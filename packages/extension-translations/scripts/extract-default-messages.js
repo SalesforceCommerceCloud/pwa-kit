@@ -37,7 +37,8 @@ function extract(locale) {
     const {extends: extendsPkg, overridesDir} = pkgJSON.ccExtensibility || {}
     if (!overridesDir) {
         const command = [
-            'formatjs extract "app/**/*.{js,jsx,ts,tsx}" "node_modules/@salesforce/extension-*/src/**/*.{js,jsx,ts,tsx}"',
+            // The order of these paths matters. In this case, overrides in the base project would win.
+            'formatjs extract "node_modules/@salesforce/extension-*/src/**/*.{js,jsx,ts,tsx}" "app/**/*.{js,jsx,ts,tsx}" ',
             `--out-file translations/${locale}.json`,
             '--id-interpolation-pattern [sha512:contenthash:base64:6]'
         ].join(' ')

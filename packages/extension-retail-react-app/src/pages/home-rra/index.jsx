@@ -45,6 +45,7 @@ import {
 } from '../../constants'
 import {useServerContext} from '@salesforce/pwa-kit-react-sdk/ssr/universal/hooks'
 import {useProductSearch} from '@salesforce/commerce-sdk-react'
+import {messages} from '*/pages/home-rra/messages'
 
 /**
  * This is the home page for Retail React App.
@@ -81,6 +82,8 @@ const Home = () => {
         einstein.sendViewPage(pathname)
     }, [])
 
+    console.log('--- messages', messages)
+
     return (
         <Box data-testid="home-page" layerStyle="page">
             <Seo
@@ -90,10 +93,7 @@ const Home = () => {
             />
 
             <Hero
-                title={intl.formatMessage({
-                    defaultMessage: 'The React PWA Starter Store for Retail',
-                    id: 'home.title.react_starter_store'
-                })}
+                title={intl.formatMessage(messages['home.title.react_starter_store'])}
                 img={{
                     src: getStaticAssetUrl('img/hero.png', {
                         appExtensionPackageName: '@salesforce/extension-retail-react-app'
@@ -110,10 +110,7 @@ const Home = () => {
                             paddingX={7}
                             _hover={{textDecoration: 'none'}}
                         >
-                            <FormattedMessage
-                                defaultMessage="Get started"
-                                id="home.link.get_started"
-                            />
+                            {intl.formatMessage(messages['home.link.get_started'])}
                         </Button>
                     </Stack>
                 }
@@ -170,45 +167,30 @@ const Home = () => {
                 <Section
                     padding={4}
                     paddingTop={16}
-                    title={intl.formatMessage({
-                        defaultMessage: 'Shop Products',
-                        id: 'home.heading.shop_products'
+                    title={intl.formatMessage(messages['home.heading.shop_products'])}
+                    subtitle={intl.formatMessage(messages['home.description.shop_products'], {
+                        docLink: (
+                            <Link
+                                target="_blank"
+                                href={'https://sfdc.co/business-manager-manage-catalogs'}
+                                textDecoration={'none'}
+                                position={'relative'}
+                                _after={{
+                                    position: 'absolute',
+                                    content: `""`,
+                                    height: '2px',
+                                    bottom: '-2px',
+                                    margin: '0 auto',
+                                    left: 0,
+                                    right: 0,
+                                    background: 'gray.700'
+                                }}
+                                _hover={{textDecoration: 'none'}}
+                            >
+                                {intl.formatMessage(messages['home.link.read_docs'])}
+                            </Link>
+                        )
                     })}
-                    subtitle={intl.formatMessage(
-                        {
-                            defaultMessage:
-                                'This section contains content from the catalog. {docLink} on how to replace it.',
-                            id: 'home.description.shop_products',
-                            description:
-                                '{docLink} is a html button that links the user to https://sfdc.co/business-manager-manage-catalogs'
-                        },
-                        {
-                            docLink: (
-                                <Link
-                                    target="_blank"
-                                    href={'https://sfdc.co/business-manager-manage-catalogs'}
-                                    textDecoration={'none'}
-                                    position={'relative'}
-                                    _after={{
-                                        position: 'absolute',
-                                        content: `""`,
-                                        height: '2px',
-                                        bottom: '-2px',
-                                        margin: '0 auto',
-                                        left: 0,
-                                        right: 0,
-                                        background: 'gray.700'
-                                    }}
-                                    _hover={{textDecoration: 'none'}}
-                                >
-                                    {intl.formatMessage({
-                                        defaultMessage: 'Read docs',
-                                        id: 'home.link.read_docs'
-                                    })}
-                                </Link>
-                            )
-                        }
-                    )}
                 >
                     <Stack pt={8} spacing={16}>
                         <ProductScroller
@@ -222,15 +204,8 @@ const Home = () => {
             <Section
                 padding={4}
                 paddingTop={32}
-                title={intl.formatMessage({
-                    defaultMessage: 'Features',
-                    id: 'home.heading.features'
-                })}
-                subtitle={intl.formatMessage({
-                    defaultMessage:
-                        'Out-of-the-box features so that you focus only on adding enhancements.',
-                    id: 'home.description.features'
-                })}
+                title={intl.formatMessage(messages['home.heading.features'])}
+                subtitle={intl.formatMessage(messages['home.description.features'])}
             >
                 <Container maxW={'6xl'} marginTop={10}>
                     <SimpleGrid columns={{base: 1, md: 2, lg: 3}} spacing={10}>
@@ -271,25 +246,12 @@ const Home = () => {
             <Section
                 padding={4}
                 paddingTop={32}
-                title={intl.formatMessage({
-                    defaultMessage: "We're here to help",
-                    id: 'home.heading.here_to_help'
-                })}
+                title={intl.formatMessage(messages['home.heading.here_to_help'])}
                 subtitle={
                     <>
-                        <>
-                            {intl.formatMessage({
-                                defaultMessage: 'Contact our support staff.',
-                                id: 'home.description.here_to_help'
-                            })}
-                        </>
+                        <>{intl.formatMessage(messages['home.description.here_to_help'])}</>
                         <br />
-                        <>
-                            {intl.formatMessage({
-                                defaultMessage: 'They will get you to the right place.',
-                                id: 'home.description.here_to_help_line_2'
-                            })}
-                        </>
+                        <>{intl.formatMessage(messages['home.description.here_to_help_line_2'])}</>
                     </>
                 }
                 actions={
@@ -301,7 +263,7 @@ const Home = () => {
                         paddingX={7}
                         _hover={{textDecoration: 'none'}}
                     >
-                        <FormattedMessage defaultMessage="Contact Us" id="home.link.contact_us" />
+                        {intl.formatMessage(messages['home.link.contact_us'])}
                     </Button>
                 }
                 maxWidth={'xl'}
