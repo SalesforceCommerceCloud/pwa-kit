@@ -21,6 +21,7 @@
 
     "@salesforce/extension-sample": "1.0.0-dev",
     "@salesforce/extension-sample-with-overrides": "1.0.0-dev",
+    "@salesforce/extension-store-locator": "1.0.0-dev",
 
     "@salesforce/pwa-kit-dev": "4.0.0-dev",
     "@salesforce/pwa-kit-react-sdk": "4.0.0-dev",
@@ -47,7 +48,7 @@
   },
   "mobify": {
     "app":{
-      "extensions": ["@salesforce/extension-sample", ["@salesforce/extension-sample-with-overrides", {"enabled": false}]]
+      "extensions": ["@salesforce/extension-sample", ["@salesforce/extension-sample-with-overrides", {"enabled": false}], "@salesforce/extension-store-locator"]
     },
     "ssrEnabled": true,
     "ssrOnly": [
