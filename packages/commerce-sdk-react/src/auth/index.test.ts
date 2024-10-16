@@ -46,7 +46,8 @@ jest.mock('../utils', () => ({
     onClient: () => true,
     getParentOrigin: jest.fn().mockResolvedValue(''),
     isOriginTrusted: () => false,
-    getDefaultCookieAttributes: () => {}
+    getDefaultCookieAttributes: () => {},
+    isAbsoluteUrl: () => true,
 }))
 
 /** The auth data we store has a slightly different shape than what we use. */
