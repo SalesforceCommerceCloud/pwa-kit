@@ -15,7 +15,7 @@ import {jwtDecode, JwtPayload} from 'jwt-decode'
 import {ApiClientConfigParams, Prettify, RemoveStringIndex} from '../hooks/types'
 import {BaseStorage, LocalStorage, CookieStorage, MemoryStorage, StorageType} from './storage'
 import {CustomerType} from '../hooks/useCustomerType'
-import {getParentOrigin, isOriginTrusted, onClient, getDefaultCookieAttributes} from '../utils'
+import {getParentOrigin, isOriginTrusted, onClient, getDefaultCookieAttributes, isAbsoluteUrl} from '../utils'
 import {
     MOBIFY_PATH,
     SLAS_PRIVATE_PROXY_PATH,
@@ -215,6 +215,7 @@ class Auth {
         // Special endpoint for injecting SLAS private client secret.
         const baseUrl = config.proxy.split(MOBIFY_PATH)[0]
         const privateClientEndpoint = `${baseUrl}${SLAS_PRIVATE_PROXY_PATH}`
+        const callbackURI = config.passwordlessConfig?.callbackURI
 
         this.client = new ShopperLogin({
             proxy: config.enablePWAKitPrivateClient ? privateClientEndpoint : config.proxy,
@@ -253,7 +254,12 @@ class Auth {
 
         this.redirectURI = config.redirectURI
 
-        this.passwordlessConfig = config.passwordlessConfig
+        this.passwordlessConfig = {
+            ...(callbackURI && {
+                callbackURI: isAbsoluteUrl(callbackURI) ? callbackURI : `${baseUrl}${callbackURI}`
+            }),
+            ...(config.passwordlessConfig?.mode && {mode: config.passwordlessConfig.mode})
+        }
 
         this.fetchedToken = config.fetchedToken || ''
 
@@ -840,7 +846,8 @@ class Auth {
      */
     async authorizePasswordless(parameters: AuthorizePasswordlessParams) {
         const userid = parameters.userid
-        const mode = this.passwordlessConfig?.callbackURI ? 'callback' : 'sms'
+        const mode = this.passwordlessConfig?.mode === 'sms' ? 'sms' : 'callback'
+        const callbackURI = this.passwordlessConfig?.callbackURI
 
         await helpers.authorizePasswordless(
             this.client,
@@ -848,7 +855,7 @@ class Auth {
                 clientSecret: this.clientSecret
             },
             {
-                ...(this.passwordlessConfig?.callbackURI && {callbackURI: this.passwordlessConfig?.callbackURI}),
+                ...(callbackURI && {callbackURI: callbackURI}),
                 userid,
                 mode: mode
             }

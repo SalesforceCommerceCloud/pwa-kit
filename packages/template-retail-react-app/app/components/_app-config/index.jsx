@@ -51,7 +51,7 @@ const AppConfig = ({children, locals = {}}) => {
     }
 
     const commerceApiConfig = locals.appConfig.commerceAPI
-    const passwordlessConfig = locals.appConfig.login.passwordless
+    const passwordlessConfig = locals.appConfig.login?.passwordless
 
     const appOrigin = useAppOrigin()
 
