@@ -545,7 +545,9 @@ class Auth {
                         isGuest
                     )
                 }
-            } catch (e) { /* catch invalid jwt */ }
+            } catch (e) {
+                /* catch invalid jwt */
+            }
         }
 
         // if a TAOB left a usid and it tries to
