@@ -35,10 +35,10 @@
     "semver": "^7.5.2",
     "shelljs": "^0.8.5",
     "slugify": "^1.6.5",
-    "tar": "^6.2.1",
-    "@salesforce/pwa-kit-dev": "4.0.0-dev"
+    "tar": "^6.2.1"
   },
   "devDependencies": {
+    "@salesforce/pwa-kit-dev": "4.0.0-dev",
     "internal-lib-build": "4.0.0-dev",
     "verdaccio": "^5.22.1"
   },
