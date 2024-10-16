@@ -211,7 +211,12 @@ const App = (props) => {
         const urlSegment = location.pathname
         console.log('useBlock: urlSegment: ', urlSegment)
 
-        const token = await getTokenWhenReady()
+        let token
+        try {
+            token = await getTokenWhenReady()
+        } catch (e) {
+            console.error('Error getting token: ', e)
+        }
         console.log('token: ', token)
         // This is where we would be making a request to the SEO API's.
         let urlMapping
