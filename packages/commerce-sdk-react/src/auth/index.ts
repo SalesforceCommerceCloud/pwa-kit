@@ -208,7 +208,7 @@ class Auth {
     private logger: Logger
     private defaultDnt: boolean | undefined
     private isPrivate: boolean
-    private passwordlessConfig?: PasswordlessConfig | undefined
+    private passwordlessConfig: PasswordlessConfig
 
 
     constructor(config: AuthConfig) {
@@ -255,10 +255,10 @@ class Auth {
         this.redirectURI = config.redirectURI
 
         this.passwordlessConfig = {
+            ...config.passwordlessConfig,
             ...(callbackURI && {
                 callbackURI: isAbsoluteUrl(callbackURI) ? callbackURI : `${baseUrl}${callbackURI}`
-            }),
-            ...(config.passwordlessConfig?.mode && {mode: config.passwordlessConfig.mode})
+            })
         }
 
         this.fetchedToken = config.fetchedToken || ''
@@ -846,8 +846,8 @@ class Auth {
      */
     async authorizePasswordless(parameters: AuthorizePasswordlessParams) {
         const userid = parameters.userid
-        const mode = this.passwordlessConfig?.mode === 'sms' ? 'sms' : 'callback'
-        const callbackURI = this.passwordlessConfig?.callbackURI
+        const mode = this.passwordlessConfig.mode === 'sms' ? 'sms' : 'callback'
+        const callbackURI = this.passwordlessConfig.callbackURI
 
         await helpers.authorizePasswordless(
             this.client,
