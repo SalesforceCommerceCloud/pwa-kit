@@ -537,13 +537,15 @@ class Auth {
 
         // refresh flow for TAOB
         if (accessToken && this.isTokenExpired(accessToken)) {
-            const {isGuest, usid, loginId, isAgent} = this.parseSlasJWT(accessToken)
-            if (isAgent) {
-                return await this.queueRequest(
-                    () => this.refreshTrustedAgent(loginId, usid),
-                    isGuest
-                )
-            }
+            try {
+                const {isGuest, usid, loginId, isAgent} = this.parseSlasJWT(accessToken)
+                if (isAgent) {
+                    return await this.queueRequest(
+                        () => this.refreshTrustedAgent(loginId, usid),
+                        isGuest
+                    )
+                }
+            } catch (e) { /* catch invalid jwt */ }
         }
 
         // if a TAOB left a usid and it tries to
@@ -629,7 +631,7 @@ class Auth {
      * The flow:
      * 1. If we have valid access token - use it
      * 2. If we have valid refresh token - refresh token flow
-     * 3. If we have an invalid TAOB access token - refresh TAOB flow
+     * 3. If we have valid TAOB access token - refresh TAOB token flow
      * 4. PKCE flow
      */
     async ready() {
@@ -644,8 +646,8 @@ class Auth {
         if (this.pendingToken) {
             return await this.pendingToken
         }
-        const accessToken = this.getAccessToken()
 
+        const accessToken = this.getAccessToken()
         if (accessToken && !this.isTokenExpired(accessToken)) {
             return this.data
         }
@@ -772,10 +774,6 @@ class Auth {
         return token
     }
 
-    /**
-     * TODO: TAOB Eventually this will be a wrapper method for commerce-sdk-isomorphic helper: authorizeTrustedAgent.
-     *
-     */
     async authorizeTrustedAgent(credentials: {loginId?: string}) {
         const slasClient = this.client
         const codeVerifier = helpers.createCodeVerifier()
@@ -788,7 +786,7 @@ class Auth {
         const idpOrigin = isGuest ? 'slas' : 'ecom'
 
         const url = `${
-            slasClient.clientConfig.proxy
+            slasClient.clientConfig.proxy || ''
         }/shopper/auth/v1/organizations/${organizationId}/oauth2/trusted-agent/authorize?${[
             ...[
                 `client_id=${clientId}`,

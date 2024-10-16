@@ -4,11 +4,10 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {useState, useEffect, useCallback} from 'react'
+import {useState, useEffect, useCallback} from 'react'
 import {useMutation} from '@tanstack/react-query'
 import useAuthContext from './useAuthContext'
 import {ShopperLoginTypes} from 'commerce-sdk-isomorphic'
-import type Auth from '../auth'
 
 type TokenResponse = ShopperLoginTypes.TokenResponse
 type UseTrustedAgent = {
@@ -41,9 +40,9 @@ const getCodeAndStateValueFromPopup = (
 
 const createTrustedAgentPopup = async (
     url: string,
-    isRefresh: boolean = false,
-    timeoutMinutes: number = 5,
-    refreshTimeoutFocusMinutes: number = 1
+    isRefresh = false,
+    timeoutMinutes = 5,
+    refreshTimeoutFocusMinutes = 1
 ): Promise<{code: string; state: string}> => {
     // if a popup already exists, close it
     if (popup) {
@@ -69,7 +68,7 @@ const createTrustedAgentPopup = async (
         window.focus()
     }
 
-    let startTime = Date.now()
+    const startTime = Date.now()
 
     return new Promise((resolve, reject) => {
         intervalId = setInterval(() => {
@@ -111,27 +110,6 @@ const createTrustedAgentPopup = async (
     })
 }
 
-const createTrustedAgentLogin = (auth: Auth) => {
-    const authorizeTrustedAgent = useMutation(auth.authorizeTrustedAgent.bind(auth))
-    const loginTrustedAgent = useMutation(auth.loginTrustedAgent.bind(auth))
-    return async (
-        loginId?: string,
-        usid?: string,
-        refresh: boolean = false
-    ): Promise<TokenResponse> => {
-        const {url, codeVerifier} = await authorizeTrustedAgent.mutateAsync({loginId})
-        const {code, state} = await createTrustedAgentPopup(url, refresh)
-        return await loginTrustedAgent.mutateAsync({loginId, code, codeVerifier, state, usid})
-    }
-}
-
-const createTrustedAgentLogout = (auth: Auth) => {
-    const logoutTrustedAgent = useMutation(auth.logout.bind(auth))
-    return async (): Promise<TokenResponse> => {
-        return await logoutTrustedAgent.mutateAsync()
-    }
-}
-
 /**
  * A hook to return trusted agent state.
  *
@@ -145,8 +123,23 @@ const useTrustedAgent = (): UseTrustedAgent => {
     const [agentId, setAgentId] = useState('')
     const [loginId, setLoginId] = useState('')
 
-    const login = useCallback(createTrustedAgentLogin(auth), [auth])
-    const logout = useCallback(createTrustedAgentLogout(auth), [auth])
+    const authorizeTrustedAgent = useMutation(auth.authorizeTrustedAgent.bind(auth))
+    const loginTrustedAgent = useMutation(auth.loginTrustedAgent.bind(auth))
+    const logoutTrustedAgent = useMutation(auth.logout.bind(auth))
+
+    const login = useCallback(
+        async (loginId?: string, usid?: string, refresh = false): Promise<TokenResponse> => {
+            const {url, codeVerifier} = await authorizeTrustedAgent.mutateAsync({loginId})
+            const {code, state} = await createTrustedAgentPopup(url, refresh)
+            return await loginTrustedAgent.mutateAsync({loginId, code, codeVerifier, state, usid})
+        },
+        [auth]
+    )
+
+    const logout = useCallback(async () => {
+        return await logoutTrustedAgent.mutateAsync()
+    }, [auth])
+
     useEffect(() => {
         auth.registerTrustedAgentRefreshHandler(login)
     }, [auth])
