@@ -11,25 +11,40 @@ import {ShopperLoginTypes} from 'commerce-sdk-isomorphic'
 import type Auth from '../auth'
 
 type TokenResponse = ShopperLoginTypes.TokenResponse
-type UseTrustedAgent = {isAgent: boolean, agentId: string | null, loginId: string | null, login: (loginId?: string, usid?: string) => Promise<TokenResponse>, logout: () => Promise<TokenResponse>}
+type UseTrustedAgent = {
+    isAgent: boolean
+    agentId: string | null
+    loginId: string | null
+    login: (loginId?: string, usid?: string) => Promise<TokenResponse>
+    logout: () => Promise<TokenResponse>
+}
 
 let popup: Window | null
 let intervalId: NodeJS.Timer
 
-const getCodeAndStateValueFromPopup = (popup: Window | null): {code: string | null, state: string | null} => {
+const getCodeAndStateValueFromPopup = (
+    popup: Window | null
+): {code: string | null; state: string | null} => {
     let code = null
     let state = null
 
     try {
-        const url  = new URL(popup?.location?.toString() || 'http://localhost')
+        const url = new URL(popup?.location?.toString() || 'http://localhost')
         code = url.searchParams.get('code')
         state = url.searchParams.get('state')
-    } catch (e) { /* here to catch invalid URL or crossdomain popup access errors */ }
+    } catch (e) {
+        /* here to catch invalid URL or crossdomain popup access errors */
+    }
 
     return {code, state}
 }
 
-const createTrustedAgentPopup = async (url: string, isRefresh: boolean = false, timeoutMinutes: number = 5, refreshTimeoutFocusMinutes: number = 1): Promise<{code: string, state: string}> => {
+const createTrustedAgentPopup = async (
+    url: string,
+    isRefresh: boolean = false,
+    timeoutMinutes: number = 5,
+    refreshTimeoutFocusMinutes: number = 1
+): Promise<{code: string; state: string}> => {
     // if a popup already exists, close it
     if (popup) {
         popup.close()
@@ -41,7 +56,11 @@ const createTrustedAgentPopup = async (url: string, isRefresh: boolean = false, 
     }
 
     // create our popup
-    popup = window.open(url, 'accountManagerPopup', "popup=true,width=800,height=800,scrollbars=false,status=false,location=false,menubar=false,toolbar=false")
+    popup = window.open(
+        url,
+        'accountManagerPopup',
+        'popup=true,width=800,height=800,scrollbars=false,status=false,location=false,menubar=false,toolbar=false'
+    )
 
     // if this is intended to be a behind the
     // scenes refresh call, make sure our main
@@ -74,7 +93,8 @@ const createTrustedAgentPopup = async (url: string, isRefresh: boolean = false, 
                 return reject('Popup closed without authenticating.')
             }
 
-            const popupTimeoutOccurred = Math.floor(Date.now() - startTime) > (timeoutMinutes * 1000 * 60)
+            const popupTimeoutOccurred =
+                Math.floor(Date.now() - startTime) > timeoutMinutes * 1000 * 60
             if (popupTimeoutOccurred) {
                 clearTimeout(intervalId)
                 popup?.close()
@@ -82,7 +102,8 @@ const createTrustedAgentPopup = async (url: string, isRefresh: boolean = false, 
             }
 
             // if our refresh flow is stuck, focus the popup window
-            const popupRefreshTimeoutOccurred = Math.floor(Date.now() - startTime) > (refreshTimeoutFocusMinutes * 1000 * 60)
+            const popupRefreshTimeoutOccurred =
+                Math.floor(Date.now() - startTime) > refreshTimeoutFocusMinutes * 1000 * 60
             if (isRefresh && popupRefreshTimeoutOccurred) {
                 popup?.focus()
             }
@@ -90,17 +111,21 @@ const createTrustedAgentPopup = async (url: string, isRefresh: boolean = false, 
     })
 }
 
-const createTrustedAgentLogin = (auth: Auth)  => {
+const createTrustedAgentLogin = (auth: Auth) => {
     const authorizeTrustedAgent = useMutation(auth.authorizeTrustedAgent.bind(auth))
     const loginTrustedAgent = useMutation(auth.loginTrustedAgent.bind(auth))
-    return async (loginId?: string, usid?: string, refresh: boolean = false): Promise<TokenResponse> => {
+    return async (
+        loginId?: string,
+        usid?: string,
+        refresh: boolean = false
+    ): Promise<TokenResponse> => {
         const {url, codeVerifier} = await authorizeTrustedAgent.mutateAsync({loginId})
         const {code, state} = await createTrustedAgentPopup(url, refresh)
         return await loginTrustedAgent.mutateAsync({loginId, code, codeVerifier, state, usid})
     }
 }
 
-const createTrustedAgentLogout = (auth: Auth)  => {
+const createTrustedAgentLogout = (auth: Auth) => {
     const logoutTrustedAgent = useMutation(auth.logout.bind(auth))
     return async (): Promise<TokenResponse> => {
         return await logoutTrustedAgent.mutateAsync()
@@ -132,7 +157,9 @@ const useTrustedAgent = (): UseTrustedAgent => {
             setIsAgent(isAgent)
             setAgentId(agentId || '')
             setLoginId(loginId)
-        } catch(e) { /* here to catch invalid jwt errors */ }
+        } catch (e) {
+            /* here to catch invalid jwt errors */
+        }
     }, [auth.get('access_token')])
 
     return {isAgent, agentId, loginId, login, logout}

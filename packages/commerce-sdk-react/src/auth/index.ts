@@ -539,7 +539,10 @@ class Auth {
         if (accessToken && this.isTokenExpired(accessToken)) {
             const {isGuest, usid, loginId, isAgent} = this.parseSlasJWT(accessToken)
             if (isAgent) {
-                return await this.queueRequest(() => this.refreshTrustedAgent(loginId, usid), isGuest)
+                return await this.queueRequest(
+                    () => this.refreshTrustedAgent(loginId, usid),
+                    isGuest
+                )
             }
         }
 
@@ -784,7 +787,9 @@ class Auth {
         const isGuest = loginId === 'guest'
         const idpOrigin = isGuest ? 'slas' : 'ecom'
 
-        const url = `${slasClient.clientConfig.proxy}/shopper/auth/v1/organizations/${organizationId}/oauth2/trusted-agent/authorize?${[
+        const url = `${
+            slasClient.clientConfig.proxy
+        }/shopper/auth/v1/organizations/${organizationId}/oauth2/trusted-agent/authorize?${[
             ...[
                 `client_id=${clientId}`,
                 `channel_id=${siteId}`,
@@ -900,14 +905,10 @@ class Auth {
             ? isbParts[3].replace('gcid:', '')
             : isbParts[4].replace('rcid:', '')
 
-        const loginId = isGuest
-            ? 'guest'
-            : isbParts[1].replace('upn:', '')
+        const loginId = isGuest ? 'guest' : isbParts[1].replace('upn:', '')
 
         const isAgent = !!isbParts?.[isGuest ? 5 : 6]?.startsWith('agent:')
-        const agentId = isAgent
-            ? isbParts?.[isGuest ? 5 : 6]?.replace('agent:', '')
-            : null
+        const agentId = isAgent ? isbParts?.[isGuest ? 5 : 6]?.replace('agent:', '') : null
 
         // SUB format
         // cc-slas::zzrf_001::scid:c9c45bfd-0ed3-4aa2-xxxx-40f88962b836::usid:b4865233-de92-4039-xxxx-aa2dfc8c1ea5
