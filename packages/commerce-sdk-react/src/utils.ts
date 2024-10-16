@@ -111,3 +111,12 @@ export function detectCookiesAvailable(options?: CookieAttributes) {
         return false
     }
 }
+
+export function isAbsoluteUrl(url: string): boolean {
+    try {
+        new URL(url);  // If this works, it's an absolute URL
+    return true;
+  } catch {
+        return false;  // If this throws an error, it's a relative URL
+  }
+}

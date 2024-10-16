@@ -44,3 +44,8 @@ export interface Logger {
      */
     error(message: string, args?: Record<string, unknown>): void
 }
+
+export type PasswordlessConfig = {
+    mode?: string
+    callbackURI?: string
+}

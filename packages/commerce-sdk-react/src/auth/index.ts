@@ -15,7 +15,7 @@ import {jwtDecode, JwtPayload} from 'jwt-decode'
 import {ApiClientConfigParams, Prettify, RemoveStringIndex} from '../hooks/types'
 import {BaseStorage, LocalStorage, CookieStorage, MemoryStorage, StorageType} from './storage'
 import {CustomerType} from '../hooks/useCustomerType'
-import {getParentOrigin, isOriginTrusted, onClient, getDefaultCookieAttributes} from '../utils'
+import {getParentOrigin, isOriginTrusted, onClient, getDefaultCookieAttributes, isAbsoluteUrl} from '../utils'
 import {
     MOBIFY_PATH,
     SLAS_PRIVATE_PROXY_PATH,
@@ -25,7 +25,7 @@ import {
     DNT_COOKIE_NAME
 } from '../constant'
 
-import {Logger} from '../types'
+import {Logger, PasswordlessConfig} from '../types'
 
 type TokenResponse = ShopperLoginTypes.TokenResponse
 type Helpers = typeof helpers
@@ -39,6 +39,7 @@ interface AuthConfig extends ApiClientConfigParams {
     silenceWarnings?: boolean
     logger: Logger
     defaultDnt?: boolean
+    passwordlessConfig?: PasswordlessConfig
 }
 
 interface JWTHeaders {
@@ -54,6 +55,8 @@ interface SlasJwtPayload extends JwtPayload {
 
 type AuthorizeIDPParams = Parameters<Helpers['authorizeIDP']>[1]
 type LoginIDPUserParams = Parameters<Helpers['loginIDPUser']>[2]
+type AuthorizePasswordlessParams = Parameters<Helpers['authorizePasswordless']>[2]
+type LoginPasswordlessParams = Parameters<Helpers['getPasswordLessAccessToken']>[2]
 type LoginRegisteredUserB2CCredentials = Parameters<Helpers['loginRegisteredUserB2C']>[1]
 
 /**
@@ -199,10 +202,15 @@ class Auth {
     private silenceWarnings: boolean
     private logger: Logger
     private defaultDnt: boolean | undefined
+    private isPrivate: boolean
+    private passwordlessConfig: PasswordlessConfig
+
+
     constructor(config: AuthConfig) {
         // Special endpoint for injecting SLAS private client secret.
         const baseUrl = config.proxy.split(MOBIFY_PATH)[0]
         const privateClientEndpoint = `${baseUrl}${SLAS_PRIVATE_PROXY_PATH}`
+        const callbackURI = config.passwordlessConfig?.callbackURI
 
         this.client = new ShopperLogin({
             proxy: config.enablePWAKitPrivateClient ? privateClientEndpoint : config.proxy,
@@ -240,6 +248,13 @@ class Auth {
         }
 
         this.redirectURI = config.redirectURI
+
+        this.passwordlessConfig = {
+            ...config.passwordlessConfig,
+            ...(callbackURI && {
+                callbackURI: isAbsoluteUrl(callbackURI) ? callbackURI : `${baseUrl}${callbackURI}`
+            })
+        }
 
         this.fetchedToken = config.fetchedToken || ''
 
@@ -815,6 +830,49 @@ class Auth {
         this.handleTokenResponse(token, isGuest)
         // Delete the code verifier once the user has logged in
         this.delete('code_verifier')
+        if (onClient()) {
+            void this.clearECOMSession()
+        }
+        return token
+    }
+
+    /**
+     * A wrapper method for commerce-sdk-isomorphic helper: authorizePasswordless.
+     */
+    async authorizePasswordless(parameters: AuthorizePasswordlessParams) {
+        const userid = parameters.userid
+        const mode = this.passwordlessConfig.mode === 'sms' ? 'sms' : 'callback'
+        const callbackURI = this.passwordlessConfig.callbackURI
+
+        await helpers.authorizePasswordless(
+            this.client,
+            {
+                clientSecret: this.clientSecret
+            },
+            {
+                ...(callbackURI && {callbackURI: callbackURI}),
+                userid,
+                mode: mode
+            }
+        )
+    }
+
+    /**
+     * A wrapper method for commerce-sdk-isomorphic helper: getPasswordLessAccessToken.
+     */
+    async getPasswordLessAccessToken(parameters: LoginPasswordlessParams) {
+        const pwdlessLoginToken = parameters.pwdlessLoginToken
+        const token = await helpers.getPasswordLessAccessToken(
+            this.client,
+            {
+                clientSecret: this.clientSecret
+            },
+            {
+                pwdlessLoginToken
+            }
+        )
+        const isGuest = false
+        this.handleTokenResponse(token, isGuest)
         if (onClient()) {
             void this.clearECOMSession()
         }

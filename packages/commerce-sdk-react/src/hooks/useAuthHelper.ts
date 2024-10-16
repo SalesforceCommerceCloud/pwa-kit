@@ -21,6 +21,8 @@ import {updateCache} from './utils'
  * @enum
  */
 export const AuthHelpers = {
+    AuthorizePasswordless: 'authorizePasswordless',
+    LoginPasswordlessUser: 'getPasswordLessAccessToken',
     AuthorizeIDP: 'authorizeIDP',
     LoginIDPUser: 'loginIDPUser',
     LoginGuestUser: 'loginGuestUser',
