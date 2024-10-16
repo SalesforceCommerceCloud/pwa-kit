@@ -15,10 +15,14 @@ class SampleExtension extends ExpressApplicationExtension<Config> {
 
     extendApp(app: ExpressApplication): ExpressApplication {
 
+         // This endpoint serves as an example of how to extend the existing PWA Kit App Express server application
+         // It demonstrates the process of adding a new route and handling function for a GET request
+         // Upon receiving a request to the '/sample' path, the endpoint sends a response showcasing the server's functionality
+         // It also includes the current extension configuration as part of the response
         app.get('/sample', (req, res) => {
             console.log('SampleExtension extendApp GET /sample')
             res.send(
-                `<p>Hello from an express SampleExtension!</p>
+                `<p>Hello from an Express SampleExtension!</p>
                 <pre>extensionConfig = ${JSON.stringify(this.getConfig())}</pre>`
             )
         })

@@ -25,19 +25,20 @@ const mkdtempSync = () => fs.mkdtempSync(p.resolve(os.tmpdir(), 'pwa-template-tm
 const tarPathForPkg = (pkg) => p.resolve(templatesDir, `${pkg}.tar.gz`)
 
 const main = () => {
-    const pkgNames = [
+    const templatePkgNames = [
         'retail-react-app',
         'express-minimal',
         'typescript-minimal',
-        'mrt-reference-app',
-        EXTENSION_BASE_NAME
+        'mrt-reference-app'
     ]
+
+    const extensionPkgName = [EXTENSION_BASE_NAME]
 
     if (!sh.test('-d', templatesDir)) {
         sh.mkdir('-p', templatesDir)
     }
 
-    sh.rm('-rf', pkgNames.map(tarPathForPkg))
+    sh.rm('-rf', templatePkgNames.map(tarPathForPkg))
 
     const tmpDir = mkdtempSync()
     const checkoutDir = p.join(tmpDir, 'mobify-platform-sdks')
@@ -49,13 +50,14 @@ const main = () => {
     )
 
     return Promise.all(
-        pkgNames.map((pkgName) => {
-            const actualPkgName =
-                pkgName === EXTENSION_BASE_NAME ? EXTENSION_BASE_NAME : `${TEMPLATE_PREFIX}${pkgName}`
+        [...templatePkgNames, ...extensionPkgName].map((pkgName) => {
+            const finalPkgName = extensionPkgName.includes(pkgName)
+                ? pkgName
+                : `${TEMPLATE_PREFIX}${pkgName}`
 
             // Emulate an NPM package by having the tar contain a "package" folder.
             const tmpPackageDir = mkdtempSync()
-            sh.mv(p.join(packageDir, actualPkgName), p.join(tmpPackageDir, 'package'))
+            sh.mv(p.join(packageDir, finalPkgName), p.join(tmpPackageDir, 'package'))
 
             return tar
                 .c(

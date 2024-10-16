@@ -12,7 +12,17 @@ the Application Extensions API can be used to enhance your PWA-Kit base project.
 
 # Folder Structure
 
-Insert description of generic Application Extension folder structure here.
+This directory contains the PWA Kit Application Extension base files and structure. It includes the following files:
+```
+├── src
+│   ├── setup-server.ts
+│   └── setup-client.ts
+└── dev
+```
+
+1. `src/setup-server.ts`: The server-side setup function for the extension.
+2. `src/setup-client.ts`: The client-side setup function for the extension.
+3. `dev/`: PWA Kit App TypeScript template project used for developing the generated PWA Kit App Extension.
 
 # Peer Dependancies
 

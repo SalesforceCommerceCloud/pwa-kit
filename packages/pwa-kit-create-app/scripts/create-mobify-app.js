@@ -127,13 +127,13 @@ const INITIAL_QUESTION = [
         message: 'What type of PWA Kit project would you like to create?',
         type: 'list',
         choices: [
-            {name: 'PWA Kit App (full project)', value: 'PWAKitProject'},
+            {name: 'PWA Kit Application', value: 'PWAKitAppProject'},
             {
-                name: 'PWA Kit Application Extension (for existing PWA Kit apps)',
-                value: 'appExtensionProject'
+                name: 'PWA Kit Application Extension',
+                value: 'PWAKitAppExtensionProject'
             }
         ],
-        default: 'PWAKitProject'
+        default: 'PWAKitAppProject'
     }
 ]
 
@@ -601,14 +601,12 @@ const slugifyName = (name) =>
     }).slice(0, PROJECT_ID_MAX_LENGTH)
 
 const getSlugifiedProjectName = (projectName) => {
-    // Split the project name into namespace and actual name if in the format @namespace/name
-    const [namespace, slugifiedName] = projectName.includes('/')
+    // Split the project name into namespace and name if it's in the format @namespace/name
+    const [slugifiedNamespace, slugifiedName] = projectName.includes('/')
         ? projectName.split('/').map(slugifyName)
         : ['', slugifyName(projectName)]
 
-    const result = namespace ? `${namespace}/${slugifiedName}` : slugifiedName
-
-    return result
+    return slugifiedNamespace ? `@${slugifiedNamespace}/${slugifiedName}` : slugifiedName
 }
 
 /**
@@ -955,13 +953,14 @@ const runGenerator = async (
         }
 
         // Check project type and handle appropriately
-        if (answers.project.type === 'appExtensionProject') {
+        if (answers.project.type === 'PWAKitAppExtensionProject') {
             const devOutputDir = p.join(outputDir, LOCAL_DEV_PROJECT_DIR)
 
             // Update the root package.json to add a start script
             updatePackageJson(p.resolve(outputDir, 'package.json'), {
                 scripts: {
-                    start: 'npm --prefix ./dev start'
+                    start: `npm --prefix ./${LOCAL_DEV_PROJECT_DIR} start`,
+                    'start:inspect': `npm --prefix ./${LOCAL_DEV_PROJECT_DIR} run start:inspect`
                 }
             })
 
@@ -973,7 +972,7 @@ const runGenerator = async (
                     templateSource: {type: TEMPLATE_SOURCE_BUNDLE, id: 'typescript-minimal'},
                     private: true
                 },
-                answers: {project: {type: 'PWAKitProject', name: 'local-dev-project'}}
+                answers: {project: {type: 'PWAKitAppProject', name: 'local-dev-project'}}
             }
 
             await runGenerator(localDevProjectContext, {
@@ -1081,7 +1080,7 @@ const main = async (opts) => {
         const initialAnswers = await inquirer.prompt(INITIAL_QUESTION)
         context = {...context, answers: {project: initialAnswers.project}}
 
-        if (initialAnswers.project.type === 'appExtensionProject') {
+        if (initialAnswers.project.type === 'PWAKitAppExtensionProject') {
             // Ask for extension name if Application Extension is selected
             const extensionNameAnswers = await inquirer.prompt(APPLICATION_EXTENSION_QUESTIONS)
             context.answers.project.name = extensionNameAnswers.project.extensionName
