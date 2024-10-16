@@ -258,16 +258,29 @@ const baseConfig = (target) => {
                             // NOTE: Might be better to export a rule directly that we can plog in here, this will 
                             // make the "extensions" file private so was can change that implementation detail later 
                             // if we choose to do so.
-                            test: /application-extensions-placeholder\.js/i,
+                            test: /react\/assets\/application-extensions-placeholder\.js/i,
                             use: {
                                 loader: findDepInStack('@salesforce/pwa-kit-extension-support/configs/webpack/loaders/extensions-loader'),
                                 options: {
                                     pkg,
                                     getConfig,
-                                    target
+                                    target: 'web'
                                 }
                             }
                         }
+                        // ,
+                        // {
+                        //     // TODO: Export rule from app extensibility sdk instead of using these loaders directly
+                        //     test: /express\/assets\/application-extensions-placeholder\.js/i,
+                        //     use: {
+                        //         loader: findDepInStack('@salesforce/pwa-kit-extension-support/configs/webpack/loaders/extensions-loader'),
+                        //         options: {
+                        //             pkg,
+                        //             getConfig,
+                        //             target: 'node'
+                        //         }
+                        //     }
+                        // }
                     ].filter(Boolean)
                 }
             }

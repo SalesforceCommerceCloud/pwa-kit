@@ -30,7 +30,7 @@ const config = {
         //         }
         //     }
         // ],
-        // require('@salesforce/pwa-kit-extension-support/configs/babel/plugin-application-extensions'),
+        require('@salesforce/pwa-kit-extension-support/configs/babel/plugin-application-extensions'), // NOTE: Would be nice to import with only /babel
         require('@babel/plugin-transform-async-to-generator'),
         require('@babel/plugin-proposal-object-rest-spread'),
         require('@babel/plugin-transform-object-assign'),

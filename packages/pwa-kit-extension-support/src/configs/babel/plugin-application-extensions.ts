@@ -15,9 +15,6 @@ import _path, {resolve} from 'path'
 const projectDir = process.cwd()
 const pkg = fse.readJsonSync(resolve(projectDir, 'package.json'))
 
-// const Module = require('module');
-// const originalRequire = Module.prototype.require;
-
 const getOptions =() => {
     return {
         pkg,
@@ -26,7 +23,7 @@ const getOptions =() => {
                 extensions: ['@salesforce/extension-sample']
             }
         }),
-        mode: 'server'
+        target: 'node'
     }
 }
 // application-extensions-placeholder
@@ -35,24 +32,25 @@ const repalcementContent = extensionLoader({getOptions}, {getOptions})
 // A Set to keep track of processed file paths
 const processedFiles = new Set()
 
-module.exports = function replaceFileContentPlugin() {
+module.exports = function replaceFileContentPlugin({ types: t } : any) {
     return {
-        // pre() {
-        //     // Hook into `require` to customize the module resolution logic
-        //     Module.prototype.require = function (request: any) {
-        //         console.log('request: ', request)
-        //         if (false) {
-        //             const resolvedPath = _path.resolve(projectDir, request);
-        //             return originalRequire.call(this, resolvedPath);
-        //         }   
-        //         return originalRequire.call(this, request)
-        //     }
-        // },
-        // post() {
-        //     // Restore the original `require` function after the plugin finishes
-        //     Module.prototype.require = originalRequire;
-        // },
         visitor: {
+            ImportDeclaration(path: any) {
+                const aliases: any = {
+                    '@salesforce/extension-sample': '/Users/bchypak/Projects/pwa-kit/packages/template-typescript-minimal/node_modules/@salesforce/extension-sample/src/'
+                }
+        
+                const source = path.node.source.value
+        
+                // Check for alias
+                for (const alias in aliases) {
+                    if (source.startsWith(alias)) {
+                        const newPath = source.replace(alias, aliases[alias])
+                        console.log('newPath: ', newPath)
+                        path.node.source = t.stringLiteral(newPath)
+                    }
+                }
+            },
             Program(path: any, state: any) {
                 const filePath = state.file.opts.filename
 
@@ -63,7 +61,7 @@ module.exports = function replaceFileContentPlugin() {
                 }
 
                 // Check if the file matches one of the files we want to replace
-                if (filePath.endsWith('assets/application-extensions-placeholder.js')) {
+                if (filePath.endsWith('express/assets/application-extensions-placeholder.js')) {
                     console.log('Project Directory: ', projectDir)
                     const newContent = repalcementContent
 

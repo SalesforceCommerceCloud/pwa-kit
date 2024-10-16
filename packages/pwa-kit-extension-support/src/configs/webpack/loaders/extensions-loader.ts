@@ -13,12 +13,16 @@ import {kebabToUpperCamelCase} from '../../../shared/utils'
 import {nameRegex} from '../../../shared/utils/extensibility-utils'
 
 const APP_EXTENSION_CLIENT_ENTRY = 'setup-app'
+const APP_EXTENSION_SERVER_ENTRY = 'setup-server'
 const APP_EXTENSION_PREFIX = 'extension-' // aligns with what's in `nameRegex`
+
+
 
 // TODO: Move these to a better location.
 interface ExtensionsLoaderOptions {
     pkg: PackageJson,
-    getConfig: () => any
+    getConfig: () => any,
+    target: 'node' | 'web'
 }
 
 interface ExtensionsLoaderContext extends LoaderContext<ExtensionsLoaderOptions> {
@@ -39,8 +43,9 @@ interface ExtensionsLoaderContext extends LoaderContext<ExtensionsLoaderOptions>
  *
  * @returns {string} The string representation of a module exporting all the named application extension modules.
  */
-module.exports = function (this: ExtensionsLoaderContext) {
-    const {pkg, getConfig} = this.getOptions() || {}
+module.exports = function (this: ExtensionsLoaderContext, that: any) {
+    // console.log('this|that: ', this, that)
+    const {pkg, getConfig, target = 'web'} = that?.getOptions?.() || this.getOptions() || {}
     const {devDependencies} = pkg
 
     // TODO: clean this up.. looks like this is a bad variable name for the type that it represents.
@@ -55,7 +60,7 @@ module.exports = function (this: ExtensionsLoaderContext) {
             instanceVariable: kebabToUpperCamelCase(`${namespace ? `${namespace}-` : ''}-${name}`),
             modulePath: `${
                 namespace ? `@${namespace}/` : ''
-            }${APP_EXTENSION_PREFIX}${name}/${APP_EXTENSION_CLIENT_ENTRY}`,
+            }${APP_EXTENSION_PREFIX}${name}/${target === 'web' ? APP_EXTENSION_CLIENT_ENTRY : APP_EXTENSION_SERVER_ENTRY}`,
             packageName
         }
     })
@@ -83,9 +88,7 @@ module.exports = function (this: ExtensionsLoaderContext) {
                         config: Array.isArray(extension) ? {enabled: true, ...extension[1]} : {enabled: true}
                     }
                 })
-               
-            // import Test from '@salesforce/extension-sample/setup-server'
-            // console.log('Manual Import: ', Test)
+            
             // App Extensions
             ${extensionDetails
                 .map(
