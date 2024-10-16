@@ -15,6 +15,7 @@ sh.set('-e')
 sh.config.silent = false
 
 const TEMPLATE_PREFIX = 'template-'
+const EXTENSION_BASE_NAME = 'extension-base'
 
 const monorepoRoot = p.resolve(__dirname, '..', '..', '..')
 const templatesDir = p.resolve(__dirname, '..', 'templates')
@@ -24,18 +25,20 @@ const mkdtempSync = () => fs.mkdtempSync(p.resolve(os.tmpdir(), 'pwa-template-tm
 const tarPathForPkg = (pkg) => p.resolve(templatesDir, `${pkg}.tar.gz`)
 
 const main = () => {
-    const pkgNames = [
+    const templatePkgNames = [
         'retail-react-app',
         'express-minimal',
         'typescript-minimal',
         'mrt-reference-app'
     ]
 
+    const extensionPkgName = [EXTENSION_BASE_NAME]
+
     if (!sh.test('-d', templatesDir)) {
         sh.mkdir('-p', templatesDir)
     }
 
-    sh.rm('-rf', pkgNames.map(tarPathForPkg))
+    sh.rm('-rf', templatePkgNames.map(tarPathForPkg))
 
     const tmpDir = mkdtempSync()
     const checkoutDir = p.join(tmpDir, 'mobify-platform-sdks')
@@ -47,13 +50,14 @@ const main = () => {
     )
 
     return Promise.all(
-        pkgNames.map((pkgName) => {
+        [...templatePkgNames, ...extensionPkgName].map((pkgName) => {
+            const finalPkgName = extensionPkgName.includes(pkgName)
+                ? pkgName
+                : `${TEMPLATE_PREFIX}${pkgName}`
+
             // Emulate an NPM package by having the tar contain a "package" folder.
             const tmpPackageDir = mkdtempSync()
-            sh.mv(
-                p.join(packageDir, `${TEMPLATE_PREFIX}${pkgName}`),
-                p.join(tmpPackageDir, 'package')
-            )
+            sh.mv(p.join(packageDir, finalPkgName), p.join(tmpPackageDir, 'package'))
 
             return tar
                 .c(
