@@ -1,3 +1,6 @@
+## v3.1.0-nightly-20241016080215 (Oct 16, 2024)
+## v3.1.0-dev (Oct 16, 2024)
+## v3.8.0-nightly-20241016080215 (Oct 16, 2024)
 ## v3.2.0-dev (Oct 14, 2024)
 
 - Add the `authorizeCustomer` and `getPasswordResetToken` to the `ShopperLoginMutations` [#2056](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2056)

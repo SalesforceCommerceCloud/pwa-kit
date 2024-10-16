@@ -1,3 +1,4 @@
+## v3.8.0-nightly-20241016080215 (Oct 16, 2024)
 ## v3.8.0-dev (Aug 08, 2024)
 - Encode non ASCII HTTP headers when `encodeNonAsciiHttpHeaders` flag is set to true in `ssr.js` in the retail react app [#2009](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2009)
 - Add x-forwarded-host header into res locals, which can be used to build an app origin [#2050](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2050)
