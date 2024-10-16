@@ -50,7 +50,6 @@ const main = () => {
 
     return Promise.all(
         pkgNames.map((pkgName) => {
-            // Handle base-app-extension using the 'extension-base' directory
             const actualPkgName =
                 pkgName === EXTENSION_BASE_NAME ? EXTENSION_BASE_NAME : `${TEMPLATE_PREFIX}${pkgName}`
 
