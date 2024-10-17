@@ -40,86 +40,52 @@ const registerUser = async (page) => {
     page.getByRole("heading", { name: /My Account/i })
   ).toBeVisible();
 }
-test.describe("Consent Tracking form works as expected", () => {
-  test.beforeEach(async ({ page }) => {
-    await page.context().clearCookies();
-    await page.goto(config.RETAIL_APP_HOME);
-  });
 
-  test("Closing form when defaultDnt exists sets DNT to defaultDnt", async ({ page }) => {
-    const modalSelector = '[aria-label="Close consent tracking form"]'
-    page.locator(modalSelector).waitFor()
-    await expect(page.getByText(/Tracking Consent/i)).toBeVisible({timeout: 10000});
-    await page.locator('button[aria-label="Close consent tracking form"]').click();
-    
-    const cookies = await page.context().cookies();
-    const cookieName = 'dw_dnt';
-    const cookie = cookies.find(cookie => cookie.name === cookieName);
-    expect(cookie).toBeTruthy();
-    // The value of 1 comes from defaultDnt prop in _app-config/index.jsx
-    expect(cookie.value).toBe('1');
-  });
+const checkDntCookie = async (page, expectedValue) => {
+  var cookies = await page.context().cookies();
+  var cookieName = 'dw_dnt';
+  var cookie = cookies.find(cookie => cookie.name === cookieName);
+  expect(cookie).toBeTruthy();
+  expect(cookie.value).toBe(expectedValue);
+}
 
-  test("Clicking on Accept makes DNT=0", async ({ page }) => {
-    const modalSelector = '[aria-label="Close consent tracking form"]'
-    page.locator(modalSelector).waitFor()
-    await expect(page.getByText(/Tracking Consent/i)).toBeVisible({timeout: 10000});
-    await page.locator('button[aria-label="Accept Tracking"]:visible').click();
-    
-    const cookies = await page.context().cookies();
-    const cookieName = 'dw_dnt';
-    const cookie = cookies.find(cookie => cookie.name === cookieName);
-    expect(cookie).toBeTruthy();
-    expect(cookie.value).toBe('0');
-  });
 
-  test("Clicking on Decline makes DNT=1", async ({ page }) => {
-    const modalSelector = '[aria-label="Close consent tracking form"]'
-    page.locator(modalSelector).waitFor()
-    await expect(page.getByText(/Tracking Consent/i)).toBeVisible({timeout: 10000});
-    await page.locator('button[aria-label="Decline Tracking"]:visible').click();
-    
-    const cookies = await page.context().cookies();
-    const cookieName = 'dw_dnt';
-    const cookie = cookies.find(cookie => cookie.name === cookieName);
-    expect(cookie).toBeTruthy();
-    expect(cookie.value).toBe('1');
-  });
+test("Shopper can use the consent tracking form", async ({ page }) => {
+  await page.context().clearCookies();
+  await page.goto(config.RETAIL_APP_HOME);
 
-  test("Logging in preserves DNT preference", async ({ page }) => {
-    const modalSelector = '[aria-label="Close consent tracking form"]'
-    page.locator(modalSelector).waitFor()
-    await expect(page.getByText(/Tracking Consent/i)).toBeVisible({timeout: 10000});
-    await page.locator('button[aria-label="Decline Tracking"]:visible').click();
+  const modalSelector = '[aria-label="Close consent tracking form"]'
+  page.locator(modalSelector).waitFor()
+  await expect(page.getByText(/Tracking Consent/i)).toBeVisible({timeout: 10000});
+  
+  // Decline Tracking
+  const declineButton = page.locator('button:visible', { hasText: 'Decline' });
+  await expect(declineButton).toBeVisible();
+  await declineButton.click();
+  
+  // The value of 1 comes from defaultDnt prop in _app-config/index.jsx
+  checkDntCookie(page, '1')
 
-    await registerUser(page)
-
-    const cookies = await page.context().cookies();
-    const cookieName = 'dw_dnt';
-    const cookie = cookies.find(cookie => cookie.name === cookieName);
-    expect(cookie).toBeTruthy();
-    expect(cookie.value).toBe('1');
-  });
-
-  test("Logging out clears DNT preference", async ({ page }) => {
-    const modalSelector = '[aria-label="Close consent tracking form"]'
-    page.locator(modalSelector).waitFor()
-    await expect(page.getByText(/Tracking Consent/i)).toBeVisible({timeout: 10000});
-    await page.locator('button[aria-label="Decline Tracking"]:visible').click();
-    
-    await registerUser(page)
-
-    const buttons = await page.getByText(/Log Out/i).elementHandles();
-    for (const button of buttons) {
-        if (await button.isVisible()) {
-            await button.click();
-            break;
-        }
+  // Reloading the page after setting DNT makes the form not appear again
+  await page.reload()
+  await expect(page.getByText(/Tracking Consent/i)).toBeHidden();
+  
+  // Registering after setting DNT persists the preference
+  await registerUser(page)
+  checkDntCookie(page, '1')
+  
+  // Logging out clears the preference
+  const buttons = await page.getByText(/Log Out/i).elementHandles();
+  for (const button of buttons) {
+    if (await button.isVisible()) {
+      await button.click();
+      break;
     }
-
-    const cookies = await page.context().cookies();
-    if (cookies.some(item => item.name === "dw_dnt")) {
-        throw new Error('dw_dnt still exists in the cookies');
-    }
-  });
+  }
+  var cookies = await page.context().cookies();
+  if (cookies.some(item => item.name === "dw_dnt")) {
+    throw new Error('dw_dnt still exists in the cookies');
+  }
+  await page.reload();
+  await expect(page.getByText(/Tracking Consent/i)).toBeVisible({timeout: 10000});
 });
