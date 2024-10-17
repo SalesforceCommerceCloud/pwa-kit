@@ -46,7 +46,7 @@ test.describe("DNT form exists", () => {
     await page.goto(config.RETAIL_APP_HOME);
   });
 
-  test("has form", async ({ page }) => {
+  test("Closing form when defaultDnt exists sets DNT to defaultDnt", async ({ page }) => {
     const modalSelector = '[aria-label="Close consent tracking form"]'
     page.locator(modalSelector).waitFor()
     await expect(page.getByText(/Tracking Consent/i)).toBeVisible({timeout: 10000});
@@ -56,7 +56,8 @@ test.describe("DNT form exists", () => {
     const cookieName = 'dw_dnt';
     const cookie = cookies.find(cookie => cookie.name === cookieName);
     expect(cookie).toBeTruthy();
-    expect(cookie.value).toBe('0');
+    // The value of 1 comes from defaultDnt prop in _app-config/index.jsx
+    expect(cookie.value).toBe('1');
   });
 
   test("Clicking on Accept makes DNT=0", async ({ page }) => {
@@ -115,7 +116,7 @@ test.describe("DNT form exists", () => {
             break;
         }
     }
-    
+
     const cookies = await page.context().cookies();
     if (cookies.some(item => item.name === "dw_dnt")) {
         throw new Error('An object with name "dw_dnt" was found in the array.');
