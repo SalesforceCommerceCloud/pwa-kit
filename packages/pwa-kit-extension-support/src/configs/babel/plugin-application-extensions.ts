@@ -4,31 +4,17 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-
+// Third-Party
+// NOTE: These do not like the "import" syntax. Will break the plugin if you change it.
 const parser = require("@babel/parser")
 const babel = require("@babel/core")
-// TODO: Refactor the shared logic
-let extensionLoader = require('../webpack/loaders/extensions-loader')
-import fse from 'fs-extra'
-import _path, {resolve} from 'path'
 
-const projectDir = process.cwd()
-const pkg = fse.readJsonSync(resolve(projectDir, 'package.json'))
+import {renderTemplate} from '../utils'
+import {buildAliases} from '../../shared/utils'
 
-const getOptions =() => {
-    return {
-        pkg,
-        getConfig: () => ({
-            app: {
-                extensions: ['@salesforce/extension-sample']
-            }
-        }),
-        target: 'node'
-    }
-}
 // application-extensions-placeholder
 // const fileToReplace = 'assets/application-extensions-placeholder.js'
-const repalcementContent = extensionLoader({getOptions}, {getOptions})
+// const repalcementContent = extensionLoader({getOptions}, {getOptions})
 // A Set to keep track of processed file paths
 const processedFiles = new Set()
 
@@ -38,14 +24,11 @@ module.exports = function replaceFileContentPlugin({ types: t } : any) {
             ImportDeclaration(path: any, state: any) {
                 console.log('state options: ', state.opts)
 
-                // Hmmmm 🤔 I can't remember why I did this, but if this is a solution to a problem we'll have to make sure we make
-                // it work for all configured application extensions.
-                const aliases: any = {
-                    '@salesforce/extension-sample': '/Users/bchypak/Projects/pwa-kit/packages/template-typescript-minimal/node_modules/@salesforce/extension-sample/src/'
-                }
-        
+                // This is analogus to the work we did in webpack to have aliases for the extensions. 
+                // TODO: This should be coming from the options.
+                const aliases: any = buildAliases(['@salesforce/extension-sample'])
                 const source = path.node.source.value
-        
+
                 // Check for alias
                 for (const alias in aliases) {
                     if (source.startsWith(alias)) {
@@ -65,10 +48,16 @@ module.exports = function replaceFileContentPlugin({ types: t } : any) {
 
                 // Check if the file matches one of the files we want to replace
                 if (filePath.endsWith('express/assets/application-extensions-placeholder.js')) {
-                    console.log('Project Directory: ', projectDir)
-                    const newContent = repalcementContent
 
-                    let parsedAst;
+                    const newContent = renderTemplate(
+                        {
+                            installed: ['@salesforce/extension-sample'],
+                            configured: ['@salesforce/extension-sample'],
+                            target: 'node'
+                        }
+                    )
+
+                    let parsedAst
                     try {
                         // Parse the new content as a full program
                         parsedAst = parser.parse(newContent, {

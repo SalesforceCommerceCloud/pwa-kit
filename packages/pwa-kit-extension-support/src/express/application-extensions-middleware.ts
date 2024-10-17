@@ -24,6 +24,7 @@ const applicationExtensionsMiddleware = (app: Application) => {
     APPLICATION_EXTENSIONS.forEach((applicationExtension) => {
         app = applicationExtension.extendApp(app)
     })
+    
     return (req: Request, res: Response, next: NextFunction): void => {
         next()
     }
