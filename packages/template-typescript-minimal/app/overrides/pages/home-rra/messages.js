@@ -7,6 +7,7 @@
 import {defineMessages} from 'react-intl'
 import {messages as originalMessages} from '*/pages/home-rra/messages'
 
+// What's in defineMessages should be statically parseable. That's why we're not including the originalMessages yet.
 let messages = defineMessages({
     'home.title.react_starter_store': {
         defaultMessage: 'The React PWA Starter Store for Retail - FOOO',
