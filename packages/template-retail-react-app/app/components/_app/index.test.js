@@ -52,7 +52,6 @@ jest.mock('@salesforce/commerce-sdk-react', () => {
     }
 })
 
-
 describe('App', () => {
     const site = {
         ...mockConfig.app.sites[0],
