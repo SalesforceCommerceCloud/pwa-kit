@@ -1,6 +1,7 @@
 ## v5.0.0
+- (These will be merged later as the feature branch gets merged into V5 template retail react app branch)
 - DNT UI: [#2017](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2017)
-- DNT E2E: [UPDATE]
+- DNT E2E: [#2083](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2083)
 
 ## v4.1.0-dev (Aug 8, 2024)
 - Add useXForwardedHost (default to false) flag to allow the use of x-forwarded-host header value in building links [#2018](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2018)
