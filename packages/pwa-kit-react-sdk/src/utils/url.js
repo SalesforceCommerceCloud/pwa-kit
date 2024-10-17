@@ -1,11 +1,9 @@
 /*
- * Copyright (c) 2021, salesforce.com, inc.
+ * Copyright (c) 2024, salesforce.com, inc.
  * All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-
-import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 
 /**
  * Returns the application's origin.
@@ -14,6 +12,8 @@ import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
  * initialized using the `_createApp` method (This happens in your /app/ssr.js file).
  *
  * @function
+ * @deprecated use `useOrigin()` instead.
+ * This function will be removed in version 4.0.0.
  * @returns {string} Returns the ORIGIN under which we are serving the page.
  * @example
  * import {getAppOrigin} from '@salesforce/pwa-kit-react-sdk/utils/url'
@@ -21,16 +21,11 @@ import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
  * const url = `${getAppOrigin()}/path`
  */
 export const getAppOrigin = () => {
-    const config = getConfig()
     if (typeof window !== 'undefined') {
         return window.location.origin
     }
 
-    const {APP_ORIGIN, X_FORWARDED_HOST} = process.env
-
-    if (config?.app?.useXForwardedHost && X_FORWARDED_HOST) {
-        return X_FORWARDED_HOST
-    }
+    const {APP_ORIGIN} = process.env
 
     if (!APP_ORIGIN) {
         throw new Error(
