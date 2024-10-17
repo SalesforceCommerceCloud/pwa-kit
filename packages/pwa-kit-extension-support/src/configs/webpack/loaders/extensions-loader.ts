@@ -8,6 +8,7 @@
 import dedent from 'dedent'
 import {LoaderContext} from 'webpack'
 import {PackageJson} from 'type-fest'
+import Handlebars from 'handlebars'
 
 import {kebabToUpperCamelCase} from '../../../shared/utils'
 import {nameRegex} from '../../../shared/utils/extensibility-utils'
@@ -15,8 +16,6 @@ import {nameRegex} from '../../../shared/utils/extensibility-utils'
 const APP_EXTENSION_CLIENT_ENTRY = 'setup-app'
 const APP_EXTENSION_SERVER_ENTRY = 'setup-server'
 const APP_EXTENSION_PREFIX = 'extension-' // aligns with what's in `nameRegex`
-
-
 
 // TODO: Move these to a better location.
 interface ExtensionsLoaderOptions {
@@ -28,6 +27,51 @@ interface ExtensionsLoaderOptions {
 interface ExtensionsLoaderContext extends LoaderContext<ExtensionsLoaderOptions> {
     // You can add any additional properties if needed
 }
+
+const templateString = dedent`
+    /*
+    * Copyright (c) 2024, salesforce.com, inc.
+    * All rights reserved.
+    * SPDX-License-Identifier: BSD-3-Clause
+    * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
+    */
+
+    {{#each installed}}
+    import {{getInstanceName .}} from {{.}}
+    {{/each}}
+
+    export default [
+        {{#each configured}}
+        new {{getInstanceName .}}({}){{#if (isNotLast @index @root.configured.length)}},{{/if}}
+        {{/each}}
+    ]
+`
+const renderTemplate = (templateString: string, data: any) => {
+    const kebabToUpperCamelCase = (aString: string) => {
+        return aString.split('-')
+            .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+            .join('')
+    }
+
+    Handlebars.registerHelper('getInstanceName', function (aString) {
+        const nameRegex = /^(?:@([^/]+)\/)?extension-(.+)$/
+        const [packageName, namespace, name] = aString.match(nameRegex)
+        
+        return kebabToUpperCamelCase(`${namespace ? `${namespace}-` : ''}-${name}`)
+    })
+      
+    Handlebars.registerHelper('isNotLast', function (index, arrayLength) {
+        return index !== arrayLength - 1;
+    })
+
+    // Compile the template
+    const template = Handlebars.compile(templateString)
+  
+    // Apply data to the compiled template
+    const output = template(data)
+  
+    return output
+  }
 
 /**
  * The `extensions-loader` as a mechanism to get all configured extensions for a given pwa-kit
@@ -48,6 +92,17 @@ module.exports = function (this: ExtensionsLoaderContext, that: any) {
     const {pkg, getConfig, target = 'web'} = that?.getOptions?.() || this.getOptions() || {}
     const {devDependencies} = pkg
 
+    // ------
+    console.log('process.cwd()', process.cwd())
+    const renderedHTML = renderTemplate(
+        templateString, 
+        {
+            installed: ['@salesforce/extension-sample', '@salesforce/extension-sample-2'],
+            configured: ['@salesforce/extension-sample'],
+        }
+    )
+    console.log(renderedHTML)
+    // ------
     // TODO: clean this up.. looks like this is a bad variable name for the type that it represents.
     const extensions = Object.keys(devDependencies || {})
         .map((packageName) => packageName.match(nameRegex))
@@ -67,8 +122,7 @@ module.exports = function (this: ExtensionsLoaderContext, that: any) {
     
     const appExtensions = getConfig()?.app?.extensions
 
-    // TODO: later consider updating `normalizeExtensionsList` to use a util function
-    return dedent`
+    const result = dedent`
             /*
             * Copyright (c) 2024, salesforce.com, inc.
             * All rights reserved.
@@ -117,4 +171,6 @@ module.exports = function (this: ExtensionsLoaderContext, that: any) {
 
             export default configuredExtensions
         `
+    console.log('result: ', result)
+    return result
 }

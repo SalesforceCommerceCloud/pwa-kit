@@ -30,8 +30,10 @@ import {sdkReplacementPlugin} from './plugins'
 import {CLIENT, SERVER, CLIENT_OPTIONAL, SSR, REQUEST_PROCESSOR} from './config-names'
 
 // Utilities
+import {getApplicationExtensionInfo} from '@salesforce/pwa-kit-extension-support/shared/utils'
+import {ruleForApplicationExtensibility} from '@salesforce/pwa-kit-extension-support/configs/webpack/loaders'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
-import {buildAliases, getExtensionNames, nameRegex} from '@salesforce/pwa-kit-extension-support/shared/utils'
+import {buildAliases, nameRegex} from '@salesforce/pwa-kit-extension-support/shared/utils'
 
 const projectDir = process.cwd()
 const pkg = fse.readJsonSync(resolve(projectDir, 'package.json'))
@@ -254,33 +256,8 @@ const baseConfig = (target) => {
                                 loader: findDepInStack('source-map-loader')
                             }
                         },
-                        {
-                            // NOTE: Might be better to export a rule directly that we can plog in here, this will 
-                            // make the "extensions" file private so was can change that implementation detail later 
-                            // if we choose to do so.
-                            test: /react\/assets\/application-extensions-placeholder\.js/i,
-                            use: {
-                                loader: findDepInStack('@salesforce/pwa-kit-extension-support/configs/webpack/loaders/extensions-loader'),
-                                options: {
-                                    pkg,
-                                    getConfig,
-                                    target: 'web'
-                                }
-                            }
-                        }
-                        // ,
-                        // {
-                        //     // TODO: Export rule from app extensibility sdk instead of using these loaders directly
-                        //     test: /express\/assets\/application-extensions-placeholder\.js/i,
-                        //     use: {
-                        //         loader: findDepInStack('@salesforce/pwa-kit-extension-support/configs/webpack/loaders/extensions-loader'),
-                        //         options: {
-                        //             pkg,
-                        //             getConfig,
-                        //             target: 'node'
-                        //         }
-                        //     }
-                        // }
+                        ruleForApplicationExtensibility(findDepInStack, {pkg, getConfig, target: 'web'}),
+                        ruleForApplicationExtensibility(findDepInStack, {pkg, getConfig, target: 'node'})
                     ].filter(Boolean)
                 }
             }

@@ -35,7 +35,11 @@ const processedFiles = new Set()
 module.exports = function replaceFileContentPlugin({ types: t } : any) {
     return {
         visitor: {
-            ImportDeclaration(path: any) {
+            ImportDeclaration(path: any, state: any) {
+                console.log('state options: ', state.opts)
+
+                // Hmmmm 🤔 I can't remember why I did this, but if this is a solution to a problem we'll have to make sure we make
+                // it work for all configured application extensions.
                 const aliases: any = {
                     '@salesforce/extension-sample': '/Users/bchypak/Projects/pwa-kit/packages/template-typescript-minimal/node_modules/@salesforce/extension-sample/src/'
                 }
@@ -46,7 +50,6 @@ module.exports = function replaceFileContentPlugin({ types: t } : any) {
                 for (const alias in aliases) {
                     if (source.startsWith(alias)) {
                         const newPath = source.replace(alias, aliases[alias])
-                        console.log('newPath: ', newPath)
                         path.node.source = t.stringLiteral(newPath)
                     }
                 }

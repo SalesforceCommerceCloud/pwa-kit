@@ -5,6 +5,10 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
+// Third-Party Imports
+import {resolve} from 'path'
+import fse from 'fs-extra'
+
 // Re-exports
 export * from './extensibility-utils'
 export * from './resolver-utils'
@@ -54,3 +58,23 @@ export const kebabToLowerCamelCase = (str: string) =>
                 : word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
         )
         .join('')
+
+export const getApplicationExtensionInfo = (getConfig: any) => {
+    console.log('getApplicationExtensionInfo: ')
+    
+    const projectDir = process.cwd()
+    const nameRegex = /^(?:@([^/]+)\/)?extension-(.+)$/
+    const pkg = fse.readJsonSync(resolve(projectDir, 'package.json'))
+
+    const installedExtensions = Object.keys(pkg?.devDependencies || {})
+        .map((packageName) => (packageName.match(nameRegex) !== null ? packageName : undefined))
+        .filter(Boolean)
+
+    // NOTE: Might have to get the expanded version of these.
+    const configuredExtensions = getConfig()?.app?.extensions
+
+    return {
+        installed: installedExtensions,
+        configured: configuredExtensions
+    }
+}
