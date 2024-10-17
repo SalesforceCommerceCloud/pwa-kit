@@ -173,6 +173,8 @@ const DATA_MAP: AuthDataMap = {
     }
 }
 
+export const ninetyDaysInSeconds = 90 * 24 * 60 * 60
+
 /**
  * This class is used to handle shopper authentication.
  * It is responsible for initializing shopper session, manage access
@@ -245,8 +247,8 @@ class Auth {
 
         this.defaultDnt = config.defaultDnt
 
-        this.refreshTokenTTL = config.refreshTokenTTL || 90 * 24 * 60 * 60 // 90 days in seconds
-
+        this.refreshTokenTTL =
+            typeof config.refreshTokenTTL === 'number' ? config.refreshTokenTTL : undefined
         /*
          * There are 2 ways to enable SLAS private client mode.
          * If enablePWAKitPrivateClient=true, we route SLAS calls to /mobify/slas/private
@@ -281,7 +283,15 @@ class Auth {
     get(name: AuthDataKeys) {
         const {key, storageType} = DATA_MAP[name]
         const storage = this.stores[storageType]
-        return storage.get(key)
+        const value = storage.get(key)
+
+        // Parse 'refresh_token_expires_in' back to a number... without
+        // this, zero 0 is handled as falsy and returns empty string ''
+        if (name === 'refresh_token_expires_in' && value !== undefined) {
+            return parseInt(value, 10)
+        }
+
+        return value
     }
 
     private set(name: AuthDataKeys, value: string, options?: unknown) {
@@ -480,7 +490,6 @@ class Auth {
         this.set('customer_id', res.customer_id)
         this.set('enc_user_id', res.enc_user_id)
         this.set('expires_in', `${res.expires_in}`)
-        this.set('refresh_token_expires_in', res.refresh_token_expires_in)
         this.set('id_token', res.id_token)
         this.set('idp_access_token', res.idp_access_token)
         this.set('token_type', res.token_type)
@@ -489,9 +498,13 @@ class Auth {
 
         const refreshTokenKey = isGuest ? 'refresh_token_guest' : 'refresh_token_registered'
         const fallbackTTL =
-            typeof this.refreshTokenTTL === 'number' && this.refreshTokenTTL >= 0
-                ? this?.refreshTokenTTL
-                : res.refresh_token_expires_in || undefined
+            typeof this.refreshTokenTTL === 'number' &&
+            this.refreshTokenTTL >= 0 &&
+            this.refreshTokenTTL <= ninetyDaysInSeconds
+                ? this.refreshTokenTTL
+                : res.refresh_token_expires_in || ninetyDaysInSeconds
+
+        this.set('refresh_token_expires_in', fallbackTTL.toString())
         const expiresDate = this.convertSecondsToDate(fallbackTTL)
 
         this.set(refreshTokenKey, res.refresh_token, {
