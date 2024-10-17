@@ -40,7 +40,7 @@ interface AuthConfig extends ApiClientConfigParams {
     silenceWarnings?: boolean
     logger: Logger
     defaultDnt?: boolean
-    refreshTokenTTL?: number
+    refreshTokenCookieTTL?: number
 }
 
 interface JWTHeaders {
@@ -194,7 +194,7 @@ class Auth {
     private silenceWarnings: boolean
     private logger: Logger
     private defaultDnt: boolean | undefined
-    private refreshTokenTTL: number | undefined
+    private refreshTokenCookieTTL: number | undefined
     private refreshTrustedAgentHandler:
         | ((loginId: string, usid: string, refresh: boolean) => Promise<TokenResponse>)
         | undefined
@@ -247,8 +247,10 @@ class Auth {
 
         this.defaultDnt = config.defaultDnt
 
-        this.refreshTokenTTL =
-            typeof config.refreshTokenTTL === 'number' ? config.refreshTokenTTL : undefined
+        this.refreshTokenCookieTTL =
+            typeof config.refreshTokenCookieTTL === 'number'
+                ? config.refreshTokenCookieTTL
+                : undefined
         /*
          * There are 2 ways to enable SLAS private client mode.
          * If enablePWAKitPrivateClient=true, we route SLAS calls to /mobify/slas/private
@@ -509,10 +511,10 @@ class Auth {
 
         const refreshTokenKey = isGuest ? 'refresh_token_guest' : 'refresh_token_registered'
         const fallbackTTL =
-            typeof this.refreshTokenTTL === 'number' &&
-            this.refreshTokenTTL >= 0 &&
-            this.refreshTokenTTL <= ninetyDaysInSeconds
-                ? this.refreshTokenTTL
+            typeof this.refreshTokenCookieTTL === 'number' &&
+            this.refreshTokenCookieTTL >= 0 &&
+            this.refreshTokenCookieTTL <= ninetyDaysInSeconds
+                ? this.refreshTokenCookieTTL
                 : res.refresh_token_expires_in || ninetyDaysInSeconds
 
         this.set('refresh_token_expires_in', fallbackTTL.toString())

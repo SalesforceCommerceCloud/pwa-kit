@@ -79,7 +79,7 @@ const TOKEN_RESPONSE: ShopperLoginTypes.TokenResponse = {
     usid: 'usid_xyz',
     idp_access_token: 'idp_access_token_xyz',
     // test that this is authoritative and not set to
-    // `ninetyDaysInSeconds` when config.refreshTokenTTL is not set
+    // `ninetyDaysInSeconds` when config.refreshTokenCookieTTL is not set
     refresh_token_expires_in: FAKE_SLAS_EXPIRY
 }
 
@@ -486,12 +486,12 @@ describe('Auth', () => {
         [-1, FAKE_SLAS_EXPIRY],
         [ninetyDaysInSeconds + 1, FAKE_SLAS_EXPIRY]
     ])(
-        'refreshTokenTTL is set correctly for refreshTokenTTLValue=`%p`, expected=`%s`',
-        async (refreshTokenTTLValue, expected) => {
+        'refreshTokenCookieTTL is set correctly for refreshTokenCookieTTLValue=`%p`, expected=`%s`',
+        async (refreshTokenCookieTTLValue, expected) => {
             // Mock the loginRegisteredUserB2C helper to return a token response
             ;(helpers.loginRegisteredUserB2C as jest.Mock).mockResolvedValueOnce(TOKEN_RESPONSE)
 
-            const auth = new Auth({...config, refreshTokenTTL: refreshTokenTTLValue})
+            const auth = new Auth({...config, refreshTokenCookieTTL: refreshTokenCookieTTLValue})
             // Call the public method because the getter for refresh_token_expires_in is private
             await auth.loginRegisteredUserB2C({username: 'test', password: 'test'})
             expect(Number(auth.get('refresh_token_expires_in'))).toBe(expected)
