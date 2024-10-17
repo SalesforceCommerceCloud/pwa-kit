@@ -19,6 +19,14 @@ import {MobileGrid1r1c} from '@salesforce/retail-react-app/app/page-designer/lay
 import {isServer} from '@salesforce/retail-react-app/app/utils/utils'
 import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
 
+// Constants
+const PROMO_BANNER_DESKTOP_PAGE_ID = 'instagram-promo-banner-desktop'
+const PROMO_BANNER_MOBILE_PAGE_ID = 'instagram-promo-banner-mobile'
+const PAGEDESIGNER_TO_COMPONENT = {
+    'commerce_assets.productListTile': ImageWithText,
+    'commerce_layouts.mobileGrid1r1c': MobileGrid1r1c
+}
+
 const PageDesignerPromotionalBanner = () => {
     const {site} = useMultiSite()
     const {usid} = useUsid()
@@ -26,13 +34,7 @@ const PageDesignerPromotionalBanner = () => {
         {parameters: {usid, siteId: site.id}},
         {enabled: !isServer}
     )
-    const PROMO_BANNER_DESKTOP_PAGE_ID = 'instagram-promo-banner-desktop'
-    const PROMO_BANNER_MOBILE_PAGE_ID = 'instagram-promo-banner-mobile'
-    const PAGEDESIGNER_TO_COMPONENT = {
-        'commerce_assets.productListTile': ImageWithText,
-        'commerce_layouts.mobileGrid1r1c': MobileGrid1r1c
-    }
-    console.warn('Jinsu', shopperContext, !!shopperContext)
+
     const {data: promoBannerDesktop, error: pageErrorDesktop} = usePage(
         {
             parameters: {pageId: PROMO_BANNER_DESKTOP_PAGE_ID}
