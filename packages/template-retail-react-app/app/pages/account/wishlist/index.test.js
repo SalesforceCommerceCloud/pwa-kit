@@ -33,7 +33,7 @@ test('Renders wishlist page', async () => {
     renderWithProviders(<AccountWishlist />)
     await waitFor(() => {
         expect(screen.getByTestId('account-wishlist-page')).toBeInTheDocument()
-        expect(screen.getByRole('link', {name: /fall look/i})).toBeInTheDocument()
+        expect(screen.getByTestId('sf-cart-item-P0150M')).toBeInTheDocument()
     })
 })
 

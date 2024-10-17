@@ -174,3 +174,13 @@ test('Handles focus for cancel/save buttons in address form correctly', async ()
     await user.click(screen.getByRole('button', {name: /save/i}))
     expect(document.activeElement).toBe(editBtn)
 })
+
+test('Edit/Remove buttons have descriptive accessibility label', async () => {
+    renderWithProviders(<MockedComponent />)
+    const address = '123 Main St'
+    await waitFor(() => expect(screen.getByText(address)).toBeInTheDocument())
+    const editBtnByLabel = screen.getByLabelText(`Edit ${address}`)
+    const removeBtnByLabel = screen.getByLabelText(`Remove ${address}`)
+    expect(editBtnByLabel).toBeInTheDocument()
+    expect(removeBtnByLabel).toBeInTheDocument()
+})
