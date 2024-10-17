@@ -494,7 +494,7 @@ describe('Auth', () => {
             const auth = new Auth({...config, refreshTokenTTL: refreshTokenTTLValue})
             // Call the public method because the getter for refresh_token_expires_in is private
             await auth.loginRegisteredUserB2C({username: 'test', password: 'test'})
-            expect(auth.get('refresh_token_expires_in')).toBe(expected)
+            expect(Number(auth.get('refresh_token_expires_in'))).toBe(expected)
         }
     )
     test('loginGuestUser with slas private', async () => {

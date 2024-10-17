@@ -283,15 +283,7 @@ class Auth {
     get(name: AuthDataKeys) {
         const {key, storageType} = DATA_MAP[name]
         const storage = this.stores[storageType]
-        const value = storage.get(key)
-
-        // Parse 'refresh_token_expires_in' back to a number... without
-        // this, zero 0 is handled as falsy and returns empty string ''
-        if (name === 'refresh_token_expires_in' && value !== undefined) {
-            return parseInt(value, 10)
-        }
-
-        return value
+        return storage.get(key)
     }
 
     private set(name: AuthDataKeys, value: string, options?: unknown) {
