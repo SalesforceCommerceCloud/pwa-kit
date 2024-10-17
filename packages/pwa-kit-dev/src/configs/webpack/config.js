@@ -256,8 +256,24 @@ const baseConfig = (target) => {
                                 loader: findDepInStack('source-map-loader')
                             }
                         },
-                        ruleForApplicationExtensibility(findDepInStack, {pkg, getConfig, target: 'web'}),
-                        ruleForApplicationExtensibility(findDepInStack, {pkg, getConfig, target: 'node'})
+                        ruleForApplicationExtensibility(
+                            {
+                                loaderResolver: findDepInStack,
+                                loaderOptions: {
+                                    appConfig: getConfig(),
+                                    target: 'web'
+                                }
+                            }
+                        ),
+                        ruleForApplicationExtensibility(
+                            {
+                                loaderResolver: findDepInStack,
+                                loaderOptions: {
+                                    appConfig: getConfig(),
+                                    target: 'node'
+                                }
+                            }
+                        )
                     ].filter(Boolean)
                 }
             }

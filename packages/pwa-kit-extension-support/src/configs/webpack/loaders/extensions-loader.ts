@@ -38,14 +38,7 @@ interface ExtensionsLoaderContext extends LoaderContext<ExtensionsLoaderOptions>
  * @returns {string} The string representation of a module exporting all the named application extension modules.
  */
 module.exports = function (this: ExtensionsLoaderContext): string {
-    // const {pkg, getConfig, target = 'web'} = this.getOptions() || {}
-    const {target = 'node'} = this?.getOptions?.() || {}
-
-    return renderTemplate(
-        {
-            installed: ['@salesforce/extension-sample'],
-            configured: ['@salesforce/extension-sample'],
-            target
-        }
-    )
+    // TODO: Add some argument checks here.
+    
+    return renderTemplate(this.getOptions())
 }

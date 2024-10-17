@@ -22,11 +22,12 @@ module.exports = function replaceFileContentPlugin({ types: t } : any) {
     return {
         visitor: {
             ImportDeclaration(path: any, state: any) {
-                console.log('state options: ', state.opts)
+                const {installed} = state.opts
+                // TODO: Throw is undefined?
 
                 // This is analogus to the work we did in webpack to have aliases for the extensions. 
                 // TODO: This should be coming from the options.
-                const aliases: any = buildAliases(['@salesforce/extension-sample'])
+                const aliases: any = buildAliases(installed)
                 const source = path.node.source.value
 
                 // Check for alias
@@ -39,6 +40,7 @@ module.exports = function replaceFileContentPlugin({ types: t } : any) {
             },
             Program(path: any, state: any) {
                 const filePath = state.file.opts.filename
+                const {installed, configured, target} = state.opts
 
                 // Add a marker to the state to prevent reprocessing
                 if (processedFiles.has(filePath)) {
@@ -51,9 +53,9 @@ module.exports = function replaceFileContentPlugin({ types: t } : any) {
 
                     const newContent = renderTemplate(
                         {
-                            installed: ['@salesforce/extension-sample'],
-                            configured: ['@salesforce/extension-sample'],
-                            target: 'node'
+                            installed,
+                            configured,
+                            target
                         }
                     )
 

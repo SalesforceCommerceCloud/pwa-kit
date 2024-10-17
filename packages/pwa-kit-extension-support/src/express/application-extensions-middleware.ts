@@ -22,6 +22,7 @@ const applicationExtensionsMiddleware = (app: Application) => {
     // const applicationExtensions = getApplicationExtensions<ApplicationExtension<ApplicationExtensionConfig>>() as ApplicationExtension<ApplicationExtensionConfig>[]
     console.log('applicationExtensionsMiddleware: applying ', APPLICATION_EXTENSIONS)
     APPLICATION_EXTENSIONS.forEach((applicationExtension) => {
+        // if (applicationExtension.getConfig().enabled)
         app = applicationExtension.extendApp(app)
     })
     

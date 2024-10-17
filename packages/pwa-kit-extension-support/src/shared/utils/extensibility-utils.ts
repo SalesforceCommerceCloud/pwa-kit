@@ -5,17 +5,19 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import path from 'path'
+// Third-Party
 import fs from 'fs-extra'
+import path from 'path'
 
 // Types 
 import {ApplicationExtensionEntry, ApplicationExtensionEntryArray} from '../../types'
 
+// CONSTANTS
 const REACT_EXTENSIBILITY_FILE = 'setup-app'
 const EXPRESS_EXTENSIBILITY_FILE = 'setup-server'
-
 const SUPPORTED_FILE_TYPES = ['.ts', '.js']
 
+// TODO: Update this block comment.
 /**
  * Given a list of extensions, returns an object where the key is the extensions
  * app entry import string, and the value the path to the source file.
@@ -42,21 +44,10 @@ export const buildAliases = (extensions: ApplicationExtensionEntry[] = []) => {
             'node_modules',
             extension,
             'src'
-            // , // 🤔
-            // REACT_EXTENSIBILITY_FILE
         )
-
-        // const foundFilePath = findFileWithExtension(basePath, SUPPORTED_FILE_TYPES)
-
-        // if (!foundFilePath) {
-        //     // no setup-server file found, early exit because it's optional
-        //     return acc
-        // }
 
         return {
             ...acc,
-            // [`${extension}/${REACT_EXTENSIBILITY_FILE}`]: findFileWithExtension(path.join(basePath, REACT_EXTENSIBILITY_FILE), SUPPORTED_FILE_TYPES),
-            // [`${extension}/${EXPRESS_EXTENSIBILITY_FILE}`]: findFileWithExtension(path.join(basePath, EXPRESS_EXTENSIBILITY_FILE), SUPPORTED_FILE_TYPES)
             [`${extension}`]: basePath
         }
     }, {})

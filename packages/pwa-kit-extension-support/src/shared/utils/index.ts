@@ -9,6 +9,10 @@
 import {resolve} from 'path'
 import fse from 'fs-extra'
 
+// Local
+import {expand} from './resolver-utils'
+import {nameRegex} from './extensibility-utils'
+
 // Re-exports
 export * from './extensibility-utils'
 export * from './resolver-utils'
@@ -59,20 +63,20 @@ export const kebabToLowerCamelCase = (str: string) =>
         )
         .join('')
 
-export const getApplicationExtensionInfo = (getConfig: any) => {
-    console.log('getApplicationExtensionInfo: ')
-    
+export const getApplicationExtensionInfo = (appConfig?: any) => {
     const projectDir = process.cwd()
-    const nameRegex = /^(?:@([^/]+)\/)?extension-(.+)$/
     const pkg = fse.readJsonSync(resolve(projectDir, 'package.json'))
+
+    // Use the application configuration in the projects application if one isn't provided.
+    appConfig = appConfig ? appConfig : fse.readJsonSync(resolve(projectDir, 'package.json'))?.mobify || {}
 
     const installedExtensions = Object.keys(pkg?.devDependencies || {})
         .map((packageName) => (packageName.match(nameRegex) !== null ? packageName : undefined))
         .filter(Boolean)
 
     // NOTE: Might have to get the expanded version of these.
-    const configuredExtensions = getConfig()?.app?.extensions
-
+    const configuredExtensions = expand(appConfig?.app?.extensions || [])
+    console.log('getApplicationExtensionInfo: ', configuredExtensions)
     return {
         installed: installedExtensions,
         configured: configuredExtensions

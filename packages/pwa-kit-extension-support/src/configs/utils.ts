@@ -8,6 +8,19 @@
 import dedent from 'dedent'
 import Handlebars from 'handlebars'
 
+// Local
+import {kebabToUpperCamelCase, nameRegex} from '../shared/utils'
+
+// Regeister Handlebars helpers
+Handlebars.registerHelper('getInstanceName', (aString) => {
+    const [_, namespace, name] = aString.match(nameRegex)
+    
+    return kebabToUpperCamelCase(`${namespace ? `${namespace}-` : ''}-${name}`)
+})
+Handlebars.registerHelper('isNotLast', (index, arrayLength) => index !== arrayLength - 1)
+Handlebars.registerHelper('isNode', (target) => target === 'node')
+Handlebars.registerHelper('jsonStringify', (context) => JSON.stringify(context, null, 0))
+
 const templateString = dedent`
     /*
     * Copyright (c) 2024, salesforce.com, inc.
@@ -22,38 +35,16 @@ const templateString = dedent`
 
     export default [
         {{#each configured}}
-        new {{getInstanceName .}}({}){{#if (isNotLast @index @root.configured.length)}},{{/if}}
+        new {{getInstanceName this.[0]}}({{{jsonStringify this.[1]}}}){{#if (isNotLast @index @root.configured.length)}},{{/if}}
         {{/each}}
     ]
 `
 
 export const renderTemplate = (data: any) => {
-    const kebabToUpperCamelCase = (aString: string) => {
-        return aString.split('-')
-            .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
-            .join('')
-    }
-
-    Handlebars.registerHelper('getInstanceName', function (aString) {
-        const nameRegex = /^(?:@([^/]+)\/)?extension-(.+)$/
-        const [_, namespace, name] = aString.match(nameRegex)
-        
-        return kebabToUpperCamelCase(`${namespace ? `${namespace}-` : ''}-${name}`)
-    })
-      
-    Handlebars.registerHelper('isNotLast', function (index, arrayLength) {
-        return index !== arrayLength - 1
-    })
-
-    Handlebars.registerHelper('isNode', function (target) {
-        return target === 'node'
-    })
-
     // Compile the template
     const template = Handlebars.compile(templateString)
   
+    console.log('template(data): ', data, template(data))
     // Apply data to the compiled template
-    const output = template(data)
-  
-    return output
+    return template(data)
 }
