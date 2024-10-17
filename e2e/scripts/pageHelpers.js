@@ -163,6 +163,8 @@ export const registerShopper = async ({page, userCredentials, isMobile = false})
 
     await page.getByRole("button", { name: /Create Account/i }).click();
 
+    await page.waitForLoadState();
+
     await expect(
         page.getByRole("heading", { name: /Account Details/i })
     ).toBeVisible();
