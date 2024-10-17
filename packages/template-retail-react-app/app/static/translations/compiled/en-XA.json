@@ -2303,6 +2303,104 @@
       "value": "]"
     }
   ],
+  "dnt_notification.button.accept": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ȧƈƈḗḗƥŧ"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "dnt_notification.button.assistive_msg.accept": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ȧƈƈḗḗƥŧ Ŧřȧȧƈķīƞɠ"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "dnt_notification.button.assistive_msg.close": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ƈŀǿǿşḗḗ ƈǿǿƞşḗḗƞŧ ŧřȧȧƈķīƞɠ ƒǿǿřḿ"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "dnt_notification.button.assistive_msg.decline": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ḓḗḗƈŀīƞḗḗ Ŧřȧȧƈķīƞɠ"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "dnt_notification.button.decline": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ḓḗḗƈŀīƞḗḗ"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "dnt_notification.description": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ŀǿǿřḗḗḿ īƥşŭŭḿ ḓǿǿŀǿǿř şīŧ ȧȧḿḗḗŧ, ƈǿǿƞşḗḗƈŧḗḗŧŭŭř ȧȧḓīƥīşƈīƞɠ ḗḗŀīŧ, şḗḗḓ ḓǿǿ ḗḗīŭŭşḿǿǿḓ ŧḗḗḿƥǿǿř īƞƈīḓīḓŭŭƞŧ ŭŭŧ ŀȧȧƀǿǿřḗḗ ḗḗŧ ḓǿǿŀǿǿřḗḗ ḿȧȧɠƞȧȧ ȧȧŀīɋŭŭȧȧ. Ŭŧ ḗḗƞīḿ ȧȧḓ ḿīƞīḿ ṽḗḗƞīȧȧḿ, ɋŭŭīş ƞǿǿşŧřŭŭḓ ḗḗẋḗḗřƈīŧȧȧŧīǿǿƞ ŭŭŀŀȧȧḿƈǿǿ ŀȧȧƀǿǿřīş ƞīşī ŭŭŧ ȧȧŀīɋŭŭīƥ ḗḗẋ ḗḗȧȧ ƈǿǿḿḿǿǿḓǿǿ ƈǿǿƞşḗḗɋŭŭȧȧŧ. Ḓŭŭīş ȧȧŭŭŧḗḗ īřŭŭřḗḗ ḓǿǿŀǿǿř īƞ řḗḗƥřḗḗħḗḗƞḓḗḗřīŧ īƞ ṽǿǿŀŭŭƥŧȧȧŧḗḗ ṽḗḗŀīŧ ḗḗşşḗḗ ƈīŀŀŭŭḿ ḓǿǿŀǿǿřḗḗ ḗḗŭŭ ƒŭŭɠīȧȧŧ ƞŭŭŀŀȧȧ ƥȧȧřīȧȧŧŭŭř."
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "dnt_notification.title": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ŧřȧȧƈķīƞɠ Ƈǿǿƞşḗḗƞŧ"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
   "drawer_menu.button.account_details": [
     {
       "type": 0,
@@ -3228,7 +3326,7 @@
     },
     {
       "type": 0,
-      "value": "Ḿẏ Ȧƈƈǿǿŭŭƞŧ"
+      "value": "Ḿẏ ȧȧƈƈǿǿŭŭƞŧ"
     },
     {
       "type": 0,

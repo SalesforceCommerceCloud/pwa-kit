@@ -193,7 +193,7 @@ const Header = ({
                         icon={<AccountIcon />}
                         aria-label={intl.formatMessage({
                             id: 'header.button.assistive_msg.my_account',
-                            defaultMessage: 'My Account'
+                            defaultMessage: 'My account'
                         })}
                         variant="unstyled"
                         {...styles.icons}

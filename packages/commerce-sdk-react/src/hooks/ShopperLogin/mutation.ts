@@ -35,11 +35,6 @@ Required parameters: `refresh token`, `channel_id`, and `client`.
    */
     LogoutCustomer: 'logoutCustomer',
     /**
-     * Get an authorization code after authenticating a user against an identity provider (IDP). This is the first step of the OAuth 2.1 authorization code flow, where a user can log in via federation to the IDP configured for the client. After successfully logging in, the user gets an authorization code via a redirect URI.
-     * @returns A TanStack Query mutation hook for interacting with the Shopper Login `authorizeCustomer` endpoint.
-     */
-    AuthorizeCustomer: 'authorizeCustomer',
-    /**
      * Get the shopper or guest JWT access token and a refresh token. This is the second step of the OAuth 2.1 authorization code flow.
      * @returns A TanStack Query mutation hook for interacting with the Shopper Login `getAccessToken` endpoint.
      */
@@ -71,11 +66,6 @@ The value of the `_sfdc_client_auth` header must be a Base64-encoded string. The
    * @returns A TanStack Query mutation hook for interacting with the Shopper Login `getTrustedAgentAccessToken` endpoint.
    */
     GetTrustedAgentAccessToken: 'getTrustedAgentAccessToken',
-    /**
-     * Request a reset password token
-     * @returns A TanStack Query mutation hook for interacting with the Shopper Login `getPasswordResetToken` endpoint.
-     */
-    GetPasswordResetToken: 'getPasswordResetToken',
     /**
      * Creates a new password
      * @returns A TanStack Query mutation hook for interacting with the Shopper Login `resetPassword` endpoint.

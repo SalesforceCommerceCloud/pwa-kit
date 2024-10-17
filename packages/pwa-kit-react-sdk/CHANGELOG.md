@@ -1,5 +1,5 @@
 ## v3.8.0-dev (Aug 08, 2024)
-- Create useOrigin hook to return an app origin that takes x-forwarded-host header into consideration. [#2050](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2050) 
+- Extend getAppOrigin to use x-forwarded-host header when useXForwardedHost config flag is enabled [#2018](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2018)
 
 ## v3.7.0 (Aug 07, 2024)
 - Add `beforeHydrate` option to withReactQuery component [#1912](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1912)

@@ -7,7 +7,7 @@
 
 import React from 'react'
 import {
-    Heading,
+    Text,
     Stack,
     Divider,
     Accordion,
@@ -79,7 +79,7 @@ const Refinements = ({
 
     return (
         <Stack spacing={8}>
-            {/* Wait to have filters before rendering the Accordion to allow the default indexes to be accurate */}
+            {/* Wait to have filters before rendering the Accordion to allow the deafult indexes to be accurate */}
             {filtersIndexes && (
                 <Accordion
                     pointerEvents={isLoading ? 'none' : 'auto'}
@@ -124,15 +124,14 @@ const Refinements = ({
                                                     paddingTop={0}
                                                     paddingBottom={isExpanded ? 2 : 0}
                                                 >
-                                                    <Heading
-                                                        as="h2"
+                                                    <Text
                                                         flex="1"
                                                         textAlign="left"
                                                         fontSize="md"
                                                         fontWeight={600}
                                                     >
                                                         {filter.label}
-                                                    </Heading>
+                                                    </Text>
                                                     <AccordionIcon />
                                                 </AccordionButton>
                                                 <AccordionPanel paddingLeft={0}>

@@ -201,7 +201,7 @@ const Subscribe = ({...otherProps}) => {
     const intl = useIntl()
     return (
         <Box {...styles.subscribe} {...otherProps}>
-            <Heading as="h1" {...styles.subscribeHeading}>
+            <Heading {...styles.subscribeHeading}>
                 {intl.formatMessage({
                     id: 'footer.subscribe.heading.first_to_know',
                     defaultMessage: 'Be the first to know'

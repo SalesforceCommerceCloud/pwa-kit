@@ -137,53 +137,40 @@ const Account = () => {
                                 <AccordionButton
                                     as={Button}
                                     height={16}
-                                    paddingLeft={8}
                                     variant="ghost"
                                     color="black"
                                     _active={{background: 'gray.100'}}
                                     _expanded={{background: 'transparent'}}
                                 >
                                     <Flex align="center" justify="center">
-                                        <Heading as="h2" fontSize="16px">
+                                        <Text as="span" mr={2}>
                                             <FormattedMessage
                                                 defaultMessage="My Account"
                                                 id="account.accordion.button.my_account"
                                             />
-                                        </Heading>
+                                        </Text>
                                         {isExpanded ? <ChevronUpIcon /> : <ChevronDownIcon />}
                                     </Flex>
                                 </AccordionButton>
                                 <AccordionPanel px={4} paddingBottom={4}>
                                     <Flex as="nav" spacing={0} direction="column">
-                                        <Stack spacing={0} as="ul" data-testid="account-nav">
-                                            {navLinks.map((link) => (
-                                                <Box
-                                                    align="center"
-                                                    key={link.name}
-                                                    as="li"
-                                                    listStyleType="none"
-                                                >
-                                                    <Button
-                                                        as={Link}
-                                                        to={`/account${link.path}`}
-                                                        useNavLink={true}
-                                                        variant="menu-link-mobile"
-                                                        justifyContent="center"
-                                                        fontSize="md"
-                                                        fontWeight="normal"
-                                                        width="100%"
-                                                        onClick={() => setMobileNavIndex(-1)}
-                                                    >
-                                                        {formatMessage(messages[link.name])}
-                                                    </Button>
-                                                </Box>
-                                            ))}
+                                        {navLinks.map((link) => (
+                                            <Button
+                                                key={link.name}
+                                                as={Link}
+                                                to={`/account${link.path}`}
+                                                useNavLink={true}
+                                                variant="menu-link-mobile"
+                                                justifyContent="center"
+                                                fontSize="md"
+                                                fontWeight="normal"
+                                                onClick={() => setMobileNavIndex(-1)}
+                                            >
+                                                {formatMessage(messages[link.name])}
+                                            </Button>
+                                        ))}
 
-                                            <LogoutButton
-                                                justify="center"
-                                                onClick={onSignoutClick}
-                                            />
-                                        </Stack>
+                                        <LogoutButton justify="center" onClick={onSignoutClick} />
                                     </Flex>
                                 </AccordionPanel>
                             </>

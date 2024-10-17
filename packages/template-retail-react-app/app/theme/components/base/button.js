@@ -56,10 +56,10 @@ export default {
             fontSize: 'sm',
             _hover: {bg: 'gray.50', textDecoration: 'underline', textDecorationColor: 'gray.900'},
             _activeLink: {
-                bg: 'gray.100',
-                border: 'solid',
-                borderColor: 'gray.600',
-                borderWidth: '1px'
+                bg: 'gray.50',
+                borderLeft: 'solid',
+                borderLeftColor: 'gray.300',
+                borderLeftWidth: '4px'
             }
         },
         'search-link': {

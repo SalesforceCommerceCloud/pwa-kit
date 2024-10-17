@@ -20,7 +20,9 @@ describe('Shopper Login hooks', () => {
             // These endpoints all return data in the response headers, rather than body, so they
             // don't work well with the current implementation of mutation hooks.
             'authenticateCustomer',
-            'getTrustedAgentAuthorizationToken'
+            'authorizeCustomer',
+            'getTrustedAgentAuthorizationToken',
+            'getPasswordResetToken'
         ])
     })
     test('all mutations have cache update logic', () => {
