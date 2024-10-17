@@ -11,7 +11,6 @@ import {useHistory, useLocation} from 'react-router-dom'
 import {StorefrontPreview} from '@salesforce/commerce-sdk-react/components'
 import {getAssetUrl} from '@salesforce/pwa-kit-react-sdk/ssr/universal/utils'
 import useActiveData from '@salesforce/retail-react-app/app/hooks/use-active-data'
-import {getAppOrigin} from '@salesforce/pwa-kit-react-sdk/utils/url'
 import {useQuery} from '@tanstack/react-query'
 import {
     useAccessToken,
@@ -19,6 +18,8 @@ import {
     useShopperBasketsMutation
 } from '@salesforce/commerce-sdk-react'
 import logger from '@salesforce/retail-react-app/app/utils/logger-instance'
+import {useAppOrigin} from '@salesforce/retail-react-app/app/hooks/use-app-origin'
+
 // Chakra
 import {
     Box,
@@ -48,10 +49,6 @@ import AboveHeader from '@salesforce/retail-react-app/app/components/_app/partia
 import StoreLocatorModal from '@salesforce/retail-react-app/app/components/store-locator-modal'
 // Hooks
 import {AuthModal, useAuthModal} from '@salesforce/retail-react-app/app/hooks/use-auth-modal'
-import {
-    DntNotification,
-    useDntNotification
-} from '@salesforce/retail-react-app/app/hooks/use-dnt-notification'
 import {AddToCartModalProvider} from '@salesforce/retail-react-app/app/hooks/use-add-to-cart-modal'
 import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
@@ -127,12 +124,11 @@ const App = (props) => {
     })
     const categories = flatten(categoriesTree || {}, 'categories')
     const {getTokenWhenReady} = useAccessToken()
-    const appOrigin = getAppOrigin()
+    const appOrigin = useAppOrigin()
     const activeData = useActiveData()
     const history = useHistory()
     const location = useLocation()
     const authModal = useAuthModal()
-    const dntNotification = useDntNotification()
     const {site, locale, buildUrl} = useMultiSite()
 
     const [isOnline, setIsOnline] = useState(true)
@@ -178,7 +174,7 @@ const App = (props) => {
                 // Otherwise, it'll continue to fetch the missing translation file again
                 return {}
             }
-            return fetchTranslations(targetLocale)
+            return fetchTranslations(targetLocale, appOrigin)
         },
         enabled: isServer
     })
@@ -423,7 +419,6 @@ const App = (props) => {
                                 {!isCheckout ? <Footer /> : <CheckoutFooter />}
 
                                 <AuthModal {...authModal} />
-                                <DntNotification {...dntNotification} />
                             </AddToCartModalProvider>
                         </Box>
                     </CurrencyProvider>
