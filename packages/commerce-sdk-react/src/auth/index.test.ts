@@ -608,4 +608,19 @@ describe('Auth', () => {
             )
         })
     })
+
+    test('getDnt() returns undefined if token and cookie value is conflicting', async () => {
+        const getSpiedOn = jest.spyOn(Auth.prototype as any, 'get')
+        const parseSlasJWTSpiedOn = jest.spyOn(Auth.prototype as any, 'parseSlasJWT')
+        parseSlasJWTSpiedOn.mockReturnValue({
+            dnt: '1'
+        })
+        getSpiedOn.mockReturnValue('0')
+
+        const auth = new Auth({...config, siteId: 'siteA'})
+        auth.getDnt()
+        await waitFor(() => {
+            expect(auth.getDnt()).toBeUndefined()
+        })
+    })
 })
