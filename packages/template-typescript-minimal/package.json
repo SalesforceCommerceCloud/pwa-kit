@@ -16,6 +16,7 @@
     "save-credentials": "pwa-kit-dev save-credentials",
     "start": "pwa-kit-dev start",
     "start:inspect": "npm run start -- --inspect",
+    "start:pseudolocale": "npm run extract-default-translations && npm run compile-translations:pseudo && cross-env USE_PSEUDOLOCALE=true npm run start",
     "tail-logs": "pwa-kit-dev tail-logs",
     "test": "pwa-kit-dev test",
     "typecheck": "tsc --noEmit"
@@ -65,7 +66,8 @@
     "raf": "^3.4.1",
     "randomstring": "^1.2.3",
     "react-hook-form": "^7.43.9",
-    "react-intl": "^5.25.1"
+    "react-intl": "^5.25.1",
+    "cross-env": "^5.2.1"
   },
   "engines": {
     "node": "^16.11.0 || ^18.0.0 || ^20.0.0",
