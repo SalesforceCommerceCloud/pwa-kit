@@ -5,6 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
+import useIdpAuth from '@salesforce/retail-react-app/app/hooks/use-idp-auth'
 import React, {Fragment} from 'react'
 import PropTypes from 'prop-types'
 import {FormattedMessage} from 'react-intl'
@@ -15,11 +16,17 @@ import {
     Stack,
     Text
 } from '@salesforce/retail-react-app/app/components/shared/ui'
-import {AlertIcon, BrandLogo} from '@salesforce/retail-react-app/app/components/icons'
+import {
+    AlertIcon,
+    BrandLogo,
+    SocialFacebookIcon
+} from '@salesforce/retail-react-app/app/components/icons'
 import LoginFields from '@salesforce/retail-react-app/app/components/forms/login-fields'
 import {noop} from '@salesforce/retail-react-app/app/utils/utils'
 
 const LoginForm = ({submitForm, clickForgotPassword = noop, clickCreateAccount = noop, form}) => {
+    const idpAuth = useIdpAuth()
+
     return (
         <Fragment>
             <Stack justify="center" align="center" spacing={8} marginBottom={8}>
@@ -69,6 +76,22 @@ const LoginForm = ({submitForm, clickForgotPassword = noop, clickCreateAccount =
                                 defaultMessage="Sign In"
                                 id="login_form.button.sign_in"
                             />
+                        </Button>
+
+                        <Button
+                            variant="outline"
+                            size="lg"
+                            leftIcon={<SocialFacebookIcon />}
+                            onClick={async () => {
+                                await idpAuth.loginRedirect('facebook')
+                            }}
+                        >
+                            <Text paddingLeft={4}>
+                                <FormattedMessage
+                                    defaultMessage="Continue with Facebook"
+                                    id="login_form.button.continue_with_facebook"
+                                />
+                            </Text>
                         </Button>
 
                         <Stack direction="row" spacing={1} justify="center">
