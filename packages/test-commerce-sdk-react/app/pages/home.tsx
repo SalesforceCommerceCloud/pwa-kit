@@ -60,6 +60,9 @@ const Home = () => {
                 <li>
                     <Link to="/stores">useShopperStores</Link>
                 </li>
+                <li>
+                    <Link to="/dnt">useDnt</Link>
+                </li>
             </ul>
 
             <h2>Miscellaneous</h2>
