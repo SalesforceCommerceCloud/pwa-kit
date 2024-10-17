@@ -14,8 +14,9 @@ import {Icon, useTheme} from '@salesforce/retail-react-app/app/components/shared
 // during SSR.
 // NOTE: Another solution would be to use `require-context.macro` package to accomplish
 // importing icon svg's.
-import '@salesforce/retail-react-app/app/assets/svg/alert.svg'
 import '@salesforce/retail-react-app/app/assets/svg/account.svg'
+import '@salesforce/retail-react-app/app/assets/svg/alert.svg'
+import '@salesforce/retail-react-app/app/assets/svg/apple.svg'
 import '@salesforce/retail-react-app/app/assets/svg/basket.svg'
 import '@salesforce/retail-react-app/app/assets/svg/check.svg'
 import '@salesforce/retail-react-app/app/assets/svg/check-circle.svg'
@@ -37,6 +38,7 @@ import '@salesforce/retail-react-app/app/assets/svg/flag-it.svg'
 import '@salesforce/retail-react-app/app/assets/svg/flag-cn.svg'
 import '@salesforce/retail-react-app/app/assets/svg/flag-jp.svg'
 import '@salesforce/retail-react-app/app/assets/svg/github-logo.svg'
+import '@salesforce/retail-react-app/app/assets/svg/google.svg'
 import '@salesforce/retail-react-app/app/assets/svg/hamburger.svg'
 import '@salesforce/retail-react-app/app/assets/svg/info.svg'
 import '@salesforce/retail-react-app/app/assets/svg/social-facebook.svg'
@@ -137,9 +139,10 @@ export const icon = (name, passProps, localizationAttributes) => {
 // Export Chakra icon components that use our SVG sprite symbol internally
 // For non-square SVGs, we can use the symbol data from the import to set the
 // proper viewBox attribute on the Icon wrapper.
-export const AmexIcon = icon('cc-amex', {viewBox: AmexSymbol.viewBox})
-export const AlertIcon = icon('alert')
 export const AccountIcon = icon('account')
+export const AlertIcon = icon('alert')
+export const AmexIcon = icon('cc-amex', {viewBox: AmexSymbol.viewBox})
+export const AppleIcon = icon('apple')
 export const BrandLogo = icon('brand-logo', {viewBox: BrandLogoSymbol.viewBox})
 export const BasketIcon = icon('basket')
 export const CheckIcon = icon('check')
@@ -163,6 +166,7 @@ export const FlagITIcon = icon('flag-it')
 export const FlagCNIcon = icon('flag-cn')
 export const FlagJPIcon = icon('flag-jp')
 export const GithubLogo = icon('github-logo')
+export const GoogleIcon = icon('google')
 export const HamburgerIcon = icon('hamburger')
 export const HeartIcon = icon('heart')
 export const HeartSolidIcon = icon('heart-solid')

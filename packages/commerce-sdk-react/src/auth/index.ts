@@ -52,6 +52,10 @@ interface SlasJwtPayload extends JwtPayload {
     dnt: string
 }
 
+type AuthorizeIDPParams = Parameters<Helpers['authorizeIDP']>[1]
+type LoginIDPUserParams = Parameters<Helpers['loginIDPUser']>[2]
+type LoginRegisteredUserB2CCredentials = Parameters<Helpers['loginRegisteredUserB2C']>[1]
+
 /**
  * The extended field is not from api response, we manually store the auth type,
  * so we don't need to make another API call when we already have the data.
@@ -73,6 +77,7 @@ type AuthDataKeys =
     | 'access_token_sfra'
     | typeof DNT_COOKIE_NAME
     | 'dwsid'
+    | 'code_verifier'
 
 type AuthDataMap = Record<
     AuthDataKeys,
@@ -168,6 +173,10 @@ const DATA_MAP: AuthDataMap = {
     dwsid: {
         storageType: 'cookie',
         key: 'dwsid'
+    },
+    code_verifier: {
+        storageType: 'local',
+        key: 'code_verifier'
     }
 }
 
@@ -267,6 +276,8 @@ class Auth {
               config.clientSecret || ''
 
         this.silenceWarnings = config.silenceWarnings || false
+
+        this.isPrivate = !!this.clientSecret
     }
 
     get(name: AuthDataKeys) {
@@ -730,7 +741,7 @@ class Auth {
      * A wrapper method for commerce-sdk-isomorphic helper: loginRegisteredUserB2C.
      *
      */
-    async loginRegisteredUserB2C(credentials: Parameters<Helpers['loginRegisteredUserB2C']>[1]) {
+    async loginRegisteredUserB2C(credentials: LoginRegisteredUserB2CCredentials) {
         if (this.clientSecret && onClient() && this.clientSecret !== SLAS_SECRET_PLACEHOLDER) {
             this.logWarning(SLAS_SECRET_WARNING_MSG)
         }
@@ -771,6 +782,62 @@ class Auth {
         }
         this.clearStorage()
         return await this.loginGuestUser()
+    }
+
+    /**
+     * A wrapper method for commerce-sdk-isomorphic helper: authorizeIDP.
+     *
+     */
+    async authorizeIDP(parameters: AuthorizeIDPParams) {
+        const redirectURI = this.redirectURI
+        const usid = this.get('usid')
+        const {url, codeVerifier} = await helpers.authorizeIDP(
+            this.client,
+            {
+                redirectURI,
+                hint: parameters.hint,
+                ...(usid && {usid})
+            },
+            this.isPrivate
+        )
+        if (onClient()) {
+            window.location.assign(url)
+        } else {
+            console.warn('Something went wrong, this client side method is invoked on the server.')
+        }
+        this.set('code_verifier', codeVerifier)
+    }
+
+    /**
+     * A wrapper method for commerce-sdk-isomorphic helper: loginIDPUser.
+     *
+     */
+    async loginIDPUser(parameters: LoginIDPUserParams) {
+        const codeVerifier = this.get('code_verifier')
+        const code = parameters.code
+        const usid = parameters.usid
+        const redirectURI = parameters.redirectURI || this.redirectURI
+
+        const token = await helpers.loginIDPUser(
+            this.client,
+            {
+                codeVerifier,
+                clientSecret: this.clientSecret
+            },
+            {
+                redirectURI,
+                code,
+                ...(usid && {usid})
+            }
+        )
+        const isGuest = false
+        this.handleTokenResponse(token, isGuest)
+        // Delete the code verifier once the user has logged in
+        this.delete('code_verifier')
+        if (onClient()) {
+            void this.clearECOMSession()
+        }
+        return token
     }
 
     /**
