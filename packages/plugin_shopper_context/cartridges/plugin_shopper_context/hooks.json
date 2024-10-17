@@ -1,0 +1,12 @@
+{
+    "hooks": [
+        {
+            "name": "dw.shop.shopper_context.beforePATCH",
+            "script": "./cartridge/scripts/hooks/updateShopperContext"
+        },
+        {
+            "name": "dw.shop.shopper_context.beforePUT",
+            "script": "./cartridge/scripts/hooks/createShopperContext"
+        }
+    ]
+}
