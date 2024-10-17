@@ -149,6 +149,7 @@ const ProductList = (props) => {
 
     const {
         isLoading,
+        isFetched,
         isRefetching,
         data: productSearchResult
     } = useProductSearch(
@@ -543,7 +544,8 @@ const ProductList = (props) => {
                                 spacingX={4}
                                 spacingY={{base: 12, lg: 16}}
                             >
-                                {isHydrated() && (isRefetching || !productSearchResult)
+                                {isHydrated() &&
+                                ((isRefetching && !isFetched) || !productSearchResult)
                                     ? new Array(searchParams.limit)
                                           .fill(0)
                                           .map((value, index) => (
@@ -563,6 +565,7 @@ const ProductList = (props) => {
                                                   product={productSearchItem}
                                                   enableFavourite={true}
                                                   isFavourite={isInWishlist}
+                                                  isRefreshingData={isRefetching && isFetched}
                                                   imageViewType={PRODUCT_LIST_IMAGE_VIEW_TYPE}
                                                   selectableAttributeId={
                                                       PRODUCT_LIST_SELECTABLE_ATTRIBUTE_ID
