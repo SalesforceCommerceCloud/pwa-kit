@@ -40,7 +40,7 @@ const registerUser = async (page) => {
     page.getByRole("heading", { name: /My Account/i })
   ).toBeVisible();
 }
-test.describe("DNT form exists", () => {
+test.describe("Consent Tracking form works as expected", () => {
   test.beforeEach(async ({ page }) => {
     await page.context().clearCookies();
     await page.goto(config.RETAIL_APP_HOME);
@@ -119,8 +119,7 @@ test.describe("DNT form exists", () => {
 
     const cookies = await page.context().cookies();
     if (cookies.some(item => item.name === "dw_dnt")) {
-        throw new Error('An object with name "dw_dnt" was found in the array.');
+        throw new Error('dw_dnt still exists in the cookies');
     }
-
   });
 });
