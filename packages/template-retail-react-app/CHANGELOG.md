@@ -1,5 +1,6 @@
 ## v5.0.0
 - DNT UI: [#2017](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2017)
+- DNT UI E2E Browser Tests: [#2081](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2081)
 
 ## v4.1.0-dev (Aug 8, 2024)
 - Add useXForwardedHost (default to false) flag to allow the use of x-forwarded-host header value in building links [#2018](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2018)
