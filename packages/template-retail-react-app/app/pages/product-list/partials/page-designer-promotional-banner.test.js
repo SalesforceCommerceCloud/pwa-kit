@@ -39,16 +39,19 @@ describe('PageDesignerPromotionalBanner', function () {
         jest.clearAllMocks()
     })
 
-    test('should render mobile and desktop banner when shopper context exists', async () => {
-        useShopperContext.mockImplementation(() => {
-            return {data: {}}
-        })
-        renderWithProviders(<PageDesignerPromotionalBanner />)
-        // NOTE: Both mobile and desktop views exist, but they're hidden
-        // with display:none style depending on the browser's view
-        expect(await screen.findByTestId('sf-promo-banner-desktop')).toBeInTheDocument()
-        expect(await screen.findByTestId('sf-promo-banner-mobile')).toBeInTheDocument()
-    })
+    test.each([[{}], [{sourceCode: 'instagram'}]])(
+        'should render mobile and desktop banner when shopper context exists',
+        async (data) => {
+            useShopperContext.mockImplementation(() => {
+                return {data}
+            })
+            renderWithProviders(<PageDesignerPromotionalBanner />)
+            // NOTE: Both mobile and desktop views exist, but they're hidden
+            // with display:none style depending on the browser's view
+            expect(await screen.findByTestId('sf-promo-banner-desktop')).toBeInTheDocument()
+            expect(await screen.findByTestId('sf-promo-banner-mobile')).toBeInTheDocument()
+        }
+    )
 
     test('should not render mobile and desktop banner when shopper context is undefined', async () => {
         useShopperContext.mockImplementation(() => {
