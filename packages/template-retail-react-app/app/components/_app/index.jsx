@@ -402,6 +402,7 @@ const App = (props) => {
                                         outline: 0
                                     }}
                                 >
+                                    <div>Test</div>
                                     <Box
                                         as="main"
                                         id="app-main"
