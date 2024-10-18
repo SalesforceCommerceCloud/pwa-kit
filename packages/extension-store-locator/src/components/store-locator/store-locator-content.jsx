@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, salesforce.com, inc.
+ * Copyright (c) 2024, salesforce.com, inc.
  * All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
@@ -7,29 +7,28 @@
 
 import React, {useState, useContext} from 'react'
 import {useIntl} from 'react-intl'
-
-// Components
 import {Heading, Accordion, AccordionItem, Box, Button} from '@chakra-ui/react'
-import StoresList from '@salesforce/retail-react-app/app/components/store-locator-modal/stores-list'
-import StoreLocatorInput from '@salesforce/retail-react-app/app/components/store-locator-modal/store-locator-input'
+import StoresList from './stores-list'
+import StoreLocatorInput from './store-locator-input'
 
-// Others
-import {
-    SUPPORTED_STORE_LOCATOR_COUNTRIES,
-    DEFAULT_STORE_LOCATOR_COUNTRY,
-    STORE_LOCATOR_DISTANCE,
-    STORE_LOCATOR_NUM_STORES_PER_LOAD,
-    STORE_LOCATOR_DISTANCE_UNIT
-} from '@salesforce/retail-react-app/app/constants'
+// todo make these configs
+const DEFAULT_STORE_LOCATOR_COUNTRY = {
+    countryCode: 'DE',
+    countryName: 'Germany'
+}
+const DEFAULT_STORE_LOCATOR_POSTAL_CODE = '10178'
+const STORE_LOCATOR_DISTANCE = 100
+const STORE_LOCATOR_NUM_STORES_PER_LOAD = 10
+const STORE_LOCATOR_DISTANCE_UNIT = 'km'
+const STORE_LOCATOR_IS_ENABLED = true
 
 //This is an API limit and is therefore not configurable
 const NUM_STORES_PER_REQUEST_API_MAX = 200
 
-// Hooks
 import {useSearchStores} from '@salesforce/commerce-sdk-react'
 import {useForm} from 'react-hook-form'
 
-import {StoreLocatorContext} from '@salesforce/retail-react-app/app/components/store-locator-modal/index'
+import {StoreLocatorContext} from './index'
 
 const StoreLocatorContent = () => {
     const {

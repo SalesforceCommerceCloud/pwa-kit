@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, salesforce.com, inc.
+ * Copyright (c) 2024, salesforce.com, inc.
  * All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
@@ -8,8 +8,6 @@
 import React, {useEffect, useContext} from 'react'
 import {useIntl} from 'react-intl'
 import PropTypes from 'prop-types'
-
-// Components
 import {
     Button,
     InputGroup,
@@ -19,15 +17,19 @@ import {
     FormControl,
     FormErrorMessage
 } from '@chakra-ui/react'
-import {AlertIcon} from '@salesforce/retail-react-app/app/components/icons'
+// import {AlertIcon} from '@salesforce/retail-react-app/app/components/icons'
 import {Controller} from 'react-hook-form'
-
-// Others
-import {
-    SUPPORTED_STORE_LOCATOR_COUNTRIES,
-    STORE_LOCATOR_NUM_STORES_PER_LOAD
-} from '@salesforce/retail-react-app/app/constants'
-import {StoreLocatorContext} from '@salesforce/retail-react-app/app/components/store-locator-modal/index'
+// todo make these configs
+const DEFAULT_STORE_LOCATOR_COUNTRY = {
+    countryCode: 'DE',
+    countryName: 'Germany'
+}
+const DEFAULT_STORE_LOCATOR_POSTAL_CODE = '10178'
+const STORE_LOCATOR_DISTANCE = 100
+const STORE_LOCATOR_NUM_STORES_PER_LOAD = 10
+const STORE_LOCATOR_DISTANCE_UNIT = 'km'
+const STORE_LOCATOR_IS_ENABLED = true
+import {StoreLocatorContext} from './index'
 
 const useGeolocation = () => {
     const {
@@ -120,7 +122,7 @@ const StoreLocatorInput = ({form, submitForm}) => {
                                             sx={{marginBottom: '10px'}}
                                             color="red.600"
                                         >
-                                            <AlertIcon aria-hidden="true" mr={2} />
+                                            {/* <AlertIcon aria-hidden="true" mr={2} /> */}
                                             {form.formState.errors.countryCode.message}
                                         </FormErrorMessage>
                                     )}
