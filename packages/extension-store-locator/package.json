@@ -5,12 +5,14 @@
   "peerDependencies": {
     "@chakra-ui/react": "^2.10.3",
     "@loadable/component": "^5.15.3",
+    "@salesforce/commerce-sdk-react": "3.1.0-dev",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },
   "devDependencies": {
     "@chakra-ui/react": "^2.10.3",
     "@loadable/component": "^5.15.3",
+    "@salesforce/commerce-sdk-react": "3.1.0-dev",
     "@salesforce/pwa-kit-react-sdk": "4.0.0-dev",
     "@salesforce/pwa-kit-runtime": "4.0.0-dev",
     "@types/react": "~18.2.0",
@@ -22,5 +24,8 @@
   "engines": {
     "node": "^16.11.0 || ^18.0.0 || ^20.0.0",
     "npm": "^8.0.0 || ^9.0.0 || ^10.0.0"
+  },
+  "dependencies": {
+    "@salesforce/commerce-sdk-react": "^3.1.0-dev"
   }
 }
