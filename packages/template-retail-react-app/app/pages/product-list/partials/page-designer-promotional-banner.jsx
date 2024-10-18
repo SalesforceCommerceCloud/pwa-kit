@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
-import {usePage} from '@salesforce/commerce-sdk-react'
+import {usePage, useUsid, useShopperContext} from '@salesforce/commerce-sdk-react'
 
 // Components
 import {Box} from '@salesforce/retail-react-app/app/components/shared/ui'
@@ -15,19 +15,42 @@ import {Page} from '@salesforce/commerce-sdk-react/components'
 import {ImageWithText} from '@salesforce/retail-react-app/app/page-designer/assets'
 import {MobileGrid1r1c} from '@salesforce/retail-react-app/app/page-designer/layouts'
 
+// Hooks
+import {isServer} from '@salesforce/retail-react-app/app/utils/utils'
+import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
+
+// Constants
+const PROMO_BANNER_DESKTOP_PAGE_ID = 'instagram-promo-banner-desktop'
+const PROMO_BANNER_MOBILE_PAGE_ID = 'instagram-promo-banner-mobile'
+const PAGEDESIGNER_TO_COMPONENT = {
+    'commerce_assets.productListTile': ImageWithText,
+    'commerce_layouts.mobileGrid1r1c': MobileGrid1r1c
+}
+
 const PageDesignerPromotionalBanner = () => {
-    const PROMO_BANNER_DESKTOP_PAGE_ID = 'instagram-promo-banner-desktop'
-    const PROMO_BANNER_MOBILE_PAGE_ID = 'instagram-promo-banner-mobile'
-    const PAGEDESIGNER_TO_COMPONENT = {
-        'commerce_assets.productListTile': ImageWithText,
-        'commerce_layouts.mobileGrid1r1c': MobileGrid1r1c
-    }
-    const {data: promoBannerDesktop, error: pageErrorDesktop} = usePage({
-        parameters: {pageId: PROMO_BANNER_DESKTOP_PAGE_ID}
-    })
-    const {data: promoBannerMobile, error: pageErrorMobile} = usePage({
-        parameters: {pageId: PROMO_BANNER_MOBILE_PAGE_ID}
-    })
+    const {site} = useMultiSite()
+    const {usid} = useUsid()
+    const {data: shopperContext} = useShopperContext(
+        {parameters: {usid, siteId: site.id}},
+        {enabled: !isServer}
+    )
+
+    const {data: promoBannerDesktop, error: pageErrorDesktop} = usePage(
+        {
+            parameters: {pageId: PROMO_BANNER_DESKTOP_PAGE_ID}
+        },
+        {
+            enabled: !!shopperContext
+        }
+    )
+    const {data: promoBannerMobile, error: pageErrorMobile} = usePage(
+        {
+            parameters: {pageId: PROMO_BANNER_MOBILE_PAGE_ID}
+        },
+        {
+            enabled: !!shopperContext
+        }
+    )
 
     return (
         <Box>
