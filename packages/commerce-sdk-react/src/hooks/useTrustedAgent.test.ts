@@ -1,11 +1,13 @@
+/*
+ * Copyright (c) 2024, Salesforce, Inc.
+ * All rights reserved.
+ * SPDX-License-Identifier: BSD-3-Clause
+ * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
+ */
+
 import nock from 'nock'
 import {act, waitFor} from '@testing-library/react'
-import {
-    mockMutationEndpoints,
-    renderHookWithProviders,
-    waitAndExpectSuccess,
-    DEFAULT_TEST_CONFIG
-} from '../test-utils'
+import {mockMutationEndpoints, renderHookWithProviders} from '../test-utils'
 import * as useTrustedAgentModule from './useTrustedAgent'
 import {ShopperLoginTypes} from 'commerce-sdk-isomorphic'
 import useAuthContext from './useAuthContext'
@@ -61,7 +63,7 @@ describe('useTrustedAgent', () => {
 
     beforeAll(() => {
         // Mock the URL constructor
-        global.URL = jest.fn((url) => ({
+        global.URL = jest.fn(() => ({
             searchParams: {
                 get: jest.fn((param) => {
                     if (param === 'code') return 'code_xyz'
@@ -112,14 +114,14 @@ describe('useTrustedAgent', () => {
     })
 
     test('popup fails if window.open is not available', async () => {
-        const mockPopup = {
-            closed: false,
-            close: jest.fn(),
-            focus: jest.fn(),
-            location: {
-                toString: () => 'about:blank'
-            }
-        }
+        // const mockPopup = {
+        //     closed: false,
+        //     close: jest.fn(),
+        //     focus: jest.fn(),
+        //     location: {
+        //         toString: () => 'about:blank'
+        //     }
+        // }
         // Store the original window.open
         const originalWindowOpen = window.open
         // Set window.open to undefined for this test
@@ -128,7 +130,7 @@ describe('useTrustedAgent', () => {
         const {result} = renderHookWithProviders(() => useTrustedAgentModule.default())
 
         let error: Error | null = null
-        await act(() => {
+        act(() => {
             result.current.login('test_login_id').catch((e) => {
                 error = e
             })
@@ -154,7 +156,7 @@ describe('useTrustedAgent', () => {
 
         const {result} = renderHookWithProviders(() => useTrustedAgentModule.default())
 
-        let error: Error | null = null
+        // let error: Error | null = null
         let returnVal: ShopperLoginTypes.TokenResponse | null = null
         await act(async () => {
             await result.current.login('test_login_id').then((data) => {
@@ -216,7 +218,7 @@ describe('useTrustedAgent', () => {
     })
 
     test('login function works correctly', async () => {
-        const mockAuthResponse = {url: 'test_url', codeVerifier: 'test_verifier'}
+        // const mockAuthResponse = {url: 'test_url', codeVerifier: 'test_verifier'}
         const mockTokenResponse = {
             access_token: 'mock_access_token',
             refresh_token: 'mock_refresh_token'
@@ -231,7 +233,7 @@ describe('useTrustedAgent', () => {
 
         const {result} = renderHookWithProviders(() => useTrustedAgentModule.default())
 
-        const mockPopup = simulateSuccessfulPopup()
+        simulateSuccessfulPopup()
 
         let tokenResponse
         await act(async () => {
@@ -247,9 +249,9 @@ describe('useTrustedAgent', () => {
     })
 
     test('updates state when auth token changes', async () => {
-        const initialTokenResponse = {
-            access_token: 'initial.jwt.token'
-        } as ShopperLoginTypes.TokenResponse
+        // const initialTokenResponse = {
+        //     access_token: 'initial.jwt.token'
+        // } as ShopperLoginTypes.TokenResponse
         const newTokenResponse = {access_token: 'new.jwt.token'} as ShopperLoginTypes.TokenResponse
 
         const origMockParseSlasJwtVals = mockParseSlasJwtVals
