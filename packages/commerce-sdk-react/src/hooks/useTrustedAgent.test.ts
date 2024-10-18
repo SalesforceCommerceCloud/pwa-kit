@@ -20,7 +20,11 @@ const mockedUseConfig = useConfig as jest.MockedFunction<typeof Object>
 const mockWindowOpen = jest.fn()
 global.open = mockWindowOpen
 
-let mockParseSlasJwtVals = {
+let mockParseSlasJwtVals: {
+    isAgent: boolean
+    agentId: string | null
+    loginId: string | null
+} = {
     isAgent: false,
     agentId: null,
     loginId: null
@@ -31,7 +35,7 @@ let mockAuthGetters = {
     refresh_token_expires_in: 7776000,
     refresh_token: 'mock_refresh_token',
     access_token: 'mock_access_token'
-}
+} as {[key: string]: string | number}
 
 jest.mock('../auth/index.ts', () => {
     const {default: mockAuth} = jest.requireActual('../auth/index.ts')
@@ -151,7 +155,7 @@ describe('useTrustedAgent', () => {
         const {result} = renderHookWithProviders(() => useTrustedAgentModule.default())
 
         let error: Error | null = null
-        let returnVal = null
+        let returnVal: ShopperLoginTypes.TokenResponse | null = null
         await act(async () => {
             await result.current.login('test_login_id').then((data) => {
                 returnVal = data
