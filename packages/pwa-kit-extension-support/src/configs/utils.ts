@@ -13,8 +13,8 @@ import {kebabToUpperCamelCase, nameRegex} from '../shared/utils'
 
 // Regeister Handlebars helpers
 Handlebars.registerHelper('getInstanceName', (aString) => {
-    const [_, namespace, name] = aString.match(nameRegex)
-    
+    const [, namespace, name] = aString.match(nameRegex)
+
     return kebabToUpperCamelCase(`${namespace ? `${namespace}-` : ''}-${name}`)
 })
 Handlebars.registerHelper('isNotLast', (index, arrayLength) => index !== arrayLength - 1)
@@ -43,8 +43,7 @@ const templateString = dedent`
 export const renderTemplate = (data: any) => {
     // Compile the template
     const template = Handlebars.compile(templateString)
-  
-    console.log('template(data): ', data, template(data))
+
     // Apply data to the compiled template
     return template(data)
 }

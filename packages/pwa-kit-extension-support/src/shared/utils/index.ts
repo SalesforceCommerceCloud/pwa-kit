@@ -68,7 +68,9 @@ export const getApplicationExtensionInfo = (appConfig?: any) => {
     const pkg = fse.readJsonSync(resolve(projectDir, 'package.json'))
 
     // Use the application configuration in the projects application if one isn't provided.
-    appConfig = appConfig ? appConfig : fse.readJsonSync(resolve(projectDir, 'package.json'))?.mobify || {}
+    appConfig = appConfig
+        ? appConfig
+        : fse.readJsonSync(resolve(projectDir, 'package.json'))?.mobify || {}
 
     const installedExtensions = Object.keys(pkg?.devDependencies || {})
         .map((packageName) => (packageName.match(nameRegex) !== null ? packageName : undefined))
@@ -76,7 +78,7 @@ export const getApplicationExtensionInfo = (appConfig?: any) => {
 
     // NOTE: Might have to get the expanded version of these.
     const configuredExtensions = expand(appConfig?.app?.extensions || [])
-    console.log('getApplicationExtensionInfo: ', configuredExtensions)
+
     return {
         installed: installedExtensions,
         configured: configuredExtensions

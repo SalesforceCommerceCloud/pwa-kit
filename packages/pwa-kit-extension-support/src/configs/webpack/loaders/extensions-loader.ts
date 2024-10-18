@@ -14,14 +14,12 @@ import {renderTemplate} from '../../utils'
 
 // TODO: Move these to a better location.
 interface ExtensionsLoaderOptions {
-    pkg: PackageJson,
-    getConfig: () => any,
+    pkg: PackageJson
+    getConfig: () => any
     target: 'node' | 'web'
 }
 
-interface ExtensionsLoaderContext extends LoaderContext<ExtensionsLoaderOptions> {
-    // You can add any additional properties if needed
-}
+type ExtensionsLoaderContext = LoaderContext<ExtensionsLoaderOptions>
 
 /**
  * The `extensions-loader` as a mechanism to get all configured extensions for a given pwa-kit
@@ -39,6 +37,6 @@ interface ExtensionsLoaderContext extends LoaderContext<ExtensionsLoaderOptions>
  */
 module.exports = function (this: ExtensionsLoaderContext): string {
     // TODO: Add some argument checks here.
-    
+
     return renderTemplate(this.getOptions())
 }

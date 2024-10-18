@@ -7,10 +7,10 @@
 import {RouteProps} from 'react-router-dom'
 
 // Local
-import {ApplicationExtension as ApplicationExtensionBase} from ".."
+import {ApplicationExtension as ApplicationExtensionBase} from '..'
 
 // Types
-import {ApplicationExtensionConfig} from "../types"
+import {ApplicationExtensionConfig} from '../types'
 
 // type GenericHocType<C> = (component: React.ComponentType<C>) => React.ComponentType<C>
 
@@ -23,7 +23,9 @@ import {ApplicationExtensionConfig} from "../types"
  *
  * @abstract
  */
-export class ApplicationExtension<Config extends ApplicationExtensionConfig> extends ApplicationExtensionBase<Config>{
+export class ApplicationExtension<
+    Config extends ApplicationExtensionConfig
+> extends ApplicationExtensionBase<Config> {
     /**
      * Called during the rendering of the base application on the server and the client.
      * It is predominantly used to enhance the "base" application by wrapping it with React providers.
@@ -32,7 +34,9 @@ export class ApplicationExtension<Config extends ApplicationExtensionConfig> ext
      * @param App - The base application component.
      * @returns EnhancedApp - The enhanced application component.
      */
-    public extendApp<T extends React.ComponentType<T>>(App: React.ComponentType<T>): React.ComponentType<T> {
+    public extendApp<T extends React.ComponentType<T>>(
+        App: React.ComponentType<T>
+    ): React.ComponentType<T> {
         return App
     }
 

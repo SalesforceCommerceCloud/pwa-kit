@@ -11,9 +11,9 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import {ApplicationExtensionConfig} from "../types"
+import {ApplicationExtensionConfig} from '../types'
 
-import {ApplicationExtension as BaseApplicationExtension} from ".."
+import {ApplicationExtension as BaseApplicationExtension} from '..'
 import {Application} from 'express'
 
 /**
@@ -25,7 +25,9 @@ import {Application} from 'express'
  *
  * @abstract
  */
-export class ApplicationExtension<Config extends ApplicationExtensionConfig> extends BaseApplicationExtension<Config>{
+export class ApplicationExtension<
+    Config extends ApplicationExtensionConfig
+> extends BaseApplicationExtension<Config> {
     /**
      * Called during the rendering of the base application on the server and the client.
      * It is predominantly used to enhance the "base" application by wrapping it with React providers.

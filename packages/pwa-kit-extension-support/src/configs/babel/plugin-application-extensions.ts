@@ -6,8 +6,8 @@
  */
 // Third-Party
 // NOTE: These do not like the "import" syntax. Will break the plugin if you change it.
-const parser = require("@babel/parser")
-const babel = require("@babel/core")
+const parser = require('@babel/parser')
+const babel = require('@babel/core')
 
 import {renderTemplate} from '../utils'
 import {buildAliases} from '../../shared/utils'
@@ -18,14 +18,14 @@ import {buildAliases} from '../../shared/utils'
 // A Set to keep track of processed file paths
 const processedFiles = new Set()
 
-module.exports = function replaceFileContentPlugin({ types: t } : any) {
+module.exports = function replaceFileContentPlugin({types: t}: any) {
     return {
         visitor: {
             ImportDeclaration(path: any, state: any) {
                 const {installed} = state.opts
                 // TODO: Throw is undefined?
 
-                // This is analogus to the work we did in webpack to have aliases for the extensions. 
+                // This is analogus to the work we did in webpack to have aliases for the extensions.
                 // TODO: This should be coming from the options.
                 const aliases: any = buildAliases(installed)
                 const source = path.node.source.value
@@ -50,28 +50,23 @@ module.exports = function replaceFileContentPlugin({ types: t } : any) {
 
                 // Check if the file matches one of the files we want to replace
                 if (filePath.endsWith('express/assets/application-extensions-placeholder.js')) {
-
-                    const newContent = renderTemplate(
-                        {
-                            installed,
-                            configured,
-                            target
-                        }
-                    )
+                    const newContent = renderTemplate({
+                        installed,
+                        configured,
+                        target
+                    })
 
                     let parsedAst
                     try {
                         // Parse the new content as a full program
                         parsedAst = parser.parse(newContent, {
-                            sourceType: "module", // Ensure it supports import/export
-                            plugins: [
-                                "jsx", 
-                                "typescript"], // Add additional plugins if needed
-                        }).program;
+                            sourceType: 'module', // Ensure it supports import/export
+                            plugins: ['jsx', 'typescript'] // Add additional plugins if needed
+                        }).program
                     } catch (error: any) {
                         throw new Error(`Failed to parse content for ${filePath}: ${error.message}`)
                     }
-                    
+
                     // Mark the file as processed by adding its path to the Set
                     processedFiles.add(filePath)
 
@@ -83,19 +78,19 @@ module.exports = function replaceFileContentPlugin({ types: t } : any) {
                         filename: filePath,
                         presets: [
                             [
-                                '/Users/bchypak/Projects/pwa-kit/packages/pwa-kit-dev/node_modules/@babel/preset-env', 
-                                { 
-                                    targets: { 
-                                        node: "current" 
-                                    } 
+                                '/Users/bchypak/Projects/pwa-kit/packages/pwa-kit-dev/node_modules/@babel/preset-env',
+                                {
+                                    targets: {
+                                        node: 'current'
+                                    }
                                 }
                             ]
-                        ],  // Transpile to ES5
+                        ] // Transpile to ES5
                     }).code
 
                     // Parse the transpiled code and replace the current program node with it
                     const transpiledAst = parser.parse(transpiledCode, {
-                        sourceType: "script",  // Now using script because it's ES5
+                        sourceType: 'script' // Now using script because it's ES5
                     }).program
 
                     // Replace with the transpiled AST and complete the plugin execution.

@@ -754,7 +754,6 @@ export const RemoteServerFactory = {
         // to add in their projects, like in any regular Express app.
         app.use(ssrMiddleware)
         app.use(errorHandlerMiddleware)
-        console.log('Applying Application Extension Middleware: ', applicationExtensionMiddleware)
 
         // NOTE: Think about changing the name of this function to `applyApplicationExtensions`. First look into
         // what a common pattern is for application enhancement.

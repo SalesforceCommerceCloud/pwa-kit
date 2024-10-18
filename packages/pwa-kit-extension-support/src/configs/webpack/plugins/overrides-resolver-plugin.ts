@@ -42,7 +42,7 @@ class OverridesResolverPlugin {
 
     constructor(options: OverridesResolverPluginOptions) {
         this.options = {
-            ...defaultOptions, 
+            ...defaultOptions,
             ...options
         }
     }
@@ -96,10 +96,15 @@ class OverridesResolverPlugin {
         resolver
             .getHook('resolve')
             .tapAsync(
-                'OverridesResolverPlugin', 
-                (requestContext: any, resolveContext: any, callback: (err?: Error | null, result?: any) => void) => {
+                'OverridesResolverPlugin',
+                (
+                    requestContext: any,
+                    resolveContext: any,
+                    callback: (err?: Error | null, result?: any) => void
+                ) => {
                     this.handleHook(requestContext, resolveContext, callback, resolver)
-                })
+                }
+            )
     }
 }
 

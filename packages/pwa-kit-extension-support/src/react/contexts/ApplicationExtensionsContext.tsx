@@ -13,4 +13,4 @@ const defaultValue: ApplicationExtension<Config>[] = []
 
 const ApplicationExtensionsContext = React.createContext(defaultValue)
 
-export default  ApplicationExtensionsContext
+export default ApplicationExtensionsContext

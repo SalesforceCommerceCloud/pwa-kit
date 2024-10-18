@@ -12,7 +12,11 @@ import path from 'path'
 import {isEnabled} from './extensibility-utils'
 
 // Types
-import {ApplicationExtensionEntry, ApplicationExtensionEntryArray, BuildCandidatePathsOptions} from '../../types'
+import {
+    ApplicationExtensionEntry,
+    ApplicationExtensionEntryArray,
+    BuildCandidatePathsOptions
+} from '../../types'
 
 const EXTENSION_NAMESPACE = '@salesforce'
 const EXTENSION_PREFIX = 'extension'
@@ -56,11 +60,15 @@ export const isSelfReference = (importPath: string, sourcePath: string) => {
  * console.log(result)
  * // [["@salesforce/extension-store-finder", {}], ["@salesforce/extension-account-pages", {singlePage: true}], ["/home/project/extensions/local-extension", {}]]
  */
-export const expand = (extensions: ApplicationExtensionEntry[] = []): ApplicationExtensionEntryArray[] =>
+export const expand = (
+    extensions: ApplicationExtensionEntry[] = []
+): ApplicationExtensionEntryArray[] =>
     extensions
         .filter((extension) => Boolean(extension))
         .map((extension) => {
-            let [nameRef, config = {}] : [string, any] = Array.isArray(extension) ? extension : [extension, {}]
+            let [nameRef, config = {}]: [string, any] = Array.isArray(extension)
+                ? extension
+                : [extension, {}]
 
             switch (true) {
                 case /^\./.test(nameRef):
@@ -96,7 +104,11 @@ export const expand = (extensions: ApplicationExtensionEntry[] = []): Applicatio
  * @param {String} opts.projectDir - Absolute path of the base project.
  * @returns {String[]} paths - The potential paths to find the module import.
  */
-export const buildCandidatePaths = (importPath: string, sourcePath: string, opts: BuildCandidatePathsOptions) => {
+export const buildCandidatePaths = (
+    importPath: string,
+    sourcePath: string,
+    opts: BuildCandidatePathsOptions
+) => {
     // Replace wildcard character as it has done its job getting us to this point.
     importPath = importPath.replace('*/', '')
 

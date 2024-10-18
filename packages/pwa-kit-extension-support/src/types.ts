@@ -14,6 +14,6 @@ export type ApplicationExtensionEntryArray = [string, ApplicationExtensionConfig
 export type ApplicationExtensionEntry = ApplicationExtensionEntryArray | string
 
 export type BuildCandidatePathsOptions = {
-    projectDir: string, 
+    projectDir: string
     extensionEntries: ApplicationExtensionEntry[]
 }

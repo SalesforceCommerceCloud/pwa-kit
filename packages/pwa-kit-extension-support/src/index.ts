@@ -47,4 +47,15 @@ export abstract class ApplicationExtension<Config extends ApplicationExtensionCo
     public getName(): string {
         return this.constructor.name
     }
+
+    /**
+     * Returns true if the application extension is enabled, false otherwise.
+     *
+     * @protected
+     * @returns enabled - The application extensions enabled state.
+     */
+    public isEnabled(): boolean {
+        const enabled = this.getConfig()?.enabled
+        return enabled || enabled === undefined
+    }
 }

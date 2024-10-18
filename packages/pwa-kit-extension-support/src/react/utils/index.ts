@@ -10,7 +10,7 @@ import hoistNonReactStatics from 'hoist-non-react-statics'
 
 // NOTE: Similar to how I was thinking that the ExpressJS interface should be a middleware,
 // it might also be wise to make the React interface with application extensibility be an HOC.
-// This will ensure that in both worlds we are using a familiar pattern. 
+// This will ensure that in both worlds we are using a familiar pattern.
 
 /**
  * Applies a series of Higher-Order Components (HOCs) to a given React component.
@@ -22,10 +22,7 @@ import hoistNonReactStatics from 'hoist-non-react-statics'
  */
 // type GenericHocType<C> = (component: React.ComponentType<C>) => React.ComponentType<C>
 
-export const applyHOCs = <T extends React.ComponentType<any>>(
-    Component: T,
-    hocs: any
-): T => {
+export const applyHOCs = <T extends React.ComponentType<any>>(Component: T, hocs: any): T => {
     return hocs.reduce((AccumulatedComponent: any, hoc: any) => {
         const WrappedComponent = hoc(AccumulatedComponent)
         return hoistNonReactStatics(WrappedComponent, AccumulatedComponent) as T

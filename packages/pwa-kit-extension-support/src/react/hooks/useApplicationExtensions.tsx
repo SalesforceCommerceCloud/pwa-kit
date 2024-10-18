@@ -15,11 +15,13 @@ import {ApplicationExtensionConfig as Config} from '../../types'
  */
 const useApplicationExtensions = (): ApplicationExtension<Config>[] => {
     const context = useContext(ApplicationExtensionsContext)
-    
+
     if (context === undefined) {
-        throw new Error('useApplicationExtensions must be used within ApplicationExtensionsProvider')
+        throw new Error(
+            'useApplicationExtensions must be used within ApplicationExtensionsProvider'
+        )
     }
-    
+
     return context
 }
 

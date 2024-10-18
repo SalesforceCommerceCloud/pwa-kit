@@ -9,13 +9,13 @@
 import fs from 'fs-extra'
 import path from 'path'
 
-// Types 
+// Types
 import {ApplicationExtensionEntry, ApplicationExtensionEntryArray} from '../../types'
 
 // CONSTANTS
-const REACT_EXTENSIBILITY_FILE = 'setup-app'
-const EXPRESS_EXTENSIBILITY_FILE = 'setup-server'
-const SUPPORTED_FILE_TYPES = ['.ts', '.js']
+// const REACT_EXTENSIBILITY_FILE = 'setup-app'
+// const EXPRESS_EXTENSIBILITY_FILE = 'setup-server'
+// const SUPPORTED_FILE_TYPES = ['.ts', '.js']
 
 // TODO: Update this block comment.
 /**
@@ -39,12 +39,7 @@ export const buildAliases = (extensions: ApplicationExtensionEntry[] = []) => {
     const projectDir = process.cwd()
 
     const aliases = getExtensionNames(extensions).reduce((acc, extension) => {
-        const basePath = path.join(
-            projectDir,
-            'node_modules',
-            extension,
-            'src'
-        )
+        const basePath = path.join(projectDir, 'node_modules', extension, 'src')
 
         return {
             ...acc,
