@@ -8,106 +8,35 @@
 const { test, expect } = require("@playwright/test");
 const config = require("../../config");
 const {
+  registerShopper,
+  addProductToCart,
+  validateOrderHistory,
+  validateWishlist,
+  loginShopper,
+  navigateToPDPMobile
+} = require("../../scripts/pageHelpers");
+const {
   generateUserCredentials,
   getCreditCardExpiry,
 } = require("../../scripts/utils.js");
 
 const REGISTERED_USER_CREDENTIALS = generateUserCredentials();
 
+/**
+ * Test that registered shoppers can add a product to cart and go through the entire checkout process,
+ * validating that shopper is able to get to the order summary section,
+ * and that order shows up in order history
+ */
 test("Registered shopper can checkout items", async ({ page }) => {
   // Create Account and Sign In
-  await page.goto(config.RETAIL_APP_HOME + "/registration");
-
-  const registrationFormHeading = page.getByText(/Let's get started!/i);
-  await registrationFormHeading.waitFor();
-
-  await page
-    .locator("input#firstName")
-    .fill(REGISTERED_USER_CREDENTIALS.firstName);
-  await page
-    .locator("input#lastName")
-    .fill(REGISTERED_USER_CREDENTIALS.lastName);
-  await page.locator("input#email").fill(REGISTERED_USER_CREDENTIALS.email);
-  await page
-    .locator("input#password")
-    .fill(REGISTERED_USER_CREDENTIALS.password);
-
-  await page.getByRole("button", { name: /Create Account/i }).click();
-
-  await expect(
-    page.getByRole("heading", { name: /Account Details/i })
-  ).toBeVisible();
-
-  await expect(page.getByText(/Email/i)).toBeVisible();
-  await expect(page.getByText(REGISTERED_USER_CREDENTIALS.email)).toBeVisible();
+  await registerShopper({
+    page,
+    userCredentials: REGISTERED_USER_CREDENTIALS,
+    isMobile: true
+  })
 
   // Shop for items as registered user
-  await page.goto(config.RETAIL_APP_HOME);
-
-  await page.getByLabel("Menu", { exact: true }).click();
-
-  // SSR nav loads top level categories as direct links so we wait till all sub-categories load in the accordion
-  const categoryAccordion = page.locator(
-    "#category-nav .chakra-accordion__button svg+:text('Womens')"
-  );
-  await categoryAccordion.waitFor();
-
-  await page.getByRole("button", { name: "Womens" }).click();
-
-  const clothingNav = page.getByRole("button", { name: "Clothing" });
-
-  await clothingNav.waitFor();
-
-  await clothingNav.click();
-
-  const topsLink = page.getByLabel('Womens').getByRole("link", { name: "Tops" })
-  await topsLink.click();
-  // Wait for the nav menu to close first
-  await topsLink.waitFor({state: 'hidden'})
-
-  await expect(page.getByRole("heading", { name: "Tops" })).toBeVisible();
-  // PLP
-  const productTile = page.getByRole("link", {
-    name: /Cotton Turtleneck Sweater/i,
-  });
-  await productTile.scrollIntoViewIfNeeded()
-  // selecting swatch
-  const productTileImg = productTile.locator("img");
-  await productTileImg.waitFor({state: 'visible'})
-  const initialSrc = await productTileImg.getAttribute("src");
-  await expect(productTile.getByText(/From \$39\.99/i)).toBeVisible();
-
-  await productTile.getByLabel(/Black/, { exact: true }).click();
-  // Make sure the image src has changed
-  await expect(async () => {
-    const newSrc = await productTileImg.getAttribute("src")
-    expect(newSrc).not.toBe(initialSrc)
-  }).toPass()
-  await expect(productTile.getByText(/From \$39\.99/i)).toBeVisible();
-  await productTile.click();
-
-  // PDP
-  await expect(
-    page.getByRole("heading", { name: /Cotton Turtleneck Sweater/i })
-  ).toBeVisible();
-  await page.getByRole("radio", { name: "L", exact: true }).click();
-
-  await page.locator("button[data-testid='quantity-increment']").click();
-
-  // Selected Size and Color texts are broken into multiple elements on the page.
-  // So we need to look at the page URL to verify selected variants
-  const updatedPageURL = await page.url();
-  const params = updatedPageURL.split("?")[1];
-  expect(params).toMatch(/size=9LG/i);
-  expect(params).toMatch(/color=JJ169XX/i);
-
-  await page.getByRole("button", { name: /Add to Cart/i }).click();
-
-  const addedToCartModal = page.getByText(/2 items added to cart/i);
-
-  await addedToCartModal.waitFor();
-
-  await page.getByLabel("Close").click();
+  await addProductToCart({page, isMobile: true})
 
   // cart
   await page.getByLabel(/My cart/i).click();
@@ -162,7 +91,7 @@ test("Registered shopper can checkout items", async ({ page }) => {
     page.getByRole("heading", { name: /Shipping & Gift Options/i })
   ).toBeVisible();
 
-  await page.waitForTimeout(2000);
+  await page.waitForLoadState();
   const continueToPayment = page.getByRole("button", {
     name: /Continue to Payment/i,
   });
@@ -207,4 +136,38 @@ test("Registered shopper can checkout items", async ({ page }) => {
   await expect(
     page.getByRole("link", { name: /Cotton Turtleneck Sweater/i })
   ).toBeVisible();
+
+  // order history
+  await validateOrderHistory({page});
+});
+
+/**
+ * Test that registered shoppers can navigate to PDP and add a product to wishlist
+ */
+test("Registered shopper can add item to wishlist", async ({ page }) => {
+  const isLoggedIn = await loginShopper({
+    page,
+    userCredentials: REGISTERED_USER_CREDENTIALS
+  })
+
+  if(!isLoggedIn) {
+    await registerShopper({
+      page,
+      userCredentials: REGISTERED_USER_CREDENTIALS,
+      isMobile: true
+    })
+  }
+
+  // PDP
+  await navigateToPDPMobile({page});
+
+  // add product to wishlist
+  await expect(
+    page.getByRole("heading", { name: /Cotton Turtleneck Sweater/i })
+  ).toBeVisible();
+  await page.getByRole("radio", { name: "L", exact: true }).click();
+  await page.getByRole("button", { name: /Add to Wishlist/i }).click()
+
+  // wishlist
+  await validateWishlist({page})
 });

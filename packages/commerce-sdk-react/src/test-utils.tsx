@@ -105,7 +105,7 @@ const NOCK_DELAY = 50
 /** Mocks DELETE, PATCH, POST, and PUT so we don't have to look up which verb an endpoint uses. */
 export const mockMutationEndpoints = (
     matchingPath: string,
-    response: string | object | undefined,
+    response: string | object | undefined | ((uri: string, requestBody: any) => object),
     statusCode = 200
 ) => {
     const matcher = (uri: string) => uri.includes(matchingPath)

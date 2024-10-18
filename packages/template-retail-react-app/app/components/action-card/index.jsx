@@ -16,7 +16,15 @@ import LoadingSpinner from '@salesforce/retail-react-app/app/components/loading-
  * The provided `onRemove` callback triggers a loading spinner internally
  * if given a promise.
  */
-const ActionCard = ({children, onEdit, onRemove, editBtnRef, ...props}) => {
+const ActionCard = ({
+    children,
+    onEdit,
+    onRemove,
+    editBtnRef,
+    editBtnLabel,
+    removeBtnLabel,
+    ...props
+}) => {
     const [showLoading, setShowLoading] = useState(false)
 
     const handleRemove = async () => {
@@ -43,7 +51,13 @@ const ActionCard = ({children, onEdit, onRemove, editBtnRef, ...props}) => {
                 <Box>{children}</Box>
                 <Stack direction="row" spacing={4}>
                     {onEdit && (
-                        <Button onClick={onEdit} variant="link" size="sm" ref={editBtnRef}>
+                        <Button
+                            onClick={onEdit}
+                            variant="link"
+                            size="sm"
+                            ref={editBtnRef}
+                            aria-label={editBtnLabel}
+                        >
                             <FormattedMessage defaultMessage="Edit" id="action_card.action.edit" />
                         </Button>
                     )}
@@ -54,6 +68,7 @@ const ActionCard = ({children, onEdit, onRemove, editBtnRef, ...props}) => {
                             colorScheme="red"
                             onClick={handleRemove}
                             color="red.600"
+                            aria-label={removeBtnLabel}
                         >
                             <FormattedMessage
                                 defaultMessage="Remove"
@@ -78,7 +93,13 @@ ActionCard.propTypes = {
     children: PropTypes.node,
 
     /** Ref for the edit button so that it can be focused on for accessibility */
-    editBtnRef: PropTypes.object
+    editBtnRef: PropTypes.object,
+
+    /** Accessibility label for edit button */
+    editBtnLabel: PropTypes.string,
+
+    /** Accessibility label for remove button */
+    removeBtnLabel: PropTypes.string
 }
 
 export default ActionCard
