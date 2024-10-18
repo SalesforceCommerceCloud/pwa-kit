@@ -173,7 +173,7 @@ const DATA_MAP: AuthDataMap = {
     }
 }
 
-export const ninetyDaysInSeconds = 90 * 24 * 60 * 60
+export const DEFAULT_SLAS_REFRESH_TOKEN_TTL = 90 * 24 * 60 * 60
 
 /**
  * This class is used to handle shopper authentication.
@@ -513,9 +513,9 @@ class Auth {
         const fallbackTTL =
             typeof this.refreshTokenCookieTTL === 'number' &&
             this.refreshTokenCookieTTL >= 0 &&
-            this.refreshTokenCookieTTL <= ninetyDaysInSeconds
+            this.refreshTokenCookieTTL <= DEFAULT_SLAS_REFRESH_TOKEN_TTL
                 ? this.refreshTokenCookieTTL
-                : res.refresh_token_expires_in || ninetyDaysInSeconds
+                : res.refresh_token_expires_in || DEFAULT_SLAS_REFRESH_TOKEN_TTL
 
         this.set('refresh_token_expires_in', fallbackTTL.toString())
         const expiresDate = this.convertSecondsToDate(fallbackTTL)

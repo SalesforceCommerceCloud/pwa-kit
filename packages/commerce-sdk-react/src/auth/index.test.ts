@@ -11,7 +11,7 @@ import {helpers} from 'commerce-sdk-isomorphic'
 import * as utils from '../utils'
 import {SLAS_SECRET_PLACEHOLDER} from '../constant'
 import {ShopperLoginTypes} from 'commerce-sdk-isomorphic'
-import {ninetyDaysInSeconds} from './index'
+import {DEFAULT_SLAS_REFRESH_TOKEN_TTL} from './index'
 
 // Use memory storage for all our storage types.
 jest.mock('./storage', () => {
@@ -66,7 +66,7 @@ const configSLASPrivate = {
     enablePWAKitPrivateClient: true
 }
 
-const FAKE_SLAS_EXPIRY = ninetyDaysInSeconds - 1
+const FAKE_SLAS_EXPIRY = DEFAULT_SLAS_REFRESH_TOKEN_TTL - 1
 
 const TOKEN_RESPONSE: ShopperLoginTypes.TokenResponse = {
     access_token: 'access_token_xyz',
@@ -79,7 +79,7 @@ const TOKEN_RESPONSE: ShopperLoginTypes.TokenResponse = {
     usid: 'usid_xyz',
     idp_access_token: 'idp_access_token_xyz',
     // test that this is authoritative and not set to
-    // `ninetyDaysInSeconds` when config.refreshTokenCookieTTL is not set
+    // `DEFAULT_SLAS_REFRESH_TOKEN_TTL` when config.refreshTokenCookieTTL is not set
     refresh_token_expires_in: FAKE_SLAS_EXPIRY
 }
 
@@ -484,7 +484,7 @@ describe('Auth', () => {
         [900, 900],
         [0, 0],
         [-1, FAKE_SLAS_EXPIRY],
-        [ninetyDaysInSeconds + 1, FAKE_SLAS_EXPIRY]
+        [DEFAULT_SLAS_REFRESH_TOKEN_TTL + 1, FAKE_SLAS_EXPIRY]
     ])(
         'refreshTokenCookieTTL is set correctly for refreshTokenCookieTTLValue=`%p`, expected=`%s`',
         async (refreshTokenCookieTTLValue, expected) => {
