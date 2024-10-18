@@ -6,13 +6,10 @@
  */
 
 import React from 'react'
-import {useIntl} from 'react-intl'
 import PropTypes from 'prop-types'
 import {AccordionItem, AccordionButton, AccordionIcon, AccordionPanel, Box} from '@chakra-ui/react'
 
 const StoresList = ({storesInfo}) => {
-    const intl = useIntl()
-
     return storesInfo?.map((store, index) => {
         return (
             <AccordionItem key={index}>
@@ -28,11 +25,7 @@ const StoresList = ({storesInfo}) => {
                         <>
                             <br />
                             <Box fontSize="md" color="gray.600">
-                                {store.distance} {store.distanceUnit}{' '}
-                                {intl.formatMessage({
-                                    id: 'store_locator.description.away',
-                                    defaultMessage: 'away'
-                                })}
+                                {store.distance} {store.distanceUnit}{' away'}
                             </Box>
                         </>
                     ) : (
@@ -42,11 +35,7 @@ const StoresList = ({storesInfo}) => {
                         <>
                             <br />
                             <Box fontSize="md" color="gray.600">
-                                {intl.formatMessage({
-                                    id: 'store_locator.description.phone',
-                                    defaultMessage: 'Phone:'
-                                })}{' '}
-                                {store.phone}
+                                {'Phone: '}{store.phone}
                             </Box>
                         </>
                     ) : (
@@ -57,10 +46,7 @@ const StoresList = ({storesInfo}) => {
                             {' '}
                             <AccordionButton color="blue.700" style={{marginTop: '10px'}}>
                                 <Box fontSize="lg">
-                                    {intl.formatMessage({
-                                        id: 'store_locator.action.viewMore',
-                                        defaultMessage: 'View More'
-                                    })}
+                                View More
                                 </Box>
                                 <AccordionIcon />
                             </AccordionButton>

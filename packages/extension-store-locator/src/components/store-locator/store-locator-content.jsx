@@ -10,16 +10,15 @@ import {Heading, Accordion, AccordionItem, Box, Button} from '@chakra-ui/react'
 import StoresList from './stores-list'
 import StoreLocatorInput from './store-locator-input'
 
-// todo make these configs
-const DEFAULT_STORE_LOCATOR_COUNTRY = {
-    countryCode: 'DE',
-    countryName: 'Germany'
-}
-const DEFAULT_STORE_LOCATOR_POSTAL_CODE = '10178'
-const STORE_LOCATOR_DISTANCE = 100
-const STORE_LOCATOR_NUM_STORES_PER_LOAD = 10
-const STORE_LOCATOR_DISTANCE_UNIT = 'km'
-const STORE_LOCATOR_IS_ENABLED = true
+import {
+    DEFAULT_STORE_LOCATOR_COUNTRY,
+    DEFAULT_STORE_LOCATOR_POSTAL_CODE,
+    STORE_LOCATOR_NUM_STORES_PER_LOAD,
+    STORE_LOCATOR_DISTANCE,
+    STORE_LOCATOR_DISTANCE_UNIT,
+    STORE_LOCATOR_IS_ENABLED,
+    SUPPORTED_STORE_LOCATOR_COUNTRIES
+} from './constants'
 
 //This is an API limit and is therefore not configurable
 const NUM_STORES_PER_REQUEST_API_MAX = 200
@@ -60,7 +59,7 @@ const StoreLocatorContent = () => {
             latitude: latitude,
             longitude: longitude,
             // @TODO translations
-            locale: 'en_US',
+            locale: 'en-GB',
             maxDistance: STORE_LOCATOR_DISTANCE,
             limit: NUM_STORES_PER_REQUEST_API_MAX,
             distanceUnit: STORE_LOCATOR_DISTANCE_UNIT

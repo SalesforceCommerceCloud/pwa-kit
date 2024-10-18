@@ -16,16 +16,14 @@ import {
 } from '@chakra-ui/react'
 import StoreLocatorContent from './store-locator-content'
 // todo make these configs
-const DEFAULT_STORE_LOCATOR_COUNTRY = {
-    countryCode: 'DE',
-    countryName: 'Germany'
-}
-const DEFAULT_STORE_LOCATOR_POSTAL_CODE = '10178'
-const STORE_LOCATOR_DISTANCE = 100
-const STORE_LOCATOR_NUM_STORES_PER_LOAD = 10
-const STORE_LOCATOR_DISTANCE_UNIT = 'km'
-const STORE_LOCATOR_IS_ENABLED = true
-
+import {
+    DEFAULT_STORE_LOCATOR_COUNTRY,
+    DEFAULT_STORE_LOCATOR_POSTAL_CODE,
+    STORE_LOCATOR_NUM_STORES_PER_LOAD,
+    STORE_LOCATOR_DISTANCE,
+    STORE_LOCATOR_DISTANCE_UNIT,
+    STORE_LOCATOR_IS_ENABLED
+} from './constants'
 
 export const StoreLocatorContext = createContext()
 export const useStoreLocator = () => {
