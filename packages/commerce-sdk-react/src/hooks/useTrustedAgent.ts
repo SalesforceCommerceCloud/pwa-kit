@@ -8,6 +8,7 @@ import {useState, useEffect, useCallback} from 'react'
 import {useMutation} from '@tanstack/react-query'
 import useAuthContext from './useAuthContext'
 import {ShopperLoginTypes} from 'commerce-sdk-isomorphic'
+import { onClient } from '../utils'
 
 type TokenResponse = ShopperLoginTypes.TokenResponse
 type UseTrustedAgent = {
@@ -44,12 +45,9 @@ export const createTrustedAgentPopup = async (
     timeoutMinutes = 5,
     refreshTimeoutFocusMinutes = 1
 ): Promise<{code: string; state: string}> => {
-    if (typeof window === 'undefined' || !window.open) {
-        throw new Error("Popup can't be opened in this environment.")
-    }
     // if a popup already exists, close it
     if (popup) {
-        popup.close()
+        popup?.close()
     }
 
     // if a timer already exists, clear it
@@ -58,17 +56,17 @@ export const createTrustedAgentPopup = async (
     }
 
     // create our popup
-    popup = window.open(
+    popup = window?.open?.(
         url,
         'accountManagerPopup',
         'popup=true,width=800,height=800,scrollbars=false,status=false,location=false,menubar=false,toolbar=false'
-    )
+    ) || null
 
     // if this is intended to be a behind the
     // scenes refresh call, make sure our main
     // window stays focused
     if (isRefresh) {
-        window.focus()
+        window?.focus?.()
     }
 
     const startTime = Date.now()
@@ -132,20 +130,19 @@ const useTrustedAgent = (): UseTrustedAgent => {
 
     const login = useCallback(
         async (loginId?: string, usid?: string, refresh = false): Promise<TokenResponse> => {
-            try {
-                const {url, codeVerifier} = await authorizeTrustedAgent.mutateAsync({loginId})
-                const {code, state} = await createTrustedAgentPopup(url, refresh)
-                return await loginTrustedAgent.mutateAsync({
-                    loginId,
-                    code,
-                    codeVerifier,
-                    state,
-                    usid
-                })
-            } catch (error) {
-                console.error('Login failed:', error)
-                throw error // Re-throw the error to be caught by the caller
+            if (!onClient()) {
+                throw new Error('Something went wrong, this client side method is invoked on the server.')
             }
+
+            const {url, codeVerifier} = await authorizeTrustedAgent.mutateAsync({loginId})
+            const {code, state} = await createTrustedAgentPopup(url, refresh)
+            return await loginTrustedAgent.mutateAsync({
+                loginId,
+                code,
+                codeVerifier,
+                state,
+                usid
+            })
         },
         [auth]
     )
