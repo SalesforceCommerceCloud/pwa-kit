@@ -11,13 +11,10 @@ import {mockMutationEndpoints, renderHookWithProviders} from '../test-utils'
 import * as useTrustedAgentModule from './useTrustedAgent'
 import {ShopperLoginTypes} from 'commerce-sdk-isomorphic'
 import useAuthContext from './useAuthContext'
-import useConfig from './useConfig'
 
 jest.mock('./useAuthContext')
-jest.mock('./useConfig')
 
 const mockedUseAuthContext = useAuthContext as jest.MockedFunction<typeof Object>
-const mockedUseConfig = useConfig as jest.MockedFunction<typeof Object>
 
 const mockWindowOpen = jest.fn()
 global.open = mockWindowOpen
@@ -81,11 +78,6 @@ describe('useTrustedAgent', () => {
     beforeEach(() => {
         nock.cleanAll()
         jest.clearAllMocks()
-        global.window = {...originalWindow, open: jest.fn()}
-        mockedUseConfig.mockReset()
-        mockedUseConfig.mockReturnValueOnce({
-            defaultDnt: true
-        })
         mockedUseAuthContext.mockReturnValue({
             refreshAccessToken: jest.fn(),
             get: (param: string) => {
@@ -192,7 +184,6 @@ describe('useTrustedAgent', () => {
         const {result} = renderHookWithProviders(() => useTrustedAgentModule.default())
 
         await waitFor(() => {
-            console.log('result.current:', result.current)
             expect(result.current).toEqual(
                 expect.objectContaining({
                     isAgent: true,
