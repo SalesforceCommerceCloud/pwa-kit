@@ -72,7 +72,7 @@ export const createTrustedAgentPopup = async (
     const startTime = Date.now()
 
     return new Promise((resolve, reject) => {
-        intervalId = setInterval(() => {
+        const checkPopupState = () => {
             const popupCouldntInitialize = !popup
             if (popupCouldntInitialize) {
                 clearTimeout(intervalId)
@@ -107,7 +107,10 @@ export const createTrustedAgentPopup = async (
             if (isRefresh && popupRefreshTimeoutOccurred) {
                 popup?.focus()
             }
-        }, 1000)
+        }
+
+        checkPopupState()
+        intervalId = setInterval(checkPopupState, 1000)
     })
 }
 
