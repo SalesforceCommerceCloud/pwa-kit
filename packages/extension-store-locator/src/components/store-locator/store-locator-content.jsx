@@ -6,7 +6,6 @@
  */
 
 import React, {useState, useContext} from 'react'
-import {useIntl} from 'react-intl'
 import {Heading, Accordion, AccordionItem, Box, Button} from '@chakra-ui/react'
 import StoresList from './stores-list'
 import StoreLocatorInput from './store-locator-input'
@@ -38,7 +37,6 @@ const StoreLocatorContent = () => {
         setUserHasSetManualGeolocation
     } = useContext(StoreLocatorContext)
     const {countryCode, postalCode, latitude, longitude, limit} = searchStoresParams
-    const intl = useIntl()
     const form = useForm({
         mode: 'onChange',
         reValidateMode: 'onChange',
@@ -61,7 +59,8 @@ const StoreLocatorContent = () => {
             postalCode: postalCode,
             latitude: latitude,
             longitude: longitude,
-            locale: intl.locale,
+            // @TODO translations
+            locale: 'en_US',
             maxDistance: STORE_LOCATOR_DISTANCE,
             limit: NUM_STORES_PER_REQUEST_API_MAX,
             distanceUnit: STORE_LOCATOR_DISTANCE_UNIT
@@ -104,51 +103,29 @@ const StoreLocatorContent = () => {
 
     const displayStoreLocatorStatusMessage = () => {
         if (storesInfo === undefined)
-            return intl.formatMessage({
-                id: 'store_locator.description.loading_locations',
-                defaultMessage: 'Loading locations...'
-            })
+            // @TODO: add translations
+            return 'Loading locations...'
         if (storesInfo.length === 0)
-            return intl.formatMessage({
-                id: 'store_locator.description.no_locations',
-                defaultMessage: 'Sorry, there are no locations in this area'
-            })
+            return 'Sorry, there are no locations in this area'
         if (searchStoresParams.postalCode !== undefined)
-            return `${intl.formatMessage(
-                {
-                    id: 'store_locator.description.viewing_near_postal_code',
-                    defaultMessage:
-                        'Viewing stores within {distance}{distanceUnit} of {postalCode} in '
-                },
-                {
-                    distance: STORE_LOCATOR_DISTANCE,
-                    distanceUnit: STORE_LOCATOR_DISTANCE_UNIT,
-                    postalCode: searchStoresParams.postalCode
-                }
-            )}
+            return `Viewing stores within ${STORE_LOCATOR_DISTANCE}${STORE_LOCATOR_DISTANCE_UNIT} of ${searchStoresParams.postalCode} in 
                 ${
                     SUPPORTED_STORE_LOCATOR_COUNTRIES.length !== 0
-                        ? intl.formatMessage(
+                        ? 
                               SUPPORTED_STORE_LOCATOR_COUNTRIES.find(
                                   (o) => o.countryCode === searchStoresParams.countryCode
                               ).countryName
-                          )
-                        : intl.formatMessage(DEFAULT_STORE_LOCATOR_COUNTRY.countryName)
+                          
+                        : DEFAULT_STORE_LOCATOR_COUNTRY.countryName
                 }`
         else
-            return intl.formatMessage({
-                id: 'store_locator.description.viewing_near_your_location',
-                defaultMessage: 'Viewing stores near your location'
-            })
+            return 'Viewing stores near your location'
     }
 
     return (
         <>
             <Heading fontSize="2xl" style={{marginBottom: '25px'}}>
-                {intl.formatMessage({
-                    id: 'store_locator.title',
-                    defaultMessage: 'Find a Store'
-                })}
+                Find a Store
             </Heading>
             <StoreLocatorInput form={form} submitForm={submitForm}></StoreLocatorInput>
             <Accordion allowMultiple flex={[1, 1, 1, 5]}>
@@ -188,10 +165,7 @@ const StoreLocatorContent = () => {
                         variant="outline"
                         marginBottom={4}
                     >
-                        {intl.formatMessage({
-                            id: 'store_locator.pagination.load_more',
-                            defaultMessage: 'Load More'
-                        })}
+                        Load More
                     </Button>
                 </Box>
             ) : (

@@ -21,6 +21,7 @@
     "@emotion/react": "^11.13.3",
     "@emotion/styled": "^11.13.0",
     "@loadable/component": "^5.15.3",
+    "@salesforce/commerce-sdk-react": "^3.1.0-dev",
     "@salesforce/extension-sample": "1.0.0-dev",
     "@salesforce/extension-sample-with-overrides": "1.0.0-dev",
     "@salesforce/extension-store-locator": "1.0.0-dev",

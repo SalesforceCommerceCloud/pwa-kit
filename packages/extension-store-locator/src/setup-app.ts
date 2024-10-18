@@ -11,6 +11,7 @@ import {
   ApplicationExtension,
   IRouteConfig,
 } from "@salesforce/pwa-kit-react-sdk/ssr/universal/extensibility";
+import withOptionalChakra from "./components/withOptionalChakraProvider";
 
 import { ReactExtensionConfig as Config } from "./types";
 
@@ -18,7 +19,8 @@ const StoreLocator = loadable(() => import("./pages/store-locator"));
 
 class Sample extends ApplicationExtension<Config> {
   extendApp(App: React.ComponentType): React.ComponentType {
-    return App;
+    
+    return withOptionalChakra(App);
   }
 
   extendRoutes(routes: IRouteConfig[]): IRouteConfig[] {
