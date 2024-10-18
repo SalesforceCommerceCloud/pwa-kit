@@ -7,11 +7,11 @@
 
 import React from "react";
 import { Box, Container } from "@chakra-ui/react";
-import StoreLocatorContent from "../../components/store-locator-modal/store-locator-content";
+import StoreLocatorContent from "../../components/store-locator/store-locator-content";
 import {
   StoreLocatorContext,
   useStoreLocator,
-} from "../../components/store-locator-modal/index";
+} from "../../components/store-locator/index";
 
 const StoreLocator = () => {
   const storeLocator = useStoreLocator();

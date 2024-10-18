@@ -6,8 +6,10 @@
     "@chakra-ui/react": "^2",
     "@loadable/component": "^5",
     "@salesforce/commerce-sdk-react": "^3.1.0-dev",
+    "prop-types": "^15",
     "react": "^18",
-    "react-dom": "^18"
+    "react-dom": "^18",
+    "react-intl": "^5"
   },
   "devDependencies": {
     "@chakra-ui/react": "^2.10.3",
@@ -18,8 +20,10 @@
     "@types/react": "~18.2.0",
     "@types/react-dom": "~18.2.1",
     "express": "^4.19.2",
+    "prop-types": "^15.8.1",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "react-dom": "^18.2.0",
+    "react-intl": "^5.25.1"
   },
   "engines": {
     "node": "^16.11.0 || ^18.0.0 || ^20.0.0",

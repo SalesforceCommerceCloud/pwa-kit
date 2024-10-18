@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, salesforce.com, inc.
+ * Copyright (c) 2024, salesforce.com, inc.
  * All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
@@ -7,8 +7,6 @@
 
 import React, {useState, createContext} from 'react'
 import PropTypes from 'prop-types'
-
-// Components
 import {
     Modal,
     ModalBody,
@@ -16,14 +14,18 @@ import {
     ModalContent,
     useBreakpointValue
 } from '@chakra-ui/react'
-import StoreLocatorContent from '@salesforce/retail-react-app/app/components/store-locator-modal/store-locator-content'
+import StoreLocatorContent from './store-locator-content'
+// todo make these configs
+const DEFAULT_STORE_LOCATOR_COUNTRY = {
+    countryCode: 'DE',
+    countryName: 'Germany'
+}
+const DEFAULT_STORE_LOCATOR_POSTAL_CODE = '10178'
+const STORE_LOCATOR_DISTANCE = 100
+const STORE_LOCATOR_NUM_STORES_PER_LOAD = 10
+const STORE_LOCATOR_DISTANCE_UNIT = 'km'
+const STORE_LOCATOR_IS_ENABLED = true
 
-// Others
-import {
-    DEFAULT_STORE_LOCATOR_COUNTRY,
-    DEFAULT_STORE_LOCATOR_POSTAL_CODE,
-    STORE_LOCATOR_NUM_STORES_PER_LOAD
-} from '@salesforce/retail-react-app/app/constants'
 
 export const StoreLocatorContext = createContext()
 export const useStoreLocator = () => {
