@@ -120,6 +120,7 @@ export const createTrustedAgentPopup = async (
  *
  * @group Helpers
  * @category Shopper Authentication
+ * @experimental
  *
  */
 const useTrustedAgent = (): UseTrustedAgent => {
