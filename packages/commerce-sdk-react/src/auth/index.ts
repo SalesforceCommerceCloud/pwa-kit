@@ -802,6 +802,11 @@ class Auth {
         return token
     }
 
+    /**
+     * Trusted agent authorization
+     *
+     * @warning This method is not supported on the server, it is a client-only method.
+     */
     async authorizeTrustedAgent(credentials: {loginId?: string}) {
         const slasClient = this.client
         const codeVerifier = helpers.createCodeVerifier()
@@ -830,6 +835,11 @@ class Auth {
         return {url, codeVerifier}
     }
 
+    /**
+     * Trusted agent login
+     *
+     * @warning This method is not supported on the server, it is a client-only method.
+     */
     async loginTrustedAgent(credentials: {
         loginId?: string
         code: string
@@ -875,7 +885,11 @@ class Auth {
 
         return token
     }
-
+    /**
+     * Trusted agent refresh handler
+     *
+     * @warning This method is not supported on the server, it is a client-only method.
+     */
     registerTrustedAgentRefreshHandler(
         refreshTrustedAgentHandler: (
             loginId?: string,
