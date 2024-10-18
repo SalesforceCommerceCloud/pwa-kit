@@ -1,3 +1,6 @@
+## v3.9.0-dev (Oct 14, 2024)
+- Add proxy handling for trusted agent on behalf of (TAOB) requests [#2077](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2077)   
+
 ## v3.8.0-dev (Aug 08, 2024)
 - Encode non ASCII HTTP headers when `encodeNonAsciiHttpHeaders` flag is set to true in `ssr.js` in the retail react app [#2009](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2009)
 - Add x-forwarded-host header into res locals, which can be used to build an app origin [#2050](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2050)

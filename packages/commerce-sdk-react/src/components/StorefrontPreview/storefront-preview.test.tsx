@@ -32,7 +32,6 @@ describe('Storefront Preview Component', function () {
     beforeEach(() => {
         delete window.STOREFRONT_PREVIEW
         ;(useConfig as jest.Mock).mockReturnValue({siteId: 'site-id'})
-
     })
     afterEach(() => {
         jest.restoreAllMocks()
