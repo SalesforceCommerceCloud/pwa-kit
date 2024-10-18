@@ -114,14 +114,6 @@ describe('useTrustedAgent', () => {
     })
 
     test('popup fails if window.open is not available', async () => {
-        // const mockPopup = {
-        //     closed: false,
-        //     close: jest.fn(),
-        //     focus: jest.fn(),
-        //     location: {
-        //         toString: () => 'about:blank'
-        //     }
-        // }
         // Store the original window.open
         const originalWindowOpen = window.open
         // Set window.open to undefined for this test
@@ -137,7 +129,7 @@ describe('useTrustedAgent', () => {
         })
 
         await waitFor(() => {
-            expect(error).toEqual(new Error("Popup can't be opened in this environment."))
+            expect(error).toEqual("Popup couldn't initialize. Check your popup blocker.")
         })
         // Restore the original window.open
         window.open = originalWindowOpen
