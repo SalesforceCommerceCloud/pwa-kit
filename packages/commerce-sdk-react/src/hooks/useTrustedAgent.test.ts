@@ -121,7 +121,7 @@ describe('useTrustedAgent', () => {
         })
 
         await waitFor(() => {
-            expect(error).toEqual("Popup couldn't initialize. Check your popup blocker.")
+            expect(error).toBe("Popup couldn't initialize. Check your popup blocker.")
         })
         // Restore the original window.open
         window.open = originalWindowOpen

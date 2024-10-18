@@ -8,7 +8,7 @@ import {useState, useEffect, useCallback} from 'react'
 import {useMutation} from '@tanstack/react-query'
 import useAuthContext from './useAuthContext'
 import {ShopperLoginTypes} from 'commerce-sdk-isomorphic'
-import { onClient } from '../utils'
+import {onClient} from '../utils'
 
 type TokenResponse = ShopperLoginTypes.TokenResponse
 type UseTrustedAgent = {
@@ -56,11 +56,12 @@ export const createTrustedAgentPopup = async (
     }
 
     // create our popup
-    popup = window?.open?.(
-        url,
-        'accountManagerPopup',
-        'popup=true,width=800,height=800,scrollbars=false,status=false,location=false,menubar=false,toolbar=false'
-    ) || null
+    popup =
+        window?.open?.(
+            url,
+            'accountManagerPopup',
+            'popup=true,width=800,height=800,scrollbars=false,status=false,location=false,menubar=false,toolbar=false'
+        ) || null
 
     // if this is intended to be a behind the
     // scenes refresh call, make sure our main
@@ -134,7 +135,9 @@ const useTrustedAgent = (): UseTrustedAgent => {
     const login = useCallback(
         async (loginId?: string, usid?: string, refresh = false): Promise<TokenResponse> => {
             if (!onClient()) {
-                throw new Error('Something went wrong, this client side method is invoked on the server.')
+                throw new Error(
+                    'Something went wrong, this client side method is invoked on the server.'
+                )
             }
 
             const {url, codeVerifier} = await authorizeTrustedAgent.mutateAsync({loginId})
