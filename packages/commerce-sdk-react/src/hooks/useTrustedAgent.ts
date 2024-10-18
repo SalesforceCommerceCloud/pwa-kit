@@ -38,12 +38,15 @@ const getCodeAndStateValueFromPopup = (
     return {code, state}
 }
 
-const createTrustedAgentPopup = async (
+export const createTrustedAgentPopup = async (
     url: string,
     isRefresh = false,
     timeoutMinutes = 5,
     refreshTimeoutFocusMinutes = 1
 ): Promise<{code: string; state: string}> => {
+    if (typeof window === 'undefined' || !window.open) {
+        throw new Error("Popup can't be opened in this environment.")
+    }
     // if a popup already exists, close it
     if (popup) {
         popup.close()
@@ -129,9 +132,20 @@ const useTrustedAgent = (): UseTrustedAgent => {
 
     const login = useCallback(
         async (loginId?: string, usid?: string, refresh = false): Promise<TokenResponse> => {
-            const {url, codeVerifier} = await authorizeTrustedAgent.mutateAsync({loginId})
-            const {code, state} = await createTrustedAgentPopup(url, refresh)
-            return await loginTrustedAgent.mutateAsync({loginId, code, codeVerifier, state, usid})
+            try {
+                const {url, codeVerifier} = await authorizeTrustedAgent.mutateAsync({loginId})
+                const {code, state} = await createTrustedAgentPopup(url, refresh)
+                return await loginTrustedAgent.mutateAsync({
+                    loginId,
+                    code,
+                    codeVerifier,
+                    state,
+                    usid
+                })
+            } catch (error) {
+                console.error('Login failed:', error)
+                throw error // Re-throw the error to be caught by the caller
+            }
         },
         [auth]
     )
