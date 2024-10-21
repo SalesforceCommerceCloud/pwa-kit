@@ -22,6 +22,7 @@ import {
     SLAS_SECRET_WARNING_MSG,
     SLAS_SECRET_PLACEHOLDER,
     SLAS_SECRET_OVERRIDE_MSG,
+    SLAS_REFRESH_TOKEN_COOKIE_TTL_OVERRIDE_MSG,
     DNT_COOKIE_NAME
 } from '../constant'
 
@@ -40,7 +41,8 @@ interface AuthConfig extends ApiClientConfigParams {
     silenceWarnings?: boolean
     logger: Logger
     defaultDnt?: boolean
-    refreshTokenCookieTTL?: number
+    refreshTokenRegisteredCookieTTL?: number
+    refreshTokenGuestCookieTTL?: number
 }
 
 interface JWTHeaders {
@@ -173,7 +175,8 @@ const DATA_MAP: AuthDataMap = {
     }
 }
 
-export const DEFAULT_SLAS_REFRESH_TOKEN_TTL = 90 * 24 * 60 * 60
+export const DEFAULT_SLAS_REFRESH_TOKEN_REGISTERED_TTL = 90 * 24 * 60 * 60
+export const DEFAULT_SLAS_REFRESH_TOKEN_GUEST_TTL = 30 * 24 * 60 * 60
 
 /**
  * This class is used to handle shopper authentication.
@@ -194,7 +197,8 @@ class Auth {
     private silenceWarnings: boolean
     private logger: Logger
     private defaultDnt: boolean | undefined
-    private refreshTokenCookieTTL: number | undefined
+    private refreshTokenRegisteredCookieTTL: any
+    private refreshTokenGuestCookieTTL: any
     private refreshTrustedAgentHandler:
         | ((loginId: string, usid: string, refresh: boolean) => Promise<TokenResponse>)
         | undefined
@@ -247,10 +251,10 @@ class Auth {
 
         this.defaultDnt = config.defaultDnt
 
-        this.refreshTokenCookieTTL =
-            typeof config.refreshTokenCookieTTL === 'number'
-                ? config.refreshTokenCookieTTL
-                : undefined
+        this.refreshTokenRegisteredCookieTTL = config.refreshTokenRegisteredCookieTTL
+
+        this.refreshTokenGuestCookieTTL = config.refreshTokenGuestCookieTTL
+
         /*
          * There are 2 ways to enable SLAS private client mode.
          * If enablePWAKitPrivateClient=true, we route SLAS calls to /mobify/slas/private
@@ -334,7 +338,7 @@ class Auth {
         if (accessToken !== '') {
             const {dnt} = this.parseSlasJWT(accessToken)
             if (dnt !== dntCookieVal) {
-                await this.refreshAccessToken(accessToken)
+                await this.refreshAccessToken()
             }
         } else {
             await this.refreshAccessToken()
@@ -495,6 +499,24 @@ class Auth {
     }
 
     /**
+     * Retrieves our refresh token cookie ttl value
+     */
+    private getRefreshTokenCookieTTLValue(
+        overrideValue: any,
+        responseValue: number | undefined,
+        defaultValue: number
+    ): number {
+        let value = overrideValue
+
+        if (typeof value !== 'number' || value <= 0 || value > defaultValue) {
+            this.logWarning(SLAS_REFRESH_TOKEN_COOKIE_TTL_OVERRIDE_MSG)
+            value = responseValue || defaultValue
+        }
+
+        return value
+    }
+
+    /**
      * This method stores the TokenResponse object retrieved from SLAS, and
      * store the data in storage.
      */
@@ -510,22 +532,26 @@ class Auth {
         this.set('customer_type', isGuest ? 'guest' : 'registered')
 
         const refreshTokenKey = isGuest ? 'refresh_token_guest' : 'refresh_token_registered'
-        const fallbackTTL =
-            typeof this.refreshTokenCookieTTL === 'number' &&
-            this.refreshTokenCookieTTL >= 0 &&
-            this.refreshTokenCookieTTL <= DEFAULT_SLAS_REFRESH_TOKEN_TTL
-                ? this.refreshTokenCookieTTL
-                : res.refresh_token_expires_in || DEFAULT_SLAS_REFRESH_TOKEN_TTL
-
-        this.set('refresh_token_expires_in', fallbackTTL.toString())
-        const expiresDate = this.convertSecondsToDate(fallbackTTL)
-
+        const overrideValue = isGuest
+            ? this.refreshTokenGuestCookieTTL
+            : this.refreshTokenRegisteredCookieTTL
+        const responseValue = res.refresh_token_expires_in as number | undefined
+        const defaultValue = isGuest
+            ? DEFAULT_SLAS_REFRESH_TOKEN_GUEST_TTL
+            : DEFAULT_SLAS_REFRESH_TOKEN_REGISTERED_TTL
+        const refreshTokenTTLValue = this.getRefreshTokenCookieTTLValue(
+            overrideValue,
+            responseValue,
+            defaultValue
+        )
+        const expiresDate = this.convertSecondsToDate(refreshTokenTTLValue)
+        this.set('refresh_token_expires_in', refreshTokenTTLValue.toString())
         this.set(refreshTokenKey, res.refresh_token, {
             expires: expiresDate
         })
     }
 
-    async refreshAccessToken(accessToken?: string) {
+    async refreshAccessToken() {
         const dntPref = this.getDntPreference(this.get(DNT_COOKIE_NAME), this.defaultDnt)
         const refreshTokenRegistered = this.get('refresh_token_registered')
         const refreshTokenGuest = this.get('refresh_token_guest')
@@ -562,6 +588,7 @@ class Auth {
         }
 
         // refresh flow for TAOB
+        const accessToken = this.getAccessToken()
         if (accessToken && this.isTokenExpired(accessToken)) {
             try {
                 const {isGuest, usid, loginId, isAgent} = this.parseSlasJWT(accessToken)
@@ -680,7 +707,7 @@ class Auth {
             return this.data
         }
 
-        return await this.refreshAccessToken(accessToken)
+        return await this.refreshAccessToken()
     }
 
     /**
