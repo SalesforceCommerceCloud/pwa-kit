@@ -23,7 +23,7 @@ import {
 import Auth from './auth'
 import {ApiClientConfigParams, ApiClients} from './hooks/types'
 import {Logger} from './types'
-import {MOBIFY_PATH, SLAS_PRIVATE_PROXY_PATH} from './constant'
+import {DWSID_COOKIE_NAME, MOBIFY_PATH, SERVER_AFFINITY_HEADER_KEY, SLAS_PRIVATE_PROXY_PATH} from './constant'
 export interface CommerceApiProviderProps extends ApiClientConfigParams {
     children: React.ReactNode
     proxy: string
@@ -124,9 +124,51 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
     // Set the logger based on provided configuration, or default to the console object if no logger is provided
     const configLogger = logger || console
 
+    const auth = useMemo(() => {
+        return new Auth({
+            clientId,
+            organizationId,
+            shortCode,
+            siteId,
+            proxy,
+            redirectURI,
+            fetchOptions,
+            fetchedToken,
+            enablePWAKitPrivateClient,
+            clientSecret,
+            silenceWarnings,
+            logger: configLogger,
+            defaultDnt,
+            refreshTokenCookieTTL
+        })
+    }, [
+        clientId,
+        organizationId,
+        shortCode,
+        siteId,
+        proxy,
+        redirectURI,
+        fetchOptions,
+        fetchedToken,
+        enablePWAKitPrivateClient,
+        clientSecret,
+        silenceWarnings,
+        configLogger,
+        refreshTokenCookieTTL
+    ])
+
+    const dwsid = auth.get(DWSID_COOKIE_NAME)
+    const serverAffinityHeader: Record<string, string> = {}
+    if (dwsid) {
+        serverAffinityHeader[SERVER_AFFINITY_HEADER_KEY] = dwsid
+    }
+
     const config = {
         proxy,
-        headers,
+        headers: {
+            ...headers,
+            ...serverAffinityHeader
+        },
         parameters: {
             clientId,
             organizationId,
@@ -175,39 +217,6 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
         locale,
         currency,
         headers?.['correlation-id']
-    ])
-
-    const auth = useMemo(() => {
-        return new Auth({
-            clientId,
-            organizationId,
-            shortCode,
-            siteId,
-            proxy,
-            redirectURI,
-            fetchOptions,
-            fetchedToken,
-            enablePWAKitPrivateClient,
-            clientSecret,
-            silenceWarnings,
-            logger: configLogger,
-            defaultDnt,
-            refreshTokenCookieTTL
-        })
-    }, [
-        clientId,
-        organizationId,
-        shortCode,
-        siteId,
-        proxy,
-        redirectURI,
-        fetchOptions,
-        fetchedToken,
-        enablePWAKitPrivateClient,
-        clientSecret,
-        silenceWarnings,
-        configLogger,
-        refreshTokenCookieTTL
     ])
 
     // Initialize the session

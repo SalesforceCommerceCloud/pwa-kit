@@ -22,7 +22,8 @@ import {
     SLAS_SECRET_WARNING_MSG,
     SLAS_SECRET_PLACEHOLDER,
     SLAS_SECRET_OVERRIDE_MSG,
-    DNT_COOKIE_NAME
+    DNT_COOKIE_NAME,
+    DWSID_COOKIE_NAME
 } from '../constant'
 
 import {Logger} from '../types'
@@ -74,7 +75,7 @@ type AuthDataKeys =
     | 'refresh_token_registered'
     | 'access_token_sfra'
     | typeof DNT_COOKIE_NAME
-    | 'dwsid'
+    | typeof DWSID_COOKIE_NAME
 
 type AuthDataMap = Record<
     AuthDataKeys,
@@ -169,7 +170,7 @@ const DATA_MAP: AuthDataMap = {
     },
     dwsid: {
         storageType: 'cookie',
-        key: 'dwsid'
+        key: DWSID_COOKIE_NAME
     }
 }
 
@@ -474,7 +475,7 @@ class Auth {
      * registered shopper refresh-token and restores session and basket on SFRA.
      */
     private clearECOMSession() {
-        const {key, storageType} = DATA_MAP['dwsid']
+        const {key, storageType} = DATA_MAP[DWSID_COOKIE_NAME]
         const store = this.stores[storageType]
         store.delete(key)
     }
