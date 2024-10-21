@@ -25,10 +25,14 @@ const SocialLoginRedirect = () => {
                 <Stack justify="center" align="center" spacing={8} marginBottom={8}>
                     <BrandLogo width="60px" height="auto" />
                     <Text align="center" fontSize="xl" fontWeight="semibold">
-                        <FormattedMessage defaultMessage="Authenticating..." />
+                        <FormattedMessage
+                            id="social_login_redirect.message.authenticating"
+                            defaultMessage="Authenticating..."
+                        />
                     </Text>
                     <Text align="center" fontSize="m">
                         <FormattedMessage
+                            id="social_login_redirect.message.redirect_link"
                             defaultMessage="If you are not automatically redirected, click <link>this link</link> to proceed."
                             values={{
                                 link: (chunks) => (

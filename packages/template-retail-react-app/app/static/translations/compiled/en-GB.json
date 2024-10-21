@@ -2175,6 +2175,12 @@
       "value": "Sign In"
     }
   ],
+  "login_form.button.social": [
+    {
+      "type": 1,
+      "value": "message"
+    }
+  ],
   "login_form.link.forgot_password": [
     {
       "type": 0,
@@ -3091,6 +3097,32 @@
     {
       "type": 0,
       "value": "Are you sure you want to sign out? You will need to sign back in to proceed with your current order."
+    }
+  ],
+  "social_login_redirect.message.authenticating": [
+    {
+      "type": 0,
+      "value": "Authenticating..."
+    }
+  ],
+  "social_login_redirect.message.redirect_link": [
+    {
+      "type": 0,
+      "value": "If you are not automatically redirected, click "
+    },
+    {
+      "children": [
+        {
+          "type": 0,
+          "value": "this link"
+        }
+      ],
+      "type": 8,
+      "value": "link"
+    },
+    {
+      "type": 0,
+      "value": " to proceed."
     }
   ],
   "store_locator.action.find": [
