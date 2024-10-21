@@ -1,3 +1,8 @@
+## v5.0.0
+- (These will be merged later as the feature branch gets merged into V5 template retail react app branch)
+- DNT UI: [#2017](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2017)
+- DNT E2E: [#2083](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2083)
+
 ## v4.1.0-dev (Aug 8, 2024)
 - Announce wishlist change in total for screen readers (a11y) [#2033](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2033)
 - Fixed a bug that incorrectly imports uninstalled package `@chakra-ui/layout` [#2047](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2047)
