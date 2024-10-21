@@ -23,7 +23,12 @@ import {
 import Auth from './auth'
 import {ApiClientConfigParams, ApiClients} from './hooks/types'
 import {Logger} from './types'
-import {DWSID_COOKIE_NAME, MOBIFY_PATH, SERVER_AFFINITY_HEADER_KEY, SLAS_PRIVATE_PROXY_PATH} from './constant'
+import {
+    DWSID_COOKIE_NAME,
+    MOBIFY_PATH,
+    SERVER_AFFINITY_HEADER_KEY,
+    SLAS_PRIVATE_PROXY_PATH
+} from './constant'
 export interface CommerceApiProviderProps extends ApiClientConfigParams {
     children: React.ReactNode
     proxy: string
