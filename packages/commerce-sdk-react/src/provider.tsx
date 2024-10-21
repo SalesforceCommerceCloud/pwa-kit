@@ -38,7 +38,8 @@ export interface CommerceApiProviderProps extends ApiClientConfigParams {
     silenceWarnings?: boolean
     logger?: Logger
     defaultDnt?: boolean
-    refreshTokenTTL?: number
+    refreshTokenRegisteredCookieTTL?: number
+    refreshTokenGuestCookieTTL?: number
 }
 
 /**
@@ -116,10 +117,10 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
         clientSecret,
         silenceWarnings,
         logger,
-        defaultDnt
+        defaultDnt,
+        refreshTokenRegisteredCookieTTL,
+        refreshTokenGuestCookieTTL
     } = props
-
-    let {refreshTokenTTL} = props
 
     // Set the logger based on provided configuration, or default to the console object if no logger is provided
     const configLogger = logger || console
@@ -141,12 +142,7 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
 
     const baseUrl = config.proxy.split(MOBIFY_PATH)[0]
     const privateClientEndpoint = `${baseUrl}${SLAS_PRIVATE_PROXY_PATH}`
-    if (refreshTokenTTL && refreshTokenTTL < 0) {
-        refreshTokenTTL = 0
-        throw new Error(
-            `'refreshTokenTTL' must be a non-negative value in seconds, overriding negative value ${refreshTokenTTL} to zero`
-        )
-    }
+
     const apiClients = useMemo(() => {
         return {
             shopperBaskets: new ShopperBaskets(config),
@@ -192,7 +188,8 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
             silenceWarnings,
             logger: configLogger,
             defaultDnt,
-            refreshTokenTTL
+            refreshTokenRegisteredCookieTTL,
+            refreshTokenGuestCookieTTL
         })
     }, [
         clientId,
@@ -207,7 +204,8 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
         clientSecret,
         silenceWarnings,
         configLogger,
-        refreshTokenTTL
+        refreshTokenRegisteredCookieTTL,
+        refreshTokenGuestCookieTTL
     ])
 
     // Initialize the session
@@ -229,7 +227,8 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
                 silenceWarnings,
                 logger: configLogger,
                 defaultDnt,
-                refreshTokenTTL
+                refreshTokenRegisteredCookieTTL,
+                refreshTokenGuestCookieTTL
             }}
         >
             <CommerceApiContext.Provider value={apiClients}>

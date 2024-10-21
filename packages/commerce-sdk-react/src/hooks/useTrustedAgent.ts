@@ -4,35 +4,50 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {useState, useEffect, useCallback} from 'react'
+import {useState, useEffect, useCallback} from 'react'
 import {useMutation} from '@tanstack/react-query'
 import useAuthContext from './useAuthContext'
 import {ShopperLoginTypes} from 'commerce-sdk-isomorphic'
-import type Auth from '../auth'
+import {onClient} from '../utils'
 
 type TokenResponse = ShopperLoginTypes.TokenResponse
-type UseTrustedAgent = {isAgent: boolean, agentId: string | null, loginId: string | null, login: (loginId?: string, usid?: string) => Promise<TokenResponse>, logout: () => Promise<TokenResponse>}
+type UseTrustedAgent = {
+    isAgent: boolean
+    agentId: string | null
+    loginId: string | null
+    login: (loginId?: string, usid?: string) => Promise<TokenResponse>
+    logout: () => Promise<TokenResponse>
+}
 
 let popup: Window | null
 let intervalId: NodeJS.Timer
 
-const getCodeAndStateValueFromPopup = (popup: Window | null): {code: string | null, state: string | null} => {
+const getCodeAndStateValueFromPopup = (
+    popup: Window | null
+): {code: string | null; state: string | null} => {
     let code = null
     let state = null
 
     try {
-        const url  = new URL(popup?.location?.toString() || 'http://localhost')
+        const url = new URL(popup?.location?.toString() || 'http://localhost')
         code = url.searchParams.get('code')
         state = url.searchParams.get('state')
-    } catch (e) { /* here to catch invalid URL or crossdomain popup access errors */ }
+    } catch (e) {
+        /* here to catch invalid URL or crossdomain popup access errors */
+    }
 
     return {code, state}
 }
 
-const createTrustedAgentPopup = async (url: string, isRefresh: boolean = false, timeoutMinutes: number = 5, refreshTimeoutFocusMinutes: number = 1): Promise<{code: string, state: string}> => {
+export const createTrustedAgentPopup = async (
+    url: string,
+    isRefresh = false,
+    timeoutMinutes = 5,
+    refreshTimeoutFocusMinutes = 1
+): Promise<{code: string; state: string}> => {
     // if a popup already exists, close it
     if (popup) {
-        popup.close()
+        popup?.close()
     }
 
     // if a timer already exists, clear it
@@ -41,21 +56,24 @@ const createTrustedAgentPopup = async (url: string, isRefresh: boolean = false, 
     }
 
     // create our popup
-    popup = window.open(url, 'accountManagerPopup', "popup=true,width=800,height=800,scrollbars=false,status=false,location=false,menubar=false,toolbar=false")
+    popup =
+        window?.open?.(
+            url,
+            'accountManagerPopup',
+            'popup=true,width=800,height=800,scrollbars=false,status=false,location=false,menubar=false,toolbar=false'
+        ) || null
 
     // if this is intended to be a behind the
     // scenes refresh call, make sure our main
     // window stays focused
     if (isRefresh) {
-        window.focus()
+        window?.focus?.()
     }
 
-    let startTime = Date.now()
+    const startTime = Date.now()
 
     return new Promise((resolve, reject) => {
-        console.log('useTrustedAgent setInterval')
-        intervalId = setInterval(() => {
-            console.log('useTrustedAgent interval tick')
+        const checkPopupState = () => {
             const popupCouldntInitialize = !popup
             if (popupCouldntInitialize) {
                 clearTimeout(intervalId)
@@ -76,7 +94,8 @@ const createTrustedAgentPopup = async (url: string, isRefresh: boolean = false, 
                 return reject('Popup closed without authenticating.')
             }
 
-            const popupTimeoutOccurred = Math.floor(Date.now() - startTime) > (timeoutMinutes * 1000 * 60)
+            const popupTimeoutOccurred =
+                Math.floor(Date.now() - startTime) > timeoutMinutes * 1000 * 60
             if (popupTimeoutOccurred) {
                 clearTimeout(intervalId)
                 popup?.close()
@@ -84,34 +103,16 @@ const createTrustedAgentPopup = async (url: string, isRefresh: boolean = false, 
             }
 
             // if our refresh flow is stuck, focus the popup window
-            const popupRefreshTimeoutOccurred = Math.floor(Date.now() - startTime) > (refreshTimeoutFocusMinutes * 1000 * 60)
+            const popupRefreshTimeoutOccurred =
+                Math.floor(Date.now() - startTime) > refreshTimeoutFocusMinutes * 1000 * 60
             if (isRefresh && popupRefreshTimeoutOccurred) {
                 popup?.focus()
             }
-        }, 1000)
+        }
+
+        checkPopupState()
+        intervalId = setInterval(checkPopupState, 1000)
     })
-}
-
-const createTrustedAgentLogin = (auth: Auth)  => {
-    console.log('useTrustedAgent createTrustedAgentLogin()')
-    const authorizeTrustedAgent = useMutation(auth.authorizeTrustedAgent.bind(auth))
-    const loginTrustedAgent = useMutation(auth.loginTrustedAgent.bind(auth))
-    return async (loginId?: string, usid?: string, refresh: boolean = false): Promise<TokenResponse> => {
-        const {url, codeVerifier} = await authorizeTrustedAgent.mutateAsync({loginId})
-        console.log('useTrustedAgent createTrustedAgentPopup')
-        const {code, state} = await createTrustedAgentPopup(url, refresh)
-        console.log('useTrustedAgent auth.loginTrustedAgent()')
-        return await loginTrustedAgent.mutateAsync({loginId, code, codeVerifier, state, usid})
-    }
-}
-
-const createTrustedAgentLogout = (auth: Auth)  => {
-    console.log('useTrustedAgent createTrustedAgentLogout()')
-    const logoutTrustedAgent = useMutation(auth.logout.bind(auth))
-    return async (): Promise<TokenResponse> => {
-        console.log('useTrustedAgent auth.logout()')
-        return await logoutTrustedAgent.mutateAsync()
-    }
 }
 
 /**
@@ -119,6 +120,7 @@ const createTrustedAgentLogout = (auth: Auth)  => {
  *
  * @group Helpers
  * @category Shopper Authentication
+ * @experimental
  *
  */
 const useTrustedAgent = (): UseTrustedAgent => {
@@ -127,21 +129,48 @@ const useTrustedAgent = (): UseTrustedAgent => {
     const [agentId, setAgentId] = useState('')
     const [loginId, setLoginId] = useState('')
 
-    const login = useCallback(createTrustedAgentLogin(auth), [auth])
-    const logout = useCallback(createTrustedAgentLogout(auth), [auth])
+    const authorizeTrustedAgent = useMutation(auth.authorizeTrustedAgent.bind(auth))
+    const loginTrustedAgent = useMutation(auth.loginTrustedAgent.bind(auth))
+    const logoutTrustedAgent = useMutation(auth.logout.bind(auth))
+
+    const login = useCallback(
+        async (loginId?: string, usid?: string, refresh = false): Promise<TokenResponse> => {
+            if (!onClient()) {
+                throw new Error(
+                    'Something went wrong, this client side method is invoked on the server.'
+                )
+            }
+
+            const {url, codeVerifier} = await authorizeTrustedAgent.mutateAsync({loginId})
+            const {code, state} = await createTrustedAgentPopup(url, refresh)
+            return await loginTrustedAgent.mutateAsync({
+                loginId,
+                code,
+                codeVerifier,
+                state,
+                usid
+            })
+        },
+        [auth]
+    )
+
+    const logout = useCallback(async () => {
+        return await logoutTrustedAgent.mutateAsync()
+    }, [auth])
+
     useEffect(() => {
-        console.log('useTrustedAgent auth.registerTrustedAgentRefreshHandler()')
         auth.registerTrustedAgentRefreshHandler(login)
     }, [auth])
 
     useEffect(() => {
-        console.log('useTrustedAgent auth.parseSlasJWT()')
         try {
             const {isAgent, agentId, loginId} = auth.parseSlasJWT(auth.get('access_token'))
             setIsAgent(isAgent)
             setAgentId(agentId || '')
             setLoginId(loginId)
-        } catch(e) { /* here to catch invalid jwt errors */ }
+        } catch (e) {
+            /* here to catch invalid jwt errors */
+        }
     }, [auth.get('access_token')])
 
     return {isAgent, agentId, loginId, login, logout}
