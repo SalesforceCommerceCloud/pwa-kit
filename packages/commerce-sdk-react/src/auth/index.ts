@@ -197,8 +197,8 @@ class Auth {
     private silenceWarnings: boolean
     private logger: Logger
     private defaultDnt: boolean | undefined
-    private refreshTokenRegisteredCookieTTL: any
-    private refreshTokenGuestCookieTTL: any
+    private refreshTokenRegisteredCookieTTL: number | undefined
+    private refreshTokenGuestCookieTTL: number | undefined
     private refreshTrustedAgentHandler:
         | ((loginId: string, usid: string, refresh: boolean) => Promise<TokenResponse>)
         | undefined
@@ -502,7 +502,7 @@ class Auth {
      * Retrieves our refresh token cookie ttl value
      */
     private getRefreshTokenCookieTTLValue(
-        overrideValue: any,
+        overrideValue: number | undefined,
         responseValue: number | undefined,
         defaultValue: number
     ): number {
