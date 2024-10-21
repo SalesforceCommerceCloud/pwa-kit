@@ -5,12 +5,22 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React from 'react'
+import React, {useEffect} from 'react'
 import {FormattedMessage} from 'react-intl'
 import {Box, Container, Stack, Text} from '@salesforce/retail-react-app/app/components/shared/ui'
 import {BrandLogo} from '@salesforce/retail-react-app/app/components/icons'
+import {useCustomerType} from '@salesforce/commerce-sdk-react'
+import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
 
 const SocialLoginRedirect = () => {
+    const navigate = useNavigation()
+    const {isRegistered} = useCustomerType()
+
+    // If customer is registered push to account page
+    useEffect(() => {
+        navigate('/account')
+    }, [isRegistered])
+
     return (
         <Box data-testid="login-redirect-page" bg="gray.50" py={[8, 16]}>
             <Container
