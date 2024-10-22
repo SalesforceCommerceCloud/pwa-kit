@@ -58,6 +58,7 @@ import SelectedRefinements from '@salesforce/retail-react-app/app/pages/product-
 import EmptySearchResults from '@salesforce/retail-react-app/app/pages/product-list/partials/empty-results'
 import PageHeader from '@salesforce/retail-react-app/app/pages/product-list/partials/page-header'
 import AbovePageHeader from '@salesforce/retail-react-app/app/pages/product-list/partials/above-page-header'
+import PageDesignerPromotionalBanner from '@salesforce/retail-react-app/app/pages/product-list/partials/page-designer-promotional-banner'
 
 // Icons
 import {FilterIcon, ChevronDownIcon} from '@salesforce/retail-react-app/app/components/icons'
@@ -148,6 +149,7 @@ const ProductList = (props) => {
 
     const {
         isLoading,
+        isFetched,
         isRefetching,
         data: productSearchResult
     } = useProductSearch(
@@ -415,6 +417,8 @@ const ProductList = (props) => {
             ) : (
                 <>
                     <AbovePageHeader />
+                    <PageDesignerPromotionalBanner />
+
                     {/* Header */}
                     <Stack
                         display={{base: 'none', lg: 'flex'}}
@@ -540,7 +544,8 @@ const ProductList = (props) => {
                                 spacingX={4}
                                 spacingY={{base: 12, lg: 16}}
                             >
-                                {isHydrated() && (isRefetching || !productSearchResult)
+                                {isHydrated() &&
+                                ((isRefetching && !isFetched) || !productSearchResult)
                                     ? new Array(searchParams.limit)
                                           .fill(0)
                                           .map((value, index) => (
@@ -560,6 +565,7 @@ const ProductList = (props) => {
                                                   product={productSearchItem}
                                                   enableFavourite={true}
                                                   isFavourite={isInWishlist}
+                                                  isRefreshingData={isRefetching && isFetched}
                                                   imageViewType={PRODUCT_LIST_IMAGE_VIEW_TYPE}
                                                   selectableAttributeId={
                                                       PRODUCT_LIST_SELECTABLE_ATTRIBUTE_ID

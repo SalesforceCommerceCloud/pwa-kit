@@ -1,3 +1,13 @@
+## v5.0.0 (TBD)
+
+### New Features
+- Implement ability to set Shopper Context via search parameters in the Retail React App [#1986](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1986)
+- Display a promo banner from Page Designer in the PLP page of the Retail React App [#2016](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2016)
+
+### Performance Improvements
+
+- PLP: When products are being refetched, only the pricing and promotions sections will display a skeleton in the ProductTile [#2064](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2064)
+
 ## v4.1.0-dev (Aug 8, 2024)
 
 - [Server Affinity] - Attach dwsid to SCAPI request headers & remove OCAPI proxy [#2090](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2090)
