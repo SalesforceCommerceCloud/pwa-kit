@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import {useQuery as useReactQuery, UseQueryOptions} from '@tanstack/react-query'
+import {useQuery as useReactQuery, UseQueryOptions, useQueryClient} from '@tanstack/react-query'
 import {helpers} from 'commerce-sdk-isomorphic'
 import {useAuthorizationHeader} from './useAuthorizationHeader'
 import useAuthContext from './useAuthContext'
@@ -42,6 +42,7 @@ export const useQuery = <Client extends ApiClient, Options extends ApiOptions, D
         enabled?: boolean
     }
 ) => {
+    const auth = useAuthContext()
     const authenticatedMethod = useAuthorizationHeader(hookConfig.method)
     // This type assertion is NOT safe in all cases. However, we know that `requiredParameters` is
     // the list of parameters required by `Options`, and we know that in the default case (when
@@ -53,6 +54,20 @@ export const useQuery = <Client extends ApiClient, Options extends ApiOptions, D
     // trade-off, as the behavior is opt-in by the end user, and it feels like adding type safety
     // for this case would add significantly more complexity.
     const wrappedMethod = async () => await authenticatedMethod(apiOptions as Options)
+
+    // The onError has deprecated/removed the onError callback for useQuery in v4 / v5
+    // So we instead manipulate the global onError callback on the QueryCache to handle failure
+    // cases where a query fails because the auth state has been invalidated
+    const queryClient = useQueryClient()
+    queryClient.getQueryCache().config = {
+        onError: async (error: any) => {
+            const response = await error.response?.json()
+            if (response.detail === "Customer credentials changed after token was issued.") {
+                auth.clearUserAuth()
+            }
+        }
+    }
+
     return useReactQuery(hookConfig.queryKey, wrappedMethod, {
         enabled:
             // Individual hooks can provide `enabled` checks that are done in ADDITION to

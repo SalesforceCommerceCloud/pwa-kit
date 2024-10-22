@@ -363,6 +363,11 @@ class Auth {
         })
     }
 
+    clearUserAuth() {
+        this.logger.info('Login was invalidated. Clearing login state.')
+        this.clearStorage()
+    }
+
     /**
      * Every method in this class that returns a `TokenResponse` constructs it via this getter.
      */
