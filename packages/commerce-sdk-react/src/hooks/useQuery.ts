@@ -21,7 +21,7 @@ import {
 } from './types'
 import useConfig from './useConfig'
 import {hasAllKeys} from './utils'
-import {onClient} from '../utils'
+import {onClient, clearAuthStateOnError} from '../utils'
 
 /**
  * Helper for query hooks, contains most of the logic in order to keep individual hooks small.
@@ -60,11 +60,10 @@ export const useQuery = <Client extends ApiClient, Options extends ApiOptions, D
     // cases where a query fails because the auth state has been invalidated
     const queryClient = useQueryClient()
     queryClient.getQueryCache().config = {
-        onError: async (error: any) => {
-            const response = await error.response?.json()
-            if (response?.detail === "Customer credentials changed after token was issued.") {
-                auth.clearUserAuth()
-            }
+        onError: (error: any) => {
+            // Typescript does not like having promises inside void functions
+            // so we use void to explicitly tell typescript to ignore it
+            void clearAuthStateOnError(error.response, auth)
         }
     }
 
@@ -160,11 +159,10 @@ export const useCustomQuery = (
     // cases where a query fails because the auth state has been invalidated
     const queryClient = useQueryClient()
     queryClient.getQueryCache().config = {
-        onError: async (error: any) => {
-            const response = await error.response?.json()
-            if (response?.detail === "Customer credentials changed after token was issued.") {
-                auth.clearUserAuth()
-            }
+        onError: (error: any) => {
+            // Typescript does not like having promises inside void functions
+            // so we use void to explicitly tell typescript to ignore it
+            void clearAuthStateOnError(error, auth)
         }
     }
 

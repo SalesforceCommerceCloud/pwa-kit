@@ -24,6 +24,7 @@ import {
 import {useAuthorizationHeader} from './useAuthorizationHeader'
 import useCustomerId from './useCustomerId'
 import {mergeOptions, updateCache} from './utils'
+import {clearAuthStateOnError} from '../utils'
 
 /**
  * Helper for mutation hooks, contains most of the logic in order to keep individual hooks small.
@@ -53,10 +54,9 @@ export const useMutation = <
             updateCache(queryClient, cacheUpdates, data)
         },
         onError(error: any) {
-            const response = error.response?.json()
-            if (response?.detail === "Customer credentials changed after token was issued.") {
-                auth.clearUserAuth()
-            }
+            // Typescript does not like having promises inside void functions
+            // so we use void to explicitly tell typescript to ignore it
+            void clearAuthStateOnError(error, auth)
         }
     })
 }
@@ -97,10 +97,9 @@ export const useCustomMutation = <TData = unknown, TError = unknown>(
     const mutationOpts = {
         ...mutationOptions,
         onError(error: any) {
-            const response = error.response?.json()
-            if (response?.detail === "Customer credentials changed after token was issued.") {
-                auth.clearUserAuth()
-            }
+            // Typescript does not like having promises inside void functions
+            // so we use void to explicitly tell typescript to ignore it
+            void clearAuthStateOnError(error, auth)
         }
     }
 
