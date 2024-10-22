@@ -51,6 +51,15 @@ import {PRODUCT_BADGE_DETAILS} from '@salesforce/retail-react-app/app/constants'
 const IconButtonWithRegistration = withRegistration(IconButton)
 
 // Component Skeleton
+const PricingAndPromotionsSkeleton = () => {
+    return (
+        <Stack spacing={2} data-testid="sf-product-tile-pricing-and-promotions-skeleton">
+            <ChakraSkeleton width="80px" height="20px" />
+            <ChakraSkeleton width={{base: '120px', md: '220px'}} height="12px" />
+        </Stack>
+    )
+}
+
 export const Skeleton = () => {
     const styles = useMultiStyleConfig('ProductTile')
     return (
@@ -61,8 +70,7 @@ export const Skeleton = () => {
                         <ChakraSkeleton />
                     </AspectRatio>
                 </Box>
-                <ChakraSkeleton width="80px" height="20px" />
-                <ChakraSkeleton width={{base: '120px', md: '220px'}} height="12px" />
+                <PricingAndPromotionsSkeleton />
             </Stack>
         </Box>
     )
@@ -83,6 +91,7 @@ const ProductTile = (props) => {
         product,
         selectableAttributeId = PRODUCT_TILE_SELECTABLE_ATTRIBUTE_ID,
         badgeDetails = PRODUCT_BADGE_DETAILS,
+        isRefreshingData = false,
         ...rest
     } = props
     const {imageGroups, productId, representedProduct, variants} = product
@@ -245,12 +254,18 @@ const ProductTile = (props) => {
                 {/* Title */}
                 <Text {...styles.title}>{localizedProductName}</Text>
 
-                {/* Price */}
-                <DisplayPrice priceData={priceData} currency={currency} />
+                {isRefreshingData ? (
+                    <PricingAndPromotionsSkeleton />
+                ) : (
+                    <>
+                        {/* Price */}
+                        <DisplayPrice priceData={priceData} currency={currency} />
 
-                {/* Promotion call-out message */}
-                {shouldShowPromoCallout(productWithFilteredVariants) && (
-                    <PromoCallout product={productWithFilteredVariants} />
+                        {/* Promotion call-out message */}
+                        {shouldShowPromoCallout(productWithFilteredVariants) && (
+                            <PromoCallout product={productWithFilteredVariants} />
+                        )}
+                    </>
                 )}
             </Link>
             {enableFavourite && (
@@ -376,7 +391,11 @@ ProductTile.propTypes = {
     /**
      * Details of badge labels and the corresponding product custom properties that enable badges.
      */
-    badgeDetails: PropTypes.array
+    badgeDetails: PropTypes.array,
+    /**
+     * Determines whether to display a skeleton over personalizable data (e.g., pricing and promotions) during data refresh.
+     */
+    isRefreshingData: PropTypes.bool
 }
 
 export default ProductTile
