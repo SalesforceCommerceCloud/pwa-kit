@@ -145,7 +145,8 @@ describe('Application Extension Loader', () => {
                     const SalesforceSampleALoader = loadable.lib(() => import('@salesforce/extension-sample-a/setup-app'))
 
                     const getApplicationExtensions = async () => {
-                        return []
+                        const modules = await Promise.all([SalesforceSampleALoader.load()])
+                        return [new modules[0].default({"enabled":false})]
                     }
                     
                     export {
@@ -177,7 +178,7 @@ describe('Application Extension Loader', () => {
                     import SalesforceSampleA from '@salesforce/extension-sample-a/setup-server'
 
                     const getApplicationExtensions = () => {
-                        return []
+                        return [new SalesforceSampleA({"enabled":false})]
                     }
                     
                     export {
