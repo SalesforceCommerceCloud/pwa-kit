@@ -32,8 +32,7 @@ export const DEFAULT_TEST_CONFIG = {
     siteId: 'RefArchGlobal',
     locale: 'en-US',
     currency: 'USD',
-    fetchedToken: 'test-token',
-    OCAPISessionsURL: `${DEFAULT_TEST_HOST}${PROXY_PATH}/ocapi/s/RefArch/dw/shop/v22_8/sessions`
+    fetchedToken: 'test-token'
 }
 
 export const createQueryClient = () => {
@@ -106,7 +105,7 @@ const NOCK_DELAY = 50
 /** Mocks DELETE, PATCH, POST, and PUT so we don't have to look up which verb an endpoint uses. */
 export const mockMutationEndpoints = (
     matchingPath: string,
-    response: string | object | undefined,
+    response: string | object | undefined | ((uri: string, requestBody: any) => object),
     statusCode = 200
 ) => {
     const matcher = (uri: string) => uri.includes(matchingPath)

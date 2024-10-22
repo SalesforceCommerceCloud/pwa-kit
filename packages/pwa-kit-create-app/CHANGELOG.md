@@ -1,5 +1,9 @@
 ## v3.8.0-dev (Aug 8, 2024)
 
+- Removed OCAPISessionURL prop from provider template. [#2090](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2090)
+- Update ssr.js templates to include new feature flag to encode non ASCII HTTP headers [#2048](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2048)
+- Replace getAppOrigin with useOrigin to have a better support for an app origin building. [#2050](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2050)
+
 ## v3.7.0 (Aug 7, 2024)
 
 - Update default Node.js version to v20. [#1867](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1867/files)
