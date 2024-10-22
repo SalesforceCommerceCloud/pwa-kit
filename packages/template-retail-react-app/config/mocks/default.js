@@ -112,10 +112,6 @@ module.exports = {
             {
                 host: 'localhost:8888',
                 path: 'api'
-            },
-            {
-                host: 'localhost:9999',
-                path: 'ocapi'
             }
         ]
     }
