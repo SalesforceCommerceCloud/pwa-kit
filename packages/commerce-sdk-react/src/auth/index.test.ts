@@ -10,7 +10,12 @@ import jwt from 'jsonwebtoken'
 import {helpers} from 'commerce-sdk-isomorphic'
 import * as utils from '../utils'
 import {SLAS_SECRET_PLACEHOLDER} from '../constant'
-import {getDefaultCookieAttributes} from '../utils'
+import {ShopperLoginTypes} from 'commerce-sdk-isomorphic'
+import {
+    DEFAULT_SLAS_REFRESH_TOKEN_REGISTERED_TTL,
+    DEFAULT_SLAS_REFRESH_TOKEN_GUEST_TTL
+} from './index'
+
 // Use memory storage for all our storage types.
 jest.mock('./storage', () => {
     const originalModule = jest.requireActual('./storage')
@@ -33,6 +38,7 @@ jest.mock('commerce-sdk-isomorphic', () => {
             loginGuestUserPrivate: jest.fn().mockResolvedValue(''),
             loginRegisteredUserB2C: jest.fn().mockResolvedValue(''),
             logout: jest.fn().mockResolvedValue(''),
+            handleTokenResponse: jest.fn().mockResolvedValue(''),
             loginIDPUser: jest.fn().mockResolvedValue(''),
             authorizeIDP: jest.fn().mockResolvedValue('')
         }
@@ -63,6 +69,23 @@ const config = {
 const configSLASPrivate = {
     ...config,
     enablePWAKitPrivateClient: true
+}
+
+const FAKE_SLAS_EXPIRY = DEFAULT_SLAS_REFRESH_TOKEN_REGISTERED_TTL - 1
+
+const TOKEN_RESPONSE: ShopperLoginTypes.TokenResponse = {
+    access_token: 'access_token_xyz',
+    customer_id: 'customer_id_xyz',
+    enc_user_id: 'enc_user_id_xyz',
+    expires_in: 1800,
+    id_token: 'id_token_xyz',
+    refresh_token: 'refresh_token_xyz',
+    token_type: 'token_type_abc',
+    usid: 'usid_xyz',
+    idp_access_token: 'idp_access_token_xyz',
+    // test that this is authoritative and not set to
+    // `DEFAULT_SLAS_REFRESH_TOKEN_REGISTERED_TTL` when config.refreshTokenRegisteredCookieTTL is not set
+    refresh_token_expires_in: FAKE_SLAS_EXPIRY
 }
 
 describe('Auth', () => {
@@ -113,7 +136,7 @@ describe('Auth', () => {
             token_type: 'token_type',
             usid: 'usid',
             customer_type: 'guest',
-            refresh_token_expires_in: 'refresh_token_expires_in'
+            refresh_token_expires_in: FAKE_SLAS_EXPIRY
         }
         // Convert stored format to exposed format
         const result = {...sample, refresh_token: 'refresh_token_guest'}
@@ -237,7 +260,7 @@ describe('Auth', () => {
             token_type: 'token_type',
             usid: 'usid',
             customer_type: 'guest',
-            refresh_token_expires_in: 'refresh_token_expires_in'
+            refresh_token_expires_in: FAKE_SLAS_EXPIRY
         }
         // Convert stored format to exposed format
         const result = {...data, refresh_token: 'refresh_token_guest'}
@@ -457,6 +480,58 @@ describe('Auth', () => {
                 expect.anything(),
                 expect.objectContaining(expected)
             )
+        }
+    )
+
+    test.each([
+        // auth config | expected return value
+        [undefined, DEFAULT_SLAS_REFRESH_TOKEN_REGISTERED_TTL, true],
+        [undefined, DEFAULT_SLAS_REFRESH_TOKEN_REGISTERED_TTL, false],
+        [0, DEFAULT_SLAS_REFRESH_TOKEN_REGISTERED_TTL, false],
+        [-1, DEFAULT_SLAS_REFRESH_TOKEN_REGISTERED_TTL, false],
+        [
+            DEFAULT_SLAS_REFRESH_TOKEN_REGISTERED_TTL + 1,
+            DEFAULT_SLAS_REFRESH_TOKEN_REGISTERED_TTL,
+            false
+        ],
+        [900, 900, false]
+    ])(
+        'refreshTokenRegisteredCookieTTL is set correctly for refreshTokenRegisteredCookieTTLValue=`%p`, expected=`%s`',
+        async (refreshTokenRegisteredCookieTTL, expected, hasNoResponseValue) => {
+            // Mock the loginRegisteredUserB2C helper to return a token response
+            TOKEN_RESPONSE.refresh_token_expires_in = hasNoResponseValue
+                ? undefined
+                : DEFAULT_SLAS_REFRESH_TOKEN_REGISTERED_TTL
+            ;(helpers.loginRegisteredUserB2C as jest.Mock).mockResolvedValueOnce(TOKEN_RESPONSE)
+
+            const auth = new Auth({...config, refreshTokenRegisteredCookieTTL})
+            // Call the public method because the getter for refresh_token_expires_in is private
+            await auth.loginRegisteredUserB2C({username: 'test', password: 'test'})
+            expect(Number(auth.get('refresh_token_expires_in'))).toBe(expected)
+        }
+    )
+
+    test.each([
+        // auth config | expected return value
+        [undefined, DEFAULT_SLAS_REFRESH_TOKEN_GUEST_TTL, true],
+        [undefined, DEFAULT_SLAS_REFRESH_TOKEN_GUEST_TTL, false],
+        [0, DEFAULT_SLAS_REFRESH_TOKEN_GUEST_TTL, false],
+        [-1, DEFAULT_SLAS_REFRESH_TOKEN_GUEST_TTL, false],
+        [DEFAULT_SLAS_REFRESH_TOKEN_GUEST_TTL + 1, DEFAULT_SLAS_REFRESH_TOKEN_GUEST_TTL, false],
+        [900, 900, false]
+    ])(
+        'refreshTokenGuestCookieTTL is set correctly for refreshTokenGuestCookieTTLValue=`%p`, expected=`%s`',
+        async (refreshTokenGuestCookieTTL, expected, hasNoResponseValue) => {
+            // Mock the loginRegisteredUserB2C helper to return a token response
+            TOKEN_RESPONSE.refresh_token_expires_in = hasNoResponseValue
+                ? undefined
+                : DEFAULT_SLAS_REFRESH_TOKEN_GUEST_TTL
+            ;(helpers.loginGuestUser as jest.Mock).mockResolvedValueOnce(TOKEN_RESPONSE)
+
+            const auth = new Auth({...config, refreshTokenGuestCookieTTL})
+            // Call the public method because the getter for refresh_token_expires_in is private
+            await auth.loginGuestUser()
+            expect(Number(auth.get('refresh_token_expires_in'))).toBe(expected)
         }
     )
 
