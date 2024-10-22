@@ -2169,6 +2169,30 @@
       "value": "Create account"
     }
   ],
+  "login_form.button.apple": [
+    {
+      "type": 0,
+      "value": "Apple"
+    }
+  ],
+  "login_form.button.continue_securely": [
+    {
+      "type": 0,
+      "value": "Continue Securely"
+    }
+  ],
+  "login_form.button.google": [
+    {
+      "type": 0,
+      "value": "Google"
+    }
+  ],
+  "login_form.button.password": [
+    {
+      "type": 0,
+      "value": "Password"
+    }
+  ],
   "login_form.button.sign_in": [
     {
       "type": 0,
@@ -2185,6 +2209,12 @@
     {
       "type": 0,
       "value": "Don't have an account?"
+    }
+  ],
+  "login_form.message.or_login_with": [
+    {
+      "type": 0,
+      "value": "Or Login With"
     }
   ],
   "login_form.message.welcome_back": [

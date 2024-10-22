@@ -7,7 +7,7 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import {FormattedMessage} from 'react-intl'
+import {useIntl} from 'react-intl'
 import {Button, Stack} from '@salesforce/retail-react-app/app/components/shared/ui'
 
 // Icons
@@ -19,14 +19,21 @@ import {AppleIcon, GoogleIcon} from '@salesforce/retail-react-app/app/components
  * @returns
  */
 const SocialLogin = ({idps}) => {
+    const intl = useIntl()
     const IDP_CONFIG = {
         apple: {
             icon: AppleIcon,
-            message: 'Apple'
+            message: intl.formatMessage({
+                id: 'login_form.button.apple',
+                defaultMessage: 'Apple'
+            })
         },
         google: {
             icon: GoogleIcon,
-            message: 'Google'
+            message: intl.formatMessage({
+                id: 'login_form.button.google',
+                defaultMessage: 'Google'
+            })
         }
     }
 
@@ -49,11 +56,7 @@ const SocialLogin = ({idps}) => {
                                 variant="outline"
                             >
                                 <Icon sx={{marginRight: 2}} />
-                                <FormattedMessage
-                                    defaultMessage="{message}"
-                                    id="login_form.button.social"
-                                    values={{message}}
-                                />
+                                {message}
                             </Button>
                         )
                     )

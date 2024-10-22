@@ -927,6 +927,18 @@
   "login_form.action.create_account": {
     "defaultMessage": "Create account"
   },
+  "login_form.button.apple": {
+    "defaultMessage": "Apple"
+  },
+  "login_form.button.continue_securely": {
+    "defaultMessage": "Continue Securely"
+  },
+  "login_form.button.google": {
+    "defaultMessage": "Google"
+  },
+  "login_form.button.password": {
+    "defaultMessage": "Password"
+  },
   "login_form.button.sign_in": {
     "defaultMessage": "Sign In"
   },
@@ -935,6 +947,9 @@
   },
   "login_form.message.dont_have_account": {
     "defaultMessage": "Don't have an account?"
+  },
+  "login_form.message.or_login_with": {
+    "defaultMessage": "Or Login With"
   },
   "login_form.message.welcome_back": {
     "defaultMessage": "Welcome Back"
