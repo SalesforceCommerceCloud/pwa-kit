@@ -178,7 +178,7 @@ const ProductDetail = () => {
             case 404:
                 throw new HTTPNotFound('Product Not Found.')
             default:
-                throw new HTTPError(`HTTP Error ${errorStatus} occurred.`)
+                throw new HTTPError(errorStatus, `HTTP Error ${errorStatus} occurred.`)
         }
     }
     if (isCategoryError) {
@@ -187,7 +187,7 @@ const ProductDetail = () => {
             case 404:
                 throw new HTTPNotFound('Category Not Found.')
             default:
-                throw new HTTPError(`HTTP Error ${errorStatus} occurred.`)
+                throw new HTTPError(errorStatus, `HTTP Error ${errorStatus} occurred.`)
         }
     }
 

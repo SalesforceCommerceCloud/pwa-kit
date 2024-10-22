@@ -7,7 +7,8 @@
 import {
     useMutation as useReactQueryMutation,
     useQueryClient,
-    UseMutationOptions
+    UseMutationOptions,
+    MutationFunction
 } from '@tanstack/react-query'
 import {helpers} from 'commerce-sdk-isomorphic'
 import useAuthContext from './useAuthContext'
@@ -53,6 +54,12 @@ export const useMutation = <
     })
 }
 
+type TMutationVariables = {
+    body?: unknown
+    parameters?: {[key: string]: string | number | boolean | string[] | number[]}
+    headers?: {[key: string]: string}
+} | void
+
 /**
  * A hook for SCAPI custom endpoint mutations.
  *
@@ -63,40 +70,51 @@ export const useMutation = <
  * @param mutationOptions - Options passed through to @tanstack/react-query
  * @returns A TanStack Query mutation hook with data from the custom API endpoint.
  */
-export const useCustomMutation = (
+export const useCustomMutation = <TData = unknown, TError = unknown>(
     apiOptions: OptionalCustomEndpointClientConfig,
-    mutationOptions?: UseMutationOptions
+    mutationOptions?: UseMutationOptions<TData, TError, TMutationVariables>
 ) => {
-    const config = useConfig()
     const auth = useAuthContext()
-    const callCustomEndpointWithAuth = (options: OptionalCustomEndpointClientConfig) => {
-        return async () => {
-            const clientConfig = options.clientConfig || {}
-            const clientHeaders = config.headers || {}
+    const globalConfig = useConfig()
+    const globalHeaders = globalConfig.headers || {}
+    const globalClientConfig = {
+        parameters: {
+            clientId: globalConfig.clientId,
+            siteId: globalConfig.siteId,
+            organizationId: globalConfig.organizationId,
+            shortCode: globalConfig.shortCode
+        },
+        proxy: globalConfig.proxy
+    }
+
+    const createMutationFnWithAuth = (): MutationFunction<TData, TMutationVariables> => {
+        return async (args): Promise<TData> => {
             const {access_token} = await auth.ready()
-            return await helpers.callCustomEndpoint({
-                ...options,
+            return (await helpers.callCustomEndpoint({
+                ...apiOptions,
                 options: {
-                    ...options.options,
+                    ...apiOptions.options,
                     headers: {
                         Authorization: `Bearer ${access_token}`,
-                        ...clientHeaders,
-                        ...options.options?.headers
-                    }
+                        // Note the order of the following destructred objects is important.
+                        // Priority assending order: global config < mutation config < mutate func args
+                        ...globalHeaders,
+                        ...apiOptions.options?.headers,
+                        ...(args?.headers ? args.headers : {})
+                    },
+                    ...(args?.body ? {body: args.body} : {}),
+                    ...(args?.parameters ? {parameters: args.parameters} : {})
                 },
                 clientConfig: {
-                    parameters: {
-                        clientId: config.clientId,
-                        siteId: config.siteId,
-                        organizationId: config.organizationId,
-                        shortCode: config.organizationId
-                    },
-                    proxy: config.proxy,
-                    ...clientConfig
+                    ...globalClientConfig,
+                    ...(apiOptions.clientConfig || {})
                 }
-            })
+            })) as TData
         }
     }
 
-    return useReactQueryMutation(callCustomEndpointWithAuth(apiOptions), mutationOptions)
+    return useReactQueryMutation<TData, TError, TMutationVariables, unknown>(
+        createMutationFnWithAuth(),
+        mutationOptions
+    )
 }

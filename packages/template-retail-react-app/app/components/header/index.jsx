@@ -193,7 +193,7 @@ const Header = ({
                         icon={<AccountIcon />}
                         aria-label={intl.formatMessage({
                             id: 'header.button.assistive_msg.my_account',
-                            defaultMessage: 'My account'
+                            defaultMessage: 'My Account'
                         })}
                         variant="unstyled"
                         {...styles.icons}
@@ -283,7 +283,11 @@ const Header = ({
                                     <Divider colorScheme="gray" />
                                     <Button variant="unstyled" {...styles.signout}>
                                         <Flex>
-                                            <SignoutIcon boxSize={5} {...styles.signoutIcon} />
+                                            <SignoutIcon
+                                                aria-hidden={true}
+                                                boxSize={5}
+                                                {...styles.signoutIcon}
+                                            />
                                             <Text as="span" {...styles.signoutText}>
                                                 {intl.formatMessage({
                                                     defaultMessage: 'Log out',

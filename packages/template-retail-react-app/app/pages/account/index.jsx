@@ -64,7 +64,7 @@ const LogoutButton = ({onClick}) => {
                 height={11}
             >
                 <Flex justify={{base: 'center', lg: 'flex-start'}}>
-                    <SignoutIcon boxSize={5} mr={2} />
+                    <SignoutIcon boxSize={5} mr={2} aria-hidden={true} />
                     <Text as="span" fontSize={['md', 'md', 'md', 'sm']} fontWeight="normal">
                         {formatMessage({
                             defaultMessage: 'Log Out',
@@ -137,40 +137,53 @@ const Account = () => {
                                 <AccordionButton
                                     as={Button}
                                     height={16}
+                                    paddingLeft={8}
                                     variant="ghost"
                                     color="black"
                                     _active={{background: 'gray.100'}}
                                     _expanded={{background: 'transparent'}}
                                 >
                                     <Flex align="center" justify="center">
-                                        <Text as="span" mr={2}>
+                                        <Heading as="h2" fontSize="16px">
                                             <FormattedMessage
                                                 defaultMessage="My Account"
                                                 id="account.accordion.button.my_account"
                                             />
-                                        </Text>
+                                        </Heading>
                                         {isExpanded ? <ChevronUpIcon /> : <ChevronDownIcon />}
                                     </Flex>
                                 </AccordionButton>
                                 <AccordionPanel px={4} paddingBottom={4}>
                                     <Flex as="nav" spacing={0} direction="column">
-                                        {navLinks.map((link) => (
-                                            <Button
-                                                key={link.name}
-                                                as={Link}
-                                                to={`/account${link.path}`}
-                                                useNavLink={true}
-                                                variant="menu-link-mobile"
-                                                justifyContent="center"
-                                                fontSize="md"
-                                                fontWeight="normal"
-                                                onClick={() => setMobileNavIndex(-1)}
-                                            >
-                                                {formatMessage(messages[link.name])}
-                                            </Button>
-                                        ))}
+                                        <Stack spacing={0} as="ul" data-testid="account-nav">
+                                            {navLinks.map((link) => (
+                                                <Box
+                                                    align="center"
+                                                    key={link.name}
+                                                    as="li"
+                                                    listStyleType="none"
+                                                >
+                                                    <Button
+                                                        as={Link}
+                                                        to={`/account${link.path}`}
+                                                        useNavLink={true}
+                                                        variant="menu-link-mobile"
+                                                        justifyContent="center"
+                                                        fontSize="md"
+                                                        fontWeight="normal"
+                                                        width="100%"
+                                                        onClick={() => setMobileNavIndex(-1)}
+                                                    >
+                                                        {formatMessage(messages[link.name])}
+                                                    </Button>
+                                                </Box>
+                                            ))}
 
-                                        <LogoutButton justify="center" onClick={onSignoutClick} />
+                                            <LogoutButton
+                                                justify="center"
+                                                onClick={onSignoutClick}
+                                            />
+                                        </Stack>
                                     </Flex>
                                 </AccordionPanel>
                             </>
@@ -182,7 +195,7 @@ const Account = () => {
                 <Stack display={{base: 'none', lg: 'flex'}} spacing={4}>
                     {showLoading && <LoadingSpinner wrapperStyles={{height: '100vh'}} />}
 
-                    <Heading as="h6" fontSize="18px">
+                    <Heading as="h2" fontSize="18px">
                         <FormattedMessage
                             defaultMessage="My Account"
                             id="account.heading.my_account"

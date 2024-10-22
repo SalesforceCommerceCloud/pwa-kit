@@ -112,20 +112,7 @@ module.exports = {
             {
                 host: 'localhost:8888',
                 path: 'api'
-            },
-            {
-                host: 'localhost:9999',
-                path: 'ocapi'
             }
         ]
-    },
-    mockFetchOCAPISessions: (url) => {
-        if (url.includes('/sessions')) {
-            return {
-                ok: true,
-                status: 200
-            }
-        }
-        throw new Error(`Unhandled request: ${url}`)
     }
 }

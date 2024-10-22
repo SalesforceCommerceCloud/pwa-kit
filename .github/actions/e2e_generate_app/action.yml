@@ -8,5 +8,5 @@ runs:
   using: composite
   steps:
   - name: Generate new project based on project-key
-    run: node e2e/scripts/generate-project.js ${{ inputs.PROJECT_KEY }}
+    run: node e2e/scripts/generate-project.js --project-key ${{ inputs.PROJECT_KEY }}
     shell: bash
