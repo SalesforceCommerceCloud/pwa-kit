@@ -208,7 +208,7 @@ describe('Overrides Resolver Plugin', () => {
             } catch (e) {
                 err = e
             }
-            console.log('err: ', err)
+
             expects(output, err)
         })
     })
