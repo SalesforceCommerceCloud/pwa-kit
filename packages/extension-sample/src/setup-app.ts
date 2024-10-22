@@ -6,7 +6,7 @@
  */
 
 import React from 'react'
-import loadable from '@loadable/component'
+// import loadable from '@loadable/component'
 import {RouteProps} from 'react-router-dom'
 
 // Platform Imports
@@ -16,8 +16,7 @@ import {ApplicationExtension} from '@salesforce/pwa-kit-extension-support/react'
 import withRedBorder from '*/components/with-red-border'
 import {Config} from './types'
 
-
-// NOTE: FIXME!
+// BUG: Laodable isn't working here --> https://gus.lightning.force.com/lightning/_classic/%2Fa07EE00001o9ELVYA2
 // const SamplePage = loadable(() => import(/* webpackChunkName: "extension-sample-page-sample" */'./pages/sample'))
 import SamplePage from './pages/sample'
 

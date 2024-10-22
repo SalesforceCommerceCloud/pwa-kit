@@ -10,7 +10,7 @@ import React from 'react'
 
 // Local
 import {applyHOCs} from '../utils'
-import applicationExtensions from '../assets/application-extensions-placeholder'
+import {getApplicationExtensions} from '../assets/application-extensions-placeholder'
 
 // Types
 import {ApplicationExtension} from '../ApplicationExtension'
@@ -38,15 +38,16 @@ type withApplicationExtensionsOptions = {
  */
 type GenericHocType<C> = (component: React.ComponentType<C>) => React.ComponentType<C>
 
-const withApplicationExtensions = <
+const withApplicationExtensions = async <
     C,
     P extends ApplicationExtension<ApplicationExtensionConfigBase>
 >(
     WrappedComponent: React.ComponentType<C>,
     options: withApplicationExtensionsOptions
 ) => {
+    const applicationExtensions = await getApplicationExtensions()
     const hocs: GenericHocType<C>[] = applicationExtensions
-        .filter((applicationExtension) => applicationExtension.isEnabled())
+        .filter((applicationExtension: any) => applicationExtension.isEnabled())
         .map((extension: any) => extension.extendApp.bind(extension) as GenericHocType<C>)
         .filter(Boolean)
 

@@ -9,7 +9,9 @@ import resolve from 'resolve'
 import {Resolver} from 'webpack'
 
 // Local
-import {buildCandidatePaths} from '../../../shared/utils/resolver-utils'
+// TODO: Is this a good place for this util? I seems to only be used in the plugin. Maybe we need to put it somewhere
+// else?
+import {buildCandidatePaths, expand} from '../../../shared/utils/resolver-utils'
 
 // Type
 import {ApplicationExtensionEntry} from '../../../types'
@@ -45,6 +47,9 @@ class OverridesResolverPlugin {
             ...defaultOptions,
             ...options
         }
+
+        // Ensure we have the long form configuration entry.
+        this.options.extensions = expand(this.options.extensions)
     }
 
     handleHook(

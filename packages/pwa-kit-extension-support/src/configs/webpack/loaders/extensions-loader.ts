@@ -5,21 +5,11 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-// Third-Party
-import {LoaderContext} from 'webpack'
-import {PackageJson} from 'type-fest'
-
 // Local
 import {renderTemplate} from '../../utils'
 
-// TODO: Move these to a better location.
-interface ExtensionsLoaderOptions {
-    pkg: PackageJson
-    getConfig: () => any
-    target: 'node' | 'web'
-}
-
-type ExtensionsLoaderContext = LoaderContext<ExtensionsLoaderOptions>
+// Types
+import {ApplicationExtensionsLoaderContext} from '../types'
 
 /**
  * The `extensions-loader` as a mechanism to get all configured extensions for a given pwa-kit
@@ -35,8 +25,11 @@ type ExtensionsLoaderContext = LoaderContext<ExtensionsLoaderOptions>
  *
  * @returns {string} The string representation of a module exporting all the named application extension modules.
  */
-module.exports = function (this: ExtensionsLoaderContext): string {
-    // TODO: Add some argument checks here.
+module.exports = function (this: ApplicationExtensionsLoaderContext): string {
+    // Get the installed and configured application extensions as well as the requested
+    // target type. For web targets the loader takes advantage of react-loadabled but node
+    // targets (server) do not require this optimization.
+    const data = this.getOptions()
 
-    return renderTemplate(this.getOptions())
+    return renderTemplate(data)
 }

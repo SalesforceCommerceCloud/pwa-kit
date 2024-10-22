@@ -77,26 +77,26 @@ describe('resolverUtils', () => {
                 name: 'extensions are all short names',
                 input: ['module-extension-a', 'module-extension-b', 'module-extension-c'],
                 expected: [
-                    ['@salesforce/extension-module-extension-a', {}],
-                    ['@salesforce/extension-module-extension-b', {}],
-                    ['@salesforce/extension-module-extension-c', {}]
+                    ['@salesforce/extension-module-extension-a', {enabled: true}],
+                    ['@salesforce/extension-module-extension-b', {enabled: true}],
+                    ['@salesforce/extension-module-extension-c', {enabled: true}]
                 ]
             },
             {
                 name: 'extensions are a mix of module extensions and local extension',
                 input: ['module-extension-a', 'module-extension-b', './local-extension-c'],
                 expected: [
-                    ['@salesforce/extension-module-extension-a', {}],
-                    ['@salesforce/extension-module-extension-b', {}],
-                    [path.join(process.cwd(), 'local-extension-c'), {}]
+                    ['@salesforce/extension-module-extension-a', {enabled: true}],
+                    ['@salesforce/extension-module-extension-b', {enabled: true}],
+                    [path.join(process.cwd(), 'local-extension-c'), {enabled: true}]
                 ]
             },
             {
                 name: 'extensions include falsey values',
                 input: ['module-extension-a', '', `.${path.sep}local-extension-c`, false],
                 expected: [
-                    ['@salesforce/extension-module-extension-a', {}],
-                    [path.join(process.cwd(), 'local-extension-c'), {}]
+                    ['@salesforce/extension-module-extension-a', {enabled: true}],
+                    [path.join(process.cwd(), 'local-extension-c'), {enabled: true}]
                 ]
             },
             {
@@ -106,16 +106,16 @@ describe('resolverUtils', () => {
                     path.join('@salesforce', 'module-extension-a')
                 ],
                 expected: [
-                    [path.join(process.cwd(), 'local-extension-a'), {}],
-                    [path.join('@salesforce', 'module-extension-a'), {}]
+                    [path.join(process.cwd(), 'local-extension-a'), {enabled: true}],
+                    [path.join('@salesforce', 'module-extension-a'), {enabled: true}]
                 ]
             },
             {
                 name: 'extensions includes windows file paths',
                 input: ['.\\local-extension-a', '\\home\\local-extension-a'],
                 expected: [
-                    [path.join(process.cwd(), 'local-extension-a'), {}],
-                    [path.join(path.sep, 'home', 'local-extension-a'), {}]
+                    [path.join(process.cwd(), 'local-extension-a'), {enabled: true}],
+                    [path.join(path.sep, 'home', 'local-extension-a'), {enabled: true}]
                 ]
             }
         ].forEach((testCase) => {

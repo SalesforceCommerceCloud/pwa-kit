@@ -82,7 +82,7 @@ OuterApp.propTypes = {
     onHydrate: PropTypes.func
 }
 /* istanbul ignore next */
-export const start = () => {
+export const start = async () => {
     const AppConfig = getAppConfig()
     const rootEl = document.getElementsByClassName('react-target')[0]
     const data = JSON.parse(document.getElementById('mobify-data').innerHTML)
@@ -115,8 +115,13 @@ export const start = () => {
     // been warned.
     window.__HYDRATING__ = true
 
-    const WrappedApp = withApplicationExtensions(routeComponent(App, false, locals), {locals})
+    // TODO: This `async` pattern isn't ideal. Look to come up with something better. Maybe a static function
+    // on the HOC that you have to await on before executing/using it.
+    // E.g.
+    // await withApplicationExtensions.loadExtensions()
+    const WrappedApp = await withApplicationExtensions(routeComponent(App, false, locals), {locals})
 
+    
     const props = {
         error: window.__ERROR__,
         locals: locals,

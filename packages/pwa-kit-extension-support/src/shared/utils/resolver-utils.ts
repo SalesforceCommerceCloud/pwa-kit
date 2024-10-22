@@ -8,16 +8,15 @@
 // Third-party imports
 import path from 'path'
 
-// Project imports
-import {isEnabled} from './extensibility-utils'
-
 // Types
 import {
+    ApplicationExtensionConfig,
     ApplicationExtensionEntry,
     ApplicationExtensionEntryArray,
     BuildCandidatePathsOptions
 } from '../../types'
 
+// TODO: Should this be in a constants folder?
 const EXTENSION_NAMESPACE = '@salesforce'
 const EXTENSION_PREFIX = 'extension'
 const NODE_MODULES = 'node_modules'
@@ -25,6 +24,9 @@ const OVERRIDES = 'overrides'
 const APP = 'app'
 const SRC = 'src'
 const PWA_KIT_REACT_SDK = 'pwa-kit-react-sdk'
+const DEFAULT_CONFIG: ApplicationExtensionConfig = {
+    enabled: true
+}
 
 // TODO: We should determine if we want the `overrides-resolver-plugin` to handle resolution of application special
 // components like _app and _document. If so we can update this map and remove the special logic from our webpack
@@ -66,9 +68,9 @@ export const expand = (
     extensions
         .filter((extension) => Boolean(extension))
         .map((extension) => {
-            let [nameRef, config = {}]: [string, any] = Array.isArray(extension)
+            let [nameRef, config]: [string, any] = Array.isArray(extension)
                 ? extension
-                : [extension, {}]
+                : [extension, DEFAULT_CONFIG]
 
             switch (true) {
                 case /^\./.test(nameRef):
@@ -118,7 +120,7 @@ export const buildCandidatePaths = (
 
     // Map all the extensions and resolve the module names to absolute paths.
     paths = expand(extensionEntries)
-        .filter(isEnabled)
+        .filter(([, {enabled}]) => typeof enabled === 'undefined' || enabled)
         .reverse()
         .reduce((acc, extensionEntry) => {
             // The reference can be a module/package or an absolute path to a file.

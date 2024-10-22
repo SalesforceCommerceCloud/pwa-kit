@@ -97,25 +97,29 @@ describe('extensibilityUtils', () => {
                 name: 'returns an defined object with correct mapping when application extensions are provided',
                 extensions: ['@extension-good'],
                 expected: {
-                    '@extension-good/setup-app': path.join(
+                    '@extension-good': path.join(
                         process.cwd(),
                         'node_modules',
                         '@extension-good',
-                        'src',
-                        'setup-app.ts'
+                        'src'
                     )
                 }
             },
             {
-                name: 'returns an defined object with correct mapping when application extensions are provided including a bad extension',
-                extensions: ['@extension-bad', '@extension-good'],
+                name: 'returns an defined objects with correct mapping when application multiple extensions are provided',
+                extensions: ['@extension-one', '@extension-two'],
                 expected: {
-                    '@extension-good/setup-app': path.join(
+                    '@extension-one': path.join(
                         process.cwd(),
                         'node_modules',
-                        '@extension-good',
-                        'src',
-                        'setup-app.ts'
+                        '@extension-one',
+                        'src'
+                    ),
+                    '@extension-two': path.join(
+                        process.cwd(),
+                        'node_modules',
+                        '@extension-two',
+                        'src'
                     )
                 }
             }
@@ -126,42 +130,6 @@ describe('extensibilityUtils', () => {
 
                 expect(result).toEqual(testCase.expected)
             })
-        })
-    })
-
-    describe('isEnabled', () => {
-        test('should return true when the application extension has a name and config is undefined', () => {
-            const extensionEntry = ['myExtension']
-            expect(extensionUtils.isEnabled(extensionEntry)).toBe(true)
-        })
-
-        test('should return true when the application extension has a name and config.enabled is true', () => {
-            const extensionEntry = ['myExtension', {enabled: true}]
-            expect(extensionUtils.isEnabled(extensionEntry)).toBe(true)
-        })
-
-        test('should return false when the application extension has a name and config.enabled is false', () => {
-            const extensionEntry = ['myExtension', {enabled: false}]
-            expect(extensionUtils.isEnabled(extensionEntry)).toBe(false)
-        })
-
-        test('should return true when the application extension has a name and config.enabled is undefined', () => {
-            const extensionEntry = ['myExtension', {}]
-            expect(extensionUtils.isEnabled(extensionEntry)).toBe(true)
-        })
-
-        test('should return false when the application extension has no name', () => {
-            const extensionEntry = [null, {enabled: true}]
-            expect(extensionUtils.isEnabled(extensionEntry)).toBe(false)
-        })
-
-        test('should return false when the application extension entry is an empty array', () => {
-            const extensionEntry = []
-            expect(extensionUtils.isEnabled(extensionEntry)).toBe(false)
-        })
-
-        test('should return false when no arguments are passed (empty application extension entry)', () => {
-            expect(extensionUtils.isEnabled()).toBe(false)
         })
     })
 })

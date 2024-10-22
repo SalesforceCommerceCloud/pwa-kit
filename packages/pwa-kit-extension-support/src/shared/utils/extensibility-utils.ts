@@ -31,8 +31,8 @@ import {ApplicationExtensionEntry, ApplicationExtensionEntryArray} from '../../t
  * buildAliases(extensions)
  * // Output
  * {
- *     ['@salesforce/extension-store-finder/setup-app']: '/path/to/setup-app.ts',
- *     ['@salesforce/extension-checkout/setup-app']: '/path/to/setup-app.ts',
+ *     ['@salesforce/extension-store-finder']: '/path/to/src/folder',
+ *     ['@salesforce/extension-checkout']: '/path/to/src/folder',
  * }
  */
 export const buildAliases = (extensions: ApplicationExtensionEntry[] = []) => {
@@ -102,22 +102,4 @@ export const getExtensionNames = (extensions: ApplicationExtensionEntry[]) => {
     return (extensions || []).map((extension) => {
         return Array.isArray(extension) ? extension[0] : extension
     })
-}
-
-/**
- * Determines if an extension is enabled based on the provided Application Extension entry.
- *
- * @param {Array} [extensionEntry=[]] - An array representing an extension entry.
- *   The first element is the extension's name (string), and the second element is an optional configuration object.
- * @param {string} extensionEntry[0] - The name of the extension.
- * @param {Object} [extensionEntry[1]={}] - The configuration object for the extension.
- * @param {boolean} [extensionEntry[1].enabled] - A flag indicating whether the extension is enabled.
- *   If `true`, the extension is enabled. If `false`, it is disabled. If `undefined`, the extension is considered enabled.
- *
- * @returns {boolean} - Returns `true` if the extension has a name and is enabled (or if the enabled flag is `undefined`).
- *   Returns `false` if the extension is explicitly disabled or if no name is provided.
- */
-export const isEnabled = (extensionEntry: ApplicationExtensionEntryArray): boolean => {
-    const [name, config] = extensionEntry
-    return !!(name && config?.enabled !== false)
 }

@@ -8,11 +8,23 @@
 import {BASE_DIR, runWebpackCompiler} from '../test-utils'
 import OverridesResolverPlugin from './overrides-resolver-plugin'
 
+// const BASE_VIRTUAL_FILES = {
+//     // Virtual Project Files
+//     'app/ssr.js': `import {getApplicationExtensions} from './application-extensions-placeholder.js'`,
+//     'app/main.jsx': `import {getApplicationExtensions} from './application-extensions-placeholder.js'`,
+//     'app/application-extensions-placeholder.js': '',
+
+//     // QUIRK! These entries are required to access the files in the actual file system. The resolve method fails if
+//     // they don't exist. This is a sharpe edge, but it's not too bad.
+//     [`${path.resolve(__dirname, './extensions-loader.ts')}`]: '',
+//     [`${path.resolve(__dirname, '../../../../node_modules/@loadable/component')}`]: ''
+// }
+
 describe('Overrides Resolver Plugin', () => {
     const testCases = [
         {
             description: 'Wildcard import resolves to correct base project file',
-            entryPoint: 'app/routes.jsx',
+            entryPoint: '/app/routes.jsx',
             // Compiler configuration.
             compilerConfig: {
                 extensions: ['@salesforce/extension-this', '@salesforce/extension-that'],
@@ -20,17 +32,17 @@ describe('Overrides Resolver Plugin', () => {
                     // Virtual Project Files
 
                     // Entry Point
-                    '/virtual/project/app/routes.jsx': `import SamplePage from '*/pages/sample-page'`,
+                    '/app/routes.jsx': `import SamplePage from '*/pages/sample-page'`,
 
                     // Overrides
 
                     // Local Files
-                    '/virtual/project/app/pages/sample-page.jsx': '// Base Project - Sample Page',
+                    '/app/pages/sample-page.jsx': '// Base Project - Sample Page',
 
                     // Extensions Overrides
-                    '/virtual/project/node_modules/@salesforce/extension-that/src/overrides/pages/sample-page.jsx':
+                    '/node_modules/@salesforce/extension-that/src/overrides/pages/sample-page.jsx':
                         '// @salesforce/extension-that',
-                    '/virtual/project/node_modules/@salesforce/extension-this/src/overrides/pages/sample-page.jsx':
+                    '/node_modules/@salesforce/extension-this/src/overrides/pages/sample-page.jsx':
                         '// @salesforce/extension-this'
                     // TODO: Why don't index files work here?
                 }
@@ -41,7 +53,7 @@ describe('Overrides Resolver Plugin', () => {
         },
         {
             description: 'Wildcard import resolved to correct extension override',
-            entryPoint: 'app/routes.jsx',
+            entryPoint: '/app/routes.jsx',
             // Compiler configuration.
             compilerConfig: {
                 extensions: ['@salesforce/extension-this', '@salesforce/extension-that'],
@@ -49,14 +61,14 @@ describe('Overrides Resolver Plugin', () => {
                     // Virtual Project Files
 
                     // Entry Point
-                    '/virtual/project/app/routes.jsx': `import SamplePage from '*/pages/sample-page'`,
+                    '/app/routes.jsx': `import SamplePage from '*/pages/sample-page'`,
 
                     // Overrides
 
                     // Extensions Overrides
-                    '/virtual/project/node_modules/@salesforce/extension-that/src/overrides/pages/sample-page.jsx':
+                    '/node_modules/@salesforce/extension-that/src/overrides/pages/sample-page.jsx':
                         '// @salesforce/extension-that',
-                    '/virtual/project/node_modules/@salesforce/extension-this/src/overrides/pages/sample-page.jsx':
+                    '/node_modules/@salesforce/extension-this/src/overrides/pages/sample-page.jsx':
                         '// @salesforce/extension-this'
                     // TODO: Why don't index files work here?
                 }
@@ -68,7 +80,7 @@ describe('Overrides Resolver Plugin', () => {
         {
             description:
                 'Wildcard import resolved to correct extension override when app extension is reversed',
-            entryPoint: 'app/routes.jsx',
+            entryPoint: '/app/routes.jsx',
             // Compiler configuration.
             compilerConfig: {
                 extensions: ['@salesforce/extension-that', '@salesforce/extension-this'],
@@ -76,14 +88,14 @@ describe('Overrides Resolver Plugin', () => {
                     // Virtual Project Files
 
                     // Entry Point
-                    '/virtual/project/app/routes.jsx': `import SamplePage from '*/pages/sample-page'`,
+                    '/app/routes.jsx': `import SamplePage from '*/pages/sample-page'`,
 
                     // Overrides
 
                     // Extensions Overrides
-                    '/virtual/project/node_modules/@salesforce/extension-that/src/overrides/pages/sample-page.jsx':
+                    '/node_modules/@salesforce/extension-that/src/overrides/pages/sample-page.jsx':
                         '// @salesforce/extension-that',
-                    '/virtual/project/node_modules/@salesforce/extension-this/src/overrides/pages/sample-page.jsx':
+                    '/node_modules/@salesforce/extension-this/src/overrides/pages/sample-page.jsx':
                         '// @salesforce/extension-this'
                     // TODO: Why don't index files work here?
                 }
@@ -95,7 +107,7 @@ describe('Overrides Resolver Plugin', () => {
         {
             description:
                 'Wildcard import pioritizes module resolution to the "overrides" folder if match import exists.',
-            entryPoint: 'app/routes.jsx',
+            entryPoint: '/app/routes.jsx',
             // Compiler configuration.
             compilerConfig: {
                 extensions: ['@salesforce/extension-that', '@salesforce/extension-this'],
@@ -103,14 +115,14 @@ describe('Overrides Resolver Plugin', () => {
                     // Virtual Project Files
 
                     // Entry Point
-                    '/virtual/project/app/routes.jsx': `import SamplePage from '*/pages/sample-page'`,
+                    '/app/routes.jsx': `import SamplePage from '*/pages/sample-page'`,
 
                     // Overrides
 
                     // Extensions Overrides
-                    '/virtual/project/node_modules/@salesforce/extension-this/src/pages/sample-page.jsx':
+                    '/node_modules/@salesforce/extension-this/src/pages/sample-page.jsx':
                         '// @salesforce/extension-this',
-                    '/virtual/project/node_modules/@salesforce/extension-this/src/overrides/pages/sample-page.jsx':
+                    '/node_modules/@salesforce/extension-this/src/overrides/pages/sample-page.jsx':
                         '// @salesforce/extension-this-override'
                     // TODO: Why don't index files work here?
                 }
@@ -121,7 +133,7 @@ describe('Overrides Resolver Plugin', () => {
         },
         {
             description: 'Wildcard import throws when no match is found.',
-            entryPoint: 'app/routes.jsx',
+            entryPoint: '/app/routes.jsx',
             // Compiler configuration.
             compilerConfig: {
                 extensions: ['@salesforce/extension-that', '@salesforce/extension-this'],
@@ -129,13 +141,12 @@ describe('Overrides Resolver Plugin', () => {
                     // Virtual Project Files
 
                     // Entry Point
-                    '/virtual/project/app/routes.jsx': `import SamplePage from '*/pages/sample-page'`
+                    '/app/routes.jsx': `import SamplePage from '*/pages/sample-page'`
 
                     // Overrides
                 }
             },
             expects: (_, err) => {
-                // console.log('output: ', output)
                 expect(err).toBeDefined()
             }
         }
@@ -154,7 +165,7 @@ describe('Overrides Resolver Plugin', () => {
                     buildPlugins: ({fileSystem}) => {
                         return [
                             new OverridesResolverPlugin({
-                                projectDir: BASE_DIR,
+                                projectDir: '/',
                                 extensions: extensions,
                                 fileExtensions: ['.ts', '.tsx', '.js', '.jsx', '.json'],
                                 resolveOptions: {
@@ -197,7 +208,7 @@ describe('Overrides Resolver Plugin', () => {
             } catch (e) {
                 err = e
             }
-
+            console.log('err: ', err)
             expects(output, err)
         })
     })
