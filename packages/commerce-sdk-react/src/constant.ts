@@ -27,6 +27,10 @@ export const SLAS_SECRET_PLACEHOLDER = '_PLACEHOLDER_PROXY-PWA_KIT_SLAS_CLIENT_S
 
 export const SLAS_SECRET_OVERRIDE_MSG =
     'You have enabled PWA Kit Private Client mode which gets the SLAS secret from your environment variable. The SLAS secret you have set in the Auth provider will be ignored.'
+
+export const SLAS_REFRESH_TOKEN_COOKIE_TTL_OVERRIDE_MSG =
+    'You are attempting to use an invalid refresh token TTL value.'
+
 export const DNT_COOKIE_NAME = 'dw_dnt' as const
 
 export const DWSID_COOKIE_NAME = 'dwsid'
