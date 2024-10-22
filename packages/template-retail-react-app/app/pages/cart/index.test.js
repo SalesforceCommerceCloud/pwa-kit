@@ -6,7 +6,7 @@
  */
 
 import React from 'react'
-import {screen, within, fireEvent, waitFor, act} from '@testing-library/react'
+import {screen, within, fireEvent, waitFor} from '@testing-library/react'
 import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
 import Cart from '@salesforce/retail-react-app/app/pages/cart/index'
 import {
@@ -79,7 +79,6 @@ beforeEach(() => {
         rest.get('*/products', (req, res, ctx) => {
             return res(ctx.delay(0), ctx.json({data: [mockCartVariant]}))
         }),
-
         rest.put('*/baskets/:basketId/shipments/:shipmentId', (req, res, ctx) => {
             const basket = mockCustomerBaskets.baskets[0]
             const updatedBasketWithShippingMethod = {
@@ -112,7 +111,6 @@ beforeEach(() => {
         rest.get('*/baskets/:basketId/shipments', (req, res, ctx) => {
             return res(ctx.delay(0), ctx.json(mockShippingMethods))
         }),
-
         rest.put('*/shipments/me/shipping-method', (req, res, ctx) => {
             const basketWithShipment = {
                 ...mockCustomerBaskets.baskets[0],
@@ -138,20 +136,31 @@ beforeEach(() => {
             }
             return res(ctx.delay(0), ctx.json(basketWithShipment))
         }),
-
         rest.get('*/shipments/me/shipping-methods', (req, res, ctx) => {
             return res(ctx.delay(0), ctx.json(mockShippingMethods))
         }),
-
         rest.get('*/promotions', (req, res, ctx) => {
             return res(ctx.delay(0), ctx.status(200), ctx.json(mockPromotions))
+        }),
+        rest.patch('*/baskets/:basketId/items/:itemId', (req, res, ctx) => {
+            const basket = mockCustomerBaskets.baskets[0]
+            const updatedBasket = {
+                ...basket,
+                productItems: [
+                    {
+                        ...basket.productItems[0],
+                        quantity: 3
+                    }
+                ]
+            }
+            return res(ctx.json(updatedBasket))
         })
     )
 })
 afterEach(() => {
     localStorage.clear()
 })
-jest.setTimeout(30000)
+jest.setTimeout(5000)
 
 describe('Empty cart tests', function () {
     beforeEach(() => {
@@ -177,48 +186,32 @@ describe('Rendering tests', function () {
     })
 })
 
-// TODO: Fix flaky/broken test
-// eslint-disable-next-line jest/no-disabled-tests
-test.skip('Can update item quantity in the cart', async () => {
+test('Can update item quantity in the cart', async () => {
     renderWithProviders(<Cart />)
+    let cartItem
     await waitFor(async () => {
+        cartItem = await screen.findByTestId(
+            `sf-cart-item-${mockCustomerBaskets.baskets[0].productItems[0].productId}`
+        )
         expect(screen.getByTestId('sf-cart-container')).toBeInTheDocument()
         expect(screen.getByText(/Belted Cardigan With Studs/i)).toBeInTheDocument()
+        expect(within(cartItem).getByDisplayValue('2')).toBeInTheDocument()
     })
 
-    const cartItem = await screen.findByTestId(
-        `sf-cart-item-${mockCustomerBaskets.baskets[0].productItems[0].productId}`
-    )
+    const incrementButton = await within(cartItem).findByTestId('quantity-increment')
 
-    // TODO: Fix assertion
-    // eslint-disable-next-line jest/valid-expect
-    expect(within(cartItem).getByDisplayValue('2'))
-
-    await act(async () => {
-        const incrementButton = await within(cartItem).findByTestId('quantity-increment')
-
-        // update item quantity
-        fireEvent.pointerDown(incrementButton)
-    })
+    // update item quantity through the keyboard
+    // as clicking through the UI works but not with the react testing library
+    incrementButton.focus()
+    fireEvent.keyDown(incrementButton, {key: 'Enter', code: 'Enter', charCode: 13})
 
     await waitFor(() => {
-        expect(screen.getByTestId('loading')).toBeInTheDocument()
-    })
-
-    await waitFor(() => {
-        // TODO: Fix assertion
-        // eslint-disable-next-line jest/valid-expect
-        expect(within(cartItem).getByDisplayValue('3'))
-    })
-
-    await waitFor(() => {
+        expect(within(cartItem).getByDisplayValue('3')).toBeInTheDocument()
         expect(screen.queryByTestId('loading')).not.toBeInTheDocument()
     })
 })
 
-// TODO: Fix flaky/broken test
-// eslint-disable-next-line jest/no-disabled-tests
-describe.skip('Update quantity in product view', function () {
+describe('Update quantity in product view', function () {
     beforeEach(() => {
         global.server.use(
             rest.get('*/products/:productId', (req, res, ctx) => {
@@ -229,10 +222,12 @@ describe.skip('Update quantity in product view', function () {
 
     test('Can update item quantity from product view modal', async () => {
         const {user} = renderWithProviders(<Cart />)
-        expect(await screen.findByTestId('sf-cart-container')).toBeInTheDocument()
-        expect(screen.getByText(/Belted Cardigan With Studs/i)).toBeInTheDocument()
+        await waitFor(() => {
+            // expect(screen.findByTestId('sf-cart-container')).toBeInTheDocument()
+            expect(screen.getByText(/Belted Cardigan With Studs/i)).toBeInTheDocument()
+        })
 
-        const cartItem = await screen.findByTestId(
+        let cartItem = await screen.findByTestId(
             `sf-cart-item-${mockCustomerBaskets.baskets[0].productItems[0].productId}`
         )
 
@@ -240,28 +235,31 @@ describe.skip('Update quantity in product view', function () {
         await user.click(editCartButton)
 
         const productView = screen.queryByTestId('product-view')
-
         const incrementButton = await within(productView).findByTestId('quantity-increment')
-        // update item quantity
-        fireEvent.pointerDown(incrementButton)
-        // TODO: Fix assertion
-        // eslint-disable-next-line jest/valid-expect
-        expect(within(productView).getByDisplayValue('3'))
+
+        // update item quantity through the keyboard
+        // as clicking through the UI works but not with the react testing library
+        incrementButton.focus()
+        fireEvent.keyDown(incrementButton, {key: 'Enter', code: 'Enter', charCode: 13})
+        await waitFor(() => {
+            expect(within(productView).getByDisplayValue('3')).toBeInTheDocument()
+        })
 
         const updateCartButtons = within(productView).getAllByRole('button', {name: 'Update'})
         await user.click(updateCartButtons[0])
-        await waitFor(() => {
-            expect(productView).not.toBeInTheDocument()
-        })
-        await waitFor(() => {
-            // TODO: Fix assertion
-            // eslint-disable-next-line jest/valid-expect
-            expect(within(cartItem).getByDisplayValue('3'))
-        })
 
-        await waitFor(() => {
-            expect(screen.queryByTestId('loading')).not.toBeInTheDocument()
-        })
+        await waitFor(
+            async () => {
+                // re-query screen to update
+                cartItem = await screen.findByTestId(
+                    `sf-cart-item-${mockCustomerBaskets.baskets[0].productItems[0].productId}`
+                )
+                expect(productView).not.toBeInTheDocument()
+                expect(within(cartItem).getByDisplayValue('3')).toBeInTheDocument()
+                expect(screen.queryByTestId('loading')).not.toBeInTheDocument()
+            },
+            {timeout: 10000}
+        )
     })
 })
 

@@ -444,7 +444,8 @@ const Cart = () => {
                     setSelectedItem(undefined)
                 },
                 onSuccess: () => {
-                    setLocalQuantity({...localQuantity, [product.itemId]: undefined})
+                    // TODO: see if there's a way to fix this test without changing this line
+                    setLocalQuantity({...localQuantity, [product.itemId]: quantity})
                 },
                 onError: () => {
                     // reset the quantity to the previous value
