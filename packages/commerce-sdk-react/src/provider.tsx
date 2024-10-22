@@ -23,7 +23,12 @@ import {
 import Auth from './auth'
 import {ApiClientConfigParams, ApiClients} from './hooks/types'
 import {Logger} from './types'
-import {MOBIFY_PATH, SLAS_PRIVATE_PROXY_PATH} from './constant'
+import {
+    DWSID_COOKIE_NAME,
+    MOBIFY_PATH,
+    SERVER_AFFINITY_HEADER_KEY,
+    SLAS_PRIVATE_PROXY_PATH
+} from './constant'
 export interface CommerceApiProviderProps extends ApiClientConfigParams {
     children: React.ReactNode
     proxy: string
@@ -38,6 +43,8 @@ export interface CommerceApiProviderProps extends ApiClientConfigParams {
     silenceWarnings?: boolean
     logger?: Logger
     defaultDnt?: boolean
+    refreshTokenRegisteredCookieTTL?: number
+    refreshTokenGuestCookieTTL?: number
 }
 
 /**
@@ -115,15 +122,61 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
         clientSecret,
         silenceWarnings,
         logger,
-        defaultDnt
+        defaultDnt,
+        refreshTokenRegisteredCookieTTL,
+        refreshTokenGuestCookieTTL
     } = props
 
     // Set the logger based on provided configuration, or default to the console object if no logger is provided
     const configLogger = logger || console
 
+    const auth = useMemo(() => {
+        return new Auth({
+            clientId,
+            organizationId,
+            shortCode,
+            siteId,
+            proxy,
+            redirectURI,
+            fetchOptions,
+            fetchedToken,
+            enablePWAKitPrivateClient,
+            clientSecret,
+            silenceWarnings,
+            logger: configLogger,
+            defaultDnt,
+            refreshTokenRegisteredCookieTTL,
+            refreshTokenGuestCookieTTL
+        })
+    }, [
+        clientId,
+        organizationId,
+        shortCode,
+        siteId,
+        proxy,
+        redirectURI,
+        fetchOptions,
+        fetchedToken,
+        enablePWAKitPrivateClient,
+        clientSecret,
+        silenceWarnings,
+        configLogger,
+        refreshTokenRegisteredCookieTTL,
+        refreshTokenGuestCookieTTL
+    ])
+
+    const dwsid = auth.get(DWSID_COOKIE_NAME)
+    const serverAffinityHeader: Record<string, string> = {}
+    if (dwsid) {
+        serverAffinityHeader[SERVER_AFFINITY_HEADER_KEY] = dwsid
+    }
+
     const config = {
         proxy,
-        headers,
+        headers: {
+            ...headers,
+            ...serverAffinityHeader
+        },
         parameters: {
             clientId,
             organizationId,
@@ -169,37 +222,6 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
         headers?.['correlation-id']
     ])
 
-    const auth = useMemo(() => {
-        return new Auth({
-            clientId,
-            organizationId,
-            shortCode,
-            siteId,
-            proxy,
-            redirectURI,
-            fetchOptions,
-            fetchedToken,
-            enablePWAKitPrivateClient,
-            clientSecret,
-            silenceWarnings,
-            logger: configLogger,
-            defaultDnt
-        })
-    }, [
-        clientId,
-        organizationId,
-        shortCode,
-        siteId,
-        proxy,
-        redirectURI,
-        fetchOptions,
-        fetchedToken,
-        enablePWAKitPrivateClient,
-        clientSecret,
-        silenceWarnings,
-        configLogger
-    ])
-
     // Initialize the session
     useEffect(() => void auth.ready(), [auth])
 
@@ -218,7 +240,9 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
                 currency,
                 silenceWarnings,
                 logger: configLogger,
-                defaultDnt
+                defaultDnt,
+                refreshTokenRegisteredCookieTTL,
+                refreshTokenGuestCookieTTL
             }}
         >
             <CommerceApiContext.Provider value={apiClients}>

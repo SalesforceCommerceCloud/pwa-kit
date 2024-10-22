@@ -1,9 +1,21 @@
+## v3.2.0-dev (Oct 14, 2024)
+
+-   [Server Affinity] Attach dwsid to SCAPI request headers [#2090](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2090)
+-   Add the `authorizeCustomer` and `getPasswordResetToken` to the `ShopperLoginMutations` [#2056](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2056)
+-   Add useDNT hook to commerce-sdk-react and put DNT in auth [#2067](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2067/files)
+-   Add Trusted Agent on Behalf of (TAOB) support for SLAS APIs [#2077](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2077)
+-   Add optional `refreshTokenRegisteredCookieTTL` and `refreshTokenGuestCookieTTL` to Commerce API config [#2077](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2077)
+
 ## v3.1.0-dev (Aug 08, 2024)
 
+-   Improve refresh token error logging [#2028](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2028)
 -   Remove ocapi session-bridging on phased launches [#2011](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2011)
 
 -   Add `defaultDnt` to support setting the dnt flag for SLAS. Upgrade `commerce-sdk-isomorphic` to v3.1.1 [#1979](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1979)
 -   Update logout helper to work for guest users [#1997](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1997)
+-   Update `useCustomMutation` hook to accept request body as a parameter to the mutate function [#2030](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2030)
+-   Simplify `useCustomMutation` hook implementation [#2034](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2034)
+-   Documentation for `useCustomMutation` hook along with new dynamic `body` param option [#2042](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2042)
 
 ## v3.0.1 (Sep 04, 2024)
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, salesforce.com, inc.
+ * Copyright (c) 2024, salesforce.com, inc.
  * All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
@@ -22,19 +22,18 @@ import 'focus-visible/dist/focus-visible'
 
 import theme from '@salesforce/retail-react-app/app/theme'
 import {MultiSiteProvider} from '@salesforce/retail-react-app/app/contexts'
+import {useAppOrigin} from '@salesforce/retail-react-app/app/hooks/use-app-origin'
 import {
     resolveSiteFromUrl,
     resolveLocaleFromUrl
 } from '@salesforce/retail-react-app/app/utils/site-utils'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
-import {proxyBasePath} from '@salesforce/pwa-kit-runtime/utils/ssr-namespace-paths'
 import {createUrlTemplate} from '@salesforce/retail-react-app/app/utils/url'
 import createLogger from '@salesforce/pwa-kit-runtime/utils/logger-factory'
 
 import {CommerceApiProvider} from '@salesforce/commerce-sdk-react'
 import {withReactQuery} from '@salesforce/pwa-kit-react-sdk/ssr/universal/components/with-react-query'
 import {useCorrelationId} from '@salesforce/pwa-kit-react-sdk/ssr/universal/hooks'
-import {getAppOrigin} from '@salesforce/pwa-kit-react-sdk/utils/url'
 import {ReactQueryDevtools} from '@tanstack/react-query-devtools'
 
 /**
@@ -52,8 +51,7 @@ const AppConfig = ({children, locals = {}}) => {
     }
 
     const commerceApiConfig = locals.appConfig.commerceAPI
-
-    const appOrigin = getAppOrigin()
+    const appOrigin = useAppOrigin()
 
     return (
         <CommerceApiProvider
@@ -84,6 +82,7 @@ AppConfig.restore = (locals = {}) => {
         typeof window === 'undefined'
             ? locals.originalUrl
             : `${window.location.pathname}${window.location.search}`
+
     const site = resolveSiteFromUrl(path)
     const locale = resolveLocaleFromUrl(path)
 
