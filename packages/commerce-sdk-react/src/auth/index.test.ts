@@ -38,7 +38,9 @@ jest.mock('commerce-sdk-isomorphic', () => {
             loginGuestUserPrivate: jest.fn().mockResolvedValue(''),
             loginRegisteredUserB2C: jest.fn().mockResolvedValue(''),
             logout: jest.fn().mockResolvedValue(''),
-            handleTokenResponse: jest.fn().mockResolvedValue('')
+            handleTokenResponse: jest.fn().mockResolvedValue(''),
+            loginIDPUser: jest.fn().mockResolvedValue(''),
+            authorizeIDP: jest.fn().mockResolvedValue('')
         }
     }
 })
@@ -573,6 +575,41 @@ describe('Auth', () => {
             clientSecret: SLAS_SECRET_PLACEHOLDER
         })
     })
+
+    test('loginIDPUser calls isomorphic loginIDPUser', async () => {
+        const auth = new Auth(config)
+        await auth.loginIDPUser({redirectURI: 'redirectURI', code: 'test'})
+        expect(helpers.loginIDPUser).toHaveBeenCalled()
+        const functionArg = (helpers.loginIDPUser as jest.Mock).mock.calls[0][2]
+        expect(functionArg).toMatchObject({redirectURI: 'redirectURI', code: 'test'})
+    })
+
+    test('loginIDPUser adds clientSecret to parameters when using private client', async () => {
+        const auth = new Auth(configSLASPrivate)
+        await auth.loginIDPUser({redirectURI: 'test', code: 'test'})
+        expect(helpers.loginIDPUser).toHaveBeenCalled()
+        const functionArg = (helpers.loginIDPUser as jest.Mock).mock.calls[0][1]
+        expect(functionArg).toMatchObject({
+            clientSecret: SLAS_SECRET_PLACEHOLDER
+        })
+    })
+
+    test('authorizeIDP calls isomorphic authorizeIDP', async () => {
+        const auth = new Auth(config)
+        await auth.authorizeIDP({redirectURI: 'redirectURI', hint: 'test'})
+        expect(helpers.authorizeIDP).toHaveBeenCalled()
+        const functionArg = (helpers.authorizeIDP as jest.Mock).mock.calls[0][1]
+        expect(functionArg).toMatchObject({redirectURI: 'redirectURI', hint: 'test'})
+    })
+
+    test('authorizeIDP adds clientSecret to parameters when using private client', async () => {
+        const auth = new Auth(configSLASPrivate)
+        await auth.authorizeIDP({redirectURI: 'test', hint: 'test'})
+        expect(helpers.authorizeIDP).toHaveBeenCalled()
+        const privateClient = (helpers.authorizeIDP as jest.Mock).mock.calls[0][2]
+        expect(privateClient).toBe(true)
+    })
+
     test('logout as registered user calls isomorphic logout', async () => {
         const auth = new Auth(config)
 
