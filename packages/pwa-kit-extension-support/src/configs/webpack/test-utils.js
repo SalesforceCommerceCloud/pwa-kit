@@ -43,7 +43,6 @@ export const runWebpackCompiler = (fixture, options = {}) => {
     } = options
 
     // Setup the virtual filesystem with the provided files.
-    console.log('files: ', files)
     const volume = Volume.fromJSON(files)
     const fileSystem = createFsFromVolume(volume)
 

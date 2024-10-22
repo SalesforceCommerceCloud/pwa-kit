@@ -26,6 +26,8 @@ import {ApplicationExtensionsLoaderContext} from '../types'
  * @returns {string} The string representation of a module exporting all the named application extension modules.
  */
 module.exports = function (this: ApplicationExtensionsLoaderContext): string {
+    // TODO: Add checking for arguments.
+
     // Get the installed and configured application extensions as well as the requested
     // target type. For web targets the loader takes advantage of react-loadabled but node
     // targets (server) do not require this optimization.
