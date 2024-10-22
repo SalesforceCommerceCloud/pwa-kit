@@ -1177,4 +1177,65 @@ describe('SLAS private client proxy', () => {
                 expect(response.body['x-mobify']).toBe('true')
             })
     }, 15000)
+
+    test('does not add _sfdc_client_auth header if request not for /oauth2/trusted-agent/token', async () => {
+        process.env.PWA_KIT_SLAS_CLIENT_SECRET = 'a secret'
+
+        const encodedCredentials = Buffer.from('clientId:a secret').toString('base64')
+
+        const app = RemoteServerFactory._createApp(
+            opts({
+                mobify: {
+                    app: {
+                        commerceAPI: {
+                            parameters: {
+                                clientId: 'clientId',
+                                shortCode: 'shortCode'
+                            }
+                        }
+                    }
+                },
+                useSLASPrivateClient: true,
+                slasTarget: slasTarget
+            })
+        )
+
+        return await request(app)
+            .get('/mobify/slas/oauth2/other-path')
+            .then((response) => {
+                expect(response.body._sfdc_client_auth).toBeUndefined()
+            })
+    }, 15000)
+
+    test('adds _sfdc_client_auth header if request is for /oauth2/trusted-agent/token', async () => {
+        process.env.PWA_KIT_SLAS_CLIENT_SECRET = 'a secret'
+
+        const encodedCredentials = Buffer.from('clientId:a secret').toString('base64')
+
+        const app = RemoteServerFactory._createApp(
+            opts({
+                mobify: {
+                    app: {
+                        commerceAPI: {
+                            parameters: {
+                                clientId: 'clientId',
+                                shortCode: 'shortCode'
+                            }
+                        }
+                    }
+                },
+                useSLASPrivateClient: true,
+                slasTarget: slasTarget,
+                trustedAgentAuthPathMatch: /\/oauth2\/trusted-agent\/token/
+            })
+        )
+
+        return await request(app)
+            .get('/mobify/slas/private/oauth2/trusted-agent/token')
+            .then((response) => {
+                expect(response.body['_sfdc_client_auth']).toBe(encodedCredentials)
+                expect(response.body.host).toBe('shortCode.api.commercecloud.salesforce.com')
+                expect(response.body['x-mobify']).toBe('true')
+            })
+    }, 15000)
 })

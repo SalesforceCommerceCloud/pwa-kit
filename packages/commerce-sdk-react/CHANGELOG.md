@@ -1,7 +1,9 @@
 ## v3.2.0-dev (Oct 14, 2024)
 
-- Add the `authorizeCustomer` and `getPasswordResetToken` to the `ShopperLoginMutations` [#2056](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2056)
-- Added useDNT hook to commerce-sdk-react and put DNT in auth [#2067](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2067/files)
+-   Add the `authorizeCustomer` and `getPasswordResetToken` to the `ShopperLoginMutations` [#2056](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2056)
+-   Add useDNT hook to commerce-sdk-react and put DNT in auth [#2067](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2067/files)
+-   Add Trusted Agent on Behalf of (TAOB) support for SLAS APIs [#2077](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2077)
+-   Add optional `refreshTokenRegisteredCookieTTL` and `refreshTokenGuestCookieTTL` to Commerce API config [#2077](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2077)
 
 ## v3.1.0-dev (Aug 08, 2024)
 
