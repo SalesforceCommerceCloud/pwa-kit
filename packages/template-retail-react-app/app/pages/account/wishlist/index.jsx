@@ -5,9 +5,14 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React, {useState, useEffect, useRef} from 'react'
-import {Stack, Heading} from '@chakra-ui/layout'
 import {FormattedMessage, useIntl} from 'react-intl'
-import {Box, Flex, Skeleton} from '@salesforce/retail-react-app/app/components/shared/ui'
+import {
+    Box,
+    Flex,
+    Skeleton,
+    Stack,
+    Heading
+} from '@salesforce/retail-react-app/app/components/shared/ui'
 import {useProducts, useShopperCustomersMutation} from '@salesforce/commerce-sdk-react'
 
 import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
@@ -216,6 +221,7 @@ const AccountWishlist = () => {
                             secondaryActions={
                                 <WishlistSecondaryButtonGroup
                                     productListItemId={item.id}
+                                    productName={item.product.name}
                                     // Focus to 'Wishlist' header after remove for accessibility
                                     focusElementOnRemove={headingRef}
                                     onClick={handleSecondaryAction}
