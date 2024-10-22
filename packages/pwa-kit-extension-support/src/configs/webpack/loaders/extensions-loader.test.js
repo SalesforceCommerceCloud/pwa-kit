@@ -134,6 +134,73 @@ describe('Application Extension Loader', () => {
                 target: 'node'
             }
         },
+
+        {
+            description: 'Disabled extensions are still exported (web)',
+            entryPoint: './app/main.jsx',
+            expects: (output) => {
+                const emptyFile = dedent`
+                    import loadable from '@loadable/component'
+
+                    const SalesforceSampleALoader = loadable.lib(() => import('@salesforce/extension-sample-a/setup-app'))
+
+                    const getApplicationExtensions = async () => {
+                        return []
+                    }
+                    
+                    export {
+                        getApplicationExtensions
+                    }
+                `
+
+                expect(output.modules[1].source).toBe(emptyFile)
+            },
+            files: {
+                ...BASE_VIRTUAL_FILES,
+                [`${path.resolve(
+                    __dirname,
+                    '../../../../node_modules/@salesforce/extension-sample-a/setup-app'
+                )}`]: ''
+
+            },
+            loaderOptions: {
+                installed: ['@salesforce/extension-sample-a'],
+                configured: [['@salesforce/extension-sample-a', {enabled: false}]],
+                target: 'web'
+            }
+        },
+        {
+            description: 'Disabled extensions are are still exported (node)',
+            entryPoint: './app/main.jsx',
+            expects: (output) => {
+                const emptyFile = dedent`
+                    import SalesforceSampleA from '@salesforce/extension-sample-a/setup-server'
+
+                    const getApplicationExtensions = () => {
+                        return []
+                    }
+                    
+                    export {
+                        getApplicationExtensions
+                    }
+                `
+
+                expect(output.modules[1].source).toBe(emptyFile)
+            },
+            files: {
+                ...BASE_VIRTUAL_FILES,
+                [`${path.resolve(
+                    __dirname,
+                    '../../../../node_modules/@salesforce/extension-sample-a/setup-server'
+                )}`]: ''
+            },
+            loaderOptions: {
+                installed: ['@salesforce/extension-sample-a'],
+                configured: [['@salesforce/extension-sample-a', {enabled: false}]],
+                target: 'node'
+            }
+        },
+
         {
             description: 'Loadable is used for web targets.',
             entryPoint: './app/main.jsx',
