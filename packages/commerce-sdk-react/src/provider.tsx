@@ -145,7 +145,8 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
             silenceWarnings,
             logger: configLogger,
             defaultDnt,
-            refreshTokenCookieTTL
+            refreshTokenRegisteredCookieTTL,
+            refreshTokenGuestCookieTTL
         })
     }, [
         clientId,
@@ -160,7 +161,8 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
         clientSecret,
         silenceWarnings,
         configLogger,
-        refreshTokenCookieTTL
+        refreshTokenRegisteredCookieTTL,
+        refreshTokenGuestCookieTTL
     ])
 
     const dwsid = auth.get(DWSID_COOKIE_NAME)
