@@ -14,6 +14,7 @@ import {
     DEFAULT_TEST_CONFIG
 } from '../test-utils'
 import {useCustomQuery} from './useQuery'
+import Auth from '../auth'
 
 jest.mock('../auth/index.ts', () => {
     const {default: mockAuth} = jest.requireActual('../auth/index.ts')
@@ -140,5 +141,36 @@ describe('useCustomQuery', () => {
         })
         await waitAndExpectSuccess(() => result.current)
         expect(result.current.data).toEqual(mockRes)
+    })
+    test('clear auth state when request uses invalid session', async () => {
+        const spy = jest.spyOn(Auth.prototype, 'clearUserAuth')
+        const mockRes = {
+            title: 'Unauthorized',
+            type: 'https://api.commercecloud.salesforce.com/documentation/error/v1/errors/unauthorized',
+            detail: 'Customer credentials changed after token was issued.'
+        }
+        const apiName = 'hello-world'
+        const endpointPath = 'test-hello-world'
+
+        mockQueryEndpoint(
+            `${apiName}/v1/organizations/${DEFAULT_TEST_CONFIG.organizationId}/${endpointPath}`,
+            mockRes,
+            401
+        )
+        const {result} = renderHookWithProviders(() => {
+            return useCustomQuery({
+                options: {
+                    customApiPathParameters: {
+                        apiVersion: 'v1',
+                        endpointPath,
+                        apiName
+                    }
+                },
+                rawResponse: false
+            })
+        })
+
+        await waitAndExpectError(() => result.current)
+        expect(spy).toHaveBeenCalled()
     })
 })
