@@ -29,7 +29,6 @@ export const withReactQuery = (Wrapped, options = {}) => {
     /* istanbul ignore next */
     const wrappedComponentName = Wrapped.displayName || Wrapped.name
     const queryClientConfig = options.queryClientConfig
-    const queryCacheConfig = options.queryCacheConfig
     const beforeHydrate = options.beforeHydrate || passthrough
 
     /**
@@ -41,9 +40,6 @@ export const withReactQuery = (Wrapped, options = {}) => {
 
             this.props.locals.__queryClient =
                 this.props.locals.__queryClient || new QueryClient(queryClientConfig)
-
-            // Set QueryCache callbacks if any were defined
-            if (queryCacheConfig) this.props.locals.__queryClient.getQueryCache().config = queryCacheConfig
 
             if (!isServerSide) {
                 try {
@@ -71,9 +67,6 @@ export const withReactQuery = (Wrapped, options = {}) => {
         static async doInitAppState({res, appJSX}) {
             const queryClient = (res.locals.__queryClient =
                 res.locals.__queryClient || new QueryClient(queryClientConfig))
-
-            // Set QueryCache callbacks if any were defined
-            if (queryCacheConfig) queryClient.getQueryCache().config = queryCacheConfig
 
             res.__performanceTimer.mark(PERFORMANCE_MARKS.reactQueryPrerender, 'start')
             // Use `ssrPrepass` to collect all uses of `useQuery`.

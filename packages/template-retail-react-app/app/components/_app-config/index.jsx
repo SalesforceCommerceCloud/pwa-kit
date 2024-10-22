@@ -30,7 +30,6 @@ import {
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {createUrlTemplate} from '@salesforce/retail-react-app/app/utils/url'
 import createLogger from '@salesforce/pwa-kit-runtime/utils/logger-factory'
-import logger from '@salesforce/retail-react-app/app/utils/logger-instance'
 
 import {CommerceApiProvider} from '@salesforce/commerce-sdk-react'
 import {withReactQuery} from '@salesforce/pwa-kit-react-sdk/ssr/universal/components/with-react-query'
@@ -131,15 +130,6 @@ const options = {
             },
             mutations: {
                 retry: false
-            }
-        }
-    },
-    queryCacheConfig: {
-        // Handle cases where SCAPI call fails due to an invalidated refresh token
-        onError: async (error) => {
-            const response = await error.response?.json()
-            if (response.detail === "Customer credentials changed after token was issued.") {
-                logger.info('Login invalidated. Clearing login state.')
             }
         }
     },
