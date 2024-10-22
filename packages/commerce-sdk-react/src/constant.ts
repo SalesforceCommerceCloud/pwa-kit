@@ -27,7 +27,25 @@ export const SLAS_SECRET_PLACEHOLDER = '_PLACEHOLDER_PROXY-PWA_KIT_SLAS_CLIENT_S
 
 export const SLAS_SECRET_OVERRIDE_MSG =
     'You have enabled PWA Kit Private Client mode which gets the SLAS secret from your environment variable. The SLAS secret you have set in the Auth provider will be ignored.'
+
+export const SLAS_REFRESH_TOKEN_COOKIE_TTL_OVERRIDE_MSG =
+    'You are attempting to use an invalid refresh token TTL value.'
+
 export const DNT_COOKIE_NAME = 'dw_dnt' as const
+
+export const DWSID_COOKIE_NAME = 'dwsid'
 // commerce-sdk-react namespaces cookies with siteID as suffixes to allow multisite setups.
 // However some cookies are set and used outside of PWA Kit and must not be modified with suffixes.
-export const EXCLUDE_COOKIE_SUFFIX = ['dwsid', DNT_COOKIE_NAME]
+export const EXCLUDE_COOKIE_SUFFIX = [DWSID_COOKIE_NAME, DNT_COOKIE_NAME]
+
+/**
+ * For Hybrid Setups only!
+ * Unlike SCAPI/OCAPI, ECOM creates baskets in app-server cache initially and move the basket object
+ * to the db later based on basket state. In a hybrid storefront, storefront requests might be
+ * routed to different appservers, if the basket object is still in appserver cache, you will start
+ * seeing inconsistencies in basket state. To avoid this, if you have a dwsid cookie, you must send
+ * the value of the dwsid cookie with each SCAPI/OCAPI request in a hybrid storefront to maintain appserver affinity.
+ *
+ * Use the header key below to send dwsid value with SCAPI/OCAPI requests.
+ */
+export const SERVER_AFFINITY_HEADER_KEY = 'sfdc_dwsid'
