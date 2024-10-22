@@ -62,7 +62,7 @@ export const useQuery = <Client extends ApiClient, Options extends ApiOptions, D
     queryClient.getQueryCache().config = {
         onError: async (error: any) => {
             const response = await error.response?.json()
-            if (response.detail === "Customer credentials changed after token was issued.") {
+            if (response?.detail === "Customer credentials changed after token was issued.") {
                 auth.clearUserAuth()
             }
         }
@@ -162,7 +162,7 @@ export const useCustomQuery = (
     queryClient.getQueryCache().config = {
         onError: async (error: any) => {
             const response = await error.response?.json()
-            if (response.detail === "Customer credentials changed after token was issued.") {
+            if (response?.detail === "Customer credentials changed after token was issued.") {
                 auth.clearUserAuth()
             }
         }

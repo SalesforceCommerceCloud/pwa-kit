@@ -54,7 +54,7 @@ export const useMutation = <
         },
         onError(error: any) {
             const response = error.response?.json()
-            if (response.detail === "Customer credentials changed after token was issued.") {
+            if (response?.detail === "Customer credentials changed after token was issued.") {
                 auth.clearUserAuth()
             }
         }
@@ -98,7 +98,7 @@ export const useCustomMutation = <TData = unknown, TError = unknown>(
         ...mutationOptions,
         onError(error: any) {
             const response = error.response?.json()
-            if (response.detail === "Customer credentials changed after token was issued.") {
+            if (response?.detail === "Customer credentials changed after token was issued.") {
                 auth.clearUserAuth()
             }
         }
