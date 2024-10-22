@@ -154,5 +154,19 @@ export const useCustomQuery = (
         `/${apiOptions.options.customApiPathParameters.endpointPath}`,
         {...apiOptions.options.parameters}
     ]
+
+    // The onError has deprecated/removed the onError callback for useQuery in v4 / v5
+    // So we instead manipulate the global onError callback on the QueryCache to handle failure
+    // cases where a query fails because the auth state has been invalidated
+    const queryClient = useQueryClient()
+    queryClient.getQueryCache().config = {
+        onError: async (error: any) => {
+            const response = await error.response?.json()
+            if (response.detail === "Customer credentials changed after token was issued.") {
+                auth.clearUserAuth()
+            }
+        }
+    }
+
     return useReactQuery(queryKey, callCustomEndpointWithAuth(apiOptions), queryOptions)
 }

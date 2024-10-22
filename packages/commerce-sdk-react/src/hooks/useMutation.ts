@@ -39,6 +39,7 @@ export const useMutation = <
     method: ApiMethod<Options, Data>
     getCacheUpdates: CacheUpdateGetter<MergedOptions<Client, Options>, Data>
 }) => {
+    const auth = useAuthContext()
     const queryClient = useQueryClient()
     const customerId = useCustomerId()
     const authenticatedMethod = useAuthorizationHeader(hookConfig.method)
@@ -50,6 +51,12 @@ export const useMutation = <
             const netOptions = mergeOptions(hookConfig.client, options)
             const cacheUpdates = hookConfig.getCacheUpdates(customerId, netOptions, data)
             updateCache(queryClient, cacheUpdates, data)
+        },
+        onError(error: any) {
+            const response = error.response?.json()
+            if (response.detail === "Customer credentials changed after token was issued.") {
+                auth.clearUserAuth()
+            }
         }
     })
 }
@@ -87,6 +94,16 @@ export const useCustomMutation = <TData = unknown, TError = unknown>(
         proxy: globalConfig.proxy
     }
 
+    const mutationOpts = {
+        ...mutationOptions,
+        onError(error: any) {
+            const response = error.response?.json()
+            if (response.detail === "Customer credentials changed after token was issued.") {
+                auth.clearUserAuth()
+            }
+        }
+    }
+
     const createMutationFnWithAuth = (): MutationFunction<TData, TMutationVariables> => {
         return async (args): Promise<TData> => {
             const {access_token} = await auth.ready()
@@ -115,6 +132,6 @@ export const useCustomMutation = <TData = unknown, TError = unknown>(
 
     return useReactQueryMutation<TData, TError, TMutationVariables, unknown>(
         createMutationFnWithAuth(),
-        mutationOptions
+        mutationOpts
     )
 }
