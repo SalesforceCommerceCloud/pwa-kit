@@ -59,11 +59,13 @@ export const useQuery = <Client extends ApiClient, Options extends ApiOptions, D
     // So we instead manipulate the global onError callback on the QueryCache to handle failure
     // cases where a query fails because the auth state has been invalidated
     const queryClient = useQueryClient()
-    queryClient.getQueryCache().config = {
-        onError: (error: any) => {
-            // Typescript does not like having promises inside void functions
-            // so we use void to explicitly tell typescript to ignore it
-            void clearAuthStateOnError(error.response, auth)
+    if (!queryClient.getQueryCache().config.onError) {
+        queryClient.getQueryCache().config = {
+            onError: (error: any) => {
+                // Typescript does not like having promises inside void functions
+                // so we use void to explicitly tell typescript to ignore it
+                void clearAuthStateOnError(error.response, auth)
+            }
         }
     }
 
@@ -158,11 +160,13 @@ export const useCustomQuery = (
     // So we instead manipulate the global onError callback on the QueryCache to handle failure
     // cases where a query fails because the auth state has been invalidated
     const queryClient = useQueryClient()
-    queryClient.getQueryCache().config = {
-        onError: (error: any) => {
-            // Typescript does not like having promises inside void functions
-            // so we use void to explicitly tell typescript to ignore it
-            void clearAuthStateOnError(error, auth)
+    if (!queryClient.getQueryCache().config.onError) {
+        queryClient.getQueryCache().config = {
+            onError: (error: any) => {
+                // Typescript does not like having promises inside void functions
+                // so we use void to explicitly tell typescript to ignore it
+                void clearAuthStateOnError(error, auth)
+            }
         }
     }
 
