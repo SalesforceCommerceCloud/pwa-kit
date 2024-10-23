@@ -21,7 +21,7 @@ import sprite from 'svg-sprite-loader/runtime/sprite.build'
 import {isRemote} from '@salesforce/pwa-kit-runtime/utils/ssr-server'
 import {proxyConfigs} from '@salesforce/pwa-kit-runtime/utils/ssr-shared'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
-import {withApplicationExtensions} from '@salesforce/pwa-kit-extension-support/react'
+import {withApplicationExtensions} from '@salesforce/pwa-kit-application-extensibility/react'
 
 import {getAssetUrl} from '../universal/utils'
 import {ServerContext, CorrelationIdProvider} from '../universal/contexts'

@@ -6,7 +6,7 @@
  */
 
 // PWA-Kit Imports
-import {getApplicationExtensionInfo} from '@salesforce/pwa-kit-extension-support/shared/utils'
+import {getApplicationExtensionInfo} from '@salesforce/pwa-kit-application-extensibility/shared/utils'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 
 const config = {
@@ -25,7 +25,7 @@ const config = {
     ],
     plugins: [
         [
-            require('@salesforce/pwa-kit-extension-support/configs/babel/plugin-application-extensions'), 
+            require('@salesforce/pwa-kit-application-extensibility/configs/babel/plugin-application-extensions'), 
             { 
                 target: 'node',
                 ...getApplicationExtensionInfo(getConfig())

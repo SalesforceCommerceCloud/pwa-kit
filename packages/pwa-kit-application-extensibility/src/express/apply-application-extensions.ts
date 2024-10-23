@@ -10,12 +10,12 @@ import {Request, Response, NextFunction, Application} from 'express'
 
 // Local Imports
 import {getApplicationExtensions} from './assets/application-extensions-placeholder'
-console.log('getApplicationExtensions: ', getApplicationExtensions)
+
 // TODO: Define our own type for this extension.
 // import {ApplicationExtensionConfig} from '../types'
 
 // Define the middleware function that modifies the app
-const applicationExtensionsMiddleware = (app: Application) => {
+const applyApplicationExtensions = (app: Application) => {
     const applicationExtensions = getApplicationExtensions()
     applicationExtensions
         .filter((applicationExtension: any) => applicationExtension.isEnabled())
@@ -28,4 +28,4 @@ const applicationExtensionsMiddleware = (app: Application) => {
     }
 }
 
-export default applicationExtensionsMiddleware
+export default applyApplicationExtensions

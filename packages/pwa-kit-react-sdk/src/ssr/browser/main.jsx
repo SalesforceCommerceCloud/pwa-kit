@@ -10,7 +10,7 @@ import {hydrateRoot} from 'react-dom/client'
 import PropTypes from 'prop-types'
 import {BrowserRouter as Router} from 'react-router-dom'
 import {loadableReady} from '@loadable/component'
-import {withApplicationExtensions} from '@salesforce/pwa-kit-extension-support/react'
+import {withApplicationExtensions} from '@salesforce/pwa-kit-application-extensibility/react'
 
 import {ServerContext, CorrelationIdProvider} from '../universal/contexts'
 import App from '../universal/components/_app'

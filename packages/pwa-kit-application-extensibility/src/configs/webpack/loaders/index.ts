@@ -12,7 +12,7 @@ import {getApplicationExtensionInfo} from '../../../shared/utils'
 export * from './extensions-loader'
 
 const LOADER_IMPORT =
-    '@salesforce/pwa-kit-extension-support/configs/webpack/loaders/extensions-loader'
+    '@salesforce/pwa-kit-application-extensibility/configs/webpack/loaders/extensions-loader'
 const DEFAULT_TARGET = 'node'
 
 export const ruleForApplicationExtensibility = (options: any = {}) => {

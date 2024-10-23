@@ -10,7 +10,7 @@ import React from 'react'
 import {RouteProps} from 'react-router-dom'
 
 // Platform Imports
-import {ApplicationExtension} from '@salesforce/pwa-kit-extension-support/react'
+import {ApplicationExtension} from '@salesforce/pwa-kit-application-extensibility/react'
 
 // Local Imports
 import withRedBorder from '*/components/with-red-border'

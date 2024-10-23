@@ -38,7 +38,7 @@
     "@loadable/babel-plugin": "^5.15.3",
     "@loadable/server": "^5.15.3",
     "@loadable/webpack-plugin": "^5.15.2",
-    "@salesforce/pwa-kit-extension-support": "4.0.0-dev",
+    "@salesforce/pwa-kit-application-extensibility": "4.0.0-dev",
     "@salesforce/pwa-kit-runtime": "4.0.0-dev",
     "@tanstack/react-query": "^4.28.0",
     "cross-env": "^5.2.1",

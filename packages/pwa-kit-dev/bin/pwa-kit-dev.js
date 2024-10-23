@@ -243,7 +243,7 @@ const main = async () => {
             execSync(
                 `${babelNode} ${
                     inspect ? '--inspect' : ''
-                } -i [\"/(?:\\/.*)?\\/node_modules\\//(?!@salesforce\/pwa-kit-extension-support\/dist)\\//i\"] ${babelArgs} ${getAppEntrypoint()}`,
+                } -i [\"/(?:\\/.*)?\\/node_modules\\//(?!@salesforce\/pwa-kit-application-extensibility\/dist)\\//i\"] ${babelArgs} ${getAppEntrypoint()}`,
                 {
                     env: {
                         ...process.env,

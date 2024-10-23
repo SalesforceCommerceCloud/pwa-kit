@@ -9,8 +9,8 @@
 import {Application} from 'express'
 
 // Platform Imports
-import {ApplicationExtension} from '@salesforce/pwa-kit-extension-support/express/application-extension'
-// import {ApplicationExtension} from '@salesforce/pwa-kit-extension-support/express' // NOTE: Doing this causes a circular dependency. Looks to fix whatever is happening in the index file.
+import {ApplicationExtension} from '@salesforce/pwa-kit-application-extensibility/express/application-extension'
+// import {ApplicationExtension} from '@salesforce/pwa-kit-application-extensibility/express' // NOTE: Doing this causes a circular dependency. Looks to fix whatever is happening in the index file.
 
 // Local Imports
 import {Config} from './types'

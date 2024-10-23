@@ -58,7 +58,7 @@
     "@loadable/server": "^5.15.3",
     "@loadable/webpack-plugin": "^5.15.2",
     "@pmmmwh/react-refresh-webpack-plugin": "^0.5.10",
-    "@salesforce/pwa-kit-extension-support": "4.0.0-dev",
+    "@salesforce/pwa-kit-application-extensibility": "4.0.0-dev",
     "@typescript-eslint/eslint-plugin": "^5.57.0",
     "@typescript-eslint/parser": "^5.57.0",
     "archiver": "1.3.0",

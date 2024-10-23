@@ -4,14 +4,14 @@
   "scripts": {},
   "peerDependencies": {
     "@loadable/component": "^5.15.3",
-    "@salesforce/pwa-kit-extension-support": "4.0.0-dev",
+    "@salesforce/pwa-kit-application-extensibility": "4.0.0-dev",
     "@salesforce/pwa-kit-react-sdk": "4.0.0-dev",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },
   "devDependencies": {
     "@loadable/component": "^5.15.3",
-    "@salesforce/pwa-kit-extension-support": "4.0.0-dev",
+    "@salesforce/pwa-kit-application-extensibility": "4.0.0-dev",
     "@salesforce/pwa-kit-react-sdk": "4.0.0-dev",
     "@types/express": "^5.0.0",
     "@types/react": "~18.2.0",

@@ -50,7 +50,7 @@ import awsServerlessExpress from 'aws-serverless-express'
 import expressLogging from 'morgan'
 import logger from '../../utils/logger-instance'
 import {createProxyMiddleware} from 'http-proxy-middleware'
-import {applicationExtensionMiddleware} from '@salesforce/pwa-kit-extension-support/express'
+import {applyApplicationExtensions} from '@salesforce/pwa-kit-application-extensibility/express'
 
 /**
  * An Array of mime-types (Content-Type values) that are considered
@@ -757,7 +757,7 @@ export const RemoteServerFactory = {
 
         // NOTE: Think about changing the name of this function to `applyApplicationExtensions`. First look into
         // what a common pattern is for application enhancement.
-        applicationExtensionMiddleware(app)
+        applyApplicationExtensions(app)
 
         applyPatches(options)
     },
