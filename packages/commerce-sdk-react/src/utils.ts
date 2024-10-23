@@ -128,5 +128,5 @@ export function detectCookiesAvailable(options?: CookieAttributes) {
  * @returns {boolean} - Returns true if the given string is a valid absolute URL, false otherwise.
  */
 export function isAbsoluteUrl(url: string): boolean {
-    return /^(https?:\/\/)[^\s/$.?#].[^\s]*\.[a-z]{2,}$/i.test(url)
+    return /^(https?:\/\/)/i.test(url)
 }
