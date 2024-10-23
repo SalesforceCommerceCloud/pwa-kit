@@ -1,0 +1,18 @@
+[
+  {
+    "rule": "aria-allowed-attr",
+    "targets": [
+      [
+        "#popover-trigger-\\:r3m\\:"
+      ]
+    ]
+  },
+  {
+    "rule": "region",
+    "targets": [
+      [
+        "#popover-trigger-\\:r3m\\: > .css-1igwmid.chakra-stack > .chakra-input__group.css-1y0e7gb[data-group=\"true\"] > .css-va76oz[autocomplete=\"off\"][type=\"search\"]"
+      ]
+    ]
+  }
+]

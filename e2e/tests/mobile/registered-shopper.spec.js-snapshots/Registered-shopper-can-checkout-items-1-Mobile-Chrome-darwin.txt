@@ -1,0 +1,35 @@
+[
+  {
+    "rule": "aria-allowed-attr",
+    "targets": [
+      [
+        "#popover-trigger-\\:RdalaqeqlbpH1\\:"
+      ]
+    ]
+  },
+  {
+    "rule": "color-contrast",
+    "targets": [
+      [
+        ".css-1nz5pv0 > .css-q0shp6.chakra-stack > .css-ahyunb.chakra-skeleton:nth-child(2) > .css-1xix1js.chakra-heading"
+      ],
+      [
+        ".css-1nz5pv0 > .css-q0shp6.chakra-stack > .css-ahyunb.chakra-skeleton:nth-child(3) > b"
+      ],
+      [
+        ".css-1nz5pv0 > .css-q0shp6.chakra-stack > .css-ahyunb.chakra-skeleton:nth-child(3) > s"
+      ],
+      [
+        ".css-14fylt8 > .css-1mfmpuh[type=\"button\"]"
+      ]
+    ]
+  },
+  {
+    "rule": "region",
+    "targets": [
+      [
+        "#popover-trigger-\\:RdalaqeqlbpH1\\: > .css-1igwmid.chakra-stack > .chakra-input__group.css-1y0e7gb[data-group=\"true\"] > .css-va76oz[type=\"search\"][aria-label=\"Search for products...\"]"
+      ]
+    ]
+  }
+]
