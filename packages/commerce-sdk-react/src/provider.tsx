@@ -22,7 +22,7 @@ import {
 } from 'commerce-sdk-isomorphic'
 import Auth from './auth'
 import {ApiClientConfigParams, ApiClients} from './hooks/types'
-import {Logger, PasswordlessConfig} from './types'
+import {Logger} from './types'
 import {MOBIFY_PATH, SLAS_PRIVATE_PROXY_PATH} from './constant'
 export interface CommerceApiProviderProps extends ApiClientConfigParams {
     children: React.ReactNode
@@ -38,7 +38,7 @@ export interface CommerceApiProviderProps extends ApiClientConfigParams {
     silenceWarnings?: boolean
     logger?: Logger
     defaultDnt?: boolean
-    passwordlessConfig?: PasswordlessConfig
+    callbackURI?: string
 }
 
 /**
@@ -117,7 +117,7 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
         silenceWarnings,
         logger,
         defaultDnt,
-        passwordlessConfig
+        callbackURI
     } = props
 
     // Set the logger based on provided configuration, or default to the console object if no logger is provided
@@ -186,7 +186,7 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
             silenceWarnings,
             logger: configLogger,
             defaultDnt,
-            passwordlessConfig
+            callbackURI
         })
     }, [
         clientId,
@@ -222,7 +222,7 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
                 silenceWarnings,
                 logger: configLogger,
                 defaultDnt,
-                passwordlessConfig
+                callbackURI
             }}
         >
             <CommerceApiContext.Provider value={apiClients}>

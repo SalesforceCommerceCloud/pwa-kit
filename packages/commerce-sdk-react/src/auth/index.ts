@@ -25,7 +25,7 @@ import {
     DNT_COOKIE_NAME
 } from '../constant'
 
-import {Logger, PasswordlessConfig} from '../types'
+import {Logger} from '../types'
 
 type TokenResponse = ShopperLoginTypes.TokenResponse
 type Helpers = typeof helpers
@@ -39,7 +39,7 @@ interface AuthConfig extends ApiClientConfigParams {
     silenceWarnings?: boolean
     logger: Logger
     defaultDnt?: boolean
-    passwordlessConfig?: PasswordlessConfig
+    callbackURI?: string
 }
 
 interface JWTHeaders {
@@ -203,14 +203,14 @@ class Auth {
     private logger: Logger
     private defaultDnt: boolean | undefined
     private isPrivate: boolean
-    private passwordlessConfig: PasswordlessConfig
+    private callbackURI: string
 
 
     constructor(config: AuthConfig) {
         // Special endpoint for injecting SLAS private client secret.
         const baseUrl = config.proxy.split(MOBIFY_PATH)[0]
         const privateClientEndpoint = `${baseUrl}${SLAS_PRIVATE_PROXY_PATH}`
-        const callbackURI = config.passwordlessConfig?.callbackURI
+        const callbackURI = config.callbackURI
 
         this.client = new ShopperLogin({
             proxy: config.enablePWAKitPrivateClient ? privateClientEndpoint : config.proxy,
@@ -249,13 +249,6 @@ class Auth {
 
         this.redirectURI = config.redirectURI
 
-        this.passwordlessConfig = {
-            ...config.passwordlessConfig,
-            ...(callbackURI && {
-                callbackURI: isAbsoluteUrl(callbackURI) ? callbackURI : `${baseUrl}${callbackURI}`
-            })
-        }
-
         this.fetchedToken = config.fetchedToken || ''
 
         this.logger = config.logger
@@ -293,6 +286,9 @@ class Auth {
         this.silenceWarnings = config.silenceWarnings || false
 
         this.isPrivate = !!this.clientSecret
+
+        this.callbackURI = callbackURI ? isAbsoluteUrl(callbackURI) 
+        ? callbackURI : `${baseUrl}${callbackURI}` : ''
     }
 
     get(name: AuthDataKeys) {
@@ -841,8 +837,8 @@ class Auth {
      */
     async authorizePasswordless(parameters: AuthorizePasswordlessParams) {
         const userid = parameters.userid
-        const mode = this.passwordlessConfig.mode === 'sms' ? 'sms' : 'callback'
-        const callbackURI = this.passwordlessConfig.callbackURI
+        const callbackURI = this.callbackURI
+        const mode = callbackURI ? 'callback' : 'sms'
 
         await helpers.authorizePasswordless(
             this.client,
