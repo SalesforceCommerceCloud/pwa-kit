@@ -123,7 +123,8 @@ export const useCustomMutation = <TData = unknown, TError = unknown>(
                 },
                 clientConfig: {
                     ...globalClientConfig,
-                    ...(apiOptions.clientConfig || {})
+                    ...(apiOptions.clientConfig || {}),
+                    throwOnBadResponse: true
                 }
             })) as TData
         }
