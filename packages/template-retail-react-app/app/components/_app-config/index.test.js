@@ -16,12 +16,18 @@ import mockConfig from '@salesforce/retail-react-app/config/mocks/default'
 import {rest} from 'msw'
 import {registerUserToken} from '@salesforce/retail-react-app/app/utils/test-utils'
 
+jest.mock('@salesforce/pwa-kit-react-sdk/ssr/universal/hooks', () => {
+    const original = jest.requireActual('@salesforce/pwa-kit-react-sdk/ssr/universal/hooks')
+    return {
+        ...original,
+        useOrigin: jest.fn(() => 'https://www.example.com')
+    }
+})
 describe('AppConfig', () => {
     let originalFetch
     beforeAll(() => {
         jest.spyOn(window.localStorage, 'setItem')
         originalFetch = global.fetch
-        global.fetch = jest.fn().mockImplementation(() => mockConfig.mockFetchOCAPISessions)
     })
 
     beforeEach(() => {

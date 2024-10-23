@@ -1,0 +1,68 @@
+name: 'Changelog Check'
+description: 'Check if changelog is updated for the changed packages'
+inputs:
+  pr_number:
+    description: 'Pull request number'
+    required: true
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+      with:
+        fetch-depth: 0  # Fetch full history to access all commits
+
+    - name: Determine Base SHA and Merge Base
+      id: determine_base
+      run: |
+        if [ -n "${{ github.event.pull_request.base.sha }}" ]; then
+          BASE_SHA="${{ github.event.pull_request.base.sha }}"
+          MERGE_BASE=$(git merge-base $BASE_SHA ${{ github.sha }})
+          echo "BASE_SHA=$BASE_SHA" >> $GITHUB_ENV
+          echo "MERGE_BASE=$MERGE_BASE" >> $GITHUB_ENV
+        else
+          echo "Not running in a PR context or unable to determine base SHA. Skipping changelog check."
+          echo "SKIP_CHANGELOG_CHECK=true" >> $GITHUB_ENV
+        fi
+      shell: bash
+
+    - name: Check if 'skip changelog' label is present
+      id: check_labels
+      run: |
+        SKIP_CHANGELOG_LABEL="${{ contains(github.event.pull_request.labels.*.name, 'skip changelog') }}"
+        if [ "$SKIP_CHANGELOG_LABEL" = "true" ]; then
+          echo "Skip changelog label is present. Skipping changelog check."
+          echo "SKIP_CHANGELOG_CHECK=true" >> $GITHUB_ENV
+        fi
+      shell: bash
+
+    - name: Debugging Info
+      run: |
+        echo "Base SHA: ${{ env.BASE_SHA }}"
+        echo "Current SHA: ${{ github.sha }}"
+        echo "Merge Base: ${{ env.MERGE_BASE }}"
+        echo "SKIP_CHANGELOG_CHECK: ${{ env.SKIP_CHANGELOG_CHECK }}"
+      shell: bash
+
+    - name: Check if changelog is updated
+      if: ${{ env.SKIP_CHANGELOG_CHECK != 'true' }}
+      run: |
+        CHANGED_FILES=$(git diff --name-only ${{ env.MERGE_BASE }} ${{ github.sha }})
+        if [ -z "$CHANGED_FILES" ]; then
+          echo "No changed files detected."
+          exit 0
+        fi
+        echo "Changed files: $CHANGED_FILES"
+        
+        PUBLIC_PACKAGES=("commerce-sdk-react" "pwa-kit-create-app" "pwa-kit-dev" "pwa-kit-react-sdk" "pwa-kit-runtime" "template-retail-react-app")
+
+        for PACKAGE in "${PUBLIC_PACKAGES[@]}"; do
+          if echo "$CHANGED_FILES" | grep -iq "^packages/$PACKAGE/"; then
+            if ! echo "$CHANGED_FILES" | grep -iq "^packages/$PACKAGE/CHANGELOG.md"; then
+              echo "CHANGELOG.md was not updated for package $PACKAGE. Please update the CHANGELOG.md or add 'skip changelog' label to the PR."
+              exit 1
+            fi
+          fi
+        done
+      shell: bash

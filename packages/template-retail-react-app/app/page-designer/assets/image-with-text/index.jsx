@@ -32,6 +32,18 @@ export const ImageWithText = ({ITCLink, ITCText, image, heading, alt}) => {
     const LinkWrapper = isAbsolute ? ChakraLink : Link
     const linkProps = isAbsolute ? {href: ITCLink} : {to: ITCLink}
 
+    const ImageComponent = () => (
+        <Image
+            className={'image-with-text-image'}
+            data-testid={'image-with-text-image'}
+            src={image?.src?.mobile ? image?.src?.mobile : image?.url}
+            ignoreFallback={true}
+            alt={alt}
+            title={alt}
+            filter={heading ? 'brightness(40%)' : undefined}
+        />
+    )
+
     return (
         <Box className={'image-with-text'}>
             <Box
@@ -44,17 +56,13 @@ export const ImageWithText = ({ITCLink, ITCText, image, heading, alt}) => {
                 <picture>
                     <source srcSet={image?.src?.tablet} media="(min-width: 48em)" />
                     <source srcSet={image?.src?.desktop} media="(min-width: 64em)" />
-                    <LinkWrapper {...linkProps}>
-                        <Image
-                            className={'image-with-text-image'}
-                            data-testid={'image-with-text-image'}
-                            src={image?.src?.mobile ? image?.src?.mobile : image?.url}
-                            ignoreFallback={true}
-                            alt={alt}
-                            title={alt}
-                            filter={'brightness(40%)'}
-                        />
-                    </LinkWrapper>
+                    {ITCLink ? (
+                        <LinkWrapper {...linkProps}>
+                            <ImageComponent />
+                        </LinkWrapper>
+                    ) : (
+                        <ImageComponent />
+                    )}
                 </picture>
                 {hasCaption && (
                     <Text as="figcaption">
@@ -64,6 +72,7 @@ export const ImageWithText = ({ITCLink, ITCText, image, heading, alt}) => {
                                 position={'absolute'}
                                 top={'50%'}
                                 width={'100%'}
+                                transform={'translateY(-50%)'}
                                 padding={'15px'}
                                 textAlign={{base: 'center', sm: 'left'}}
                             >

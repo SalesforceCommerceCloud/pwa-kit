@@ -10,7 +10,8 @@ import PropTypes from 'prop-types'
 import {rest} from 'msw'
 import {
     mockProductSearch,
-    mockedEmptyCustomerProductList
+    mockedEmptyCustomerProductList,
+    mockCategories
 } from '@salesforce/retail-react-app/app/mocks/mock-data'
 import {screen, waitFor} from '@testing-library/react'
 import {Route, Switch} from 'react-router-dom'
@@ -20,8 +21,41 @@ import {
 } from '@salesforce/retail-react-app/app/utils/test-utils'
 import ProductList from '.'
 import EmptySearchResults from '@salesforce/retail-react-app/app/pages/product-list/partials/empty-results'
+import {useProductSearch, useCategory} from '@salesforce/commerce-sdk-react'
+
+const MOCK_USE_QUERY_RESULT = {
+    data: undefined,
+    dataUpdatedAt: 0,
+    error: null,
+    errorUpdatedAt: 0,
+    failureCount: 0,
+    isError: false,
+    isFetched: false,
+    isFetchedAfterMount: false,
+    isFetching: false,
+    isIdle: false,
+    isLoading: false,
+    isLoadingError: false,
+    isPlaceholderData: false,
+    isPreviousData: false,
+    isRefetchError: false,
+    isRefetching: false,
+    isStale: false,
+    isSuccess: true,
+    status: 'success',
+    refetch: jest.fn(),
+    remove: jest.fn()
+}
 
 jest.setTimeout(60000)
+jest.mock('@salesforce/commerce-sdk-react', () => {
+    const originalModule = jest.requireActual('@salesforce/commerce-sdk-react')
+    return {
+        ...originalModule,
+        useProductSearch: jest.fn(),
+        useCategory: jest.fn()
+    }
+})
 let mockProductListSearchResponse = mockProductSearch
 
 const MockedComponent = ({isLoading}) => {
@@ -62,6 +96,13 @@ beforeEach(() => {
             return res(ctx.delay(0), ctx.status(200), ctx.json(mockProductListSearchResponse))
         })
     )
+    useProductSearch.mockImplementation(() => ({
+        ...MOCK_USE_QUERY_RESULT,
+        data: mockProductSearch
+    }))
+    useCategory.mockImplementation(() => ({
+        data: mockCategories.root.categories[0].categories[0]
+    }))
 })
 
 afterEach(() => {
@@ -85,10 +126,40 @@ test('should render sort option list page', async () => {
     expect(await screen.findByTestId('sf-product-list-sort')).toBeInTheDocument()
 })
 
-test('should render skeleton', async () => {
+test('should render skeleton when productSearch data is undefined', async () => {
+    useProductSearch.mockImplementation(() => ({
+        ...MOCK_USE_QUERY_RESULT
+    }))
     window.history.pushState({}, 'ProductList', '/uk/en-GB/category/mens-clothing-jackets')
     renderWithProviders(<MockedComponent isLoading />)
     expect(screen.getAllByTestId('sf-product-tile-skeleton')).toHaveLength(25)
+})
+
+test('should render skeleton on initial fetch', async () => {
+    useProductSearch.mockImplementation(() => ({
+        ...MOCK_USE_QUERY_RESULT,
+        data: mockProductSearch,
+        isRefetching: true,
+        isFetched: false
+    }))
+    window.history.pushState({}, 'ProductList', '/uk/en-GB/category/mens-clothing-jackets')
+    renderWithProviders(<MockedComponent isLoading />)
+    expect(screen.getAllByTestId('sf-product-tile-skeleton')).toHaveLength(25)
+})
+
+test('should render only pricing and promotions skeleton when data is refreshing', async () => {
+    useProductSearch.mockImplementation(() => ({
+        ...MOCK_USE_QUERY_RESULT,
+        data: mockProductSearch,
+        isRefetching: true,
+        isFetched: true
+    }))
+    window.history.pushState({}, 'ProductList', '/uk/en-GB/category/mens-clothing-jackets')
+    renderWithProviders(<MockedComponent isLoading />)
+    expect(screen.getAllByTestId('sf-product-tile-pricing-and-promotions-skeleton')).toHaveLength(
+        25
+    )
+    expect(screen.queryByTestId('sf-product-tile-skeleton')).not.toBeInTheDocument()
 })
 
 test('should render empty list page', async () => {

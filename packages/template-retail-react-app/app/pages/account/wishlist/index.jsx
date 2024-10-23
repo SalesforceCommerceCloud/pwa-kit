@@ -10,8 +10,8 @@ import {
     Box,
     Flex,
     Skeleton,
-    Heading,
-    Stack
+    Stack,
+    Heading
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 import {useProducts, useShopperCustomersMutation} from '@salesforce/commerce-sdk-react'
 
@@ -221,6 +221,7 @@ const AccountWishlist = () => {
                             secondaryActions={
                                 <WishlistSecondaryButtonGroup
                                     productListItemId={item.id}
+                                    productName={item.product.name}
                                     // Focus to 'Wishlist' header after remove for accessibility
                                     focusElementOnRemove={headingRef}
                                     onClick={handleSecondaryAction}

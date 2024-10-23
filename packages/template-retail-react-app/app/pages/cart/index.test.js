@@ -584,7 +584,7 @@ describe('Product bundles', () => {
                 }
                 return res(ctx.json(updatedBasket))
             }),
-            rest.patch('*/baskets/:basketId/items/:itemId', (req, res, ctx) => {})
+            rest.patch('*/baskets/:basketId/items/:itemId', () => {})
         )
     })
 

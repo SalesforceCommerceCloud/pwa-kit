@@ -28,7 +28,19 @@ env:
   RELEASE: ${{ (github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository) && startsWith(github.head_ref || github.ref_name, 'release-') }}
 
 jobs:
+  changelog-check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Changelog Check
+        uses: ./.github/actions/changelog-check
+        with:
+          pr_number: ${{ github.event.pull_request.number }}
+
   pwa-kit:
+    needs: changelog-check
     strategy:
       fail-fast: false
       matrix:
@@ -125,6 +137,7 @@ jobs:
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
   pwa-kit-windows:
+    needs: changelog-check
     strategy:
       fail-fast: false
       matrix:
@@ -133,6 +146,7 @@ jobs:
         exclude: # node 16 is not compatible with npm 10
           - node: 16
             npm: 10
+    runs-on: windows-latest
     env:
       # The "default" npm is the one that ships with a given version of node.
       # For more: https://nodejs.org/en/download/releases/
@@ -142,7 +156,6 @@ jobs:
       # The current recommended version for Managed Runtime:
       # https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/upgrade-node-version.html
       IS_MRT_NODE: ${{ matrix.node == 20 && matrix.npm == 10 }}
-    runs-on: windows-latest
     steps:
         - name: Checkout
           uses: actions/checkout@v3
@@ -167,6 +180,7 @@ jobs:
   # TODO: The generated workflow is identical to the generated-windows workflow,
   # with a few extra steps. Can the workflows be merged? (Add `os` to the matrix?)
   generated:
+    needs: changelog-check
     strategy:
       fail-fast: false
       matrix:
@@ -264,6 +278,7 @@ jobs:
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
   generated-windows:
+    needs: changelog-check
     strategy:
       fail-fast: false
       matrix:
@@ -318,10 +333,11 @@ jobs:
         with:
           path: packages/pwa-kit-create-app/local-npm-repo/verdaccio.log
   lighthouse:
+    needs: changelog-check
     strategy:
       fail-fast: false
       matrix:
-        node: [18] # Should match node version supported by MRT.
+        node: [20] # Should match node version supported by MRT.
     runs-on: ubuntu-latest
     steps:
       - name: Checkout

@@ -73,11 +73,7 @@ module.exports = {
             {
                 host: '{{answers.project.commerce.shortCode}}.api.commercecloud.salesforce.com',
                 path: 'api'
-            }{{~#if answers.project.commerce.instanceUrl}},
-            {
-                host: '{{answers.project.commerce.instanceUrl}}',
-                path: 'ocapi'
-            }{{/if}}
+            }
         ]
     }
 }

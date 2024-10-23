@@ -73,6 +73,7 @@ const ENVS_TO_EXPOSE = [
     'mobify_property_id',
     'mrt_allow_cookies',
     'node_env',
+    'node_options',
     'tz'
 ]
 

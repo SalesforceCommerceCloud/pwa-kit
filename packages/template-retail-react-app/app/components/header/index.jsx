@@ -48,9 +48,39 @@ import {
 import {navLinks, messages} from '@salesforce/retail-react-app/app/pages/account/constant'
 import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
 import LoadingSpinner from '@salesforce/retail-react-app/app/components/loading-spinner'
+import {HideOnDesktop, HideOnMobile} from '@salesforce/retail-react-app/app/components/responsive'
 import {isHydrated, noop} from '@salesforce/retail-react-app/app/utils/utils'
 import {STORE_LOCATOR_IS_ENABLED} from '@salesforce/retail-react-app/app/constants'
 const IconButtonWithRegistration = withRegistration(IconButton)
+
+/**
+ * Search bar for the header.
+ *
+ * The search bar is a simple input field with a search icon.
+ * It can be used to search for products or navigate to a
+ * specific page.
+ *
+ * @param props {object} the component props
+ * @returns {Element} the search bar element
+ */
+const SearchBar = (props) => {
+    const styles = useMultiStyleConfig('Header')
+    const intl = useIntl()
+    const placeholder = intl.formatMessage({
+        id: 'header.field.placeholder.search_for_products',
+        defaultMessage: 'Search for products...'
+    })
+    return (
+        <Box {...styles.searchContainer}>
+            <Search
+                aria-label={placeholder}
+                placeholder={placeholder}
+                {...styles.search}
+                {...props}
+            />
+        </Box>
+    )
+}
 /**
  * The header is the main source for accessing
  * navigation, search, basket, and other
@@ -125,11 +155,6 @@ const Header = ({
         }
     }
 
-    const placeholder = intl.formatMessage({
-        id: 'header.field.placeholder.search_for_products',
-        defaultMessage: 'Search for products...'
-    })
-
     return (
         <Box {...styles.container} {...props}>
             <Box {...styles.content}>
@@ -161,18 +186,14 @@ const Header = ({
                         onClick={onLogoClick}
                     />
                     <Box {...styles.bodyContainer}>{children}</Box>
-                    <Box {...styles.searchContainer}>
-                        <Search
-                            aria-label={placeholder}
-                            placeholder={placeholder}
-                            {...styles.search}
-                        />
-                    </Box>
+                    <HideOnMobile>
+                        <SearchBar />
+                    </HideOnMobile>
                     <IconButtonWithRegistration
                         icon={<AccountIcon />}
                         aria-label={intl.formatMessage({
                             id: 'header.button.assistive_msg.my_account',
-                            defaultMessage: 'My account'
+                            defaultMessage: 'My Account'
                         })}
                         variant="unstyled"
                         {...styles.icons}
@@ -262,7 +283,11 @@ const Header = ({
                                     <Divider colorScheme="gray" />
                                     <Button variant="unstyled" {...styles.signout}>
                                         <Flex>
-                                            <SignoutIcon boxSize={5} {...styles.signoutIcon} />
+                                            <SignoutIcon
+                                                aria-hidden={true}
+                                                boxSize={5}
+                                                {...styles.signoutIcon}
+                                            />
                                             <Text as="span" {...styles.signoutText}>
                                                 {intl.formatMessage({
                                                     defaultMessage: 'Log out',
@@ -318,6 +343,9 @@ const Header = ({
                         {...styles.icons}
                         onClick={onMyCartClick}
                     />
+                    <HideOnDesktop display={{base: 'contents', lg: 'none'}}>
+                        <SearchBar />
+                    </HideOnDesktop>
                 </Flex>
             </Box>
         </Box>

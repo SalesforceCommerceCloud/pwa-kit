@@ -45,6 +45,17 @@ test('Renders Skeleton', () => {
     expect(skeleton).toBeDefined()
 })
 
+test('Renders PricingAndPromotionsSkeleton when isRefetching is true', async () => {
+    const {getAllByTestId, queryByTestId} = renderWithProviders(
+        <ProductTile isRefreshingData={true} product={mockMasterProductHitWithMultipleVariants} />
+    )
+
+    const skeleton = getAllByTestId('sf-product-tile-pricing-and-promotions-skeleton')
+
+    expect(skeleton).toBeDefined()
+    expect(queryByTestId('sf-product-tile-skeleton')).not.toBeInTheDocument()
+})
+
 test('Remove from wishlist cannot be muti-clicked', () => {
     const onClick = jest.fn()
 
