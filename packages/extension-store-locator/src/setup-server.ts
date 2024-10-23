@@ -12,9 +12,7 @@ import {
 import {ServerExtensionConfig as Config} from './types'
 
 class SampleExtension extends ExpressApplicationExtension<Config> {
-
     extendApp(app: ExpressApplication): ExpressApplication {
-
         return app
     }
 }

@@ -22,7 +22,6 @@ import {
     STORE_LOCATOR_NUM_STORES_PER_LOAD,
     STORE_LOCATOR_DISTANCE,
     STORE_LOCATOR_DISTANCE_UNIT,
-    STORE_LOCATOR_IS_ENABLED
 } from './constants'
 
 export const StoreLocatorContext = createContext()

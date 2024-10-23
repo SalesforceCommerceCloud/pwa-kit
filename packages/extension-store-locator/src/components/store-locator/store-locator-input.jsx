@@ -25,7 +25,6 @@ import {
     STORE_LOCATOR_NUM_STORES_PER_LOAD,
     STORE_LOCATOR_DISTANCE,
     STORE_LOCATOR_DISTANCE_UNIT,
-    STORE_LOCATOR_IS_ENABLED,
     SUPPORTED_STORE_LOCATOR_COUNTRIES
 } from './constants'
 import {StoreLocatorContext} from './index'

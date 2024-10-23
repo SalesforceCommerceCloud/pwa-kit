@@ -56,7 +56,13 @@
             "enabled": false
           }
         ],
-        "@salesforce/extension-store-locator"
+        [
+          "@salesforce/extension-store-locator",
+          {
+            "enabled": true,
+            "path": "/store-locator"
+          }
+        ]
       ]
     },
     "ssrEnabled": true,
