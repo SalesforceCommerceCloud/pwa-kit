@@ -1,4 +1,4 @@
-## v3.8.0 (Oct 23, 2024)
+## v3.8.0-preview.0 (Oct 23, 2024)
 
 - Removed OCAPISessionURL prop from provider template. [#2090](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2090)
 - Update ssr.js templates to include new feature flag to encode non ASCII HTTP headers [#2048](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2048)

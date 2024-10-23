@@ -1,4 +1,4 @@
-## v3.8.0 (Oct 23, 2024)
+## v3.8.0-preview.0 (Oct 23, 2024)
 - [Server Affinity] - Attach dwsid to SCAPI request headers [#2090](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2090)
 - Create useOrigin hook to return an app origin that takes x-forwarded-host header into consideration. [#2050](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2050) 
 

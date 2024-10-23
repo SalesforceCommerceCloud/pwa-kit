@@ -1,4 +1,4 @@
-## v5.0.0 (Oct 23, 2024)
+## v5.0.0-preview.0 (Oct 23, 2024)
 
 ### New Features
 - Implement ability to set Shopper Context via search parameters in the Retail React App [#1986](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1986)

@@ -1,4 +1,4 @@
-## v3.1.0-dev (Oct 23, 2024)
+## v3.1.0-preview.0 (Oct 23, 2024)
 
 -   [Server Affinity] Attach dwsid to SCAPI request headers [#2090](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2090)
 -   Add the `authorizeCustomer` and `getPasswordResetToken` to the `ShopperLoginMutations` [#2056](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2056)
