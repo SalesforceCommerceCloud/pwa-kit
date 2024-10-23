@@ -150,37 +150,33 @@ describe('useCustomMutation', () => {
     })
     // The below test does not work currently because HTTP 400 and above are still flagged as a
     // successful mutation. See https://github.com/TanStack/query/discussions/1385
-    // test('clear auth state when request uses invalid session', async () => {
-    //     const spy = jest.spyOn(Auth.prototype, 'clearUserAuth')
-    //     const mockRes = {
-    //         title: 'Unauthorized',
-    //         type: 'https://api.commercecloud.salesforce.com/documentation/error/v1/errors/unauthorized',
-    //         detail: 'Customer credentials changed after token was issued.'
-    //     }
-    //     const apiName = 'hello-world'
-    //     mockMutationEndpoints(apiName, mockRes, 401)
+    test('clear auth state when request uses invalid session', async () => {
+        const spy = jest.spyOn(Auth.prototype, 'clearUserAuth')
+        const mockRes = {
+            title: 'Unauthorized',
+            type: 'https://api.commercecloud.salesforce.com/documentation/error/v1/errors/unauthorized',
+            detail: 'Customer credentials changed after token was issued.'
+        }
+        const apiName = 'hello-world'
+        mockMutationEndpoints(apiName, mockRes, 401)
 
-    //     const {result} = renderHookWithProviders(() => {
-    //         return useCustomMutation({
-    //             options: {
-    //                 method: 'POST',
-    //                 customApiPathParameters: {
-    //                     endpointPath: 'test-hello-world',
-    //                     apiName
-    //                 },
-    //                 body: {test: '123'}
-    //             },
-    //             rawResponse: false
-    //         })
-    //     })
+        const {result} = renderHookWithProviders(() => {
+            return useCustomMutation({
+                options: {
+                    method: 'POST',
+                    customApiPathParameters: {
+                        endpointPath: 'test-hello-world',
+                        apiName
+                    },
+                    body: {test: '123'}
+                },
+                rawResponse: false
+            })
+        })
 
-    //     expect(result.current.error).toBeNull()
-    //     act(() => result.current.mutate())
-    //     await waitAndExpectError(() => {
-    //         const a = result.current
-    //         console.log(a)
-    //         return a
-    //     })
-    //     expect(spy).toHaveBeenCalled()
-    // })
+        expect(result.current.error).toBeNull()
+        act(() => result.current.mutate())
+        await waitAndExpectError(() => result.current)
+        expect(spy).toHaveBeenCalled()
+    })
 })
