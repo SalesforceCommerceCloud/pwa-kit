@@ -8,15 +8,15 @@ import {defineMessages} from 'react-intl'
 import {messages as originalMessages} from '*/pages/home-rra/messages'
 
 // What's in defineMessages should be statically parseable. That's why we're not including the originalMessages yet.
-let messages = defineMessages({
+const newMessages = defineMessages({
     'home.title.react_starter_store': {
-        defaultMessage: 'The React PWA Starter Store for Retail - FOOO',
+        defaultMessage: 'The React PWA Starter Store for Retail - FOO',
         id: 'home.title.react_starter_store'
     }
 })
-messages = {
+const messages = {
     ...originalMessages,
-    messages
+    ...newMessages
 }
 
 export {messages}
