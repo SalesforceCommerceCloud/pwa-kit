@@ -8,7 +8,7 @@
 import fs from 'fs-extra'
 import path from 'path'
 
-import * as extensionUtils from './extensibility-utils'
+import * as extensionUtils from './extensibility'
 
 describe('extensibilityUtils', () => {
     const existingTSFile = path.join('mocked', 'path', 'exists.ts')

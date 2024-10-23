@@ -6,7 +6,7 @@
  */
 
 import path from 'path'
-import * as resolverUtils from './resolver-utils'
+import * as resolverUtils from './resolver'
 
 const PROJECT_PATH_GOOD = '/home/user/testproject'
 const PROJECT_PATH_BAD = '/home/user/test.project'

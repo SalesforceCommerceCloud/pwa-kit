@@ -5,20 +5,8 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import {BASE_DIR, runWebpackCompiler} from '../test-utils'
+import {runWebpackCompiler} from './test-utils'
 import OverridesResolverPlugin from './overrides-resolver-plugin'
-
-// const BASE_VIRTUAL_FILES = {
-//     // Virtual Project Files
-//     'app/ssr.js': `import {getApplicationExtensions} from './application-extensions-placeholder.js'`,
-//     'app/main.jsx': `import {getApplicationExtensions} from './application-extensions-placeholder.js'`,
-//     'app/application-extensions-placeholder.js': '',
-
-//     // QUIRK! These entries are required to access the files in the actual file system. The resolve method fails if
-//     // they don't exist. This is a sharpe edge, but it's not too bad.
-//     [`${path.resolve(__dirname, './extensions-loader.ts')}`]: '',
-//     [`${path.resolve(__dirname, '../../../../node_modules/@loadable/component')}`]: ''
-// }
 
 describe('Overrides Resolver Plugin', () => {
     const testCases = [

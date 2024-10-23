@@ -11,10 +11,10 @@ import {Resolver} from 'webpack'
 // Local
 // TODO: Is this a good place for this util? I seems to only be used in the plugin. Maybe we need to put it somewhere
 // else?
-import {buildCandidatePaths, expand} from '../../../shared/utils/resolver-utils'
+import {buildCandidatePaths, expand} from '../../shared/utils/resolver'
 
-// Type
-import {ApplicationExtensionEntry} from '../../../types'
+// Types
+import {ApplicationExtensionEntry} from '../../types'
 
 export const DEFAULT_FILE_EXTENSIONS = ['.ts', '.tsx', '.js', '.jsx', '.json']
 
@@ -39,7 +39,7 @@ const defaultOptions = {
  *  App Extension developers to define which files are part of their public api thus can be overridden, but
  *  also the module resolution algorithm.
  */
-class OverridesResolverPlugin {
+export class OverridesResolverPlugin {
     private options: OverridesResolverPluginOptions
 
     constructor(options: OverridesResolverPluginOptions) {
@@ -113,4 +113,3 @@ class OverridesResolverPlugin {
     }
 }
 
-export default OverridesResolverPlugin

@@ -5,5 +5,5 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-export * from './loaders'
-export * from './plugins'
+export * from './application-extensions-loader'
+export * from './overrides-resolver-plugin'

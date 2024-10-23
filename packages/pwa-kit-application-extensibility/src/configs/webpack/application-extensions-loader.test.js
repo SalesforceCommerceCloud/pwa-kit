@@ -8,8 +8,8 @@
 import dedent from 'dedent'
 import path from 'path'
 
-import {runWebpackCompiler} from '../test-utils'
-console.log('__dirname: ', `${path.resolve(__dirname, './extensions-loader.ts')}`)
+import {runWebpackCompiler} from './test-utils'
+
 const BASE_VIRTUAL_FILES = {
     // Virtual Project Files
     './app/ssr.js': dedent`

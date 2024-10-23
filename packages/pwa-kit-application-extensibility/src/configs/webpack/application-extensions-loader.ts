@@ -6,10 +6,16 @@
  */
 
 // Local
-import {renderTemplate} from '../../utils'
+import {renderTemplate} from '../utils'
+import {getApplicationExtensionInfo} from '../../shared/utils'
 
 // Types
-import {ApplicationExtensionsLoaderContext} from '../types'
+import {ApplicationExtensionsLoaderContext} from './types'
+
+// Constants
+const LOADER_IMPORT =
+    '@salesforce/pwa-kit-application-extensibility/configs/webpack/application-extensions-loader'
+const DEFAULT_TARGET = 'node'
 
 /**
  * The `extensions-loader` as a mechanism to get all configured extensions for a given pwa-kit
@@ -25,7 +31,7 @@ import {ApplicationExtensionsLoaderContext} from '../types'
  *
  * @returns {string} The string representation of a module exporting all the named application extension modules.
  */
-module.exports = function (this: ApplicationExtensionsLoaderContext): string {
+export default function ApplicationExtensibilityLoader (this: ApplicationExtensionsLoaderContext): string {
     // TODO: Add checking for arguments.
 
     // Get the installed and configured application extensions as well as the requested
@@ -34,4 +40,27 @@ module.exports = function (this: ApplicationExtensionsLoaderContext): string {
     const data = this.getOptions()
 
     return renderTemplate(data)
+}
+
+export const ruleForApplicationExtensibility = (options: any = {}) => {
+    const {loaderResolver, loaderOptions = {}} = options
+    const {target = DEFAULT_TARGET, appConfig} = loaderOptions
+
+    // TODO: User the newly created utility getApplicationExtensionInfo to get the information required here.
+    // NOTE: Passing around the `getConfig` is going to be interesting to make it look nice. Might just abandon it???
+    return {
+        test: new RegExp(
+            `${
+                target === 'node' ? 'express' : 'react'
+            }/assets/application-extensions-placeholder.js`,
+            'i'
+        ),
+        use: {
+            loader: loaderResolver ? loaderResolver(LOADER_IMPORT) : LOADER_IMPORT,
+            options: {
+                ...getApplicationExtensionInfo(appConfig),
+                target
+            }
+        }
+    }
 }

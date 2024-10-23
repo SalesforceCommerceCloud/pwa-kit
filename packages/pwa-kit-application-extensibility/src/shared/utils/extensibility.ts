@@ -6,11 +6,15 @@
  */
 
 // Third-Party
-import fs from 'fs-extra'
+import fse from 'fs-extra'
 import path from 'path'
+import {resolve} from 'path'
 
 // Types
 import {ApplicationExtensionEntry, ApplicationExtensionEntryArray} from '../../types'
+
+// Local
+import {expand} from './resolver'
 
 // CONSTANTS
 // const REACT_EXTENSIBILITY_FILE = 'setup-app'
@@ -73,7 +77,7 @@ export const buildAliases = (extensions: ApplicationExtensionEntry[] = []) => {
 export const findFileWithExtension = (basePath: string, extensions: string[] = []) => {
     for (const ext of extensions) {
         const filePath = path.format({...path.parse(basePath), base: undefined, ext})
-        if (fs.existsSync(filePath)) {
+        if (fse.existsSync(filePath)) {
             return filePath
         }
     }
@@ -102,4 +106,26 @@ export const getExtensionNames = (extensions: ApplicationExtensionEntry[]) => {
     return (extensions || []).map((extension) => {
         return Array.isArray(extension) ? extension[0] : extension
     })
+}
+
+export const getApplicationExtensionInfo = (appConfig?: any) => {
+    const projectDir = process.cwd()
+    const pkg = fse.readJsonSync(resolve(projectDir, 'package.json'))
+
+    // Use the application configuration in the projects application if one isn't provided.
+    appConfig = appConfig
+        ? appConfig
+        : fse.readJsonSync(resolve(projectDir, 'package.json'))?.mobify || {}
+
+    const installedExtensions = Object.keys(pkg?.devDependencies || {})
+        .map((packageName) => (packageName.match(nameRegex) !== null ? packageName : undefined))
+        .filter(Boolean)
+
+    // NOTE: Might have to get the expanded version of these.
+    const configuredExtensions = expand(appConfig?.app?.extensions || [])
+
+    return {
+        installed: installedExtensions,
+        configured: configuredExtensions
+    }
 }
