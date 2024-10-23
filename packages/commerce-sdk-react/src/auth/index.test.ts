@@ -61,9 +61,7 @@ const config = {
     proxy: 'proxy',
     redirectURI: 'redirectURI',
     logger: console,
-    passwordlessConfig: {
-        callbackURI: 'callbackURI'
-    }
+    callbackURI: 'callbackURI'
 }
 
 const configSLASPrivate = {
@@ -79,9 +77,6 @@ const configPasswordlessSms = {
     proxy: 'proxy',
     redirectURI: 'redirectURI',
     logger: console,
-    passwordlessConfig: {
-        mode: 'sms'
-    }
 }
 
 describe('Auth', () => {
