@@ -83,14 +83,14 @@ export const expand = (extensions = []) =>
         })
 
 /**
- * Based on the current extensibility configuration, return an array of candiate file paths to be used
- * in the wild-card import module resolution for the given import path..
+ * Based on the current extensibility configuration, return an array of candidate file paths to be used
+ * in the dollar-prefixed import module resolution for the given import path.
  *
  * @param {String} importPath - The import module-name.
- * @param {String} sourcePath - The path the the file of the source import.
+ * @param {String} sourcePath - The path to the file of the source import.
  * @param {Object} opts - The path the the file of the source import.
- * @param {Array<shortName: String, config: Array>} opts.extensionEntries - List of extension entries (tupals) used by the base PWA-Kit application.
- * @param {String>} opts.projectDir - Absolute path of the base project.
+ * @param {Array<{shortName: String, config: Array}>} opts.extensionEntries - List of extension entries (tuples) used by the base PWA-Kit application.
+ * @param {String} opts.projectDir - Absolute path of the base project.
  * @returns {String[]} paths - The potential paths to find the module import.
  */
 export const buildCandidatePaths = (importPath, sourcePath, opts = {}) => {
@@ -135,9 +135,9 @@ export const buildCandidatePaths = (importPath, sourcePath, opts = {}) => {
             : [])
     ]
 
-    // Under certain circumstances we want to truncate the cadidate path array to prevent circular dependancies.
+    // Under certain circumstances we want to truncate the candidate path array to prevent circular dependencies.
     // In particular, we only want to include extensions up to, but not including, the importing extension source if it is
-    // a self-named import (e.g. importing routes from an overridden file names routes)
+    // a self-referenced import (e.g. importing routes from an overridden file names routes)
     if (isSelfReferenceImport) {
         // NOTE: Overriding files requires that you use the exact file name, you cannot replace a non-index file with one that
         // is an index file.
