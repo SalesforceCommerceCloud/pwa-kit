@@ -8,17 +8,43 @@
 const { test, expect } = require("@playwright/test");
 const {
   generateUserCredentials,
+  createViolationFingerprints,
 } = require("../../scripts/utils.js");
-const { addProductToCart, searchProduct, checkoutProduct } = require("../../scripts/pageHelpers.js")
+const {
+  addProductToCart,
+  searchProduct,
+  checkoutProduct,
+} = require("../../scripts/pageHelpers.js");
+const config = require("../../config");
+const AxeBuilder = require("@axe-core/playwright").default; // 1
 
 const GUEST_USER_CREDENTIALS = generateUserCredentials();
+
+test.describe("HomePage accessibility", () => {
+  test("should not have any automatically detectable accessibility issues except the known issues", async ({
+    page,
+  }) => {
+    await page.goto(config.RETAIL_APP_HOME);
+    // wait til product tiles are fully load before analyzing
+    await expect(
+      page.getByRole("link", { name: /Denim slim skirt/i })
+    ).toBeVisible();
+    const accessibilityScanResults = await new AxeBuilder({
+      page,
+    }).analyze();
+
+    expect(
+      createViolationFingerprints(accessibilityScanResults)
+    ).toMatchSnapshot("HomePage-a11y-snapshot");
+  });
+});
 
 /**
  * Test that guest shoppers can add a product to cart and go through the entire checkout process,
  * validating that shopper is able to get to the order summary section
  */
 test("Guest shopper can checkout items as guest", async ({ page }) => {
-  await addProductToCart({page})
+  await addProductToCart({ page });
 
   // cart
   await page.getByLabel(/My cart/i).click();
@@ -27,7 +53,15 @@ test("Guest shopper can checkout items as guest", async ({ page }) => {
     page.getByRole("link", { name: /Cotton Turtleneck Sweater/i })
   ).toBeVisible();
 
-  await checkoutProduct({page, userCredentials: GUEST_USER_CREDENTIALS });
+  const accessibilityScanResults = await new AxeBuilder({
+    page,
+  }).analyze();
+
+  expect(createViolationFingerprints(accessibilityScanResults)).toMatchSnapshot(
+    ["Guest-cart-a11y-snapshots", "landing"]
+  );
+
+  await checkoutProduct({ page, userCredentials: GUEST_USER_CREDENTIALS });
 
   await expect(
     page.getByRole("heading", { name: /Order Summary/i })
@@ -42,7 +76,7 @@ test("Guest shopper can checkout items as guest", async ({ page }) => {
  * Test that guest shoppers can use the product edit modal on cart page
  */
 test("Guest shopper can edit product item in cart", async ({ page }) => {
-  await addProductToCart({page});
+  await addProductToCart({ page });
 
   // cart
   await page.getByLabel(/My cart/i).click();
@@ -65,8 +99,8 @@ test("Guest shopper can edit product item in cart", async ({ page }) => {
   await page.waitForLoadState();
 
   // Product edit modal should be open
-  await expect(page.getByTestId('product-view')).toBeVisible();
-  
+  await expect(page.getByTestId("product-view")).toBeVisible();
+
   await page.getByRole("radio", { name: "S", exact: true }).click();
   await page.getByRole("radio", { name: "Meadow Violet", exact: true }).click();
   await page.getByRole("button", { name: /Update/i }).click();
@@ -74,17 +108,26 @@ test("Guest shopper can edit product item in cart", async ({ page }) => {
   await page.waitForLoadState();
   await expect(page.getByText(/Color: Meadow Violet/i)).toBeVisible();
   await expect(page.getByText(/Size: S/i)).toBeVisible();
+  const accessibilityScanResults = await new AxeBuilder({
+    page,
+  }).analyze();
+
+  expect(createViolationFingerprints(accessibilityScanResults)).toMatchSnapshot(
+    ["Guest-cart-a11y-snapshots", "editing-item"]
+  );
 });
 
 /**
  * Test that guest shoppers can add product bundle to cart and successfully checkout
  */
 test("Guest shopper can checkout product bundle", async ({ page }) => {
-  await searchProduct({page, query: 'bundle'});
+  await searchProduct({ page, query: "bundle" });
 
-  await page.getByRole("link", {
-    name: /Turquoise Jewelry Bundle/i,
-  }).click();
+  await page
+    .getByRole("link", {
+      name: /Turquoise Jewelry Bundle/i,
+    })
+    .click();
 
   await page.waitForLoadState();
 
@@ -108,15 +151,23 @@ test("Guest shopper can checkout product bundle", async ({ page }) => {
   // bundle child selections with all color gold
   await expect(page.getByText(/Turquoise and Gold Bracelet/i)).toBeVisible();
   await expect(page.getByText(/Turquoise and Gold Necklace/i)).toBeVisible();
-  await expect(page.getByText(/Turquoise and Gold Hoop Earring/i)).toBeVisible();
+  await expect(
+    page.getByText(/Turquoise and Gold Hoop Earring/i)
+  ).toBeVisible();
 
   const qtyText = page.locator('text="Qty: 1"');
   const colorGoldText = page.locator('text="Color: Gold"');
   await expect(colorGoldText).toHaveCount(3);
   await expect(qtyText).toHaveCount(3);
 
-  await checkoutProduct({page, userCredentials: GUEST_USER_CREDENTIALS });
+  await checkoutProduct({ page, userCredentials: GUEST_USER_CREDENTIALS });
+  const accessibilityScanResults = await new AxeBuilder({
+    page,
+  }).analyze();
 
+  expect(createViolationFingerprints(accessibilityScanResults)).toMatchSnapshot(
+    ["Checkout-a11y-snapshots", "bundle-checkout"]
+  );
   await expect(
     page.getByRole("heading", { name: /Order Summary/i })
   ).toBeVisible();
@@ -126,5 +177,7 @@ test("Guest shopper can checkout product bundle", async ({ page }) => {
   ).toBeVisible();
   await expect(page.getByText(/Turquoise and Gold Bracelet/i)).toBeVisible();
   await expect(page.getByText(/Turquoise and Gold Necklace/i)).toBeVisible();
-  await expect(page.getByText(/Turquoise and Gold Hoop Earring/i)).toBeVisible();
+  await expect(
+    page.getByText(/Turquoise and Gold Hoop Earring/i)
+  ).toBeVisible();
 });
