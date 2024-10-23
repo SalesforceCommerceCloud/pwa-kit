@@ -18,7 +18,7 @@ module.exports = {
         login: {
             passwordless: {
                 enabled: true,
-                callbackURI: 'https://webhook.site/27761b71-50c1-4097-a600-21a3b89a546c'
+                callbackURI: 'https://webhook.site/993f131f-117b-4b4d-a525-72cf895fb32a'
             },
             social: {
                 enabled: false

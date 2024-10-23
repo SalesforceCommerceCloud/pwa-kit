@@ -23,7 +23,9 @@ import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {useAuthHelper, AuthHelpers} from '@salesforce/commerce-sdk-react'
 
 const LoginForm = ({submitForm, clickForgotPassword = noop, clickCreateAccount = noop, form}) => {
-    const idps = getConfig().app?.login?.idps
+    const loginConfig = getConfig().app?.login
+    const idps = loginConfig.social?.idps
+    const enablePasswordless = loginConfig.passwordless?.enabled
     const authorizePasswordless = useAuthHelper(AuthHelpers.AuthorizePasswordless)
     const loginPasswordlessUser = useAuthHelper(AuthHelpers.LoginPasswordlessUser)
 
@@ -89,15 +91,17 @@ const LoginForm = ({submitForm, clickForgotPassword = noop, clickCreateAccount =
                         </Button>
 
                         <SocialLogin idps={idps} />
-                        <Button
+                        {enablePasswordless && (
+                            <Button
                             variant="outline"
                             onClick={async () => {
                                 await authorizePasswordless.mutateAsync({userid: 'diana@test.com'})
                             }}
                             isLoading={form.formState.isSubmitting}
-                        >
-                            <FormattedMessage defaultMessage="Continue Securely" />
-                        </Button>
+                            >
+                                <FormattedMessage defaultMessage="Continue Securely" />
+                            </Button>
+                        )}
 
                         <Stack direction="row" spacing={1} justify="center">
                             <Text fontSize="sm">
