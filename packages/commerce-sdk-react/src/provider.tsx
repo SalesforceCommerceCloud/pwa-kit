@@ -38,6 +38,7 @@ export interface CommerceApiProviderProps extends ApiClientConfigParams {
     silenceWarnings?: boolean
     logger?: Logger
     defaultDnt?: boolean
+    callbackURI?: string
 }
 
 /**
@@ -115,7 +116,8 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
         clientSecret,
         silenceWarnings,
         logger,
-        defaultDnt
+        defaultDnt,
+        callbackURI
     } = props
 
     // Set the logger based on provided configuration, or default to the console object if no logger is provided
@@ -183,7 +185,8 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
             clientSecret,
             silenceWarnings,
             logger: configLogger,
-            defaultDnt
+            defaultDnt,
+            callbackURI
         })
     }, [
         clientId,
@@ -218,7 +221,8 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
                 currency,
                 silenceWarnings,
                 logger: configLogger,
-                defaultDnt
+                defaultDnt,
+                callbackURI
             }}
         >
             <CommerceApiContext.Provider value={apiClients}>
