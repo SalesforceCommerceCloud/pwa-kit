@@ -1,3 +1,4 @@
+## v3.8.0-nightly-20241023080203 (Oct 23, 2024)
 ## v3.9.0-dev (Oct 14, 2024)
 - Add proxy handling for trusted agent on behalf of (TAOB) requests [#2077](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2077)   
 
