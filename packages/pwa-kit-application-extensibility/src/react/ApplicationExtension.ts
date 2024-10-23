@@ -4,15 +4,14 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
+// Third-Party
 import {RouteProps} from 'react-router-dom'
 
 // Local
-import {ApplicationExtension as ApplicationExtensionBase} from '..'
+import {ApplicationExtension as ApplicationExtensionBase} from '../shared/application-extension-base'
 
 // Types
 import {ApplicationExtensionConfig} from '../types'
-
-// type GenericHocType<C> = (component: React.ComponentType<C>) => React.ComponentType<C>
 
 /**
  * An abstract class representing an Application Extension. This class provides

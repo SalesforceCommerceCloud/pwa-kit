@@ -24,8 +24,8 @@ const BASE_VIRTUAL_FILES = {
 
     // QUIRK! These entries are required to access the files in the actual file system. The resolve method fails if
     // they don't exist. This is a sharpe edge, but it's not too bad.
-    [`${path.resolve(__dirname, './extensions-loader.ts')}`]: '',
-    [`${path.resolve(__dirname, '../../../../node_modules/@loadable/component')}`]: ''
+    [`${path.resolve(__dirname, './application-extensions-loader.ts')}`]: '',
+    [`${path.resolve(__dirname, '../../../node_modules/@loadable/component')}`]: ''
 }
 
 describe('Application Extension Loader', () => {
@@ -96,7 +96,6 @@ describe('Application Extension Loader', () => {
                     __dirname,
                     '../../../../node_modules/@salesforce/extension-sample-a/setup-app'
                 )}`]: ''
-
             },
             loaderOptions: {
                 installed: ['@salesforce/extension-sample-a'],
@@ -162,7 +161,6 @@ describe('Application Extension Loader', () => {
                     __dirname,
                     '../../../../node_modules/@salesforce/extension-sample-a/setup-app'
                 )}`]: ''
-
             },
             loaderOptions: {
                 installed: ['@salesforce/extension-sample-a'],
@@ -229,7 +227,6 @@ describe('Application Extension Loader', () => {
                     __dirname,
                     '../../../../node_modules/@salesforce/extension-sample-a/setup-app'
                 )}`]: ''
-
             },
             loaderOptions: {
                 installed: ['@salesforce/extension-sample-a'],
@@ -261,7 +258,6 @@ describe('Application Extension Loader', () => {
                     __dirname,
                     '../../../../node_modules/@salesforce/extension-sample-a/setup-server'
                 )}`]: ''
-
             },
             loaderOptions: {
                 installed: ['@salesforce/extension-sample-a'],
@@ -282,7 +278,7 @@ describe('Application Extension Loader', () => {
                     alias: {
                         '@loadable/component$': path.resolve(
                             __dirname,
-                            '../../../../node_modules/@loadable/component'
+                            '../../../node_modules/@loadable/component'
                         )
                     },
                     files,
@@ -290,7 +286,10 @@ describe('Application Extension Loader', () => {
                         {
                             test: /application-extensions-placeholder.js/i,
                             use: {
-                                loader: path.resolve(__dirname, './extensions-loader.ts'),
+                                loader: path.resolve(
+                                    __dirname,
+                                    './application-extensions-loader.ts'
+                                ),
                                 options: loaderOptions
                             }
                         }
@@ -306,5 +305,4 @@ describe('Application Extension Loader', () => {
             expects(output, error)
         })
     })
-
 })

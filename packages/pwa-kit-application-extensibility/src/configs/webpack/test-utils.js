@@ -46,6 +46,7 @@ export const runWebpackCompiler = (fixture, options = {}) => {
     const volume = Volume.fromJSON(files)
     const fileSystem = createFsFromVolume(volume)
 
+    // Get loaders and plugins.
     const plugins = buildPlugins({fileSystem})
     const loaders = buildLoaders({fileSystem})
 

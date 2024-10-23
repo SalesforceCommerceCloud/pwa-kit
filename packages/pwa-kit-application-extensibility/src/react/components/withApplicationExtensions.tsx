@@ -16,6 +16,7 @@ import {getApplicationExtensions} from '../assets/application-extensions-placeho
 import {ApplicationExtension} from '../ApplicationExtension'
 import {ApplicationExtensionConfig as ApplicationExtensionConfigBase} from '../../types'
 
+// TODO: Move me!
 type withApplicationExtensionsOptions = {
     locals?: any
 }

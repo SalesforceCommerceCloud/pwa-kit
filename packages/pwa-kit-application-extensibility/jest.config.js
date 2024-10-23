@@ -12,11 +12,16 @@ module.exports = {
     coverageThreshold: {
         global: {
             branches: 90,
-            functions: 87,
+            functions: 90,
             lines: 90,
             statements: 90
         }
     },
     testPathIgnorePatterns: ['bin/*', 'coverage/*', 'dist/*', 'node_modules/*', 'scripts/*'],
-    collectCoverageFrom: ['src/**', '!src/ssr/server/test_fixtures/*']
+    collectCoverageFrom: ['src/**', '!src/ssr/server/test_fixtures/*', '!src/**/*-placeholder'],
+    coveragePathIgnorePatterns: [
+        '^index\\.ts$', // Don't put code in index files!
+        '-placeholder\\.ts$' // Ignore Placeholder files
+    ],
+    setupFilesAfterEnv: ['@testing-library/jest-dom/extend-expect']
 }

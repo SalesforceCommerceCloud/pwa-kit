@@ -6,7 +6,7 @@
  */
 
 import {runWebpackCompiler} from './test-utils'
-import OverridesResolverPlugin from './overrides-resolver-plugin'
+import {OverridesResolverPlugin} from './overrides-resolver-plugin'
 
 describe('Overrides Resolver Plugin', () => {
     const testCases = [
@@ -145,7 +145,7 @@ describe('Overrides Resolver Plugin', () => {
         const {extensions, files} = compilerConfig
 
         test(`${description}`, async () => {
-            let output, err
+            let output, error
 
             try {
                 const stats = await runWebpackCompiler(entryPoint, {
@@ -194,10 +194,10 @@ describe('Overrides Resolver Plugin', () => {
                 // Here we are looking at the first module imported via the wildcard syntax and testing that it's right.
                 output = stats.toJson({source: true})
             } catch (e) {
-                err = e
+                error = e
             }
 
-            expects(output, err)
+            expects(output, error)
         })
     })
 })

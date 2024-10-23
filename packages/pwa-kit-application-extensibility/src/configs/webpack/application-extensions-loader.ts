@@ -31,7 +31,9 @@ const DEFAULT_TARGET = 'node'
  *
  * @returns {string} The string representation of a module exporting all the named application extension modules.
  */
-export default function ApplicationExtensibilityLoader (this: ApplicationExtensionsLoaderContext): string {
+export default function ApplicationExtensibilityLoader(
+    this: ApplicationExtensionsLoaderContext
+): string {
     // TODO: Add checking for arguments.
 
     // Get the installed and configured application extensions as well as the requested
@@ -46,7 +48,7 @@ export const ruleForApplicationExtensibility = (options: any = {}) => {
     const {loaderResolver, loaderOptions = {}} = options
     const {target = DEFAULT_TARGET, appConfig} = loaderOptions
 
-    // TODO: User the newly created utility getApplicationExtensionInfo to get the information required here.
+    // TODO: Use the newly created utility getApplicationExtensionInfo to get the information required here.
     // NOTE: Passing around the `getConfig` is going to be interesting to make it look nice. Might just abandon it???
     return {
         test: new RegExp(

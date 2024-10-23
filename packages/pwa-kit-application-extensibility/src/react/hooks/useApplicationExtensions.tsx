@@ -7,7 +7,7 @@
 
 import {useContext} from 'react'
 import {ApplicationExtensionsContext} from '../contexts'
-import {ApplicationExtension} from '../..'
+import {ApplicationExtension} from '../ApplicationExtension'
 import {ApplicationExtensionConfig as Config} from '../../types'
 
 /**
