@@ -11,7 +11,7 @@ import OverridesResolverPlugin from './overrides-resolver-plugin'
 describe('Overrides Resolver Plugin', () => {
     const testCases = [
         {
-            description: 'Wildcard import resolves to correct base project file',
+            description: 'Dollar import resolves to correct base project file',
             entryPoint: 'app/routes.jsx',
             // Compiler configuration.
             compilerConfig: {
@@ -20,7 +20,7 @@ describe('Overrides Resolver Plugin', () => {
                     // Virtual Project Files
 
                     // Entry Point
-                    '/virtual/project/app/routes.jsx': `import SamplePage from '*/pages/sample-page'`,
+                    '/virtual/project/app/routes.jsx': `import SamplePage from '$/pages/sample-page'`,
 
                     // Overrides
 
@@ -40,7 +40,7 @@ describe('Overrides Resolver Plugin', () => {
             }
         },
         {
-            description: 'Wildcard import resolved to correct extension override',
+            description: 'Dollar import resolved to correct extension override',
             entryPoint: 'app/routes.jsx',
             // Compiler configuration.
             compilerConfig: {
@@ -49,7 +49,7 @@ describe('Overrides Resolver Plugin', () => {
                     // Virtual Project Files
 
                     // Entry Point
-                    '/virtual/project/app/routes.jsx': `import SamplePage from '*/pages/sample-page'`,
+                    '/virtual/project/app/routes.jsx': `import SamplePage from '$/pages/sample-page'`,
 
                     // Overrides
 
@@ -67,7 +67,7 @@ describe('Overrides Resolver Plugin', () => {
         },
         {
             description:
-                'Wildcard import resolved to correct extension override when app extension is reversed',
+                'Dollar import resolved to correct extension override when app extension is reversed',
             entryPoint: 'app/routes.jsx',
             // Compiler configuration.
             compilerConfig: {
@@ -76,7 +76,7 @@ describe('Overrides Resolver Plugin', () => {
                     // Virtual Project Files
 
                     // Entry Point
-                    '/virtual/project/app/routes.jsx': `import SamplePage from '*/pages/sample-page'`,
+                    '/virtual/project/app/routes.jsx': `import SamplePage from '$/pages/sample-page'`,
 
                     // Overrides
 
@@ -94,7 +94,7 @@ describe('Overrides Resolver Plugin', () => {
         },
         {
             description:
-                'Wildcard import pioritizes module resolution to the "overrides" folder if match import exists.',
+                'Dollar import prioritizes module resolution to the "overrides" folder if match import exists',
             entryPoint: 'app/routes.jsx',
             // Compiler configuration.
             compilerConfig: {
@@ -103,7 +103,7 @@ describe('Overrides Resolver Plugin', () => {
                     // Virtual Project Files
 
                     // Entry Point
-                    '/virtual/project/app/routes.jsx': `import SamplePage from '*/pages/sample-page'`,
+                    '/virtual/project/app/routes.jsx': `import SamplePage from '$/pages/sample-page'`,
 
                     // Overrides
 
@@ -120,7 +120,7 @@ describe('Overrides Resolver Plugin', () => {
             }
         },
         {
-            description: 'Wildcard import throws when no match is found.',
+            description: 'Dollar import throws when no match is found.',
             entryPoint: 'app/routes.jsx',
             // Compiler configuration.
             compilerConfig: {
@@ -129,7 +129,7 @@ describe('Overrides Resolver Plugin', () => {
                     // Virtual Project Files
 
                     // Entry Point
-                    '/virtual/project/app/routes.jsx': `import SamplePage from '*/pages/sample-page'`
+                    '/virtual/project/app/routes.jsx': `import SamplePage from '$/pages/sample-page'`
 
                     // Overrides
                 }
