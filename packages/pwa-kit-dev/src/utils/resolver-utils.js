@@ -94,8 +94,8 @@ export const expand = (extensions = []) =>
  * @returns {String[]} paths - The potential paths to find the module import.
  */
 export const buildCandidatePaths = (importPath, sourcePath, opts = {}) => {
-    // Replace wildcard character as it has done its job getting us to this point.
-    importPath = importPath.replace('*/', '')
+    // Replace $ character as it has done its job getting us to this point.
+    importPath = importPath.replace('$/', '')
 
     const {extensionEntries = [], projectDir = process.cwd()} = opts
     const isSelfReferenceImport = isSelfReference(importPath, sourcePath)
