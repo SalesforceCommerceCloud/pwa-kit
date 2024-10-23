@@ -45,11 +45,27 @@ const LinksList = ({
                 ))}
 
             {links && (
-                <List spacing={5} {...styles.list}>
+                <>
                     {variant === 'horizontal' ? (
-                        <HStack>
+                        <>
+                            <List {...styles.list}>
+                                {links.map((link, i) => (
+                                    <ListItem key={i} {...styles.listItem} sx={styles.listItemSx}>
+                                        <Link
+                                            to={link.href}
+                                            onClick={onLinkClick}
+                                            {...(link.styles ? link.styles : {})}
+                                        >
+                                            {link.text}
+                                        </Link>
+                                    </ListItem>
+                                ))}
+                            </List>
+                        </>
+                    ) : (
+                        <List spacing={5} {...styles.list}>
                             {links.map((link, i) => (
-                                <ListItem key={i} {...styles.listItem} sx={styles.listItemSx}>
+                                <ListItem key={i}>
                                     <Link
                                         to={link.href}
                                         onClick={onLinkClick}
@@ -59,21 +75,9 @@ const LinksList = ({
                                     </Link>
                                 </ListItem>
                             ))}
-                        </HStack>
-                    ) : (
-                        links.map((link, i) => (
-                            <ListItem key={i}>
-                                <Link
-                                    to={link.href}
-                                    onClick={onLinkClick}
-                                    {...(link.styles ? link.styles : {})}
-                                >
-                                    {link.text}
-                                </Link>
-                            </ListItem>
-                        ))
+                        </List>
                     )}
-                </List>
+                </>
             )}
         </Box>
     )
