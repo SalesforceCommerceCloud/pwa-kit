@@ -1,0 +1,38 @@
+{
+    "compilerOptions": {
+        /* Language and Environment */
+        "target": "es2016",
+        "jsx": "react-jsx",
+
+        /* Modules */
+        "module": "esnext",
+        "moduleResolution": "node",
+        "baseUrl": "./",
+        "paths": {
+            "$/*": [
+                "src/*",
+                "node_modules/@salesforce/extension-*"
+            ]
+        },
+
+        /* JavaScript Support */
+        "allowJs": true,
+
+        /* Emit */
+        "declaration": true,
+        "declarationMap": true,
+        "sourceMap": true,
+        "outDir": "./dist",
+
+        /* Interop Constraints */
+        "isolatedModules": true,
+        "esModuleInterop": true,
+        "forceConsistentCasingInFileNames": true,
+
+        /* Type Checking */
+        "strict": true,
+
+        /* Completeness */
+        "skipLibCheck": true
+    }
+}

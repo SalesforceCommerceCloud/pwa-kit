@@ -9,10 +9,10 @@ import React from 'react'
 import loadable from '@loadable/component'
 import {ApplicationExtension, IRouteConfig} from '@salesforce/pwa-kit-react-sdk/ssr/universal/extensibility'
 
-import withRedBorder from '*/components/with-red-border'
+import withRedBorder from '$/components/with-red-border'
 import {ReactExtensionConfig as Config} from './types'
 
-const SamplePage = loadable(() => import('*/pages/sample'))
+const SamplePage = loadable(() => import('$/pages/sample'))
 
 const defaultPath: string = '/sample-page'
 class Sample extends ApplicationExtension<Config> {
