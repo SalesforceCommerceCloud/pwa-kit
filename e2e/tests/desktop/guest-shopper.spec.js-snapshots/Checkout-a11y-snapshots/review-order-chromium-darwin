@@ -1,0 +1,40 @@
+[
+  {
+    "rule": "aria-prohibited-attr",
+    "targets": [
+      [
+        "div[aria-label=\"7.99\"]"
+      ]
+    ]
+  },
+  {
+    "rule": "listitem",
+    "targets": [
+      [
+        ".css-427wse:nth-child(1)"
+      ],
+      [
+        ".css-427wse:nth-child(2)"
+      ],
+      [
+        ".css-427wse:nth-child(3)"
+      ]
+    ]
+  },
+  {
+    "rule": "page-has-heading-one",
+    "targets": [
+      [
+        "html"
+      ]
+    ]
+  },
+  {
+    "rule": "region",
+    "targets": [
+      [
+        ".css-1k2aozt"
+      ]
+    ]
+  }
+]

@@ -1,0 +1,32 @@
+[
+  {
+    "rule": "aria-allowed-attr",
+    "targets": [
+      [
+        "#popover-trigger-\\:Rd95aqeqlbpH1\\:"
+      ]
+    ]
+  },
+  {
+    "rule": "listitem",
+    "targets": [
+      [
+        ".css-427wse:nth-child(1)"
+      ],
+      [
+        ".css-427wse:nth-child(2)"
+      ],
+      [
+        ".css-427wse:nth-child(3)"
+      ]
+    ]
+  },
+  {
+    "rule": "region",
+    "targets": [
+      [
+        "#popover-trigger-\\:Rd95aqeqlbpH1\\: > .css-1igwmid.chakra-stack > .chakra-input__group.css-1y0e7gb[data-group=\"true\"] > .css-va76oz[autocomplete=\"off\"][type=\"search\"]"
+      ]
+    ]
+  }
+]

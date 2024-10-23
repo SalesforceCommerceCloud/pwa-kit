@@ -1,0 +1,26 @@
+[
+  {
+    "rule": "aria-prohibited-attr",
+    "targets": [
+      [
+        "div[aria-label=\"7.99\"]"
+      ]
+    ]
+  },
+  {
+    "rule": "page-has-heading-one",
+    "targets": [
+      [
+        "html"
+      ]
+    ]
+  },
+  {
+    "rule": "region",
+    "targets": [
+      [
+        ".css-1k2aozt"
+      ]
+    ]
+  }
+]
