@@ -183,6 +183,7 @@ const ContactInfo = () => {
                                             defaultMessage="Checkout as Guest"
                                             id="contact_info.button.checkout_as_guest"
                                         />
+                                        
                                     ) : (
                                         <FormattedMessage
                                             defaultMessage="Log In"
@@ -190,6 +191,27 @@ const ContactInfo = () => {
                                         />
                                     )}
                                 </Button>
+                                <Divider />
+                                <Text align="center" fontSize="sm">
+                                    <FormattedMessage
+                                        defaultMessage="Or Login With"
+                                        id="login_form.message.or_login_with"
+                                    />
+                                </Text>
+                                <Stack spacing={4}>
+                                    <Button
+                                        onClick={handlePasswordButton}
+                                        borderColor="gray.500"
+                                        color="blue.600"
+                                        variant="outline"
+                                    >
+                                        <FormattedMessage
+                                            defaultMessage="Password"
+                                            id="login_form.button.password"
+                                        />
+                                    </Button>
+                                    {isSocialEnabled && <SocialLogin idps={idps} />}
+                                </Stack>
                                 <Button variant="outline" onClick={togglePasswordField}>
                                     {!showPasswordField ? (
                                         <FormattedMessage
