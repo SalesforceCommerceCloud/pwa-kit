@@ -36,6 +36,15 @@ module.exports = {
             // This differs from the siteId in commerceAPIConfig for testing purposes
             siteId: 'aaij-MobileFirst',
             isProduction: false
+        },
+        login: {
+            social: {
+                enabled: true,
+            },
+            passwordless: {
+                enabled: true,
+                callbackURI: 'something'
+            }
         }
     },
     externals: [],

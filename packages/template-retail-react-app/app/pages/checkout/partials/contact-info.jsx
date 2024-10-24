@@ -31,11 +31,13 @@ import {
     ToggleCardSummary
 } from '@salesforce/retail-react-app/app/components/toggle-card'
 import Field from '@salesforce/retail-react-app/app/components/field'
+import PasswordlessLogin from '@salesforce/retail-react-app/app/components/passwordless-login'
 import {AuthModal, useAuthModal} from '@salesforce/retail-react-app/app/hooks/use-auth-modal'
 import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
 import {AuthHelpers, useAuthHelper, useShopperBasketsMutation} from '@salesforce/commerce-sdk-react'
+import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 
 const ContactInfo = () => {
     const {formatMessage} = useIntl()
@@ -47,6 +49,7 @@ const ContactInfo = () => {
     const logout = useAuthHelper(AuthHelpers.Logout)
     const updateCustomerForBasket = useShopperBasketsMutation('updateCustomerForBasket')
     const transferBasket = useShopperBasketsMutation('transferBasket')
+    const {passwordless, social} = getConfig().app.login
 
     const {step, STEPS, goToStep, goToNextStep} = useCheckout()
 
