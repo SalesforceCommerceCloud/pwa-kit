@@ -8,7 +8,7 @@
 import React, {useState, useContext} from 'react'
 import {Heading, Accordion, AccordionItem, Box, Button} from '@chakra-ui/react'
 import StoresList from './stores-list'
-import StoreLocatorInput from './store-locator-input'
+import StoreLocatorInput from '*/components/store-locator/store-locator-input'
 
 import {
     DEFAULT_STORE_LOCATOR_COUNTRY,
@@ -164,6 +164,10 @@ const StoreLocatorContent = () => {
                         marginBottom={4}
                     >
                         Load More
+                        {/* intl.formatMessage({
+                id: 'store_locator.description.load_more',
+                defaultMessage: 'Load more'
+            }) */}
                     </Button>
                 </Box>
             ) : (

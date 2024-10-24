@@ -51,16 +51,31 @@
       "extensions": [
         "@salesforce/extension-sample",
         [
-          "@salesforce/extension-sample-with-overrides",
-          {
-            "enabled": false
-          }
-        ],
-        [
           "@salesforce/extension-store-locator",
           {
             "enabled": true,
-            "path": "/store-locator"
+            "path": "/store-locator",
+            "defaultDistance": 100,
+            "defaultDistanceUnit": "km",
+            "defaultPageSize": 10,
+            "defaultCountry": "Germany",
+            "defaultCountryCode": "DE",
+            "supportedCountries": [
+              {
+                "countryCode": "US",
+                "countryName": "United States"
+              },
+              {
+                "countryCode": "DE",
+                "countryName": "Germany"
+              }
+            ]
+          }
+        ],
+        [
+          "@salesforce/extension-sample-with-overrides",
+          {
+            "enabled": true
           }
         ]
       ]
