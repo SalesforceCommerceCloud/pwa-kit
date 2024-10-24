@@ -21,7 +21,7 @@ const links = [
         text: 'Privacy Policy'
     }
 ]
-const horizontalVariantSelector = 'ul > .chakra-stack > li'
+const horizontalVariantSelector = 'ul > li'
 
 const FooterStylesProvider = ({children}) => {
     const styles = useMultiStyleConfig('Footer')
@@ -41,7 +41,7 @@ test('renders LinksList with default arguments', () => {
     expect(screen.getAllByRole('listitem')).toHaveLength(1)
     expect(screen.getByRole('link', {name: links[0].text})).toBeInTheDocument()
     expect(screen.queryByRole('heading')).toBeNull()
-    expect(document.querySelector(horizontalVariantSelector)).toBeNull()
+    expect(screen.queryByTestId('horizontal-list')).toBeNull()
 })
 
 test('renders LinksList with heading', () => {
@@ -55,11 +55,12 @@ test('renders LinksList with heading', () => {
 })
 
 test('renders LinksList with horizontal variant', () => {
-    renderWithProviders(
+    const {container} = renderWithProviders(
         <FooterStylesProvider>
             <LinksList links={links} variant="horizontal" />
         </FooterStylesProvider>
     )
+    screen.logTestingPlaygroundURL()
 
-    expect(document.querySelector(horizontalVariantSelector)).toBeInTheDocument()
+    expect(container.querySelector(horizontalVariantSelector)).toBeInTheDocument()
 })
