@@ -1,3 +1,6 @@
+## v3.1.0-nightly-20241024080204 (Oct 24, 2024)
+## v3.1.0-dev (Oct 24, 2024)
+## v3.8.0-nightly-20241024080204 (Oct 24, 2024)
 ## v3.2.0-dev (Oct 14, 2024)
 
 -   [Server Affinity] Attach dwsid to SCAPI request headers [#2090](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2090)
