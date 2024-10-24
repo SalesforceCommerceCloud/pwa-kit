@@ -234,9 +234,9 @@ const PasswordCard = () => {
     const {data: customer} = useCurrentCustomer()
     const {isRegistered, customerId, email} = customer
 
-    const login = useAuthHelper(AuthHelpers.LoginRegisteredUserB2C)
+    const login = useAuthHelper(AuthHelpers.UpdateCustomerPassword)
 
-    const updateCustomerPassword = useShopperCustomersMutation('updateCustomerPassword')
+    //const updateCustomerPassword = useShopperCustomersMutation('updateCustomerPassword')
     const toast = useToast()
     const [isEditing, setIsEditing] = useState(false)
 
@@ -245,40 +245,25 @@ const PasswordCard = () => {
     const submit = async (values) => {
         try {
             form.clearErrors()
-            updateCustomerPassword.mutate(
-                {
-                    parameters: {customerId},
-                    body: {
-                        password: values.password,
-                        currentPassword: values.currentPassword
-                    }
-                },
-                {
-                    onSuccess: () => {
-                        setIsEditing(false)
-                        toast({
-                            title: formatMessage({
-                                defaultMessage: 'Password updated',
-                                id: 'password_card.info.password_updated'
-                            }),
-                            status: 'success',
-                            isClosable: true
-                        })
-                        login.mutate({
-                            username: email,
-                            password: values.password
-                        })
-                        headingRef?.current?.focus()
-                        form.reset()
-                    },
-                    onError: async (err) => {
-                        const resObj = await err.response.json()
-                        form.setError('root.global', {type: 'manual', message: resObj.detail})
-                    }
-                }
-            )
+            await login.mutateAsync({
+                customer,
+                password: values.password,
+                currentPassword: values.currentPassword
+            })
+            setIsEditing(false)
+            toast({
+                title: formatMessage({
+                    defaultMessage: 'Password updated',
+                    id: 'password_card.info.password_updated'
+                }),
+                status: 'success',
+                isClosable: true
+            })
+            headingRef?.current?.focus()
+            form.reset()
         } catch (error) {
-            form.setError('root.global', {type: 'manual', message: error.message})
+            const resObj = await error.response.json()
+            form.setError('root.global', {type: 'manual', message: resObj.detail})
         }
     }
 
