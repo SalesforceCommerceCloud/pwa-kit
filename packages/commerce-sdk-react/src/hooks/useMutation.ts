@@ -91,7 +91,8 @@ export const useCustomMutation = <TData = unknown, TError = unknown>(
             organizationId: globalConfig.organizationId,
             shortCode: globalConfig.shortCode
         },
-        proxy: globalConfig.proxy
+        proxy: globalConfig.proxy,
+        throwOnBadResponse: true
     }
 
     const mutationOpts = {
@@ -123,8 +124,7 @@ export const useCustomMutation = <TData = unknown, TError = unknown>(
                 },
                 clientConfig: {
                     ...globalClientConfig,
-                    ...(apiOptions.clientConfig || {}),
-                    throwOnBadResponse: true
+                    ...(apiOptions.clientConfig || {})
                 }
             })) as TData
         }

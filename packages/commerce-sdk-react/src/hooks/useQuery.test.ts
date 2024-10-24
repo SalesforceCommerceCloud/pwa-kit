@@ -13,8 +13,9 @@ import {
     waitAndExpectSuccess,
     DEFAULT_TEST_CONFIG
 } from '../test-utils'
-import {useCustomQuery} from './useQuery'
+import {useQuery, useCustomQuery} from './useQuery'
 import Auth from '../auth'
+import {omitNullableParameters} from './utils'
 
 jest.mock('../auth/index.ts', () => {
     const {default: mockAuth} = jest.requireActual('../auth/index.ts')
@@ -171,6 +172,53 @@ describe('useCustomQuery', () => {
         })
 
         await waitAndExpectError(() => result.current)
+        expect(spy).toHaveBeenCalled()
+    })
+})
+
+describe('useQuery', () => {
+    test('clear auth state when request uses invalid session', async () => {
+        const spy = jest.spyOn(Auth.prototype, 'clearUserAuth')
+
+        const mockRes = {
+            title: 'Unauthorized',
+            type: 'https://api.commercecloud.salesforce.com/documentation/error/v1/errors/unauthorized',
+            detail: 'Customer credentials changed after token was issued.'
+        }
+        const apiName = 'hello-world'
+        const endpointPath = 'test-hello-world'
+        const queryKey = `queryKey`
+
+        const options = omitNullableParameters({
+            headers: {},
+            body: {},
+            parameters: {
+                apiVersion: 'v1',
+                endpointPath,
+                apiName
+            },
+            rawResponse: false
+        })
+        const hookConfig = {
+            method: () =>
+                new Promise((resolve, reject) => {
+                    reject({
+                        response: {
+                            json: () => mockRes
+                        }
+                    })
+                }),
+            queryKey: [queryKey],
+            requiredParameters: []
+        }
+
+        const {result} = renderHookWithProviders(() => {
+            // set hookConfig as any since we're just trying to invoke the method and not an actual query
+            return useQuery(options, {}, hookConfig as any)
+        })
+
+        await waitAndExpectError(() => result.current)
+
         expect(spy).toHaveBeenCalled()
     })
 })

@@ -64,7 +64,7 @@ export const useQuery = <Client extends ApiClient, Options extends ApiOptions, D
             onError: (error: any) => {
                 // Typescript does not like having promises inside void functions
                 // so we use void to explicitly tell typescript to ignore it
-                void clearAuthStateOnError(error.response, auth)
+                void clearAuthStateOnError(error, auth)
             }
         }
     }

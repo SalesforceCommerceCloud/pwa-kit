@@ -14,7 +14,7 @@ import {
     waitAndExpectError,
     DEFAULT_TEST_CONFIG
 } from '../test-utils'
-import {useCustomMutation} from './useMutation'
+import {useMutation, useCustomMutation} from './useMutation'
 import Auth from '../auth'
 
 jest.mock('../auth/index.ts', () => {
@@ -177,6 +177,46 @@ describe('useCustomMutation', () => {
         expect(result.current.error).toBeNull()
         act(() => result.current.mutate())
         await waitAndExpectError(() => result.current)
+        expect(spy).toHaveBeenCalled()
+    })
+})
+
+describe('useMutation', () => {
+    test('clear auth state when request uses invalid session', async () => {
+        const spy = jest.spyOn(Auth.prototype, 'clearUserAuth')
+
+        const mockRes = {
+            title: 'Unauthorized',
+            type: 'https://api.commercecloud.salesforce.com/documentation/error/v1/errors/unauthorized',
+            detail: 'Customer credentials changed after token was issued.'
+        }
+
+        const hookConfig = {
+            client: {},
+            method: () =>
+                new Promise((resolve, reject) => {
+                    reject({
+                        response: {
+                            json: () => mockRes
+                        }
+                    })
+                }),
+            getCacheUpdates: () => {}
+        }
+
+        const {result} = renderHookWithProviders(() => {
+            // set hookConfig as any since we're just trying to invoke the method and not an actual query
+            return useMutation(hookConfig as any)
+        })
+
+        act(() => result.current.mutate({}))
+
+        await waitAndExpectError(() => {
+            const a = result.current
+            console.log(a)
+            return a
+        })
+
         expect(spy).toHaveBeenCalled()
     })
 })
