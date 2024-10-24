@@ -16,8 +16,12 @@ module.exports = {
             interpretPlusSignAsSpace: false
         },
         login: {
-            idps: ['Google'],
+            social: {
+                enabled: true,
+                idps: ['Google']
+            },
             passwordless: {
+                enabled: false,
                 callbackURI: ''
             }
         },

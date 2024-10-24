@@ -9,6 +9,8 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import {FormattedMessage} from 'react-intl'
 import {Button, Stack} from '@salesforce/retail-react-app/app/components/shared/ui'
+import {useAuthHelper, AuthHelpers} from '@salesforce/commerce-sdk-react'
+
 
 // Icons
 import {AppleIcon, GoogleIcon} from '@salesforce/retail-react-app/app/components/icons'
@@ -18,7 +20,7 @@ import {AppleIcon, GoogleIcon} from '@salesforce/retail-react-app/app/components
  * @param {array} idps - array of known IDPs to show buttons for
  * @returns
  */
-const SocialLogin = ({idps}) => {
+const SocialLogin = ({isSocialEnabled, idps}) => {
     const IDP_CONFIG = {
         apple: {
             icon: AppleIcon,
@@ -32,7 +34,7 @@ const SocialLogin = ({idps}) => {
     const authorizeIDP = useAuthHelper(AuthHelpers.AuthorizeIDP)
 
     return (
-        idps && (
+        isSocialEnabled && (
             <Stack spacing={4}>
                 {idps.map((name) => {
                     const config = IDP_CONFIG[name.toLowerCase()]
@@ -65,6 +67,7 @@ const SocialLogin = ({idps}) => {
 }
 
 SocialLogin.propTypes = {
+    isSocialEnabled: PropTypes.bool,
     idps: PropTypes.array
 }
 

@@ -22,7 +22,9 @@ import {noop} from '@salesforce/retail-react-app/app/utils/utils'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 
 const LoginForm = ({submitForm, clickForgotPassword = noop, clickCreateAccount = noop, form}) => {
-    const idps = getConfig().app?.login?.idps
+    const loginConfig = getConfig().app?.login
+    const idps = loginConfig.social?.idps
+    const isSocialEnabled = loginConfig.social?.enabled
 
     return (
         <Fragment>
@@ -75,7 +77,7 @@ const LoginForm = ({submitForm, clickForgotPassword = noop, clickCreateAccount =
                             />
                         </Button>
 
-                        <SocialLogin idps={idps} />
+                        <SocialLogin isSocialEnabled={isSocialEnabled} idps={idps} />
 
                         <Stack direction="row" spacing={1} justify="center">
                             <Text fontSize="sm">

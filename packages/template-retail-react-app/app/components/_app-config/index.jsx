@@ -64,7 +64,7 @@ const AppConfig = ({children, locals = {}}) => {
             siteId={locals.site?.id}
             locale={locals.locale?.id}
             currency={locals.locale?.preferredCurrency}
-            redirectURI={`${appOrigin}/social-login-redirect`}
+            redirectURI={`${appOrigin}/social-callback`}
             callbackURI={`${passwordlessLoginConfig.callbackURI}`}
             proxy={`${appOrigin}${commerceApiConfig.proxyPath}`}
             headers={headers}
