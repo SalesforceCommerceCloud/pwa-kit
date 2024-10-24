@@ -1317,7 +1317,7 @@
     "defaultMessage": "Are you sure you want to sign out? You will need to sign back in to proceed with your current order."
   },
   "social_login_redirect.message.authenticating": {
-    "defaultMessage": "Authenticating..."
+    "defaultMessage": "Authenticating"
   },
   "social_login_redirect.message.redirect_link": {
     "defaultMessage": "If you are not automatically redirected, click <link>this link</link> to proceed."
