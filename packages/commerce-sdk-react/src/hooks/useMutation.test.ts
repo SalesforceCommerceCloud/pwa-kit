@@ -210,9 +210,7 @@ describe('useMutation', () => {
         act(() => result.current.mutate({}))
 
         await waitAndExpectError(() => {
-            const a = result.current
-            console.log(a)
-            return a
+            return result.current
         })
 
         expect(spy).toHaveBeenCalled()
