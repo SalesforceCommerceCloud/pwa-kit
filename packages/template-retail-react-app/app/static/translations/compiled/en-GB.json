@@ -3102,7 +3102,7 @@
   "social_login_redirect.message.authenticating": [
     {
       "type": 0,
-      "value": "Authenticating"
+      "value": "Authenticating..."
     }
   ],
   "social_login_redirect.message.redirect_link": [

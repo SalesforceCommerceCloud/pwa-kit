@@ -7,32 +7,9 @@
 
 import React, {useEffect, useState} from 'react'
 import {FormattedMessage} from 'react-intl'
-import {Box, Container, Stack, Text} from '@salesforce/retail-react-app/app/components/shared/ui'
-import {BrandLogo} from '@salesforce/retail-react-app/app/components/icons'
+import {Box, Container, Stack, Text, Spinner} from '@salesforce/retail-react-app/app/components/shared/ui'
 import {useCustomerType} from '@salesforce/commerce-sdk-react'
 import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
-
-const AnimatedEllipsis = () => {
-    const [dots, setDots] = useState('')
-
-    useEffect(() => {
-        const interval = setInterval(() => {
-            setDots(prev => (prev.length < 3 ? prev + '.' : '')) // Append dot if less than 3, reset otherwise
-        }, 500)
-
-        return () => clearInterval(interval) // Cleanup on unmount
-    }, [])
-
-    return (
-        <span>
-            <FormattedMessage
-                id="social_login_redirect.message.authenticating"
-                defaultMessage="Authenticating"
-            />
-            {dots} {/* Render the animated dots separately */}
-        </span>
-    )
-}
 
 const SocialLoginRedirect = () => {
     const navigate = useNavigation()
@@ -57,9 +34,17 @@ const SocialLoginRedirect = () => {
                 borderRadius="base"
             >
                 <Stack justify="center" align="center" spacing={8} marginBottom={8}>
-                    <BrandLogo width="60px" height="auto" />
+                    <Spinner 
+                        opacity={0.85}
+                        color="blue.600"
+                        animationDuration="0.8s"
+                        size="lg" 
+                    />
                     <Text align="center" fontSize="xl" fontWeight="semibold">
-                        <AnimatedEllipsis />
+                        <FormattedMessage
+                            id="social_login_redirect.message.authenticating"
+                            defaultMessage="Authenticating..."
+                        />
                     </Text>
                     <Text align="center" fontSize="m">
                         <FormattedMessage
