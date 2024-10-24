@@ -18,8 +18,31 @@ import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation
 //Login Helpers functions
 import {useAuthHelper, AuthHelpers} from '@salesforce/commerce-sdk-react'
 
+const AnimatedEllipsis = () => {
+    const [dots, setDots] = useState('')
+
+    useEffect(() => {
+        const interval = setInterval(() => {
+            setDots(prev => (prev.length < 3 ? prev + '.' : '')) // Append dot if less than 3, reset otherwise
+        }, 500)
+
+        return () => clearInterval(interval) // Cleanup on unmount
+    }, [])
+
+    return (
+        <span>
+            <FormattedMessage
+                id="social_login_redirect.message.authenticating"
+                defaultMessage="Authenticating"
+            />
+            {dots} {/* Render the animated dots separately */}
+        </span>
+    )
+}
+
 const SocialLoginRedirect = () => {
     const navigate = useNavigation()
+    const {isRegistered} = useCustomerType()
     const [searchParams] = useSearchParams()
     const loginIDPUser = useAuthHelper(AuthHelpers.LoginIDPUser)
     const {data: customer} = useCurrentCustomer()
@@ -44,6 +67,13 @@ const SocialLoginRedirect = () => {
         }
     }, [customer?.isRegistered])
 
+    // If customer is registered push to account page
+    useEffect(() => {
+        if (isRegistered) {
+            navigate('/account')
+        }
+    }, [isRegistered])
+
     return (
         <Box data-testid="login-redirect-page" bg="gray.50" py={[8, 16]}>
             <Container
@@ -58,10 +88,11 @@ const SocialLoginRedirect = () => {
                 <Stack justify="center" align="center" spacing={8} marginBottom={8}>
                     <BrandLogo width="60px" height="auto" />
                     <Text align="center" fontSize="xl" fontWeight="semibold">
-                        <FormattedMessage defaultMessage="Authenticating..." />
+                        <AnimatedEllipsis />
                     </Text>
                     <Text align="center" fontSize="m">
                         <FormattedMessage
+                            id="social_login_redirect.message.redirect_link"
                             defaultMessage="If you are not automatically redirected, click <link>this link</link> to proceed."
                             values={{
                                 link: (chunks) => (

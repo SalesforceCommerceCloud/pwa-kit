@@ -933,6 +933,9 @@
   "login_form.button.sign_in": {
     "defaultMessage": "Sign In"
   },
+  "login_form.button.social": {
+    "defaultMessage": "{message}"
+  },
   "login_form.link.forgot_password": {
     "defaultMessage": "Forgot password?"
   },
@@ -1315,6 +1318,12 @@
   },
   "signout_confirmation_dialog.message.sure_to_sign_out": {
     "defaultMessage": "Are you sure you want to sign out? You will need to sign back in to proceed with your current order."
+  },
+  "social_login_redirect.message.authenticating": {
+    "defaultMessage": "Authenticating"
+  },
+  "social_login_redirect.message.redirect_link": {
+    "defaultMessage": "If you are not automatically redirected, click <link>this link</link> to proceed."
   },
   "store_locator.action.find": {
     "defaultMessage": "Find"
