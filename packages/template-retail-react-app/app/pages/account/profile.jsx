@@ -244,7 +244,6 @@ const PasswordCard = () => {
 
     const submit = async (values) => {
         try {
-            form.clearErrors()
             updateCustomerPassword.mutate(
                 {
                     parameters: {customerId},
@@ -263,21 +262,28 @@ const PasswordCard = () => {
                             status: 'success',
                             isClosable: true
                         })
-                        login.mutate({
+                        // changing the password updates the customer object
+                        // this delay seems to help mitigate changing the access token
+                        // while the customer update is in flight
+                        setTimeout(login.mutate({
                             username: email,
                             password: values.password
-                        })
-                        headingRef?.current?.focus()
+                        }), 500)
+                        // These are here to avoid form rerenders until after the login
+                        form.clearErrors()
                         setIsEditing(false)
+                        headingRef?.current?.focus()
                         form.reset()
                     },
                     onError: async (err) => {
+                        form.clearErrors()
                         const resObj = await err.response.json()
                         form.setError('root.global', {type: 'manual', message: resObj.detail})
                     }
                 }
             )
         } catch (error) {
+            form.clearErrors()
             form.setError('root.global', {type: 'manual', message: error.message})
         }
     }
