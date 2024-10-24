@@ -255,7 +255,6 @@ const PasswordCard = () => {
                 },
                 {
                     onSuccess: () => {
-                        setIsEditing(false)
                         toast({
                             title: formatMessage({
                                 defaultMessage: 'Password updated',
@@ -269,6 +268,7 @@ const PasswordCard = () => {
                             password: values.password
                         })
                         headingRef?.current?.focus()
+                        setIsEditing(false)
                         form.reset()
                     },
                     onError: async (err) => {
