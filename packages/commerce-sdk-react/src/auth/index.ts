@@ -15,7 +15,7 @@ import {jwtDecode, JwtPayload} from 'jwt-decode'
 import {ApiClientConfigParams, Prettify, RemoveStringIndex} from '../hooks/types'
 import {BaseStorage, LocalStorage, CookieStorage, MemoryStorage, StorageType} from './storage'
 import {CustomerType} from '../hooks/useCustomerType'
-import {getParentOrigin, isOriginTrusted, onClient, getDefaultCookieAttributes} from '../utils'
+import {getParentOrigin, isOriginTrusted, onClient, getDefaultCookieAttributes, isAbsoluteUrl} from '../utils'
 import {
     MOBIFY_PATH,
     SLAS_PRIVATE_PROXY_PATH,
@@ -41,6 +41,7 @@ interface AuthConfig extends ApiClientConfigParams {
     silenceWarnings?: boolean
     logger: Logger
     defaultDnt?: boolean
+    callbackURI?: string
     refreshTokenRegisteredCookieTTL?: number
     refreshTokenGuestCookieTTL?: number
 }
@@ -58,6 +59,8 @@ interface SlasJwtPayload extends JwtPayload {
 
 type AuthorizeIDPParams = Parameters<Helpers['authorizeIDP']>[1]
 type LoginIDPUserParams = Parameters<Helpers['loginIDPUser']>[2]
+type AuthorizePasswordlessParams = Parameters<Helpers['authorizePasswordless']>[2]
+type LoginPasswordlessParams = Parameters<Helpers['getPasswordLessAccessToken']>[2]
 type LoginRegisteredUserB2CCredentials = Parameters<Helpers['loginRegisteredUserB2C']>[1]
 
 /**
@@ -206,6 +209,8 @@ class Auth {
     private silenceWarnings: boolean
     private logger: Logger
     private defaultDnt: boolean | undefined
+    private isPrivate: boolean
+    private callbackURI: string
     private refreshTokenRegisteredCookieTTL: number | undefined
     private refreshTokenGuestCookieTTL: number | undefined
     private refreshTrustedAgentHandler:
@@ -216,6 +221,7 @@ class Auth {
         // Special endpoint for injecting SLAS private client secret.
         const baseUrl = config.proxy.split(MOBIFY_PATH)[0]
         const privateClientEndpoint = `${baseUrl}${SLAS_PRIVATE_PROXY_PATH}`
+        const callbackURI = config.callbackURI
 
         this.client = new ShopperLogin({
             proxy: config.enablePWAKitPrivateClient ? privateClientEndpoint : config.proxy,
@@ -295,6 +301,9 @@ class Auth {
         this.silenceWarnings = config.silenceWarnings || false
 
         this.isPrivate = !!this.clientSecret
+
+        this.callbackURI = callbackURI ? isAbsoluteUrl(callbackURI) 
+        ? callbackURI : `${baseUrl}${callbackURI}` : ''
     }
 
     get(name: AuthDataKeys) {
@@ -1013,6 +1022,49 @@ class Auth {
         this.handleTokenResponse(token, isGuest)
         // Delete the code verifier once the user has logged in
         this.delete('code_verifier')
+        if (onClient()) {
+            void this.clearECOMSession()
+        }
+        return token
+    }
+
+    /**
+     * A wrapper method for commerce-sdk-isomorphic helper: authorizePasswordless.
+     */
+    async authorizePasswordless(parameters: AuthorizePasswordlessParams) {
+        const userid = parameters.userid
+        const callbackURI = this.callbackURI
+        const mode = callbackURI ? 'callback' : 'sms'
+
+        await helpers.authorizePasswordless(
+            this.client,
+            {
+                clientSecret: this.clientSecret
+            },
+            {
+                ...(callbackURI && {callbackURI: callbackURI}),
+                userid,
+                mode: mode
+            }
+        )
+    }
+
+    /**
+     * A wrapper method for commerce-sdk-isomorphic helper: getPasswordLessAccessToken.
+     */
+    async getPasswordLessAccessToken(parameters: LoginPasswordlessParams) {
+        const pwdlessLoginToken = parameters.pwdlessLoginToken
+        const token = await helpers.getPasswordLessAccessToken(
+            this.client,
+            {
+                clientSecret: this.clientSecret
+            },
+            {
+                pwdlessLoginToken
+            }
+        )
+        const isGuest = false
+        this.handleTokenResponse(token, isGuest)
         if (onClient()) {
             void this.clearECOMSession()
         }

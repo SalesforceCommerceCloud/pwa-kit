@@ -40,7 +40,9 @@ jest.mock('commerce-sdk-isomorphic', () => {
             logout: jest.fn().mockResolvedValue(''),
             handleTokenResponse: jest.fn().mockResolvedValue(''),
             loginIDPUser: jest.fn().mockResolvedValue(''),
-            authorizeIDP: jest.fn().mockResolvedValue('')
+            authorizeIDP: jest.fn().mockResolvedValue(''),
+            authorizePasswordless: jest.fn().mockResolvedValue(''),
+            getPasswordLessAccessToken: jest.fn().mockResolvedValue('')
         }
     }
 })
@@ -50,7 +52,8 @@ jest.mock('../utils', () => ({
     onClient: () => true,
     getParentOrigin: jest.fn().mockResolvedValue(''),
     isOriginTrusted: () => false,
-    getDefaultCookieAttributes: () => {}
+    getDefaultCookieAttributes: () => {},
+    isAbsoluteUrl: () => true,
 }))
 
 /** The auth data we store has a slightly different shape than what we use. */
@@ -63,12 +66,23 @@ const config = {
     siteId: 'siteId',
     proxy: 'proxy',
     redirectURI: 'redirectURI',
-    logger: console
+    logger: console,
+    callbackURI: 'callbackURI'
 }
 
 const configSLASPrivate = {
     ...config,
     enablePWAKitPrivateClient: true
+}
+
+const configPasswordlessSms = {
+    clientId: 'clientId',
+    organizationId: 'organizationId',
+    shortCode: 'shortCode',
+    siteId: 'siteId',
+    proxy: 'proxy',
+    redirectURI: 'redirectURI',
+    logger: console,
 }
 
 const FAKE_SLAS_EXPIRY = DEFAULT_SLAS_REFRESH_TOKEN_REGISTERED_TTL - 1
@@ -608,6 +622,30 @@ describe('Auth', () => {
         expect(helpers.authorizeIDP).toHaveBeenCalled()
         const privateClient = (helpers.authorizeIDP as jest.Mock).mock.calls[0][2]
         expect(privateClient).toBe(true)
+    })
+
+    test('authorizePasswordless calls isomorphic authorizePasswordless', async () => {
+        const auth = new Auth(config)
+        await auth.authorizePasswordless({callbackURI: 'callbackURI', userid: 'userid', mode: 'callback'})
+        expect(helpers.authorizePasswordless).toHaveBeenCalled()
+        const functionArg = (helpers.authorizePasswordless as jest.Mock).mock.calls[0][2]
+        expect(functionArg).toMatchObject({callbackURI: 'callbackURI', userid: 'userid', mode: 'callback'})
+    })
+
+    test('authorizePasswordless sets mode to sms as configured', async () => {
+        const auth = new Auth(configPasswordlessSms)
+        await auth.authorizePasswordless({userid: 'userid', mode: 'sms'})
+        expect(helpers.authorizePasswordless).toHaveBeenCalled()
+        const functionArg = (helpers.authorizePasswordless as jest.Mock).mock.calls[0][2]
+        expect(functionArg).toMatchObject({userid: 'userid', mode: 'sms'})
+    })
+
+    test('getPasswordLessAccessToken calls isomorphic getPasswordLessAccessToken', async () => {
+        const auth = new Auth(config)
+        await auth.getPasswordLessAccessToken({pwdlessLoginToken: '12345678'})
+        expect(helpers.getPasswordLessAccessToken).toHaveBeenCalled()
+        const functionArg = (helpers.getPasswordLessAccessToken as jest.Mock).mock.calls[0][2]
+        expect(functionArg).toMatchObject({pwdlessLoginToken: '12345678'})
     })
 
     test('logout as registered user calls isomorphic logout', async () => {
