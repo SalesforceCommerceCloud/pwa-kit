@@ -35,6 +35,7 @@ const Checkout = loadable(() => import('./pages/checkout'), {
     fallback
 })
 const CheckoutConfirmation = loadable(() => import('./pages/checkout/confirmation'), {fallback})
+const SocialLoginRedirect = loadable(() => import('./pages/social-login-redirect'), {fallback})
 const LoginRedirect = loadable(() => import('./pages/login-redirect'), {fallback})
 const ProductDetail = loadable(() => import('./pages/product-detail'), {fallback})
 const ProductList = loadable(() => import('./pages/product-list'), {
@@ -85,6 +86,11 @@ export const routes = [
     {
         path: '/callback',
         component: LoginRedirect,
+        exact: true
+    },
+    {
+        path: '/social-callback',
+        component: SocialLoginRedirect,
         exact: true
     },
     {
