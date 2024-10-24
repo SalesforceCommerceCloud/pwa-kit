@@ -38,6 +38,9 @@ export interface CommerceApiProviderProps extends ApiClientConfigParams {
     silenceWarnings?: boolean
     logger?: Logger
     defaultDnt?: boolean
+    callbackURI?: string
+    refreshTokenRegisteredCookieTTL?: number
+    refreshTokenGuestCookieTTL?: number
 }
 
 /**
@@ -115,7 +118,10 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
         clientSecret,
         silenceWarnings,
         logger,
-        defaultDnt
+        defaultDnt,
+        callbackURI,
+        refreshTokenRegisteredCookieTTL,
+        refreshTokenGuestCookieTTL
     } = props
 
     // Set the logger based on provided configuration, or default to the console object if no logger is provided
@@ -183,7 +189,10 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
             clientSecret,
             silenceWarnings,
             logger: configLogger,
-            defaultDnt
+            defaultDnt,
+            callbackURI,
+            refreshTokenRegisteredCookieTTL,
+            refreshTokenGuestCookieTTL
         })
     }, [
         clientId,
@@ -197,7 +206,9 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
         enablePWAKitPrivateClient,
         clientSecret,
         silenceWarnings,
-        configLogger
+        configLogger,
+        refreshTokenRegisteredCookieTTL,
+        refreshTokenGuestCookieTTL
     ])
 
     // Initialize the session
@@ -218,7 +229,10 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
                 currency,
                 silenceWarnings,
                 logger: configLogger,
-                defaultDnt
+                defaultDnt,
+                callbackURI,
+                refreshTokenRegisteredCookieTTL,
+                refreshTokenGuestCookieTTL
             }}
         >
             <CommerceApiContext.Provider value={apiClients}>
