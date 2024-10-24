@@ -148,8 +148,6 @@ describe('useCustomMutation', () => {
         await waitAndExpectSuccess(() => result.current)
         expect(result.current.data).toHaveProperty('test')
     })
-    // The below test does not work currently because HTTP 400 and above are still flagged as a
-    // successful mutation. See https://github.com/TanStack/query/discussions/1385
     test('clear auth state when request uses invalid session', async () => {
         const spy = jest.spyOn(Auth.prototype, 'clearUserAuth')
         const mockRes = {
