@@ -265,10 +265,13 @@ const PasswordCard = () => {
                         // changing the password updates the customer object
                         // this delay seems to help mitigate changing the access token
                         // while the customer update is in flight
-                        setTimeout(login.mutate({
-                            username: email,
-                            password: values.password
-                        }), 500)
+                        setTimeout(
+                            login.mutate({
+                                username: email,
+                                password: values.password
+                            }),
+                            500
+                        )
                         // These are here to avoid form rerenders until after the login
                         form.clearErrors()
                         setIsEditing(false)
