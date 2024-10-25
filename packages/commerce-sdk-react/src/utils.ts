@@ -7,6 +7,7 @@
 
 import Cookies, {CookieAttributes} from 'js-cookie'
 import {IFRAME_HOST_ALLOW_LIST} from './constant'
+import Auth from './auth'
 
 /** Utility to determine if you are on the browser (client) or not. */
 export const onClient = (): boolean => typeof window !== 'undefined'
@@ -109,5 +110,15 @@ export function detectCookiesAvailable(options?: CookieAttributes) {
         return success
     } catch {
         return false
+    }
+}
+
+/** Utility for clearing auth state if a certain error saying the session credentials are invalid is received.
+ *  @private
+ */
+export async function clearAuthStateOnError(error: any, auth: Auth) {
+    const response = await error?.response?.json()
+    if (response?.detail === 'Customer credentials changed after token was issued.') {
+        auth.clearUserAuth()
     }
 }

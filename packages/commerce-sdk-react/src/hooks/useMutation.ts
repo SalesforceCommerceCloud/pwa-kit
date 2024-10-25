@@ -24,6 +24,7 @@ import {
 import {useAuthorizationHeader} from './useAuthorizationHeader'
 import useCustomerId from './useCustomerId'
 import {mergeOptions, updateCache} from './utils'
+import {clearAuthStateOnError} from '../utils'
 
 /**
  * Helper for mutation hooks, contains most of the logic in order to keep individual hooks small.
@@ -39,6 +40,7 @@ export const useMutation = <
     method: ApiMethod<Options, Data>
     getCacheUpdates: CacheUpdateGetter<MergedOptions<Client, Options>, Data>
 }) => {
+    const auth = useAuthContext()
     const queryClient = useQueryClient()
     const customerId = useCustomerId()
     const authenticatedMethod = useAuthorizationHeader(hookConfig.method)
@@ -50,6 +52,11 @@ export const useMutation = <
             const netOptions = mergeOptions(hookConfig.client, options)
             const cacheUpdates = hookConfig.getCacheUpdates(customerId, netOptions, data)
             updateCache(queryClient, cacheUpdates, data)
+        },
+        onError(error: any) {
+            // Typescript does not like having promises inside void functions
+            // so we use void to explicitly tell typescript to ignore it
+            void clearAuthStateOnError(error, auth)
         }
     })
 }
@@ -84,7 +91,17 @@ export const useCustomMutation = <TData = unknown, TError = unknown>(
             organizationId: globalConfig.organizationId,
             shortCode: globalConfig.shortCode
         },
-        proxy: globalConfig.proxy
+        proxy: globalConfig.proxy,
+        throwOnBadResponse: true
+    }
+
+    const mutationOpts = {
+        ...mutationOptions,
+        onError(error: any) {
+            // Typescript does not like having promises inside void functions
+            // so we use void to explicitly tell typescript to ignore it
+            void clearAuthStateOnError(error, auth)
+        }
     }
 
     const createMutationFnWithAuth = (): MutationFunction<TData, TMutationVariables> => {
@@ -115,6 +132,6 @@ export const useCustomMutation = <TData = unknown, TError = unknown>(
 
     return useReactQueryMutation<TData, TError, TMutationVariables, unknown>(
         createMutationFnWithAuth(),
-        mutationOptions
+        mutationOpts
     )
 }

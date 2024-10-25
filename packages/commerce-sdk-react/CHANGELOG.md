@@ -5,6 +5,7 @@
 -   Add useDNT hook to commerce-sdk-react and put DNT in auth [#2067](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2067/files)
 -   Add Trusted Agent on Behalf of (TAOB) support for SLAS APIs [#2077](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2077)
 -   Add optional `refreshTokenRegisteredCookieTTL` and `refreshTokenGuestCookieTTL` to Commerce API config [#2077](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2077)
+-   Clear auth state if session has been invalidated by a password change [#2092](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2092)
 
 ## v3.1.0-dev (Aug 08, 2024)
 

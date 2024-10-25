@@ -7,7 +7,7 @@
 import Auth, {AuthData} from './'
 import {waitFor} from '@testing-library/react'
 import jwt from 'jsonwebtoken'
-import {helpers} from 'commerce-sdk-isomorphic'
+import {helpers, ShopperCustomersTypes} from 'commerce-sdk-isomorphic'
 import * as utils from '../utils'
 import {SLAS_SECRET_PLACEHOLDER} from '../constant'
 import {ShopperLoginTypes} from 'commerce-sdk-isomorphic'
@@ -15,6 +15,12 @@ import {
     DEFAULT_SLAS_REFRESH_TOKEN_REGISTERED_TTL,
     DEFAULT_SLAS_REFRESH_TOKEN_GUEST_TTL
 } from './index'
+import {RequireKeys} from '../hooks/types'
+
+const baseCustomer: RequireKeys<ShopperCustomersTypes.Customer, 'login'> = {
+    customerId: 'customerId',
+    login: 'test@test.com'
+}
 
 // Use memory storage for all our storage types.
 jest.mock('./storage', () => {
@@ -39,7 +45,12 @@ jest.mock('commerce-sdk-isomorphic', () => {
             loginRegisteredUserB2C: jest.fn().mockResolvedValue(''),
             logout: jest.fn().mockResolvedValue(''),
             handleTokenResponse: jest.fn().mockResolvedValue('')
-        }
+        },
+        ShopperCustomers: jest.fn().mockImplementation(() => {
+            return {
+                updateCustomerPassword: () => {}
+            }
+        })
     }
 })
 
@@ -589,6 +600,15 @@ describe('Auth', () => {
         await auth.logout()
         expect(helpers.logout).not.toHaveBeenCalled()
         expect(helpers.loginGuestUser).toHaveBeenCalled()
+    })
+    test('updateCustomerPassword calls registered login', async () => {
+        const auth = new Auth(config)
+        await auth.updateCustomerPassword({
+            customer: baseCustomer,
+            password: 'test123',
+            currentPassword: 'test12'
+        })
+        expect(helpers.loginRegisteredUserB2C).toHaveBeenCalled()
     })
     test('PWA private client mode takes priority', async () => {
         const auth = new Auth({...configSLASPrivate, clientSecret: 'someSecret'})
