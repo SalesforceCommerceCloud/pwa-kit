@@ -232,11 +232,9 @@ const PasswordCard = () => {
     const {formatMessage} = useIntl()
     const headingRef = useRef(null)
     const {data: customer} = useCurrentCustomer()
-    const {isRegistered, customerId, email} = customer
+    const {isRegistered} = customer
 
-    const login = useAuthHelper(AuthHelpers.UpdateCustomerPassword)
-
-    //const updateCustomerPassword = useShopperCustomersMutation('updateCustomerPassword')
+    const updateCustomerPassword = useAuthHelper(AuthHelpers.UpdateCustomerPassword)
     const toast = useToast()
     const [isEditing, setIsEditing] = useState(false)
 
@@ -245,7 +243,7 @@ const PasswordCard = () => {
     const submit = async (values) => {
         try {
             form.clearErrors()
-            await login.mutateAsync({
+            await updateCustomerPassword.mutateAsync({
                 customer,
                 password: values.password,
                 currentPassword: values.currentPassword
