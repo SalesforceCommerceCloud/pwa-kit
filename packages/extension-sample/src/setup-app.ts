@@ -13,7 +13,7 @@ import {RouteProps} from 'react-router-dom'
 import {ApplicationExtension} from '@salesforce/pwa-kit-extension-sdk/react'
 
 // Local Imports
-import withRedBorder from '$/components/with-red-border'
+import withRedBorder from 'override!/components/with-red-border'
 import {Config} from './types'
 
 // BUG: Laodable isn't working here --> https://gus.lightning.force.com/lightning/_classic/%2Fa07EE00001o9ELVYA2

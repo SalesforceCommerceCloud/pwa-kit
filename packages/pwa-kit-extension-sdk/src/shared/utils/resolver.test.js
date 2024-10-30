@@ -12,10 +12,10 @@ const PROJECT_PATH_GOOD = '/home/user/testproject'
 const PROJECT_PATH_BAD = '/home/user/test.project'
 
 describe('resolverUtils', () => {
-    describe('"isSelfReference" util returns whether or not a dollar-prefixed import is for the same module it is coming from.', () => {
+    describe('"isSelfReference" util returns whether or not a overridable import is for the same module it is coming from.', () => {
         ;[
             {
-                name: 'Importing the dollar-prefixed routes from the routes file',
+                name: 'Importing the overridable routes from the routes file',
                 importPath: 'app/routes',
                 sourcePath: path.join(
                     PROJECT_PATH_GOOD,
@@ -30,7 +30,7 @@ describe('resolverUtils', () => {
                 expected: true
             },
             {
-                name: 'Importing the dollar-prefixed routes from the routes file where project path has dots in it',
+                name: 'Importing the overridable routes from the routes file where project path has dots in it',
                 importPath: 'app/routes',
                 sourcePath: path.join(
                     PROJECT_PATH_BAD,
@@ -105,7 +105,7 @@ describe('resolverUtils', () => {
     describe('"buildCandidatePaths" util returns array of paths used to module resolving', () => {
         ;[
             {
-                name: 'Correct paths are returned when dollar-prefixed import is used in an application extension',
+                name: 'Correct paths are returned when overridable import is used in an application extension',
                 importPath: '$/pages/sample',
                 sourcePath: path.join(
                     process.cwd(),
@@ -174,7 +174,7 @@ describe('resolverUtils', () => {
             },
             {
                 name: 'Correct paths are returned when "some" extensions are disabled',
-                importPath: '$/pages/sample',
+                importPath: 'override!/pages/sample',
                 sourcePath: path.join(
                     process.cwd(),
                     'node_modules',
@@ -225,7 +225,7 @@ describe('resolverUtils', () => {
             },
             {
                 name: 'Correct paths are returned when "all" extensions are disabled',
-                importPath: '$/pages/sample',
+                importPath: 'override!/pages/sample',
                 sourcePath: path.join(
                     process.cwd(),
                     'node_modules',
@@ -246,7 +246,7 @@ describe('resolverUtils', () => {
             },
             {
                 name: 'If sourcePath implies a self-reference, only the paths before its first mention are included',
-                importPath: '$/app/routes',
+                importPath: 'override!/app/routes',
                 sourcePath: path.join(
                     process.cwd(),
                     'node_modules',
