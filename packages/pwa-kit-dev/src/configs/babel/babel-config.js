@@ -4,6 +4,11 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
+
+// PWA-Kit Imports
+import {getApplicationExtensionInfo} from '@salesforce/pwa-kit-extension-sdk/shared/utils'
+import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
+
 const config = {
     sourceType: 'unambiguous',
     presets: [
@@ -19,6 +24,13 @@ const config = {
         require('@babel/preset-react')
     ],
     plugins: [
+        [
+            require('@salesforce/pwa-kit-extension-sdk/configs/babel/plugin-application-extensions'),
+            {
+                target: 'node',
+                ...getApplicationExtensionInfo(getConfig())
+            }
+        ],
         require('@babel/plugin-transform-async-to-generator'),
         require('@babel/plugin-proposal-object-rest-spread'),
         require('@babel/plugin-transform-object-assign'),
@@ -39,7 +51,7 @@ const config = {
             }
         ],
         require('@babel/plugin-transform-async-generator-functions')
-    ],
+    ].filter(Boolean),
     env: {
         test: {
             presets: [require('@babel/preset-env'), require('@babel/preset-react')],
@@ -47,5 +59,4 @@ const config = {
         }
     }
 }
-
 export default config

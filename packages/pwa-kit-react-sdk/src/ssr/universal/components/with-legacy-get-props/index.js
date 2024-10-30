@@ -26,9 +26,8 @@ export const withLegacyGetProps = (Wrapped) => {
          */
         static async doInitAppState({App, match, route, req, res, location}) {
             const {params} = match
-
             const components = [App, route.component]
-            const promises = components.map((c, i) => {
+            const promises = components.map((c) => {
                 // getTemplateName is a promise and it's intentially not awaited here
                 // to avoid blocking the execution of the getProps function to maximize performance
                 // getTemplateName should be very fast, under 0.2ms

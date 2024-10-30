@@ -1,0 +1,89 @@
+{
+  "name": "@salesforce/pwa-kit-extension-sdk",
+  "version": "4.0.0-dev",
+  "description": "",
+  "homepage": "https://github.com/SalesforceCommerceCloud/pwa-kit#readme",
+  "bugs": {
+    "url": "https://github.com/SalesforceCommerceCloud/pwa-kit/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SalesforceCommerceCloud/pwa-kit.git"
+  },
+  "license": "SEE LICENSE IN LICENSE",
+  "author": "cc-pwa-kit@salesforce.com",
+  "files": [
+    "CHANGELOG.md",
+    "LICENSE",
+    "configs",
+    "core",
+    "express",
+    "react",
+    "shared",
+    "types",
+    "utils"
+  ],
+  "publishConfig": {
+    "directory": "dist"
+  },
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build-old": "tsc",
+    "build": "cross-env NODE_ENV=production internal-lib-build build && tsc",
+    "prepare": "npm run build",
+    "lint": "npm run lint:js",
+    "lint:fix": "npm run lint:js -- --fix",
+    "lint:js": "pwa-kit-dev lint \"**/*.{js,jsx,ts,tsx}\"",
+    "test": "pwa-kit-dev test"
+  },
+  "dependencies": {
+    "cross-env": "^5.2.1",
+    "dedent": "^1.5.3",
+    "fs-extra": "^11.2.0",
+    "handlebars": "^4.7.8",
+    "hoist-non-react-statics": "^3.3.2",
+    "resolve": "^1.22.8"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.21.3",
+    "@babel/parser": "^7.21.3",
+    "@babel/preset-env": "^7.20.2",
+    "@loadable/component": "^5.15.3",
+    "@salesforce/pwa-kit-dev": "4.0.0-dev",
+    "@testing-library/jest-dom": "^5.16.5",
+    "@testing-library/react": "^14.0.0",
+    "@types/babel__core": "^7.20.5",
+    "@types/express": "^5.0.0",
+    "@types/fs-extra": "^11.0.4",
+    "@types/hoist-non-react-statics": "~3.3.5",
+    "@types/jest": "29.5.14",
+    "@types/mocha": "^10.0.9",
+    "@types/node": "^20",
+    "@types/react-router-dom": "^5.3.3",
+    "@types/resolve": "^1.20.6",
+    "@types/supertest": "^6.0.2",
+    "@types/webpack": "^5.28.5",
+    "express": "^4.19.2",
+    "internal-lib-build": "4.0.0-dev",
+    "memfs": "^4.14.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-router-dom": "^5.3.4",
+    "supertest": "^7.0.0",
+    "type-fest": "^4.26.1"
+  },
+  "peerDependencies": {
+    "@babel/core": "^7.21.3",
+    "@babel/parser": "^7.21.3",
+    "@babel/preset-env": "^7.20.2",
+    "@loadable/component": "^5.15.3",
+    "express": "^4.19.2",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-router-dom": "^5.3.4"
+  },
+  "engines": {
+    "node": "^16.11.0 || ^18.0.0 || ^20.0.0",
+    "npm": "^8.0.0 || ^9.0.0 || ^10.0.0"
+  }
+}

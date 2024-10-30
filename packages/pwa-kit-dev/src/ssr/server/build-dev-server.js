@@ -19,7 +19,6 @@ import open from 'open'
 import logger from '../../utils/logger-instance'
 import requireFromString from 'require-from-string'
 import {RemoteServerFactory} from '@salesforce/pwa-kit-runtime/ssr/server/build-remote-server'
-import {ApplicationExtension} from '@salesforce/pwa-kit-runtime/ssr/server/extensibility'
 
 import {proxyConfigs} from '@salesforce/pwa-kit-runtime/utils/ssr-shared'
 import {bundleBasePath} from '@salesforce/pwa-kit-runtime/utils/ssr-namespace-paths'
@@ -32,7 +31,6 @@ import {
 
 import {randomUUID} from 'crypto'
 import chalk from 'chalk'
-import tsx from 'tsx/cjs/api'
 
 const CONTENT_TYPE = 'content-type'
 const CONTENT_ENCODING = 'content-encoding'
@@ -129,108 +127,6 @@ export const DevServerMixin = {
             app.use(config.proxyPath, config.proxy)
             app.use(config.cachingPath, config.cachingProxy)
         })
-    },
-
-    /**
-     * @private
-     */
-    _setupExtensions(app, options) {
-        logger.info('Setting up extensions...')
-
-        // Normalize the extensions list for easier parsing
-        const extensions = (options.mobify?.app?.extensions || [])
-            .map((extension) => {
-                return {
-                    // TODO: later we'll consider reusing a util function or perhaps eliminate this
-                    packageName: Array.isArray(extension) ? extension[0] : extension,
-                    config: Array.isArray(extension)
-                        ? {enabled: true, ...extension[1]}
-                        : {enabled: true}
-                }
-            })
-            .filter((extension) => extension.config.enabled)
-
-        logger.info('Extensions to load', {
-            namespace: 'DevServerMixin._setupExtensions',
-            additionalProperties: {extensions: extensions}
-        })
-
-        app.__extensions = extensions
-
-        extensions.forEach((extension) => {
-            logger.info(`Loading extension: ${extension.packageName}`)
-
-            const setupServerFilePathBase = path.join(
-                options.projectDir,
-                'node_modules',
-                extension.packageName,
-                'src',
-                'setup-server'
-            )
-            let filePath
-            if (fs.existsSync(`${setupServerFilePathBase}.ts`)) {
-                filePath = `${setupServerFilePathBase}.ts`
-            } else if (fs.existsSync(`${setupServerFilePathBase}.js`)) {
-                filePath = `${setupServerFilePathBase}.js`
-            } else {
-                logger.warn(`No setup-server file found for ${extension.packageName}. Skipping.`)
-                return
-            }
-
-            let ExtensionClass
-            try {
-                ExtensionClass = tsx.require(filePath, __filename).default
-            } catch (e) {
-                logger.error(`Error loading extension ${extension.packageName}:`, {
-                    namespace: 'DevServerMixin._setupExtensions',
-                    additionalProperties: {error: e}
-                })
-                return
-            }
-
-            // Ensure that the default export is a class that extends abstract class "ApplicationExtension".
-            const isPrototype = Object.prototype.isPrototypeOf.call(
-                ApplicationExtension.prototype,
-                ExtensionClass?.prototype
-            )
-
-            if (!isPrototype) {
-                logger.error(
-                    `'${extension.packageName}' is not a valid PWA-Kit Application Extension, please ensure you are exporting a class of type 'ApplicationExtension'. Skipping.`,
-                    {
-                        namespace: 'DevServerMixin._setupExtensions'
-                    }
-                )
-                return
-            }
-
-            let extensionInstance
-            try {
-                logger.info(`Instantiating extension class for ${extension.packageName}...`)
-                extensionInstance = new ExtensionClass(extension.config)
-                logger.info(`Successfully instantiated extension ${extension.packageName}.`)
-            } catch (e) {
-                logger.error(`Error instantiating extension ${extension.packageName}:`, {
-                    namespace: 'DevServerMixin._setupExtensions',
-                    additionalProperties: {error: e}
-                })
-                return
-            }
-
-            // Extend the app using the provided method
-            try {
-                logger.info(`Extending app using extension ${extension.packageName}...`)
-                app = extensionInstance.extendApp(app)
-                logger.info(`Successfully extended app with ${extension.packageName}.`)
-            } catch (e) {
-                logger.error(`Error setting extension ${extension.packageName}:`, {
-                    namespace: 'DevServerMixin._setupExtensions',
-                    additionalProperties: {error: e}
-                })
-            }
-        })
-
-        logger.info('Finished setting up extensions.')
     },
 
     /**

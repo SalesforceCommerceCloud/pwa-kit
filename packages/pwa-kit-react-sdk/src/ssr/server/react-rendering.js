@@ -21,16 +21,17 @@ import sprite from 'svg-sprite-loader/runtime/sprite.build'
 import {isRemote} from '@salesforce/pwa-kit-runtime/utils/ssr-server'
 import {proxyConfigs} from '@salesforce/pwa-kit-runtime/utils/ssr-shared'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
+import {
+    getApplicationExtensions,
+    withApplicationExtensions
+} from '@salesforce/pwa-kit-extension-sdk/react'
 
 import {getAssetUrl} from '../universal/utils'
-import {applyAppExtensions} from '../universal/extensibility/utils'
 import {ServerContext, CorrelationIdProvider} from '../universal/contexts'
 
 import App from '../universal/components/_app'
 import Document from '../universal/components/_document'
-import {getExtensions} from '../universal/extensibility/extensions'
 import Throw404 from '../universal/components/throw-404'
-
 import {getAppConfig} from '../universal/compatibility'
 import Switch from '../universal/components/switch'
 import {getRoutes, routeComponent} from '../universal/components/route-component'
@@ -81,7 +82,7 @@ const logAndFormatError = (err) => {
 // as best as we can.
 export const getLocationSearch = (req, opts = {}) => {
     const {interpretPlusSignAsSpace = false} = opts
-    const [_, search] = req.originalUrl.split('?')
+    const [, search] = req.originalUrl.split('?')
     const params = new URLSearchParams(search)
 
     const newParams = new URLSearchParams()
@@ -127,17 +128,16 @@ export const render = async (req, res, next) => {
     const AppConfig = getAppConfig()
     // Get the application config which should have been stored at this point.
     const config = getConfig()
-    const extensions = getExtensions()
 
     AppConfig.restore(res.locals)
 
     // Use locals to thread the application extensions through the rendering pipeline.
-    res.locals.appExtensions = extensions
+    const applicationExtensions = await getApplicationExtensions()
 
-    let WrappedApp = routeComponent(App, false, res.locals)
-
-    // Initialize all the react app extensions.
-    WrappedApp = applyAppExtensions(WrappedApp, extensions)
+    const WrappedApp = withApplicationExtensions(routeComponent(App, false, res.locals), {
+        applicationExtensions,
+        locals: res.locals
+    })
 
     const routes = getRoutes(res.locals)
 

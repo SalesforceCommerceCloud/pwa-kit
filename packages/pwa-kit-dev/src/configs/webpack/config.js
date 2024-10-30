@@ -20,16 +20,19 @@ import ReactRefreshWebpackPlugin from '@pmmmwh/react-refresh-webpack-plugin'
 import SpeedMeasurePlugin from 'speed-measure-webpack-plugin'
 import WebpackNotifierPlugin from 'webpack-notifier'
 
+// PWA-Kit Plugins
+import {OverridesResolverPlugin} from '@salesforce/pwa-kit-extension-sdk/configs/webpack'
+
 // Local Plugins
-import OverridesResolverPlugin from './plugins/overrides-resolver-plugin'
 import {sdkReplacementPlugin} from './plugins'
 
 // Constants
 import {CLIENT, SERVER, CLIENT_OPTIONAL, SSR, REQUEST_PROCESSOR} from './config-names'
 
 // Utilities
+import {ruleForApplicationExtensibility} from '@salesforce/pwa-kit-extension-sdk/configs/webpack'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
-import {buildAliases, getExtensionNames, nameRegex} from '../../utils/extensibility-utils'
+import {buildAliases, nameRegex} from '@salesforce/pwa-kit-extension-sdk/shared/utils'
 
 const projectDir = process.cwd()
 const pkg = fse.readJsonSync(resolve(projectDir, 'package.json'))
@@ -140,6 +143,7 @@ const baseConfig = (target) => {
     if (!['web', 'node'].includes(target)) {
         throw Error(`The value "${target}" is not a supported webpack target`)
     }
+
     class Builder {
         constructor() {
             this.config = {
@@ -190,6 +194,11 @@ const baseConfig = (target) => {
                     ],
                     extensions: SUPPORTED_FILE_EXTENSIONS,
                     alias: {
+                        ...Object.assign(
+                            ...DEPS_TO_DEDUPE.map((dep) => ({
+                                [dep]: findDepInStack(dep)
+                            }))
+                        ),
                         // TODO: This alias is temporary. When we investigate turning the retail template into an application extension
                         // we'll have to decide if we want to continue using an alias, or change back to using relative paths.
                         '@salesforce/retail-react-app': projectDir,
@@ -200,16 +209,10 @@ const baseConfig = (target) => {
                             Object.keys(pkg?.devDependencies || {}).filter((dependency) =>
                                 dependency.match(nameRegex)
                             )
-                        ),
-                        ...Object.assign(
-                            ...DEPS_TO_DEDUPE.map((dep) => ({
-                                [dep]: findDepInStack(dep)
-                            }))
                         )
                     },
                     ...(target === 'web' ? {fallback: {crypto: false}} : {})
                 },
-
                 plugins: [
                     new webpack.DefinePlugin({
                         DEBUG,
@@ -251,13 +254,18 @@ const baseConfig = (target) => {
                                 loader: findDepInStack('source-map-loader')
                             }
                         },
-                        {
-                            test: /universal[\\/]+extensibility[\\/]+extensions/,
-                            loader: `@salesforce/pwa-kit-dev/configs/webpack/loaders/extensions-loader`,
-                            options: {
-                                pkg
+                        ruleForApplicationExtensibility({
+                            loaderOptions: {
+                                appConfig: getConfig(),
+                                target: 'web'
                             }
-                        }
+                        }),
+                        ruleForApplicationExtensibility({
+                            loaderOptions: {
+                                appConfig: getConfig(),
+                                target: 'node'
+                            }
+                        })
                     ].filter(Boolean)
                 }
             }
@@ -335,8 +343,7 @@ const ruleForBabelLoader = (babelPlugins) => {
         test: /(\.js(x?)|\.ts(x?))$/,
         // NOTE: Because our extensions are just folders containing source code, we need to ensure that the babel-loader processes them.
         // By default babel doesn't process files in "node_modules" folder, so here we will ensure they are included.
-        // TODO: Make sure this regex works for windows.
-        exclude: /^\/node_modules\/(?:@([^/]+)\/)*(?!extension-)[^/]+$/i,
+        exclude: /node_modules\/(?!(@?[^/]+\/)?extension-)[^/]+\/.*$/i,
         use: [
             {
                 loader: findDepInStack('babel-loader'),
@@ -537,76 +544,7 @@ const requestProcessor =
         })
         .build()
 
-// This is the extensions for multi-extensibility feature in PWA Kit.
-// Don't mistake this with the concept of extensions for Webpack.
-const extensions =
-    mode === 'production'
-        ? (getExtensionNames(appConfig?.extensions) || [])
-              .map((extension) => {
-                  const setupServerFilePathBase = `${projectDir}/node_modules/${extension}/src/setup-server`
-                  const foundType = ['ts', 'js'].find((type) =>
-                      fse.existsSync(`${setupServerFilePathBase}.${type}`)
-                  )
-
-                  if (!foundType) {
-                      // No setup-server file found, early exit because it's optional
-                      return
-                  }
-
-                  const defaultTsConfig = {
-                      target: 'ES2020',
-                      module: 'commonjs',
-                      strict: true,
-                      esModuleInterop: true,
-                      skipLibCheck: true
-                  }
-
-                  let tsConfigFound = fse.existsSync(
-                      `${projectDir}/node_modules/${extension}/tsconfig.json`
-                  )
-
-                  return {
-                      name: 'extensions',
-                      target: 'node',
-                      mode,
-                      entry: setupServerFilePathBase,
-                      output: {
-                          path: `${buildDir}/extensions/${extension}`,
-                          filename: 'setup-server.js',
-                          libraryTarget: 'commonjs2'
-                      },
-                      resolve: {
-                          extensions: ['.ts', '.js']
-                      },
-                      module: {
-                          rules: [
-                              {
-                                  test: /\.ts?$/,
-                                  use: {
-                                      loader: findDepInStack('ts-loader'),
-                                      options: {
-                                          // If tsconfig is not found, ignore tsconfig.json and rely on
-                                          // using the default compilerOptions
-                                          // TODO: Avoid using happyPackMode in the future.
-                                          // This was required to get your PR working because the `tsconfig.json`
-                                          // file was not found.
-                                          happyPackMode: !tsConfigFound,
-                                          compilerOptions: tsConfigFound ? {} : defaultTsConfig
-                                      }
-                                  },
-                                  exclude: /node_modules/
-                              }
-                          ]
-                      },
-                      optimization: {
-                          minimize: false
-                      }
-                  }
-              })
-              .filter(Boolean)
-        : []
-
-module.exports = [client, ssr, renderer, clientOptional, requestProcessor, ...extensions]
+module.exports = [client, ssr, renderer, clientOptional, requestProcessor]
     .filter(Boolean)
     .map((config) => {
         return new SpeedMeasurePlugin({disable: !process.env.MEASURE}).wrap(config)

@@ -801,99 +801,99 @@ describe('SLAS private client proxy', () => {
     })
 })
 
-describe('extensions', () => {
-    beforeEach(() => {
-        jest.clearAllMocks()
-    })
+// describe('extensions', () => {
+//     beforeEach(() => {
+//         jest.clearAllMocks()
+//     })
 
-    test('can register extensions properly via _setupExtensions', () => {
-        const app = NoWebpackDevServerFactory._createApp(opts())
-        expect(app.__extensions).toBeDefined()
-        return request(app)
-            .get('/test-extension')
-            .expect(200)
-            .then((res) => {
-                expect(res.text).toBe('test')
-            })
-    })
+//     test('can register extensions properly via _setupExtensions', () => {
+//         const app = NoWebpackDevServerFactory._createApp(opts())
+//         expect(app.__extensions).toBeDefined()
+//         return request(app)
+//             .get('/test-extension')
+//             .expect(200)
+//             .then((res) => {
+//                 expect(res.text).toBe('test')
+//             })
+//     })
 
-    test('mixed types in extensions configuration', async () => {
-        const options = opts({
-            mobify: {app: {extensions: [['test-extension', {path: '/foo'}], 'another-extension']}}
-        })
-        const app = NoWebpackDevServerFactory._createApp(options)
-        expect(app.__extensions).toBeDefined()
+//     test('mixed types in extensions configuration', async () => {
+//         const options = opts({
+//             mobify: {app: {extensions: [['test-extension', {path: '/foo'}], 'another-extension']}}
+//         })
+//         const app = NoWebpackDevServerFactory._createApp(options)
+//         expect(app.__extensions).toBeDefined()
 
-        await request(app)
-            .get('/test-extension')
-            .expect(200)
-            .then((res) => {
-                expect(res.text).toBe('test')
-            })
+//         await request(app)
+//             .get('/test-extension')
+//             .expect(200)
+//             .then((res) => {
+//                 expect(res.text).toBe('test')
+//             })
 
-        await request(app)
-            .get('/another-extension')
-            .expect(200)
-            .then((res) => {
-                expect(res.text).toBe('test')
-            })
+//         await request(app)
+//             .get('/another-extension')
+//             .expect(200)
+//             .then((res) => {
+//                 expect(res.text).toBe('test')
+//             })
 
-        await request(app)
-            .get('/test-extension-config')
-            .expect(200)
-            .then((res) => {
-                // The config should have {enabled: true} by default
-                expect(res.text).toBe('{"enabled":true,"path":"/foo"}')
-            })
-    })
+//         await request(app)
+//             .get('/test-extension-config')
+//             .expect(200)
+//             .then((res) => {
+//                 // The config should have {enabled: true} by default
+//                 expect(res.text).toBe('{"enabled":true,"path":"/foo"}')
+//             })
+//     })
 
-    test('disabled extension will not run', () => {
-        const options = opts({mobify: {app: {extensions: [['test-extension', {enabled: false}]]}}})
-        const app = NoWebpackDevServerFactory._createApp(options)
-        expect(app.__extensions).toBeDefined()
-        return request(app).get('/test-extension').expect(404)
-    })
+//     test('disabled extension will not run', () => {
+//         const options = opts({mobify: {app: {extensions: [['test-extension', {enabled: false}]]}}})
+//         const app = NoWebpackDevServerFactory._createApp(options)
+//         expect(app.__extensions).toBeDefined()
+//         return request(app).get('/test-extension').expect(404)
+//     })
 
-    test('logs warning when setup-server file is not found', () => {
-        const warn = jest.spyOn(console, 'warn').mockImplementation(() => {})
-        const app = NoWebpackDevServerFactory._createApp(
-            opts({
-                mobify: {app: {extensions: ['extension-without-setup-server']}}
-            })
-        )
-        expect(warn.mock.calls).toEqual([
-            [
-                'pwa-kit-dev WARN No setup-server file found for extension-without-setup-server. Skipping.'
-            ]
-        ])
-    })
+//     test('logs warning when setup-server file is not found', () => {
+//         const warn = jest.spyOn(console, 'warn').mockImplementation(() => {})
+//         const app = NoWebpackDevServerFactory._createApp(
+//             opts({
+//                 mobify: {app: {extensions: ['extension-without-setup-server']}}
+//             })
+//         )
+//         expect(warn.mock.calls).toEqual([
+//             [
+//                 'pwa-kit-dev WARN No setup-server file found for extension-without-setup-server. Skipping.'
+//             ]
+//         ])
+//     })
 
-    test('logs error when there is an error loading extension', () => {
-        const errorlog = jest.spyOn(console, 'error').mockImplementation(() => {})
-        const app = NoWebpackDevServerFactory._createApp(
-            opts({
-                mobify: {app: {extensions: ['extension-with-bad-setup-server']}}
-            })
-        )
-        expect(errorlog.mock.calls).toEqual([
-            [
-                'pwa-kit-dev.DevServerMixin._setupExtensions ERROR Error setting extension extension-with-bad-setup-server: {"error":{}}'
-            ]
-        ])
-    })
+//     test('logs error when there is an error loading extension', () => {
+//         const errorlog = jest.spyOn(console, 'error').mockImplementation(() => {})
+//         const app = NoWebpackDevServerFactory._createApp(
+//             opts({
+//                 mobify: {app: {extensions: ['extension-with-bad-setup-server']}}
+//             })
+//         )
+//         expect(errorlog.mock.calls).toEqual([
+//             [
+//                 'pwa-kit-dev.DevServerMixin._setupExtensions ERROR Error setting extension extension-with-bad-setup-server: {"error":{}}'
+//             ]
+//         ])
+//     })
 
-    test('logs error when instantiating extension throws an error', () => {
-        const errorlog = jest.spyOn(console, 'error').mockImplementation(() => {})
-        const app = NoWebpackDevServerFactory._createApp(
-            opts({
-                mobify: {app: {extensions: ['extension-with-setup-server-no-default-export']}}
-            })
-        )
+//     test('logs error when instantiating extension throws an error', () => {
+//         const errorlog = jest.spyOn(console, 'error').mockImplementation(() => {})
+//         const app = NoWebpackDevServerFactory._createApp(
+//             opts({
+//                 mobify: {app: {extensions: ['extension-with-setup-server-no-default-export']}}
+//             })
+//         )
 
-        expect(errorlog.mock.calls).toEqual([
-            [
-                `pwa-kit-dev.DevServerMixin._setupExtensions ERROR 'extension-with-setup-server-no-default-export' is not a valid PWA-Kit Application Extension, please ensure you are exporting a class of type 'ApplicationExtension'. Skipping.`
-            ]
-        ])
-    })
-})
+//         expect(errorlog.mock.calls).toEqual([
+//             [
+//                 `pwa-kit-dev.DevServerMixin._setupExtensions ERROR 'extension-with-setup-server-no-default-export' is not a valid PWA-Kit Application Extension, please ensure you are exporting a class of type 'ApplicationExtension'. Skipping.`
+//             ]
+//         ])
+//     })
+// })

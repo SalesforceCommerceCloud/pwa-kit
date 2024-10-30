@@ -6,22 +6,23 @@
  */
 
 import React from 'react'
-import loadable from '@loadable/component'
-import {ApplicationExtension, IRouteConfig} from '@salesforce/pwa-kit-react-sdk/ssr/universal/extensibility'
+import {RouteProps} from 'react-router-dom'
 
+// Platform Imports
+import {ApplicationExtension} from '@salesforce/pwa-kit-extension-sdk/react'
+
+// Local Imports
+import {Config} from './types'
 import withRedBorder from '$/components/with-red-border'
-import {ReactExtensionConfig as Config} from './types'
-
-const SamplePage = loadable(() => import('$/pages/sample'))
+import SamplePage from './pages/sample'
 
 const defaultPath: string = '/sample-page'
 class Sample extends ApplicationExtension<Config> {
-    extendApp(App: React.ComponentType): React.ComponentType {
+    extendApp<T>(App: React.ComponentType<T>): React.ComponentType<T> {
         return withRedBorder(App)
     }
 
-    extendRoutes(routes: IRouteConfig[]): IRouteConfig[] {
-        console.log('Extend Routes for ', this.getName())
+    extendRoutes(routes: RouteProps[]): RouteProps[] {
         return [
             {
                 exact: true,

@@ -10,16 +10,18 @@ import {hydrateRoot} from 'react-dom/client'
 import PropTypes from 'prop-types'
 import {BrowserRouter as Router} from 'react-router-dom'
 import {loadableReady} from '@loadable/component'
+import {
+    getApplicationExtensions,
+    withApplicationExtensions
+} from '@salesforce/pwa-kit-extension-sdk/react'
 
 import {ServerContext, CorrelationIdProvider} from '../universal/contexts'
 import App from '../universal/components/_app'
 import {getAppConfig} from '../universal/compatibility'
 import Switch from '../universal/components/switch'
 import {getRoutes, routeComponent} from '../universal/components/route-component'
-import {applyAppExtensions} from '../universal/extensibility/utils'
 import {uuidv4} from '../../utils/uuidv4.client'
 import logger from '../../utils/logger-instance'
-import {getExtensions} from '../universal/extensibility/extensions'
 
 /* istanbul ignore next */
 export const registerServiceWorker = (url) => {
@@ -83,7 +85,7 @@ OuterApp.propTypes = {
     onHydrate: PropTypes.func
 }
 /* istanbul ignore next */
-export const start = () => {
+export const start = async () => {
     const AppConfig = getAppConfig()
     const rootEl = document.getElementsByClassName('react-target')[0]
     const data = JSON.parse(document.getElementById('mobify-data').innerHTML)
@@ -116,14 +118,12 @@ export const start = () => {
     // been warned.
     window.__HYDRATING__ = true
 
-    let WrappedApp = routeComponent(App, false, locals)
-    const extensions = getExtensions()
-
-    // Use locals to thread the application extensions through the react app start flow.
-    locals.appExtensions = extensions
-
-    // Initialize all the react app extensions.
-    WrappedApp = applyAppExtensions(WrappedApp, extensions)
+    // Load all the configured Application Extensions and provide them to the
+    const applicationExtensions = await getApplicationExtensions()
+    const WrappedApp = withApplicationExtensions(routeComponent(App, false, locals), {
+        applicationExtensions,
+        locals
+    })
 
     const props = {
         error: window.__ERROR__,

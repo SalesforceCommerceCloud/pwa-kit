@@ -1,7 +1,5 @@
 ## v4.0.0-dev (Jun 21, 2024)
-- Replace `IApplicationExtension` with `ApplicationExtension` abstract class. [#2019](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2019)
-- Define interface of the app extension's config [#2010](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2010)
-- Support the tuples way of configuring the app extensions [#2010](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2010)
+- Integrate Application Extensions Project. (#2099)[https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2099]
 
 ## v3.7.0 (Aug 07, 2024)
 

@@ -6,7 +6,8 @@
  */
 import React, {useEffect, useState} from 'react'
 import {useQuery} from '@tanstack/react-query'
-import {Link} from 'react-router-dom'
+
+import {useApplicationExtensions} from '@salesforce/pwa-kit-extension-sdk/react'
 
 import HelloTS from '../components/hello-typescript'
 import HelloJS from '../components/hello-javascript'
@@ -83,6 +84,7 @@ h1 {
 
 const Home = ({value}: Props) => {
     const [counter, setCounter] = useState(0)
+    const applicationExtensions = useApplicationExtensions()
 
     useEffect(() => {
         const interval = setInterval(() => {
@@ -133,10 +135,14 @@ const Home = ({value}: Props) => {
                             Client-side JS works if this counter increments: {counter}
                             <br />
                             <br />
+                            Application Extensions work if you see a list below:
+                            <br />
+                            <ul>
+                                {applicationExtensions?.map((extension, index) => (
+                                    <li key={index}>{extension.getName()} Extension</li>
+                                ))}
+                            </ul>
                             <b>You can mix-and-match JS and TS</b>
-                            <br />
-                            <br />
-                            <b>Chakra UI was added via `extension-chakra-ui`</b>
                             <br />
                             <br />
                             <HelloJS />
