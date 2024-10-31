@@ -193,17 +193,11 @@ describe('Overrides Resolver Plugin', () => {
 
                 // Here we are looking at the first module imported via the override! syntax and testing that it's right.
                 output = stats.toJson({source: true})
-                console.log('testCasesTry output:', output)
-
             } catch (e) {
-                console.log('testCasesCatch e:', e)
                 error = e
             }
 
             expects(output, error)
-            if(error){
-                console.log('Error encountered in test:', error)
-            }
         })
     })
 })

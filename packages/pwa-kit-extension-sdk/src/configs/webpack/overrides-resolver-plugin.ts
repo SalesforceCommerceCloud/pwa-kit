@@ -59,7 +59,7 @@ export class OverridesResolverPlugin {
         resolver: Resolver
     ) {
         // Early exit for none Feature Loader imports
-        if (!request.request.startsWith('*')) {
+        if (!request.request.startsWith('override!')) {
             callback()
             return
         }
