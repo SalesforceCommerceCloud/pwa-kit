@@ -7,20 +7,19 @@
 
 import React from 'react'
 
-// Define a type for the HOC props
-type WithRedBorderProps = React.ComponentPropsWithoutRef<any>
-
 // Define the HOC function
-const withRedBorder = <P extends {}>(WrappedComponent: React.ComponentType<P>) => {
-  const WithRedBorder: React.FC<P> = (props: WithRedBorderProps) => {
-    return (
-      <div style={{ border: '2px solid red', padding: '10px' }}>
-        <WrappedComponent {...(props as P)} />
-      </div>
+const withRedBorder = <T extends object>(WrappedComponent: React.ComponentType<T>) => {
+    const ComponentWithRedBorder: React.FC<T> = (props) => (
+        <div style={{border: '2px solid red', padding: '8px'}}>
+            <WrappedComponent {...props} />
+        </div>
     )
-  }
 
-  return WithRedBorder
+    ComponentWithRedBorder.displayName = `WithRedBorder(${
+        WrappedComponent.displayName || WrappedComponent.name || 'Component'
+    })`
+
+    return ComponentWithRedBorder
 }
 
 export default withRedBorder
