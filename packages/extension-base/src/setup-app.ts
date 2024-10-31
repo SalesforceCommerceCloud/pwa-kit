@@ -13,9 +13,8 @@ import {RouteProps} from 'react-router-dom'
 import {ApplicationExtension} from '@salesforce/pwa-kit-extension-sdk/react'
 
 // Local Imports
-import withRedBorder from 'override!/components/with-red-border'
 import {Config} from './types'
-
+import withRedBorder from '$/components/with-red-border'
 import SamplePage from './pages/sample'
 
 const defaultPath = '/sample-page'

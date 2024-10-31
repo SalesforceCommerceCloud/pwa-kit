@@ -59,7 +59,7 @@ export class OverridesResolverPlugin {
         resolver: Resolver
     ) {
         // Early exit for none Feature Loader imports
-        if (!request.request.startsWith('override!')) {
+        if (!request.request.startsWith('$')) {
             callback()
             return
         }
@@ -85,7 +85,7 @@ export class OverridesResolverPlugin {
             return callback(e)
         }
 
-        // Update the requests path with the one resoved from above.
+        // Update the requests path with the one resolved from above.
         request.path = modulePath
 
         resolver.doResolve(

@@ -91,7 +91,7 @@ export const expand = (
 // TODO: The extensionsEntries really isn't optional, so maybe it shouldn't exist in the opts object?
 /**
  * Based on the current extensibility configuration, return an array of candidate file paths to be used
- * in the overridable import module resolution for the given import path.
+ * in the dollar-prefixed import module resolution for the given import path.
  *
  * @param {String} importPath - The import module-name.
  * @param {String} sourcePath - The path to the file of the source import.
@@ -104,8 +104,8 @@ export const buildCandidatePaths = (
     sourcePath: string,
     opts: BuildCandidatePathsOptions
 ) => {
-    // Replace override! as it has done its job getting us to this point.
-    importPath = importPath.replace('override!/', '')
+    // Replace $ character as it has done its job getting us to this point.
+    importPath = importPath.replace('$/', '')
 
     const {extensionEntries = [], projectDir = process.cwd()} = opts
     const isSelfReferenceImport = isSelfReference(importPath, sourcePath)

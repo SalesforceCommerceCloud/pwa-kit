@@ -26,6 +26,7 @@
     "@salesforce/pwa-kit-dev": "4.0.0-dev",
     "@salesforce/pwa-kit-extension-sdk": "4.0.0-dev",
     "@salesforce/pwa-kit-react-sdk": "4.0.0-dev",
+    "@types/loadable__component": "^5.13.9",
     "@types/express": "^5.0.0",
     "@types/react": "~18.2.0",
     "@types/react-dom": "~18.2.1",
