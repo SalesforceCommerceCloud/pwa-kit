@@ -106,7 +106,7 @@ describe('resolverUtils', () => {
         ;[
             {
                 name: 'Correct paths are returned when overridable import is used in an application extension',
-                importPath: '$/pages/sample',
+                importPath: 'override!/pages/sample',
                 sourcePath: path.join(
                     process.cwd(),
                     'node_modules',
