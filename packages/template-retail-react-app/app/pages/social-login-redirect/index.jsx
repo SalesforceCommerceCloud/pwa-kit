@@ -5,9 +5,15 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, {useEffect, useState} from 'react'
+import React, {useEffect} from 'react'
 import {FormattedMessage} from 'react-intl'
-import {Box, Container, Stack, Text, Spinner} from '@salesforce/retail-react-app/app/components/shared/ui'
+import {
+    Box,
+    Container,
+    Stack,
+    Text,
+    Spinner
+} from '@salesforce/retail-react-app/app/components/shared/ui'
 import {useCustomerType} from '@salesforce/commerce-sdk-react'
 import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
 
@@ -34,12 +40,7 @@ const SocialLoginRedirect = () => {
                 borderRadius="base"
             >
                 <Stack justify="center" align="center" spacing={8} marginBottom={8}>
-                    <Spinner 
-                        opacity={0.85}
-                        color="blue.600"
-                        animationDuration="0.8s"
-                        size="lg" 
-                    />
+                    <Spinner opacity={0.85} color="blue.600" animationDuration="0.8s" size="lg" />
                     <Text align="center" fontSize="xl" fontWeight="semibold">
                         <FormattedMessage
                             id="social_login_redirect.message.authenticating"

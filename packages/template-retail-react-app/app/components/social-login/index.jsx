@@ -46,7 +46,13 @@ const SocialLogin = ({idps}) => {
                     const config = IDP_CONFIG[name.toLowerCase()]
 
                     if (!config) {
-                        logger.error('IDP "'+ name + '" is missing from IDP_CONFIG. Valid IDPs are ['+ Object.keys(IDP_CONFIG).join(', ') + '].')
+                        logger.error(
+                            'IDP "' +
+                                name +
+                                '" is missing from IDP_CONFIG. Valid IDPs are [' +
+                                Object.keys(IDP_CONFIG).join(', ') +
+                                '].'
+                        )
                         return null
                     }
 
