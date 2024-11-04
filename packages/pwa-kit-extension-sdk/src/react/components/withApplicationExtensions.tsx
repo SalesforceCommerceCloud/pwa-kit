@@ -45,10 +45,19 @@ const withApplicationExtensions = <C,>(
     WrappedComponent: React.ComponentType<C>,
     options: withApplicationExtensionsOptions
 ) => {
+    console.log(
+        'DEBUG pwa-kit-extension-sdk.withApplicationExtensions options.locals:',
+        options.locals
+    )
+
     const hocs: GenericHocType<C>[] = options.applicationExtensions
         .filter((applicationExtension: any) => applicationExtension.isEnabled())
-        .map((extension: any) => extension.extendApp.bind(extension) as GenericHocType<C>)
+        .map(
+            (extension: any) => (App: React.ComponentType<C>) =>
+                extension.extendApp(App, options.locals)
+        )
         .filter(Boolean)
+
     const withApplicationExtensionsProvider: GenericHocType<any> = (WrappedComponent) => {
         const WithApplicationExtensionsProvider = (props: any) => (
             <ApplicationExtensionsProvider extensions={options.applicationExtensions}>

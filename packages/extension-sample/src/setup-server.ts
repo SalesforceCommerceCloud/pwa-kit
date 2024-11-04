@@ -6,7 +6,7 @@
  */
 
 // Third-Party Imports
-import {Application} from 'express'
+import {Application, Request, Response} from 'express'
 
 // Platform Imports
 import {ApplicationExtension} from '@salesforce/pwa-kit-extension-sdk/express'
@@ -16,8 +16,9 @@ import {Config} from './types'
 
 class SampleExtension extends ApplicationExtension<Config> {
     extendApp(app: Application): Application {
-        app.get('/sample', (req, res) => {
-            console.log('SampleExtension extendApp GET /sample')
+        app.get('/sample', (req: Request, res: Response) => {
+            console.log('DEBUG extension-sample.setup-server.extendApp res.locals:', res.locals)
+
             res.send(
                 `<p>Hello from an express SampleExtension!</p>
                 <pre>extensionConfig = ${JSON.stringify(this.getConfig())}</pre>`

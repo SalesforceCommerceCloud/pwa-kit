@@ -20,7 +20,9 @@ import SamplePage from './pages/sample'
 
 const defaultPath = '/sample-page'
 class Sample extends ApplicationExtension<Config> {
-    extendApp<T>(App: React.ComponentType<T>): React.ComponentType<T> {
+    extendApp<T>(App: React.ComponentType<T>, locals: any = {}): React.ComponentType<T> {
+        console.log('DEBUG extension-sample.setup-app.extendApp locals:', locals)
+
         return withRedBorder(App)
     }
 
