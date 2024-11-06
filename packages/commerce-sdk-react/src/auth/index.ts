@@ -510,7 +510,9 @@ class Auth {
         let value = overrideValue
 
         if (typeof value !== 'number' || value <= 0 || value > defaultValue) {
-            this.logWarning(SLAS_REFRESH_TOKEN_COOKIE_TTL_OVERRIDE_MSG)
+            if (value !== undefined) {
+                this.logWarning(SLAS_REFRESH_TOKEN_COOKIE_TTL_OVERRIDE_MSG)
+            }
             value = responseValue || defaultValue
         }
 
