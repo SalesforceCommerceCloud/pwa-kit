@@ -1,4 +1,5 @@
 ## v3.2.0-dev (Oct 29, 2024)
+- Fix refresh token TTL warning from firing when override is not provided [#2114](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2114)
 
 ## v3.1.0 (Oct 28, 2024)
 
