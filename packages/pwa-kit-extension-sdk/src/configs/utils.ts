@@ -38,11 +38,11 @@ const templateString = dedent`
     import loadable from '@loadable/component'
     {{/if}}
 
-    {{#each installed}}
+    {{#each configured}}
     {{#if (isNode @root.target)}}
-    import {{getInstanceName .}} from '{{.}}/setup-server'
+    import {{getInstanceName this.[0]}} from '{{this.[0]}}/setup-server'
     {{else}}
-    const {{getInstanceName .}}Loader = loadable.lib(() => import('{{.}}/setup-app'))
+    const {{getInstanceName this.[0]}}Loader = loadable.lib(() => import('{{this.[0]}}/setup-app'))
     {{/if}}
     {{/each}}
 
@@ -52,7 +52,7 @@ const templateString = dedent`
         return [{{#each configured}}new {{getInstanceName this.[0]}}({{{jsonStringify this.[1]}}}){{#if (isNotLast @index @root.configured.length)}}, {{/if}}{{/each}}]
         {{else}}
         return []
-        {{/if}}    
+        {{/if}}
     }
     {{else}}
     const getApplicationExtensions = async () => {

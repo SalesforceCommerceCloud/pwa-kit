@@ -11,7 +11,7 @@ import path from 'path'
 import {resolve} from 'path'
 
 // Types
-import {ApplicationExtensionEntry} from '../../types'
+import {ApplicationExtensionEntry, ApplicationExtensionEntryArray} from '../../types'
 
 // Local
 import {expand} from './resolver'
@@ -109,37 +109,12 @@ export const getExtensionNames = (extensions: ApplicationExtensionEntry[]) => {
 }
 
 /**
- * Retrieves information about application extensions from the provided application configuration or,
- * if none is provided, from the default configuration in the project's `package.json`.
- *
- * This function returns an object containing two lists: `installed`, which includes extensions
- * found in the project's dependencies, and `configured`, which lists extensions configured
- * in the application settings.
- *
- * @param {object} [appConfig] - Optional application configuration object. If not provided,
- * defaults to the configuration in the project's `package.json` file under the `mobify` key.
- * @returns {Object} An object containing the following properties:
- * - `installed` {string[]} - An array of installed extension names based on the project's devDependencies.
- * - `configured` {string[]} - An array of configured extension names as specified in the application configuration.
+ * Returns the list of configured extensions, given the configurations found in a config file or package.json's `mobify`
+ * @example
+ * import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
+ * getConfiguredExtensions(getConfig())
  */
-export const getApplicationExtensionInfo = (appConfig?: any) => {
-    const projectDir = process.cwd()
-    const pkg = fse.readJsonSync(resolve(projectDir, 'package.json'))
-
-    // Use the application configuration in the projects application if one isn't provided.
-    appConfig = appConfig
-        ? appConfig
-        : fse.readJsonSync(resolve(projectDir, 'package.json'))?.mobify || {}
-
-    const installedExtensions = Object.keys(pkg?.devDependencies || {})
-        .map((packageName) => (packageName.match(nameRegex) !== null ? packageName : undefined))
-        .filter(Boolean)
-
-    // NOTE: Might have to get the expanded version of these.
-    const configuredExtensions = expand(appConfig?.app?.extensions || [])
-
-    return {
-        installed: installedExtensions,
-        configured: configuredExtensions
-    }
+export const getConfiguredExtensions = (config: any): ApplicationExtensionEntryArray[] => {
+    // Note: this path to the `extensions` property may change
+    return expand(config?.app?.extensions || [])
 }

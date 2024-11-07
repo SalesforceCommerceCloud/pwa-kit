@@ -14,6 +14,7 @@ const babel = require('@babel/core')
 // Local
 import {renderTemplate} from '../utils'
 import {buildAliases} from '../../shared/utils'
+import {ApplicationExtensionsLoaderOptions} from '../webpack/types'
 
 // Constants
 const extensionsPlaceholderFile = 'express/placeholders/application-extensions.js'
@@ -25,10 +26,10 @@ module.exports = function replaceExtensionsPlaceholderContentPlugin({types: t}: 
     return {
         visitor: {
             ImportDeclaration(path: any, state: any) {
-                const {installed} = state.opts
+                const {configured} = state.opts as ApplicationExtensionsLoaderOptions
 
                 // This is analogus to the work we did in webpack to have aliases for the extensions.
-                const aliases: any = buildAliases(installed)
+                const aliases: any = buildAliases(configured)
                 const source = path.node.source.value
 
                 // Check for alias
@@ -41,7 +42,6 @@ module.exports = function replaceExtensionsPlaceholderContentPlugin({types: t}: 
             },
             Program(path: any, state: any) {
                 const filePath = state.file.opts.filename
-                const {installed, configured, target} = state.opts
 
                 // Add a marker to the state to prevent reprocessing
                 if (processedFiles.has(filePath)) {
@@ -51,11 +51,7 @@ module.exports = function replaceExtensionsPlaceholderContentPlugin({types: t}: 
 
                 // Check if the file matches one of the files we want to replace
                 if (filePath.endsWith(extensionsPlaceholderFile)) {
-                    const newContent = renderTemplate({
-                        installed,
-                        configured,
-                        target
-                    })
+                    const newContent = renderTemplate(state.opts)
 
                     let parsedAst
 

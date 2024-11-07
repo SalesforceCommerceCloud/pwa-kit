@@ -6,7 +6,7 @@
  */
 
 // PWA-Kit Imports
-import {getApplicationExtensionInfo} from '@salesforce/pwa-kit-extension-sdk/shared/utils'
+import {getConfiguredExtensions} from '@salesforce/pwa-kit-extension-sdk/shared/utils'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 
 export default {
@@ -28,7 +28,7 @@ export default {
             require('@salesforce/pwa-kit-extension-sdk/configs/babel/plugin-application-extensions'),
             {
                 target: 'node',
-                ...getApplicationExtensionInfo(getConfig())
+                configured: getConfiguredExtensions(getConfig())
             }
         ],
         require('@babel/plugin-transform-async-to-generator'),

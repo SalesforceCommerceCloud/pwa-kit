@@ -7,10 +7,9 @@
 
 // Local
 import {renderTemplate} from '../utils'
-import {getApplicationExtensionInfo} from '../../shared/utils'
 
 // Types
-import {ApplicationExtensionsLoaderContext} from './types'
+import {ApplicationExtensionsLoaderContext, ApplicationExtensionsLoaderOptions} from './types'
 
 // Constants
 const DEFAULT_TARGET = 'node'
@@ -56,7 +55,8 @@ export default function ApplicationExtensibilityLoader(
  */
 export const ruleForApplicationExtensibility = (options: any = {}) => {
     const {loaderOptions = {}} = options
-    const {target = DEFAULT_TARGET, appConfig} = loaderOptions
+    const {target = DEFAULT_TARGET, configured} =
+        loaderOptions as ApplicationExtensionsLoaderOptions
 
     return {
         test: new RegExp(
@@ -66,7 +66,7 @@ export const ruleForApplicationExtensibility = (options: any = {}) => {
         use: {
             loader: '@salesforce/pwa-kit-extension-sdk/configs/webpack/application-extensions-loader',
             options: {
-                ...getApplicationExtensionInfo(appConfig),
+                configured,
                 target
             }
         }
