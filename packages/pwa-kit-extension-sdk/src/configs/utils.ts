@@ -63,8 +63,7 @@ const templateString = dedent`
         if (!configuredExtensions) return []
 
         return configuredExtensions.map((extension) => {
-            const packageName = extension[0]
-            const config = extension[1]
+            const [packageName, config] = extension
             return new imports[packageName](config)
         })
     }
@@ -74,11 +73,11 @@ const templateString = dedent`
         if (!configuredExtensions) return []
 
         const modules = await Promise.all(configuredExtensions.map((extension) => {
-            const packageName = extension[0]
+            const [packageName] = extension
             return imports[packageName].load()
         }))
         return configuredExtensions.map((extension, index) => {
-            const config = extension[1]
+            const [,config] = extension
             return new modules[index].default(config)
         })
     }
