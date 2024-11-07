@@ -10,6 +10,7 @@ import {
     ApplicationExtensionEntryArray,
     ApplicationExtensionConfig
 } from '../../types'
+import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 
 const DEFAULT_CONFIG: ApplicationExtensionConfig = {
     enabled: true
@@ -102,7 +103,9 @@ export const expand = (
  * import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
  * getConfiguredExtensions(getConfig())
  */
-export const getConfiguredExtensions = (config: any): ApplicationExtensionEntryArray[] => {
+export const getConfiguredExtensions = (
+    config: any = getConfig()
+): ApplicationExtensionEntryArray[] => {
     // Note: this path to the `extensions` property may change
     return expand(config?.app?.extensions || [])
 }
