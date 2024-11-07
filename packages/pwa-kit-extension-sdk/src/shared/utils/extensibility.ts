@@ -8,13 +8,9 @@
 // Third-Party
 import fse from 'fs-extra'
 import path from 'path'
-import {resolve} from 'path'
 
 // Types
-import {ApplicationExtensionEntry, ApplicationExtensionEntryArray} from '../../types'
-
-// Local
-import {expand} from './resolver'
+import {ApplicationExtensionEntry} from '../../types'
 
 // CONSTANTS
 // const REACT_EXTENSIBILITY_FILE = 'setup-app'
@@ -106,15 +102,4 @@ export const getExtensionNames = (extensions: ApplicationExtensionEntry[]) => {
     return (extensions || []).map((extension) => {
         return Array.isArray(extension) ? extension[0] : extension
     })
-}
-
-/**
- * Returns the list of configured extensions, given the configurations found in a config file or package.json's `mobify`
- * @example
- * import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
- * getConfiguredExtensions(getConfig())
- */
-export const getConfiguredExtensions = (config: any): ApplicationExtensionEntryArray[] => {
-    // Note: this path to the `extensions` property may change
-    return expand(config?.app?.extensions || [])
 }

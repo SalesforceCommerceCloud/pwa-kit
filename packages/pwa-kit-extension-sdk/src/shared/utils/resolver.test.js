@@ -71,37 +71,6 @@ describe('resolverUtils', () => {
         })
     })
 
-    describe('"expand" util returns correct return value when', () => {
-        ;[
-            {
-                name: 'extensions are all valid package names',
-                input: ['extension-a', 'extension-b', 'extension-c', '@salesforce/extension-d'],
-                expected: [
-                    ['extension-a', {enabled: true}],
-                    ['extension-b', {enabled: true}],
-                    ['extension-c', {enabled: true}],
-                    ['@salesforce/extension-d', {enabled: true}]
-                ]
-            },
-            {
-                name: 'extensions include falsey values',
-                input: ['extension-a', '', false],
-                expected: [['extension-a', {enabled: true}]]
-            },
-            {
-                name: 'extensions defined do not follow naming convension',
-                input: ['not-the-correct-prefix-a'],
-                expected: []
-            }
-        ].forEach((testCase) => {
-            test(`${testCase.name}`, () => {
-                const result = resolverUtils.expand(testCase.input)
-
-                expect(result).toEqual(testCase.expected)
-            })
-        })
-    })
-
     describe('"buildCandidatePaths" util returns array of paths used to module resolving', () => {
         ;[
             {

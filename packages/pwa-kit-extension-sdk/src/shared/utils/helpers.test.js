@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import {kebabToLowerCamelCase, kebabToUpperCamelCase} from './helpers'
+import {kebabToLowerCamelCase, kebabToUpperCamelCase, expand} from './helpers'
 
 describe('kebabToLowerCamelCase', () => {
     test('converts a simple kebab-case string to lowerCamelCase', () => {
@@ -72,5 +72,36 @@ describe('kebabToUpperCamelCase', () => {
 
     test('handles strings that start or end with hyphens', () => {
         expect(kebabToUpperCamelCase('-foo-bar-')).toBe('FooBar')
+    })
+})
+
+describe('"expand" util returns correct return value when', () => {
+    ;[
+        {
+            name: 'extensions are all valid package names',
+            input: ['extension-a', 'extension-b', 'extension-c', '@salesforce/extension-d'],
+            expected: [
+                ['extension-a', {enabled: true}],
+                ['extension-b', {enabled: true}],
+                ['extension-c', {enabled: true}],
+                ['@salesforce/extension-d', {enabled: true}]
+            ]
+        },
+        {
+            name: 'extensions include falsey values',
+            input: ['extension-a', '', false],
+            expected: [['extension-a', {enabled: true}]]
+        },
+        {
+            name: 'extensions defined do not follow naming convension',
+            input: ['not-the-correct-prefix-a'],
+            expected: []
+        }
+    ].forEach((testCase) => {
+        test(`${testCase.name}`, () => {
+            const result = expand(testCase.input)
+
+            expect(result).toEqual(testCase.expected)
+        })
     })
 })

@@ -11,7 +11,7 @@ import {Resolver} from 'webpack'
 // Local
 // TODO: Is this a good place for this util? I seems to only be used in the plugin. Maybe we need to put it somewhere
 // else?
-import {buildCandidatePaths, expand} from '../../shared/utils/resolver'
+import {buildCandidatePaths, expand} from '../../shared/utils'
 
 // Types
 import {ApplicationExtensionEntry} from '../../types'

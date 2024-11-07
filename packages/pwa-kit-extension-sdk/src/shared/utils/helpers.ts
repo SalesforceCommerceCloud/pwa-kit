@@ -5,6 +5,16 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
+import {
+    ApplicationExtensionEntry,
+    ApplicationExtensionEntryArray,
+    ApplicationExtensionConfig
+} from '../../types'
+
+const DEFAULT_CONFIG: ApplicationExtensionConfig = {
+    enabled: true
+}
+
 /**
  * Converts a kebab-case string to UpperCamelCase (PascalCase).
  *
@@ -50,3 +60,49 @@ export const kebabToLowerCamelCase = (str: string) =>
                 : word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
         )
         .join('')
+
+// Returns true if the entry passes is a ApplicationExtensionEntryArray type.
+// TODO: This looks like it could be done in a more generic way.
+const isApplicationExtensionEntryArray = (entry: ApplicationExtensionEntryArray): boolean => {
+    const [nameRef, config] = entry || []
+    return (
+        typeof nameRef === 'string' &&
+        typeof config === 'object' &&
+        !!nameRef.match(/^(?:@([^/]+)\/)?extension-(.+)$/)
+    )
+}
+
+/**
+ * Normalize and expand the extension configuration array so that it is easier to process.
+ * @param {{String, Object}[]} extensions - The extensions configuration value as defined in the PWA-Kit config.
+ * @returns {Object[]} extensions - The extensions array in object form.
+ *
+ * @example
+ * const result = expand(["store-finder", ["account-pages", {singlePage: true}], './extensions/local-extension']);
+ * console.log(result)
+ * // [["@salesforce/extension-store-finder", {}], ["@salesforce/extension-account-pages", {singlePage: true}], ["/home/project/extensions/local-extension", {}]]
+ */
+export const expand = (
+    extensions: ApplicationExtensionEntry[] = []
+): ApplicationExtensionEntryArray[] =>
+    extensions
+        .filter((extension) => Boolean(extension))
+        .map((extension) => {
+            const thing: [string, any] = Array.isArray(extension)
+                ? extension
+                : [extension, DEFAULT_CONFIG]
+
+            return thing
+        })
+        .filter(isApplicationExtensionEntryArray)
+
+/**
+ * Returns the list of configured extensions, given the configurations found in a config file or package.json's `mobify`
+ * @example
+ * import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
+ * getConfiguredExtensions(getConfig())
+ */
+export const getConfiguredExtensions = (config: any): ApplicationExtensionEntryArray[] => {
+    // Note: this path to the `extensions` property may change
+    return expand(config?.app?.extensions || [])
+}

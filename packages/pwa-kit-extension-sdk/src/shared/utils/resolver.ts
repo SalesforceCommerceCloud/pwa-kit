@@ -8,13 +8,11 @@
 // Third-party imports
 import path from 'path'
 
+// Local
+import {expand} from './index'
+
 // Types
-import {
-    ApplicationExtensionConfig,
-    ApplicationExtensionEntry,
-    ApplicationExtensionEntryArray,
-    BuildCandidatePathsOptions
-} from '../../types'
+import {ApplicationExtensionEntry, BuildCandidatePathsOptions} from '../../types'
 
 // TODO: Should this be in a constants folder?
 const EXTENSION_NAMESPACE = '@salesforce'
@@ -23,9 +21,6 @@ const OVERRIDES = 'overrides'
 const APP = 'app'
 const SRC = 'src'
 const PWA_KIT_REACT_SDK = 'pwa-kit-react-sdk'
-const DEFAULT_CONFIG: ApplicationExtensionConfig = {
-    enabled: true
-}
 
 // TODO: We should determine if we want the `overrides-resolver-plugin` to handle resolution of application special
 // components like _app and _document. If so we can update this map and remove the special logic from our webpack
@@ -50,43 +45,6 @@ export const isSelfReference = (importPath: string, sourcePath: string) => {
 
     return sourcePath.endsWith(importPath)
 }
-
-// Returns true if the entry passes is a ApplicationExtensionEntryArray type.
-// TODO: This looks like it could be done in a more generic way.
-export const isApplicationExtensionEntryArray = (
-    entry: ApplicationExtensionEntryArray
-): boolean => {
-    const [nameRef, config] = entry || []
-    return (
-        typeof nameRef === 'string' &&
-        typeof config === 'object' &&
-        !!nameRef.match(/^(?:@([^/]+)\/)?extension-(.+)$/)
-    )
-}
-
-/**
- * Normalize and expand the extension configuration array so that it is easier to process.
- * @param {{String, Object}[]} extensions - The extensions configuration value as defined in the PWA-Kit config.
- * @returns {Object[]} extensions - The extensions array in object form.
- *
- * @example
- * const result = expand(["store-finder", ["account-pages", {singlePage: true}], './extensions/local-extension']);
- * console.log(result)
- * // [["@salesforce/extension-store-finder", {}], ["@salesforce/extension-account-pages", {singlePage: true}], ["/home/project/extensions/local-extension", {}]]
- */
-export const expand = (
-    extensions: ApplicationExtensionEntry[] = []
-): ApplicationExtensionEntryArray[] =>
-    extensions
-        .filter((extension) => Boolean(extension))
-        .map((extension) => {
-            const thing: [string, any] = Array.isArray(extension)
-                ? extension
-                : [extension, DEFAULT_CONFIG]
-
-            return thing
-        })
-        .filter(isApplicationExtensionEntryArray)
 
 // TODO: The extensionsEntries really isn't optional, so maybe it shouldn't exist in the opts object?
 /**
