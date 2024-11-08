@@ -5,7 +5,12 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import {kebabToLowerCamelCase, kebabToUpperCamelCase, expand} from './helpers'
+import {
+    kebabToLowerCamelCase,
+    kebabToUpperCamelCase,
+    expand,
+    getConfiguredExtensions
+} from './helpers'
 
 describe('kebabToLowerCamelCase', () => {
     test('converts a simple kebab-case string to lowerCamelCase', () => {
@@ -103,5 +108,29 @@ describe('"expand" util returns correct return value when', () => {
 
             expect(result).toEqual(testCase.expected)
         })
+    })
+})
+
+describe('getConfiguredExtensions', () => {
+    test('parses the given config and normalizes the list', () => {
+        const extensions = getConfiguredExtensions({
+            app: {
+                extensions: [
+                    '@salesforce/extension-sample',
+                    ['@salesforce/extension-sample-2', {foo: 'bar'}]
+                ]
+            }
+        })
+        const firstExtension = extensions[0]
+        const secondExtension = extensions[1]
+
+        expect(Array.isArray(firstExtension)).toBe(true)
+        expect(firstExtension[0]).toBe('@salesforce/extension-sample')
+        expect(secondExtension[0]).toBe('@salesforce/extension-sample-2')
+    })
+
+    test('returns empty array for config without extensions', () => {
+        const extensions = getConfiguredExtensions({app: {}})
+        expect(Array.isArray(extensions) && extensions.length === 0).toBe(true)
     })
 })
