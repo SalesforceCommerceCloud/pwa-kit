@@ -101,6 +101,19 @@ describe('"expand" util returns correct return value when', () => {
             name: 'extensions defined do not follow naming convension',
             input: ['not-the-correct-prefix-a'],
             expected: []
+        },
+        {
+            name: 'extensions have mixed formats',
+            input: [
+                '@salesforce/extension-a',
+                ['@salesforce/extension-b', {foo: 'bar'}],
+                ['@salesforce/extension-c']
+            ],
+            expected: [
+                ['@salesforce/extension-a', {enabled: true}],
+                ['@salesforce/extension-b', {enabled: true, foo: 'bar'}],
+                ['@salesforce/extension-c', {enabled: true}]
+            ]
         }
     ].forEach((testCase) => {
         test(`${testCase.name}`, () => {
