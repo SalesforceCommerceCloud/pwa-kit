@@ -157,7 +157,7 @@ describe('App', () => {
 
         global.server.use(
             // mock updating basket currency
-            rest.patch('*/baskets/:basketId', (req, res, ctx) => {
+            rest.patf('*/baskets/:basketId', (req, res, ctx) => {
                 basket.currency = 'GBP'
                 return res(ctx.json(basket))
             }),

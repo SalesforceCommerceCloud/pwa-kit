@@ -17,11 +17,11 @@ type WithCurrencyProps = React.ComponentPropsWithoutRef<any>
 // Define the HOC function
 const withCurrency = <P extends object>(WrappedComponent: React.ComponentType<P>) => {
     const WithCurrency: React.FC<P> = (props: WithCurrencyProps) => {
-        const {site} = useMultiSite()
-        const currency = site.l10n.defaultCurrency
+        const {site, locale} = useMultiSite()
+        const {l10n} = site
 
         return (
-            <CurrencyProvider currency={currency}>
+            <CurrencyProvider currency={locale.preferredCurrency || l10n.defaultCurrency}>
                 <WrappedComponent {...(props as P)} />
             </CurrencyProvider>
         )

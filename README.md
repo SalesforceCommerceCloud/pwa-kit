@@ -85,24 +85,62 @@ The inclusion of the below code will inform the SDK to use this component as the
 
 # Configuration
 
-This section is optional and will depend on your application extensions implementation. If you have features
-that are configurable, then list those configurations here so that the PWA-Kit project implementor can configure
-the extension as they like. 
+The storefront is configurable in many ways, like how your URLs are displayed, what size images are used, where your data is sourced from, etc. 
+Please refer to the sample configuration below in order to properly configure your application. 
 
 ```
 {
-    path: 'sample-page'
+    "activeDataEnabled": false,                                 // Enable/Disable Active Data anaylitcs tracting.
+    "commerceAPI": {
+        "proxyPath": "/mobify/proxy/api",                       // The proxy path used for you commerce api data requests
+        "parameters": {
+            "clientId": "<YOUR_CLIENT_ID_HERE>",                // The id of your commerce api client
+            "organizationId": "<YOUR_ORGANIZATION_ID_HERE>",    // Your commerce instance org id
+            "shortCode": "<YOUR_SHORT_CODE_HERE>",              // Your commerce short code
+            "siteId": "<YOUR_SITE_ID_HERE>"                     // Your commerce site id
+        }
+    },
+    "defaultSite": "<YOUR_SITE_ID_HERE>",                       // If site id used if one is not determined from the URL in multi-site
+    "einsteinAPI": {                                            // Einstein analytics tracting connection info.
+        "host": "https://api.cquotient.com",
+        "einsteinId": "<YOUR_EINSTEIN_ID_HERE>",
+        "siteId": "<YOUR_SITE_ID_HERE>",
+        "isProduction": false
+    },
+    "enabled": true,                                            // Toggle this extesnion on or off, this is useful for debugging and development, defaults to true.
+    "pages": {},                                                // Per page configuration information.
+    "siteAliases": {},                                          // Site alias's for multi-site support.
+    "sites": [],                                                // Site configs for multi-site support.
+    "url": {                                                    // URL configuration
+        "site": "path",                                         // Display the site id/alias in the path or querystring or none.
+        "locale": "path",                                       // Display the locale id/alias in the path or querystring or none.
+        "showDefaults": true,                                   // If the site/locale is the default setting you can choose to not display it in the url.
+        "interpretPlusSignAsSpace": false
+    }
 }
 ```
 
 # Installation
 
+1. Install the `@salesforce/extension-chakra-storefront` extension into your base application.
 ```
-> npm install @salesforce/extension-sample --legacy-peer-deps*<br/>
+> npm install @salesforce/extension-chakra-storefront<br/>
 > Downloading npm package... <br/>
 > Installing extention... <br/>
 > Finished. <br/>
-> Congratulations! The Sample extension was successfully installed! Please visit https://www.npmjs.com/package/@salesforce/extension-sample for more information on how to use this extension.
+> Congratulations! The extension was successfully installed! Please visit https://www.npmjs.com/package/@salesforce/extension-sample for more information on how to use this extension.
+```
+2. Configure the extension in your base application by updating the configured "extensions" in your configuration. The config file can exist in their the `package.json`
+file under the `mobify` key or in the `config/` folder depending on how your base application is setup.
+```
+extensions: [
+    [
+        "@salesforce/extension-chakra-storefront",
+        {
+            // Please refer to the config section of this document to properly configure the extension.
+        }
+    ]
+]
 ```
 
 # Advanced Usage
