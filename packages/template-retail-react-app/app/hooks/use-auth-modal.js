@@ -27,9 +27,9 @@ import {
     useCustomerId,
     useCustomerType,
     useCustomerBaskets,
-    useShopperCustomersMutation,
+    useShopperLoginMutation,
     useShopperBasketsMutation,
-    ShopperCustomersMutations
+    ShopperLoginMutations
 } from '@salesforce/commerce-sdk-react'
 import {BrandLogo} from '@salesforce/retail-react-app/app/components/icons'
 import LoginForm from '@salesforce/retail-react-app/app/components/login'
@@ -39,6 +39,7 @@ import {noop} from '@salesforce/retail-react-app/app/utils/utils'
 import {API_ERROR_MESSAGE} from '@salesforce/retail-react-app/app/constants'
 import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
 import {usePrevious} from '@salesforce/retail-react-app/app/hooks/use-previous'
+import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
 import {isServer} from '@salesforce/retail-react-app/app/utils/utils'
 const LOGIN_VIEW = 'login'
 const REGISTER_VIEW = 'register'
@@ -75,9 +76,10 @@ export const AuthModal = ({
     const toast = useToast()
     const login = useAuthHelper(AuthHelpers.LoginRegisteredUserB2C)
     const register = useAuthHelper(AuthHelpers.Register)
+    const {site} = useMultiSite()
 
-    const getResetPasswordToken = useShopperCustomersMutation(
-        ShopperCustomersMutations.GetResetPasswordToken
+    const getPasswordResetToken = useShopperLoginMutation(
+        ShopperLoginMutations.GetPasswordResetToken
     )
 
     const {data: baskets} = useCustomerBaskets(
@@ -149,9 +151,12 @@ export const AuthModal = ({
             password: async (data) => {
                 try {
                     const body = {
-                        login: data.email
+                        user_id: email,
+                        channel_id: site.id,
+                        mode: "callback", // Should this be based on the default.js
+                        callback_uri: "https://www.test.com"
                     }
-                    await getResetPasswordToken.mutateAsync({body})
+                    await getPasswordResetToken.mutateAsync({body})
                 } catch (e) {
                     form.setError('global', {
                         type: 'manual',

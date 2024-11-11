@@ -17,14 +17,15 @@ import {
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 import {useForm} from 'react-hook-form'
 import {
-    useShopperCustomersMutation,
-    ShopperCustomersMutations
+    useShopperLoginMutation,
+    ShopperLoginMutations
 } from '@salesforce/commerce-sdk-react'
 import Seo from '@salesforce/retail-react-app/app/components/seo'
 import ResetPasswordForm from '@salesforce/retail-react-app/app/components/reset-password'
 import {BrandLogo} from '@salesforce/retail-react-app/app/components/icons'
 import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
 import useEinstein from '@salesforce/retail-react-app/app/hooks/use-einstein'
+import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
 import {useLocation} from 'react-router-dom'
 
 const ResetPassword = () => {
@@ -34,16 +35,20 @@ const ResetPassword = () => {
     const [showSubmittedSuccess, setShowSubmittedSuccess] = useState(false)
     const einstein = useEinstein()
     const {pathname} = useLocation()
-    const getResetPasswordToken = useShopperCustomersMutation(
-        ShopperCustomersMutations.GetResetPasswordToken
+    const {site} = useMultiSite()
+    const getPasswordResetToken = useShopperLoginMutation(
+        ShopperLoginMutations.GetPasswordResetToken
     )
 
     const submitForm = async ({email}) => {
         const body = {
-            login: email
+            user_id: email,
+            channel_id: site.id,
+            mode: "callback", // Should this be based on the default.js
+            callback_uri: "https://www.test.com"
         }
         try {
-            await getResetPasswordToken.mutateAsync({body})
+            await getPasswordResetToken.mutateAsync({body})
             setSubmittedEmail(email)
             setShowSubmittedSuccess(!showSubmittedSuccess)
         } catch (error) {
