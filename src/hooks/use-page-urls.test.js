@@ -9,7 +9,7 @@ import {Router} from 'react-router'
 
 import {render} from '@testing-library/react'
 import {createMemoryHistory} from 'history'
-import {usePageUrls} from '../../hooks/use-page-urls'
+import {usePageUrls} from './use-page-urls'
 
 const MockComponent = () => {
     const urls = usePageUrls({total: 100})

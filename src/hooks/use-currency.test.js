@@ -7,9 +7,9 @@
 
 import React from 'react'
 import {renderHook} from '@testing-library/react'
-import {useCurrency} from '../../hooks/use-currency'
-import {CurrencyProvider} from '../../contexts'
-import {DEFAULT_CURRENCY} from '../../constants'
+import {useCurrency} from './use-currency'
+import {CurrencyProvider} from '../contexts'
+import {DEFAULT_CURRENCY} from '../constants'
 
 const wrapper = ({children}) => <CurrencyProvider>{children}</CurrencyProvider>
 

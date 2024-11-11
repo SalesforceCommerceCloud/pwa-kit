@@ -7,10 +7,10 @@
 /*global dw*/
 /* eslint-disable no-import-assign */
 /* eslint-disable react-hooks/rules-of-hooks */
-import useActiveData from '../../hooks/use-active-data'
-import {mockCategory, mockProduct, mockSearchResults} from '../../hooks/einstein-mock-data'
-import * as constants from '../../constants'
-import {DEFAULT_SEARCH_PARAMS} from '../../constants'
+import useActiveData from './use-active-data'
+import {mockCategory, mockProduct, mockSearchResults} from './einstein-mock-data'
+import * as constants from '../constants'
+import {DEFAULT_SEARCH_PARAMS} from '../constants'
 
 const activeDataApi = useActiveData()
 

@@ -7,8 +7,8 @@
 import React from 'react'
 import {screen} from '@testing-library/react'
 
-import CheckoutHeader from '../../pages/checkout/partials/checkout-header'
-import {renderWithProviders} from '../../utils/test-utils'
+import CheckoutHeader from './checkout-header'
+import {renderWithProviders} from '../../../utils/test-utils'
 
 test('renders component', () => {
     renderWithProviders(<CheckoutHeader />)

@@ -17,7 +17,6 @@ import {resolveSiteFromUrl, resolveLocaleFromUrl} from '../../utils/site-utils'
 import {useConfig} from '../../hooks/use-config'
 
 // Define a type for the HOC props
-// TODO: update the type to have site, locale, and buildUrl
 type WithMultiSiteProps = React.ComponentPropsWithoutRef<any>
 
 // Define the HOC function
@@ -26,12 +25,9 @@ const withMultiSite = <P extends object>(WrappedComponent: React.ComponentType<P
         const {req} = useServerContext()
         const path = req?.originalUrl || `${window.location.pathname}${window.location.search}`
 
-        // TODO: Fix  type
         const config: any = useConfig()
-
         const site: any = resolveSiteFromUrl(path)
         const locale: any = resolveLocaleFromUrl(path)
-
         const buildUrl = createUrlTemplate(config, site.alias || site.id, locale.id)
 
         return (

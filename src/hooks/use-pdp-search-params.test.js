@@ -8,8 +8,8 @@
 import React from 'react'
 import {screen} from '@testing-library/react'
 import PropTypes from 'prop-types'
-import {usePDPSearchParams} from '../../hooks/use-pdp-search-params'
-import {renderWithProviders} from '../../utils/test-utils'
+import {usePDPSearchParams} from './use-pdp-search-params'
+import {renderWithProviders} from '../utils/test-utils'
 
 const MockComponent = ({productId} = {}) => {
     const [allParams, productParams] = usePDPSearchParams(productId)

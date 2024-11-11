@@ -10,8 +10,8 @@ import {screen} from '@testing-library/react'
 import {rest} from 'msw'
 import {renderWithProviders, createPathWithDefaults} from '../../utils/test-utils'
 import {mockCustomerBaskets, mockOrderHistory, mockOrderProducts} from '../../mocks/mock-data'
-import Orders from '../../pages/account/orders'
-import mockConfig from '@salesforce/retail-react-app/config/mocks/default'
+import Orders from './orders'
+import mockConfig from '../../mock-config'
 
 const MockedComponent = () => {
     return (

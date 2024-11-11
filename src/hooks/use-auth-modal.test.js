@@ -8,12 +8,12 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import {screen, within, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import {renderWithProviders, createPathWithDefaults, guestToken} from '../../utils/test-utils'
-import {AuthModal, useAuthModal} from '../../hooks/use-auth-modal'
+import {renderWithProviders, createPathWithDefaults, guestToken} from '../utils/test-utils'
+import {AuthModal, useAuthModal} from '../hooks/use-auth-modal'
 import {BrowserRouter as Router, Route} from 'react-router-dom'
-import Account from '../../pages/account'
+import Account from '../pages/account'
 import {rest} from 'msw'
-import {mockedRegisteredCustomer} from '../../mocks/mock-data'
+import {mockedRegisteredCustomer} from '../mocks/mock-data'
 
 jest.setTimeout(60000)
 

@@ -41,8 +41,7 @@ import {
     HamburgerIcon,
     ChevronDownIcon,
     HeartIcon,
-    SignoutIcon,
-    StoreIcon
+    SignoutIcon
 } from '../../components/icons'
 
 import {navLinks, messages} from '../../pages/account/constant'

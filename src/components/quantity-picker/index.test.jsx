@@ -8,7 +8,7 @@ import React, {useState} from 'react'
 import {screen} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import {renderWithProviders} from '../../utils/test-utils'
-import QuantityPicker from '../../components/quantity-picker/index'
+import QuantityPicker from './index'
 
 const MockComponent = () => {
     const [quantity, setQuantity] = useState(5)

@@ -5,7 +5,6 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-// import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {getExtensionConfig as getConfig} from '../utils/get-extension-config'
 
 import {absoluteUrl} from './url'
@@ -124,11 +123,11 @@ export const getParamsFromPath = (path) => {
  * @return {object} - url config
  */
 export const getUrlConfig = () => {
-    const {app} = getConfig()
-    if (!app.url) {
+    const {url} = getConfig()
+    if (!url) {
         throw new Error('Cannot find `url` key. Please check your configuration file.')
     }
-    return app.url
+    return url
 }
 
 /**

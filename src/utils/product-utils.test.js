@@ -13,17 +13,17 @@ import {
     filterImageGroups,
     normalizeSetBundleProduct,
     getUpdateBundleChildArray
-} from '../../utils/product-utils'
+} from './product-utils'
 import {
     mockMasterProductHitWithMultipleVariants,
     mockMasterProductHitWithOneVariant,
     mockProductSetHit,
     mockStandardProductHit
-} from '../../mocks/product-search-hit-data'
-import {productSearch, getProduct} from '../../components/product-tile/promo-callout.mock'
-import productSetWinterLookM from '../../mocks/product-set-winter-lookM'
-import {mockProductSearch} from '../../mocks/mock-data'
-import {mockProductBundle, mockBundledProductItemsVariant} from '../../mocks/product-bundle.js'
+} from '../mocks/product-search-hit-data'
+import {productSearch, getProduct} from '../components/product-tile/promo-callout.mock'
+import productSetWinterLookM from '../mocks/product-set-winter-lookM'
+import {mockProductSearch} from '../mocks/mock-data'
+import {mockProductBundle, mockBundledProductItemsVariant} from '../mocks/product-bundle.js'
 
 const imageGroups = [
     {

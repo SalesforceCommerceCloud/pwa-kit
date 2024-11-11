@@ -8,7 +8,6 @@ import React from 'react'
 import {render} from '@testing-library/react'
 import '@testing-library/jest-dom'
 import withCurrency from './with-currency'
-import {CurrencyProvider} from '../../contexts'
 import useMultiSite from '../../hooks/use-multi-site'
 
 // Mock the `useMultiSite` hook
@@ -28,10 +27,10 @@ const WrappedComponent = withCurrency(TestComponent)
 describe('withCurrency HOC', () => {
     beforeEach(() => {
         // Set up a default mock implementation for useMultiSite
+        // @ts-ignore
         mockUseMultiSite.mockReturnValue({
             site: {l10n: {defaultCurrency: 'USD'}},
-            locale: {preferredCurrency: 'EUR'},
-            buildUrl: () => ''
+            locale: {preferredCurrency: 'EUR'}
         })
     })
 
@@ -45,7 +44,7 @@ describe('withCurrency HOC', () => {
     })
 
     it('should use locale.preferredCurrency if available', () => {
-        const {getByTestId} = render(<WrappedComponent />)
+        render(<WrappedComponent />)
 
         // Check if CurrencyProvider has been rendered with the preferred currency
         expect(mockUseMultiSite).toHaveBeenCalledTimes(1)
@@ -57,10 +56,10 @@ describe('withCurrency HOC', () => {
 
     it('should fallback to l10n.defaultCurrency if preferredCurrency is not available', () => {
         // Update the mock to have an empty preferredCurrency
+        // @ts-ignore
         mockUseMultiSite.mockReturnValueOnce({
             site: {l10n: {defaultCurrency: 'USD'}},
-            locale: {preferredCurrency: ''},
-            buildUrl: () => ''
+            locale: {preferredCurrency: ''}
         })
 
         const {getByTestId} = render(<WrappedComponent />)

@@ -15,7 +15,7 @@ import {
 } from '../../mocks/mock-data'
 
 import {Route, Switch} from 'react-router-dom'
-import mockConfig from '@salesforce/retail-react-app/config/mocks/default'
+import mockConfig from '../../mock-config'
 
 let mockCustomer = {}
 

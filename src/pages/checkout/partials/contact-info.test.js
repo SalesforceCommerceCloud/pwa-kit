@@ -6,8 +6,8 @@
  */
 import React from 'react'
 import {screen, within} from '@testing-library/react'
-import ContactInfo from '../../pages/checkout/partials/contact-info'
-import {renderWithProviders} from '../../utils/test-utils'
+import ContactInfo from './contact-info'
+import {renderWithProviders} from '../../../utils/test-utils'
 
 jest.mock('../util/checkout-context', () => {
     return {

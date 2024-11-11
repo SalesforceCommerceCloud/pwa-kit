@@ -10,8 +10,13 @@
 require('cross-fetch/polyfill')
 require('raf/polyfill') // fix requestAnimationFrame issue with polyfill
 require('@testing-library/jest-dom/extend-expect')
-// const mockConfig = require('./src/config/mocks/default')
-const mockConfig = {}
+const mockConfig = require('./src/mock-config')
+
+const mockAppConfig = {
+    app: {
+        extensions: [['@salesforce/extension-chakra-storefront', mockConfig]]
+    }
+}
 const {configure: configureTestingLibrary} = require('@testing-library/react')
 const {Crypto} = require('@peculiar/webcrypto')
 const {setupServer} = require('msw/node')
@@ -101,7 +106,7 @@ afterAll(() => {
 // Mock the application configuration to be used in all tests.
 jest.mock('@salesforce/pwa-kit-runtime/utils/ssr-config', () => {
     return {
-        getConfig: () => mockConfig
+        getConfig: () => mockAppConfig
     }
 })
 

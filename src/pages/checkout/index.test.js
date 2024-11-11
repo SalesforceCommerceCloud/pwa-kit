@@ -16,7 +16,7 @@ import {
     mockedRegisteredCustomer,
     mockedCustomerProductLists
 } from '../../mocks/mock-data'
-import mockConfig from '@salesforce/retail-react-app/config/mocks/default'
+import mockConfig from '../../mock-config'
 
 // This is a flaky test file!
 jest.retryTimes(5)

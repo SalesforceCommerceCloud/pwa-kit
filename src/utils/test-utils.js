@@ -10,20 +10,20 @@ import {BrowserRouter as Router} from 'react-router-dom'
 import {ChakraProvider} from '@chakra-ui/react'
 import PropTypes from 'prop-types'
 
-import theme from '../../theme'
-import {AddToCartModalProvider} from '../../hooks/use-add-to-cart-modal'
+import theme from '../theme'
+import {AddToCartModalProvider} from '../hooks/use-add-to-cart-modal'
 import {ServerContext} from '@salesforce/pwa-kit-react-sdk/ssr/universal/contexts'
 import {IntlProvider} from 'react-intl'
 import {CommerceApiProvider} from '@salesforce/commerce-sdk-react'
 import {PageContext, Region} from '@salesforce/commerce-sdk-react/components'
 import {withReactQuery} from '@salesforce/pwa-kit-react-sdk/ssr/universal/components/with-react-query'
 import fallbackMessages from '../../static/translations/compiled/en-GB.json'
-import mockConfig from '@salesforce/retail-react-app/config/mocks/default'
+import mockConfig from '../mock-config'
 // Contexts
-import {CurrencyProvider, MultiSiteProvider} from '../../contexts'
+import {CurrencyProvider, MultiSiteProvider} from '../contexts'
 
-import {createUrlTemplate} from '../../utils/url'
-import {getSiteByReference} from '../../utils/site-utils'
+import {createUrlTemplate} from '../utils/url'
+import {getSiteByReference} from '../utils/site-utils'
 import jwt from 'jsonwebtoken'
 import userEvent from '@testing-library/user-event'
 // This JWT's payload is special
@@ -96,7 +96,7 @@ export const TestProviders = ({
     children,
     locale = {id: DEFAULT_LOCALE},
     messages = fallbackMessages,
-    appConfig = mockConfig.app,
+    config = mockConfig,
     siteAlias = DEFAULT_SITE,
     isGuest = false,
     bypassAuth = true
@@ -110,15 +110,11 @@ export const TestProviders = ({
         }
     }, [])
 
-    const commerceApiConfig = appConfig.commerceAPI
+    const commerceApiConfig = config.commerceAPI
 
-    const site = getSiteByReference(siteAlias || appConfig.defaultSite)
+    const site = getSiteByReference(siteAlias || config.defaultSite)
 
-    const buildUrl = createUrlTemplate(
-        appConfig,
-        site?.alias || site?.id,
-        locale.alias || locale.id
-    )
+    const buildUrl = createUrlTemplate(config, site?.alias || site?.id, locale.alias || locale.id)
 
     return (
         <ServerContext.Provider value={{}}>
@@ -155,7 +151,7 @@ TestProviders.propTypes = {
     initialProductLists: PropTypes.object,
     messages: PropTypes.object,
     locale: PropTypes.object,
-    appConfig: PropTypes.object,
+    config: PropTypes.object,
     siteAlias: PropTypes.string,
     bypassAuth: PropTypes.bool,
     isGuest: PropTypes.bool
@@ -206,12 +202,12 @@ export const renderWithProviders = (children, options) => {
  * @returns {string} URL pathname for the given path
  */
 export const createPathWithDefaults = (path) => {
-    const {app} = mockConfig
-    const defaultSite = app.sites.find((site) => site.id === app.defaultSite)
-    const siteAlias = app.siteAliases[defaultSite.id]
+    const {siteAliases, sites} = mockConfig
+    const defaultSite = sites.find((site) => site.id === mockConfig.defaultSite)
+    const siteAlias = siteAliases[defaultSite.id]
     const defaultLocale = defaultSite.l10n.defaultLocale
 
-    const buildUrl = createUrlTemplate(app, siteAlias || defaultSite, defaultLocale)
+    const buildUrl = createUrlTemplate(mockConfig, siteAlias || defaultSite, defaultLocale)
 
     const updatedPath = buildUrl(path, siteAlias || defaultSite.id, defaultLocale)
     return updatedPath

@@ -13,7 +13,7 @@ import {BrowserRouter as Router, Route} from 'react-router-dom'
 import Account from '../../pages/account'
 import Registration from '../../pages/registration'
 import ResetPassword from '../../pages/reset-password'
-import mockConfig from '@salesforce/retail-react-app/config/mocks/default'
+import mockConfig from '../../mock-config'
 import {mockedRegisteredCustomer} from '../../mocks/mock-data'
 const mockMergedBasket = {
     basketId: 'a10ff320829cb0eef93ca5310a',
