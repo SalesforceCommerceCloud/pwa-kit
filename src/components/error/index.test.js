@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
-import Error from '../../components/_error/index'
+import Error from './index'
 // !!! ----- WARNING ----- WARNING ----- WARNING ----- !!!
 // Tests use render instead of renderWithProviders because
 // error component is rendered outside provider tree

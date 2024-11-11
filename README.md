@@ -1,18 +1,58 @@
 
-   ___      __       _ ______     __               _         
-  / _ \___ / /____ _(_/ / ____ __/ /____ ___  ___ (____  ___ 
- / , _/ -_/ __/ _ `/ / / _/ \ \ / __/ -_/ _ \(_-</ / _ \/ _ \
-/_/|_|\__/\__/\_,_/_/_/___//_\_\\__/\__/_//_/___/_/\___/_//_/
-                                                             
+_________ .__            __                    _________ __                        _____                      __   
+\_   ___ \|  |__ _____  |  | ______________   /   _____//  |_  ___________   _____/ ____\______  ____   _____/  |_ 
+/    \  \/|  |  \\__  \ |  |/ /\_  __ \__  \  \_____  \\   __\/  _ \_  __ \_/ __ \   __\\_  __ \/  _ \ /    \   __\
+\     \___|   Y  \/ __ \|    <  |  | \// __ \_/        \|  | (  <_> )  | \/\  ___/|  |   |  | \(  <_> )   |  \  |  
+ \______  /___|  (____  /__|_ \ |__|  (____  /_______  /|__|  \____/|__|    \___  >__|   |__|   \____/|___|  /__|  
+        \/     \/     \/     \/            \/        \/                         \/                         \/      
+
 
 # Description
 
-This is a sample PWA-Kit Application Extension. The purpose of this application extensions is to show how
-the Application Extensions API can be used to enhance your PWA-Kit base project.
+The Chakra Storefront Application Extension is a fully featured composible storefront using Chakra UI for its primary component
+library, along with other first and third party librarys like ReactIntl to handle localization and CommerceSDKReact to provide a
+React Hook library for accessing your Commerce Instance. This is a great place to start your storefront implementation if you are 
+looking to get off to a quick start!! 
 
-# Folder Structure
+Please refer to the list of features that this extesnion supports below. Also, noted below is the public API of files that you can 
+override if you choose to customize you application that way. 
 
-Insert description of generic Application Extension folder structure here.
+# Features
+
+The Chakra Storefront is a fully fledged storefront that includes the below features:
+
+- Localization support using ReactIntl.
+- Components provided by Chakra UI.
+- Implementations of the following pages:
+    - Home
+    - Product List
+    - Product Detail
+    - Cart
+    - Checkout
+    - Account
+    - Login
+    - Order Summary
+    - Wishlist
+
+# Overridable API
+
+Below is a list of all files this Application Extension allows to be overridden. This means that each of the below files can be overridden
+in the base project or any other configured appllication extension that is configured after it.
+
+Files:
+
+- /pages/account
+- /pages/cart
+- /pages/checkout
+- /pages/confirmation
+- /pages/home
+- /pages/login
+- /pages/registration
+- /pages/reset-password
+- /pages/login-redirect
+- /pages/product-detail
+- /pages/product-list
+- /pages/wishlist
 
 # Peer Dependancies
 
@@ -26,6 +66,22 @@ given package.
 
 "react": "^18.2.0",
 "react-dom": "^18.2.0"
+
+# Error Page
+
+This extension provides a error page that can be used as a replacement for the default provided by the PWA Kit
+React SDK. This page is NOT automatically wired up into the base application, its up to you to integrate it if you
+choose to use it. To accomplish this follow the below steps:
+
+1. In your base application, create a new file called `index.ts` located in the `app/components/_error` folder.
+2. Import and re-export the error component from this Application Extension like so:
+
+```
+import Error from '@salesforce/extension-chakra-storefront/src/components/error'
+export default Error
+```
+
+The inclusion of the below code will inform the SDK to use this component as the default error page.
 
 # Configuration
 
@@ -58,11 +114,5 @@ request to be fulfilled, then you can use overrides.
 Below is a list of files that can't be overridden from within your PWA-Kit base project. Please refer to the documentation here on
 how to properly override extensions. Additionally it's up to the Application Extension developer as to which files can and 
 cannot be overridden. Please refer to this documentation on how to write your first PWA-Kit Application Extension.
-
-## Overridable Files
-
-```
-/src/path/to/overridable/file.ts
-```
 
 

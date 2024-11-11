@@ -9,7 +9,7 @@ import PropTypes from 'prop-types'
 import {Helmet} from 'react-helmet'
 import {Box, Button, Flex, Heading, IconButton, Stack, Text} from '@chakra-ui/react'
 
-import {BrandLogo, FileIcon} from '../../components/icons'
+import {BrandLogo, FileIcon} from '../icons'
 import {useHistory} from 'react-router-dom'
 
 // <Error> is rendered when:
