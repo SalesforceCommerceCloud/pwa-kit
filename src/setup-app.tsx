@@ -113,7 +113,7 @@ class RetailReactApp extends ApplicationExtension<Config> {
     }
 
     // Called before the route with all the routes
-    beforeMatch(allRoutes: RouteProps[]): RouteProps[] {
+    beforeRouteMatch(allRoutes: RouteProps[]): RouteProps[] {
         const config = this.getConfig()
 
         return configureRoutes(allRoutes, config, {
