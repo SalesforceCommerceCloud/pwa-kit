@@ -14,6 +14,9 @@ const program = require('commander')
 const validator = require('validator')
 const {execSync: _execSync} = require('child_process')
 const {getConfig} = require('@salesforce/pwa-kit-runtime/utils/ssr-config')
+const {
+    buildBabelExtensibilityArgs
+} = require('@salesforce/pwa-kit-extension-sdk/configs/babel/utils')
 
 // Scripts in ./bin have never gone through babel, so we
 // don't have a good pattern for mixing compiled/un-compiled
@@ -239,12 +242,10 @@ const main = async () => {
                 'babel-node'
             )
 
-            // TODO: Babel is transpiling files in the node_modules folder that is doesn't have to!! I don't know why these ignores are working
-            // there is also a set of ignores that might have to be set in the babel configuration.
             execSync(
                 `${babelNode} ${
                     inspect ? '--inspect' : ''
-                } --ignore '/node_modules\\/(?!extension-[^\\/]+\\/)/i' ${babelArgs} ${getAppEntrypoint()}`,
+                } ${buildBabelExtensibilityArgs()} ${babelArgs} ${getAppEntrypoint()}`,
                 {
                     env: {
                         ...process.env,

@@ -1020,9 +1020,9 @@ const runGenerator = async (
             ...(selectedAppExtensions.length > 0 && {
                 mobify: {
                     app: {
-                        extensions: selectedAppExtensions.map((appExtensionName) => [
-                            appExtensionName
-                        ])
+                        extensions: selectedAppExtensions.map(
+                            (appExtensionName) => appExtensionName
+                        )
                     }
                 }
             })
