@@ -19,6 +19,7 @@
   "devDependencies": {
     "@loadable/component": "^5.15.3",
     "@salesforce/extension-sample": "1.0.0-dev",
+    "@salesforce/extension-sample-2": "1.0.0-dev",
     "@salesforce/pwa-kit-extension-sdk": "4.0.0-dev",
     "@salesforce/pwa-kit-dev": "4.0.0-dev",
     "@salesforce/pwa-kit-react-sdk": "4.0.0-dev",
@@ -45,12 +46,8 @@
   "mobify": {
     "app":{
       "extensions": [
-        [
-          "@salesforce/extension-sample",
-          {
-            "enabled": true
-          }
-        ]
+        ["@salesforce/extension-sample", {"enabled": true}],
+        "@salesforce/extension-sample-2"
       ]
     },
     "ssrEnabled": true,
