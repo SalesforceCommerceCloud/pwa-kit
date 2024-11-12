@@ -8,6 +8,9 @@
 import {ApplicationExtensionEntryArray, ApplicationExtensionConfig} from '../../types'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 
+// NOTE: please make sure that the imported modules do not include 'path'.
+// This way getConfiguredExtensions can be called from both server and client side.
+
 const DEFAULT_CONFIG: ApplicationExtensionConfig = {
     enabled: true
 }
@@ -62,11 +65,20 @@ export const kebabToLowerCamelCase = (str: string) =>
 // TODO: This looks like it could be done in a more generic way.
 const isApplicationExtensionEntryArray = (entry: unknown[]): boolean => {
     const [nameRef, config] = entry || []
-    return (
+    const isValid =
         typeof nameRef === 'string' &&
         typeof config === 'object' &&
         !!nameRef.match(/^(?:@([^/]+)\/)?extension-(.+)$/)
-    )
+
+    if (!isValid) {
+        // TODO: use our logger factory
+        console.warn(
+            'Skipping this application extension entry because it is not of valid format. Please double check your configuration.',
+            entry
+        )
+    }
+
+    return isValid
 }
 
 /**
