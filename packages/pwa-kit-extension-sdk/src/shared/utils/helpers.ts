@@ -91,11 +91,11 @@ export const expand = (extensions: unknown[] = []): ApplicationExtensionEntryArr
     extensions
         .filter((extension) => Boolean(extension))
         .map((extension) => {
-            const thing: [string, any] = Array.isArray(extension)
+            const tuple: [string, any] = Array.isArray(extension)
                 ? [extension[0], {...DEFAULT_CONFIG, ...extension[1]}]
                 : [extension, DEFAULT_CONFIG]
 
-            return thing
+            return tuple
         })
         .filter(isApplicationExtensionEntryArray)
 

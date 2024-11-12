@@ -46,7 +46,7 @@
     "app":{
       "extensions": [
         [
-          "@salesforce/extension-sample", 
+          "@salesforce/extension-sample",
           {
             "enabled": true
           }
