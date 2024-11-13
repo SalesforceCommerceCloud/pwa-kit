@@ -64,11 +64,13 @@ export class OverridesResolverPlugin {
             return
         }
         const target = resolver.ensureHook('resolved')
-        const importPath = request.request
-        const sourcePath = request.context.issuer
+        const importPath: string = request.request
+        const sourcePath: string = request.context.issuer
 
         // Resolve the import with the provided packageIterator.
         let modulePath
+
+        // console.log('--- resolver plugin 1')
 
         try {
             modulePath = resolve.sync(importPath, {
@@ -82,7 +84,14 @@ export class OverridesResolverPlugin {
                 ...this.options.resolveOptions
             })
         } catch (e: any) {
-            return callback(e)
+            // console.log('--- resolver plugin: caught this this error', e.name, e.message)
+            // console.log('---', importPath, sourcePath)
+            return callback(
+                new Error(
+                    // sourcePath, in this case, points to a more specific file that is more helpful for debugging
+                    `Cannot find module '${importPath}' from '${sourcePath}'. Please verify that your \`app.extensions\` config is correct.`
+                )
+            )
         }
 
         // Update the requests path with the one resolved from above.
