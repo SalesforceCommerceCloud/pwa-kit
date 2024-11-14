@@ -15,10 +15,12 @@ import {AddToCartModalProvider} from '../hooks/use-add-to-cart-modal'
 import {ServerContext} from '@salesforce/pwa-kit-react-sdk/ssr/universal/contexts'
 import {IntlProvider} from 'react-intl'
 import {CommerceApiProvider} from '@salesforce/commerce-sdk-react'
+import {ApplicationExtensionsProvider} from '@salesforce/pwa-kit-extension-sdk/react/contexts'
 import {PageContext, Region} from '@salesforce/commerce-sdk-react/components'
 import {withReactQuery} from '@salesforce/pwa-kit-react-sdk/ssr/universal/components/with-react-query'
 import fallbackMessages from '../../static/translations/compiled/en-GB.json'
 import mockConfig from '../mock-config'
+import ChakraStorefrontExtension from '../setup-app'
 // Contexts
 import {CurrencyProvider, MultiSiteProvider} from '../contexts'
 
@@ -118,28 +120,32 @@ export const TestProviders = ({
 
     return (
         <ServerContext.Provider value={{}}>
-            <IntlProvider locale={locale.id} defaultLocale={DEFAULT_LOCALE} messages={messages}>
-                <MultiSiteProvider site={site} locale={locale} buildUrl={buildUrl}>
-                    <CommerceApiProvider
-                        shortCode={commerceApiConfig.parameters.shortCode}
-                        clientId={commerceApiConfig.parameters.clientId}
-                        organizationId={commerceApiConfig.parameters.organizationId}
-                        siteId={site?.id}
-                        locale={locale.id}
-                        proxy={`${window.location.origin}/${commerceApiConfig.proxyPath}`}
-                        redirectURI={`${window.location.origin}/testcallback`}
-                        fetchedToken={bypassAuth ? (isGuest ? guestToken : registerUserToken) : ''}
-                    >
-                        <CurrencyProvider currency={DEFAULT_CURRENCY}>
-                            <Router>
-                                <ChakraProvider theme={theme}>
-                                    <AddToCartModalProvider>{children}</AddToCartModalProvider>
-                                </ChakraProvider>
-                            </Router>
-                        </CurrencyProvider>
-                    </CommerceApiProvider>
-                </MultiSiteProvider>
-            </IntlProvider>
+            <ApplicationExtensionsProvider extensions={[new ChakraStorefrontExtension(config)]}>
+                <IntlProvider locale={locale.id} defaultLocale={DEFAULT_LOCALE} messages={messages}>
+                    <MultiSiteProvider site={site} locale={locale} buildUrl={buildUrl}>
+                        <CommerceApiProvider
+                            shortCode={commerceApiConfig.parameters.shortCode}
+                            clientId={commerceApiConfig.parameters.clientId}
+                            organizationId={commerceApiConfig.parameters.organizationId}
+                            siteId={site?.id}
+                            locale={locale.id}
+                            proxy={`${window.location.origin}/${commerceApiConfig.proxyPath}`}
+                            redirectURI={`${window.location.origin}/testcallback`}
+                            fetchedToken={
+                                bypassAuth ? (isGuest ? guestToken : registerUserToken) : ''
+                            }
+                        >
+                            <CurrencyProvider currency={DEFAULT_CURRENCY}>
+                                <Router>
+                                    <ChakraProvider theme={theme}>
+                                        <AddToCartModalProvider>{children}</AddToCartModalProvider>
+                                    </ChakraProvider>
+                                </Router>
+                            </CurrencyProvider>
+                        </CommerceApiProvider>
+                    </MultiSiteProvider>
+                </IntlProvider>
+            </ApplicationExtensionsProvider>
         </ServerContext.Provider>
     )
 }

@@ -13,6 +13,7 @@
  * A single-site, single-locale config is a special case of multi-site case.
  */
 module.exports = {
+    id: '@salesforce/extension-chakra-storefront',
     url: {
         locale: 'path',
         site: 'path',

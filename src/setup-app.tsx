@@ -27,7 +27,7 @@ import {withStorefrontPreview} from './components/with-storefront-preview'
 // Pages
 import * as Pages from './pages'
 
-class RetailReactApp extends ApplicationExtension<Config> {
+class ChakraStorefront extends ApplicationExtension<Config> {
     extendApp<T>(App: React.ComponentType<T>): React.ComponentType<T> {
         // NOTE: The order of these HOCs is important!
         const requiredHOCs = [
@@ -122,4 +122,4 @@ class RetailReactApp extends ApplicationExtension<Config> {
     }
 }
 
-export default RetailReactApp
+export default ChakraStorefront

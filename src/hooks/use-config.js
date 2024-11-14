@@ -11,19 +11,26 @@ import {useMemo} from 'react'
 import {useApplicationExtensions} from '@salesforce/pwa-kit-extension-sdk/react'
 
 // Local Imports
-import {id} from '../config'
+import config from '../config'
 
 /**
  * This hook returns the configuration for the current application extenson.
  */
 export const useConfig = () => {
+    // TODO: We should probably just have a "filter" option for this hook so that we can pass in some filters
+    // and get the appropriate result so we aren't always writing the same find logic.
     const applicationExtensions = useApplicationExtensions()
 
     // NOTE: The Application Extensions aren't going to change as they are set once and never set again
     // but lets future proof this in case we have some sore of dynamic loading of extensions in the future.
-    const extension = useMemo(() => {
-        return applicationExtensions.find((extension) => extension.getConfig().id === id)
-    }, [applicationExtensions])
+    const extension = useMemo(
+        () => applicationExtensions.find((extension) => extension.getConfig().id === config.id),
+        [applicationExtensions]
+    )
+
+    if (extension === undefined) {
+        throw new Error(`'useConfig' could find your current application extension instance!`)
+    }
 
     return extension.getConfig()
 }
