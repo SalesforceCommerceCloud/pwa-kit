@@ -7,10 +7,10 @@
 
 // Third-Party
 import {LoaderContext} from 'webpack'
-import {ApplicationExtensionEntryArray} from '../../types'
+import {ApplicationExtensionEntryTuple} from '../../types'
 
 export interface ApplicationExtensionsLoaderOptions {
-    configured: ApplicationExtensionEntryArray[]
+    configured: ApplicationExtensionEntryTuple[]
     target: 'node' | 'web'
 }
 

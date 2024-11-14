@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import {ApplicationExtensionEntryArray, ApplicationExtensionConfig} from '../../types'
+import {ApplicationExtensionEntryTuple, ApplicationExtensionConfig} from '../../types'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 
 // NOTE: please make sure that the imported modules do not include 'path'.
@@ -61,9 +61,9 @@ export const kebabToLowerCamelCase = (str: string) =>
         )
         .join('')
 
-// Returns true if the entry passes is a ApplicationExtensionEntryArray type.
+// Returns true if the entry passes is a ApplicationExtensionEntryTuple type.
 // TODO: This looks like it could be done in a more generic way.
-const isApplicationExtensionEntryArray = (entry: unknown[]): boolean => {
+const isApplicationExtensionEntryTuple = (entry: unknown[]): boolean => {
     const [nameRef, config] = entry || []
     const isValid =
         typeof nameRef === 'string' &&
@@ -99,7 +99,7 @@ const isApplicationExtensionEntryArray = (entry: unknown[]): boolean => {
  *   ['@salesforce/extension-c', {enabled: true}]
  * ]
  */
-export const expand = (extensions: unknown[] = []): ApplicationExtensionEntryArray[] =>
+export const expand = (extensions: unknown[] = []): ApplicationExtensionEntryTuple[] =>
     extensions
         .filter((extension) => Boolean(extension))
         .map((extension) => {
@@ -109,7 +109,7 @@ export const expand = (extensions: unknown[] = []): ApplicationExtensionEntryArr
 
             return tuple
         })
-        .filter(isApplicationExtensionEntryArray)
+        .filter(isApplicationExtensionEntryTuple)
 
 /**
  * Returns the list of configured extensions, given the configurations found in a config file or package.json's `mobify`
@@ -119,7 +119,7 @@ export const expand = (extensions: unknown[] = []): ApplicationExtensionEntryArr
  */
 export const getConfiguredExtensions = (
     config: any = getConfig()
-): ApplicationExtensionEntryArray[] => {
+): ApplicationExtensionEntryTuple[] => {
     // Note: this path to the `extensions` property may change
     return expand(config?.app?.extensions || [])
 }

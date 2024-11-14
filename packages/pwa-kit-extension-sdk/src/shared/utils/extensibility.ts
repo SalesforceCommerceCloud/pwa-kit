@@ -10,7 +10,7 @@ import fse from 'fs-extra'
 import path, {resolve} from 'path'
 
 // Types
-import {ApplicationExtensionEntry, ApplicationExtensionEntryArray} from '../../types'
+import {ApplicationExtensionEntry, ApplicationExtensionEntryTuple} from '../../types'
 
 // CONSTANTS
 // const REACT_EXTENSIBILITY_FILE = 'setup-app'
@@ -105,8 +105,8 @@ export const getExtensionNames = (extensions: ApplicationExtensionEntry[]) => {
 }
 
 // TODO: jsdoc
-export const validateExtensionDependencies = (extensions: ApplicationExtensionEntryArray[]) => {
-    const hasDependencies = (extension: ApplicationExtensionEntryArray) => {
+export const validateExtensionDependencies = (extensions: ApplicationExtensionEntryTuple[]) => {
+    const hasDependencies = (extension: ApplicationExtensionEntryTuple) => {
         const dependencies = getDependencies(extension)
         const previousExtensions = getPreviousExtensions(extension, extensions).map((ext) => ext[0])
         const success = dependencies.every((dependency) => previousExtensions.includes(dependency))
@@ -116,6 +116,7 @@ export const validateExtensionDependencies = (extensions: ApplicationExtensionEn
     return extensions.every((extension) => {
         const {success, dependencies} = hasDependencies(extension)
         if (!success) {
+            // TODO: use our own logger
             console.error(
                 `Extension(s) missing: ${dependencies.join(', ')}, as required by ${extension[0]}`
             )
@@ -124,7 +125,7 @@ export const validateExtensionDependencies = (extensions: ApplicationExtensionEn
     })
 }
 
-const getDependencies = (extension: ApplicationExtensionEntryArray) => {
+const getDependencies = (extension: ApplicationExtensionEntryTuple) => {
     const projectDir = process.cwd()
     const pkg = fse.readJsonSync(resolve(projectDir, 'node_modules', extension[0], 'package.json'))
 
@@ -133,8 +134,8 @@ const getDependencies = (extension: ApplicationExtensionEntryArray) => {
 
 // TODO: may need to change what it means by "previous" extensions
 const getPreviousExtensions = (
-    currentExtension: ApplicationExtensionEntryArray,
-    extensions: ApplicationExtensionEntryArray[]
+    currentExtension: ApplicationExtensionEntryTuple,
+    extensions: ApplicationExtensionEntryTuple[]
 ) => {
     const array = extensions.slice().reverse()
     const index = array.findIndex((extension) => extension[0] === currentExtension[0])

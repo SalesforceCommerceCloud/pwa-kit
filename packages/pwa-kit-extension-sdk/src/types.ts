@@ -16,13 +16,13 @@ export interface ApplicationExtensionConfig extends Record<string, unknown> {
 /**
  * When configuring your PWA-Kit Application to use Application Extensions via the config
  */
-export type ApplicationExtensionEntryArray = [string, ApplicationExtensionConfig]
+export type ApplicationExtensionEntryTuple = [string, ApplicationExtensionConfig]
 
 /**
  * This type represents the array entry in the "extensions" property of your PWA-Kit
  * application configuration.
  */
-export type ApplicationExtensionEntry = ApplicationExtensionEntryArray | string
+export type ApplicationExtensionEntry = ApplicationExtensionEntryTuple | string
 
 /**
  * This type is used in the resolver utility for passing in the currently configured
