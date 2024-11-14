@@ -86,6 +86,8 @@ export class OverridesResolverPlugin {
         } catch (e: any) {
             // console.log('--- resolver plugin: caught this this error', e.name, e.message)
             // console.log('---', importPath, sourcePath)
+
+            // Return a better error message
             return callback(
                 new Error(
                     // sourcePath, in this case, points to a more specific file that is more helpful for debugging
