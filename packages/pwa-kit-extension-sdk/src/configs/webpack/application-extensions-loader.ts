@@ -7,6 +7,7 @@
 
 // Local
 import {renderTemplate} from '../utils'
+import {validateExtensionDependencies} from '../../shared/utils'
 
 // Types
 import {ApplicationExtensionsLoaderContext, ApplicationExtensionsLoaderOptions} from './types'
@@ -33,10 +34,18 @@ export default function ApplicationExtensibilityLoader(
 ): string {
     // TODO: Add checking for arguments.
 
-    // Get the installed and configured application extensions as well as the requested
-    // target type. For web targets the loader takes advantage of react-loadabled but node
-    // targets (server) do not require this optimization.
+    console.log('--- ApplicationExtensibilityLoader')
+
+    // Get configured application extensions as well as the requested target type.
+    // For web targets, the loader takes advantage of react-loadable but node targets (server) do not require this optimization.
     const data = this.getOptions()
+
+    const isValidated = validateExtensionDependencies(data.configured)
+    if (!isValidated) {
+        throw new Error(
+            'Missing app extensions that other extensions depend on. See logs for more details.'
+        )
+    }
 
     return renderTemplate(data)
 }
@@ -57,6 +66,8 @@ export const ruleForApplicationExtensibility = (options: any = {}) => {
     const {loaderOptions = {}} = options
     const {target = DEFAULT_TARGET, configured} =
         loaderOptions as ApplicationExtensionsLoaderOptions
+
+    console.log('--- ruleForApplicationExtensibility')
 
     return {
         test: new RegExp(

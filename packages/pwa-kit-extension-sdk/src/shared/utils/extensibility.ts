@@ -7,10 +7,10 @@
 
 // Third-Party
 import fse from 'fs-extra'
-import path from 'path'
+import path, {resolve} from 'path'
 
 // Types
-import {ApplicationExtensionEntry} from '../../types'
+import {ApplicationExtensionEntry, ApplicationExtensionEntryArray} from '../../types'
 
 // CONSTANTS
 // const REACT_EXTENSIBILITY_FILE = 'setup-app'
@@ -102,4 +102,41 @@ export const getExtensionNames = (extensions: ApplicationExtensionEntry[]) => {
     return (extensions || []).map((extension) => {
         return Array.isArray(extension) ? extension[0] : extension
     })
+}
+
+// TODO: jsdoc
+export const validateExtensionDependencies = (extensions: ApplicationExtensionEntryArray[]) => {
+    const hasDependencies = (extension: ApplicationExtensionEntryArray) => {
+        const dependencies = getDependencies(extension)
+        const previousExtensions = getPreviousExtensions(extension, extensions).map((ext) => ext[0])
+        const success = dependencies.every((dependency) => previousExtensions.includes(dependency))
+
+        return {success, dependencies}
+    }
+    return extensions.every((extension) => {
+        const {success, dependencies} = hasDependencies(extension)
+        if (!success) {
+            console.error(
+                `Extension(s) missing: ${dependencies.join(', ')}, as required by ${extension[0]}`
+            )
+        }
+        return success
+    })
+}
+
+const getDependencies = (extension: ApplicationExtensionEntryArray) => {
+    const projectDir = process.cwd()
+    const pkg = fse.readJsonSync(resolve(projectDir, 'node_modules', extension[0], 'package.json'))
+
+    return Object.keys(pkg.peerDependencies).filter((name) => name.match(nameRegex) !== null)
+}
+
+// TODO: may need to change what it means by "previous" extensions
+const getPreviousExtensions = (
+    currentExtension: ApplicationExtensionEntryArray,
+    extensions: ApplicationExtensionEntryArray[]
+) => {
+    const array = extensions.slice().reverse()
+    const index = array.findIndex((extension) => extension[0] === currentExtension[0])
+    return array.slice(index + 1)
 }
