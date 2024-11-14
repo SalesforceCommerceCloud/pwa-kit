@@ -5,7 +5,6 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import {useMemo, useState} from 'react'
-import {getExtensionConfig as getConfig} from '../utils/get-extension-config'
 
 import {
     useCommerceApi,
@@ -14,6 +13,7 @@ import {
     useEncUserId,
     useCustomerType
 } from '@salesforce/commerce-sdk-react'
+import {useConfig} from '../hooks/use-config'
 import {keysToCamel} from '../utils/utils'
 import logger from '../utils/logger-instance'
 
@@ -390,7 +390,7 @@ export class EinsteinAPI {
 const useEinstein = () => {
     const api = useCommerceApi()
     const {getTokenWhenReady} = useAccessToken()
-    const {einsteinAPI: config} = getConfig()
+    const {einsteinAPI: config} = useConfig()
     const {host, einsteinId, siteId, isProduction} = config
 
     const {getUsidWhenReady} = useUsid()

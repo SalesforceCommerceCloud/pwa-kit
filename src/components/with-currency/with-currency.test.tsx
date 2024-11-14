@@ -27,10 +27,10 @@ const WrappedComponent = withCurrency(TestComponent)
 describe('withCurrency HOC', () => {
     beforeEach(() => {
         // Set up a default mock implementation for useMultiSite
-        // @ts-ignore
         mockUseMultiSite.mockReturnValue({
             site: {l10n: {defaultCurrency: 'USD'}},
-            locale: {preferredCurrency: 'EUR'}
+            locale: {preferredCurrency: 'EUR'},
+            buildUrl: () => ''
         })
     })
 
@@ -56,10 +56,10 @@ describe('withCurrency HOC', () => {
 
     it('should fallback to l10n.defaultCurrency if preferredCurrency is not available', () => {
         // Update the mock to have an empty preferredCurrency
-        // @ts-ignore
         mockUseMultiSite.mockReturnValueOnce({
             site: {l10n: {defaultCurrency: 'USD'}},
-            locale: {preferredCurrency: ''}
+            locale: {preferredCurrency: ''},
+            buildUrl: () => ''
         })
 
         const {getByTestId} = render(<WrappedComponent />)

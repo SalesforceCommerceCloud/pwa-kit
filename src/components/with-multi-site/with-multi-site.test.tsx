@@ -46,11 +46,14 @@ const WrappedComponent = withMultiSite(TestComponent)
 describe('withMultiSite HOC', () => {
     beforeEach(() => {
         // Set up default mock values
-        mockUseServerContext.mockReturnValue({req: {originalUrl: '/test-path'}})
+        mockUseServerContext.mockReturnValue({
+            req: {originalUrl: '/test-path'},
+            res: {}
+        })
         mockUseConfig.mockReturnValue({someConfig: 'value'})
         mockResolveSiteFromUrl.mockReturnValue({id: 'site-id', alias: 'site-alias'})
         mockResolveLocaleFromUrl.mockReturnValue({id: 'locale-id'})
-        mockCreateUrlTemplate.mockReturnValue(jest.fn((path) => `/resolved-url${path}`))
+        mockCreateUrlTemplate.mockReturnValue(jest.fn((path: string) => `/resolved-url${path}`))
     })
 
     afterEach(() => {
