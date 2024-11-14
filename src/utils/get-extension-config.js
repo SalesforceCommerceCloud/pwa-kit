@@ -9,11 +9,11 @@
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 
 // Local Imports
-import {id as extensionId} from '../config'
+import config from '../config'
 
 export const getExtensionConfig = () => {
     const extensions = getConfig()?.app?.extensions
-    const extensionEntry = extensions.find(([id]) => id === extensionId)
+    const extensionEntry = extensions.find(([id]) => id === config.id)
 
     // TODO: This isn't the right way to do this for multiple reasons.
     // 1. The config isn't always in tupal format so this might break.
