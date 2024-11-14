@@ -28,6 +28,12 @@ import {withStorefrontPreview} from './components/with-storefront-preview'
 import * as Pages from './pages'
 
 class ChakraStorefront extends ApplicationExtension<Config> {
+    static id: string = `@salesforce/extension-chakra-storefront`
+
+    getStaticId(): string {
+        return ChakraStorefront.id
+    }
+
     extendApp<T>(App: React.ComponentType<T>): React.ComponentType<T> {
         // NOTE: The order of these HOCs is important!
         const requiredHOCs = [
