@@ -28,11 +28,7 @@ import {withStorefrontPreview} from './components/with-storefront-preview'
 import * as Pages from './pages'
 
 class ChakraStorefront extends ApplicationExtension<Config> {
-    static id: string = `@salesforce/extension-chakra-storefront`
-
-    getStaticId(): string {
-        return ChakraStorefront.id
-    }
+    static id = `@salesforce/extension-chakra-storefront`
 
     extendApp<T>(App: React.ComponentType<T>): React.ComponentType<T> {
         // NOTE: The order of these HOCs is important!
@@ -115,7 +111,7 @@ class ChakraStorefront extends ApplicationExtension<Config> {
             return (config.pages || [])[component.displayName] !== false
         })
 
-        return [...extensionRoutes, ...routes]
+        return [...routes, ...extensionRoutes]
     }
 
     // Called before the route with all the routes

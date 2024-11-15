@@ -7,7 +7,7 @@
 
 import React, {useEffect, useRef} from 'react'
 import {FormattedMessage, useIntl} from 'react-intl'
-import {useHistory, useRouteMatch} from 'react-router'
+import {useHistory, useRouteMatch} from 'react-router-dom'
 import {
     Box,
     Heading,

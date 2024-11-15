@@ -20,8 +20,8 @@ import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 const mockHistoryPush = jest.fn()
 const mockHistoryReplace = jest.fn()
 
-jest.mock('react-router', () => {
-    const original = jest.requireActual('react-router')
+jest.mock('react-router-dom', () => {
+    const original = jest.requireActual('react-router-dom')
 
     return {
         ...original,

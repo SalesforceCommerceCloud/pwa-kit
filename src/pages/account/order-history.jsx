@@ -7,7 +7,7 @@
 
 import React, {useEffect, useRef} from 'react'
 import {FormattedMessage, FormattedNumber, useIntl} from 'react-intl'
-import {useLocation} from 'react-router'
+import {useLocation} from 'react-router-dom'
 import {
     Box,
     Heading,

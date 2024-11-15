@@ -11,7 +11,7 @@ import {useMemo} from 'react'
 import {useApplicationExtensions} from '@salesforce/pwa-kit-extension-sdk/react'
 
 // Local Imports
-import ChakraStorefrontExtension from '../setup-app'
+// import ChakraStorefrontExtension from '../setup-app'
 
 /**
  * This hook returns the configuration for the current application extenson.
@@ -24,7 +24,10 @@ export const useConfig = () => {
     // NOTE: The Application Extensions aren't going to change as they are set once and never set again
     // but lets future proof this in case we have some sore of dynamic loading of extensions in the future.
     const extension = useMemo(
-        () => applicationExtensions.find((extension) => extension.getStaticId() === ChakraStorefrontExtension.id),
+        () =>
+            applicationExtensions.find(
+                (extension) => extension.constructor.id === `@salesforce/extension-chakra-storefront`
+            ),
         [applicationExtensions]
     )
 

@@ -8,7 +8,7 @@
 import React, {useEffect, useState} from 'react'
 import PropTypes from 'prop-types'
 import {FormattedMessage, useIntl} from 'react-intl'
-import {Route, Switch, useRouteMatch, Redirect} from 'react-router'
+import {Route, Switch, Redirect, useLocation, useRouteMatch} from 'react-router-dom'
 import {
     Accordion,
     AccordionButton,
@@ -30,7 +30,6 @@ import AccountDetail from '../../pages/account/profile'
 import AccountAddresses from '../../pages/account/addresses'
 import AccountOrders from '../../pages/account/orders'
 import AccountWishlist from '../../pages/account/wishlist/index'
-import {useLocation} from 'react-router-dom'
 
 import {messages, navLinks} from '../../pages/account/constant'
 import useNavigation from '../../hooks/use-navigation'

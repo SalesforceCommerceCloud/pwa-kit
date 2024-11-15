@@ -7,7 +7,7 @@
 
 import React, {useEffect} from 'react'
 import {useIntl, FormattedMessage} from 'react-intl'
-import {useLocation} from 'react-router-dom'
+import {useLocation, useRouteMatch} from 'react-router-dom'
 
 // Components
 import {
@@ -53,6 +53,8 @@ import {useProductSearch} from '@salesforce/commerce-sdk-react'
  * categories and products, data is from local file.
  */
 const Home = () => {
+    const match = useRouteMatch()
+    console.log('match: ', match)
     const intl = useIntl()
     const einstein = useEinstein()
     const {pathname} = useLocation()

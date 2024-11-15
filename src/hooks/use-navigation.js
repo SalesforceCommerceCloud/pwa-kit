@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import {useCallback} from 'react'
-import {useHistory} from 'react-router'
+import {useHistory} from 'react-router-dom'
 import useMultiSite from './use-multi-site'
 import {removeSiteLocaleFromPath} from '../utils/url'
 
