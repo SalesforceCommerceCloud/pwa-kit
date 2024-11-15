@@ -104,7 +104,10 @@ export const getExtensionNames = (extensions: ApplicationExtensionEntry[]) => {
     })
 }
 
-// TODO: jsdoc
+/**
+ * Validate the given extensions to make sure that other extensions they depend on will be loaded.
+ * @returns the validation status. If it fails, then an error will also be returned, which lists what dependencies are missing or disabled.
+ */
 export const validateExtensionDependencies = (
     extensions: ApplicationExtensionEntryTuple[]
 ): {success: boolean; error?: Error} => {
