@@ -34,7 +34,7 @@ export default function ApplicationExtensibilityLoader(
 ): string {
     // TODO: Add checking for arguments.
 
-    console.log('--- ApplicationExtensibilityLoader')
+    // console.log('--- ApplicationExtensibilityLoader')
 
     // Get configured application extensions as well as the requested target type.
     // For web targets, the loader takes advantage of react-loadable but node targets (server) do not require this optimization.
@@ -43,7 +43,7 @@ export default function ApplicationExtensibilityLoader(
     const isValidated = validateExtensionDependencies(data.configured)
     if (!isValidated) {
         throw new Error(
-            'Missing app extensions that other extensions depend on. See logs for more details.'
+            'Missing app extensions that other extensions depend on. See previous logs for more details.'
         )
     }
 
@@ -67,7 +67,7 @@ export const ruleForApplicationExtensibility = (options: any = {}) => {
     const {target = DEFAULT_TARGET, configured} =
         loaderOptions as ApplicationExtensionsLoaderOptions
 
-    console.log('--- ruleForApplicationExtensibility')
+    // console.log('--- ruleForApplicationExtensibility')
 
     return {
         test: new RegExp(
