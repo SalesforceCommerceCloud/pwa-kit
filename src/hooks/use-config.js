@@ -10,9 +10,6 @@ import {useMemo} from 'react'
 // Platform Imports
 import {useApplicationExtensions} from '@salesforce/pwa-kit-extension-sdk/react'
 
-// Local Imports
-// import ChakraStorefrontExtension from '../setup-app'
-
 /**
  * This hook returns the configuration for the current application extenson.
  */
