@@ -47,6 +47,7 @@ const withApplicationExtensions = <C,>(
 ) => {
     const hocs: GenericHocType<C>[] = options.applicationExtensions
         .filter((applicationExtension: any) => applicationExtension.isEnabled())
+        .reverse()
         .map((extension: any) => extension.extendApp.bind(extension) as GenericHocType<C>)
         .filter(Boolean)
     const withApplicationExtensionsProvider: GenericHocType<any> = (WrappedComponent) => {

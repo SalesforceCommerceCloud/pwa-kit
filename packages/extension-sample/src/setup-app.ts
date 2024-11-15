@@ -25,6 +25,7 @@ class Sample extends ApplicationExtension<Config> {
     }
 
     extendRoutes(routes: RouteProps[]): RouteProps[] {
+        // TODO: reverse this order, and look at other similar files too
         return [
             {
                 exact: true,
