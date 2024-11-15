@@ -154,7 +154,6 @@ const getDependencies = (extension: ApplicationExtensionEntryTuple) => {
     return Object.keys(pkg.peerDependencies).filter((name) => name.match(nameRegex) !== null)
 }
 
-// TODO: may need to change what it means by "previous" extensions
 const getPreviousExtensions = (
     currentExtension: ApplicationExtensionEntryTuple,
     extensions: ApplicationExtensionEntryTuple[]

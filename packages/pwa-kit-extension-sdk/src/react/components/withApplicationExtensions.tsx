@@ -47,6 +47,7 @@ const withApplicationExtensions = <C,>(
 ) => {
     const hocs: GenericHocType<C>[] = options.applicationExtensions
         .filter((applicationExtension: any) => applicationExtension.isEnabled())
+        // It's counterintuitive: reversing the list is necessary, as we build the React tree from innermost
         .reverse()
         .map((extension: any) => extension.extendApp.bind(extension) as GenericHocType<C>)
         .filter(Boolean)

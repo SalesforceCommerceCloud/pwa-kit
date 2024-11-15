@@ -16,10 +16,12 @@ import {Config} from './types'
 
 class Sample2Extension extends ApplicationExtension<Config> {
     extendApp(app: Application): Application {
-        app.get('/sample', (req, res) => {
-            console.log('SampleExtension extendApp GET /sample')
+        // I'm not sure what it looks to extend the behavior of the _same_ endpoint
+        app.get('/sample', (req, res, next) => {
+            console.log('Sample2Extension extendApp GET /sample')
+            // We can't call next() because already calling send here
             res.send(
-                `<p>Hello from an express SampleExtension!</p>
+                `<p>Hello from an express Sample2Extension!</p>
                 <pre>extensionConfig = ${JSON.stringify(this.getConfig())}</pre>`
             )
         })

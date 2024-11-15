@@ -70,8 +70,6 @@ export class OverridesResolverPlugin {
         // Resolve the import with the provided packageIterator.
         let modulePath
 
-        // console.log('--- resolver plugin 1')
-
         try {
             modulePath = resolve.sync(importPath, {
                 basedir: this.options.projectDir,
