@@ -105,7 +105,9 @@ export const getExtensionNames = (extensions: ApplicationExtensionEntry[]) => {
 }
 
 // TODO: jsdoc
-export const validateExtensionDependencies = (extensions: ApplicationExtensionEntryTuple[]) => {
+export const validateExtensionDependencies = (
+    extensions: ApplicationExtensionEntryTuple[]
+): {success: boolean; error?: Error} => {
     const hasRequiredDependencies = (extension: ApplicationExtensionEntryTuple) => {
         const dependencies = getDependencies(extension)
         if (dependencies.length === 0) return {success: true, dependencies}
@@ -119,18 +121,30 @@ export const validateExtensionDependencies = (extensions: ApplicationExtensionEn
 
         return {success, dependencies}
     }
-    return extensions.every((extension) => {
-        const {success, dependencies} = hasRequiredDependencies(extension)
-        if (!success) {
-            // TODO: use our own logger
-            console.error(
-                `[ERROR] Extension(s) missing or disabled: ${dependencies.join(
-                    ', '
-                )}, as required by ${extension[0]}`
-            )
-        }
-        return success
-    })
+
+    const errorMessages = extensions
+        .map((extension) => {
+            const {success, dependencies} = hasRequiredDependencies(extension)
+            return success
+                ? undefined
+                : `- Extension(s) missing or disabled: ${dependencies.join(', ')}, as required by ${
+                      extension[0]
+                  }`
+        })
+        .filter(Boolean)
+
+    const success = errorMessages.length === 0
+
+    return {
+        success,
+        error: success
+            ? undefined
+            : new Error(
+                  `Missing app extensions that other extensions depend on:\n${errorMessages.join(
+                      '\n'
+                  )}`
+              )
+    }
 }
 
 const getDependencies = (extension: ApplicationExtensionEntryTuple) => {

@@ -51,11 +51,9 @@ module.exports = function replaceExtensionsPlaceholderContentPlugin({types: t}: 
 
                 // Check if the file matches one of the files we want to replace
                 if (filePath.endsWith(extensionsPlaceholderFile)) {
-                    const isValidated = validateExtensionDependencies(state.opts.configured)
-                    if (!isValidated) {
-                        throw new Error(
-                            'Missing app extensions that other extensions depend on. See previous logs for more details.'
-                        )
+                    const {success, error} = validateExtensionDependencies(state.opts.configured)
+                    if (!success) {
+                        throw error
                     }
                     const newContent = renderTemplate(state.opts)
 

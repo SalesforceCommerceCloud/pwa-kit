@@ -40,11 +40,9 @@ export default function ApplicationExtensibilityLoader(
     // For web targets, the loader takes advantage of react-loadable but node targets (server) do not require this optimization.
     const data = this.getOptions()
 
-    const isValidated = validateExtensionDependencies(data.configured)
-    if (!isValidated) {
-        throw new Error(
-            'Missing app extensions that other extensions depend on. See previous logs for more details.'
-        )
+    const {success, error} = validateExtensionDependencies(data.configured)
+    if (!success) {
+        throw error
     }
 
     return renderTemplate(data)
