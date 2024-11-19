@@ -110,7 +110,7 @@ export const getExtensionNames = (extensions: ApplicationExtensionEntry[]) => {
  */
 export const validateExtensionDependencies = (
     extensions: ApplicationExtensionEntryTuple[]
-): {success: boolean; error?: Error} => {
+): {success: boolean; errors?: Error[]} => {
     const hasRequiredDependencies = (extension: ApplicationExtensionEntryTuple) => {
         const dependencies = getDependencies(extension)
         if (dependencies.length === 0) return {success: true, dependencies}
@@ -125,28 +125,24 @@ export const validateExtensionDependencies = (
         return {success, dependencies}
     }
 
-    const errorMessages = extensions
+    const errors = extensions
         .map((extension) => {
             const {success, dependencies} = hasRequiredDependencies(extension)
             return success
                 ? undefined
-                : `- Extension(s) missing or disabled: ${dependencies.join(', ')}, as required by ${
-                      extension[0]
-                  }`
+                : new Error(
+                      `Extension(s) missing or disabled: ${dependencies.join(
+                          ', '
+                      )}, as required by ${extension[0]}`
+                  )
         })
-        .filter(Boolean)
+        .filter((error): error is Error => Boolean(error))
 
-    const success = errorMessages.length === 0
+    const success = errors.length === 0
 
     return {
         success,
-        error: success
-            ? undefined
-            : new Error(
-                  `Missing app extensions that other extensions depend on:\n${errorMessages.join(
-                      '\n'
-                  )}`
-              )
+        errors: success ? undefined : errors
     }
 }
 

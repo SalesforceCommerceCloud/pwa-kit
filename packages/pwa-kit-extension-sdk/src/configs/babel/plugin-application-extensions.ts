@@ -51,10 +51,6 @@ module.exports = function replaceExtensionsPlaceholderContentPlugin({types: t}: 
 
                 // Check if the file matches one of the files we want to replace
                 if (filePath.endsWith(extensionsPlaceholderFile)) {
-                    const {success, error} = validateExtensionDependencies(state.opts.configured)
-                    if (!success) {
-                        throw error
-                    }
                     const newContent = renderTemplate(state.opts)
 
                     let parsedAst

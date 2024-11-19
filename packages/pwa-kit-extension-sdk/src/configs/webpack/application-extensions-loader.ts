@@ -38,11 +38,6 @@ export default function ApplicationExtensibilityLoader(
     // For web targets, the loader takes advantage of react-loadable but node targets (server) do not require this optimization.
     const data = this.getOptions()
 
-    const {success, error} = validateExtensionDependencies(data.configured)
-    if (!success) {
-        throw error
-    }
-
     return renderTemplate(data)
 }
 

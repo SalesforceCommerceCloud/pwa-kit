@@ -17,6 +17,10 @@ const {getConfig} = require('@salesforce/pwa-kit-runtime/utils/ssr-config')
 const {
     buildBabelExtensibilityArgs
 } = require('@salesforce/pwa-kit-extension-sdk/configs/babel/utils')
+const {
+    getConfiguredExtensions,
+    validateExtensionDependencies
+} = require('@salesforce/pwa-kit-extension-sdk/shared/utils')
 
 // Scripts in ./bin have never gone through babel, so we
 // don't have a good pattern for mixing compiled/un-compiled
@@ -64,6 +68,18 @@ const getProjectName = async () => {
 
 const getAppEntrypoint = () => {
     return p.join(process.cwd(), 'app', 'ssr.js')
+}
+
+const validateAppExtensions = () => {
+    const extensions = getConfiguredExtensions()
+    if (extensions.length > 0) {
+        info('Validating app extensions...')
+        const {success, errors} = validateExtensionDependencies(extensions)
+        if (!success) {
+            errors.forEach((e) => error(e.message))
+            throw new Error('Please check your configuration of the app extensions.')
+        }
+    }
 }
 
 const main = async () => {
@@ -232,6 +248,9 @@ const main = async () => {
             ).default('--extensions ".js,.jsx,.ts,.tsx"')
         )
         .action(async ({inspect, noHMR, babelArgs}) => {
+            validateAppExtensions()
+
+            info('Starting server...')
             // We use @babel/node instead of node because we want to support ES6 import syntax
             const babelNode = p.join(
                 require.resolve('webpack'),
@@ -267,6 +286,9 @@ const main = async () => {
         )
         .description(`build your app for production`)
         .action(async ({buildDirectory}) => {
+            validateAppExtensions()
+
+            info('Building...')
             const webpack = p.join(require.resolve('webpack'), '..', '..', '..', '.bin', 'webpack')
             const projectWebpack = p.join(process.cwd(), 'webpack.config.js')
             const webpackConf = fse.pathExistsSync(projectWebpack)
