@@ -70,14 +70,14 @@ const getAppEntrypoint = () => {
     return p.join(process.cwd(), 'app', 'ssr.js')
 }
 
-const validateAppExtensions = () => {
+const validateConfiguration = () => {
     const extensions = getConfiguredExtensions()
     if (extensions.length > 0) {
         info('Validating app extensions...')
         const {success, errors} = validateExtensionDependencies(extensions)
         if (!success) {
             errors.forEach((e) => error(e.message))
-            throw new Error('Please check your configuration of the app extensions.')
+            throw new Error('Please double-check your configuration.')
         }
     }
 }
@@ -248,7 +248,7 @@ const main = async () => {
             ).default('--extensions ".js,.jsx,.ts,.tsx"')
         )
         .action(async ({inspect, noHMR, babelArgs}) => {
-            validateAppExtensions()
+            validateConfiguration()
 
             info('Starting server...')
             // We use @babel/node instead of node because we want to support ES6 import syntax
@@ -286,7 +286,7 @@ const main = async () => {
         )
         .description(`build your app for production`)
         .action(async ({buildDirectory}) => {
-            validateAppExtensions()
+            validateConfiguration()
 
             info('Building...')
             const webpack = p.join(require.resolve('webpack'), '..', '..', '..', '.bin', 'webpack')
