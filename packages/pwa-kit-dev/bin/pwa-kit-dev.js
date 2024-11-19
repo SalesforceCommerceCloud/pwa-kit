@@ -324,6 +324,8 @@ const main = async () => {
                     '// This file is required by Managed Runtime for historical reasons.\n'
                 )
             }
+
+            success(`Build directory is at ${buildDirectory}`)
         })
 
     managedRuntimeCommand('push')
