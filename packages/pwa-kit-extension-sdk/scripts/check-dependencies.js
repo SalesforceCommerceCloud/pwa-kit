@@ -13,6 +13,7 @@ const devDependencies = Object.keys(packageJson.devDependencies || {})
 const peerDependencies = Object.keys(packageJson.peerDependencies || {})
 const allDependencies = [...dependencies, ...devDependencies, ...peerDependencies]
 
+// Not wanting pwa-kit-runtime, to avoid circular dependency
 const UNWANTED_DEPENDENCIES = ['@salesforce/pwa-kit-runtime']
 UNWANTED_DEPENDENCIES.forEach((dep) => {
     if (allDependencies.includes(dep)) {
