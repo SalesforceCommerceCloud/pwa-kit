@@ -28,7 +28,8 @@
   },
   "types": "dist/index.d.ts",
   "scripts": {
-    "build": "cross-env NODE_ENV=production internal-lib-build build && tsc",
+    "build": "cross-env NODE_ENV=production internal-lib-build build && tsc && npm run check-dependencies",
+    "check-dependencies": "node scripts/check-dependencies.js",
     "prepare": "npm run build",
     "lint": "npm run lint:js",
     "lint:fix": "npm run lint:js -- --fix",
@@ -49,7 +50,6 @@
     "@babel/preset-env": "^7.20.2",
     "@loadable/component": "^5.15.3",
     "@salesforce/pwa-kit-dev": "4.0.0-dev",
-    "@salesforce/pwa-kit-runtime": "4.0.0-dev",
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^14.0.0",
     "@types/babel__core": "^7.20.5",

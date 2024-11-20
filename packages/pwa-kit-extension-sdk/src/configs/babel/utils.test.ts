@@ -7,29 +7,22 @@
 import * as fse from 'fs-extra'
 import * as path from 'path'
 import {buildBabelExtensibilityArgs} from './utils'
-import {getConfig as originalGetConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
-
-jest.mock('@salesforce/pwa-kit-runtime/utils/ssr-config', () => ({
-    getConfig: jest.fn()
-}))
+import {ApplicationExtensionEntryTuple} from '../../types'
 
 jest.mock('fs-extra', () => ({
     ...jest.requireActual('fs-extra'),
     realpathSync: jest.fn()
 }))
 
-const getConfig = originalGetConfig as jest.Mock
+const EXTENSIONS: ApplicationExtensionEntryTuple[] = [
+    ['@salesforce/extension-sample', {enabled: true}],
+    ['@salesforce/extension-another', {enabled: true}]
+]
 
 describe('buildBabelExtensibilityArgs', () => {
     const realpathSyncMock = jest.spyOn(fse, 'realpathSync') as jest.Mock
 
     beforeEach(() => {
-        getConfig.mockReturnValue({
-            app: {
-                extensions: ['@salesforce/extension-sample', '@salesforce/extension-another']
-            }
-        })
-
         realpathSyncMock.mockImplementation((filePath: string) => {
             if (filePath.includes('build-remote-server.js')) {
                 return '/absolute/path/to/build-remote-server.js'
@@ -53,12 +46,12 @@ describe('buildBabelExtensibilityArgs', () => {
 
     test('should return the correct Babel arguments string', () => {
         const expectedArgs = `--ignore "node_modules/does_not_exist" --only "app/**,/absolute/path/to/build-remote-server.js,/absolute/path/to/application-extensions.js,/absolute/path/to/@salesforce/extension-sample/src,/absolute/path/to/@salesforce/extension-another/src/**"`
-        const result = buildBabelExtensibilityArgs()
+        const result = buildBabelExtensibilityArgs(EXTENSIONS)
         expect(result).toBe(expectedArgs)
     })
 
     test('should call realpathSync with the correct paths for each extension', () => {
-        buildBabelExtensibilityArgs()
+        buildBabelExtensibilityArgs(EXTENSIONS)
 
         // Validate that realpathSync was called with the correct paths
         expect(fse.realpathSync).toHaveBeenCalledWith(
@@ -80,13 +73,8 @@ describe('buildBabelExtensibilityArgs', () => {
     })
 
     test('should handle an empty list of configured extensions', () => {
-        // Modify the mock return value to simulate no configured extensions
-        getConfig.mockReturnValue({
-            app: {}
-        })
-
         const expectedArgs = `--ignore "node_modules/does_not_exist" --only "app/**,/absolute/path/to/build-remote-server.js,/absolute/path/to/application-extensions.js/**"`
-        const result = buildBabelExtensibilityArgs()
+        const result = buildBabelExtensibilityArgs([])
         expect(result).toBe(expectedArgs)
     })
 })

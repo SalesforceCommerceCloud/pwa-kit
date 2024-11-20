@@ -35,6 +35,8 @@ Handlebars.registerHelper('jsonStringify', (context) => JSON.stringify(context, 
 // We can look to resolve this in the future as it would be nice to have a independant file for the template.
 const templateString = dedent`
     import {getConfiguredExtensions} from '../../shared/utils/helpers'
+    import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
+
     {{#if (isWeb @root.target)}}
     import loadable from '@loadable/component'
     {{/if}}
@@ -59,7 +61,7 @@ const templateString = dedent`
 
     {{#if (isNode @root.target)}}
     const getApplicationExtensions = () => {
-        const configuredExtensions = getConfiguredExtensions()
+        const configuredExtensions = getConfiguredExtensions(getConfig())
         if (!configuredExtensions) return []
 
         return configuredExtensions.map((extension) => {
@@ -69,7 +71,7 @@ const templateString = dedent`
     }
     {{else}}
     const getApplicationExtensions = async () => {
-        const configuredExtensions = getConfiguredExtensions()
+        const configuredExtensions = getConfiguredExtensions(getConfig())
         if (!configuredExtensions) return []
 
         const modules = await Promise.all(configuredExtensions.map((extension) => {

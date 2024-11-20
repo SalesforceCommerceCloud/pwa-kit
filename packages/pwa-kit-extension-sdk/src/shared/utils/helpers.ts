@@ -6,7 +6,6 @@
  */
 
 import {ApplicationExtensionEntryTuple, ApplicationExtensionConfig} from '../../types'
-import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 
 // NOTE: please make sure that the imported modules do not include 'path'.
 // This way getConfiguredExtensions can be called from both server and client side.
@@ -117,9 +116,7 @@ export const expand = (extensions: unknown[] = []): ApplicationExtensionEntryTup
  * import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
  * getConfiguredExtensions(getConfig())
  */
-export const getConfiguredExtensions = (
-    config: any = getConfig()
-): ApplicationExtensionEntryTuple[] => {
+export const getConfiguredExtensions = (config: any): ApplicationExtensionEntryTuple[] => {
     // Note: this path to the `extensions` property may change
     return expand(config?.app?.extensions || [])
 }

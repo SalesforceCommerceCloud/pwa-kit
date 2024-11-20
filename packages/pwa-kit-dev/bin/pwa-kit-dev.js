@@ -71,7 +71,7 @@ const getAppEntrypoint = () => {
 }
 
 const validateConfiguration = () => {
-    const extensions = getConfiguredExtensions()
+    const extensions = getConfiguredExtensions(getConfig())
     if (extensions.length > 0) {
         info('Validating app extensions...')
         const {success, errors} = validateExtensionDependencies(extensions)
@@ -262,9 +262,9 @@ const main = async () => {
             )
 
             execSync(
-                `${babelNode} ${
-                    inspect ? '--inspect' : ''
-                } ${buildBabelExtensibilityArgs()} ${babelArgs} ${getAppEntrypoint()}`,
+                `${babelNode} ${inspect ? '--inspect' : ''} ${buildBabelExtensibilityArgs(
+                    getConfiguredExtensions(getConfig())
+                )} ${babelArgs} ${getAppEntrypoint()}`,
                 {
                     env: {
                         ...process.env,
