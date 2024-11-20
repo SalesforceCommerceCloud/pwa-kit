@@ -70,7 +70,11 @@ const getAppEntrypoint = () => {
     return p.join(process.cwd(), 'app', 'ssr.js')
 }
 
-const validateConfiguration = () => {
+/**
+ * For some commands, we like to validate the configuration first before proceeding with the rest of the command.
+ * Currently, we're only validating the app extensions, but we plan to validate other parts of the config in the future.
+ */
+const validateAppConfiguration = () => {
     const extensions = getConfiguredExtensions(getConfig())
     if (extensions.length > 0) {
         info('Validating app extensions...')
@@ -248,7 +252,7 @@ const main = async () => {
             ).default('--extensions ".js,.jsx,.ts,.tsx"')
         )
         .action(async ({inspect, noHMR, babelArgs}) => {
-            validateConfiguration()
+            validateAppConfiguration()
 
             info('Starting server...')
             // We use @babel/node instead of node because we want to support ES6 import syntax
@@ -286,7 +290,7 @@ const main = async () => {
         )
         .description(`build your app for production`)
         .action(async ({buildDirectory}) => {
-            validateConfiguration()
+            validateAppConfiguration()
 
             info('Building...')
             const webpack = p.join(require.resolve('webpack'), '..', '..', '..', '.bin', 'webpack')

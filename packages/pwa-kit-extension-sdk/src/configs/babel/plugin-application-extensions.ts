@@ -13,7 +13,7 @@ const babel = require('@babel/core')
 
 // Local
 import {renderTemplate} from '../utils'
-import {buildAliases, validateExtensionDependencies} from '../../shared/utils'
+import {buildAliases} from '../../shared/utils'
 import {ApplicationExtensionsLoaderOptions} from '../webpack/types'
 
 // Constants

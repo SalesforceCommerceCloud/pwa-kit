@@ -7,7 +7,6 @@
 
 // Local
 import {renderTemplate} from '../utils'
-import {validateExtensionDependencies} from '../../shared/utils'
 
 // Types
 import {ApplicationExtensionsLoaderContext, ApplicationExtensionsLoaderOptions} from './types'

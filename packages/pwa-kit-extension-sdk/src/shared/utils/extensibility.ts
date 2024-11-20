@@ -12,6 +12,8 @@ import path, {resolve} from 'path'
 // Types
 import {ApplicationExtensionEntry, ApplicationExtensionEntryTuple} from '../../types'
 
+import {expand} from './index'
+
 // CONSTANTS
 // const REACT_EXTENSIBILITY_FILE = 'setup-app'
 // const EXPRESS_EXTENSIBILITY_FILE = 'setup-server'
@@ -109,8 +111,9 @@ export const getExtensionNames = (extensions: ApplicationExtensionEntry[]) => {
  * @returns the validation status. If it fails, then an error will also be returned, which lists what dependencies are missing or disabled.
  */
 export const validateExtensionDependencies = (
-    extensions: ApplicationExtensionEntryTuple[]
+    appExtensions: ApplicationExtensionEntry[]
 ): {success: boolean; errors?: Error[]} => {
+    const extensions = expand(appExtensions)
     const hasRequiredDependencies = (extension: ApplicationExtensionEntryTuple) => {
         const dependencies = getDependencies(extension)
         if (dependencies.length === 0) return {success: true, dependencies}
