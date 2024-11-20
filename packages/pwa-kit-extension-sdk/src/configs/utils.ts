@@ -36,7 +36,6 @@ Handlebars.registerHelper('jsonStringify', (context) => JSON.stringify(context, 
 const templateString = dedent`
     import {getConfiguredExtensions} from '../../shared/utils/helpers'
     import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
-
     {{#if (isWeb @root.target)}}
     import loadable from '@loadable/component'
     {{/if}}
