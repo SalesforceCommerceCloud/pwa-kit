@@ -6,7 +6,7 @@
  */
 import * as fse from 'fs-extra'
 import * as p from 'path'
-import {ApplicationExtensionEntryTuple} from '../../types'
+import {getConfiguredExtensions} from '../../shared/utils'
 
 /**
  * Constants used for building Babel extensibility arguments:
@@ -35,7 +35,8 @@ const PLACEHOLDER_PATH = `${NODE_MODULES_PATH}/@salesforce/pwa-kit-extension-sdk
  * developers' environments working on templates with extensibility. Avoids relative paths
  * or symlinked paths that Babel doesn't support by using realpathSync.
  */
-export const buildBabelExtensibilityArgs = (extensions: ApplicationExtensionEntryTuple[]) => {
+export const buildBabelExtensibilityArgs = (config: any) => {
+    const extensions = getConfiguredExtensions(config)
     const serverPath = fse.realpathSync(p.resolve(SERVER_PATH))
     const placeHolderPath = fse.realpathSync(p.resolve(PLACEHOLDER_PATH))
 
