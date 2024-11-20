@@ -20,8 +20,8 @@ describe('withStoreLocator', () => {
         defaultCountryCode: 'US',
         defaultPostalCode: '94105',
         defaultPageSize: 10,
-        defaultDistance: 100,
-        defaultDistanceUnit: 'mi',
+        radius: 100,
+        radiusUnit: 'mi',
         supportedCountries: []
     }
 

@@ -44,8 +44,8 @@ const mockStores = {
 }
 
 const defaultConfig = {
-    defaultDistance: 10,
-    defaultDistanceUnit: 'mi',
+    radius: 10,
+    radiusUnit: 'mi',
     defaultPageSize: 2,
     defaultCountry: 'United States',
     supportedCountries: [{countryCode: 'US', countryName: 'United States'}]

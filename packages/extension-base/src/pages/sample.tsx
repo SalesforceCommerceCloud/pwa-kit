@@ -35,7 +35,7 @@ const Sample = () => {
                 }}
             >
                 <code>
-                    &gt; npm install @salesforce/extension-sample --legacy-peer-deps*
+                    &gt; npm install @salesforce/extension-sample
                     <br />
                     &gt; Downloading npm package... <br />
                     &gt; Installing extention... <br />

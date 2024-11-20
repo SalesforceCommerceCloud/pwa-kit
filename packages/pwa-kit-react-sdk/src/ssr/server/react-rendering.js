@@ -139,7 +139,7 @@ export const render = async (req, res, next) => {
         locals: res.locals
     })
 
-    const routes = getRoutes(res.locals)
+    let routes = getRoutes(res.locals)
 
     const [pathname] = req.originalUrl.split('?')
 
@@ -151,6 +151,12 @@ export const render = async (req, res, next) => {
     }
 
     // Step 1 - Find the match.
+
+    // Call `beforeRouteMatch` application extension hook.
+    applicationExtensions.forEach((applicationExtension) => {
+        routes = applicationExtension.beforeRouteMatch(routes)
+    })
+
     res.__performanceTimer.mark(PERFORMANCE_MARKS.routeMatching, 'start')
     let route
     let match

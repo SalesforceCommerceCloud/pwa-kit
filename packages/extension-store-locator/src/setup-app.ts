@@ -21,33 +21,28 @@ import StoreLocatorPage from './pages/store-locator'
 
 class StoreLocatorExtension extends ApplicationExtension<Config> {
     DEFAULT_PATH = '/store-locator'
-    REQUIRED_CONFIG_FIELDS = [
-        'defaultCountry',
-        'defaultCountryCode',
-        'defaultDistance',
-        'defaultDistanceUnit',
-        'defaultPageSize',
-        'defaultPostalCode',
-        'supportedCountries'
-    ]
+    DEFAULT_RADIUS = 100
+    DEFAULT_RADIUS_UNIT = 'km'
+    DEFAULT_PAGE_SIZE = 10
 
     extendApp<T>(App: React.ComponentType<T>): React.ComponentType<T> {
         const config = this.getConfig()
 
-        const missingFields = this.REQUIRED_CONFIG_FIELDS.filter((field) => !config[field])
-        if (missingFields.length) {
-            throw new Error(`Missing required config fields: ${missingFields.join(', ')}`)
+        if (!config.supportedCountries || config.supportedCountries.length === 0) {
+            console.warn(
+                '[extension-store-locator] Missing supportedCountries, this extension will not work.'
+            )
         }
 
         return withStoreLocator(withOptionalChakra(App), {
             path: config.path ?? this.DEFAULT_PATH,
-            defaultCountry: config.defaultCountry,
-            defaultCountryCode: config.defaultCountryCode,
-            defaultDistance: config.defaultDistance,
-            defaultDistanceUnit: config.defaultDistanceUnit,
-            defaultPageSize: config.defaultPageSize,
-            defaultPostalCode: config.defaultPostalCode,
-            supportedCountries: config.supportedCountries
+            radius: config.radius ?? this.DEFAULT_RADIUS,
+            radiusUnit: config.radiusUnit ?? this.DEFAULT_RADIUS_UNIT,
+            defaultPageSize: config.defaultPageSize ?? this.DEFAULT_PAGE_SIZE,
+            defaultCountry: config.defaultCountry ?? '',
+            defaultCountryCode: config.defaultCountryCode ?? '',
+            defaultPostalCode: config.defaultPostalCode ?? '',
+            supportedCountries: config.supportedCountries ?? []
         })
     }
 

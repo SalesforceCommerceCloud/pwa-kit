@@ -17,6 +17,7 @@ import {ApplicationExtensionConfig} from '../../types'
  * @abstract
  */
 export abstract class ApplicationExtension<Config extends ApplicationExtensionConfig> {
+    static id: string
     private config: Config
 
     /**

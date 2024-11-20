@@ -47,8 +47,8 @@ The Store Locator extension is configured via the `mobify.app.extensions` proper
           {
             "enabled": true,
             "path": "/store-locator",
-            "defaultDistance": 100,
-            "defaultDistanceUnit": "km",
+            "radius": 100,
+            "radiusUnit": "km",
             "defaultPageSize": 10,
             "defaultPostalCode": "10178",
             "defaultCountry": "Germany",

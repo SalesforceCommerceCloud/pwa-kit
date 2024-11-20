@@ -10,8 +10,8 @@ import type {ApplicationExtensionConfig} from '@salesforce/pwa-kit-extension-sdk
 // of the extension itself. Update this config type to your specific needs!
 export interface Config extends ApplicationExtensionConfig {
     path?: string
-    defaultDistance: number
-    defaultDistanceUnit: string
+    radius: number
+    radiusUnit: string
     defaultPageSize: number
     defaultCountry: string
     defaultCountryCode: string

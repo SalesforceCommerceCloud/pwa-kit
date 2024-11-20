@@ -27,8 +27,8 @@ export const StoreLocatorList: React.FC<StoreLocatorListProps> = () => {
         if (data?.total === 0) return 'Sorry, there are no locations in this area'
 
         if (mode === 'input') {
-            return `Viewing stores within ${String(config.defaultDistance)}${String(
-                String(config.defaultDistanceUnit)
+            return `Viewing stores within ${String(config.radius)}${String(
+                String(config.radiusUnit)
             )} of ${String(data?.data[0].postalCode)} in 
                 ${
                     config.supportedCountries.length !== 0

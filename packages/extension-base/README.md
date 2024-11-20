@@ -52,7 +52,7 @@ the extension as they like.
 # Installation
 
 ```
-> npm install @salesforce/extension-sample --legacy-peer-deps*<br/>
+> npm install @salesforce/extension-sample<br/>
 > Downloading npm package... <br/>
 > Installing extention... <br/>
 > Finished. <br/>

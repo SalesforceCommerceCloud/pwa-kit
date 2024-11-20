@@ -11,8 +11,8 @@ import {StoreLocatorProvider} from './components/store-locator/store-locator-pro
 
 const CONFIG = {
     path: '/store-locator',
-    defaultDistance: 100,
-    defaultDistanceUnit: 'km',
+    radius: 100,
+    radiusUnit: 'km',
     defaultPageSize: 10,
     defaultPostalCode: '10178',
     defaultCountry: 'Germany',

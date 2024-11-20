@@ -15,7 +15,8 @@
     "@salesforce/pwa-kit-runtime": "4.0.0-dev",
     "prop-types": "^15",
     "react": "^18",
-    "react-dom": "^18"
+    "react-dom": "^18",
+    "react-router-dom": "^5.3.4"
   },
   "peerDependenciesMeta": {
     "@chakra-ui/react": {

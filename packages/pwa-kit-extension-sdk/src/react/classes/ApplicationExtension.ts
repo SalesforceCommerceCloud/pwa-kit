@@ -47,10 +47,22 @@ export class ApplicationExtension<
      * at page components added by your application extension.
      *
      * @protected
-     * @param routes - The base application routes.
+     * @param routes - The list application routes currently loaded.
      * @returns routes - The modified application routes.
      */
     public extendRoutes(routes: RouteProps[]): RouteProps[] {
+        return routes
+    }
+
+    /**
+     * Called before route matching is evaluated. This method gives each extension the opportunity
+     * to modify the routes knowing that the list of routes passed-in is complete.
+     *
+     * @protected
+     * @param routes - All the application routes from both extensions and base application.
+     * @returns routes - The modified application routes.
+     */
+    public beforeRouteMatch(routes: RouteProps[]): RouteProps[] {
         return routes
     }
 }

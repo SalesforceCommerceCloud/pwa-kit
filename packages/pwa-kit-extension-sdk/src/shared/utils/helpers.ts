@@ -118,5 +118,5 @@ export const expand = (extensions: unknown[] = []): ApplicationExtensionEntryTup
  */
 export const getConfiguredExtensions = (config: any): ApplicationExtensionEntryTuple[] => {
     // Note: this path to the `extensions` property may change
-    return expand(config?.app?.extensions || [])
+    return expand(config?.app?.extensions || []).filter(([, config]) => config?.enabled !== false)
 }

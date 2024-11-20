@@ -29,16 +29,16 @@ const useStores = (state: StoreLocatorState) => {
             ? {
                   countryCode: state.formValues.countryCode,
                   postalCode: state.formValues.postalCode,
-                  maxDistance: state.config.defaultDistance,
+                  maxDistance: state.config.radius,
                   limit: NUM_STORES_PER_REQUEST_API_MAX,
-                  distanceUnit: state.config.defaultDistanceUnit
+                  distanceUnit: state.config.radiusUnit
               }
             : {
                   latitude: state.deviceCoordinates.latitude,
                   longitude: state.deviceCoordinates.longitude,
-                  maxDistance: state.config.defaultDistance,
+                  maxDistance: state.config.radius,
                   limit: NUM_STORES_PER_REQUEST_API_MAX,
-                  distanceUnit: state.config.defaultDistanceUnit
+                  distanceUnit: state.config.radiusUnit
               }
     const shouldFetchStores =
         Boolean(

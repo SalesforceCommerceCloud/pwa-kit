@@ -16,8 +16,8 @@ jest.mock('@salesforce/commerce-sdk-react', () => ({
 }))
 
 const config = {
-    defaultDistance: 100,
-    defaultDistanceUnit: 'mi',
+    radius: 100,
+    radiusUnit: 'mi',
     defaultCountryCode: 'US',
     defaultPostalCode: '10178'
 }

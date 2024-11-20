@@ -22,4 +22,4 @@ import {ApplicationExtensionConfig as Config} from '../../types'
  * This utility can be used for many purposes. For example, using it in development
  * tools to show what Application Extensions that are currently in use.
  */
-export default React.createContext<ApplicationExtension<Config>[]>([])
+export default React.createContext<ApplicationExtension<Config>[] | undefined>(undefined)
