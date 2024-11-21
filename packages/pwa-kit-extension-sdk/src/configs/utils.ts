@@ -25,7 +25,6 @@ Handlebars.registerHelper('getInstanceName', (aString: string) => {
 
     return kebabToUpperCamelCase(`${namespace ? `${namespace}-` : ''}${name}`)
 })
-Handlebars.registerHelper('isNotLast', (index, arrayLength) => index !== arrayLength - 1)
 Handlebars.registerHelper('isNode', (target) => target === 'node')
 Handlebars.registerHelper('isWeb', (target) => target === 'web')
 Handlebars.registerHelper('jsonStringify', (context) => JSON.stringify(context, null, 0))
@@ -35,7 +34,6 @@ Handlebars.registerHelper('jsonStringify', (context) => JSON.stringify(context, 
 // We can look to resolve this in the future as it would be nice to have a independant file for the template.
 const templateString = dedent`
     import {getConfiguredExtensions} from '../../shared/utils/helpers'
-    import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
     {{#if (isWeb @root.target)}}
     import loadable from '@loadable/component'
     {{/if}}
@@ -57,27 +55,28 @@ const templateString = dedent`
         {{/if}}
         {{/each}}
     }
+    const configuredExtensions = {{{jsonStringify @root.configured}}}
 
     {{#if (isNode @root.target)}}
-    const getApplicationExtensions = () => {
-        const configuredExtensions = getConfiguredExtensions(getConfig())
-        if (!configuredExtensions) return []
+    const getApplicationExtensions = (config) => {
+        const extensions = config ? getConfiguredExtensions(config) : configuredExtensions
+        if (!extensions) return []
 
-        return configuredExtensions.map((extension) => {
+        return extensions.map((extension) => {
             const [packageName, config] = extension
             return new imports[packageName](config)
         })
     }
     {{else}}
-    const getApplicationExtensions = async () => {
-        const configuredExtensions = getConfiguredExtensions(getConfig())
-        if (!configuredExtensions) return []
+    const getApplicationExtensions = async (config) => {
+        const extensions = config ? getConfiguredExtensions(config) : configuredExtensions
+        if (!extensions) return []
 
-        const modules = await Promise.all(configuredExtensions.map((extension) => {
+        const modules = await Promise.all(extensions.map((extension) => {
             const [packageName] = extension
             return imports[packageName].load()
         }))
-        return configuredExtensions.map((extension, index) => {
+        return extensions.map((extension, index) => {
             const [,config] = extension
             return new modules[index].default(config)
         })

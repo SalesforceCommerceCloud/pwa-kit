@@ -14,6 +14,7 @@ import {
     getApplicationExtensions,
     withApplicationExtensions
 } from '@salesforce/pwa-kit-extension-sdk/react'
+import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 
 import {ServerContext, CorrelationIdProvider} from '../universal/contexts'
 import App from '../universal/components/_app'
@@ -126,7 +127,7 @@ export const start = async () => {
     window.__HYDRATING__ = true
 
     // Load all the configured Application Extensions and provide them to the
-    const applicationExtensions = await getApplicationExtensions()
+    const applicationExtensions = await getApplicationExtensions(getConfig())
     const WrappedApp = withApplicationExtensions(routeComponent(App, false, locals), {
         applicationExtensions,
         locals
