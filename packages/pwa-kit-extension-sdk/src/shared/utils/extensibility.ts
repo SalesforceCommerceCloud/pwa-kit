@@ -114,6 +114,7 @@ export const validateExtensionDependencies = (
     appExtensions: ApplicationExtensionEntry[]
 ): {success: boolean; errors?: Error[]} => {
     const extensions = expand(appExtensions)
+
     const hasRequiredDependencies = (extension: ApplicationExtensionEntryTuple) => {
         const dependencies = getDependencies(extension)
         if (dependencies.length === 0) return {success: true, dependencies}
@@ -145,7 +146,7 @@ export const validateExtensionDependencies = (
 
     return {
         success,
-        errors: success ? undefined : errors
+        ...(!success ? {errors} : {})
     }
 }
 

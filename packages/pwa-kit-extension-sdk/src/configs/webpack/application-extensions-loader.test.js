@@ -29,10 +29,6 @@ const BASE_VIRTUAL_FILES = {
     [`${path.resolve(__dirname, '../../../node_modules/@loadable/component')}`]: '',
     [`${path.resolve(
         __dirname,
-        '../../../node_modules/@salesforce/pwa-kit-runtime/utils/ssr-config'
-    )}`]: '',
-    [`${path.resolve(
-        __dirname,
         '../../../node_modules/@salesforce/pwa-kit-extension-sdk/shared/utils/helpers'
     )}`]: ''
 }
@@ -45,21 +41,22 @@ describe('Application Extension Loader', () => {
             expects: (output) => {
                 const file = dedent`
                     import {getConfiguredExtensions} from '../../shared/utils/helpers'
-                    import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 
 
                     const imports = {
                     }
 
-                    const getApplicationExtensions = async () => {
-                        const configuredExtensions = getConfiguredExtensions(getConfig())
-                        if (!configuredExtensions) return []
+                    const configuredExtensions = []
 
-                        const modules = await Promise.all(configuredExtensions.map((extension) => {
+                    const getApplicationExtensions = async (config) => {
+                        const extensions = config ? getConfiguredExtensions(config) : configuredExtensions
+                        if (!extensions) return []
+
+                        const modules = await Promise.all(extensions.map((extension) => {
                             const [packageName] = extension
                             return imports[packageName].load()
                         }))
-                        return configuredExtensions.map((extension, index) => {
+                        return extensions.map((extension, index) => {
                             const [,config] = extension
                             return new modules[index].default(config)
                         })
@@ -80,7 +77,6 @@ describe('Application Extension Loader', () => {
             expects: (output) => {
                 const file = dedent`
                     import {getConfiguredExtensions} from '../../shared/utils/helpers'
-                    import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
                     import loadable from '@loadable/component'
 
                     const SalesforceSampleALoader = loadable.lib(() => import('@salesforce/extension-sample-a/setup-app'))
@@ -89,15 +85,17 @@ describe('Application Extension Loader', () => {
                         '@salesforce/extension-sample-a': SalesforceSampleALoader,
                     }
 
-                    const getApplicationExtensions = async () => {
-                        const configuredExtensions = getConfiguredExtensions(getConfig())
-                        if (!configuredExtensions) return []
+                    const configuredExtensions = [["@salesforce/extension-sample-a",{"enabled":true}]]
 
-                        const modules = await Promise.all(configuredExtensions.map((extension) => {
+                    const getApplicationExtensions = async (config) => {
+                        const extensions = config ? getConfiguredExtensions(config) : configuredExtensions
+                        if (!extensions) return []
+
+                        const modules = await Promise.all(extensions.map((extension) => {
                             const [packageName] = extension
                             return imports[packageName].load()
                         }))
-                        return configuredExtensions.map((extension, index) => {
+                        return extensions.map((extension, index) => {
                             const [,config] = extension
                             return new modules[index].default(config)
                         })
@@ -127,7 +125,6 @@ describe('Application Extension Loader', () => {
             expects: (output) => {
                 const file = dedent`
                     import {getConfiguredExtensions} from '../../shared/utils/helpers'
-                    import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 
                     import SalesforceSampleA from '@salesforce/extension-sample-a/setup-server'
 
@@ -135,11 +132,13 @@ describe('Application Extension Loader', () => {
                         '@salesforce/extension-sample-a': SalesforceSampleA,
                     }
 
-                    const getApplicationExtensions = () => {
-                        const configuredExtensions = getConfiguredExtensions(getConfig())
-                        if (!configuredExtensions) return []
+                    const configuredExtensions = [["@salesforce/extension-sample-a",{"enabled":true}]]
 
-                        return configuredExtensions.map((extension) => {
+                    const getApplicationExtensions = (config) => {
+                        const extensions = config ? getConfiguredExtensions(config) : configuredExtensions
+                        if (!extensions) return []
+
+                        return extensions.map((extension) => {
                             const [packageName, config] = extension
                             return new imports[packageName](config)
                         })
@@ -181,10 +180,6 @@ describe('Application Extension Loader', () => {
                         '../../shared/utils/helpers$': path.resolve(
                             __dirname,
                             '../../../node_modules/@salesforce/pwa-kit-extension-sdk/shared/utils/helpers'
-                        ),
-                        '@salesforce/pwa-kit-runtime/utils/ssr-config': path.resolve(
-                            __dirname,
-                            '../../../node_modules/@salesforce/pwa-kit-runtime/utils/ssr-config'
                         )
                     },
                     files,

@@ -18,6 +18,9 @@ const EXTENSIONS: ApplicationExtensionEntryTuple[] = [
     ['@salesforce/extension-sample', {enabled: true}],
     ['@salesforce/extension-another', {enabled: true}]
 ]
+const CONFIG = {
+    app: {extensions: EXTENSIONS}
+}
 
 describe('buildBabelExtensibilityArgs', () => {
     const realpathSyncMock = jest.spyOn(fse, 'realpathSync') as jest.Mock
@@ -46,12 +49,12 @@ describe('buildBabelExtensibilityArgs', () => {
 
     test('should return the correct Babel arguments string', () => {
         const expectedArgs = `--ignore "node_modules/does_not_exist" --only "app/**,/absolute/path/to/build-remote-server.js,/absolute/path/to/application-extensions.js,/absolute/path/to/@salesforce/extension-sample/src,/absolute/path/to/@salesforce/extension-another/src/**"`
-        const result = buildBabelExtensibilityArgs(EXTENSIONS)
+        const result = buildBabelExtensibilityArgs(CONFIG)
         expect(result).toBe(expectedArgs)
     })
 
     test('should call realpathSync with the correct paths for each extension', () => {
-        buildBabelExtensibilityArgs(EXTENSIONS)
+        buildBabelExtensibilityArgs(CONFIG)
 
         // Validate that realpathSync was called with the correct paths
         expect(fse.realpathSync).toHaveBeenCalledWith(
@@ -74,7 +77,9 @@ describe('buildBabelExtensibilityArgs', () => {
 
     test('should handle an empty list of configured extensions', () => {
         const expectedArgs = `--ignore "node_modules/does_not_exist" --only "app/**,/absolute/path/to/build-remote-server.js,/absolute/path/to/application-extensions.js/**"`
-        const result = buildBabelExtensibilityArgs([])
+        const result = buildBabelExtensibilityArgs({app: {extensions: []}})
         expect(result).toBe(expectedArgs)
+        const result2 = buildBabelExtensibilityArgs({app: {}})
+        expect(result2).toBe(expectedArgs)
     })
 })

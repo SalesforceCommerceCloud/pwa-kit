@@ -55,7 +55,12 @@ const templateString = dedent`
         {{/if}}
         {{/each}}
     }
+
+    {{#if @root.configured}}
     const configuredExtensions = {{{jsonStringify @root.configured}}}
+    {{else}}
+    const configuredExtensions = []
+    {{/if}}
 
     {{#if (isNode @root.target)}}
     const getApplicationExtensions = (config) => {

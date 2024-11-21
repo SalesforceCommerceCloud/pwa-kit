@@ -14,16 +14,20 @@ import * as extensionUtils from './extensibility'
 jest.mock('fs-extra')
 const mockedFse = fse as jest.Mocked<typeof fse>
 
+interface MockedPackageJSON {
+    peerDependencies: Record<string, string>
+    mobify?: any
+}
 // Helper function to mock package.json structure
-const mockPackageJson = (devDependencies: Record<string, string>, mobifyConfig?: any) => {
+const mockPackageJson = (opts: Record<string, MockedPackageJSON>) => {
     mockedFse.readJsonSync.mockImplementation((filePath) => {
-        if (filePath.toString().endsWith('package.json')) {
-            return {
-                devDependencies,
-                mobify: mobifyConfig
-            }
-        }
-        return {}
+        const found = Object.entries(opts).find(([packageName]) =>
+            filePath.toString().endsWith(`${packageName}/package.json`)
+        )
+        if (!found) return {}
+
+        const [, value] = found
+        return value
     })
 }
 
@@ -157,6 +161,74 @@ describe('extensibilityUtils', () => {
                 const result = extensionUtils.buildAliases(extensions)
                 expect(result).toEqual(expected)
             })
+        })
+    })
+
+    describe('validateExtensionDependencies', () => {
+        test('returns success if given an empty list of extensions', () => {
+            const result = extensionUtils.validateExtensionDependencies([])
+            expect(result).toStrictEqual({
+                success: true
+            })
+        })
+
+        test('returns success if the given extensions do NOT depend on other extensions', () => {
+            mockPackageJson({
+                'extension-sample': {
+                    peerDependencies: {
+                        react: '^18.2.0'
+                    }
+                }
+            })
+            const result = extensionUtils.validateExtensionDependencies(['extension-sample'])
+            expect(result).toStrictEqual({
+                success: true
+            })
+        })
+
+        test('returns success if the given extensions do depend on other extensions and they are all loaded', () => {
+            mockPackageJson({
+                'extension-sample': {
+                    peerDependencies: {
+                        react: '^18.2.0'
+                    }
+                },
+                'extension-sample-2': {
+                    peerDependencies: {
+                        react: '^18.2.0',
+                        'extension-sample': '1.0.0'
+                    }
+                }
+            })
+            const result = extensionUtils.validateExtensionDependencies([
+                'extension-sample',
+                'extension-sample-2'
+            ])
+            expect(result).toStrictEqual({
+                success: true
+            })
+        })
+
+        test('returns failure if the given extensions do depend on other extensions and some are NOT loaded', () => {
+            mockPackageJson({
+                'extension-sample': {
+                    peerDependencies: {
+                        react: '^18.2.0'
+                    }
+                },
+                'extension-sample-2': {
+                    peerDependencies: {
+                        react: '^18.2.0',
+                        'extension-sample': '1.0.0'
+                    }
+                }
+            })
+            const result = extensionUtils.validateExtensionDependencies([
+                ['extension-sample', {enabled: false}],
+                'extension-sample-2'
+            ])
+            expect(result.success).toBe(false)
+            expect(Array.isArray(result.errors) && result.errors.length > 0).toBe(true)
         })
     })
 })
