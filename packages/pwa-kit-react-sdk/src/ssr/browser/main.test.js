@@ -25,7 +25,8 @@ describe('main', function () {
             error: undefined,
             locals,
             routes: getRoutes(locals),
-            WrappedApp: routeComponent(App, false, locals)
+            WrappedApp: routeComponent(App, false, locals),
+            extensions: []
         }
         render(<OuterApp {...props} />)
         expect(screen.getByText('App')).toBeInTheDocument()
@@ -41,7 +42,8 @@ describe('main', function () {
             error: window.__ERROR__,
             locals,
             routes: getRoutes(locals),
-            WrappedApp: routeComponent(App, false, locals)
+            WrappedApp: routeComponent(App, false, locals),
+            extensions: []
         }
         render(<OuterApp {...props} />)
         expect(screen.getByText('Error Status: 404')).toBeInTheDocument()
