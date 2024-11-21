@@ -16,24 +16,24 @@ import {Skeleton} from '@chakra-ui/react'
 const fallback = <Skeleton height="75vh" width="100%" />
 
 // Page Loadables
-const Account = loadable(() => import('$/pages/account'), {fallback})
-const Cart = loadable(() => import('$/pages/cart'), {fallback})
-const Checkout = loadable(() => import('$/pages/checkout'), {
+const Account = loadable(() => import('overridable!./account'), {fallback})
+const Cart = loadable(() => import('overridable!./cart'), {fallback})
+const Checkout = loadable(() => import('overridable!./checkout'), {
     fallback
 })
-const CheckoutConfirmation = loadable(() => import('$/pages/checkout/confirmation'), {fallback})
-const Home = loadable(() => import('$/pages/home'), {fallback})
-const Login = loadable(() => import('$/pages/login'), {fallback})
-const Registration = loadable(() => import('$/pages/registration'), {
+const CheckoutConfirmation = loadable(() => import('overridable!./checkout/confirmation'), {fallback})
+const Home = loadable(() => import('overridable!./home'), {fallback})
+const Login = loadable(() => import('overridable!./login'), {fallback})
+const Registration = loadable(() => import('overridable!./registration'), {
     fallback
 })
-const ResetPassword = loadable(() => import('$/pages/reset-password'), {fallback})
-const LoginRedirect = loadable(() => import('$/pages/login-redirect'), {fallback})
-const ProductDetail = loadable(() => import('$/pages/product-detail'), {fallback})
-const ProductList = loadable(() => import('$/pages/product-list'), {
+const ResetPassword = loadable(() => import('overridable!./reset-password'), {fallback})
+const LoginRedirect = loadable(() => import('overridable!./login-redirect'), {fallback})
+const ProductDetail = loadable(() => import('overridable!./product-detail'), {fallback})
+const ProductList = loadable(() => import('overridable!./product-list'), {
     fallback
 })
-const Wishlist = loadable(() => import('$/pages/account/wishlist'), {
+const Wishlist = loadable(() => import('overridable!./account/wishlist'), {
     fallback
 })
 
