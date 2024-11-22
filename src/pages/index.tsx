@@ -21,7 +21,9 @@ const Cart = loadable(() => import('overridable!./cart'), {fallback})
 const Checkout = loadable(() => import('overridable!./checkout'), {
     fallback
 })
-const CheckoutConfirmation = loadable(() => import('overridable!./checkout/confirmation'), {fallback})
+const CheckoutConfirmation = loadable(() => import('overridable!./checkout/confirmation'), {
+    fallback
+})
 const Home = loadable(() => import('overridable!./home'), {fallback})
 const Login = loadable(() => import('overridable!./login'), {fallback})
 const Registration = loadable(() => import('overridable!./registration'), {
