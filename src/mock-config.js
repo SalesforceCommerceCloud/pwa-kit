@@ -74,6 +74,7 @@ module.exports = {
             siteId: 'site-1'
         }
     },
+    activeDataEnabled: true,
     einsteinAPI: {
         host: 'http://localhost:7777',
         einsteinId: '11111111',
