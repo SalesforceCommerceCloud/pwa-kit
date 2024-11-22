@@ -7,16 +7,12 @@
 
 import React from 'react'
 
-export const FooContext = React.createContext('initial-value')
-
 // Define the HOC function
 const withRedBorder = <T extends object>(WrappedComponent: React.ComponentType<T>) => {
     const ComponentWithRedBorder: React.FC<T> = (props) => (
-        <FooContext.Provider value="foobar">
-            <div style={{border: '2px solid red', padding: '8px'}}>
-                <WrappedComponent {...props} />
-            </div>
-        </FooContext.Provider>
+        <div style={{border: '2px solid red', padding: '8px'}}>
+            <WrappedComponent {...props} />
+        </div>
     )
 
     ComponentWithRedBorder.displayName = `WithRedBorder(${
