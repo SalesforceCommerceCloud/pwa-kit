@@ -23,7 +23,8 @@ export const useConfig = () => {
     const extension = useMemo(
         () =>
             applicationExtensions.find(
-                (extension) => extension.constructor.id === `@salesforce/extension-chakra-storefront`
+                (extension) =>
+                    extension.constructor.id === `@salesforce/extension-chakra-storefront`
             ),
         [applicationExtensions]
     )
