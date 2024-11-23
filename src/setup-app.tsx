@@ -27,8 +27,10 @@ import {withStorefrontPreview} from './components/with-storefront-preview'
 // Pages
 import * as Pages from './pages'
 
+import extensionMeta from '../extension-meta.json'
+
 class ChakraStorefront extends ApplicationExtension<Config> {
-    static id = `@salesforce/extension-chakra-storefront`
+    static readonly id = extensionMeta.id
 
     extendApp<T>(App: React.ComponentType<T>): React.ComponentType<T> {
         // NOTE: The order of these HOCs is important!

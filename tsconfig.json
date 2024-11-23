@@ -18,6 +18,9 @@
         /* JavaScript Support */
         "allowJs": true,
 
+        /* Json Support */
+        "resolveJsonModule": true,
+
         /* Emit */
         "declaration": true,
         "declarationMap": true,
