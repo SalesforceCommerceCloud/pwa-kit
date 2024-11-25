@@ -7,7 +7,7 @@
 /*global dw*/
 import {proxyBasePath} from '@salesforce/pwa-kit-runtime/utils/ssr-namespace-paths'
 import logger from '../utils/logger-instance'
-import {useConfig} from '../hooks/use-config'
+import {useConfig} from '../hooks/use-extension-config'
 
 const useActiveData = () => {
     // Returns true when the feature flag is enabled and the tracking scripts have been executed

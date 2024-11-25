@@ -14,7 +14,7 @@ import {useServerContext} from '@salesforce/pwa-kit-react-sdk/ssr/universal/hook
 import {createUrlTemplate} from '../../utils/url'
 import {MultiSiteProvider} from '../../contexts'
 import {resolveSiteFromUrl, resolveLocaleFromUrl} from '../../utils/site-utils'
-import {useConfig} from '../../hooks/use-config'
+import {useConfig} from '../../hooks/use-extension-config'
 
 // Define a type for the HOC props
 type WithMultiSiteProps = React.ComponentPropsWithoutRef<any>

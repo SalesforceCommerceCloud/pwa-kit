@@ -12,13 +12,13 @@ import withMultiSite from './with-multi-site'
 import {useServerContext} from '@salesforce/pwa-kit-react-sdk/ssr/universal/hooks'
 import {createUrlTemplate} from '../../utils/url'
 import {resolveSiteFromUrl, resolveLocaleFromUrl} from '../../utils/site-utils'
-import {useConfig} from '../../hooks/use-config'
+import {useConfig} from '../../hooks/use-extension-config'
 
 // Mock dependencies
 jest.mock('@salesforce/pwa-kit-react-sdk/ssr/universal/hooks', () => ({
     useServerContext: jest.fn()
 }))
-jest.mock('../../hooks/use-config', () => ({
+jest.mock('../../hooks/use-extension-config', () => ({
     useConfig: jest.fn()
 }))
 jest.mock('../../utils/url', () => ({

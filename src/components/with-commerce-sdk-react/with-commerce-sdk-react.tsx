@@ -18,7 +18,7 @@ import createLogger from '@salesforce/pwa-kit-runtime/utils/logger-factory'
 
 // Local Imports
 import {resolveSiteFromUrl, resolveLocaleFromUrl} from '../../utils/site-utils'
-import {useConfig} from '../../hooks/use-config'
+import {useConfig} from '../../hooks/use-extension-config'
 // Define a type for the HOC props
 type WithCommerceSDKReactProps = {
     shortCode: string

@@ -13,7 +13,7 @@ import {
     useEncUserId,
     useCustomerType
 } from '@salesforce/commerce-sdk-react'
-import {useConfig} from '../hooks/use-config'
+import {useConfig} from '../hooks/use-extension-config'
 import {keysToCamel} from '../utils/utils'
 import logger from '../utils/logger-instance'
 
