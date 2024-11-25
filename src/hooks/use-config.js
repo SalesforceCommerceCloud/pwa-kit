@@ -5,20 +5,16 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-// Platform Imports
 import {useApplicationExtension} from '@salesforce/pwa-kit-extension-sdk/react'
-
-import extensionMeta from '../extension-meta.json'
+import extensionMeta from '../../extension-meta.json'
 
 /**
- * This hook returns the configuration for the current application extenson.
+ * This hook returns the configuration for the current application extension.
  */
-export const useConfig = () => {
+export const useExtensionConfig = () => {
     const extension = useApplicationExtension(extensionMeta.id)
-
     if (extension === undefined) {
-        throw new Error(`'useConfig' could find your current application extension instance!`)
+        throw new Error(`'useExtensionConfig' could find your current application extension instance!`)
     }
-
-    return extension.getConfig()
+    return extension?.getConfig()
 }
