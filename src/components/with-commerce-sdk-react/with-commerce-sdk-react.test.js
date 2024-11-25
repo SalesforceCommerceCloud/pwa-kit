@@ -23,11 +23,9 @@ MockedComponent.propTypes = {
     data: PropTypes.object
 }
 
-
 describe('withCommerceSdkReact enhanced component', function () {
     // TODO: This entire file needs to be re-written.
     test.skip('renders placeholder when hook is loading', async () => {
-
         const EnhancedComponent = withCommerceSdkReact(MockedComponent)
 
         render(<EnhancedComponent />)
@@ -35,5 +33,4 @@ describe('withCommerceSdkReact enhanced component', function () {
         // Placeholder is rendered.
         expect(screen.getByTestId('placeholder')).toBeDefined()
     })
-
 })
