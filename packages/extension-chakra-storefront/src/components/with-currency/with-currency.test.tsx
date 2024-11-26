@@ -24,13 +24,15 @@ const TestComponent: React.FC = () => <div data-testid="test-component">Test Com
 // Wrap the TestComponent with withCurrency HOC
 const WrappedComponent = withCurrency(TestComponent)
 
+const noop = () => ''
+
 describe('withCurrency HOC', () => {
     beforeEach(() => {
         // Set up a default mock implementation for useMultiSite
         mockUseMultiSite.mockReturnValue({
             site: {l10n: {defaultCurrency: 'USD'}},
             locale: {preferredCurrency: 'EUR'},
-            buildUrl: () => ''
+            buildUrl: noop
         })
     })
 
@@ -50,7 +52,8 @@ describe('withCurrency HOC', () => {
         expect(mockUseMultiSite).toHaveBeenCalledTimes(1)
         expect(mockUseMultiSite).toHaveReturnedWith({
             site: {l10n: {defaultCurrency: 'USD'}},
-            locale: {preferredCurrency: 'EUR'}
+            locale: {preferredCurrency: 'EUR'},
+            buildUrl: noop
         })
     })
 
@@ -59,7 +62,7 @@ describe('withCurrency HOC', () => {
         mockUseMultiSite.mockReturnValueOnce({
             site: {l10n: {defaultCurrency: 'USD'}},
             locale: {preferredCurrency: ''},
-            buildUrl: () => ''
+            buildUrl: noop
         })
 
         const {getByTestId} = render(<WrappedComponent />)
@@ -69,7 +72,8 @@ describe('withCurrency HOC', () => {
         // Verify that the currency fallback to defaultCurrency (USD)
         expect(mockUseMultiSite).toHaveReturnedWith({
             site: {l10n: {defaultCurrency: 'USD'}},
-            locale: {preferredCurrency: ''}
+            locale: {preferredCurrency: ''},
+            buildUrl: noop
         })
     })
 })
