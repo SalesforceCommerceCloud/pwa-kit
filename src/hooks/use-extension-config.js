@@ -14,7 +14,9 @@ import extensionMeta from '../../extension-meta.json'
 export const useExtensionConfig = () => {
     const extension = useApplicationExtension(extensionMeta.id)
     if (extension === undefined) {
-        throw new Error(`'useExtensionConfig' could not find your current application extension instance!`)
+        throw new Error(
+            `'useExtensionConfig' could not find your current application extension instance!`
+        )
     }
-    return extension?.getConfig()
+    return extension.getConfig()
 }
