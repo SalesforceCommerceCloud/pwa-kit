@@ -78,7 +78,8 @@
     "react-router-dom": "^5.3.4"
   },
   "devDependencies": {
-    "cross-env": "^5.2.1"
+    "cross-env": "^5.2.1",
+    "@salesforce/pwa-kit-extension-sdk": "4.0.0-dev"
   },
   "engines": {
     "node": "^16.11.0 || ^18.0.0 || ^20.0.0",
