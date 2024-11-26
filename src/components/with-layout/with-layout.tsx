@@ -110,7 +110,7 @@ const withLayout = <P extends object>(WrappedComponent: React.ComponentType<P>) 
 
         const appOrigin = getAppOrigin()
         const activeData = useActiveData()
-        const config = useConfig()
+        const config = useExtensionConfig()
         const history = useHistory()
         const location = useLocation()
         const authModal = useAuthModal()

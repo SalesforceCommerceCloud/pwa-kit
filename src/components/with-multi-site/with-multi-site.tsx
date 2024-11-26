@@ -25,7 +25,7 @@ const withMultiSite = <P extends object>(WrappedComponent: React.ComponentType<P
         const {req} = useServerContext()
         const path = req?.originalUrl || `${window.location.pathname}${window.location.search}`
 
-        const config: any = useConfig()
+        const config: any = useExtensionConfig()
         const site: any = resolveSiteFromUrl(path)
         const locale: any = resolveLocaleFromUrl(path)
         const buildUrl = createUrlTemplate(config, site.alias || site.id, locale.id)

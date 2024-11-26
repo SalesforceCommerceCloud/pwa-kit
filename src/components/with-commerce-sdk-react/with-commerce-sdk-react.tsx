@@ -41,7 +41,7 @@ const withCommerceSDKReact = <P extends object>(WrappedComponent: React.Componen
         const path = req?.originalUrl || `${window.location.pathname}${window.location.search}`
 
         // TODO: Update this type
-        const config: any = useConfig()
+        const config: any = useExtensionConfig()
 
         const appOrigin = getAppOrigin()
         const site: any = resolveSiteFromUrl(path)

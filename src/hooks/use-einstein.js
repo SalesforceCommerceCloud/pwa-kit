@@ -390,7 +390,7 @@ export class EinsteinAPI {
 const useEinstein = () => {
     const api = useCommerceApi()
     const {getTokenWhenReady} = useAccessToken()
-    const {einsteinAPI: config} = useConfig()
+    const {einsteinAPI: config} = useExtensionConfig()
     const {host, einsteinId, siteId, isProduction} = config
 
     const {getUsidWhenReady} = useUsid()

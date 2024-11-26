@@ -30,7 +30,7 @@ jest.mock('../../utils/site-utils', () => ({
 }))
 
 const mockUseServerContext = useServerContext as jest.MockedFunction<typeof useServerContext>
-const mockUseConfig = useConfig as jest.MockedFunction<typeof useConfig>
+const mockUseConfig = useExtensionConfig as jest.MockedFunction<typeof useExtensionConfig>
 const mockCreateUrlTemplate = createUrlTemplate as jest.MockedFunction<typeof createUrlTemplate>
 const mockResolveSiteFromUrl = resolveSiteFromUrl as jest.MockedFunction<typeof resolveSiteFromUrl>
 const mockResolveLocaleFromUrl = resolveLocaleFromUrl as jest.MockedFunction<

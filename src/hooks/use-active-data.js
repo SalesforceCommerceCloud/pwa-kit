@@ -12,7 +12,7 @@ import {useExtensionConfig} from '../hooks/use-extension-config'
 const useActiveData = () => {
     // Returns true when the feature flag is enabled and the tracking scripts have been executed
     // This MUST be called before using the `dw` variable, otherwise a ReferenceError will be thrown
-    const {activeDataEnabled = false} = useConfig()
+    const {activeDataEnabled = false} = useExtensionConfig()
 
     const canTrack = () => activeDataEnabled && typeof dw !== 'undefined'
     return {
