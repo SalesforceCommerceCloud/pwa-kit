@@ -43,8 +43,7 @@ describe('withCurrency HOC', () => {
         expect(getByTestId('test-component')).toBeInTheDocument()
     })
 
-    // TODO
-    it.skip('should use locale.preferredCurrency if available', () => {
+    it('should use locale.preferredCurrency if available', () => {
         render(<WrappedComponent />)
 
         // Check if CurrencyProvider has been rendered with the preferred currency
@@ -55,8 +54,7 @@ describe('withCurrency HOC', () => {
         })
     })
 
-    // TODO
-    it.skip('should fallback to l10n.defaultCurrency if preferredCurrency is not available', () => {
+    it('should fallback to l10n.defaultCurrency if preferredCurrency is not available', () => {
         // Update the mock to have an empty preferredCurrency
         mockUseMultiSite.mockReturnValueOnce({
             site: {l10n: {defaultCurrency: 'USD'}},
