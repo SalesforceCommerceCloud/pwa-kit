@@ -13,6 +13,9 @@
 // import {rest} from 'msw'
 // import {registerUserToken} from '../../utils/test-utils'
 
+// TODO
+test('TODO', () => {})
+
 // describe('AppConfig', () => {
 //     let originalFetch
 //     beforeAll(() => {

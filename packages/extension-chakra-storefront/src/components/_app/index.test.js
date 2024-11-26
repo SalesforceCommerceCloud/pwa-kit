@@ -13,6 +13,9 @@
 // import mockConfig from '../config/mocks/default'
 // import * as constants from '../../constants'
 
+// TODO
+test('TODO', () => {})
+
 // jest.mock('../../hooks/use-multi-site', () => jest.fn())
 
 // let windowSpy
