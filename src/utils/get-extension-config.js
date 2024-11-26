@@ -9,7 +9,7 @@
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 
 export const getExtensionConfig = () => {
-    const extensions = getConfig()?.app?.extensions
+    const extensions = getConfig()?.app?.extensions || []
     const extensionEntry = extensions.find(
         ([id]) => id === '@salesforce/extension-chakra-storefront'
     )
