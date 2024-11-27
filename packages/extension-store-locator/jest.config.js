@@ -13,8 +13,8 @@ module.exports = {
     moduleNameMapper: {
         ...base.moduleNameMapper,
 
-        // handle pwa-kit extensibility special import "$"
-        '^\\$/(.*)': '<rootDir>/src/$1'
+        // handle pwa-kit extensibility special import
+        '^overridable!(.*)': '$1'
     },
     coverageThreshold: {
         global: {
