@@ -18,7 +18,9 @@ module.exports = {
         '^@tanstack/react-query$':
             '<rootDir>/node_modules/@tanstack/react-query/build/lib/index.js',
         '^is-what$': '<rootDir>/node_modules/is-what/dist/cjs/index.cjs',
-        '^copy-anything$': '<rootDir>/node_modules/copy-anything/dist/cjs/index.cjs'
+        '^copy-anything$': '<rootDir>/node_modules/copy-anything/dist/cjs/index.cjs',
+        // handle pwa-kit extensibility special import
+        '^overridable!(.*)': '$1'
     },
     setupFilesAfterEnv: [path.join(__dirname, 'jest-setup.js')],
     collectCoverageFrom: [
