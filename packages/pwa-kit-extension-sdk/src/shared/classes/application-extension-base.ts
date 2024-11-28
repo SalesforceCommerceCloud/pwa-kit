@@ -35,7 +35,13 @@ export abstract class ApplicationExtension<Config extends ApplicationExtensionCo
             // We can remove this once TS supports abstract static properties.
             throw new Error(`Static readonly property 'id' must be defined in class ${cls.name}`)
         }
-        this.config = config
+        // console.log('--- this.defaultConfig', this.getDefaultConfig())
+        this.config = {
+            // TODO: deep merge
+            ...this.getDefaultConfig(),
+            ...config
+        }
+        // console.log('--- resulting config', this.config)
     }
 
     /**
@@ -46,6 +52,10 @@ export abstract class ApplicationExtension<Config extends ApplicationExtensionCo
      */
     public getConfig(): Config {
         return this.config
+    }
+
+    public getDefaultConfig(): Config | undefined {
+        return
     }
 
     /**

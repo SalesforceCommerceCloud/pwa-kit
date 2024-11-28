@@ -18,11 +18,14 @@ import {Config} from './types'
 
 import SamplePage from './pages/sample'
 import extensionMeta from '../extension-meta.json'
-
-const defaultPath = '/sample-page'
+import defaultConfig from './default-config'
 
 class Sample extends ApplicationExtension<Config> {
     static readonly id = extensionMeta.id
+
+    getDefaultConfig(): Config {
+        return defaultConfig
+    }
 
     extendApp<T>(App: React.ComponentType<T>): React.ComponentType<T> {
         return withRedBorder(App)
@@ -33,7 +36,7 @@ class Sample extends ApplicationExtension<Config> {
         return [
             {
                 exact: true,
-                path: this.getConfig().path || defaultPath,
+                path: this.getConfig().path,
                 component: SamplePage
             },
             ...routes
