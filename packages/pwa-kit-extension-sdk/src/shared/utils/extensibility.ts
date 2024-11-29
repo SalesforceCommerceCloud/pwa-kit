@@ -165,3 +165,25 @@ const getPreviousExtensions = (
     const index = array.findIndex((extension) => extension[0] === currentExtension[0])
     return array.slice(index + 1)
 }
+
+export const mergeWithExtensionDefaultConfig = (
+    extension: ApplicationExtensionEntryTuple
+): ApplicationExtensionEntryTuple => {
+    const packageName = extension[0]
+    const userDefinedConfig = extension[1]
+    const defaultConfig = getExtensionDefaultConfig(packageName)
+
+    // TODO: deep merge
+    const mergedConfig = {
+        ...defaultConfig,
+        ...userDefinedConfig
+    }
+    return [packageName, mergedConfig]
+}
+
+const getExtensionDefaultConfig = (packageName: string) => {
+    const projectDir = process.cwd()
+    return fse.readJsonSync(
+        resolve(projectDir, 'node_modules', packageName, 'src', 'default-config.json')
+    )
+}

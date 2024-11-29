@@ -6,6 +6,7 @@
  */
 
 // Local
+import {expand, mergeWithExtensionDefaultConfig} from '../../shared/utils'
 import {renderTemplate} from '../utils'
 
 // Types
@@ -37,7 +38,10 @@ export default function ApplicationExtensibilityLoader(
     // For web targets, the loader takes advantage of react-loadable but node targets (server) do not require this optimization.
     const data = this.getOptions()
 
-    return renderTemplate(data)
+    return renderTemplate({
+        ...data,
+        configured: expand(data.configured).map(mergeWithExtensionDefaultConfig)
+    })
 }
 
 /**

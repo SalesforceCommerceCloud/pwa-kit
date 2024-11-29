@@ -18,14 +18,9 @@ import {Config} from './types'
 
 import SamplePage from './pages/sample'
 import extensionMeta from '../extension-meta.json'
-import defaultConfig from './default-config'
 
 class Sample extends ApplicationExtension<Config> {
     static readonly id = extensionMeta.id
-
-    getDefaultConfig(): Config {
-        return defaultConfig
-    }
 
     extendApp<T>(App: React.ComponentType<T>): React.ComponentType<T> {
         return withRedBorder(App)

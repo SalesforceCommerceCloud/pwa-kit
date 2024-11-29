@@ -15,14 +15,9 @@ import {ApplicationExtension} from '@salesforce/pwa-kit-extension-sdk/express'
 import {Config} from './types'
 
 import extensionMeta from '../extension-meta.json'
-import defaultConfig from './default-config'
 
 class SampleExtension extends ApplicationExtension<Config> {
     static readonly id = extensionMeta.id
-
-    getDefaultConfig(): Config {
-        return defaultConfig
-    }
 
     extendApp(app: Application): Application {
         app.get('/sample', (req, res) => {
