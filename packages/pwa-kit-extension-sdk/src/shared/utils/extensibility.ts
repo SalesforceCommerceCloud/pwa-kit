@@ -10,7 +10,11 @@ import fse from 'fs-extra'
 import path, {resolve} from 'path'
 
 // Types
-import {ApplicationExtensionEntry, ApplicationExtensionEntryTuple} from '../../types'
+import {
+    ApplicationExtensionConfig,
+    ApplicationExtensionEntry,
+    ApplicationExtensionEntryTuple
+} from '../../types'
 
 import {expand} from './index'
 
@@ -166,22 +170,25 @@ const getPreviousExtensions = (
     return array.slice(index + 1)
 }
 
-export const mergeWithExtensionDefaultConfig = (
-    extension: ApplicationExtensionEntryTuple
+/**
+ * For the given extension, merge its user-defined config and default config
+ */
+export const mergeConfigs = (
+    extension: ApplicationExtensionEntryTuple,
+    defaultConfig = getExtensionDefaultConfig(extension[0])
 ): ApplicationExtensionEntryTuple => {
-    const packageName = extension[0]
     const userDefinedConfig = extension[1]
-    const defaultConfig = getExtensionDefaultConfig(packageName)
-
     // TODO: deep merge
     const mergedConfig = {
         ...defaultConfig,
         ...userDefinedConfig
     }
-    return [packageName, mergedConfig]
+    return [extension[0], mergedConfig]
 }
 
-const getExtensionDefaultConfig = (packageName: string) => {
+const getExtensionDefaultConfig = (
+    packageName: string
+): ApplicationExtensionConfig & Record<string, unknown> => {
     const projectDir = process.cwd()
     return fse.readJsonSync(
         resolve(projectDir, 'node_modules', packageName, 'src', 'default-config.json')

@@ -6,7 +6,7 @@
  */
 
 // Local
-import {expand, mergeWithExtensionDefaultConfig} from '../../shared/utils'
+import {expand, mergeConfigs} from '../../shared/utils'
 import {renderTemplate} from '../utils'
 
 // Types
@@ -40,7 +40,7 @@ export default function ApplicationExtensibilityLoader(
 
     return renderTemplate({
         ...data,
-        configured: expand(data.configured).map(mergeWithExtensionDefaultConfig)
+        configured: expand(data.configured).map((extension) => mergeConfigs(extension))
     })
 }
 

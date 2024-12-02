@@ -13,7 +13,7 @@ const babel = require('@babel/core')
 
 // Local
 import {renderTemplate} from '../utils'
-import {buildAliases, expand, mergeWithExtensionDefaultConfig} from '../../shared/utils'
+import {buildAliases, expand, mergeConfigs} from '../../shared/utils'
 import {ApplicationExtensionsLoaderOptions} from '../webpack/types'
 
 // Constants
@@ -53,8 +53,8 @@ module.exports = function replaceExtensionsPlaceholderContentPlugin({types: t}: 
                 if (filePath.endsWith(extensionsPlaceholderFile)) {
                     const newContent = renderTemplate({
                         ...(state.opts as ApplicationExtensionsLoaderOptions),
-                        configured: expand(state.opts.configured).map(
-                            mergeWithExtensionDefaultConfig
+                        configured: expand(state.opts.configured).map((extension) =>
+                            mergeConfigs(extension)
                         )
                     })
 

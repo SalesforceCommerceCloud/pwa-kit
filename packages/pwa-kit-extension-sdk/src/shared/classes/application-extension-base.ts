@@ -40,6 +40,7 @@ export abstract class ApplicationExtension<Config extends ApplicationExtensionCo
 
     /**
      * Returns the configuration that was used to instantiate this application extension.
+     * It's a merge of the user-defined config and the extension's default config.
      *
      * @protected
      * @returns config - The configuration object.
