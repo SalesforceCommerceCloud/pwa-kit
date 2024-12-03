@@ -11,7 +11,10 @@ A [PWA Kit](https://github.com/SalesforceCommerceCloud/pwa-kit) extension that a
 
 ```sh
 npm install @salesforce/extension-store-locator
-# Also, install the peer dependencies listed in the package.json
+
+# Also: 
+# - install the peer dependencies listed in the package.json
+# - see the Peer Dependancies section below for any other steps (e.g. make sure your app uses CommerceApiProvider component)
 ```
 
 ## Peer Dependancies
