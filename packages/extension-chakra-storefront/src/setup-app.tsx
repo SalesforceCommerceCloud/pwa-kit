@@ -32,7 +32,9 @@ import extensionMeta from '../extension-meta.json'
 class ChakraStorefront extends ApplicationExtension<Config> {
     static readonly id = extensionMeta.id
 
-    extendApp<T>(App: React.ComponentType<T>): React.ComponentType<T> {
+    extendApp<T extends React.ComponentType<T>>(
+        App: React.ComponentType<T>
+    ): React.ComponentType<T> {
         // NOTE: The order of these HOCs is important!
         const requiredHOCs = [
             withLayout,
