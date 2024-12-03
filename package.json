@@ -79,7 +79,6 @@
     "@types/react": "~18.2.0",
     "@types/react-dom": "~18.2.1",
     "express": "^4.19.2",
-    "internal-lib-build": "4.0.0-dev",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },
