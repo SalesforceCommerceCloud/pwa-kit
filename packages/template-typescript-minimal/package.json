@@ -21,7 +21,9 @@
     "@emotion/react": "^11.13.3",
     "@emotion/styled": "^11.13.0",
     "@loadable/component": "^5.15.3",
+    "@salesforce/commerce-sdk-react": "3.1.0-dev",
     "@salesforce/extension-sample": "^1.0.0-dev",
+    "@salesforce/extension-store-locator": "^0.1.0-dev",
     "@salesforce/pwa-kit-dev": "4.0.0-dev",
     "@salesforce/pwa-kit-extension-sdk": "4.0.0-dev",
     "@salesforce/pwa-kit-react-sdk": "4.0.0-dev",
@@ -32,6 +34,7 @@
     "@types/react-dom": "~18.2.1",
     "@types/react-router-dom": "~5.3.3",
     "framer-motion": "^11.5.4",
+    "prop-types": "^15",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-helmet": "^6.1.0",
@@ -45,7 +48,10 @@
   },
   "mobify": {
     "app":{
-      "extensions": ["@salesforce/extension-sample"]
+      "extensions": [
+        "@salesforce/extension-sample",
+        "@salesforce/extension-store-locator"
+      ]
     },
     "ssrEnabled": true,
     "ssrOnly": [

@@ -1,0 +1,10 @@
+{
+    "path": "/store-locator",
+    "radius": 100,
+    "radiusUnit": "km",
+    "defaultPageSize": 10,
+    "defaultCountry": "",
+    "defaultCountryCode": "",
+    "defaultPostalCode": "",
+    "supportedCountries": []
+}
