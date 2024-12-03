@@ -1,10 +1,16 @@
 {
+    "enabled": true,
     "path": "/store-locator",
     "radius": 100,
     "radiusUnit": "km",
     "defaultPageSize": 10,
-    "defaultCountry": "",
-    "defaultCountryCode": "",
-    "defaultPostalCode": "",
-    "supportedCountries": []
+    "defaultCountry": "<COUNTRY>",
+    "defaultCountryCode": "<COUNTRY_CODE>",
+    "defaultPostalCode": "<POSTAL_CODE>",
+    "supportedCountries": [
+        {
+            "countryName": "<COUNTRY>",
+            "countryCode": "<COUNTRY_CODE>"
+        }
+    ]
 }
