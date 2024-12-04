@@ -1,3 +1,6 @@
+## v3.1.1-extensibility-preview.0 (Dec 02, 2024)
+## v3.1.0-dev (Nov 28, 2024)
+## v4.0.0-extensibility-preview.0 (Nov 28, 2024)
 ## v4.0.0-dev (Jun 21, 2024)
 
 ## v3.0.0 (Aug 07, 2024)
