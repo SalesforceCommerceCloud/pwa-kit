@@ -1,6 +1,15 @@
 {
   "name": "@salesforce/extension-store-locator",
   "version": "0.1.0-extensibility-preview.0",
+  "bugs": {
+    "url": "https://github.com/SalesforceCommerceCloud/pwa-kit/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SalesforceCommerceCloud/pwa-kit.git"
+  },
+  "license": "SEE LICENSE IN LICENSE",
+  "author": "cc-pwa-kit@salesforce.com",
   "scripts": {
     "lint": "npm run lint:js",
     "lint:fix": "npm run lint:js -- --fix",
