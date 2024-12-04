@@ -51,69 +51,18 @@ class ChakraStorefront extends ApplicationExtension<Config> {
 
     extendRoutes(routes: RouteProps[]): RouteProps[] {
         const config = this.getConfig()
-        const extensionRoutes = [
-            {
-                path: '/',
-                component: Pages.Home,
-                exact: true
-            },
-            {
-                path: '/login',
-                component: Pages.Login,
-                exact: true
-            },
-            {
-                path: '/registration',
-                component: Pages.Registration,
-                exact: true
-            },
-            {
-                path: '/reset-password',
-                component: Pages.ResetPassword,
-                exact: true
-            },
-            {
-                path: '/account',
-                component: Pages.Account
-            },
-            {
-                path: '/checkout',
-                component: Pages.Checkout,
-                exact: true
-            },
-            {
-                path: '/checkout/confirmation/:orderNo',
-                component: Pages.CheckoutConfirmation
-            },
-            {
-                path: '/callback',
-                component: Pages.LoginRedirect,
-                exact: true
-            },
-            {
-                path: '/cart',
-                component: Pages.Cart,
-                exact: true
-            },
-            {
-                path: '/product/:productId',
-                component: Pages.ProductDetail
-            },
-            {
-                path: '/search',
-                component: Pages.ProductList
-            },
-            {
-                path: '/category/:categoryId',
-                component: Pages.ProductList
-            },
-            {
-                path: '/account/wishlist',
-                component: Pages.Wishlist
-            }
-        ].filter(({component}) => {
-            return (config.pages || [])[component.displayName] !== false
-        })
+
+        const extensionRoutes = config.routes
+            .map((route) => {
+                const {page, ...rest} = route
+                return {
+                    ...rest,
+                    component: Pages[page]
+                }
+            })
+            .filter(({component}) => {
+                return (config.pages || {})[component.displayName as string] !== false
+            })
 
         return [...routes, ...extensionRoutes]
     }

@@ -24,6 +24,7 @@
     "@salesforce/commerce-sdk-react": "3.1.0-dev",
     "@salesforce/extension-sample": "^1.0.0-dev",
     "@salesforce/extension-store-locator": "^0.1.0-dev",
+    "@salesforce/extension-chakra-storefront": "^1.0.0-dev",
     "@salesforce/pwa-kit-dev": "4.0.0-dev",
     "@salesforce/pwa-kit-extension-sdk": "4.0.0-dev",
     "@salesforce/pwa-kit-react-sdk": "4.0.0-dev",
@@ -50,7 +51,182 @@
     "app":{
       "extensions": [
         "@salesforce/extension-sample",
-        "@salesforce/extension-store-locator"
+        "@salesforce/extension-store-locator",
+
+        ["@salesforce/extension-chakra-storefront", {
+          "enabled": true,
+          "routes": [
+            {
+              "page": "Home",
+              "path": "/",
+              "exact": true
+            },
+            {
+              "page": "Login",
+              "path": "/login",
+              "exact": true
+            },
+            {
+              "page": "Registration",
+              "path": "/registration",
+              "exact": true
+            },
+            {
+              "page": "ResetPassword",
+              "path": "/reset-password",
+              "exact": true
+            },
+            {
+              "page": "Account",
+              "path": "/account"
+            },
+            {
+              "page": "Checkout",
+              "path": "/checkout",
+              "exact": true
+            },
+            {
+              "page": "CheckoutConfirmation",
+              "path": "/checkout/confirmation/:orderNo"
+            },
+            {
+              "page": "LoginRedirect",
+              "path": "/callback",
+              "exact": true
+            },
+            {
+              "page": "Cart",
+              "path": "/cart",
+              "exact": true
+            },
+            {
+              "page": "ProductDetail",
+              "path": "/product/:productId"
+            },
+            {
+              "page": "ProductList",
+              "path": "/search"
+            },
+            {
+              "page": "ProductList",
+              "path": "/category/:categoryId"
+            },
+            {
+              "page": "Wishlist",
+              "path": "/account/wishlist"
+            }
+          ],
+          "pages": {
+            "Account": true,
+            "Cart": true,
+            "Checkout": true,
+            "CheckoutConfirmation": true,
+            "Home": true,
+            "Login": true,
+            "Registration": true,
+            "ResetPassword": true,
+            "LoginRedirect": true,
+            "ProductDetail": true,
+            "ProductList": true,
+            "Wishlist": true
+          },
+          "url": {
+            "site": "path",
+            "locale": "path",
+            "showDefaults": true,
+            "interpretPlusSignAsSpace": false
+          },
+          "defaultSite": "RefArchGlobal",
+          "siteAliases": {
+            "RefArch": "us",
+            "RefArchGlobal": "global"
+          },
+          "sites": [
+            {
+              "id": "RefArch",
+              "l10n": {
+                "supportedCurrencies": ["USD"],
+                "defaultCurrency": "USD",
+                "defaultLocale": "en-US",
+                "supportedLocales": [
+                  {
+                    "id": "en-US",
+                    "preferredCurrency": "USD"
+                  },
+                  {
+                    "id": "en-CA",
+                    "preferredCurrency": "USD"
+                  }
+                ]
+              }
+            },
+            {
+              "id": "RefArchGlobal",
+              "l10n": {
+                "supportedCurrencies": ["GBP", "EUR", "CNY", "JPY"],
+                "defaultCurrency": "GBP",
+                "supportedLocales": [
+                  {
+                    "id": "de-DE",
+                    "preferredCurrency": "EUR"
+                  },
+                  {
+                    "id": "en-GB",
+                    "preferredCurrency": "GBP"
+                  },
+                  {
+                    "id": "es-MX",
+                    "preferredCurrency": "MXN"
+                  },
+                  {
+                    "id": "fr-FR",
+                    "preferredCurrency": "EUR"
+                  },
+                  {
+                    "id": "it-IT",
+                    "preferredCurrency": "EUR"
+                  },
+                  {
+                    "id": "ja-JP",
+                    "preferredCurrency": "JPY"
+                  },
+                  {
+                    "id": "ko-KR",
+                    "preferredCurrency": "KRW"
+                  },
+                  {
+                    "id": "pt-BR",
+                    "preferredCurrency": "BRL"
+                  },
+                  {
+                    "id": "zh-CN",
+                    "preferredCurrency": "CNY"
+                  },
+                  {
+                    "id": "zh-TW",
+                    "preferredCurrency": "TWD"
+                  }
+                ],
+                "defaultLocale": "en-GB"
+              }
+            }
+          ],
+          "commerceAPI": {
+            "proxyPath": "/mobify/proxy/api",
+            "parameters": {
+              "clientId": "c9c45bfd-0ed3-4aa2-9971-40f88962b836",
+              "organizationId": "f_ecom_zzrf_001",
+              "shortCode": "8o7m175y",
+              "siteId": "RefArchGlobal"
+            }
+          },
+          "einsteinAPI": {
+            "host": "https://api.cquotient.com",
+            "einsteinId": "1ea06c6e-c936-4324-bcf0-fada93f83bb1",
+            "siteId": "aaij-MobileFirst",
+            "isProduction": false
+          }
+        }]
       ]
     },
     "ssrEnabled": true,

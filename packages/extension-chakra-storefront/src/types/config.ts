@@ -5,6 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import type {ApplicationExtensionConfig} from '@salesforce/pwa-kit-extension-sdk/types'
+import {RouteProps} from 'react-router-dom'
 
 // Represents a locale with its ID and preferred currency.
 type Locale = {
@@ -48,6 +49,9 @@ type EinsteinAPI = {
 // Indicates where a value should be placed in the URL.
 type UrlPlacement = 'path' | 'query_string' | 'none'
 
+type Pages = typeof import('../pages')
+type Route = Record<'page', keyof Pages> & RouteProps
+
 // Main configuration type, extending ApplicationExtensionConfig for additional settings.
 export interface Config extends ApplicationExtensionConfig {
     activeDataEnabled: boolean // default = false
@@ -56,6 +60,7 @@ export interface Config extends ApplicationExtensionConfig {
     einsteinAPI: EinsteinAPI
     enabled: boolean
     pages: Record<string, boolean>
+    routes: Route[]
     siteAliases: Record<Site['id'], string>
     sites: Site[]
     url: {
