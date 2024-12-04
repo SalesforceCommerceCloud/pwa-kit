@@ -59,7 +59,7 @@ export interface Config extends ApplicationExtensionConfig {
     defaultSite: Site['id']
     einsteinAPI: EinsteinAPI
     enabled: boolean
-    pages: Record<string, boolean>
+    pages: Record<keyof Pages, boolean>
     routes: Route[]
     siteAliases: Record<Site['id'], string>
     sites: Site[]

@@ -61,7 +61,11 @@ class ChakraStorefront extends ApplicationExtension<Config> {
                 }
             })
             .filter(({component}) => {
-                return (config.pages || {})[component.displayName as string] !== false
+                return (
+                    (config.pages || {})[
+                        component.displayName as keyof typeof import('./pages')
+                    ] !== false
+                )
             })
 
         return [...routes, ...extensionRoutes]
