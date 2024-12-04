@@ -191,6 +191,6 @@ const getExtensionDefaultConfig = (
 ): ApplicationExtensionConfig & Record<string, unknown> => {
     const projectDir = process.cwd()
     return fse.readJsonSync(
-        resolve(projectDir, 'node_modules', packageName, 'src', 'default-config.json')
+        resolve(projectDir, 'node_modules', packageName, 'config', 'default.json')
     )
 }
