@@ -17,7 +17,6 @@ import {Config} from './types'
 import withRedBorder from 'overridable!./components/with-red-border'
 import SamplePage from './pages/sample'
 
-const defaultPath = '/sample-page'
 import extensionMeta from '../extension-meta.json'
 
 class Sample extends ApplicationExtension<Config> {
@@ -33,7 +32,7 @@ class Sample extends ApplicationExtension<Config> {
         return [
             {
                 exact: true,
-                path: this.getConfig().path || defaultPath,
+                path: this.getConfig().path,
                 component: SamplePage
             },
             ...routes

@@ -10,5 +10,5 @@ import type {ApplicationExtensionConfig} from '@salesforce/pwa-kit-extension-sdk
 // of the extension itself. Update this config type to your specific needs!
 export interface Config extends ApplicationExtensionConfig {
     // react-router-style path to the new sample page
-    path?: string
+    path: string
 }
