@@ -7,5 +7,6 @@
 
 // Platform Imports
 import {extensionConfigs} from '@salesforce/pwa-kit-extension-sdk/react'
+import extensionMeta from '../../extension-meta.json'
 
-export const getExtensionConfig = () => extensionConfigs['@salesforce/extension-chakra-storefront']
+export const getExtensionConfig = () => extensionConfigs[extensionMeta.id]
