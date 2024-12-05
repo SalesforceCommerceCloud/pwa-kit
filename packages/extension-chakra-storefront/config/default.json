@@ -92,7 +92,9 @@
             "path": "/account/wishlist"
         }
     ],
-    "siteAliases": {},
+    "siteAliases": {
+        "<SITE_ID>": "<ALIAS>"
+    },
     "sites": [
         {
             "id": "<SITE_ID>",
