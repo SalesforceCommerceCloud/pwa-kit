@@ -58,7 +58,6 @@ export interface Config extends ApplicationExtensionConfig {
     commerceAPI: CommerceAPIConfig
     defaultSite: Site['id']
     einsteinAPI: EinsteinAPI
-    enabled: boolean
     pages: Record<keyof Pages, boolean>
     routes: Route[]
     siteAliases: Record<Site['id'], string>
