@@ -53,7 +53,7 @@
   "devDependencies": {
     "@chakra-ui/react": "2.8.2",
     "@loadable/component": "^5.15.3",
-    "@salesforce/commerce-sdk-react": "3.1.1-extensibility-preview.0",
+    "@salesforce/commerce-sdk-react": "3.1.1-preview.0",
     "@salesforce/pwa-kit-dev": "4.0.0-extensibility-preview.0",
     "@salesforce/pwa-kit-extension-sdk": "4.0.0-extensibility-preview.0",
     "@salesforce/pwa-kit-react-sdk": "4.0.0-extensibility-preview.0",
