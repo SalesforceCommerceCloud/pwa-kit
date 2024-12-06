@@ -1,6 +1,15 @@
 {
   "name": "@salesforce/extension-chakra-storefront",
-  "version": "1.0.0-dev",
+  "version": "0.1.0-extensibility-preview.0",
+  "bugs": {
+    "url": "https://github.com/SalesforceCommerceCloud/pwa-kit/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SalesforceCommerceCloud/pwa-kit.git"
+  },
+  "license": "SEE LICENSE IN LICENSE",
+  "author": "cc-pwa-kit@salesforce.com",
   "scripts": {
     "lint": "npm run lint:js",
     "lint:fix": "npm run lint:js -- --fix",
@@ -13,8 +22,8 @@
     "@chakra-ui/skip-nav": "^2.0.15",
     "@chakra-ui/system": "^2.5.6",
     "@loadable/component": "^5.15.3",
-    "@salesforce/pwa-kit-extension-sdk": "4.0.0-dev",
-    "@salesforce/pwa-kit-react-sdk": "4.0.0-dev",
+    "@salesforce/pwa-kit-extension-sdk": "4.0.0-extensibility-preview.0",
+    "@salesforce/pwa-kit-react-sdk": "4.0.0-extensibility-preview.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-intl": "^5.25.1",
@@ -34,8 +43,8 @@
     "@chakra-ui/skip-nav": "^2.0.15",
     "@chakra-ui/system": "^2.5.6",
     "@peculiar/webcrypto": "^1.4.2",
-    "@salesforce/commerce-sdk-react": "3.1.0-dev",
-    "@salesforce/pwa-kit-runtime": "4.0.0-dev",
+    "@salesforce/commerce-sdk-react": "3.1.1-preview.0",
+    "@salesforce/pwa-kit-runtime": "4.0.0-extensibility-preview.0",
     "@tanstack/react-query": "^4.28.0",
     "@tanstack/react-query-devtools": "^4.29.1",
     "card-validator": "^8.1.1",
@@ -65,9 +74,9 @@
   },
   "devDependencies": {
     "@loadable/component": "^5.15.3",
-    "@salesforce/pwa-kit-dev": "4.0.0-dev",
-    "@salesforce/pwa-kit-extension-sdk": "4.0.0-dev",
-    "@salesforce/pwa-kit-react-sdk": "4.0.0-dev",
+    "@salesforce/pwa-kit-dev": "4.0.0-extensibility-preview.0",
+    "@salesforce/pwa-kit-extension-sdk": "4.0.0-extensibility-preview.0",
+    "@salesforce/pwa-kit-react-sdk": "4.0.0-extensibility-preview.0",
     "@tanstack/react-query-devtools": "^4.29.1",
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^14.0.0",
