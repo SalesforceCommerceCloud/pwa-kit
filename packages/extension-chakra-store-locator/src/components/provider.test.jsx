@@ -6,7 +6,7 @@
  */
 import React from 'react'
 import {render, act} from '@testing-library/react'
-import {StoreLocatorProvider, StoreLocatorContext} from './store-locator-provider'
+import {StoreLocatorProvider, StoreLocatorContext} from './provider'
 
 describe('StoreLocatorProvider', () => {
     const mockConfig = {

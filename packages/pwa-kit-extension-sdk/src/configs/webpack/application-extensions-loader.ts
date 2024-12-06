@@ -5,6 +5,8 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
+import path from 'path'
+
 // Local
 import {renderTemplate} from '../utils'
 
@@ -56,12 +58,16 @@ export const ruleForApplicationExtensibility = (options: any = {}) => {
     const {loaderOptions = {}} = options
     const {target = DEFAULT_TARGET, configured} =
         loaderOptions as ApplicationExtensionsLoaderOptions
+    const testRegExp = new RegExp(
+        `${target === 'node' ? 'express' : 'react'}/placeholders/application-extensions.js`,
+        'i'
+    )
 
     return {
-        test: new RegExp(
-            `${target === 'node' ? 'express' : 'react'}/placeholders/application-extensions.js`,
-            'i'
-        ),
+        test: (source: string) => {
+            const posixPath = path.posix.join(...source.split(path.sep))
+            return testRegExp.test(posixPath)
+        },
         use: {
             loader: '@salesforce/pwa-kit-extension-sdk/configs/webpack/application-extensions-loader',
             options: {

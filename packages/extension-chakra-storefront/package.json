@@ -81,19 +81,24 @@
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^14.0.0",
     "@testing-library/user-event": "^14.5.2",
+    "@types/loadable__component": "^5.13.9",
     "@types/express": "^5.0.0",
     "@types/jest": "29.5.14",
-    "@types/loadable__component": "^5.13.9",
     "@types/mocha": "^10.0.9",
     "@types/react": "~18.2.0",
     "@types/react-dom": "~18.2.1",
     "express": "^4.19.2",
-    "internal-lib-build": "4.0.0-extensibility-preview.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },
   "engines": {
     "node": "^16.11.0 || ^18.0.0 || ^20.0.0",
     "npm": "^8.0.0 || ^9.0.0 || ^10.0.0"
+  },
+  "mobify": {
+    "app": {
+      "extensions": []
+    }
   }
+  
 }

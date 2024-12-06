@@ -3,6 +3,7 @@
   "version": "4.0.0-extensibility-preview.0",
   "private": true,
   "scripts": {
+    "analyze-build": "cross-env MOBIFY_ANALYZE=true npm run build",
     "build": "pwa-kit-dev build",
     "format": "pwa-kit-dev format \"**/*.{js,jsx,ts,tsx}\"",
     "lint": "npm run lint:js && npm run typecheck",

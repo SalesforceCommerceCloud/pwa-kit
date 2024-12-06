@@ -17,7 +17,7 @@ import {
 } from '@chakra-ui/react'
 import {useForm, Controller} from 'react-hook-form'
 import {useStoreLocator} from './use-store-locator'
-import type {FormValues} from './store-locator-provider'
+import type {FormValues} from './provider'
 import {useGeolocation} from './use-geo-location'
 
 export const StoreLocatorForm: React.FC = () => {

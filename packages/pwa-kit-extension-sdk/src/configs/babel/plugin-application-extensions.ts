@@ -10,6 +10,8 @@
 const parser = require('@babel/parser')
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const babel = require('@babel/core')
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const path = require('path')
 
 // Local
 import {renderTemplate} from '../utils'
@@ -17,7 +19,7 @@ import {buildAliases} from '../../shared/utils'
 import {ApplicationExtensionsLoaderOptions} from '../webpack/types'
 
 // Constants
-const extensionsPlaceholderFile = 'express/placeholders/application-extensions.js'
+const extensionsPlaceholderFile = path.join('express', 'placeholders', 'application-extensions.js')
 
 // A Set to keep track of processed file paths
 const processedFiles = new Set()

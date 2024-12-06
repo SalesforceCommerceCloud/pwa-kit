@@ -8,7 +8,7 @@
 import React from 'react'
 import {render, screen} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import {StoreLocatorForm} from './store-locator-form'
+import {StoreLocatorForm} from './form'
 import {useStoreLocator} from './use-store-locator'
 import {useGeolocation} from './use-geo-location'
 

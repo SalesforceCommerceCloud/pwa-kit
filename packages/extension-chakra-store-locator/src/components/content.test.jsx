@@ -7,17 +7,17 @@
 
 import React from 'react'
 import {render, screen} from '@testing-library/react'
-import {StoreLocatorContent} from './store-locator-content'
+import {StoreLocatorContent} from './content'
 
-jest.mock('./store-locator-list', () => ({
+jest.mock('./list', () => ({
     StoreLocatorList: () => <div data-testid="store-locator-list">Store List Mock</div>
 }))
 
-jest.mock('./store-locator-form', () => ({
+jest.mock('./form', () => ({
     StoreLocatorForm: () => <div data-testid="store-locator-form">Store Form Mock</div>
 }))
 
-jest.mock('./store-locator-heading', () => ({
+jest.mock('./heading', () => ({
     StoreLocatorHeading: () => <div data-testid="store-locator-heading">Store Heading Mock</div>
 }))
 

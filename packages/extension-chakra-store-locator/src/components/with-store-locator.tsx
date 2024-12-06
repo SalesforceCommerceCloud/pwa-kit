@@ -5,8 +5,8 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
-import {Config as StoreLocatorConfig} from '../../types/config'
-import {StoreLocatorProvider} from './store-locator-provider'
+import {Config as StoreLocatorConfig} from '../types/config'
+import {StoreLocatorProvider} from './provider'
 
 /**
  * Higher-order component that wraps a component with the StoreLocatorProvider

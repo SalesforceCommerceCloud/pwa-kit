@@ -47,7 +47,7 @@ const main = () => {
 
     sh.exec(
         `git clone --config core.longpaths=true --single-branch ` +
-            `--depth=1 file://${monorepoRoot} ${checkoutDir}`
+            `--depth=1 "file://${monorepoRoot}" "${checkoutDir}"`
     )
 
     return Promise.all(

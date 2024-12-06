@@ -1,5 +1,5 @@
 {
-  "name": "@salesforce/extension-store-locator",
+  "name": "@salesforce/extension-chakra-store-locator",
   "version": "0.1.0-extensibility-preview.0",
   "bugs": {
     "url": "https://github.com/SalesforceCommerceCloud/pwa-kit/issues"

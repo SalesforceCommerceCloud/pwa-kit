@@ -22,6 +22,8 @@ const CONFIG = {
     app: {extensions: EXTENSIONS}
 }
 
+const normalizePath = (posixPath: string) => posixPath.split(path.posix.sep).join(path.sep)
+
 describe('buildBabelExtensibilityArgs', () => {
     const realpathSyncMock = jest.spyOn(fse, 'realpathSync') as jest.Mock
 
@@ -33,10 +35,10 @@ describe('buildBabelExtensibilityArgs', () => {
             if (filePath.includes('application-extensions.js')) {
                 return '/absolute/path/to/application-extensions.js'
             }
-            if (filePath.includes('@salesforce/extension-sample/src')) {
+            if (filePath.includes(normalizePath('@salesforce/extension-sample/src'))) {
                 return '/absolute/path/to/@salesforce/extension-sample/src'
             }
-            if (filePath.includes('@salesforce/extension-another/src')) {
+            if (filePath.includes(normalizePath('@salesforce/extension-another/src'))) {
                 return '/absolute/path/to/@salesforce/extension-another/src'
             }
             throw new Error(`Unexpected path: ${filePath}`)

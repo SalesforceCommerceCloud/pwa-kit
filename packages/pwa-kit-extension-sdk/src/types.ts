@@ -29,6 +29,7 @@ export type ApplicationExtensionEntry = ApplicationExtensionEntryTuple | string
  * Application Extensions and the projects working directory.
  */
 export type BuildCandidatePathsOptions = {
+    canonicalSource: string
     projectDir: string
     extensionEntries: ApplicationExtensionEntry[]
 }

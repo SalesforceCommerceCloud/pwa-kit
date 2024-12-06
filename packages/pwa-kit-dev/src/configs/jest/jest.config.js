@@ -10,12 +10,13 @@ module.exports = {
     testURL: 'http://localhost/',
     verbose: true,
     collectCoverage: true,
+    coveragePathIgnorePatterns: ['app/application-extensions', '/node_modules/'],
     // We need access to jsdom globally in tests.
     // jsdom isn't accessible so we need to use this
     // 3rd party test environment wrapper. When we
     // upgrade to jest 28, we can revert back to jsdom.
     testEnvironment: 'jest-environment-jsdom-global',
-    testPathIgnorePatterns: ['node_modules', 'build'],
+    testPathIgnorePatterns: ['node_modules', 'build', 'app/application-extensions'],
     moduleNameMapper: {
         '\\.(jpg|jpeg|png|gif|eot|otf|webp|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$':
             path.join(__dirname, 'mocks', 'fileMock.js'),

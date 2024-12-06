@@ -13,8 +13,8 @@ import {RouteProps} from 'react-router-dom'
 import {ApplicationExtension} from '@salesforce/pwa-kit-extension-sdk/react'
 
 // Local Imports
-import {withOptionalChakra} from './components/store-locator/with-optional-chakra-provider'
-import {withStoreLocator} from './components/store-locator/with-store-locator'
+import {withOptionalChakra} from './components/with-optional-chakra-provider'
+import {withStoreLocator} from './components/with-store-locator'
 import {Config} from './types'
 
 import StoreLocatorPage from './pages/store-locator'
@@ -33,7 +33,7 @@ class StoreLocatorExtension extends ApplicationExtension<Config> {
 
         if (!config.supportedCountries || config.supportedCountries.length === 0) {
             console.warn(
-                '[extension-store-locator] Missing supportedCountries, this extension will not work.'
+                '[extension-chakra-store-locator] Missing supportedCountries, this extension will not work.'
             )
         }
 
