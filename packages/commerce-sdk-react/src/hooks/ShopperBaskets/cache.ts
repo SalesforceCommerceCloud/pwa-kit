@@ -184,6 +184,8 @@ export const cacheUpdateMatrix: CacheUpdateMatrix<Client> = {
     },
     mergeBasket(customerId, {parameters}, response) {
         const {basketId} = response
+        const registeredCustomerId = response?.customerInfo?.customerId
+
         return {
             // TODO: Convert invalidate to an update that removes the matching basket
             invalidate: [
@@ -193,8 +195,14 @@ export const cacheUpdateMatrix: CacheUpdateMatrix<Client> = {
             ],
             update: [
                 {queryKey: getBasket.queryKey({...parameters, basketId})},
-                ...(customerId && basketId
-                    ? [updateCustomerBasketsQuery(customerId, {...parameters, basketId}, response)]
+                ...(registeredCustomerId && basketId
+                    ? [
+                          updateCustomerBasketsQuery(
+                              registeredCustomerId,
+                              {...parameters, basketId},
+                              response
+                          )
+                      ]
                     : [])
             ]
         }

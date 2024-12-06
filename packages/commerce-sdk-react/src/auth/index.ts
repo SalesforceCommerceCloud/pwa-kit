@@ -952,7 +952,50 @@ class Auth {
             })
         }
         this.clearStorage()
-        return await this.loginGuestUser()
+        return await this.ready()
+    }
+
+    /**
+     * Handle updating customer password and re-log in after the access token is invalidated.
+     *
+     */
+    async updateCustomerPassword(body: {
+        customer: ShopperCustomersTypes.Customer
+        password: string
+        currentPassword: string
+        shouldReloginCurrentSession?: boolean
+    }) {
+        const {
+            customer: {customerId, login},
+            password,
+            currentPassword,
+            shouldReloginCurrentSession
+        } = body
+
+        // login and customerId are optional fields on the Customer type
+        // here we had to guard it to avoid ts error
+        if (!login || !customerId) {
+            throw new Error('Customer is missing required fields.')
+        }
+
+        const res = await this.shopperCustomersClient.updateCustomerPassword({
+            headers: {
+                authorization: `Bearer ${this.get('access_token')}`
+            },
+            parameters: {customerId},
+            body: {
+                password: password,
+                currentPassword: currentPassword
+            }
+        })
+
+        if (shouldReloginCurrentSession) {
+            await this.loginRegisteredUserB2C({
+                username: login,
+                password
+            })
+        }
+        return res
     }
 
     /**

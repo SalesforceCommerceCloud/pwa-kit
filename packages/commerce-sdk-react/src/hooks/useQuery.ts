@@ -22,6 +22,7 @@ import {
 import useConfig from './useConfig'
 import {hasAllKeys} from './utils'
 import {onClient} from '../utils'
+import {handleInvalidToken, generateCustomEndpointOptions} from './helpers'
 
 /**
  * Helper for query hooks, contains most of the logic in order to keep individual hooks small.
@@ -53,6 +54,7 @@ export const useQuery = <Client extends ApiClient, Options extends ApiOptions, D
     // trade-off, as the behavior is opt-in by the end user, and it feels like adding type safety
     // for this case would add significantly more complexity.
     const wrappedMethod = async () => await authenticatedMethod(apiOptions as Options)
+
     return useReactQuery(hookConfig.queryKey, wrappedMethod, {
         enabled:
             // Individual hooks can provide `enabled` checks that are done in ADDITION to
@@ -86,34 +88,27 @@ export const useCustomQuery = (
     queryOptions?: UseQueryOptions<unknown, unknown, unknown, any>
 ) => {
     const config = useConfig()
+    const logger = config.logger || console
     const auth = useAuthContext()
     const callCustomEndpointWithAuth = (options: OptionalCustomEndpointClientConfig) => {
-        const clientConfig = options.clientConfig || {}
-        const clientHeaders = config.headers || {}
         return async () => {
             const {access_token} = await auth.ready()
-            return await helpers.callCustomEndpoint({
-                ...options,
-                options: {
-                    method: options.options?.method || 'GET',
-                    headers: {
-                        Authorization: `Bearer ${access_token}`,
-                        ...clientHeaders,
-                        ...options.options?.headers
-                    },
-                    ...options.options
-                },
-                clientConfig: {
-                    parameters: {
-                        clientId: config.clientId,
-                        siteId: config.siteId,
-                        organizationId: config.organizationId,
-                        shortCode: config.organizationId
-                    },
-                    proxy: config.proxy,
-                    ...clientConfig,
-                    throwOnBadResponse: true
-                }
+            const customEndpointOptions = generateCustomEndpointOptions(
+                options,
+                config,
+                access_token
+            )
+
+            return await helpers.callCustomEndpoint(customEndpointOptions).catch(async (error) => {
+                const {access_token} = await handleInvalidToken(error, auth, logger)
+
+                // Retry again after resetting auth state
+                const customEndpointOptions = generateCustomEndpointOptions(
+                    options,
+                    config,
+                    access_token
+                )
+                return await helpers.callCustomEndpoint(customEndpointOptions)
             })
         }
     }
@@ -139,5 +134,6 @@ export const useCustomQuery = (
         `/${apiOptions.options.customApiPathParameters.endpointPath}`,
         {...apiOptions.options.parameters}
     ]
+
     return useReactQuery(queryKey, callCustomEndpointWithAuth(apiOptions), queryOptions)
 }

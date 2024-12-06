@@ -1,4 +1,7 @@
-## v5.1.0 (TBD)
+## v5.1.0-dev (TBD)
+
+- [BUG] Fixed "getCheckboxProps is not a function" when rendering checkout page in generated app.[#2140](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2140)
+- Replace transfer basket call with merge basket on checkout [#2138])(https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2138)
 
 ### Accessibility Improvements
 - [a11y] Fix LinkList component to follow a11y practise [#2098])(https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2098)
@@ -8,6 +11,7 @@
 ### New Features
 - Implement ability to set Shopper Context via search parameters in the Retail React App [#1986](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1986)
 - Display a promo banner from Page Designer in the PLP page of the Retail React App [#2016](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2016)
+- Clear auth state if session has been invalidated by a password change [#2092](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2092)
 
 ### Performance Improvements
 

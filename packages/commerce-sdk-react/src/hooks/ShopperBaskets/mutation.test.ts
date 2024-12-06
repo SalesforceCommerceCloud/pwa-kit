@@ -242,10 +242,10 @@ describe('ShopperBaskets mutations', () => {
             act(() => result.current.mutation.mutate(options))
             await waitAndExpectSuccess(() => result.current.mutation)
             assertUpdateQuery(result.current.basket, newBasket)
-            // Because 'transferBasket` returns basket information applicable to a different (registered) customer
+            // Because 'transferBasket` and `mergeBasket` returns basket information applicable to a different (registered) customer
             // the `result.current.customerBaskets` isn't effected here as the customer id is static.
             // https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1887
-            if (mutationName !== 'transferBasket') {
+            if (mutationName !== 'transferBasket' && mutationName !== 'mergeBasket') {
                 assertUpdateQuery(result.current.customerBaskets, newCustomerBaskets)
             }
         }
