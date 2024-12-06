@@ -173,17 +173,20 @@ const getPreviousExtensions = (
 /**
  * For the given extension, merge its user-defined config and default config
  */
-export const mergeConfigs = (
+export const mergeWithDefaultConfig = (
     extension: ApplicationExtensionEntryTuple,
-    defaultConfig = getExtensionDefaultConfig(extension[0])
+    defaultConfig?: ApplicationExtensionEntryTuple[1]
 ): ApplicationExtensionEntryTuple => {
+    const packageName = extension[0]
     const userDefinedConfig = extension[1]
+    defaultConfig = defaultConfig ?? getExtensionDefaultConfig(packageName)
+
     // TODO: deep merge
     const mergedConfig = {
         ...defaultConfig,
         ...userDefinedConfig
     }
-    return [extension[0], mergedConfig]
+    return [packageName, mergedConfig]
 }
 
 const getExtensionDefaultConfig = (
