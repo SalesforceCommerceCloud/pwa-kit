@@ -507,16 +507,16 @@ class Auth {
         responseValue: number | undefined,
         defaultValue: number
     ): number {
-        let value = overrideValue
-
-        if (typeof value !== 'number' || value <= 0 || value > defaultValue) {
-            if (value !== undefined) {
-                this.logWarning(SLAS_REFRESH_TOKEN_COOKIE_TTL_OVERRIDE_MSG)
-            }
-            value = responseValue || defaultValue
+        // Check if overrideValue is valid
+        // if not, log warning and fall back to responseValue or defaultValue
+        const isOverrideValid =
+            typeof overrideValue === 'number' && overrideValue > 0 && overrideValue <= defaultValue
+        if (!isOverrideValid && overrideValue !== undefined) {
+            this.logWarning(SLAS_REFRESH_TOKEN_COOKIE_TTL_OVERRIDE_MSG)
         }
 
-        return value
+        // Return the first valid value: overrideValue (if valid), responseValue, or defaultValue
+        return isOverrideValid ? overrideValue : responseValue || defaultValue
     }
 
     /**
