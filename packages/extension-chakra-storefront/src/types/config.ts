@@ -5,7 +5,6 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import type {ApplicationExtensionConfig} from '@salesforce/pwa-kit-extension-sdk/types'
-import {RouteProps} from 'react-router-dom'
 
 // Represents a locale with its ID and preferred currency.
 type Locale = {
@@ -50,19 +49,19 @@ type EinsteinAPI = {
 type UrlPlacement = 'path' | 'query_string' | 'none'
 
 type Pages = typeof import('../pages')
-type Route = Record<'page', keyof Pages> & RouteProps
 
-// Main configuration type, extending ApplicationExtensionConfig for additional settings.
-export interface Config extends ApplicationExtensionConfig {
-    activeDataEnabled: boolean // default = false
+/**
+ * This defines how your extension can be configured in the user's project. Please update it to your specific needs!
+ */
+export interface UserDefinedConfig extends ApplicationExtensionConfig {
+    activeDataEnabled?: boolean // default = false
     commerceAPI: CommerceAPIConfig
     defaultSite: Site['id']
     einsteinAPI: EinsteinAPI
-    pages: Record<keyof Pages, boolean>
-    routes: Route[]
-    siteAliases: Record<Site['id'], string>
+    pages?: Record<keyof Pages, boolean | string>
+    siteAliases?: Record<Site['id'], string>
     sites: Site[]
-    url: {
+    url?: {
         site: UrlPlacement
         locale: UrlPlacement
         showDefaults: boolean
@@ -81,3 +80,8 @@ export interface Config extends ApplicationExtensionConfig {
     // TODO: Write README, including steps to install.
     // TODO: Fix tests
 }
+
+/**
+ * When instantiating your extension, pwa-kit-extension-sdk will make sure to pass in the "complete" configuration, which has the merged user-defined and default configs.
+ */
+export type Config = Required<UserDefinedConfig>
