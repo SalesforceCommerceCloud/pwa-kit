@@ -35,16 +35,7 @@ class StoreLocatorExtension extends ApplicationExtension<Config> {
             )
         }
 
-        return withStoreLocator(withOptionalChakra(App), {
-            path: config.path,
-            radius: config.radius,
-            radiusUnit: config.radiusUnit,
-            defaultPageSize: config.defaultPageSize,
-            defaultCountry: config.defaultCountry,
-            defaultCountryCode: config.defaultCountryCode,
-            defaultPostalCode: config.defaultPostalCode,
-            supportedCountries: config.supportedCountries
-        })
+        return withStoreLocator(withOptionalChakra(App), config)
     }
 
     extendRoutes(routes: RouteProps[]): RouteProps[] {
