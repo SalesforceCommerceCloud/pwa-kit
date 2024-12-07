@@ -55,80 +55,18 @@
 
         ["@salesforce/extension-chakra-storefront", {
           "enabled": true,
-          "routes": [
-            {
-              "page": "Home",
-              "path": "/",
-              "exact": true
-            },
-            {
-              "page": "Login",
-              "path": "/login",
-              "exact": true
-            },
-            {
-              "page": "Registration",
-              "path": "/registration",
-              "exact": true
-            },
-            {
-              "page": "ResetPassword",
-              "path": "/reset-password",
-              "exact": true
-            },
-            {
-              "page": "Account",
-              "path": "/account"
-            },
-            {
-              "page": "Checkout",
-              "path": "/checkout",
-              "exact": true
-            },
-            {
-              "page": "CheckoutConfirmation",
-              "path": "/checkout/confirmation/:orderNo"
-            },
-            {
-              "page": "LoginRedirect",
-              "path": "/callback",
-              "exact": true
-            },
-            {
-              "page": "Cart",
-              "path": "/cart",
-              "exact": true
-            },
-            {
-              "page": "ProductDetail",
-              "path": "/product/:productId"
-            },
-            {
-              "page": "ProductList",
-              "path": "/search"
-            },
-            {
-              "page": "ProductList",
-              "path": "/category/:categoryId"
-            },
-            {
-              "page": "Wishlist",
-              "path": "/account/wishlist"
-            }
-          ],
           "pages": {
-            "Account": true,
-            "Cart": true,
-            "Checkout": true,
-            "CheckoutConfirmation": true,
-            "Home": true,
-            "Login": true,
-            "Registration": true,
-            "ResetPassword": true,
-            "LoginRedirect": true,
-            "ProductDetail": true,
-            "ProductList": true,
-            "Wishlist": true
+            "Account": "/account",
+            "Cart": "/cart",
+            "Checkout": "/checkout",
+            "CheckoutConfirmation": "/checkout/confirmation/:orderNo",
+            "Home": "/",
+            "Login": "/login",
+            "Registration": "/registration",
+            "ResetPassword": "/reset-password",
+            "LoginRedirect": "/callback",
+            "ProductDetail": "/product/:productId",
+            "ProductList": ["/search", "/category/:categoryId"]
           },
           "url": {
             "site": "path",

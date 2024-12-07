@@ -52,23 +52,61 @@ class ChakraStorefront extends ApplicationExtension<Config> {
     extendRoutes(routes: RouteProps[]): RouteProps[] {
         const config = this.getConfig()
 
-        const extensionRoutes = config.routes
-            .map((route) => {
-                const {page, ...rest} = route
-                return {
-                    ...rest,
-                    component: Pages[page]
-                }
-            })
-            .filter(({component}) => {
-                return (
-                    (config.pages || {})[
-                        component.displayName as keyof typeof import('./pages')
-                    ] !== false
-                )
-            })
+        const extensionRoutes = [
+            {
+                path: config.pages.Home,
+                component: Pages.Home,
+                exact: true
+            },
+            {
+                path: config.pages.Login,
+                component: Pages.Login,
+                exact: true
+            },
+            {
+                path: config.pages.Registration,
+                component: Pages.Registration,
+                exact: true
+            },
+            {
+                path: config.pages.ResetPassword,
+                component: Pages.ResetPassword,
+                exact: true
+            },
+            {
+                path: config.pages.Account,
+                component: Pages.Account
+            },
+            {
+                path: config.pages.Checkout,
+                component: Pages.Checkout,
+                exact: true
+            },
+            {
+                path: config.pages.CheckoutConfirmation,
+                component: Pages.CheckoutConfirmation
+            },
+            {
+                path: config.pages.LoginRedirect,
+                component: Pages.LoginRedirect,
+                exact: true
+            },
+            {
+                path: config.pages.Cart,
+                component: Pages.Cart,
+                exact: true
+            },
+            {
+                path: config.pages.ProductDetail,
+                component: Pages.ProductDetail
+            },
+            {
+                path: config.pages.ProductList,
+                component: Pages.ProductList
+            }
+        ].filter((route) => route.path !== false)
 
-        return [...routes, ...extensionRoutes]
+        return [...routes, ...flattenRoutes(extensionRoutes as RouteProps[])]
     }
 
     // Called before the route with all the routes
@@ -82,3 +120,18 @@ class ChakraStorefront extends ApplicationExtension<Config> {
 }
 
 export default ChakraStorefront
+
+// Flatten routes with multiple paths
+const flattenRoutes = (routes: RouteProps[]): RouteProps[] => {
+    const flatten: RouteProps[] = []
+    routes.forEach((route) => {
+        if (Array.isArray(route.path)) {
+            route.path.forEach((path) => {
+                flatten.push({path, component: route.component})
+            })
+        } else {
+            flatten.push(route)
+        }
+    })
+    return flatten
+}

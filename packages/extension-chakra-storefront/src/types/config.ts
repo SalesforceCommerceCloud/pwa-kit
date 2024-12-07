@@ -58,7 +58,7 @@ export interface UserDefinedConfig extends ApplicationExtensionConfig {
     commerceAPI: CommerceAPIConfig
     defaultSite: Site['id']
     einsteinAPI: EinsteinAPI
-    pages?: Record<keyof Pages, boolean | string>
+    pages?: Record<keyof Pages, false | string | string[]> // if false, the page will not be shown
     siteAliases?: Record<Site['id'], string>
     sites: Site[]
     url?: {
