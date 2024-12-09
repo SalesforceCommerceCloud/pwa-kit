@@ -848,47 +848,11 @@ const processAppExtensions = (
  * @returns {Array} A list of available Application Extension names and their versions.
  */
 const fetchAvailableAppExtensions = () => {
-    // Static value to replace the npm search result
-    const staticResult = [
-        {
-            name: '@salesforce/extension-chakra-store-locator',
-            description:
-                'A [PWA Kit](https://github.com/SalesforceCommerceCloud/pwa-kit) extension that adds store locator functionality to your application. This extension provides a store locator solution with features like:',
-            'dist-tags': {latest: '4.0.0-extensibility-preview.1'},
-            maintainers: [{name: 'cc-pwa-kit@salesforce.com'}],
-            author: {name: 'cc-pwa-kit@salesforce.com'},
-            repository: {
-                type: 'git',
-                url: 'git+https://github.com/SalesforceCommerceCloud/pwa-kit.git'
-            },
-            readmeFilename: 'README.md',
-            homepage: 'https://github.com/SalesforceCommerceCloud/pwa-kit#readme',
-            time: {modified: '2024-12-09T19:36:30.902Z'},
-            bugs: {url: 'https://github.com/SalesforceCommerceCloud/pwa-kit/issues'},
-            license: 'SEE LICENSE IN LICENSE',
-            versions: {'4.0.0-extensibility-preview.1': 'latest'}
-        },
-        {
-            name: '@salesforce/extension-chakra-storefront',
-            description:
-                '_________ .__            __                    _________ __                        _____                      __    \\_   ___ \\|  |__ _____  |  | ______________   /   _____//  |_  ___________   _____/ ____\\______  ____   _____/  |_  /    \\  \\/|  |  \\\\__  \\ |  |/ /\\_  __ \\__  \\  \\_____  \\\\   __\\/  _ \\_  __ \\_/ __ \\   __\\\\_  __ \\/  _ \\ /    \\   __\\ \\     \\___|   Y  \\/ __ \\|    <  |  | \\// __ \\_/        \\|  | (  <_> )  | \\/\\  ___/|  |   |  | \\(  <_> )   |  \\  |    \\______  /___|  (____  /__|_ \\ |__|  (____  /_______  /|__|  \\____/|__|    \\___  >__|   |__|   \\____/|___|  /__|           \\/     \\/     \\/     \\/            \\/        \\/                         \\/                         \\/',
-            'dist-tags': {latest: '4.0.0-extensibility-preview.1'},
-            maintainers: [{name: 'cc-pwa-kit@salesforce.com'}],
-            author: {name: 'cc-pwa-kit@salesforce.com'},
-            repository: {
-                type: 'git',
-                url: 'git+https://github.com/SalesforceCommerceCloud/pwa-kit.git'
-            },
-            readmeFilename: 'README.md',
-            homepage: 'https://github.com/SalesforceCommerceCloud/pwa-kit#readme',
-            time: {modified: '2024-12-09T19:36:30.914Z'},
-            bugs: {url: 'https://github.com/SalesforceCommerceCloud/pwa-kit/issues'},
-            license: 'SEE LICENSE IN LICENSE',
-            versions: {'4.0.0-extensibility-preview.1': 'latest'}
-        }
-    ]
-
+    const filePath = p.join(__dirname, '..', 'assets', 'available-app-extensions.json')
     try {
+        const data = fs.readFileSync(filePath)
+        const staticResult = JSON.parse(data)
+
         // Use the static result for names but always use the npm label "latest" for versions
         return staticResult.map((pkg) => {
             return {
