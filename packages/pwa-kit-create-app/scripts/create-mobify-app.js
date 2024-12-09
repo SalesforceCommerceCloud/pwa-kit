@@ -842,27 +842,30 @@ const processAppExtensions = (
  * Fetch available Application Extensions using npm search command.
  * The command searches for packages starting with '@salesforce/extension-'.
  *
+ * Currently, the npm search command is not returning the expected results for known extension packages.
+ * Therefore, we are using a static value to ensure the correct extensions are available.
+ *
  * @returns {Array} A list of available Application Extension names and their versions.
  */
 const fetchAvailableAppExtensions = () => {
-    try {
-        const result = child_proc.execSync('npm search @salesforce/extension- --json', {
-            encoding: 'utf-8'
-        })
-        const parsedData = JSON.parse(result)
+    // Static value to replace the npm search result
+    const staticResult = [
+        {"name":"@salesforce/extension-chakra-store-locator","description":"A [PWA Kit](https://github.com/SalesforceCommerceCloud/pwa-kit) extension that adds store locator functionality to your application. This extension provides a store locator solution with features like:","dist-tags":{"latest":"4.0.0-extensibility-preview.1"},"maintainers":[{"name":"cc-pwa-kit@salesforce.com"}],"author":{"name":"cc-pwa-kit@salesforce.com"},"repository":{"type":"git","url":"git+https://github.com/SalesforceCommerceCloud/pwa-kit.git"},"readmeFilename":"README.md","homepage":"https://github.com/SalesforceCommerceCloud/pwa-kit#readme","time":{"modified":"2024-12-09T19:36:30.902Z"},"bugs":{"url":"https://github.com/SalesforceCommerceCloud/pwa-kit/issues"},"license":"SEE LICENSE IN LICENSE","versions":{"4.0.0-extensibility-preview.1":"latest"}},
+        {"name":"@salesforce/extension-chakra-storefront","description":"_________ .__            __                    _________ __                        _____                      __    \\_   ___ \\|  |__ _____  |  | ______________   /   _____//  |_  ___________   _____/ ____\\______  ____   _____/  |_  /    \\  \\/|  |  \\\\__  \\ |  |/ /\\_  __ \\__  \\  \\_____  \\\\   __\\/  _ \\_  __ \\_/ __ \\   __\\\\_  __ \\/  _ \\ /    \\   __\\ \\     \\___|   Y  \\/ __ \\|    <  |  | \\// __ \\_/        \\|  | (  <_> )  | \\/\\  ___/|  |   |  | \\(  <_> )   |  \\  |    \\______  /___|  (____  /__|_ \\ |__|  (____  /_______  /|__|  \\____/|__|    \\___  >__|   |__|   \\____/|___|  /__|           \\/     \\/     \\/     \\/            \\/        \\/                         \\/                         \\/","dist-tags":{"latest":"4.0.0-extensibility-preview.1"},"maintainers":[{"name":"cc-pwa-kit@salesforce.com"}],"author":{"name":"cc-pwa-kit@salesforce.com"},"repository":{"type":"git","url":"git+https://github.com/SalesforceCommerceCloud/pwa-kit.git"},"readmeFilename":"README.md","homepage":"https://github.com/SalesforceCommerceCloud/pwa-kit#readme","time":{"modified":"2024-12-09T19:36:30.914Z"},"bugs":{"url":"https://github.com/SalesforceCommerceCloud/pwa-kit/issues"},"license":"SEE LICENSE IN LICENSE","versions":{"4.0.0-extensibility-preview.1":"latest"}}
+    ]
 
-        // Include both name and version in the choices
-        return parsedData.map((pkg) => {
-            const latestVersion = pkg['dist-tags'].latest
+    try {
+        // Use the static result for names but always use the npm label "latest" for versions
+        return staticResult.map((pkg) => {
             return {
-                name: `${pkg.name} (v${latestVersion})`,
+                name: pkg.name,
                 value: pkg.name,
-                version: latestVersion
-            }
-        })
+                version: 'latest'
+            };
+        });
     } catch (error) {
-        console.error('Failed to fetch Application Extensions via npm search:', error.message)
-        return []
+        console.error('Failed to fetch Application Extensions:', error.message);
+        return [];
     }
 }
 
@@ -1011,9 +1014,9 @@ const runGenerator = async (
     const appExtensionDeps = selectedAppExtensions.reduce((acc, appExtensionName) => {
         // Find the corresponding Application Extension details
         const appExtensionDetails = context?.availableAppExtensions?.find(
-            (ext) => ext.value === appExtensionName
+            (ext) => ext.value === `${appExtensionName}@latest`
         )
-        const version = appExtensionDetails ? appExtensionDetails.version : '1.0.0-dev'
+        const version = appExtensionDetails ? appExtensionDetails.version : 'latest'
 
         acc[appExtensionName] = extractAppExtensions
             ? `file:./app/application-extensions/${appExtensionName}`
