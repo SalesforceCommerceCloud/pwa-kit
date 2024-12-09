@@ -106,11 +106,7 @@ class ChakraStorefront extends ApplicationExtension<Config> {
             }
         ].filter((route) => route.path !== false)
 
-        return [
-            ...routes,
-            // Note: need to flatten the routes with multiple paths, so our `configureRoutes` are able to work properly
-            ...flattenRoutes(extensionRoutes as RouteProps[])
-        ]
+        return [...routes, ...(extensionRoutes as RouteProps[])]
     }
 
     // Called before the route with all the routes
@@ -124,18 +120,3 @@ class ChakraStorefront extends ApplicationExtension<Config> {
 }
 
 export default ChakraStorefront
-
-// Flatten routes with multiple paths
-const flattenRoutes = (routes: RouteProps[]): RouteProps[] => {
-    const flatten: RouteProps[] = []
-    routes.forEach((route) => {
-        if (Array.isArray(route.path)) {
-            route.path.forEach((path) => {
-                flatten.push({path, component: route.component})
-            })
-        } else {
-            flatten.push(route)
-        }
-    })
-    return flatten
-}

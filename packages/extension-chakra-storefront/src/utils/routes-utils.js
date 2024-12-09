@@ -21,6 +21,10 @@ export const configureRoutes = (routes = [], config, {ignoredRoutes = []}) => {
     if (!routes.length) return []
     if (!config) return routes
 
+    // First, flatten the routes in case there are multiple paths in a route
+    // because the rest of the function expects routes with a single path.
+    routes = flattenRoutes(routes)
+
     const {url: urlConfig, sites, siteAliases} = config
     const allSites = sites.map((site) => {
         const alias = siteAliases[site.id]
@@ -112,4 +116,19 @@ export const configureRoutes = (routes = [], config, {ignoredRoutes = []}) => {
         return res
     }, [])
     return outputRoutes
+}
+
+// Flatten routes with multiple paths
+const flattenRoutes = (routes) => {
+    const flatten = []
+    routes.forEach((route) => {
+        if (Array.isArray(route.path)) {
+            route.path.forEach((path) => {
+                flatten.push({path, component: route.component})
+            })
+        } else {
+            flatten.push(route)
+        }
+    })
+    return flatten
 }
