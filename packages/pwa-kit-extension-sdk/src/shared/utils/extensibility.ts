@@ -8,6 +8,7 @@
 // Third-Party
 import fse from 'fs-extra'
 import path, {resolve} from 'path'
+import merge from 'lodash.merge'
 
 // Types
 import {
@@ -181,12 +182,7 @@ export const mergeWithDefaultConfig = (
     const userDefinedConfig = extension[1]
     defaultConfig = defaultConfig ?? getExtensionDefaultConfig(packageName)
 
-    // TODO: deep merge
-    const mergedConfig = {
-        ...defaultConfig,
-        ...userDefinedConfig
-    }
-    return [packageName, mergedConfig]
+    return [packageName, merge(defaultConfig, userDefinedConfig)]
 }
 
 const getExtensionDefaultConfig = (
