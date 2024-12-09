@@ -106,7 +106,11 @@ class ChakraStorefront extends ApplicationExtension<Config> {
             }
         ].filter((route) => route.path !== false)
 
-        return [...routes, ...flattenRoutes(extensionRoutes as RouteProps[])]
+        return [
+            ...routes,
+            // Note: need to flatten the routes with multiple paths, so our `configureRoutes` are able to work properly
+            ...flattenRoutes(extensionRoutes as RouteProps[])
+        ]
     }
 
     // Called before the route with all the routes
