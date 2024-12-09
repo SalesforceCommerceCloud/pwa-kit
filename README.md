@@ -38,7 +38,7 @@ The Chakra Storefront is a fully fledged storefront that includes the below feat
 # Overridable API
 
 Below is a list of all files this Application Extension allows to be overridden. This means that each of the below files can be overridden
-in the base project or any other configured application extension that is configured after it.
+in the base project or any Application Extension installed and configured after this one.
 
 Files:
 
