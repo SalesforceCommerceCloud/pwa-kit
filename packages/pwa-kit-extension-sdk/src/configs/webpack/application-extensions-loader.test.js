@@ -29,6 +29,14 @@ const BASE_VIRTUAL_FILES = {
     [`${path.resolve(__dirname, '../../../node_modules/@loadable/component')}`]: ''
 }
 
+jest.mock('../../shared/utils', () => {
+    const origin = jest.requireActual('../../shared/utils')
+    return {
+        ...origin,
+        mergeWithDefaultConfig: jest.fn().mockImplementation((extension) => extension)
+    }
+})
+
 describe('Application Extension Loader', () => {
     const testCases = [
         {
@@ -36,12 +44,16 @@ describe('Application Extension Loader', () => {
             entryPoint: './app/main.jsx',
             expects: (output) => {
                 const file = dedent`
+                    const extensionConfigs = {
+                    }
+
                     const getApplicationExtensions = async () => {
                         return []
                     }
 
                     export {
-                        getApplicationExtensions
+                        getApplicationExtensions,
+                        extensionConfigs
                     }
                 `
                 expect(output.modules[1].source).toBe(file)
@@ -58,13 +70,18 @@ describe('Application Extension Loader', () => {
 
                     const SalesforceSampleALoader = loadable.lib(() => import('@salesforce/extension-sample-a/setup-app'))
 
+                    const extensionConfigs = {
+                        '@salesforce/extension-sample-a': {"enabled":true},
+                    }
+
                     const getApplicationExtensions = async () => {
                         const modules = await Promise.all([SalesforceSampleALoader.load()])
                         return [new modules[0].default({"enabled":true})]
                     }
 
                     export {
-                        getApplicationExtensions
+                        getApplicationExtensions,
+                        extensionConfigs
                     }
                 `
                 expect(output.modules[1].source).toBe(file)
@@ -74,6 +91,10 @@ describe('Application Extension Loader', () => {
                 [`${path.resolve(
                     __dirname,
                     '../../../../node_modules/@salesforce/extension-sample-a/setup-app'
+                )}`]: '',
+                [`${path.resolve(
+                    __dirname,
+                    '../../../../node_modules/@salesforce/extension-sample-a/config/default.json'
                 )}`]: ''
             },
             loaderOptions: {
@@ -88,12 +109,17 @@ describe('Application Extension Loader', () => {
                 const file = dedent`
                     import SalesforceSampleA from '@salesforce/extension-sample-a/setup-server'
 
+                    const extensionConfigs = {
+                        '@salesforce/extension-sample-a': {"enabled":true},
+                    }
+
                     const getApplicationExtensions = () => {
                         return [new SalesforceSampleA({"enabled":true})]
                     }
 
                     export {
-                        getApplicationExtensions
+                        getApplicationExtensions,
+                        extensionConfigs
                     }
                 `
                 expect(output.modules[1].source).toBe(file)
@@ -103,6 +129,10 @@ describe('Application Extension Loader', () => {
                 [`${path.resolve(
                     __dirname,
                     '../../../../node_modules/@salesforce/extension-sample-a/setup-server'
+                )}`]: '',
+                [`${path.resolve(
+                    __dirname,
+                    '../../../../node_modules/@salesforce/extension-sample-a/config/default.json'
                 )}`]: ''
             },
             loaderOptions: {
