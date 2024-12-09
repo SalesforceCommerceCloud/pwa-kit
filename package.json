@@ -8,7 +8,7 @@
     "bump-version:extension-base": "node ./scripts/bump-version/index.js --package=@salesforce/extension-base",
     "bump-version:extension-chakra-storefront": "node ./scripts/bump-version/index.js --package=@salesforce/extension-chakra-storefront",
     "bump-version:extension-sample": "node ./scripts/bump-version/index.js --package=@salesforce/extension-sample",
-    "bump-version:extension-store-locator": "node ./scripts/bump-version/index.js --package=@salesforce/extension-store-locator",
+    "bump-version:extension-chakra-store-locator": "node ./scripts/bump-version/index.js --package=@salesforce/extension-chakra-store-locator",
     "publish-to-npm": "node ./scripts/publish-to-npm.js",
     "format": "lerna run --stream format",
     "preinstall": "node ./scripts/check-version.js",

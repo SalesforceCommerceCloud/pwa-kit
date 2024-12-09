@@ -27,7 +27,7 @@ const INDEPENDENT_PACKAGES = [
     '@salesforce/extension-base',
     '@salesforce/extension-chakra-storefront',
     '@salesforce/extension-sample',
-    '@salesforce/extension-store-locator',
+    '@salesforce/extension-chakra-store-locator'
 ]
 const independentPackages = INDEPENDENT_PACKAGES.map((pkgName) =>
     monorepoPackages.find((pkg) => pkg.name === pkgName)
