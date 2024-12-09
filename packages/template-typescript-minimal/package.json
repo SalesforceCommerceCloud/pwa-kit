@@ -24,7 +24,7 @@
     "@loadable/component": "^5.15.3",
     "@salesforce/commerce-sdk-react": "3.1.1-preview.0",
     "@salesforce/extension-sample": "^0.1.0-extensibility-preview.0",
-    "@salesforce/extension-store-locator": "^0.1.0-extensibility-preview.0",
+    "@salesforce/extension-chakra-store-locator": "^0.1.0-extensibility-preview.0",
     "@salesforce/extension-chakra-storefront": "^0.1.0-extensibility-preview.0",
     "@salesforce/pwa-kit-dev": "4.0.0-extensibility-preview.0",
     "@salesforce/pwa-kit-extension-sdk": "4.0.0-extensibility-preview.0",
@@ -52,7 +52,7 @@
     "app":{
       "extensions": [
         "@salesforce/extension-sample",
-        "@salesforce/extension-store-locator",
+        "@salesforce/extension-chakra-store-locator",
 
         ["@salesforce/extension-chakra-storefront", {
           "enabled": true,
