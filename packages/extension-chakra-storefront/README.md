@@ -1,20 +1,21 @@
+:loudspeaker: Hey there, Salesforce Commerce Cloud community!
 
-_________ .__            __                    _________ __                        _____                      __   
-\_   ___ \|  |__ _____  |  | ______________   /   _____//  |_  ___________   _____/ ____\______  ____   _____/  |_ 
-/    \  \/|  |  \\__  \ |  |/ /\_  __ \__  \  \_____  \\   __\/  _ \_  __ \_/ __ \   __\\_  __ \/  _ \ /    \   __\
-\     \___|   Y  \/ __ \|    <  |  | \// __ \_/        \|  | (  <_> )  | \/\  ___/|  |   |  | \(  <_> )   |  \  |  
- \______  /___|  (____  /__|_ \ |__|  (____  /_______  /|__|  \____/|__|    \___  >__|   |__|   \____/|___|  /__|  
-        \/     \/     \/     \/            \/        \/                         \/                         \/      
+We’re excited to hear your thoughts on your developer experience with PWA Kit and the Composable Storefront generally! Your feedback is incredibly valuable in helping us guide our roadmap and improve our offering.
 
+:clipboard: Take our quick survey here: [Survey](https://forms.gle/bUZNxQ3QKUcrjhV18) 
 
-# Description
+Feel free to share this survey link with your colleagues, partners, or anyone who has experience with PWA Kit. Your input will help us shape the future of our development tools.
 
-The Chakra Storefront Application Extension is a fully featured composible storefront using Chakra UI for its primary component
-library, along with other first and third party librarys like ReactIntl to handle localization and CommerceSDKReact to provide a
+Thank you for being a part of our community and for your continuous support! :raised_hands:
+
+# Chakra Storefront PWA-Kit Application Extension
+
+The Chakra Storefront Application Extension is a fully featured composable storefront using Chakra UI for its primary component
+library, along with other first and third party libraries like ReactIntl to handle localization and CommerceSDKReact to provide a
 React Hook library for accessing your Commerce Instance. This is a great place to start your storefront implementation if you are 
 looking to get off to a quick start!! 
 
-Please refer to the list of features that this extesnion supports below. Also, noted below is the public API of files that you can 
+Please refer to the list of features that this extension supports below. Also, noted below is the public API of files that you can 
 override if you choose to customize you application that way. 
 
 # Features
@@ -37,7 +38,7 @@ The Chakra Storefront is a fully fledged storefront that includes the below feat
 # Overridable API
 
 Below is a list of all files this Application Extension allows to be overridden. This means that each of the below files can be overridden
-in the base project or any other configured appllication extension that is configured after it.
+in the base project or any Application Extension installed and configured after this one.
 
 Files:
 
@@ -54,7 +55,7 @@ Files:
 - /pages/product-list
 - /pages/wishlist
 
-# Peer Dependancies
+# Peer Dependencies
 
 PWA-Kit Application Extensions are NPM packages at their most simplest form, and as such you can define
 what peer dependencies are required when using it. Because this sample application extension provides
@@ -90,7 +91,7 @@ Please refer to the sample configuration below in order to properly configure yo
 
 ```
 {
-    "activeDataEnabled": false,                                 // Enable/Disable Active Data anaylitcs tracting.
+    "activeDataEnabled": false,                                 // Enable/Disable Active Data analytics tracking.
     "commerceAPI": {
         "proxyPath": "/mobify/proxy/api",                       // The proxy path used for you commerce api data requests
         "parameters": {
@@ -101,13 +102,13 @@ Please refer to the sample configuration below in order to properly configure yo
         }
     },
     "defaultSite": "<YOUR_SITE_ID_HERE>",                       // If site id used if one is not determined from the URL in multi-site
-    "einsteinAPI": {                                            // Einstein analytics tracting connection info.
+    "einsteinAPI": {                                            // Einstein analytics tracking connection info.
         "host": "https://api.cquotient.com",
         "einsteinId": "<YOUR_EINSTEIN_ID_HERE>",
         "siteId": "<YOUR_SITE_ID_HERE>",
         "isProduction": false
     },
-    "enabled": true,                                            // Toggle this extesnion on or off, this is useful for debugging and development, defaults to true.
+    "enabled": true,                                            // Toggle this extension on or off, this is useful for debugging and development, defaults to true.
     "pages": {},                                                // Per page configuration information.
     "siteAliases": {},                                          // Site alias's for multi-site support.
     "sites": [],                                                // Site configs for multi-site support.
@@ -126,7 +127,7 @@ Please refer to the sample configuration below in order to properly configure yo
 ```
 > npm install @salesforce/extension-chakra-storefront<br/>
 > Downloading npm package... <br/>
-> Installing extention... <br/>
+> Installing extension... <br/>
 > Finished. <br/>
 > Congratulations! The extension was successfully installed! Please visit https://www.npmjs.com/package/@salesforce/extension-sample for more information on how to use this extension.
 ```
@@ -145,7 +146,7 @@ extensions: [
 
 # Advanced Usage
 
-In order to customize this Application Extension to your particulare needs we suggest that you refer to the section titled
+In order to customize this Application Extension to your particular needs we suggest that you refer to the section titled
 "configuration", but if there is something that you want to customize that isn't configurable and cannot wait for a feature
 request to be fulfilled, then you can use overrides. 
 
