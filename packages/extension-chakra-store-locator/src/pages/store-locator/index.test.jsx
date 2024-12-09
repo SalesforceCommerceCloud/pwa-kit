@@ -11,7 +11,7 @@ import {renderWithProviders} from '../../test-utils'
 import StoreLocatorPage from './index'
 
 // Mock the StoreLocatorContent component since we're only testing the page wrapper
-jest.mock('../../components/store-locator/store-locator-content', () => ({
+jest.mock('../../components/content', () => ({
     StoreLocatorContent: () => <div data-testid="mock-store-locator-content">Mock Content</div>
 }))
 

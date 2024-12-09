@@ -1,6 +1,7 @@
 {
   "name": "@salesforce/retail-react-app",
   "version": "4.1.0-dev",
+  "private": true,
   "license": "See license in LICENSE",
   "author": "cc-pwa-kit@salesforce.com",
   "scripts": {
@@ -40,10 +41,10 @@
     "@lhci/cli": "^0.11.0",
     "@loadable/component": "^5.15.3",
     "@peculiar/webcrypto": "^1.4.2",
-    "@salesforce/commerce-sdk-react": "3.1.0-dev",
-    "@salesforce/pwa-kit-dev": "4.0.0-dev",
-    "@salesforce/pwa-kit-react-sdk": "4.0.0-dev",
-    "@salesforce/pwa-kit-runtime": "4.0.0-dev",
+    "@salesforce/commerce-sdk-react": "3.1.1-preview.0",
+    "@salesforce/pwa-kit-dev": "4.0.0-extensibility-preview.0",
+    "@salesforce/pwa-kit-react-sdk": "4.0.0-extensibility-preview.0",
+    "@salesforce/pwa-kit-runtime": "4.0.0-extensibility-preview.0",
     "@tanstack/react-query": "^4.28.0",
     "@tanstack/react-query-devtools": "^4.29.1",
     "@testing-library/dom": "^9.0.1",
@@ -78,8 +79,8 @@
     "react-router-dom": "^5.3.4"
   },
   "devDependencies": {
-    "cross-env": "^5.2.1",
-    "@salesforce/pwa-kit-extension-sdk": "4.0.0-dev"
+    "@salesforce/pwa-kit-extension-sdk": "4.0.0-extensibility-preview.0",
+    "cross-env": "^5.2.1"
   },
   "engines": {
     "node": "^16.11.0 || ^18.0.0 || ^20.0.0",

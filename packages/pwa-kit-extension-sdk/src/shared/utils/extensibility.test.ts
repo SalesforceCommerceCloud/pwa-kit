@@ -22,7 +22,7 @@ interface MockedPackageJSON {
 const mockPackageJson = (opts: Record<string, MockedPackageJSON>) => {
     mockedFse.readJsonSync.mockImplementation((filePath) => {
         const found = Object.entries(opts).find(([packageName]) =>
-            filePath.toString().endsWith(`${packageName}/package.json`)
+            filePath.toString().endsWith(`${packageName}${path.sep}package.json`)
         )
         if (!found) return {}
 

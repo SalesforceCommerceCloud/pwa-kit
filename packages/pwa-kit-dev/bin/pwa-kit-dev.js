@@ -266,9 +266,9 @@ const main = async () => {
             )
 
             execSync(
-                `${babelNode} ${inspect ? '--inspect' : ''} ${buildBabelExtensibilityArgs(
+                `"${babelNode}" ${inspect ? '--inspect' : ''} ${buildBabelExtensibilityArgs(
                     getConfig()
-                )} ${babelArgs} ${getAppEntrypoint()}`,
+                )} ${babelArgs} "${getAppEntrypoint()}"`,
                 {
                     env: {
                         ...process.env,
@@ -445,7 +445,9 @@ const main = async () => {
         .action(async (path, {fix}) => {
             const eslint = p.join(require.resolve('eslint'), '..', '..', '..', '.bin', 'eslint')
             execSync(
-                `${eslint} --resolve-plugins-relative-to ${pkgRoot}${fix ? ' --fix' : ''} "${path}"`
+                `"${eslint}" --resolve-plugins-relative-to "${pkgRoot}"${
+                    fix ? ' --fix' : ''
+                } "${path}"`
             )
         })
 
@@ -455,16 +457,19 @@ const main = async () => {
         .argument('<path>', 'path or glob to format')
         .action(async (path) => {
             const prettier = p.join(require.resolve('prettier'), '..', '..', '.bin', 'prettier')
-            execSync(`${prettier} --write "${path}"`)
+            execSync(`"${prettier}" --write "${path}"`)
         })
 
     program
         .command('test')
+        .allowUnknownOption()
         .description('test the project')
         .action(async (_, {args}) => {
             const jest = p.join(require.resolve('jest'), '..', '..', '..', '.bin', 'jest')
             execSync(
-                `${jest} --passWithNoTests --maxWorkers=2${args.length ? ' ' + args.join(' ') : ''}`
+                `"${jest}" --passWithNoTests --maxWorkers=2${
+                    args.length ? ' ' + args.join(' ') : ''
+                }`
             )
         })
 

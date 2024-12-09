@@ -1,6 +1,6 @@
-## v3.8.0-dev (Aug 8, 2024)
+## v4.0.0-extensibility-preview.0 (Dec 02, 2024)
+- Fix build script execution on windows when spaces exists in users home path. [#2156](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2156)
 - Update assets/templated files after removing "Shared UI" support in Retail App [#2022](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2022)
-
 
 ## v3.7.0 (Aug 7, 2024)
 

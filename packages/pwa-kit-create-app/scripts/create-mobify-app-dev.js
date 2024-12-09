@@ -77,7 +77,7 @@ const withLocalNPMRepo = (func) => {
                 new Promise((resolve) => {
                     console.log('Starting up local NPM repository')
 
-                    verdaccioServerProcess = cp.exec(`${verdaccioBinary} --config config.yaml`, {
+                    verdaccioServerProcess = cp.exec(`"${verdaccioBinary}" --config config.yaml`, {
                         cwd: verdaccioConfigDir,
                         stdio: 'inherit',
                         env: {

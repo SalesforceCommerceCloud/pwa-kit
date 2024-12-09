@@ -7,9 +7,9 @@
 
 import React from 'react'
 
-import {StoreLocatorList} from './store-locator-list'
-import {StoreLocatorForm} from './store-locator-form'
-import {StoreLocatorHeading} from 'overridable!./store-locator-heading'
+import {StoreLocatorList} from './list'
+import {StoreLocatorForm} from './form'
+import {StoreLocatorHeading} from 'overridable!./heading'
 
 export const StoreLocatorContent = (): JSX.Element => {
     return (

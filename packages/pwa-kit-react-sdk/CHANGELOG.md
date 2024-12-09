@@ -1,6 +1,5 @@
-## v4.0.0-dev (Jun 21, 2024)
+## v4.0.0-extensibility-preview.0 (Nov 28, 2024)
 - Integrate Application Extensions Project. (#2099)[https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2099]
-
 - Add new `getStaticAssetUrl` utility to access assets specifically in the `/static` folder. (#2040)[https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2040]
 - Update Application Extensions import in `react-rendering.js` and `main.js` (#2004)[https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2004]
 - Define interface of the app extension's config [#2010](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2010)

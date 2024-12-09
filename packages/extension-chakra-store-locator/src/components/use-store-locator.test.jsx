@@ -6,7 +6,7 @@
  */
 import {renderHook, act} from '@testing-library/react'
 import {useStoreLocator} from './use-store-locator'
-import {StoreLocatorProvider} from './store-locator-provider'
+import {StoreLocatorProvider} from './provider'
 import {useSearchStores} from '@salesforce/commerce-sdk-react'
 import React from 'react'
 

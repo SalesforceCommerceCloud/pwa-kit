@@ -1,6 +1,15 @@
 {
-  "name": "@salesforce/extension-store-locator",
-  "version": "0.1.0-dev",
+  "name": "@salesforce/extension-chakra-store-locator",
+  "version": "0.1.0-extensibility-preview.0",
+  "bugs": {
+    "url": "https://github.com/SalesforceCommerceCloud/pwa-kit/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SalesforceCommerceCloud/pwa-kit.git"
+  },
+  "license": "SEE LICENSE IN LICENSE",
+  "author": "cc-pwa-kit@salesforce.com",
   "scripts": {
     "lint": "npm run lint:js",
     "lint:fix": "npm run lint:js -- --fix",
@@ -10,9 +19,9 @@
   "peerDependencies": {
     "@chakra-ui/react": "^2",
     "@loadable/component": "^5",
-    "@salesforce/commerce-sdk-react": "3.1.0-dev",
-    "@salesforce/pwa-kit-react-sdk": "4.0.0-dev",
-    "@salesforce/pwa-kit-runtime": "4.0.0-dev",
+    "@salesforce/commerce-sdk-react": "3.1.1-preview.0",
+    "@salesforce/pwa-kit-react-sdk": "4.0.0-extensibility-preview.0",
+    "@salesforce/pwa-kit-runtime": "4.0.0-extensibility-preview.0",
     "prop-types": "^15",
     "react": "^18",
     "react-dom": "^18",
@@ -44,11 +53,11 @@
   "devDependencies": {
     "@chakra-ui/react": "2.8.2",
     "@loadable/component": "^5.15.3",
-    "@salesforce/commerce-sdk-react": "^3.1.0-dev",
-    "@salesforce/pwa-kit-dev": "^4.0.0-dev",
-    "@salesforce/pwa-kit-extension-sdk": "4.0.0-dev",
-    "@salesforce/pwa-kit-react-sdk": "4.0.0-dev",
-    "@salesforce/pwa-kit-runtime": "4.0.0-dev",
+    "@salesforce/commerce-sdk-react": "3.1.1-preview.0",
+    "@salesforce/pwa-kit-dev": "4.0.0-extensibility-preview.0",
+    "@salesforce/pwa-kit-extension-sdk": "4.0.0-extensibility-preview.0",
+    "@salesforce/pwa-kit-react-sdk": "4.0.0-extensibility-preview.0",
+    "@salesforce/pwa-kit-runtime": "4.0.0-extensibility-preview.0",
     "@testing-library/react": "^16.0.1",
     "@testing-library/user-event": "^14.5.2",
     "@types/react": "~18.2.0",

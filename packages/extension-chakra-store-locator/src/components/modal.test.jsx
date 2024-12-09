@@ -6,8 +6,8 @@
  */
 import React from 'react'
 import {screen} from '@testing-library/react'
-import {renderWithProviders} from '../../test-utils'
-import {StoreLocatorModal} from './store-locator-modal'
+import {renderWithProviders} from '../test-utils'
+import {StoreLocatorModal} from './modal'
 
 // Mock specific Chakra UI components and hooks
 const mockUseBreakpointValue = jest.fn()
@@ -20,7 +20,7 @@ jest.mock('@chakra-ui/react', () => {
 })
 
 // Mock the StoreLocatorContent component
-jest.mock('./store-locator-content', () => ({
+jest.mock('./content', () => ({
     StoreLocatorContent: () => <div data-testid="store-locator-content">Store Locator Content</div>
 }))
 

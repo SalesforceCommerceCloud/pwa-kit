@@ -6,7 +6,7 @@
  */
 
 import React, {useState, createContext, ReactNode} from 'react'
-import {Config as StoreLocatorConfig} from '../../types/config'
+import {Config as StoreLocatorConfig} from '../types/config'
 
 type Mode = 'device' | 'input'
 interface FormValues {
