@@ -53,7 +53,7 @@ type Pages = typeof import('../pages')
 /**
  * This defines how your extension can be configured in the user's project. Please update it to your specific needs!
  */
-export interface UserDefinedConfig extends ApplicationExtensionConfig {
+export interface UserConfig extends ApplicationExtensionConfig {
     activeDataEnabled?: boolean // default = false
     commerceAPI: CommerceAPIConfig
     defaultSite: Site['id']
@@ -84,4 +84,4 @@ export interface UserDefinedConfig extends ApplicationExtensionConfig {
 /**
  * When instantiating your extension, pwa-kit-extension-sdk will make sure to pass in the "complete" configuration, which has the merged user-defined and default configs.
  */
-export type Config = Required<UserDefinedConfig>
+export type Config = Required<UserConfig>
