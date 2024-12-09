@@ -33,7 +33,6 @@ The Chakra Storefront is a fully fledged storefront that includes the below feat
     - Account
     - Login
     - Order Summary
-    - Wishlist
 
 # Overridable API
 
@@ -53,7 +52,6 @@ Files:
 - /pages/login-redirect
 - /pages/product-detail
 - /pages/product-list
-- /pages/wishlist
 
 # Peer Dependencies
 
@@ -109,9 +107,36 @@ Please refer to the sample configuration below in order to properly configure yo
         "isProduction": false
     },
     "enabled": true,                                            // Toggle this extension on or off, this is useful for debugging and development, defaults to true.
-    "pages": {},                                                // Per page configuration information.
+    "pages": {                                                  // Define the url path of each page. A page can be set to false if you want to disable it.
+        "Account": "/account",
+        "Cart": "/cart",
+        "Checkout": "/checkout",
+        "CheckoutConfirmation": "/checkout/confirmation/:orderNo",
+        "Home": "/",
+        "Login": "/login",
+        "Registration": "/registration",
+        "ResetPassword": "/reset-password",
+        "LoginRedirect": "/callback",
+        "ProductDetail": "/product/:productId",
+        "ProductList": ["/search", "/category/:categoryId"]
+    },
     "siteAliases": {},                                          // Site alias's for multi-site support.
-    "sites": [],                                                // Site configs for multi-site support.
+    "sites": [                                                  // Site configs for multi-site support.
+        {
+            "id": "<SITE_ID>",
+            "l10n": {
+                "defaultCurrency": "<CURRENCY>",
+                "defaultLocale": "<LOCALE>",
+                "supportedCurrencies": ["<CURRENCY>"],
+                "supportedLocales": [
+                    {
+                        "id": "<LOCALE>",
+                        "preferredCurrency": "<CURRENCY>"
+                    }
+                ]
+            }
+        }
+    ],
     "url": {                                                    // URL configuration
         "site": "path",                                         // Display the site id/alias in the path or querystring or none.
         "locale": "path",                                       // Display the locale id/alias in the path or querystring or none.

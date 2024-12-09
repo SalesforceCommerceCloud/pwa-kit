@@ -109,6 +109,13 @@ jest.mock('@salesforce/pwa-kit-runtime/utils/ssr-config', () => {
         getConfig: () => mockAppConfig
     }
 })
+jest.mock('./src/utils/get-extension-config', () => {
+    const origin = jest.requireActual('./src/utils/get-extension-config')
+    return {
+        ...origin,
+        getExtensionConfig: jest.fn().mockReturnValue(mockConfig)
+    }
+})
 
 // TextEncoder is a web API, need to import it
 // from nodejs util in testing environment.

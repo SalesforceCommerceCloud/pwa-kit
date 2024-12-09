@@ -32,7 +32,9 @@ import extensionMeta from '../extension-meta.json'
 class ChakraStorefront extends ApplicationExtension<Config> {
     static readonly id = extensionMeta.id
 
-    extendApp<T>(App: React.ComponentType<T>): React.ComponentType<T> {
+    extendApp<T extends React.ComponentType<T>>(
+        App: React.ComponentType<T>
+    ): React.ComponentType<T> {
         // NOTE: The order of these HOCs is important!
         const requiredHOCs = [
             withLayout,
@@ -49,71 +51,62 @@ class ChakraStorefront extends ApplicationExtension<Config> {
 
     extendRoutes(routes: RouteProps[]): RouteProps[] {
         const config = this.getConfig()
+
         const extensionRoutes = [
             {
-                path: '/',
+                path: config.pages.Home,
                 component: Pages.Home,
                 exact: true
             },
             {
-                path: '/login',
+                path: config.pages.Login,
                 component: Pages.Login,
                 exact: true
             },
             {
-                path: '/registration',
+                path: config.pages.Registration,
                 component: Pages.Registration,
                 exact: true
             },
             {
-                path: '/reset-password',
+                path: config.pages.ResetPassword,
                 component: Pages.ResetPassword,
                 exact: true
             },
             {
-                path: '/account',
+                path: config.pages.Account,
                 component: Pages.Account
             },
             {
-                path: '/checkout',
+                path: config.pages.Checkout,
                 component: Pages.Checkout,
                 exact: true
             },
             {
-                path: '/checkout/confirmation/:orderNo',
+                path: config.pages.CheckoutConfirmation,
                 component: Pages.CheckoutConfirmation
             },
             {
-                path: '/callback',
+                path: config.pages.LoginRedirect,
                 component: Pages.LoginRedirect,
                 exact: true
             },
             {
-                path: '/cart',
+                path: config.pages.Cart,
                 component: Pages.Cart,
                 exact: true
             },
             {
-                path: '/product/:productId',
+                path: config.pages.ProductDetail,
                 component: Pages.ProductDetail
             },
             {
-                path: '/search',
+                path: config.pages.ProductList,
                 component: Pages.ProductList
-            },
-            {
-                path: '/category/:categoryId',
-                component: Pages.ProductList
-            },
-            {
-                path: '/account/wishlist',
-                component: Pages.Wishlist
             }
-        ].filter(({component}) => {
-            return (config.pages || [])[component.displayName] !== false
-        })
+        ].filter((route) => route.path !== false)
 
-        return [...routes, ...extensionRoutes]
+        return [...routes, ...(extensionRoutes as RouteProps[])]
     }
 
     // Called before the route with all the routes

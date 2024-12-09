@@ -1,0 +1,56 @@
+{
+    "enabled": true,
+    "activeDataEnabled": false,
+    "commerceAPI": {
+        "proxyPath": "/mobify/proxy/api",
+        "parameters": {
+            "clientId": "<CLIENT_ID>",
+            "organizationId": "<ORGANIZATION_ID>",
+            "shortCode": "<SHORT_CODE>",
+            "siteId": "<SITE_ID>"
+        }
+    },
+    "defaultSite": "<SITE_ID>",
+    "einsteinAPI": {
+        "host": "https://api.cquotient.com",
+        "einsteinId": "<EINSTEIN_ID>",
+        "siteId": "<EINSTEIN_SITE_ID>",
+        "isProduction": false
+    },
+    "pages": {
+        "Account": "/account",
+        "Cart": "/cart",
+        "Checkout": "/checkout",
+        "CheckoutConfirmation": "/checkout/confirmation/:orderNo",
+        "Home": "/",
+        "Login": "/login",
+        "Registration": "/registration",
+        "ResetPassword": "/reset-password",
+        "LoginRedirect": "/callback",
+        "ProductDetail": "/product/:productId",
+        "ProductList": ["/search", "/category/:categoryId"]
+    },
+    "siteAliases": {},
+    "sites": [
+        {
+            "id": "<SITE_ID>",
+            "l10n": {
+                "defaultCurrency": "<CURRENCY>",
+                "defaultLocale": "<LOCALE>",
+                "supportedCurrencies": ["<CURRENCY>"],
+                "supportedLocales": [
+                    {
+                        "id": "<LOCALE>",
+                        "preferredCurrency": "<CURRENCY>"
+                    }
+                ]
+            }
+        }
+    ],
+    "url": {
+        "site": "path",
+        "locale": "path",
+        "showDefaults": true,
+        "interpretPlusSignAsSpace": false
+    }
+}
