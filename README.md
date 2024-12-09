@@ -1,13 +1,14 @@
+:loudspeaker: Hey there, Salesforce Commerce Cloud community!
 
-_________ .__            __                    _________ __                        _____                      __   
-\_   ___ \|  |__ _____  |  | ______________   /   _____//  |_  ___________   _____/ ____\______  ____   _____/  |_ 
-/    \  \/|  |  \\__  \ |  |/ /\_  __ \__  \  \_____  \\   __\/  _ \_  __ \_/ __ \   __\\_  __ \/  _ \ /    \   __\
-\     \___|   Y  \/ __ \|    <  |  | \// __ \_/        \|  | (  <_> )  | \/\  ___/|  |   |  | \(  <_> )   |  \  |  
- \______  /___|  (____  /__|_ \ |__|  (____  /_______  /|__|  \____/|__|    \___  >__|   |__|   \____/|___|  /__|  
-        \/     \/     \/     \/            \/        \/                         \/                         \/      
+We’re excited to hear your thoughts on your developer experience with PWA Kit and the Composable Storefront generally! Your feedback is incredibly valuable in helping us guide our roadmap and improve our offering.
 
+:clipboard: Take our quick survey here: [Survey](https://forms.gle/bUZNxQ3QKUcrjhV18) 
 
-# Description
+Feel free to share this survey link with your colleagues, partners, or anyone who has experience with PWA Kit. Your input will help us shape the future of our development tools.
+
+Thank you for being a part of our community and for your continuous support! :raised_hands:
+
+# Chakra Storefront PWA-Kit Application Extension
 
 The Chakra Storefront Application Extension is a fully featured composable storefront using Chakra UI for its primary component
 library, along with other first and third party libraries like ReactIntl to handle localization and CommerceSDKReact to provide a
