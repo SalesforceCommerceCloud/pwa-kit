@@ -71,7 +71,7 @@ afterAll(() => {
 
 describe('useDerivedProduct hook', () => {
     beforeEach(() => {
-        jest.resetAllMocks()
+        jest.clearAllMocks()
     })
 
     test('viewProduct captures expected product', async () => {
