@@ -15,9 +15,13 @@ jest.mock('../utils', () => ({
     renderTemplate: jest.fn()
 }))
 
-jest.mock('../../shared/utils', () => ({
-    buildAliases: jest.fn()
-}))
+jest.mock('../../shared/utils', () => {
+    const origin = jest.requireActual('../../shared/utils')
+    return {
+        ...origin,
+        mergeWithDefaultConfig: jest.fn()
+    }
+})
 
 describe('replaceExtensionsPlaceholderContentPlugin', () => {
     beforeEach(() => {
