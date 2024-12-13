@@ -1,6 +1,6 @@
 {
   "name": "@salesforce/extension-sample",
-  "version": "0.1.0-extensibility-preview.2",
+  "version": "0.1.0-extensibility-preview.3",
   "private": true,
   "scripts": {
     "lint": "npm run lint:js",
@@ -9,8 +9,8 @@
   },
   "peerDependencies": {
     "@loadable/component": "^5.15.3",
-    "@salesforce/pwa-kit-extension-sdk": "4.0.0-extensibility-preview.2",
-    "@salesforce/pwa-kit-react-sdk": "4.0.0-extensibility-preview.2",
+    "@salesforce/pwa-kit-extension-sdk": "4.0.0-extensibility-preview.3",
+    "@salesforce/pwa-kit-react-sdk": "4.0.0-extensibility-preview.3",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },
@@ -24,9 +24,9 @@
   },
   "devDependencies": {
     "@loadable/component": "^5.15.3",
-    "@salesforce/pwa-kit-dev": "4.0.0-extensibility-preview.2",
-    "@salesforce/pwa-kit-extension-sdk": "4.0.0-extensibility-preview.2",
-    "@salesforce/pwa-kit-react-sdk": "4.0.0-extensibility-preview.2",
+    "@salesforce/pwa-kit-dev": "4.0.0-extensibility-preview.3",
+    "@salesforce/pwa-kit-extension-sdk": "4.0.0-extensibility-preview.3",
+    "@salesforce/pwa-kit-react-sdk": "4.0.0-extensibility-preview.3",
     "@types/express": "^5.0.0",
     "@types/loadable__component": "^5.13.9",
     "@types/react": "~18.2.0",
