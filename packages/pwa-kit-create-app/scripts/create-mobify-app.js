@@ -1008,7 +1008,7 @@ const runGenerator = async (
         processAppExtensions(selectedAppExtensions, extractAppExtensions, appExtensionsDir)
     }
 
-    // Add selected Application Extensions to devDependencies and mobify object
+    // Add selected Application Extensions to devDependencies
     const appExtensionDeps = selectedAppExtensions.reduce((acc, appExtensionName) => {
         // Find the corresponding Application Extension details
         const appExtensionDetails = context?.availableAppExtensions?.find(
@@ -1022,17 +1022,11 @@ const runGenerator = async (
         return acc
     }, {})
 
+    // TODO: consider "config/default.js" (cosmiconfig) instead?
     updatePackageJson(p.resolve(outputDir, 'package.json'), {
         name: getSlugifiedProjectName(context.answers.project.name || context.preset.id),
         version: GENERATED_PROJECT_VERSION,
-        devDependencies: appExtensionDeps,
-        ...(selectedAppExtensions.length > 0 && {
-            mobify: {
-                app: {
-                    extensions: selectedAppExtensions
-                }
-            }
-        })
+        devDependencies: appExtensionDeps
     })
 
     // Clean up the temporary directory
@@ -1042,6 +1036,24 @@ const runGenerator = async (
         // Install dependencies for the newly minted project.
         npmInstall(outputDir, {verbose, projectName: context.answers.project.name})
     }
+
+    // Add selected Application Extensions and their default config
+    updatePackageJson(p.resolve(outputDir, 'package.json'), {
+        ...(selectedAppExtensions.length > 0 && {
+            mobify: {
+                app: {
+                    extensions: selectedAppExtensions.map((extension) => {
+                        // Since we've just installed the dependencies, we can read the default config of each extension
+                        // TODO: btw with extracted extensions, why they also appears inside node_modules? So the following line surprisingly works.
+                        const defaultConfig = readJson(
+                            p.join(outputDir, 'node_modules', extension, 'config', 'default.json')
+                        )
+                        return [extension, defaultConfig]
+                    })
+                }
+            }
+        })
+    })
 }
 
 const foundNode = process.versions.node
