@@ -1036,31 +1036,31 @@ const runGenerator = async (
         npmInstall(outputDir, {verbose, projectName: context.answers.project.name})
     }
 
-    // Add selected Application Extensions and their default config
+    const extensionsWithDefaultConfig = selectedAppExtensions.map((extension) => {
+        // Since we've just installed the dependencies, we can read the default config of each extension
+        const pathToDefaultConfig = p.join(
+            outputDir,
+            'node_modules',
+            extension,
+            'config',
+            'default.json'
+        )
+        if (!fs.existsSync(pathToDefaultConfig)) {
+            console.warn(
+                `The extension ${extension} does not have a default config. Will generate a minimal default config for it.`
+            )
+            // Return a minimal default config. It should match what's defined in: https://github.com/SalesforceCommerceCloud/pwa-kit/blob/310e946bed12fd4cbb42a209ee6982e9b1bb9b99/packages/pwa-kit-extension-sdk/src/shared/utils/helpers.ts#L13-L15
+            return [extension, {enabled: true}]
+        }
+
+        const defaultConfig = readJson(pathToDefaultConfig)
+        return [extension, defaultConfig]
+    })
     updatePackageJson(p.resolve(outputDir, 'package.json'), {
         ...(selectedAppExtensions.length > 0 && {
             mobify: {
                 app: {
-                    extensions: selectedAppExtensions.map((extension) => {
-                        // Since we've just installed the dependencies, we can read the default config of each extension
-                        const pathToDefaultConfig = p.join(
-                            outputDir,
-                            'node_modules',
-                            extension,
-                            'config',
-                            'default.json'
-                        )
-                        if (!fs.existsSync(pathToDefaultConfig)) {
-                            console.warn(
-                                `The extension ${extension} does not have a default config. Will generate a minimal default config for it.`
-                            )
-                            // Return a minimal default config. It should match what's defined in: https://github.com/SalesforceCommerceCloud/pwa-kit/blob/310e946bed12fd4cbb42a209ee6982e9b1bb9b99/packages/pwa-kit-extension-sdk/src/shared/utils/helpers.ts#L13-L15
-                            return [extension, {enabled: true}]
-                        }
-
-                        const defaultConfig = readJson(pathToDefaultConfig)
-                        return [extension, defaultConfig]
-                    })
+                    extensions: extensionsWithDefaultConfig
                 }
             }
         })
