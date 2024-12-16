@@ -10,6 +10,7 @@ import {ApplicationExtensionEntryTuple, ApplicationExtensionConfig} from '../../
 // NOTE: please make sure that the imported modules do not include 'path'.
 // This way getConfiguredExtensions can be called from both server and client side.
 
+// NOTE: if you update this, please also update the generator: https://github.com/SalesforceCommerceCloud/pwa-kit/blob/753711cf65cb9528c70b7fbf421464fa01deb83f/packages/pwa-kit-create-app/scripts/create-mobify-app.js#L1053
 const DEFAULT_CONFIG: ApplicationExtensionConfig = {
     enabled: true
 }
