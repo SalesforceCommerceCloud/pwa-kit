@@ -1048,7 +1048,7 @@ const runGenerator = async (
                             'node_modules',
                             extension,
                             'config',
-                            'defaulttttt.json'
+                            'default.json'
                         )
                         if (!fs.existsSync(pathToDefaultConfig)) {
                             console.warn(
