@@ -1022,7 +1022,6 @@ const runGenerator = async (
         return acc
     }, {})
 
-    // TODO: consider "config/default.js" (cosmiconfig) instead?
     updatePackageJson(p.resolve(outputDir, 'package.json'), {
         name: getSlugifiedProjectName(context.answers.project.name || context.preset.id),
         version: GENERATED_PROJECT_VERSION,
@@ -1044,10 +1043,22 @@ const runGenerator = async (
                 app: {
                     extensions: selectedAppExtensions.map((extension) => {
                         // Since we've just installed the dependencies, we can read the default config of each extension
-                        // TODO: btw with extracted extensions, why they also appears inside node_modules? So the following line surprisingly works.
-                        const defaultConfig = readJson(
-                            p.join(outputDir, 'node_modules', extension, 'config', 'default.json')
+                        const pathToDefaultConfig = p.join(
+                            outputDir,
+                            'node_modules',
+                            extension,
+                            'config',
+                            'defaulttttt.json'
                         )
+                        if (!fs.existsSync(pathToDefaultConfig)) {
+                            console.warn(
+                                `The extension ${extension} does not have a default config. Will generate a minimal default config for it.`
+                            )
+                            // Return a minimal default config. It should match what's defined in: https://github.com/SalesforceCommerceCloud/pwa-kit/blob/310e946bed12fd4cbb42a209ee6982e9b1bb9b99/packages/pwa-kit-extension-sdk/src/shared/utils/helpers.ts#L13-L15
+                            return [extension, {enabled: true}]
+                        }
+
+                        const defaultConfig = readJson(pathToDefaultConfig)
                         return [extension, defaultConfig]
                     })
                 }
