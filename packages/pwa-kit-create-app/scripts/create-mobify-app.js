@@ -881,11 +881,7 @@ const runGenerator = async (
 ) => {
     const {answers, preset} = context
     const {templateSource} = preset
-    const {
-        extend = false,
-        selectedAppExtensions = [],
-        extractAppExtensions = false
-    } = answers.project
+    const {selectedAppExtensions = [], extractAppExtensions = false} = answers.project
 
     // Check if the output directory doesn't already exist.
     checkOutputDir(outputDir)
@@ -1162,43 +1158,6 @@ const main = async (opts) => {
         const url = new URL(context.answers.project.commerce.instanceUrl)
         context.answers.project.commerce.instanceUrl = url.hostname
     }
-
-    // Inject the packageJSON into the context for extensibile projects.
-    // if (context.answers.project.extend) {
-    //     const pkgJSON = JSON.parse(
-    //         sh.exec(`npm view ${selectedPreset.templateSource.id}@${templateVersion} --json`, {
-    //             silent: true
-    //         }).stdout
-    //     )
-
-    //     // NOTE: Here we are rewriting a specific script (extract-default-translations) in order
-    //     // to update the script location for extensibility. In the future we'll hopefully
-    //     // move transations outside of the template and into the sdk where the script for
-    //     // building translations will ultimately live, meaning we won't have to do this. So
-    //     // its OK for now.
-    //     if (pkgJSON?.scripts['extract-default-translations']) {
-    //         pkgJSON.scripts['extract-default-translations'] = pkgJSON.scripts[
-    //             'extract-default-translations'
-    //         ].replace('./', `./node_modules/${selectedPreset.templateSource.id}/`)
-    //     }
-    //     if (pkgJSON?.scripts['compile-translations']) {
-    //         pkgJSON.scripts['compile-translations'] = pkgJSON.scripts[
-    //             'compile-translations'
-    //         ].replace('./', `./node_modules/${selectedPreset.templateSource.id}/`)
-    //     }
-    //     if (pkgJSON?.scripts['compile-translations:pseudo']) {
-    //         pkgJSON.scripts['compile-translations:pseudo'] = pkgJSON.scripts[
-    //             'compile-translations:pseudo'
-    //         ].replace('./', `./node_modules/${selectedPreset.templateSource.id}/`)
-    //     }
-
-    //     context = merge(
-    //         context,
-    //         expandObject({
-    //             ['answers.general.packageJSON']: pkgJSON
-    //         })
-    //     )
-    // }
 
     // Generate the project.
     runGenerator(context, {outputDir, templateVersion, verbose})
