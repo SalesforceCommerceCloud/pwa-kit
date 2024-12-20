@@ -15,6 +15,8 @@ import {buildCandidatePaths, getPackageName} from '../../shared/utils'
 import type {ExtendedCompiler} from './types'
 
 // Constants
+const IMPORT_REGEX = /import\s+(?:(?:[\w*\s{},]*)\s+from\s+)?['"](\..*?)['"]/g
+const REQUIRES_REGEX = /require\(['"](\..*?)['"]\)/g
 const SRC = 'src'
 
 /**
@@ -22,7 +24,7 @@ const SRC = 'src'
  * extension configuration.
  *
  * This loader resolves a new resource path by evaluating possible overrides in other
- * extensions, transpilubg the file with the same loaders/plugins as the original file.
+ * extensions, transpiling the file with the same loaders/plugins as the original file.
  *
  * @param {LoaderContext<any>} this - The Webpack loader context, which provides information
  * about the module being processed and the current Webpack compiler.
@@ -32,6 +34,7 @@ const OverrideResolverLoader = function (this: LoaderContext<any>) {
     // NOTE: We intensionally exclude any path prefixes like "/" or "./" so that we can
     // use `packageIterator` in the "resolve" function used later on.
     const {resourcePath, _compiler} = this
+
     const compiler = _compiler as ExtendedCompiler
     const projectRelPath = resourcePath.split(`${SRC}${path.sep}`)[1].split('.')[0] // File path relative to the project directory without file extension
     const projectPath = resourcePath.split(SRC)[0]
@@ -71,19 +74,40 @@ const OverrideResolverLoader = function (this: LoaderContext<any>) {
     })
 
     // Tell Webpack to treat this new resource as a dependency of the original module in order to have the dependency
-    // transpiled with all the same loaders/plugins that the orginal file was.
+    // transpiled with all the same loaders/plugins that the original file was.
     this.addDependency(resolvedResourcePath)
 
     // Use Webpack's `loadModule` function to load, process, and transpile the alternative module
     const callback = this.async()
+
+    // Adjust the `basedir` dynamically for resolving relative imports in the new file
+    const newBasedir = path.dirname(resolvedResourcePath)
+
+    // Provided a match and group representing a relative path, replace it with an absolute path using the new base directory.
+    const convertRelativePaths = (match: string, relativePath: string) => {
+        const absolutePath = path.resolve(newBasedir, relativePath)
+        return match.replace(relativePath, absolutePath)
+    }
 
     // Load the replacement module adding a `noHMR=true` query so we can prevent the HMR plugin from trying
     // to define its globals again.
     this.loadModule(`${resolvedResourcePath}?noHMR=true`, (err, newSource) => {
         if (err) return callback(err)
 
-        // Return the loaded and transpiled content of the alternative module
-        callback(null, newSource)
+        // NOTE: Convert all relative path imports to absolute path imports. This solves the problem of the wrong
+        // basedir being used when imports are resolved by webpack.
+        // NOTE: This only supports "import" statements and should be adjusted to work with "require"
+        // statements as well.
+        const adjustedSource = newSource
+            ?.toString()
+            .replace(IMPORT_REGEX, convertRelativePaths) // Update relative imports
+            .replace(REQUIRES_REGEX, convertRelativePaths) // Update relative requires
+
+        // Return the loaded and transpiled content of the alternative module.
+        // NOTE: The third argument to the `callback` function is `sourceMap`. The fact that we aren't using
+        // that argument might be a point of debugging limitations in the future. Leaving this note here to tell
+        // future dev's this might be a place that needs to be adjusted.
+        callback(null, adjustedSource)
     })
 }
 

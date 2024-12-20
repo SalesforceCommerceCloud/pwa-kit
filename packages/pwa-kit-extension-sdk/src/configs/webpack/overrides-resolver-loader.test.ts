@@ -189,6 +189,56 @@ describe('Overrides Resolver Loader', () => {
             expects: (_: any, err: any) => {
                 expect(err).toBeDefined()
             }
+        },
+        {
+            bypassWindows: true,
+            description:
+                'imports can be overridden from extensions and the override can use relative paths',
+            entryPoint: '/node_modules/@salesforce/extension-this/src/setup-app.js',
+            loaderTest: /node_modules\/@salesforce\/extension-this\/src\/pages\/sample-page/i,
+            // Compiler configuration.
+            compilerConfig: {
+                extensions: [
+                    ['@salesforce/extension-this', {enabled: true}],
+                    ['@salesforce/extension-that', {enabled: true}]
+                ],
+                files: {
+                    // Virtual Project Files
+
+                    // Overrides
+
+                    // Extensions with overrides
+                    '/node_modules/@salesforce/extension-that/src/overrides/@salesforce/extension-this/pages/sample-page.jsx': `
+                            // @salesforce/extension-that
+                            import Test from './sample-page-dependency'
+                        `,
+                    '/node_modules/@salesforce/extension-that/src/overrides/@salesforce/extension-this/pages/sample-page-dependency.js': `
+                            // Should Be Referenced
+                            export default {} 
+                        `,
+
+                    // Extension using overridable import
+                    '/node_modules/@salesforce/extension-this/src/pages/sample-page.jsx': `
+                            // @salesforce/extension-this
+                            import Test from './sample-page-dependency'
+                        `,
+                    '/node_modules/@salesforce/extension-this/src/pages/sample-page-dependency.js': `
+                            // Should Not Be Referenced
+                            export default {} 
+                        `,
+                    '/node_modules/@salesforce/extension-this/package.json':
+                        '{"name": "@salesforce/extension-this"}',
+                    '/node_modules/@salesforce/extension-this/src/setup-app.js':
+                        'import Page from "./pages/sample-page"',
+
+                    // QUIRK! These entries are required to access the files in the actual file system. The resolve method fails if
+                    // they don't exist. This is a sharpe edge, but it's not too bad.
+                    [`${path.resolve(__dirname, './overrides-resolver-loader.ts')}`]: ''
+                }
+            },
+            expects: (output: any) => {
+                expect(output.modules[2].source).toContain('// Should Be Referenced')
+            }
         }
     ]
 
