@@ -55,9 +55,7 @@ program.description(
 
 program.addArgument(
   new Argument("<project-key>", "project key").choices([
-    "retail-app-demo",
-    "retail-app-ext",
-    "retail-app-no-ext",
+    "retail-app-demo"
   ])
 );
 

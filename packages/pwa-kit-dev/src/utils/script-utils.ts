@@ -59,7 +59,6 @@ interface Bundle {
 interface Pkg {
     name: string
     version: string
-    ccExtensibility?: {extends: string; overridesDir: string}
     dependencies?: {[key: string]: string}
     devDependencies?: {[key: string]: string}
 }
@@ -438,23 +437,9 @@ export const createBundle = async ({
                     })
             )
             .then(async () => {
-                const {
-                    dependencies = {},
-                    devDependencies = {},
-                    ccExtensibility = {extends: '', overridesDir: ''}
-                } = await getProjectPkg()
-                const extendsTemplate = 'node_modules/' + ccExtensibility.extends
+                const {dependencies = {}, devDependencies = {}} = await getProjectPkg()
 
-                let cc_overrides: string[] = []
-                if (ccExtensibility.overridesDir) {
-                    const overrides_files = await walkDir(
-                        ccExtensibility.overridesDir,
-                        ccExtensibility.overridesDir
-                    )
-                    cc_overrides = Array.from(overrides_files).filter((item) =>
-                        existsSync(path.join(extendsTemplate, item))
-                    )
-                }
+                const cc_overrides: string[] = []
                 const dependencyTree = await getProjectDependencyTree()
                 // If we can't load the dependency tree, pretend that it's empty.
                 // TODO: Should we report an error?

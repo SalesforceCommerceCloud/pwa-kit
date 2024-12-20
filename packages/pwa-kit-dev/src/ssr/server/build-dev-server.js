@@ -241,6 +241,11 @@ export const DevServerMixin = {
         })
     },
 
+    /**
+     * Serve static files from the app directory.
+     * @param filePath - The path to the file to serve.
+     * @param opts - Additional options.
+     */
     serveStaticFile(filePath, opts = {}) {
         // Warning: Ugly part of the Bundle spec that we need to maintain.
         //
@@ -265,13 +270,7 @@ export const DevServerMixin = {
         const pkg = require(path.resolve(process.cwd(), 'package.json'))
 
         return (req, res) => {
-            const baseDir = path.resolve(
-                req.app.options.projectDir,
-                pkg?.ccExtensibility?.overridesDir
-                    ? pkg?.ccExtensibility?.overridesDir?.replace(/^\//, '')
-                    : '',
-                'app'
-            )
+            const baseDir = path.resolve(req.app.options.projectDir, 'app')
             return this._serveStaticFile(req, res, baseDir, filePath, opts)
         }
     },

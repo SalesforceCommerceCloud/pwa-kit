@@ -17,7 +17,7 @@ const pkg = require(resolve(projectDir, 'package.json'))
 const OVERRIDES_EXTENSIONS = '.+(js|jsx|ts|tsx)'
 
 const getOverridePath = (relativePath) => {
-    const extendPath = pkg?.ccExtensibility?.extends ? `node_modules/${EXT_EXTENDS}` : ''
+    const extendPath = EXT_EXTENDS ? `node_modules/${EXT_EXTENDS}` : ''
     const overridePath = EXT_OVERRIDES_DIR?.replace(/^\//, '')
 
     // order matters here, we perform look ups starting in the following order:

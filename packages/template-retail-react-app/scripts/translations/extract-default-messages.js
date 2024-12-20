@@ -33,46 +33,17 @@ const getAllFilesByExtensions = (dirPath, arrayOfFiles = [], extensions = []) =>
 }
 
 function extract(locale) {
-    // `extends` is a reserved word (`class A extends B {}`)
-    const {extends: extendsPkg, overridesDir} = pkgJSON.ccExtensibility || {}
-    if (!overridesDir) {
-        const command = [
-            'formatjs extract "app/**/*.{js,jsx,ts,tsx}"',
-            `--out-file translations/${locale}.json`,
-            '--id-interpolation-pattern [sha512:contenthash:base64:6]'
-        ].join(' ')
-        exec(command, (err) => {
-            if (err) {
-                console.error(err)
-            }
-        })
-    } else {
-        const overridesPath = path.join(process.cwd(), overridesDir)
-        // get all the files in extended app
-        const files = getAllFilesByExtensions(
-            path.join(overridesPath, 'app'),
-            [],
-            ['.js', '.jsx', '.ts', '.tsx']
-        )
-        // get the file names that are overridden in base template
-        const overriddenFiles = files
-            .map((path) => path.replace(overridesDir, `node_modules/${extendsPkg}`))
-            .filter((file) => fs.existsSync(file))
-        const extractCommand = [
-            'formatjs extract',
-            `"./node_modules/${extendsPkg}/app/**/*.{js,jsx,ts,tsx}"`,
-            `"${overridesDir}/app/**/*.{js,jsx,ts,tsx}"`,
-            `--out-file translations/${locale}.json`,
-            '--id-interpolation-pattern [sha512:contenthash:base64:6]',
-            '--ignore',
-            ...overriddenFiles.map((file) => `'${file}'`)
-        ].join(' ')
-        exec(extractCommand, (err) => {
-            if (err) {
-                console.error(err)
-            }
-        })
-    }
+    const command = [
+        'formatjs extract "app/**/*.{js,jsx,ts,tsx}"',
+        `--out-file translations/${locale}.json`,
+        '--id-interpolation-pattern [sha512:contenthash:base64:6]'
+    ].join(' ')
+    
+    exec(command, (err) => {
+        if (err) {
+            console.error(err)
+        }
+    })
 }
 
 try {

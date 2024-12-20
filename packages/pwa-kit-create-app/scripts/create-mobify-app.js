@@ -177,24 +177,6 @@ const APPLICATION_EXTENSION_QUESTIONS = [
     }
 ]
 
-const EXTENSIBILITY_QUESTIONS = [
-    {
-        name: 'project.extend',
-        message: 'Do you wish to use template extensibility?',
-        type: 'list',
-        choices: [
-            {
-                name: 'No',
-                value: false
-            },
-            {
-                name: 'Yes',
-                value: true
-            }
-        ]
-    }
-]
-
 const HYBRID_QUESTIONS = [
     {
         name: 'project.hybrid',
@@ -301,7 +283,7 @@ const PRESETS = [
             type: TEMPLATE_SOURCE_NPM,
             id: '@salesforce/retail-react-app'
         },
-        questions: [...EXTENSIBILITY_QUESTIONS, ...RETAIL_REACT_APP_QUESTIONS],
+        questions: [...RETAIL_REACT_APP_QUESTIONS],
         assets: ['translations'],
         private: false
     },
@@ -319,9 +301,8 @@ const PRESETS = [
             type: TEMPLATE_SOURCE_NPM,
             id: '@salesforce/retail-react-app'
         },
-        questions: [...EXTENSIBILITY_QUESTIONS, ...RETAIL_REACT_APP_QUESTIONS],
+        questions: [...RETAIL_REACT_APP_QUESTIONS],
         answers: {
-            ['project.extend']: true,
             ['project.hybrid']: false,
             ['project.name']: 'demo-storefront',
             ['project.commerce.instanceUrl']: 'https://zzte-053.dx.commercecloud.salesforce.com',
@@ -344,9 +325,8 @@ const PRESETS = [
             type: TEMPLATE_SOURCE_BUNDLE,
             id: 'typescript-minimal'
         },
-        questions: [...EXTENSIBILITY_QUESTIONS, ...RETAIL_REACT_APP_QUESTIONS],
+        questions: [...RETAIL_REACT_APP_QUESTIONS],
         answers: {
-            ['project.extend']: false,
             ['project.hybrid']: false,
             ['project.extractAppExtensions']: true,
             ['project.type']: 'PWAKitAppProject',
@@ -376,9 +356,8 @@ const PRESETS = [
             type: TEMPLATE_SOURCE_NPM,
             id: '@salesforce/retail-react-app'
         },
-        questions: [...EXTENSIBILITY_QUESTIONS, ...RETAIL_REACT_APP_QUESTIONS],
+        questions: [...RETAIL_REACT_APP_QUESTIONS],
         answers: {
-            ['project.extend']: true,
             ['project.hybrid']: false,
             ['project.name']: 'retail-react-app',
             ['project.commerce.instanceUrl']: 'https://zzrf-002.dx.commercecloud.salesforce.com',
@@ -401,9 +380,8 @@ const PRESETS = [
             type: TEMPLATE_SOURCE_NPM,
             id: '@salesforce/retail-react-app'
         },
-        questions: [...EXTENSIBILITY_QUESTIONS, ...HYBRID_QUESTIONS, ...RETAIL_REACT_APP_QUESTIONS],
+        questions: [...HYBRID_QUESTIONS, ...RETAIL_REACT_APP_QUESTIONS],
         answers: {
-            ['project.extend']: true,
             ['project.hybrid']: true,
             ['project.name']: 'retail-react-app',
             ['project.commerce.instanceUrl']: 'https://test.phased-launch-testing.com/',
@@ -426,9 +404,8 @@ const PRESETS = [
             type: TEMPLATE_SOURCE_NPM,
             id: '@salesforce/retail-react-app'
         },
-        questions: [...EXTENSIBILITY_QUESTIONS, ...HYBRID_QUESTIONS, ...RETAIL_REACT_APP_QUESTIONS],
+        questions: [...HYBRID_QUESTIONS, ...RETAIL_REACT_APP_QUESTIONS],
         answers: {
-            ['project.extend']: true,
             ['project.hybrid']: true,
             ['project.name']: 'retail-react-app',
             ['project.commerce.instanceUrl']: 'https://www.phased-launch-testing.com/',
