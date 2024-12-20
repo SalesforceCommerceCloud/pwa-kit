@@ -96,8 +96,6 @@ const OverrideResolverLoader = function (this: LoaderContext<any>) {
 
         // NOTE: Convert all relative path imports to absolute path imports. This solves the problem of the wrong
         // basedir being used when imports are resolved by webpack.
-        // NOTE: This only supports "import" statements and should be adjusted to work with "require"
-        // statements as well.
         const adjustedSource = newSource
             ?.toString()
             .replace(IMPORT_REGEX, convertRelativePaths) // Update relative imports
