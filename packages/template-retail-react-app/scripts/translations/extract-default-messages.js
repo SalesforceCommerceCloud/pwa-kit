@@ -38,7 +38,7 @@ function extract(locale) {
         `--out-file translations/${locale}.json`,
         '--id-interpolation-pattern [sha512:contenthash:base64:6]'
     ].join(' ')
-    
+
     exec(command, (err) => {
         if (err) {
             console.error(err)
