@@ -1,7 +1,7 @@
 name: e2e_validate_generated_app
 inputs:
   PROJECT_KEY:
-    description: Project key to specify project to validate ("retail-app-demo", "retail-app-ext" or "retail-app-no-ext")
+    description: Project key to specify project to validate ("retail-app-demo")
     required: true
     type: string
 runs:
