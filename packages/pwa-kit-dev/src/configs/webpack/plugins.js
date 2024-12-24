@@ -7,7 +7,6 @@
 import webpack from 'webpack'
 import path, {resolve} from 'path'
 import glob from 'glob'
-import {EXT_OVERRIDES_DIR, EXT_EXTENDS} from './config'
 import {makeRegExp} from './utils'
 
 const projectDir = process.cwd()
@@ -17,33 +16,11 @@ const pkg = require(resolve(projectDir, 'package.json'))
 const OVERRIDES_EXTENSIONS = '.+(js|jsx|ts|tsx)'
 
 const getOverridePath = (relativePath) => {
-    const extendPath = EXT_EXTENDS ? `node_modules/${EXT_EXTENDS}` : ''
-    const overridePath = EXT_OVERRIDES_DIR?.replace(/^\//, '')
-
-    // order matters here, we perform look ups starting in the following order:
-    // pkg.ccExtensibility.overridesDir => pkg.ccExtensibility.extends => current projectDir
-    if (EXT_EXTENDS && EXT_OVERRIDES_DIR) {
-        const filePath = `${resolve(
-            projectDir,
-            overridePath,
-            ...relativePath
-        )}${OVERRIDES_EXTENSIONS}`
-
-        const overrideFile = glob.sync(filePath)
-
-        if (overrideFile?.length) {
-            return overrideFile?.[0]
-        }
-        const extendFile = glob.sync(
-            `${resolve(projectDir, extendPath, ...relativePath)}${OVERRIDES_EXTENSIONS}`
-        )
-        if (extendFile?.length) {
-            return extendFile?.[0]
-        }
-    }
+    // Perform lookups starting in the current projectDir
     const generatedProjectOverride = glob.sync(
         `${resolve(projectDir, ...relativePath)}${OVERRIDES_EXTENSIONS}`
     )
+
     return generatedProjectOverride?.length
         ? generatedProjectOverride?.[0]
         : resolve(

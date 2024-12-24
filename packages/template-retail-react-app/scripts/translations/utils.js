@@ -11,9 +11,6 @@ const fs = require('fs')
 const path = require('path')
 
 const getOutputFolder = () => {
-    const packagePath = path.join(process.cwd(), 'package.json')
-    const pkgJSON = JSON.parse(fs.readFileSync(packagePath))
-
     const outputFolder = 'app/static/translations/compiled'
 
     return outputFolder
