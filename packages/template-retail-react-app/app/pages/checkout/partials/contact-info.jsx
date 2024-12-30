@@ -40,12 +40,12 @@ import {AuthHelpers, useAuthHelper, useShopperBasketsMutation} from '@salesforce
 
 const ContactInfo = ({isSocialEnabled = false, isPasswordlessEnabled = false, idps = []}) => {
     const {formatMessage} = useIntl()
-    const authModal = useAuthModal('password')
     const navigate = useNavigation()
     const {data: customer} = useCurrentCustomer()
     const {data: basket} = useCurrentBasket()
     const login = useAuthHelper(AuthHelpers.LoginRegisteredUserB2C)
     const logout = useAuthHelper(AuthHelpers.Logout)
+    const authorizePasswordlessLogin = useAuthHelper(AuthHelpers.AuthorizePasswordless)
     const updateCustomerForBasket = useShopperBasketsMutation('updateCustomerForBasket')
     const mergeBasket = useShopperBasketsMutation('mergeBasket')
 
@@ -61,6 +61,11 @@ const ContactInfo = ({isSocialEnabled = false, isPasswordlessEnabled = false, id
     const [error, setError] = useState(null)
     const [showPasswordField, setShowPasswordField] = useState(false)
     const [signOutConfirmDialogIsOpen, setSignOutConfirmDialogIsOpen] = useState(false)
+
+    // TODO use constant
+    const [authModalView, setAuthModalView] = useState('')
+    const authModal = useAuthModal(authModalView)
+    const [isPasswordlessLoginClicked, setIsPasswordlessLoginClicked] = useState(false)
 
     const submitForm = async (data) => {
         setError(null)
@@ -82,7 +87,15 @@ const ContactInfo = ({isSocialEnabled = false, isPasswordlessEnabled = false, id
                     })
                 }
             }
-            goToNextStep()
+            if (isPasswordlessLoginClicked) {
+                // TODO is current error handling sufficient
+                await authorizePasswordlessLogin.mutateAsync({userid: data.email})
+                // TODO use constant
+                setAuthModalView('email')
+                authModal.onOpen()
+            } else {
+                goToNextStep()
+            }
         } catch (error) {
             if (/Unauthorized/i.test(error.message)) {
                 setError(
@@ -108,6 +121,8 @@ const ContactInfo = ({isSocialEnabled = false, isPasswordlessEnabled = false, id
     }
 
     const onForgotPasswordClick = () => {
+        // TODO make this a constant
+        setAuthModalView('password')
         authModal.onOpen()
     }
 
@@ -116,6 +131,10 @@ const ContactInfo = ({isSocialEnabled = false, isPasswordlessEnabled = false, id
             form.unregister('password')
         }
     }, [showPasswordField])
+
+    const onPasswordlessLoginClick = async () => {
+        setIsPasswordlessLoginClicked(true)
+    }
 
     return (
         <ToggleCard
@@ -198,12 +217,16 @@ const ContactInfo = ({isSocialEnabled = false, isPasswordlessEnabled = false, id
                                     idps={idps}
                                     showPasswordField={showPasswordField}
                                     togglePasswordField={togglePasswordField}
+                                    handlePasswordlessLoginClick={onPasswordlessLoginClick}
                                 />
                             </Stack>
                         </Stack>
                     </form>
                 </Container>
-                <AuthModal {...authModal} />
+                <AuthModal 
+                    {...authModal}
+                    initialEmail={form.getValues().email}
+                />
             </ToggleCardEdit>
             <ToggleCardSummary>
                 <Text>{basket?.customerInfo?.email || customer?.email}</Text>

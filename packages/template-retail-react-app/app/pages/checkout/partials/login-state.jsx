@@ -12,6 +12,7 @@ import SocialLogin from '@salesforce/retail-react-app/app/components/social-logi
 
 const LoginState = ({
     form,
+    handlePasswordlessLoginClick,
     isSocialEnabled,
     isPasswordlessEnabled,
     idps,
@@ -38,7 +39,7 @@ const LoginState = ({
                         borderColor="gray.500"
                         type="submit"
                         onClick={() => {
-                            form.clearErrors('global')
+                            handlePasswordlessLoginClick()
                         }}
                         isLoading={form.formState.isSubmitting}
                     >
@@ -77,6 +78,7 @@ const LoginState = ({
                     setShowLoginButtons(!showLoginButtons)
                 }}
             >
+                {/* TODO: Possibly change to GO Back to Login */}
                 <FormattedMessage
                     defaultMessage="Checkout as Guest"
                     id="contact_info.button.checkout_as_guest"
@@ -104,6 +106,7 @@ const LoginState = ({
 
 LoginState.propTypes = {
     form: PropTypes.object,
+    handlePasswordlessLoginClick: PropTypes.func,
     isSocialEnabled: PropTypes.bool,
     isPasswordlessEnabled: PropTypes.bool,
     idps: PropTypes.arrayOf(PropTypes.string),

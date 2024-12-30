@@ -50,6 +50,7 @@ const LOGIN_ERROR = defineMessage({
 
 export const AuthModal = ({
     initialView = LOGIN_VIEW,
+    initialEmail = '',
     onLoginSuccess = noop,
     onRegistrationSuccess = noop,
     isOpen,
@@ -78,7 +79,7 @@ export const AuthModal = ({
     const register = useAuthHelper(AuthHelpers.Register)
 
     const [loginType, setLoginType] = useState(LOGIN_TYPES.PASSWORD)
-    const [passwordlessLoginEmail, setPasswordlessLoginEmail] = useState('')
+    const [passwordlessLoginEmail, setPasswordlessLoginEmail] = useState(initialEmail)
     const {getPasswordResetToken} = usePasswordReset()
     const authorizePasswordlessLogin = useAuthHelper(AuthHelpers.AuthorizePasswordless)
 
@@ -317,6 +318,7 @@ export const AuthModal = ({
 
 AuthModal.propTypes = {
     initialView: PropTypes.oneOf([LOGIN_VIEW, REGISTER_VIEW, PASSWORD_VIEW, EMAIL_VIEW]),
+    initialEmail: PropTypes.string,
     isOpen: PropTypes.bool.isRequired,
     onOpen: PropTypes.func.isRequired,
     onClose: PropTypes.func.isRequired,
