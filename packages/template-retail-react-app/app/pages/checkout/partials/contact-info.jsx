@@ -93,6 +93,7 @@ const ContactInfo = ({isSocialEnabled = false, isPasswordlessEnabled = false, id
                 // TODO use constant
                 setAuthModalView('email')
                 authModal.onOpen()
+                setIsPasswordlessLoginClicked(false)
             } else {
                 goToNextStep()
             }
