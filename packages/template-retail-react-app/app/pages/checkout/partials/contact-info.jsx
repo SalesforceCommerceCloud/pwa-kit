@@ -32,7 +32,7 @@ import {
 } from '@salesforce/retail-react-app/app/components/toggle-card'
 import Field from '@salesforce/retail-react-app/app/components/field'
 import LoginState from '@salesforce/retail-react-app/app/pages/checkout/partials/login-state'
-import {AuthModal, useAuthModal} from '@salesforce/retail-react-app/app/hooks/use-auth-modal'
+import {AuthModal, EMAIL_VIEW, PASSWORD_VIEW, useAuthModal} from '@salesforce/retail-react-app/app/hooks/use-auth-modal'
 import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
@@ -62,8 +62,7 @@ const ContactInfo = ({isSocialEnabled = false, isPasswordlessEnabled = false, id
     const [showPasswordField, setShowPasswordField] = useState(false)
     const [signOutConfirmDialogIsOpen, setSignOutConfirmDialogIsOpen] = useState(false)
 
-    // TODO use constant
-    const [authModalView, setAuthModalView] = useState('')
+    const [authModalView, setAuthModalView] = useState(PASSWORD_VIEW)
     const authModal = useAuthModal(authModalView)
     const [isPasswordlessLoginClicked, setIsPasswordlessLoginClicked] = useState(false)
 
@@ -90,8 +89,7 @@ const ContactInfo = ({isSocialEnabled = false, isPasswordlessEnabled = false, id
             if (isPasswordlessLoginClicked) {
                 // TODO is current error handling sufficient
                 await authorizePasswordlessLogin.mutateAsync({userid: data.email})
-                // TODO use constant
-                setAuthModalView('email')
+                setAuthModalView(EMAIL_VIEW)
                 authModal.onOpen()
                 setIsPasswordlessLoginClicked(false)
             } else {
@@ -122,8 +120,7 @@ const ContactInfo = ({isSocialEnabled = false, isPasswordlessEnabled = false, id
     }
 
     const onForgotPasswordClick = () => {
-        // TODO make this a constant
-        setAuthModalView('password')
+        setAuthModalView(PASSWORD_VIEW)
         authModal.onOpen()
     }
 

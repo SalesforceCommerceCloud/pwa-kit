@@ -38,10 +38,10 @@ import {usePasswordReset} from '@salesforce/retail-react-app/app/hooks/use-passw
 import {isServer} from '@salesforce/retail-react-app/app/utils/utils'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 
-const LOGIN_VIEW = 'login'
-const REGISTER_VIEW = 'register'
-const PASSWORD_VIEW = 'password'
-const EMAIL_VIEW = 'email'
+export const LOGIN_VIEW = 'login'
+export const REGISTER_VIEW = 'register'
+export const PASSWORD_VIEW = 'password'
+export const EMAIL_VIEW = 'email'
 
 const LOGIN_ERROR = defineMessage({
     defaultMessage: "Something's not right with your email or password. Try again.",
