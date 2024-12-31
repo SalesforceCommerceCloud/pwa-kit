@@ -26,11 +26,14 @@ describe('LoginState', () => {
     expect(mockTogglePasswordField).toHaveBeenCalled()
   })
 
-  test('shows passwordless login button if enabled', () => {
-    const { getByRole, getByText } = renderWithProviders(<WrapperComponent isPasswordlessEnabled={true}/>)
+  test('shows passwordless login button if enabled', async () => {
+    const { getByRole, getByText, user } = renderWithProviders(<WrapperComponent isPasswordlessEnabled={true}/>)
     expect(getByText('Or Login With')).toBeInTheDocument();
     expect(getByRole("button", {name: 'Secure Link'})).toBeInTheDocument();
-    expect(getByRole("button", {name: 'Password'})).toBeInTheDocument();
+    const trigger = getByRole("button", {name: 'Password'})
+    await user.click(trigger);
+    expect(mockTogglePasswordField).toHaveBeenCalled()
+    expect(getByRole("button", {name: 'Back to Sign In Options'})).toBeInTheDocument();
   });
 
   test('does not show passwordless login button if disabled', () => {
@@ -39,12 +42,15 @@ describe('LoginState', () => {
     expect(queryByRole("button", {name: 'Secure Link'})).not.toBeInTheDocument();
   });
 
-  test('shows social login buttons if enabled', () => {
-    const { getByRole, getByText } = renderWithProviders(<WrapperComponent isSocialEnabled={true} idps={idps}/>)
+  test('shows social login buttons if enabled', async () => {
+    const { getByRole, getByText, user } = renderWithProviders(<WrapperComponent isSocialEnabled={true} idps={idps}/>)
     expect(getByText('Or Login With')).toBeInTheDocument();
     expect(getByRole("button", {name: /Google/i})).toBeInTheDocument();
     expect(getByRole("button", {name: /Apple/i})).toBeInTheDocument();
-    expect(getByRole("button", {name: 'Password'})).toBeInTheDocument();
+    const trigger = getByRole("button", {name: 'Password'})
+    await user.click(trigger);
+    expect(mockTogglePasswordField).toHaveBeenCalled()
+    expect(getByRole("button", {name: 'Back to Sign In Options'})).toBeInTheDocument();
   });
 
   test('does not show social login buttons if disabled', () => {

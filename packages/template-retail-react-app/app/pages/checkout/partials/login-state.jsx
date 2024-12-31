@@ -78,10 +78,9 @@ const LoginState = ({
                     setShowLoginButtons(!showLoginButtons)
                 }}
             >
-                {/* TODO: Possibly change to GO Back to Login */}
                 <FormattedMessage
-                    defaultMessage="Checkout as Guest"
-                    id="contact_info.button.checkout_as_guest"
+                    defaultMessage="Back to Sign In Options"
+                    id="contact_info.button.back_to_sign_in_options"
                 />
             </Button>
         )
