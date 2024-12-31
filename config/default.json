@@ -1,6 +1,10 @@
 {
     "enabled": true,
     "activeDataEnabled": false,
+    "categoryNav": {
+        "defaultNavSsrDepth": 1,
+        "defaultRootCategory": "root"
+    },
     "commerceAPI": {
         "proxyPath": "/mobify/proxy/api",
         "parameters": {
@@ -11,24 +15,66 @@
         }
     },
     "defaultSite": "<SITE_ID>",
+    "defaultAppLocale": "<DEFAULT_APP_LOCALE>",
+    "defaultSiteTitle": "<DEFAULT_SITE_TITLE>",
     "einsteinAPI": {
         "host": "https://api.cquotient.com",
         "einsteinId": "<EINSTEIN_ID>",
         "siteId": "<EINSTEIN_SITE_ID>",
         "isProduction": false
     },
+    "maxCacheAge": 900,
     "pages": {
-        "Account": "/account",
-        "Cart": "/cart",
-        "Checkout": "/checkout",
-        "CheckoutConfirmation": "/checkout/confirmation/:orderNo",
-        "Home": "/",
-        "Login": "/login",
-        "Registration": "/registration",
-        "ResetPassword": "/reset-password",
-        "LoginRedirect": "/callback",
-        "ProductDetail": "/product/:productId",
-        "ProductList": ["/search", "/category/:categoryId"]
+        "Account": {
+            "path": "/account",
+            "orderSearchParam": {"limit": 10, "offset": 0, "sort": "best-matches", "refine": []}
+        },
+        "Cart": {
+            "path": "/cart"
+        },
+        "Checkout": {
+            "path": "/checkout",
+            "shippingCountryCode": [
+                {"value": "CA", "label": "Canada"},
+                {"value": "US", "label": "United States"}
+            ]
+        },
+        "CheckoutConfirmation": {
+            "path": "/checkout/confirmation/:orderNo"
+        },
+        "Home": {
+            "path": "/",
+            "productLimit": 10,
+            "mainCategory": "newarrivals"
+        },
+        "Login": {
+            "path": "/login"
+        },
+        "Registration": {
+            "path": "/registration"
+        },
+        "ResetPassword": {
+            "path": "/reset-password"
+        },
+        "LoginRedirect": {
+            "path": "/callback"
+        },
+        "ProductDetail": {
+            "path": "/product/:productId"
+        },
+        "ProductList": {
+            "path": ["/search", "/category/:categoryId"],
+            "imageViewType": "large",
+            "selectableAttributeId": "color",
+            "filterAccordionSate": "filters-expanded-index"
+        }
+    },
+    "search": {
+        "defaultLimitValues": [25, 50, 100],
+        "defaultSearchParams": {"limit": 25, "offset": 0, "sort": "best-matches", "refine": []},
+        "recentSearchKey": "recent-search-key",
+        "recentSearchLimit": 5,
+        "recentSearchMinLength": 3
     },
     "siteAliases": {},
     "sites": [
@@ -47,6 +93,7 @@
             }
         }
     ],
+    "staleWhileRevalidate": 900,
     "url": {
         "site": "path",
         "locale": "path",

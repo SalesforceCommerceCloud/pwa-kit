@@ -354,7 +354,7 @@ describe('createUrlTemplate tests', () => {
                 locale?.alias ? `, locale.alias:${locale.alias}` : ''
             } and urlConfig:${JSON.stringify(urlConfig)}`, () => {
                 const buildUrl = createUrlTemplate(
-                    {url: urlConfig},
+                    {url: urlConfig, pages: {Home: {path: '/'}}},
                     site.id,
                     locale?.alias || locale?.id
                 )

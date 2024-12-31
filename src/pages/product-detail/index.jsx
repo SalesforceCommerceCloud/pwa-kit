@@ -24,8 +24,7 @@ import {
 } from '@salesforce/commerce-sdk-react'
 
 // Hooks
-import {useCurrentBasket} from '../../hooks/use-current-basket'
-import {useVariant} from '../../hooks'
+import {useCurrentBasket, useExtensionConfig, useVariant} from '../../hooks'
 import useNavigation from '../../hooks/use-navigation'
 import useEinstein from '../../hooks/use-einstein'
 import useActiveData from '../../hooks/use-active-data'
@@ -42,11 +41,9 @@ import logger from '../../utils/logger-instance'
 import {
     API_ERROR_MESSAGE,
     EINSTEIN_RECOMMENDERS,
-    MAX_CACHE_AGE,
     TOAST_ACTION_VIEW_WISHLIST,
     TOAST_MESSAGE_ADDED_TO_WISHLIST,
-    TOAST_MESSAGE_ALREADY_IN_WISHLIST,
-    STALE_WHILE_REVALIDATE
+    TOAST_MESSAGE_ALREADY_IN_WISHLIST
 } from '../../constants'
 import {rebuildPathWithParams} from '../../utils/url'
 import {useHistory, useLocation, useParams} from 'react-router-dom'
@@ -62,6 +59,8 @@ const ProductDetail = () => {
     const toast = useToast()
     const navigate = useNavigation()
     const customerId = useCustomerId()
+    const {maxCacheAge: MAX_CACHE_AGE, staleWhileRevalidate: STALE_WHILE_REVALIDATE} =
+        useExtensionConfig()
 
     /****************************** Basket *********************************/
     const {isLoading: isBasketLoading} = useCurrentBasket()

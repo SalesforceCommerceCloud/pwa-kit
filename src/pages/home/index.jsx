@@ -37,14 +37,9 @@ import {heroFeatures, features} from '../../pages/home/data'
 import useEinstein from '../../hooks/use-einstein'
 
 // Constants
-import {
-    HOME_SHOP_PRODUCTS_CATEGORY_ID,
-    HOME_SHOP_PRODUCTS_LIMIT,
-    MAX_CACHE_AGE,
-    STALE_WHILE_REVALIDATE
-} from '../../constants'
 import {useServerContext} from '@salesforce/pwa-kit-react-sdk/ssr/universal/hooks'
 import {useProductSearch} from '@salesforce/commerce-sdk-react'
+import {useExtensionConfig} from '../../hooks'
 
 /**
  * This is the home page for Retail React App.
@@ -56,7 +51,11 @@ const Home = () => {
     const intl = useIntl()
     const einstein = useEinstein()
     const {pathname} = useLocation()
-
+    const {
+        pages: {Home: homeConfig},
+        maxCacheAge: MAX_CACHE_AGE,
+        staleWhileRevalidate: STALE_WHILE_REVALIDATE
+    } = useExtensionConfig()
     const {res} = useServerContext()
     if (res) {
         res.set(
@@ -70,9 +69,9 @@ const Home = () => {
             allImages: true,
             allVariationProperties: true,
             expand: ['promotions', 'variations', 'prices', 'images', 'custom_properties'],
-            limit: HOME_SHOP_PRODUCTS_LIMIT,
+            limit: homeConfig.productLimit,
             perPricebook: true,
-            refine: [`cgid=${HOME_SHOP_PRODUCTS_CATEGORY_ID}`, 'htype=master']
+            refine: [`cgid=${homeConfig.mainCategory}`, 'htype=master']
         }
     })
 

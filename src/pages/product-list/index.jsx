@@ -60,7 +60,13 @@ import AbovePageHeader from '../../pages/product-list/partials/above-page-header
 import {FilterIcon, ChevronDownIcon} from '../../components/icons'
 
 // Hooks
-import {useLimitUrls, usePageUrls, useSortUrls, useSearchParams} from '../../hooks'
+import {
+    useLimitUrls,
+    usePageUrls,
+    useSortUrls,
+    useSearchParams,
+    useExtensionConfig
+} from '../../hooks'
 import {useToast} from '../../hooks/use-toast'
 import useEinstein from '../../hooks/use-einstein'
 import useActiveData from '../../hooks/use-active-data'
@@ -71,15 +77,10 @@ import logger from '../../utils/logger-instance'
 
 // Constants
 import {
-    DEFAULT_LIMIT_VALUES,
     API_ERROR_MESSAGE,
-    MAX_CACHE_AGE,
     TOAST_ACTION_VIEW_WISHLIST,
     TOAST_MESSAGE_ADDED_TO_WISHLIST,
-    TOAST_MESSAGE_REMOVED_FROM_WISHLIST,
-    STALE_WHILE_REVALIDATE,
-    PRODUCT_LIST_IMAGE_VIEW_TYPE,
-    PRODUCT_LIST_SELECTABLE_ATTRIBUTE_ID
+    TOAST_MESSAGE_REMOVED_FROM_WISHLIST
 } from '../../constants'
 import useNavigation from '../../hooks/use-navigation'
 import LoadingSpinner from '../../components/loading-spinner'
@@ -112,7 +113,12 @@ const ProductList = (props) => {
     const {res} = useServerContext()
     const customerId = useCustomerId()
     const [searchParams, {stringify: stringifySearchParams}] = useSearchParams()
-
+    const {
+        pages: {ProductList: productListConfig},
+        maxCacheAge: MAX_CACHE_AGE,
+        staleWhileRevalidate: STALE_WHILE_REVALIDATE,
+        search: searchConfig
+    } = useExtensionConfig()
     /**************** Page State ****************/
     const [filtersLoading, setFiltersLoading] = useState(false)
     const [wishlistLoading, setWishlistLoading] = useState([])
@@ -551,9 +557,9 @@ const ProductList = (props) => {
                                                   product={productSearchItem}
                                                   enableFavourite={true}
                                                   isFavourite={isInWishlist}
-                                                  imageViewType={PRODUCT_LIST_IMAGE_VIEW_TYPE}
+                                                  imageViewType={productListConfig.imageViewType}
                                                   selectableAttributeId={
-                                                      PRODUCT_LIST_SELECTABLE_ATTRIBUTE_ID
+                                                      productListConfig.selectableAttributeId
                                                   }
                                                   onClick={() => {
                                                       if (searchQuery) {
@@ -607,7 +613,7 @@ const ProductList = (props) => {
                                 >
                                     {limitUrls.map((href, index) => (
                                         <option key={href} value={href}>
-                                            {DEFAULT_LIMIT_VALUES[index]}
+                                            {searchConfig.defaultLimitValues[index]}
                                         </option>
                                     ))}
                                 </Select>

@@ -6,9 +6,17 @@
  */
 
 import React from 'react'
-import {Box, SimpleGrid, HStack, Text, Button, Center, useMultiStyleConfig} from '@chakra-ui/react'
+import {
+    Box,
+    SimpleGrid,
+    HStack,
+    Text,
+    Button,
+    Center,
+    useMultiStyleConfig,
+    useTheme
+} from '@chakra-ui/react'
 import PropTypes from 'prop-types'
-import {cssColorGroups} from '../../../constants'
 import {useIntl} from 'react-intl'
 import {
     ADD_FILTER_HIT_COUNT,
@@ -21,6 +29,8 @@ const ColorRefinements = ({filter, toggleFilter, selectedFilters}) => {
         variant: 'circle',
         disabled: false
     })
+    const theme = useTheme()
+    const cssColorGroups = theme.colors.cssColorGroups
 
     return (
         <SimpleGrid columns={2} spacing={2} mt={1}>

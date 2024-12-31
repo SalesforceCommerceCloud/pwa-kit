@@ -5,6 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import type {ApplicationExtensionConfig} from '@salesforce/pwa-kit-extension-sdk/types'
+type Pages = typeof import('../pages')
 
 // Represents a locale with its ID and preferred currency.
 type Locale = {
@@ -45,22 +46,80 @@ type EinsteinAPI = {
     isProduction: boolean
 }
 
+type ShippingCountry = {
+    value: string
+    label: string
+}
+
 // Indicates where a value should be placed in the URL.
 type UrlPlacement = 'path' | 'query_string' | 'none'
 
-type Pages = typeof import('../pages')
+// Default configuration type
+// should we keep string | string[] type here??
+type DefaultPageConfig = {
+    path: string
+}
 
+type CustomPageConfigs = {
+    Account: DefaultPageConfig & {
+        orderSearchParam: {
+            limit: number
+            offset: number
+            sort: string
+            refine: []
+        }
+    }
+    Checkout: DefaultPageConfig & {
+        shippingCountryCode: ShippingCountry[]
+    }
+    Home: DefaultPageConfig & {
+        productLimit?: number
+        mainCategory?: string
+    }
+    ProductList: DefaultPageConfig & {
+        imageViewType: 'large'
+        selectableAttributeId: 'color'
+        filterAccordionSate: string
+    }
+}
+
+// Combine inferred pages with specific configurations
+type PageConfigs = {
+    [K in keyof Pages]: K extends keyof CustomPageConfigs ? CustomPageConfigs[K] : DefaultPageConfig
+}
 /**
  * This defines how your extension can be configured in the user's project. Please update it to your specific needs!
  */
 export interface UserConfig extends ApplicationExtensionConfig {
     activeDataEnabled?: boolean // default = false
     commerceAPI: CommerceAPIConfig
+    categoryNav: {
+        defaultNavSsrDepth: number
+        defaultRootCategory: string | number
+    }
     defaultSite: Site['id']
+    defaultAppLocale: string
+    defaultSiteTitle: string
     einsteinAPI: EinsteinAPI
-    pages?: Record<keyof Pages, false | string | string[]> // if false, the page will not be shown
+    maxCacheAge: number
+    pages?: {
+        [K in keyof PageConfigs]: false | PageConfigs[K]
+    }
+    search: {
+        defaultLimitValues: number[]
+        defaultSearchParams: {
+            limit: number
+            offset: number
+            sort: string
+            refine: []
+        }
+        recentSearchKey: string
+        recentSearchLimit: number
+        recentSearchMinLength: number
+    }
     siteAliases?: Record<Site['id'], string>
     sites: Site[]
+    staleWhileRevalidate: number
     url?: {
         site: UrlPlacement
         locale: UrlPlacement

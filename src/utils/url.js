@@ -12,7 +12,7 @@ import {
     getDefaultSite,
     getSiteByReference
 } from './site-utils'
-import {HOME_HREF, urlPartPositions} from '../constants'
+import {urlPartPositions} from '../constants'
 
 /**
  * A function that takes a path and qualifies it with the current host and protocol.
@@ -210,7 +210,7 @@ export const createUrlTemplate = (appConfig, siteRef, localeRef) => {
 
     return (path, site, locale) => {
         const isHomeWithDefaultSiteAndLocale =
-            path === HOME_HREF &&
+            path === appConfig.pages.Home.path &&
             (defaultSite.id === site || (defaultSite.alias && defaultSite.alias === site)) &&
             (defaultLocale.id === locale || (defaultLocale.alias && defaultLocale.alias === locale))
 

@@ -8,11 +8,9 @@
 import {useMemo} from 'react'
 import {useLocation} from 'react-router-dom'
 
-// Constants
-import {DEFAULT_LIMIT_VALUES} from '../constants'
-
 // Utils
 import {buildUrlSet} from '../utils/url'
+import {useExtensionConfig} from './use-extension-config'
 
 /*
  * Generate a memoized list of page size urls. Chaning the page size will reset
@@ -20,12 +18,17 @@ import {buildUrlSet} from '../utils/url'
  */
 export const useLimitUrls = () => {
     const location = useLocation()
-
+    const {search: searchConfig} = useExtensionConfig()
     return useMemo(
         () =>
-            buildUrlSet(`${location.pathname}${location.search}`, 'limit', DEFAULT_LIMIT_VALUES, {
-                offset: 0
-            }),
+            buildUrlSet(
+                `${location.pathname}${location.search}`,
+                'limit',
+                searchConfig.defaultLimitValues,
+                {
+                    offset: 0
+                }
+            ),
         [location.search, location.pathname]
     )
 }

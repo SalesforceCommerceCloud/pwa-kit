@@ -22,16 +22,14 @@ import {
     Img,
     Skeleton
 } from '@chakra-ui/react'
-import {useCurrentCustomer} from '../../hooks/use-current-customer'
 import {useCustomerOrders, useProducts} from '@salesforce/commerce-sdk-react'
 import useNavigation from '../../hooks/use-navigation'
-import {usePageUrls, useSearchParams} from '../../hooks'
+import {useExtensionConfig, useCurrentCustomer, usePageUrls, useSearchParams} from '../../hooks'
 import PageActionPlaceHolder from '../../components/page-action-placeholder'
 import Link from '../../components/link'
 import {ChevronRightIcon, ReceiptIcon} from '../../components/icons'
 import Pagination from '../../components/pagination'
 import PropTypes from 'prop-types'
-import {DEFAULT_ORDERS_SEARCH_PARAMS} from '../../constants'
 
 const OrderProductImages = ({productItems}) => {
     const ids = productItems.map((item) => item.productId).join(',') ?? ''
@@ -81,11 +79,14 @@ const AccountOrderHistory = () => {
     const location = useLocation()
     const {formatMessage, formatDate} = useIntl()
     const navigate = useNavigation()
+    const {
+        pages: {Account: accountConfig}
+    } = useExtensionConfig()
 
     const {data: customer} = useCurrentCustomer()
     const {customerId} = customer
 
-    const searchParams = useSearchParams(DEFAULT_ORDERS_SEARCH_PARAMS)
+    const searchParams = useSearchParams(accountConfig.orderSearchParam)
     const {limit, offset} = searchParams[0]
 
     const {data: {data: orders, ...paging} = {}, isLoading} = useCustomerOrders(

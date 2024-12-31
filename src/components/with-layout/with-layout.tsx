@@ -40,21 +40,11 @@ import ScrollToTop from '../scroll-to-top'
 // Local Project Hooks
 import {AuthModal, useAuthModal} from '../../hooks/use-auth-modal'
 import {AddToCartModalProvider} from '../../hooks/use-add-to-cart-modal'
-import {useExtensionConfig} from '../../hooks/use-extension-config'
-import {useCurrentCustomer} from '../../hooks/use-current-customer'
-import {useCurrentBasket} from '../../hooks/use-current-basket'
+import {useExtensionConfig, useCurrentCustomer, useCurrentBasket} from '../../hooks'
 import {watchOnlineStatus, flatten} from '../../utils/utils'
 import useActiveData from '../../hooks/use-active-data'
 import useMultiSite from '../../hooks/use-multi-site'
-
-// CONSTANTS
-import {
-    DEFAULT_SITE_TITLE,
-    HOME_HREF,
-    THEME_COLOR,
-    CAT_MENU_DEFAULT_NAV_SSR_DEPTH,
-    CAT_MENU_DEFAULT_ROOT_CATEGORY
-} from '../../constants'
+import {useTheme} from '@chakra-ui/react'
 
 // Define a type for the HOC props
 type WithAppLayoutProps = React.ComponentPropsWithoutRef<any>
@@ -103,22 +93,26 @@ const ListMenuContentWithData = withCommerceSdkReactHookData(
 // Define the HOC function
 const withLayout = <P extends object>(WrappedComponent: React.ComponentType<P>) => {
     const WithLayout: React.FC<P> = (props: WithAppLayoutProps) => {
+        const config = useExtensionConfig()
+
+        const CAT_MENU_DEFAULT_ROOT_CATEGORY = config.categoryNav.defaultRootCategory
+        const CAT_MENU_DEFAULT_NAV_SSR_DEPTH = config.categoryNav.defaultNavSsrDepth
         const {data: categoriesTree} = useCategory({
-            parameters: {id: CAT_MENU_DEFAULT_ROOT_CATEGORY, levels: CAT_MENU_DEFAULT_NAV_SSR_DEPTH}
+            parameters: {
+                id: CAT_MENU_DEFAULT_ROOT_CATEGORY,
+                levels: CAT_MENU_DEFAULT_NAV_SSR_DEPTH
+            }
         })
         const categories = flatten(categoriesTree || {}, 'categories')
-
         const appOrigin = getAppOrigin()
         const activeData = useActiveData()
-        const config = useExtensionConfig()
         const history = useHistory()
         const location = useLocation()
         const authModal = useAuthModal()
         const {site, locale, buildUrl} = useMultiSite()
-
         const [isOnline, setIsOnline] = useState(true)
         const styles = useStyleConfig('App')
-
+        const {colors} = useTheme()
         const {isOpen, onOpen, onClose} = useDisclosure()
 
         // Used to conditionally render header/footer for checkout page
@@ -178,7 +172,7 @@ const withLayout = <P extends object>(WrappedComponent: React.ComponentType<P>) 
 
         const onLogoClick = () => {
             // Goto the home page.
-            const path = buildUrl(HOME_HREF)
+            const path = buildUrl(config.pages.Home.path)
 
             history.push(path)
 
@@ -229,8 +223,8 @@ const withLayout = <P extends object>(WrappedComponent: React.ComponentType<P>) 
                 </Helmet>
 
                 <Seo>
-                    <meta name="theme-color" content={THEME_COLOR} />
-                    <meta name="apple-mobile-web-app-title" content={DEFAULT_SITE_TITLE} />
+                    <meta name="theme-color" content={colors.blue['600']} />
+                    <meta name="apple-mobile-web-app-title" content={config.defaultSiteTitle} />
 
                     {/* Urls for all localized versions of this page (including current page)
                     For more details on hrefLang, see https://developers.google.com/search/docs/advanced/crawling/localized-versions */}

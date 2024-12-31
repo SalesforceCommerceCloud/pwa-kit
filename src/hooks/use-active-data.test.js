@@ -14,8 +14,7 @@ import {renderWithProviders} from '../utils/test-utils'
 import useActiveData from './use-active-data'
 import {mockCategory, mockProduct, mockSearchResults} from './einstein-mock-data'
 import mockConfig from '../mock-config'
-import {DEFAULT_SEARCH_PARAMS} from '../constants'
-
+const DEFAULT_SEARCH_PARAMS = mockConfig.search.defaultSearchParams
 jest.mock('../mock-config')
 
 const MockComponent = ({action, args}) => {

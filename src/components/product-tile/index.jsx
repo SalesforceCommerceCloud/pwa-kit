@@ -35,12 +35,15 @@ import PromoCallout from '../../components/product-tile/promo-callout'
 import {useIntl} from 'react-intl'
 
 // Other
-import {PRODUCT_TILE_IMAGE_VIEW_TYPE, PRODUCT_TILE_SELECTABLE_ATTRIBUTE_ID} from '../../constants'
 import {productUrlBuilder, rebuildPathWithParams} from '../../utils/url'
 import {getPriceData} from '../../utils/product-utils'
 import {useCurrency} from '../../hooks'
 import {filterImageGroups, getDecoratedVariationAttributes} from '../../utils/product-utils'
 import {PRODUCT_BADGE_DETAILS} from '../../constants'
+
+// Constants for product tile page
+export const PRODUCT_TILE_IMAGE_VIEW_TYPE = 'large'
+export const PRODUCT_TILE_SELECTABLE_ATTRIBUTE_ID = 'color'
 
 const IconButtonWithRegistration = withRegistration(IconButton)
 

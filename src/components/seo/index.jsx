@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, salesforce.com, inc.
+ * Copyright (c) 2024, salesforce.com, inc.
  * All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
@@ -8,10 +8,11 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import Helmet from 'react-helmet'
 
-import {DEFAULT_SITE_TITLE} from '../../constants'
+import {useExtensionConfig} from '../../hooks'
 
 const Seo = ({title, description, noIndex, keywords, children, ...props}) => {
-    const fullTitle = title ? `${title} | ${DEFAULT_SITE_TITLE}` : DEFAULT_SITE_TITLE
+    const {defaultSiteTitle} = useExtensionConfig()
+    const fullTitle = title ? `${title} | ${defaultSiteTitle}` : defaultSiteTitle
 
     return (
         <Helmet {...props}>

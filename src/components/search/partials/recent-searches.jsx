@@ -9,14 +9,16 @@ import PropTypes from 'prop-types'
 import {Text, Button, Box} from '@chakra-ui/react'
 
 import {clearSessionJSONItem} from '../../../utils/utils'
-import {RECENT_SEARCH_KEY} from '../../../constants'
 
 import {FormattedMessage} from 'react-intl'
 import {searchUrlBuilder} from '../../../utils/url'
+import {useExtensionConfig} from '../../../hooks'
 
 const RecentSearches = ({recentSearches, closeAndNavigate}) => {
+    const {search: searchConfig} = useExtensionConfig()
+
     const clearSearches = () => {
-        clearSessionJSONItem(RECENT_SEARCH_KEY)
+        clearSessionJSONItem(searchConfig.recentSearchKey)
         closeAndNavigate(false)
     }
     return (
