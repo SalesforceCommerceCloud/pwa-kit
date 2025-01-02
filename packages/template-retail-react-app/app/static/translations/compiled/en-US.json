@@ -1055,6 +1055,12 @@
       "value": "Already have an account? Log in"
     }
   ],
+  "contact_info.button.back_to_sign_in_options": [
+    {
+      "type": 0,
+      "value": "Back to Sign In Options"
+    }
+  ],
   "contact_info.button.checkout_as_guest": [
     {
       "type": 0,

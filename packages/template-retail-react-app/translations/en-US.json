@@ -418,6 +418,9 @@
   "contact_info.button.already_have_account": {
     "defaultMessage": "Already have an account? Log in"
   },
+  "contact_info.button.back_to_sign_in_options": {
+    "defaultMessage": "Back to Sign In Options"
+  },
   "contact_info.button.checkout_as_guest": {
     "defaultMessage": "Checkout as Guest"
   },
