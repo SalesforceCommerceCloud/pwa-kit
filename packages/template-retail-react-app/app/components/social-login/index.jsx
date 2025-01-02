@@ -52,7 +52,8 @@ const SocialLogin = ({form, idps}) => {
     const redirectURI = buildRedirectURI(appOrigin, redirectPath)
 
     const isIdpValid = (name) => {
-        return name in IDP_CONFIG && IDP_CONFIG[name.toLowerCase()]
+        const formattedName = name.toLowerCase()
+        return formattedName in IDP_CONFIG && IDP_CONFIG[formattedName]
     }
 
     useEffect(() => {
