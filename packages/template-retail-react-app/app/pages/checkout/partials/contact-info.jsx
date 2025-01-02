@@ -69,6 +69,14 @@ const ContactInfo = ({isSocialEnabled = false, isPasswordlessEnabled = false, id
     const submitForm = async (data) => {
         setError(null)
         try {
+            if (isPasswordlessLoginClicked) {
+                // TODO is current error handling sufficient
+                await authorizePasswordlessLogin.mutateAsync({userid: data.email})
+                setAuthModalView(EMAIL_VIEW)
+                authModal.onOpen()
+                setIsPasswordlessLoginClicked(false)
+                return
+            }
             if (!data.password) {
                 await updateCustomerForBasket.mutateAsync({
                     parameters: {basketId: basket.basketId},
@@ -86,15 +94,7 @@ const ContactInfo = ({isSocialEnabled = false, isPasswordlessEnabled = false, id
                     })
                 }
             }
-            if (isPasswordlessLoginClicked) {
-                // TODO is current error handling sufficient
-                await authorizePasswordlessLogin.mutateAsync({userid: data.email})
-                setAuthModalView(EMAIL_VIEW)
-                authModal.onOpen()
-                setIsPasswordlessLoginClicked(false)
-            } else {
-                goToNextStep()
-            }
+            goToNextStep()
         } catch (error) {
             if (/Unauthorized/i.test(error.message)) {
                 setError(
