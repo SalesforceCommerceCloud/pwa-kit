@@ -32,7 +32,12 @@ import {
 } from '@salesforce/retail-react-app/app/components/toggle-card'
 import Field from '@salesforce/retail-react-app/app/components/field'
 import LoginState from '@salesforce/retail-react-app/app/pages/checkout/partials/login-state'
-import {AuthModal, EMAIL_VIEW, PASSWORD_VIEW, useAuthModal} from '@salesforce/retail-react-app/app/hooks/use-auth-modal'
+import {
+    AuthModal,
+    EMAIL_VIEW,
+    PASSWORD_VIEW,
+    useAuthModal
+} from '@salesforce/retail-react-app/app/hooks/use-auth-modal'
 import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
@@ -221,10 +226,7 @@ const ContactInfo = ({isSocialEnabled = false, isPasswordlessEnabled = false, id
                         </Stack>
                     </form>
                 </Container>
-                <AuthModal 
-                    {...authModal}
-                    initialEmail={form.getValues().email}
-                />
+                <AuthModal {...authModal} initialEmail={form.getValues().email} />
             </ToggleCardEdit>
             <ToggleCardSummary>
                 <Text>{basket?.customerInfo?.email || customer?.email}</Text>

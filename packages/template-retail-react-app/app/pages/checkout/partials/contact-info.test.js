@@ -9,23 +9,24 @@ import {screen, waitFor, within} from '@testing-library/react'
 import ContactInfo from '@salesforce/retail-react-app/app/pages/checkout/partials/contact-info'
 import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
 import {rest} from 'msw'
-import {
-    scapiBasketWithItem} from '@salesforce/retail-react-app/app/mocks/mock-data'
+import {scapiBasketWithItem} from '@salesforce/retail-react-app/app/mocks/mock-data'
 import {AuthHelpers} from '@salesforce/commerce-sdk-react'
 
 const invalidEmail = 'invalidEmail'
 const validEmail = 'test@salesforce.com'
 const password = 'abc123'
 const mockAuthHelperFunctions = {
-    [AuthHelpers.LoginRegisteredUserB2C]: { mutateAsync: jest.fn() },
-    [AuthHelpers.AuthorizePasswordless]: { mutateAsync: jest.fn() },
+    [AuthHelpers.LoginRegisteredUserB2C]: {mutateAsync: jest.fn()},
+    [AuthHelpers.AuthorizePasswordless]: {mutateAsync: jest.fn()}
 }
 
 jest.mock('@salesforce/commerce-sdk-react', () => {
     const originalModule = jest.requireActual('@salesforce/commerce-sdk-react')
     return {
         ...originalModule,
-        useAuthHelper: jest.fn().mockImplementation((helperType) => mockAuthHelperFunctions[helperType])
+        useAuthHelper: jest
+            .fn()
+            .mockImplementation((helperType) => mockAuthHelperFunctions[helperType])
     }
 })
 
@@ -49,7 +50,7 @@ afterEach(() => {
     jest.resetModules()
 })
 
-describe ('passwordless and social disabled', () => {
+describe('passwordless and social disabled', () => {
     test('renders component', async () => {
         const {user} = renderWithProviders(
             <ContactInfo isPasswordlessEnabled={false} isSocialEnabled={false} />
@@ -70,7 +71,7 @@ describe ('passwordless and social disabled', () => {
     })
 
     test('does not allow login if email or password is missing', async () => {
-        const {user} = renderWithProviders(<ContactInfo/>)
+        const {user} = renderWithProviders(<ContactInfo />)
 
         // switch to login
         const trigger = screen.getByText(/Already have an account\? Log in/i)
@@ -84,31 +85,32 @@ describe ('passwordless and social disabled', () => {
     })
 
     test('allows login', async () => {
-        const {user} = renderWithProviders(<ContactInfo/>)
+        const {user} = renderWithProviders(<ContactInfo />)
 
         // switch to login
         const trigger = screen.getByText(/Already have an account\? Log in/i)
         await user.click(trigger)
-        
+
         // enter email address and password
         await user.type(screen.getByLabelText('Email'), validEmail)
         await user.type(screen.getByLabelText('Password'), password)
 
         const loginButton = screen.getByText('Log In')
         await user.click(loginButton)
-        expect(mockAuthHelperFunctions[AuthHelpers.LoginRegisteredUserB2C].mutateAsync).toHaveBeenCalledWith({username: validEmail, password: password})
+        expect(
+            mockAuthHelperFunctions[AuthHelpers.LoginRegisteredUserB2C].mutateAsync
+        ).toHaveBeenCalledWith({username: validEmail, password: password})
     })
 })
 
-describe ('passwordless enabled', () => {
+describe('passwordless enabled', () => {
     let currentBasket = JSON.parse(JSON.stringify(scapiBasketWithItem))
     beforeEach(() => {
         global.server.use(
             rest.put('*/baskets/:basketId/customer', (req, res, ctx) => {
                 currentBasket.customerInfo.email = validEmail
                 return res(ctx.json(currentBasket))
-            }),
-            
+            })
         )
     })
 
@@ -135,7 +137,7 @@ describe ('passwordless enabled', () => {
 
     test('does not allow passwordless login if email is invalid', async () => {
         const {user} = renderWithProviders(<ContactInfo isPasswordlessEnabled={true} />)
-        
+
         // enter an invalid email address
         await user.type(screen.getByLabelText('Email'), invalidEmail)
 
@@ -146,7 +148,7 @@ describe ('passwordless enabled', () => {
 
     test('allows passwordless login', async () => {
         const {user} = renderWithProviders(<ContactInfo isPasswordlessEnabled={true} />)
-        
+
         // enter a valid email address
         await user.type(screen.getByLabelText('Email'), validEmail)
 
@@ -155,21 +157,25 @@ describe ('passwordless enabled', () => {
         // Click the button twice as the isPasswordlessLoginClicked state doesn't change after the first click
         await user.click(passwordlessLoginButton)
         await user.click(passwordlessLoginButton)
-        expect(mockAuthHelperFunctions[AuthHelpers.AuthorizePasswordless].mutateAsync).toHaveBeenCalledWith({userid: validEmail})
-    
+        expect(
+            mockAuthHelperFunctions[AuthHelpers.AuthorizePasswordless].mutateAsync
+        ).toHaveBeenCalledWith({userid: validEmail})
+
         // check that check email modal is open
         await waitFor(() => {
             const withinForm = within(screen.getByTestId('sf-form-resend-passwordless-email'))
             expect(withinForm.getByText(/Check Your Email/i)).toBeInTheDocument()
         })
-    
-        // resend the email 
+
+        // resend the email
         user.click(screen.getByText(/Resend Link/i))
-        expect(mockAuthHelperFunctions[AuthHelpers.AuthorizePasswordless].mutateAsync).toHaveBeenCalledWith({userid: validEmail})
+        expect(
+            mockAuthHelperFunctions[AuthHelpers.AuthorizePasswordless].mutateAsync
+        ).toHaveBeenCalledWith({userid: validEmail})
     })
 
     test('allows login using password', async () => {
-        const {user} = renderWithProviders(<ContactInfo isPasswordlessEnabled={true}/>)
+        const {user} = renderWithProviders(<ContactInfo isPasswordlessEnabled={true} />)
 
         // enter a valid email address
         await user.type(screen.getByLabelText('Email'), validEmail)
@@ -177,19 +183,23 @@ describe ('passwordless enabled', () => {
         // initiate login using password
         const passwordButton = screen.getByText('Password')
         await user.click(passwordButton)
-        
+
         // enter a password
         await user.type(screen.getByLabelText('Password'), password)
 
         const loginButton = screen.getByText('Log In')
         await user.click(loginButton)
-        expect(mockAuthHelperFunctions[AuthHelpers.LoginRegisteredUserB2C].mutateAsync).toHaveBeenCalledWith({username: validEmail, password: password})
+        expect(
+            mockAuthHelperFunctions[AuthHelpers.LoginRegisteredUserB2C].mutateAsync
+        ).toHaveBeenCalledWith({username: validEmail, password: password})
     })
 })
 
-describe ('social login enabled', () => {
+describe('social login enabled', () => {
     test('renders component', async () => {
-        const {getByRole} = renderWithProviders(<ContactInfo isSocialEnabled={true} idps={['google']} />)
+        const {getByRole} = renderWithProviders(
+            <ContactInfo isSocialEnabled={true} idps={['google']} />
+        )
         expect(getByRole('button', {name: 'Checkout as Guest'})).toBeInTheDocument()
         expect(getByRole('button', {name: 'Password'})).toBeInTheDocument()
         expect(getByRole('button', {name: /Google/i})).toBeInTheDocument()
