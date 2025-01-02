@@ -75,7 +75,6 @@ const ContactInfo = ({isSocialEnabled = false, isPasswordlessEnabled = false, id
         setError(null)
         try {
             if (isPasswordlessLoginClicked) {
-                // TODO is current error handling sufficient
                 await authorizePasswordlessLogin.mutateAsync({userid: data.email})
                 setAuthModalView(EMAIL_VIEW)
                 authModal.onOpen()
