@@ -208,6 +208,10 @@ export const AuthModal = ({
     }, [currentView])
 
     useEffect(() => {
+        setPasswordlessLoginEmail(initialEmail);
+    }, [initialEmail])
+
+    useEffect(() => {
         // Lets determine if the user has either logged in, or registed.
         const loggingIn = currentView === LOGIN_VIEW
         const registering = currentView === REGISTER_VIEW

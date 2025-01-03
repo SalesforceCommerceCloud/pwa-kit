@@ -165,6 +165,7 @@ describe('passwordless enabled', () => {
         await waitFor(() => {
             const withinForm = within(screen.getByTestId('sf-form-resend-passwordless-email'))
             expect(withinForm.getByText(/Check Your Email/i)).toBeInTheDocument()
+            expect(withinForm.getByText(validEmail)).toBeInTheDocument()
         })
 
         // resend the email
