@@ -627,6 +627,9 @@
   "global.account.link.wishlist": {
     "defaultMessage": "Wishlist"
   },
+  "global.error.feature_unavailable": {
+    "defaultMessage": "This feature is not currently available."
+  },
   "global.error.invalid_token": {
     "defaultMessage": "Invalid token, please try again."
   },

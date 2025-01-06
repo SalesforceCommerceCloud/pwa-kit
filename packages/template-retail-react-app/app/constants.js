@@ -6,7 +6,7 @@
  */
 
 import {defineMessage} from 'react-intl'
-import {noop} from '@salesforce/retail-react-app/app/utils/utils'
+import {noop} from './utils/utils'
 
 // Global app defaults
 export const DEFAULT_LOCALE = 'en-US'
@@ -94,6 +94,10 @@ export const API_ERROR_MESSAGE = defineMessage({
 export const INVALID_TOKEN_ERROR_MESSAGE = defineMessage({
     defaultMessage: 'Invalid token, please try again.',
     id: 'global.error.invalid_token'
+})
+export const FEATURE_UNAVAILABLE_ERROR_MESSAGE = defineMessage({
+    defaultMessage: 'This feature is not currently available.',
+    id: 'global.error.feature_unavailable'
 })
 
 export const HOME_HREF = '/'

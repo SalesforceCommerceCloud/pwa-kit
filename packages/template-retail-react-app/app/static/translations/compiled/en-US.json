@@ -1521,6 +1521,12 @@
       "value": "Wishlist"
     }
   ],
+  "global.error.feature_unavailable": [
+    {
+      "type": 0,
+      "value": "This feature is not currently available."
+    }
+  ],
   "global.error.invalid_token": [
     {
       "type": 0,

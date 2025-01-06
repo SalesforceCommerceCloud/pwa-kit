@@ -67,7 +67,7 @@ const SocialLogin = ({form, idps}) => {
         })
     }, [idps])
 
-    const onSocialLoginClick = async () => {
+    const onSocialLoginClick = async (name) => {
         try {
             // Save the path where the user logged in
             setSessionJSONItem('returnToPage', window.location.pathname)
@@ -93,7 +93,9 @@ const SocialLogin = ({form, idps}) => {
                         return (
                             config && (
                                 <Button
-                                    onClick={onSocialLoginClick}
+                                    onClick={() => {
+                                        onSocialLoginClick(name)
+                                    }}
                                     borderColor="gray.500"
                                     color="blue.600"
                                     variant="outline"
