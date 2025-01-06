@@ -1098,7 +1098,7 @@ class Auth {
         const usid = this.get('usid')
         const mode = callbackURI ? 'callback' : 'sms'
 
-        await helpers.authorizePasswordless(
+        const res = await helpers.authorizePasswordless(
             this.client,
             {
                 clientSecret: this.clientSecret
@@ -1110,6 +1110,7 @@ class Auth {
                 mode
             }
         )
+        return res
     }
 
     /**

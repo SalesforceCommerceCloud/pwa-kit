@@ -97,13 +97,16 @@ export const AuthModal = ({
 
         const handlePasswordlessLogin = async (email) => {
             try {
-                await authorizePasswordlessLogin.mutateAsync({userid: email})
+                const res = await authorizePasswordlessLogin.mutateAsync({userid: email})
+                if (res.status !== 200) {
+                    throw new Error(`${res.status}${res.statusText}`)
+                }
                 setCurrentView(EMAIL_VIEW)
             } catch (error) {
-                form.setError('global', {
-                    type: 'manual',
-                    message: formatMessage(API_ERROR_MESSAGE)
-                })
+                const message = /^400/.test(error.message)
+                    ? formatMessage(FEATURE_UNAVAILABLE_ERROR_MESSAGE)
+                    : formatMessage(API_ERROR_MESSAGE)
+                form.setError('global', { type: 'manual', message })
             }
         }
 
