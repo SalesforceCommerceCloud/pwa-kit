@@ -75,7 +75,7 @@ const passwordlessLoginCallback =
     config.app.login?.passwordless?.callbackURI || '/passwordless-login-callback'
 
 // Reusable function to handle sending a magic link email.
-// By default, this imp[lmenetation uses Marketing Cloud.
+// By default, this implementation uses Marketing Cloud.
 async function sendMagicLinkEmail(req, res, landingPath, emailTemplate) {
     // Extract the base URL from the request
     const base = req.protocol + '://' + req.get('host')
