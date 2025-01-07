@@ -51,16 +51,19 @@ const SocialLoginRedirect = () => {
         if (!searchParams.code) {
             return
         }
-        try {
-            loginIDPUser.mutateAsync({
-                code: searchParams.code,
-                redirectURI: redirectURI,
-                ...(searchParams.usid && {usid: searchParams.usid})
-            })
-        } catch (error) {
-            const message = formatMessage(API_ERROR_MESSAGE)
-            setError(message)
+        const socialLogin = async() => {
+            try {
+                await loginIDPUser.mutateAsync({
+                    code: searchParams.code,
+                    redirectURI: redirectURI,
+                    ...(searchParams.usid && {usid: searchParams.usid})
+                })
+            } catch (error) {
+                const message = formatMessage(API_ERROR_MESSAGE)
+                setError(message)
+            }
         }
+        socialLogin()
     }, [])
 
     // If customer is registered, push to secure account page
