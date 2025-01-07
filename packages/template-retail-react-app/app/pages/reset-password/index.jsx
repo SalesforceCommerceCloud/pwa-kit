@@ -32,8 +32,8 @@ const ResetPassword = () => {
     const submitForm = async ({email}) => {
         try {
             await getPasswordResetToken(email)
-        } catch (error) {
-            const message = /^400/.test(error.message)
+        } catch (e) {
+            const message = e.response?.status === 400
                 ? formatMessage(FEATURE_UNAVAILABLE_ERROR_MESSAGE)
                 : formatMessage(API_ERROR_MESSAGE)
             form.setError('global', { type: 'manual', message });
