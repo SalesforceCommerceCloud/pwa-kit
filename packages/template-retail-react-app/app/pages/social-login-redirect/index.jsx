@@ -47,12 +47,12 @@ const SocialLoginRedirect = () => {
     const [error, setError] = useState('')
 
     // Runs after successful 3rd-party IDP authorization, processing query parameters
-    useEffect(async () => {
+    useEffect(() => {
         if (!searchParams.code) {
             return
         }
         try {
-            await loginIDPUser.mutateAsync({
+            loginIDPUser.mutateAsync({
                 code: searchParams.code,
                 redirectURI: redirectURI,
                 ...(searchParams.usid && {usid: searchParams.usid})

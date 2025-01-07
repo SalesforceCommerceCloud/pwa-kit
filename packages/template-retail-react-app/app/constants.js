@@ -6,7 +6,7 @@
  */
 
 import {defineMessage} from 'react-intl'
-import {noop} from './utils/utils'
+import {noop} from '@salesforce/retail-react-app/app/utils/utils'
 
 // Global app defaults
 export const DEFAULT_LOCALE = 'en-US'

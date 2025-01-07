@@ -1049,6 +1049,16 @@ class Auth {
             },
             this.isPrivate
         )
+        // Perform an initial fetch request to check for potential API errors
+        const response = await fetch(url, {
+            method: 'GET',
+            redirect: 'manual'
+        })
+        // Check if the response indicates an HTTP error (status codes 400 and above)
+        if (response.status >= 400) {
+            const errorData = await response.json()
+            throw new Error(errorData.message || 'API validation failed')
+        }
         if (onClient()) {
             window.location.assign(url)
         } else {

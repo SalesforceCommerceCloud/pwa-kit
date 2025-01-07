@@ -173,7 +173,7 @@ export const AuthModal = ({
                 try {
                     await getPasswordResetToken(data.email)
                 } catch (e) {
-                    const message = /^400/.test(e.message)
+                    const message = e.status === 400
                         ? formatMessage(FEATURE_UNAVAILABLE_ERROR_MESSAGE)
                         : formatMessage(API_ERROR_MESSAGE)
                     form.setError('global', { type: 'manual', message });
