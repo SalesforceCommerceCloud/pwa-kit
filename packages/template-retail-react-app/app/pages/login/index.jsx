@@ -153,7 +153,7 @@ const Login = ({initialView = LOGIN_VIEW}) => {
 
             const passwordlessLogin = async() => {
                 try {
-                    const res = await loginPasswordless.mutateAsync({pwdlessLoginToken: token})
+                    await loginPasswordless.mutateAsync({pwdlessLoginToken: token})
                 } catch (e) {
                     const errorData = await e.response?.json()
                     const message = /invalid token/i.test(errorData.message)
