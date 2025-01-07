@@ -154,7 +154,7 @@ Please refer to the sample configuration below in order to properly configure yo
 > Downloading npm package... <br/>
 > Installing extension... <br/>
 > Finished. <br/>
-> Congratulations! The extension was successfully installed! Please visit https://www.npmjs.com/package/@salesforce/extension-sample for more information on how to use this extension.
+> Congratulations! The extension was successfully installed! Please visit https://www.npmjs.com/package/@salesforce/extension-chakra-storefront for more information on how to use this extension.
 ```
 2. Configure the extension in your base application by updating the configured "extensions" in your configuration. The config file can exist in their the `package.json`
 file under the `mobify` key or in the `config/` folder depending on how your base application is setup.
