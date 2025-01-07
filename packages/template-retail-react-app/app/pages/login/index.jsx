@@ -148,16 +148,21 @@ const Login = ({initialView = LOGIN_VIEW}) => {
     // executing a passwordless login attempt using the token. The process waits for the
     // customer baskets to be loaded to guarantee proper basket merging.
     useEffect(() => {
-        if (path === PASSWORDLESS_LOGIN_LANDING_PATH && isSuccessCustomerBaskets) {
+        if (path === PASSWORDLESS_LOGIN_LANDING_PATH) {
             const token = queryParams.get('token')
-            try {
-                loginPasswordless.mutate({pwdlessLoginToken: token})
-            } catch (e) {
-                const message = /Unauthorized/i.test(e.message)
-                    ? formatMessage(INVALID_TOKEN_ERROR_MESSAGE)
-                    : formatMessage(API_ERROR_MESSAGE)
-                form.setError('global', {type: 'manual', message})
+
+            const passwordlessLogin = async() => {
+                try {
+                    const res = await loginPasswordless.mutateAsync({pwdlessLoginToken: token})
+                } catch (e) {
+                    const errorData = await e.response?.json()
+                    const message = /invalid token/i.test(errorData.message)
+                        ? formatMessage(INVALID_TOKEN_ERROR_MESSAGE)
+                        : formatMessage(API_ERROR_MESSAGE)
+                    form.setError('global', {type: 'manual', message})
+                }
             }
+            passwordlessLogin()
         }
     }, [path, isSuccessCustomerBaskets])
 
