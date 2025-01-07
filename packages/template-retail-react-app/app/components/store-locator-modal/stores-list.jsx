@@ -20,12 +20,32 @@ import {
     RadioGroup
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 
+// Hooks
+import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
+
 const StoresList = ({storesInfo}) => {
     const intl = useIntl()
+    const {site} = useMultiSite()
     const [selectedStore, setSelectedStore] = useState('')
 
+    const handleChange = (storeId) => {
+        setSelectedStore(storeId)
+        const store = storesInfo.find((store) => store.id === storeId)
+        window.localStorage.setItem(
+            `store_${site.id}`,
+            JSON.stringify({
+                id: storeId,
+                name: store.name,
+                inventoryId: store.inventoryId || null,
+                postalCode: store.postalCode,
+                latitude: store.latitude,
+                longitude: store.longitude
+            })
+        )
+    }
+
     return (
-        <RadioGroup onChange={setSelectedStore} value={selectedStore}>
+        <RadioGroup onChange={handleChange} value={selectedStore}>
             {storesInfo?.map((store, index) => {
                 return (
                     <AccordionItem key={index}>
