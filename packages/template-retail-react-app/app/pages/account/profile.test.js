@@ -57,7 +57,7 @@ afterEach(() => {
 })
 
 test('Allows customer to edit phone number', async () => {
-    sdk.useCustomerType.mockReturnValue({isRegistered: true, uido: 'ecom'})
+    sdk.useCustomerType.mockReturnValue({isRegistered: true, isExternal: false})
 
     global.server.use(
         rest.get('*/customers/:customerId', (req, res, ctx) =>
@@ -95,7 +95,7 @@ test('Allows customer to edit phone number', async () => {
 })
 
 test('Non ECOM user cannot see the password card', async () => {
-    sdk.useCustomerType.mockReturnValue({isRegistered: true, uido: 'Google'})
+    sdk.useCustomerType.mockReturnValue({isRegistered: true, isExternal: true})
 
     global.server.use(
         rest.get('*/customers/:customerId', (req, res, ctx) =>
