@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React from 'react'
+import React, {useState} from 'react'
 import {useIntl} from 'react-intl'
 import PropTypes from 'prop-types'
 
@@ -15,78 +15,87 @@ import {
     AccordionButton,
     AccordionIcon,
     AccordionPanel,
-    Box
+    Box,
+    Radio,
+    RadioGroup
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 
 const StoresList = ({storesInfo}) => {
     const intl = useIntl()
+    const [selectedStore, setSelectedStore] = useState('')
 
-    return storesInfo?.map((store, index) => {
-        return (
-            <AccordionItem key={index}>
-                <Box margin="10px">
-                    {store.name ? <Box fontSize="lg">{store.name}</Box> : ''}
-                    <Box fontSize="md" color="gray.600">
-                        {store.address1}
-                    </Box>
-                    <Box fontSize="md" color="gray.600">
-                        {store.city}, {store.stateCode ? store.stateCode : ''} {store.postalCode}
-                    </Box>
-                    {store.distance !== undefined ? (
-                        <>
-                            <br />
+    return (
+        <RadioGroup onChange={setSelectedStore} value={selectedStore}>
+            {storesInfo?.map((store, index) => {
+                return (
+                    <AccordionItem key={index}>
+                        <Box margin="10px">
+                            <Radio value={store.id}></Radio>
+                            {store.name ? <Box fontSize="lg">{store.name}</Box> : ''}
                             <Box fontSize="md" color="gray.600">
-                                {store.distance} {store.distanceUnit}{' '}
-                                {intl.formatMessage({
-                                    id: 'store_locator.description.away',
-                                    defaultMessage: 'away'
-                                })}
+                                {store.address1}
                             </Box>
-                        </>
-                    ) : (
-                        ''
-                    )}
-                    {store.phone !== undefined ? (
-                        <>
-                            <br />
                             <Box fontSize="md" color="gray.600">
-                                {intl.formatMessage({
-                                    id: 'store_locator.description.phone',
-                                    defaultMessage: 'Phone:'
-                                })}{' '}
-                                {store.phone}
+                                {store.city}, {store.stateCode ? store.stateCode : ''}{' '}
+                                {store.postalCode}
                             </Box>
-                        </>
-                    ) : (
-                        ''
-                    )}
-                    {store?.storeHours ? (
-                        <>
-                            {' '}
-                            <AccordionButton color="blue.700" style={{marginTop: '10px'}}>
-                                <Box fontSize="lg">
-                                    {intl.formatMessage({
-                                        id: 'store_locator.action.viewMore',
-                                        defaultMessage: 'View More'
-                                    })}
-                                </Box>
-                                <AccordionIcon />
-                            </AccordionButton>
-                            <AccordionPanel mb={6} mt={4}>
-                                <div
-                                    dangerouslySetInnerHTML={{
-                                        __html: store?.storeHours
-                                    }}
-                                />
-                            </AccordionPanel>{' '}
-                        </>
-                    ) : (
-                        ''
-                    )}
-                </Box>
-            </AccordionItem>
-        )
-    })
+                            {store.distance !== undefined ? (
+                                <>
+                                    <br />
+                                    <Box fontSize="md" color="gray.600">
+                                        {store.distance} {store.distanceUnit}{' '}
+                                        {intl.formatMessage({
+                                            id: 'store_locator.description.away',
+                                            defaultMessage: 'away'
+                                        })}
+                                    </Box>
+                                </>
+                            ) : (
+                                ''
+                            )}
+                            {store.phone !== undefined ? (
+                                <>
+                                    <br />
+                                    <Box fontSize="md" color="gray.600">
+                                        {intl.formatMessage({
+                                            id: 'store_locator.description.phone',
+                                            defaultMessage: 'Phone:'
+                                        })}{' '}
+                                        {store.phone}
+                                    </Box>
+                                </>
+                            ) : (
+                                ''
+                            )}
+                            {store?.storeHours ? (
+                                <>
+                                    {' '}
+                                    <AccordionButton color="blue.700" style={{marginTop: '10px'}}>
+                                        <Box fontSize="lg">
+                                            {intl.formatMessage({
+                                                id: 'store_locator.action.viewMore',
+                                                defaultMessage: 'View More'
+                                            })}
+                                        </Box>
+                                        <AccordionIcon />
+                                    </AccordionButton>
+                                    <AccordionPanel mb={6} mt={4}>
+                                        <div
+                                            dangerouslySetInnerHTML={{
+                                                __html: store?.storeHours
+                                            }}
+                                        />
+                                    </AccordionPanel>{' '}
+                                </>
+                            ) : (
+                                ''
+                            )}
+                        </Box>
+                    </AccordionItem>
+                )
+            })}
+        </RadioGroup>
+    )
 }
 
 StoresList.propTypes = {
