@@ -42,7 +42,7 @@ const IDP_CONFIG = {
  * @param {array} idps - array of known IDPs to show buttons for
  * @returns
  */
-const SocialLogin = ({form, idps}) => {
+const SocialLogin = ({form, idps = []}) => {
     const {formatMessage} = useIntl()
     const authorizeIDP = useAuthHelper(AuthHelpers.AuthorizeIDP)
 
@@ -52,7 +52,8 @@ const SocialLogin = ({form, idps}) => {
     const redirectURI = buildRedirectURI(appOrigin, redirectPath)
 
     const isIdpValid = (name) => {
-        return name in IDP_CONFIG && IDP_CONFIG[name.toLowerCase()]
+        const idp = name.toLowerCase()
+        return idp in IDP_CONFIG && IDP_CONFIG[idp]
     }
 
     useEffect(() => {
