@@ -807,7 +807,8 @@ const processAppExtensions = (
             const appExtensionDestDir = p.join(appExtensionsDir, appExtensionName)
             sh.mkdir('-p', appExtensionDestDir)
 
-            sh.cp('-rf', p.join(appExtensionTmpPath, '*'), appExtensionDestDir)
+            sh.cp('-rf', p.join(appExtensionTmpPath, '.*'), appExtensionDestDir) // Copy hidden files
+            sh.cp('-rf', p.join(appExtensionTmpPath, '*'), appExtensionDestDir)  // Copy regular files
 
             // Clean up the temporary Application Extension directory
             sh.rm('-rf', appExtensionTmp)
