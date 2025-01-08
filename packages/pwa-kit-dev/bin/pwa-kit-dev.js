@@ -442,12 +442,33 @@ const main = async () => {
         .description('lint all source files')
         .argument('<path>', 'path or glob to lint')
         .option('--fix', 'Try and fix errors (default: false)')
-        .action(async (path, {fix}) => {
+        .action(async (pathArg, {fix}) => {
             const eslint = p.join(require.resolve('eslint'), '..', '..', '..', '.bin', 'eslint')
+
+            // Check if app/application-extensions directory exists
+            const extensionsDir = p.join(pkgRoot, 'app', 'application-extensions')
+            if (fse.existsSync(extensionsDir)) {
+                // Get all directories in app/application-extensions
+                const extensions = fse.readdirSync(extensionsDir).filter(dir => {
+                    return fse.statSync(p.join(extensionsDir, dir)).isDirectory()
+                })
+
+                // Lint each extension
+                for (const extension of extensions) {
+                    const extensionPath = p.join(extensionsDir, extension)
+                    execSync(
+                        `"${eslint}" --resolve-plugins-relative-to "${pkgRoot}"${
+                            fix ? ' --fix' : ''
+                        } "${extensionPath}"`
+                    )
+                }
+            }
+
+            // Run eslint on the provided path
             execSync(
                 `"${eslint}" --resolve-plugins-relative-to "${pkgRoot}"${
                     fix ? ' --fix' : ''
-                } "${path}"`
+                } "${pathArg}"`
             )
         })
 
