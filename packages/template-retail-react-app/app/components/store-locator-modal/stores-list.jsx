@@ -40,7 +40,7 @@ const StoresList = ({storesInfo}) => {
             JSON.stringify({
                 id: storeId,
                 name: store.name || null,
-                inventoryId: store.inventoryId || null,
+                inventoryId: store.inventoryId || null
             })
         )
     }
@@ -51,7 +51,11 @@ const StoresList = ({storesInfo}) => {
                 return (
                     <AccordionItem key={index}>
                         <HStack align="flex-start" marginTop="16px">
-                            <Radio value={store.id} marginTop="1.5px"  aria-describedby={`store-info-${store.id}`}></Radio>
+                            <Radio
+                                value={store.id}
+                                marginTop="1.5px"
+                                aria-describedby={`store-info-${store.id}`}
+                            ></Radio>
                             <Box id={`store-info-${store.id}`}>
                                 {store.name ? <Box fontSize="lg">{store.name}</Box> : ''}
                                 <Box fontSize="md" color="gray.600">
