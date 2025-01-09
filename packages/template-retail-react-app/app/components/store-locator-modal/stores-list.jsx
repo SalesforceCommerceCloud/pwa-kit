@@ -27,20 +27,20 @@ import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
 const StoresList = ({storesInfo}) => {
     const intl = useIntl()
     const {site} = useMultiSite()
-    const [selectedStore, setSelectedStore] = useState('')
+    const storeInfoKey = `store_${site.id}`
+    const [selectedStore, setSelectedStore] = useState(
+        JSON.parse(window.localStorage.getItem(storeInfoKey))?.id || ''
+    )
 
     const handleChange = (storeId) => {
         setSelectedStore(storeId)
         const store = storesInfo.find((store) => store.id === storeId)
         window.localStorage.setItem(
-            `store_${site.id}`,
+            storeInfoKey,
             JSON.stringify({
                 id: storeId,
-                name: store.name,
+                name: store.name || null,
                 inventoryId: store.inventoryId || null,
-                postalCode: store.postalCode,
-                latitude: store.latitude,
-                longitude: store.longitude
             })
         )
     }
