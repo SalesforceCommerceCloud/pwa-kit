@@ -446,21 +446,43 @@ const main = async () => {
             const eslint = p.join(require.resolve('eslint'), '..', '..', '..', '.bin', 'eslint')
 
             // Check if app/application-extensions directory exists
-            const extensionsDir = p.join(pkgRoot, 'app', 'application-extensions')
+            const extensionsDir = p.join(pkgRoot, '..', '..', '..', 'app', 'application-extensions')
+
             if (fse.existsSync(extensionsDir)) {
                 // Get all directories in app/application-extensions
                 const extensions = fse.readdirSync(extensionsDir).filter(dir => {
-                    return fse.statSync(p.join(extensionsDir, dir)).isDirectory()
+                    const dirPath = p.join(extensionsDir, dir)
+                    return fse.statSync(dirPath).isDirectory()
                 })
 
                 // Lint each extension
                 for (const extension of extensions) {
                     const extensionPath = p.join(extensionsDir, extension)
-                    execSync(
-                        `"${eslint}" --resolve-plugins-relative-to "${pkgRoot}"${
-                            fix ? ' --fix' : ''
-                        } "${extensionPath}"`
-                    )
+                    let lintPath = extensionPath
+
+                    // If the extension is namespaced, look for the next directory
+                    if (extension.startsWith('@')) {
+                        const subDirs = fse.readdirSync(extensionPath).filter(subDir => {
+                            return fse.statSync(p.join(extensionPath, subDir)).isDirectory()
+                        })
+
+                        // Lint each subdirectory for namespaced extensions
+                        for (const subDir of subDirs) {
+                            const subDirPath = p.join(extensionPath, subDir)
+                            execSync(
+                                `cd ${subDirPath} && "${eslint}" --resolve-plugins-relative-to "${pkgRoot}"${
+                                    fix ? ' --fix' : ''
+                                } .`
+                            )
+                        }
+                    } else {
+                        // For non-namespaced extensions
+                        execSync(
+                            `cd ${lintPath} && "${eslint}" --resolve-plugins-relative-to "${pkgRoot}"${
+                                fix ? ' --fix' : ''
+                            } .`
+                        )
+                    }
                 }
             }
 
