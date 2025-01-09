@@ -456,7 +456,7 @@ const main = async () => {
                 })
 
                 // Lint each extension
-                for (const extension of extensions) {
+                extensions.map(extension => {
                     const extensionPath = p.join(extensionsDir, extension)
                     let lintPath = extensionPath
 
@@ -467,14 +467,14 @@ const main = async () => {
                         })
 
                         // Lint each subdirectory for namespaced extensions
-                        for (const subDir of subDirs) {
+                        subDirs.forEach(subDir => {
                             const subDirPath = p.join(extensionPath, subDir)
                             execSync(
                                 `cd ${subDirPath} && "${eslint}" --resolve-plugins-relative-to "${pkgRoot}"${
                                     fix ? ' --fix' : ''
                                 } .`
                             )
-                        }
+                        })
                     } else {
                         // For non-namespaced extensions
                         execSync(
@@ -483,7 +483,7 @@ const main = async () => {
                             } .`
                         )
                     }
-                }
+                })
             }
 
             // Run eslint on the provided path
