@@ -115,23 +115,30 @@ const runCommandInExtensions = (command, pkgRoot) => {
                 // Lint each subdirectory for namespaced extensions
                 subDirs.forEach((subDir) => {
                     const subDirPath = p.join(extensionPath, subDir)
-                    try {
-                        console.log(
-                            `Debug: Running command in namespaced extension subdirectory: ${subDirPath}`
-                        )
-                        execSync(`cd ${subDirPath} && ${command}`)
-                        console.log(`Debug: Command executed: ${command}`)
-                    } catch (error) {
-                        console.error(`Error executing command in ${subDirPath}:`, error.message)
+                    if (!subDirPath.includes('node_modules')) {
+                        try {
+                            console.log(
+                                `Debug: Running command in namespaced extension subdirectory: ${subDirPath}`
+                            )
+                            execSync(`cd ${subDirPath} && ${command}`)
+                            console.log(`Debug: Command executed: ${command}`)
+                        } catch (error) {
+                            console.error(
+                                `Error executing command in ${subDirPath}:`,
+                                error.message
+                            )
+                        }
                     }
                 })
             } else {
                 // For non-namespaced extensions, run the command in the extension directory
-                try {
-                    execSync(`cd ${extensionPath} && ${command}`)
-                    console.log(`Debug: Command executed: ${command}`)
-                } catch (error) {
-                    console.error(`Error executing command in ${extensionPath}:`, error.message)
+                if (!extensionPath.includes('node_modules')) {
+                    try {
+                        execSync(`cd ${extensionPath} && ${command}`)
+                        console.log(`Debug: Command executed: ${command}`)
+                    } catch (error) {
+                        console.error(`Error executing command in ${extensionPath}:`, error.message)
+                    }
                 }
             }
         })
