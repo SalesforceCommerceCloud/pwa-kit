@@ -8,9 +8,10 @@
 import React from 'react'
 import StoresList from '@salesforce/retail-react-app/app/components/store-locator-modal/stores-list'
 import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
-import {waitFor, screen} from '@testing-library/react'
+import {waitFor, screen, fireEvent} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import {Accordion} from '@salesforce/retail-react-app/app/components/shared/ui'
+import mockConfig from '@salesforce/retail-react-app/config/mocks/default'
 
 const mockSearchStoresData = [
     {
@@ -73,10 +74,9 @@ const mockSearchStoresData = [
         distance: 81.1,
         distanceUnit: 'km',
         id: '00021',
-        inventoryId: 'inventory_m_store_store13',
         latitude: 49.4077,
         longitude: 8.6908,
-        name: 'Heidelberg Tech Mart',
+        name: 'Store with no inventoryId',
         phone: '+49 6221 123456',
         posEnabled: false,
         postalCode: '69117',
@@ -104,18 +104,26 @@ describe('StoresList', () => {
             </Accordion>
         )
 
-        await waitFor(async () => {
-            const aStoreName = screen.getByText(/Wiesbaden Tech Depot/i)
-            const aStoreAddress = screen.getByText(/Kirchgasse 12/i)
-            const aStoreCityAndPostalCode = screen.getByText(/Wiesbaden, 65185/i)
-            const aStoreDistance = screen.getByText(/0.74 km away/i)
-            const aStorePhoneNumber = screen.getByText(/49 611 876543/i)
+        expect(screen.queryAllByRole('radio')).toHaveLength(mockSearchStoresData.length)
 
-            expect(aStoreName).toBeInTheDocument()
-            expect(aStoreAddress).toBeInTheDocument()
-            expect(aStoreCityAndPostalCode).toBeInTheDocument()
-            expect(aStoreDistance).toBeInTheDocument()
-            expect(aStorePhoneNumber).toBeInTheDocument()
+        await waitFor(async () => {
+            mockSearchStoresData.forEach((store) => {
+                const storeName = screen.getByText(store.name)
+                const storeAddress = screen.getByText(store.address1)
+                const storeCityAndPostalCode = screen.getByText(
+                    `${store.city}, ${store.postalCode}`
+                )
+                const storeDistance = screen.getByText(
+                    `${store.distance} ${store.distanceUnit} away`
+                )
+                const storePhoneNumber = screen.getByText(`Phone: ${store.phone}`)
+
+                expect(storeName).toBeInTheDocument()
+                expect(storeAddress).toBeInTheDocument()
+                expect(storeCityAndPostalCode).toBeInTheDocument()
+                expect(storeDistance).toBeInTheDocument()
+                expect(storePhoneNumber).toBeInTheDocument()
+            })
         })
     })
 
@@ -167,6 +175,25 @@ describe('StoresList', () => {
             // Check that the numbers are in the correct visual order
             const positions = numbers.map((number) => number.getBoundingClientRect().top)
             expect(positions).toEqual([...positions].sort((a, b) => a - b))
+        })
+    })
+
+    test('Can select store', async () => {
+        renderWithProviders(
+            <Accordion>
+                <StoresList storesInfo={mockSearchStoresData} />
+            </Accordion>
+        )
+
+        await waitFor(async () => {
+            const {id, name, inventoryId} = mockSearchStoresData[1]
+            const radioButton = screen.getByDisplayValue(id)
+            fireEvent.click(radioButton)
+
+            const expectedStoreInfo = {id, name, inventoryId}
+            expect(localStorage.getItem(`store_${mockConfig.app.defaultSite}`)).toEqual(
+                JSON.stringify(expectedStoreInfo)
+            )
         })
     })
 })
