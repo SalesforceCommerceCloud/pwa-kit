@@ -450,24 +450,24 @@ const main = async () => {
 
             if (fse.existsSync(extensionsDir)) {
                 // Get all directories in app/application-extensions
-                const extensions = fse.readdirSync(extensionsDir).filter(dir => {
+                const extensions = fse.readdirSync(extensionsDir).filter((dir) => {
                     const dirPath = p.join(extensionsDir, dir)
                     return fse.statSync(dirPath).isDirectory()
                 })
 
                 // Lint each extension
-                extensions.map(extension => {
+                extensions.map((extension) => {
                     const extensionPath = p.join(extensionsDir, extension)
                     let lintPath = extensionPath
 
                     // If the extension is namespaced, look for the next directory
                     if (extension.startsWith('@')) {
-                        const subDirs = fse.readdirSync(extensionPath).filter(subDir => {
+                        const subDirs = fse.readdirSync(extensionPath).filter((subDir) => {
                             return fse.statSync(p.join(extensionPath, subDir)).isDirectory()
                         })
 
                         // Lint each subdirectory for namespaced extensions
-                        subDirs.forEach(subDir => {
+                        subDirs.forEach((subDir) => {
                             const subDirPath = p.join(extensionPath, subDir)
                             execSync(
                                 `cd ${subDirPath} && "${eslint}" --resolve-plugins-relative-to "${pkgRoot}"${
