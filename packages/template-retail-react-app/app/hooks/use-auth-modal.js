@@ -31,7 +31,7 @@ import ResetPasswordForm from '@salesforce/retail-react-app/app/components/reset
 import RegisterForm from '@salesforce/retail-react-app/app/components/register'
 import PasswordlessEmailConfirmation from '@salesforce/retail-react-app/app/components/email-confirmation/index'
 import {noop} from '@salesforce/retail-react-app/app/utils/utils'
-import {API_ERROR_MESSAGE, LOGIN_TYPES} from '@salesforce/retail-react-app/app/constants'
+import {API_ERROR_MESSAGE, FEATURE_UNAVAILABLE_ERROR_MESSAGE, LOGIN_TYPES, PASSWORDLESS_ERROR_MESSAGES} from '@salesforce/retail-react-app/app/constants'
 import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
 import {usePrevious} from '@salesforce/retail-react-app/app/hooks/use-previous'
 import {usePasswordReset} from '@salesforce/retail-react-app/app/hooks/use-password-reset'
@@ -98,13 +98,17 @@ export const AuthModal = ({
 
         const handlePasswordlessLogin = async (email) => {
             try {
-                await authorizePasswordlessLogin.mutateAsync({userid: email})
+                const res = await authorizePasswordlessLogin.mutateAsync({userid: email})
+                if (res.status !== 200) {
+                    const errorData = await res.json()
+                    throw new Error(`${res.status} ${errorData.message}`)
+                }
                 setCurrentView(EMAIL_VIEW)
             } catch (error) {
-                form.setError('global', {
-                    type: 'manual',
-                    message: formatMessage(API_ERROR_MESSAGE)
-                })
+                const message = PASSWORDLESS_ERROR_MESSAGES.some(msg => msg.test(error.message))
+                    ? formatMessage(FEATURE_UNAVAILABLE_ERROR_MESSAGE)
+                    : formatMessage(API_ERROR_MESSAGE)
+                form.setError('global', { type: 'manual', message })
             }
         }
 
@@ -170,10 +174,10 @@ export const AuthModal = ({
                 try {
                     await getPasswordResetToken(data.email)
                 } catch (e) {
-                    form.setError('global', {
-                        type: 'manual',
-                        message: formatMessage(API_ERROR_MESSAGE)
-                    })
+                    const message = e.response?.status === 400
+                        ? formatMessage(FEATURE_UNAVAILABLE_ERROR_MESSAGE)
+                        : formatMessage(API_ERROR_MESSAGE)
+                    form.setError('global', { type: 'manual', message });
                 }
             },
             email: async () => {

@@ -46,7 +46,8 @@ const ResetPasswordLanding = () => {
             await resetPassword({email, token, newPassword: values.password})
             navigate('/login')
         } catch (error) {
-            const message = /Unauthorized/i.test(error.message)
+            const errorData = await error.response?.json()
+            const message = /invalid token/i.test(errorData.message)
                 ? formatMessage(INVALID_TOKEN_ERROR_MESSAGE)
                 : formatMessage(API_ERROR_MESSAGE)
             form.setError('global', {type: 'manual', message})

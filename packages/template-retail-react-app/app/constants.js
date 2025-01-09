@@ -95,6 +95,10 @@ export const INVALID_TOKEN_ERROR_MESSAGE = defineMessage({
     defaultMessage: 'Invalid token, please try again.',
     id: 'global.error.invalid_token'
 })
+export const FEATURE_UNAVAILABLE_ERROR_MESSAGE = defineMessage({
+    defaultMessage: 'This feature is not currently available.',
+    id: 'global.error.feature_unavailable'
+})
 
 export const HOME_HREF = '/'
 
@@ -248,3 +252,10 @@ export const RESET_PASSWORD_LANDING_PATH = '/reset-password-landing'
 
 // Constants for Passwordless Login
 export const PASSWORDLESS_LOGIN_LANDING_PATH = '/passwordless-login-landing'
+
+export const PASSWORDLESS_ERROR_MESSAGES = [
+    /callback_uri doesn't match/i,
+    /error getting user info/i,
+    /passwordless permissions error/i,
+    /client secret is not provided/i,
+]

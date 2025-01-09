@@ -28,8 +28,10 @@ import PasswordlessEmailConfirmation from '@salesforce/retail-react-app/app/comp
 import {
     API_ERROR_MESSAGE,
     INVALID_TOKEN_ERROR_MESSAGE,
+    FEATURE_UNAVAILABLE_ERROR_MESSAGE,
     LOGIN_TYPES,
-    PASSWORDLESS_LOGIN_LANDING_PATH
+    PASSWORDLESS_LOGIN_LANDING_PATH,
+    PASSWORDLESS_ERROR_MESSAGES
 } from '@salesforce/retail-react-app/app/constants'
 import {usePrevious} from '@salesforce/retail-react-app/app/hooks/use-previous'
 import {isServer} from '@salesforce/retail-react-app/app/utils/utils'
@@ -104,12 +106,17 @@ const Login = ({initialView = LOGIN_VIEW}) => {
 
         const handlePasswordlessLogin = async (email) => {
             try {
-                await authorizePasswordlessLogin.mutateAsync({userid: email})
+                const res = await authorizePasswordlessLogin.mutateAsync({userid: email})
+                if (res.status !== 200) {
+                    const errorData = await res.json()
+                    throw new Error(`${res.status} ${errorData.message}`)
+                }
+                setCurrentView(EMAIL_VIEW)
             } catch (error) {
-                form.setError('global', {
-                    type: 'manual',
-                    message: formatMessage(API_ERROR_MESSAGE)
-                })
+                const message = PASSWORDLESS_ERROR_MESSAGES.some(msg => msg.test(error.message))
+                    ? formatMessage(FEATURE_UNAVAILABLE_ERROR_MESSAGE)
+                    : formatMessage(API_ERROR_MESSAGE)
+                form.setError('global', { type: 'manual', message })
             }
         }
 
@@ -141,16 +148,21 @@ const Login = ({initialView = LOGIN_VIEW}) => {
     // executing a passwordless login attempt using the token. The process waits for the
     // customer baskets to be loaded to guarantee proper basket merging.
     useEffect(() => {
-        if (path === PASSWORDLESS_LOGIN_LANDING_PATH && isSuccessCustomerBaskets) {
+        if (path === PASSWORDLESS_LOGIN_LANDING_PATH) {
             const token = queryParams.get('token')
-            try {
-                loginPasswordless.mutate({pwdlessLoginToken: token})
-            } catch (e) {
-                const message = /Unauthorized/i.test(e.message)
-                    ? formatMessage(INVALID_TOKEN_ERROR_MESSAGE)
-                    : formatMessage(API_ERROR_MESSAGE)
-                form.setError('global', {type: 'manual', message})
+
+            const passwordlessLogin = async() => {
+                try {
+                    await loginPasswordless.mutateAsync({pwdlessLoginToken: token})
+                } catch (e) {
+                    const errorData = await e.response?.json()
+                    const message = /invalid token/i.test(errorData.message)
+                        ? formatMessage(INVALID_TOKEN_ERROR_MESSAGE)
+                        : formatMessage(API_ERROR_MESSAGE)
+                    form.setError('global', {type: 'manual', message})
+                }
             }
+            passwordlessLogin()
         }
     }, [path, isSuccessCustomerBaskets])
 

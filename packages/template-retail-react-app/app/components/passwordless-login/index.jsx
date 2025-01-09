@@ -48,7 +48,10 @@ const PasswordlessLogin = ({
                     />
                     <Button
                         type="submit"
-                        onClick={handlePasswordlessLoginClick}
+                        onClick={() => {
+                            handlePasswordlessLoginClick()
+                            form.clearErrors('global')
+                        }}
                         isLoading={form.formState.isSubmitting}
                     >
                         <FormattedMessage
@@ -87,7 +90,7 @@ const PasswordlessLogin = ({
                         handleForgotPasswordClick={handleForgotPasswordClick}
                         hideEmail={true}
                     />
-                )}
+            )}
         </>
     )
 }
