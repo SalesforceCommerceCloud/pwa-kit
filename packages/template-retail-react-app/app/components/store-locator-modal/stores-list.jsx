@@ -16,6 +16,7 @@ import {
     AccordionIcon,
     AccordionPanel,
     Box,
+    HStack,
     Radio,
     RadioGroup
 } from '@salesforce/retail-react-app/app/components/shared/ui'
@@ -49,68 +50,73 @@ const StoresList = ({storesInfo}) => {
             {storesInfo?.map((store, index) => {
                 return (
                     <AccordionItem key={index}>
-                        <Box margin="10px">
-                            <Radio value={store.id}></Radio>
-                            {store.name ? <Box fontSize="lg">{store.name}</Box> : ''}
-                            <Box fontSize="md" color="gray.600">
-                                {store.address1}
-                            </Box>
-                            <Box fontSize="md" color="gray.600">
-                                {store.city}, {store.stateCode ? store.stateCode : ''}{' '}
-                                {store.postalCode}
-                            </Box>
-                            {store.distance !== undefined ? (
-                                <>
-                                    <br />
-                                    <Box fontSize="md" color="gray.600">
-                                        {store.distance} {store.distanceUnit}{' '}
-                                        {intl.formatMessage({
-                                            id: 'store_locator.description.away',
-                                            defaultMessage: 'away'
-                                        })}
-                                    </Box>
-                                </>
-                            ) : (
-                                ''
-                            )}
-                            {store.phone !== undefined ? (
-                                <>
-                                    <br />
-                                    <Box fontSize="md" color="gray.600">
-                                        {intl.formatMessage({
-                                            id: 'store_locator.description.phone',
-                                            defaultMessage: 'Phone:'
-                                        })}{' '}
-                                        {store.phone}
-                                    </Box>
-                                </>
-                            ) : (
-                                ''
-                            )}
-                            {store?.storeHours ? (
-                                <>
-                                    {' '}
-                                    <AccordionButton color="blue.700" style={{marginTop: '10px'}}>
-                                        <Box fontSize="lg">
+                        <HStack align="flex-start" marginTop="16px">
+                            <Radio marginTop="1.5px" value={store.id}></Radio>
+                            <Box>
+                                {store.name ? <Box fontSize="lg">{store.name}</Box> : ''}
+                                <Box fontSize="md" color="gray.600">
+                                    {store.address1}
+                                </Box>
+                                <Box fontSize="md" color="gray.600">
+                                    {store.city}, {store.stateCode ? store.stateCode : ''}{' '}
+                                    {store.postalCode}
+                                </Box>
+                                {store.distance !== undefined ? (
+                                    <>
+                                        <br />
+                                        <Box fontSize="md" color="gray.600">
+                                            {store.distance} {store.distanceUnit}{' '}
                                             {intl.formatMessage({
-                                                id: 'store_locator.action.viewMore',
-                                                defaultMessage: 'View More'
+                                                id: 'store_locator.description.away',
+                                                defaultMessage: 'away'
                                             })}
                                         </Box>
-                                        <AccordionIcon />
-                                    </AccordionButton>
-                                    <AccordionPanel mb={6} mt={4}>
-                                        <div
-                                            dangerouslySetInnerHTML={{
-                                                __html: store?.storeHours
-                                            }}
-                                        />
-                                    </AccordionPanel>{' '}
-                                </>
-                            ) : (
-                                ''
-                            )}
-                        </Box>
+                                    </>
+                                ) : (
+                                    ''
+                                )}
+                                {store.phone !== undefined ? (
+                                    <>
+                                        <br />
+                                        <Box fontSize="md" color="gray.600">
+                                            {intl.formatMessage({
+                                                id: 'store_locator.description.phone',
+                                                defaultMessage: 'Phone:'
+                                            })}{' '}
+                                            {store.phone}
+                                        </Box>
+                                    </>
+                                ) : (
+                                    ''
+                                )}
+                                {store?.storeHours ? (
+                                    <>
+                                        {' '}
+                                        <AccordionButton
+                                            color="blue.700"
+                                            style={{marginTop: '10px'}}
+                                        >
+                                            <Box fontSize="lg">
+                                                {intl.formatMessage({
+                                                    id: 'store_locator.action.viewMore',
+                                                    defaultMessage: 'View More'
+                                                })}
+                                            </Box>
+                                            <AccordionIcon />
+                                        </AccordionButton>
+                                        <AccordionPanel mb={6} mt={4}>
+                                            <div
+                                                dangerouslySetInnerHTML={{
+                                                    __html: store?.storeHours
+                                                }}
+                                            />
+                                        </AccordionPanel>{' '}
+                                    </>
+                                ) : (
+                                    ''
+                                )}
+                            </Box>
+                        </HStack>
                     </AccordionItem>
                 )
             })}
