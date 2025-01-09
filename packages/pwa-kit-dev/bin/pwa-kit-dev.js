@@ -86,6 +86,37 @@ const validateAppConfiguration = () => {
     }
 }
 
+const runCommandInExtensions = (command, pkgRoot) => {
+    const extensionsDir = p.join(pkgRoot, '..', '..', '..', 'app', 'application-extensions')
+
+    if (fse.existsSync(extensionsDir)) {
+        const extensions = fse.readdirSync(extensionsDir).filter((dir) => {
+            const dirPath = p.join(extensionsDir, dir)
+            return fse.statSync(dirPath).isDirectory()
+        })
+
+        extensions.forEach((extension) => {
+            const extensionPath = p.join(extensionsDir, extension)
+
+            // If the extension is namespaced, look for the next directory
+            if (extension.startsWith('@')) {
+                const subDirs = fse.readdirSync(extensionPath).filter((subDir) => {
+                    return fse.statSync(p.join(extensionPath, subDir)).isDirectory()
+                })
+
+                // Lint each subdirectory for namespaced extensions
+                subDirs.forEach((subDir) => {
+                    const subDirPath = p.join(extensionPath, subDir)
+                    execSync(`cd ${subDirPath} && ${command}`)
+                })
+            } else {
+                // For non-namespaced extensions
+                execSync(`cd ${extensionPath} && ${command}`)
+            }
+        })
+    }
+}
+
 const main = async () => {
     const pkgRoot = p.join(__dirname, '..')
     process.env.CONTEXT = process.cwd()
@@ -444,54 +475,15 @@ const main = async () => {
         .option('--fix', 'Try and fix errors (default: false)')
         .action(async (pathArg, {fix}) => {
             const eslint = p.join(require.resolve('eslint'), '..', '..', '..', '.bin', 'eslint')
+            const command = `"${eslint}" --resolve-plugins-relative-to "${pkgRoot}"${
+                fix ? ' --fix' : ''
+            } .`
 
-            // Check if app/application-extensions directory exists
-            const extensionsDir = p.join(pkgRoot, '..', '..', '..', 'app', 'application-extensions')
+            // Run the command in application extensions
+            runCommandInExtensions(command, pkgRoot)
 
-            if (fse.existsSync(extensionsDir)) {
-                // Get all directories in app/application-extensions
-                const extensions = fse.readdirSync(extensionsDir).filter((dir) => {
-                    const dirPath = p.join(extensionsDir, dir)
-                    return fse.statSync(dirPath).isDirectory()
-                })
-
-                // Lint each extension
-                extensions.map((extension) => {
-                    const extensionPath = p.join(extensionsDir, extension)
-                    let lintPath = extensionPath
-
-                    // If the extension is namespaced, look for the next directory
-                    if (extension.startsWith('@')) {
-                        const subDirs = fse.readdirSync(extensionPath).filter((subDir) => {
-                            return fse.statSync(p.join(extensionPath, subDir)).isDirectory()
-                        })
-
-                        // Lint each subdirectory for namespaced extensions
-                        subDirs.forEach((subDir) => {
-                            const subDirPath = p.join(extensionPath, subDir)
-                            execSync(
-                                `cd ${subDirPath} && "${eslint}" --resolve-plugins-relative-to "${pkgRoot}"${
-                                    fix ? ' --fix' : ''
-                                } .`
-                            )
-                        })
-                    } else {
-                        // For non-namespaced extensions
-                        execSync(
-                            `cd ${lintPath} && "${eslint}" --resolve-plugins-relative-to "${pkgRoot}"${
-                                fix ? ' --fix' : ''
-                            } .`
-                        )
-                    }
-                })
-            }
-
-            // Run eslint on the provided path
-            execSync(
-                `"${eslint}" --resolve-plugins-relative-to "${pkgRoot}"${
-                    fix ? ' --fix' : ''
-                } "${pathArg}"`
-            )
+            // Run the command on the provided path
+            execSync(`${command} "${pathArg}"`)
         })
 
     program
@@ -592,6 +584,21 @@ const main = async () => {
                     )
                 })
             })
+        })
+
+    program
+        .command('tsc')
+        .description('compile TypeScript files in all files')
+        .argument('<path>', 'path or glob to compile')
+        .action(async (pathArg) => {
+            const tsc = p.join(require.resolve('typescript'), '..', '..', '..', '.bin', 'tsc')
+            const command = `"${tsc}"`
+
+            // Run the command in application extensions
+            runCommandInExtensions(command, pkgRoot)
+
+            // Run the command on the provided path
+            execSync(`${command} "${pathArg}"`)
         })
 
     // Global options
