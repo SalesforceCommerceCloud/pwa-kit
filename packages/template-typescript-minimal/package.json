@@ -15,7 +15,7 @@
     "start:inspect": "npm run start -- --inspect",
     "tail-logs": "pwa-kit-dev tail-logs",
     "test": "pwa-kit-dev test",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "pwa-kit-dev tsc -- --noEmit"
   },
   "devDependencies": {
     "@chakra-ui/react": "^2.8.2",
