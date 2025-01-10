@@ -273,7 +273,7 @@ test('Can proceed through checkout steps as guest', async () => {
                         cardType: 'Visa',
                         creditCardExpired: false,
                         expirationMonth: 12,
-                        expirationYear: 2024,
+                        expirationYear: 2030,
                         holder: 'Testy McTester',
                         maskedNumber: '************1111',
                         numberLastDigits: '1111',
