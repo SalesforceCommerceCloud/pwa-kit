@@ -99,6 +99,10 @@ export const FEATURE_UNAVAILABLE_ERROR_MESSAGE = defineMessage({
     defaultMessage: 'This feature is not currently available.',
     id: 'global.error.feature_unavailable'
 })
+export const CREATE_ACCOUNT_FIRST_ERROR_MESSAGE = defineMessage({
+    defaultMessage: 'This feature is not currently available. You must create an account to access this feature.',
+    id: 'global.error.create_account'
+})
 
 export const HOME_HREF = '/'
 
