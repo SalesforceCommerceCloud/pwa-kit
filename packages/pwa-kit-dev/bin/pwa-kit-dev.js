@@ -88,7 +88,6 @@ const validateAppConfiguration = () => {
 
 const runCommandInExtensions = (command, pkgRoot) => {
     const extensionsDir = p.join(pkgRoot, '..', '..', '..', 'app', 'application-extensions')
-    console.log(`Debug: Checking for application extensions in ${extensionsDir}`)
 
     if (fse.existsSync(extensionsDir)) {
         const extensions = fse.readdirSync(extensionsDir).filter((dir) => {
@@ -96,11 +95,8 @@ const runCommandInExtensions = (command, pkgRoot) => {
             return fse.statSync(dirPath).isDirectory()
         })
 
-        console.log(`Debug: Found ${extensions.length} extension(s)`)
-
         extensions.forEach((extension) => {
             const extensionPath = p.join(extensionsDir, extension)
-            console.log(`Debug: Running command in extension: ${extensionPath}`)
 
             // If the extension is namespaced, look for the next directory
             if (extension.startsWith('@')) {
@@ -108,42 +104,24 @@ const runCommandInExtensions = (command, pkgRoot) => {
                     return fse.statSync(p.join(extensionPath, subDir)).isDirectory()
                 })
 
-                console.log(
-                    `Debug: Found ${subDirs.length} subdirectory(s) in namespaced extension: ${extension}`
-                )
-
                 // Lint each subdirectory for namespaced extensions
                 subDirs.forEach((subDir) => {
                     const subDirPath = p.join(extensionPath, subDir)
-                    if (!subDirPath.includes('node_modules')) {
-                        try {
-                            console.log(
-                                `Debug: Running command in namespaced extension subdirectory: ${subDirPath}`
-                            )
-                            execSync(`cd ${subDirPath} && ${command}`)
-                            console.log(`Debug: Command executed: ${command}`)
-                        } catch (error) {
-                            console.error(
-                                `Error executing command in ${subDirPath}:`,
-                                error.message
-                            )
-                        }
+                    try {
+                        execSync(`cd ${subDirPath} && ${command}`)
+                    } catch (error) {
+                        console.error(`Error executing command in ${subDirPath}:`, error.message) // Log the error
                     }
                 })
             } else {
                 // For non-namespaced extensions, run the command in the extension directory
-                if (!extensionPath.includes('node_modules')) {
-                    try {
-                        execSync(`cd ${extensionPath} && ${command}`)
-                        console.log(`Debug: Command executed: ${command}`)
-                    } catch (error) {
-                        console.error(`Error executing command in ${extensionPath}:`, error.message)
-                    }
+                try {
+                    execSync(`cd ${extensionPath} && ${command}`)
+                } catch (error) {
+                    console.error(`Error executing command in ${extensionPath}:`, error.message) // Log the error
                 }
             }
         })
-    } else {
-        console.log(`Debug: No application extensions directory found at ${extensionsDir}`)
     }
 }
 
