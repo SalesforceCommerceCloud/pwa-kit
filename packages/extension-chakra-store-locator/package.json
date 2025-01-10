@@ -60,6 +60,7 @@
     "@salesforce/pwa-kit-runtime": "4.0.0-extensibility-preview.3",
     "@testing-library/react": "^16.0.1",
     "@testing-library/user-event": "^14.5.2",
+    "@types/express": "^5.0.0",
     "@types/react": "~18.2.0",
     "@types/react-dom": "~18.2.1",
     "@types/react-router-dom": "^5.3.3",
