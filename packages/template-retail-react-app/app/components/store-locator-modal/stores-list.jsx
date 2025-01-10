@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, {useState} from 'react'
+import React, {useEffect, useState} from 'react'
 import {useIntl} from 'react-intl'
 import PropTypes from 'prop-types'
 
@@ -28,9 +28,11 @@ const StoresList = ({storesInfo}) => {
     const intl = useIntl()
     const {site} = useMultiSite()
     const storeInfoKey = `store_${site.id}`
-    const [selectedStore, setSelectedStore] = useState(
-        JSON.parse(window.localStorage.getItem(storeInfoKey))?.id || ''
-    )
+    const [selectedStore, setSelectedStore] = useState('')
+
+    useEffect(() => {
+        setSelectedStore(JSON.parse(window.localStorage.getItem(storeInfoKey))?.id || '')
+    }, [storeInfoKey])
 
     const handleChange = (storeId) => {
         setSelectedStore(storeId)
