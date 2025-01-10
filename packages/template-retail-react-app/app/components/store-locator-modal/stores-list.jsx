@@ -50,10 +50,10 @@ const StoresList = ({storesInfo}) => {
             {storesInfo?.map((store, index) => {
                 return (
                     <AccordionItem key={index}>
-                        <HStack align="flex-start" marginTop="16px">
+                        <HStack align="flex-start" margin="10px">
                             <Radio
                                 value={store.id}
-                                marginTop="1.5px"
+                                mt="1.5px"
                                 aria-describedby={`store-info-${store.id}`}
                             ></Radio>
                             <Box id={`store-info-${store.id}`}>
