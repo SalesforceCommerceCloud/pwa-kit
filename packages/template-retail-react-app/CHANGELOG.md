@@ -1,7 +1,8 @@
 ## v5.1.0-dev (TBD)
 
+- Fixed failing checkout tests [#2195](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2195)
 - [BUG] Fixed "getCheckboxProps is not a function" when rendering checkout page in generated app.[#2140](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2140)
-- Replace transfer basket call with merge basket on checkout [#2138])(https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2138)
+- Replace transfer basket call with merge basket on checkout [#2138](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2138)
 
 ### Accessibility Improvements
 - [a11y] Fix LinkList component to follow a11y practise [#2098])(https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2098)
