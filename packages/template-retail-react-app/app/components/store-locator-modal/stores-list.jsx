@@ -50,7 +50,7 @@ const StoresList = ({storesInfo}) => {
             {storesInfo?.map((store, index) => {
                 return (
                     <AccordionItem key={index}>
-                        <HStack align="flex-start" margin="10px">
+                        <HStack align="flex-start" mt="16px" mb="16px">
                             <Radio
                                 value={store.id}
                                 mt="1.5px"
@@ -98,7 +98,7 @@ const StoresList = ({storesInfo}) => {
                                         {' '}
                                         <AccordionButton
                                             color="blue.700"
-                                            style={{marginTop: '10px'}}
+                                            style={{marginTop: '10px', paddingBottom: '0px'}}
                                         >
                                             <Box fontSize="lg">
                                                 {intl.formatMessage({
