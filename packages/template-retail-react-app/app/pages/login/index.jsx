@@ -113,9 +113,11 @@ const Login = ({initialView = LOGIN_VIEW}) => {
                 }
                 setCurrentView(EMAIL_VIEW)
             } catch (error) {
-                const message = PASSWORDLESS_ERROR_MESSAGES.some(msg => msg.test(error.message))
-                    ? formatMessage(FEATURE_UNAVAILABLE_ERROR_MESSAGE)
-                    : formatMessage(API_ERROR_MESSAGE)
+                const message = /error getting user info/i.test(error.message)
+                    ? formatMessage(`${FEATURE_UNAVAILABLE_ERROR_MESSAGE} You must create an account to access this feature.`)
+                    : PASSWORDLESS_ERROR_MESSAGES.some(msg => msg.test(error.message))
+                        ? formatMessage(FEATURE_UNAVAILABLE_ERROR_MESSAGE)
+                        : formatMessage(API_ERROR_MESSAGE)
                 form.setError('global', { type: 'manual', message })
             }
         }
@@ -133,7 +135,6 @@ const Login = ({initialView = LOGIN_VIEW}) => {
                     }
                     handleMergeBasket()
                 } else if (loginType === LOGIN_TYPES.PASSWORDLESS) {
-                    setCurrentView(EMAIL_VIEW)
                     setPasswordlessLoginEmail(data.email)
                     await handlePasswordlessLogin(data.email)
                 }

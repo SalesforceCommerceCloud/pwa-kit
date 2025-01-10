@@ -255,7 +255,6 @@ export const PASSWORDLESS_LOGIN_LANDING_PATH = '/passwordless-login-landing'
 
 export const PASSWORDLESS_ERROR_MESSAGES = [
     /callback_uri doesn't match/i,
-    /error getting user info/i,
     /passwordless permissions error/i,
     /client secret is not provided/i,
 ]
