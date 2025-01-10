@@ -86,6 +86,11 @@ const validateAppConfiguration = () => {
     }
 }
 
+/**
+ * Executes a command in the application-extension directory.
+ * @param {string} command - The command to execute.
+ * @param {string} pkgRoot - The root directory of the package.
+ */
 const runCommandInExtensions = (command, pkgRoot) => {
     const extensionsDir = p.join(pkgRoot, '..', '..', '..', 'app', 'application-extensions')
 
@@ -104,21 +109,21 @@ const runCommandInExtensions = (command, pkgRoot) => {
                     return fse.statSync(p.join(extensionPath, subDir)).isDirectory()
                 })
 
-                // Lint each subdirectory for namespaced extensions
+                // Execute the provided command in each subdirectory for namespaced extensions
                 subDirs.forEach((subDir) => {
                     const subDirPath = p.join(extensionPath, subDir)
                     try {
                         execSync(`cd ${subDirPath} && ${command}`)
                     } catch (error) {
-                        console.error(`Error executing command in ${subDirPath}:`, error.message) // Log the error
+                        console.error(`Error executing command in ${subDirPath}:`, error.message)
                     }
                 })
             } else {
-                // For non-namespaced extensions, run the command in the extension directory
+                // For non-namespaced extensions, execute the provided command in the extension directory
                 try {
                     execSync(`cd ${extensionPath} && ${command}`)
                 } catch (error) {
-                    console.error(`Error executing command in ${extensionPath}:`, error.message) // Log the error
+                    console.error(`Error executing command in ${extensionPath}:`, error.message)
                 }
             }
         })
@@ -481,7 +486,7 @@ const main = async () => {
         .description('lint all source files')
         .argument('<path>', 'path or glob to lint')
         .option('--fix', 'Try and fix errors (default: false)')
-        .action(async (pathArg, {fix}) => {
+        .action(async (path, {fix}) => {
             const eslint = p.join(require.resolve('eslint'), '..', '..', '..', '.bin', 'eslint')
             const command = `"${eslint}" --resolve-plugins-relative-to "${pkgRoot}"${
                 fix ? ' --fix' : ''
@@ -491,7 +496,7 @@ const main = async () => {
             runCommandInExtensions(command, pkgRoot)
 
             // Run the command on the provided path
-            execSync(`${command} "${pathArg}"`)
+            execSync(`${command} "${path}"`)
         })
 
     program
@@ -599,17 +604,15 @@ const main = async () => {
         .description('compile TypeScript files in all files')
         .argument('<path>', 'path or glob to compile')
         .argument('[args...]', 'additional arguments for tsc')
-        .action(async (pathArg, args) => {
+        .action(async (path, args) => {
             const tsc = p.join(require.resolve('typescript'), '..', '..', '..', '.bin', 'tsc')
             const command = `"${tsc}" ${args.join(' ')}`
-
-            console.log(`Debug: Executing TypeScript command: ${command} "${pathArg}"`)
 
             // Run the command in application extensions
             runCommandInExtensions(command, pkgRoot)
 
             // Run the command on the provided path
-            execSync(`${command} "${pathArg}"`)
+            execSync(`${command} "${path}"`)
         })
 
     // Global options
