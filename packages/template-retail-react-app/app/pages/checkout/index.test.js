@@ -394,7 +394,7 @@ test('Can proceed through checkout steps as guest', async () => {
     // Fill out credit card payment form
     await user.type(screen.getByLabelText(/card number/i), '4111111111111111')
     await user.type(screen.getByLabelText(/name on card/i), 'Testy McTester')
-    await user.type(screen.getByLabelText(/expiration date/i), '1224')
+    await user.type(screen.getByLabelText(/expiration date/i), '1240')
     await user.type(screen.getByLabelText(/^security code$/i /* not "security code info" */), '123')
 
     // Same as shipping checkbox selected by default
@@ -485,7 +485,7 @@ test('Can proceed through checkout as registered customer', async () => {
     // (we no longer have saved payment methods)
     await user.type(screen.getByLabelText(/card number/i), '4111111111111111')
     await user.type(screen.getByLabelText(/name on card/i), 'Testy McTester')
-    await user.type(screen.getByLabelText(/expiration date/i), '1224')
+    await user.type(screen.getByLabelText(/expiration date/i), '1240')
     await user.type(screen.getByLabelText(/^security code$/i /* not "security code info" */), '123')
 
     // Same as shipping checkbox selected by default
