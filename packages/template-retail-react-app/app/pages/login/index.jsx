@@ -34,7 +34,6 @@ import {
     PASSWORDLESS_LOGIN_LANDING_PATH,
     PASSWORDLESS_ERROR_MESSAGES,
     CREATE_ACCOUNT_FIRST_ERROR_MESSAGE,
-    INVALID_TOKEN_ERROR
 } from '@salesforce/retail-react-app/app/constants'
 import {usePrevious} from '@salesforce/retail-react-app/app/hooks/use-previous'
 import {isServer} from '@salesforce/retail-react-app/app/utils/utils'
