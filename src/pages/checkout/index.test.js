@@ -414,7 +414,7 @@ test('Can proceed through checkout steps as guest', async () => {
     // Verify applied payment and billing address
     expect(step3Content.getByText('Visa')).toBeInTheDocument()
     expect(step3Content.getByText('•••• 1111')).toBeInTheDocument()
-    expect(step3Content.getByText('12/2024')).toBeInTheDocument()
+    expect(step3Content.getByText('12/2040')).toBeInTheDocument()
 
     expect(step3Content.getByText('Tester McTesting')).toBeInTheDocument()
     expect(step3Content.getByText('123 Main St')).toBeInTheDocument()
@@ -502,7 +502,7 @@ test('Can proceed through checkout as registered customer', async () => {
     // Verify applied payment and billing address
     expect(step3Content.getByText('Master Card')).toBeInTheDocument()
     expect(step3Content.getByText('•••• 5454')).toBeInTheDocument()
-    expect(step3Content.getByText('1/2030')).toBeInTheDocument()
+    expect(step3Content.getByText('1/2040')).toBeInTheDocument()
 
     expect(step3Content.getByText('123 Main St')).toBeInTheDocument()
 
