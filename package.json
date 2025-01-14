@@ -43,7 +43,7 @@
     "@chakra-ui/skip-nav": "^2.0.15",
     "@chakra-ui/system": "^2.5.6",
     "@peculiar/webcrypto": "^1.4.2",
-    "@salesforce/commerce-sdk-react": "3.1.1-preview.3",
+    "@salesforce/commerce-sdk-react": "3.2.0-preview.3",
     "@salesforce/pwa-kit-runtime": "4.0.0-extensibility-preview.3",
     "@tanstack/react-query": "^4.28.0",
     "@tanstack/react-query-devtools": "^4.29.1",
