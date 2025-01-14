@@ -262,3 +262,5 @@ export const PASSWORDLESS_ERROR_MESSAGES = [
     /passwordless permissions error/i,
     /client secret is not provided/i,
 ]
+
+export const INVALID_TOKEN_ERROR = /invalid token/i

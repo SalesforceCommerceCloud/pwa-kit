@@ -97,11 +97,7 @@ export const AuthModal = ({
 
         const handlePasswordlessLogin = async (email) => {
             try {
-                const res = await authorizePasswordlessLogin.mutateAsync({userid: email})
-                if (res.status !== 200) {
-                    const errorData = await res.json()
-                    throw new Error(`${res.status} ${errorData.message}`)
-                }
+                await authorizePasswordlessLogin.mutateAsync({userid: email})
                 setCurrentView(EMAIL_VIEW)
             } catch (error) {
                 const message = /error getting user info/i.test(error.message)

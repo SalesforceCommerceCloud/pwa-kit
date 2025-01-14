@@ -27,12 +27,14 @@ import LoginForm from '@salesforce/retail-react-app/app/components/login'
 import PasswordlessEmailConfirmation from '@salesforce/retail-react-app/app/components/email-confirmation/index'
 import {
     API_ERROR_MESSAGE,
+    INVALID_TOKEN_ERROR,
     INVALID_TOKEN_ERROR_MESSAGE,
     FEATURE_UNAVAILABLE_ERROR_MESSAGE,
     LOGIN_TYPES,
     PASSWORDLESS_LOGIN_LANDING_PATH,
     PASSWORDLESS_ERROR_MESSAGES,
-    CREATE_ACCOUNT_FIRST_ERROR_MESSAGE
+    CREATE_ACCOUNT_FIRST_ERROR_MESSAGE,
+    INVALID_TOKEN_ERROR
 } from '@salesforce/retail-react-app/app/constants'
 import {usePrevious} from '@salesforce/retail-react-app/app/hooks/use-previous'
 import {isServer} from '@salesforce/retail-react-app/app/utils/utils'
@@ -107,11 +109,7 @@ const Login = ({initialView = LOGIN_VIEW}) => {
 
         const handlePasswordlessLogin = async (email) => {
             try {
-                const res = await authorizePasswordlessLogin.mutateAsync({userid: email})
-                if (res.status !== 200) {
-                    const errorData = await res.json()
-                    throw new Error(`${res.status} ${errorData.message}`)
-                }
+                await authorizePasswordlessLogin.mutateAsync({userid: email})
                 setCurrentView(EMAIL_VIEW)
             } catch (error) {
                 const message = /error getting user info/i.test(error.message)
@@ -158,7 +156,7 @@ const Login = ({initialView = LOGIN_VIEW}) => {
                     await loginPasswordless.mutateAsync({pwdlessLoginToken: token})
                 } catch (e) {
                     const errorData = await e.response?.json()
-                    const message = /invalid token/i.test(errorData.message)
+                    const message = INVALID_TOKEN_ERROR.test(errorData.message)
                         ? formatMessage(INVALID_TOKEN_ERROR_MESSAGE)
                         : formatMessage(API_ERROR_MESSAGE)
                     form.setError('global', {type: 'manual', message})
