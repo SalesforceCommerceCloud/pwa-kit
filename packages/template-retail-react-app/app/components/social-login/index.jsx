@@ -18,7 +18,10 @@ import {setSessionJSONItem, buildRedirectURI} from '@salesforce/retail-react-app
 // Icons
 import {AppleIcon, GoogleIcon} from '@salesforce/retail-react-app/app/components/icons'
 
-import {API_ERROR_MESSAGE, FEATURE_UNAVAILABLE_ERROR_MESSAGE} from '@salesforce/retail-react-app/app/constants'
+import {
+    API_ERROR_MESSAGE,
+    FEATURE_UNAVAILABLE_ERROR_MESSAGE
+} from '@salesforce/retail-react-app/app/constants'
 
 const IDP_CONFIG = {
     apple: {

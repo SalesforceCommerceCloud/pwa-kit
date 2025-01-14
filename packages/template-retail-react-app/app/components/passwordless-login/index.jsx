@@ -90,7 +90,7 @@ const PasswordlessLogin = ({
                         handleForgotPasswordClick={handleForgotPasswordClick}
                         hideEmail={true}
                     />
-            )}
+                )}
         </>
     )
 }

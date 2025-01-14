@@ -33,7 +33,7 @@ import {
     LOGIN_TYPES,
     PASSWORDLESS_LOGIN_LANDING_PATH,
     PASSWORDLESS_ERROR_MESSAGES,
-    CREATE_ACCOUNT_FIRST_ERROR_MESSAGE,
+    CREATE_ACCOUNT_FIRST_ERROR_MESSAGE
 } from '@salesforce/retail-react-app/app/constants'
 import {usePrevious} from '@salesforce/retail-react-app/app/hooks/use-previous'
 import {isServer} from '@salesforce/retail-react-app/app/utils/utils'
@@ -113,10 +113,10 @@ const Login = ({initialView = LOGIN_VIEW}) => {
             } catch (error) {
                 const message = /error getting user info/i.test(error.message)
                     ? formatMessage(CREATE_ACCOUNT_FIRST_ERROR_MESSAGE)
-                    : PASSWORDLESS_ERROR_MESSAGES.some(msg => msg.test(error.message))
-                        ? formatMessage(FEATURE_UNAVAILABLE_ERROR_MESSAGE)
-                        : formatMessage(API_ERROR_MESSAGE)
-                form.setError('global', { type: 'manual', message })
+                    : PASSWORDLESS_ERROR_MESSAGES.some((msg) => msg.test(error.message))
+                    ? formatMessage(FEATURE_UNAVAILABLE_ERROR_MESSAGE)
+                    : formatMessage(API_ERROR_MESSAGE)
+                form.setError('global', {type: 'manual', message})
             }
         }
 
@@ -150,7 +150,7 @@ const Login = ({initialView = LOGIN_VIEW}) => {
         if (path === PASSWORDLESS_LOGIN_LANDING_PATH) {
             const token = queryParams.get('token')
 
-            const passwordlessLogin = async() => {
+            const passwordlessLogin = async () => {
                 try {
                     await loginPasswordless.mutateAsync({pwdlessLoginToken: token})
                 } catch (e) {

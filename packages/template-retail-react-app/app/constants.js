@@ -100,7 +100,8 @@ export const FEATURE_UNAVAILABLE_ERROR_MESSAGE = defineMessage({
     id: 'global.error.feature_unavailable'
 })
 export const CREATE_ACCOUNT_FIRST_ERROR_MESSAGE = defineMessage({
-    defaultMessage: 'This feature is not currently available. You must create an account to access this feature.',
+    defaultMessage:
+        'This feature is not currently available. You must create an account to access this feature.',
     id: 'global.error.create_account'
 })
 
@@ -260,7 +261,7 @@ export const PASSWORDLESS_LOGIN_LANDING_PATH = '/passwordless-login-landing'
 export const PASSWORDLESS_ERROR_MESSAGES = [
     /callback_uri doesn't match/i,
     /passwordless permissions error/i,
-    /client secret is not provided/i,
+    /client secret is not provided/i
 ]
 
 export const INVALID_TOKEN_ERROR = /invalid token/i
