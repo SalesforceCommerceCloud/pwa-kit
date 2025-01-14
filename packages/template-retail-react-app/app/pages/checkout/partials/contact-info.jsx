@@ -42,6 +42,12 @@ import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
 import {AuthHelpers, useAuthHelper, useShopperBasketsMutation} from '@salesforce/commerce-sdk-react'
+import {
+    API_ERROR_MESSAGE,
+    FEATURE_UNAVAILABLE_ERROR_MESSAGE,
+    CREATE_ACCOUNT_FIRST_ERROR_MESSAGE,
+    PASSWORDLESS_ERROR_MESSAGES
+} from '@salesforce/retail-react-app/app/constants'
 
 const ContactInfo = ({isSocialEnabled = false, isPasswordlessEnabled = false, idps = []}) => {
     const {formatMessage} = useIntl()
@@ -71,16 +77,33 @@ const ContactInfo = ({isSocialEnabled = false, isPasswordlessEnabled = false, id
     const authModal = useAuthModal(authModalView)
     const [isPasswordlessLoginClicked, setIsPasswordlessLoginClicked] = useState(false)
 
+    const handlePasswordlessLogin = async (email) => {
+        try {
+            const res = await authorizePasswordlessLogin.mutateAsync({userid: email})
+            if (res.status !== 200) {
+                const errorData = await res.json()
+                throw new Error(`${res.status} ${errorData.message}`)
+            }
+        } catch (error) {
+            const message = /error getting user info/i.test(error.message)
+                ? formatMessage(CREATE_ACCOUNT_FIRST_ERROR_MESSAGE)
+                : PASSWORDLESS_ERROR_MESSAGES.some((msg) => msg.test(error.message))
+                ? formatMessage(FEATURE_UNAVAILABLE_ERROR_MESSAGE)
+                : formatMessage(API_ERROR_MESSAGE)
+            setError(message)
+        }
+    }
+
     const submitForm = async (data) => {
         setError(null)
+        if (isPasswordlessLoginClicked) {
+            handlePasswordlessLogin(data.email)
+            setAuthModalView(EMAIL_VIEW)
+            authModal.onOpen()
+            setIsPasswordlessLoginClicked(false)
+            return
+        }
         try {
-            if (isPasswordlessLoginClicked) {
-                await authorizePasswordlessLogin.mutateAsync({userid: data.email})
-                setAuthModalView(EMAIL_VIEW)
-                authModal.onOpen()
-                setIsPasswordlessLoginClicked(false)
-                return
-            }
             if (!data.password) {
                 await updateCustomerForBasket.mutateAsync({
                     parameters: {basketId: basket.basketId},

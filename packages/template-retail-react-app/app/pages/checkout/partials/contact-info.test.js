@@ -194,6 +194,41 @@ describe('passwordless enabled', () => {
             mockAuthHelperFunctions[AuthHelpers.LoginRegisteredUserB2C].mutateAsync
         ).toHaveBeenCalledWith({username: validEmail, password: password})
     })
+
+    test.each([
+        [
+            'Error getting user info for xxx@xxx.com',
+            'This feature is not currently available. You must create an account to access this feature.'
+        ],
+        [
+            "callback_uri doesn't match the registered callbacks",
+            'This feature is not currently available.'
+        ],
+        [
+            'PasswordLess Permissions Error for clientId:aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa',
+            'This feature is not currently available.'
+        ],
+        ['client secret is not provided', 'This feature is not currently available.'],
+        ['unexpected error message', 'Something went wrong. Try again!']
+    ])(
+        'maps API error "%s" to the displayed error message"%s"',
+        async (apiErrorMessage, expectedMessage) => {
+            mockAuthHelperFunctions[
+                AuthHelpers.AuthorizePasswordless
+            ].mutateAsync.mockImplementation(() => {
+                throw new Error(apiErrorMessage)
+            })
+            const {user} = renderWithProviders(<ContactInfo isPasswordlessEnabled={true} />)
+            await user.type(screen.getByLabelText('Email'), validEmail)
+            const passwordlessLoginButton = screen.getByText('Secure Link')
+            // Click the button twice as the isPasswordlessLoginClicked state doesn't change after the first click
+            await user.click(passwordlessLoginButton)
+            await user.click(passwordlessLoginButton)
+            await waitFor(() => {
+                expect(screen.getByText(expectedMessage)).toBeInTheDocument()
+            })
+        }
+    )
 })
 
 describe('social login enabled', () => {
