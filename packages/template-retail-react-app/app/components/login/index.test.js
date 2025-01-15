@@ -32,7 +32,12 @@ describe('LoginForm', () => {
 
         test('renders form errors when "Continue Securely" button is clicked', async () => {
             const mockPasswordlessLoginClick = jest.fn()
-            const {user} = renderWithProviders(<WrapperComponent isPasswordlessEnabled={true} handlePasswordlessLoginClick={mockPasswordlessLoginClick}/>)
+            const {user} = renderWithProviders(
+                <WrapperComponent
+                    isPasswordlessEnabled={true}
+                    handlePasswordlessLoginClick={mockPasswordlessLoginClick}
+                />
+            )
 
             await user.click(screen.getByRole('button', {name: 'Continue Securely'}))
             expect(screen.getByText(/Please enter your email address./)).toBeInTheDocument()
@@ -40,7 +45,9 @@ describe('LoginForm', () => {
 
         test('renders form errors when "Password" button is clicked', async () => {
             const mockSetLoginType = jest.fn()
-            const {user} = renderWithProviders(<WrapperComponent isPasswordlessEnabled={true} setLoginType={mockSetLoginType}/>)
+            const {user} = renderWithProviders(
+                <WrapperComponent isPasswordlessEnabled={true} setLoginType={mockSetLoginType} />
+            )
 
             await user.click(screen.getByRole('button', {name: 'Password'}))
             expect(screen.getByText(/Please enter your email address./)).toBeInTheDocument()

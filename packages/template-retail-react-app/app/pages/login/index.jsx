@@ -27,6 +27,7 @@ import LoginForm from '@salesforce/retail-react-app/app/components/login'
 import PasswordlessEmailConfirmation from '@salesforce/retail-react-app/app/components/email-confirmation/index'
 import {
     API_ERROR_MESSAGE,
+    INVALID_TOKEN_ERROR,
     INVALID_TOKEN_ERROR_MESSAGE,
     FEATURE_UNAVAILABLE_ERROR_MESSAGE,
     LOGIN_TYPES,
@@ -107,19 +108,15 @@ const Login = ({initialView = LOGIN_VIEW}) => {
 
         const handlePasswordlessLogin = async (email) => {
             try {
-                const res = await authorizePasswordlessLogin.mutateAsync({userid: email})
-                if (res.status !== 200) {
-                    const errorData = await res.json()
-                    throw new Error(`${res.status} ${errorData.message}`)
-                }
+                await authorizePasswordlessLogin.mutateAsync({userid: email})
                 setCurrentView(EMAIL_VIEW)
             } catch (error) {
                 const message = /error getting user info/i.test(error.message)
                     ? formatMessage(CREATE_ACCOUNT_FIRST_ERROR_MESSAGE)
-                    : PASSWORDLESS_ERROR_MESSAGES.some(msg => msg.test(error.message))
-                        ? formatMessage(FEATURE_UNAVAILABLE_ERROR_MESSAGE)
-                        : formatMessage(API_ERROR_MESSAGE)
-                form.setError('global', { type: 'manual', message })
+                    : PASSWORDLESS_ERROR_MESSAGES.some((msg) => msg.test(error.message))
+                    ? formatMessage(FEATURE_UNAVAILABLE_ERROR_MESSAGE)
+                    : formatMessage(API_ERROR_MESSAGE)
+                form.setError('global', {type: 'manual', message})
             }
         }
 
@@ -153,12 +150,12 @@ const Login = ({initialView = LOGIN_VIEW}) => {
         if (path === PASSWORDLESS_LOGIN_LANDING_PATH) {
             const token = queryParams.get('token')
 
-            const passwordlessLogin = async() => {
+            const passwordlessLogin = async () => {
                 try {
                     await loginPasswordless.mutateAsync({pwdlessLoginToken: token})
                 } catch (e) {
                     const errorData = await e.response?.json()
-                    const message = /invalid token/i.test(errorData.message)
+                    const message = INVALID_TOKEN_ERROR.test(errorData.message)
                         ? formatMessage(INVALID_TOKEN_ERROR_MESSAGE)
                         : formatMessage(API_ERROR_MESSAGE)
                     form.setError('global', {type: 'manual', message})

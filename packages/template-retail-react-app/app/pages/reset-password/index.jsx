@@ -18,7 +18,11 @@ import useEinstein from '@salesforce/retail-react-app/app/hooks/use-einstein'
 import {useLocation} from 'react-router-dom'
 import {useRouteMatch} from 'react-router'
 import {usePasswordReset} from '@salesforce/retail-react-app/app/hooks/use-password-reset'
-import {RESET_PASSWORD_LANDING_PATH, API_ERROR_MESSAGE, FEATURE_UNAVAILABLE_ERROR_MESSAGE} from '@salesforce/retail-react-app/app/constants'
+import {
+    RESET_PASSWORD_LANDING_PATH,
+    API_ERROR_MESSAGE,
+    FEATURE_UNAVAILABLE_ERROR_MESSAGE
+} from '@salesforce/retail-react-app/app/constants'
 
 const ResetPassword = () => {
     const {formatMessage} = useIntl()
@@ -33,10 +37,11 @@ const ResetPassword = () => {
         try {
             await getPasswordResetToken(email)
         } catch (e) {
-            const message = e.response?.status === 400
-                ? formatMessage(FEATURE_UNAVAILABLE_ERROR_MESSAGE)
-                : formatMessage(API_ERROR_MESSAGE)
-            form.setError('global', { type: 'manual', message });
+            const message =
+                e.response?.status === 400
+                    ? formatMessage(FEATURE_UNAVAILABLE_ERROR_MESSAGE)
+                    : formatMessage(API_ERROR_MESSAGE)
+            form.setError('global', {type: 'manual', message})
         }
     }
 

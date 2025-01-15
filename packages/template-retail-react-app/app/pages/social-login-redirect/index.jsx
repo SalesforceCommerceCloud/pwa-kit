@@ -51,7 +51,7 @@ const SocialLoginRedirect = () => {
         if (!searchParams.code) {
             return
         }
-        const socialLogin = async() => {
+        const socialLogin = async () => {
             try {
                 await loginIDPUser.mutateAsync({
                     code: searchParams.code,

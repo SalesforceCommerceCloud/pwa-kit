@@ -42,7 +42,7 @@ const LoginForm = ({
                 data-testid="sf-auth-modal-form"
             >
                 {form.formState.errors?.global && (
-                    <Alert status="error" marginBottom={8} >
+                    <Alert status="error" marginBottom={8}>
                         <AlertIcon color="red.500" boxSize={4} />
                         <Text fontSize="sm" ml={3}>
                             {form.formState.errors.global.message}

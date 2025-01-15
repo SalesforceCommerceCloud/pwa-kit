@@ -1120,6 +1120,10 @@ class Auth {
                 mode
             }
         )
+        if (res.status !== 200) {
+            const errorData = await res.json()
+            throw new Error(`${res.status} ${errorData.message}`)
+        }
         return res
     }
 

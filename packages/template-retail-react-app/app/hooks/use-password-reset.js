@@ -19,8 +19,11 @@ export const usePasswordReset = () => {
     const {formatMessage} = useIntl()
     const appOrigin = useAppOrigin()
     const config = getConfig()
-    const resetPasswordCallback = config.app.login?.resetPassword?.callbackURI || '/reset-password-callback'
-    const callbackURI = isAbsoluteURL(resetPassworCallback) ? resetPassworCallback : `${appOrigin}${resetPasswordCallback}`
+    const resetPasswordCallback =
+        config.app.login?.resetPassword?.callbackURI || '/reset-password-callback'
+    const callbackURI = isAbsoluteURL(resetPasswordCallback)
+        ? resetPasswordCallback
+        : `${appOrigin}${resetPasswordCallback}`
 
     const getPasswordResetTokenMutation = useAuthHelper(AuthHelpers.GetPasswordResetToken)
     const resetPasswordMutation = useAuthHelper(AuthHelpers.ResetPassword)
