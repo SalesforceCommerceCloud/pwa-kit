@@ -59,7 +59,7 @@ const StoresList = ({storesInfo}) => {
                                 aria-describedby={`store-info-${store.id}`}
                             ></Radio>
                             <Box id={`store-info-${store.id}`}>
-                                {store.name ? <Box fontSize="lg">{store.name}</Box> : ''}
+                                {store.name && <Box fontSize="lg">{store.name}</Box>}
                                 <Box fontSize="md" color="gray.600">
                                     {store.address1}
                                 </Box>
@@ -67,7 +67,7 @@ const StoresList = ({storesInfo}) => {
                                     {store.city}, {store.stateCode ? store.stateCode : ''}{' '}
                                     {store.postalCode}
                                 </Box>
-                                {store.distance !== undefined ? (
+                                {store.distance !== undefined && (
                                     <>
                                         <br />
                                         <Box fontSize="md" color="gray.600">
@@ -78,10 +78,8 @@ const StoresList = ({storesInfo}) => {
                                             })}
                                         </Box>
                                     </>
-                                ) : (
-                                    ''
                                 )}
-                                {store.phone !== undefined ? (
+                                {store.phone && (
                                     <>
                                         <br />
                                         <Box fontSize="md" color="gray.600">
@@ -92,10 +90,8 @@ const StoresList = ({storesInfo}) => {
                                             {store.phone}
                                         </Box>
                                     </>
-                                ) : (
-                                    ''
                                 )}
-                                {store?.storeHours ? (
+                                {store.storeHours && (
                                     <>
                                         {' '}
                                         <AccordionButton
@@ -118,8 +114,6 @@ const StoresList = ({storesInfo}) => {
                                             />
                                         </AccordionPanel>{' '}
                                     </>
-                                ) : (
-                                    ''
                                 )}
                             </Box>
                         </HStack>
