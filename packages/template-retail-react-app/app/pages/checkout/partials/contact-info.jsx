@@ -79,11 +79,7 @@ const ContactInfo = ({isSocialEnabled = false, isPasswordlessEnabled = false, id
 
     const handlePasswordlessLogin = async (email) => {
         try {
-            const res = await authorizePasswordlessLogin.mutateAsync({userid: email})
-            if (res.status !== 200) {
-                const errorData = await res.json()
-                throw new Error(`${res.status} ${errorData.message}`)
-            }
+            await authorizePasswordlessLogin.mutateAsync({userid: email})
         } catch (error) {
             const message = /error getting user info/i.test(error.message)
                 ? formatMessage(CREATE_ACCOUNT_FIRST_ERROR_MESSAGE)
