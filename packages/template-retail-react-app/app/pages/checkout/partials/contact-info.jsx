@@ -80,6 +80,8 @@ const ContactInfo = ({isSocialEnabled = false, isPasswordlessEnabled = false, id
     const handlePasswordlessLogin = async (email) => {
         try {
             await authorizePasswordlessLogin.mutateAsync({userid: email})
+            setAuthModalView(EMAIL_VIEW)
+            authModal.onOpen()
         } catch (error) {
             const message = /error getting user info/i.test(error.message)
                 ? formatMessage(CREATE_ACCOUNT_FIRST_ERROR_MESSAGE)
@@ -94,8 +96,6 @@ const ContactInfo = ({isSocialEnabled = false, isPasswordlessEnabled = false, id
         setError(null)
         if (isPasswordlessLoginClicked) {
             handlePasswordlessLogin(data.email)
-            setAuthModalView(EMAIL_VIEW)
-            authModal.onOpen()
             setIsPasswordlessLoginClicked(false)
             return
         }
