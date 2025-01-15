@@ -94,40 +94,42 @@ const validateAppConfiguration = () => {
 const runCommandInExtensions = (command, pkgRoot) => {
     const extensionsDir = p.join(pkgRoot, '..', '..', '..', 'app', 'application-extensions')
 
-    if (fse.existsSync(extensionsDir)) {
-        const extensions = fse.readdirSync(extensionsDir).filter((dir) => {
-            const dirPath = p.join(extensionsDir, dir)
-            return fse.statSync(dirPath).isDirectory()
-        })
-
-        extensions.forEach((extension) => {
-            const extensionPath = p.join(extensionsDir, extension)
-
-            // If the extension is namespaced, look for the next directory
-            if (extension.startsWith('@')) {
-                const subDirs = fse.readdirSync(extensionPath).filter((subDir) => {
-                    return fse.statSync(p.join(extensionPath, subDir)).isDirectory()
-                })
-
-                // Execute the provided command in each subdirectory for namespaced extensions
-                subDirs.forEach((subDir) => {
-                    const subDirPath = p.join(extensionPath, subDir)
-                    try {
-                        execSync(`cd ${subDirPath} && ${command}`)
-                    } catch (error) {
-                        console.error(`Error executing command in ${subDirPath}:`, error.message)
-                    }
-                })
-            } else {
-                // For non-namespaced extensions, execute the provided command in the extension directory
-                try {
-                    execSync(`cd ${extensionPath} && ${command}`)
-                } catch (error) {
-                    console.error(`Error executing command in ${extensionPath}:`, error.message)
-                }
-            }
-        })
+    if (!fse.existsSync(extensionsDir)) {
+        return
     }
+
+    const extensions = fse.readdirSync(extensionsDir).filter((dir) => {
+        const dirPath = p.join(extensionsDir, dir)
+        return fse.statSync(dirPath).isDirectory()
+    })
+
+    extensions.forEach((extension) => {
+        const extensionPath = p.join(extensionsDir, extension)
+
+        // If the extension is namespaced, look for the next directory
+        if (extension.startsWith('@')) {
+            const subDirs = fse.readdirSync(extensionPath).filter((subDir) => {
+                return fse.statSync(p.join(extensionPath, subDir)).isDirectory()
+            })
+
+            // Execute the provided command in each subdirectory for namespaced extensions
+            subDirs.forEach((subDir) => {
+                const subDirPath = p.join(extensionPath, subDir)
+                try {
+                    execSync(`cd ${subDirPath} && ${command}`)
+                } catch (error) {
+                    console.error(`Error executing command in ${subDirPath}:`, error.message)
+                }
+            })
+        } else {
+            // For non-namespaced extensions, execute the provided command in the extension directory
+            try {
+                execSync(`cd ${extensionPath} && ${command}`)
+            } catch (error) {
+                console.error(`Error executing command in ${extensionPath}:`, error.message)
+            }
+        }
+    })
 }
 
 const main = async () => {
