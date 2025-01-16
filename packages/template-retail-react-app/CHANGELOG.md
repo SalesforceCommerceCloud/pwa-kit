@@ -1,5 +1,6 @@
 ## v5.1.0-dev (TBD)
 
+- [BUG] Fixed GET /shopper-context API calls being made without the usid [#2206](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2206)
 - Update test data references to 2024, and unify to 01/2040 [#2196](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2197)
 - Fixed failing checkout tests [#2195](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2195)
 - [BUG] Fixed "getCheckboxProps is not a function" when rendering checkout page in generated app.[#2140](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2140)
