@@ -1,6 +1,7 @@
 ## v5.1.0-dev (TBD)
 
 - Fixed failing checkout tests [#2195](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2195)
+- Allow store to be selectable in StoreLocator [#2187](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2187)
 - [BUG] Fixed "getCheckboxProps is not a function" when rendering checkout page in generated app.[#2140](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2140)
 - Replace transfer basket call with merge basket on checkout [#2138](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2138)
 
