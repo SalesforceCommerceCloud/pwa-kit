@@ -7,7 +7,7 @@
 import Auth, {AuthData} from './'
 import {waitFor} from '@testing-library/react'
 import jwt from 'jsonwebtoken'
-import {helpers, ShopperCustomersTypes} from 'commerce-sdk-isomorphic'
+import {helpers, ShopperCustomersTypes, ShopperLogin} from 'commerce-sdk-isomorphic'
 import * as utils from '../utils'
 import {SLAS_SECRET_PLACEHOLDER} from '../constant'
 import {ShopperLoginTypes} from 'commerce-sdk-isomorphic'
@@ -15,7 +15,7 @@ import {
     DEFAULT_SLAS_REFRESH_TOKEN_REGISTERED_TTL,
     DEFAULT_SLAS_REFRESH_TOKEN_GUEST_TTL
 } from './index'
-import {RequireKeys} from '../hooks/types'
+import {ApiClientConfigParams, RequireKeys} from '../hooks/types'
 
 const baseCustomer: RequireKeys<ShopperCustomersTypes.Customer, 'login'> = {
     customerId: 'customerId',
@@ -718,5 +718,89 @@ describe('Auth', () => {
         await waitFor(() => {
             expect(auth.getDnt()).toBeUndefined()
         })
+    })
+})
+
+describe('Auth service sends credentials fetch option to the ShopperLogin API', () => {
+    beforeEach(() => {
+        jest.clearAllMocks()
+    })
+
+    test('Adds fetch options with credentials when not defined in config', async () => {
+        const auth = new Auth(config)
+        await auth.loginGuestUser()
+
+        // Ensure the helper method was called
+        expect(helpers.loginGuestUser).toHaveBeenCalled()
+        expect(helpers.loginGuestUser).toHaveBeenCalledTimes(1)
+
+        // Check that the correct parameters were passed to the helper
+        const callArguments = (helpers.loginGuestUser as jest.Mock).mock.calls[0]
+        expect(callArguments).toBeDefined()
+        expect(callArguments.length).toBeGreaterThan(0)
+
+        const shopperLogin: ShopperLogin<ApiClientConfigParams> = callArguments[0]
+        expect(shopperLogin).toBeDefined()
+        expect(shopperLogin.clientConfig).toBeDefined()
+        expect(shopperLogin.clientConfig.fetchOptions).toBeDefined()
+
+        // Ensure fetch options include the expected credentials
+        expect(shopperLogin.clientConfig.fetchOptions.credentials).toBe('same-origin')
+    })
+
+    test('Does not override the credentials in fetch options if already exists', async () => {
+        const configWithFetchOptions = {
+            ...config,
+            fetchOptions: {
+                credentials: 'include'
+            }
+        }
+        const auth = new Auth(configWithFetchOptions)
+        await auth.loginGuestUser()
+
+        // Ensure the helper method was called
+        expect(helpers.loginGuestUser).toHaveBeenCalled()
+        expect(helpers.loginGuestUser).toHaveBeenCalledTimes(1)
+
+        // Check that the correct parameters were passed to the helper
+        const callArguments = (helpers.loginGuestUser as jest.Mock).mock.calls[0]
+        expect(callArguments).toBeDefined()
+        expect(callArguments.length).toBeGreaterThan(0)
+
+        const shopperLogin: ShopperLogin<ApiClientConfigParams> = callArguments[0]
+        expect(shopperLogin).toBeDefined()
+        expect(shopperLogin.clientConfig).toBeDefined()
+        expect(shopperLogin.clientConfig.fetchOptions).toBeDefined()
+
+        // Ensure fetch options include the expected credentials
+        expect(shopperLogin.clientConfig.fetchOptions.credentials).toBe('include')
+    })
+
+    test('Adds credentials to the fetch options if it is missing', async () => {
+        const configWithFetchOptions = {
+            ...config,
+            fetchOptions: {
+                cache: 'no-cache'
+            }
+        }
+        const auth = new Auth(configWithFetchOptions)
+        await auth.loginGuestUser()
+
+        // Ensure the helper method was called
+        expect(helpers.loginGuestUser).toHaveBeenCalled()
+        expect(helpers.loginGuestUser).toHaveBeenCalledTimes(1)
+
+        // Check that the correct parameters were passed to the helper
+        const callArguments = (helpers.loginGuestUser as jest.Mock).mock.calls[0]
+        expect(callArguments).toBeDefined()
+        expect(callArguments.length).toBeGreaterThan(0)
+
+        const shopperLogin: ShopperLogin<ApiClientConfigParams> = callArguments[0]
+        expect(shopperLogin).toBeDefined()
+        expect(shopperLogin.clientConfig).toBeDefined()
+        expect(shopperLogin.clientConfig.fetchOptions).toBeDefined()
+
+        // Ensure fetch options include the expected credentials
+        expect(shopperLogin.clientConfig.fetchOptions.credentials).toBe('same-origin')
     })
 })
