@@ -928,20 +928,13 @@ const runGenerator = async (
     if (answers.project.type === 'PWAKitAppExtensionProject') {
         const devOutputDir = p.join(outputDir, LOCAL_DEV_PROJECT_DIR)
 
-        // Prepare the package.json updates
-        const pkgUpdates = {
+        // Update the root package.json to add a start script
+        updatePackageJson(p.resolve(outputDir, 'package.json'), {
             scripts: {
                 start: `npm --prefix ./${LOCAL_DEV_PROJECT_DIR} start`,
                 'start:inspect': `npm --prefix ./${LOCAL_DEV_PROJECT_DIR} run start:inspect`
             }
-        }
-
-        if (answers.project.extractAppExtensions === true) {
-            pkgUpdates.workspaces = ['app/application-extensions/*']
-        }
-
-        // Update the root package.json
-        updatePackageJson(p.resolve(outputDir, 'package.json'), pkgUpdates)
+        })
 
         // Recursively call runGenerator for the 'typescript-minimal' local dev project
         const localDevProjectContext = {
@@ -995,25 +988,35 @@ const runGenerator = async (
         processAppExtensions(selectedAppExtensions, extractAppExtensions, appExtensionsDir)
     }
 
-    // Add selected Application Extensions to devDependencies
-    const appExtensionDeps = selectedAppExtensions.reduce((acc, appExtensionName) => {
-        // Find the corresponding Application Extension details
-        const appExtensionDetails = context?.availableAppExtensions?.find(
-            (ext) => ext.value === `${appExtensionName}@latest`
-        )
-        const version = appExtensionDetails ? appExtensionDetails.version : 'latest'
-
-        acc[appExtensionName] = extractAppExtensions
-            ? `file:./app/application-extensions/${appExtensionName.replace('/', '_')}`
-            : version
-        return acc
-    }, {})
-
-    updatePackageJson(p.resolve(outputDir, 'package.json'), {
+    // Prepare updates for package.json
+    const pkgUpdates = {
         name: getSlugifiedProjectName(context.answers.project.name || context.preset.id),
         version: GENERATED_PROJECT_VERSION,
-        devDependencies: appExtensionDeps
-    })
+        scripts: {
+            start: `npm --prefix ./${LOCAL_DEV_PROJECT_DIR} start`,
+            'start:inspect': `npm --prefix ./${LOCAL_DEV_PROJECT_DIR} run start:inspect`
+        },
+        // Conditionally add workspaces for extractAppExtensions
+        ...(extractAppExtensions && {
+            workspaces: ['app/application-extensions/*']
+        }),
+        // Add selected Application Extensions to devDependencies
+        devDependencies: selectedAppExtensions.reduce((acc, appExtensionName) => {
+            // Find the corresponding Application Extension details
+            const appExtensionDetails = context?.availableAppExtensions?.find(
+                (ext) => ext.value === `${appExtensionName}@latest`
+            )
+            const version = appExtensionDetails ? appExtensionDetails.version : 'latest'
+
+            acc[appExtensionName] = answers.project.extractAppExtensions
+                ? `file:./app/application-extensions/${appExtensionName.replace('/', '_')}`
+                : version
+            return acc
+        }, {})
+    }
+
+    // Update the root package.json
+    updatePackageJson(p.resolve(outputDir, 'package.json'), pkgUpdates)
 
     // Clean up the temporary directory
     sh.rm('-rf', tmp)
