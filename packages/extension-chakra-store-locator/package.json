@@ -14,7 +14,8 @@
     "lint": "npm run lint:js",
     "lint:fix": "npm run lint:js -- --fix",
     "test": "pwa-kit-dev test",
-    "lint:js": "pwa-kit-dev lint \"**/*.{js,jsx,ts,tsx}\""
+    "lint:js": "pwa-kit-dev lint \"**/*.{js,jsx,ts,tsx}\"",
+    "typecheck": "tsc --noEmit"
   },
   "peerDependencies": {
     "@chakra-ui/react": "^2",

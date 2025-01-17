@@ -2,6 +2,9 @@
   "name": "typescript-minimal",
   "version": "4.0.0-extensibility-preview.3",
   "private": true,
+  "workspaces": [
+    "app/application-extensions/*"
+  ],
   "scripts": {
     "analyze-build": "cross-env MOBIFY_ANALYZE=true npm run build",
     "build": "pwa-kit-dev build",
@@ -15,7 +18,7 @@
     "start:inspect": "npm run start -- --inspect",
     "tail-logs": "pwa-kit-dev tail-logs",
     "test": "pwa-kit-dev test",
-    "typecheck": "pwa-kit-dev tsc -- --noEmit"
+    "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
     "@chakra-ui/react": "^2.8.2",

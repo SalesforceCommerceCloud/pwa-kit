@@ -808,7 +808,7 @@ const processAppExtensions = (
 
             // Copy the Application Extension into the appropriate folder inside application-extensions
             const appExtensionTmpPath = p.join(appExtensionTmp, 'package')
-            const appExtensionDestDir = p.join(appExtensionsDir, appExtensionName)
+            const appExtensionDestDir = p.join(appExtensionsDir, appExtensionName.replace('/', '_'))
             sh.mkdir('-p', appExtensionDestDir)
 
             // Copy hidden files
@@ -997,7 +997,7 @@ const runGenerator = async (
         const version = appExtensionDetails ? appExtensionDetails.version : 'latest'
 
         acc[appExtensionName] = extractAppExtensions
-            ? `file:./app/application-extensions/${appExtensionName}`
+            ? `file:./app/application-extensions/${appExtensionName.replace('/', '_')}`
             : version
         return acc
     }, {})
