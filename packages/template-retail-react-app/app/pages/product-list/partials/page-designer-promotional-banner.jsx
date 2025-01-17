@@ -32,7 +32,7 @@ const PageDesignerPromotionalBanner = () => {
     const {usid} = useUsid()
     const {data: shopperContext} = useShopperContext(
         {parameters: {usid, siteId: site.id}},
-        {enabled: !isServer}
+        {enabled: !isServer && Boolean(usid)}
     )
 
     const {data: promoBannerDesktop, error: pageErrorDesktop} = usePage(
