@@ -96,7 +96,7 @@ const StoresList = ({storesInfo}) => {
                                         {' '}
                                         <AccordionButton
                                             color="blue.700"
-                                            style={{marginTop: '10px', paddingBottom: '0px'}}
+                                            sx={{marginTop: '10px', paddingBottom: '0px'}}
                                         >
                                             <Box fontSize="lg">
                                                 {intl.formatMessage({
