@@ -30,7 +30,11 @@ const OPTIONS = {
     parameters: {
         organizationId: 'organizationId',
         client_id: 'client_id',
-        refresh_token: 'token'
+        refresh_token: 'token',
+        // These parameters are required in the query parameters for certain mutations, while in the request body for others.
+        redirect_uri: 'redirect_uri',
+        response_type: 'response_type',
+        code_challenge: 'code_challenge'
     },
     body: {
         agent_id: 'agent_id',
@@ -72,7 +76,9 @@ type Implemented = ShopperLoginMutation
 type TestMap = {[Mut in Implemented]: [Argument<Client[Mut]>, DataType<Client[Mut]>]}
 const testMap: TestMap = {
     authorizePasswordlessCustomer: [OPTIONS, {}],
+    authorizeCustomer: [OPTIONS, undefined],
     getAccessToken: [OPTIONS, TOKEN_RESPONSE],
+    getPasswordResetToken: [OPTIONS, undefined],
     getPasswordLessAccessToken: [OPTIONS, TOKEN_RESPONSE],
     getSessionBridgeAccessToken: [OPTIONS, TOKEN_RESPONSE],
     getTrustedAgentAccessToken: [OPTIONS, TOKEN_RESPONSE],

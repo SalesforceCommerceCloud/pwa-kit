@@ -24,10 +24,9 @@ const monorepoPackageNames = monorepoPackages.map((pkg) => pkg.name)
 const INDEPENDENT_PACKAGES = [
     '@salesforce/retail-react-app',
     '@salesforce/commerce-sdk-react',
-    '@salesforce/extension-base',
     '@salesforce/extension-chakra-storefront',
-    '@salesforce/extension-sample',
-    '@salesforce/extension-chakra-store-locator'
+    '@salesforce/extension-chakra-store-locator',
+    '@salesforce/extension-starter',
 ]
 const independentPackages = INDEPENDENT_PACKAGES.map((pkgName) =>
     monorepoPackages.find((pkg) => pkg.name === pkgName)

@@ -174,13 +174,13 @@ describe('extensibilityUtils', () => {
 
         test('returns success if the given extensions do NOT depend on other extensions', () => {
             mockPackageJson({
-                'extension-sample': {
+                'extension-test': {
                     peerDependencies: {
                         react: '^18.2.0'
                     }
                 }
             })
-            const result = extensionUtils.validateExtensionDependencies(['extension-sample'])
+            const result = extensionUtils.validateExtensionDependencies(['extension-test'])
             expect(result).toStrictEqual({
                 success: true
             })
@@ -188,21 +188,21 @@ describe('extensibilityUtils', () => {
 
         test('returns success if the given extensions do depend on other extensions and they are all loaded', () => {
             mockPackageJson({
-                'extension-sample': {
+                'extension-test': {
                     peerDependencies: {
                         react: '^18.2.0'
                     }
                 },
-                'extension-sample-2': {
+                'extension-test-2': {
                     peerDependencies: {
                         react: '^18.2.0',
-                        'extension-sample': '1.0.0'
+                        'extension-test': '1.0.0'
                     }
                 }
             })
             const result = extensionUtils.validateExtensionDependencies([
-                'extension-sample',
-                'extension-sample-2'
+                'extension-test',
+                'extension-test-2'
             ])
             expect(result).toStrictEqual({
                 success: true
@@ -211,21 +211,21 @@ describe('extensibilityUtils', () => {
 
         test('returns failure if the given extensions do depend on other extensions and some are NOT loaded', () => {
             mockPackageJson({
-                'extension-sample': {
+                'extension-test': {
                     peerDependencies: {
                         react: '^18.2.0'
                     }
                 },
-                'extension-sample-2': {
+                'extension-test-2': {
                     peerDependencies: {
                         react: '^18.2.0',
-                        'extension-sample': '1.0.0'
+                        'extension-test': '1.0.0'
                     }
                 }
             })
             const result = extensionUtils.validateExtensionDependencies([
-                ['extension-sample', {enabled: false}],
-                'extension-sample-2'
+                ['extension-test', {enabled: false}],
+                'extension-test-2'
             ])
             expect(result.success).toBe(false)
             expect(Array.isArray(result.errors) && result.errors.length > 0).toBe(true)

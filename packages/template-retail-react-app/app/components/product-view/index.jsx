@@ -584,6 +584,7 @@ const ProductView = forwardRef(
                                             // component, potentially as a prop called `selectInputOnFocus`.
                                             e.target.select()
                                         }}
+                                        productName={product?.name}
                                     />
                                 </VStack>
                             )}

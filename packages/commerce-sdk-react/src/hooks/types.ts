@@ -220,3 +220,9 @@ type CustomEndpointArgClientConfig = CustomEndpointArg['clientConfig']
 export type OptionalCustomEndpointClientConfig = Omit<CustomEndpointArg, 'clientConfig'> & {
     clientConfig?: CustomEndpointArgClientConfig
 }
+
+export type TMutationVariables = {
+    body?: unknown
+    parameters?: {[key: string]: string | number | boolean | string[] | number[]}
+    headers?: {[key: string]: string}
+} | void

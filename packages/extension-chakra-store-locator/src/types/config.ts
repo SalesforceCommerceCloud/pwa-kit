@@ -21,6 +21,17 @@ export interface UserConfig extends ApplicationExtensionConfig {
         countryCode: string
         countryName: string
     }>
+    commerceApi?: {
+        proxyPath: string
+        parameters: {
+            shortCode: string
+            clientId: string
+            organizationId: string
+            siteId: string
+            locale: string
+            currency: string
+        }
+    }
 }
 
 /**

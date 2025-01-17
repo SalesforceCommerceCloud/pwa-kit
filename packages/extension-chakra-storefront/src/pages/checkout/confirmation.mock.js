@@ -45,8 +45,8 @@ export const mockOrder = {
             paymentCard: {
                 cardType: 'Visa',
                 creditCardExpired: false,
-                expirationMonth: 12,
-                expirationYear: 2023,
+                expirationMonth: 1,
+                expirationYear: 2040,
                 holder: 'test',
                 maskedNumber: '************1111',
                 numberLastDigits: '1111'

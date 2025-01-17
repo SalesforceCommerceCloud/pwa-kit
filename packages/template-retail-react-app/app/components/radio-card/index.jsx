@@ -12,11 +12,11 @@ import {CheckIcon} from '@salesforce/retail-react-app/app/components/icons'
 const RadioCardGroupContext = React.createContext()
 
 export const RadioCard = (props) => {
-    const getRadioProps = React.useContext(RadioCardGroupContext)
-    const {getInputProps, getCheckboxProps} = useRadio(getRadioProps(props))
+    const getRadioGroupProps = React.useContext(RadioCardGroupContext)
+    const {getInputProps, getRadioProps} = useRadio(getRadioGroupProps(props))
 
     const input = getInputProps()
-    const checkbox = getCheckboxProps()
+    const checkbox = getRadioProps()
     return (
         <Box as="label">
             <input {...input} />

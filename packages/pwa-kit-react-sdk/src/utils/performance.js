@@ -68,7 +68,7 @@ export default class PerformanceTimer {
      */
     log() {
         this.metrics.forEach((metric) => {
-            logger.info(`${metric.name} - ${metric.duration}ms ${metric.detail || ''}`, {
+            logger.info(`${metric.name} - ${metric.duration.toFixed(4)}ms ${metric.detail || ''}`, {
                 namespace: 'performance'
             })
         })
@@ -117,7 +117,7 @@ export default class PerformanceTimer {
             if (startMark) {
                 const measurement = {
                     name,
-                    duration: (timestamp - startMark.timestamp).toFixed(2),
+                    duration: timestamp - startMark.timestamp,
                     detail: options.detail
                 }
                 this.metrics.push(measurement)

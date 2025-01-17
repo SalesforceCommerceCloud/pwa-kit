@@ -1,4 +1,5 @@
-## v4.0.0-extensibility-preview.3 (Dec 13, 2024)
+## v4.0.0-extensibility-preview.3 (Jan 14, 2025)
+- Ensure build command works on windows when path includes spaces. [#2204](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2204)
 ## v4.0.0-extensibility-preview.2 (Dec 09, 2024)
 ## v4.0.0-extensibility-preview.1 (Dec 09, 2024)
 ## v4.0.0-extensibility-preview.0 (Nov 28, 2024)
@@ -12,16 +13,20 @@
 - Change Webpack logic to include all installed Application Extensions in the app bundle. [#2004](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2004)
 - Support the tuples way of configuring the app extensions [#2010](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2010)
 
+## v3.8.0 (Oct 28, 2024)
+
+## v3.7.0 (Aug 07, 2024)
+
 ## v3.6.0 (Apr 17, 2024)
 - Implement core wildcard import logic to be used in upcoming webpack/babel plugins [#1826](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1826)
 
 ## v3.5.1 (Apr 17, 2024)
+
 - Update SLAS private proxy path [#1752](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1752)
 
 ## v3.5.0 (Apr 15, 2024)
 
 - Add Support for SLAS private flow [#1722](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1722)
-
 
 ## v3.4.0 (Jan 19, 2024)
 

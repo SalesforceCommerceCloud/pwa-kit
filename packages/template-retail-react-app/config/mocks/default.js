@@ -118,14 +118,5 @@ module.exports = {
                 path: 'ocapi'
             }
         ]
-    },
-    mockFetchOCAPISessions: (url) => {
-        if (url.includes('/sessions')) {
-            return {
-                ok: true,
-                status: 200
-            }
-        }
-        throw new Error(`Unhandled request: ${url}`)
     }
 }

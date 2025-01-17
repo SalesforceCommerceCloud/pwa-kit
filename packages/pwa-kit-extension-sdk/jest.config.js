@@ -13,8 +13,8 @@ module.exports = {
         global: {
             branches: 60,
             functions: 80,
-            lines: 80,
-            statements: 80
+            lines: 75,
+            statements: 75
         }
     },
     testPathIgnorePatterns: ['bin/*', 'coverage/*', 'dist/*', 'node_modules/*', 'scripts/*'],

@@ -10,5 +10,5 @@ runs:
   - name: Smoke test scripts
     run: |-
       # Basic smoke-tests for uncommonly run scripts in a project
-      node ./scripts/smoke-test-npm-scripts.js --dir ${{ inputs.dir }}
+      node ./scripts/smoke-test-npm-scripts.js --dir "${{ inputs.dir }}"
     shell: bash

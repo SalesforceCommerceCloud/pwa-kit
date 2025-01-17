@@ -15,7 +15,7 @@ sh.set('-e')
 sh.config.silent = false
 
 const TEMPLATE_PREFIX = 'template-'
-const EXTENSION_BASE_NAME = 'extension-base'
+const EXTENSION_STARTER_NAME = 'extension-starter'
 const EXTENSION_CHAKRA_STOREFRONT_NAME = 'extension-chakra-storefront'
 
 const monorepoRoot = p.resolve(__dirname, '..', '..', '..')
@@ -33,7 +33,7 @@ const main = () => {
         'mrt-reference-app'
     ]
 
-    const extensionPkgName = [EXTENSION_BASE_NAME, EXTENSION_CHAKRA_STOREFRONT_NAME]
+    const extensionPkgName = [EXTENSION_STARTER_NAME, EXTENSION_CHAKRA_STOREFRONT_NAME]
 
     if (!sh.test('-d', templatesDir)) {
         sh.mkdir('-p', templatesDir)

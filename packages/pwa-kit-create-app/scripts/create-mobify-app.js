@@ -491,45 +491,51 @@ const PRESETS = [
         private: true
     },
     {
-        id: 'extension-base',
-        name: 'Template base Application Extension',
+        id: 'extension-starter',
+        name: 'Starter Application Extension',
         description: '',
         templateSource: {
             type: TEMPLATE_SOURCE_BUNDLE,
-            id: 'extension-base'
+            id: 'extension-starter'
+        },
+        questions: APPLICATION_EXTENSION_QUESTIONS,
+        answers: {
+            ['project.name']: '@salesforce/extension-starter',
+            ['project.type']: 'PWAKitAppExtensionProject',
+            ['project.extensionName']: '@salesforce/extension-starter'
         },
         private: true
     },
     {
-        id: 'app-extension-sample-extract',
-        name: 'Application Extension sample project (Extract Application Extensions code)',
+        id: 'app-extension-starter-extract',
+        name: 'Typescript Minimal With Extracted Extension',
         description:
-            'Generate an Application Extension using typescript-minimal template with the Application Extensions code extracted.',
+            'Generate an typescript-minimal project with a starter extension. The extension code will be included in the project.',
         templateSource: {
             type: TEMPLATE_SOURCE_BUNDLE,
             id: 'typescript-minimal'
         },
         questions: TYPESCRIPT_MINIMAL_QUESTIONS,
         answers: {
-            ['project.name']: 'app-extension-sample-extract',
-            ['project.selectedAppExtensions']: ['extension-sample'],
+            ['project.name']: 'app-extension-starter-extract',
+            ['project.selectedAppExtensions']: ['extension-starter'],
             ['project.extractAppExtensions']: true
         },
         private: true
     },
     {
-        id: 'app-extension-sample-no-extract',
-        name: 'Application Extension sample project (Without extracting Application Extensions code)',
+        id: 'app-extension-starter-no-extract',
+        name: 'Typescript Minimal With Extension',
         description:
-            'Generate an Application Extension using typescript-minimal template without the Applications Extensions code extracted.',
+            'Generate an typescript-minimal project with a starter extension. The extension code will not included in the project.',
         templateSource: {
             type: TEMPLATE_SOURCE_BUNDLE,
             id: 'typescript-minimal'
         },
         questions: TYPESCRIPT_MINIMAL_QUESTIONS,
         answers: {
-            ['project.name']: 'app-extension-sample-no-extract',
-            ['project.selectedAppExtensions']: ['extension-sample'],
+            ['project.name']: 'app-extension-starter-no-extract',
+            ['project.selectedAppExtensions']: ['extension-starter'],
             ['project.extractAppExtensions']: false
         },
         private: true
@@ -547,8 +553,6 @@ const PRESET_QUESTIONS = [
         }))
     }
 ]
-
-const BOOTSTRAP_DIR = p.join(__dirname, '..', 'assets', 'bootstrap', 'js')
 
 const ASSETS_TEMPLATES_DIR = p.join(__dirname, '..', 'assets', 'templates')
 
@@ -959,12 +963,12 @@ const runGenerator = async (
         // TODO: The generator is growing, we should refactor this to be more maintainable.
         const processGeneratedExtension = () => {
             // do a file content replacement for extension-meta.json in the outputDir
-            // find all instances of "@salesforce/extension-base" and replace with answers.project.name
+            // find all instances of "@salesforce/extension-starter" and replace with answers.project.name
             const extensionMetaJsonPath = p.join(outputDir, 'extension-meta.json')
             if (fs.existsSync(extensionMetaJsonPath)) {
                 let extensionMetaJsonContent = fs.readFileSync(extensionMetaJsonPath, 'utf8')
                 extensionMetaJsonContent = extensionMetaJsonContent.replace(
-                    /@salesforce\/extension-base/g,
+                    /@salesforce\/extension-starter/g,
                     answers.project.name
                 )
                 fs.writeFileSync(extensionMetaJsonPath, extensionMetaJsonContent)
@@ -1012,35 +1016,40 @@ const runGenerator = async (
         npmInstall(outputDir, {verbose, projectName: context.answers.project.name})
     }
 
-    const extensionsWithDefaultConfig = selectedAppExtensions.map((extension) => {
-        // Since we've just installed the dependencies, we can read the default config of each extension
-        const pathToDefaultConfig = p.join(
-            outputDir,
-            'node_modules',
-            extension,
-            'config',
-            'default.json'
-        )
-        if (!fs.existsSync(pathToDefaultConfig)) {
-            console.warn(
-                `The extension ${extension} does not have a default config. Will generate a minimal default config for it.`
+    if (selectedAppExtensions.length > 0) {
+        const extensionsWithDefaultConfig = selectedAppExtensions.map((extension) => {
+            // Since we've just installed the dependencies, we can read the default config of each extension
+            const pathToDefaultConfig = p.join(
+                outputDir,
+                'node_modules',
+                extension,
+                'config',
+                'default.json'
             )
-            // Return a minimal default config. It should match what's defined in: https://github.com/SalesforceCommerceCloud/pwa-kit/blob/310e946bed12fd4cbb42a209ee6982e9b1bb9b99/packages/pwa-kit-extension-sdk/src/shared/utils/helpers.ts#L13-L15
-            return [extension, {enabled: true}]
-        }
+            if (!fs.existsSync(pathToDefaultConfig)) {
+                console.warn(
+                    `The extension ${extension} does not have a default config. Will generate a minimal default config for it.`
+                )
+                // Return a minimal default config. It should match what's defined in: https://github.com/SalesforceCommerceCloud/pwa-kit/blob/310e946bed12fd4cbb42a209ee6982e9b1bb9b99/packages/pwa-kit-extension-sdk/src/shared/utils/helpers.ts#L13-L15
+                return [extension, {enabled: true}]
+            }
 
-        const defaultConfig = readJson(pathToDefaultConfig)
-        return [extension, defaultConfig]
-    })
-    updatePackageJson(p.resolve(outputDir, 'package.json'), {
-        ...(selectedAppExtensions.length > 0 && {
+            const defaultConfig = readJson(pathToDefaultConfig)
+            return [extension, defaultConfig]
+        })
+
+        updatePackageJson(p.resolve(outputDir, 'package.json'), {
             mobify: {
                 app: {
                     extensions: extensionsWithDefaultConfig
                 }
             }
         })
-    })
+
+        console.log(
+            'After your project is generated, please review `mobify.app.extensions` in package.json to check the configuration of the extensions and fill out any placeholder values.'
+        )
+    }
 }
 
 const foundNode = process.versions.node
@@ -1089,7 +1098,7 @@ const main = async (opts) => {
             // Ask for extension name if Application Extension is selected
             const extensionNameAnswers = await inquirer.prompt(APPLICATION_EXTENSION_QUESTIONS)
             context.answers.project.name = extensionNameAnswers.project.extensionName
-            context.preset = PRESETS.find(({id}) => id === 'extension-base')
+            context.preset = PRESETS.find(({id}) => id === 'extension-starter')
         } else {
             const availableAppExtensions = fetchAvailableAppExtensions()
 

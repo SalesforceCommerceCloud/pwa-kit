@@ -11,13 +11,16 @@ import {RouteProps} from 'react-router-dom'
 
 // Platform Imports
 import {ApplicationExtension} from '@salesforce/pwa-kit-extension-sdk/react'
+import {applyHOCs} from '@salesforce/pwa-kit-extension-sdk/react/utils'
 
 // Local Imports
 import {withOptionalChakra} from './components/with-optional-chakra-provider'
+import {withOptionalCommerceSdkReactProvider} from './components/with-optional-commerce-sdk-react-provider'
 import {withStoreLocator} from './components/with-store-locator'
 import {Config} from './types'
 
 import StoreLocatorPage from './pages/store-locator'
+import {logger} from './logger'
 import extensionMeta from '../extension-meta.json'
 
 class StoreLocatorExtension extends ApplicationExtension<Config> {
@@ -29,13 +32,19 @@ class StoreLocatorExtension extends ApplicationExtension<Config> {
         const config = this.getConfig()
 
         if (!config.supportedCountries || config.supportedCountries.length === 0) {
-            // TODO: use our logger
-            console.warn(
+            logger.error(
                 '[extension-chakra-store-locator] Missing supportedCountries, this extension will not work.'
             )
         }
 
-        return withStoreLocator(withOptionalChakra(App), config)
+        const HOCs = [
+            (component: React.ComponentType<any>) => withStoreLocator(component, config),
+            (component: React.ComponentType<any>) =>
+                withOptionalCommerceSdkReactProvider(component, config),
+            (component: React.ComponentType<any>) => withOptionalChakra(component)
+        ]
+
+        return applyHOCs(App, HOCs)
     }
 
     extendRoutes(routes: RouteProps[]): RouteProps[] {

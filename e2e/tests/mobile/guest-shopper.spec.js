@@ -7,6 +7,7 @@
 
 const { test, expect } = require("@playwright/test");
 const config = require("../../config");
+const { addProductToCart, searchProduct, checkoutProduct } = require("../../scripts/pageHelpers");
 const {
   generateUserCredentials,
   getCreditCardExpiry,
@@ -14,75 +15,12 @@ const {
 
 const GUEST_USER_CREDENTIALS = generateUserCredentials();
 
+/**
+ * Test that guest shoppers can add a product to cart and go through the entire checkout process,
+ * validating that shopper is able to get to the order summary section
+ */
 test("Guest shopper can checkout items as guest", async ({ page }) => {
-  // Home page
-  await page.goto(config.RETAIL_APP_HOME);
-
-  await page.getByLabel("Menu", { exact: true }).click();
-
-  // SSR nav loads top level categories as direct links so we wait till all sub-categories load in the accordion
-  const categoryAccordion = page.locator(
-    "#category-nav .chakra-accordion__button svg+:text('Womens')"
-  );
-  await categoryAccordion.waitFor();
-
-  await page.getByRole("button", { name: "Womens" }).click();
-
-  const clothingNav = page.getByRole("button", { name: "Clothing" });
-
-  await clothingNav.waitFor();
-
-  await clothingNav.click();
-
-  const topsLink = page.getByLabel('Womens').getByRole("link", { name: "Tops" })
-  await topsLink.click();
-  // Wait for the nav menu to close first
-  await topsLink.waitFor({state: 'hidden'})
-
-  await expect(page.getByRole("heading", { name: "Tops" })).toBeVisible();
-
-  // PLP
-  const productTile = page.getByRole("link", {
-    name: /Cotton Turtleneck Sweater/i,
-  });
-  await productTile.scrollIntoViewIfNeeded()
-  // selecting swatch
-  const productTileImg = productTile.locator("img");
-  await productTileImg.waitFor({state: 'visible'})
-  const initialSrc = await productTileImg.getAttribute("src");
-  await expect(productTile.getByText(/From \$39\.99/i)).toBeVisible();
-
-  await productTile.getByLabel(/Black/, { exact: true }).click();
-  // Make sure the image src has changed
-  await expect(async () => {
-    const newSrc = await productTileImg.getAttribute("src")
-    expect(newSrc).not.toBe(initialSrc)
-  }).toPass()
-  await expect(productTile.getByText(/From \$39\.99/i)).toBeVisible();
-  await productTile.click();
-
-  // PDP
-  await expect(
-    page.getByRole("heading", { name: /Cotton Turtleneck Sweater/i })
-  ).toBeVisible();
-  await page.getByRole("radio", { name: "L", exact: true }).click();
-
-  await page.locator("button[data-testid='quantity-increment']").click();
-
-  // Selected Size and Color texts are broken into multiple elements on the page.
-  // So we need to look at the page URL to verify selected variants
-  const updatedPageURL = await page.url();
-  const params = updatedPageURL.split("?")[1];
-  expect(params).toMatch(/size=9LG/i);
-  expect(params).toMatch(/color=JJ169XX/i);
-
-  await page.getByRole("button", { name: /Add to Cart/i }).click();
-
-  const addedToCartModal = page.getByText(/2 items added to cart/i);
-
-  await addedToCartModal.waitFor();
-
-  await page.getByLabel("Close").click();
+  await addProductToCart({page, isMobile: true})
 
   // Cart
   await page.getByLabel(/My cart/i).click();
@@ -137,7 +75,7 @@ test("Guest shopper can checkout items as guest", async ({ page }) => {
   await expect(
     page.getByRole("heading", { name: /Shipping & Gift Options/i })
   ).toBeVisible();
-  await page.waitForTimeout(2000);
+  await page.waitForLoadState();
 
   const continueToPayment = page.getByRole("button", {
     name: /Continue to Payment/i,
@@ -180,4 +118,85 @@ test("Guest shopper can checkout items as guest", async ({ page }) => {
   await expect(
     page.getByRole("link", { name: /Cotton Turtleneck Sweater/i })
   ).toBeVisible();
+});
+
+/**
+ * Test that guest shoppers can use the product edit modal on cart page
+ */
+test("Guest shopper can edit product item in cart", async ({ page }) => {
+  await addProductToCart({page, isMobile: true});
+
+  // Cart
+  await page.getByLabel(/My cart/i).click();
+
+  await expect(
+    page.getByRole("link", { name: /Cotton Turtleneck Sweater/i })
+  ).toBeVisible();
+
+  await expect(page.getByText(/Color: Black/i)).toBeVisible()
+  await expect(page.getByText(/Size: L/i)).toBeVisible()
+
+  await page.getByRole("button", { name: "Edit" }).click();
+  await expect(page.getByTestId('product-view')).toBeVisible()      
+  
+  // update variant in product edit modal
+  await page.getByRole("radio", { name: "S", exact: true }).click();
+  await page.getByRole("radio", { name: "Meadow Violet", exact: true }).click();
+  await page.getByRole("button", { name: /Update/i }).click()
+
+  await expect(page.getByText(/Color: Meadow Violet/i)).toBeVisible()
+  await expect(page.getByText(/Size: S/i)).toBeVisible()
+});
+
+/**
+ * Test that guest shoppers can add product bundle to cart and successfully checkout
+ */
+test("Guest shopper can checkout product bundle", async ({ page }) => {
+  await searchProduct({page, query: 'bundle', isMobile: true});
+
+  await page.getByRole("link", {
+    name: /Turquoise Jewelry Bundle/i,
+  }).click();
+
+  await page.waitForLoadState();
+
+  await expect(
+    page.getByRole("heading", { name: /Turquoise Jewelry Bundle/i })
+  ).toBeVisible();
+
+  await page.getByRole("button", { name: /Add Bundle to Cart/i }).click();
+
+  const addedToCartModal = page.getByText(/1 item added to cart/i);
+  await addedToCartModal.waitFor();
+  await page.getByLabel("Close").click();
+
+  await page.getByLabel(/My cart/i).click();
+  await page.waitForLoadState();
+
+  await expect(
+    page.getByRole("heading", { name: /Turquoise Jewelry Bundle/i })
+  ).toBeVisible();
+
+  // bundle child selections with all color gold
+  await expect(page.getByText(/Turquoise and Gold Bracelet/i)).toBeVisible();
+  await expect(page.getByText(/Turquoise and Gold Necklace/i)).toBeVisible();
+  await expect(page.getByText(/Turquoise and Gold Hoop Earring/i)).toBeVisible();
+
+  const qtyText = page.locator('text="Qty: 1"');
+  const colorGoldText = page.locator('text="Color: Gold"');
+  await expect(colorGoldText).toHaveCount(3);
+  await expect(qtyText).toHaveCount(3);
+
+  await checkoutProduct({page, userCredentials: GUEST_USER_CREDENTIALS });
+
+  await expect(
+    page.getByRole("heading", { name: /Order Summary/i })
+  ).toBeVisible();
+  await expect(page.getByText(/1 Item/i)).toBeVisible();
+  await expect(
+    page.getByRole("link", { name: /Turquoise Jewelry Bundle/i })
+  ).toBeVisible();
+  await expect(page.getByText(/Turquoise and Gold Bracelet/i)).toBeVisible();
+  await expect(page.getByText(/Turquoise and Gold Necklace/i)).toBeVisible();
+  await expect(page.getByText(/Turquoise and Gold Hoop Earring/i)).toBeVisible();
 });

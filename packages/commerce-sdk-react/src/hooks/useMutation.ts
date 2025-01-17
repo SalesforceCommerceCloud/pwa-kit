@@ -7,7 +7,8 @@
 import {
     useMutation as useReactQueryMutation,
     useQueryClient,
-    UseMutationOptions
+    UseMutationOptions,
+    MutationFunction
 } from '@tanstack/react-query'
 import {helpers} from 'commerce-sdk-isomorphic'
 import useAuthContext from './useAuthContext'
@@ -18,11 +19,13 @@ import {
     ApiOptions,
     CacheUpdateGetter,
     MergedOptions,
-    OptionalCustomEndpointClientConfig
+    OptionalCustomEndpointClientConfig,
+    TMutationVariables
 } from './types'
 import {useAuthorizationHeader} from './useAuthorizationHeader'
 import useCustomerId from './useCustomerId'
 import {mergeOptions, updateCache} from './utils'
+import {handleInvalidToken, generateCustomEndpointOptions} from './helpers'
 
 /**
  * Helper for mutation hooks, contains most of the logic in order to keep individual hooks small.
@@ -63,40 +66,32 @@ export const useMutation = <
  * @param mutationOptions - Options passed through to @tanstack/react-query
  * @returns A TanStack Query mutation hook with data from the custom API endpoint.
  */
-export const useCustomMutation = (
+export const useCustomMutation = <TData = unknown, TError = unknown>(
     apiOptions: OptionalCustomEndpointClientConfig,
-    mutationOptions?: UseMutationOptions
+    mutationOptions?: UseMutationOptions<TData, TError, TMutationVariables>
 ) => {
-    const config = useConfig()
     const auth = useAuthContext()
-    const callCustomEndpointWithAuth = (options: OptionalCustomEndpointClientConfig) => {
-        return async () => {
-            const clientConfig = options.clientConfig || {}
-            const clientHeaders = config.headers || {}
+    const globalConfig = useConfig()
+    const logger = globalConfig.logger || console
+
+    const createMutationFnWithAuth = (): MutationFunction<TData, TMutationVariables> => {
+        return async (args): Promise<TData> => {
             const {access_token} = await auth.ready()
-            return await helpers.callCustomEndpoint({
-                ...options,
-                options: {
-                    ...options.options,
-                    headers: {
-                        Authorization: `Bearer ${access_token}`,
-                        ...clientHeaders,
-                        ...options.options?.headers
-                    }
-                },
-                clientConfig: {
-                    parameters: {
-                        clientId: config.clientId,
-                        siteId: config.siteId,
-                        organizationId: config.organizationId,
-                        shortCode: config.organizationId
-                    },
-                    proxy: config.proxy,
-                    ...clientConfig
-                }
-            })
+            return (await helpers
+                .callCustomEndpoint(
+                    generateCustomEndpointOptions(apiOptions, globalConfig, access_token, args)
+                )
+                .catch(async (error) => {
+                    const {access_token} = await handleInvalidToken(error, auth, logger)
+                    return await helpers.callCustomEndpoint(
+                        generateCustomEndpointOptions(apiOptions, globalConfig, access_token, args)
+                    )
+                })) as TData
         }
     }
 
-    return useReactQueryMutation(callCustomEndpointWithAuth(apiOptions), mutationOptions)
+    return useReactQueryMutation<TData, TError, TMutationVariables, unknown>(
+        createMutationFnWithAuth(),
+        mutationOptions
+    )
 }

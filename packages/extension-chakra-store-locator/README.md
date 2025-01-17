@@ -35,7 +35,7 @@ If you want to use this without having to install `@chakra-ui` in your project, 
 
 ### `@salesforce/commerce-sdk-react` Provider
 
-This extension uses the `@salesforce/commerce-sdk-react` package to fetch the store locator data from SCAPI. Your application must use the `CommerceApiProvider` in the React component tree.
+This extension uses the `@salesforce/commerce-sdk-react` package to fetch the store locator data from SCAPI. If you provide a `commerceApi` configuration in the extension config, the `CommerceApiProvider` will be added to the React component tree as the default provider. If you already have a `CommerceApiProvider` in your application, do not include the `commerceApi` configuration in the extension config.
 
 ## Configurations
 
@@ -66,7 +66,16 @@ The Store Locator extension is configured via the `mobify.app.extensions` proper
                 "countryCode": "DE",
                 "countryName": "Germany"
               }
-            ]
+            ],
+            "commerceApi": {
+              "proxyPath": "/mobify/proxy/api",
+              "parameters": {
+                "shortCode": "8o7m175y",
+                "clientId": "c9c45bfd-0ed3-4aa2-9971-40f88962b836",
+                "organizationId": "f_ecom_zzrf_001",
+                "siteId": "RefArchGlobal"
+              }
+            }
           }
         ]
       ]

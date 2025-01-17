@@ -93,12 +93,12 @@ describe('"expand" util returns correct return value when', () => {
             ]
         },
         {
-            name: 'extensions include falsey values',
+            name: 'extensions include falsy values',
             input: ['extension-a', '', false],
             expected: [['extension-a', {enabled: true}]]
         },
         {
-            name: 'extensions defined do not follow naming convension',
+            name: 'extensions defined do not follow naming convention',
             input: ['not-the-correct-prefix-a'],
             expected: []
         },
@@ -129,8 +129,8 @@ describe('getConfiguredExtensions', () => {
         const extensions = getConfiguredExtensions({
             app: {
                 extensions: [
-                    '@salesforce/extension-sample',
-                    ['@salesforce/extension-sample-2', {foo: 'bar'}]
+                    '@salesforce/extension-test',
+                    ['@salesforce/extension-test-2', {foo: 'bar'}]
                 ]
             }
         })
@@ -138,8 +138,8 @@ describe('getConfiguredExtensions', () => {
         const secondExtension = extensions[1]
 
         expect(Array.isArray(firstExtension)).toBe(true)
-        expect(firstExtension[0]).toBe('@salesforce/extension-sample')
-        expect(secondExtension[0]).toBe('@salesforce/extension-sample-2')
+        expect(firstExtension[0]).toBe('@salesforce/extension-test')
+        expect(secondExtension[0]).toBe('@salesforce/extension-test-2')
     })
 
     test('returns empty array for config without extensions', () => {

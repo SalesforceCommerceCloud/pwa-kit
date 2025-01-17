@@ -68,14 +68,14 @@ describe('Application Extension Loader', () => {
                 const file = dedent`
                     import loadable from '@loadable/component'
 
-                    const SalesforceSampleALoader = loadable.lib(() => import('@salesforce/extension-sample-a/setup-app'))
+                    const SalesforceTestALoader = loadable.lib(() => import('@salesforce/extension-test-a/setup-app'))
 
                     const extensionConfigs = {
-                        '@salesforce/extension-sample-a': {"enabled":true},
+                        '@salesforce/extension-test-a': {"enabled":true},
                     }
 
                     const getApplicationExtensions = async () => {
-                        const modules = await Promise.all([SalesforceSampleALoader.load()])
+                        const modules = await Promise.all([SalesforceTestALoader.load()])
                         return [new modules[0].default({"enabled":true})]
                     }
 
@@ -90,15 +90,15 @@ describe('Application Extension Loader', () => {
                 ...BASE_VIRTUAL_FILES,
                 [`${path.resolve(
                     __dirname,
-                    '../../../../node_modules/@salesforce/extension-sample-a/setup-app'
+                    '../../../../node_modules/@salesforce/extension-test-a/setup-app'
                 )}`]: '',
                 [`${path.resolve(
                     __dirname,
-                    '../../../../node_modules/@salesforce/extension-sample-a/config/default.json'
+                    '../../../../node_modules/@salesforce/extension-test-a/config/default.json'
                 )}`]: ''
             },
             loaderOptions: {
-                configured: [['@salesforce/extension-sample-a', {enabled: true}]],
+                configured: [['@salesforce/extension-test-a', {enabled: true}]],
                 target: 'web'
             }
         },
@@ -107,14 +107,14 @@ describe('Application Extension Loader', () => {
             entryPoint: './app/main.jsx',
             expects: (output) => {
                 const file = dedent`
-                    import SalesforceSampleA from '@salesforce/extension-sample-a/setup-server'
+                    import SalesforceTestA from '@salesforce/extension-test-a/setup-server'
 
                     const extensionConfigs = {
-                        '@salesforce/extension-sample-a': {"enabled":true},
+                        '@salesforce/extension-test-a': {"enabled":true},
                     }
 
                     const getApplicationExtensions = () => {
-                        return [new SalesforceSampleA({"enabled":true})]
+                        return [new SalesforceTestA({"enabled":true})]
                     }
 
                     export {
@@ -128,15 +128,15 @@ describe('Application Extension Loader', () => {
                 ...BASE_VIRTUAL_FILES,
                 [`${path.resolve(
                     __dirname,
-                    '../../../../node_modules/@salesforce/extension-sample-a/setup-server'
+                    '../../../../node_modules/@salesforce/extension-test-a/setup-server'
                 )}`]: '',
                 [`${path.resolve(
                     __dirname,
-                    '../../../../node_modules/@salesforce/extension-sample-a/config/default.json'
+                    '../../../../node_modules/@salesforce/extension-test-a/config/default.json'
                 )}`]: ''
             },
             loaderOptions: {
-                configured: [['@salesforce/extension-sample-a', {enabled: true}]],
+                configured: [['@salesforce/extension-test-a', {enabled: true}]],
                 target: 'node'
             }
         }

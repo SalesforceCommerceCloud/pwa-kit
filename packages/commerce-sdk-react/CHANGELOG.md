@@ -1,17 +1,44 @@
-## v3.1.1-preview.3 (Dec 13, 2024)
 ## v4.0.0-extensibility-preview.3 (Dec 13, 2024)
+## v3.1.1-preview.3 (Dec 13, 2024)
 ## v3.1.1-preview.3 (Dec 13, 2024)
 ## v3.1.1-preview.2 (Dec 09, 2024)
 ## v3.1.1-preview.1 (Dec 09, 2024)
 ## v4.0.0-extensibility-preview.2 (Dec 09, 2024)
 ## v3.1.1-preview.1 (Dec 09, 2024)
 ## v3.1.1-preview.0 (Dec 02, 2024)
+## v3.2.0-dev (Oct 29, 2024)
+- Allow cookies for ShopperLogin API [#2190](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2190
+- Fix refresh token TTL warning from firing when override is not provided [#2114](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2114)
+
+- Update CacheUpdateMatrix for mergeBasket mutation [#2138](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2092)
+- Clear auth state if session has been invalidated by a password change [#2092](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2092)
+
+## v3.1.0 (Oct 28, 2024)
+
+- [Server Affinity] Attach dwsid to SCAPI request headers [#2090](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2090)
+- Add the `authorizeCustomer` and `getPasswordResetToken` to the `ShopperLoginMutations` [#2056](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2056)
+- Add useDNT hook to commerce-sdk-react and put DNT in auth [#2067](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2067/files)
+- Add Trusted Agent on Behalf of (TAOB) support for SLAS APIs [#2077](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2077)
+- Add optional `refreshTokenRegisteredCookieTTL` and `refreshTokenGuestCookieTTL` to Commerce API config [#2077](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2077)
+- Improve refresh token error logging [#2028](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2028)
+- Remove ocapi session-bridging on phased launches [#2011](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2011)
+- Add `defaultDnt` to support setting the dnt flag for SLAS. Upgrade `commerce-sdk-isomorphic` to v3.1.1 [#1979](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1979)
+- Update logout helper to work for guest users [#1997](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1997)
+- Update `useCustomMutation` hook to accept request body as a parameter to the mutate function [#2030](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2030)
+- Simplify `useCustomMutation` hook implementation [#2034](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2034)
+- Documentation for `useCustomMutation` hook along with new dynamic `body` param option [#2042](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2042)
+
+## v3.0.1 (Sep 04, 2024)
+
+- Fixed an issue where the `expires` attribute in cookies, ensuring it uses seconds instead of days. [#1994](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1994)
 
 ## v3.0.0 (Aug 07, 2024)
+
 - Add `meta.displayName` to queries. It can be used to identify queries in performance metrics or logs. [#1895](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1895)
 - Upgrade to commerce-sdk-isomorphic v3.0.0 [#1914](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1914)
 
 ### :warning: Planned API Changes :warning:
+
 #### Shopper Context
 
 Starting July 31st 2024, all endpoints in the Shopper context API will require the `siteId` parameter for new customers. This field is marked as optional for backward compatibility and will be changed to mandatory tentatively by January 2025. You can read more about the planned change [here](https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-context?meta=Summary) in the notes section.
@@ -20,21 +47,25 @@ Starting July 31st 2024, all endpoints in the Shopper context API will require t
 
 SLAS will soon require new tenants to pass `channel_id` as an argument for retrieving guest access tokens. You can read more about the planned change [here](https://developer.salesforce.com/docs/commerce/commerce-api/guide/slas.html#guest-tokens).
 
-Please be aware that existing tenants are on a temporary allow list and will see no immediate disruption to service.  We do ask that all users seek to adhere to the `channel_id` requirement before the end of August to enhance your security posture before the holiday peak season.
+Please be aware that existing tenants are on a temporary allow list and will see no immediate disruption to service. We do ask that all users seek to adhere to the `channel_id` requirement before the end of August to enhance your security posture before the holiday peak season.
 
 In practice, we recommend:
+
 - For customers using the SLAS helpers with a private client, it is recommended to upgrade to `v3.0.0` of the `commerce-sdk-react`.
 
 ## v2.0.2 (Jul 12, 2024)
+
 - Updated StorefrontPreview component to make siteId available [#1874](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1874)
 
 ## v2.0.1 (Jul 08, 2024)
+
 - Fix private slas proxy config for commerce api in provider [#1883](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1883)
 - Fix `useCustomQuery` error handling [#1883](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1883)
 - Fix `updateCustomer` squashing existing data [#1883](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1883)
 - Fix `transferBasket` updating the wrong customer basket [#1887](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1887)
 
 ## v2.0.0 (Jun 25, 2024)
+
 - Add `useCustomQuery` and `useCustomMutation` for SCAPI custom endpoint support [#1793](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1793)
 - Add Shopper Stores hooks [#1788](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1788)
 - Add a helper method to add an item to either new or existing basket [#1677](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1677)
@@ -42,10 +73,12 @@ In practice, we recommend:
 - Upgrade to commerce-sdk-isomorphic v2.1.0 [#1852](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1852)
 
 ## v1.4.2 (Apr 17, 2024)
+
 - Update SLAS private proxy path [#1752](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1752)
 
 ## v1.4.1 (Apr 16, 2024)
-- Add missing params keys `allVariationProperties` and `perPricebook`  for Shopper Search [#1750](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1750)
+
+- Add missing params keys `allVariationProperties` and `perPricebook` for Shopper Search [#1750](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1750)
 
 ## v1.4.0 (Apr 15, 2024)
 

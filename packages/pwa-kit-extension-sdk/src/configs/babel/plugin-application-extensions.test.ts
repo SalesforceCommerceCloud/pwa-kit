@@ -43,8 +43,8 @@ describe('replaceExtensionsPlaceholderContentPlugin', () => {
 
         const code = `export const oldExample = 'Old Content'`
         const options = {
-            installed: ['extension-sample'],
-            configured: ['extension-sample'],
+            installed: ['extension-test'],
+            configured: ['extension-test'],
             target: 'web'
         }
         const result = transformCode(code, options)
@@ -60,8 +60,8 @@ describe('replaceExtensionsPlaceholderContentPlugin', () => {
 
         const filePath = '../express/placeholders/application-extensions.js'
         const options = {
-            installed: ['extension-sample'],
-            configured: ['extension-sample'],
+            installed: ['extension-test'],
+            configured: ['extension-test'],
             target: 'web'
         }
 
@@ -86,8 +86,8 @@ describe('replaceExtensionsPlaceholderContentPlugin', () => {
         ;(renderTemplate as jest.Mock).mockReturnValue(`<.@invalid syntax here`)
 
         const options = {
-            installed: ['extension-sample'],
-            configured: ['extension-sample'],
+            installed: ['extension-test'],
+            configured: ['extension-test'],
             target: 'web'
         }
 

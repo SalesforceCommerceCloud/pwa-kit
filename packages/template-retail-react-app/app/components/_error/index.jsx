@@ -10,7 +10,6 @@ import {Helmet} from 'react-helmet'
 import {Box, Button, Flex, Heading, IconButton, Stack, Text} from '@chakra-ui/react'
 
 import {BrandLogo, FileIcon} from '@salesforce/retail-react-app/app/components/icons'
-import {useHistory} from 'react-router-dom'
 
 // <Error> is rendered when:
 //
@@ -22,7 +21,6 @@ import {useHistory} from 'react-router-dom'
 
 const Error = (props) => {
     const {message, stack} = props
-    const history = useHistory()
 
     const title = "This page isn't working"
     return (
@@ -44,7 +42,10 @@ const Error = (props) => {
                         icon={<BrandLogo width={[8, 8, 8, 12]} height={[6, 6, 6, 8]} />}
                         marginBottom={[1, 1, 2, 0]}
                         variant="unstyled"
-                        onClick={() => history.push('/')}
+                        // We need to use window.location.href here rather than history
+                        // as the application is in an error state. We need to force a
+                        // hard navigation to get back to the normal state.
+                        onClick={() => (window.location.href = '/')}
                     />
                 </Box>
             </Box>

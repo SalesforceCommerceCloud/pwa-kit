@@ -15,8 +15,8 @@ jest.mock('fs-extra', () => ({
 }))
 
 const EXTENSIONS: ApplicationExtensionEntryTuple[] = [
-    ['@salesforce/extension-sample', {enabled: true}],
-    ['@salesforce/extension-another', {enabled: true}]
+    ['@salesforce/extension-this', {enabled: true}],
+    ['@salesforce/extension-that', {enabled: true}]
 ]
 const CONFIG = {
     app: {extensions: EXTENSIONS}
@@ -35,11 +35,11 @@ describe('buildBabelExtensibilityArgs', () => {
             if (filePath.includes('application-extensions.js')) {
                 return '/absolute/path/to/application-extensions.js'
             }
-            if (filePath.includes(normalizePath('@salesforce/extension-sample/src'))) {
-                return '/absolute/path/to/@salesforce/extension-sample/src'
+            if (filePath.includes(normalizePath('@salesforce/extension-this/src'))) {
+                return '/absolute/path/to/@salesforce/extension-this/src'
             }
-            if (filePath.includes(normalizePath('@salesforce/extension-another/src'))) {
-                return '/absolute/path/to/@salesforce/extension-another/src'
+            if (filePath.includes(normalizePath('@salesforce/extension-that/src'))) {
+                return '/absolute/path/to/@salesforce/extension-that/src'
             }
             throw new Error(`Unexpected path: ${filePath}`)
         })
@@ -50,7 +50,7 @@ describe('buildBabelExtensibilityArgs', () => {
     })
 
     test('should return the correct Babel arguments string', () => {
-        const expectedArgs = `--ignore "node_modules/does_not_exist" --only "app/**,/absolute/path/to/build-remote-server.js,/absolute/path/to/application-extensions.js,/absolute/path/to/@salesforce/extension-sample/src,/absolute/path/to/@salesforce/extension-another/src/**"`
+        const expectedArgs = `--ignore "node_modules/does_not_exist" --only "app/**,/absolute/path/to/build-remote-server.js,/absolute/path/to/application-extensions.js,/absolute/path/to/@salesforce/extension-this/src,/absolute/path/to/@salesforce/extension-that/src/**"`
         const result = buildBabelExtensibilityArgs(CONFIG)
         expect(result).toBe(expectedArgs)
     })
@@ -70,10 +70,10 @@ describe('buildBabelExtensibilityArgs', () => {
             )
         )
         expect(fse.realpathSync).toHaveBeenCalledWith(
-            path.resolve('node_modules/@salesforce/extension-sample/src')
+            path.resolve('node_modules/@salesforce/extension-this/src')
         )
         expect(fse.realpathSync).toHaveBeenCalledWith(
-            path.resolve('node_modules/@salesforce/extension-another/src')
+            path.resolve('node_modules/@salesforce/extension-that/src')
         )
     })
 

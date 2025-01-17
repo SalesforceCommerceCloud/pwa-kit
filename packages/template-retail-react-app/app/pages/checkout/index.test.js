@@ -130,10 +130,10 @@ beforeEach(() => {
                 address1: '123 Main St',
                 city: 'Tampa',
                 countryCode: 'US',
-                firstName: 'Test',
-                fullName: 'Test McTester',
+                firstName: 'John',
+                fullName: 'John Smith',
                 id: '047b18d4aaaf4138f693a4b931',
-                lastName: 'McTester',
+                lastName: 'Smith',
                 phone: '(727) 555-1234',
                 postalCode: '33712',
                 stateCode: 'FL',
@@ -159,7 +159,7 @@ beforeEach(() => {
                         cardType: 'Master Card',
                         creditCardExpired: false,
                         expirationMonth: 1,
-                        expirationYear: 2030,
+                        expirationYear: 2040,
                         holder: 'Test McTester',
                         maskedNumber: '************5454',
                         numberLastDigits: '5454',
@@ -275,8 +275,8 @@ test('Can proceed through checkout steps as guest', async () => {
                     paymentCard: {
                         cardType: 'Visa',
                         creditCardExpired: false,
-                        expirationMonth: 12,
-                        expirationYear: 2024,
+                        expirationMonth: 1,
+                        expirationYear: 2040,
                         holder: 'Testy McTester',
                         maskedNumber: '************1111',
                         numberLastDigits: '1111',
@@ -394,7 +394,7 @@ test('Can proceed through checkout steps as guest', async () => {
     // Fill out credit card payment form
     await user.type(screen.getByLabelText(/card number/i), '4111111111111111')
     await user.type(screen.getByLabelText(/name on card/i), 'Testy McTester')
-    await user.type(screen.getByLabelText(/expiration date/i), '1224')
+    await user.type(screen.getByLabelText(/expiration date/i), '0140')
     await user.type(screen.getByLabelText(/^security code$/i /* not "security code info" */), '123')
 
     // Same as shipping checkbox selected by default
@@ -417,7 +417,7 @@ test('Can proceed through checkout steps as guest', async () => {
     // Verify applied payment and billing address
     expect(step3Content.getByText('Visa')).toBeInTheDocument()
     expect(step3Content.getByText('•••• 1111')).toBeInTheDocument()
-    expect(step3Content.getByText('12/2024')).toBeInTheDocument()
+    expect(step3Content.getByText('1/2040')).toBeInTheDocument()
 
     expect(step3Content.getByText('Tester McTesting')).toBeInTheDocument()
     expect(step3Content.getByText('123 Main St')).toBeInTheDocument()
@@ -485,7 +485,7 @@ test('Can proceed through checkout as registered customer', async () => {
     // (we no longer have saved payment methods)
     await user.type(screen.getByLabelText(/card number/i), '4111111111111111')
     await user.type(screen.getByLabelText(/name on card/i), 'Testy McTester')
-    await user.type(screen.getByLabelText(/expiration date/i), '1224')
+    await user.type(screen.getByLabelText(/expiration date/i), '0140')
     await user.type(screen.getByLabelText(/^security code$/i /* not "security code info" */), '123')
 
     // Same as shipping checkbox selected by default
@@ -494,6 +494,19 @@ test('Can proceed through checkout as registered customer', async () => {
     // Should display billing address that matches shipping address
     const step3Content = within(screen.getByTestId('sf-toggle-card-step-3-content'))
     expect(step3Content.getByText('123 Main St')).toBeInTheDocument()
+
+    // Edit billing address
+    const sameAsShippingBtn = screen.getByText(/same as shipping address/i)
+    await user.click(sameAsShippingBtn)
+
+    const firstNameInput = screen.getByLabelText(/first name/i)
+    const lastNameInput = screen.getByLabelText(/last name/i)
+    expect(step3Content.queryByText(/Set as default/)).not.toBeInTheDocument()
+
+    await user.clear(firstNameInput)
+    await user.clear(lastNameInput)
+    await user.type(firstNameInput, 'John')
+    await user.type(lastNameInput, 'Smith')
 
     // Move to final review step
     await user.click(screen.getByText(/review order/i))
@@ -505,8 +518,9 @@ test('Can proceed through checkout as registered customer', async () => {
     // Verify applied payment and billing address
     expect(step3Content.getByText('Master Card')).toBeInTheDocument()
     expect(step3Content.getByText('•••• 5454')).toBeInTheDocument()
-    expect(step3Content.getByText('1/2030')).toBeInTheDocument()
+    expect(step3Content.getByText('1/2040')).toBeInTheDocument()
 
+    expect(step3Content.getByText('John Smith')).toBeInTheDocument()
     expect(step3Content.getByText('123 Main St')).toBeInTheDocument()
 
     // Place the order

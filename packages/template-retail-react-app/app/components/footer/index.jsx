@@ -71,7 +71,7 @@ const Footer = ({...otherProps}) => {
 
     return (
         <Box as="footer" {...styles.container} {...otherProps}>
-            <Box {...styles.content}>
+            <Box {...styles.content} as="section">
                 <StylesProvider value={styles}>
                     <HideOnMobile>
                         <SimpleGrid columns={4} spacing={3}>
@@ -201,7 +201,7 @@ const Subscribe = ({...otherProps}) => {
     const intl = useIntl()
     return (
         <Box {...styles.subscribe} {...otherProps}>
-            <Heading {...styles.subscribeHeading}>
+            <Heading as="h1" {...styles.subscribeHeading}>
                 {intl.formatMessage({
                     id: 'footer.subscribe.heading.first_to_know',
                     defaultMessage: 'Be the first to know'

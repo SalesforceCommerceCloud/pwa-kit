@@ -6,7 +6,7 @@
  */
 import React from 'react'
 import PropTypes from 'prop-types'
-import {Box, List, ListItem, Heading, HStack, useMultiStyleConfig} from '@chakra-ui/react'
+import {Box, List, ListItem, Heading, useMultiStyleConfig} from '@chakra-ui/react'
 import Link from '@salesforce/retail-react-app/app/components/link'
 
 const LinksList = ({
@@ -37,24 +37,24 @@ const LinksList = ({
                     <Heading {...styles.heading}>{heading}</Heading>
                 ))}
 
-            {links && (
-                <List spacing={5} {...styles.list}>
-                    {variant === 'horizontal' ? (
-                        <HStack>
-                            {links.map((link, i) => (
-                                <ListItem key={i} {...styles.listItem} sx={styles.listItemSx}>
-                                    <Link
-                                        to={link.href}
-                                        onClick={onLinkClick}
-                                        {...(link.styles ? link.styles : {})}
-                                    >
-                                        {link.text}
-                                    </Link>
-                                </ListItem>
-                            ))}
-                        </HStack>
-                    ) : (
-                        links.map((link, i) => (
+            {links &&
+                (variant === 'horizontal' ? (
+                    <List {...styles.list} data-testid="horizontal-list">
+                        {links.map((link, i) => (
+                            <ListItem key={i} {...styles.listItem} sx={styles.listItemSx}>
+                                <Link
+                                    to={link.href}
+                                    onClick={onLinkClick}
+                                    {...(link.styles ? link.styles : {})}
+                                >
+                                    {link.text}
+                                </Link>
+                            </ListItem>
+                        ))}
+                    </List>
+                ) : (
+                    <List spacing={5} {...styles.list}>
+                        {links.map((link, i) => (
                             <ListItem key={i}>
                                 <Link
                                     to={link.href}
@@ -64,10 +64,9 @@ const LinksList = ({
                                     {link.text}
                                 </Link>
                             </ListItem>
-                        ))
-                    )}
-                </List>
-            )}
+                        ))}
+                    </List>
+                ))}
         </Box>
     )
 }

@@ -6,7 +6,7 @@
  */
 import React, {useState, useEffect, useRef} from 'react'
 import {FormattedMessage, useIntl} from 'react-intl'
-import {Box, Stack, Heading, Flex, Skeleton} from '@chakra-ui/react'
+import {Box, Flex, Skeleton, Stack, Heading} from '@chakra-ui/react'
 import {useProducts, useShopperCustomersMutation} from '@salesforce/commerce-sdk-react'
 
 import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
@@ -215,6 +215,7 @@ const AccountWishlist = () => {
                             secondaryActions={
                                 <WishlistSecondaryButtonGroup
                                     productListItemId={item.id}
+                                    productName={item.product.name}
                                     // Focus to 'Wishlist' header after remove for accessibility
                                     focusElementOnRemove={headingRef}
                                     onClick={handleSecondaryAction}

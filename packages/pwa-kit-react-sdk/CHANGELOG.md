@@ -6,6 +6,12 @@
 - Add new `getStaticAssetUrl` utility to access assets specifically in the `/static` folder. (#2040)[https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2040]
 - Update Application Extensions import in `react-rendering.js` and `main.js` (#2004)[https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2004]
 - Define interface of the app extension's config [#2010](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2010)
+## v3.9.0-dev (Oct 29, 2024)
+- Add RedirectWithStatus component, allowing finer grained control of rediriects and their status code [#2173](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2173)
+
+## v3.8.0 (Oct 28, 2024)
+- [Server Affinity] - Attach dwsid to SCAPI request headers [#2090](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2090)
+- Create useOrigin hook to return an app origin that takes x-forwarded-host header into consideration. [#2050](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2050)
 
 ## v3.7.0 (Aug 07, 2024)
 - Add `beforeHydrate` option to withReactQuery component [#1912](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1912)

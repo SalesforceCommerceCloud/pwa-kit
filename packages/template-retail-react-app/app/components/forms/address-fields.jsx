@@ -18,11 +18,15 @@ const defaultFormTitleAriaLabel = defineMessage({
     id: 'use_address_fields.label.address_form'
 })
 
-const AddressFields = ({form, prefix = '', formTitleAriaLabel = defaultFormTitleAriaLabel}) => {
+const AddressFields = ({
+    form,
+    prefix = '',
+    formTitleAriaLabel = defaultFormTitleAriaLabel,
+    isBillingAddress = false
+}) => {
     const {data: customer} = useCurrentCustomer()
     const fields = useAddressFields({form, prefix})
     const intl = useIntl()
-
     const addressFormRef = useRef()
     useEffect(() => {
         // Focus on the form when the component mounts for accessibility
@@ -52,7 +56,7 @@ const AddressFields = ({form, prefix = '', formTitleAriaLabel = defaultFormTitle
                     <Field {...fields.postalCode} />
                 </GridItem>
             </Grid>
-            {customer.isRegistered && <Field {...fields.preferred} />}
+            {customer.isRegistered && !isBillingAddress && <Field {...fields.preferred} />}
         </Stack>
     )
 }
@@ -65,7 +69,10 @@ AddressFields.propTypes = {
     prefix: PropTypes.string,
 
     /** Optional aria label to use for the address form */
-    formTitleAriaLabel: MESSAGE_PROPTYPE
+    formTitleAriaLabel: MESSAGE_PROPTYPE,
+
+    /** Optional flag to indication if an address is a billing address */
+    isBillingAddress: PropTypes.bool
 }
 
 export default AddressFields

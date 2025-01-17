@@ -11,7 +11,8 @@ import {
     X_MOBIFY_QUERYSTRING,
     SET_COOKIE,
     CACHE_CONTROL,
-    NO_CACHE
+    NO_CACHE,
+    X_ENCODED_HEADERS
 } from './constants'
 import {
     catchAndLog,
@@ -357,6 +358,7 @@ export const RemoteServerFactory = {
         // want request-processors applied to development views.
         this._addSDKInternalHandlers(app)
         this._setupSSRRequestProcessorMiddleware(app)
+        this._setForwardedHeaders(app, options)
 
         this._setupLogging(app)
         this._setupMetricsFlushing(app)
@@ -443,6 +445,23 @@ export const RemoteServerFactory = {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     _addSDKInternalHandlers(app) {
         // This method is used by the dev server, but is not needed here.
+    },
+
+    /**
+     * Set x-forward-* headers into locals, this is primarily used to facilitate react sdk hook `useOrigin`
+     * @private
+     */
+    _setForwardedHeaders(app, options) {
+        app.use((req, res, next) => {
+            const xForwardedHost = req.headers?.['x-forwarded-host']
+            const xForwardedProto = req.headers?.['x-forwarded-proto']
+            if (xForwardedHost) {
+                // prettier-ignore
+                res.locals.xForwardedOrigin = `${xForwardedProto || options.protocol}://${xForwardedHost}`
+            }
+
+            next()
+        })
     },
 
     /**
@@ -703,6 +722,11 @@ export const RemoteServerFactory = {
                     if (incomingRequest.path?.match(options.applySLASPrivateClientToEndpoints)) {
                         proxyRequest.setHeader('Authorization', `Basic ${encodedSlasCredentials}`)
                     }
+
+                    // /oauth2/trusted-agent/token endpoint requires a different auth header
+                    if (incomingRequest.path?.match(/\/oauth2\/trusted-agent\/token/)) {
+                        proxyRequest.setHeader('_sfdc_client_auth', encodedSlasCredentials)
+                    }
                 },
                 onProxyRes: (proxyRes, req) => {
                     if (proxyRes.statusCode && proxyRes.statusCode >= 400) {
@@ -758,6 +782,10 @@ export const RemoteServerFactory = {
         // NOTE: Think about changing the name of this function to `applyApplicationExtensions`. First look into
         // what a common pattern is for application enhancement.
         applyApplicationExtensions(app)
+
+        if (options?.encodeNonAsciiHttpHeaders) {
+            app.use(encodeNonAsciiMiddleware)
+        }
 
         applyPatches(options)
     },
@@ -955,7 +983,7 @@ export const RemoteServerFactory = {
      * @param app {Express} - an Express App
      * @private
      */
-    _createHandler(app) {
+    _createHandler(app, options) {
         // This flag is initially false, and is set true on the first request
         // handled by a Lambda. If it is true on entry to the handler function,
         // it indicates that the Lambda container has been reused.
@@ -964,6 +992,24 @@ export const RemoteServerFactory = {
         const server = awsServerlessExpress.createServer(app, null, binaryMimeTypes)
 
         const handler = (event, context, callback) => {
+            // encode non ASCII request headers
+            if (options?.encodeNonAsciiHttpHeaders) {
+                Object.keys(event.headers).forEach((key) => {
+                    if (!isASCII(event.headers[key])) {
+                        event.headers[key] = encodeURIComponent(event.headers[key])
+                        // x-encoded-headers keeps track of which headers have been modified and encoded
+                        if (event.headers[X_ENCODED_HEADERS]) {
+                            // append header key
+                            event.headers[
+                                X_ENCODED_HEADERS
+                            ] = `${event.headers[X_ENCODED_HEADERS]},${key}`
+                        } else {
+                            event.headers[X_ENCODED_HEADERS] = key
+                        }
+                    }
+                })
+            }
+
             // We don't want to wait for an empty event loop once the response
             // has been sent. Setting this to false will "send the response
             // right away when the callback executes", but any pending events
@@ -1066,8 +1112,8 @@ export const RemoteServerFactory = {
     createHandler(options, customizeApp) {
         process.on('unhandledRejection', catchAndLog)
         const app = this._createApp(options)
-        customizeApp(app)
-        return this._createHandler(app)
+        customizeApp(app, options)
+        return this._createHandler(app, options)
     },
 
     /**
@@ -1157,6 +1203,40 @@ const errorHandlerMiddleware = (err, req, res, next) => {
     catchAndLog(err)
     req.app.sendMetric('RenderErrors')
     res.sendStatus(500)
+}
+
+/**
+ * Helper function that checks if a string is composed of ASCII characters
+ * We only check printable ASCII characters and not special ASCII characters
+ * such as NULL
+ *
+ * @private
+ */
+const isASCII = (str) => {
+    return /^[\x20-\x7E]*$/.test(str)
+}
+
+/**
+ * Express Middleware applied to responses that encode any non ASCII headers
+ *
+ * @private
+ */
+const encodeNonAsciiMiddleware = (req, res, next) => {
+    const originalSetHeader = res.setHeader
+
+    res.setHeader = function (key, value) {
+        if (!isASCII(value)) {
+            originalSetHeader.call(this, key, encodeURIComponent(value))
+
+            let encodedHeaders = res.getHeader(X_ENCODED_HEADERS)
+            encodedHeaders = encodedHeaders ? `${encodedHeaders},${key}` : key
+            originalSetHeader.call(this, X_ENCODED_HEADERS, encodedHeaders)
+        } else {
+            originalSetHeader.call(this, key, value)
+        }
+    }
+
+    next()
 }
 
 /**

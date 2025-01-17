@@ -7,6 +7,7 @@
 import Cookies from 'js-cookie'
 import {getDefaultCookieAttributes} from '../../utils'
 import {BaseStorage, BaseStorageOptions} from './base'
+import {EXCLUDE_COOKIE_SUFFIX} from '../../constant'
 
 /**
  * A normalized implementation for Cookie store. It implements the BaseStorage interface
@@ -23,16 +24,15 @@ export class CookieStorage extends BaseStorage {
         super(options)
     }
     set(key: string, value: string, options?: Cookies.CookieAttributes) {
-        const suffixedKey = this.getSuffixedKey(key)
+        const suffixedKey = EXCLUDE_COOKIE_SUFFIX.includes(key) ? key : this.getSuffixedKey(key)
         Cookies.set(suffixedKey, value, {
             ...getDefaultCookieAttributes(),
             ...options
         })
     }
     get(key: string) {
-        const suffixedKey = this.getSuffixedKey(key)
+        const suffixedKey = EXCLUDE_COOKIE_SUFFIX.includes(key) ? key : this.getSuffixedKey(key)
         let value = Cookies.get(suffixedKey) || ''
-
         if (value) {
             // Some values, like the access token, may be split
             // across multiple keys to fit under ECOM cookie size
@@ -49,7 +49,7 @@ export class CookieStorage extends BaseStorage {
         return value
     }
     delete(key: string, options?: Cookies.CookieAttributes) {
-        const suffixedKey = this.getSuffixedKey(key)
+        const suffixedKey = EXCLUDE_COOKIE_SUFFIX.includes(key) ? key : this.getSuffixedKey(key)
 
         Cookies.remove(suffixedKey, {
             ...getDefaultCookieAttributes(),
