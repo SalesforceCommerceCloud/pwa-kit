@@ -218,7 +218,13 @@ class Auth {
                 siteId: config.siteId
             },
             throwOnBadResponse: true,
-            fetchOptions: config.fetchOptions
+            // We need to set credentials to 'same-origin' to allow cookies to be set.
+            // This is required as SLAS calls return a dwsid cookie for hybrid sites.
+            // The dwsid value is then passed to the SCAPI as a header maintain the server affinity.
+            fetchOptions: {
+                credentials: 'same-origin',
+                ...config.fetchOptions
+            }
         })
         this.shopperCustomersClient = new ShopperCustomers({
             proxy: config.proxy,
