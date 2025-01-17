@@ -565,7 +565,7 @@ const ALL_PRESET_NAMES = PRIVATE_PRESET_NAMES.concat(PUBLIC_PRESET_NAMES)
 const PROJECT_ID_MAX_LENGTH = 20
 
 // Constant for the base application directory
-const APP_DIR = 'dir'
+const APP_DIR = 'app'
 // Constant for the directory containing extracted application extensions
 const APP_EXTENSIONS_DIR = 'application-extensions'
 
@@ -783,8 +783,13 @@ const processTemplate = (relFile, inputDir, outputDir, context) => {
  *
  * @param {Array} appExtensions - An array of the Application Extension names.
  * @param {boolean} extractAppExtensions - A boolean indicating whether to extract the Application Extensions code from the npm package.
+ * @param {string} appExtensionsDir - The path to the extracted application extensions directory.
  */
-const processAppExtensions = (appExtensions = [], extractAppExtensions = false) => {
+const processAppExtensions = (
+    appExtensions = [],
+    extractAppExtensions = false,
+    appExtensionsDir
+) => {
     if (appExtensions.length > 0 && extractAppExtensions) {
         appExtensions.forEach((appExtensionName) => {
             // Create the full path for the temporary directory, preserving the namespace
@@ -807,11 +812,7 @@ const processAppExtensions = (appExtensions = [], extractAppExtensions = false) 
 
             // Copy the extracted Application Extension into the appropriate folder
             const appExtensionTmpPath = p.join(appExtensionTmp, 'package')
-            const appExtensionDestDir = p.join(
-                APP_DIR,
-                APP_EXTENSIONS_DIR,
-                appExtensionName.replace('/', '_')
-            )
+            const appExtensionDestDir = p.join(appExtensionsDir, appExtensionName.replace('/', '_'))
             sh.mkdir('-p', appExtensionDestDir)
 
             // Copy hidden files
@@ -880,6 +881,7 @@ const runGenerator = async (
     // downloading from NPM or copying from the template bundle folder.
     const tmp = fs.mkdtempSync(p.resolve(os.tmpdir(), 'extract-template'))
     const packagePath = p.join(tmp, 'package')
+    const appExtensionsDir = p.join(outputDir, APP_DIR, APP_EXTENSIONS_DIR)
     const {id, type} = templateSource
     let tarPath
 
@@ -987,7 +989,7 @@ const runGenerator = async (
             projectName: localDevProjectContext.answers.project.name
         })
     } else {
-        processAppExtensions(selectedAppExtensions, extractAppExtensions)
+        processAppExtensions(selectedAppExtensions, extractAppExtensions, appExtensionsDir)
     }
 
     // Prepare updates for package.json
