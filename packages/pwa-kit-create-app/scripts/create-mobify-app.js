@@ -928,13 +928,20 @@ const runGenerator = async (
     if (answers.project.type === 'PWAKitAppExtensionProject') {
         const devOutputDir = p.join(outputDir, LOCAL_DEV_PROJECT_DIR)
 
-        // Update the root package.json to add a start script
-        updatePackageJson(p.resolve(outputDir, 'package.json'), {
+        // Prepare the package.json updates
+        const pkgUpdates = {
             scripts: {
                 start: `npm --prefix ./${LOCAL_DEV_PROJECT_DIR} start`,
                 'start:inspect': `npm --prefix ./${LOCAL_DEV_PROJECT_DIR} run start:inspect`
             }
-        })
+        }
+
+        if (answers.project.extractAppExtensions === true) {
+            pkgUpdates.workspaces = ['app/application-extensions/*']
+        }
+
+        // Update the root package.json
+        updatePackageJson(p.resolve(outputDir, 'package.json'), pkgUpdates)
 
         // Recursively call runGenerator for the 'typescript-minimal' local dev project
         const localDevProjectContext = {
