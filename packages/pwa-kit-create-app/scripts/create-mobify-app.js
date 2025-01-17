@@ -564,6 +564,9 @@ const ALL_PRESET_NAMES = PRIVATE_PRESET_NAMES.concat(PUBLIC_PRESET_NAMES)
 
 const PROJECT_ID_MAX_LENGTH = 20
 
+// Constant for the directory containing extracted application extensions
+const APP_EXTENSIONS_DIR = p.join('app', 'application-extensions')
+
 // Utilities
 
 const readJson = (path) => JSON.parse(sh.cat(path))
@@ -775,11 +778,11 @@ const processTemplate = (relFile, inputDir, outputDir, context) => {
 }
 
 /**
- * Process the Application Extensions into the application-extensions directory.
+ * Process the Application Extensions into the extracted application extensions directory.
  *
- * @param appExtensions - An array of the Application Extension names.
- * @param extractAppExtensions - A boolean indicating whether to extract the Application Extensions code from the npm package
- * @param appExtensionsDir - The path to the application-extensions directory.
+ * @param {Array} appExtensions - An array of the Application Extension names.
+ * @param {boolean} extractAppExtensions - A boolean indicating whether to extract the Application Extensions code from the npm package.
+ * @param {string} appExtensionsDir - The path to the extracted application extensions directory.
  */
 const processAppExtensions = (
     appExtensions = [],
@@ -806,7 +809,7 @@ const processAppExtensions = (
                 sync: true
             })
 
-            // Copy the Application Extension into the appropriate folder inside application-extensions
+            // Copy the extracted Application Extension into the appropriate folder
             const appExtensionTmpPath = p.join(appExtensionTmp, 'package')
             const appExtensionDestDir = p.join(appExtensionsDir, appExtensionName.replace('/', '_'))
             sh.mkdir('-p', appExtensionDestDir)
@@ -877,7 +880,7 @@ const runGenerator = async (
     // downloading from NPM or copying from the template bundle folder.
     const tmp = fs.mkdtempSync(p.resolve(os.tmpdir(), 'extract-template'))
     const packagePath = p.join(tmp, 'package')
-    const appExtensionsDir = p.join(outputDir, 'app', 'application-extensions')
+    const appExtensionsDir = p.join(outputDir, APP_EXTENSIONS_DIR)
     const {id, type} = templateSource
     let tarPath
 
@@ -998,7 +1001,7 @@ const runGenerator = async (
         },
         // Conditionally add workspaces for extractAppExtensions
         ...(extractAppExtensions && {
-            workspaces: ['app/application-extensions/*']
+            workspaces: [`${APP_EXTENSIONS_DIR}/*`]
         }),
         // Add selected Application Extensions to devDependencies
         devDependencies: selectedAppExtensions.reduce((acc, appExtensionName) => {
@@ -1009,7 +1012,7 @@ const runGenerator = async (
             const version = appExtensionDetails ? appExtensionDetails.version : 'latest'
 
             acc[appExtensionName] = answers.project.extractAppExtensions
-                ? `file:./app/application-extensions/${appExtensionName.replace('/', '_')}`
+                ? `file:${p.join('.', APP_EXTENSIONS_DIR, appExtensionName.replace('/', '_'))}`
                 : version
             return acc
         }, {})
