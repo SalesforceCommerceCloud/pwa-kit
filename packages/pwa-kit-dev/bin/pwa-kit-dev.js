@@ -86,52 +86,6 @@ const validateAppConfiguration = () => {
     }
 }
 
-/**
- * Executes a command in the application-extension directory.
- * @param {string} command - The command to execute.
- * @param {string} pkgRoot - The root directory of the package.
- */
-const runCommandInExtensions = (command, pkgRoot) => {
-    const extensionsDir = p.join(pkgRoot, '..', '..', '..', 'app', 'application-extensions')
-
-    if (!fse.existsSync(extensionsDir)) {
-        return
-    }
-
-    const extensions = fse.readdirSync(extensionsDir).filter((dir) => {
-        const dirPath = p.join(extensionsDir, dir)
-        return fse.statSync(dirPath).isDirectory()
-    })
-
-    extensions.forEach((extension) => {
-        const extensionPath = p.join(extensionsDir, extension)
-
-        // If the extension is namespaced, look for the next directory
-        if (extension.startsWith('@')) {
-            const subDirs = fse.readdirSync(extensionPath).filter((subDir) => {
-                return fse.statSync(p.join(extensionPath, subDir)).isDirectory()
-            })
-
-            // Execute the provided command in each subdirectory for namespaced extensions
-            subDirs.forEach((subDir) => {
-                const subDirPath = p.join(extensionPath, subDir)
-                try {
-                    execSync(`cd ${subDirPath} && ${command}`)
-                } catch (error) {
-                    console.error(`Error executing command in ${subDirPath}:`, error.message)
-                }
-            })
-        } else {
-            // For non-namespaced extensions, execute the provided command in the extension directory
-            try {
-                execSync(`cd ${extensionPath} && ${command}`)
-            } catch (error) {
-                console.error(`Error executing command in ${extensionPath}:`, error.message)
-            }
-        }
-    })
-}
-
 const main = async () => {
     const pkgRoot = p.join(__dirname, '..')
     process.env.CONTEXT = process.cwd()
@@ -490,15 +444,11 @@ const main = async () => {
         .option('--fix', 'Try and fix errors (default: false)')
         .action(async (path, {fix}) => {
             const eslint = p.join(require.resolve('eslint'), '..', '..', '..', '.bin', 'eslint')
-            const command = `"${eslint}" --resolve-plugins-relative-to "${pkgRoot}"${
-                fix ? ' --fix' : ''
-            } .`
-
-            // Run the command in application extensions
-            runCommandInExtensions(command, pkgRoot)
-
-            // Run the command on the provided path
-            execSync(`${command} "${path}"`)
+            execSync(
+                `"${eslint}" --resolve-plugins-relative-to "${pkgRoot}"${
+                    fix ? ' --fix' : ''
+                } "${path}"`
+            )
         })
 
     program
@@ -599,22 +549,6 @@ const main = async () => {
                     )
                 })
             })
-        })
-
-    program
-        .command('tsc')
-        .description('compile TypeScript files in all files')
-        .argument('<path>', 'path or glob to compile')
-        .argument('[args...]', 'additional arguments for tsc')
-        .action(async (path, args) => {
-            const tsc = p.join(require.resolve('typescript'), '..', '..', '..', '.bin', 'tsc')
-            const command = `"${tsc}" ${args.join(' ')}`
-
-            // Run the command in application extensions
-            runCommandInExtensions(command, pkgRoot)
-
-            // Run the command on the provided path
-            execSync(`${command} "${path}"`)
         })
 
     // Global options
