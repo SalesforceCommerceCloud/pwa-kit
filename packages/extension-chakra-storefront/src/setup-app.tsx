@@ -118,7 +118,9 @@ class ChakraStorefront extends ApplicationExtension<Config> {
                 route.component !== Pages.Home
         )
         const routes = allRoutes.slice()
-        routes.splice(indexOfOriginalHome, 1)
+        if (indexOfOriginalHome >= 0) {
+            routes.splice(indexOfOriginalHome, 1)
+        }
 
         return configureRoutes(routes, config, {
             ignoredRoutes: ['/callback']
