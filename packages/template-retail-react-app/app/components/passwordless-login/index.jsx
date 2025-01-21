@@ -88,6 +88,7 @@ const PasswordlessLogin = ({
                     <StandardLogin
                         form={form}
                         handleForgotPasswordClick={handleForgotPasswordClick}
+                        setShowPasswordView={setShowPasswordView}
                         hideEmail={true}
                     />
                 )}

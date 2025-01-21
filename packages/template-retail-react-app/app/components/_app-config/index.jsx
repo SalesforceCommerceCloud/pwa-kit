@@ -54,6 +54,8 @@ const AppConfig = ({children, locals = {}}) => {
 
     const appOrigin = useAppOrigin()
 
+    const passwordlessCallback = locals.appConfig.login?.passwordless?.callbackURI
+
     return (
         <CommerceApiProvider
             shortCode={commerceApiConfig.parameters.shortCode}
@@ -63,7 +65,7 @@ const AppConfig = ({children, locals = {}}) => {
             locale={locals.locale?.id}
             currency={locals.locale?.preferredCurrency}
             redirectURI={`${appOrigin}/callback`}
-            passwordlessLoginCallbackURI={locals.appConfig.login?.passwordless?.callbackURI}
+            passwordlessLoginCallbackURI={passwordlessCallback}
             proxy={`${appOrigin}${commerceApiConfig.proxyPath}`}
             headers={headers}
             // Uncomment 'enablePWAKitPrivateClient' to use SLAS private client login flows.

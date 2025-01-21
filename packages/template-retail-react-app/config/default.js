@@ -18,15 +18,15 @@ module.exports = {
         login: {
             passwordless: {
                 enabled: false,
-                callbackURI: '/passwordless-login-callback'
+                callbackURI: process.env.PASSWORDLESS_LOGIN_CALLBACK_URI || '/passwordless-login-callback'
             },
             social: {
                 enabled: false,
                 idps: ['google', 'apple'],
-                redirectURI: '/social-callback'
+                redirectURI: process.env.SOCIAL_LOGIN_REDIRECT_URI || '/social-callback'
             },
             resetPassword: {
-                callbackURI: '/reset-password-callback'
+                callbackURI: process.env.RESET_PASSWORD_CALLBACK_URI || '/reset-password-callback'
             }
         },
         defaultSite: 'RefArchGlobal',
