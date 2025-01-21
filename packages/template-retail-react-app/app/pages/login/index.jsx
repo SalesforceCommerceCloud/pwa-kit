@@ -111,7 +111,7 @@ const Login = ({initialView = LOGIN_VIEW}) => {
                 await authorizePasswordlessLogin.mutateAsync({userid: email})
                 setCurrentView(EMAIL_VIEW)
             } catch (error) {
-                const message = /error getting user info/i.test(error.message)
+                const message = /user not found/i.test(error.message)
                     ? formatMessage(CREATE_ACCOUNT_FIRST_ERROR_MESSAGE)
                     : PASSWORDLESS_ERROR_MESSAGES.some((msg) => msg.test(error.message))
                     ? formatMessage(FEATURE_UNAVAILABLE_ERROR_MESSAGE)
