@@ -239,7 +239,7 @@ export const render = async (req, res, next) => {
     }
 
     if (redirectUrl) {
-        res.redirect(302, redirectUrl)
+        res.redirect(routerContext.status || 302, redirectUrl)
     } else {
         res.status(status).send(html)
     }

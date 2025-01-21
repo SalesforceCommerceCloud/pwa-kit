@@ -2251,6 +2251,12 @@
       "value": "Apple"
     }
   ],
+  "login_form.button.back": [
+    {
+      "type": 0,
+      "value": "Back to Sign In Options"
+    }
+  ],
   "login_form.button.continue_securely": [
     {
       "type": 0,

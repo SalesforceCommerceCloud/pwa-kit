@@ -58,6 +58,7 @@ jest.mock('../universal/routes', () => {
     const React = require('react')
     const PropTypes = require('prop-types')
     const errors = require('../universal/errors')
+    const RedirectWithStatus = require('../universal/components/redirect-with-status').default
     const {Redirect} = require('react-router-dom')
     const {Helmet} = require('react-helmet')
     const {useQuery} = require('@tanstack/react-query')
@@ -183,6 +184,16 @@ jest.mock('../universal/routes', () => {
         }
     }
 
+    class RedirectWithStatusPage extends React.Component {
+        static getProps() {
+            return Promise.resolve()
+        }
+
+        render() {
+            return <RedirectWithStatus to="/elsewhere/" status={301} />
+        }
+    }
+
     class HelmetPage extends React.Component {
         static getProps() {
             return Promise.resolve()
@@ -304,6 +315,10 @@ jest.mock('../universal/routes', () => {
             {
                 path: '/redirect/',
                 component: RedirectPage
+            },
+            {
+                path: '/redirectWithStatus/',
+                component: RedirectWithStatusPage
             },
             {
                 path: '/init-sets-status/',
@@ -536,6 +551,13 @@ describe('The Node SSR Environment', () => {
             req: {url: '/redirect/'},
             assertions: (res) => {
                 expect(res.statusCode).toBe(302)
+            }
+        },
+        {
+            description: `can redirect with HTTP 301 status`,
+            req: {url: '/redirectWithStatus/'},
+            assertions: (res) => {
+                expect(res.statusCode).toBe(301)
             }
         },
         {
