@@ -33,10 +33,11 @@ import PasswordlessEmailConfirmation from '@salesforce/retail-react-app/app/comp
 import {noop} from '@salesforce/retail-react-app/app/utils/utils'
 import {
     API_ERROR_MESSAGE,
-    FEATURE_UNAVAILABLE_ERROR_MESSAGE,
     CREATE_ACCOUNT_FIRST_ERROR_MESSAGE,
+    FEATURE_UNAVAILABLE_ERROR_MESSAGE,
     LOGIN_TYPES,
-    PASSWORDLESS_ERROR_MESSAGES
+    PASSWORDLESS_ERROR_MESSAGES,
+    USER_NOT_FOUND_ERROR
 } from '@salesforce/retail-react-app/app/constants'
 import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
 import {usePrevious} from '@salesforce/retail-react-app/app/hooks/use-previous'
@@ -106,7 +107,7 @@ export const AuthModal = ({
                 await authorizePasswordlessLogin.mutateAsync({userid: email})
                 setCurrentView(EMAIL_VIEW)
             } catch (error) {
-                const message = /user not found/i.test(error.message)
+                const message = USER_NOT_FOUND_ERROR.test(error.message)
                     ? formatMessage(CREATE_ACCOUNT_FIRST_ERROR_MESSAGE)
                     : PASSWORDLESS_ERROR_MESSAGES.some((msg) => msg.test(error.message))
                     ? formatMessage(FEATURE_UNAVAILABLE_ERROR_MESSAGE)
