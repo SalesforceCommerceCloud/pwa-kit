@@ -197,7 +197,7 @@ describe('passwordless enabled', () => {
 
     test.each([
         [
-            'Error getting user info for xxx@xxx.com',
+            'User not found',
             'This feature is not currently available. You must create an account to access this feature.'
         ],
         [

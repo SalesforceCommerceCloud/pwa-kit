@@ -218,7 +218,7 @@ export const AuthModal = ({
     }, [currentView])
 
     useEffect(() => {
-        setPasswordlessLoginEmail(initialEmail);
+        setPasswordlessLoginEmail(initialEmail)
     }, [initialEmail])
 
     useEffect(() => {

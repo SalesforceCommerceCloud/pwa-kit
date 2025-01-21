@@ -46,7 +46,8 @@ import {
     API_ERROR_MESSAGE,
     FEATURE_UNAVAILABLE_ERROR_MESSAGE,
     CREATE_ACCOUNT_FIRST_ERROR_MESSAGE,
-    PASSWORDLESS_ERROR_MESSAGES
+    PASSWORDLESS_ERROR_MESSAGES,
+    USER_NOT_FOUND_ERROR
 } from '@salesforce/retail-react-app/app/constants'
 
 const ContactInfo = ({isSocialEnabled = false, isPasswordlessEnabled = false, idps = []}) => {
@@ -83,7 +84,7 @@ const ContactInfo = ({isSocialEnabled = false, isPasswordlessEnabled = false, id
             setAuthModalView(EMAIL_VIEW)
             authModal.onOpen()
         } catch (error) {
-            const message = /error getting user info/i.test(error.message)
+            const message = USER_NOT_FOUND_ERROR.test(error.message)
                 ? formatMessage(CREATE_ACCOUNT_FIRST_ERROR_MESSAGE)
                 : PASSWORDLESS_ERROR_MESSAGES.some((msg) => msg.test(error.message))
                 ? formatMessage(FEATURE_UNAVAILABLE_ERROR_MESSAGE)
