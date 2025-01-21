@@ -55,7 +55,7 @@ const StoresList = ({storesInfo}) => {
                         <HStack align="flex-start" mt="16px" mb="16px">
                             <Radio
                                 value={store.id}
-                                mt="1.5px"
+                                mt="1px"
                                 aria-describedby={`store-info-${store.id}`}
                             ></Radio>
                             <Box id={`store-info-${store.id}`}>
