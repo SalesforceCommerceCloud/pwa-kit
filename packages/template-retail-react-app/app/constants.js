@@ -265,3 +265,5 @@ export const PASSWORDLESS_ERROR_MESSAGES = [
 ]
 
 export const INVALID_TOKEN_ERROR = /invalid token/i
+
+export const USER_NOT_FOUND_ERROR = /user not found/i
