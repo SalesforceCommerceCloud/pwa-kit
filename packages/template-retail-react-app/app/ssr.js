@@ -54,7 +54,7 @@ const options = {
     // Set this to false if using a SLAS public client
     // When setting this to true, make sure to also set the PWA_KIT_SLAS_CLIENT_SECRET
     // environment variable as this endpoint will return HTTP 501 if it is not set
-    useSLASPrivateClient: true,
+    useSLASPrivateClient: false,
     applySLASPrivateClientToEndpoints:
         /oauth2\/(token|passwordless|password\/(login|token|reset|action))/,
 

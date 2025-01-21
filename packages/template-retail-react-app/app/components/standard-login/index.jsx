@@ -17,6 +17,7 @@ const StandardLogin = ({
     handleForgotPasswordClick,
     hideEmail = false,
     isSocialEnabled = false,
+    setShowPasswordView,
     idps = []
 }) => {
     return (
@@ -28,7 +29,7 @@ const StandardLogin = ({
                     handleForgotPasswordClick={handleForgotPasswordClick}
                 />
             </Stack>
-            <Stack spacing={6}>
+            <Stack spacing={4}>
                 <Button
                     type="submit"
                     onClick={() => {
@@ -40,15 +41,30 @@ const StandardLogin = ({
                 </Button>
                 {isSocialEnabled && idps.length > 0 && (
                     <>
-                        <Divider />
-                        <Text align="center" fontSize="sm">
-                            <FormattedMessage
-                                defaultMessage="Or Login With"
-                                id="login_form.message.or_login_with"
-                            />
-                        </Text>
+                        <Stack spacing={6} paddingTop={2} paddingBottom={2}>
+                            <Divider />
+                            <Text align="center" fontSize="sm">
+                                <FormattedMessage
+                                    defaultMessage="Or Login With"
+                                    id="login_form.message.or_login_with"
+                                />
+                            </Text>
+                        </Stack>
                         <SocialLogin form={form} idps={idps} />
                     </>
+                )}
+                {hideEmail && (
+                    <Button
+                        onClick={() => setShowPasswordView(false)}
+                        borderColor="gray.500"
+                        color="blue.600"
+                        variant="outline"
+                    >
+                        <FormattedMessage
+                            defaultMessage="Back to Sign In Options"
+                            id="login_form.button.back"
+                        />
+                    </Button>
                 )}
             </Stack>
         </Stack>
@@ -60,6 +76,7 @@ StandardLogin.propTypes = {
     handleForgotPasswordClick: PropTypes.func,
     hideEmail: PropTypes.bool,
     isSocialEnabled: PropTypes.bool,
+    setShowPasswordView: PropTypes.func,
     idps: PropTypes.arrayOf(PropTypes.string)
 }
 
