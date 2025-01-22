@@ -361,7 +361,7 @@ export const DevServerMixin = {
                 open(
                     `${this._getDevServerURL(
                         app.options
-                    )}/__mrt/loading-screen/index.html?loading=1`
+                    )}/__mrt/loading-screen/index.html?loading=1&path=/__pwa-kit/start`
                 )
             }
         })

@@ -112,17 +112,17 @@ class ChakraStorefront extends ApplicationExtension<Config> {
     beforeRouteMatch(allRoutes: RouteProps[]): RouteProps[] {
         const config = this.getConfig()
 
-        const indexOfOriginalHome = allRoutes.findIndex(
-            (route) =>
-                route.path === (config.pages.Home && config.pages.Home.path) &&
-                route.component !== Pages.Home
-        )
-        const routes = allRoutes.slice()
-        if (indexOfOriginalHome >= 0) {
-            routes.splice(indexOfOriginalHome, 1)
-        }
+        // const indexOfOriginalHome = allRoutes.findIndex(
+        //     (route) =>
+        //         route.path === (config.pages.Home && config.pages.Home.path) &&
+        //         route.component !== Pages.Home
+        // )
+        // const routes = allRoutes.slice()
+        // if (indexOfOriginalHome >= 0) {
+        //     routes.splice(indexOfOriginalHome, 1)
+        // }
 
-        return configureRoutes(routes, config, {
+        return configureRoutes(allRoutes, config, {
             ignoredRoutes: ['/callback']
         })
     }
