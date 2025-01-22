@@ -148,7 +148,7 @@ const Login = ({initialView = LOGIN_VIEW}) => {
     // executing a passwordless login attempt using the token. The process waits for the
     // customer baskets to be loaded to guarantee proper basket merging.
     useEffect(() => {
-        if (path === PASSWORDLESS_LOGIN_LANDING_PATH) {
+        if (path === PASSWORDLESS_LOGIN_LANDING_PATH && isSuccessCustomerBaskets) {
             const token = queryParams.get('token')
 
             const passwordlessLogin = async () => {
