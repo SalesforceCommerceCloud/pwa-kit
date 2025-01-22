@@ -4789,6 +4789,20 @@
       "value": "]"
     }
   ],
+  "login_form.button.back": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ɓȧȧƈķ ŧǿǿ Şīɠƞ Īƞ Ǿƥŧīǿǿƞş"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
   "login_form.button.continue_securely": [
     {
       "type": 0,
