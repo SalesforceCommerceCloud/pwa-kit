@@ -119,7 +119,7 @@ const Home = ({value}: Props) => {
                     <div className="divider"></div>
                 </div>
                 <div className="panel">
-                    <p style={{width: '300px'}} className="fade-in fade-in-0">
+                    <div style={{width: '300px'}} className="fade-in fade-in-0">
                         <>
                             <b>This page is written in Typescript</b>
                             <br />
@@ -149,7 +149,7 @@ const Home = ({value}: Props) => {
                             &nbsp;
                             <HelloTS message="it works!" />
                         </>
-                    </p>
+                    </div>
                 </div>
             </div>
         </div>
