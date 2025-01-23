@@ -339,7 +339,7 @@ export const DevServerMixin = {
      * @private
      */
     _createHandler(app) {
-        const {protocol, sslFilePath} = app.options
+        const {protocol, sslFilePath, startPath} = app.options
         const {hostname, port} = this._getDevServerHostAndPort(app.options)
 
         let server
@@ -358,10 +358,11 @@ export const DevServerMixin = {
         server.listen({hostname, port}, () => {
             /* istanbul ignore next */
             if (process.env.NODE_ENV !== 'test') {
+                // TODO
                 open(
                     `${this._getDevServerURL(
                         app.options
-                    )}/__mrt/loading-screen/index.html?loading=1&path=/__pwa-kit/start`
+                    )}/__mrt/loading-screen/index.html?loading=1&path=${startPath}`
                 )
             }
         })
