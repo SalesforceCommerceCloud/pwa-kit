@@ -4,15 +4,13 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {useContext, useEffect, useState} from 'react'
+import React, {useEffect, useState} from 'react'
 import {useQuery} from '@tanstack/react-query'
-import {Redirect} from 'react-router-dom'
 
 import {useApplicationExtensions} from '@salesforce/pwa-kit-extension-sdk/react'
 
 import HelloTS from '../components/hello-typescript'
 import HelloJS from '../components/hello-javascript'
-import {RoutesContext} from '../components/_app-config'
 
 interface Props {
     value: number
@@ -85,8 +83,6 @@ h1 {
 `
 
 const Home = ({value}: Props) => {
-    // @ts-ignore
-    const {indexRouteExists} = useContext(RoutesContext)
     const [counter, setCounter] = useState(0)
     const applicationExtensions = useApplicationExtensions()
 
@@ -107,9 +103,6 @@ const Home = ({value}: Props) => {
             })
     )
 
-    if (indexRouteExists) {
-        return <Redirect to="/"></Redirect>
-    }
     return (
         <div>
             <style dangerouslySetInnerHTML={{__html: style}} />
