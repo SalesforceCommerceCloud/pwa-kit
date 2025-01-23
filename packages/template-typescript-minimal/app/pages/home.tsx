@@ -17,7 +17,7 @@ interface Props {
 }
 
 const style = `
-body {
+.content {
     background: linear-gradient(-45deg, #e73c7e, #23a6d5, #ee7752);
     background-size: 400% 400%;
     height: 100vh;
@@ -49,7 +49,7 @@ body {
 .fade-in-3 { animation-delay: 12s}
 .fade-in-4 { animation-delay: 16s}
 .fade-in-5 { animation-delay: 20s}
-body {
+.content {
     font-family: "Helvetica", sans-serif;
     font-weight: 300;
     color: rgba(255,255,255,0.8);
@@ -64,7 +64,7 @@ body {
     align-items: center;
     height: 100vh;
 }
-h1 {
+.content h1 {
     font-size: 10em;
     font-weight: 900;
     letter-spacing: -0.05em;
@@ -104,7 +104,7 @@ const Home = ({value}: Props) => {
     )
 
     return (
-        <div>
+        <section className="content">
             <style dangerouslySetInnerHTML={{__html: style}} />
 
             <div className="loading-screen">
@@ -142,6 +142,7 @@ const Home = ({value}: Props) => {
                                     <li key={index}>{extension.getName()} Extension</li>
                                 ))}
                             </ul>
+                            <br />
                             <b>You can mix-and-match JS and TS</b>
                             <br />
                             <br />
@@ -152,7 +153,7 @@ const Home = ({value}: Props) => {
                     </div>
                 </div>
             </div>
-        </div>
+        </section>
     )
 }
 
