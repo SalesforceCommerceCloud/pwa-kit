@@ -52,6 +52,7 @@ export default {
         ],
         require('@babel/plugin-transform-async-generator-functions')
     ].filter(Boolean),
+    ignore: ['node_modules/**'],
     env: {
         test: {
             presets: [require('@babel/preset-env'), require('@babel/preset-react')],
