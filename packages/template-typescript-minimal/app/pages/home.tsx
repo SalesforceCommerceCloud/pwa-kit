@@ -17,6 +17,10 @@ const style = `
     font-weight: 900;
     letter-spacing: -0.05em;
 }
+.content p,
+.content ul {
+    margin: 1em 0;
+}
 .loading-screen {
     display: flex;
     flex-direction: row;
@@ -31,9 +35,20 @@ const style = `
 .divider {
     width: 8px;
     background-color: black;
-    height: 200px;
+    height: 300px;
     margin-left: 5em;
     margin-right: 3em;
+}
+.button {
+    display: inline-block;
+    padding: 10px 20px;
+    font-size: 16px;
+    font-weight: bold;
+    color: white;
+    background-color: #0176D3;
+    text-align: center;
+    text-decoration: none;
+    border-radius: 5px;
 }
 `
 
@@ -45,14 +60,23 @@ const Home = () => {
             <style dangerouslySetInnerHTML={{__html: style}} />
 
             <div className="loading-screen">
-                <div className="panel title">
+                <div className="title">
                     <h1>Welcome!</h1>
                 </div>
-                <div className="panel">
+                <div>
                     <div className="divider"></div>
                 </div>
-                <div className="panel">
-                    <div style={{width: '300px'}} className="fade-in fade-in-0">
+                <div>
+                    <div style={{width: '300px'}}>
+                        <p>
+                            <a
+                                href="https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/developer-workflow.html"
+                                className="button"
+                            >
+                                Get started
+                            </a>
+                        </p>
+
                         <p>You have installed the following application extensions:</p>
                         <ul>
                             {applicationExtensions.length > 0 ? (
