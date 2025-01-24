@@ -44,7 +44,10 @@ export const DevServerMixin = {
      * @private
      */
     _logStartupMessage(options) {
-        logger.log(`Starting the DevServer on ${chalk.cyan(this._getDevServerURL(options))}`)
+        const {startPath} = options
+        logger.log(
+            `Starting the DevServer on ${chalk.cyan(this._getDevServerURL(options) + startPath)}`
+        )
     },
 
     /**
