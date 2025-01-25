@@ -77,16 +77,18 @@ const Home = () => {
                             </a>
                         </p>
 
-                        <p>You have installed the following application extensions:</p>
-                        <ul>
-                            {applicationExtensions.length > 0 ? (
-                                applicationExtensions?.map((extension, index) => (
-                                    <li key={index}>{extension.getName()} Extension</li>
-                                ))
-                            ) : (
-                                <li>None</li>
-                            )}
-                        </ul>
+                        {applicationExtensions.length > 0 ? (
+                            <>
+                                <p>You have {applicationExtensions.length} extensions installed:</p>
+                                <ul>
+                                    {applicationExtensions?.map((extension, index) => (
+                                        <li key={index}>{extension.getName()} Extension</li>
+                                    ))}
+                                </ul>
+                            </>
+                        ) : (
+                            <p>You currently do not have any extensions installed.</p>
+                        )}
                     </div>
                 </div>
             </div>
