@@ -28,7 +28,7 @@ const options = {
     protocol: 'http',
 
     // The path that the local dev server would open initially
-    startPath: '/__pwa-kit/start',
+    startPath: '/__pwa-kit/getting-started',
 
     mobify: pkg.mobify
 }

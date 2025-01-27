@@ -52,7 +52,7 @@ const style = `
 }
 `
 
-const Home = () => {
+const GettingStarted = () => {
     const applicationExtensions = useApplicationExtensions()
 
     return (
@@ -96,6 +96,6 @@ const Home = () => {
     )
 }
 
-Home.getTemplateName = () => 'home'
+GettingStarted.getTemplateName = () => 'gettingStarted'
 
-export default Home
+export default GettingStarted

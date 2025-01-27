@@ -6,13 +6,13 @@
  */
 import loadable from '@loadable/component'
 
-const Home = loadable(() => import('./pages/home'))
+const GettingStarted = loadable(() => import('./pages/getting-started'))
 
 const routes = [
     {
-        path: '/__pwa-kit/start',
+        path: '/__pwa-kit/getting-started',
         exact: true,
-        component: Home
+        component: GettingStarted
     }
 ]
 
