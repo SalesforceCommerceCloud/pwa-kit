@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, {useState} from 'react'
+import React from 'react'
 import PropTypes from 'prop-types'
 import {FormattedMessage} from 'react-intl'
 
@@ -26,7 +26,7 @@ import {useSelectStore} from '@salesforce/retail-react-app/app/hooks/use-select-
 const INVENTORY_ATTRIBUTE_ID = 'ilids'
 
 const StoreAvailabilityRefinement = ({toggleFilter, selectedFilters}) => {
-    const {selectedStore, name} = useSelectStore()
+    const {selectedStore, isStoreSelected} = useSelectStore()
 
     return (
         <AccordionItem paddingBottom={6} borderTop="none" key="show-all">
@@ -43,9 +43,9 @@ const StoreAvailabilityRefinement = ({toggleFilter, selectedFilters}) => {
                 <CheckboxRefinements
                     filter={{
                         values: [
-                            Object.keys(selectedStore).length === 0
-                                ? {label: 'Select Store'}
-                                : {value: selectedStore.inventoryId, label: name}
+                            isStoreSelected
+                                ? {value: selectedStore.inventoryId, label: selectedStore.name}
+                                : {label: 'Select Store'}
                         ],
                         attributeId: INVENTORY_ATTRIBUTE_ID
                     }}

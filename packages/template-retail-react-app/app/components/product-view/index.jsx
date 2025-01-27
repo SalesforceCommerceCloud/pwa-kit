@@ -39,6 +39,7 @@ import Swatch from '@salesforce/retail-react-app/app/components/swatch-group/swa
 import SwatchGroup from '@salesforce/retail-react-app/app/components/swatch-group'
 import {getPriceData} from '@salesforce/retail-react-app/app/utils/product-utils'
 import PromoCallout from '@salesforce/retail-react-app/app/components/product-tile/promo-callout'
+import StoreAvailabilityText from '@salesforce/retail-react-app/app/components/store-availability-text'
 
 const ProductViewHeader = ({
     name,
@@ -118,7 +119,8 @@ const ProductView = forwardRef(
                 !isProductLoading && variant?.orderable && quantity > 0 && quantity <= stockLevel,
             showImageGallery = true,
             setSelectedBundleQuantity = () => {},
-            selectedBundleParentQuantity = 1
+            selectedBundleParentQuantity = 1,
+            selectedStore
         },
         ref
     ) => {
@@ -598,6 +600,10 @@ const ProductView = forwardRef(
                                     />
                                 </VStack>
                             )}
+                            <StoreAvailabilityText
+                                storeName={selectedStore?.name}
+                                productInventories={product?.inventories}
+                            />
                             <Box ref={errorContainerRef}>
                                 {!showLoading && showOptionsMessage && (
                                     <Fade in={true}>
@@ -698,7 +704,8 @@ ProductView.propTypes = {
     validateOrderability: PropTypes.func,
     showImageGallery: PropTypes.bool,
     setSelectedBundleQuantity: PropTypes.func,
-    selectedBundleParentQuantity: PropTypes.number
+    selectedBundleParentQuantity: PropTypes.number,
+    selectedStore: PropTypes.object
 }
 
 export default ProductView

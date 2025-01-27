@@ -30,5 +30,5 @@ export const useSelectStore = () => {
         setSelectedStore(storeInfo)
     }
 
-    return {selectedStore, setStore}
+    return {selectedStore, setStore, isStoreSelected: !!selectedStore.id}
 }

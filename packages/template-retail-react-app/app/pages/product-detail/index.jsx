@@ -55,6 +55,7 @@ import {rebuildPathWithParams} from '@salesforce/retail-react-app/app/utils/url'
 import {useHistory, useLocation, useParams} from 'react-router-dom'
 import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
 import {useWishList} from '@salesforce/retail-react-app/app/hooks/use-wish-list'
+import {useSelectStore} from '@salesforce/retail-react-app/app/hooks/use-select-store'
 
 const ProductDetail = () => {
     const {formatMessage} = useIntl()
@@ -81,6 +82,7 @@ const ProductDetail = () => {
     /*************************** Product Detail and Category ********************/
     const {productId} = useParams()
     const urlParams = new URLSearchParams(location.search)
+    const {selectedStore} = useSelectStore()
     const {
         data: product,
         isLoading: isProductLoading,
@@ -101,7 +103,8 @@ const ProductDetail = () => {
                     'set_products',
                     'bundled_products'
                 ],
-                allImages: true
+                allImages: true,
+                inventoryIds: selectedStore?.inventoryId || []
             }
         },
         {
@@ -476,6 +479,7 @@ const ProductDetail = () => {
                             validateOrderability={handleChildProductValidation}
                             childProductOrderability={childProductOrderability}
                             setSelectedBundleQuantity={setSelectedBundleQuantity}
+                            selectedStore={selectedStore}
                         />
 
                         <hr />
@@ -501,6 +505,7 @@ const ProductDetail = () => {
                                             isProductPartOfBundle={isProductABundle}
                                             childOfBundleQuantity={childQuantity}
                                             selectedBundleParentQuantity={selectedBundleQuantity}
+                                            selectedStore={selectedStore}
                                             addToCart={
                                                 isProductASet
                                                     ? (variant, quantity) =>
@@ -563,6 +568,7 @@ const ProductDetail = () => {
                             isProductLoading={isProductLoading}
                             isBasketLoading={isBasketLoading}
                             isWishlistLoading={isWishlistLoading}
+                            selectedStore={selectedStore}
                         />
                         <InformationAccordion product={product} />
                     </Fragment>
