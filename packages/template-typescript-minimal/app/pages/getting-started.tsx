@@ -96,6 +96,6 @@ const GettingStarted = () => {
     )
 }
 
-GettingStarted.getTemplateName = () => 'gettingStarted'
+GettingStarted.getTemplateName = () => 'getting-started'
 
 export default GettingStarted
