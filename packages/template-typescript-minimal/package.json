@@ -22,8 +22,6 @@
     "@emotion/react": "^11.13.3",
     "@emotion/styled": "^11.13.0",
     "@loadable/component": "^5.15.3",
-    "@salesforce/extension-chakra-store-locator": "^0.1.0-extensibility-preview.3",
-    "@salesforce/extension-chakra-storefront": "^0.1.0-extensibility-preview.3",
     "@salesforce/pwa-kit-dev": "4.0.0-extensibility-preview.3",
     "@salesforce/pwa-kit-extension-sdk": "4.0.0-extensibility-preview.3",
     "@salesforce/pwa-kit-react-sdk": "4.0.0-extensibility-preview.3",
