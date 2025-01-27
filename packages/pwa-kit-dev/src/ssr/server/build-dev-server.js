@@ -361,11 +361,12 @@ export const DevServerMixin = {
         server.listen({hostname, port}, () => {
             /* istanbul ignore next */
             if (process.env.NODE_ENV !== 'test') {
-                open(
-                    `${this._getDevServerURL(
-                        app.options
-                    )}/__mrt/loading-screen/index.html?loading=1&path=${startPath}`
-                )
+                const targetPath = encodeURIComponent(startPath)
+                const loadingPage = `${this._getDevServerURL(
+                    app.options
+                )}/__mrt/loading-screen/index.html?loading=1&path=${targetPath}`
+
+                open(loadingPage)
             }
         })
 
