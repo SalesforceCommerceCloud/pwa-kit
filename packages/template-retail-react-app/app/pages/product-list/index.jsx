@@ -54,6 +54,7 @@ import ProductTile, {
 import {HideOnDesktop} from '@salesforce/retail-react-app/app/components/responsive'
 import Refinements from '@salesforce/retail-react-app/app/pages/product-list/partials/refinements'
 import CategoryLinks from '@salesforce/retail-react-app/app/pages/product-list/partials/category-links'
+import StoreAvailabilityRefinement from '@salesforce/retail-react-app/app/pages/product-list/partials/store-availability-refinement'
 import SelectedRefinements from '@salesforce/retail-react-app/app/pages/product-list/partials/selected-refinements'
 import EmptySearchResults from '@salesforce/retail-react-app/app/pages/product-list/partials/empty-results'
 import PageHeader from '@salesforce/retail-react-app/app/pages/product-list/partials/page-header'
@@ -526,11 +527,16 @@ const ProductList = (props) => {
                     <Grid templateColumns={{base: '1fr', md: '280px 1fr'}} columnGap={6}>
                         <Stack display={{base: 'none', md: 'flex'}}>
                             <Refinements
-                                itemsBefore={
-                                    category?.categories
+                                itemsBefore={[
+                                    <StoreAvailabilityRefinement
+                                        key="storeAvailability"
+                                        toggleFilter={toggleFilter}
+                                        selectedFilters={searchParams.refine}
+                                    />,
+                                    ...(category?.categories
                                         ? [<CategoryLinks key="itemsBefore" category={category} />]
-                                        : undefined
-                                }
+                                        : [])
+                                ]}
                                 isLoading={filtersLoading}
                                 toggleFilter={toggleFilter}
                                 filters={productSearchResult?.refinements}

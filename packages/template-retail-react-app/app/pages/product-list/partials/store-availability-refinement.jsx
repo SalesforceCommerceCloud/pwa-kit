@@ -1,0 +1,65 @@
+/*
+ * Copyright (c) 2023, salesforce.com, inc.
+ * All rights reserved.
+ * SPDX-License-Identifier: BSD-3-Clause
+ * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
+ */
+
+import React, {useState} from 'react'
+import PropTypes from 'prop-types'
+import {FormattedMessage} from 'react-intl'
+
+// Project Components
+import {
+    AccordionItem,
+    AccordionButton,
+    AccordionPanel,
+    AccordionIcon,
+    Heading
+} from '@salesforce/retail-react-app/app/components/shared/ui'
+import Link from '@salesforce/retail-react-app/app/components/link'
+import CheckboxRefinements from '@salesforce/retail-react-app/app/pages/product-list/partials/checkbox-refinements'
+
+// Hooks
+import {useSelectStore} from '@salesforce/retail-react-app/app/hooks/use-select-store'
+
+const INVENTORY_ATTRIBUTE_ID = 'ilids'
+
+const StoreAvailabilityRefinement = ({toggleFilter, selectedFilters}) => {
+    const {selectedStore, name} = useSelectStore()
+
+    return (
+        <AccordionItem paddingBottom={6} borderTop="none" key="show-all">
+            <AccordionButton>
+                <Heading as="h2" flex="1" textAlign="left" fontSize="md" fontWeight={600}>
+                    <FormattedMessage
+                        defaultMessage="Shop By Availability"
+                        id="store_availability_refinement.button_text"
+                    />
+                </Heading>
+                <AccordionIcon />
+            </AccordionButton>
+            <AccordionPanel>
+                <CheckboxRefinements
+                    filter={{
+                        values: [
+                            Object.keys(selectedStore).length === 0
+                                ? {label: 'Select Store'}
+                                : {value: selectedStore.inventoryId, label: name}
+                        ],
+                        attributeId: INVENTORY_ATTRIBUTE_ID
+                    }}
+                    toggleFilter={toggleFilter}
+                    selectedFilters={selectedFilters?.[INVENTORY_ATTRIBUTE_ID] || []}
+                ></CheckboxRefinements>
+            </AccordionPanel>
+        </AccordionItem>
+    )
+}
+
+StoreAvailabilityRefinement.propTypes = {
+    toggleFilter: PropTypes.func,
+    selectedFilters: PropTypes.array
+}
+
+export default StoreAvailabilityRefinement

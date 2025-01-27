@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, {useEffect, useState} from 'react'
+import React from 'react'
 import {useIntl} from 'react-intl'
 import PropTypes from 'prop-types'
 
@@ -22,33 +22,19 @@ import {
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 
 // Hooks
-import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
+import {useSelectStore} from '@salesforce/retail-react-app/app/hooks/use-select-store'
 
 const StoresList = ({storesInfo}) => {
     const intl = useIntl()
-    const {site} = useMultiSite()
-    const storeInfoKey = `store_${site.id}`
-    const [selectedStore, setSelectedStore] = useState('')
-
-    useEffect(() => {
-        setSelectedStore(JSON.parse(window.localStorage.getItem(storeInfoKey))?.id || '')
-    }, [storeInfoKey])
+    const {selectedStore, setStore} = useSelectStore()
 
     const handleChange = (storeId) => {
-        setSelectedStore(storeId)
         const store = storesInfo.find((store) => store.id === storeId)
-        window.localStorage.setItem(
-            storeInfoKey,
-            JSON.stringify({
-                id: storeId,
-                name: store.name || null,
-                inventoryId: store.inventoryId || null
-            })
-        )
+        setStore(store)
     }
 
     return (
-        <RadioGroup onChange={handleChange} value={selectedStore}>
+        <RadioGroup onChange={handleChange} value={selectedStore.id}>
             {storesInfo?.map((store, index) => {
                 return (
                     <AccordionItem key={index}>
