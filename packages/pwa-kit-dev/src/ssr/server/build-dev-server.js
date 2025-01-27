@@ -44,7 +44,7 @@ export const DevServerMixin = {
      * @private
      */
     _logStartupMessage(options) {
-        const {startPath} = options
+        const {startPath = '/'} = options
         logger.log(
             `Starting the DevServer on ${chalk.cyan(this._getDevServerURL(options) + startPath)}`
         )
@@ -342,7 +342,7 @@ export const DevServerMixin = {
      * @private
      */
     _createHandler(app) {
-        const {protocol, sslFilePath, startPath} = app.options
+        const {protocol, sslFilePath, startPath = '/'} = app.options
         const {hostname, port} = this._getDevServerHostAndPort(app.options)
 
         let server
