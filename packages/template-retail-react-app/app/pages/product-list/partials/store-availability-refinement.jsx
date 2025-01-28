@@ -17,7 +17,6 @@ import {
     AccordionIcon,
     Heading
 } from '@salesforce/retail-react-app/app/components/shared/ui'
-import Link from '@salesforce/retail-react-app/app/components/link'
 import CheckboxRefinements from '@salesforce/retail-react-app/app/pages/product-list/partials/checkbox-refinements'
 
 // Hooks
