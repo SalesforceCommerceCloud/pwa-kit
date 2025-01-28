@@ -10,7 +10,11 @@ import React from 'react'
 import {RouteProps} from 'react-router-dom'
 
 // Platform Imports
-import {ApplicationExtension} from '@salesforce/pwa-kit-extension-sdk/react'
+import {
+    ApplicationExtension,
+    SliceInitializer,
+    withApplicationExtensionStore
+} from '@salesforce/pwa-kit-extension-sdk/react'
 import {applyHOCs} from '@salesforce/pwa-kit-extension-sdk/react/utils'
 
 // Local Imports
@@ -23,6 +27,21 @@ import StoreLocatorPage from './pages/store-locator'
 import {logger} from './logger'
 import extensionMeta from '../extension-meta.json'
 
+// NOTE: Hey Kevin, this is where you are going to define the type of the store slice for your extension. I imagine that you'll
+// have something that manages the modal being open/closed here.
+interface StoreSlice {
+    count: number
+    increment: () => void
+    decrement: () => void
+}
+
+// This is the store slice definition that we are adding via the `withApplicationExtensionStore` HOC below in the extendApp
+// method.
+const storeSliceInitializer: SliceInitializer<StoreSlice> = (set) => ({
+    count: 0,
+    increment: () => set((state) => ({count: state.count + 1})),
+    decrement: () => set((state) => ({count: state.count - 1}))
+})
 class StoreLocatorExtension extends ApplicationExtension<Config> {
     static readonly id = extensionMeta.id
 
@@ -41,7 +60,12 @@ class StoreLocatorExtension extends ApplicationExtension<Config> {
             (component: React.ComponentType<any>) => withStoreLocator(component, config),
             (component: React.ComponentType<any>) =>
                 withOptionalCommerceSdkReactProvider(component, config),
-            (component: React.ComponentType<any>) => withOptionalChakra(component)
+            (component: React.ComponentType<any>) => withOptionalChakra(component),
+            (component: React.ComponentType<any>) =>
+                withApplicationExtensionStore(component, {
+                    id: extensionMeta.id,
+                    initializer: storeSliceInitializer
+                })
         ]
 
         return applyHOCs(App, HOCs)

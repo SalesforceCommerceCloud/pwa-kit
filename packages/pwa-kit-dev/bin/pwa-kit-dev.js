@@ -263,8 +263,19 @@ const main = async () => {
                 '..',
                 '.bin',
                 'babel-node'
-        );
+            )
 
+            // TODO: Babel is transpiling files in the node_modules folder that is doesn't have to!! I don't know why these ignores are working
+            // there is also a set of ignores that might have to be set in the babel configuration.
+            execSync(
+                `${babelNode} ${
+                    inspect ? '--inspect' : ''
+                } --ignore '/node_modules\\/(?!extension-[^\\/]+\\/)/i' ${babelArgs} ${getAppEntrypoint()}`,
+                {
+                    env: {
+                        ...process.env,
+                        ...(noHMR ? {HMR: 'false'} : {})
+                    }
         // Refined Babel arguments
         const command = `${babelNode} --no-babelrc --debug \
             --only "${[
@@ -283,7 +294,7 @@ const main = async () => {
                 BABEL_DISABLE_CACHE: '1',
                     ...(noHMR ? {HMR: 'false'} : {})
                 }
-            });
+            )
         })
 
     program

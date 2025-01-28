@@ -12,5 +12,16 @@
             "countryName": "<COUNTRY>",
             "countryCode": "<COUNTRY_CODE>"
         }
-    ]
+    ],
+    "commerceApi": {
+        "proxyPath": "/mobify/proxy/api",
+        "parameters": {
+            "shortCode": "<SHORT_CODE>",
+            "clientId": "<CLIENT_ID>",
+            "organizationId": "<ORGANIZATION_ID>",
+            "siteId": "<SITE_ID>",
+            "locale": "<LOCALE>",
+            "currency": "<CURRENCY>"
+        }
+    }
 }

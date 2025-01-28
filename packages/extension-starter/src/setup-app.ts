@@ -10,7 +10,12 @@ import React from 'react'
 import {RouteProps} from 'react-router-dom'
 
 // Platform Imports
-import {ApplicationExtension} from '@salesforce/pwa-kit-extension-sdk/react'
+import {
+    ApplicationExtension,
+    SliceInitializer,
+    withApplicationExtensionStore
+} from '@salesforce/pwa-kit-extension-sdk/react'
+import {applyHOCs} from '@salesforce/pwa-kit-extension-sdk/react/utils'
 
 // Local Imports
 import {Config} from './types'
@@ -25,6 +30,20 @@ import sampleHOC from 'overridable!./components/sample-hoc'
 // Others
 import extensionMeta from '../extension-meta.json'
 
+interface StoreSlice {
+    count: number
+    increment: () => void
+    decrement: () => void
+}
+
+// This is safe to delete if your extension does not use state. If you aren't using this, ensure you remove the
+// `withApplicationExtensionStore` usage below as well.
+const sliceInitializer: SliceInitializer<StoreSlice> = (set) => ({
+    count: 0,
+    increment: () => set((state) => ({count: state.count + 1})),
+    decrement: () => set((state) => ({count: state.count - 1}))
+})
+
 class Sample extends ApplicationExtension<Config> {
     static readonly id = extensionMeta.id
 
@@ -36,7 +55,18 @@ class Sample extends ApplicationExtension<Config> {
     extendApp<T extends React.ComponentType<T>>(
         App: React.ComponentType<T>
     ): React.ComponentType<T> {
-        return sampleHOC(App)
+        const HOCs = [
+            // Example higher-order component, this can be safely removed.
+            sampleHOC,
+            // Optionally include state for this extension using `withApplicationExtensionStore`
+            (component: React.ComponentType<any>) =>
+                withApplicationExtensionStore(component, {
+                    id: extensionMeta.id,
+                    initializer: sliceInitializer
+                })
+        ]
+
+        return applyHOCs(App, HOCs)
     }
 
     /**

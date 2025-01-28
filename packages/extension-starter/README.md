@@ -48,7 +48,7 @@ the extension as they like.
 
 ```
 {
-    path: 'sample-page'
+    path: '/sample-page'
 }
 ```
 
@@ -62,20 +62,47 @@ the extension as they like.
 > Congratulations! The Sample extension was successfully installed! Please visit https://www.npmjs.com/package/@salesforce/extension-starter for more information on how to use this extension.
 ```
 
+# State Management
+
+By default all extensions are enhanced with state management using the `withApplicationExtensionStore` higher-order component. Under the hood
+the state is provided using [Zustand](https://www.npmjs.com/package/zustand) as a global store for the entire PWA-Kit application. 
+Each Application Extension inserts a "slice" into this global store following the 
+[slicing pattern](https://github.com/pmndrs/zustand/blob/37e1e3f193a5e5dec6fbd0f07514aec59a187e01/docs/guides/slices-pattern.md). 
+This allows you to have data separation from one extension to the other, but also allows you to access state and associated actions of other extensions when needed. 
+
+You can access the state of other extensions via the global store. Below is an example of why you might want to access state and actions from another extensions. In the following snippet we use the global store to access actions from the store locator. You can then use these actions as you please.
+
+This is how you would do something like this.
+
+```
+// /base-project/app/components/my-component.jsx
+import {useApplicationExtensionsStore} from '@salesforce/pwa-kit-extension-sdk/react'
+
+export MyComponent = () => {
+    // Zustand V5 requires stable selector outputs. E.g. Do NOT return a new reference in your selectors return value. This will
+    // cause infinite re-renders.
+    const defaultState = {}
+
+    // Grab the slice of the extension state for "extension-a"
+    const {toggleMapsModal} = useApplicationExtensionsStore(
+        (state) =>
+            state.state['@salesforce/extension-store-locator'] || defaultState
+    )
+
+    return (
+        <div>
+            <button onClick={() => toggleMapsModal()}/>
+        </div>
+    )
+}
+```
+
 # Advanced Usage
 
-In order to customize this Application Extension to your particular needs we suggest that you refer to the section titled
-"configuration", but if there is something that you want to customize that isn't configurable and cannot wait for a feature
-request to be fulfilled, then you can use overrides. 
-
-Below is a list of files that can't be overridden from within your PWA-Kit base project. Please refer to the documentation here on
-how to properly override extensions. Additionally it's up to the Application Extension developer as to which files can and 
-cannot be overridden. Please refer to this documentation on how to write your first PWA-Kit Application Extension.
+As an application extension developer you are responsible for documenting how your extension works including basic usage, its configuration, and advanced customization via overrides. Use this section to explain how your extension can use overrides to accomplish this. Make should to include what files are overridable as well as their expected inputs and outputs.
 
 ## Overridable Files
 
 ```
-/src/path/to/overridable/file.ts
+/src/path/to/overridable/files.ts
 ```
-
-

@@ -27,6 +27,9 @@ const options = {
     // except by Safari.
     protocol: 'http',
 
+    // The path that the local dev server would open initially
+    startPath: '/__pwa-kit/getting-started',
+
     mobify: pkg.mobify
 }
 

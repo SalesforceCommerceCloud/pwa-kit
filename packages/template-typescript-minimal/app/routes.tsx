@@ -4,17 +4,17 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import loadable, {LoadableComponent} from '@loadable/component'
+import loadable from '@loadable/component'
 
-const Home = loadable(() => import('./pages/home'))
+const GettingStarted = loadable(() => import('./pages/getting-started'))
 
 const routes = [
     {
-        path: '/',
+        // The path that the local dev server would open initially.
+        // You can configure the server in /app/ssr.js file.
+        path: '/__pwa-kit/getting-started',
         exact: true,
-        // Type assertion because otherwise we encounter this error:
-        // Exported variable 'routes' has or is using name 'Props' from external module "./app/pages/home" but cannot be named.
-        component: Home as LoadableComponent<unknown>
+        component: GettingStarted
     }
 ]
 

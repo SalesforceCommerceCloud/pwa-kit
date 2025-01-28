@@ -44,7 +44,10 @@ export const DevServerMixin = {
      * @private
      */
     _logStartupMessage(options) {
-        logger.log(`Starting the DevServer on ${chalk.cyan(this._getDevServerURL(options))}`)
+        const {startPath = '/'} = options
+        logger.log(
+            `Starting the DevServer on ${chalk.cyan(this._getDevServerURL(options) + startPath)}`
+        )
     },
 
     /**
@@ -339,7 +342,7 @@ export const DevServerMixin = {
      * @private
      */
     _createHandler(app) {
-        const {protocol, sslFilePath} = app.options
+        const {protocol, sslFilePath, startPath = '/'} = app.options
         const {hostname, port} = this._getDevServerHostAndPort(app.options)
 
         let server
@@ -358,11 +361,12 @@ export const DevServerMixin = {
         server.listen({hostname, port}, () => {
             /* istanbul ignore next */
             if (process.env.NODE_ENV !== 'test') {
-                open(
-                    `${this._getDevServerURL(
-                        app.options
-                    )}/__mrt/loading-screen/index.html?loading=1`
-                )
+                const targetPath = encodeURIComponent(startPath)
+                const loadingPage = `${this._getDevServerURL(
+                    app.options
+                )}/__mrt/loading-screen/index.html?loading=1&path=${targetPath}`
+
+                open(loadingPage)
             }
         })
 

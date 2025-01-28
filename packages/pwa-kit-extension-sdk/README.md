@@ -209,6 +209,8 @@ Using the `extendApp` method in your extensions allows you to do things like:
 
 ### React Hooks 🪝
 
+#### useApplicationExtensions
+
 Sometimes it can be useful to know what extensions are configured and applied to the currently running PWA-Kit application. For this reason we provide a utility hook called `useApplicationExtensions`. This is useful for both base application developers as well as extension developers. A common scenario for using this hook would be to "unlock" certain behavior if a known extension is determined to be running. For example, in our `@salesforce/extension-chakra-storefront` we use this hook to determine if the `@salesforce/extension-chakra-store-locator` extension is loaded. If it is, we'll ensure that certain buttons are visible to the customer so they can navigate to the store locator successfully.
 
 Sample Usage:
@@ -230,6 +232,51 @@ const Header = () => {
         </div>
     )
 }
+```
+
+#### `useApplicationExtensionsStore`
+
+When generating an Application Extension you are automatically opted into having shared state management via the `withApplicationExtensionStore` HOC. This component will register a boilerplate Zustand store slice with the PWA-Kit application, you can opt out of state management by simply removing the use of this HOC in your `extendApp` function. But we do not recommend doing this, as it is an easy way to manage state, as well as share state between extensions.
+
+Here is a sample of how you can use this hook to use state from a given extension:
+
+```
+// /base-project/app/components/my-component.jsx
+import {useApplicationExtensionsStore} from '@salesforce/pwa-kit-extension-sdk/react'
+
+export MyComponent = () => {
+    // Zustand V5 requires stable selector outputs. E.g. Do NOT return a new reference in your selectors return value. This will
+    // cause infinite re-renders.
+    const defaultState = {}
+
+    // Grab the slice of the extension state for "extension-a"
+    const {toggleMapsModal} = useApplicationExtensionsStore(
+        (state) =>
+            state.state['@salesforce/extension-store-locator'] || defaultState
+    )
+
+    return (
+        <div>
+            <button onClick={() => toggleMapsModal()}/>
+        </div>
+    )
+}
+```
+
+In the above example we get the state of the store locator extension in order to open its map modal. We recommend that if you intend to use an extensions state often to build a custom hook like this for reuse and adding type safety.
+
+```
+// /base-project/app/hooks/useStoreLocatorState.ts
+const defaultState = {}
+
+const useStoreLocatorState = useApplicationExtensionsStore(
+    (state) =>
+        state.state['@salesforce/extension-store-locator'] || defaultState
+    )
+
+export default useStoreLocatorState
+// Example usage:
+// const {toggleMapsModal} = useStoreLocatorState()
 ```
 
 ## Support Policy
