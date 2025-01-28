@@ -6,29 +6,39 @@
  */
 import React from 'react'
 import PropTypes from 'prop-types'
+import {FormattedMessage} from 'react-intl'
 
 // Components
-import {Box, Text} from '@salesforce/retail-react-app/app/components/shared/ui'
-
-// Hooks
-import {useIntl} from 'react-intl'
+import {Box, Link} from '@salesforce/retail-react-app/app/components/shared/ui'
 
 const StoreAvailabilityText = ({selectedStore, productInventories}) => {
-    const intl = useIntl()
     const inStock = productInventories?.find(
         (inventory) => inventory.id === selectedStore.inventoryId && inventory.orderable
     )
 
     return (
         <Box gap={1} fontWeight={400} display="flex">
-            <Text>
-                {!productInventories || inStock
-                    ? intl.formatMessage({
-                          defaultMessage: 'In Stock at'
-                      })
-                    : intl.formatMessage({defaultMessage: 'Out of Stock at'})}
-            </Text>
-            <Text>{selectedStore.name ? selectedStore.name : 'Select Store'}</Text>
+            {!productInventories || inStock ? (
+                <FormattedMessage
+                    id={'product_view.store_availability.in_stock_at'}
+                    defaultMessage={'In Stock at'}
+                />
+            ) : (
+                <FormattedMessage
+                    id={'product_view.store_availability.out_of_stock_at'}
+                    defaultMessage={'Out of Stock at'}
+                />
+            )}
+            <Link>
+                {selectedStore.name ? (
+                    selectedStore.name
+                ) : (
+                    <FormattedMessage
+                        id={'product_view.link.select_store'}
+                        defaultMessage={'Select Store'}
+                    />
+                )}
+            </Link>
         </Box>
     )
 }
