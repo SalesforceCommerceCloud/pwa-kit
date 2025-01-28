@@ -28,7 +28,7 @@ import {
     useMediaQuery
 } from '@chakra-ui/react'
 import {AuthHelpers, useAuthHelper, useCustomerType} from '@salesforce/commerce-sdk-react'
-import {useApplicationExtension} from '@salesforce/pwa-kit-extension-sdk/react'
+import {useApplicationExtension, useApplicationExtensionsStore} from '@salesforce/pwa-kit-extension-sdk/react'
 
 import {useCurrentBasket} from '../../hooks/use-current-basket'
 
@@ -127,6 +127,10 @@ const Header = ({
     const [isDesktop] = useMediaQuery('(min-width: 992px)')
     const storeLocatorExtension = useApplicationExtension('@salesforce/extension-chakra-store-locator')
     const isStoreLocatorEnabled = !!storeLocatorExtension && storeLocatorExtension.isEnabled
+    const {openModal} = useApplicationExtensionsStore(
+        (state) =>
+            state.state['@salesforce/extension-chakra-store-locator'] || {}
+    )
 
     const [showLoading, setShowLoading] = useState(false)
     // tracking if users enter the popover Content,
@@ -317,7 +321,10 @@ const Header = ({
                             icon={<StoreIcon />}
                             {...styles.icons}
                             variant="unstyled"
-                            onClick={() => {console.log('store locator')}}
+                            onClick={() => {
+                                console.log('open modal test')
+                                openModal()
+                            }}
                         />}
                     <IconButton
                         aria-label={intl.formatMessage(
