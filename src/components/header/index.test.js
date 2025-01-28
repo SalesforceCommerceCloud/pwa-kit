@@ -21,6 +21,15 @@ jest.mock('@chakra-ui/react', () => {
         useMediaQuery: jest.fn().mockReturnValue([true])
     }
 })
+
+jest.mock('@salesforce/pwa-kit-extension-sdk/react', () => ({
+    ...jest.requireActual('@salesforce/pwa-kit-extension-sdk/react'),
+    useApplicationExtensionsStore: jest.fn().mockReturnValue({
+        isModalOpen: false,
+        closeModal: jest.fn()
+    })
+}))
+
 const MockedComponent = ({history}) => {
     const onAccountClick = () => {
         history.push(createPathWithDefaults('/account'))
