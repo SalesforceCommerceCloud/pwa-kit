@@ -1018,7 +1018,7 @@ const runGenerator = async (
                 : version
             return acc
         }, {})
-                    }
+    }
 
     // Update the root package.json
     updatePackageJson(p.resolve(outputDir, 'package.json'), pkgUpdates)

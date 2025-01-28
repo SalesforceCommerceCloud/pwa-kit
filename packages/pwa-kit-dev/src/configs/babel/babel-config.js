@@ -59,6 +59,6 @@ export default {
         }
     },
     ignore: [
-        /node_modules\/(?!(@?[^/]+\/)?extension-)[^/]+\/.*$/i // Ignore all node_modules except for those starting with extension-
+        /node_modules\/(?!(@?[^/]+\/)?extension-)[^/]+\/.*$/i // TODO: This effectively avoids babel from transpiling node_modules BUT also breaks the extensions setup-server.ts
     ]
 }
