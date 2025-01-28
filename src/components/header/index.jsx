@@ -28,6 +28,7 @@ import {
     useMediaQuery
 } from '@chakra-ui/react'
 import {AuthHelpers, useAuthHelper, useCustomerType} from '@salesforce/commerce-sdk-react'
+import {useApplicationExtension} from '@salesforce/pwa-kit-extension-sdk/react'
 
 import {useCurrentBasket} from '../../hooks/use-current-basket'
 
@@ -41,7 +42,8 @@ import {
     HamburgerIcon,
     ChevronDownIcon,
     HeartIcon,
-    SignoutIcon
+    SignoutIcon,
+    StoreIcon
 } from '../../components/icons'
 
 import {navLinks, messages} from '../../pages/account/constant'
@@ -123,6 +125,8 @@ const Header = ({
         onOpen: onAccountMenuOpen
     } = useDisclosure()
     const [isDesktop] = useMediaQuery('(min-width: 992px)')
+    const storeLocatorExtension = useApplicationExtension('@salesforce/extension-chakra-store-locator')
+    const isStoreLocatorEnabled = !!storeLocatorExtension && storeLocatorExtension.isEnabled
 
     const [showLoading, setShowLoading] = useState(false)
     // tracking if users enter the popover Content,
@@ -304,6 +308,17 @@ const Header = ({
                         {...styles.wishlistIcon}
                         onClick={onWishlistClick}
                     />
+                    {isStoreLocatorEnabled && <IconButton
+                        // @TODO: Add store locator aria-label
+                            // aria-label={intl.formatMessage({
+                            //     defaultMessage: 'Store Locator',
+                            //     id: 'header.button.assistive_msg.store_locator'
+                            // })}
+                            icon={<StoreIcon />}
+                            {...styles.icons}
+                            variant="unstyled"
+                            onClick={() => {console.log('store locator')}}
+                        />}
                     <IconButton
                         aria-label={intl.formatMessage(
                             {
