@@ -52,7 +52,13 @@ export default {
         ],
         require('@babel/plugin-transform-async-generator-functions')
     ].filter(Boolean),
-    ignore: ['node_modules/**'],
+    only: [
+        // Include all files outside node_modules
+        /^(?!.*node_modules).*/,
+
+        // Explicitly include `extension-*` packages from `node_modules`
+        /node_modules\/(@?[^/]+\/)?extension-.*$/
+    ],
     env: {
         test: {
             presets: [require('@babel/preset-env'), require('@babel/preset-react')],

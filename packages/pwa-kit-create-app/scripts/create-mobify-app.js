@@ -1018,21 +1018,10 @@ const runGenerator = async (
                 : version
             return acc
         }, {})
-
-        updatePackageJson(p.resolve(outputDir, 'package.json'), {
-            name: getSlugifiedProjectName(context.answers.project.name || context.preset.id),
-            version: GENERATED_PROJECT_VERSION,
-            devDependencies: appExtensionDeps,
-            ...(selectedAppExtensions.length > 0 && {
-                mobify: {
-                    app: {
-                        extensions: selectedAppExtensions.map((appExtensionName) => [
-                            appExtensionName
-                        ])
                     }
-                }
-            })
-        })
+
+    // Update the root package.json
+    updatePackageJson(p.resolve(outputDir, 'package.json'), pkgUpdates)
 
     // Clean up the temporary directory
     sh.rm('-rf', tmp)
