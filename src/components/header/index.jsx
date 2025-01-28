@@ -313,16 +313,14 @@ const Header = ({
                         onClick={onWishlistClick}
                     />
                     {isStoreLocatorEnabled && <IconButton
-                        // @TODO: Add store locator aria-label
-                            // aria-label={intl.formatMessage({
-                            //     defaultMessage: 'Store Locator',
-                            //     id: 'header.button.assistive_msg.store_locator'
-                            // })}
+                            aria-label={intl.formatMessage({
+                                defaultMessage: 'Store Locator',
+                                id: 'header.button.assistive_msg.store_locator'
+                            })}
                             icon={<StoreIcon />}
                             {...styles.icons}
                             variant="unstyled"
                             onClick={() => {
-                                console.log('open modal test')
                                 openModal()
                             }}
                         />}
