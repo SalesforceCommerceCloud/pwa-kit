@@ -326,7 +326,13 @@ const Header = ({
                             {...styles.icons}
                             variant="unstyled"
                             onClick={() => {
-                                openModal()
+                                if (
+                                    !window.location.pathname.includes(
+                                        storeLocatorExtension.config.path
+                                    )
+                                ) {
+                                    openModal()
+                                }
                             }}
                         />
                     )}
