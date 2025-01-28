@@ -1,3 +1,6 @@
+## v6.0.0
+- DNT Consent Banner: [#2203](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2203)
+
 ## v5.1.0-dev (TBD)
 
 - [BUG] Fixed GET /shopper-context API calls being made without the usid [#2206](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2206)

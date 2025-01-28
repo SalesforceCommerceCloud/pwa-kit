@@ -1,6 +1,6 @@
 {
   "name": "@salesforce/retail-react-app",
-  "version": "5.1.0-dev",
+  "version": "6.0.0-dev",
   "license": "See license in LICENSE",
   "author": "cc-pwa-kit@salesforce.com",
   "ccExtensibility": {
@@ -92,7 +92,7 @@
   "bundlesize": [
     {
       "path": "build/main.js",
-      "maxSize": "52 kB"
+      "maxSize": "53 kB"
     },
     {
       "path": "build/vendor.js",
