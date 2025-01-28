@@ -42,20 +42,21 @@ export const buildBabelExtensibilityArgs = (config: any) => {
 
     const extensionSrcPaths =
         extensions.length > 0
-            ? extensions.map(([packageName]) =>
-                  fse.realpathSync(p.resolve(`${NODE_MODULES_PATH}/${packageName}/src`))
+            ? extensions.map(
+                  ([packageName]) =>
+                      fse.realpathSync(p.resolve(`${NODE_MODULES_PATH}/${packageName}/src`)) + '/**'
               )
             : []
 
     const extensionsPathsStr = extensionSrcPaths.length > 0 ? `,${extensionSrcPaths.join(',')}` : ''
 
-    console.log('[DEBUG] serverPath:', serverPath);
-    console.log('[DEBUG] placeHolderPath:', placeHolderPath);
-    console.log('[DEBUG] extensionSrcPaths:', extensionSrcPaths);
+    console.log('[DEBUG] serverPath:', serverPath)
+    console.log('[DEBUG] placeHolderPath:', placeHolderPath)
+    console.log('[DEBUG] extensionSrcPaths:', extensionSrcPaths)
 
-    const babelArgs = `--ignore "${IGNORE_PATH}" --only "app/**,${serverPath},${placeHolderPath}${extensionsPathsStr}/**"`
+    const babelArgs = `--ignore "${IGNORE_PATH}" --only "app/**,${serverPath},${placeHolderPath}${extensionsPathsStr}"`
 
-    console.log('[DEBUG] buildBabelExtensibilityArgs:', babelArgs);
+    console.log('[DEBUG] buildBabelExtensibilityArgs:', babelArgs)
 
     return babelArgs
 }
