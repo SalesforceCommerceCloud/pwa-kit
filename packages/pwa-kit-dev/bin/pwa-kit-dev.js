@@ -265,34 +265,15 @@ const main = async () => {
                 'babel-node'
             )
 
-            // TODO: Babel is transpiling files in the node_modules folder that is doesn't have to!! I don't know why these ignores are working
-            // there is also a set of ignores that might have to be set in the babel configuration.
             execSync(
-                `${babelNode} ${
-                    inspect ? '--inspect' : ''
-                } --ignore '/node_modules\\/(?!extension-[^\\/]+\\/)/i' ${babelArgs} ${getAppEntrypoint()}`,
+                `"${babelNode}" ${inspect ? '--inspect' : ''} ${buildBabelExtensibilityArgs(
+                    getConfig()
+                )} ${babelArgs} "${getAppEntrypoint()}"`,
                 {
                     env: {
                         ...process.env,
                         ...(noHMR ? {HMR: 'false'} : {})
                     }
-        // Refined Babel arguments
-        const command = `${babelNode} --no-babelrc --debug \
-            --only "${[
-                "app/**",
-                "/Users/arayanavarro/git/latest-pwa-kit/packages/pwa-kit-runtime/dist/ssr/server/build-remote-server.js",
-                "/Users/arayanavarro/git/latest-pwa-kit/packages/pwa-kit-extension-sdk/dist/express/placeholders/application-extensions.js",
-                "/Users/arayanavarro/git/latest-pwa-kit/packages/extension-chakra-store-locator/src/setup-server.ts",
-            ].join(",")}" \
-            ${babelArgs} \
-            "${getAppEntrypoint()}"`;
-
-        // Execute the command
-            execSync(command, {
-                env: {
-                    ...process.env,
-                BABEL_DISABLE_CACHE: '1',
-                    ...(noHMR ? {HMR: 'false'} : {})
                 }
             )
         })
