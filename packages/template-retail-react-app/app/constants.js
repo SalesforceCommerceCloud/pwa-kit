@@ -202,6 +202,7 @@ export const STORE_LOCATOR_NUM_STORES_PER_LOAD = 10
 export const STORE_LOCATOR_DISTANCE_UNIT = 'km'
 export const STORE_LOCATOR_IS_ENABLED = true
 
+export const DEFAULT_DNT_STATE = true
 // Constants for shopper context
 // Supported non-string field types used in SHOPPER_CONTEXT_SEARCH_PARAMS below.
 // Only non-string types need to be identified using the "type" field.

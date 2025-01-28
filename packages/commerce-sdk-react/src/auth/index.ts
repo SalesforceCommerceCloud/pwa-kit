@@ -87,6 +87,9 @@ type AuthDataMap = Record<
         callback?: (storage: BaseStorage) => void
     }
 >
+type DntOptions = {
+    includeDefaults: boolean
+}
 
 const isParentTrusted = isOriginTrusted(getParentOrigin())
 
@@ -312,9 +315,21 @@ class Auth {
         storage.delete(key)
     }
 
-    getDnt() {
+    /**
+     * Return the value of the DNT cookie or undefined if it is not set.
+     * The DNT cookie being undefined means that there is a necessity to
+     * get the user's input for consent tracking, but not that there is no
+     * DNT value to apply to analytics layers. DNT value will default to
+     * a certain value and this is reflected by effectiveDnt.
+     *
+     * If the cookie value is invalid, then it will be deleted in this function.
+     *
+     * If includeDefaults is true, then even if the cookie is not defined,
+     * defaultDnt will be returned, if it exists. If defaultDnt is not defined, then
+     * the SDK Default will return (false)
+     */
+    getDnt(options?: DntOptions) {
         const dntCookieVal = this.get(DNT_COOKIE_NAME)
-        // Only '1' or '0' are valid, and invalid values, lack of cookie, or value conflict with token must be an undefined DNT
         let dntCookieStatus = undefined
         const accessToken = this.getAccessToken()
         let isInSync = true
@@ -327,6 +342,23 @@ class Auth {
         } else {
             dntCookieStatus = Boolean(Number(dntCookieVal))
         }
+
+        if (options?.includeDefaults) {
+            const defaultDnt = this.defaultDnt
+
+            let effectiveDnt
+            const dntCookie = dntCookieVal === '1' ? true : dntCookieVal === '0' ? false : undefined
+            if (dntCookie !== undefined) {
+                effectiveDnt = dntCookie
+            } else {
+                // If the cookie is not set, read the defaultDnt preference.
+                // If defaultDnt doesn't exist, default to false, following SLAS default for dnt
+                effectiveDnt = defaultDnt !== undefined ? defaultDnt : false
+            }
+
+            return effectiveDnt
+        }
+
         return dntCookieStatus
     }
 
@@ -397,22 +429,6 @@ class Auth {
         const validTimeSeconds = exp - iat - 60
         const tokenAgeSeconds = Date.now() / 1000 - iat
         return validTimeSeconds <= tokenAgeSeconds
-    }
-
-    /**
-     * Gets the Do-Not-Track (DNT) preference from the `dw_dnt` cookie.
-     * If user has set their DNT preference, read the cookie, if not, use the default DNT pref. If the default DNT pref has not been set, default to false.
-     */
-    private getDntPreference(dw_dnt: string | undefined, defaultDnt: boolean | undefined) {
-        let dntPref
-        // Read `dw_dnt` cookie
-        const dntCookie = dw_dnt === '1' ? true : dw_dnt === '0' ? false : undefined
-        dntPref = dntCookie
-
-        // If the cookie is not set, read the default DNT preference.
-        if (dntCookie === undefined) dntPref = defaultDnt !== undefined ? defaultDnt : undefined
-
-        return dntPref
     }
 
     /**
@@ -561,7 +577,7 @@ class Auth {
     }
 
     async refreshAccessToken() {
-        const dntPref = this.getDntPreference(this.get(DNT_COOKIE_NAME), this.defaultDnt)
+        const dntPref = this.getDnt({includeDefaults: true})
         const refreshTokenRegistered = this.get('refresh_token_registered')
         const refreshTokenGuest = this.get('refresh_token_guest')
         const refreshToken = refreshTokenRegistered || refreshTokenGuest
@@ -573,7 +589,7 @@ class Auth {
                             this.client,
                             {
                                 refreshToken,
-                                ...(dntPref !== undefined && {dnt: dntPref})
+                                dnt: dntPref
                             },
                             {
                                 clientSecret: this.clientSecret
@@ -742,12 +758,12 @@ class Auth {
             this.logWarning(SLAS_SECRET_WARNING_MSG)
         }
         const usid = this.get('usid')
-        const dntPref = this.getDntPreference(this.get(DNT_COOKIE_NAME), this.defaultDnt)
+        const dntPref = this.getDnt({includeDefaults: true})
         const isGuest = true
         const guestPrivateArgs = [
             this.client,
             {
-                ...(dntPref !== undefined && {dnt: dntPref}),
+                dnt: dntPref,
                 ...(usid && {usid})
             },
             {clientSecret: this.clientSecret}
@@ -756,7 +772,7 @@ class Auth {
             this.client,
             {
                 redirectURI: this.redirectURI,
-                ...(dntPref !== undefined && {dnt: dntPref}),
+                dnt: dntPref,
                 ...(usid && {usid})
             }
         ] as const
@@ -817,7 +833,7 @@ class Auth {
         }
         const redirectURI = this.redirectURI
         const usid = this.get('usid')
-        const dntPref = this.getDntPreference(this.get(DNT_COOKIE_NAME), this.defaultDnt)
+        const dntPref = this.getDnt({includeDefaults: true})
         const isGuest = false
         const token = await helpers.loginRegisteredUserB2C(
             this.client,
@@ -827,7 +843,7 @@ class Auth {
             },
             {
                 redirectURI,
-                ...(dntPref !== undefined && {dnt: dntPref}),
+                dnt: dntPref,
                 ...(usid && {usid})
             }
         )
