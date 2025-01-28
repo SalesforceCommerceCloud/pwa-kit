@@ -263,19 +263,27 @@ const main = async () => {
                 '..',
                 '.bin',
                 'babel-node'
-            )
+        );
 
-            execSync(
-                `"${babelNode}" ${inspect ? '--inspect' : ''} ${buildBabelExtensibilityArgs(
-                    getConfig()
-                )} ${babelArgs} "${getAppEntrypoint()}"`,
-                {
-                    env: {
-                        ...process.env,
-                        ...(noHMR ? {HMR: 'false'} : {})
-                    }
+        // Refined Babel arguments
+        const command = `${babelNode} --no-babelrc --debug \
+            --only "${[
+                "app/**",
+                "/Users/arayanavarro/git/latest-pwa-kit/packages/pwa-kit-runtime/dist/ssr/server/build-remote-server.js",
+                "/Users/arayanavarro/git/latest-pwa-kit/packages/pwa-kit-extension-sdk/dist/express/placeholders/application-extensions.js",
+                "/Users/arayanavarro/git/latest-pwa-kit/packages/extension-chakra-store-locator/src/setup-server.ts",
+            ].join(",")}" \
+            ${babelArgs} \
+            "${getAppEntrypoint()}"`;
+
+        // Execute the command
+            execSync(command, {
+                env: {
+                    ...process.env,
+                BABEL_DISABLE_CACHE: '1',
+                    ...(noHMR ? {HMR: 'false'} : {})
                 }
-            )
+            });
         })
 
     program
