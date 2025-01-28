@@ -601,7 +601,7 @@ const ProductView = forwardRef(
                                 </VStack>
                             )}
                             <StoreAvailabilityText
-                                storeName={selectedStore?.name}
+                                selectedStore={selectedStore}
                                 productInventories={product?.inventories}
                             />
                             <Box ref={errorContainerRef}>

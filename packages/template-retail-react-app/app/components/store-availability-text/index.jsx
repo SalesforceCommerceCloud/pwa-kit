@@ -13,10 +13,11 @@ import {Box, Text} from '@salesforce/retail-react-app/app/components/shared/ui'
 // Hooks
 import {useIntl} from 'react-intl'
 
-const StoreAvailabilityText = ({storeName, productInventories}) => {
-    console.log(productInventories)
+const StoreAvailabilityText = ({selectedStore, productInventories}) => {
     const intl = useIntl()
-    const inStock = productInventories?.find((inventory) => inventory.orderable)
+    const inStock = productInventories?.find(
+        (inventory) => inventory.id === selectedStore.inventoryId && inventory.orderable
+    )
 
     return (
         <Box gap={1} fontWeight={400} display="flex">
@@ -27,13 +28,13 @@ const StoreAvailabilityText = ({storeName, productInventories}) => {
                       })
                     : intl.formatMessage({defaultMessage: 'Out of Stock at'})}
             </Text>
-            <Text>{storeName ? storeName : 'Select Store'}</Text>
+            <Text>{selectedStore.name ? selectedStore.name : 'Select Store'}</Text>
         </Box>
     )
 }
 
 StoreAvailabilityText.propTypes = {
-    storeName: PropTypes.string,
+    selectedStore: PropTypes.object,
     productInventories: PropTypes.arrayOf(PropTypes.object)
 }
 
