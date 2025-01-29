@@ -21,9 +21,7 @@ class StoreLocatorExtension extends ApplicationExtension<Config> {
         // TODO: Code added for testing proposes remove before merging
         app.get('/sample', (req, res) => {
             console.log('StarterExtension extendApp GET /sample')
-            res.send(
-                `<p>Hello starter extension!</p>`
-            )
+            res.send(`<p>Hello starter extension!</p>`)
         })
 
         return app
