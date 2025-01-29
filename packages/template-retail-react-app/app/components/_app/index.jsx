@@ -46,7 +46,10 @@ import {DrawerMenu} from '@salesforce/retail-react-app/app/components/drawer-men
 import {ListMenu, ListMenuContent} from '@salesforce/retail-react-app/app/components/list-menu'
 import {HideOnDesktop, HideOnMobile} from '@salesforce/retail-react-app/app/components/responsive'
 import AboveHeader from '@salesforce/retail-react-app/app/components/_app/partials/above-header'
-import StoreLocatorModal from '@salesforce/retail-react-app/app/components/store-locator-modal'
+import StoreLocatorModal, {
+    StoreLocatorProvider
+} from '@salesforce/retail-react-app/app/components/store-locator-modal'
+
 // Hooks
 import {AuthModal, useAuthModal} from '@salesforce/retail-react-app/app/hooks/use-auth-modal'
 import {
@@ -354,10 +357,6 @@ const App = (props) => {
 
                         <Box id="app" display="flex" flexDirection="column" flex={1}>
                             <SkipNavLink zIndex="skipLink">Skip to Content</SkipNavLink>
-                            <StoreLocatorModal
-                                isOpen={isOpenStoreLocator}
-                                onClose={onCloseStoreLocator}
-                            />
                             <Box {...styles.headerWrapper}>
                                 {!isCheckout ? (
                                     <>
@@ -402,32 +401,38 @@ const App = (props) => {
                             </Box>
                             {!isOnline && <OfflineBanner />}
                             <AddToCartModalProvider>
-                                <SkipNavContent
-                                    style={{
-                                        display: 'flex',
-                                        flexDirection: 'column',
-                                        flex: 1,
-                                        outline: 0
-                                    }}
-                                >
-                                    <Box
-                                        as="main"
-                                        id="app-main"
-                                        role="main"
-                                        display="flex"
-                                        flexDirection="column"
-                                        flex="1"
+                                <StoreLocatorProvider>
+                                    <SkipNavContent
+                                        style={{
+                                            display: 'flex',
+                                            flexDirection: 'column',
+                                            flex: 1,
+                                            outline: 0
+                                        }}
                                     >
-                                        <OfflineBoundary isOnline={false}>
-                                            {children}
-                                        </OfflineBoundary>
-                                    </Box>
-                                </SkipNavContent>
+                                        <Box
+                                            as="main"
+                                            id="app-main"
+                                            role="main"
+                                            display="flex"
+                                            flexDirection="column"
+                                            flex="1"
+                                        >
+                                            <OfflineBoundary isOnline={false}>
+                                                {children}
+                                            </OfflineBoundary>
+                                        </Box>
+                                    </SkipNavContent>
 
-                                {!isCheckout ? <Footer /> : <CheckoutFooter />}
+                                    {!isCheckout ? <Footer /> : <CheckoutFooter />}
 
-                                <AuthModal {...authModal} />
-                                <DntNotification {...dntNotification} />
+                                    <AuthModal {...authModal} />
+                                    <StoreLocatorModal
+                                        isOpen={isOpenStoreLocator}
+                                        onClose={onCloseStoreLocator}
+                                    />
+                                    <DntNotification {...dntNotification} />
+                                </StoreLocatorProvider>
                             </AddToCartModalProvider>
                         </Box>
                     </CurrencyProvider>

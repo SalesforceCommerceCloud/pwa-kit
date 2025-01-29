@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React from 'react'
+import React, {useContext} from 'react'
 import {useIntl} from 'react-intl'
 import PropTypes from 'prop-types'
 
@@ -21,12 +21,12 @@ import {
     RadioGroup
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 
-// Hooks
-import {useSelectStore} from '@salesforce/retail-react-app/app/hooks/use-select-store'
+// Others
+import {StoreLocatorContext} from '@salesforce/retail-react-app/app/components/store-locator-modal'
 
 const StoresList = ({storesInfo}) => {
     const intl = useIntl()
-    const {selectedStore, setStore} = useSelectStore()
+    const {selectedStore, setStore} = useContext(StoreLocatorContext)
 
     const handleChange = (storeId) => {
         const store = storesInfo.find((store) => store.id === storeId)

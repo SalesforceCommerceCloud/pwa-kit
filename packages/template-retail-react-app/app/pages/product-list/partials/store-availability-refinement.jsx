@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React from 'react'
+import React, {useContext} from 'react'
 import PropTypes from 'prop-types'
 import {FormattedMessage} from 'react-intl'
 
@@ -19,13 +19,13 @@ import {
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 import CheckboxRefinements from '@salesforce/retail-react-app/app/pages/product-list/partials/checkbox-refinements'
 
-// Hooks
-import {useSelectStore} from '@salesforce/retail-react-app/app/hooks/use-select-store'
+// Others
+import {StoreLocatorContext} from '@salesforce/retail-react-app/app/components/store-locator-modal/index'
 
 const INVENTORY_ATTRIBUTE_ID = 'ilids'
 
 const StoreAvailabilityRefinement = ({toggleFilter, selectedFilters}) => {
-    const {selectedStore, isStoreSelected} = useSelectStore()
+    const {selectedStore, isStoreSelected} = useContext(StoreLocatorContext)
 
     return (
         <AccordionItem paddingBottom={6} borderTop="none" key="show-all">

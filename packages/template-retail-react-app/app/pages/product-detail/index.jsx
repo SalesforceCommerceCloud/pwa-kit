@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, {Fragment, useCallback, useEffect, useState} from 'react'
+import React, {Fragment, useCallback, useContext, useEffect, useState} from 'react'
 import PropTypes from 'prop-types'
 import {Helmet} from 'react-helmet'
 import {FormattedMessage, useIntl} from 'react-intl'
@@ -55,7 +55,7 @@ import {rebuildPathWithParams} from '@salesforce/retail-react-app/app/utils/url'
 import {useHistory, useLocation, useParams} from 'react-router-dom'
 import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
 import {useWishList} from '@salesforce/retail-react-app/app/hooks/use-wish-list'
-import {useSelectStore} from '@salesforce/retail-react-app/app/hooks/use-select-store'
+import {StoreLocatorContext} from '@salesforce/retail-react-app/app/components/store-locator-modal'
 
 const ProductDetail = () => {
     const {formatMessage} = useIntl()
@@ -82,7 +82,7 @@ const ProductDetail = () => {
     /*************************** Product Detail and Category ********************/
     const {productId} = useParams()
     const urlParams = new URLSearchParams(location.search)
-    const {selectedStore} = useSelectStore()
+    const {selectedStore} = useContext(StoreLocatorContext)
     const {
         data: product,
         isLoading: isProductLoading,
