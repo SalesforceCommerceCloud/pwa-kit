@@ -60,18 +60,17 @@ export default {
     },
     ignore: [
         function (filepath) {
-            // Ignore node_modules, but include @salesforce/extension-* and pwa-kit-extension-sdk
-            if (/node_modules/.test(filepath)) {
-                // Only ignore non-extension @salesforce packages
-                if (
-                    /node_modules\/(?!@salesforce\/pwa-kit-extension-sdk|@salesforce\/extension-)/.test(
-                        filepath
-                    )
-                ) {
-                    return true
-                }
+            // Return false if it's an allowed extension package @salesforce/pwa-kit-extension-sdk and extension-*
+            if (/node_modules\/@[^/]+\/(pwa-kit-extension-sdk|extension-)/.test(filepath)) {
                 return false
             }
+
+            // Return true if it's in node_modules (excluding allowed packages handled above)
+            if (/node_modules/.test(filepath)) {
+                return true
+            }
+
+            // Return false for all other files
             return false
         }
     ]
