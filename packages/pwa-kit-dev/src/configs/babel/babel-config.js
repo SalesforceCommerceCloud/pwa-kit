@@ -59,6 +59,25 @@ export default {
         }
     },
     ignore: [
-        /node_modules\/(?!(@?[^/]+\/)?extension-)[^/]+\/.*$/i // TODO: This effectively avoids babel from transpiling node_modules BUT also breaks the extensions setup-server.ts
+        function (filepath) {
+            // Log file path to see which files are being processed
+            console.log(`Processing file: ${filepath}`)
+
+            // Ignore node_modules, but include @salesforce/extension-*
+            if (/node_modules/.test(filepath)) {
+                // Only ignore non-extension @salesforce packages
+                if (
+                    /node_modules\/(?!@salesforce\/pwa-kit-extension-sdk|@salesforce\/extension-)/.test(
+                        filepath
+                    )
+                ) {
+                    console.log('Babel is ignoring:', filepath)
+                    return true // Ignore this file
+                }
+                console.log('Babel is NOT ignoring:', filepath)
+                return false // Don't ignore @salesforce/extension- or pwa-kit-extension-sdk
+            }
+            return false // Process all other files outside node_modules
+        }
     ]
 }
