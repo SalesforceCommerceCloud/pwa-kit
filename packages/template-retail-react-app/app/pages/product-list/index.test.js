@@ -13,6 +13,7 @@ import {
     mockedEmptyCustomerProductList,
     mockCategories
 } from '@salesforce/retail-react-app/app/mocks/mock-data'
+import mockConfig from '@salesforce/retail-react-app/config/mocks/default'
 import {screen, waitFor} from '@testing-library/react'
 import {Route, Switch} from 'react-router-dom'
 import {
@@ -304,6 +305,21 @@ test('clicking a filter on search result will change url', async () => {
     await waitFor(() =>
         expect(window.location.search).toBe(
             '?limit=25&q=dress&refine=c_refinementColor%3DBeige&sort=best-matches'
+        )
+    )
+})
+
+test('clicking store availability filter will change url', async () => {
+    window.history.pushState({}, 'ProductList', '/uk/en-GB/category/mens-clothing-jackets')
+    window.localStorage.setItem(
+        `store_${mockConfig.app.defaultSite}`,
+        JSON.stringify({id: 'test_store', name: 'Test Store', inventoryId: 'inventory_1'})
+    )
+    const {user} = renderWithProviders(<MockedComponent />)
+    await user.click(screen.getByText(/Test Store/i))
+    await waitFor(() =>
+        expect(window.location.search).toBe(
+            '?limit=25&refine=ilids%3Dinventory_1&sort=best-matches'
         )
     )
 })

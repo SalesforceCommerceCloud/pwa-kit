@@ -30,7 +30,7 @@ const StoreAvailabilityText = ({selectedStore, productInventories}) => {
                 />
             )}
             <Link>
-                {selectedStore.name ? (
+                {selectedStore?.name ? (
                     selectedStore.name
                 ) : (
                     <FormattedMessage

@@ -54,6 +54,8 @@ test('ProductView Component renders properly', async () => {
     expect(screen.getAllByText(/Add to cart/i)).toHaveLength(2)
     expect(screen.getAllByRole('radiogroup')).toHaveLength(3)
     expect(screen.getAllByText(/add to cart/i)).toHaveLength(2)
+    expect(screen.getByText(/In Stock at/i)).toBeInTheDocument()
+    expect(screen.getByText(/Select Store/i)).toBeInTheDocument()
 })
 
 test('ProductView Component renders with addToCart event handler', async () => {
