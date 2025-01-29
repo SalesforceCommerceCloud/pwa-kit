@@ -60,10 +60,7 @@ export default {
     },
     ignore: [
         function (filepath) {
-            // Log file path to see which files are being processed
-            console.log(`Processing file: ${filepath}`)
-
-            // Ignore node_modules, but include @salesforce/extension-*
+            // Ignore node_modules, but include @salesforce/extension-* and pwa-kit-extension-sdk
             if (/node_modules/.test(filepath)) {
                 // Only ignore non-extension @salesforce packages
                 if (
@@ -71,13 +68,11 @@ export default {
                         filepath
                     )
                 ) {
-                    console.log('Babel is ignoring:', filepath)
-                    return true // Ignore this file
+                    return true
                 }
-                console.log('Babel is NOT ignoring:', filepath)
-                return false // Don't ignore @salesforce/extension- or pwa-kit-extension-sdk
+                return false
             }
-            return false // Process all other files outside node_modules
+            return false
         }
     ]
 }

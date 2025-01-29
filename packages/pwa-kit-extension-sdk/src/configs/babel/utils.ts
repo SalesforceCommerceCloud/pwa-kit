@@ -50,13 +50,7 @@ export const buildBabelExtensibilityArgs = (config: any) => {
 
     const extensionsPathsStr = extensionSrcPaths.length > 0 ? `,${extensionSrcPaths.join(',')}` : ''
 
-    console.log('[DEBUG] serverPath:', serverPath)
-    console.log('[DEBUG] placeHolderPath:', placeHolderPath)
-    console.log('[DEBUG] extensionSrcPaths:', extensionSrcPaths)
-
     const babelArgs = `--ignore "${IGNORE_PATH}" --only "app/**,${serverPath},${placeHolderPath}${extensionsPathsStr}"`
-
-    console.log('[DEBUG] buildBabelExtensibilityArgs:', babelArgs)
 
     return babelArgs
 }

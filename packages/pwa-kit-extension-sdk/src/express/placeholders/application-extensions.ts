@@ -12,6 +12,6 @@
 // During build process, this file is replaced with the actual implementation.
 // see pwa-kit-extension-sdk/configs/utils.ts for more details.
 export const getApplicationExtensions = () => {
-    console.error('EXPRESS Something went wrong. Cannot load application extensions.')
+    console.error('Something went wrong. Cannot load application extensions.')
     return []
 }
