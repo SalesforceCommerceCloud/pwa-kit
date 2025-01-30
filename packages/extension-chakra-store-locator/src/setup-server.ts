@@ -18,12 +18,6 @@ import extensionMeta from '../extension-meta.json'
 class StoreLocatorExtension extends ApplicationExtension<Config> {
     static readonly id = extensionMeta.id
     extendApp(app: Application): Application {
-        // TODO: Code added for testing proposes remove before merging
-        app.get('/sample', (req, res) => {
-            console.log('StarterExtension extendApp GET /sample')
-            res.send(`<p>Hello starter extension!</p>`)
-        })
-
         return app
     }
 }
