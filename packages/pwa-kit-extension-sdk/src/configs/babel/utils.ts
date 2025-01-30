@@ -63,10 +63,7 @@ export const buildBabelExtensibilityArgs = (config: any) => {
         const extensionsPathsStr =
             extensionSrcPaths.length > 0 ? `,${extensionSrcPaths.join(',')}` : ''
 
-        const babelArgs = `--only "${p.join(
-            'app',
-            '**'
-        )},${serverPath},${placeHolderPath}${extensionsPathsStr}"`
+        const babelArgs = `--only "app/**,${serverPath},${placeHolderPath}${extensionsPathsStr}"`
 
         return babelArgs
     } catch (error) {
