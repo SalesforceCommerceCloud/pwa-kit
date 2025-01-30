@@ -21,8 +21,22 @@ import {getConfiguredExtensions} from '../../shared/utils'
  * if no actual extensions are added.
  */
 const NODE_MODULES_PATH = 'node_modules'
-const SERVER_PATH = `${NODE_MODULES_PATH}/@salesforce/pwa-kit-runtime/ssr/server/build-remote-server.js`
-const PLACEHOLDER_PATH = `${NODE_MODULES_PATH}/@salesforce/pwa-kit-extension-sdk/express/placeholders/application-extensions.js`
+const SERVER_PATH = p.join(
+    NODE_MODULES_PATH,
+    '@salesforce',
+    'pwa-kit-runtime',
+    'ssr',
+    'server',
+    'build-remote-server.js'
+)
+const PLACEHOLDER_PATH = p.join(
+    NODE_MODULES_PATH,
+    '@salesforce',
+    'pwa-kit-extension-sdk',
+    'express',
+    'placeholders',
+    'application-extensions.js'
+)
 
 /**
  * Builds Babel extensibility arguments for processing specific files and paths.
@@ -37,15 +51,17 @@ export const buildBabelExtensibilityArgs = (config: any) => {
 
     const extensionSrcPaths =
         extensions.length > 0
-            ? extensions.map(
-                  ([packageName]) =>
-                      fse.realpathSync(p.resolve(`${NODE_MODULES_PATH}/${packageName}/src`)) + '/**'
+            ? extensions.map(([packageName]) =>
+                  fse.realpathSync(p.resolve(p.join(NODE_MODULES_PATH, packageName, 'src', '**')))
               )
             : []
 
     const extensionsPathsStr = extensionSrcPaths.length > 0 ? `,${extensionSrcPaths.join(',')}` : ''
 
-    const babelArgs = `--only "app/**,${serverPath},${placeHolderPath}${extensionsPathsStr}"`
+    const babelArgs = `--only "${p.join(
+        'app',
+        '**'
+    )},${serverPath},${placeHolderPath}${extensionsPathsStr}"`
 
     return babelArgs
 }
