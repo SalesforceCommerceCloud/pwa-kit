@@ -21,6 +21,7 @@ import fallbackMessages from '@salesforce/retail-react-app/app/static/translatio
 import mockConfig from '@salesforce/retail-react-app/config/mocks/default'
 // Contexts
 import {CurrencyProvider, MultiSiteProvider} from '@salesforce/retail-react-app/app/contexts'
+import {StoreLocatorProvider} from '@salesforce/retail-react-app/app/components/store-locator-modal'
 
 import {createUrlTemplate} from '@salesforce/retail-react-app/app/utils/url'
 import {getSiteByReference} from '@salesforce/retail-react-app/app/utils/site-utils'
@@ -137,7 +138,9 @@ export const TestProviders = ({
                         <CurrencyProvider currency={DEFAULT_CURRENCY}>
                             <Router>
                                 <ChakraProvider theme={theme}>
-                                    <AddToCartModalProvider>{children}</AddToCartModalProvider>
+                                    <AddToCartModalProvider>
+                                        <StoreLocatorProvider>{children}</StoreLocatorProvider>
+                                    </AddToCartModalProvider>
                                 </ChakraProvider>
                             </Router>
                         </CurrencyProvider>

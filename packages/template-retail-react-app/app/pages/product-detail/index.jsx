@@ -479,7 +479,6 @@ const ProductDetail = () => {
                             validateOrderability={handleChildProductValidation}
                             childProductOrderability={childProductOrderability}
                             setSelectedBundleQuantity={setSelectedBundleQuantity}
-                            selectedStore={selectedStore}
                         />
 
                         <hr />
@@ -505,7 +504,6 @@ const ProductDetail = () => {
                                             isProductPartOfBundle={isProductABundle}
                                             childOfBundleQuantity={childQuantity}
                                             selectedBundleParentQuantity={selectedBundleQuantity}
-                                            selectedStore={selectedStore}
                                             addToCart={
                                                 isProductASet
                                                     ? (variant, quantity) =>
@@ -568,7 +566,6 @@ const ProductDetail = () => {
                             isProductLoading={isProductLoading}
                             isBasketLoading={isBasketLoading}
                             isWishlistLoading={isWishlistLoading}
-                            selectedStore={selectedStore}
                         />
                         <InformationAccordion product={product} />
                     </Fragment>

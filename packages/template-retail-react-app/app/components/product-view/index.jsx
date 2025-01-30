@@ -119,8 +119,7 @@ const ProductView = forwardRef(
                 !isProductLoading && variant?.orderable && quantity > 0 && quantity <= stockLevel,
             showImageGallery = true,
             setSelectedBundleQuantity = () => {},
-            selectedBundleParentQuantity = 1,
-            selectedStore
+            selectedBundleParentQuantity = 1
         },
         ref
     ) => {
@@ -600,10 +599,7 @@ const ProductView = forwardRef(
                                     />
                                 </VStack>
                             )}
-                            <StoreAvailabilityText
-                                selectedStore={selectedStore}
-                                productInventories={product?.inventories}
-                            />
+                            <StoreAvailabilityText productInventories={product?.inventories} />
                             <Box ref={errorContainerRef}>
                                 {!showLoading && showOptionsMessage && (
                                     <Fade in={true}>
@@ -704,8 +700,7 @@ ProductView.propTypes = {
     validateOrderability: PropTypes.func,
     showImageGallery: PropTypes.bool,
     setSelectedBundleQuantity: PropTypes.func,
-    selectedBundleParentQuantity: PropTypes.number,
-    selectedStore: PropTypes.object
+    selectedBundleParentQuantity: PropTypes.number
 }
 
 export default ProductView

@@ -9,6 +9,7 @@ import {screen} from '@testing-library/react'
 
 import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
 import StoreAvailabilityText from '@salesforce/retail-react-app/app/components/store-availability-text'
+import {StoreLocatorContext} from '@salesforce/retail-react-app/app/components/store-locator-modal'
 
 const selectedStore = {
     name: 'Test Store',
@@ -18,48 +19,64 @@ const selectedStore = {
 
 describe('Store Name Rendering', () => {
     test('renders "Select Store" if selectedStore does not contain a name field', () => {
-        renderWithProviders(<StoreAvailabilityText selectedStore={{}} />)
+        renderWithProviders(
+            <StoreLocatorContext.Provider value={{selectedStore: {}}}>
+                <StoreAvailabilityText />
+            </StoreLocatorContext.Provider>
+        )
         expect(screen.getByText(/Select Store/i)).toBeInTheDocument()
     })
 
     test('renders store name if selectedStore contains a name field', () => {
-        renderWithProviders(<StoreAvailabilityText selectedStore={selectedStore} />)
+        renderWithProviders(
+            <StoreLocatorContext.Provider value={{selectedStore}}>
+                <StoreAvailabilityText />
+            </StoreLocatorContext.Provider>
+        )
         expect(screen.getByText(selectedStore.name)).toBeInTheDocument()
     })
 })
 
 describe('Stock Availability Rendering', () => {
     test('renders "In Stock" when productInventories is undefined', () => {
-        renderWithProviders(<StoreAvailabilityText selectedStore={selectedStore} />)
+        renderWithProviders(
+            <StoreLocatorContext.Provider value={{selectedStore}}>
+                <StoreAvailabilityText />
+            </StoreLocatorContext.Provider>
+        )
         expect(screen.getByText(/In Stock at/i)).toBeInTheDocument()
     })
+    test
 
     test('renders "In Stock" if orderable is true', () => {
         renderWithProviders(
-            <StoreAvailabilityText
-                selectedStore={selectedStore}
-                productInventories={[{id: 'inventory_1', orderable: true}]}
-            />
+            <StoreLocatorContext.Provider value={{selectedStore}}>
+                <StoreAvailabilityText
+                    productInventories={[{id: 'inventory_1', orderable: true}]}
+                />
+            </StoreLocatorContext.Provider>
         )
         expect(screen.getByText(/In Stock at/i)).toBeInTheDocument()
     })
 
     test('renders "Out of Stock" if orderable is false', () => {
         renderWithProviders(
-            <StoreAvailabilityText
-                selectedStore={selectedStore}
-                productInventories={[{id: 'inventory_1', orderable: false}]}
-            />
+            <StoreLocatorContext.Provider value={{selectedStore}}>
+                <StoreAvailabilityText
+                    productInventories={[{id: 'inventory_1', orderable: false}]}
+                />
+            </StoreLocatorContext.Provider>
         )
         expect(screen.getByText(/Out of Stock at/i)).toBeInTheDocument()
     })
 
     test('renders "Out of Stock" if selectedStore inventoryId is not in productInventories', () => {
         renderWithProviders(
-            <StoreAvailabilityText
-                selectedStore={selectedStore}
-                productInventories={[{id: 'inventory_99', orderable: true}]}
-            />
+            <StoreLocatorContext.Provider value={{selectedStore}}>
+                <StoreAvailabilityText
+                    productInventories={[{id: 'inventory_99', orderable: true}]}
+                />
+            </StoreLocatorContext.Provider>
         )
         expect(screen.getByText(/Out of Stock at/i)).toBeInTheDocument()
     })

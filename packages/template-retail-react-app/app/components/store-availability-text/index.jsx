@@ -4,14 +4,18 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React from 'react'
+import React, {useContext} from 'react'
 import PropTypes from 'prop-types'
 import {FormattedMessage} from 'react-intl'
 
 // Components
 import {Box, Link} from '@salesforce/retail-react-app/app/components/shared/ui'
 
-const StoreAvailabilityText = ({selectedStore, productInventories}) => {
+// Others
+import {StoreLocatorContext} from '@salesforce/retail-react-app/app/components/store-locator-modal'
+
+const StoreAvailabilityText = ({productInventories}) => {
+    const {selectedStore} = useContext(StoreLocatorContext)
     const inStock = productInventories?.find(
         (inventory) => inventory.id === selectedStore.inventoryId && inventory.orderable
     )
@@ -44,7 +48,6 @@ const StoreAvailabilityText = ({selectedStore, productInventories}) => {
 }
 
 StoreAvailabilityText.propTypes = {
-    selectedStore: PropTypes.object,
     productInventories: PropTypes.arrayOf(PropTypes.object)
 }
 

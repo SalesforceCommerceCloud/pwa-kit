@@ -6,9 +6,14 @@
  */
 
 import React from 'react'
-import StoreLocatorModal from '@salesforce/retail-react-app/app/components/store-locator-modal/index'
+import PropTypes from 'prop-types'
+import StoreLocatorModal, {
+    useStoreLocator
+} from '@salesforce/retail-react-app/app/components/store-locator-modal/index'
 import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
+import {act, fireEvent, screen} from '@testing-library/react'
 import {rest} from 'msw'
+import mockConfig from '@salesforce/retail-react-app/config/mocks/default'
 
 const mockStoresData = [
     {
@@ -199,14 +204,82 @@ const mockStores = {
 }
 
 describe('StoreLocatorModal', () => {
-    test('renders without crashing', () => {
+    beforeEach(() => {
         global.server.use(
             rest.get('*/shopper-stores/v1/organizations/*', (req, res, ctx) => {
                 return res(ctx.delay(0), ctx.status(200), ctx.json(mockStores))
             })
         )
-        expect(() => {
-            renderWithProviders(<StoreLocatorModal />)
-        }).not.toThrow()
+    })
+
+    test('does not render when isOpen is false', () => {
+        renderWithProviders(<StoreLocatorModal isOpen={false} />)
+        expect(screen.queryByText(/Find a Store/i)).not.toBeInTheDocument()
+    })
+
+    test('renders when isOpen is true', async () => {
+        renderWithProviders(<StoreLocatorModal isOpen={true} />)
+        expect(screen.getByText(/Find a Store/i)).toBeInTheDocument()
+
+        await act(async () => {
+            // Select the country
+            const countrySelect = screen.getByRole('combobox')
+            fireEvent.change(countrySelect, {target: {value: 'US'}})
+
+            // Enter a postal code
+            const postalCodeInput = screen.getByPlaceholderText(/enter postal code/i)
+            fireEvent.change(postalCodeInput, {target: {value: '12345'}})
+
+            // Click the "Find" button
+            const findButton = screen.getByRole('button', {name: /find/i})
+            fireEvent.click(findButton)
+        })
+
+        mockStoresData.forEach((store) => {
+            expect(screen.getByText(store.name)).toBeInTheDocument()
+            expect(screen.getByText(store.address1)).toBeInTheDocument()
+        })
+    })
+})
+
+describe('useStoreLocator', () => {
+    const MockComponent = ({store} = {}) => {
+        const {selectedStore, setStore, isStoreSelected} = useStoreLocator()
+
+        return (
+            <>
+                <div data-testid="selected-store">{JSON.stringify(selectedStore)}</div>
+                <div data-testid="is-store-selected">{isStoreSelected.toString()}</div>
+                <button data-testid="set-store" onClick={() => setStore(store)} />
+            </>
+        )
+    }
+    MockComponent.propTypes = {
+        store: PropTypes.object
+    }
+
+    test('no store selected', () => {
+        renderWithProviders(<MockComponent />)
+        expect(screen.getByTestId('selected-store')).toHaveTextContent(/{}/i)
+        expect(screen.getByTestId('is-store-selected')).toHaveTextContent(/false/i)
+    })
+
+    test('store selected', () => {
+        const store = {
+            id: 'test-store',
+            name: 'Test Store',
+            inventoryId: 'inventory'
+        }
+
+        const expectedStoreData = JSON.stringify(store)
+
+        renderWithProviders(<MockComponent store={store} />)
+        fireEvent.click(screen.getByTestId('set-store'))
+
+        expect(screen.getByTestId('selected-store')).toHaveTextContent(expectedStoreData)
+        expect(screen.getByTestId('is-store-selected')).toHaveTextContent(/true/i)
+        expect(localStorage.getItem(`store_${mockConfig.app.defaultSite}`)).toEqual(
+            expectedStoreData
+        )
     })
 })

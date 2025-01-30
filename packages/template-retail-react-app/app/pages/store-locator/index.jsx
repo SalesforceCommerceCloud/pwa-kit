@@ -13,7 +13,6 @@ import Seo from '@salesforce/retail-react-app/app/components/seo'
 import StoreLocatorContent from '@salesforce/retail-react-app/app/components/store-locator-modal/store-locator-content'
 
 const StoreLocator = () => {
-
     return (
         <Box data-testid="store-locator-page" bg="gray.50" py={[8, 16]}>
             <Seo title="Store Locator" description="Find a Store" />
