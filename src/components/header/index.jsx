@@ -136,7 +136,7 @@ const Header = ({
         (state) => {
             return state.state['@salesforce/extension-chakra-store-locator'] || {}
         }
-    ) || {}
+    )
 
     const [showLoading, setShowLoading] = useState(false)
     // tracking if users enter the popover Content,
