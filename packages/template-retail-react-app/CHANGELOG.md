@@ -1,4 +1,5 @@
 ## v6.0.0
+- [BOPIS] Added text indicating the product's stock status at the selected store on the PDP and filtered products based on the selected store on the PLP. [#2226](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2226)
 - DNT Consent Banner: [#2203](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2203)
 
 ## v5.1.0-dev (TBD)
