@@ -2801,6 +2801,24 @@
       "value": "See full details"
     }
   ],
+  "product_view.link.select_store": [
+    {
+      "type": 0,
+      "value": "Select Store"
+    }
+  ],
+  "product_view.store_availability.in_stock_at": [
+    {
+      "type": 0,
+      "value": "In Stock at"
+    }
+  ],
+  "product_view.store_availability.out_of_stock_at": [
+    {
+      "type": 0,
+      "value": "Out of Stock at"
+    }
+  ],
   "profile_card.info.profile_updated": [
     {
       "type": 0,
@@ -3133,6 +3151,12 @@
     {
       "type": 0,
       "value": "Are you sure you want to sign out? You will need to sign back in to proceed with your current order."
+    }
+  ],
+  "store_availability_refinement.button_text": [
+    {
+      "type": 0,
+      "value": "Shop By Availability"
     }
   ],
   "store_locator.action.find": [

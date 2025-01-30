@@ -5937,6 +5937,48 @@
       "value": "]"
     }
   ],
+  "product_view.link.select_store": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Şḗḗŀḗḗƈŧ Şŧǿǿřḗḗ"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "product_view.store_availability.in_stock_at": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Īƞ Şŧǿǿƈķ ȧȧŧ"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "product_view.store_availability.out_of_stock_at": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ǿŭŭŧ ǿǿƒ Şŧǿǿƈķ ȧȧŧ"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
   "profile_card.info.profile_updated": [
     {
       "type": 0,
@@ -6649,6 +6691,20 @@
     {
       "type": 0,
       "value": "Ȧřḗḗ ẏǿǿŭŭ şŭŭřḗḗ ẏǿǿŭŭ ẇȧȧƞŧ ŧǿǿ şīɠƞ ǿǿŭŭŧ? Ẏǿǿŭŭ ẇīŀŀ ƞḗḗḗḗḓ ŧǿǿ şīɠƞ ƀȧȧƈķ īƞ ŧǿǿ ƥřǿǿƈḗḗḗḗḓ ẇīŧħ ẏǿǿŭŭř ƈŭŭřřḗḗƞŧ ǿǿřḓḗḗř."
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "store_availability_refinement.button_text": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Şħǿǿƥ Ɓẏ Ȧṽȧȧīŀȧȧƀīŀīŧẏ"
     },
     {
       "type": 0,
