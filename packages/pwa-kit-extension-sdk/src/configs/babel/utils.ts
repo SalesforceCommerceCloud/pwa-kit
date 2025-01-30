@@ -52,7 +52,7 @@ export const buildBabelExtensibilityArgs = (config: any) => {
     const extensionSrcPaths =
         extensions.length > 0
             ? extensions.map(([packageName]) =>
-                  fse.realpathSync(p.resolve(p.join(NODE_MODULES_PATH, packageName, 'src', '**')))
+                  fse.realpathSync(p.resolve(p.join(NODE_MODULES_PATH, packageName, 'src'))) + '/**'
               )
             : []
 
