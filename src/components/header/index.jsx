@@ -133,8 +133,10 @@ const Header = ({
     )
     const isStoreLocatorEnabled = !!storeLocatorExtension && storeLocatorExtension.isEnabled
     const {openModal} = useApplicationExtensionsStore(
-        (state) => state.state['@salesforce/extension-chakra-store-locator'] || {}
-    )
+        (state) => {
+            return state.state['@salesforce/extension-chakra-store-locator'] || {}
+        }
+    ) || {}
 
     const [showLoading, setShowLoading] = useState(false)
     // tracking if users enter the popover Content,
@@ -326,13 +328,7 @@ const Header = ({
                             {...styles.icons}
                             variant="unstyled"
                             onClick={() => {
-                                if (
-                                    !window.location.pathname.includes(
-                                        storeLocatorExtension.config.path
-                                    )
-                                ) {
-                                    openModal()
-                                }
+                                openModal()
                             }}
                         />
                     )}
