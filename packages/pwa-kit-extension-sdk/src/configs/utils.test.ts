@@ -30,16 +30,16 @@ describe('buildBabelExtensibilityArgs', () => {
     beforeEach(() => {
         realpathSyncMock.mockImplementation((filePath: string) => {
             if (filePath.includes('build-remote-server.js')) {
-                return '/absolute/path/to/build-remote-server.js'
+                return normalizePath('/absolute/path/to/build-remote-server.js')
             }
             if (filePath.includes('application-extensions.js')) {
-                return '/absolute/path/to/application-extensions.js'
+                return normalizePath('/absolute/path/to/application-extensions.js')
             }
             if (filePath.includes(normalizePath('@salesforce/extension-this/src'))) {
-                return '/absolute/path/to/@salesforce/extension-this/src'
+                return normalizePath('/absolute/path/to/@salesforce/extension-this/src')
             }
             if (filePath.includes(normalizePath('@salesforce/extension-that/src'))) {
-                return '/absolute/path/to/@salesforce/extension-that/src'
+                return normalizePath('/absolute/path/to/@salesforce/extension-that/src')
             }
             throw new Error(`Unexpected path: ${filePath}`)
         })
@@ -50,7 +50,7 @@ describe('buildBabelExtensibilityArgs', () => {
     })
 
     test('should return the correct Babel arguments string', () => {
-        const expectedArgs = `--only "app/**,/absolute/path/to/build-remote-server.js,/absolute/path/to/application-extensions.js,/absolute/path/to/@salesforce/extension-this/src/**,/absolute/path/to/@salesforce/extension-that/src/**"`
+        const expectedArgs = `--only "app${path.sep}**,${path.sep}absolute${path.sep}path${path.sep}to${path.sep}build-remote-server.js,${path.sep}absolute${path.sep}path${path.sep}to${path.sep}application-extensions.js,${path.sep}absolute${path.sep}path${path.sep}to${path.sep}@salesforce${path.sep}extension-this${path.sep}src${path.sep}**,${path.sep}absolute${path.sep}path${path.sep}to${path.sep}@salesforce${path.sep}extension-that${path.sep}src${path.sep}**"`
         const result = buildBabelExtensibilityArgs(CONFIG)
         expect(result).toBe(expectedArgs)
     })
@@ -78,7 +78,7 @@ describe('buildBabelExtensibilityArgs', () => {
     })
 
     test('should handle an empty list of configured extensions', () => {
-        const expectedArgs = `--only "app/**,/absolute/path/to/build-remote-server.js,/absolute/path/to/application-extensions.js"`
+        const expectedArgs = `--only "app${path.sep}**,${path.sep}absolute${path.sep}path${path.sep}to${path.sep}build-remote-server.js,${path.sep}absolute${path.sep}path${path.sep}to${path.sep}application-extensions.js"`
         const result = buildBabelExtensibilityArgs({app: {extensions: []}})
         expect(result).toBe(expectedArgs)
         const result2 = buildBabelExtensibilityArgs({app: {}})

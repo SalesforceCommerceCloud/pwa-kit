@@ -64,7 +64,7 @@ export default {
             const normalizedPath = path.normalize(filepath)
 
             const extensionRegex = new RegExp(
-                `node_modules${path.sep}[^${path.sep}]+${path.sep}(pwa-kit-extension-sdk|@[^${path.sep}]+${path.sep}extension-|extension-)`
+                `node_modules\\${path.sep}[^\\${path.sep}]+\\${path.sep}(pwa-kit-extension-sdk|@[^\\${path.sep}]+\\${path.sep}extension-|extension-)`
             )
 
             // Return false if it's an allowed extension package @salesforce/pwa-kit-extension-sdk and extension-*

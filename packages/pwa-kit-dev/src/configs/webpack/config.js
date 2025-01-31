@@ -342,7 +342,7 @@ const ruleForBabelLoader = (babelPlugins) => {
         // NOTE: Because our extensions are just folders containing source code, we need to ensure that the babel-loader processes them.
         // This regex exclude everything in node_modules, but node_modules/extensions-*/ folders
         exclude: new RegExp(
-            `node_modules${path.sep}(?!(@?[^${path.sep}]+${path.sep})?extension-).*`,
+            `node_modules\\${path.sep}(?!(@?[^\\${path.sep}]+\\${path.sep})?extension-).*`,
             'i'
         ),
         use: [
