@@ -65,9 +65,9 @@ export default {
 
             // Return false if it's an allowed extension package @salesforce/pwa-kit-extension-sdk and extension-*
             if (
-                /node_modules[\\/][^/]+[\\/](pwa-kit-extension-sdk|@[^/]+\/extension-|extension-)/.test(
-                    normalizedPath
-                )
+                new RegExp(
+                    `node_modules\\${path.sep}[^\\${path.sep}]+\\${path.sep}(pwa-kit-extension-sdk|@[^\\${path.sep}]+\\${path.sep}extension-|extension-)`
+                ).test(normalizedPath)
             ) {
                 return false
             }

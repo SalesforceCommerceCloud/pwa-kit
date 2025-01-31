@@ -49,21 +49,22 @@ export const buildBabelExtensibilityArgs = (config: any) => {
         const extensions = getConfiguredExtensions(config)
         const serverPath = fse.realpathSync(p.resolve(SERVER_PATH))
         const placeHolderPath = fse.realpathSync(p.resolve(PLACEHOLDER_PATH))
+        const appPath = p.join('app', '**')
 
         const extensionSrcPaths =
             extensions.length > 0
-                ? extensions.map(
-                      ([packageName]) =>
-                          fse.realpathSync(
-                              p.resolve(p.join(NODE_MODULES_PATH, packageName, 'src'))
-                          ) + '/**'
-                  )
+                ? extensions.map(([packageName]) => {
+                      const realPath = fse.realpathSync(
+                          p.resolve(p.join(NODE_MODULES_PATH, packageName, 'src'))
+                      )
+                      return p.join(realPath, '**')
+                  })
                 : []
 
         const extensionsPathsStr =
             extensionSrcPaths.length > 0 ? `,${extensionSrcPaths.join(',')}` : ''
 
-        const babelArgs = `--only "app/**,${serverPath},${placeHolderPath}${extensionsPathsStr}"`
+        const babelArgs = `--only ${appPath},${serverPath},${placeHolderPath}${extensionsPathsStr}`
 
         return babelArgs
     } catch (error) {
