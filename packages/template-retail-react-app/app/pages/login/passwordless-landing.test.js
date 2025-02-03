@@ -9,7 +9,7 @@ import {waitFor} from '@testing-library/react'
 import {rest} from 'msw'
 import {
     renderWithProviders,
-    createPathWithDefaults,
+    createPathWithDefaults
 } from '@salesforce/retail-react-app/app/utils/test-utils'
 import Login from '.'
 import {BrowserRouter as Router, Route} from 'react-router-dom'
@@ -48,7 +48,9 @@ const MockedComponent = () => {
 jest.mock('react-router', () => {
     return {
         ...jest.requireActual('react-router'),
-        useRouteMatch: () => {return {path: '/passwordless-login-landing'}}
+        useRouteMatch: () => {
+            return {path: '/passwordless-login-landing'}
+        }
     }
 })
 
@@ -59,8 +61,12 @@ jest.mock('@salesforce/commerce-sdk-react', () => {
         useAuthHelper: jest
             .fn()
             .mockImplementation((helperType) => mockAuthHelperFunctions[helperType]),
-        useCustomerBaskets: () => {return {data: mockMergedBasket, isSuccess: true}},
-        useCustomerType: jest.fn(() => {return {isRegistered: true, customerType: 'guest'}})
+        useCustomerBaskets: () => {
+            return {data: mockMergedBasket, isSuccess: true}
+        },
+        useCustomerType: jest.fn(() => {
+            return {isRegistered: true, customerType: 'guest'}
+        })
     }
 })
 
@@ -93,7 +99,11 @@ afterEach(() => {
 describe('Passwordless landing tests', function () {
     test('redirects to account page when redirect url is not passed', async () => {
         const token = '12345678'
-        window.history.pushState({}, 'Passwordless Login Landing', createPathWithDefaults(`/passwordless-login-landing?token=${token}`))
+        window.history.pushState(
+            {},
+            'Passwordless Login Landing',
+            createPathWithDefaults(`/passwordless-login-landing?token=${token}`)
+        )
         renderWithProviders(<MockedComponent />, {
             wrapperProps: {
                 siteAlias: 'uk',
@@ -116,7 +126,13 @@ describe('Passwordless landing tests', function () {
     test('redirects to redirectUrl when passed as param', async () => {
         const token = '12345678'
         const redirectUrl = '/womens-tops'
-        window.history.pushState({}, 'Passwordless Login Landing', createPathWithDefaults(`/passwordless-login-landing?token=${token}&redirect_url=${redirectUrl}`))
+        window.history.pushState(
+            {},
+            'Passwordless Login Landing',
+            createPathWithDefaults(
+                `/passwordless-login-landing?token=${token}&redirect_url=${redirectUrl}`
+            )
+        )
         renderWithProviders(<MockedComponent />, {
             wrapperProps: {
                 siteAlias: 'uk',
