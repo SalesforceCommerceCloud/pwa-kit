@@ -153,6 +153,8 @@ const Login = ({initialView = LOGIN_VIEW}) => {
             const token = decodeURIComponent(queryParams.get('token'))
             if (queryParams.get('redirect_url')) {
                 setRedirectPath(decodeURIComponent(queryParams.get('redirect_url')))
+            } else {
+                setRedirectPath('')
             }
 
             const passwordlessLogin = async () => {
@@ -176,9 +178,8 @@ const Login = ({initialView = LOGIN_VIEW}) => {
             handleMergeBasket()
             const redirectTo = redirectPath ? redirectPath : '/account'
             navigate(redirectTo)
-            setRedirectPath('')
         }
-    }, [isRegistered])
+    }, [isRegistered, redirectPath])
 
     /**************** Einstein ****************/
     useEffect(() => {
