@@ -107,18 +107,50 @@ Please refer to the sample configuration below in order to properly configure yo
         "isProduction": false
     },
     "enabled": true,                                            // Toggle this extension on or off, this is useful for debugging and development, defaults to true.
-    "pages": {                                                  // Define the url path of each page. A page can be set to false if you want to disable it.
-        "Account": "/account",
-        "Cart": "/cart",
-        "Checkout": "/checkout",
-        "CheckoutConfirmation": "/checkout/confirmation/:orderNo",
-        "Home": "/",
-        "Login": "/login",
-        "Registration": "/registration",
-        "ResetPassword": "/reset-password",
-        "LoginRedirect": "/callback",
-        "ProductDetail": "/product/:productId",
-        "ProductList": ["/search", "/category/:categoryId"]
+    "pages": {                                                  // Define the url path of and the configuration on each page. A page can be set to false if you want to disable it.
+         "Account": {
+            "path": "/account",
+            "orderSearchParam": {"limit": 10, "offset": 0, "sort": "best-matches", "refine": []}
+        },
+        "Cart": {
+            "path": "/cart"
+        },
+        "Checkout": {
+            "path": "/checkout",
+            "shippingCountryCode": [
+                {"value": "CA", "label": "Canada"},
+                {"value": "US", "label": "United States"}
+            ]
+        },
+        "CheckoutConfirmation": {
+            "path": "/checkout/confirmation/:orderNo"
+        },
+        "Home": {
+            "path": "/",
+            "productLimit": 10,
+            "mainCategory": "newarrivals"
+        },
+        "Login": {
+            "path": "/login"
+        },
+        "Registration": {
+            "path": "/registration"
+        },
+        "ResetPassword": {
+            "path": "/reset-password"
+        },
+        "LoginRedirect": {
+            "path": "/callback"
+        },
+        "ProductDetail": {
+            "path": "/product/:productId"
+        },
+        "ProductList": {
+            "path": ["/search", "/category/:categoryId"],
+            "imageViewType": "large",
+            "selectableAttributeId": "color",
+            "filterAccordionSate": "filters-expanded-index"
+        }
     },
     "siteAliases": {},                                          // Site alias's for multi-site support.
     "sites": [                                                  // Site configs for multi-site support.
