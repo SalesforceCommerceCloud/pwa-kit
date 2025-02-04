@@ -15,13 +15,12 @@
   "files": [
     "CHANGELOG.md",
     "LICENSE",
-    "configs",
-    "core",
-    "express",
-    "react",
-    "shared",
-    "types",
-    "utils"
+    "+(configs|express|react|shared)/**/!(*.test*).{ts,js}",
+    "*.{js,d.ts}",
+    "!*.test*.{js,d.ts}",
+    "!test*.*",
+    "!+(jest|babel).config.js",
+    "!setup-jest.js"
   ],
   "publishConfig": {
     "directory": "dist"
