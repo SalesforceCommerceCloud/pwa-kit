@@ -49,21 +49,21 @@ import {useTheme} from '@chakra-ui/react'
 // Define a type for the HOC props
 type WithAppLayoutProps = React.ComponentPropsWithoutRef<any>
 
-const PlaceholderComponent = () => (
+const PlaceholderComponent: React.FC = () => (
     <Center p="2">
         <Spinner size="lg" />
     </Center>
 )
 
 const DrawerMenuItemWithData = withCommerceSdkReactHookData(
-    ({itemComponent: ItemComponent, data, ...rest}) => (
+    ({itemComponent: ItemComponent, data, ...rest}: any) => (
         <Fade in={true}>
             <ItemComponent {...rest} item={data} itemComponent={DrawerMenuItemWithData} />
         </Fade>
     ),
     {
         hook: useCategory,
-        queryOptions: ({item}) => ({
+        queryOptions: ({item}: {item: {id: string}}) => ({
             parameters: {
                 id: item.id
             }
@@ -73,14 +73,14 @@ const DrawerMenuItemWithData = withCommerceSdkReactHookData(
 )
 
 const ListMenuContentWithData = withCommerceSdkReactHookData(
-    ({data, ...rest}) => (
+    ({data, ...rest}: any) => (
         <Fade in={true}>
             <ListMenuContent {...rest} item={data} />
         </Fade>
     ),
     {
         hook: useCategory,
-        queryOptions: ({item}) => ({
+        queryOptions: ({item}: {item: {id: string}}) => ({
             parameters: {
                 id: item.id,
                 levels: 2
