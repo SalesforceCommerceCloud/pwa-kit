@@ -50,7 +50,9 @@ describe('withMultiSite HOC', () => {
             req: {originalUrl: '/test-path'},
             res: {}
         })
-        mockUseConfig.mockReturnValue({someConfig: 'value'})
+        mockUseConfig.mockReturnValue({
+            defaultAppLocale: 'en-US'
+        })
         mockResolveSiteFromUrl.mockReturnValue({id: 'site-id', alias: 'site-alias'})
         mockResolveLocaleFromUrl.mockReturnValue({id: 'locale-id'})
         mockCreateUrlTemplate.mockReturnValue(jest.fn((path: string) => `/resolved-url${path}`))
@@ -75,13 +77,20 @@ describe('withMultiSite HOC', () => {
         // Set up window location for test
         delete (global as any).window.location
         ;(global as any).window.location = {pathname: '/fallback-path', search: '?query=123'}
-        mockUseServerContext.mockReturnValue({req: undefined})
+
+        // Provide a valid req and res object
+        mockUseServerContext.mockReturnValue({
+            req: {originalUrl: undefined},
+            res: {}
+        })
 
         render(<WrappedComponent />)
 
+        const expectedUrl = '/fallback-path?query=123'
+
         // Verify resolveSiteFromUrl and resolveLocaleFromUrl were called with fallback path
-        expect(mockResolveSiteFromUrl).toHaveBeenCalledWith('/fallback-path?query=123')
-        expect(mockResolveLocaleFromUrl).toHaveBeenCalledWith('/fallback-path?query=123')
+        expect(mockResolveSiteFromUrl).toHaveBeenCalledWith(expectedUrl)
+        expect(mockResolveLocaleFromUrl).toHaveBeenCalledWith(expectedUrl)
     })
 
     it('should provide correct props to MultiSiteProvider', () => {
@@ -89,7 +98,7 @@ describe('withMultiSite HOC', () => {
 
         // Check if MultiSiteProvider was called with the resolved site, locale, and buildUrl
         expect(mockCreateUrlTemplate).toHaveBeenCalledWith(
-            {someConfig: 'value'},
+            {defaultAppLocale: 'en-US'},
             'site-alias',
             'locale-id'
         )

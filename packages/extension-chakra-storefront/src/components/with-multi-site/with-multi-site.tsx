@@ -16,13 +16,17 @@ import {MultiSiteProvider} from '../../contexts'
 import {resolveSiteFromUrl, resolveLocaleFromUrl} from '../../utils/site-utils'
 import {useExtensionConfig} from '../../hooks/use-extension-config'
 
+interface Request {
+    originalUrl?: string
+}
+
 // Define a type for the HOC props
 type WithMultiSiteProps = React.ComponentPropsWithoutRef<any>
 
 // Define the HOC function
 const withMultiSite = <P extends object>(WrappedComponent: React.ComponentType<P>) => {
     const WithMultiSite: React.FC<P> = (props: WithMultiSiteProps) => {
-        const {req} = useServerContext()
+        const {req} = useServerContext() as {req: Request}
         const path = req?.originalUrl || `${window.location.pathname}${window.location.search}`
 
         const config: any = useExtensionConfig()
