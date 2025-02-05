@@ -110,7 +110,7 @@ const withLayout = <P extends object>(WrappedComponent: React.ComponentType<P>) 
         const location = useLocation()
         const authModal = useAuthModal()
         const {site, locale, buildUrl} = useMultiSite()
-        const [isOnline, setIsOnline] = useState(true)
+        const [isOnline, setIsOnline] = useState<boolean>(true)
         const styles = useStyleConfig('App')
         const {colors} = useTheme()
         const {isOpen, onOpen, onClose} = useDisclosure()
@@ -159,7 +159,7 @@ const withLayout = <P extends object>(WrappedComponent: React.ComponentType<P>) 
 
         useEffect(() => {
             // Listen for online status changes.
-            watchOnlineStatus((isOnline) => {
+            watchOnlineStatus((isOnline: boolean) => {
                 setIsOnline(isOnline)
             })
         }, [])
@@ -323,7 +323,7 @@ const withLayout = <P extends object>(WrappedComponent: React.ComponentType<P>) 
                             appExtensionPackageName: '@salesforce/extension-chakra-storefront'
                         })}
                         id="dwanalytics"
-                        async="async"
+                        async={true}
                         onLoad={trackPage}
                     ></script>
                 )}
@@ -334,7 +334,7 @@ const withLayout = <P extends object>(WrappedComponent: React.ComponentType<P>) 
                         })}
                         type="text/javascript"
                         id="dwac"
-                        async="async"
+                        async={true}
                     ></script>
                 )}
             </Box>
