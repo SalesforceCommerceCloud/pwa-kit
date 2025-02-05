@@ -19,7 +19,7 @@ const selectedStore = {
 
 const renderWithStoreLocatorContextProvider = (selectedStore, productInventories = []) => {
     return renderWithProviders(
-        <StoreLocatorContext.Provider value={{ selectedStore, isStoreSelected: true }}>
+        <StoreLocatorContext.Provider value={{selectedStore, isStoreSelected: true}}>
             <StoreAvailabilityText productInventories={productInventories} />
         </StoreLocatorContext.Provider>
     )
@@ -29,7 +29,7 @@ describe('StoreAvailability', () => {
     describe('store is not selected', () => {
         test('renders "In Stock at Select Store"', () => {
             renderWithProviders(
-                <StoreLocatorContext.Provider value={{ selectedStore: {} }}>
+                <StoreLocatorContext.Provider value={{selectedStore: {}}}>
                     <StoreAvailabilityText />
                 </StoreLocatorContext.Provider>
             )
@@ -46,28 +46,33 @@ describe('StoreAvailability', () => {
         })
 
         test('renders "Out of Stock at Test Store" when selectedStore does not have an inventoryId', () => {
-            renderWithStoreLocatorContextProvider({ ...selectedStore, inventoryId: null })
+            renderWithStoreLocatorContextProvider({...selectedStore, inventoryId: null})
             expect(screen.getByText(/Out of Stock at/i)).toBeInTheDocument()
             expect(screen.getByText(selectedStore.name)).toBeInTheDocument()
         })
 
         test('renders "Out of Stock at Test Store" if selectedStore inventoryId is not in productInventories', () => {
-            renderWithStoreLocatorContextProvider(selectedStore, [{ id: 'inventory_99', orderable: true }])
+            renderWithStoreLocatorContextProvider(selectedStore, [
+                {id: 'inventory_99', orderable: true}
+            ])
             expect(screen.getByText(/Out of Stock at/i)).toBeInTheDocument()
             expect(screen.getByText(selectedStore.name)).toBeInTheDocument()
         })
 
         test('renders "Out of Stock at Test Store" if orderable is false', () => {
-            renderWithStoreLocatorContextProvider(selectedStore, [{ id: 'inventory_1', orderable: false }])
+            renderWithStoreLocatorContextProvider(selectedStore, [
+                {id: 'inventory_1', orderable: false}
+            ])
             expect(screen.getByText(/Out of Stock at/i)).toBeInTheDocument()
             expect(screen.getByText(selectedStore.name)).toBeInTheDocument()
         })
 
         test('renders "In Stock at Test Store" if orderable is true', () => {
-            renderWithStoreLocatorContextProvider(selectedStore, [{ id: 'inventory_1', orderable: true }])
+            renderWithStoreLocatorContextProvider(selectedStore, [
+                {id: 'inventory_1', orderable: true}
+            ])
             expect(screen.getByText(/In Stock at/i)).toBeInTheDocument()
             expect(screen.getByText(selectedStore.name)).toBeInTheDocument()
         })
     })
 })
-
