@@ -12,7 +12,7 @@ import {waitFor, screen} from '@testing-library/react'
 import {useForm} from 'react-hook-form'
 import PropTypes from 'prop-types'
 import {StoreLocatorContext} from '@salesforce/retail-react-app/app/components/store-locator-modal/index'
-import {useStoreLocator} from '@salesforce/retail-react-app/app/components/store-locator-modal/index'
+import {useStoreLocator} from '@salesforce/retail-react-app/app/hooks/use-store-locator'
 import {STORE_LOCATOR_NUM_STORES_PER_LOAD} from '@salesforce/retail-react-app/app/constants'
 
 const WrapperComponent = ({userHasSetManualGeolocation}) => {
