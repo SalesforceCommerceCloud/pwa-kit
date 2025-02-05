@@ -13,6 +13,7 @@ import {useServerContext} from '@salesforce/pwa-kit-react-sdk/ssr/universal/hook
 import {createUrlTemplate} from '../../utils/url'
 import {resolveSiteFromUrl, resolveLocaleFromUrl} from '../../utils/site-utils'
 import {useExtensionConfig} from '../../hooks/use-extension-config'
+import {UserConfig} from '../../types/config'
 
 // Mock dependencies
 jest.mock('@salesforce/pwa-kit-react-sdk/ssr/universal/hooks', () => ({
@@ -30,7 +31,7 @@ jest.mock('../../utils/site-utils', () => ({
 }))
 
 const mockUseServerContext = useServerContext as jest.MockedFunction<typeof useServerContext>
-const mockUseConfig = useExtensionConfig as jest.MockedFunction<typeof useExtensionConfig>
+const mockUseConfig = useExtensionConfig as jest.MockedFunction<() => UserConfig>
 const mockCreateUrlTemplate = createUrlTemplate as jest.MockedFunction<typeof createUrlTemplate>
 const mockResolveSiteFromUrl = resolveSiteFromUrl as jest.MockedFunction<typeof resolveSiteFromUrl>
 const mockResolveLocaleFromUrl = resolveLocaleFromUrl as jest.MockedFunction<
@@ -51,7 +52,43 @@ describe('withMultiSite HOC', () => {
             res: {}
         })
         mockUseConfig.mockReturnValue({
-            defaultAppLocale: 'en-US'
+            defaultAppLocale: 'en-US',
+            commerceAPI: {
+                proxyPath: '/api/proxy',
+                parameters: {
+                    clientId: 'your-client-id',
+                    organizationId: 'your-org-id',
+                    shortCode: 'your-short-code',
+                    siteId: 'your-site-id'
+                }
+            },
+            categoryNav: {
+                defaultNavSsrDepth: 3,
+                defaultRootCategory: 'root-category'
+            },
+            defaultSite: 'site-1',
+            defaultSiteTitle: 'Default Site Title',
+            einsteinAPI: {
+                host: 'https://example.com',
+                einsteinId: 'your-einstein-id',
+                siteId: 'your-site-id',
+                isProduction: false
+            },
+            maxCacheAge: 3600,
+            search: {
+                defaultLimitValues: [10, 20, 50],
+                defaultSearchParams: {
+                    limit: 10,
+                    offset: 0,
+                    sort: 'relevance',
+                    refine: []
+                },
+                recentSearchKey: 'recentSearch',
+                recentSearchLimit: 5,
+                recentSearchMinLength: 3
+            },
+            sites: [],
+            staleWhileRevalidate: 60
         })
         mockResolveSiteFromUrl.mockReturnValue({id: 'site-id', alias: 'site-alias'})
         mockResolveLocaleFromUrl.mockReturnValue({id: 'locale-id'})
