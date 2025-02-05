@@ -6,11 +6,10 @@
  */
 
 export class HTTPError extends Error {
-    constructor(status, message) {
+    status: number
+
+    constructor(status: number, message: string) {
         super(message)
-        this.constructor = HTTPError
-        this.__proto__ = HTTPError.prototype
-        this.message = message
         this.status = status
     }
 
@@ -20,9 +19,7 @@ export class HTTPError extends Error {
 }
 
 export class HTTPNotFound extends HTTPError {
-    constructor(message) {
+    constructor(message: string) {
         super(404, message)
-        this.constructor = HTTPNotFound
-        this.__proto__ = HTTPNotFound.prototype
     }
 }

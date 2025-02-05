@@ -11,6 +11,8 @@
         "paths": {
             "overridable!./*": [
                 "src/*",
+                "src/components/*",
+                "src/pages/*",
                 "node_modules/@salesforce/extension-*"
             ]
         },
