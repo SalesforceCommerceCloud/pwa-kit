@@ -12,7 +12,7 @@ jobs:
       contents: write
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
         
@@ -42,9 +42,9 @@ jobs:
           echo "commerce_sdk_react_version_base=$version" >> "$GITHUB_ENV"
 
       - name: Setup Node
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: 22
           cache: npm
 
       - name: Install Monorepo Dependencies

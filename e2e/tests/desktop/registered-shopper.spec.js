@@ -5,163 +5,154 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-const { test, expect } = require("@playwright/test");
-const config = require("../../config");
-const { 
-  addProductToCart,
-  registerShopper,
-  validateOrderHistory,
-  validateWishlist,
-  loginShopper,
-  navigateToPDPDesktop,
-} = require("../../scripts/pageHelpers");
+const {test, expect} = require('@playwright/test')
+const config = require('../../config')
 const {
-  generateUserCredentials,
-  getCreditCardExpiry,
-} = require("../../scripts/utils.js");
+    addProductToCart,
+    registerShopper,
+    validateOrderHistory,
+    validateWishlist,
+    loginShopper,
+    navigateToPDPDesktop
+} = require('../../scripts/pageHelpers')
+const {generateUserCredentials, getCreditCardExpiry} = require('../../scripts/utils.js')
 
-const REGISTERED_USER_CREDENTIALS = generateUserCredentials();
+let registeredUserCredentials = {}
+
+test.beforeAll(async () => {
+    // Generate credentials once and use throughout tests to avoid creating a new account
+    registeredUserCredentials = generateUserCredentials()
+})
 
 /**
  * Test that registered shoppers can add a product to cart and go through the entire checkout process,
  * validating that shopper is able to get to the order summary section,
  * and that order shows up in order history
  */
-test("Registered shopper can checkout items", async ({ page }) => {
-  // register and login user
-  await registerShopper({page, userCredentials: REGISTERED_USER_CREDENTIALS});
+test('Registered shopper can checkout items', async ({page}) => {
+    // Since we're re-using the same account, we need to check if the user is already registered.
+    // This ensures the tests are independent and not dependent on the order they are run in.
+    const isLoggedIn = await loginShopper({
+        page,
+        userCredentials: registeredUserCredentials
+    })
 
-  // Shop for items as registered user
-  await addProductToCart({page});
+    if (!isLoggedIn) {
+        await registerShopper({
+            page,
+            userCredentials: registeredUserCredentials
+        })
+    }
 
-  // cart
-  await page.getByLabel(/My cart/i).click();
+    await expect(page.getByRole('heading', {name: /Account Details/i})).toBeVisible()
 
-  await expect(
-    page.getByRole("link", { name: /Cotton Turtleneck Sweater/i })
-  ).toBeVisible();
+    // Shop for items as registered user
+    await addProductToCart({page})
 
-  await page.getByRole("link", { name: "Proceed to Checkout" }).click();
+    // cart
+    await page.getByLabel(/My cart/i).click()
 
-  // Confirm the email input toggles to show sign out button on clicking "Checkout as guest"
-  const step0Card = page.locator("div[data-testid='sf-toggle-card-step-0']");
+    await expect(page.getByRole('link', {name: /Cotton Turtleneck Sweater/i})).toBeVisible()
 
-  await expect(
-    step0Card.getByRole("button", { name: /Sign Out/i })
-  ).toBeVisible();
+    await page.getByRole('link', {name: 'Proceed to Checkout'}).click()
 
-  await expect(
-    page.getByRole("heading", { name: /Shipping Address/i })
-  ).toBeVisible();
+    // Confirm the email input toggles to show sign out button on clicking "Checkout as guest"
+    const step0Card = page.locator("div[data-testid='sf-toggle-card-step-0']")
 
-  await page
-    .locator("input#firstName")
-    .fill(REGISTERED_USER_CREDENTIALS.firstName);
-  await page
-    .locator("input#lastName")
-    .fill(REGISTERED_USER_CREDENTIALS.lastName);
-  await page.locator("input#phone").fill(REGISTERED_USER_CREDENTIALS.phone);
-  await page
-    .locator("input#address1")
-    .fill(REGISTERED_USER_CREDENTIALS.address.street);
-  await page
-    .locator("input#city")
-    .fill(REGISTERED_USER_CREDENTIALS.address.city);
-  await page
-    .locator("select#stateCode")
-    .selectOption(REGISTERED_USER_CREDENTIALS.address.state);
-  await page
-    .locator("input#postalCode")
-    .fill(REGISTERED_USER_CREDENTIALS.address.zipcode);
+    await expect(step0Card.getByRole('button', {name: /Sign Out/i})).toBeVisible()
 
-  await page
-    .getByRole("button", { name: /Continue to Shipping Method/i })
-    .click();
+    await expect(page.getByRole('heading', {name: /Shipping Address/i})).toBeVisible()
 
-  // Confirm the shipping details form toggles to show edit button on clicking "Checkout as guest"
-  const step1Card = page.locator("div[data-testid='sf-toggle-card-step-1']");
+    await page.locator('input#firstName').fill(registeredUserCredentials.firstName)
+    await page.locator('input#lastName').fill(registeredUserCredentials.lastName)
+    await page.locator('input#phone').fill(registeredUserCredentials.phone)
+    await page.locator('input#address1').fill(registeredUserCredentials.address.street)
+    await page.locator('input#city').fill(registeredUserCredentials.address.city)
+    await page.locator('select#stateCode').selectOption(registeredUserCredentials.address.state)
+    await page.locator('input#postalCode').fill(registeredUserCredentials.address.zipcode)
 
-  await expect(step1Card.getByRole("button", { name: /Edit/i })).toBeVisible();
+    await page.getByRole('button', {name: /Continue to Shipping Method/i}).click()
 
-  await expect(
-    page.getByRole("heading", { name: /Shipping & Gift Options/i })
-  ).toBeVisible();
-  await page.waitForLoadState();
+    // Confirm the shipping details form toggles to show edit button on clicking "Checkout as guest"
+    const step1Card = page.locator("div[data-testid='sf-toggle-card-step-1']")
 
-  const continueToPayment = page.getByRole("button", {
-    name: /Continue to Payment/i,
-  });
+    await expect(step1Card.getByRole('button', {name: /Edit/i})).toBeVisible()
 
-  if (continueToPayment.isEnabled()) {
-    await continueToPayment.click();
-  }
+    await expect(page.getByRole('heading', {name: /Shipping & Gift Options/i})).toBeVisible()
+    await page.waitForLoadState()
 
-  // Confirm the shipping options form toggles to show edit button on clicking "Checkout as guest"
-  const step2Card = page.locator("div[data-testid='sf-toggle-card-step-2']");
+    const continueToPayment = page.getByRole('button', {
+        name: /Continue to Payment/i
+    })
 
-  await expect(step2Card.getByRole("button", { name: /Edit/i })).toBeVisible();
+    if (continueToPayment.isEnabled()) {
+        await continueToPayment.click()
+    }
 
-  await expect(page.getByRole("heading", { name: /Payment/i })).toBeVisible();
+    // Confirm the shipping options form toggles to show edit button on clicking "Checkout as guest"
+    const step2Card = page.locator("div[data-testid='sf-toggle-card-step-2']")
 
-  const creditCardExpiry = getCreditCardExpiry();
+    await expect(step2Card.getByRole('button', {name: /Edit/i})).toBeVisible()
 
-  await page.locator("input#number").fill("4111111111111111");
-  await page.locator("input#holder").fill("John Doe");
-  await page.locator("input#expiry").fill(creditCardExpiry);
-  await page.locator("input#securityCode").fill("213");
+    await expect(page.getByRole('heading', {name: /Payment/i})).toBeVisible()
 
-  await page.getByRole("button", { name: /Review Order/i }).click();
+    const creditCardExpiry = getCreditCardExpiry()
 
-  // Confirm the shipping options form toggles to show edit button on clicking "Checkout as guest"
-  const step3Card = page.locator("div[data-testid='sf-toggle-card-step-3']");
+    await page.locator('input#number').fill('4111111111111111')
+    await page.locator('input#holder').fill('John Doe')
+    await page.locator('input#expiry').fill(creditCardExpiry)
+    await page.locator('input#securityCode').fill('213')
 
-  await expect(step3Card.getByRole("button", { name: /Edit/i })).toBeVisible();
-  page
-    .getByRole("button", { name: /Place Order/i })
-    .first()
-    .click();
+    await page.getByRole('button', {name: /Review Order/i}).click()
 
-  const orderConfirmationHeading = page.getByRole("heading", {
-    name: /Thank you for your order!/i,
-  });
-  await orderConfirmationHeading.waitFor();
+    // Confirm the shipping options form toggles to show edit button on clicking "Checkout as guest"
+    const step3Card = page.locator("div[data-testid='sf-toggle-card-step-3']")
 
-  await expect(
-    page.getByRole("heading", { name: /Order Summary/i })
-  ).toBeVisible();
-  await expect(page.getByText(/2 Items/i)).toBeVisible();
-  await expect(
-    page.getByRole("link", { name: /Cotton Turtleneck Sweater/i })
-  ).toBeVisible();
+    await expect(step3Card.getByRole('button', {name: /Edit/i})).toBeVisible()
+    page.getByRole('button', {name: /Place Order/i})
+        .first()
+        .click()
 
-  // order history
-  await validateOrderHistory({page});
-});
+    const orderConfirmationHeading = page.getByRole('heading', {
+        name: /Thank you for your order!/i
+    })
+    await orderConfirmationHeading.waitFor()
+
+    await expect(page.getByRole('heading', {name: /Order Summary/i})).toBeVisible()
+    await expect(page.getByText(/2 Items/i)).toBeVisible()
+    await expect(page.getByRole('link', {name: /Cotton Turtleneck Sweater/i})).toBeVisible()
+
+    // order history
+    await validateOrderHistory({page})
+})
 
 /**
  * Test that registered shoppers can navigate to PDP and add a product to wishlist
  */
-test("Registered shopper can add item to wishlist", async ({ page }) => {
-  const isLoggedIn = await loginShopper({
-    page,
-    userCredentials: REGISTERED_USER_CREDENTIALS
-  })
+test('Registered shopper can add item to wishlist', async ({page}) => {
+    const isLoggedIn = await loginShopper({
+        page,
+        userCredentials: registeredUserCredentials
+    })
 
-  if(!isLoggedIn) {
-    await registerShopper({page, userCredentials: generateUserCredentials() })
-  }
+    if (!isLoggedIn) {
+        await registerShopper({
+            page,
+            userCredentials: registeredUserCredentials
+        })
+    }
 
-  // Navigate to PDP
-  await navigateToPDPDesktop({page});
+    await expect(page.getByRole('heading', {name: /Account Details/i})).toBeVisible()
 
-  // add product to wishlist
-  await expect(
-    page.getByRole("heading", { name: /Cotton Turtleneck Sweater/i })
-  ).toBeVisible();
+    // Navigate to PDP
+    await navigateToPDPDesktop({page})
 
-  await page.getByRole("radio", { name: "L", exact: true }).click();
-  await page.getByRole("button", { name: /Add to Wishlist/i }).click()
+    // add product to wishlist
+    await expect(page.getByRole('heading', {name: /Cotton Turtleneck Sweater/i})).toBeVisible()
 
-  // wishlist
-  await validateWishlist({page})
-});
+    await page.getByRole('radio', {name: 'L', exact: true}).click()
+    await page.getByRole('button', {name: /Add to Wishlist/i}).click()
+
+    // wishlist
+    await validateWishlist({page})
+})

@@ -11,13 +11,9 @@ jobs:
       fail-fast: false
       matrix:
         # Run all matrix env at once because we will not deploy demo app to MRT.
-        node: [16, 18, 20, 22]
+        node: [18, 20, 22]
         npm: [8, 9, 10, 11]
-        exclude: # node 16 with npm 10/11 and node 18 with npm 11 are not compatible
-          - node: 16
-            npm: 10
-          - node: 16
-            npm: 11
+        exclude: # node 18 with npm 11 is not compatible
           - node: 18
             npm: 11
     runs-on: ubuntu-latest
@@ -26,7 +22,7 @@ jobs:
       # For more: https://nodejs.org/en/download/releases/
       # (We also use this env var for making sure a step runs once for the current node version)
       # Note: For node 18, the default was npm 9 until v18.19.0, when it became npm 10
-      IS_DEFAULT_NPM: ${{ (matrix.node == 16 && matrix.npm == 8) || (matrix.node == 18 && matrix.npm == 10) || (matrix.node == 20 && matrix.npm == 10) || (matrix.node == 22 && matrix.npm == 10) }}
+      IS_DEFAULT_NPM: ${{ (matrix.node == 18 && matrix.npm == 10) || (matrix.node == 20 && matrix.npm == 10) || (matrix.node == 22 && matrix.npm == 10) }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -46,6 +42,14 @@ jobs:
         run: |-
           # Install node dependencies
           node ./scripts/gtime.js monorepo_install npm ci
+
+      - name: Check Playwright Versions
+        run: |-
+          # Check the installed version of playwright
+          echo "Playwright version: $(npm list playwright --depth=0)"
+          
+          # Check the installed version of @playwright/test
+          echo "@playwright/test version: $(npm list @playwright/test --depth=0)"
 
       - name: Generate Retail App Demo
         uses: ./.github/actions/e2e_generate_app
@@ -62,13 +66,10 @@ jobs:
       # Run one matrix env at a time because we need to deploy each app to MRT and run e2e tests there
       max-parallel: 1
       matrix:
-        node: [16, 18, 20, 22]
+        # Run all matrix env at once because we will not deploy demo app to MRT.
+        node: [18, 20, 22]
         npm: [8, 9, 10, 11]
-        exclude: # node 16 with npm 10/11 and node 18 with npm 11 are not compatible
-          - node: 16
-            npm: 10
-          - node: 16
-            npm: 11
+        exclude: # node 18 with npm 11 is not compatible
           - node: 18
             npm: 11
     runs-on: ubuntu-latest
@@ -77,7 +78,7 @@ jobs:
       # For more: https://nodejs.org/en/download/releases/
       # (We also use this env var for making sure a step runs once for the current node version)
       # Note: For node 18, the default was npm 9 until v18.19.0, when it became npm 10
-      IS_DEFAULT_NPM: ${{ (matrix.node == 16 && matrix.npm == 8) || (matrix.node == 18 && matrix.npm == 10) || (matrix.node == 20 && matrix.npm == 10) || (matrix.node == 22 && matrix.npm == 10) }}
+      IS_DEFAULT_NPM: ${{ (matrix.node == 18 && matrix.npm == 10) || (matrix.node == 20 && matrix.npm == 10) || (matrix.node == 22 && matrix.npm == 10) }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -97,6 +98,14 @@ jobs:
         run: |-
           # Install node dependencies
           node ./scripts/gtime.js monorepo_install npm ci
+
+      - name: Check Playwright Versions
+        run: |-
+          # Check the installed version of playwright
+          echo "Playwright version: $(npm list playwright --depth=0)"
+          
+          # Check the installed version of @playwright/test
+          echo "@playwright/test version: $(npm list @playwright/test --depth=0)"
 
       - name: Generate Retail App Without Extensibility
         uses: ./.github/actions/e2e_generate_app
@@ -163,13 +172,10 @@ jobs:
       # Run one matrix env at a time because we need to deploy each app to MRT and run e2e tests there
       max-parallel: 1
       matrix:
-        node: [16, 18, 20, 22]
+        # Run all matrix env at once because we will not deploy demo app to MRT.
+        node: [18, 20, 22]
         npm: [8, 9, 10, 11]
-        exclude: # node 16 with npm 10/11 and node 18 with npm 11 are not compatible
-          - node: 16
-            npm: 10
-          - node: 16
-            npm: 11
+        exclude: # node 18 with npm 11 is not compatible
           - node: 18
             npm: 11
     runs-on: ubuntu-latest
@@ -178,7 +184,7 @@ jobs:
       # For more: https://nodejs.org/en/download/releases/
       # (We also use this env var for making sure a step runs once for the current node version)
       # Note: For node 18, the default was npm 9 until v18.19.0, when it became npm 10
-      IS_DEFAULT_NPM: ${{ (matrix.node == 16 && matrix.npm == 8) || (matrix.node == 18 && matrix.npm == 10) || (matrix.node == 20 && matrix.npm == 10) || (matrix.node == 22 && matrix.npm == 10) }}
+      IS_DEFAULT_NPM: ${{ (matrix.node == 18 && matrix.npm == 10) || (matrix.node == 20 && matrix.npm == 10) || (matrix.node == 22 && matrix.npm == 10) }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -198,6 +204,14 @@ jobs:
         run: |-
           # Install node dependencies
           node ./scripts/gtime.js monorepo_install npm ci
+
+      - name: Check Playwright Versions
+        run: |-
+          # Check the installed version of playwright
+          echo "Playwright version: $(npm list playwright --depth=0)"
+          
+          # Check the installed version of @playwright/test
+          echo "@playwright/test version: $(npm list @playwright/test --depth=0)"
 
       - name: Generate Retail App With Extensibility
         uses: ./.github/actions/e2e_generate_app
@@ -262,23 +276,19 @@ jobs:
       # Run one matrix env at a time because we need to deploy each app to MRT and run e2e tests there
       max-parallel: 1
       matrix:
-        # Run all matrix env at once because we will not deploy demo app to MRT.
-        node: [16, 18, 20, 22]
-        npm: [8, 9, 10, 11]
-        exclude: # node 16 with npm 10/11 and node 18 with npm 11 are not compatible
-          - node: 16
-            npm: 10
-          - node: 16
-            npm: 11
-          - node: 18
-            npm: 11
+          # Run all matrix env at once because we will not deploy demo app to MRT.
+          node: [18, 20, 22]
+          npm: [8, 9, 10, 11]
+          exclude: # node 18 with npm 11 is not compatible
+            - node: 18
+              npm: 11
     runs-on: ubuntu-latest
     env:
       # The "default" npm is the one that ships with a given version of node.
       # For more: https://nodejs.org/en/download/releases/
       # (We also use this env var for making sure a step runs once for the current node version)
       # Note: For node 18, the default was npm 9 until v18.19.0, when it became npm 10
-      IS_DEFAULT_NPM: ${{ (matrix.node == 16 && matrix.npm == 8) || (matrix.node == 18 && matrix.npm == 10) || (matrix.node == 20 && matrix.npm == 10) || (matrix.node == 22 && matrix.npm == 10) }}
+      IS_DEFAULT_NPM: ${{ (matrix.node == 18 && matrix.npm == 10) || (matrix.node == 20 && matrix.npm == 10) || (matrix.node == 22 && matrix.npm == 10) }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -297,6 +307,14 @@ jobs:
         run: |-
           # Install node dependencies
           node ./scripts/gtime.js monorepo_install npm ci
+
+      - name: Check Playwright Versions
+        run: |-
+          # Check the installed version of playwright
+          echo "Playwright version: $(npm list playwright --depth=0)"
+          
+          # Check the installed version of @playwright/test
+          echo "@playwright/test version: $(npm list @playwright/test --depth=0)"
 
       - name: Generate Retail App Private Client
         uses: ./.github/actions/e2e_generate_app
