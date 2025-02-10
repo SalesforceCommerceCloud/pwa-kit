@@ -19,6 +19,7 @@ import createLogger from '@salesforce/pwa-kit-runtime/utils/logger-factory'
 // Local Imports
 import {resolveSiteFromUrl, resolveLocaleFromUrl} from '../../utils/site-utils'
 import {useExtensionConfig} from '../../hooks/use-extension-config'
+
 // Define a type for the HOC props
 type WithCommerceSDKReactProps = {
     shortCode: string
@@ -34,20 +35,26 @@ type WithCommerceSDKReactProps = {
     logger: any
 }
 
+// Define a type for the server context
+type ServerContext = {
+    req: {
+        originalUrl?: string
+    }
+}
+
 // Define the HOC function
 const withCommerceSDKReact = <P extends object>(WrappedComponent: React.ComponentType<P>) => {
-    const WithCommerceSDKReact: React.FC<P> = (props: WithCommerceSDKReactProps) => {
-        const {req} = useServerContext()
+    const WithCommerceSDKReact: React.FC<P & WithCommerceSDKReactProps> = (props) => {
+        const {req} = useServerContext() as ServerContext
         const path = req?.originalUrl || `${window.location.pathname}${window.location.search}`
 
         // TODO: Update this type
         const config: any = useExtensionConfig()
-
         const appOrigin = getAppOrigin()
         const site: any = resolveSiteFromUrl(path)
         const locale: any = resolveLocaleFromUrl(path)
 
-        const {correlationId} = useCorrelationId()
+        const {correlationId} = useCorrelationId() as {correlationId: string}
         const headers = {
             'correlation-id': correlationId
         }
