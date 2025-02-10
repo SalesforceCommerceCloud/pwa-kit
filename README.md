@@ -76,7 +76,7 @@ choose to use it. To accomplish this follow the below steps:
 2. Import and re-export the error component from this Application Extension like so:
 
 ```
-import Error from '@salesforce/extension-chakra-storefront/src/components/error'
+import Error from '@salesforce/extension-chakra-storefront/components/error'
 export default Error
 ```
 
