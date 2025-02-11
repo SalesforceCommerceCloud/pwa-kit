@@ -44,7 +44,8 @@ export interface CommerceApiProviderProps extends ApiClientConfigParams {
     logger?: Logger
     defaultDnt?: boolean
     refreshTokenRegisteredCookieTTL?: number
-    refreshTokenGuestCookieTTL?: number
+    refreshTokenGuestCookieTTL?: number,
+    OCAPISessionsURL?: string
 }
 
 /**
