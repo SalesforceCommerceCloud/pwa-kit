@@ -15,6 +15,7 @@ import {proxyBasePath} from '@salesforce/pwa-kit-runtime/utils/ssr-namespace-pat
 import {useCorrelationId} from '@salesforce/pwa-kit-react-sdk/ssr/universal/hooks'
 import {useServerContext} from '@salesforce/pwa-kit-react-sdk/ssr/universal/hooks'
 import createLogger from '@salesforce/pwa-kit-runtime/utils/logger-factory'
+import {ServerContext} from '@salesforce/commerce-sdk-react/hooks/types'
 
 // Local Imports
 import {resolveSiteFromUrl, resolveLocaleFromUrl} from '../../utils/site-utils'
@@ -33,13 +34,6 @@ type WithCommerceSDKReactProps = {
     headers: Record<string, string>
     OCAPISessionsURL: string
     logger: any
-}
-
-// Define a type for the server context
-type ServerContext = {
-    req: {
-        originalUrl?: string
-    }
 }
 
 // Define the HOC function

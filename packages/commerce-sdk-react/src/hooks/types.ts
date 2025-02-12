@@ -226,3 +226,9 @@ export type TMutationVariables = {
     parameters?: {[key: string]: string | number | boolean | string[] | number[]}
     headers?: {[key: string]: string}
 } | void
+
+export type ServerContext = {
+    req: {
+        originalUrl?: string
+    }
+}
