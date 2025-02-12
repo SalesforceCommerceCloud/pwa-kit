@@ -4,77 +4,30 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React from 'react'
-import {screen, fireEvent} from '@testing-library/react'
-import PropTypes from 'prop-types'
-import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
+import {act} from 'react'
+import {renderHook} from '@testing-library/react'
 import mockConfig from '@salesforce/retail-react-app/config/mocks/default'
 import {useStoreLocator} from '@salesforce/retail-react-app/app/hooks/use-store-locator'
+import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
+import {
+    DEFAULT_STORE_LOCATOR_COUNTRY,
+    DEFAULT_STORE_LOCATOR_POSTAL_CODE,
+    STORE_LOCATOR_NUM_STORES_PER_LOAD
+} from '@salesforce/retail-react-app/app/constants'
 
-const MockComponent = ({store} = {}) => {
-    const {
-        selectedStore,
-        setStore,
-        isStoreSelected,
-        userHasSetManualGeolocation,
-        setUserHasSetManualGeolocation,
-        automaticGeolocationHasFailed,
-        setAutomaticGeolocationHasFailed,
-        userWantsToShareLocation,
-        setUserWantsToShareLocation,
-        searchStoresParams,
-        setSearchStoresParams
-    } = useStoreLocator()
+jest.mock('./use-multi-site', () => jest.fn())
+useMultiSite.mockImplementation(() => ({site: {id: mockConfig.app.defaultSite}}))
 
-    return (
-        <>
-            <div data-testid="selected-store">{JSON.stringify(selectedStore)}</div>
-            <div data-testid="is-store-selected">{isStoreSelected.toString()}</div>
-            <button data-testid="set-store" onClick={() => setStore(store)} />
-            <div data-testid="user-has-set-manual-geolocation">
-                {userHasSetManualGeolocation.toString()}
-            </div>
-            <button
-                data-testid="set-user-has-set-manual-geolocation"
-                onClick={() => setUserHasSetManualGeolocation(true)}
-            />
-            <div data-testid="automatic-geolocation-has-failed">
-                {automaticGeolocationHasFailed.toString()}
-            </div>
-            <button
-                data-testid="set-automatic-geolocation-has-failed"
-                onClick={() => setAutomaticGeolocationHasFailed(true)}
-            />
-            <div data-testid="user-wants-to-share-location">
-                {userWantsToShareLocation.toString()}
-            </div>
-            <button
-                data-testid="set-user-wants-to-share-location"
-                onClick={() => setUserWantsToShareLocation(true)}
-            />
-            <div data-testid="search-stores-params">{JSON.stringify(searchStoresParams)}</div>
-            <button
-                data-testid="set-search-stores-params"
-                onClick={() =>
-                    setSearchStoresParams({
-                        countryCode: 'US',
-                        postalCode: '94105',
-                        limit: 10
-                    })
-                }
-            />
-        </>
-    )
-}
-MockComponent.propTypes = {
-    store: PropTypes.object
-}
+beforeEach(() => {
+    localStorage.clear()
+    jest.spyOn(window.localStorage, 'setItem')
+})
 
 describe('useStoreLocator', () => {
     test('initial state with no store selected', () => {
-        renderWithProviders(<MockComponent />)
-        expect(screen.getByTestId('selected-store')).toHaveTextContent(/{}/i)
-        expect(screen.getByTestId('is-store-selected')).toHaveTextContent(/false/i)
+        const {result} = renderHook(() => useStoreLocator())
+        expect(result.current.selectedStore).toEqual({})
+        expect(result.current.isStoreSelected).toBe(false)
     })
 
     test('selecting a store', () => {
@@ -83,46 +36,67 @@ describe('useStoreLocator', () => {
             name: 'Test Store',
             inventoryId: 'inventory'
         }
-
         const expectedStoreData = JSON.stringify(store)
 
-        renderWithProviders(<MockComponent store={store} />)
-        fireEvent.click(screen.getByTestId('set-store'))
+        const {result} = renderHook(() => useStoreLocator())
 
-        expect(screen.getByTestId('selected-store')).toHaveTextContent(expectedStoreData)
-        expect(screen.getByTestId('is-store-selected')).toHaveTextContent(/true/i)
-        expect(localStorage.getItem(`store_${mockConfig.app.defaultSite}`)).toEqual(
+        act(() => {
+            result.current.setStore(store)
+        })
+
+        expect(result.current.selectedStore).toEqual(store)
+        expect(result.current.isStoreSelected).toBe(true)
+        expect(localStorage.setItem).toHaveBeenCalledWith(
+            `store_${mockConfig.app.defaultSite}`,
             expectedStoreData
         )
     })
 
     test('set user has set manual geolocation', () => {
-        renderWithProviders(<MockComponent />)
-        fireEvent.click(screen.getByTestId('set-user-has-set-manual-geolocation'))
-        expect(screen.getByTestId('user-has-set-manual-geolocation')).toHaveTextContent(/true/i)
+        const {result} = renderHook(() => useStoreLocator())
+        expect(result.current.userHasSetManualGeolocation).toBe(false)
+        act(() => {
+            result.current.setUserHasSetManualGeolocation(true)
+        })
+        expect(result.current.userHasSetManualGeolocation).toBe(true)
     })
 
     test('set automatic geolocation has failed', () => {
-        renderWithProviders(<MockComponent />)
-        fireEvent.click(screen.getByTestId('set-automatic-geolocation-has-failed'))
-        expect(screen.getByTestId('automatic-geolocation-has-failed')).toHaveTextContent(/true/i)
+        const {result} = renderHook(() => useStoreLocator())
+        expect(result.current.automaticGeolocationHasFailed).toBe(false)
+        act(() => {
+            result.current.setAutomaticGeolocationHasFailed(true)
+        })
+        expect(result.current.automaticGeolocationHasFailed).toBe(true)
     })
 
     test('set user wants to share location', () => {
-        renderWithProviders(<MockComponent />)
-        fireEvent.click(screen.getByTestId('set-user-wants-to-share-location'))
-        expect(screen.getByTestId('user-wants-to-share-location')).toHaveTextContent(/true/i)
+        const {result} = renderHook(() => useStoreLocator())
+        expect(result.current.userWantsToShareLocation).toBe(false)
+        act(() => {
+            result.current.setUserWantsToShareLocation(true)
+        })
+        expect(result.current.userWantsToShareLocation).toBe(true)
     })
 
     test('set search stores params', () => {
-        renderWithProviders(<MockComponent />)
-        fireEvent.click(screen.getByTestId('set-search-stores-params'))
-        expect(screen.getByTestId('search-stores-params')).toHaveTextContent(
-            JSON.stringify({
-                countryCode: 'US',
-                postalCode: '94105',
-                limit: 10
-            })
-        )
+        const {result} = renderHook(() => useStoreLocator())
+        expect(result.current.searchStoresParams).toEqual({
+            countryCode: DEFAULT_STORE_LOCATOR_COUNTRY.countryCode,
+            postalCode: DEFAULT_STORE_LOCATOR_POSTAL_CODE,
+            limit: STORE_LOCATOR_NUM_STORES_PER_LOAD
+        })
+
+        const newSearchStoresParams = {
+            countryCode: 'US',
+            postalCode: '94105',
+            limit: 10
+        }
+
+        act(() => {
+            result.current.setSearchStoresParams(newSearchStoresParams)
+        })
+
+        expect(result.current.searchStoresParams).toEqual(newSearchStoresParams)
     })
 })
