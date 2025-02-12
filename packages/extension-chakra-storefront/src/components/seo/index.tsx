@@ -6,7 +6,7 @@
  */
 import React from 'react'
 import Helmet from 'react-helmet'
-import {ApplicationExtensionConfig} from '../../types'
+import {UserConfig} from '../../types/config'
 
 import {useExtensionConfig} from '../../hooks'
 
@@ -18,12 +18,8 @@ interface SeoProps {
     children?: React.ReactNode
 }
 
-type ExtendedApplicationExtensionConfig = ApplicationExtensionConfig & {
-    defaultSiteTitle: string
-}
-
 const Seo: React.FC<SeoProps> = ({title, description, noIndex, keywords, children, ...props}) => {
-    const {defaultSiteTitle} = useExtensionConfig() as ExtendedApplicationExtensionConfig
+    const {defaultSiteTitle} = useExtensionConfig() as UserConfig
     const fullTitle = title ? `${title} | ${defaultSiteTitle}` : defaultSiteTitle
 
     return (
