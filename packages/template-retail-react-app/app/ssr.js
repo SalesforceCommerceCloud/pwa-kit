@@ -65,7 +65,7 @@ const options = {
     // private client secret handler will inject an Authorization header.
     // The default regex is defined in this file: https://github.com/SalesforceCommerceCloud/pwa-kit/blob/develop/packages/pwa-kit-runtime/src/ssr/server/build-remote-server.js
     // applySLASPrivateClientToEndpoints:
-    //     /oauth2\/(token|authorize|passwordless\/(login|token)|password\/(reset|action))/,
+    //     /\/oauth2\/(token|passwordless\/(login|token)|password\/(reset|action))/,
 
     // If this is enabled, any HTTP header that has a non ASCII value will be URI encoded
     // If there any HTTP headers that have been encoded, an additional header will be
