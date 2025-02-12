@@ -5,13 +5,25 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
-import PropTypes from 'prop-types'
 import Helmet from 'react-helmet'
+import {ApplicationExtensionConfig} from '../../types'
 
 import {useExtensionConfig} from '../../hooks'
 
-const Seo = ({title, description, noIndex, keywords, children, ...props}) => {
-    const {defaultSiteTitle} = useExtensionConfig()
+interface SeoProps {
+    title?: string
+    description?: string
+    noIndex?: boolean
+    keywords?: string
+    children?: React.ReactNode
+}
+
+type ExtendedApplicationExtensionConfig = ApplicationExtensionConfig & {
+    defaultSiteTitle: string
+}
+
+const Seo: React.FC<SeoProps> = ({title, description, noIndex, keywords, children, ...props}) => {
+    const {defaultSiteTitle} = useExtensionConfig() as ExtendedApplicationExtensionConfig
     const fullTitle = title ? `${title} | ${defaultSiteTitle}` : defaultSiteTitle
 
     return (
@@ -23,14 +35,6 @@ const Seo = ({title, description, noIndex, keywords, children, ...props}) => {
             {children}
         </Helmet>
     )
-}
-
-Seo.propTypes = {
-    title: PropTypes.string,
-    description: PropTypes.string,
-    noIndex: PropTypes.bool,
-    children: PropTypes.node,
-    keywords: PropTypes.string
 }
 
 export default Seo

@@ -231,12 +231,7 @@ const withLayout = <P extends object>(WrappedComponent: React.ComponentType<P>) 
                     )}
                 </Helmet>
 
-                <Seo
-                    title={config.defaultSiteTitle}
-                    description="Your Description"
-                    noIndex={false}
-                    keywords="Your Keywords"
-                >
+                <Seo>
                     <meta name="theme-color" content={colors.blue['600']} />
                     <meta name="apple-mobile-web-app-title" content={config.defaultSiteTitle} />
 
