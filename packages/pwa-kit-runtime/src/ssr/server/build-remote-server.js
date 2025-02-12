@@ -133,9 +133,10 @@ export const RemoteServerFactory = {
 
             // A regex for identifying which SLAS endpoints the custom SLAS private
             // client secret handler will inject an Authorization header.
-            // Do not modify unless a project wants to customize additional SLAS
-            // endpoints that we currently do not support (ie. /oauth2/passwordless/token)
-            applySLASPrivateClientToEndpoints: /\/oauth2\/token/
+            // To allow additional SLAS endpoints, users can override this value in
+            // their project's ssr.js.
+            applySLASPrivateClientToEndpoints:
+                /oauth2\/(token|authorize|passwordless\/(login|token)|password\/(reset|action))/
         }
 
         options = Object.assign({}, defaults, options)
@@ -713,8 +714,7 @@ export const RemoteServerFactory = {
                     })
 
                     // We pattern match and add client secrets only to endpoints that
-                    // match the regex specified by options.applySLASPrivateClientToEndpoints.
-                    // By default, this regex matches only calls to SLAS /oauth2/token
+                    // match the regex specified by options.applySLASPrivateClientToEndpoints
                     // (see option defaults at the top of this file).
                     // Other SLAS endpoints, ie. SLAS authenticate (/oauth2/login) and
                     // SLAS logout (/oauth2/logout), use the Authorization header for a different
