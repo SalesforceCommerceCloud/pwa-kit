@@ -136,7 +136,7 @@ export const RemoteServerFactory = {
             // To allow additional SLAS endpoints, users can override this value in
             // their project's ssr.js.
             applySLASPrivateClientToEndpoints:
-                /oauth2\/(token|authorize|passwordless\/(login|token)|password\/(reset|action))/
+/\/oauth2\/(token|passwordless\/(login|token)|password\/(reset|action))/
         }
 
         options = Object.assign({}, defaults, options)
