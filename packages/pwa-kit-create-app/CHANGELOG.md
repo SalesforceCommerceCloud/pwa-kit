@@ -1,4 +1,6 @@
 ## v3.9.0-dev (Oct 29, 2024)
+
+- Update bootstrap `default.js` template to include new login configurations [#2263] (https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2263)
 - Support Node 22 [#2218](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2218)
 - Update `default.js` template to include new login configurations [#2079] (https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2079)
 
