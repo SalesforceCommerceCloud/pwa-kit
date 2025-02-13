@@ -13,6 +13,7 @@ import {useServerContext} from '@salesforce/pwa-kit-react-sdk/ssr/universal/hook
 import {createUrlTemplate} from '../../utils/url'
 import {resolveSiteFromUrl, resolveLocaleFromUrl} from '../../utils/site-utils'
 import {useExtensionConfig} from '../../hooks/use-extension-config'
+import {UserConfig} from '../../types/config'
 
 // Mock dependencies
 jest.mock('@salesforce/pwa-kit-react-sdk/ssr/universal/hooks', () => ({
@@ -30,7 +31,7 @@ jest.mock('../../utils/site-utils', () => ({
 }))
 
 const mockUseServerContext = useServerContext as jest.MockedFunction<typeof useServerContext>
-const mockUseConfig = useExtensionConfig as jest.MockedFunction<typeof useExtensionConfig>
+const mockUseConfig = useExtensionConfig as jest.MockedFunction<() => UserConfig>
 const mockCreateUrlTemplate = createUrlTemplate as jest.MockedFunction<typeof createUrlTemplate>
 const mockResolveSiteFromUrl = resolveSiteFromUrl as jest.MockedFunction<typeof resolveSiteFromUrl>
 const mockResolveLocaleFromUrl = resolveLocaleFromUrl as jest.MockedFunction<
@@ -50,7 +51,45 @@ describe('withMultiSite HOC', () => {
             req: {originalUrl: '/test-path'},
             res: {}
         })
-        mockUseConfig.mockReturnValue({someConfig: 'value'})
+        mockUseConfig.mockReturnValue({
+            defaultAppLocale: 'en-US',
+            commerceAPI: {
+                proxyPath: '/api/proxy',
+                parameters: {
+                    clientId: 'your-client-id',
+                    organizationId: 'your-org-id',
+                    shortCode: 'your-short-code',
+                    siteId: 'your-site-id'
+                }
+            },
+            categoryNav: {
+                defaultNavSsrDepth: 3,
+                defaultRootCategory: 'root-category'
+            },
+            defaultSite: 'site-1',
+            defaultSiteTitle: 'Default Site Title',
+            einsteinAPI: {
+                host: 'https://example.com',
+                einsteinId: 'your-einstein-id',
+                siteId: 'your-site-id',
+                isProduction: false
+            },
+            maxCacheAge: 3600,
+            search: {
+                defaultLimitValues: [10, 20, 50],
+                defaultSearchParams: {
+                    limit: 10,
+                    offset: 0,
+                    sort: 'relevance',
+                    refine: []
+                },
+                recentSearchKey: 'recentSearch',
+                recentSearchLimit: 5,
+                recentSearchMinLength: 3
+            },
+            sites: [],
+            staleWhileRevalidate: 60
+        })
         mockResolveSiteFromUrl.mockReturnValue({id: 'site-id', alias: 'site-alias'})
         mockResolveLocaleFromUrl.mockReturnValue({id: 'locale-id'})
         mockCreateUrlTemplate.mockReturnValue(jest.fn((path: string) => `/resolved-url${path}`))
@@ -75,13 +114,20 @@ describe('withMultiSite HOC', () => {
         // Set up window location for test
         delete (global as any).window.location
         ;(global as any).window.location = {pathname: '/fallback-path', search: '?query=123'}
-        mockUseServerContext.mockReturnValue({req: undefined})
+
+        // Provide a valid req and res object
+        mockUseServerContext.mockReturnValue({
+            req: {originalUrl: undefined},
+            res: {}
+        })
 
         render(<WrappedComponent />)
 
+        const expectedUrl = '/fallback-path?query=123'
+
         // Verify resolveSiteFromUrl and resolveLocaleFromUrl were called with fallback path
-        expect(mockResolveSiteFromUrl).toHaveBeenCalledWith('/fallback-path?query=123')
-        expect(mockResolveLocaleFromUrl).toHaveBeenCalledWith('/fallback-path?query=123')
+        expect(mockResolveSiteFromUrl).toHaveBeenCalledWith(expectedUrl)
+        expect(mockResolveLocaleFromUrl).toHaveBeenCalledWith(expectedUrl)
     })
 
     it('should provide correct props to MultiSiteProvider', () => {
@@ -89,7 +135,7 @@ describe('withMultiSite HOC', () => {
 
         // Check if MultiSiteProvider was called with the resolved site, locale, and buildUrl
         expect(mockCreateUrlTemplate).toHaveBeenCalledWith(
-            {someConfig: 'value'},
+            {defaultAppLocale: 'en-US'},
             'site-alias',
             'locale-id'
         )

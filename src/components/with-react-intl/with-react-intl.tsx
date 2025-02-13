@@ -10,6 +10,8 @@ import {IntlProvider} from 'react-intl'
 import {useQuery} from '@tanstack/react-query'
 import {useLocation} from 'react-router-dom'
 
+import {UserConfig} from '../../types/config'
+
 // Local Imports
 import {getTargetLocale, fetchTranslations} from '../../utils/locale'
 import {isServer} from '../../utils/utils'
@@ -25,7 +27,7 @@ const withReactIntl = <P extends object>(WrappedComponent: React.ComponentType<P
     const WithReactIntl: React.FC<P> = (props: WithReactIntlProps) => {
         const {site, locale} = useMultiSite()
         const location = useLocation()
-        const config = useExtensionConfig()
+        const config = useExtensionConfig() as UserConfig
         const targetLocale = getTargetLocale({
             getUserPreferredLocales: () => {
                 // CONFIG: This function should return an array of preferred locales. They can be
