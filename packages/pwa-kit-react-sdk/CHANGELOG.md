@@ -1,3 +1,4 @@
+## v4.0.0-extensibility-preview.4 (Feb 12, 2025)
 ## v4.0.0-extensibility-preview.3 (Dec 13, 2024)
 ## v4.0.0-extensibility-preview.2 (Dec 09, 2024)
 ## v4.0.0-extensibility-preview.1 (Dec 09, 2024)

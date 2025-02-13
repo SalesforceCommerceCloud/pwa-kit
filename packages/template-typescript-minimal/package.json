@@ -1,6 +1,6 @@
 {
   "name": "typescript-minimal",
-  "version": "4.0.0-extensibility-preview.3",
+  "version": "4.0.0-extensibility-preview.4",
   "private": true,
   "scripts": {
     "analyze-build": "cross-env MOBIFY_ANALYZE=true npm run build",
@@ -22,10 +22,10 @@
     "@emotion/react": "^11.13.3",
     "@emotion/styled": "^11.13.0",
     "@loadable/component": "^5.15.3",
-    "@salesforce/pwa-kit-dev": "4.0.0-extensibility-preview.3",
-    "@salesforce/pwa-kit-extension-sdk": "4.0.0-extensibility-preview.3",
-    "@salesforce/pwa-kit-react-sdk": "4.0.0-extensibility-preview.3",
-    "@salesforce/pwa-kit-runtime": "4.0.0-extensibility-preview.3",
+    "@salesforce/pwa-kit-dev": "4.0.0-extensibility-preview.4",
+    "@salesforce/pwa-kit-extension-sdk": "4.0.0-extensibility-preview.4",
+    "@salesforce/pwa-kit-react-sdk": "4.0.0-extensibility-preview.4",
+    "@salesforce/pwa-kit-runtime": "4.0.0-extensibility-preview.4",
     "@tanstack/react-query": "^4.28.0",
     "@types/loadable__component": "~5.13.4",
     "@types/react": "~18.2.0",

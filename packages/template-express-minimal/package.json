@@ -1,6 +1,6 @@
 {
   "name": "template-express-minimal",
-  "version": "4.0.0-extensibility-preview.3",
+  "version": "4.0.0-extensibility-preview.4",
   "private": true,
   "license": "See license in LICENSE",
   "scripts": {
@@ -15,8 +15,8 @@
     "test": "pwa-kit-dev test"
   },
   "devDependencies": {
-    "@salesforce/pwa-kit-dev": "4.0.0-extensibility-preview.3",
-    "@salesforce/pwa-kit-runtime": "4.0.0-extensibility-preview.3",
+    "@salesforce/pwa-kit-dev": "4.0.0-extensibility-preview.4",
+    "@salesforce/pwa-kit-runtime": "4.0.0-extensibility-preview.4",
     "supertest": "^4.0.2"
   },
   "mobify": {
