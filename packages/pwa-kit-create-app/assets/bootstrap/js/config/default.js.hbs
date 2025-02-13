@@ -24,7 +24,7 @@ module.exports = {
                 // The callback URI, which can be an absolute URL (including third-party URIs) or a relative path set up by the developer.
                 // Required in 'callback' mode; if missing, passwordless login defaults to 'sms' mode, which requires Marketing Cloud configuration.
                 // If the env var `PASSWORDLESS_LOGIN_CALLBACK_URI` is set, it will override the config value.
-                callbackURI: 
+                callbackURI:
                     process.env.PASSWORDLESS_LOGIN_CALLBACK_URI || '/passwordless-login-callback'
             },
             social: {
