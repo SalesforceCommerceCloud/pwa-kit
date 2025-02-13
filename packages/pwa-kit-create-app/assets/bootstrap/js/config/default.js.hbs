@@ -17,6 +17,33 @@ module.exports = {
             // This boolean value dictates whether or not default site or locale values are shown in the url. Defaults to: false
             // showDefaults: true
         },
+        login: {
+            passwordless: {
+                // Enables or disables passwordless login for the site. Defaults to: false
+                enabled: false,
+                // The callback URI, which can be an absolute URL (including third-party URIs) or a relative path set up by the developer.
+                // Required in 'callback' mode; if missing, passwordless login defaults to 'sms' mode, which requires Marketing Cloud configuration.
+                // If the env var `PASSWORDLESS_LOGIN_CALLBACK_URI` is set, it will override the config value.
+                callbackURI: 
+                    process.env.PASSWORDLESS_LOGIN_CALLBACK_URI || '/passwordless-login-callback'
+            },
+            social: {
+                // Enables or disables social login for the site. Defaults to: false
+                enabled: false,
+                // The third-party identity providers supported by your app. The PWA Kit supports Google and Apple by default.
+                // Additional IDPs will also need to be added to the IDP_CONFIG in the SocialLogin component.
+                idps: ['google', 'apple'],
+                // The redirect URI used after a successful social login authentication. 
+                // This should be a relative path set up by the developer.
+                // If the env var `SOCIAL_LOGIN_REDIRECT_URI` is set, it will override the config value.
+                redirectURI: process.env.SOCIAL_LOGIN_REDIRECT_URI || '/social-callback'
+            },
+            resetPassword: {
+                // The callback URI, which can be an absolute URL (including third-party URIs) or a relative path set up by the developer.
+                // If the env var `RESET_PASSWORD_CALLBACK_URI` is set, it will override the config value.
+                callbackURI: process.env.RESET_PASSWORD_CALLBACK_URI || '/reset-password-callback'
+            }
+        },
         // The default site for your app. This value will be used when a siteRef could not be determined from the url
         defaultSite: '{{answers.project.commerce.siteId}}',
         // Provide aliases for your sites. These will be used in place of your site id when generating paths throughout the application.
