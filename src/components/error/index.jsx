@@ -11,6 +11,7 @@ import {Box, Button, Flex, Heading, IconButton, Stack, Text} from '@chakra-ui/re
 
 import {BrandLogo, FileIcon} from '../icons'
 import {useHistory} from 'react-router-dom'
+import {withChakraUI} from '../with-chakra-ui'
 
 // <Error> is rendered when:
 //
@@ -139,4 +140,4 @@ Error.propTypes = {
     message: PropTypes.string
 }
 
-export default Error
+export default withChakraUI(Error)
