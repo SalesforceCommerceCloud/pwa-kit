@@ -63,6 +63,7 @@ const Home = () => {
             `s-maxage=${MAX_CACHE_AGE}, stale-while-revalidate=${STALE_WHILE_REVALIDATE}`
         )
     }
+    throw new Error('Test Error')
 
     const {data: productSearchResult, isLoading} = useProductSearch({
         parameters: {
