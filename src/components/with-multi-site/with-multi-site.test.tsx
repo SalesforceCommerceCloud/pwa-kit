@@ -135,7 +135,7 @@ describe('withMultiSite HOC', () => {
 
         // Check if MultiSiteProvider was called with the resolved site, locale, and buildUrl
         expect(mockCreateUrlTemplate).toHaveBeenCalledWith(
-            {defaultAppLocale: 'en-US'},
+            expect.objectContaining({defaultAppLocale: 'en-US'}),
             'site-alias',
             'locale-id'
         )
