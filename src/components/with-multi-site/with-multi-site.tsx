@@ -29,11 +29,7 @@ const withMultiSite = <P extends object>(WrappedComponent: React.ComponentType<P
         const config: any = useExtensionConfig()
         const site: any = resolveSiteFromUrl(path)
         const locale: any = resolveLocaleFromUrl(path)
-        const buildUrl = createUrlTemplate(
-            {defaultAppLocale: config.defaultAppLocale},
-            site.alias || site.id,
-            locale.id
-        )
+        const buildUrl = createUrlTemplate(config, site.alias || site.id, locale.id)
 
         return (
             <MultiSiteProvider site={site} locale={locale} buildUrl={buildUrl}>
