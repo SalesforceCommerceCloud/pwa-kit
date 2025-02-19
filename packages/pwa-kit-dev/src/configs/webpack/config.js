@@ -445,7 +445,6 @@ const clientOptional = baseConfig('web')
             entry: {
                 ...optional('loader', resolve(projectDir, 'app', 'loader.js')),
                 ...optional('worker', resolve(projectDir, 'worker', 'main.js')),
-                ...optional('core-polyfill', resolve(projectDir, 'node_modules', 'core-js')),
                 ...optional('fetch-polyfill', resolve(projectDir, 'node_modules', 'whatwg-fetch'))
             },
             // use source map to make debugging easier
