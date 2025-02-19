@@ -58,7 +58,7 @@ import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
 import {useUpdateShopperContext} from '@salesforce/retail-react-app/app/hooks/use-update-shopper-context'
-
+import {useRouting} from '@salesforce/retail-react-app/app/hooks/use-routing'
 // HOCs
 import {withCommerceSdkReact} from '@salesforce/retail-react-app/app/components/with-commerce-sdk-react/with-commerce-sdk-react'
 
@@ -198,6 +198,8 @@ const App = (props) => {
 
     const updateBasket = useShopperBasketsMutation('updateBasket')
     const updateCustomerForBasket = useShopperBasketsMutation('updateCustomerForBasket')
+
+    const isBlocked = useRouting()
 
     useEffect(() => {
         // update the basket currency if it doesn't match the current locale currency
@@ -402,27 +404,40 @@ const App = (props) => {
                             </Box>
                             {!isOnline && <OfflineBanner />}
                             <AddToCartModalProvider>
-                                <SkipNavContent
-                                    style={{
-                                        display: 'flex',
-                                        flexDirection: 'column',
-                                        flex: 1,
-                                        outline: 0
-                                    }}
-                                >
-                                    <Box
-                                        as="main"
-                                        id="app-main"
-                                        role="main"
-                                        display="flex"
-                                        flexDirection="column"
-                                        flex="1"
+                                {!isBlocked ? (
+                                    <SkipNavContent
+                                        style={{
+                                            display: 'flex',
+                                            flexDirection: 'column',
+                                            flex: 1,
+                                            outline: 0
+                                        }}
                                     >
-                                        <OfflineBoundary isOnline={false}>
-                                            {children}
-                                        </OfflineBoundary>
+                                        <Box
+                                            as="main"
+                                            id="app-main"
+                                            role="main"
+                                            display="flex"
+                                            flexDirection="column"
+                                            flex="1"
+                                        >
+                                            <OfflineBoundary isOnline={false}>
+                                                {children}
+                                            </OfflineBoundary>
+                                        </Box>
+                                    </SkipNavContent>
+                                ) : (
+                                    <Box
+                                        height="700px"
+                                        style={{
+                                            display: 'flex',
+                                            'justify-content': 'center',
+                                            'align-items': 'center'
+                                        }}
+                                    >
+                                        <PlaceholderComponent></PlaceholderComponent>
                                     </Box>
-                                </SkipNavContent>
+                                )}
 
                                 {!isCheckout ? <Footer /> : <CheckoutFooter />}
 

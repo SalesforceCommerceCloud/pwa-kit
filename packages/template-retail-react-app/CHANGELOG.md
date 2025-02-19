@@ -1,3 +1,6 @@
+## v???
+- useBlock function and Skeleton: [#2247](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2247)
+
 ## v6.0.0
 - DNT Consent Banner: [#2203](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2203)
 

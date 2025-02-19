@@ -168,6 +168,7 @@ const DrawerMenu = ({
                                                             to={categoryUrlBuilder(item)}
                                                             fontSize={FONT_SIZES[depth]}
                                                             fontWeight={FONT_WEIGHTS[depth]}
+                                                            onClick={onClose}
                                                             color="black"
                                                         >
                                                             {intl.formatMessage({

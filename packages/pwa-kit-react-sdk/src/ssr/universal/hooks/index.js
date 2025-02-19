@@ -6,7 +6,8 @@
  */
 /* istanbul ignore file */
 
-import React, {useContext} from 'react'
+import React, {useContext, useEffect, useRef, useState} from 'react'
+import {useHistory} from 'react-router-dom'
 import {CorrelationIdContext, ServerContext} from '../contexts'
 
 /**
@@ -69,4 +70,39 @@ export const useOrigin = ({fromXForwardedHeader = false}) => {
         return xForwardedOrigin
     }
     return APP_ORIGIN
+}
+
+/**
+ * Blocks the navigation to run a provided function whenever there is a new page being navigated to
+ * The function must return false to unblock, otherwise it will continue to block
+ *
+ * @param {function} func
+ * @returns {object} State that is set to true during blocking, false otherwise.
+ */
+export const useBlockNavigation = (func) => {
+    const {block, push, location} = useHistory()
+    const lastLocation = useRef()
+    const [isBlocked, setIsBlocked] = useState(false)
+    const funcRef = useRef()
+
+    funcRef.current = func
+    useEffect(() => {
+        if (location !== lastLocation.current && funcRef.current) {
+            lastLocation.current = location
+
+            const unblock = block((location, action) => {
+                // It is necessary to wrap this block in an async function to ensure the callback itself is not async, otherwise it will mess up order of execution
+                ;(async () => {
+                    setIsBlocked(true)
+                    if (!(await funcRef.current(location, action))) {
+                        setIsBlocked(false)
+                        unblock()
+                        push(location)
+                    }
+                })()
+                return false
+            })
+        }
+    }, [location])
+    return isBlocked
 }
