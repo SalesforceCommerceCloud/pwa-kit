@@ -135,14 +135,15 @@ export const start = async () => {
     const props = {
         error: window.__ERROR__,
         locals: locals,
-        routes: getRoutes(locals),
         extensions: applicationExtensions,
         WrappedApp
     }
 
     return Promise.resolve()
         .then(() => new Promise((resolve) => loadableReady(resolve)))
-        .then(() => {
+        .then(getRoutes)
+        .then((_routes) => {
+            props.routes = _routes
             hydrateRoot(
                 rootEl,
                 <OuterApp

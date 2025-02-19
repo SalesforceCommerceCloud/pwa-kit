@@ -402,11 +402,11 @@ export const routeComponent = (Wrapped, isPage, locals) => {
  *
  * @private
  */
-export const getRoutes = (locals = {}) => {
+export const getRoutes = async (locals = {}) => {
     let _routes = routes
     const {applicationExtensions = []} = locals
     if (typeof routes === 'function') {
-        _routes = routes()
+        _routes = await routes(locals)
     }
 
     // Call the `extendRoutes` function for all the Application Extensions.
