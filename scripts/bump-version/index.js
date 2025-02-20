@@ -26,7 +26,7 @@ const INDEPENDENT_PACKAGES = [
     '@salesforce/commerce-sdk-react',
     '@salesforce/extension-chakra-storefront',
     '@salesforce/extension-chakra-store-locator',
-    '@salesforce/extension-starter'
+    '@salesforce/extension-starter',
 ]
 const independentPackages = INDEPENDENT_PACKAGES.map((pkgName) =>
     monorepoPackages.find((pkg) => pkg.name === pkgName)
@@ -42,20 +42,15 @@ const main = (program) => {
     }
 
     const opts = program.opts()
-    const packageName = opts.package
-    const isIndependentBump = opts.package !== 'sdk'
-
-    if (isIndependentBump) {
+    if (opts.package !== 'sdk') {
         // Assume that we're bumping the version of package that has its own independent version
+
         const script1 = path.join(__dirname, 'independent-pkg-version.js')
-        sh.exec(`node ${script1} ${targetVersion} ${packageName}`)
+        sh.exec(`node ${script1} ${targetVersion} ${opts.package}`)
 
         const script2 = path.join(__dirname, 'pwa-kit-deps-version.js')
         const updateDepsBehaviour = opts.pwaKitDeps
-        sh.exec(`node ${script2} ${updateDepsBehaviour} ${packageName}`)
-
-        // Update peerDependencies across all packages
-        updatePeerDeps(packageName, targetVersion, true)
+        sh.exec(`node ${script2} ${updateDepsBehaviour} ${opts.package}`)
 
         // After updating the dependencies, let's update the package lock files
         sh.exec('npm install')
@@ -65,7 +60,6 @@ const main = (program) => {
         process.exit(0)
     }
 
-    // Handle non-independent package version bump
     sh.exec(`lerna version --exact --no-push --no-git-tag-version --yes ${targetVersion}`)
     // `--exact` above is for pinning the version of the pwa-kit dependencies
     // https://github.com/lerna/lerna/tree/main/libs/commands/version#--exact
@@ -76,9 +70,9 @@ const main = (program) => {
     // update versions for root package and root package lock
     setPackageVersion(newMonorepoVersion, {cwd: rootPath})
 
-    // Restore independent package versions
     independentPackages.forEach((pkg) => {
         const {location, version: oldVersion} = pkg
+        // Restore to the original version
         // TODO: is it possible to _not_ trigger the lifecycle scripts? See commerce-sdk-react/CHANGELOG.md
         setPackageVersion(oldVersion, {cwd: location})
     })
@@ -101,25 +95,14 @@ const main = (program) => {
     listAllVersions()
 }
 
-const updatePeerDeps = (pkgJsonOrPackageName, newVersion, isIndependent = false) => {
-    monorepoPackages.forEach(({ location }) => {
-        const pathToPkgJson = path.join(location, 'package.json')
-        const pkgJson = JSON.parse(sh.cat(pathToPkgJson))
-        const peerDependencies = pkgJson.peerDependencies || {}
+const updatePeerDeps = (pkgJson, newMonorepoVersion) => {
+    const peerDependencies = pkgJson.peerDependencies
+    if (!peerDependencies) return
 
-        if (isIndependent) {
-            if (peerDependencies[pkgJsonOrPackageName]) {
-                console.log(`Updating ${pkgJsonOrPackageName} peerDependency in ${pkgJson.name} to ${newVersion}`)
-                peerDependencies[pkgJsonOrPackageName] = newVersion
-            saveJSONToFile(pkgJson, pathToPkgJson)
-        }
-        } else {
     Object.keys(peerDependencies).forEach((dep) => {
         if (monorepoPackageNames.includes(dep)) {
-                    console.log(`Updating ${dep} peerDependency in ${pkgJson.name} to ${newVersion}`)
-                    peerDependencies[dep] = newVersion
-                }
-            })
+            console.log(`Found lerna local package ${dep} as a peer dependency of ${pkgJson.name}.`)
+            peerDependencies[dep] = newMonorepoVersion
         }
     })
 }
