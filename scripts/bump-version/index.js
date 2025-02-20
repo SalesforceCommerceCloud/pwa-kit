@@ -101,8 +101,16 @@ const main = (program) => {
     listAllVersions()
 }
 
+/**
+ * Updates the peerDependencies of monorepo packages to the specified version in all packages.
+ * If updating an independent package version, only updates its references in all packages.
+ *
+ * @param {string|Object} pkgJsonOrPackageName - Package JSON object or package name to update.
+ * @param {string} newVersion - The target version to set.
+ * @param {boolean} [isIndependent=false] - Whether the update is for an independent package.
+ */
 const updatePeerDeps = (pkgJsonOrPackageName, newVersion, isIndependent = false) => {
-    monorepoPackages.forEach(({ location }) => {
+    monorepoPackages.forEach(({location}) => {
         const pathToPkgJson = path.join(location, 'package.json')
         const pkgJson = JSON.parse(sh.cat(pathToPkgJson))
         const peerDependencies = pkgJson.peerDependencies || {}
@@ -111,11 +119,11 @@ const updatePeerDeps = (pkgJsonOrPackageName, newVersion, isIndependent = false)
             if (peerDependencies[pkgJsonOrPackageName]) {
                 console.log(`Updating ${pkgJsonOrPackageName} peerDependency in ${pkgJson.name} to ${newVersion}`)
                 peerDependencies[pkgJsonOrPackageName] = newVersion
-            saveJSONToFile(pkgJson, pathToPkgJson)
-        }
+                saveJSONToFile(pkgJson, pathToPkgJson)
+            }
         } else {
-    Object.keys(peerDependencies).forEach((dep) => {
-        if (monorepoPackageNames.includes(dep)) {
+            Object.keys(peerDependencies).forEach((dep) => {
+                if (monorepoPackageNames.includes(dep)) {
                     console.log(`Updating ${dep} peerDependency in ${pkgJson.name} to ${newVersion}`)
                     peerDependencies[dep] = newVersion
                 }
@@ -124,6 +132,11 @@ const updatePeerDeps = (pkgJsonOrPackageName, newVersion, isIndependent = false)
     })
 }
 
+/**
+ * Updates the dependencies of a package to match the versions of independent packages.
+ *
+ * @param {Object} pkgJson - The package.json object to update.
+ */
 const updateDeps = (pkgJson) => {
     independentPackages.forEach((independentPkg) => {
         const newVersion = independentPkg.version
