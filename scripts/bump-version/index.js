@@ -102,12 +102,13 @@ const main = (program) => {
 }
 
 /**
- * Updates the peerDependencies of monorepo packages to the specified version in all packages.
- * If updating an independent package version, only updates its references in all packages.
+ * Updates the peerDependencies of monorepo packages to the specified version.
+ * If updating a monorepo-wide version bump, updates all monorepo package peer dependencies.
+ * If updating an independent package, only updates its references in monorepo packages.
  *
- * @param {string|Object} pkgJsonOrPackageName - Package JSON object or package name to update.
+ * @param {string|Object} pkgJsonOrPackageName - A package JSON object or the package name to update.
  * @param {string} newVersion - The target version to set.
- * @param {boolean} [isIndependent=false] - Whether the update is for an independent package.
+ * @param {boolean} [isIndependent=false] - Whether the update is for an independently versioned package.
  */
 const updatePeerDeps = (pkgJsonOrPackageName, newVersion, isIndependent = false) => {
     monorepoPackages.forEach(({location}) => {
