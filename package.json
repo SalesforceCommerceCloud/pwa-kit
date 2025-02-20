@@ -10,9 +10,17 @@
   },
   "license": "SEE LICENSE IN LICENSE",
   "author": "cc-pwa-kit@salesforce.com",
+  "scripts": {
+    "lint": "npm run lint:js",
+    "lint:fix": "npm run lint:js -- --fix",
+    "lint:js": "pwa-kit-dev lint \"**/*.{js,jsx,ts,tsx}\"",
+    "test": "pwa-kit-dev test",
+    "typecheck": "tsc --noEmit"
+  },
   "peerDependencies": {
     "@chakra-ui/react": "^2",
     "@chakra-ui/skip-nav": "^2",
+    "@salesforce/commerce-sdk-react": "^3.2.0-extensibility-preview.4",
     "@salesforce/pwa-kit-extension-sdk": "^4.0.0-extensibility-preview.0",
     "@salesforce/pwa-kit-react-sdk": "^4.0.0-extensibility-preview.0",
     "react-hook-form": "^7",
