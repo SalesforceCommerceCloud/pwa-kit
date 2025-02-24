@@ -16,10 +16,10 @@ import {
     withApplicationExtensionStore
 } from '@salesforce/pwa-kit-extension-sdk/react'
 import {applyHOCs} from '@salesforce/pwa-kit-extension-sdk/react/utils'
+import {resolveRoutes} from '@salesforce/pwa-kit-react-sdk/utils/routes'
 
 // Local Imports
 import {Config} from './types'
-import {configureRoutes, transformUrlMappingToRoute} from './utils/routes-utils'
 
 // Pages
 import * as Pages from '@salesforce/extension-chakra-storefront/pages'
@@ -46,8 +46,6 @@ const sliceInitializer: SliceInitializer<StoreSlice> = (set) => ({
     increment: () => set((state) => ({count: state.count + 1})),
     decrement: () => set((state) => ({count: state.count - 1}))
 })
-
-const isServerSide = typeof window === 'undefined'
 
 class Sample extends ApplicationExtension<Config> {
     static readonly id = extensionMeta.id
@@ -91,72 +89,8 @@ class Sample extends ApplicationExtension<Config> {
      * method to modify these routes in any way you want, but you must return an array of routes as a result.
      */
     beforeRouteMatch(allRoutes: RouteProps[]): RouteProps[] {
-        let configuredRoutes: RouteProps[] = []
-
-        const seoUrlMappingEnabled = true
-        // console.log('---- beforeRouteMatch CLIENT! allRoutes:')
-        // allRoutes.forEach((route: RouteProps) => {
-        //     console.log(route.path)
-        // })
-        console.log('---beforeRouteMatch isClient', !isServerSide)
-        if (!isServerSide) {
-            // CLIENT!
-            // Router Deserialization
-            const _routes = window.__CONFIG__.app.routes
-            // console.log('---- beforeRouteMatch CLIENT! window.__CONFIG__.app.routes:')
-            // _routes.forEach((route: RouteProps) => {
-            //     console.log(route)
-            // })
-            configuredRoutes = _routes.map(({path, componentName, componentProps}) => {
-                // DEVELOPER NOTE: We previously tried to dynamically load the component using the path to map to the
-                // filename and use import, but I couldn't get that to work. So here we are using the original routes
-                // array to find the component for a given path from the serialized route config. It doesn't completely
-                // work as it will remove the configured routes as they don't match the path. This should be done in
-                // another way.
-                // console.log('--- beforeRouteMatch in _routes.map:', path, 'componentName:', componentName, 'componentProps:', componentProps)
-                // TODO: Pass the components though the configuration
-                // - use a js file for configuration to import the files
-                const component = Pages[componentName]
-                if (!component) {
-                    return
-                }
-                // if (componentProps) {
-                //     // DEVELOPER NOTE: This is where you should determine the component
-                //     const ComponentClass: React.ComponentType<any> = SamplePage
-                //     component = () => <ComponentClass {...componentProps}/>
-                // }
-                return {
-                    path,
-                    exact: true,
-                    component
-                }
-            })
-            configuredRoutes = configuredRoutes.filter((route) => !!route)
-            // DEVELOPER NOTES: ensure routes work with sites/locale
-            // console.log('--- beforeRouteMatch: config', this.getConfig())
-            // configuredRoutes = configureRoutes(configuredRoutes, this.getConfig(), {
-            //     ignoredRoutes: ['/callback', '*']
-            // })
-        } else {
-            // SERVER!
-            if (seoUrlMappingEnabled) {
-                // DEVELOPER NOTES: Replace with actual getUrlMapping call
-                // For now we Mock a response that returns a resourceType category
-                const mapping = {
-                    copySourceParams: false,
-                    destinationUrl: '/s/RefArch/search?lang=en_US&cgid=newarrivals',
-                    resourceId: 'newarrivals',
-                    resourceType: 'category',
-                    statusCode: '301'
-                }
-                if (mapping) {
-                    // DEVELOPER NOTES: Here we'd make the getUrlMapping API call
-                    const path = '/category/top-seller'
-                    const route = transformUrlMappingToRoute(path, mapping)
-                    configuredRoutes = [route, ...allRoutes]
-                }
-            }
-        }
+        // TODO: component map should be passed in as configuration
+        const configuredRoutes = resolveRoutes(allRoutes, Pages)
         console.log('---- beforeRouteMatch configuredRoutes')
         configuredRoutes.forEach((route: RouteProps) => {
             console.log(route.path)
