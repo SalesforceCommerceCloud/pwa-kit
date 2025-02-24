@@ -18,7 +18,7 @@
     "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
-    "@chakra-ui/react": "^2.8.2",
+    "@chakra-ui/react": "2.8.2",
     "@chakra-ui/skip-nav": "^2.0.15",
     "@loadable/component": "^5.15.3",
     "@peculiar/webcrypto": "^1.4.2",
@@ -31,7 +31,7 @@
     "@tanstack/react-query-devtools": "^4.29.1",
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^14.0.0",
-    "@testing-library/user-event": "^14.5.2",
+    "@testing-library/user-event": "14.5.2",
     "@types/express": "^5.0.0",
     "@types/jest": "29.5.14",
     "@types/loadable__component": "^5.13.9",
