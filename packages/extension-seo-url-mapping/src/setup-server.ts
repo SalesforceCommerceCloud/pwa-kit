@@ -15,23 +15,10 @@ import {ApplicationExtension} from '@salesforce/pwa-kit-extension-sdk/express'
 import {Config} from './types'
 import extensionMeta from '../extension-meta.json'
 
-class StarterExtension extends ApplicationExtension<Config> {
+class SeoUrlMappingExtension extends ApplicationExtension<Config> {
     static readonly id = extensionMeta.id
-
-    /**
-     * Use this method to enhance or modify your ExpressJS Application by adding route handlers and middleware.
-     */
     extendApp(app: Application): Application {
-        app.get('/sample', (req, res) => {
-            console.log('StarterExtension extendApp GET /sample')
-            res.send(
-                `<p>Hello starter extension!</p>
-                <pre>extensionConfig = ${JSON.stringify(this.getConfig())}</pre>`
-            )
-        })
-
         return app
     }
 }
-
-export default StarterExtension
+export default SeoUrlMappingExtension
