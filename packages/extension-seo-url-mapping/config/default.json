@@ -1,4 +1,5 @@
 {
     "enabled": true,
-    "path": "/sample-page"
+    "componentMap": {},
+    "resourceTypeToComponentMap": {}
 }

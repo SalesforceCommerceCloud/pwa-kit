@@ -30,7 +30,6 @@
     "@salesforce/pwa-kit-extension-sdk": "4.0.0-extensibility-preview.4",
     "@salesforce/pwa-kit-react-sdk": "4.0.0-extensibility-preview.4",
     "@salesforce/pwa-kit-runtime": "4.0.0-extensibility-preview.4",
-    "@salesforce/extension-chakra-storefront": "0.1.0-extensibility-preview.4",
     "@types/loadable__component": "^5.13.9",
     "@types/react": "~18.2.0",
     "@types/react-dom": "~18.2.1",

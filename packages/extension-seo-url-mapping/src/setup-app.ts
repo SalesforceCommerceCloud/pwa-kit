@@ -22,13 +22,7 @@ import {resolveRoutes} from '@salesforce/pwa-kit-react-sdk/utils/routes'
 import {Config} from './types'
 
 // Pages
-import * as Pages from '@salesforce/extension-chakra-storefront/pages'
-
-// Overridable Imports
-// Using the `overridable` loader means that you are opting in to the override module resolution flow. As a result this module
-// will be resolved by first looking in the base projects `overrides` folder then the overrides folders of any extensions configured
-// after this one. Only if no module is found will the referenced module in this project be used.
-import sampleHOC from 'overridable!./components/sample-hoc'
+// import * as Pages from '@salesforce/extension-chakra-storefront/pages'
 
 // Others
 import extensionMeta from '../extension-meta.json'
@@ -47,7 +41,8 @@ const sliceInitializer: SliceInitializer<StoreSlice> = (set) => ({
     decrement: () => set((state) => ({count: state.count - 1}))
 })
 
-class Sample extends ApplicationExtension<Config> {
+// TODO: change name of extension
+class SeoUrlMappingExtension extends ApplicationExtension<Config> {
     static readonly id = extensionMeta.id
 
     /**
@@ -59,8 +54,6 @@ class Sample extends ApplicationExtension<Config> {
         App: React.ComponentType<T>
     ): React.ComponentType<T> {
         const HOCs = [
-            // Example higher-order component, this can be safely removed.
-            sampleHOC,
             // Optionally include state for this extension using `withApplicationExtensionStore`
             (component: React.ComponentType<any>) =>
                 withApplicationExtensionStore(component, {
@@ -89,8 +82,10 @@ class Sample extends ApplicationExtension<Config> {
      * method to modify these routes in any way you want, but you must return an array of routes as a result.
      */
     beforeRouteMatch(allRoutes: RouteProps[]): RouteProps[] {
+        const {componentMap, resourceTypeToComponentMap, test} = this.getConfig()
+        console.log('---- beforeRouteMatch componentMap:', componentMap, 'resourceTypeToComponentMap:', resourceTypeToComponentMap, 'test:', test)
         // TODO: component map should be passed in as configuration
-        const configuredRoutes = resolveRoutes(allRoutes, Pages)
+        const configuredRoutes = resolveRoutes(allRoutes, componentMap, resourceTypeToComponentMap)
         console.log('---- beforeRouteMatch configuredRoutes')
         configuredRoutes.forEach((route: RouteProps) => {
             console.log(route.path)
@@ -99,4 +94,4 @@ class Sample extends ApplicationExtension<Config> {
     }
 }
 
-export default Sample
+export default SeoUrlMappingExtension

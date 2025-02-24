@@ -17,13 +17,7 @@ import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
  * @param {string} urlMapping.destinationUrl - The destination URL for redirects.
  * @param {Object} resourceableComponentsMap - A map of resource types to React components.
  */
-export const transformUrlMappingToRoute = (path, urlMapping, Pages) => {
-    // TODO: should be in config
-    const resourceableComponentsMap = {
-        category: Pages.ProductList,
-        product: Pages.ProductDetail
-    }
-
+export const transformUrlMappingToRoute = (path, urlMapping, resourceableComponentsMap) => {
     let Component, props
 
     // Resource type is not defined for redirects with a URL destination
@@ -54,12 +48,13 @@ export const transformUrlMappingToRoute = (path, urlMapping, Pages) => {
  * @param {*} routes 
  * @returns 
  */
-export const resolveRoutes = (routes, Pages) => {
+export const resolveRoutes = (routes, componentMap, resourceTypeToComponentMap) => {
     const isServerSide = typeof window === 'undefined'
     let configuredRoutes = []
     // TODO: use the config to determine if seoUrlMappingEnabled
     const seoUrlMappingEnabled = true
-    const {config} = getConfig()
+    // const {config} = getConfig()
+    console.log('isServerSide', isServerSide)
 
     if (!isServerSide) {
         // CLIENT!
@@ -78,7 +73,7 @@ export const resolveRoutes = (routes, Pages) => {
             // console.log('--- beforeRouteMatch in _routes.map:', path, 'componentName:', componentName, 'componentProps:', componentProps)
             // TODO: Pass the components though the configuration
             // - use a js file for configuration to import the files
-            const component = Pages[componentName]
+            const component = componentMap[componentName]
             if (!component) {
                 return
             }
@@ -114,7 +109,7 @@ export const resolveRoutes = (routes, Pages) => {
             if (mapping) {
                 // DEVELOPER NOTES: Here we'd make the getUrlMapping API call
                 const path = '/category/top-seller'
-                const route = transformUrlMappingToRoute(path, mapping, Pages)
+                const route = transformUrlMappingToRoute(path, mapping, resourceTypeToComponentMap)
                 configuredRoutes = [route, ...routes]
             }
         }
