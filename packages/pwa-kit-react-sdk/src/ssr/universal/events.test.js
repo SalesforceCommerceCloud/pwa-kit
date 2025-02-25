@@ -13,7 +13,7 @@ describe('Page Events', () => {
 
         return new Promise((resolve) => {
             pages.addEventListener(PAGEEVENTS.PAGELOAD, (evt) => {
-                expect(JSON.stringify(evt)).toEqual(
+                expect(JSON.stringify(evt.detail)).toEqual(
                     JSON.stringify({
                         templateName: 'blah',
                         start: 123,
@@ -31,7 +31,7 @@ describe('Page Events', () => {
 
         return new Promise((resolve) => {
             pages.addEventListener(PAGEEVENTS.ERROR, (evt) => {
-                expect(JSON.stringify(evt)).toEqual(
+                expect(JSON.stringify(evt.detail)).toEqual(
                     JSON.stringify({
                         name: 'blah',
                         content: 'more blah'
