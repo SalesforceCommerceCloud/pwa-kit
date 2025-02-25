@@ -346,6 +346,7 @@ const ruleForBabelLoader = (babelPlugins) => {
             'i'
         ),
         use: [
+            findDepInStack('thread-loader'),
             {
                 loader: findDepInStack('babel-loader'),
                 options: {
