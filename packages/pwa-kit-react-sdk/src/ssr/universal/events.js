@@ -9,7 +9,6 @@ export const PAGEEVENTS = {
     PAGELOAD: 'PAGELOAD',
     ERROR: 'ERROR'
 }
-
 class Pages extends EventTarget {
     pageLoad(templateName, start, end) {
         const payload = {
