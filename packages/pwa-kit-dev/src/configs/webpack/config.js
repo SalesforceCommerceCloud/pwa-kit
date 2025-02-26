@@ -346,7 +346,14 @@ const ruleForBabelLoader = (babelPlugins) => {
             'i'
         ),
         use: [
-            findDepInStack('thread-loader'),
+            {
+                loader: findDepInStack('thread-loader'),
+                options: {
+                    // eslint-disable-next-line @typescript-eslint/no-var-requires
+                    workers: Math.min(4, require('os').cpus().length),
+                    workerParallelJobs: 100
+                }
+            },
             {
                 loader: findDepInStack('babel-loader'),
                 options: {
