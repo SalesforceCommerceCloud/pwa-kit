@@ -1,4 +1,6 @@
 ## v4.0.0-extensibility-preview.4 (Feb 12, 2025)
+- Replace `event-emitter` in favor of the native `EventTarget` [#2289](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2289)
+
 ## v4.0.0-extensibility-preview.3 (Dec 13, 2024)
 ## v4.0.0-extensibility-preview.2 (Dec 09, 2024)
 ## v4.0.0-extensibility-preview.1 (Dec 09, 2024)
