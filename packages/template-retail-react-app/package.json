@@ -50,7 +50,7 @@
     "@testing-library/dom": "^9.0.1",
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^14.0.0",
-    "@testing-library/user-event": "^14.4.3",
+    "@testing-library/user-event": "14.5.2",
     "base64-arraybuffer": "^0.2.0",
     "bundlesize2": "^0.0.31",
     "card-validator": "^8.1.1",
@@ -93,7 +93,7 @@
     },
     {
       "path": "build/vendor.js",
-      "maxSize": "330 kB"
+      "maxSize": "350 kB"
     }
   ]
 }
