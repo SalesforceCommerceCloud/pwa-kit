@@ -757,8 +757,6 @@ const processTemplate = (relFile, inputDir, outputDir, context) => {
     const outputFile = p.join(outputDir, relFile)
     const destDir = p.join(outputFile, '..')
 
-    console.log('DEBUG destDir:',destDir)
-
     // Create folder if we are doing a deep copy
     if (destDir) {
         fs.mkdirSync(destDir, {recursive: true})
@@ -1081,8 +1079,6 @@ const main = async (opts) => {
     // like its `package.json` value.
     let context = INITIAL_CONTEXT
     let {outputDir, verbose, preset, templateVersion} = opts
-    console.log('DEBUG opts:', JSON.stringify(opts))
-    console.log('DEBUG outputDir:', outputDir)
     const {prompt} = inquirer
     const OUTPUT_DIR_FLAG_ACTIVE = !!outputDir
     const presetId = preset || process.env.GENERATOR_PRESET
@@ -1171,10 +1167,6 @@ const main = async (opts) => {
         } else {
             outputDir = p.join(process.cwd(), context.answers.project.name || selectedPreset.id)
         }
-        console.log(`DEBUG OUTPUT_DIR_FLAG_ACTIVE: ${OUTPUT_DIR_FLAG_ACTIVE}`)
-        console.log(`DEBUG context.answers.project.name: ${context.answers.project.name}`)
-        console.log(`DEBUG selectedPreset.id: ${selectedPreset.id}`)
-        console.log(`DEBUG outputDir: ${outputDir}`)
     }
 
     if (context.answers.project.commerce?.instanceUrl) {
@@ -1182,8 +1174,6 @@ const main = async (opts) => {
         const url = new URL(context.answers.project.commerce.instanceUrl)
         context.answers.project.commerce.instanceUrl = url.hostname
     }
-
-    console.log('DEBUG outputDir before runGenerator:', outputDir)
 
     // Generate the project.
     runGenerator(context, {outputDir, templateVersion, verbose})
