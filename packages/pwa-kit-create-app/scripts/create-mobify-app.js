@@ -140,17 +140,10 @@ const INITIAL_QUESTION = [
 const askApplicationExtensibilityQuestions = (availableAppExtensions) => {
     return [
         {
-            name: 'project.useAppExtensibility',
-            message: 'Do you want to use Application Extensibility?',
-            type: 'confirm',
-            default: true
-        },
-        {
             name: 'project.selectedAppExtensions',
             message: 'Which Application Extensions do you want to install?',
             type: 'checkbox',
-            choices: availableAppExtensions,
-            when: (answers) => answers.project.useAppExtensibility === true
+            choices: availableAppExtensions
         },
         {
             name: 'project.extractAppExtensions',
@@ -161,8 +154,7 @@ const askApplicationExtensibilityQuestions = (availableAppExtensions) => {
                 '\n' +
                 'Do you want to proceed with extracting the Application Extensions code?',
             type: 'confirm',
-            default: false,
-            when: (answers) => answers.project.useAppExtensibility === true
+            default: false
         }
     ]
 }
@@ -765,6 +757,8 @@ const processTemplate = (relFile, inputDir, outputDir, context) => {
     const outputFile = p.join(outputDir, relFile)
     const destDir = p.join(outputFile, '..')
 
+    console.log('DEBUG destDir:',destDir)
+
     // Create folder if we are doing a deep copy
     if (destDir) {
         fs.mkdirSync(destDir, {recursive: true})
@@ -1087,6 +1081,8 @@ const main = async (opts) => {
     // like its `package.json` value.
     let context = INITIAL_CONTEXT
     let {outputDir, verbose, preset, templateVersion} = opts
+    console.log('DEBUG opts:', JSON.stringify(opts))
+    console.log('DEBUG outputDir:', outputDir)
     const {prompt} = inquirer
     const OUTPUT_DIR_FLAG_ACTIVE = !!outputDir
     const presetId = preset || process.env.GENERATOR_PRESET
@@ -1113,7 +1109,18 @@ const main = async (opts) => {
             // Ask for extension name if Application Extension is selected
             const extensionNameAnswers = await inquirer.prompt(APPLICATION_EXTENSION_QUESTIONS)
             context.answers.project.name = extensionNameAnswers.project.extensionName
+            context.answers.project.extensionName = extensionNameAnswers.project.extensionName
             context.preset = PRESETS.find(({id}) => id === 'extension-starter')
+            
+            // Override the preset answers with the user's extension name
+            context.preset = {
+                ...context.preset,
+                answers: {
+                    ...context.preset.answers,
+                    ['project.name']: extensionNameAnswers.project.extensionName,
+                    ['project.extensionName']: extensionNameAnswers.project.extensionName
+                }
+            }
         } else {
             const availableAppExtensions = fetchAvailableAppExtensions()
 
@@ -1125,10 +1132,8 @@ const main = async (opts) => {
             )
             context = merge(context, {answers: expandObject(generationAnswers)})
 
-            if (context.answers.project.useAppExtensibility) {
-                // Add the 'typescript-minimal' preset for Application Extension
-                context.preset = PRESETS.find(({id}) => id === 'typescript-minimal')
-            }
+            // Add the 'typescript-minimal' preset for Application Extension
+            context.preset = PRESETS.find(({id}) => id === 'typescript-minimal')
         }
     }
 
@@ -1154,7 +1159,22 @@ const main = async (opts) => {
     }
 
     if (!OUTPUT_DIR_FLAG_ACTIVE) {
-        outputDir = p.join(process.cwd(), context.answers.project.name || selectedPreset.id)
+        // For extension projects, use the extension name as the output directory
+        if (context.answers.project.type === 'PWAKitAppExtensionProject' && context.answers.project.extensionName) {
+            // Extract the package name part without the namespace for the directory name
+            const extensionName = context.answers.project.extensionName
+            const packageNamePart = extensionName.includes('/') 
+                ? extensionName.split('/')[1] 
+                : extensionName
+            
+            outputDir = p.join(process.cwd(), packageNamePart)
+        } else {
+            outputDir = p.join(process.cwd(), context.answers.project.name || selectedPreset.id)
+        }
+        console.log(`DEBUG OUTPUT_DIR_FLAG_ACTIVE: ${OUTPUT_DIR_FLAG_ACTIVE}`)
+        console.log(`DEBUG context.answers.project.name: ${context.answers.project.name}`)
+        console.log(`DEBUG selectedPreset.id: ${selectedPreset.id}`)
+        console.log(`DEBUG outputDir: ${outputDir}`)
     }
 
     if (context.answers.project.commerce?.instanceUrl) {
@@ -1162,6 +1182,8 @@ const main = async (opts) => {
         const url = new URL(context.answers.project.commerce.instanceUrl)
         context.answers.project.commerce.instanceUrl = url.hostname
     }
+
+    console.log('DEBUG outputDir before runGenerator:', outputDir)
 
     // Generate the project.
     runGenerator(context, {outputDir, templateVersion, verbose})
