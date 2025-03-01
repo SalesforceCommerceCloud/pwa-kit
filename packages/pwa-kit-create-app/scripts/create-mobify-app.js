@@ -534,18 +534,6 @@ const PRESETS = [
     }
 ]
 
-const PRESET_QUESTIONS = [
-    {
-        name: 'general.presetId',
-        message: 'Choose a project preset to get started:',
-        type: 'list',
-        choices: PRESETS.filter(({private}) => !private).map(({shortDescription, id}) => ({
-            name: shortDescription,
-            value: id
-        }))
-    }
-]
-
 const ASSETS_TEMPLATES_DIR = p.join(__dirname, '..', 'assets', 'templates')
 
 const PRIVATE_PRESET_NAMES = PRESETS.filter(({private}) => !!private).map(({id}) => id)
@@ -1128,24 +1116,18 @@ const main = async (opts) => {
             )
             context = merge(context, {answers: expandObject(generationAnswers)})
 
-            // Add the 'typescript-minimal' preset for Application Extension
+            // Default to 'typescript-minimal' preset when no preset is specified
             context.preset = PRESETS.find(({id}) => id === 'typescript-minimal')
         }
     }
 
-    // If no preset is provided, prompt the user with available preset options
-    if (!presetId && !context.preset) {
-        context.answers = await prompt(PRESET_QUESTIONS)
+    // Set the preset based on presetId if provided
+    if (presetId && !context.preset) {
+        context.preset = PRESETS.find(({id}) => id === presetId)
     }
 
-    // Set the preset to the selected preset or based on presetId
-    const selectedPreset =
-        context.preset ||
-        PRESETS.find(({id}) => id === (presetId || context.answers.general.presetId))
-    context.preset = selectedPreset
-
     // Ask preset specific questions and merge into the current context.
-    const {questions = {}, answers = {}} = selectedPreset
+    const {questions = {}, answers = {}} = context.preset
     if (questions) {
         const projectAnswers = await prompt(questions, answers)
 
@@ -1165,7 +1147,7 @@ const main = async (opts) => {
             
             outputDir = p.join(process.cwd(), packageNamePart)
         } else {
-            outputDir = p.join(process.cwd(), context.answers.project.name || selectedPreset.id)
+            outputDir = p.join(process.cwd(), context.answers.project.name || context.preset.id)
         }
     }
 
