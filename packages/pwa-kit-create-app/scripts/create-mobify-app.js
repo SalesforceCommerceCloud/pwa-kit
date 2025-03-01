@@ -1092,17 +1092,15 @@ const main = async (opts) => {
         if (initialAnswers.project.type === 'PWAKitAppExtensionProject') {
             // Ask for extension name if Application Extension is selected
             const extensionNameAnswers = await inquirer.prompt(APPLICATION_EXTENSION_QUESTIONS)
-            context.answers.project.name = extensionNameAnswers.project.extensionName
-            context.answers.project.extensionName = extensionNameAnswers.project.extensionName
-            context.preset = PRESETS.find(({id}) => id === 'extension-starter')
+            const extensionName = extensionNameAnswers.project.extensionName
             
-            // Override the preset answers with the user's extension name
+            // Get the preset and set extension name in all required places
             context.preset = {
-                ...context.preset,
+                ...PRESETS.find(({id}) => id === 'extension-starter'),
                 answers: {
-                    ...context.preset.answers,
-                    ['project.name']: extensionNameAnswers.project.extensionName,
-                    ['project.extensionName']: extensionNameAnswers.project.extensionName
+                    'project.type': 'PWAKitAppExtensionProject',
+                    'project.name': extensionName,
+                    'project.extensionName': extensionName
                 }
             }
         } else {
