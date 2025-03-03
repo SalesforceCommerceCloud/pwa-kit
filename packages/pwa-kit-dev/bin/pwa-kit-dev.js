@@ -22,6 +22,15 @@ const {
     validateExtensionDependencies
 } = require('@salesforce/pwa-kit-extension-sdk/shared/utils')
 
+const {
+    findOverridableImports,
+    findOverrideFiles,
+    findAppOverrideFiles,
+    hasCorrespondingOverridableImport,
+    groupImportsBySourceFile,
+    getPackageNameFromDir
+} = require('@salesforce/pwa-kit-extension-sdk/shared/utils/overridables')
+
 // Scripts in ./bin have never gone through babel, so we
 // don't have a good pattern for mixing compiled/un-compiled
 // code.
@@ -471,6 +480,70 @@ const main = async () => {
                     args.length ? ' ' + args.join(' ') : ''
                 }`
             )
+        })
+
+    program
+        .command('list-overridables')
+        .description('list all overridable files and check override files')
+        .action(async () => {
+            try {
+                // Get the project directory
+                const projectDir = process.cwd()
+                
+                console.log(chalk.bold('\n🔍 Scanning for overridable files...\n'))
+                
+                const packageName = getPackageNameFromDir(projectDir)
+                if (!packageName) {
+                    error('Could not determine package name. Exiting.')
+                    return
+                }
+                
+                // Find all overridable imports
+                const imports = findOverridableImports(projectDir)
+                
+                if (imports.length === 0) {
+                    console.log(chalk.yellow('No overridable imports found in this project.'))
+                } else {
+                    console.log(chalk.green(`Found ${imports.length} overridable imports:`))
+                    
+                    // Group imports by source file
+                    const groupedImports = groupImportsBySourceFile(imports, projectDir)
+                    
+                    // Display grouped imports
+                    Object.entries(groupedImports).forEach(([sourceFile, importPaths]) => {
+                        console.log(chalk.cyan(`\n📄 ${sourceFile}:`))
+                        importPaths.forEach(importPath => {
+                            console.log(`  - ${importPath}`)
+                        })
+                    })
+                }
+                
+                // Find all override files
+                const overrideFiles = findOverrideFiles(projectDir)
+                const appOverrideFiles = findAppOverrideFiles(projectDir)
+                const allOverrideFiles = [...overrideFiles, ...appOverrideFiles]
+                
+                if (allOverrideFiles.length > 0) {
+                    console.log(chalk.bold('\n🔄 Checking override files...\n'))
+                    
+                    const unusedOverrides = allOverrideFiles.filter(file => 
+                        !hasCorrespondingOverridableImport(file, imports, projectDir)
+                    )
+                    
+                    if (unusedOverrides.length > 0) {
+                        console.log(chalk.yellow(`Found ${unusedOverrides.length} override files that don't match any overridable imports:`))
+                        unusedOverrides.forEach(file => {
+                            console.log(`  - ${p.relative(projectDir, file)}`)
+                        })
+                    } else {
+                        console.log(chalk.green(`All ${allOverrideFiles.length} override files correspond to overridable imports.`))
+                    }
+                }
+                
+                console.log(chalk.bold('\n✅ Scan complete!\n'))
+            } catch (err) {
+                error(`Failed to run list-overridables: ${err.message}`)
+            }
         })
 
     managedRuntimeCommand('tail-logs')

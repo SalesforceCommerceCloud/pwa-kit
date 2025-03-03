@@ -14,6 +14,7 @@
     "lint": "npm run lint:js",
     "lint:fix": "npm run lint:js -- --fix",
     "lint:js": "pwa-kit-dev lint \"**/*.{js,jsx,ts,tsx}\"",
+    "list-overridables": "pwa-kit-dev list-overridables",
     "test": "pwa-kit-dev test",
     "typecheck": "tsc --noEmit"
   },
