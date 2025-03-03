@@ -1093,7 +1093,7 @@ const main = async (opts) => {
             // Ask for extension name if Application Extension is selected
             const extensionNameAnswers = await inquirer.prompt(APPLICATION_EXTENSION_QUESTIONS)
             const extensionName = extensionNameAnswers.project.extensionName
-            
+
             // Get the preset and set extension name in all required places
             context.preset = {
                 ...PRESETS.find(({id}) => id === 'extension-starter'),
@@ -1136,13 +1136,16 @@ const main = async (opts) => {
 
     if (!OUTPUT_DIR_FLAG_ACTIVE) {
         // For extension projects, use the extension name as the output directory
-        if (context.answers.project.type === 'PWAKitAppExtensionProject' && context.answers.project.extensionName) {
+        if (
+            context.answers.project.type === 'PWAKitAppExtensionProject' &&
+            context.answers.project.extensionName
+        ) {
             // Extract the package name part without the namespace for the directory name
             const extensionName = context.answers.project.extensionName
-            const packageNamePart = extensionName.includes('/') 
-                ? extensionName.split('/')[1] 
+            const packageNamePart = extensionName.includes('/')
+                ? extensionName.split('/')[1]
                 : extensionName
-            
+
             outputDir = p.join(process.cwd(), packageNamePart)
         } else {
             outputDir = p.join(process.cwd(), context.answers.project.name || context.preset.id)
