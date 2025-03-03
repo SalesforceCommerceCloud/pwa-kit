@@ -513,7 +513,17 @@ const main = async () => {
                     Object.entries(groupedImports).forEach(([sourceFile, importPaths]) => {
                         console.log(chalk.cyan(`\n📄 ${sourceFile}:`))
                         importPaths.forEach(importPath => {
-                            console.log(`  - ${importPath}`)
+                            // Calculate the full path based on the source file and import path
+                            const sourceDir = p.dirname(p.join(projectDir, sourceFile))
+                            let fullPath = importPath
+                            
+                            // Handle relative imports
+                            if (importPath.startsWith('./') || importPath.startsWith('../')) {
+                                fullPath = p.normalize(p.join(p.dirname(sourceFile), importPath))
+                            }
+                            
+                            // Display both the import path and the full path
+                            console.log(`  - ${importPath} ${chalk.gray(`(${fullPath})`)}`)
                         })
                     })
                 }

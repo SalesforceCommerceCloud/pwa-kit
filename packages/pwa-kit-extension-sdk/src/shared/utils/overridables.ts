@@ -10,7 +10,7 @@ import path from 'path'
 import glob from 'glob'
 
 // Constants
-export const IMPORT_REGEX = /import\s+(?:(?:[\w*\s{},]*)\s+from\s+)?['"]overridable!(.+?)['"]/g
+export const IMPORT_REGEX = /(?:import\s+(?:[\w*\s{},]*)\s+from\s+['"]overridable!(.+?)['"]|import\s*\(\s*['"]overridable!(.+?)['"]\s*\))/g
 export const SUPPORTED_FILE_EXTENSIONS = ['.js', '.jsx', '.ts', '.tsx']
 export const OVERRIDES_DIR = 'overrides'
 export const SRC_DIR = 'src'
@@ -49,10 +49,14 @@ export function extractOverridableImports(filePath: string): OverridableImport[]
     let match
 
     while ((match = IMPORT_REGEX.exec(content)) !== null) {
-        imports.push({
-            importPath: match[1],
-            sourceFile: filePath
-        })
+        // The import path could be in either capture group depending on the import style
+        const importPath = match[1] || match[2]
+        if (importPath) {
+            imports.push({
+                importPath,
+                sourceFile: filePath
+            })
+        }
     }
 
     return imports
