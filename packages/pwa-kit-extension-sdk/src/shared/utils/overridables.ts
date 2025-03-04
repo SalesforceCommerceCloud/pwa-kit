@@ -19,73 +19,49 @@ export const SRC_DIR = 'src'
 export const APP_DIR = 'app'
 export const NODE_MODULES = 'node_modules'
 
-/**
- * Represents an overridable import
- */
+// Interfaces
 export interface OverridableImport {
     importPath: string
     sourceFile: string
-    extension?: string // The extension package name if applicable
+    extension?: string
 }
 
 /**
- * Extension configuration from package.json
+ * Finds all files with the specified extensions in a directory.
+ * @param {string} dir - Directory to search.
+ * @param {string[]} extensions - File extensions to include.
+ * @returns {string[]} Array of absolute file paths matching the criteria.
  */
-export interface ExtensionConfig {
-    name: string
-    path?: string
-    enabled?: boolean
-    [key: string]: any
-}
+export const findFiles = (dir: string, extensions: string[]): string[] =>
+    fs.existsSync(dir)
+        ? glob.sync(`${dir}/**/*+(${extensions.join('|')})`, {nodir: true, absolute: true})
+        : []
 
 /**
- * Finds all files with the specified extensions in a directory
- * @param {string} dir - Directory to search
- * @param {string[]} extensions - File extensions to include
- * @returns {string[]} - Array of file paths
+ * Extracts overridable imports from a file.
+ * @param {string} filePath - Path to the file to analyze.
+ * @param {string} [extensionName] - Name of the extension, if applicable.
+ * @returns {OverridableImport[]} Array of overridable imports found in the file.
  */
-export function findFiles(dir: string, extensions: string[]): string[] {
-    if (!fs.existsSync(dir)) {
-        return []
-    }
-    const pattern = `${dir}/**/*+(${extensions.join('|')})`
-    return glob.sync(pattern, {nodir: true, absolute: true})
-}
-
-/**
- * Extracts overridable imports from a file
- * @param {string} filePath - Path to the file
- * @returns {OverridableImport[]} - Array of overridable import paths
- */
-export function extractOverridableImports(
+export const extractOverridableImports = (
     filePath: string,
     extensionName?: string
-): OverridableImport[] {
+): OverridableImport[] => {
     const content = fs.readFileSync(filePath, 'utf8')
-    const imports: OverridableImport[] = []
-    let match
-
-    while ((match = IMPORT_REGEX.exec(content)) !== null) {
+    return Array.from(content.matchAll(IMPORT_REGEX), (match) => ({
         // The import path could be in either capture group depending on the import style
-        const importPath = match[1] || match[2]
-        if (importPath) {
-            imports.push({
-                importPath,
-                sourceFile: filePath,
-                extension: extensionName
-            })
-        }
-    }
-
-    return imports
+        importPath: match[1] || match[2],
+        sourceFile: filePath,
+        extension: extensionName
+    })).filter((imp) => imp.importPath)
 }
 
 /**
- * Gets the package name from package.json
- * @param {string} projectDir - Project directory
- * @returns {string|null} - Package name
+ * Gets the package name from package.json in the given directory.
+ * @param {string} projectDir - Project directory containing package.json.
+ * @returns {string|null} Package name if found, null otherwise.
  */
-export function getPackageNameFromDir(projectDir: string): string | null {
+export const getPackageNameFromDir = (projectDir: string): string | null => {
     try {
         const packageJson = JSON.parse(
             fs.readFileSync(path.join(projectDir, 'package.json'), 'utf8')
@@ -98,30 +74,17 @@ export function getPackageNameFromDir(projectDir: string): string | null {
 }
 
 /**
- * Resolves the path to an extension
- * @param {string} extensionName - Extension name
- * @param {string} projectDir - Project directory
- * @returns {string|null} - Path to the extension
+ * Resolves the path to an extension.
+ * @param {string} extensionName - Name of the extension to resolve.
+ * @param {string} projectDir - Project directory.
+ * @returns {string|null} Resolved path to the extension if found, null otherwise.
  */
-export function resolveExtensionPath(extensionName: string, projectDir: string): string | null {
-    // First check if it's a local extension in app/application-extensions
-    const localExtPath = path.join(
-        projectDir,
-        APP_DIR,
-        'application-extensions',
-        extensionName.replace(/\//g, '_')
-    )
-    if (fs.existsSync(localExtPath)) {
-        return localExtPath
-    }
-
-    // Then check in node_modules
-    const nodeModulesPath = path.join(projectDir, NODE_MODULES, extensionName)
-    if (fs.existsSync(nodeModulesPath)) {
-        return nodeModulesPath
-    }
-
-    return null
+export const resolveExtensionPath = (extensionName: string, projectDir: string): string | null => {
+    const paths = [
+        path.join(projectDir, APP_DIR, 'application-extensions', extensionName.replace(/\//g, '_')),
+        path.join(projectDir, NODE_MODULES, extensionName)
+    ]
+    return paths.find(fs.existsSync) ?? null
 }
 
 /**
@@ -129,105 +92,59 @@ export function resolveExtensionPath(extensionName: string, projectDir: string):
  * @param {string} projectDir - Project directory
  * @returns {OverridableImport[]} - Array of overridable imports
  */
-export function findOverridableImports(projectDir: string): OverridableImport[] {
-    let allImports: OverridableImport[] = []
+export const findOverridableImports = (projectDir: string): OverridableImport[] => {
+    const processFiles = (dir: string, extensionName?: string) =>
+        findFiles(dir, SUPPORTED_FILE_EXTENSIONS).flatMap((file) =>
+            extractOverridableImports(file, extensionName)
+        )
 
-    // First, check the project's own source files
-    const srcDir = path.join(projectDir, SRC_DIR)
-    const appDir = path.join(projectDir, APP_DIR)
+    const projectImports = [
+        ...processFiles(path.join(projectDir, SRC_DIR)),
+        ...processFiles(path.join(projectDir, APP_DIR))
+    ]
 
-    let projectFiles: string[] = []
-
-    // Check src directory
-    if (fs.existsSync(srcDir)) {
-        const srcFiles = findFiles(srcDir, SUPPORTED_FILE_EXTENSIONS)
-        projectFiles = projectFiles.concat(srcFiles)
-    }
-
-    // Check app directory
-    if (fs.existsSync(appDir)) {
-        const appFiles = findFiles(appDir, SUPPORTED_FILE_EXTENSIONS)
-        projectFiles = projectFiles.concat(appFiles)
-    }
-
-    // Process project files
-    projectFiles.forEach((file) => {
-        const imports = extractOverridableImports(file)
-        allImports = allImports.concat(imports)
-    })
-
-    // Then, check all configured extensions using the helper function
     try {
         const packageJson = JSON.parse(
             fs.readFileSync(path.join(projectDir, 'package.json'), 'utf8')
         )
         const extensions = getConfiguredExtensions(packageJson.mobify)
-
-        extensions.forEach(([extensionName]) => {
+        const extensionImports = extensions.flatMap(([extensionName]) => {
             const extensionPath = resolveExtensionPath(extensionName, projectDir)
-            if (!extensionPath) {
-                console.warn(`Could not resolve path for extension: ${extensionName}`)
-                return
-            }
-
-            const extensionSrcDir = path.join(extensionPath, SRC_DIR)
-            if (fs.existsSync(extensionSrcDir)) {
-                const extensionFiles = findFiles(extensionSrcDir, SUPPORTED_FILE_EXTENSIONS)
-                extensionFiles.forEach((file) => {
-                    const imports = extractOverridableImports(file, extensionName)
-                    allImports = allImports.concat(imports)
-                })
-            }
+            return extensionPath
+                ? processFiles(path.join(extensionPath, SRC_DIR), extensionName)
+                : []
         })
+        return [...projectImports, ...extensionImports]
     } catch (error) {
         console.error('Error reading package.json:', (error as Error).message)
+        return projectImports
     }
-
-    return allImports
 }
 
 /**
- * Finds all override files in the project
- * @param {string} projectDir - Project directory
- * @returns {string[]} - Array of override file paths
+ * Finds all override files in the project or app directory.
+ * @param {string} projectDir - Project directory.
+ * @param {boolean} [inAppDir=false] - Whether to search in the app directory instead of src.
+ * @returns {string[]} Array of override file paths.
  */
-export function findOverrideFiles(projectDir: string): string[] {
-    const overridesDir = path.join(projectDir, SRC_DIR, OVERRIDES_DIR)
-
-    if (!fs.existsSync(overridesDir)) {
-        return []
-    }
-
-    return findFiles(overridesDir, SUPPORTED_FILE_EXTENSIONS)
-}
+export const findOverrideFiles = (projectDir: string, inAppDir = false): string[] =>
+    findFiles(
+        path.join(projectDir, inAppDir ? APP_DIR : SRC_DIR, OVERRIDES_DIR),
+        SUPPORTED_FILE_EXTENSIONS
+    )
 
 /**
- * Finds all override files in the app directory (for PWA Kit applications)
- * @param {string} projectDir - Project directory
- * @returns {string[]} - Array of override file paths
+ * Checks if an override file has a corresponding overridable import.
+ * @param {string} overrideFile - Path to the override file.
+ * @param {OverridableImport[]} overridableImports - Array of overridable imports.
+ * @param {string} projectDir - Project directory.
+ * @returns {boolean} True if the override file has a corresponding overridable import, false otherwise.
  */
-export function findAppOverrideFiles(projectDir: string): string[] {
-    const appOverridesDir = path.join(projectDir, APP_DIR, OVERRIDES_DIR)
-
-    if (!fs.existsSync(appOverridesDir)) {
-        return []
-    }
-
-    return findFiles(appOverridesDir, SUPPORTED_FILE_EXTENSIONS)
-}
-
-/**
- * Checks if an override file has a corresponding overridable import
- * @param {string} overrideFile - Path to the override file
- * @param {OverridableImport[]} overridableImports - Array of overridable imports
- * @param {string} projectDir - Project directory
- * @returns {boolean} - True if the override file has a corresponding overridable import
- */
-export function hasCorrespondingOverridableImport(
+export const hasCorrespondingOverridableImport = (
     overrideFile: string,
     overridableImports: OverridableImport[],
     projectDir: string
-): boolean {
+): boolean => {
     // Extract the extension name and relative path from the override file
     const overridesDir = path.join(projectDir, SRC_DIR, OVERRIDES_DIR)
     const appOverridesDir = path.join(projectDir, APP_DIR, OVERRIDES_DIR)
@@ -270,13 +187,13 @@ export function hasCorrespondingOverridableImport(
  * Groups imports by source file
  * @param {OverridableImport[]} imports - Array of overridable imports
  * @param {string} projectDir - Project directory
- * @returns {Record<string, string[]>} - Object with source files as keys and import paths as values
+ * @returns {Record<string, {paths: string[], extension?: string}>} - Object with source files as keys and import details as values
  */
-export function groupImportsBySourceFile(
+export const groupImportsBySourceFile = (
     imports: OverridableImport[],
     projectDir: string
-): Record<string, {paths: string[]; extension?: string}> {
-    return imports.reduce((acc, imp) => {
+): Record<string, {paths: string[]; extension?: string}> =>
+    imports.reduce((acc, imp) => {
         const relativePath = path.relative(projectDir, imp.sourceFile)
         if (!acc[relativePath]) {
             acc[relativePath] = {
@@ -287,4 +204,3 @@ export function groupImportsBySourceFile(
         acc[relativePath].paths.push(imp.importPath)
         return acc
     }, {} as Record<string, {paths: string[]; extension?: string}>)
-}

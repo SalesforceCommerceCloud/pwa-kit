@@ -14,7 +14,6 @@ import {
     resolveExtensionPath,
     findOverridableImports,
     findOverrideFiles,
-    findAppOverrideFiles,
     hasCorrespondingOverridableImport,
     groupImportsBySourceFile,
     SUPPORTED_FILE_EXTENSIONS,
@@ -61,13 +60,13 @@ describe('Overridables Utilities', () => {
     })
 
     describe('findFiles', () => {
-        it('returns empty array if directory does not exist', () => {
+        test('returns empty array if directory does not exist', () => {
             mockFs.existsSync.mockReturnValue(false)
             const result = findFiles('/test', SUPPORTED_FILE_EXTENSIONS)
             expect(result).toEqual([])
         })
 
-        it('finds files with supported extensions', () => {
+        test('finds files with supported extensions', () => {
             mockFs.existsSync.mockReturnValue(true)
             mockGlob.sync.mockReturnValue(['/test/file.js', '/test/sub/file.tsx'])
             const result = findFiles('/test', SUPPORTED_FILE_EXTENSIONS)
@@ -80,7 +79,7 @@ describe('Overridables Utilities', () => {
     })
 
     describe('extractOverridableImports', () => {
-        it('extracts overridable imports from file content', () => {
+        test('extracts overridable imports from file content', () => {
             mockFs.readFileSync.mockReturnValue(`
                 import x from "overridable!./component";
                 import y from "other";
@@ -93,7 +92,7 @@ describe('Overridables Utilities', () => {
             ])
         })
 
-        it('uses IMPORT_REGEX to match imports', () => {
+        test('uses IMPORT_REGEX to match imports', () => {
             mockFs.readFileSync.mockReturnValue('import x from "overridable!./test"')
             const result = extractOverridableImports('/test/file.js')
             expect(result).toHaveLength(1)
@@ -105,7 +104,7 @@ describe('Overridables Utilities', () => {
     })
 
     describe('getPackageNameFromDir', () => {
-        it('returns package name from package.json', () => {
+        test('returns package name from package.json', () => {
             mockFs.readFileSync.mockReturnValue('{"name": "test-package"}')
             const result = getPackageNameFromDir('/project')
             expect(result).toBe('test-package')
@@ -115,7 +114,7 @@ describe('Overridables Utilities', () => {
             )
         })
 
-        it('returns null on error', () => {
+        test('returns null on error', () => {
             mockFs.readFileSync.mockImplementation(() => {
                 throw new Error('File not found')
             })
@@ -125,7 +124,7 @@ describe('Overridables Utilities', () => {
     })
 
     describe('resolveExtensionPath', () => {
-        it('resolves local extension path in app directory', () => {
+        test('resolves local extension path in app directory', () => {
             mockFs.existsSync.mockImplementation(
                 (p: string) =>
                     p === path.join('/project', APP_DIR, 'application-extensions', 'test_ext')
@@ -136,7 +135,7 @@ describe('Overridables Utilities', () => {
             )
         })
 
-        it('resolves node_modules path', () => {
+        test('resolves node_modules path', () => {
             mockFs.existsSync.mockImplementation(
                 (p: string) => p === path.join('/project', NODE_MODULES, 'test/ext')
             )
@@ -144,99 +143,15 @@ describe('Overridables Utilities', () => {
             expect(result).toBe(path.join('/project', NODE_MODULES, 'test/ext'))
         })
 
-        it('returns null if no path exists', () => {
+        test('returns null if no path exists', () => {
             mockFs.existsSync.mockReturnValue(false)
             const result = resolveExtensionPath('test/ext', '/project')
             expect(result).toBeNull()
         })
     })
 
-    describe('findOverridableImports', () => {
-        it.skip('finds imports from src and app directories', () => {
-            mockFs.existsSync.mockImplementation((p: string) => {
-                const srcDir = path.join('/project', SRC_DIR)
-                const appDir = path.join('/project', APP_DIR)
-                return p === srcDir || p === appDir
-            })
-
-            mockGlob.sync.mockImplementation((pattern: string) => {
-                if (pattern.includes(SRC_DIR)) {
-                    return ['/project/src/file.js']
-                }
-                if (pattern.includes(APP_DIR)) {
-                    return ['/project/app/file.js']
-                }
-                return []
-            })
-
-            mockFs.readFileSync.mockImplementation((filePath: string) => {
-                if (filePath === path.join('/project', 'package.json')) {
-                    return '{"mobify": {}}'
-                }
-                if (filePath === '/project/src/file.js') {
-                    return 'import x from "overridable!./test"'
-                }
-                if (filePath === '/project/app/file.js') {
-                    return 'import y from "overridable!./app-test"'
-                }
-                throw new Error(`Unexpected filePath: ${filePath}`)
-            })
-
-            mockHelpers.getConfiguredExtensions.mockReturnValue([])
-
-            const result = findOverridableImports('/project')
-            expect(result).toEqual([
-                {importPath: './test', sourceFile: '/project/src/file.js', extension: undefined},
-                {importPath: './app-test', sourceFile: '/project/app/file.js', extension: undefined}
-            ])
-        })
-
-        it.skip('includes extension imports', () => {
-            mockFs.existsSync.mockImplementation((p: string) => {
-                return (
-                    p === path.join('/project', SRC_DIR) ||
-                    p === path.join('/project', APP_DIR) ||
-                    p === path.join('/project', NODE_MODULES, 'ext') ||
-                    p === path.join('/project', NODE_MODULES, 'ext', SRC_DIR)
-                )
-            })
-
-            mockGlob.sync.mockImplementation((pattern: string) => {
-                if (pattern.includes(SRC_DIR) && !pattern.includes('ext')) {
-                    return []
-                }
-                if (pattern.includes(APP_DIR)) {
-                    return []
-                }
-                if (pattern.includes('ext') && pattern.includes(SRC_DIR)) {
-                    return ['/project/node_modules/ext/src/file.js']
-                }
-                return []
-            })
-
-            mockFs.readFileSync.mockImplementation((filePath: string) => {
-                if (filePath === path.join('/project', 'package.json')) {
-                    return '{"mobify": {"extensions": {"ext": {}}}}'
-                }
-                if (filePath === '/project/node_modules/ext/src/file.js') {
-                    return 'import x from "overridable!./ext"'
-                }
-                throw new Error(`Unexpected filePath: ${filePath}`)
-            })
-
-            mockHelpers.getConfiguredExtensions.mockReturnValue([['ext']])
-
-            const result = findOverridableImports('/project')
-            expect(result).toContainEqual({
-                importPath: './ext',
-                sourceFile: '/project/node_modules/ext/src/file.js',
-                extension: 'ext'
-            })
-        })
-    })
-
     describe('findOverrideFiles', () => {
-        it('finds override files in src/overrides', () => {
+        test('finds override files in src/overrides', () => {
             mockFs.existsSync.mockReturnValue(true)
             mockGlob.sync.mockReturnValue(['/project/src/overrides/file.js'])
             const result = findOverrideFiles('/project')
@@ -247,34 +162,182 @@ describe('Overridables Utilities', () => {
             )
         })
 
-        it('returns empty array if overrides dir does not exist', () => {
+        test('returns empty array if overrides dir does not exist', () => {
             mockFs.existsSync.mockReturnValue(false)
             const result = findOverrideFiles('/project')
             expect(result).toEqual([])
         })
     })
 
-    describe('findAppOverrideFiles', () => {
-        it('finds override files in app/overrides', () => {
-            mockFs.existsSync.mockReturnValue(true)
-            mockGlob.sync.mockReturnValue(['/project/app/overrides/file.tsx'])
-            const result = findAppOverrideFiles('/project')
-            expect(result).toEqual(['/project/app/overrides/file.tsx'])
-            expect(mockGlob.sync).toHaveBeenCalledWith(
-                path.join('/project', APP_DIR, OVERRIDES_DIR, '**/*+(.js|.jsx|.ts|.tsx)'),
-                {nodir: true, absolute: true}
+    describe('findOverridableImports', () => {
+        test('finds imports in project src and app directories', () => {
+            // Mock file system existence checks
+            mockFs.existsSync.mockImplementation(
+                (p: string) =>
+                    p === path.join('/project', SRC_DIR) || p === path.join('/project', APP_DIR)
             )
+
+            // Mock file findings
+            mockGlob.sync.mockImplementation((pattern: string) => {
+                if (pattern.includes(SRC_DIR)) {
+                    return [path.join('/project', SRC_DIR, 'file1.js')]
+                }
+                if (pattern.includes(APP_DIR)) {
+                    return [path.join('/project', APP_DIR, 'file2.js')]
+                }
+                return []
+            })
+
+            // Mock file contents with overridable imports
+            mockFs.readFileSync.mockImplementation((filePath: string) => {
+                if (filePath === path.join('/project', SRC_DIR, 'file1.js')) {
+                    return 'import x from "overridable!./component1"'
+                }
+                if (filePath === path.join('/project', APP_DIR, 'file2.js')) {
+                    return 'import y from "overridable!./component2"'
+                }
+                return ''
+            })
+
+            // Mock package.json that throws error (no extensions)
+            mockFs.readFileSync.mockImplementation((filePath: string) => {
+                if (filePath === path.join('/project', 'package.json')) {
+                    throw new Error('Invalid JSON')
+                }
+                return ''
+            })
+
+            const result = findOverridableImports('/project')
+            expect(result).toEqual([
+                {
+                    importPath: './component1',
+                    sourceFile: path.join('/project', SRC_DIR, 'file1.js')
+                },
+                {
+                    importPath: './component2',
+                    sourceFile: path.join('/project', APP_DIR, 'file2.js')
+                }
+            ])
         })
 
-        it('returns empty array if app overrides dir does not exist', () => {
-            mockFs.existsSync.mockReturnValue(false)
-            const result = findAppOverrideFiles('/project')
+        test('includes imports from configured extensions', () => {
+            // Mock file system existence checks
+            mockFs.existsSync.mockImplementation(
+                (p: string) =>
+                    p === path.join('/project', SRC_DIR) ||
+                    p === path.join('/project', APP_DIR) ||
+                    p === path.join('/project', NODE_MODULES, 'test-ext')
+            )
+
+            // Mock file findings
+            mockGlob.sync.mockImplementation((pattern: string) => {
+                if (pattern.includes(SRC_DIR) && !pattern.includes('test-ext')) {
+                    return [path.join('/project', SRC_DIR, 'file1.js')]
+                }
+                if (pattern.includes(APP_DIR)) {
+                    return []
+                }
+                if (pattern.includes('test-ext')) {
+                    return [path.join('/project', NODE_MODULES, 'test-ext', SRC_DIR, 'ext-file.js')]
+                }
+                return []
+            })
+
+            // Mock file contents
+            mockFs.readFileSync.mockImplementation((filePath: string) => {
+                if (filePath === path.join('/project', SRC_DIR, 'file1.js')) {
+                    return 'import x from "overridable!./component"'
+                }
+                if (
+                    filePath ===
+                    path.join('/project', NODE_MODULES, 'test-ext', SRC_DIR, 'ext-file.js')
+                ) {
+                    return 'import y from "overridable!./ext-component"'
+                }
+                if (filePath === path.join('/project', 'package.json')) {
+                    return '{"mobify": {"extensions": ["test-ext"]}}'
+                }
+                return ''
+            })
+
+            // Mock getConfiguredExtensions
+            mockHelpers.getConfiguredExtensions.mockReturnValue([['test-ext']])
+
+            const result = findOverridableImports('/project')
+            expect(result).toEqual([
+                {
+                    importPath: './component',
+                    sourceFile: path.join('/project', SRC_DIR, 'file1.js')
+                },
+                {
+                    importPath: './ext-component',
+                    sourceFile: path.join(
+                        '/project',
+                        NODE_MODULES,
+                        'test-ext',
+                        SRC_DIR,
+                        'ext-file.js'
+                    ),
+                    extension: 'test-ext'
+                }
+            ])
+        })
+
+        test('returns project imports when package.json is invalid', () => {
+            // Mock file system existence checks
+            mockFs.existsSync.mockImplementation(
+                (p: string) => p === path.join('/project', SRC_DIR)
+            )
+
+            // Mock file findings
+            mockGlob.sync.mockImplementation((pattern: string) => {
+                if (pattern.includes(SRC_DIR)) {
+                    return [path.join('/project', SRC_DIR, 'file1.js')]
+                }
+                return []
+            })
+
+            // Mock file contents and invalid package.json
+            mockFs.readFileSync.mockImplementation((filePath: string) => {
+                if (filePath === path.join('/project', SRC_DIR, 'file1.js')) {
+                    return 'import x from "overridable!./component"'
+                }
+                if (filePath === path.join('/project', 'package.json')) {
+                    throw new Error('Invalid JSON')
+                }
+                return ''
+            })
+
+            const result = findOverridableImports('/project')
+            expect(result).toEqual([
+                {
+                    importPath: './component',
+                    sourceFile: path.join('/project', SRC_DIR, 'file1.js')
+                }
+            ])
+        })
+
+        test('returns empty array when no imports are found', () => {
+            // Mock file system existence checks
+            mockFs.existsSync.mockImplementation(
+                (p: string) =>
+                    p === path.join('/project', SRC_DIR) || p === path.join('/project', APP_DIR)
+            )
+
+            // Mock no files found
+            mockGlob.sync.mockReturnValue([])
+
+            // Mock empty package.json
+            mockFs.readFileSync.mockReturnValue('{"mobify": {}}')
+            mockHelpers.getConfiguredExtensions.mockReturnValue([])
+
+            const result = findOverridableImports('/project')
             expect(result).toEqual([])
         })
     })
 
     describe('hasCorrespondingOverridableImport', () => {
-        it('matches override file to import in src/overrides', () => {
+        test('matches override file to import in src/overrides', () => {
             const overrideFile = path.join(
                 '/project',
                 SRC_DIR,
@@ -289,7 +352,7 @@ describe('Overridables Utilities', () => {
             expect(result).toBe(true)
         })
 
-        it('returns false for non-matching import', () => {
+        test('returns false for non-matching import', () => {
             const overrideFile = path.join(
                 '/project',
                 APP_DIR,
@@ -306,7 +369,7 @@ describe('Overridables Utilities', () => {
     })
 
     describe('groupImportsBySourceFile', () => {
-        it('groups imports by source file with path.relative', () => {
+        test('groups imports by source file with path.relative', () => {
             const imports: OverridableImport[] = [
                 {importPath: './comp1', sourceFile: path.join('/project', 'src', 'file1.js')},
                 {importPath: './comp2', sourceFile: path.join('/project', 'src', 'file1.js')},
