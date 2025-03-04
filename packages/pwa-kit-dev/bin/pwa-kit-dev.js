@@ -25,7 +25,6 @@ const {
 const {
     findOverridableImports,
     findOverrideFiles,
-    findAppOverrideFiles,
     hasCorrespondingOverridableImport,
     groupImportsBySourceFile,
     getPackageNameFromDir
@@ -546,7 +545,7 @@ const main = async () => {
 
                 const imports = findOverridableImports(projectDir)
                 const overrideFiles = findOverrideFiles(projectDir)
-                const appOverrideFiles = findAppOverrideFiles(projectDir)
+                const appOverrideFiles = findOverrideFiles(projectDir, true)
                 const allOverrideFiles = [...overrideFiles, ...appOverrideFiles]
 
                 if (allOverrideFiles.length === 0) {
