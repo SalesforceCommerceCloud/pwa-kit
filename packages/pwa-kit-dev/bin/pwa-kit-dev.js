@@ -489,41 +489,47 @@ const main = async () => {
             try {
                 const projectDir = process.cwd()
                 console.log(chalk.bold('\n🔍 Scanning for overridable files...\n'))
-                
+
                 const packageName = getPackageNameFromDir(projectDir)
                 if (!packageName) {
                     error('Could not determine package name. Exiting.')
                     return
                 }
-                
+
                 const imports = findOverridableImports(projectDir)
-                
+
                 if (imports.length === 0) {
-                    console.log(chalk.yellow('No overridable imports found in this project or its extensions.'))
+                    console.log(
+                        chalk.yellow(
+                            'No overridable imports found in this project or its extensions.'
+                        )
+                    )
                     return
                 }
-                
+
                 console.log(chalk.green(`Found ${imports.length} overridable imports:`))
                 const groupedImports = groupImportsBySourceFile(imports, projectDir)
-                
+
                 Object.entries(groupedImports).forEach(([sourceFile, {paths, extension}]) => {
-                    const sourceDisplay = extension 
-                        ? `${chalk.cyan(sourceFile)} ${chalk.yellow(`(from extension: ${extension})`)}`
+                    const sourceDisplay = extension
+                        ? `${chalk.cyan(sourceFile)} ${chalk.yellow(
+                              `(from extension: ${extension})`
+                          )}`
                         : chalk.cyan(sourceFile)
-                    
+
                     console.log(`\n📄 ${sourceDisplay}:`)
-                    paths.forEach(importPath => {
+                    paths.forEach((importPath) => {
                         const sourceDir = p.dirname(p.join(projectDir, sourceFile))
                         let fullPath = importPath
-                        
+
                         if (importPath.startsWith('./') || importPath.startsWith('../')) {
                             fullPath = p.normalize(p.join(p.dirname(sourceFile), importPath))
                         }
-                        
+
                         console.log(`  - ${importPath} ${chalk.gray(`(${fullPath})`)}`)
                     })
                 })
-                
+
                 console.log(chalk.bold('\n✅ Scan complete!\n'))
             } catch (err) {
                 error(`Failed to list overridable files: ${err.message}`)
@@ -537,30 +543,38 @@ const main = async () => {
             try {
                 const projectDir = process.cwd()
                 console.log(chalk.bold('\n🔍 Checking override files...\n'))
-                
+
                 const imports = findOverridableImports(projectDir)
                 const overrideFiles = findOverrideFiles(projectDir)
                 const appOverrideFiles = findAppOverrideFiles(projectDir)
                 const allOverrideFiles = [...overrideFiles, ...appOverrideFiles]
-                
+
                 if (allOverrideFiles.length === 0) {
                     console.log(chalk.yellow('No override files found.'))
                     return
                 }
-                
-                const unusedOverrides = allOverrideFiles.filter(file => 
-                    !hasCorrespondingOverridableImport(file, imports, projectDir)
+
+                const unusedOverrides = allOverrideFiles.filter(
+                    (file) => !hasCorrespondingOverridableImport(file, imports, projectDir)
                 )
-                
+
                 if (unusedOverrides.length > 0) {
-                    console.log(chalk.yellow(`Found ${unusedOverrides.length} override files that don't match any overridable imports:`))
-                    unusedOverrides.forEach(file => {
+                    console.log(
+                        chalk.yellow(
+                            `Found ${unusedOverrides.length} override files that don't match any overridable imports:`
+                        )
+                    )
+                    unusedOverrides.forEach((file) => {
                         console.log(`  - ${p.relative(projectDir, file)}`)
                     })
                 } else {
-                    console.log(chalk.green(`All ${allOverrideFiles.length} override files correspond to overridable imports.`))
+                    console.log(
+                        chalk.green(
+                            `All ${allOverrideFiles.length} override files correspond to overridable imports.`
+                        )
+                    )
                 }
-                
+
                 console.log(chalk.bold('\n✅ Check complete!\n'))
             } catch (err) {
                 error(`Failed to check override files: ${err.message}`)
