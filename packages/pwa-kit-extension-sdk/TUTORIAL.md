@@ -19,7 +19,6 @@ npx @salesforce/pwa-kit-create-app@4.0.0-extensibility-preview.3
 During the generation process, you'll be presented with several configuration options, answer the questions as follows:
 
 * What type of PWA Kit project would you like to create? **PWA Kit Application**
-* Do you want to use Application Extensibility? **Yes**
 * Which Application Extensions do you want to install? *(use arrow key to navigate, space to select and enter to confirm)*
     * **@salesforce/extension-chakra-storefront**
     * **@salesforce/extension-chakra-store-locator**

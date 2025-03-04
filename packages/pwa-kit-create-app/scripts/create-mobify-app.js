@@ -140,17 +140,10 @@ const INITIAL_QUESTION = [
 const askApplicationExtensibilityQuestions = (availableAppExtensions) => {
     return [
         {
-            name: 'project.useAppExtensibility',
-            message: 'Do you want to use Application Extensibility?',
-            type: 'confirm',
-            default: true
-        },
-        {
             name: 'project.selectedAppExtensions',
             message: 'Which Application Extensions do you want to install?',
             type: 'checkbox',
-            choices: availableAppExtensions,
-            when: (answers) => answers.project.useAppExtensibility === true
+            choices: availableAppExtensions
         },
         {
             name: 'project.extractAppExtensions',
@@ -161,8 +154,7 @@ const askApplicationExtensibilityQuestions = (availableAppExtensions) => {
                 '\n' +
                 'Do you want to proceed with extracting the Application Extensions code?',
             type: 'confirm',
-            default: false,
-            when: (answers) => answers.project.useAppExtensibility === true
+            default: false
         }
     ]
 }
@@ -539,18 +531,6 @@ const PRESETS = [
             ['project.extractAppExtensions']: false
         },
         private: true
-    }
-]
-
-const PRESET_QUESTIONS = [
-    {
-        name: 'general.presetId',
-        message: 'Choose a project preset to get started:',
-        type: 'list',
-        choices: PRESETS.filter(({private}) => !private).map(({shortDescription, id}) => ({
-            name: shortDescription,
-            value: id
-        }))
     }
 ]
 
@@ -1112,8 +1092,17 @@ const main = async (opts) => {
         if (initialAnswers.project.type === 'PWAKitAppExtensionProject') {
             // Ask for extension name if Application Extension is selected
             const extensionNameAnswers = await inquirer.prompt(APPLICATION_EXTENSION_QUESTIONS)
-            context.answers.project.name = extensionNameAnswers.project.extensionName
-            context.preset = PRESETS.find(({id}) => id === 'extension-starter')
+            const extensionName = extensionNameAnswers.project.extensionName
+
+            // Get the preset and set extension name in all required places
+            context.preset = {
+                ...PRESETS.find(({id}) => id === 'extension-starter'),
+                answers: {
+                    'project.type': 'PWAKitAppExtensionProject',
+                    'project.name': extensionName,
+                    'project.extensionName': extensionName
+                }
+            }
         } else {
             const availableAppExtensions = fetchAvailableAppExtensions()
 
@@ -1125,26 +1114,18 @@ const main = async (opts) => {
             )
             context = merge(context, {answers: expandObject(generationAnswers)})
 
-            if (context.answers.project.useAppExtensibility) {
-                // Add the 'typescript-minimal' preset for Application Extension
-                context.preset = PRESETS.find(({id}) => id === 'typescript-minimal')
-            }
+            // Default to 'typescript-minimal' preset when no preset is specified
+            context.preset = PRESETS.find(({id}) => id === 'typescript-minimal')
         }
     }
 
-    // If no preset is provided, prompt the user with available preset options
-    if (!presetId && !context.preset) {
-        context.answers = await prompt(PRESET_QUESTIONS)
+    // Set the preset based on presetId if provided
+    if (presetId && !context.preset) {
+        context.preset = PRESETS.find(({id}) => id === presetId)
     }
 
-    // Set the preset to the selected preset or based on presetId
-    const selectedPreset =
-        context.preset ||
-        PRESETS.find(({id}) => id === (presetId || context.answers.general.presetId))
-    context.preset = selectedPreset
-
     // Ask preset specific questions and merge into the current context.
-    const {questions = {}, answers = {}} = selectedPreset
+    const {questions = {}, answers = {}} = context.preset
     if (questions) {
         const projectAnswers = await prompt(questions, answers)
 
@@ -1154,7 +1135,21 @@ const main = async (opts) => {
     }
 
     if (!OUTPUT_DIR_FLAG_ACTIVE) {
-        outputDir = p.join(process.cwd(), context.answers.project.name || selectedPreset.id)
+        // For extension projects, use the extension name as the output directory
+        if (
+            context.answers.project.type === 'PWAKitAppExtensionProject' &&
+            context.answers.project.extensionName
+        ) {
+            // Extract the package name part without the namespace for the directory name
+            const extensionName = context.answers.project.extensionName
+            const packageNamePart = extensionName.includes('/')
+                ? extensionName.split('/')[1]
+                : extensionName
+
+            outputDir = p.join(process.cwd(), packageNamePart)
+        } else {
+            outputDir = p.join(process.cwd(), context.answers.project.name || context.preset.id)
+        }
     }
 
     if (context.answers.project.commerce?.instanceUrl) {
