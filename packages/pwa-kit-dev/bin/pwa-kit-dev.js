@@ -502,7 +502,7 @@ const main = async () => {
                 const imports = findOverridableImports(projectDir)
                 
                 if (imports.length === 0) {
-                    console.log(chalk.yellow('No overridable imports found in this project.'))
+                    console.log(chalk.yellow('No overridable imports found in this project or its extensions.'))
                 } else {
                     console.log(chalk.green(`Found ${imports.length} overridable imports:`))
                     
@@ -510,9 +510,15 @@ const main = async () => {
                     const groupedImports = groupImportsBySourceFile(imports, projectDir)
                     
                     // Display grouped imports
-                    Object.entries(groupedImports).forEach(([sourceFile, importPaths]) => {
-                        console.log(chalk.cyan(`\n📄 ${sourceFile}:`))
-                        importPaths.forEach(importPath => {
+                    Object.entries(groupedImports).forEach(([sourceFile, {paths, extension}]) => {
+                        // Add extension info to the source file display if available
+                        const sourceDisplay = extension 
+                            ? `${chalk.cyan(sourceFile)} ${chalk.yellow(`(from extension: ${extension})`)}`
+                            : chalk.cyan(sourceFile)
+                        
+                        console.log(`\n📄 ${sourceDisplay}:`)
+                        
+                        paths.forEach(importPath => {
                             // Calculate the full path based on the source file and import path
                             const sourceDir = p.dirname(p.join(projectDir, sourceFile))
                             let fullPath = importPath
