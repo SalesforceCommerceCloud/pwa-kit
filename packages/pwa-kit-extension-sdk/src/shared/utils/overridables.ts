@@ -8,6 +8,7 @@
 import fs from 'fs'
 import path from 'path'
 import glob from 'glob'
+import { getConfiguredExtensions } from './helpers'
 
 // Constants
 export const IMPORT_REGEX = /(?:import\s+(?:[\w*\s{},]*)\s+from\s+['"]overridable!(.+?)['"]|import\s*\(\s*['"]overridable!(.+?)['"]\s*\))/g
@@ -91,31 +92,6 @@ export function getPackageNameFromDir(projectDir: string): string | null {
 }
 
 /**
- * Gets configured extensions from package.json
- * @param {string} projectDir - Project directory
- * @returns {ExtensionConfig[]} - Array of extension configurations
- */
-export function getConfiguredExtensions(projectDir: string): ExtensionConfig[] {
-    try {
-        const packageJson = JSON.parse(fs.readFileSync(path.join(projectDir, 'package.json'), 'utf8'))
-        const extensions = packageJson?.mobify?.app?.extensions || []
-        
-        return extensions.map((ext: string | [string, any]) => {
-            if (typeof ext === 'string') {
-                return { name: ext, enabled: true }
-            } else if (Array.isArray(ext) && ext.length >= 2) {
-                const [name, config] = ext
-                return { name, ...config }
-            }
-            return null
-        }).filter(Boolean)
-    } catch (error) {
-        console.error('Error reading extensions from package.json:', (error as Error).message)
-        return []
-    }
-}
-
-/**
  * Resolves the path to an extension
  * @param {string} extensionName - Extension name
  * @param {string} projectDir - Project directory
@@ -169,29 +145,30 @@ export function findOverridableImports(projectDir: string): OverridableImport[] 
         allImports = allImports.concat(imports)
     })
     
-    // Then, check all configured extensions
-    const extensions = getConfiguredExtensions(projectDir)
-    
-    extensions.forEach(extension => {
-        if (extension.enabled === false) {
-            return
-        }
+    // Then, check all configured extensions using the helper function
+    try {
+        const packageJson = JSON.parse(fs.readFileSync(path.join(projectDir, 'package.json'), 'utf8'))
+        const extensions = getConfiguredExtensions(packageJson.mobify)
         
-        const extensionPath = resolveExtensionPath(extension.name, projectDir)
-        if (!extensionPath) {
-            console.warn(`Could not resolve path for extension: ${extension.name}`)
-            return
-        }
-        
-        const extensionSrcDir = path.join(extensionPath, SRC_DIR)
-        if (fs.existsSync(extensionSrcDir)) {
-            const extensionFiles = findFiles(extensionSrcDir, SUPPORTED_FILE_EXTENSIONS)
-            extensionFiles.forEach(file => {
-                const imports = extractOverridableImports(file, extension.name)
-                allImports = allImports.concat(imports)
-            })
-        }
-    })
+        extensions.forEach(([extensionName]) => {
+            const extensionPath = resolveExtensionPath(extensionName, projectDir)
+            if (!extensionPath) {
+                console.warn(`Could not resolve path for extension: ${extensionName}`)
+                return
+            }
+            
+            const extensionSrcDir = path.join(extensionPath, SRC_DIR)
+            if (fs.existsSync(extensionSrcDir)) {
+                const extensionFiles = findFiles(extensionSrcDir, SUPPORTED_FILE_EXTENSIONS)
+                extensionFiles.forEach(file => {
+                    const imports = extractOverridableImports(file, extensionName)
+                    allImports = allImports.concat(imports)
+                })
+            }
+        })
+    } catch (error) {
+        console.error('Error reading package.json:', (error as Error).message)
+    }
     
     return allImports
 }
