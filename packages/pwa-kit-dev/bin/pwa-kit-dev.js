@@ -547,21 +547,45 @@ const main = async () => {
                     return
                 }
 
-                const unusedOverrides = allOverrideFiles.filter(
-                    (file) => !hasCorrespondingOverridableImport(file, imports, projectDir)
+                // Separate override files into matched and unmatched using array methods
+                const {matchedOverrides, unmatchedOverrides} = allOverrideFiles.reduce(
+                    (acc, file) => {
+                        const key = hasCorrespondingOverridableImport(file, imports, projectDir)
+                            ? 'matchedOverrides'
+                            : 'unmatchedOverrides'
+                        acc[key].push(file)
+                        return acc
+                    },
+                    {matchedOverrides: [], unmatchedOverrides: []}
                 )
 
+                // Report on matched overrides using template literals
                 console.log(
-                    unusedOverrides.length
+                    matchedOverrides.length
+                        ? chalk.green(
+                              `Found ${matchedOverrides.length} override files that match overridable imports:`
+                          )
+                        : chalk.yellow('No override files match any overridable imports.')
+                )
+
+                matchedOverrides.forEach((file) =>
+                    console.log(`  - ${chalk.cyan(p.relative(projectDir, file))}`)
+                )
+
+                console.log('')
+
+                // Report on unmatched overrides using template literals
+                console.log(
+                    unmatchedOverrides.length
                         ? chalk.yellow(
-                              `Found ${unusedOverrides.length} override files that don't match any overridable imports:`
+                              `Found ${unmatchedOverrides.length} override files that don't match any overridable imports:`
                           )
                         : chalk.green(
                               `All ${allOverrideFiles.length} override files correspond to overridable imports.`
                           )
                 )
 
-                unusedOverrides.forEach((file) =>
+                unmatchedOverrides.forEach((file) =>
                     console.log(`  - ${p.relative(projectDir, file)}`)
                 )
 
