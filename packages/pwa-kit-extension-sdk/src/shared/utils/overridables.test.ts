@@ -10,7 +10,6 @@ import * as glob from 'glob'
 import {
     findFiles,
     extractOverridableImports,
-    getPackageNameFromDir,
     resolveExtensionPath,
     findOverridableImports,
     findOverrideFiles,
@@ -100,26 +99,6 @@ describe('Overridables Utilities', () => {
             const match = IMPORT_REGEX.exec('import x from "overridable!./test"')
             expect(match).toBeTruthy()
             expect(match![1]).toBe('./test')
-        })
-    })
-
-    describe('getPackageNameFromDir', () => {
-        test('returns package name from package.json', () => {
-            mockFs.readFileSync.mockReturnValue('{"name": "test-package"}')
-            const result = getPackageNameFromDir('/project')
-            expect(result).toBe('test-package')
-            expect(mockFs.readFileSync).toHaveBeenCalledWith(
-                path.join('/project', 'package.json'),
-                'utf8'
-            )
-        })
-
-        test('returns null on error', () => {
-            mockFs.readFileSync.mockImplementation(() => {
-                throw new Error('File not found')
-            })
-            const result = getPackageNameFromDir('/project')
-            expect(result).toBeNull()
         })
     })
 

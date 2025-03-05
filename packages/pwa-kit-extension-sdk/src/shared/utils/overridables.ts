@@ -57,23 +57,6 @@ export const extractOverridableImports = (
 }
 
 /**
- * Gets the package name from package.json in the given directory.
- * @param {string} projectDir - Project directory containing package.json.
- * @returns {string|null} Package name if found, null otherwise.
- */
-export const getPackageNameFromDir = (projectDir: string): string | null => {
-    try {
-        const packageJson = JSON.parse(
-            fs.readFileSync(path.join(projectDir, 'package.json'), 'utf8')
-        )
-        return packageJson.name
-    } catch (error) {
-        console.error('Error reading package.json:', (error as Error).message)
-        return null
-    }
-}
-
-/**
  * Resolves the path to an extension.
  * @param {string} extensionName - Name of the extension to resolve.
  * @param {string} projectDir - Project directory.

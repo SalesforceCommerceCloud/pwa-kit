@@ -24,7 +24,7 @@ const {
     findOverrideFiles,
     hasCorrespondingOverridableImport,
     groupImportsBySourceFile,
-    getPackageNameFromDir
+    getPackageName
 } = require('@salesforce/pwa-kit-extension-sdk/shared/utils')
 
 // Scripts in ./bin have never gone through babel, so we
@@ -486,7 +486,7 @@ const main = async () => {
                 const projectDir = process.cwd()
                 console.log(chalk.bold('\n🔍 Scanning for overridable files...\n'))
 
-                const packageName = getPackageNameFromDir(projectDir)
+                const packageName = getPackageName(projectDir, {})
                 if (!packageName) {
                     error('Could not determine package name. Exiting.')
                     return
