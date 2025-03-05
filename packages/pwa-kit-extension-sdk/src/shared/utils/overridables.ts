@@ -10,6 +10,8 @@ import path from 'path'
 import glob from 'glob'
 import {getConfiguredExtensions} from './helpers'
 import {OVERRIDES, NODE_MODULES, APP, SRC} from './resolver'
+import {buildCandidatePaths} from './resolver'
+import resolve from 'resolve'
 
 import {OverridableImport} from '../../types'
 
@@ -140,33 +142,21 @@ export const hasCorrespondingOverridableImport = (
 
     // Get the relative path from the overrides directory
     const relativePath = path.relative(baseDir, overrideFile)
+    const [extensionName, ...pathParts] = relativePath.split(path.sep)
+    
+    // Get the component name without extension
+    const componentName = path.basename(overrideFile).replace(/\.[^/.]+$/, '')
 
-    // Split the path into parts to extract extension name and component path
-    const pathParts = relativePath.split(path.sep)
-
-    // The first part should be the extension name
-    const extensionName = pathParts[0]
-
-    // Extract the file name without extension
-    const fileName = path.basename(overrideFile).replace(/\.[^/.]+$/, '')
-
-    // For each overridable import, check if it matches our override file
+    // Check if any overridable import matches this override
     return overridableImports.some(({importPath, extension}) => {
-        // Clean up the import path (remove ./ prefix if present)
-        const cleanImportPath = importPath.replace(/^\.\//, '')
-
-        // Get the file name from the import path
-        const importFileName = path.basename(cleanImportPath)
-
-        // Check if the file name matches
-        const fileNameMatches = importFileName === fileName
-
-        // Check if the extension matches (if provided)
+        // Clean up the import path
+        const importName = path.basename(importPath.replace(/^\.\//, ''))
+        
+        // Check if both the component name and extension match
+        const nameMatches = importName === componentName
         const extensionMatches = extension ? extension.includes(extensionName) : false
 
-        // For extension imports, we need both the file name and extension to match
-        // For non-extension imports, just the file name needs to match
-        return extension ? fileNameMatches && extensionMatches : fileNameMatches
+        return extension ? (nameMatches && extensionMatches) : nameMatches
     })
 }
 
