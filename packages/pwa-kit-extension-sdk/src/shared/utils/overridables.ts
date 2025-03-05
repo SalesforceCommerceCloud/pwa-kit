@@ -114,7 +114,17 @@ export const findOverridableImports = (projectDir: string): OverridableImport[] 
                 ? processFiles(path.join(extensionPath, SRC_DIR), extensionName)
                 : []
         })
-        return [...projectImports, ...extensionImports]
+
+        const allImports = [...projectImports, ...extensionImports]
+        const uniqueImports = Array.from(
+            new Map(
+                allImports.map((imp) => [
+                    `${imp.sourceFile}:${imp.importPath}`, // Changed to exclude extension
+                    imp
+                ])
+            ).values()
+        )
+        return uniqueImports
     } catch (error) {
         console.error('Error reading package.json:', (error as Error).message)
         return projectImports
@@ -149,38 +159,25 @@ export const hasCorrespondingOverridableImport = (
     const overridesDir = path.join(projectDir, SRC_DIR, OVERRIDES_DIR)
     const appOverridesDir = path.join(projectDir, APP_DIR, OVERRIDES_DIR)
 
-    let relativePath: string
-    let extensionName = ''
+    // Determine the base directory and compute relative path
+    const baseDir = overrideFile.includes(overridesDir)
+        ? overridesDir
+        : overrideFile.includes(appOverridesDir)
+        ? appOverridesDir
+        : null
 
-    if (overrideFile.includes(overridesDir)) {
-        relativePath = path.relative(overridesDir, overrideFile)
-        const parts = relativePath.split(path.sep)
-        if (parts.length > 0) {
-            extensionName = parts[0]
-            relativePath = parts.slice(1).join(path.sep)
-        }
-    } else if (overrideFile.includes(appOverridesDir)) {
-        relativePath = path.relative(appOverridesDir, overrideFile)
-        const parts = relativePath.split(path.sep)
-        if (parts.length > 0) {
-            extensionName = parts[0]
-            relativePath = parts.slice(1).join(path.sep)
-        }
-    } else {
-        // If the file is not in either overrides directory, it can't be an override
-        return false
-    }
+    // If the file is not in either overrides directory, it can't be an override
+    if (!baseDir) return false
 
-    // Remove file extension
-    relativePath = relativePath.replace(/\.[^/.]+$/, '')
+    // Extract extension name and relative path using destructuring
+    const relativePath = path.relative(baseDir, overrideFile)
+    const [extensionName = '', ...rest] = relativePath.split(path.sep)
+    const cleanPath = rest.join(path.sep).replace(/\.[^/.]+$/, '')
 
     // Check if any overridable import matches this path
-    return overridableImports.some((imp) => {
-        const importPath = imp.importPath.startsWith('./')
-            ? imp.importPath.substring(2)
-            : imp.importPath
-        return importPath.includes(relativePath)
-    })
+    return overridableImports.some(({importPath}) =>
+        importPath.replace(/^\.\//, '').includes(cleanPath)
+    )
 }
 
 /**

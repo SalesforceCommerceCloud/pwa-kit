@@ -19,16 +19,13 @@ const {
 } = require('@salesforce/pwa-kit-extension-sdk/configs/babel/utils')
 const {
     getConfiguredExtensions,
-    validateExtensionDependencies
-} = require('@salesforce/pwa-kit-extension-sdk/shared/utils')
-
-const {
+    validateExtensionDependencies,
     findOverridableImports,
     findOverrideFiles,
     hasCorrespondingOverridableImport,
     groupImportsBySourceFile,
     getPackageNameFromDir
-} = require('@salesforce/pwa-kit-extension-sdk/shared/utils/overridables')
+} = require('@salesforce/pwa-kit-extension-sdk/shared/utils')
 
 // Scripts in ./bin have never gone through babel, so we
 // don't have a good pattern for mixing compiled/un-compiled
