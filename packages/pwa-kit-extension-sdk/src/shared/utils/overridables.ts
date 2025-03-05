@@ -84,9 +84,7 @@ export const findOverridableImports = (projectDir: string): OverridableImport[] 
         const extensions = getConfiguredExtensions(packageJson.mobify)
         const extensionImports = extensions.flatMap(([extensionName]) => {
             const extensionPath = resolveExtensionPath(extensionName, projectDir)
-            return extensionPath
-                ? processFiles(path.join(extensionPath, SRC), extensionName)
-                : []
+            return extensionPath ? processFiles(path.join(extensionPath, SRC), extensionName) : []
         })
 
         const allImports = [...projectImports, ...extensionImports]
@@ -112,10 +110,7 @@ export const findOverridableImports = (projectDir: string): OverridableImport[] 
  * @returns {string[]} Array of override file paths.
  */
 export const findOverrideFiles = (projectDir: string, inAppDir = false): string[] =>
-    findFiles(
-        path.join(projectDir, inAppDir ? APP : SRC, OVERRIDES),
-        SUPPORTED_FILE_EXTENSIONS
-    )
+    findFiles(path.join(projectDir, inAppDir ? APP : SRC, OVERRIDES), SUPPORTED_FILE_EXTENSIONS)
 
 /**
  * Checks if an override file has a corresponding overridable import.
