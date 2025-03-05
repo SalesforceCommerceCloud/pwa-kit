@@ -138,15 +138,36 @@ export const hasCorrespondingOverridableImport = (
     // If the file is not in either overrides directory, it can't be an override
     if (!baseDir) return false
 
-    // Extract extension name and relative path using destructuring
+    // Get the relative path from the overrides directory
     const relativePath = path.relative(baseDir, overrideFile)
-    const [extensionName = '', ...rest] = relativePath.split(path.sep)
-    const cleanPath = rest.join(path.sep).replace(/\.[^/.]+$/, '')
-
-    // Check if any overridable import matches this path
-    return overridableImports.some(({importPath}) =>
-        importPath.replace(/^\.\//, '').includes(cleanPath)
-    )
+    
+    // Split the path into parts to extract extension name and component path
+    const pathParts = relativePath.split(path.sep)
+    
+    // The first part should be the extension name
+    const extensionName = pathParts[0]
+    
+    // Extract the file name without extension
+    const fileName = path.basename(overrideFile).replace(/\.[^/.]+$/, '')
+    
+    // For each overridable import, check if it matches our override file
+    return overridableImports.some(({importPath, extension}) => {
+        // Clean up the import path (remove ./ prefix if present)
+        const cleanImportPath = importPath.replace(/^\.\//, '')
+        
+        // Get the file name from the import path
+        const importFileName = path.basename(cleanImportPath)
+        
+        // Check if the file name matches
+        const fileNameMatches = importFileName === fileName
+        
+        // Check if the extension matches (if provided)
+        const extensionMatches = extension ? extension.includes(extensionName) : false
+        
+        // For extension imports, we need both the file name and extension to match
+        // For non-extension imports, just the file name needs to match
+        return extension ? (fileNameMatches && extensionMatches) : fileNameMatches
+    })
 }
 
 /**
