@@ -10,8 +10,6 @@ import path from 'path'
 import glob from 'glob'
 import {getConfiguredExtensions} from './helpers'
 import {OVERRIDES, NODE_MODULES, APP, SRC} from './resolver'
-import {buildCandidatePaths} from './resolver'
-import resolve from 'resolve'
 
 import {OverridableImport} from '../../types'
 
@@ -143,7 +141,7 @@ export const hasCorrespondingOverridableImport = (
     // Get the relative path from the overrides directory
     const relativePath = path.relative(baseDir, overrideFile)
     const [extensionName, ...pathParts] = relativePath.split(path.sep)
-    
+
     // Get the component name without extension
     const componentName = path.basename(overrideFile).replace(/\.[^/.]+$/, '')
 
@@ -151,12 +149,12 @@ export const hasCorrespondingOverridableImport = (
     return overridableImports.some(({importPath, extension}) => {
         // Clean up the import path
         const importName = path.basename(importPath.replace(/^\.\//, ''))
-        
+
         // Check if both the component name and extension match
         const nameMatches = importName === componentName
         const extensionMatches = extension ? extension.includes(extensionName) : false
 
-        return extension ? (nameMatches && extensionMatches) : nameMatches
+        return extension ? nameMatches && extensionMatches : nameMatches
     })
 }
 
