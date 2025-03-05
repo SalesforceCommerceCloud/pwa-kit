@@ -36,3 +36,12 @@ export type BuildCandidatePathsOptions = {
     projectDir: string
     extensionEntries: ApplicationExtensionEntry[]
 }
+
+/**
+ * Represents an overridable import
+ */
+export interface OverridableImport {
+    importPath: string
+    sourceFile: string
+    extension?: string
+}

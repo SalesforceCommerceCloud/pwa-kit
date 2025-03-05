@@ -493,8 +493,7 @@ const main = async () => {
                 }
 
                 const imports = findOverridableImports(projectDir)
-
-                if (imports.length === 0) {
+                if (!imports.length) {
                     console.log(
                         chalk.yellow(
                             'No overridable imports found in this project or its extensions.'
@@ -515,20 +514,17 @@ const main = async () => {
 
                     console.log(`\n📄 ${sourceDisplay}:`)
                     paths.forEach((importPath) => {
-                        const sourceDir = p.dirname(p.join(projectDir, sourceFile))
-                        let fullPath = importPath
-
-                        if (importPath.startsWith('./') || importPath.startsWith('../')) {
-                            fullPath = p.normalize(p.join(p.dirname(sourceFile), importPath))
-                        }
-
+                        const fullPath =
+                            importPath.startsWith('./') || importPath.startsWith('../')
+                                ? p.normalize(p.join(p.dirname(sourceFile), importPath))
+                                : importPath
                         console.log(`  - ${importPath} ${chalk.gray(`(${fullPath})`)}`)
                     })
                 })
 
                 console.log(chalk.bold('\n✅ Scan complete!\n'))
-            } catch (err) {
-                error(`Failed to list overridable files: ${err.message}`)
+            } catch ({message}) {
+                error(`Failed to list overridable files: ${message}`)
             }
         })
 
@@ -541,11 +537,12 @@ const main = async () => {
                 console.log(chalk.bold('\n🔍 Checking override files...\n'))
 
                 const imports = findOverridableImports(projectDir)
-                const overrideFiles = findOverrideFiles(projectDir)
-                const appOverrideFiles = findOverrideFiles(projectDir, true)
-                const allOverrideFiles = [...overrideFiles, ...appOverrideFiles]
+                const allOverrideFiles = [
+                    ...findOverrideFiles(projectDir),
+                    ...findOverrideFiles(projectDir, true)
+                ]
 
-                if (allOverrideFiles.length === 0) {
+                if (!allOverrideFiles.length) {
                     console.log(chalk.yellow('No override files found.'))
                     return
                 }
@@ -554,26 +551,23 @@ const main = async () => {
                     (file) => !hasCorrespondingOverridableImport(file, imports, projectDir)
                 )
 
-                if (unusedOverrides.length > 0) {
-                    console.log(
-                        chalk.yellow(
-                            `Found ${unusedOverrides.length} override files that don't match any overridable imports:`
-                        )
-                    )
-                    unusedOverrides.forEach((file) => {
-                        console.log(`  - ${p.relative(projectDir, file)}`)
-                    })
-                } else {
-                    console.log(
-                        chalk.green(
-                            `All ${allOverrideFiles.length} override files correspond to overridable imports.`
-                        )
-                    )
-                }
+                console.log(
+                    unusedOverrides.length
+                        ? chalk.yellow(
+                              `Found ${unusedOverrides.length} override files that don't match any overridable imports:`
+                          )
+                        : chalk.green(
+                              `All ${allOverrideFiles.length} override files correspond to overridable imports.`
+                          )
+                )
+
+                unusedOverrides.forEach((file) =>
+                    console.log(`  - ${p.relative(projectDir, file)}`)
+                )
 
                 console.log(chalk.bold('\n✅ Check complete!\n'))
-            } catch (err) {
-                error(`Failed to check override files: ${err.message}`)
+            } catch ({message}) {
+                error(`Failed to check override files: ${message}`)
             }
         })
 

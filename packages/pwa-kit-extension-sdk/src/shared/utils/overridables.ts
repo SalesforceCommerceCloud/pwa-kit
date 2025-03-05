@@ -9,22 +9,13 @@ import fs from 'fs'
 import path from 'path'
 import glob from 'glob'
 import {getConfiguredExtensions} from './helpers'
+import {OVERRIDES, NODE_MODULES, APP, SRC} from './resolver'
 
-// Constants
+import {OverridableImport} from '../../types'
+
 export const IMPORT_REGEX =
     /(?:import\s+(?:[\w*\s{},]*)\s+from\s+['"]overridable!(.+?)['"]|import\s*\(\s*['"]overridable!(.+?)['"]\s*\))/g
 export const SUPPORTED_FILE_EXTENSIONS = ['.js', '.jsx', '.ts', '.tsx']
-export const OVERRIDES_DIR = 'overrides'
-export const SRC_DIR = 'src'
-export const APP_DIR = 'app'
-export const NODE_MODULES = 'node_modules'
-
-// Interfaces
-export interface OverridableImport {
-    importPath: string
-    sourceFile: string
-    extension?: string
-}
 
 /**
  * Finds all files with the specified extensions in a directory.
@@ -64,7 +55,7 @@ export const extractOverridableImports = (
  */
 export const resolveExtensionPath = (extensionName: string, projectDir: string): string | null => {
     const paths = [
-        path.join(projectDir, APP_DIR, 'application-extensions', extensionName.replace(/\//g, '_')),
+        path.join(projectDir, APP, 'application-extensions', extensionName.replace(/\//g, '_')),
         path.join(projectDir, NODE_MODULES, extensionName)
     ]
     return paths.find(fs.existsSync) ?? null
@@ -82,8 +73,8 @@ export const findOverridableImports = (projectDir: string): OverridableImport[] 
         )
 
     const projectImports = [
-        ...processFiles(path.join(projectDir, SRC_DIR)),
-        ...processFiles(path.join(projectDir, APP_DIR))
+        ...processFiles(path.join(projectDir, SRC)),
+        ...processFiles(path.join(projectDir, APP))
     ]
 
     try {
@@ -94,7 +85,7 @@ export const findOverridableImports = (projectDir: string): OverridableImport[] 
         const extensionImports = extensions.flatMap(([extensionName]) => {
             const extensionPath = resolveExtensionPath(extensionName, projectDir)
             return extensionPath
-                ? processFiles(path.join(extensionPath, SRC_DIR), extensionName)
+                ? processFiles(path.join(extensionPath, SRC), extensionName)
                 : []
         })
 
@@ -122,7 +113,7 @@ export const findOverridableImports = (projectDir: string): OverridableImport[] 
  */
 export const findOverrideFiles = (projectDir: string, inAppDir = false): string[] =>
     findFiles(
-        path.join(projectDir, inAppDir ? APP_DIR : SRC_DIR, OVERRIDES_DIR),
+        path.join(projectDir, inAppDir ? APP : SRC, OVERRIDES),
         SUPPORTED_FILE_EXTENSIONS
     )
 
@@ -139,8 +130,8 @@ export const hasCorrespondingOverridableImport = (
     projectDir: string
 ): boolean => {
     // Extract the extension name and relative path from the override file
-    const overridesDir = path.join(projectDir, SRC_DIR, OVERRIDES_DIR)
-    const appOverridesDir = path.join(projectDir, APP_DIR, OVERRIDES_DIR)
+    const overridesDir = path.join(projectDir, SRC, OVERRIDES)
+    const appOverridesDir = path.join(projectDir, APP, OVERRIDES)
 
     // Determine the base directory and compute relative path
     const baseDir = overrideFile.includes(overridesDir)
