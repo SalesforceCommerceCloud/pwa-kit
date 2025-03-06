@@ -4,18 +4,86 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-
-import fs from 'fs'
 import path from 'path'
+import fs from 'fs'
 import glob from 'glob'
 import {getConfiguredExtensions} from './helpers'
 import {OVERRIDES, NODE_MODULES, APP, SRC} from './resolver'
-
 import {OverridableImport} from '../../types'
 
+// Constants
+export const EXTENSION_PACKAGE_PREFIX = 'extension-'
+export const EXTENSION_PACKAGE_NAMESPACE = '@salesforce'
 export const IMPORT_REGEX =
     /(?:import\s+(?:[\w*\s{},]*)\s+from\s+['"]overridable!(.+?)['"]|import\s*\(\s*['"]overridable!(.+?)['"]\s*\))/g
 export const SUPPORTED_FILE_EXTENSIONS = ['.js', '.jsx', '.ts', '.tsx']
+export const OVERRIDABLE_FILE_NAME = '.force_overrides'
+
+/**
+ * Extracts the component name and extension from an override file path
+ */
+export const parseOverridePath = (overrideFile: string, projectDir: string) => {
+    const overridesDir = path.join(projectDir, SRC, OVERRIDES)
+    const appOverridesDir = path.join(projectDir, APP, OVERRIDES)
+
+    // Determine the base directory and compute relative path
+    const baseDir = overrideFile.includes(overridesDir)
+        ? overridesDir
+        : overrideFile.includes(appOverridesDir)
+        ? appOverridesDir
+        : null
+
+    if (!baseDir) return null
+
+    const relativePath = path.relative(baseDir, overrideFile)
+    const [extensionName, ...pathParts] = relativePath.split(path.sep)
+    const componentPath = pathParts.join(path.sep).replace(/\.[^/.]+$/, '')
+    const componentName = path.basename(componentPath)
+
+    return {
+        extensionName,
+        componentName,
+        componentPath
+    }
+}
+
+/**
+ * Checks if a file path belongs to an extension
+ */
+export const isExtensionFile = (filePath: string): boolean => {
+    return filePath.includes(`${path.sep}${EXTENSION_PACKAGE_PREFIX}`)
+}
+
+/**
+ * Gets overridable paths from the .force_overrides file
+ */
+export const getOverridablePaths = (projectDir: string): string[] => {
+    try {
+        return fs
+            .readFileSync(path.join(projectDir, OVERRIDABLE_FILE_NAME), 'utf8')
+            .split(/\r?\n/)
+            .filter((line) => !line.startsWith('//') && line.trim() !== '')
+    } catch {
+        return []
+    }
+}
+
+/**
+ * Normalizes a source path for comparison
+ */
+export const normalizeSourcePath = (sourcePath: string, isMonoRepo = false): string => {
+    // Split on node_modules or packages (for monorepo) and take the last part
+    const parts = sourcePath.split(path.sep + (isMonoRepo ? 'packages' : NODE_MODULES) + path.sep)
+    const lastPart = parts[parts.length - 1] || ''
+
+    // Convert to POSIX path
+    const posixPath = lastPart.replace(/\\/g, '/')
+
+    // Add standard prefix
+    return `./${NODE_MODULES}/${
+        isMonoRepo ? EXTENSION_PACKAGE_NAMESPACE + path.posix.sep : ''
+    }${posixPath}`
+}
 
 /**
  * Finds all files with the specified extensions in a directory.
@@ -124,28 +192,11 @@ export const hasCorrespondingOverridableImport = (
     overridableImports: OverridableImport[],
     projectDir: string
 ): boolean => {
-    // Extract the extension name and relative path from the override file
-    const overridesDir = path.join(projectDir, SRC, OVERRIDES)
-    const appOverridesDir = path.join(projectDir, APP, OVERRIDES)
+    const parsed = parseOverridePath(overrideFile, projectDir)
+    if (!parsed) return false
 
-    // Determine the base directory and compute relative path
-    const baseDir = overrideFile.includes(overridesDir)
-        ? overridesDir
-        : overrideFile.includes(appOverridesDir)
-        ? appOverridesDir
-        : null
+    const {extensionName, componentName} = parsed
 
-    // If the file is not in either overrides directory, it can't be an override
-    if (!baseDir) return false
-
-    // Get the relative path from the overrides directory
-    const relativePath = path.relative(baseDir, overrideFile)
-    const [extensionName, ...pathParts] = relativePath.split(path.sep)
-
-    // Get the component name without extension
-    const componentName = path.basename(overrideFile).replace(/\.[^/.]+$/, '')
-
-    // Check if any overridable import matches this override
     return overridableImports.some(({importPath, extension}) => {
         // Clean up the import path
         const importName = path.basename(importPath.replace(/^\.\//, ''))
