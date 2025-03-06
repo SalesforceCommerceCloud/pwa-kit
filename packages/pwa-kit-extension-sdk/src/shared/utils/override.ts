@@ -31,7 +31,8 @@ export const parseOverridePath = (overrideFile: string, projectDir: string) => {
     if (!baseDir) return null
 
     const [extensionName, ...pathParts] = path.relative(baseDir, overrideFile).split(path.sep)
-    const componentPath = pathParts.join(path.sep).replace(/\.[^/.]+$/, '')
+    // Use path.posix.join for cross-platform compatibility with forward slashes
+    const componentPath = path.posix.join(...pathParts).replace(/\.[^/.]+$/, '')
 
     return {
         extensionName,
@@ -217,7 +218,8 @@ export const groupImportsBySourceFile = (
     projectDir: string
 ): Record<string, {paths: string[]; extension?: string}> =>
     imports.reduce((acc, imp) => {
-        const relativePath = path.relative(projectDir, imp.sourceFile)
+        // Use path.posix for cross-platform compatibility with forward slashes
+        const relativePath = path.posix.normalize(path.relative(projectDir, imp.sourceFile))
         if (!acc[relativePath]) {
             acc[relativePath] = {
                 paths: [],

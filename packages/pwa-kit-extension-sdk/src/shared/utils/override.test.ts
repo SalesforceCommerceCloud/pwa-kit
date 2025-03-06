@@ -35,7 +35,7 @@ describe('overrideUtils', () => {
             const expected = {
                 extensionName: 'ext1',
                 componentName: 'Button',
-                componentPath: 'components/Button'
+                componentPath: path.posix.join('components', 'Button')
             }
             const result = overrideUtils.parseOverridePath(overrideFile, mockProjectDir)
             expect(result).toEqual(expected)
@@ -53,7 +53,7 @@ describe('overrideUtils', () => {
             const expected = {
                 extensionName: 'ext2',
                 componentName: 'Home',
-                componentPath: 'pages/Home'
+                componentPath: path.posix.join('pages', 'Home')
             }
             const result = overrideUtils.parseOverridePath(overrideFile, mockProjectDir)
             expect(result).toEqual(expected)
@@ -235,8 +235,10 @@ describe('overrideUtils', () => {
 
             const result = overrideUtils.groupImportsBySourceFile(imports, mockProjectDir)
             expect(Object.keys(result)).toHaveLength(2)
-            expect(result['src/file1.ts'].paths).toEqual(['./Button', './Input'])
-            expect(result['src/file2.ts'].paths).toEqual(['./Card'])
+            const file1Key = path.posix.join('src', 'file1.ts')
+            const file2Key = path.posix.join('src', 'file2.ts')
+            expect(result[file1Key].paths).toEqual(['./Button', './Input'])
+            expect(result[file2Key].paths).toEqual(['./Card'])
         })
     })
 })
