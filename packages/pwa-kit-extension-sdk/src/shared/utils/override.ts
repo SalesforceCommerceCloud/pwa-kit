@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import path from 'path'
-import fs from 'fs'
+import fse from 'fs-extra'
 import glob from 'glob'
 import {getConfiguredExtensions} from './helpers'
 import {OVERRIDES, NODE_MODULES, APP, SRC} from './resolver'
@@ -59,7 +59,7 @@ export const isExtensionFile = (filePath: string): boolean => {
  */
 export const getOverridablePaths = (projectDir: string): string[] => {
     try {
-        return fs
+        return fse
             .readFileSync(path.join(projectDir, OVERRIDABLE_FILE_NAME), 'utf8')
             .split(/\r?\n/)
             .filter((line) => !line.startsWith('//') && line.trim() !== '')
@@ -72,14 +72,18 @@ export const getOverridablePaths = (projectDir: string): string[] => {
  * Normalizes a source path for comparison
  */
 export const normalizeSourcePath = (sourcePath: string, isMonoRepo = false): string => {
+    // We are only concerned with the source path relative to the extension package namespace.
     // Split on node_modules or packages (for monorepo) and take the last part
     const parts = sourcePath.split(path.sep + (isMonoRepo ? 'packages' : NODE_MODULES) + path.sep)
     const lastPart = parts[parts.length - 1] || ''
 
-    // Convert to POSIX path
+    // At this point the path is either POSIX or windows, we need to normalize it to POSIX.
     const posixPath = lastPart.replace(/\\/g, '/')
 
     // Add standard prefix
+    // NOTE:
+    // For now we are going to make the assumption that all the extension projects in our mono repo
+    // are part of the `@salesforce` namespace, this is pretty safe. So we are going to add the namespace.
     return `./${NODE_MODULES}/${
         isMonoRepo ? EXTENSION_PACKAGE_NAMESPACE + path.posix.sep : ''
     }${posixPath}`
@@ -92,7 +96,7 @@ export const normalizeSourcePath = (sourcePath: string, isMonoRepo = false): str
  * @returns {string[]} Array of absolute file paths matching the criteria.
  */
 export const findFiles = (dir: string, extensions: string[]): string[] =>
-    fs.existsSync(dir)
+    fse.existsSync(dir)
         ? glob.sync(`${dir}/**/*+(${extensions.join('|')})`, {nodir: true, absolute: true})
         : []
 
@@ -106,7 +110,7 @@ export const extractOverridableImports = (
     filePath: string,
     extensionName?: string
 ): OverridableImport[] => {
-    const content = fs.readFileSync(filePath, 'utf8')
+    const content = fse.readFileSync(filePath, 'utf8')
     return Array.from(content.matchAll(IMPORT_REGEX), (match) => ({
         // The import path could be in either capture group depending on the import style
         importPath: match[1] || match[2],
@@ -126,7 +130,7 @@ export const resolveExtensionPath = (extensionName: string, projectDir: string):
         path.join(projectDir, APP, 'application-extensions', extensionName.replace(/\//g, '_')),
         path.join(projectDir, NODE_MODULES, extensionName)
     ]
-    return paths.find(fs.existsSync) ?? null
+    return paths.find(fse.existsSync) ?? null
 }
 
 /**
@@ -147,7 +151,7 @@ export const findOverridableImports = (projectDir: string): OverridableImport[] 
 
     try {
         const packageJson = JSON.parse(
-            fs.readFileSync(path.join(projectDir, 'package.json'), 'utf8')
+            fse.readFileSync(path.join(projectDir, 'package.json'), 'utf8')
         )
         const extensions = getConfiguredExtensions(packageJson.mobify)
         const extensionImports = extensions.flatMap(([extensionName]) => {

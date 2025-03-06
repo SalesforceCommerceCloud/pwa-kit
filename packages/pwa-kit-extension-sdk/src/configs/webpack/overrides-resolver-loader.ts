@@ -145,13 +145,23 @@ export const validateOverrideSource = (source: string, options: any = {}) => {
     const isSetupFile = SETUP_FILE_REGEX.test(source)
     const targetCache = OVERRIDABLE_CACHE[target as keyof typeof OVERRIDABLE_CACHE]
 
+    // Exit early if we have:
+    // 1. Processed this file already.
+    // 2. The file is not an extension file.
+    // 3. The file is an extension setup file.
     if (targetCache.includes(source) || !isExtensionFile(source) || isSetupFile) {
         return false
     }
 
+    // Because our webpack configuration is setup to resolve symlinks, we need to normalize the source path because
+    // the source path passed to the loaded is not representative of what you would see in a generated project (e.g.
+    // it doesn't resolve to being in the node_modules folder).
     const normalizedSource = normalizeSourcePath(source, isMonoRepo)
+
+    // Check if the normalized source is in the list of overridables.
     const hasOverride = overridables.includes(normalizedSource)
 
+    // If we have an override, add it to the cache so we don't process it again.
     if (hasOverride) {
         targetCache.push(source)
     }
