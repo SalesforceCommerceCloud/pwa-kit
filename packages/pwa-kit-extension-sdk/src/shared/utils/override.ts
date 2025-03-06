@@ -30,9 +30,10 @@ export const parseOverridePath = (overrideFile: string, projectDir: string) => {
 
     if (!baseDir) return null
 
-    const [extensionName, ...pathParts] = path.relative(baseDir, overrideFile).split(path.sep)
-    // Use path.posix.join for cross-platform compatibility with forward slashes
-    const componentPath = path.posix.join(...pathParts).replace(/\.[^/.]+$/, '')
+    // Normalize paths to use forward slashes for consistent parsing
+    const normalizedPath = path.relative(baseDir, overrideFile).split(path.sep).join('/')
+    const [extensionName, ...pathParts] = normalizedPath.split('/')
+    const componentPath = pathParts.join('/').replace(/\.[^/.]+$/, '')
 
     return {
         extensionName,
@@ -196,12 +197,14 @@ export const hasCorrespondingOverridableImport = (
     const {extensionName, componentName} = parsed
 
     return overridableImports.some(({importPath, extension}) => {
-        // Clean up the import path
+        // Clean up and normalize the import path
         const importName = path.basename(importPath.replace(/^\.\//, ''))
 
         // Check if both the component name and extension match
         const nameMatches = importName === componentName
-        const extensionMatches = extension ? extension.includes(extensionName) : false
+        // Handle scoped package names in extension paths
+        const normalizedExtensionName = extensionName.replace(/^@[^/]+\//, '')
+        const extensionMatches = extension ? extension.includes(normalizedExtensionName) : false
 
         return extension ? nameMatches && extensionMatches : nameMatches
     })
@@ -218,8 +221,12 @@ export const groupImportsBySourceFile = (
     projectDir: string
 ): Record<string, {paths: string[]; extension?: string}> =>
     imports.reduce((acc, imp) => {
-        // Use path.posix for cross-platform compatibility with forward slashes
-        const relativePath = path.posix.normalize(path.relative(projectDir, imp.sourceFile))
+        // Convert Windows paths to POSIX paths for consistent lookup
+        const relativePath = path
+            .relative(projectDir, imp.sourceFile)
+            .split(path.sep)
+            .join(path.posix.sep)
+
         if (!acc[relativePath]) {
             acc[relativePath] = {
                 paths: [],

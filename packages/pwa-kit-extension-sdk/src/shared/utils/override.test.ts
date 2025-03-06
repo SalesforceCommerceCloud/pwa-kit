@@ -188,12 +188,41 @@ describe('overrideUtils', () => {
             {
                 importPath: './Button',
                 sourceFile: 'source.ts',
-                extension: 'ext1'
+                extension: 'extension-chakra-store-locator'
+            },
+            {
+                importPath: './heading',
+                sourceFile: 'source.ts',
+                extension: 'extension-chakra-store-locator'
             }
         ]
 
-        test('returns true for matching override', () => {
-            const overrideFile = path.join(mockProjectDir, 'src', 'overrides', 'ext1', 'Button.tsx')
+        test('returns true for matching override with scoped package name', () => {
+            const overrideFile = path.join(
+                mockProjectDir,
+                'app',
+                'overrides',
+                '@salesforce',
+                'extension-chakra-store-locator',
+                'components',
+                'heading.tsx'
+            )
+            const result = overrideUtils.hasCorrespondingOverridableImport(
+                overrideFile,
+                overridableImports,
+                mockProjectDir
+            )
+            expect(result).toBe(true)
+        })
+
+        test('returns true for matching override with simple name', () => {
+            const overrideFile = path.join(
+                mockProjectDir,
+                'src',
+                'overrides',
+                'extension-chakra-store-locator',
+                'Button.tsx'
+            )
             const result = overrideUtils.hasCorrespondingOverridableImport(
                 overrideFile,
                 overridableImports,
@@ -203,7 +232,15 @@ describe('overrideUtils', () => {
         })
 
         test('returns false for non-matching override', () => {
-            const overrideFile = path.join(mockProjectDir, 'src', 'overrides', 'ext2', 'Button.tsx')
+            const overrideFile = path.join(
+                mockProjectDir,
+                'src',
+                'overrides',
+                '@salesforce',
+                'extension-chakra-store-locator',
+                'components',
+                'list.tsx'
+            )
             const result = overrideUtils.hasCorrespondingOverridableImport(
                 overrideFile,
                 overridableImports,
@@ -215,28 +252,34 @@ describe('overrideUtils', () => {
 
     describe('groupImportsBySourceFile', () => {
         test('groups imports correctly', () => {
+            // Create paths using the native path.join for the input
+            const srcFile1 = path.join(mockProjectDir, 'src', 'file1.ts')
+            const srcFile2 = path.join(mockProjectDir, 'src', 'file2.ts')
+
             const imports = [
                 {
                     importPath: './Button',
-                    sourceFile: path.join(mockProjectDir, 'src', 'file1.ts'),
+                    sourceFile: srcFile1,
                     extension: 'ext1'
                 },
                 {
                     importPath: './Input',
-                    sourceFile: path.join(mockProjectDir, 'src', 'file1.ts'),
+                    sourceFile: srcFile1,
                     extension: 'ext1'
                 },
                 {
                     importPath: './Card',
-                    sourceFile: path.join(mockProjectDir, 'src', 'file2.ts'),
+                    sourceFile: srcFile2,
                     extension: 'ext2'
                 }
             ]
 
             const result = overrideUtils.groupImportsBySourceFile(imports, mockProjectDir)
             expect(Object.keys(result)).toHaveLength(2)
-            const file1Key = path.posix.join('src', 'file1.ts')
-            const file2Key = path.posix.join('src', 'file2.ts')
+
+            // Use the same path normalization for lookup as the implementation
+            const file1Key = 'src/file1.ts'
+            const file2Key = 'src/file2.ts'
             expect(result[file1Key].paths).toEqual(['./Button', './Input'])
             expect(result[file2Key].paths).toEqual(['./Card'])
         })
