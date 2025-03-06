@@ -23,26 +23,19 @@ export const OVERRIDABLE_FILE_NAME = '.force_overrides'
  * Extracts the component name and extension from an override file path
  */
 export const parseOverridePath = (overrideFile: string, projectDir: string) => {
-    const overridesDir = path.join(projectDir, SRC, OVERRIDES)
-    const appOverridesDir = path.join(projectDir, APP, OVERRIDES)
-
-    // Determine the base directory and compute relative path
-    const baseDir = overrideFile.includes(overridesDir)
-        ? overridesDir
-        : overrideFile.includes(appOverridesDir)
-        ? appOverridesDir
-        : null
+    const baseDir = [SRC, APP].reduce((dir, type) => {
+        const fullPath = path.join(projectDir, type, OVERRIDES)
+        return overrideFile.includes(fullPath) ? fullPath : dir
+    }, null as string | null)
 
     if (!baseDir) return null
 
-    const relativePath = path.relative(baseDir, overrideFile)
-    const [extensionName, ...pathParts] = relativePath.split(path.sep)
+    const [extensionName, ...pathParts] = path.relative(baseDir, overrideFile).split(path.sep)
     const componentPath = pathParts.join(path.sep).replace(/\.[^/.]+$/, '')
-    const componentName = path.basename(componentPath)
 
     return {
         extensionName,
-        componentName,
+        componentName: path.basename(componentPath),
         componentPath
     }
 }
