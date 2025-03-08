@@ -17,6 +17,7 @@
     "LICENSE",
     "+(configs|express|react|shared)/**/!(*.test*).{ts,js}",
     "*.{js,d.ts}",
+    "bin/**/*.js",
     "!*.test*.{js,d.ts}",
     "!test*.*",
     "!+(jest|babel).config.js",
@@ -24,6 +25,9 @@
   ],
   "publishConfig": {
     "directory": "dist"
+  },
+  "bin": {
+    "list-overrides": "./bin/list-overrides.js"
   },
   "types": "dist/index.d.ts",
   "scripts": {

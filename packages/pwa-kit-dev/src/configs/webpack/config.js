@@ -22,6 +22,7 @@ import WebpackNotifierPlugin from 'webpack-notifier'
 
 // PWA-Kit Plugins
 import ApplicationExtensionConfigPlugin from '@salesforce/pwa-kit-extension-sdk/configs/webpack/application-extensions-config-plugin'
+import OverrideStatsPlugin from '@salesforce/pwa-kit-extension-sdk/configs/webpack/override-stats-plugin'
 
 // Local Plugins
 import {sdkReplacementPlugin} from './plugins'
@@ -228,6 +229,7 @@ const baseConfig = (target) => {
                         WEBPACK_TARGET: `'${target}'`,
                         ['global.GENTLY']: false
                     }),
+                    process.env.RECORD_OVERRIDES === 'true' && new OverrideStatsPlugin(),
                     // new SharedStatePlugin(),
                     mode === development && new webpack.NoEmitOnErrorsPlugin(),
 

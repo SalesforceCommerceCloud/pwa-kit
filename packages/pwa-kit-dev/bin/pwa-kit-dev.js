@@ -21,6 +21,7 @@ const {
     getConfiguredExtensions,
     validateExtensionDependencies
 } = require('@salesforce/pwa-kit-extension-sdk/shared/utils')
+const listOverridesModule = require('@salesforce/pwa-kit-extension-sdk/bin/list-overrides')
 
 // Scripts in ./bin have never gone through babel, so we
 // don't have a good pattern for mixing compiled/un-compiled
@@ -471,6 +472,13 @@ const main = async () => {
                     args.length ? ' ' + args.join(' ') : ''
                 }`
             )
+        })
+
+    program
+        .command('list-overrides')
+        .description('List all files that can be overridden in extensions')
+        .action(() => {
+            listOverridesModule.listOverrides()
         })
 
     managedRuntimeCommand('tail-logs')
