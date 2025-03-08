@@ -5,23 +5,24 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import {LoaderContext} from 'webpack'
+import fse from 'fs-extra'
 import os from 'os'
 import path from 'path'
 import resolve from 'resolve'
 
 // Local Imports
 import {buildCandidatePaths, getPackageName, SETUP_FILE_REGEX} from '../../shared/utils'
-import {
-    IMPORT_REGEX,
-    isExtensionFile,
-    normalizeSourcePath,
-    getOverridablePaths
-} from '../../shared/utils/override'
 
 // Types
 import type {ExtendedCompiler} from './types'
 
 // Constants
+const EXTENSION_PACKAGE_PREFIX = 'extension-'
+const EXTENSION_PACKAGE_NAMESPACE = '@salesforce'
+const IMPORT_REGEX = /import\s+(?:(?:[\w*\s{},]*)\s+from\s+)?['"](\..*?)['"]/g
+const OVERRIDABLE_FILE_NAME = '.force_overrides'
+const MONO_REPO_WORKSPACE_FOLDER = 'packages'
+const NODE_MODULES_FOLDER = 'node_modules'
 const REQUIRES_REGEX = /require\(['"](\..*?)['"]\)/g
 const SRC = 'src'
 
@@ -142,6 +143,7 @@ const OverrideResolverLoader = function (this: LoaderContext<any>) {
  */
 export const validateOverrideSource = (source: string, options: any = {}) => {
     const {isMonoRepo = false, target = 'node', overridables = []} = options
+    const isExtensionFile = source.includes(`${path.sep}${EXTENSION_PACKAGE_PREFIX}`)
     const isSetupFile = SETUP_FILE_REGEX.test(source)
     const targetCache = OVERRIDABLE_CACHE[target as keyof typeof OVERRIDABLE_CACHE]
 
@@ -149,14 +151,35 @@ export const validateOverrideSource = (source: string, options: any = {}) => {
     // 1. Processed this file already.
     // 2. The file is not an extension file.
     // 3. The file is an extension setup file.
-    if (targetCache.includes(source) || !isExtensionFile(source) || isSetupFile) {
+    if (targetCache.includes(source) || !isExtensionFile || isSetupFile) {
         return false
     }
 
     // Because our webpack configuration is setup to resolve symlinks, we need to normalize the source path because
     // the source path passed to the loaded is not representative of what you would see in a generated project (e.g.
     // it doesn't resolve to being in the node_modules folder).
-    const normalizedSource = normalizeSourcePath(source, isMonoRepo)
+    let normalizedSource = ''
+
+    // We are only concerned with the source path relative to the extension package namespace.
+    normalizedSource = `${
+        source
+            .split(
+                `${path.sep}${isMonoRepo ? MONO_REPO_WORKSPACE_FOLDER : NODE_MODULES_FOLDER}${
+                    path.sep
+                }`
+            )
+            .pop() ?? ''
+    }`
+
+    // At this point the path is either POSIX or windows, we need to normalize it to POSIX.
+    normalizedSource = normalizedSource.replace(/\\/g, '/')
+
+    // NOTE:
+    // For now we are going to make the assumption that all the extension projects in our mono repo
+    // are part of the `@salesforce` namespace, this is pretty safe. So we are going to add the namespace.
+    normalizedSource = `./${NODE_MODULES_FOLDER}/${
+        isMonoRepo ? EXTENSION_PACKAGE_NAMESPACE + path.posix.sep : ''
+    }${normalizedSource}`
 
     // Check if the normalized source is in the list of overridables.
     const hasOverride = overridables.includes(normalizedSource)
@@ -187,7 +210,10 @@ export const ruleForOverrideResolver = (options: any = {}) => {
     let overridables: string[] = []
 
     try {
-        overridables = getOverridablePaths(projectDir)
+        overridables = fse
+            .readFileSync(path.join(projectDir, OVERRIDABLE_FILE_NAME), 'utf8')
+            .split(/\r?\n/)
+            .filter((line) => !line.startsWith('//'))
     } catch (e) {
         // If where is no .force_overrides file, we can safely return null.
         return null

@@ -9,4 +9,3 @@
 export * from './extensibility'
 export * from './helpers'
 export * from './resolver'
-export * from './override'

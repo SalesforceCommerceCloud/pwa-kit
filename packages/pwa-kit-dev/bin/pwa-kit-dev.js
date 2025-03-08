@@ -19,12 +19,7 @@ const {
 } = require('@salesforce/pwa-kit-extension-sdk/configs/babel/utils')
 const {
     getConfiguredExtensions,
-    validateExtensionDependencies,
-    findOverridableImports,
-    findOverrideFiles,
-    hasCorrespondingOverridableImport,
-    groupImportsBySourceFile,
-    getPackageName
+    validateExtensionDependencies
 } = require('@salesforce/pwa-kit-extension-sdk/shared/utils')
 
 // Scripts in ./bin have never gone through babel, so we
@@ -476,123 +471,6 @@ const main = async () => {
                     args.length ? ' ' + args.join(' ') : ''
                 }`
             )
-        })
-
-    program
-        .command('list-overridables')
-        .description('list all files that can be overridden')
-        .action(async () => {
-            try {
-                const projectDir = process.cwd()
-                console.log(chalk.bold('\n🔍 Scanning for overridable files...\n'))
-
-                const packageName = getPackageName(projectDir, {})
-                if (!packageName) {
-                    error('Could not determine package name. Exiting.')
-                    return
-                }
-
-                const imports = findOverridableImports(projectDir)
-                if (!imports.length) {
-                    console.log(
-                        chalk.yellow(
-                            'No overridable imports found in this project or its extensions.'
-                        )
-                    )
-                    return
-                }
-
-                console.log(chalk.green(`Found ${imports.length} overridable imports:`))
-                const groupedImports = groupImportsBySourceFile(imports, projectDir)
-
-                Object.entries(groupedImports).forEach(([sourceFile, {paths, extension}]) => {
-                    const sourceDisplay = extension
-                        ? `${chalk.cyan(sourceFile)} ${chalk.yellow(
-                              `(from extension: ${extension})`
-                          )}`
-                        : chalk.cyan(sourceFile)
-
-                    console.log(`\n📄 ${sourceDisplay}:`)
-                    paths.forEach((importPath) => {
-                        const fullPath =
-                            importPath.startsWith('./') || importPath.startsWith('../')
-                                ? p.normalize(p.join(p.dirname(sourceFile), importPath))
-                                : importPath
-                        console.log(`  - ${importPath} ${chalk.gray(`(${fullPath})`)}`)
-                    })
-                })
-
-                console.log(chalk.bold('\n✅ Scan complete!\n'))
-            } catch ({message}) {
-                error(`Failed to list overridable files: ${message}`)
-            }
-        })
-
-    program
-        .command('check-overrides')
-        .description('check for issues in override files')
-        .action(async () => {
-            try {
-                const projectDir = process.cwd()
-                console.log(chalk.bold('\n🔍 Checking override files...\n'))
-
-                const imports = findOverridableImports(projectDir)
-                const allOverrideFiles = [
-                    ...findOverrideFiles(projectDir),
-                    ...findOverrideFiles(projectDir, true)
-                ]
-
-                if (!allOverrideFiles.length) {
-                    console.log(chalk.yellow('No override files found.'))
-                    return
-                }
-
-                // Separate override files into matched and unmatched using array methods
-                const {matchedOverrides, unmatchedOverrides} = allOverrideFiles.reduce(
-                    (acc, file) => {
-                        const key = hasCorrespondingOverridableImport(file, imports, projectDir)
-                            ? 'matchedOverrides'
-                            : 'unmatchedOverrides'
-                        acc[key].push(file)
-                        return acc
-                    },
-                    {matchedOverrides: [], unmatchedOverrides: []}
-                )
-
-                // Report on matched overrides using template literals
-                console.log(
-                    matchedOverrides.length
-                        ? chalk.green(
-                              `Found ${matchedOverrides.length} override files that match overridable imports:`
-                          )
-                        : chalk.yellow('No override files match any overridable imports.')
-                )
-
-                matchedOverrides.forEach((file) =>
-                    console.log(`  - ${chalk.cyan(p.relative(projectDir, file))}`)
-                )
-
-                console.log('')
-
-                // Report on unmatched overrides using template literals
-                console.log(
-                    unmatchedOverrides.length
-                        ? chalk.yellow(
-                              `Found ${unmatchedOverrides.length} override files that don't match any overridable imports:`
-                          )
-                        : chalk.green(
-                              `All ${allOverrideFiles.length} override files correspond to overridable imports.`
-                          )
-                )
-
-                unmatchedOverrides.forEach((file) =>
-                    console.log(`  - ${p.relative(projectDir, file)}`)
-                )
-
-                console.log(chalk.bold('\n✅ Check complete!\n'))
-            } catch ({message}) {
-                error(`Failed to check override files: ${message}`)
-            }
         })
 
     managedRuntimeCommand('tail-logs')

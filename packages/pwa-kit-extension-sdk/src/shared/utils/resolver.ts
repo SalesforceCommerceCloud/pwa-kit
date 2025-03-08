@@ -16,10 +16,10 @@ import {expand} from './index'
 import {BuildCandidatePathsOptions} from '../../types'
 
 // TODO: Should this be in a constants folder?
-export const NODE_MODULES = 'node_modules'
-export const OVERRIDES = 'overrides'
-export const SRC = 'src'
-export const APP = 'app'
+const NODE_MODULES = 'node_modules'
+const OVERRIDES = 'overrides'
+const SRC = 'src'
+const APP = 'app'
 
 /**
  * Returns the pacakge name from the `package.json` at the provided location.
