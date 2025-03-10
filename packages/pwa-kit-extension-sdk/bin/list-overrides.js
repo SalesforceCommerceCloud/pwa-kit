@@ -5,6 +5,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
+/* eslint-disable @typescript-eslint/no-var-requires */
 const fs = require('fs')
 const path = require('path')
 const chalk = require('chalk')
@@ -36,7 +37,7 @@ const getAllFiles = (dir, fileList = []) => {
 
 /**
  * Reads the overrides stats file and processes the data
- * @returns {Object} Object containing overridable files and stats data
+ * @returns {StatsData} Object containing overridable files and stats data
  */
 const readOverrideStats = () => {
     const statsPath = path.join(process.cwd(), 'build', 'overrides-stats.json')
@@ -68,13 +69,13 @@ const readOverrideStats = () => {
 
 /**
  * Checks for unused override files in the overrides directory
- * @param {Object} stats - Stats data from readOverrideStats
+ * @param {StatsData} stats - Stats data from readOverrideStats
  */
 const checkUnusedOverrides = ({statsData}) => {
     const overridesDir = path.join(process.cwd(), 'app', 'overrides')
 
+    // No overrides directory, nothing to check
     if (!fs.existsSync(overridesDir)) {
-        // No overrides directory, nothing to check
         return
     }
 
