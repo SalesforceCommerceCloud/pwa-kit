@@ -28,7 +28,7 @@ export const useProductViewModal = (initialProduct) => {
     const [product, setProduct] = useState(initialProduct)
     const variant = useVariant(product)
 
-    const {data: currentProduct, isFetching} = useProduct(
+    const {data: currentProduct, isFetching, isError} = useProduct(
         {parameters: {id: (variant || product)?.productId}},
         {
             placeholderData: initialProduct,
@@ -42,12 +42,6 @@ export const useProductViewModal = (initialProduct) => {
                     }
                 }
                 return data
-            },
-            onError: () => {
-                toast({
-                    title: intl.formatMessage(API_ERROR_MESSAGE),
-                    status: 'error'
-                })
             }
         }
     )
@@ -55,6 +49,15 @@ export const useProductViewModal = (initialProduct) => {
     useEffect(() => {
         if (currentProduct) setProduct(currentProduct)
     }, [currentProduct])
+
+    useEffect(() => {
+        if (isError) {
+            toast({
+                title: intl.formatMessage(API_ERROR_MESSAGE),
+                status: 'error'
+            })
+        }
+    }, [isError, toast, intl])
 
     const cleanUpVariantParams = () => {
         const paramToRemove = [...(product?.variationAttributes?.map(({id}) => id) ?? []), 'pid']
