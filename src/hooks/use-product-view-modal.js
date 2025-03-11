@@ -57,7 +57,7 @@ export const useProductViewModal = (initialProduct) => {
                 status: 'error'
             })
         }
-    }, [isError, toast, intl])
+    }, [isError])
 
     const cleanUpVariantParams = () => {
         const paramToRemove = [...(product?.variationAttributes?.map(({id}) => id) ?? []), 'pid']
