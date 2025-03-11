@@ -45,7 +45,7 @@ const Login = () => {
         {parameters: {customerId}},
         {
             enabled: !!customerId && !isServer,
-            placeholderData: (previousData) => previousData
+            placeholderData: keepPreviousData
         }
     )
     const mergeBasket = useShopperBasketsMutation('mergeBasket')
