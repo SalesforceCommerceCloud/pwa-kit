@@ -476,7 +476,7 @@ const main = async () => {
 
     program
         .command('list-overrides')
-        .description('List all files that can be overridden in extensions')
+        .description('List all overridable files in the project')
         .action(() => {
             listOverridesModule.listOverrides()
         })

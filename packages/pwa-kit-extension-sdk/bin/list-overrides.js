@@ -27,9 +27,7 @@ const getAllFiles = (dir, fileList = []) => {
         const filePath = path.join(dir, file)
         const isDirectory = fs.statSync(filePath).isDirectory()
 
-        isDirectory
-            ? (fileList = getAllFiles(filePath, fileList))
-            : fileList.push(path.normalize(filePath))
+        isDirectory ? getAllFiles(filePath, fileList) : fileList.push(filePath)
     })
 
     return fileList
@@ -48,120 +46,142 @@ const readOverrideStats = () => {
             chalk.yellow('Please build with RECORD_OVERRIDES=true to generate the stats file:')
         )
         console.log(chalk.cyan('RECORD_OVERRIDES=true pwa-kit-dev build'))
-        process.exit(1)
+        throw new Error('Stats file not found')
     }
 
     try {
         const statsData = JSON.parse(fs.readFileSync(statsPath, 'utf8'))
 
         // Extract unique original paths (overridable files)
-        const overridableFiles = [...new Set(statsData.map(({original}) => original))]
+        const overridableFiles = statsData.map((entry) => entry.original)
 
         return {
             overridableFiles,
-            statsData
+            rawStats: statsData
         }
-    } catch ({message}) {
-        console.error(chalk.red(`Error reading stats file: ${message}`))
-        process.exit(1)
+    } catch (error) {
+        throw new Error(`Failed to read override stats: ${error.message}`)
     }
 }
 
 /**
  * Checks for unused override files in the overrides directory
- * @param {StatsData} stats - Stats data from readOverrideStats
+ * @param {StatsData} statsData - Stats data from readOverrideStats
  */
-const checkUnusedOverrides = ({statsData}) => {
+const checkUnusedOverrides = ({rawStats}) => {
     const overridesDir = path.join(process.cwd(), 'app', 'overrides')
 
     // No overrides directory, nothing to check
     if (!fs.existsSync(overridesDir)) {
+        console.log(chalk.yellow('\nNo overrides directory found.'))
         return
     }
 
-    console.log(chalk.cyan('\nChecking for unused overrides...'))
+    // Get all resolved paths from the stats
+    const resolvedPaths = rawStats.map(({resolved}) => path.normalize(resolved))
 
     // Get all files in the overrides directory
     const overrideFiles = getAllFiles(overridesDir)
 
-    // Get all resolved paths from the stats
-    const resolvedPaths = statsData.map(({resolved}) => path.normalize(resolved))
-
     // Find override files that aren't being used
-    const unusedOverrides = overrideFiles.filter((file) => !resolvedPaths.includes(file))
+    const unusedOverrides = overrideFiles.filter(
+        (file) => !resolvedPaths.includes(path.normalize(file))
+    )
 
     if (unusedOverrides.length > 0) {
         console.log(
-            chalk.yellow(`\nWarning: Found ${unusedOverrides.length} unused override file(s):`)
+            chalk.yellow(`\n⚠️  Warning: Found ${unusedOverrides.length} unused override file(s):`)
         )
         unusedOverrides.forEach((file) => {
-            const relativePath = path.relative(process.cwd(), file)
-            console.log(chalk.yellow(`- ${relativePath} is not overriding any file`))
+            console.log(chalk.yellow(`  ${path.relative(process.cwd(), file)}`))
         })
-    } else {
-        console.log(chalk.green('All override files are being used.'))
+    } else if (overrideFiles.length > 0) {
+        console.log(chalk.green('\n✅ All override files are being used.'))
     }
+}
+
+/**
+ * Groups files by their source extension
+ * @param {string[]} files - List of files to group
+ * @param {OverrideStatsEntry[]} rawStats - Raw stats data
+ * @returns {FilesByExtension} Files grouped by extension
+ */
+const groupFilesByExtension = (files, rawStats) => {
+    const filesByExtension = {}
+
+    // Create a map of original paths to their stats entries
+    const originalToStats = {}
+    rawStats.forEach((entry) => {
+        originalToStats[entry.original] = entry
+    })
+
+    files.forEach((file) => {
+        // Get the stats entry for this file
+        const statsEntry = originalToStats[file]
+
+        if (!statsEntry) {
+            console.warn(chalk.yellow(`Warning: No stats entry found for ${file}`))
+            return
+        }
+
+        // Use the sourceExtension property from the stats entry
+        const extensionName = statsEntry.sourceExtension || 'other'
+
+        // Extract the relative path (everything after src/)
+        const srcIndex = file.indexOf(`${path.sep}src${path.sep}`)
+        const relativePath =
+            srcIndex !== -1
+                ? file.substring(srcIndex + 5).replace(/\\/g, '/') // Normalize path separators to forward slashes
+                : file.replace(/\\/g, '/')
+
+        // Initialize the array for this extension if it doesn't exist
+        if (!filesByExtension[extensionName]) {
+            filesByExtension[extensionName] = []
+        }
+
+        // Add the file to the appropriate extension group
+        filesByExtension[extensionName].push(relativePath)
+    })
+
+    return filesByExtension
 }
 
 /**
  * Main function to list overridable files
  */
 const listOverrides = () => {
-    console.log(chalk.cyan('Listing overridable files...\n'))
+    try {
+        console.log(chalk.cyan('Listing overridable files...\n'))
 
-    const stats = readOverrideStats()
-    const {overridableFiles} = stats
+        const statsData = readOverrideStats()
 
-    if (overridableFiles.length === 0) {
-        console.log(chalk.yellow('No overridable files found.'))
-        return
-    }
-
-    console.log(chalk.green(`Found ${overridableFiles.length} overridable file(s):\n`))
-
-    // Group files by extension package
-    const filesByExtension = {}
-
-    overridableFiles.forEach((file) => {
-        // Extract extension name from path
-        const pathParts = file.split(path.sep)
-        const extensionIndex = pathParts.findIndex((part) => part.startsWith('extension-'))
-
-        if (extensionIndex !== -1) {
-            const extensionName = pathParts[extensionIndex]
-            const relativePath = pathParts.slice(extensionIndex + 1).join(path.sep)
-
-            filesByExtension[extensionName] ??= []
-
-            filesByExtension[extensionName].push({
-                fullPath: file,
-                relativePath
-            })
-        } else {
-            // Handle files not in an extension
-            filesByExtension.other ??= []
-
-            filesByExtension.other.push({
-                fullPath: file,
-                relativePath: path.relative(process.cwd(), file)
-            })
+        if (!statsData || !statsData.overridableFiles || !statsData.rawStats) {
+            console.error(chalk.red('No override stats found. Run a build first.'))
+            process.exit(1)
         }
-    })
 
-    // Print files grouped by extension
-    Object.entries(filesByExtension).forEach(([extension, files]) => {
-        console.log(chalk.cyan(`${extension}:`))
+        const filesByExtension = groupFilesByExtension(
+            statsData.overridableFiles,
+            statsData.rawStats
+        )
 
-        files.forEach(({relativePath}) => {
-            console.log(`  - ${relativePath}`)
-        })
+        // Print files grouped by extension
+        console.log(chalk.cyan('\nOverridable files by extension:'))
+        Object.keys(filesByExtension)
+            .sort()
+            .forEach((extension) => {
+                console.log(`\n${chalk.bold(extension)}:`)
+                filesByExtension[extension].sort().forEach((file) => {
+                    console.log(`  ${file}`)
+                })
+            })
 
-        // Empty line between extensions
-        console.log('')
-    })
-
-    // Check for unused overrides
-    checkUnusedOverrides(stats)
+        // Check for unused overrides
+        checkUnusedOverrides(statsData)
+    } catch (error) {
+        console.error(chalk.red(`Error: ${error.message}`))
+        process.exit(1)
+    }
 }
 
 // Export for use in pwa-kit-dev

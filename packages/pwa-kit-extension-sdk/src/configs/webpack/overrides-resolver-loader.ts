@@ -102,7 +102,8 @@ const OverrideResolverLoader = function (this: LoaderContext<any>) {
         compilation.overrideStats.push({
             importer: this.resourcePath,
             original: resourcePath,
-            resolved: resolvedResourcePath
+            resolved: resolvedResourcePath,
+            sourceExtension: packageName
         })
     }
 

@@ -13,6 +13,7 @@ export interface OverrideStatsEntry {
     importer: string
     original: string
     resolved: string
+    sourceExtension: string
 }
 
 /**
