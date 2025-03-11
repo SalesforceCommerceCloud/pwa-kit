@@ -149,7 +149,7 @@ const groupFilesByExtension = (files, rawStats) => {
 /**
  * Main function to list overridable files
  */
-const listOverrides = () => {
+const main = () => {
     try {
         console.log(chalk.cyan('Listing overridable files...\n'))
 
@@ -184,12 +184,7 @@ const listOverrides = () => {
     }
 }
 
-// Export for use in pwa-kit-dev
-module.exports = {
-    listOverrides
-}
-
 // Allow direct execution
 if (require.main === module) {
-    listOverrides()
+    main()
 }

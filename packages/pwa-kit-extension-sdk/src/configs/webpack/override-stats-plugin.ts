@@ -10,7 +10,6 @@ import {Compiler, Compilation, sources} from 'webpack'
  * Interface for override stats entry
  */
 export interface OverrideStatsEntry {
-    importer: string
     original: string
     resolved: string
     sourceExtension: string
