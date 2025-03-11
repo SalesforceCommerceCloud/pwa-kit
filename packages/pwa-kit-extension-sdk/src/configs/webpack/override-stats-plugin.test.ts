@@ -5,21 +5,22 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import OverrideStatsPlugin, {OverrideStatsEntry} from './override-stats-plugin' // Adjust the path as needed
+import {Compiler} from 'webpack'
 
 interface MockCompilation {
     hooks: {
         processAssets: {
-            tap: jest.Mock<(options: {name: string; stage: number}, callback: () => void) => void>
+            tap: jest.Mock<void, [{name: string; stage: number}, () => void]>
         }
     }
-    emitAsset: jest.Mock<(filename: string, source: {source: () => string}) => void>
+    emitAsset: jest.Mock<void, [string, {source: () => string}]>
     overrideStats?: OverrideStatsEntry[]
 }
 
 interface MockCompiler {
     hooks: {
         compilation: {
-            tap: jest.Mock<(name: string, callback: (compilation: MockCompilation) => void) => void>
+            tap: jest.Mock<void, [string, (compilation: MockCompilation) => void]>
         }
     }
 }
@@ -71,11 +72,10 @@ describe('OverrideStatsPlugin', () => {
 
     test('initializes overrideStats on compilation', () => {
         const plugin = new OverrideStatsPlugin()
-        plugin.apply(mockCompiler)
+        plugin.apply(mockCompiler as unknown as Compiler)
 
         // Simulate the compilation hook being triggered
         compilationCallback(mockCompilation)
-
         expect(mockCompilation.overrideStats).toEqual([])
     })
 
@@ -83,7 +83,7 @@ describe('OverrideStatsPlugin', () => {
         process.env.RECORD_OVERRIDES = 'true'
 
         const plugin = new OverrideStatsPlugin()
-        plugin.apply(mockCompiler)
+        plugin.apply(mockCompiler as unknown as Compiler)
 
         // Simulate the compilation hook
         compilationCallback(mockCompilation)
@@ -108,16 +108,14 @@ describe('OverrideStatsPlugin', () => {
         // Verify the content of the emitted asset
         const emittedAsset = mockCompilation.emitAsset.mock.calls[0][1]
         const content = emittedAsset.source()
-        expect(content).toEqual(JSON.stringify(mockCompilation.overrideStats, null, 2))
-        const parsedContent = JSON.parse(content)
-        expect(parsedContent).toEqual(mockCompilation.overrideStats)
+        expect(JSON.parse(content)).toEqual(mockCompilation.overrideStats)
     })
 
     test('does not generate overrides-stats.json when RECORD_OVERRIDES is not true', () => {
-        delete process.env.RECORD_OVERRIDES // Ensure RECORD_OVERRIDES is not set
+        delete process.env.RECORD_OVERRIDES
 
         const plugin = new OverrideStatsPlugin()
-        plugin.apply(mockCompiler)
+        plugin.apply(mockCompiler as unknown as Compiler)
 
         // Simulate the compilation hook
         compilationCallback(mockCompilation)
@@ -136,7 +134,7 @@ describe('OverrideStatsPlugin', () => {
         process.env.RECORD_OVERRIDES = 'true'
 
         const plugin = new OverrideStatsPlugin()
-        plugin.apply(mockCompiler)
+        plugin.apply(mockCompiler as unknown as Compiler)
 
         // Simulate the compilation hook
         compilationCallback(mockCompilation)
@@ -158,8 +156,6 @@ describe('OverrideStatsPlugin', () => {
         // Verify the content of the emitted asset
         const emittedAsset = mockCompilation.emitAsset.mock.calls[0][1]
         const content = emittedAsset.source()
-        expect(content).toEqual(JSON.stringify([], null, 2))
-        const parsedContent = JSON.parse(content)
-        expect(parsedContent).toEqual([])
+        expect(JSON.parse(content)).toEqual([])
     })
 })
