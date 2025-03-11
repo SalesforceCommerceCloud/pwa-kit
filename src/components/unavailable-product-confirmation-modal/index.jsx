@@ -32,7 +32,6 @@ const UnavailableProductConfirmationModal = ({
     const unavailableProductIdsRef = useRef(null)
     const ids = productIds.length ? productIds : productItems.map((i) => i.productId)
     
-    // Updated to remove onSuccess callback
     const productsQuery = useProducts(
         {parameters: {ids: ids?.join(','), allImages: true}},
         {
@@ -40,7 +39,6 @@ const UnavailableProductConfirmationModal = ({
         }
     )
     
-    // New useEffect to handle the logic previously in onSuccess
     useEffect(() => {
         if (productsQuery.isSuccess && productsQuery.data) {
             const result = productsQuery.data
@@ -76,7 +74,7 @@ const UnavailableProductConfirmationModal = ({
 
             unavailableProductIdsRef.current = unavailableProductIds
         }
-    }, [productsQuery.data, productsQuery.isSuccess, ids, productItems])
+    }, [productsQuery.data, productsQuery.isSuccess])
     
     const unavailableProductsModalProps = useDisclosure()
     useEffect(() => {
