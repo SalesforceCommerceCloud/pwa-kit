@@ -17,7 +17,7 @@ export const useWishList = ({listId = ''} = {}) => {
     const {customerId} = customer
     const createCustomerProductList = useShopperCustomersMutation('createCustomerProductList')
     
-    const {data: productLists, ...restOfQuery} = useCustomerProductLists(
+    const {data: productLists, isSuccess: isProductListsSuccess, ...restOfQuery} = useCustomerProductLists(
         {
             parameters: {customerId}
         },
@@ -28,14 +28,14 @@ export const useWishList = ({listId = ''} = {}) => {
     
     // Handle product list creation when no lists exist
     useEffect(() => {
-        if (productLists && !productLists.total) {
+        if (productLists && isProductListsSuccess && !productLists.total) {
             createCustomerProductList.mutate({
                 parameters: {customerId},
                 // we only use one type of product lists for now
                 body: {type: 'wish_list'}
             })
         }
-    }, [productLists])
+    }, [productLists, isProductListsSuccess])
 
     const wishLists = productLists?.data?.filter((list) => list.type === 'wish_list') || []
     const currentWishlist = wishLists.find((list) => list.id === listId)
