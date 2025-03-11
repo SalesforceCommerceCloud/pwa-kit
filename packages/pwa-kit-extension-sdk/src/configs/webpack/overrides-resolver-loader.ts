@@ -91,11 +91,7 @@ const OverrideResolverLoader = function (this: LoaderContext<any>) {
     })
 
     // Record override stats if RECORD_OVERRIDES is enabled
-    if (
-        process.env.RECORD_OVERRIDES === 'true' &&
-        this._compilation &&
-        'overrideStats' in this._compilation
-    ) {
+    if (this._compilation && 'overrideStats' in this._compilation) {
         const compilation = this._compilation as {overrideStats: OverrideStatsEntry[]}
 
         // Add the override information to the stats
