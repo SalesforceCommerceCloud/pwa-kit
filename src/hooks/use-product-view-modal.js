@@ -28,7 +28,11 @@ export const useProductViewModal = (initialProduct) => {
     const [product, setProduct] = useState(initialProduct)
     const variant = useVariant(product)
 
-    const {data: currentProduct, isFetching, isError} = useProduct(
+    const {
+        data: currentProduct,
+        isFetching,
+        isError
+    } = useProduct(
         {parameters: {id: (variant || product)?.productId}},
         {
             placeholderData: initialProduct,
@@ -51,12 +55,11 @@ export const useProductViewModal = (initialProduct) => {
     }, [currentProduct])
 
     useEffect(() => {
-        if (isError) {
-            toast({
-                title: intl.formatMessage(API_ERROR_MESSAGE),
-                status: 'error'
-            })
-        }
+        if (!isError) return
+        toast({
+            title: intl.formatMessage(API_ERROR_MESSAGE),
+            status: 'error'
+        })
     }, [isError])
 
     const cleanUpVariantParams = () => {

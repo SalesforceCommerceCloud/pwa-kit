@@ -186,20 +186,21 @@ const Cart = () => {
                 !basket.shipments[0].shippingMethod
         }
     )
-    
+
     // Handle shipping method update when data is returned
     useEffect(() => {
-        if (shippingMethodsQuery.isSuccess && shippingMethodsQuery.data) {
-            updateShippingMethodForShipmentsMutation.mutate({
-                parameters: {
-                    basketId: basket?.basketId,
-                    shipmentId: 'me'
-                },
-                body: {
-                    id: shippingMethodsQuery.data.defaultShippingMethodId
-                }
-            })
+        if (!shippingMethodsQuery.isSuccess || !shippingMethodsQuery.data) {
+            return
         }
+        updateShippingMethodForShipmentsMutation.mutate({
+            parameters: {
+                basketId: basket?.basketId,
+                shipmentId: 'me'
+            },
+            body: {
+                id: shippingMethodsQuery.data.defaultShippingMethodId
+            }
+        })
     }, [shippingMethodsQuery.isSuccess, shippingMethodsQuery.data])
 
     /************************* Error handling ***********************/

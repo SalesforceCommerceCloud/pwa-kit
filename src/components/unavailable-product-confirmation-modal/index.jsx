@@ -31,51 +31,51 @@ const UnavailableProductConfirmationModal = ({
 }) => {
     const unavailableProductIdsRef = useRef(null)
     const ids = productIds.length ? productIds : productItems.map((i) => i.productId)
-    
+
     const productsQuery = useProducts(
         {parameters: {ids: ids?.join(','), allImages: true}},
         {
             enabled: ids?.length > 0
         }
     )
-    
+
     useEffect(() => {
-        if (productsQuery.isSuccess && productsQuery.data) {
-            const result = productsQuery.data
-            const resProductIds = []
-            const unOrderableIds = []
-            
-            result.data?.forEach(({id, inventory}) => {
-                // when a product is unavailable, the getProducts will not return its product detail.
-                // we compare the response ids with the ones in basket to figure which product has become unavailable
-                resProductIds.push(id)
-
-                // when a product is orderable, but the quantity in the basket is more than the remaining stock
-                // we want to make sure it is removed before go to checkout page to avoid error when placing order
-                // we don't need to remove low stock/ out of stock from wishlist
-                if (productItems.length) {
-                    const productItem = productItems.find((item) => item.productId === id)
-                    // wishlist item will have the property type
-                    const isWishlist = !!productItem?.type
-                    if (
-                        !isWishlist &&
-                        (!inventory?.orderable ||
-                            (inventory?.orderable &&
-                                productItem?.quantity > inventory.stockLevel))
-                    ) {
-                        unOrderableIds.push(id)
-                    }
-                }
-            })
-
-            const unavailableProductIds = ids.filter(
-                (id) => !resProductIds.includes(id) || unOrderableIds.includes(id)
-            )
-
-            unavailableProductIdsRef.current = unavailableProductIds
+        if (!productsQuery.isSuccess || !productsQuery.data) {
+            return
         }
+        const result = productsQuery.data
+        const resProductIds = []
+        const unOrderableIds = []
+
+        result.data?.forEach(({id, inventory}) => {
+            // when a product is unavailable, the getProducts will not return its product detail.
+            // we compare the response ids with the ones in basket to figure which product has become unavailable
+            resProductIds.push(id)
+
+            // when a product is orderable, but the quantity in the basket is more than the remaining stock
+            // we want to make sure it is removed before go to checkout page to avoid error when placing order
+            // we don't need to remove low stock/ out of stock from wishlist
+            if (productItems.length) {
+                const productItem = productItems.find((item) => item.productId === id)
+                // wishlist item will have the property type
+                const isWishlist = !!productItem?.type
+                if (
+                    !isWishlist &&
+                    (!inventory?.orderable ||
+                        (inventory?.orderable && productItem?.quantity > inventory.stockLevel))
+                ) {
+                    unOrderableIds.push(id)
+                }
+            }
+        })
+
+        const unavailableProductIds = ids.filter(
+            (id) => !resProductIds.includes(id) || unOrderableIds.includes(id)
+        )
+
+        unavailableProductIdsRef.current = unavailableProductIds
     }, [productsQuery.data, productsQuery.isSuccess])
-    
+
     const unavailableProductsModalProps = useDisclosure()
     useEffect(() => {
         if (unavailableProductIdsRef.current?.length > 0) {
