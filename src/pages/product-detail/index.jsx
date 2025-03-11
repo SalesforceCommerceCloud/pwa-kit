@@ -103,7 +103,7 @@ const ProductDetail = () => {
         {
             // When shoppers select a different variant (and the app fetches the new data),
             // the old data is still rendered (and not the skeletons).
-            keepPreviousData: true
+            placeholderData: (previousData) => previousData
         }
     )
 
@@ -145,7 +145,7 @@ const ProductDetail = () => {
         },
         {
             enabled: bundleChildVariantIds?.length > 0,
-            keepPreviousData: true
+            placeholderData: (previousData) => previousData
         }
     )
 

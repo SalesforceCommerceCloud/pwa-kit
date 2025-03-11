@@ -82,7 +82,10 @@ export const AuthModal = ({
 
     const {data: baskets} = useCustomerBaskets(
         {parameters: {customerId}},
-        {enabled: !!customerId && !isServer, keepPreviousData: true}
+        {
+            enabled: !!customerId && !isServer,
+            placeholderData: (previousData) => previousData
+        }
     )
     const mergeBasket = useShopperBasketsMutation('mergeBasket')
 

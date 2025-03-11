@@ -98,7 +98,7 @@ const Cart = () => {
         },
         {
             enabled: bundleChildVariantIds?.length > 0,
-            keepPreviousData: true,
+            placeholderData: (previousData) => previousData,
             select: (result) => {
                 return result?.data?.reduce((result, item) => {
                     const key = item.id

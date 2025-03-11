@@ -160,7 +160,7 @@ const ProductList = (props) => {
             }
         },
         {
-            keepPreviousData: true
+            placeholderData: (previousData) => previousData
         }
     )
 

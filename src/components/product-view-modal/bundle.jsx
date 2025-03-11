@@ -51,7 +51,7 @@ const BundleProductViewModal = ({product: bundle, isOpen, onClose, updateCart, .
         {parameters: {ids: childProductIds, allImages: true}},
         {
             enabled: Boolean(childProductIds),
-            keepPreviousData: true
+            placeholderData: (previousData) => previousData
         }
     )
 
