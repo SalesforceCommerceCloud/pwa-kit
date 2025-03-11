@@ -4,14 +4,32 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import OverrideStatsPlugin from './override-stats-plugin' // Adjust the path to where OverrideStatsPlugin is located
+import OverrideStatsPlugin, {OverrideStatsEntry} from './override-stats-plugin' // Adjust the path as needed
+
+interface MockCompilation {
+    hooks: {
+        processAssets: {
+            tap: jest.Mock<(options: {name: string; stage: number}, callback: () => void) => void>
+        }
+    }
+    emitAsset: jest.Mock<(filename: string, source: {source: () => string}) => void>
+    overrideStats?: OverrideStatsEntry[]
+}
+
+interface MockCompiler {
+    hooks: {
+        compilation: {
+            tap: jest.Mock<(name: string, callback: (compilation: MockCompilation) => void) => void>
+        }
+    }
+}
 
 describe('OverrideStatsPlugin', () => {
-    let mockCompiler
-    let mockCompilation
-    let compilationCallback
-    let processAssetsCallback
-    let originalRecordOverrides
+    let mockCompiler: MockCompiler
+    let mockCompilation: MockCompilation
+    let compilationCallback: (compilation: MockCompilation) => void
+    let processAssetsCallback: () => void
+    let originalRecordOverrides: string | undefined
 
     /**
      * Set up the mock compiler and compilation objects before each test,
