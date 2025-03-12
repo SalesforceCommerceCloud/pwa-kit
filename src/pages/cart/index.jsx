@@ -6,6 +6,7 @@
  */
 import React, {useState, useMemo, useEffect} from 'react'
 import {FormattedMessage, useIntl} from 'react-intl'
+import {keepPreviousData} from '@tanstack/react-query'
 
 // Chakra Components
 import {Box, Stack, Grid, GridItem, Container, useDisclosure, Button} from '@chakra-ui/react'
@@ -98,7 +99,7 @@ const Cart = () => {
         },
         {
             enabled: bundleChildVariantIds?.length > 0,
-            keepPreviousData: true,
+            placeholderData: keepPreviousData,
             select: (result) => {
                 return result?.data?.reduce((result, item) => {
                     const key = item.id
