@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, {useEffect, useRef} from 'react'
+import React, {useEffect, useState} from 'react'
 import PropTypes from 'prop-types'
 import {useProducts} from '@salesforce/commerce-sdk-react'
 import {REMOVE_UNAVAILABLE_CART_ITEM_DIALOG_CONFIG} from '../../constants'
@@ -29,7 +29,7 @@ const UnavailableProductConfirmationModal = ({
     productItems = [],
     handleUnavailableProducts = noop
 }) => {
-    const unavailableProductIdsRef = useRef(null)
+    const [unavailableProductIds, setUnavailableProductIds] = useState(null)
     const ids = productIds.length ? productIds : productItems.map((i) => i.productId)
 
     const productsQuery = useProducts(
@@ -40,9 +40,13 @@ const UnavailableProductConfirmationModal = ({
     )
 
     useEffect(() => {
+        console.error('useEffect')
+        console.error('productsQuery.isSuccess', productsQuery.isSuccess)
+        console.error('productsQuery.data', productsQuery.data)
         if (!productsQuery.isSuccess || !productsQuery.data) {
             return
         }
+        console.error('not early return')
         const result = productsQuery.data
         const resProductIds = []
         const unOrderableIds = []
@@ -69,19 +73,19 @@ const UnavailableProductConfirmationModal = ({
             }
         })
 
-        const unavailableProductIds = ids.filter(
+        const unavailableIds = ids.filter(
             (id) => !resProductIds.includes(id) || unOrderableIds.includes(id)
         )
-
-        unavailableProductIdsRef.current = unavailableProductIds
+        console.error('unavailableProductIds', unavailableIds)
+        setUnavailableProductIds(unavailableIds)
     }, [productsQuery.data, productsQuery.isSuccess])
 
     const unavailableProductsModalProps = useDisclosure()
     useEffect(() => {
-        if (unavailableProductIdsRef.current?.length > 0) {
+        if (unavailableProductIds?.length > 0) {
             unavailableProductsModalProps.onOpen()
         }
-    }, [unavailableProductIdsRef.current])
+    }, [unavailableProductIds])
 
     return (
         <ConfirmationModal
@@ -91,8 +95,8 @@ const UnavailableProductConfirmationModal = ({
             {...REMOVE_UNAVAILABLE_CART_ITEM_DIALOG_CONFIG}
             hideAlternateAction={true}
             onPrimaryAction={async () => {
-                await handleUnavailableProducts(unavailableProductIdsRef.current)
-                unavailableProductIdsRef.current = null
+                await handleUnavailableProducts(unavailableProductIds)
+                setUnavailableProductIds(null)
                 unavailableProductsModalProps.onClose()
             }}
             onAlternateAction={() => {}}
