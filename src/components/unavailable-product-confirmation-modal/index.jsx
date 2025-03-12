@@ -40,13 +40,9 @@ const UnavailableProductConfirmationModal = ({
     )
 
     useEffect(() => {
-        console.error('useEffect')
-        console.error('productsQuery.isSuccess', productsQuery.isSuccess)
-        console.error('productsQuery.data', productsQuery.data)
         if (!productsQuery.isSuccess || !productsQuery.data) {
             return
         }
-        console.error('not early return')
         const result = productsQuery.data
         const resProductIds = []
         const unOrderableIds = []
@@ -76,7 +72,6 @@ const UnavailableProductConfirmationModal = ({
         const unavailableIds = ids.filter(
             (id) => !resProductIds.includes(id) || unOrderableIds.includes(id)
         )
-        console.error('unavailableProductIds', unavailableIds)
         setUnavailableProductIds(unavailableIds)
     }, [productsQuery.data, productsQuery.isSuccess])
 
