@@ -27,7 +27,7 @@
     "directory": "dist"
   },
   "bin": {
-    "list-overrides": "./bin/list-overrides.js"
+    "pwa-kit-extension-sdk": "bin/pwa-kit-extension-sdk.js"
   },
   "types": "dist/index.d.ts",
   "scripts": {

@@ -73,7 +73,6 @@ const checkUnusedOverrides = ({rawStats}) => {
 
     // No overrides directory, nothing to check
     if (!fs.existsSync(overridesDir)) {
-        console.log(chalk.yellow('\nNo overrides directory found.'))
         return
     }
 
@@ -165,16 +164,21 @@ const main = () => {
             statsData.rawStats
         )
 
-        // Print files grouped by extension
-        console.log(chalk.cyan('\nOverridable files by extension:'))
-        Object.keys(filesByExtension)
-            .sort()
-            .forEach((extension) => {
-                console.log(`\n${chalk.bold(extension)}:`)
-                filesByExtension[extension].sort().forEach((file) => {
-                    console.log(`  ${file}`)
+        if (Object.keys(filesByExtension).length > 0) {
+            console.log(chalk.cyan('\nOverridable files by extension:'))
+
+            // Print files grouped by extension
+            Object.keys(filesByExtension)
+                .sort()
+                .forEach((extension) => {
+                    console.log(`\n${chalk.bold(extension)}:`)
+                    filesByExtension[extension].sort().forEach((file) => {
+                        console.log(`  ${file}`)
+                    })
                 })
-            })
+        } else {
+            console.log(chalk.cyan('\nNo overridable files found.'))
+        }
 
         // Check for unused overrides
         checkUnusedOverrides(statsData)

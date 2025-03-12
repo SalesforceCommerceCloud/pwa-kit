@@ -477,7 +477,7 @@ const main = async () => {
         .command('list-overrides')
         .description('List all overridable files in the project')
         .action(() => {
-            execSync(p.join('node_modules', '.bin', 'list-overrides'))
+            execSync(p.join('node_modules', '.bin', 'pwa-kit-extension-sdk'))
         })
 
     managedRuntimeCommand('tail-logs')
