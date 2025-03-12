@@ -8,6 +8,7 @@
 import React, {useEffect} from 'react'
 import PropTypes from 'prop-types'
 import {useIntl, defineMessage} from 'react-intl'
+import {keepPreviousData} from '@tanstack/react-query'
 import {Box, Container} from '@chakra-ui/react'
 import {
     AuthHelpers,
@@ -43,7 +44,10 @@ const Login = () => {
     const prevAuthType = usePrevious(customerType)
     const {data: baskets} = useCustomerBaskets(
         {parameters: {customerId}},
-        {enabled: !!customerId && !isServer, keepPreviousData: true}
+        {
+            enabled: !!customerId && !isServer,
+            placeholderData: keepPreviousData
+        }
     )
     const mergeBasket = useShopperBasketsMutation('mergeBasket')
 
