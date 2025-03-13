@@ -107,6 +107,58 @@ Now when the base application is built the import for the `logo.ts` in `extensio
 
 This mechanism is useful when you want to allow for fine grained customization of your application extension. Its the responsibility of the extension developer to ensure their document what files are overridable and what the expected input and output of those files are. For example, if the overridable file is a React component you should document the props that get passed to that component and the expected exports of the file.
 
+#### List Overridable Files
+
+The PWA Kit Extension SDK provides a utility script, `list-overrides`, to help developers identify all files in an extension that can be overridden using the `overridable!` import syntax. Additionally, for PWA Kit application developers, it checks for unused overrides in the `app/overrides` directory and issues warnings if any are found.
+
+**Usage**
+
+Run the following command in your project directory:
+```bash
+npm run list-overrides
+```
+
+**For Extension Developers**
+
+If you're developing an extension, use this command to generate a list of overridable files in your extension. The output groups files by extension and can be included in your extension’s README to inform users about customizable files. This enhances transparency and usability for consumers of your extension.
+
+**For PWA Kit Application Developers**
+
+n a PWA Kit application, this command lists all overridable files from installed extensions. It also scans the `app/overrides` directory and warns about any files that aren’t actively overriding an `overridable!` import, helping you maintain a clean and effective override structure.
+
+**Example Output**
+
+```
+Listing overridable files...
+
+
+Overridable files by extension:
+
+@salesforce/extension-chakra-store-locator:
+  components/heading.tsx
+  components/list-item.tsx
+
+@salesforce/extension-chakra-storefront:
+  pages/account/index.jsx
+  pages/cart/index.jsx
+  pages/checkout/confirmation.jsx
+  pages/checkout/index.jsx
+  pages/home/index.jsx
+  pages/login-redirect/index.jsx
+  pages/login/index.jsx
+  pages/product-detail/index.jsx
+  pages/product-list/index.jsx
+  pages/registration/index.jsx
+  pages/reset-password/index.jsx
+
+⚠️  Warning: Found 1 unused override file(s):
+  app/overrides/@salesforce/extension-chakra-store-locator/components/list.tsx
+```
+
+**How It Works**
+
+The `list-overrides` script analyzes a stats file generated during the build process when the `RECORD_OVERRIDES` environment variable is set to `true`. This file contains data about all `overridable!` imports, including original and resolved file paths. For applications, it cross-references this data with the `app/overrides` directory to detect unused overrides.
+
 #### Forced Overrides
 Users of your extension may sometimes need to override files that are not explicitly designed to be overridden. To accommodate this, they can use a special dotfile named `.forced_overrides`.
 
