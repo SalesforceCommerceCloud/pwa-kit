@@ -20,7 +20,7 @@ class SetOverrideStatsPlugin {
                     stage: Compilation.PROCESS_ASSETS_STAGE_ANALYSE
                 },
                 () => {
-                    (compilation as any).overrideStats = this.overrideStats;
+                    ;(compilation as any).overrideStats = this.overrideStats
                 }
             )
         })
