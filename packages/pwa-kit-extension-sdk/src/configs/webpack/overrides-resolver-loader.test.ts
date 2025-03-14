@@ -266,6 +266,67 @@ describe('Overrides Resolver Loader', () => {
             expects: (output: any) => {
                 expect(output.modules[2].source).toContain('// Should Be Referenced')
             }
+        },
+        {
+            bypassWindows: true,
+            description: 'records override stats correctly',
+            entryPoint: '/node_modules/@salesforce/extension-this/src/setup-app.js',
+            loaderTest: /node_modules\/@salesforce\/extension-this\/src\/pages\/sample-page/i,
+            compilerConfig: {
+                extensions: [
+                    ['@salesforce/extension-this', {enabled: true}],
+                    ['@salesforce/extension-that', {enabled: true}]
+                ],
+                files: {
+                    '/node_modules/@salesforce/extension-that/src/overrides/@salesforce/extension-this/pages/sample-page.jsx':
+                        '// @salesforce/extension-that',
+                    '/node_modules/@salesforce/extension-this/src/pages/sample-page.jsx':
+                        '// @salesforce/extension-this',
+                    '/node_modules/@salesforce/extension-this/package.json':
+                        '{"name": "@salesforce/extension-this"}',
+                    '/node_modules/@salesforce/extension-this/src/setup-app.js':
+                        'import Page from "./pages/sample-page"',
+                    [`${path.resolve(__dirname, './overrides-resolver-loader.ts')}`]: ''
+                },
+                recordStats: true
+            },
+            expects: (output: any) => {
+                expect(output.overrideStats).toHaveLength(1)
+                expect(output.overrideStats[0]).toMatchObject({
+                    sourceExtension: '@salesforce/extension-this',
+                    original: expect.stringContaining('extension-this/src/pages/sample-page'),
+                    resolved: expect.stringContaining(
+                        'extension-that/src/overrides/@salesforce/extension-this/pages/sample-page'
+                    )
+                })
+            }
+        },
+        {
+            bypassWindows: true,
+            description: 'does not record stats when overrideStats is not present',
+            entryPoint: '/node_modules/@salesforce/extension-this/src/setup-app.js',
+            loaderTest: /node_modules\/@salesforce\/extension-this\/src\/pages\/sample-page/i,
+            compilerConfig: {
+                extensions: [
+                    ['@salesforce/extension-this', {enabled: true}],
+                    ['@salesforce/extension-that', {enabled: true}]
+                ],
+                files: {
+                    '/node_modules/@salesforce/extension-that/src/overrides/@salesforce/extension-this/pages/sample-page.jsx':
+                        '// @salesforce/extension-that',
+                    '/node_modules/@salesforce/extension-this/src/pages/sample-page.jsx':
+                        '// @salesforce/extension-this',
+                    '/node_modules/@salesforce/extension-this/package.json':
+                        '{"name": "@salesforce/extension-this"}',
+                    '/node_modules/@salesforce/extension-this/src/setup-app.js':
+                        'import Page from "./pages/sample-page"',
+                    [`${path.resolve(__dirname, './overrides-resolver-loader.ts')}`]: ''
+                },
+                recordStats: false
+            },
+            expects: (output: any) => {
+                expect(output.overrideStats).toBeUndefined()
+            }
         }
     ]
 
@@ -273,7 +334,7 @@ describe('Overrides Resolver Loader', () => {
         testCases.forEach((options: any) => {
             const {compilerConfig, description, entryPoint, expects, loaderTest, bypassWindows} =
                 options
-            const {extensions, files} = compilerConfig
+            const {extensions, files, recordStats = true} = compilerConfig
 
             test(`${description as string}`, async () => {
                 let output, error
@@ -283,7 +344,7 @@ describe('Overrides Resolver Loader', () => {
                         files,
                         buildPlugins: () => [
                             new ApplicationExtensionConfigPlugin({extensions}),
-                            new OverrideStatsPlugin()
+                            ...(recordStats ? [new OverrideStatsPlugin()] : [])
                         ],
                         buildLoaders: ({fileSystem}: any) => [
                             {
@@ -535,154 +596,5 @@ describe('validateOverrideSource', () => {
 
         expect(resultWeb).toBe(true)
         expect(resultNode).toBe(true)
-    })
-})
-
-describe('Override Stats Recording', () => {
-    it('records override stats correctly', async () => {
-        const entryPoint = '/node_modules/@salesforce/extension-this/src/setup-app.js'
-        const stats = await runWebpackCompiler(entryPoint, {
-            files: {
-                '/node_modules/@salesforce/extension-that/src/overrides/@salesforce/extension-this/pages/sample-page.jsx':
-                    '// @salesforce/extension-that',
-                '/node_modules/@salesforce/extension-this/src/pages/sample-page.jsx':
-                    '// @salesforce/extension-this',
-                '/node_modules/@salesforce/extension-this/package.json':
-                    '{"name": "@salesforce/extension-this"}',
-                '/node_modules/@salesforce/extension-this/src/setup-app.js':
-                    'import Page from "./pages/sample-page"',
-                [`${path.resolve(__dirname, './overrides-resolver-loader.ts')}`]: ''
-            },
-            buildPlugins: () => [
-                new ApplicationExtensionConfigPlugin({
-                    extensions: [
-                        ['@salesforce/extension-this', {enabled: true}],
-                        ['@salesforce/extension-that', {enabled: true}]
-                    ]
-                }),
-                new OverrideStatsPlugin()
-            ],
-            buildLoaders: ({fileSystem}: any) => [
-                {
-                    test: /node_modules\/@salesforce\/extension-this\/src\/pages\/sample-page/i,
-                    use: {
-                        loader: path.resolve(__dirname, './overrides-resolver-loader.ts'),
-                        options: {
-                            baseDir: '/',
-                            resolveOptions: {
-                                existsSync: (filePath: string) => fileSystem.existsSync(filePath),
-                                readFile: (filePath: string, encoding: string, cb: any) => {
-                                    try {
-                                        const data = fileSystem.readFileSync(filePath, encoding)
-                                        cb(null, data)
-                                    } catch (err) {
-                                        cb(err)
-                                    }
-                                },
-                                readFileSync: (filePath: string, encoding: string) =>
-                                    fileSystem.readFileSync(filePath, encoding),
-                                isFile: (filePath: string) => {
-                                    try {
-                                        return fileSystem.statSync(filePath).isFile()
-                                    } catch (e) {
-                                        return false
-                                    }
-                                },
-                                isDirectory: (dirPath: string) => {
-                                    try {
-                                        return fileSystem.statSync(dirPath).isDirectory()
-                                    } catch (e) {
-                                        return false
-                                    }
-                                },
-                                realpath: (filePath: string, cb: any) => cb(null, filePath),
-                                realpathSync: (filePath: string) => filePath
-                            }
-                        }
-                    }
-                }
-            ]
-        })
-
-        const output = stats.toJson({source: true})
-        output.overrideStats = stats.compilation.overrideStats
-
-        expect(output.overrideStats).toHaveLength(1)
-        expect(output.overrideStats[0]).toMatchObject({
-            sourceExtension: '@salesforce/extension-this',
-            original: expect.stringContaining('extension-this/src/pages/sample-page'),
-            resolved: expect.stringContaining(
-                'extension-that/src/overrides/@salesforce/extension-this/pages/sample-page'
-            )
-        })
-    })
-
-    it('does not record stats when overrideStats is not present', async () => {
-        const entryPoint = '/node_modules/@salesforce/extension-this/src/setup-app.js'
-        const stats = await runWebpackCompiler(entryPoint, {
-            files: {
-                '/node_modules/@salesforce/extension-that/src/overrides/@salesforce/extension-this/pages/sample-page.jsx':
-                    '// @salesforce/extension-that',
-                '/node_modules/@salesforce/extension-this/src/pages/sample-page.jsx':
-                    '// @salesforce/extension-this',
-                '/node_modules/@salesforce/extension-this/package.json':
-                    '{"name": "@salesforce/extension-this"}',
-                '/node_modules/@salesforce/extension-this/src/setup-app.js':
-                    'import Page from "./pages/sample-page"',
-                [`${path.resolve(__dirname, './overrides-resolver-loader.ts')}`]: ''
-            },
-            buildPlugins: () => [
-                new ApplicationExtensionConfigPlugin({
-                    extensions: [
-                        ['@salesforce/extension-this', {enabled: true}],
-                        ['@salesforce/extension-that', {enabled: true}]
-                    ]
-                })
-                // Note the OverrideStatsPlugin has not been added for this test
-            ],
-            buildLoaders: ({fileSystem}: any) => [
-                {
-                    test: /node_modules\/@salesforce\/extension-this\/src\/pages\/sample-page/i,
-                    use: {
-                        loader: path.resolve(__dirname, './overrides-resolver-loader.ts'),
-                        options: {
-                            baseDir: '/',
-                            resolveOptions: {
-                                existsSync: (filePath: string) => fileSystem.existsSync(filePath),
-                                readFile: (filePath: string, encoding: string, cb: any) => {
-                                    try {
-                                        const data = fileSystem.readFileSync(filePath, encoding)
-                                        cb(null, data)
-                                    } catch (err) {
-                                        cb(err)
-                                    }
-                                },
-                                readFileSync: (filePath: string, encoding: string) =>
-                                    fileSystem.readFileSync(filePath, encoding),
-                                isFile: (filePath: string) => {
-                                    try {
-                                        return fileSystem.statSync(filePath).isFile()
-                                    } catch (e) {
-                                        return false
-                                    }
-                                },
-                                isDirectory: (dirPath: string) => {
-                                    try {
-                                        return fileSystem.statSync(dirPath).isDirectory()
-                                    } catch (e) {
-                                        return false
-                                    }
-                                },
-                                realpath: (filePath: string, cb: any) => cb(null, filePath),
-                                realpathSync: (filePath: string) => filePath
-                            }
-                        }
-                    }
-                }
-            ]
-        })
-
-        const output = stats.toJson({source: true})
-        expect(output.overrideStats).toBeUndefined()
     })
 })
