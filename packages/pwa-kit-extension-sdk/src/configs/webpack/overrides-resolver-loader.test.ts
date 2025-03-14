@@ -8,7 +8,13 @@
 import path from 'path'
 import {runWebpackCompiler} from './test-utils'
 import {validateOverrideSource, __OVERRIDABLE_CACHE__} from './overrides-resolver-loader'
-import OverrideStatsPlugin from './override-stats-plugin'
+import OverrideStatsPlugin, {OverrideStatsEntry} from './override-stats-plugin'
+
+declare module 'webpack' {
+    interface Compilation {
+        overrideStats?: OverrideStatsEntry[]
+    }
+}
 
 // DEVELOPER NOTE:
 // This loader is intended to be used as an "inline" loader, meaning that you don't typically see it configured

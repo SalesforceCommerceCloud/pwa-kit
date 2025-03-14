@@ -124,7 +124,7 @@ If you're developing an extension, use this command to generate a list of overri
 
 **For PWA Kit Application Developers**
 
-n a PWA Kit application, this command lists all overridable files from installed extensions. It also scans the `app/overrides` directory and warns about any files that aren’t actively overriding an `overridable!` import, helping you maintain a clean and effective override structure.
+In a PWA Kit application, this command lists all overridable files from installed extensions. It also scans the `app/overrides` directory and warns about any files that aren’t actively overriding an `overridable!` import, helping you maintain a clean and effective override structure.
 
 **Example Output**
 

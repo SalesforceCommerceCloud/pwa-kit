@@ -123,55 +123,12 @@ const Home = () => {
 
 export default Home
 ```
+For now, you need to restart the dev server for new override files to take effect. Once the server is started, navigate to home page and you should see. 
 
-For now, you need to restart the dev server for new override files to take effect. Once the server is started, navigate to home page and you should see
-
-#### List Overridable Files
-To assist with managing overrides, PWA Kit provides a utility script, `list-overrides`, which lists all files in your installed extensions that can be overridden and checks for unused overrides in your project.
-
-**Usage**
-
-Run the following command in your project directory:
+You can also verify the overrides by running the [List Overridable Files](README.md#list-overridable-files) command at the root of your project directory:
 ```bash
 npm run list-overrides
 ```
-
-This command displays a list of all files using the `overridable!` import syntax across your installed extensions, grouped by extension name. It also scans the `app/overrides` directory and warns you about any files that aren’t overriding anything, helping you avoid clutter and ensure your overrides are effective.
-
-**Example Output**
-
-```
-Listing overridable files...
-
-
-Overridable files by extension:
-
-@salesforce/extension-chakra-store-locator:
-  components/heading.tsx
-  components/list-item.tsx
-
-@salesforce/extension-chakra-storefront:
-  pages/account/index.jsx
-  pages/cart/index.jsx
-  pages/checkout/confirmation.jsx
-  pages/checkout/index.jsx
-  pages/home/index.jsx
-  pages/login-redirect/index.jsx
-  pages/login/index.jsx
-  pages/product-detail/index.jsx
-  pages/product-list/index.jsx
-  pages/registration/index.jsx
-  pages/reset-password/index.jsx
-
-⚠️  Warning: Found 1 unused override file(s):
-  app/overrides/@salesforce/extension-chakra-store-locator/components/list.tsx
-```
-
-**How It Works**
-
-The script relies on a stats file generated during the build process when the `RECORD_OVERRIDES` environment variable is set to `true`. This file tracks all `overridable!` imports and their resolved paths. The script then compares this data with the contents of `app/overrides` to identify unused files.
-
-Use this tool to verify that your override (e.g., `pages/home/index.jsx`) targets an overridable file and to clean up any unused overrides in your project.
 
 #### Important Considerations
 
