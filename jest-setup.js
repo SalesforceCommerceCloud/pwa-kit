@@ -61,10 +61,18 @@ export const setupMockServer = () => {
             res(
                 ctx.delay(0),
                 ctx.json({
-                    customer_id: 'customerid',
-                    // Is this token for guest or registered user?
+                    // FYI decoded token has this payload:
+                    // {
+                    // "sub": "cc-slas::zzrf_001::scid:c9c45bfd-0ed3-4aa2-xxxx-40f88962b836::usid:b4865233-de92-4039-xxxx-aa2dfc8c1ea5",
+                    // "name": "John Doe",
+                    // "exp": 2673911261,
+                    // "iat": 2673909461,
+                    // "isb": "uido:ecom::upn:Guest||xxxEmailxxx::uidn:FirstName LastName::gcid:xxxGuestCustomerIdxxx::rcid:xxxRegisteredCustomerIdxxx::chid:xxxSiteIdxxx"
+                    // }
                     access_token:
-                        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiZXhwIjoyNjczOTExMjYxLCJpYXQiOjI2NzM5MDk0NjF9.BDAp9G8nmArdBqAbsE5GUWZ3fiv2LwQKClEFDCGIyy8',
+                        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjYy1zbGFzOjp6enJmXzAwMTo6c2NpZDpjOWM0NWJmZC0wZWQzLTRhYTIteHh4eC00MGY4ODk2MmI4MzY6OnVzaWQ6YjQ4NjUyMzMtZGU5Mi00MDM5LXh4eHgtYWEyZGZjOGMxZWE1IiwibmFtZSI6IkpvaG4gRG9lIiwiZXhwIjoyNjczOTExMjYxLCJpYXQiOjI2NzM5MDk0NjEsImlzYiI6InVpZG86ZWNvbTo6dXBuOkd1ZXN0fHx4eHhFbWFpbHh4eDo6dWlkbjpGaXJzdE5hbWUgTGFzdE5hbWU6OmdjaWQ6eHh4R3Vlc3RDdXN0b21lcklkeHh4OjpyY2lkOnh4eFJlZ2lzdGVyZWRDdXN0b21lcklkeHh4OjpjaGlkOnh4eFNpdGVJZHh4eCJ9.CQpejPFNav6NLc_csSImVcDxeY8GVzBHblE9lu7RtGM',
+
+                    customer_id: 'customerid',
                     refresh_token: 'testrefeshtoken',
                     usid: 'testusid',
                     enc_user_id: 'testEncUserId',
@@ -84,6 +92,10 @@ export const setupMockServer = () => {
         }),
         rest.post('*/v3/personalization/recs/EinsteinTestSite/*', (req, res, ctx) => {
             return res(ctx.delay(0), ctx.status(200), ctx.json({}))
+        }),
+        // Mock Data Cloud API
+        rest.post('*.pc-rnd.c360a.salesforce.com/web/events/*', (req, res, ctx) => {
+            return res(ctx.delay(0), ctx.status(204), ctx.json({}))
         })
     )
 }
