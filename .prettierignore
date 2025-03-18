@@ -1,5 +1,5 @@
-build
-docs
 coverage
-scripts/generator/assets
-app/static
+dist
+generator-assets
+docs
+vendor
