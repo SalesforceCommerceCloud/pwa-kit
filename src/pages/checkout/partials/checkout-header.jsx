@@ -7,21 +7,23 @@
 import React from 'react'
 import {FormattedMessage, useIntl} from 'react-intl'
 import {Badge, Box, Button, Flex, Center} from '@chakra-ui/react'
-import Link from '@salesforce/retail-react-app/app/components/link'
-import {BasketIcon, BrandLogo} from '@salesforce/retail-react-app/app/components/icons'
-import {HOME_HREF} from '@salesforce/retail-react-app/app/constants'
-import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
+import Link from '../../../components/link'
+import {BasketIcon, BrandLogo} from '../../../components/icons'
+import {useCurrentBasket, useExtensionConfig} from '../../../hooks/'
 
 const CheckoutHeader = () => {
     const intl = useIntl()
     const {
         derivedData: {totalItems}
     } = useCurrentBasket()
+    const {
+        pages: {Home: homeConfig}
+    } = useExtensionConfig()
     return (
         <Box px={[4, 4, 8]} bg="white" borderBottom="1px" borderColor="gray.100">
             <Box maxWidth="container.xxxl" marginLeft="auto" marginRight="auto">
                 <Flex h={{base: '52px', md: '80px'}} align="center" justify="space-between">
-                    <Link href={HOME_HREF} title="Back to homepage">
+                    <Link href={homeConfig.path} title="Back to homepage">
                         <BrandLogo
                             width={{base: '35px', md: '45px'}}
                             height={{base: '24px', md: '32px'}}
