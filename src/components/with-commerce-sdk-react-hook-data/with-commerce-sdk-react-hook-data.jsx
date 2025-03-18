@@ -33,4 +33,4 @@ const withCommerceSdkReact = (Component, opts = {}) => {
     return WrappedComponent
 }
 
-export {withCommerceSdkReact}
+export default withCommerceSdkReact
