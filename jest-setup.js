@@ -10,7 +10,13 @@
 require('cross-fetch/polyfill')
 require('raf/polyfill') // fix requestAnimationFrame issue with polyfill
 require('@testing-library/jest-dom/extend-expect')
-const mockConfig = require('@salesforce/retail-react-app/config/mocks/default')
+const mockConfig = require('./src/mock-config')
+
+const mockAppConfig = {
+    app: {
+        extensions: [['@salesforce/extension-chakra-storefront', mockConfig]]
+    }
+}
 const {configure: configureTestingLibrary} = require('@testing-library/react')
 const {Crypto} = require('@peculiar/webcrypto')
 const {setupServer} = require('msw/node')
@@ -20,7 +26,7 @@ const {
     mockedRegisteredCustomer,
     exampleTokenReponse,
     mockCustomerBaskets
-} = require('./app/mocks/mock-data')
+} = require('./src/mocks/mock-data')
 
 // set jsdom in https context to allow read/write secure cookies
 global.jsdom.reconfigure({url: 'https://www.domain.com'})
@@ -112,7 +118,14 @@ afterAll(() => {
 // Mock the application configuration to be used in all tests.
 jest.mock('@salesforce/pwa-kit-runtime/utils/ssr-config', () => {
     return {
-        getConfig: () => mockConfig
+        getConfig: () => mockAppConfig
+    }
+})
+jest.mock('./src/utils/get-extension-config', () => {
+    const origin = jest.requireActual('./src/utils/get-extension-config')
+    return {
+        ...origin,
+        getExtensionConfig: jest.fn().mockReturnValue(mockConfig)
     }
 })
 
