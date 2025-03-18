@@ -7,7 +7,7 @@
 
 import React, {useMemo, useRef, useState} from 'react'
 import PropTypes from 'prop-types'
-import DisplayPrice from '@salesforce/retail-react-app/app/components/display-price'
+import DisplayPrice from '../../components/display-price'
 
 // Components
 import {
@@ -21,32 +21,29 @@ import {
     IconButton,
     HStack
 } from '@chakra-ui/react'
-import DynamicImage from '@salesforce/retail-react-app/app/components/dynamic-image'
+import DynamicImage from '../../components/dynamic-image'
 
 // Project Components
-import {HeartIcon, HeartSolidIcon} from '@salesforce/retail-react-app/app/components/icons'
-import Link from '@salesforce/retail-react-app/app/components/link'
-import Swatch from '@salesforce/retail-react-app/app/components/swatch-group/swatch'
-import SwatchGroup from '@salesforce/retail-react-app/app/components/swatch-group'
-import withRegistration from '@salesforce/retail-react-app/app/components/with-registration'
-import PromoCallout from '@salesforce/retail-react-app/app/components/product-tile/promo-callout'
+import {HeartIcon, HeartSolidIcon} from '../../components/icons'
+import Link from '../../components/link'
+import Swatch from '../../components/swatch-group/swatch'
+import SwatchGroup from '../../components/swatch-group'
+import withRegistration from '../../components/with-registration'
+import PromoCallout from '../../components/product-tile/promo-callout'
 
 // Hooks
 import {useIntl} from 'react-intl'
 
 // Other
-import {
-    PRODUCT_TILE_IMAGE_VIEW_TYPE,
-    PRODUCT_TILE_SELECTABLE_ATTRIBUTE_ID
-} from '@salesforce/retail-react-app/app/constants'
-import {productUrlBuilder, rebuildPathWithParams} from '@salesforce/retail-react-app/app/utils/url'
-import {getPriceData} from '@salesforce/retail-react-app/app/utils/product-utils'
-import {useCurrency} from '@salesforce/retail-react-app/app/hooks'
-import {
-    filterImageGroups,
-    getDecoratedVariationAttributes
-} from '@salesforce/retail-react-app/app/utils/product-utils'
-import {PRODUCT_BADGE_DETAILS} from '@salesforce/retail-react-app/app/constants'
+import {productUrlBuilder, rebuildPathWithParams} from '../../utils/url'
+import {getPriceData} from '../../utils/product-utils'
+import {useCurrency} from '../../hooks'
+import {filterImageGroups, getDecoratedVariationAttributes} from '../../utils/product-utils'
+import {PRODUCT_BADGE_DETAILS} from '../../constants'
+
+// Constants for product tile page
+export const PRODUCT_TILE_IMAGE_VIEW_TYPE = 'large'
+export const PRODUCT_TILE_SELECTABLE_ATTRIBUTE_ID = 'color'
 
 const IconButtonWithRegistration = withRegistration(IconButton)
 
