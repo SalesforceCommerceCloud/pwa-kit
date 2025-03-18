@@ -5,21 +5,18 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
-import Checkout from '@salesforce/retail-react-app/app/pages/checkout/index'
+import Checkout from '../../pages/checkout/index'
 import {Route, Switch} from 'react-router-dom'
 import {screen, waitFor, within} from '@testing-library/react'
 import {rest} from 'msw'
-import {
-    renderWithProviders,
-    createPathWithDefaults
-} from '@salesforce/retail-react-app/app/utils/test-utils'
+import {renderWithProviders, createPathWithDefaults} from '../../utils/test-utils'
 import {
     scapiBasketWithItem,
     mockShippingMethods,
     mockedRegisteredCustomer,
     mockedCustomerProductLists
-} from '@salesforce/retail-react-app/app/mocks/mock-data'
-import mockConfig from '@salesforce/retail-react-app/config/mocks/default'
+} from '../../mocks/mock-data'
+import mockConfig from '../../mock-config'
 
 // This is a flaky test file!
 jest.retryTimes(5)

@@ -6,18 +6,12 @@
  */
 
 import React from 'react'
-import {screen, waitFor} from '@testing-library/react'
+import {act, screen, waitFor} from '@testing-library/react'
 import {Route, Switch} from 'react-router-dom'
 import {rest} from 'msw'
-import {
-    renderWithProviders,
-    createPathWithDefaults
-} from '@salesforce/retail-react-app/app/utils/test-utils'
-import Confirmation from '@salesforce/retail-react-app/app/pages/checkout/confirmation'
-import {
-    mockOrder,
-    mockProducts
-} from '@salesforce/retail-react-app/app/pages/checkout/confirmation.mock'
+import {renderWithProviders, createPathWithDefaults} from '../../utils/test-utils'
+import Confirmation from '../../pages/checkout/confirmation'
+import {mockOrder, mockProducts} from '../../pages/checkout/confirmation.mock'
 
 const MockedComponent = () => {
     return (
@@ -105,8 +99,10 @@ test('Create Account form - successful submission results in redirect to the Acc
     const createAccountButton = await screen.findByRole('button', {name: /create account/i})
     const password = screen.getByLabelText('Password')
 
-    await user.type(password, 'P4ssword!')
-    await user.click(createAccountButton)
+    await act(async () => {
+        await user.type(password, 'P4ssword!')
+        await user.click(createAccountButton)
+    })
 
     await waitFor(() => {
         expect(window.location.pathname).toBe('/uk/en-GB/account')
