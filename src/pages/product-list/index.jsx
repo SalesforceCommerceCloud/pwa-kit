@@ -25,7 +25,6 @@ import {
     SimpleGrid,
     Grid,
     Select,
-    Heading,
     Text,
     FormControl,
     Stack,
@@ -47,54 +46,47 @@ import {
 } from '@chakra-ui/react'
 
 // Project Components
-import Pagination from '@salesforce/retail-react-app/app/components/pagination'
-import ProductTile, {
-    Skeleton as ProductTileSkeleton
-} from '@salesforce/retail-react-app/app/components/product-tile'
-import {HideOnDesktop} from '@salesforce/retail-react-app/app/components/responsive'
-import Refinements from '@salesforce/retail-react-app/app/pages/product-list/partials/refinements'
-import CategoryLinks from '@salesforce/retail-react-app/app/pages/product-list/partials/category-links'
-import SelectedRefinements from '@salesforce/retail-react-app/app/pages/product-list/partials/selected-refinements'
-import EmptySearchResults from '@salesforce/retail-react-app/app/pages/product-list/partials/empty-results'
-import PageHeader from '@salesforce/retail-react-app/app/pages/product-list/partials/page-header'
-import AbovePageHeader from '@salesforce/retail-react-app/app/pages/product-list/partials/above-page-header'
-import PageDesignerPromotionalBanner from '@salesforce/retail-react-app/app/pages/product-list/partials/page-designer-promotional-banner'
+import Pagination from '../../components/pagination'
+import ProductTile, {Skeleton as ProductTileSkeleton} from '../../components/product-tile'
+import {HideOnDesktop} from '../../components/responsive'
+import Refinements from '../../pages/product-list/partials/refinements'
+import CategoryLinks from '../../pages/product-list/partials/category-links'
+import SelectedRefinements from '../../pages/product-list/partials/selected-refinements'
+import EmptySearchResults from '../../pages/product-list/partials/empty-results'
+import PageHeader from '../../pages/product-list/partials/page-header'
+import AbovePageHeader from '../../pages/product-list/partials/above-page-header'
+import PageDesignerPromotionalBanner from '../../pages/product-list/partials/page-designer-promotional-banner'
 
 // Icons
-import {FilterIcon, ChevronDownIcon} from '@salesforce/retail-react-app/app/components/icons'
+import {FilterIcon, ChevronDownIcon} from '../../components/icons'
 
 // Hooks
 import {
     useLimitUrls,
     usePageUrls,
     useSortUrls,
-    useSearchParams
-} from '@salesforce/retail-react-app/app/hooks'
-import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
-import useEinstein from '@salesforce/retail-react-app/app/hooks/use-einstein'
-import useDataCloud from '@salesforce/retail-react-app/app/hooks/use-datacloud'
-import useActiveData from '@salesforce/retail-react-app/app/hooks/use-active-data'
+    useSearchParams,
+    useExtensionConfig
+} from '../../hooks'
+import {useToast} from '../../hooks/use-toast'
+import useEinstein from '../../hooks/use-einstein'
+import useActiveData from '../../hooks/use-active-data'
 
 // Others
 import {HTTPNotFound, HTTPError} from '@salesforce/pwa-kit-react-sdk/ssr/universal/errors'
-import logger from '@salesforce/retail-react-app/app/utils/logger-instance'
+import logger from '../../utils/logger-instance'
 
 // Constants
 import {
-    DEFAULT_LIMIT_VALUES,
     API_ERROR_MESSAGE,
-    MAX_CACHE_AGE,
     TOAST_ACTION_VIEW_WISHLIST,
     TOAST_MESSAGE_ADDED_TO_WISHLIST,
-    TOAST_MESSAGE_REMOVED_FROM_WISHLIST,
-    STALE_WHILE_REVALIDATE,
-    PRODUCT_LIST_IMAGE_VIEW_TYPE,
-    PRODUCT_LIST_SELECTABLE_ATTRIBUTE_ID
-} from '@salesforce/retail-react-app/app/constants'
-import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
-import LoadingSpinner from '@salesforce/retail-react-app/app/components/loading-spinner'
-import {useWishList} from '@salesforce/retail-react-app/app/hooks/use-wish-list'
-import {isHydrated} from '@salesforce/retail-react-app/app/utils/utils'
+    TOAST_MESSAGE_REMOVED_FROM_WISHLIST
+} from '../../constants'
+import useNavigation from '../../hooks/use-navigation'
+import LoadingSpinner from '../../components/loading-spinner'
+import {useWishList} from '../../hooks/use-wish-list'
+import {isHydrated} from '../../utils/utils'
 
 // NOTE: You can ignore certain refinements on a template level by updating the below
 // list of ignored refinements.
@@ -123,7 +115,12 @@ const ProductList = (props) => {
     const {res} = useServerContext()
     const customerId = useCustomerId()
     const [searchParams, {stringify: stringifySearchParams}] = useSearchParams()
-
+    const {
+        pages: {ProductList: productListConfig},
+        maxCacheAge: MAX_CACHE_AGE,
+        staleWhileRevalidate: STALE_WHILE_REVALIDATE,
+        search: searchConfig
+    } = useExtensionConfig()
     /**************** Page State ****************/
     const [filtersLoading, setFiltersLoading] = useState(false)
     const [wishlistLoading, setWishlistLoading] = useState([])
@@ -580,9 +577,9 @@ const ProductList = (props) => {
                                                   enableFavourite={true}
                                                   isFavourite={isInWishlist}
                                                   isRefreshingData={isRefetching && isFetched}
-                                                  imageViewType={PRODUCT_LIST_IMAGE_VIEW_TYPE}
+                                                  imageViewType={productListConfig.imageViewType}
                                                   selectableAttributeId={
-                                                      PRODUCT_LIST_SELECTABLE_ATTRIBUTE_ID
+                                                      productListConfig.selectableAttributeId
                                                   }
                                                   onClick={() => {
                                                       if (searchQuery) {
@@ -636,7 +633,7 @@ const ProductList = (props) => {
                                 >
                                     {limitUrls.map((href, index) => (
                                         <option key={href} value={href}>
-                                            {DEFAULT_LIMIT_VALUES[index]}
+                                            {searchConfig.defaultLimitValues[index]}
                                         </option>
                                     ))}
                                 </Select>
