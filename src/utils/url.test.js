@@ -16,9 +16,9 @@ import {
     absoluteUrl,
     createUrlTemplate,
     removeSiteLocaleFromPath
-} from '@salesforce/retail-react-app/app/utils/url'
-import {getUrlConfig} from '@salesforce/retail-react-app/app/utils/site-utils'
-import mockConfig from '@salesforce/retail-react-app/config/mocks/default'
+} from './url'
+import {getUrlConfig} from './site-utils'
+import mockConfig from '../mock-config'
 
 afterEach(() => {
     jest.clearAllMocks()
@@ -138,11 +138,11 @@ describe('url builder test', () => {
 })
 
 describe('getPathWithLocale', () => {
-    getUrlConfig.mockImplementation(() => mockConfig.app.url)
+    getUrlConfig.mockImplementation(() => mockConfig.url)
 
     test('getPathWithLocale returns expected for PLP', () => {
         const location = new URL('http://localhost:3000/uk/it-IT/category/newarrivals-womens')
-        const buildUrl = createUrlTemplate(mockConfig.app, 'uk', 'it-IT')
+        const buildUrl = createUrlTemplate(mockConfig, 'uk', 'it-IT')
 
         const relativeUrl = getPathWithLocale('fr-FR', buildUrl, {location})
         expect(relativeUrl).toBe(`/uk/fr/category/newarrivals-womens`)
@@ -150,7 +150,7 @@ describe('getPathWithLocale', () => {
 
     test('getPathWithLocale uses default site for siteRef when it is no defined in the url', () => {
         const location = new URL('http://localhost:3000/category/newarrivals-womens')
-        const buildUrl = createUrlTemplate(mockConfig.app, 'uk', 'it-IT')
+        const buildUrl = createUrlTemplate(mockConfig, 'uk', 'it-IT')
 
         const relativeUrl = getPathWithLocale('fr-FR', buildUrl, {location})
         expect(relativeUrl).toBe(`/uk/fr/category/newarrivals-womens`)
@@ -160,7 +160,7 @@ describe('getPathWithLocale', () => {
         const location = new URL(
             'http://localhost:3000/uk/it-IT/category/newarrivals-womens?limit=25&refine=c_refinementColor%3DBianco&sort=best-matches&offset=25'
         )
-        const buildUrl = createUrlTemplate(mockConfig.app, 'uk', 'it-IT')
+        const buildUrl = createUrlTemplate(mockConfig, 'uk', 'it-IT')
 
         const relativeUrl = getPathWithLocale('fr-FR', buildUrl, {
             disallowParams: ['refine'],
@@ -173,7 +173,7 @@ describe('getPathWithLocale', () => {
 
     test('getPathWithLocale returns expected for Homepage', () => {
         const location = new URL('http://localhost:3000/uk/it-IT/')
-        const buildUrl = createUrlTemplate(mockConfig.app, 'uk', 'it-IT')
+        const buildUrl = createUrlTemplate(mockConfig, 'uk', 'it-IT')
 
         const relativeUrl = getPathWithLocale('fr-FR', buildUrl, {location})
         expect(relativeUrl).toBe(`/uk/fr/`)
@@ -181,7 +181,7 @@ describe('getPathWithLocale', () => {
 
     test('getPathWithLocale returns / when both site and locale are default', () => {
         const location = new URL('http://localhost:3000/')
-        const buildUrl = createUrlTemplate(mockConfig.app, 'uk', 'en-GB')
+        const buildUrl = createUrlTemplate(mockConfig, 'uk', 'en-GB')
 
         const relativeUrl = getPathWithLocale('en-GB', buildUrl, {location})
         expect(relativeUrl).toBe(`/`)
@@ -189,12 +189,12 @@ describe('getPathWithLocale', () => {
 })
 
 describe('createUrlTemplate tests', () => {
-    const defaultSite = mockConfig.app.sites[0]
-    const defaultAlias = mockConfig.app.siteAliases[defaultSite.id]
+    const defaultSite = mockConfig.sites[0]
+    const defaultAlias = mockConfig.siteAliases[defaultSite.id]
     const defaultSiteMock = {...defaultSite, alias: defaultAlias}
 
-    const nonDefaultSite = mockConfig.app.sites[1]
-    const nonDefaultAlias = mockConfig.app.siteAliases[nonDefaultSite.id]
+    const nonDefaultSite = mockConfig.sites[1]
+    const nonDefaultAlias = mockConfig.siteAliases[nonDefaultSite.id]
     const nonDefaultSiteMock = {...nonDefaultSite, alias: nonDefaultAlias}
 
     const configValues = ['path', 'query_param', 'none']
@@ -354,13 +354,13 @@ describe('createUrlTemplate tests', () => {
                 locale?.alias ? `, locale.alias:${locale.alias}` : ''
             } and urlConfig:${JSON.stringify(urlConfig)}`, () => {
                 const buildUrl = createUrlTemplate(
-                    {url: urlConfig},
+                    {url: urlConfig, pages: {Home: {path: '/'}}},
                     site.id,
                     locale?.alias || locale?.id
                 )
                 const resultUrl = buildUrl(
                     path,
-                    mockConfig.app.siteAliases[site.id],
+                    mockConfig.siteAliases[site.id],
                     locale?.alias || locale?.id
                 )
 
