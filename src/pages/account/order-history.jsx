@@ -7,7 +7,7 @@
 
 import React, {useEffect, useRef} from 'react'
 import {FormattedMessage, FormattedNumber, useIntl} from 'react-intl'
-import {useLocation} from 'react-router'
+import {useLocation} from 'react-router-dom'
 import {
     Box,
     Heading,
@@ -22,16 +22,14 @@ import {
     Img,
     Skeleton
 } from '@chakra-ui/react'
-import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
 import {useCustomerOrders, useProducts} from '@salesforce/commerce-sdk-react'
-import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
-import {usePageUrls, useSearchParams} from '@salesforce/retail-react-app/app/hooks'
-import PageActionPlaceHolder from '@salesforce/retail-react-app/app/components/page-action-placeholder'
-import Link from '@salesforce/retail-react-app/app/components/link'
-import {ChevronRightIcon, ReceiptIcon} from '@salesforce/retail-react-app/app/components/icons'
-import Pagination from '@salesforce/retail-react-app/app/components/pagination'
+import useNavigation from '../../hooks/use-navigation'
+import {useExtensionConfig, useCurrentCustomer, usePageUrls, useSearchParams} from '../../hooks'
+import PageActionPlaceHolder from '../../components/page-action-placeholder'
+import Link from '../../components/link'
+import {ChevronRightIcon, ReceiptIcon} from '../../components/icons'
+import Pagination from '../../components/pagination'
 import PropTypes from 'prop-types'
-import {DEFAULT_ORDERS_SEARCH_PARAMS} from '@salesforce/retail-react-app/app/constants'
 
 const OrderProductImages = ({productItems}) => {
     const ids = productItems.map((item) => item.productId).join(',') ?? ''
@@ -81,11 +79,14 @@ const AccountOrderHistory = () => {
     const location = useLocation()
     const {formatMessage, formatDate} = useIntl()
     const navigate = useNavigation()
+    const {
+        pages: {Account: accountConfig}
+    } = useExtensionConfig()
 
     const {data: customer} = useCurrentCustomer()
     const {customerId} = customer
 
-    const searchParams = useSearchParams(DEFAULT_ORDERS_SEARCH_PARAMS)
+    const searchParams = useSearchParams(accountConfig.orderSearchParam)
     const {limit, offset} = searchParams[0]
 
     const {data: {data: orders, ...paging} = {}, isLoading} = useCustomerOrders(
