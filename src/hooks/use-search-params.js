@@ -8,8 +8,7 @@
 import {useLocation} from 'react-router-dom'
 import queryString from 'query-string'
 
-// Constants
-import {DEFAULT_SEARCH_PARAMS} from '@salesforce/retail-react-app/app/constants'
+import {useExtensionConfig} from './use-extension-config'
 
 const PARSE_OPTIONS = {
     parseBooleans: true,
@@ -20,9 +19,12 @@ const PARSE_OPTIONS = {
  * This hook will return all the location search params pertinant
  * to the product list page.
  */
-export const useSearchParams = (searchParams = DEFAULT_SEARCH_PARAMS, parseRefine = true) => {
+export const useSearchParams = (searchParams, parseRefine = true) => {
     const {search} = useLocation()
-
+    const {search: searchConfig} = useExtensionConfig()
+    if (!searchParams) {
+        searchParams = searchConfig.defaultSearchParams
+    }
     // Encode the search query, including preset values.
     const searchParamsObject = {
         ...searchParams,

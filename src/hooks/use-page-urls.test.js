@@ -5,11 +5,12 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
-import {Router} from 'react-router'
+import {Router} from 'react-router-dom'
 
 import {render} from '@testing-library/react'
 import {createMemoryHistory} from 'history'
-import {usePageUrls} from '@salesforce/retail-react-app/app/hooks/use-page-urls'
+import {usePageUrls} from './use-page-urls'
+import {renderWithProviders} from '../utils/test-utils'
 
 const MockComponent = () => {
     const urls = usePageUrls({total: 100})
@@ -26,7 +27,7 @@ describe('The usePageUrls', () => {
         const history = createMemoryHistory()
         history.push('/test/path?limit=25')
 
-        const wrapper = render(
+        const wrapper = renderWithProviders(
             <Router history={history}>
                 <MockComponent />
             </Router>

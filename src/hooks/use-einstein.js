@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import {useMemo, useState} from 'react'
-import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
+
 import {
     useCommerceApi,
     useAccessToken,
@@ -14,8 +14,9 @@ import {
     useCustomerType,
     useDNT
 } from '@salesforce/commerce-sdk-react'
-import {keysToCamel} from '@salesforce/retail-react-app/app/utils/utils'
-import logger from '@salesforce/retail-react-app/app/utils/logger-instance'
+import {useExtensionConfig} from '../hooks/use-extension-config'
+import {keysToCamel} from '../utils/utils'
+import logger from '../utils/logger-instance'
 
 export class EinsteinAPI {
     constructor({host, einsteinId, siteId, isProduction, dnt}) {
@@ -394,9 +395,7 @@ const useEinstein = () => {
     const api = useCommerceApi()
     const {effectiveDnt} = useDNT()
     const {getTokenWhenReady} = useAccessToken()
-    const {
-        app: {einsteinAPI: config}
-    } = getConfig()
+    const {einsteinAPI: config} = useExtensionConfig()
     const {host, einsteinId, siteId, isProduction} = config
 
     const {getUsidWhenReady} = useUsid()

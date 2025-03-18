@@ -6,15 +6,12 @@
  */
 
 import React from 'react'
-import {Router} from 'react-router'
+import {Router} from 'react-router-dom'
 
 import {render} from '@testing-library/react'
 import {createMemoryHistory} from 'history'
-import {
-    useSearchParams,
-    stringify,
-    parse
-} from '@salesforce/retail-react-app/app/hooks/use-search-params'
+import {useSearchParams, stringify, parse} from './use-search-params'
+import {renderWithProviders} from '../utils/test-utils'
 
 const MockComponent = () => {
     const [params] = useSearchParams()
@@ -31,7 +28,7 @@ describe('The useSearchParams', () => {
         const history = createMemoryHistory()
         history.push('/test/path')
 
-        const wrapper = render(
+        const wrapper = renderWithProviders(
             <Router history={history}>
                 <MockComponent />
             </Router>
@@ -48,7 +45,7 @@ describe('The useSearchParams', () => {
             '/test/path?limit=25&offset=0&refine=c_refinementColor%3DBlack%7CPurple&sort=best-matches'
         )
 
-        const wrapper = render(
+        const wrapper = renderWithProviders(
             <Router history={history}>
                 <MockComponent />
             </Router>

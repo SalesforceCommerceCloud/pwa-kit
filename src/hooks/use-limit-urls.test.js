@@ -6,11 +6,12 @@
  */
 
 import React from 'react'
-import {Router} from 'react-router'
+import {Router} from 'react-router-dom'
 
 import {render} from '@testing-library/react'
 import {createMemoryHistory} from 'history'
-import {useLimitUrls} from '@salesforce/retail-react-app/app/hooks/use-limit-urls'
+import {useLimitUrls} from './use-limit-urls'
+import {renderWithProviders} from '../utils/test-utils'
 
 const MockComponent = () => {
     const urls = useLimitUrls()
@@ -27,7 +28,7 @@ describe('The useLimitUrls', () => {
         const history = createMemoryHistory()
         history.push('/test/path')
 
-        const wrapper = render(
+        const wrapper = renderWithProviders(
             <Router history={history}>
                 <MockComponent />
             </Router>
