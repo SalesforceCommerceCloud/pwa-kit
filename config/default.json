@@ -56,8 +56,14 @@
         "ResetPassword": {
             "path": "/reset-password"
         },
+        "ResetPasswordLanding": {
+            "path": "/reset-password-landing"
+        },
         "LoginRedirect": {
             "path": "/callback"
+        },
+        "PasswordlessLoginLanding": {
+            "path": "/passwordless-login-landing"
         },
         "ProductDetail": {
             "path": "/product/:productId"
@@ -67,6 +73,12 @@
             "imageViewType": "large",
             "selectableAttributeId": "color",
             "filterAccordionSate": "filters-expanded-index"
+        },
+        "SocialRedirect": {
+            "path": "/social-redirect"
+        },
+        "WishList": {
+            "path": "/account/wishlist"
         }
     },
     "search": {
