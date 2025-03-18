@@ -28,12 +28,16 @@ import {
     useMediaQuery
 } from '@chakra-ui/react'
 import {AuthHelpers, useAuthHelper, useCustomerType} from '@salesforce/commerce-sdk-react'
+import {
+    useApplicationExtension,
+    useApplicationExtensionsStore
+} from '@salesforce/pwa-kit-extension-sdk/react'
 
-import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
+import {useCurrentBasket} from '../../hooks/use-current-basket'
 
-import Link from '@salesforce/retail-react-app/app/components/link'
-import Search from '@salesforce/retail-react-app/app/components/search'
-import withRegistration from '@salesforce/retail-react-app/app/components/with-registration'
+import Link from '../../components/link'
+import Search from '../../components/search'
+import withRegistration from '../../components/with-registration'
 import {
     AccountIcon,
     BrandLogo,
@@ -43,14 +47,14 @@ import {
     HeartIcon,
     SignoutIcon,
     StoreIcon
-} from '@salesforce/retail-react-app/app/components/icons'
+} from '../../components/icons'
 
-import {navLinks, messages} from '@salesforce/retail-react-app/app/pages/account/constant'
-import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
-import LoadingSpinner from '@salesforce/retail-react-app/app/components/loading-spinner'
-import {HideOnDesktop, HideOnMobile} from '@salesforce/retail-react-app/app/components/responsive'
-import {isHydrated, noop} from '@salesforce/retail-react-app/app/utils/utils'
-import {STORE_LOCATOR_IS_ENABLED} from '@salesforce/retail-react-app/app/constants'
+import {navLinks, messages} from '../../pages/account/constant'
+import useNavigation from '../../hooks/use-navigation'
+import LoadingSpinner from '../../components/loading-spinner'
+import {HideOnDesktop, HideOnMobile} from '../../components/responsive'
+import {isHydrated, noop} from '../../utils/utils'
+
 const IconButtonWithRegistration = withRegistration(IconButton)
 
 /**
@@ -105,7 +109,6 @@ const Header = ({
     onLogoClick = noop,
     onMyCartClick = noop,
     onWishlistClick = noop,
-    onStoreLocatorClick = noop,
     ...props
 }) => {
     const intl = useIntl()
@@ -125,6 +128,13 @@ const Header = ({
         onOpen: onAccountMenuOpen
     } = useDisclosure()
     const [isDesktop] = useMediaQuery('(min-width: 992px)')
+    const storeLocatorExtension = useApplicationExtension(
+        '@salesforce/extension-chakra-store-locator'
+    )
+    const isStoreLocatorEnabled = !!storeLocatorExtension && storeLocatorExtension.isEnabled
+    const openModal = useApplicationExtensionsStore((state) => {
+        return state.state['@salesforce/extension-chakra-store-locator']?.openModal || noop
+    })
 
     const [showLoading, setShowLoading] = useState(false)
     // tracking if users enter the popover Content,
@@ -201,7 +211,6 @@ const Header = ({
                         onClick={onMyAccountClick}
                         onMouseOver={isDesktop ? onAccountMenuOpen : noop}
                     />
-
                     {isRegistered && isHydrated() && (
                         <Popover
                             isLazy
@@ -311,7 +320,7 @@ const Header = ({
                         {...styles.wishlistIcon}
                         onClick={onWishlistClick}
                     />
-                    {STORE_LOCATOR_IS_ENABLED && (
+                    {isStoreLocatorEnabled && (
                         <IconButton
                             aria-label={intl.formatMessage({
                                 defaultMessage: 'Store Locator',
@@ -320,7 +329,9 @@ const Header = ({
                             icon={<StoreIcon />}
                             {...styles.icons}
                             variant="unstyled"
-                            onClick={onStoreLocatorClick}
+                            onClick={() => {
+                                openModal()
+                            }}
                         />
                     )}
                     <IconButton
@@ -359,7 +370,6 @@ Header.propTypes = {
     onMyAccountClick: PropTypes.func,
     onWishlistClick: PropTypes.func,
     onMyCartClick: PropTypes.func,
-    onStoreLocatorClick: PropTypes.func,
     searchInputRef: PropTypes.oneOfType([
         PropTypes.func,
         PropTypes.shape({current: PropTypes.elementType})
