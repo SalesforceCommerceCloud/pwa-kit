@@ -5,25 +5,20 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
-import {
-    renderWithProviders,
-    createPathWithDefaults
-} from '@salesforce/retail-react-app/app/utils/test-utils'
+import {renderWithProviders, createPathWithDefaults} from '../../utils/test-utils'
 import userEvent from '@testing-library/user-event'
 import {screen, waitFor, within} from '@testing-library/react'
-import SearchInput from '@salesforce/retail-react-app/app/components/search/index'
-import Suggestions from '@salesforce/retail-react-app/app/components/search/partials/suggestions'
-import {
-    clearSessionJSONItem,
-    getSessionJSONItem,
-    setSessionJSONItem,
-    noop
-} from '@salesforce/retail-react-app/app/utils/utils'
-import {RECENT_SEARCH_KEY, RECENT_SEARCH_LIMIT} from '@salesforce/retail-react-app/app/constants'
-import mockSearchResults from '@salesforce/retail-react-app/app/mocks/searchResults'
-import mockConfig from '@salesforce/retail-react-app/config/mocks/default'
+import SearchInput from '../../components/search/index'
+import Suggestions from '../../components/search/partials/suggestions'
+import {clearSessionJSONItem, getSessionJSONItem, setSessionJSONItem, noop} from '../../utils/utils'
+import mockSearchResults from '../../mocks/searchResults'
+import mockConfig from '../../mock-config'
 import {rest} from 'msw'
-import {mockCustomerBaskets} from '@salesforce/retail-react-app/app/mocks/mock-data'
+import {mockCustomerBaskets} from '../../mocks/mock-data'
+
+// Constants for Search Component
+const RECENT_SEARCH_LIMIT = mockConfig.search.recentSearchLimit
+const RECENT_SEARCH_KEY = mockConfig.search.recentSearchKey
 
 beforeEach(() => {
     clearSessionJSONItem(RECENT_SEARCH_KEY)

@@ -19,28 +19,15 @@ import {
     HStack,
     Spinner
 } from '@chakra-ui/react'
-import SearchSuggestions from '@salesforce/retail-react-app/app/components/search/partials/search-suggestions'
-import {SearchIcon} from '@salesforce/retail-react-app/app/components/icons'
-import {
-    capitalize,
-    boldString,
-    getSessionJSONItem,
-    setSessionJSONItem
-} from '@salesforce/retail-react-app/app/utils/utils'
-import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
-import {HideOnDesktop, HideOnMobile} from '@salesforce/retail-react-app/app/components/responsive'
+import SearchSuggestions from '../../components/search/partials/search-suggestions'
+import {SearchIcon} from '../../components/icons'
+import {capitalize, boldString, getSessionJSONItem, setSessionJSONItem} from '../../utils/utils'
+import useNavigation from '../../hooks/use-navigation'
+import {HideOnDesktop, HideOnMobile} from '../../components/responsive'
 import {FormattedMessage} from 'react-intl'
 import debounce from 'lodash/debounce'
-import {
-    RECENT_SEARCH_KEY,
-    RECENT_SEARCH_LIMIT,
-    RECENT_SEARCH_MIN_LENGTH
-} from '@salesforce/retail-react-app/app/constants'
-import {
-    productUrlBuilder,
-    searchUrlBuilder,
-    categoryUrlBuilder
-} from '@salesforce/retail-react-app/app/utils/url'
+import {productUrlBuilder, searchUrlBuilder, categoryUrlBuilder} from '../../utils/url'
+import {useExtensionConfig} from '../../hooks'
 
 const formatSuggestions = (searchSuggestions, input) => {
     return {
@@ -88,6 +75,7 @@ const Search = (props) => {
     const [isOpen, setIsOpen] = useState(false)
     const [searchQuery, setSearchQuery] = useState('')
     const navigate = useNavigation()
+    const {search: searchConfig} = useExtensionConfig()
     const searchSuggestion = useSearchSuggestions(
         {
             parameters: {
@@ -95,11 +83,11 @@ const Search = (props) => {
             }
         },
         {
-            enabled: searchQuery?.length >= RECENT_SEARCH_MIN_LENGTH
+            enabled: searchQuery?.length >= searchConfig.recentSearchMinLength
         }
     )
     const searchInputRef = useRef()
-    const recentSearches = getSessionJSONItem(RECENT_SEARCH_KEY)
+    const recentSearches = getSessionJSONItem(searchConfig.recentSearchKey)
     const searchSuggestions = useMemo(
         () => formatSuggestions(searchSuggestion.data, searchInputRef?.current?.value),
         [searchSuggestion]
@@ -117,7 +105,7 @@ const Search = (props) => {
 
     const saveRecentSearch = (searchText) => {
         // Get recent searches or an empty array if undefined.
-        let searches = getSessionJSONItem(RECENT_SEARCH_KEY) || []
+        let searches = getSessionJSONItem(searchConfig.recentSearchKey) || []
 
         // Check if term is already in the saved searches
         searches = searches.filter((savedSearchTerm) => {
@@ -126,10 +114,10 @@ const Search = (props) => {
 
         // Create a new array consisting of the search text and up to 4 other resent searches.
         // I'm assuming the order is newest to oldest.
-        searches = [searchText, ...searches].slice(0, RECENT_SEARCH_LIMIT)
+        searches = [searchText, ...searches].slice(0, searchConfig.recentSearchLimit)
 
         // Replace the save resent search with the updated value.
-        setSessionJSONItem(RECENT_SEARCH_KEY, searches)
+        setSessionJSONItem(searchConfig.recentSearchKey, searches)
     }
 
     const debouncedSearch = debounce((input) => {
@@ -139,7 +127,7 @@ const Search = (props) => {
 
     const onSearchChange = async (e) => {
         const input = e.target.value
-        if (input.length >= RECENT_SEARCH_MIN_LENGTH) {
+        if (input.length >= searchConfig.recentSearchMinLength) {
             debouncedSearch(input)
         } else {
             setSearchQuery('')
