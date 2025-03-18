@@ -5,12 +5,9 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import {useIntl, defineMessages} from 'react-intl'
-import {formatPhoneNumber} from '@salesforce/retail-react-app/app/utils/phone-utils'
-import {
-    stateOptions,
-    provinceOptions
-} from '@salesforce/retail-react-app/app/components/forms/state-province-options'
-import {SHIPPING_COUNTRY_CODES} from '@salesforce/retail-react-app/app/constants'
+import {formatPhoneNumber} from '../../utils/phone-utils'
+import {stateOptions, provinceOptions} from '../../components/forms/state-province-options'
+import {useExtensionConfig} from '../../hooks'
 
 const messages = defineMessages({
     required: {defaultMessage: 'Required', id: 'use_address_fields.error.required'},
@@ -47,7 +44,9 @@ export default function useAddressFields({
     prefix = ''
 }) {
     const {formatMessage} = useIntl()
-
+    const {
+        pages: {Checkout: checkoutConfig}
+    } = useExtensionConfig()
     const countryCode = watch('countryCode')
 
     const fields = {
@@ -107,7 +106,7 @@ export default function useAddressFields({
             label: formatMessage(messages.country),
             defaultValue: 'US',
             type: 'select',
-            options: SHIPPING_COUNTRY_CODES,
+            options: checkoutConfig.shippingCountryCode,
             rules: {
                 required: formatMessage({
                     defaultMessage: 'Please select your country.',
