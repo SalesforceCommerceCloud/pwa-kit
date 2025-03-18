@@ -1,79 +1,45 @@
-<div align="center">
+:loudspeaker: Hey there, Salesforce Commerce Cloud community!
 
-<h1>The Progressive Web App (PWA) Kit</h1>
+We’re excited to hear your thoughts on your developer experience with PWA Kit and the Composable Storefront generally! Your feedback is incredibly valuable in helping us guide our roadmap and improve our offering.
 
-[![npm](https://img.shields.io/npm/v/@salesforce/pwa-kit-react-sdk.svg)](https://www.npmjs.com/package/@salesforce/pwa-kit-react-sdk)
-[![License](https://img.shields.io/github/license/SalesforceCommerceCloud/pwa-kit.svg)](https://github.com/SalesforceCommerceCloud/pwa-kit/blob/master/LICENSE)
-[![Checks](https://img.shields.io/github/checks-status/SalesforceCommerceCloud/pwa-kit/develop.svg)](https://github.com/SalesforceCommerceCloud/pwa-kit)
-[![npm](https://img.shields.io/npm/dm/@salesforce/pwa-kit-react-sdk.svg)](https://www.npmjs.com/package/@salesforce/pwa-kit-react-sdk)
+:clipboard: Take our quick survey here: [Survey](https://forms.gle/bUZNxQ3QKUcrjhV18) 
 
-</div>
+Feel free to share this survey link with your colleagues, partners, or anyone who has experience with PWA Kit. Your input will help us shape the future of our development tools.
 
-<div align="center">
+Thank you for being a part of our community and for your continuous support! :raised_hands:
 
-📖 [Read Docs](https://sfdc.co/pwa-kit) |
-🏖️ [View Demo](https://pwa-kit.mobify-storefront.com/) |
-🚀 [Deploy](https://runtime.commercecloud.com/) |
-➕ [Contribute](https://github.com/SalesforceCommerceCloud/pwa-kit/blob/develop/CONTRIBUTING.md)
-<br /><br />
-The PWA Kit is a storefront technology for headless commerce using Salesforce Commerce APIs and React. It provides front-end developers with a more flexible and agile approach to build and maintain modern shopping experiences.
-<br/><br/>
-<img alt="pwa-kit banner" src="https://raw.githubusercontent.com/SalesforceCommerceCloud/pwa-kit/develop/packages/template-retail-react-app/app/static/img/hero.png" style="width: 700px; height:auto;">
+# The Retail React App
 
-</div>
+A project template that includes an isomorphic JavaScript storefront and [Progressive Web App](https://developer.mozilla.org/en-US/docs/Web/Progressive_web_apps) built using [React](https://reactjs.org/) and [Express](https://expressjs.com/). It uses a modern headless architecture that enables developers to decouple front-end code from back-end systems. It leverages popular open-source libraries in the React ecosystem, such as [Chakra UI](https://chakra-ui.com/) components, [Emotion](https://emotion.sh/docs/introduction) (CSS-in-JS), [Webpack](https://webpack.js.org/), and many more.
 
----
+Developers don’t have to worry about the underlying infrastructure, whether they’re developing their app locally, deploying it to a [Managed Runtime](https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/mrt-overview.html) environment, or testing the app live.
 
-## 🏄 Get Started
+## Requirements
 
-### Requirements
+-   Node 16.11 or later
+-   npm 8 or later
 
--   Node 18 or later
--   npm 9 or later
+## Get Started
 
-### Create Your First Project
-
-```bash
-npx @salesforce/pwa-kit-create-app
-```
-
-Enter your [sandbox configuration](https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/getting-started.html#new-project).
-
-### Run the Project Locally
+To start your web server for local development, run the following command in your project directory:
 
 ```bash
 npm start
 ```
 
-### Deploy to Managed Runtime
+Now that the development server is running, you can open a browser and preview your commerce app:
 
-```
-npm run push -- -m "Message to help you recognize this bundle"
-```
+-   Go to http://localhost:3000/
 
-**Important**: Access to the [Runtime Admin](https://runtime.commercecloud.com/) application is required to deploy bundles. To learn more, read our guide to [Push and Deploy Bundles](https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/pushing-and-deploying-bundles.html).
+## Localization
 
-## 🌍 Localization
+See the [Localization README.md](./translations/README.md) for important setup instructions for localization.
 
-See the [Localization README.md](./packages/template-retail-react-app/translations/README.md) for important setup instructions for localization.
+## Configuration Files
 
-## ⚠️ License Information
+The Retail React App's configuration files are located in the `app/config` folder. For more details, see [Configuration Files](https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/configuration-options.html) in the documentation.
 
-The PWA Kit is licensed under a BSD 3-Clause license. See the [license](./LICENSE) for details.
-
-## ➕ Contribute
-
-Your contributions are welcome! Refer to the [CONTRIBUTING](./CONTRIBUTING.md) guide to get started. If you like `pwa-kit`, consider adding a ⭐ on the [GitHub Repo](https://github.com/SalesforceCommerceCloud/pwa-kit/). It helps other people discover PWA Kit!
-
-## 🛠️ Nightly Builds
-
-⚠️ PWA Kit releases nightly builds on a nightly cadence for better visibility about upcoming features and a chance for implementers to test code integrations via a "preview" release. These builds are untested and unsupported. Use at your own risk!
-Nightly builds carry none of our guarantees associated with well-tested software. **Do not use these builds in production**.
-Some feature included in the nightly builds may not be included in final PWA Kit releases.
-These unreleased builds may not even load, may have undocumented features, known defects, and any number of other issues.
-They are intended for use by developers and others wishing to get early access to planned PWA Kit features.
-
-## 📖 Documentation
+## Documentation
 
 The full documentation for PWA Kit and Managed Runtime is hosted on the [Salesforce Developers](https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/overview) portal.
 
@@ -90,7 +56,3 @@ The full documentation for PWA Kit and Managed Runtime is hosted on the [Salesfo
 -   [Routing](https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/routing.html)
 -   [Phased Headless Rollouts](https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/phased-headless-rollouts.html)
 -   [Launch Your Storefront](https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/launching-your-storefront.html)
-
-## 🔮 Forward-Looking Statements
-
-This repository may contain forward-looking statements that involve risks, uncertainties, and assumptions. For more information, see [STATEMENTS](STATEMENTS.md)
