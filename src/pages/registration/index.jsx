@@ -12,12 +12,12 @@ import {Box, Container} from '@chakra-ui/react'
 import {AuthHelpers, useAuthHelper, useCustomerType} from '@salesforce/commerce-sdk-react'
 import {useForm} from 'react-hook-form'
 import {useLocation} from 'react-router-dom'
-import Seo from '@salesforce/retail-react-app/app/components/seo'
-import RegisterForm from '@salesforce/retail-react-app/app/components/register'
-import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
-import useEinstein from '@salesforce/retail-react-app/app/hooks/use-einstein'
-import useDataCloud from '@salesforce/retail-react-app/app/hooks/use-datacloud'
-import {API_ERROR_MESSAGE} from '@salesforce/retail-react-app/app/constants'
+import Seo from '../../components/seo'
+import RegisterForm from '../../components/register'
+import useNavigation from '../../hooks/use-navigation'
+import useEinstein from '../../hooks/use-einstein'
+import useDataCloud from '../../hooks/use-datacloud'
+import {API_ERROR_MESSAGE} from '../../constants'
 
 const Registration = () => {
     const {formatMessage} = useIntl()
