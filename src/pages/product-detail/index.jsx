@@ -9,10 +9,7 @@ import React, {Fragment, useCallback, useEffect, useState} from 'react'
 import PropTypes from 'prop-types'
 import {Helmet} from 'react-helmet'
 import {FormattedMessage, useIntl} from 'react-intl'
-import {
-    normalizeSetBundleProduct,
-    getUpdateBundleChildArray
-} from '@salesforce/retail-react-app/app/utils/product-utils'
+import {normalizeSetBundleProduct, getUpdateBundleChildArray} from '../../utils/product-utils'
 
 // Components
 import {Box, Button, Stack} from '@chakra-ui/react'
@@ -27,35 +24,32 @@ import {
 } from '@salesforce/commerce-sdk-react'
 
 // Hooks
-import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
-import {useVariant} from '@salesforce/retail-react-app/app/hooks'
-import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
-import useEinstein from '@salesforce/retail-react-app/app/hooks/use-einstein'
-import useDataCloud from '@salesforce/retail-react-app/app/hooks/use-datacloud'
-import useActiveData from '@salesforce/retail-react-app/app/hooks/use-active-data'
+import {useCurrentBasket, useExtensionConfig, useVariant} from '../../hooks'
+import useNavigation from '../../hooks/use-navigation'
+import useEinstein from '../../hooks/use-einstein'
+import useDataCloud from '../../hooks/use-datacloud'
+import useActiveData from '../../hooks/use-active-data'
 import {useServerContext} from '@salesforce/pwa-kit-react-sdk/ssr/universal/hooks'
 // Project Components
-import RecommendedProducts from '@salesforce/retail-react-app/app/components/recommended-products'
-import ProductView from '@salesforce/retail-react-app/app/components/product-view'
-import InformationAccordion from '@salesforce/retail-react-app/app/pages/product-detail/partials/information-accordion'
+import RecommendedProducts from '../../components/recommended-products'
+import ProductView from '../../components/product-view'
+import InformationAccordion from '../../pages/product-detail/partials/information-accordion'
 
 import {HTTPNotFound, HTTPError} from '@salesforce/pwa-kit-react-sdk/ssr/universal/errors'
-import logger from '@salesforce/retail-react-app/app/utils/logger-instance'
+import logger from '../../utils/logger-instance'
 
 // constant
 import {
     API_ERROR_MESSAGE,
     EINSTEIN_RECOMMENDERS,
-    MAX_CACHE_AGE,
     TOAST_ACTION_VIEW_WISHLIST,
     TOAST_MESSAGE_ADDED_TO_WISHLIST,
-    TOAST_MESSAGE_ALREADY_IN_WISHLIST,
-    STALE_WHILE_REVALIDATE
-} from '@salesforce/retail-react-app/app/constants'
-import {rebuildPathWithParams} from '@salesforce/retail-react-app/app/utils/url'
+    TOAST_MESSAGE_ALREADY_IN_WISHLIST
+} from '../../constants'
+import {rebuildPathWithParams} from '../../utils/url'
 import {useHistory, useLocation, useParams} from 'react-router-dom'
-import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
-import {useWishList} from '@salesforce/retail-react-app/app/hooks/use-wish-list'
+import {useToast} from '../../hooks/use-toast'
+import {useWishList} from '../../hooks/use-wish-list'
 
 const ProductDetail = () => {
     const {formatMessage} = useIntl()
@@ -67,6 +61,8 @@ const ProductDetail = () => {
     const toast = useToast()
     const navigate = useNavigation()
     const customerId = useCustomerId()
+    const {maxCacheAge: MAX_CACHE_AGE, staleWhileRevalidate: STALE_WHILE_REVALIDATE} =
+        useExtensionConfig()
 
     /****************************** Basket *********************************/
     const {isLoading: isBasketLoading} = useCurrentBasket()

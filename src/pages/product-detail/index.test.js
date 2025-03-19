@@ -6,27 +6,24 @@
  */
 import React from 'react'
 import {fireEvent, screen, waitFor, within} from '@testing-library/react'
-import {
-    mockCustomerBaskets,
-    mockedCustomerProductLists
-} from '@salesforce/retail-react-app/app/mocks/mock-data'
+import {mockCustomerBaskets, mockedCustomerProductLists} from '../../mocks/mock-data'
 import {Route, Switch} from 'react-router-dom'
 import {rest} from 'msw'
 import ProductDetail from '.'
-import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
+import {renderWithProviders} from '../../utils/test-utils'
 import {
     basketWithProductSet,
     mockWishlistWithItem,
     einsteinRecommendation,
     masterProduct,
     productsForEinstein
-} from '@salesforce/retail-react-app/app/pages/product-detail/index.mock'
-import mockedProductSet from '@salesforce/retail-react-app/app/mocks/product-set-winter-lookM'
+} from '../../pages/product-detail/index.mock'
+import mockedProductSet from '../../mocks/product-set-winter-lookM'
 import {
     mockProductBundle,
     basketWithProductBundle,
     bundleProductItemsForPDP
-} from '@salesforce/retail-react-app/app/mocks/product-bundle'
+} from '../../mocks/product-bundle'
 
 jest.setTimeout(60000)
 
@@ -47,6 +44,7 @@ jest.mock('@salesforce/commerce-sdk-react', () => {
     }
 })
 
+// NOTE: This is probably going to break.
 jest.mock('@salesforce/retail-react-app/app/constants', () => {
     const originalModule = jest.requireActual('@salesforce/retail-react-app/app/constants')
     return {
