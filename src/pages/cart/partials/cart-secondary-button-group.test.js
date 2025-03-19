@@ -6,12 +6,12 @@
  */
 import React from 'react'
 import PropTypes from 'prop-types'
-import {mockedCustomerProductListsDetails} from '@salesforce/retail-react-app/app/mocks/mock-data'
-import ItemVariantProvider from '@salesforce/retail-react-app/app/components/item-variant'
-import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
-import CartSecondaryButtonGroup from '@salesforce/retail-react-app/app/pages/cart/partials/cart-secondary-button-group'
+import {mockedCustomerProductListsDetails} from '../../../mocks/mock-data'
+import ItemVariantProvider from '../../../components/item-variant'
+import {renderWithProviders} from '../../../utils/test-utils'
+import CartSecondaryButtonGroup from './cart-secondary-button-group'
 import {screen, waitFor} from '@testing-library/react'
-import {noop} from '@salesforce/retail-react-app/app/utils/utils'
+import {noop} from '../../../utils/utils'
 
 const MockedComponent = ({
     onAddToWishlistClick = noop,

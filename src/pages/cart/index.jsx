@@ -11,22 +11,22 @@ import {FormattedMessage, useIntl} from 'react-intl'
 import {Box, Stack, Grid, GridItem, Container, useDisclosure, Button} from '@chakra-ui/react'
 
 // Project Components
-import CartCta from '@salesforce/retail-react-app/app/pages/cart/partials/cart-cta'
-import CartSecondaryButtonGroup from '@salesforce/retail-react-app/app/pages/cart/partials/cart-secondary-button-group'
-import CartSkeleton from '@salesforce/retail-react-app/app/pages/cart/partials/cart-skeleton'
-import CartTitle from '@salesforce/retail-react-app/app/pages/cart/partials/cart-title'
-import ConfirmationModal from '@salesforce/retail-react-app/app/components/confirmation-modal'
-import EmptyCart from '@salesforce/retail-react-app/app/pages/cart/partials/empty-cart'
-import OrderSummary from '@salesforce/retail-react-app/app/components/order-summary'
-import ProductItem from '@salesforce/retail-react-app/app/components/product-item'
-import ProductViewModal from '@salesforce/retail-react-app/app/components/product-view-modal'
-import BundleProductViewModal from '@salesforce/retail-react-app/app/components/product-view-modal/bundle'
-import RecommendedProducts from '@salesforce/retail-react-app/app/components/recommended-products'
+import CartCta from '../../pages/cart/partials/cart-cta'
+import CartSecondaryButtonGroup from '../../pages/cart/partials/cart-secondary-button-group'
+import CartSkeleton from '../../pages/cart/partials/cart-skeleton'
+import CartTitle from '../../pages/cart/partials/cart-title'
+import ConfirmationModal from '../../components/confirmation-modal'
+import EmptyCart from '../../pages/cart/partials/empty-cart'
+import OrderSummary from '../../components/order-summary'
+import ProductItem from '../../components/product-item'
+import ProductViewModal from '../../components/product-view-modal'
+import BundleProductViewModal from '../../components/product-view-modal/bundle'
+import RecommendedProducts from '../../components/recommended-products'
 
 // Hooks
-import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
-import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
-import {useWishList} from '@salesforce/retail-react-app/app/hooks/use-wish-list'
+import {useToast} from '../../hooks/use-toast'
+import useNavigation from '../../hooks/use-navigation'
+import {useWishList} from '../../hooks/use-wish-list'
 
 // Constants
 import {

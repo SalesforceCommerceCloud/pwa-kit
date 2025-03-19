@@ -7,27 +7,24 @@
 
 import React from 'react'
 import {screen, within, fireEvent, waitFor, act} from '@testing-library/react'
-import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
-import Cart from '@salesforce/retail-react-app/app/pages/cart/index'
+import {renderWithProviders} from '../../utils/test-utils'
+import Cart from '../../pages/cart/index'
 import {
     mockShippingMethods,
     mockCustomerBaskets,
     mockEmptyBasket,
     mockCartVariant,
     mockedCustomerProductLists
-} from '@salesforce/retail-react-app/app/mocks/mock-data'
-import mockVariant from '@salesforce/retail-react-app/app/mocks/variant-750518699578M'
+} from '../../mocks/mock-data'
+import mockVariant from '../../mocks/variant-750518699578M'
 import {rest} from 'msw'
 import {
     mockProductBundle,
     mockGetBundleChildrenProducts,
     basketWithProductBundle
-} from '@salesforce/retail-react-app/app/mocks/product-bundle'
+} from '../../mocks/product-bundle'
 import {prependHandlersToServer} from '@salesforce/retail-react-app/jest-setup'
-import {
-    baskets as mockBaskets,
-    products as mockProducts
-} from '@salesforce/retail-react-app/app/pages/cart/cart.mock'
+import {baskets as mockBaskets, products as mockProducts} from '../../pages/cart/cart.mock'
 
 const mockProduct = {
     ...mockVariant,
