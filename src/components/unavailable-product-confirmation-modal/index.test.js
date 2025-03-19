@@ -6,8 +6,8 @@
  */
 
 import React from 'react'
-import UnavailableProductConfirmationModal from '@salesforce/retail-react-app/app/components/unavailable-product-confirmation-modal/index'
-import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
+import UnavailableProductConfirmationModal from '../../components/unavailable-product-confirmation-modal/index'
+import {renderWithProviders} from '../../utils/test-utils'
 import {waitFor} from '@testing-library/react'
 import {prependHandlersToServer} from '@salesforce/retail-react-app/jest-setup'
 const mockProductsWithUnavailableProducts = {

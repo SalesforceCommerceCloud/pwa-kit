@@ -8,7 +8,7 @@ import React, {useContext, createContext, useEffect, useRef} from 'react'
 import PropTypes from 'prop-types'
 import {FormattedMessage} from 'react-intl'
 import {Box, Button, Flex, Heading, Stack} from '@chakra-ui/react'
-import LoadingSpinner from '@salesforce/retail-react-app/app/components/loading-spinner'
+import LoadingSpinner from '../../components/loading-spinner'
 
 const ToggleCardContext = createContext()
 

@@ -12,20 +12,20 @@ import {FormattedMessage, useIntl} from 'react-intl'
 import {Box, Fade, Flex, Stack, Text, VisuallyHidden} from '@chakra-ui/react'
 
 // Project Components
-import {HideOnDesktop, HideOnMobile} from '@salesforce/retail-react-app/app/components/responsive'
-import ItemVariantProvider from '@salesforce/retail-react-app/app/components/item-variant'
-import CartItemVariantImage from '@salesforce/retail-react-app/app/components/item-variant/item-image'
-import CartItemVariantName from '@salesforce/retail-react-app/app/components/item-variant/item-name'
-import CartItemVariantAttributes from '@salesforce/retail-react-app/app/components/item-variant/item-attributes'
-import CartItemVariantPrice from '@salesforce/retail-react-app/app/components/item-variant/item-price'
-import LoadingSpinner from '@salesforce/retail-react-app/app/components/loading-spinner'
-import QuantityPicker from '@salesforce/retail-react-app/app/components/quantity-picker'
+import {HideOnDesktop, HideOnMobile} from '../../components/responsive'
+import ItemVariantProvider from '../../components/item-variant'
+import CartItemVariantImage from '../../components/item-variant/item-image'
+import CartItemVariantName from '../../components/item-variant/item-name'
+import CartItemVariantAttributes from '../../components/item-variant/item-attributes'
+import CartItemVariantPrice from '../../components/item-variant/item-price'
+import LoadingSpinner from '../../components/loading-spinner'
+import QuantityPicker from '../../components/quantity-picker'
 
 // Utilities
-import {noop} from '@salesforce/retail-react-app/app/utils/utils'
+import {noop} from '../../utils/utils'
 
 // Hooks
-import {useCurrency, useDerivedProduct} from '@salesforce/retail-react-app/app/hooks'
+import {useCurrency, useDerivedProduct} from '../../hooks'
 
 /**
  * Component representing a product item usually in a list with details about the product - name, variant, pricing, etc.

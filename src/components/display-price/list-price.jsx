@@ -9,7 +9,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import {Text, VisuallyHidden} from '@chakra-ui/react'
 import {useIntl} from 'react-intl'
-import msg from '@salesforce/retail-react-app/app/components/display-price/messages'
+import msg from '../../components/display-price/messages'
 /**
  * Component that displays list price of a product with a11y
  * @param currency - currency

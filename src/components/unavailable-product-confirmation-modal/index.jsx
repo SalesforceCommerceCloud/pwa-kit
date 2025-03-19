@@ -8,10 +8,10 @@
 import React, {useEffect, useRef} from 'react'
 import PropTypes from 'prop-types'
 import {useProducts} from '@salesforce/commerce-sdk-react'
-import {REMOVE_UNAVAILABLE_CART_ITEM_DIALOG_CONFIG} from '@salesforce/retail-react-app/app/constants'
-import ConfirmationModal from '@salesforce/retail-react-app/app/components/confirmation-modal'
+import {REMOVE_UNAVAILABLE_CART_ITEM_DIALOG_CONFIG} from '../../constants'
+import ConfirmationModal from '../../components/confirmation-modal'
 import {useDisclosure} from '@chakra-ui/react'
-import {noop} from '@salesforce/retail-react-app/app/utils/utils'
+import {noop} from '../../utils/utils'
 
 /**
  * This Component determines if the provided products have become unavailable or out of stock or low stock that

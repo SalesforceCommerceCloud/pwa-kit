@@ -7,13 +7,10 @@
 import React from 'react'
 import {screen, cleanup} from '@testing-library/react'
 
-import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
-import PromoCallout from '@salesforce/retail-react-app/app/components/product-tile/promo-callout'
-import {
-    getProduct,
-    productSearch
-} from '@salesforce/retail-react-app/app/components/product-tile/promo-callout.mock.js'
-import productSetWinterLookM from '@salesforce/retail-react-app/app/mocks/product-set-winter-lookM'
+import {renderWithProviders} from '../../utils/test-utils'
+import PromoCallout from '../../components/product-tile/promo-callout'
+import {getProduct, productSearch} from '../../components/product-tile/promo-callout.mock.js'
+import productSetWinterLookM from '../../mocks/product-set-winter-lookM'
 
 describe('on product list page', () => {
     test('renders callout for a promotional price', () => {

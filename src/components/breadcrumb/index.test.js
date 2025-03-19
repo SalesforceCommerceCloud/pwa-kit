@@ -5,8 +5,8 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
-import Breadcrumb from '@salesforce/retail-react-app/app/components/breadcrumb/index'
-import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
+import Breadcrumb from '../../components/breadcrumb/index'
+import {renderWithProviders} from '../../utils/test-utils'
 
 const mockCategories = [
     {

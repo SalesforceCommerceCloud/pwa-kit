@@ -8,8 +8,8 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import {Box} from '@chakra-ui/react'
-import CurrentPrice from '@salesforce/retail-react-app/app/components/display-price/current-price'
-import ListPrice from '@salesforce/retail-react-app/app/components/display-price/list-price'
+import CurrentPrice from '../../components/display-price/current-price'
+import ListPrice from '../../components/display-price/list-price'
 
 /**
  * @param priceData - price info extracted from a product

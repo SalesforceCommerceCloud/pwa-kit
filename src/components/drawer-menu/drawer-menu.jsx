@@ -10,9 +10,9 @@ import PropTypes from 'prop-types'
 import {useIntl} from 'react-intl'
 
 // Project Components
-import LocaleSelector from '@salesforce/retail-react-app/app/components/locale-selector'
-import NestedAccordion from '@salesforce/retail-react-app/app/components/nested-accordion'
-import SocialIcons from '@salesforce/retail-react-app/app/components/social-icons'
+import LocaleSelector from '../../components/locale-selector'
+import NestedAccordion from '../../components/nested-accordion'
+import SocialIcons from '../../components/social-icons'
 
 // Components
 import {
@@ -42,24 +42,18 @@ import {
     useMultiStyleConfig
 } from '@chakra-ui/react'
 import {AuthHelpers, useAuthHelper, useCustomerType} from '@salesforce/commerce-sdk-react'
-import Link from '@salesforce/retail-react-app/app/components/link'
+import Link from '../../components/link'
 // Icons
-import {
-    BrandLogo,
-    SignoutIcon,
-    StoreIcon,
-    UserIcon
-} from '@salesforce/retail-react-app/app/components/icons'
+import {BrandLogo, SignoutIcon, UserIcon} from '../../components/icons'
 
 // Others
-import {noop} from '@salesforce/retail-react-app/app/utils/utils'
-import {getPathWithLocale, categoryUrlBuilder} from '@salesforce/retail-react-app/app/utils/url'
-import LoadingSpinner from '@salesforce/retail-react-app/app/components/loading-spinner'
+import {noop} from '../../utils/utils'
+import {getPathWithLocale, categoryUrlBuilder} from '../../utils/url'
+import LoadingSpinner from '../../components/loading-spinner'
 
-import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
-import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
+import useNavigation from '../../hooks/use-navigation'
+import useMultiSite from '../../hooks/use-multi-site'
 
-import {STORE_LOCATOR_IS_ENABLED} from '@salesforce/retail-react-app/app/constants'
 // The FONT_SIZES and FONT_WEIGHTS constants are used to control the styling for
 // the accordion buttons as their current depth. In the below definition we assign
 // values for depths 0 - 3, any depth deeper than that will use the default styling.
@@ -76,7 +70,6 @@ const DrawerSeparator = () => (
 
 // CUSTOMIZE YOUR NAVIGATION BY ALTERING THESE VALUES
 const SIGN_IN_HREF = '/login'
-const STORE_LOCATOR_HREF = '/store-locator'
 
 /**
  * This is the navigation component used for mobile devices (phone and tablet). It's
@@ -274,21 +267,6 @@ const DrawerMenu = ({
                                     </Link>
                                 )}
                             </Box>
-                            {STORE_LOCATOR_IS_ENABLED && (
-                                <Box {...styles.actionsItem}>
-                                    <Link to={STORE_LOCATOR_HREF}>
-                                        <HStack>
-                                            <StoreIcon {...styles.icon} />{' '}
-                                            <Text>
-                                                {intl.formatMessage({
-                                                    id: 'drawer_menu.link.store_locator',
-                                                    defaultMessage: 'Store Locator'
-                                                })}
-                                            </Text>
-                                        </HStack>
-                                    </Link>
-                                </Box>
-                            )}
                             {showLocaleSelector && (
                                 <Box>
                                     <LocaleSelector

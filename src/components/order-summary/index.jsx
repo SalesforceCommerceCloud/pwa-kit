@@ -21,16 +21,16 @@ import {
     AccordionButton,
     AccordionPanel
 } from '@chakra-ui/react'
-import Link from '@salesforce/retail-react-app/app/components/link'
-import {PromoCode, usePromoCode} from '@salesforce/retail-react-app/app/components/promo-code'
-import ItemVariantProvider from '@salesforce/retail-react-app/app/components/item-variant'
-import CartItemVariantImage from '@salesforce/retail-react-app/app/components/item-variant/item-image'
-import CartItemVariantName from '@salesforce/retail-react-app/app/components/item-variant/item-name'
-import CartItemVariantAttributes from '@salesforce/retail-react-app/app/components/item-variant/item-attributes'
-import CartItemVariantPrice from '@salesforce/retail-react-app/app/components/item-variant/item-price'
-import PromoPopover from '@salesforce/retail-react-app/app/components/promo-popover'
+import Link from '../../components/link'
+import {PromoCode, usePromoCode} from '../../components/promo-code'
+import ItemVariantProvider from '../../components/item-variant'
+import CartItemVariantImage from '../../components/item-variant/item-image'
+import CartItemVariantName from '../../components/item-variant/item-name'
+import CartItemVariantAttributes from '../../components/item-variant/item-attributes'
+import CartItemVariantPrice from '../../components/item-variant/item-price'
+import PromoPopover from '../../components/promo-popover'
 import {useProducts} from '@salesforce/commerce-sdk-react'
-import {BasketIcon} from '@salesforce/retail-react-app/app/components/icons'
+import {BasketIcon} from '../../components/icons'
 
 const CartItems = ({basket}) => {
     const totalItems = basket?.productItems?.reduce((acc, item) => acc + item.quantity, 0) || 0

@@ -18,13 +18,11 @@ import {
     VStack,
     useBreakpointValue
 } from '@chakra-ui/react'
-import ProductView from '@salesforce/retail-react-app/app/components/product-view'
-import {useProductViewModal} from '@salesforce/retail-react-app/app/hooks/use-product-view-modal'
+import ProductView from '../../components/product-view'
+import {useProductViewModal} from '../../hooks/use-product-view-modal'
 import {useProducts} from '@salesforce/commerce-sdk-react'
-import ImageGallery, {
-    Skeleton as ImageGallerySkeleton
-} from '@salesforce/retail-react-app/app/components/image-gallery'
-import {useDerivedProduct} from '@salesforce/retail-react-app/app/hooks'
+import ImageGallery, {Skeleton as ImageGallerySkeleton} from '../../components/image-gallery'
+import {useDerivedProduct} from '../../hooks'
 import {useIntl} from 'react-intl'
 
 /**

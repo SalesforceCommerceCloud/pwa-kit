@@ -9,8 +9,8 @@ import React, {Fragment, useRef} from 'react'
 import PropTypes from 'prop-types'
 
 // Project Components
-import {ListMenuContent} from '@salesforce/retail-react-app/app/components/list-menu/list-menu-content'
-import {ListMenuTrigger} from '@salesforce/retail-react-app/app/components/list-menu/list-menu-trigger'
+import {ListMenuContent} from '../../components/list-menu/list-menu-content'
+import {ListMenuTrigger} from '../../components/list-menu/list-menu-trigger'
 
 // Components
 import {

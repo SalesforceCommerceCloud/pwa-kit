@@ -7,13 +7,10 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
-import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
-import ItemVariantProvider from '@salesforce/retail-react-app/app/components/item-variant/index'
-import ItemPrice from '@salesforce/retail-react-app/app/components/item-variant/item-price'
-import {
-    cartVariant,
-    wishlistVariant
-} from '@salesforce/retail-react-app/app/components/item-variant/data.mock'
+import {renderWithProviders} from '../../utils/test-utils'
+import ItemVariantProvider from '../../components/item-variant/index'
+import ItemPrice from '../../components/item-variant/item-price'
+import {cartVariant, wishlistVariant} from '../../components/item-variant/data.mock'
 import {within} from '@testing-library/react'
 import {useMediaQuery} from '@chakra-ui/react'
 

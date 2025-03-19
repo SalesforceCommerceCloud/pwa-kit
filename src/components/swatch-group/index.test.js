@@ -10,9 +10,9 @@ import {Router, useHistory, useLocation} from 'react-router-dom'
 import {screen, fireEvent, waitFor} from '@testing-library/react'
 
 import {Box} from '@chakra-ui/react'
-import SwatchGroup from '@salesforce/retail-react-app/app/components/swatch-group/index'
-import Swatch from '@salesforce/retail-react-app/app/components/swatch-group/swatch'
-import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
+import SwatchGroup from '../../components/swatch-group/index'
+import Swatch from '../../components/swatch-group/swatch'
+import {renderWithProviders} from '../../utils/test-utils'
 
 const arrowLeft = {key: 'ArrowLeft', code: 'ArrowRight', charCode: 37}
 const arrowUp = {key: 'ArrowUp', code: 'ArrowRight', charCode: 38}

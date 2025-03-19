@@ -7,7 +7,7 @@
 import React, {useMemo} from 'react'
 import PropTypes from 'prop-types'
 import {Img, Box, useTheme} from '@chakra-ui/react'
-import {getResponsiveImageAttributes} from '@salesforce/retail-react-app/app/utils/responsive-image'
+import {getResponsiveImageAttributes} from '../../utils/responsive-image'
 
 /**
  * Quickly create a responsive image using your dynamic image service

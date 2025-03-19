@@ -6,7 +6,7 @@
  */
 import React, {useMemo} from 'react'
 import PropTypes from 'prop-types'
-import {findLowestPrice} from '@salesforce/retail-react-app/app/utils/product-utils'
+import {findLowestPrice} from '../../utils/product-utils'
 
 const PromoCallout = ({product}) => {
     const {promotion, data} = useMemo(() => findLowestPrice(product), [product])

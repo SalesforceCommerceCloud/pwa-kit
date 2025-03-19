@@ -8,8 +8,8 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import {screen, fireEvent} from '@testing-library/react'
 import {useForm} from 'react-hook-form'
-import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
-import Field from '@salesforce/retail-react-app/app/components/field/index'
+import {renderWithProviders} from '../../utils/test-utils'
+import Field from '../../components/field/index'
 
 const TestComponent = ({defaultValues, children}) => {
     const methods = useForm({defaultValues})

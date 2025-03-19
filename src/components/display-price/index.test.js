@@ -6,10 +6,10 @@
  */
 import React from 'react'
 import {screen, within} from '@testing-library/react'
-import DisplayPrice from '@salesforce/retail-react-app/app/components/display-price/index'
-import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
-import CurrentPrice from '@salesforce/retail-react-app/app/components/display-price/current-price'
-import ListPrice from '@salesforce/retail-react-app/app/components/display-price/list-price'
+import DisplayPrice from '../../components/display-price/index'
+import {renderWithProviders} from '../../utils/test-utils'
+import CurrentPrice from '../../components/display-price/current-price'
+import ListPrice from '../../components/display-price/list-price'
 
 describe('DisplayPrice', function () {
     const data = {

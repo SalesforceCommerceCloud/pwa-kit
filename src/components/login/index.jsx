@@ -9,10 +9,10 @@ import React, {Fragment} from 'react'
 import PropTypes from 'prop-types'
 import {FormattedMessage} from 'react-intl'
 import {Alert, Button, Stack, Text} from '@chakra-ui/react'
-import {AlertIcon, BrandLogo} from '@salesforce/retail-react-app/app/components/icons'
-import StandardLogin from '@salesforce/retail-react-app/app/components/standard-login'
-import PasswordlessLogin from '@salesforce/retail-react-app/app/components/passwordless-login'
-import {noop} from '@salesforce/retail-react-app/app/utils/utils'
+import {AlertIcon, BrandLogo} from '../../components/icons'
+import StandardLogin from '../../components/standard-login'
+import PasswordlessLogin from '../../components/passwordless-login'
+import {noop} from '../../utils/utils'
 
 const LoginForm = ({
     submitForm,

@@ -8,8 +8,8 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import {defineMessage, useIntl} from 'react-intl'
 import {SimpleGrid, Stack} from '@chakra-ui/react'
-import useProfileFields from '@salesforce/retail-react-app/app/components/forms/useProfileFields'
-import Field from '@salesforce/retail-react-app/app/components/field'
+import useProfileFields from '../../components/forms/useProfileFields'
+import Field from '../../components/field'
 
 const ProfileFields = ({form, prefix = ''}) => {
     const fields = useProfileFields({form, prefix})

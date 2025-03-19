@@ -23,14 +23,13 @@ import {
 } from '@chakra-ui/react'
 import {useIntl} from 'react-intl'
 
-import LinksList from '@salesforce/retail-react-app/app/components/links-list'
-import SocialIcons from '@salesforce/retail-react-app/app/components/social-icons'
-import {HideOnDesktop, HideOnMobile} from '@salesforce/retail-react-app/app/components/responsive'
-import {getPathWithLocale} from '@salesforce/retail-react-app/app/utils/url'
-import LocaleText from '@salesforce/retail-react-app/app/components/locale-text'
-import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
+import LinksList from '../../components/links-list'
+import SocialIcons from '../../components/social-icons'
+import {HideOnDesktop, HideOnMobile} from '../../components/responsive'
+import {getPathWithLocale} from '../../utils/url'
+import LocaleText from '../../components/locale-text'
+import useMultiSite from '../../hooks/use-multi-site'
 import styled from '@emotion/styled'
-import {STORE_LOCATOR_IS_ENABLED} from '@salesforce/retail-react-app/app/constants'
 
 const [StylesProvider, useStyles] = createStylesContext('Footer')
 const Footer = ({...otherProps}) => {
@@ -51,14 +50,6 @@ const Footer = ({...otherProps}) => {
     })
     const makeOurCompanyLinks = () => {
         const links = []
-        if (STORE_LOCATOR_IS_ENABLED)
-            links.push({
-                href: '/store-locator',
-                text: intl.formatMessage({
-                    id: 'footer.link.store_locator',
-                    defaultMessage: 'Store Locator'
-                })
-            })
         links.push({
             href: '/',
             text: intl.formatMessage({

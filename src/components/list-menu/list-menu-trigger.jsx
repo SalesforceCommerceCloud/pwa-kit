@@ -19,11 +19,11 @@ import {
 } from '@chakra-ui/react'
 
 // Project Components
-import Link from '@salesforce/retail-react-app/app/components/link'
+import Link from '../../components/link'
 
 // Others
-import {categoryUrlBuilder} from '@salesforce/retail-react-app/app/utils/url'
-import {ChevronDownIcon} from '@salesforce/retail-react-app/app/components/icons'
+import {categoryUrlBuilder} from '../../utils/url'
+import {ChevronDownIcon} from '../../components/icons'
 
 const ChevronIconTrigger = forwardRef(function ChevronIconTrigger(props, ref) {
     return (

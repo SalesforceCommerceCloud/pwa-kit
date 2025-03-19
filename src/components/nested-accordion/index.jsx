@@ -9,7 +9,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 
 // Project Components
-import Link from '@salesforce/retail-react-app/app/components/link'
+import Link from '../../components/link'
 
 // Components
 import {
@@ -24,7 +24,7 @@ import {
 } from '@chakra-ui/react'
 
 // Icons
-import {ChevronDownIcon, ChevronRightIcon} from '@salesforce/retail-react-app/app/components/icons'
+import {ChevronDownIcon, ChevronRightIcon} from '../../components/icons'
 
 /**
  * The nested accordion allows you to create, as the name suggest, a nests

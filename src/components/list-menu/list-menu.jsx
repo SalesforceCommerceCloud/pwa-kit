@@ -23,11 +23,11 @@ import {
 } from '@chakra-ui/react'
 
 // Project Components
-import {ListMenuPopover} from '@salesforce/retail-react-app/app/components/list-menu/list-menu-popover'
-import Link from '@salesforce/retail-react-app/app/components/link'
+import {ListMenuPopover} from '../../components/list-menu/list-menu-popover'
+import Link from '../../components/link'
 
 // Others
-import {categoryUrlBuilder} from '@salesforce/retail-react-app/app/utils/url'
+import {categoryUrlBuilder} from '../../utils/url'
 
 // Constants
 const MAXIMUM_NUMBER_COLUMNS = 5

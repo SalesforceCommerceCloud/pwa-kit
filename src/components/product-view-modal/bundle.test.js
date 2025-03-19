@@ -7,15 +7,15 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import BundleProductViewModal from '@salesforce/retail-react-app/app/components/product-view-modal/bundle'
-import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
+import BundleProductViewModal from '../../components/product-view-modal/bundle'
+import {renderWithProviders} from '../../utils/test-utils'
 import {fireEvent, screen, waitFor, within} from '@testing-library/react'
 import {useDisclosure} from '@chakra-ui/react'
 import {
     mockBundledProductItemsVariant,
     mockProductBundleWithVariants,
     mockProductBundle
-} from '@salesforce/retail-react-app/app/mocks/product-bundle'
+} from '../../mocks/product-bundle'
 import {rest} from 'msw'
 
 const MockComponent = ({updateCart}) => {

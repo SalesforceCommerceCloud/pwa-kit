@@ -6,8 +6,8 @@
  */
 import React from 'react'
 import {screen, fireEvent} from '@testing-library/react'
-import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
-import {ToggleCard} from '@salesforce/retail-react-app/app/components/toggle-card'
+import {renderWithProviders} from '../../utils/test-utils'
+import {ToggleCard} from '../../components/toggle-card'
 
 test('ToggleCard renders edit button with correct aria-label and calls onEdit on click', () => {
     const mockOnEdit = jest.fn()

@@ -6,7 +6,7 @@
  */
 import React from 'react'
 import {useItemVariant} from '.'
-import Link from '@salesforce/retail-react-app/app/components/link'
+import Link from '../../components/link'
 import {Heading} from '@chakra-ui/react'
 
 /**

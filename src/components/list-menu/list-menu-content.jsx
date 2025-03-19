@@ -20,10 +20,10 @@ import {
 } from '@chakra-ui/react'
 
 // Project Components
-import LinksList from '@salesforce/retail-react-app/app/components/links-list'
+import LinksList from '../../components/links-list'
 
 // Others
-import {categoryUrlBuilder} from '@salesforce/retail-react-app/app/utils/url'
+import {categoryUrlBuilder} from '../../utils/url'
 
 const ListMenuContent = ({maxColumns, item, itemsKey, onClose, initialFocusRef}) => {
     const theme = useTheme()

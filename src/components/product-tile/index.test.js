@@ -5,8 +5,8 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
-import ProductTile, {Skeleton} from '@salesforce/retail-react-app/app/components/product-tile/index'
-import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
+import ProductTile, {Skeleton} from '../../components/product-tile/index'
+import {renderWithProviders} from '../../utils/test-utils'
 import {fireEvent, waitFor, within, screen} from '@testing-library/react'
 import {
     mockMasterProductHitWithMultipleVariants,
@@ -14,7 +14,7 @@ import {
     mockProductSearchItem,
     mockProductSetHit,
     mockStandardProductHit
-} from '@salesforce/retail-react-app/app/mocks/product-search-hit-data'
+} from '../../mocks/product-search-hit-data'
 import {useBreakpointValue} from '@chakra-ui/react'
 
 jest.mock('@chakra-ui/react', () => {
