@@ -10,20 +10,20 @@ import {useIntl} from 'react-intl'
 import PropTypes from 'prop-types'
 import {Box, Container} from '@chakra-ui/react'
 import {useForm} from 'react-hook-form'
-import Seo from '@salesforce/retail-react-app/app/components/seo'
-import ResetPasswordForm from '@salesforce/retail-react-app/app/components/reset-password'
-import ResetPasswordLanding from '@salesforce/retail-react-app/app/pages/reset-password/reset-password-landing'
-import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
-import useEinstein from '@salesforce/retail-react-app/app/hooks/use-einstein'
-import useDataCloud from '@salesforce/retail-react-app/app/hooks/use-datacloud'
+import Seo from '../../components/seo'
+import ResetPasswordForm from '../../components/reset-password'
+import ResetPasswordLanding from '../../pages/reset-password/reset-password-landing'
+import useNavigation from '../../hooks/use-navigation'
+import useEinstein from '../../hooks/use-einstein'
+import useDataCloud from '../../hooks/use-datacloud'
 import {useLocation} from 'react-router-dom'
 import {useRouteMatch} from 'react-router'
-import {usePasswordReset} from '@salesforce/retail-react-app/app/hooks/use-password-reset'
+import {usePasswordReset} from '../../hooks/use-password-reset'
 import {
     RESET_PASSWORD_LANDING_PATH,
     API_ERROR_MESSAGE,
     FEATURE_UNAVAILABLE_ERROR_MESSAGE
-} from '@salesforce/retail-react-app/app/constants'
+} from '../../constants'
 
 const ResetPassword = () => {
     const {formatMessage} = useIntl()
