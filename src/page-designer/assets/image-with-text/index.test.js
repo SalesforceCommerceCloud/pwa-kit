@@ -5,9 +5,9 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
-import ImageWithText from '@salesforce/retail-react-app/app/page-designer/assets/image-with-text/index'
-import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
-import {mockImageWithText} from '@salesforce/retail-react-app/app/mocks/page-designer'
+import ImageWithText from './index'
+import {renderWithProviders} from '../../../utils/test-utils'
+import {mockImageWithText} from '../../../utils/mocks'
 
 test('Page renders correct component', () => {
     const {getByText, getByRole} = renderWithProviders(<ImageWithText {...mockImageWithText} />)
