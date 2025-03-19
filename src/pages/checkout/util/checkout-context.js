@@ -6,9 +6,9 @@
  */
 import React, {useEffect, useState} from 'react'
 import PropTypes from 'prop-types'
-import useEinstein from '@salesforce/retail-react-app/app/hooks/use-einstein'
-import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
-import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
+import useEinstein from '../../../hooks/use-einstein'
+import {useCurrentCustomer} from '../../../hooks/use-current-customer'
+import {useCurrentBasket} from '../../../hooks/use-current-basket'
 
 const CheckoutContext = React.createContext()
 

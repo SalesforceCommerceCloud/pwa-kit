@@ -6,10 +6,10 @@
  */
 import React from 'react'
 import {screen, waitFor, within} from '@testing-library/react'
-import ContactInfo from '@salesforce/retail-react-app/app/pages/checkout/partials/contact-info'
-import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
+import ContactInfo from './contact-info'
+import {renderWithProviders} from '../../../utils/test-utils'
 import {rest} from 'msw'
-import {scapiBasketWithItem} from '@salesforce/retail-react-app/app/mocks/mock-data'
+import {scapiBasketWithItem} from '../../../mocks/mock-data'
 import {AuthHelpers} from '@salesforce/commerce-sdk-react'
 
 const invalidEmail = 'invalidEmail'

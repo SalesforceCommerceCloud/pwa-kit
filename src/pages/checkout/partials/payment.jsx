@@ -9,25 +9,21 @@ import PropTypes from 'prop-types'
 import {defineMessage, FormattedMessage, useIntl} from 'react-intl'
 import {Box, Button, Checkbox, Container, Heading, Stack, Text, Divider} from '@chakra-ui/react'
 import {useForm} from 'react-hook-form'
-import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
+import {useToast} from '../../../hooks/use-toast'
 import {useShopperBasketsMutation} from '@salesforce/commerce-sdk-react'
-import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
-import {useCheckout} from '@salesforce/retail-react-app/app/pages/checkout/util/checkout-context'
+import {useCurrentBasket} from '../../../hooks/use-current-basket'
+import {useCheckout} from '../../../pages/checkout/util/checkout-context'
 import {
     getPaymentInstrumentCardType,
     getMaskCreditCardNumber,
     getCreditCardIcon
-} from '@salesforce/retail-react-app/app/utils/cc-utils'
-import {
-    ToggleCard,
-    ToggleCardEdit,
-    ToggleCardSummary
-} from '@salesforce/retail-react-app/app/components/toggle-card'
-import PaymentForm from '@salesforce/retail-react-app/app/pages/checkout/partials/payment-form'
-import ShippingAddressSelection from '@salesforce/retail-react-app/app/pages/checkout/partials/shipping-address-selection'
-import AddressDisplay from '@salesforce/retail-react-app/app/components/address-display'
-import {PromoCode, usePromoCode} from '@salesforce/retail-react-app/app/components/promo-code'
-import {API_ERROR_MESSAGE} from '@salesforce/retail-react-app/app/constants'
+} from '../../../utils/cc-utils'
+import {ToggleCard, ToggleCardEdit, ToggleCardSummary} from '../../../components/toggle-card'
+import PaymentForm from '../../../pages/checkout/partials/payment-form'
+import ShippingAddressSelection from '../../../pages/checkout/partials/shipping-address-selection'
+import AddressDisplay from '../../../components/address-display'
+import {PromoCode, usePromoCode} from '../../../components/promo-code'
+import {API_ERROR_MESSAGE} from '../../../constants'
 
 const Payment = () => {
     const {formatMessage} = useIntl()

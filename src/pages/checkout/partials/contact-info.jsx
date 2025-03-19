@@ -23,26 +23,26 @@ import {
 } from '@chakra-ui/react'
 import {useForm} from 'react-hook-form'
 import {FormattedMessage, useIntl} from 'react-intl'
-import {useCheckout} from '@salesforce/retail-react-app/app/pages/checkout/util/checkout-context'
-import useLoginFields from '@salesforce/retail-react-app/app/components/forms/useLoginFields'
+import {useCheckout} from '../../../pages/checkout/util/checkout-context'
+import useLoginFields from '../../../components/forms/useLoginFields'
 import {
     ToggleCard,
     ToggleCardEdit,
     ToggleCardSummary
-} from '@salesforce/retail-react-app/app/components/toggle-card'
-import Field from '@salesforce/retail-react-app/app/components/field'
-import LoginState from '@salesforce/retail-react-app/app/pages/checkout/partials/login-state'
+} from '../../../components/toggle-card'
+import Field from '../../../components/field'
+import LoginState from '../../../pages/checkout/partials/login-state'
 import {
     AuthModal,
     EMAIL_VIEW,
     PASSWORD_VIEW,
     useAuthModal
-} from '@salesforce/retail-react-app/app/hooks/use-auth-modal'
-import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
-import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
-import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
-import {isAbsoluteURL} from '@salesforce/retail-react-app/app/page-designer/utils'
-import {useAppOrigin} from '@salesforce/retail-react-app/app/hooks/use-app-origin'
+} from '../../../hooks/use-auth-modal'
+import useNavigation from '../../../hooks/use-navigation'
+import {useCurrentCustomer} from '../../../hooks/use-current-customer'
+import {useCurrentBasket} from '../../../hooks/use-current-basket'
+import {isAbsoluteURL} from '../../../page-designer/utils'
+import {useAppOrigin} from '../../../hooks/use-app-origin'
 import {AuthHelpers, useAuthHelper, useShopperBasketsMutation} from '@salesforce/commerce-sdk-react'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {
@@ -51,7 +51,7 @@ import {
     CREATE_ACCOUNT_FIRST_ERROR_MESSAGE,
     PASSWORDLESS_ERROR_MESSAGES,
     USER_NOT_FOUND_ERROR
-} from '@salesforce/retail-react-app/app/constants'
+} from '../../../constants'
 
 const ContactInfo = ({isSocialEnabled = false, isPasswordlessEnabled = false, idps = []}) => {
     const {formatMessage} = useIntl()

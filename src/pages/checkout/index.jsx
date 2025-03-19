@@ -6,28 +6,37 @@
  */
 import React, {useEffect, useState} from 'react'
 import {FormattedMessage, useIntl} from 'react-intl'
-import {Alert, AlertIcon, Box, Button, Container, Grid, GridItem, Stack} from '@chakra-ui/react'
-import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
+import {
+    Alert,
+    AlertIcon,
+    Box,
+    Button,
+    Container,
+    Grid,
+    GridItem,
+    Stack
+} from '@chakra-ui/react'
+import useNavigation from '../../hooks/use-navigation'
 import {
     CheckoutProvider,
     useCheckout
-} from '@salesforce/retail-react-app/app/pages/checkout/util/checkout-context'
-import ContactInfo from '@salesforce/retail-react-app/app/pages/checkout/partials/contact-info'
-import ShippingAddress from '@salesforce/retail-react-app/app/pages/checkout/partials/shipping-address'
-import ShippingOptions from '@salesforce/retail-react-app/app/pages/checkout/partials/shipping-options'
-import Payment from '@salesforce/retail-react-app/app/pages/checkout/partials/payment'
-import OrderSummary from '@salesforce/retail-react-app/app/components/order-summary'
-import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
-import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
-import CheckoutSkeleton from '@salesforce/retail-react-app/app/pages/checkout/partials/checkout-skeleton'
+} from '../../pages/checkout/util/checkout-context'
+import ContactInfo from '../../pages/checkout/partials/contact-info'
+import ShippingAddress from '../../pages/checkout/partials/shipping-address'
+import ShippingOptions from '../../pages/checkout/partials/shipping-options'
+import Payment from '../../pages/checkout/partials/payment'
+import OrderSummary from '../../components/order-summary'
+import {useCurrentCustomer} from '../../hooks/use-current-customer'
+import {useCurrentBasket} from '../../hooks/use-current-basket'
+import CheckoutSkeleton from '../../pages/checkout/partials/checkout-skeleton'
 import {useShopperOrdersMutation, useShopperBasketsMutation} from '@salesforce/commerce-sdk-react'
-import UnavailableProductConfirmationModal from '@salesforce/retail-react-app/app/components/unavailable-product-confirmation-modal'
+import UnavailableProductConfirmationModal from '../../components/unavailable-product-confirmation-modal'
 import {
     API_ERROR_MESSAGE,
     TOAST_MESSAGE_REMOVED_ITEM_FROM_CART
-} from '@salesforce/retail-react-app/app/constants'
-import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
-import LoadingSpinner from '@salesforce/retail-react-app/app/components/loading-spinner'
+} from '../../constants'
+import {useToast} from '../../hooks/use-toast'
+import LoadingSpinner from '../../components/loading-spinner'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 
 const Checkout = () => {
