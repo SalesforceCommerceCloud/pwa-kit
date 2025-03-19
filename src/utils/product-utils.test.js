@@ -13,23 +13,17 @@ import {
     filterImageGroups,
     normalizeSetBundleProduct,
     getUpdateBundleChildArray
-} from '@salesforce/retail-react-app/app/utils/product-utils'
+} from './product-utils'
 import {
     mockMasterProductHitWithMultipleVariants,
     mockMasterProductHitWithOneVariant,
     mockProductSetHit,
     mockStandardProductHit
-} from '@salesforce/retail-react-app/app/mocks/product-search-hit-data'
-import {
-    productSearch,
-    getProduct
-} from '@salesforce/retail-react-app/app/components/product-tile/promo-callout.mock'
-import productSetWinterLookM from '@salesforce/retail-react-app/app/mocks/product-set-winter-lookM'
-import {mockProductSearch} from '@salesforce/retail-react-app/app/mocks/mock-data'
-import {
-    mockProductBundle,
-    mockBundledProductItemsVariant
-} from '@salesforce/retail-react-app/app/mocks/product-bundle.js'
+} from '../mocks/product-search-hit-data'
+import {productSearch, getProduct} from '../components/product-tile/promo-callout.mock'
+import productSetWinterLookM from '../mocks/product-set-winter-lookM'
+import {mockProductSearch} from '../mocks/mock-data'
+import {mockProductBundle, mockBundledProductItemsVariant} from '../mocks/product-bundle.js'
 
 const imageGroups = [
     {

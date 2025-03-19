@@ -5,7 +5,8 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
-import {configureRoutes} from '@salesforce/retail-react-app/app/utils/routes-utils'
+import {configureRoutes} from './routes-utils'
+import mockConfig from '../mock-config'
 
 describe('configureRoutes', function () {
     const cases = [
@@ -279,9 +280,8 @@ describe('configureRoutes', function () {
             ignoredRoutes.length ? ` and ignore routes ${ignoredRoutes.join(',')}` : ' '
         }`, () => {
             const config = {
-                app: {
-                    url: urlConfig
-                }
+                ...mockConfig,
+                url: urlConfig
             }
             const configuredRoutes = configureRoutes(routes, config, {ignoredRoutes})
             const paths = configuredRoutes.map((route) => route.path)

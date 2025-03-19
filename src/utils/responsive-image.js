@@ -6,7 +6,7 @@
  */
 
 import {theme} from '@chakra-ui/theme'
-import logger from '@salesforce/retail-react-app/app/utils/logger-instance'
+import logger from './logger-instance'
 
 /**
  * @param {Object} breakpoints

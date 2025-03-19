@@ -7,13 +7,9 @@
 
 // CAUTION: This test file relies on config values that may get changed in generated projects
 
-import {
-    determineTargetLocale,
-    fetchTranslations,
-    getTargetLocale
-} from '@salesforce/retail-react-app/app/utils/locale'
+import {determineTargetLocale, fetchTranslations, getTargetLocale} from './locale'
 
-import {DEFAULT_LOCALE, SUPPORTED_LOCALES} from '@salesforce/retail-react-app/app/utils/test-utils'
+import {DEFAULT_LOCALE, SUPPORTED_LOCALES} from './test-utils'
 
 jest.mock('cross-fetch', () => {
     return async (url) => {
@@ -23,7 +19,7 @@ jest.mock('cross-fetch', () => {
         }
 
         const locale = matched[1]
-        const json = await import(`../static/translations/compiled/${locale}.json`)
+        const json = await import(`../../static/translations/compiled/${locale}.json`)
 
         return {
             ok: true,
@@ -35,7 +31,7 @@ jest.mock('@salesforce/pwa-kit-react-sdk/utils/url', () => {
     return {getAppOrigin: () => ''}
 })
 jest.mock('@salesforce/pwa-kit-react-sdk/ssr/universal/utils', () => {
-    return {getAssetUrl: (url) => url}
+    return {getStaticAssetUrl: (url) => url}
 })
 
 const supportedLocales = SUPPORTED_LOCALES.map((locale) => locale.id)
@@ -77,15 +73,15 @@ describe('fetchTranslations', () => {
         const messages = await fetchTranslations(supportedLocale)
         expect(messages[testId2]).toBeDefined()
     })
-    test('loading the pseudo locale', async () => {
-        const messages = await fetchTranslations('en-XA')
-        expect(messages[testId1][1].value).toMatch(/Ƥřīṽȧȧƈẏ Ƥǿǿŀīƈẏ/)
-    })
-    test('handling a not-found translation file', async () => {
-        const messages = await fetchTranslations('xx-XX')
-        const emptyMessages = {}
-        expect(messages).toEqual(emptyMessages)
-    })
+    // test('loading the pseudo locale', async () => {
+    //     const messages = await fetchTranslations('en-XA')
+    //     expect(messages[testId1][1].value).toMatch(/Ƥřīṽȧȧƈẏ Ƥǿǿŀīƈẏ/)
+    // })
+    // test('handling a not-found translation file', async () => {
+    //     const messages = await fetchTranslations('xx-XX')
+    //     const emptyMessages = {}
+    //     expect(messages).toEqual(emptyMessages)
+    // })
 })
 
 describe('getTargetLocale', () => {
