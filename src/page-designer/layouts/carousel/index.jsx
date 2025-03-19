@@ -16,7 +16,7 @@ import {
     useBreakpointValue
 } from '@chakra-ui/react'
 import {Component, regionPropType} from '@salesforce/commerce-sdk-react/components'
-import {ChevronLeftIcon, ChevronRightIcon} from '@salesforce/retail-react-app/app/components/icons'
+import {ChevronLeftIcon, ChevronRightIcon} from '../../../components/icons'
 import {useEffect} from 'react'
 import {useIntl} from 'react-intl'
 
