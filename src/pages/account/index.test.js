@@ -19,6 +19,7 @@ import {
 import Account from '../../pages/account/index'
 import Login from '../../pages/login'
 import mockConfig from '../../mock-config'
+import * as sdk from '@salesforce/commerce-sdk-react'
 
 jest.mock('@salesforce/commerce-sdk-react', () => ({
     ...jest.requireActual('@salesforce/commerce-sdk-react'),
