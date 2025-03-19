@@ -23,6 +23,22 @@
         "siteId": "aaij-MobileFirst",
         "isProduction": false
     },
+    "login": {
+        "passwordless": {
+            "enabled": false,
+            "callbackURI": "/passwordless-login-callback",
+            "landingPath": "/passwordless-login-landing"
+        },
+        "social": {
+            "enabled": false,
+            "idps": ["google", "apple"],
+            "redirectURI": "/social-callback"
+        },
+        "resetPassword": {
+            "callbackURI": "/reset-password-callback",
+            "landingPath": "/reset-password-landing"
+        }
+    },
     "maxCacheAge": 900,
     "pages": {
         "Account": {

@@ -6,12 +6,12 @@
  */
 
 import {useEffect, useState} from 'react'
-import {removeQueryParamsFromPath} from '@salesforce/retail-react-app/app/utils/url'
+import {removeQueryParamsFromPath} from '../utils/url'
 import {useHistory, useLocation} from 'react-router-dom'
-import {useVariant} from '@salesforce/retail-react-app/app/hooks/use-variant'
-import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
+import {useVariant} from './use-variant'
+import {useToast} from './use-toast'
 import {useIntl} from 'react-intl'
-import {API_ERROR_MESSAGE} from '@salesforce/retail-react-app/app/constants'
+import {API_ERROR_MESSAGE} from '../constants'
 import {useProduct} from '@salesforce/commerce-sdk-react'
 
 /**

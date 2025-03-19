@@ -5,9 +5,9 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import {useCallback} from 'react'
-import {useHistory} from 'react-router'
-import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
-import {removeSiteLocaleFromPath} from '@salesforce/retail-react-app/app/utils/url'
+import {useHistory} from 'react-router-dom'
+import useMultiSite from './use-multi-site'
+import {removeSiteLocaleFromPath} from '../utils/url'
 
 /**
  * A convenience hook for programmatic navigation uses history's `push` or `replace`. The proper locale

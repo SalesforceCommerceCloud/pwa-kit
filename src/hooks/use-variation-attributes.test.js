@@ -6,11 +6,11 @@
  */
 
 import React from 'react'
-import {Router} from 'react-router'
+import {Router} from 'react-router-dom'
 
 import {render} from '@testing-library/react'
 import {createMemoryHistory} from 'history'
-import {useVariationAttributes} from '@salesforce/retail-react-app/app/hooks/use-variation-attributes'
+import {useVariationAttributes} from './use-variation-attributes'
 
 // Below is a partial product used for mocking purposes. Note: only the properties
 // that are used in the hook at defined.

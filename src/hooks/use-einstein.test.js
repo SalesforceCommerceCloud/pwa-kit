@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import {EinsteinAPI} from '@salesforce/retail-react-app/app/hooks/use-einstein'
+import {EinsteinAPI} from './use-einstein'
 import {
     mockAddToCartProduct,
     mockProduct,
@@ -13,7 +13,7 @@ import {
     mockBasket,
     mockRecommenderDetails,
     mockNoSearchResults
-} from '@salesforce/retail-react-app/app/hooks/einstein-mock-data'
+} from './einstein-mock-data'
 import fetchMock from 'jest-fetch-mock'
 
 const einsteinApi = new EinsteinAPI({

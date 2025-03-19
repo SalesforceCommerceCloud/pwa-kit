@@ -8,16 +8,12 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import {screen, within, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import {
-    renderWithProviders,
-    createPathWithDefaults,
-    guestToken
-} from '@salesforce/retail-react-app/app/utils/test-utils'
-import {AuthModal, useAuthModal} from '@salesforce/retail-react-app/app/hooks/use-auth-modal'
+import {renderWithProviders, createPathWithDefaults, guestToken} from '../utils/test-utils'
+import {AuthModal, useAuthModal} from '../hooks/use-auth-modal'
 import {BrowserRouter as Router, Route} from 'react-router-dom'
-import Account from '@salesforce/retail-react-app/app/pages/account'
+import Account from '../pages/account'
 import {rest} from 'msw'
-import {mockedRegisteredCustomer} from '@salesforce/retail-react-app/app/mocks/mock-data'
+import {mockedRegisteredCustomer} from '../mocks/mock-data'
 import * as ReactHookForm from 'react-hook-form'
 import {AuthHelpers} from '@salesforce/commerce-sdk-react'
 

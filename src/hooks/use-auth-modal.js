@@ -26,11 +26,11 @@ import {
     useCustomerBaskets,
     useShopperBasketsMutation
 } from '@salesforce/commerce-sdk-react'
-import LoginForm from '@salesforce/retail-react-app/app/components/login'
-import ResetPasswordForm from '@salesforce/retail-react-app/app/components/reset-password'
-import RegisterForm from '@salesforce/retail-react-app/app/components/register'
-import PasswordlessEmailConfirmation from '@salesforce/retail-react-app/app/components/email-confirmation/index'
-import {noop} from '@salesforce/retail-react-app/app/utils/utils'
+import LoginForm from '../components/login'
+import ResetPasswordForm from '../components/reset-password'
+import RegisterForm from '../components/register'
+import PasswordlessEmailConfirmation from '../components/email-confirmation/index'
+import {noop} from '../utils/utils'
 import {
     API_ERROR_MESSAGE,
     CREATE_ACCOUNT_FIRST_ERROR_MESSAGE,
@@ -38,14 +38,15 @@ import {
     LOGIN_TYPES,
     PASSWORDLESS_ERROR_MESSAGES,
     USER_NOT_FOUND_ERROR
-} from '@salesforce/retail-react-app/app/constants'
-import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
-import {usePrevious} from '@salesforce/retail-react-app/app/hooks/use-previous'
-import {usePasswordReset} from '@salesforce/retail-react-app/app/hooks/use-password-reset'
-import {isServer} from '@salesforce/retail-react-app/app/utils/utils'
+} from '../constants'
+import useNavigation from './use-navigation'
+import {usePrevious} from './use-previous'
+import {usePasswordReset} from './use-password-reset'
+import {isServer} from '../utils/utils'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {isAbsoluteURL} from '@salesforce/retail-react-app/app/page-designer/utils'
-import {useAppOrigin} from '@salesforce/retail-react-app/app/hooks/use-app-origin'
+import {useAppOrigin} from './use-app-origin'
+import useExtensionConfig from './use-extension-config'
 
 export const LOGIN_VIEW = 'login'
 export const REGISTER_VIEW = 'register'
@@ -87,12 +88,13 @@ export const AuthModal = ({
     const login = useAuthHelper(AuthHelpers.LoginRegisteredUserB2C)
     const register = useAuthHelper(AuthHelpers.Register)
     const appOrigin = useAppOrigin()
+    const config = useExtensionConfig()
 
     const [loginType, setLoginType] = useState(LOGIN_TYPES.PASSWORD)
     const [passwordlessLoginEmail, setPasswordlessLoginEmail] = useState(initialEmail)
     const {getPasswordResetToken} = usePasswordReset()
     const authorizePasswordlessLogin = useAuthHelper(AuthHelpers.AuthorizePasswordless)
-    const passwordlessConfigCallback = getConfig().app.login?.passwordless?.callbackURI
+    const passwordlessConfigCallback = config.login?.passwordless?.callbackURI
     const callbackURL = isAbsoluteURL(passwordlessConfigCallback)
         ? passwordlessConfigCallback
         : `${appOrigin}${passwordlessConfigCallback}`

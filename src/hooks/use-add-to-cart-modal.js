@@ -25,17 +25,14 @@ import {
     Stack,
     useBreakpointValue
 } from '@chakra-ui/react'
-import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
-import Link from '@salesforce/retail-react-app/app/components/link'
-import RecommendedProducts from '@salesforce/retail-react-app/app/components/recommended-products'
-import {LockIcon} from '@salesforce/retail-react-app/app/components/icons'
-import {findImageGroupBy} from '@salesforce/retail-react-app/app/utils/image-groups-utils'
-import {
-    getPriceData,
-    getDisplayVariationValues
-} from '@salesforce/retail-react-app/app/utils/product-utils'
-import {EINSTEIN_RECOMMENDERS} from '@salesforce/retail-react-app/app/constants'
-import DisplayPrice from '@salesforce/retail-react-app/app/components/display-price'
+import {useCurrentBasket} from './use-current-basket'
+import Link from '../components/link'
+import RecommendedProducts from '../components/recommended-products'
+import {LockIcon} from '../components/icons'
+import {findImageGroupBy} from '../utils/image-groups-utils'
+import {getPriceData, getDisplayVariationValues} from '../utils/product-utils'
+import {EINSTEIN_RECOMMENDERS} from '../constants'
+import DisplayPrice from '../components/display-price'
 
 /**
  * This is the context for managing the AddToCartModal.

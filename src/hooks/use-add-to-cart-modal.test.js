@@ -5,19 +5,13 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
-import {
-    AddToCartModal,
-    AddToCartModalContext
-} from '@salesforce/retail-react-app/app/hooks/use-add-to-cart-modal'
-import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
+import {AddToCartModal, AddToCartModalContext} from '../hooks/use-add-to-cart-modal'
+import {renderWithProviders} from '../utils/test-utils'
 import {screen} from '@testing-library/react'
 import {rest} from 'msw'
-import {mockCustomerBaskets} from '@salesforce/retail-react-app/app/mocks/mock-data'
-import {
-    mockProductBundle,
-    mockBundleItemsAdded
-} from '@salesforce/retail-react-app/app/mocks/product-bundle'
-import {getDisplayVariationValues} from '@salesforce/retail-react-app/app/utils/product-utils'
+import {mockCustomerBaskets} from '../mocks/mock-data'
+import {mockProductBundle, mockBundleItemsAdded} from '../mocks/product-bundle'
+import {getDisplayVariationValues} from '../utils/product-utils'
 
 const MOCK_PRODUCT = {
     currency: 'USD',

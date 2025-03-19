@@ -7,10 +7,10 @@
 
 import React from 'react'
 import {renderHook} from '@testing-library/react'
-import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
-import {MultiSiteProvider} from '@salesforce/retail-react-app/app/contexts'
-import mockConfig from '@salesforce/retail-react-app/config/mocks/default'
-import {DEFAULT_LOCALE} from '@salesforce/retail-react-app/app/utils/test-utils'
+import useMultiSite from './use-multi-site'
+import {MultiSiteProvider} from '../contexts'
+import mockConfig from '../mock-config'
+import {DEFAULT_LOCALE} from '../utils/test-utils'
 
 const wrapper = ({children}) => <MultiSiteProvider>{children}</MultiSiteProvider>
 
@@ -21,7 +21,7 @@ beforeEach(() => {
 })
 
 const site = {
-    ...mockConfig.app.sites[0],
+    ...mockConfig.sites[0],
     alias: 'uk'
 }
 
