@@ -17,15 +17,15 @@ import {
     useCustomerType,
     useShopperBasketsMutation
 } from '@salesforce/commerce-sdk-react'
-import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
-import Seo from '@salesforce/retail-react-app/app/components/seo'
+import useNavigation from '../../hooks/use-navigation'
+import Seo from '../../components/seo'
 import {useForm} from 'react-hook-form'
 import {useRouteMatch} from 'react-router'
 import {useLocation} from 'react-router-dom'
-import useEinstein from '@salesforce/retail-react-app/app/hooks/use-einstein'
-import useDataCloud from '@salesforce/retail-react-app/app/hooks/use-datacloud'
-import LoginForm from '@salesforce/retail-react-app/app/components/login'
-import PasswordlessEmailConfirmation from '@salesforce/retail-react-app/app/components/email-confirmation/index'
+import useEinstein from '../../hooks/use-einstein'
+import useDataCloud from '../../hooks/use-datacloud'
+import LoginForm from '../../components/login'
+import PasswordlessEmailConfirmation from '../../components/email-confirmation/index'
 import {
     API_ERROR_MESSAGE,
     CREATE_ACCOUNT_FIRST_ERROR_MESSAGE,
@@ -36,9 +36,9 @@ import {
     PASSWORDLESS_LOGIN_LANDING_PATH,
     PASSWORDLESS_ERROR_MESSAGES,
     USER_NOT_FOUND_ERROR
-} from '@salesforce/retail-react-app/app/constants'
-import {usePrevious} from '@salesforce/retail-react-app/app/hooks/use-previous'
-import {isServer} from '@salesforce/retail-react-app/app/utils/utils'
+} from '../../constants'
+import {usePrevious} from '../../hooks/use-previous'
+import {isServer} from '../../utils/utils'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 
 const LOGIN_ERROR_MESSAGE = defineMessage({
