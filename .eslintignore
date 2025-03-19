@@ -1,7 +1,7 @@
 build
 coverage
 docs
-app/static
+static
 jest.config.js
 webpack
 scripts/generator/assets
