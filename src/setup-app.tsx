@@ -122,7 +122,7 @@ class ChakraStorefront extends ApplicationExtension<Config> {
             {
                 path: config.pages.WishList,
                 component: Pages.Wishlist
-            },
+            }
         ].filter((route) => route.path !== false)
         return [...routes, ...(extensionRoutes as RouteProps[])]
     }
