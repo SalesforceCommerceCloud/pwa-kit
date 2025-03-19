@@ -36,21 +36,21 @@ import {
     TOAST_MESSAGE_ADDED_TO_WISHLIST,
     TOAST_MESSAGE_REMOVED_ITEM_FROM_CART,
     TOAST_MESSAGE_ALREADY_IN_WISHLIST
-} from '@salesforce/retail-react-app/app/constants'
-import {REMOVE_CART_ITEM_CONFIRMATION_DIALOG_CONFIG} from '@salesforce/retail-react-app/app/pages/cart/partials/cart-secondary-button-group'
+} from '../../constants'
+import {REMOVE_CART_ITEM_CONFIRMATION_DIALOG_CONFIG} from '../../pages/cart/partials/cart-secondary-button-group'
 
 // Utilities
 import debounce from 'lodash/debounce'
-import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
+import {useCurrentBasket} from '../../hooks/use-current-basket'
 import {
     useShopperBasketsMutation,
     useShippingMethodsForShipment,
     useProducts,
     useShopperCustomersMutation
 } from '@salesforce/commerce-sdk-react'
-import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
-import UnavailableProductConfirmationModal from '@salesforce/retail-react-app/app/components/unavailable-product-confirmation-modal'
-import {getUpdateBundleChildArray} from '@salesforce/retail-react-app/app/utils/product-utils'
+import {useCurrentCustomer} from '../../hooks/use-current-customer'
+import UnavailableProductConfirmationModal from '../../components/unavailable-product-confirmation-modal'
+import {getUpdateBundleChildArray} from '../../utils/product-utils'
 
 const DEBOUNCE_WAIT = 750
 const Cart = () => {
