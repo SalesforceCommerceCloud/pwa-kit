@@ -24,28 +24,23 @@ import {
 } from '@chakra-ui/react'
 
 // Project Components
-import Hero from '@salesforce/retail-react-app/app/components/hero'
-import Seo from '@salesforce/retail-react-app/app/components/seo'
-import Section from '@salesforce/retail-react-app/app/components/section'
-import ProductScroller from '@salesforce/retail-react-app/app/components/product-scroller'
+import Hero from '../../components/hero'
+import Seo from '../../components/seo'
+import Section from '../../components/section'
+import ProductScroller from '../../components/product-scroller'
 
 // Others
-import {getAssetUrl} from '@salesforce/pwa-kit-react-sdk/ssr/universal/utils'
-import {heroFeatures, features} from '@salesforce/retail-react-app/app/pages/home/data'
+import {getStaticAssetUrl} from '@salesforce/pwa-kit-react-sdk/ssr/universal/utils'
+import {heroFeatures, features} from '../../pages/home/data'
 
 //Hooks
-import useEinstein from '@salesforce/retail-react-app/app/hooks/use-einstein'
-import useDataCloud from '@salesforce/retail-react-app/app/hooks/use-datacloud'
+import useEinstein from '../../hooks/use-einstein'
+import useDataCloud from '../../hooks/use-datacloud'
 
 // Constants
-import {
-    HOME_SHOP_PRODUCTS_CATEGORY_ID,
-    HOME_SHOP_PRODUCTS_LIMIT,
-    MAX_CACHE_AGE,
-    STALE_WHILE_REVALIDATE
-} from '@salesforce/retail-react-app/app/constants'
 import {useServerContext} from '@salesforce/pwa-kit-react-sdk/ssr/universal/hooks'
 import {useProductSearch} from '@salesforce/commerce-sdk-react'
+import {useExtensionConfig} from '../../hooks'
 
 /**
  * This is the home page for Retail React App.
@@ -58,7 +53,11 @@ const Home = () => {
     const einstein = useEinstein()
     const dataCloud = useDataCloud()
     const {pathname} = useLocation()
-
+    const {
+        pages: {Home: homeConfig},
+        maxCacheAge: MAX_CACHE_AGE,
+        staleWhileRevalidate: STALE_WHILE_REVALIDATE
+    } = useExtensionConfig()
     const {res} = useServerContext()
     if (res) {
         res.set(
@@ -72,16 +71,15 @@ const Home = () => {
             allImages: true,
             allVariationProperties: true,
             expand: ['promotions', 'variations', 'prices', 'images', 'custom_properties'],
-            limit: HOME_SHOP_PRODUCTS_LIMIT,
+            limit: homeConfig.productLimit,
             perPricebook: true,
-            refine: [`cgid=${HOME_SHOP_PRODUCTS_CATEGORY_ID}`, 'htype=master']
+            refine: [`cgid=${homeConfig.mainCategory}`, 'htype=master']
         }
     })
 
     /**************** Einstein ****************/
     useEffect(() => {
         einstein.sendViewPage(pathname)
-        dataCloud.sendViewPage(pathname)
     }, [])
 
     return (
@@ -98,7 +96,9 @@ const Home = () => {
                     id: 'home.title.react_starter_store'
                 })}
                 img={{
-                    src: getAssetUrl('static/img/hero.png'),
+                    src: getStaticAssetUrl('img/hero.png', {
+                        appExtensionPackageName: '@salesforce/extension-chakra-storefront'
+                    }),
                     alt: 'npx pwa-kit-create-app'
                 }}
                 actions={
