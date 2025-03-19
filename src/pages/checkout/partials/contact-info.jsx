@@ -25,19 +25,10 @@ import {useForm} from 'react-hook-form'
 import {FormattedMessage, useIntl} from 'react-intl'
 import {useCheckout} from '../../../pages/checkout/util/checkout-context'
 import useLoginFields from '../../../components/forms/useLoginFields'
-import {
-    ToggleCard,
-    ToggleCardEdit,
-    ToggleCardSummary
-} from '../../../components/toggle-card'
+import {ToggleCard, ToggleCardEdit, ToggleCardSummary} from '../../../components/toggle-card'
 import Field from '../../../components/field'
 import LoginState from '../../../pages/checkout/partials/login-state'
-import {
-    AuthModal,
-    EMAIL_VIEW,
-    PASSWORD_VIEW,
-    useAuthModal
-} from '../../../hooks/use-auth-modal'
+import {AuthModal, EMAIL_VIEW, PASSWORD_VIEW, useAuthModal} from '../../../hooks/use-auth-modal'
 import useNavigation from '../../../hooks/use-navigation'
 import {useCurrentCustomer} from '../../../hooks/use-current-customer'
 import {useCurrentBasket} from '../../../hooks/use-current-basket'

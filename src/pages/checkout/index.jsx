@@ -6,21 +6,9 @@
  */
 import React, {useEffect, useState} from 'react'
 import {FormattedMessage, useIntl} from 'react-intl'
-import {
-    Alert,
-    AlertIcon,
-    Box,
-    Button,
-    Container,
-    Grid,
-    GridItem,
-    Stack
-} from '@chakra-ui/react'
+import {Alert, AlertIcon, Box, Button, Container, Grid, GridItem, Stack} from '@chakra-ui/react'
 import useNavigation from '../../hooks/use-navigation'
-import {
-    CheckoutProvider,
-    useCheckout
-} from '../../pages/checkout/util/checkout-context'
+import {CheckoutProvider, useCheckout} from '../../pages/checkout/util/checkout-context'
 import ContactInfo from '../../pages/checkout/partials/contact-info'
 import ShippingAddress from '../../pages/checkout/partials/shipping-address'
 import ShippingOptions from '../../pages/checkout/partials/shipping-options'
@@ -31,10 +19,7 @@ import {useCurrentBasket} from '../../hooks/use-current-basket'
 import CheckoutSkeleton from '../../pages/checkout/partials/checkout-skeleton'
 import {useShopperOrdersMutation, useShopperBasketsMutation} from '@salesforce/commerce-sdk-react'
 import UnavailableProductConfirmationModal from '../../components/unavailable-product-confirmation-modal'
-import {
-    API_ERROR_MESSAGE,
-    TOAST_MESSAGE_REMOVED_ITEM_FROM_CART
-} from '../../constants'
+import {API_ERROR_MESSAGE, TOAST_MESSAGE_REMOVED_ITEM_FROM_CART} from '../../constants'
 import {useToast} from '../../hooks/use-toast'
 import LoadingSpinner from '../../components/loading-spinner'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
