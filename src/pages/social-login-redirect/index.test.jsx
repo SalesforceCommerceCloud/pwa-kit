@@ -6,8 +6,8 @@
  */
 import React from 'react'
 import {screen} from '@testing-library/react'
-import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
-import SocialLoginRedirect from '@salesforce/retail-react-app/app/pages/social-login-redirect/index'
+import {renderWithProviders} from '../../utils/test-utils'
+import SocialLoginRedirect from '../../pages/social-login-redirect/index'
 
 test('Social Login Redirect renders without errors', () => {
     renderWithProviders(<SocialLoginRedirect />)

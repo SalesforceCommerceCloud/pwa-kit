@@ -6,8 +6,8 @@
  */
 import React from 'react'
 import {screen} from '@testing-library/react'
-import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
-import PasswordlessEmailConfirmation from '@salesforce/retail-react-app/app/components/email-confirmation/index'
+import {renderWithProviders} from '../../utils/test-utils'
+import PasswordlessEmailConfirmation from '../../components/email-confirmation/index'
 import {useForm} from 'react-hook-form'
 
 const WrapperComponent = ({...props}) => {

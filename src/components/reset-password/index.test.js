@@ -7,7 +7,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import {screen, waitFor, within} from '@testing-library/react'
-import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
+import {renderWithProviders} from '../../utils/test-utils'
 import ResetPasswordForm from '.'
 import mockConfig from '@salesforce/retail-react-app/config/mocks/default'
 import {useForm} from 'react-hook-form'

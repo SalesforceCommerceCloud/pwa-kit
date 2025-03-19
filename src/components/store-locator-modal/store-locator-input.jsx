@@ -19,15 +19,12 @@ import {
     FormControl,
     FormErrorMessage
 } from '@chakra-ui/react'
-import {AlertIcon} from '@salesforce/retail-react-app/app/components/icons'
+import {AlertIcon} from '../../components/icons'
 import {Controller} from 'react-hook-form'
 
 // Others
-import {
-    SUPPORTED_STORE_LOCATOR_COUNTRIES,
-    STORE_LOCATOR_NUM_STORES_PER_LOAD
-} from '@salesforce/retail-react-app/app/constants'
-import {StoreLocatorContext} from '@salesforce/retail-react-app/app/components/store-locator-modal/index'
+import {SUPPORTED_STORE_LOCATOR_COUNTRIES, STORE_LOCATOR_NUM_STORES_PER_LOAD} from '../../constants'
+import {StoreLocatorContext} from '../../components/store-locator-modal/index'
 
 const useGeolocation = () => {
     const {

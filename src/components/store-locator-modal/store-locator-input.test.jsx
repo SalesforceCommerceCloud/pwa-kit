@@ -6,14 +6,14 @@
  */
 
 import React, {useEffect} from 'react'
-import StoreLocatorInput from '@salesforce/retail-react-app/app/components/store-locator-modal/store-locator-input'
-import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
+import StoreLocatorInput from '../../components/store-locator-modal/store-locator-input'
+import {renderWithProviders} from '../../utils/test-utils'
 import {waitFor, screen} from '@testing-library/react'
 import {useForm} from 'react-hook-form'
 import PropTypes from 'prop-types'
-import {StoreLocatorContext} from '@salesforce/retail-react-app/app/components/store-locator-modal/index'
-import {useStoreLocator} from '@salesforce/retail-react-app/app/components/store-locator-modal/index'
-import {STORE_LOCATOR_NUM_STORES_PER_LOAD} from '@salesforce/retail-react-app/app/constants'
+import {StoreLocatorContext} from '../../components/store-locator-modal/index'
+import {useStoreLocator} from '../../components/store-locator-modal/index'
+import {STORE_LOCATOR_NUM_STORES_PER_LOAD} from '../../constants'
 
 const WrapperComponent = ({userHasSetManualGeolocation}) => {
     const form = useForm({

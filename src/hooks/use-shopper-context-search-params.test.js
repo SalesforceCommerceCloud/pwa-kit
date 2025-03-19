@@ -12,11 +12,8 @@ import {createMemoryHistory} from 'history'
 import {
     useShopperContextSearchParams,
     getShopperContextFromSearchParams
-} from '@salesforce/retail-react-app/app/hooks/use-shopper-context-search-params'
-import {
-    SHOPPER_CONTEXT_FIELD_TYPES,
-    SHOPPER_CONTEXT_SEARCH_PARAMS
-} from '@salesforce/retail-react-app/app/constants'
+} from '../hooks/use-shopper-context-search-params'
+import {SHOPPER_CONTEXT_FIELD_TYPES, SHOPPER_CONTEXT_SEARCH_PARAMS} from '../constants'
 
 afterEach(() => {
     jest.clearAllMocks()

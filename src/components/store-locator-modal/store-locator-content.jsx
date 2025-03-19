@@ -10,8 +10,8 @@ import {useIntl} from 'react-intl'
 
 // Components
 import {Heading, Accordion, AccordionItem, Box, Button} from '@chakra-ui/react'
-import StoresList from '@salesforce/retail-react-app/app/components/store-locator-modal/stores-list'
-import StoreLocatorInput from '@salesforce/retail-react-app/app/components/store-locator-modal/store-locator-input'
+import StoresList from '../../components/store-locator-modal/stores-list'
+import StoreLocatorInput from '../../components/store-locator-modal/store-locator-input'
 
 // Others
 import {
@@ -20,7 +20,7 @@ import {
     STORE_LOCATOR_DISTANCE,
     STORE_LOCATOR_NUM_STORES_PER_LOAD,
     STORE_LOCATOR_DISTANCE_UNIT
-} from '@salesforce/retail-react-app/app/constants'
+} from '../../constants'
 
 //This is an API limit and is therefore not configurable
 const NUM_STORES_PER_REQUEST_API_MAX = 200
@@ -29,7 +29,7 @@ const NUM_STORES_PER_REQUEST_API_MAX = 200
 import {useSearchStores} from '@salesforce/commerce-sdk-react'
 import {useForm} from 'react-hook-form'
 
-import {StoreLocatorContext} from '@salesforce/retail-react-app/app/components/store-locator-modal/index'
+import {StoreLocatorContext} from '../../components/store-locator-modal/index'
 
 const StoreLocatorContent = () => {
     const {

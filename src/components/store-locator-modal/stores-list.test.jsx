@@ -6,8 +6,8 @@
  */
 
 import React from 'react'
-import StoresList from '@salesforce/retail-react-app/app/components/store-locator-modal/stores-list'
-import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
+import StoresList from '../../components/store-locator-modal/stores-list'
+import {renderWithProviders} from '../../utils/test-utils'
 import {waitFor, screen, fireEvent} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import {Accordion} from '@chakra-ui/react'

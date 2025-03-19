@@ -9,19 +9,16 @@ import React, {useEffect} from 'react'
 import PropTypes from 'prop-types'
 import {defineMessage, useIntl} from 'react-intl'
 import {Button} from '@chakra-ui/react'
-import logger from '@salesforce/retail-react-app/app/utils/logger-instance'
+import logger from '../../utils/logger-instance'
 import {useAuthHelper, AuthHelpers} from '@salesforce/commerce-sdk-react'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
-import {useAppOrigin} from '@salesforce/retail-react-app/app/hooks/use-app-origin'
-import {setSessionJSONItem, buildRedirectURI} from '@salesforce/retail-react-app/app/utils/utils'
+import {useAppOrigin} from '../../hooks/use-app-origin'
+import {setSessionJSONItem, buildRedirectURI} from '../../utils/utils'
 
 // Icons
-import {AppleIcon, GoogleIcon} from '@salesforce/retail-react-app/app/components/icons'
+import {AppleIcon, GoogleIcon} from '../../components/icons'
 
-import {
-    API_ERROR_MESSAGE,
-    FEATURE_UNAVAILABLE_ERROR_MESSAGE
-} from '@salesforce/retail-react-app/app/constants'
+import {API_ERROR_MESSAGE, FEATURE_UNAVAILABLE_ERROR_MESSAGE} from '../../constants'
 
 const IDP_CONFIG = {
     apple: {

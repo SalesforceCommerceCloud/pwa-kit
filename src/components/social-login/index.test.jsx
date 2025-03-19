@@ -6,8 +6,8 @@
  */
 import React from 'react'
 import {screen} from '@testing-library/react'
-import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
-import SocialLogin from '@salesforce/retail-react-app/app/components/social-login/index'
+import {renderWithProviders} from '../../utils/test-utils'
+import SocialLogin from '../../components/social-login/index'
 
 describe('SocialLogin', () => {
     test('Load Apple', async () => {

@@ -5,9 +5,9 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
-import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
+import {renderWithProviders} from '../../utils/test-utils'
 import {useForm} from 'react-hook-form'
-import StandardLogin from '@salesforce/retail-react-app/app/components/standard-login'
+import StandardLogin from '../../components/standard-login'
 import {screen} from '@testing-library/react'
 
 const WrapperComponent = ({...props}) => {

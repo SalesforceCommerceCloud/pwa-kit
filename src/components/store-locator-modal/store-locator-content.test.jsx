@@ -6,14 +6,14 @@
  */
 
 import React, {useEffect} from 'react'
-import StoreLocatorContent from '@salesforce/retail-react-app/app/components/store-locator-modal/store-locator-content'
-import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
+import StoreLocatorContent from '../../components/store-locator-modal/store-locator-content'
+import {renderWithProviders} from '../../utils/test-utils'
 import {waitFor, screen} from '@testing-library/react'
 import PropTypes from 'prop-types'
-import {STORE_LOCATOR_NUM_STORES_PER_LOAD} from '@salesforce/retail-react-app/app/constants'
+import {STORE_LOCATOR_NUM_STORES_PER_LOAD} from '../../constants'
 import {rest} from 'msw'
-import {StoreLocatorContext} from '@salesforce/retail-react-app/app/components/store-locator-modal/index'
-import {useStoreLocator} from '@salesforce/retail-react-app/app/components/store-locator-modal/index'
+import {StoreLocatorContext} from '../../components/store-locator-modal/index'
+import {useStoreLocator} from '../../components/store-locator-modal/index'
 const mockStoresData = [
     {
         address1: '162 University Ave',

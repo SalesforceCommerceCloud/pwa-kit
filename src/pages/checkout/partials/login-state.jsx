@@ -8,7 +8,7 @@ import React, {useState} from 'react'
 import PropTypes from 'prop-types'
 import {Button, Divider, Text} from '@chakra-ui/react'
 import {FormattedMessage} from 'react-intl'
-import SocialLogin from '@salesforce/retail-react-app/app/components/social-login'
+import SocialLogin from '../../../components/social-login'
 
 const LoginState = ({
     form,

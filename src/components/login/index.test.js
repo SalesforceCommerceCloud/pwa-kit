@@ -6,8 +6,8 @@
  */
 import React from 'react'
 import {screen} from '@testing-library/react'
-import LoginForm from '@salesforce/retail-react-app/app/components/login/index'
-import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
+import LoginForm from '../../components/login/index'
+import {renderWithProviders} from '../../utils/test-utils'
 import {useForm} from 'react-hook-form'
 
 const WrapperComponent = ({...props}) => {

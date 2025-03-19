@@ -6,8 +6,8 @@
  */
 
 import React from 'react'
-import StoreLocatorModal from '@salesforce/retail-react-app/app/components/store-locator-modal/index'
-import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
+import StoreLocatorModal from '../../components/store-locator-modal/index'
+import {renderWithProviders} from '../../utils/test-utils'
 import {rest} from 'msw'
 
 const mockStoresData = [

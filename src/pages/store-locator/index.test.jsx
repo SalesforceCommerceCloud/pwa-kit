@@ -7,10 +7,7 @@
 import React from 'react'
 import {screen, waitFor} from '@testing-library/react'
 import {rest} from 'msw'
-import {
-    createPathWithDefaults,
-    renderWithProviders
-} from '@salesforce/retail-react-app/app/utils/test-utils'
+import {createPathWithDefaults, renderWithProviders} from '../../utils/test-utils'
 import StoreLocator from '.'
 import mockConfig from '@salesforce/retail-react-app/config/mocks/default'
 

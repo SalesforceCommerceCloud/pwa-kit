@@ -7,8 +7,8 @@
 
 import React from 'react'
 import {renderHook, waitFor} from '@testing-library/react'
-import useDataCloud from '@salesforce/retail-react-app/app/hooks/use-datacloud'
-import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
+import useDataCloud from './use-datacloud'
+import {useCurrentCustomer} from './use-current-customer'
 import {useDNT} from '@salesforce/commerce-sdk-react'
 import {
     mockLoginViewPageEvent,
@@ -21,13 +21,13 @@ import {
     mockCategorySearchParams,
     mockRecommendationIds,
     mockLoginViewPageEventDNT
-} from '@salesforce/retail-react-app/app/mocks/datacloud-mock-data'
+} from '../mocks/datacloud-mock-data'
 import {
     mockProduct,
     mockCategory,
     mockSearchResults,
     mockRecommenderDetails
-} from '@salesforce/retail-react-app/app/hooks/einstein-mock-data'
+} from '../hooks/einstein-mock-data'
 
 const dataCloudConfig = {
     app: {
@@ -65,7 +65,7 @@ jest.mock('@salesforce/commerce-sdk-react', () => {
     }
 })
 
-jest.mock('@salesforce/retail-react-app/app/hooks/use-current-customer', () => ({
+jest.mock('./use-current-customer', () => ({
     useCurrentCustomer: jest.fn(() => {
         return {
             data: {

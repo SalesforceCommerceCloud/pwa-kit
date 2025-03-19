@@ -5,11 +5,11 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import {AuthHelpers, useAuthHelper} from '@salesforce/commerce-sdk-react'
-import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
+import {useToast} from './use-toast'
 import {useIntl} from 'react-intl'
-import {useAppOrigin} from '@salesforce/retail-react-app/app/hooks/use-app-origin'
+import {useAppOrigin} from './use-app-origin'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
-import {isAbsoluteURL} from '@salesforce/retail-react-app/app/page-designer/utils'
+import {isAbsoluteURL} from '../page-designer/utils'
 
 /**
  * This hook provides commerce-react-sdk hooks to simplify the reset password flow.

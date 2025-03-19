@@ -9,14 +9,11 @@ import React from 'react'
 
 // Components
 import {Box, Container} from '@chakra-ui/react'
-import Seo from '@salesforce/retail-react-app/app/components/seo'
-import StoreLocatorContent from '@salesforce/retail-react-app/app/components/store-locator-modal/store-locator-content'
+import Seo from '../../components/seo'
+import StoreLocatorContent from '../../components/store-locator-modal/store-locator-content'
 
 // Others
-import {
-    StoreLocatorContext,
-    useStoreLocator
-} from '@salesforce/retail-react-app/app/components/store-locator-modal/index'
+import {StoreLocatorContext, useStoreLocator} from '../../components/store-locator-modal/index'
 
 const StoreLocator = () => {
     const storeLocator = useStoreLocator()

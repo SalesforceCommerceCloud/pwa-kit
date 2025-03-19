@@ -6,16 +6,10 @@
  */
 import React from 'react'
 import {screen, waitFor, within} from '@testing-library/react'
-import {
-    createPathWithDefaults,
-    renderWithProviders
-} from '@salesforce/retail-react-app/app/utils/test-utils'
+import {createPathWithDefaults, renderWithProviders} from '../../utils/test-utils'
 import {rest} from 'msw'
-import AccountDetail from '@salesforce/retail-react-app/app/pages/account/profile'
-import {
-    mockedRegisteredCustomerWithNoNumber,
-    mockedRegisteredCustomer
-} from '@salesforce/retail-react-app/app/mocks/mock-data'
+import AccountDetail from '../../pages/account/profile'
+import {mockedRegisteredCustomerWithNoNumber, mockedRegisteredCustomer} from '../../mocks/mock-data'
 
 import {Route, Switch} from 'react-router-dom'
 import mockConfig from '@salesforce/retail-react-app/config/mocks/default'

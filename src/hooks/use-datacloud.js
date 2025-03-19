@@ -6,12 +6,12 @@
  */
 import {useMemo} from 'react'
 import Cookies from 'js-cookie'
-import logger from '@salesforce/retail-react-app/app/utils/logger-instance'
+import logger from '../utils/logger-instance'
 import {initDataCloudSdk} from '@salesforce/cc-datacloud-typescript'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {useUsid, useCustomerType, useDNT} from '@salesforce/commerce-sdk-react'
-import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
-import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
+import useMultiSite from '../hooks/use-multi-site'
+import {useCurrentCustomer} from '../hooks/use-current-customer'
 
 export class DataCloudApi {
     constructor({siteId, appSourceId, tenantId, dnt}) {

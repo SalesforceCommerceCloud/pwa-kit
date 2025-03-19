@@ -7,15 +7,12 @@
 import React from 'react'
 import {waitFor} from '@testing-library/react'
 import {rest} from 'msw'
-import {
-    renderWithProviders,
-    createPathWithDefaults
-} from '@salesforce/retail-react-app/app/utils/test-utils'
+import {renderWithProviders, createPathWithDefaults} from '../../utils/test-utils'
 import Login from '.'
 import {BrowserRouter as Router, Route} from 'react-router-dom'
-import Account from '@salesforce/retail-react-app/app/pages/account'
+import Account from '../../pages/account'
 import mockConfig from '@salesforce/retail-react-app/config/mocks/default'
-import {mockedRegisteredCustomer} from '@salesforce/retail-react-app/app/mocks/mock-data'
+import {mockedRegisteredCustomer} from '../../mocks/mock-data'
 import {AuthHelpers} from '@salesforce/commerce-sdk-react'
 
 const mockMergedBasket = {

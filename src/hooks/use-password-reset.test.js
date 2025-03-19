@@ -7,8 +7,8 @@
 import React from 'react'
 import {fireEvent, screen, waitFor} from '@testing-library/react'
 import {useAuthHelper, AuthHelpers} from '@salesforce/commerce-sdk-react'
-import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
-import {usePasswordReset} from '@salesforce/retail-react-app/app/hooks/use-password-reset'
+import {renderWithProviders} from '../utils/test-utils'
+import {usePasswordReset} from './use-password-reset'
 
 const mockEmail = 'test@email.com'
 const mockToken = '123456'

@@ -44,7 +44,7 @@ import {usePrevious} from './use-previous'
 import {usePasswordReset} from './use-password-reset'
 import {isServer} from '../utils/utils'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
-import {isAbsoluteURL} from '@salesforce/retail-react-app/app/page-designer/utils'
+import {isAbsoluteURL} from '../page-designer/utils'
 import {useAppOrigin} from './use-app-origin'
 import useExtensionConfig from './use-extension-config'
 

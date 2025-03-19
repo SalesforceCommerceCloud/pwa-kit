@@ -11,17 +11,13 @@ import {useForm} from 'react-hook-form'
 import {useLocation} from 'react-router-dom'
 import {useIntl, FormattedMessage} from 'react-intl'
 import {Alert, Button, Container, Stack, Text} from '@chakra-ui/react'
-import {AlertIcon, BrandLogo} from '@salesforce/retail-react-app/app/components/icons'
-import Field from '@salesforce/retail-react-app/app/components/field'
-import PasswordRequirements from '@salesforce/retail-react-app/app/components/forms/password-requirements'
-import useUpdatePasswordFields from '@salesforce/retail-react-app/app/components/forms/useUpdatePasswordFields'
-import {usePasswordReset} from '@salesforce/retail-react-app/app/hooks/use-password-reset'
-import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
-import {
-    API_ERROR_MESSAGE,
-    INVALID_TOKEN_ERROR,
-    INVALID_TOKEN_ERROR_MESSAGE
-} from '@salesforce/retail-react-app/app/constants'
+import {AlertIcon, BrandLogo} from '../../components/icons'
+import Field from '../../components/field'
+import PasswordRequirements from '../../components/forms/password-requirements'
+import useUpdatePasswordFields from '../../components/forms/useUpdatePasswordFields'
+import {usePasswordReset} from '../../hooks/use-password-reset'
+import useNavigation from '../../hooks/use-navigation'
+import {API_ERROR_MESSAGE, INVALID_TOKEN_ERROR, INVALID_TOKEN_ERROR_MESSAGE} from '../../constants'
 
 const ResetPasswordLanding = () => {
     const form = useForm()

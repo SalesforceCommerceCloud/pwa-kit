@@ -7,9 +7,9 @@
 import React from 'react'
 import {rest} from 'msw'
 import {screen} from '@testing-library/react'
-import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
-import {mockImageWithText} from '@salesforce/retail-react-app/app/mocks/page-designer'
-import PageDesignerPromotionalBanner from '@salesforce/retail-react-app/app/pages/product-list/partials/page-designer-promotional-banner'
+import {renderWithProviders} from '../../../utils/test-utils'
+import {mockImageWithText} from '../../../mocks/page-designer'
+import PageDesignerPromotionalBanner from '../../../pages/product-list/partials/page-designer-promotional-banner'
 import {useShopperContext} from '@salesforce/commerce-sdk-react'
 
 jest.mock('@salesforce/commerce-sdk-react', () => {
