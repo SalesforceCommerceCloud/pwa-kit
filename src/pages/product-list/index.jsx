@@ -25,6 +25,7 @@ import {
     SimpleGrid,
     Grid,
     Select,
+    Heading,
     Text,
     FormControl,
     Stack,
@@ -71,6 +72,7 @@ import {
 import {useToast} from '../../hooks/use-toast'
 import useEinstein from '../../hooks/use-einstein'
 import useActiveData from '../../hooks/use-active-data'
+import useDataCloud from '../../hooks/use-datacloud'
 
 // Others
 import {HTTPNotFound, HTTPError} from '@salesforce/pwa-kit-react-sdk/ssr/universal/errors'

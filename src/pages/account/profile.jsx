@@ -6,6 +6,7 @@
  */
 
 import React, {forwardRef, useEffect, useRef, useState} from 'react'
+import PropTypes from 'prop-types'
 import {FormattedMessage, useIntl} from 'react-intl'
 import {
     Alert,
