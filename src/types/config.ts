@@ -83,7 +83,7 @@ type CustomPageConfigs = {
     }
 }
 
-type IDPValues = "google" | "apple"
+type IDPValues = 'google' | 'apple'
 type IDPArray = IDPValues[]
 
 // Combine inferred pages with specific configurations
@@ -106,20 +106,20 @@ export interface UserConfig extends BaseApplicationExtensionConfig {
     einsteinAPI: EinsteinAPI
     login: {
         passwordless: {
-            enabled: false,
-            callbackURI: string,
-            landingPath: string
-        },
-        social: {
-            enabled: false,
-            idps: IDPArray,
-            redirectURI: string
-        },
-        resetPassword: {
-            callbackURI: string,
+            enabled: false
+            callbackURI: string
             landingPath: string
         }
-    },
+        social: {
+            enabled: false
+            idps: IDPArray
+            redirectURI: string
+        }
+        resetPassword: {
+            callbackURI: string
+            landingPath: string
+        }
+    }
     maxCacheAge: number
     pages?: {
         [K in keyof PageConfigs]: false | PageConfigs[K]
