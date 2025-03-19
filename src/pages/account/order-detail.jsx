@@ -7,7 +7,7 @@
 
 import React, {useEffect, useRef} from 'react'
 import {FormattedMessage, useIntl} from 'react-intl'
-import {useHistory, useRouteMatch} from 'react-router'
+import {useHistory, useRouteMatch} from 'react-router-dom'
 import {
     Box,
     Heading,
@@ -21,16 +21,16 @@ import {
     SimpleGrid,
     Skeleton
 } from '@chakra-ui/react'
-import {getCreditCardIcon} from '@salesforce/retail-react-app/app/utils/cc-utils'
+import {getCreditCardIcon} from '../../utils/cc-utils'
 import {useOrder, useProducts} from '@salesforce/commerce-sdk-react'
-import Link from '@salesforce/retail-react-app/app/components/link'
-import {ChevronLeftIcon} from '@salesforce/retail-react-app/app/components/icons'
-import OrderSummary from '@salesforce/retail-react-app/app/components/order-summary'
-import ItemVariantProvider from '@salesforce/retail-react-app/app/components/item-variant'
-import CartItemVariantImage from '@salesforce/retail-react-app/app/components/item-variant/item-image'
-import CartItemVariantName from '@salesforce/retail-react-app/app/components/item-variant/item-name'
-import CartItemVariantAttributes from '@salesforce/retail-react-app/app/components/item-variant/item-attributes'
-import CartItemVariantPrice from '@salesforce/retail-react-app/app/components/item-variant/item-price'
+import Link from '../../components/link'
+import {ChevronLeftIcon} from '../../components/icons'
+import OrderSummary from '../../components/order-summary'
+import ItemVariantProvider from '../../components/item-variant'
+import CartItemVariantImage from '../../components/item-variant/item-image'
+import CartItemVariantName from '../../components/item-variant/item-name'
+import CartItemVariantAttributes from '../../components/item-variant/item-attributes'
+import CartItemVariantPrice from '../../components/item-variant/item-price'
 import PropTypes from 'prop-types'
 const onClient = typeof window !== 'undefined'
 

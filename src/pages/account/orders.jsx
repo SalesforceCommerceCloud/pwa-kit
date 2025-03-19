@@ -6,9 +6,9 @@
  */
 
 import React from 'react'
-import {Route, Switch, useRouteMatch} from 'react-router'
-import OrderHistory from '@salesforce/retail-react-app/app/pages/account/order-history'
-import OrderDetail from '@salesforce/retail-react-app/app/pages/account/order-detail'
+import {Route, Switch, useRouteMatch} from 'react-router-dom'
+import OrderHistory from '../../pages/account/order-history'
+import OrderDetail from '../../pages/account/order-detail'
 
 const AccountOrders = () => {
     const {path} = useRouteMatch()

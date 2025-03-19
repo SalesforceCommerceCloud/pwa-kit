@@ -7,11 +7,11 @@
 import React, {useState} from 'react'
 import {Button, useDisclosure} from '@chakra-ui/react'
 import {FormattedMessage, useIntl} from 'react-intl'
-import {useItemVariant} from '@salesforce/retail-react-app/app/components/item-variant'
-import ProductViewModal from '@salesforce/retail-react-app/app/components/product-view-modal'
-import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
-import {API_ERROR_MESSAGE} from '@salesforce/retail-react-app/app/constants'
-import Link from '@salesforce/retail-react-app/app/components/link'
+import {useItemVariant} from '../../../../components/item-variant'
+import ProductViewModal from '../../../../components/product-view-modal'
+import {useToast} from '../../../../hooks/use-toast'
+import {API_ERROR_MESSAGE} from '../../../../constants'
+import Link from '../../../../components/link'
 import {useShopperBasketsMutationHelper} from '@salesforce/commerce-sdk-react'
 
 /**

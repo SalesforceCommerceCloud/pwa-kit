@@ -8,22 +8,17 @@ import React from 'react'
 import {Route, Switch} from 'react-router-dom'
 import {screen, waitFor, within} from '@testing-library/react'
 import {rest} from 'msw'
-import {
-    renderWithProviders,
-    createPathWithDefaults,
-    guestToken
-} from '@salesforce/retail-react-app/app/utils/test-utils'
+import {renderWithProviders, createPathWithDefaults} from '../../utils/test-utils'
 import {
     mockOrderHistory,
     mockedGuestCustomer,
     mockedRegisteredCustomer,
     mockOrderProducts,
     mockPasswordUpdateFalure
-} from '@salesforce/retail-react-app/app/mocks/mock-data'
-import Account from '@salesforce/retail-react-app/app/pages/account/index'
-import Login from '@salesforce/retail-react-app/app/pages/login'
-import mockConfig from '@salesforce/retail-react-app/config/mocks/default'
-import * as sdk from '@salesforce/commerce-sdk-react'
+} from '../../mocks/mock-data'
+import Account from '../../pages/account/index'
+import Login from '../../pages/login'
+import mockConfig from '../../mock-config'
 
 jest.mock('@salesforce/commerce-sdk-react', () => ({
     ...jest.requireActual('@salesforce/commerce-sdk-react'),

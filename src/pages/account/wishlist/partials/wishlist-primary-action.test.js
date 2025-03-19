@@ -5,15 +5,15 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
-import {mockWishListDetails} from '@salesforce/retail-react-app/app/pages/account/wishlist/partials/wishlist-primary-action.mock'
-import ItemVariantProvider from '@salesforce/retail-react-app/app/components/item-variant'
-import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
-import WishlistPrimaryAction from '@salesforce/retail-react-app/app/pages/account/wishlist/partials/wishlist-primary-action'
+import {mockWishListDetails} from './wishlist-primary-action.mock'
+import ItemVariantProvider from '../../../../components/item-variant'
+import {renderWithProviders} from '../../../../utils/test-utils'
+import WishlistPrimaryAction from './wishlist-primary-action'
 import {screen, waitFor} from '@testing-library/react'
 import PropTypes from 'prop-types'
 import {rest} from 'msw'
-import {basketWithProductSet} from '@salesforce/retail-react-app/app/pages/product-detail/index.mock'
-import {mockProductBundle} from '@salesforce/retail-react-app/app/mocks/product-bundle'
+import {basketWithProductSet} from '../../../product-detail/index.mock'
+import {mockProductBundle} from '../../../../mocks/product-bundle'
 
 const MockedComponent = ({variant}) => {
     return (

@@ -6,22 +6,22 @@
  */
 import React, {useState, useEffect, useRef} from 'react'
 import {FormattedMessage, useIntl} from 'react-intl'
-import {Box, Flex, Skeleton, Stack, Heading} from '@chakra-ui/react'
+import {Box, Stack, Heading, Flex, Skeleton} from '@chakra-ui/react'
 import {useProducts, useShopperCustomersMutation} from '@salesforce/commerce-sdk-react'
 
-import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
-import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
-import {useWishList} from '@salesforce/retail-react-app/app/hooks/use-wish-list'
+import useNavigation from '../../../hooks/use-navigation'
+import {useToast} from '../../../hooks/use-toast'
+import {useWishList} from '../../../hooks/use-wish-list'
 
-import PageActionPlaceHolder from '@salesforce/retail-react-app/app/components/page-action-placeholder'
-import {HeartIcon} from '@salesforce/retail-react-app/app/components/icons'
-import ProductItem from '@salesforce/retail-react-app/app/components/product-item'
-import WishlistPrimaryAction from '@salesforce/retail-react-app/app/pages/account/wishlist/partials/wishlist-primary-action'
-import WishlistSecondaryButtonGroup from '@salesforce/retail-react-app/app/pages/account/wishlist/partials/wishlist-secondary-button-group'
+import PageActionPlaceHolder from '../../../components/page-action-placeholder'
+import {HeartIcon} from '../../../components/icons'
+import ProductItem from '../../../components/product-item'
+import WishlistPrimaryAction from '../../../pages/account/wishlist/partials/wishlist-primary-action'
+import WishlistSecondaryButtonGroup from '../../../pages/account/wishlist/partials/wishlist-secondary-button-group'
 
-import {API_ERROR_MESSAGE} from '@salesforce/retail-react-app/app/constants'
-import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
-import UnavailableProductConfirmationModal from '@salesforce/retail-react-app/app/components/unavailable-product-confirmation-modal'
+import {API_ERROR_MESSAGE} from '../../../constants'
+import {useCurrentCustomer} from '../../../hooks/use-current-customer'
+import UnavailableProductConfirmationModal from '../../../components/unavailable-product-confirmation-modal'
 
 const numberOfSkeletonItems = 3
 
