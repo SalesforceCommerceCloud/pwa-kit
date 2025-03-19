@@ -8,10 +8,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import {useIntl} from 'react-intl'
 import {SimpleGrid, Button, Center, useMultiStyleConfig} from '@chakra-ui/react'
-import {
-    ADD_FILTER,
-    REMOVE_FILTER
-} from '@salesforce/retail-react-app/app/pages/product-list/partials/refinements-utils'
+import {ADD_FILTER, REMOVE_FILTER} from '../../../pages/product-list/partials/refinements-utils'
 
 const SizeRefinements = ({filter, toggleFilter, selectedFilters}) => {
     const {formatMessage} = useIntl()

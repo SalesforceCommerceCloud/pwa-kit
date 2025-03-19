@@ -19,10 +19,10 @@ import {
     Stack,
     Text
 } from '@chakra-ui/react'
-import Link from '@salesforce/retail-react-app/app/components/link'
+import Link from '../../../components/link'
 
 // Others
-import {noop} from '@salesforce/retail-react-app/app/utils/utils'
+import {noop} from '../../../utils/utils'
 
 const CategoryLinks = ({category = {}, onSelect = noop}) => {
     const {categories = []} = category

@@ -8,19 +8,12 @@ import React from 'react'
 import PropTypes from 'prop-types'
 
 import {rest} from 'msw'
-import {
-    mockProductSearch,
-    mockedEmptyCustomerProductList,
-    mockCategories
-} from '@salesforce/retail-react-app/app/mocks/mock-data'
+import {mockProductSearch, mockedEmptyCustomerProductList, mockCategories} from '../../mocks/mock-data'
 import {screen, waitFor} from '@testing-library/react'
 import {Route, Switch} from 'react-router-dom'
-import {
-    createPathWithDefaults,
-    renderWithProviders
-} from '@salesforce/retail-react-app/app/utils/test-utils'
+import {createPathWithDefaults, renderWithProviders} from '../../utils/test-utils'
 import ProductList from '.'
-import EmptySearchResults from '@salesforce/retail-react-app/app/pages/product-list/partials/empty-results'
+import EmptySearchResults from '../../pages/product-list/partials/empty-results'
 import {useProductSearch, useCategory} from '@salesforce/commerce-sdk-react'
 
 const MOCK_USE_QUERY_RESULT = {
