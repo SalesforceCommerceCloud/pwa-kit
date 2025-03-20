@@ -11,7 +11,7 @@ import {Alert, Box, Container, Stack, Text, Spinner} from '@chakra-ui/react'
 import {AlertIcon} from '../../components/icons'
 
 // Hooks
-import useNavigation from '../../app/hooks/use-navigation'
+import useNavigation from '../../hooks/use-navigation'
 import {useAuthHelper, AuthHelpers, useShopperBasketsMutation} from '@salesforce/commerce-sdk-react'
 import {useSearchParams} from '../../hooks'
 import {useCurrentCustomer} from '../../hooks/use-current-customer'

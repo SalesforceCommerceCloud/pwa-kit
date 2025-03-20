@@ -121,6 +121,8 @@ export const REMOVE_UNAVAILABLE_CART_ITEM_DIALOG_CONFIG = {
     onPrimaryAction: noop
 }
 
+export const DEFAULT_DNT_STATE = true
+
 // Constants for shopper context
 // Supported non-string field types used in SHOPPER_CONTEXT_SEARCH_PARAMS below.
 // Only non-string types need to be identified using the "type" field.

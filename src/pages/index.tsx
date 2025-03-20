@@ -30,14 +30,13 @@ const Registration = loadable(() => import('overridable!./registration'), {
     fallback
 })
 const ResetPassword = loadable(() => import('overridable!./reset-password'), {fallback})
-ResetPasswordLanding
 const LoginRedirect = loadable(() => import('overridable!./login-redirect'), {fallback})
 const ProductDetail = loadable(() => import('overridable!./product-detail'), {fallback})
 const ProductList = loadable(() => import('overridable!./product-list'), {
     fallback
 })
-const SocialLoginRedirect = loadable(() => import('./pages/social-login-redirect'), {fallback})
-const Wishlist = loadable(() => import('./pages/account/wishlist'), {
+const SocialLoginRedirect = loadable(() => import('overridable!./social-login-redirect'), {fallback})
+const Wishlist = loadable(() => import('overridable!./account/wishlist'), {
     fallback
 })
 

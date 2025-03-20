@@ -43,10 +43,9 @@ import useNavigation from './use-navigation'
 import {usePrevious} from './use-previous'
 import {usePasswordReset} from './use-password-reset'
 import {isServer} from '../utils/utils'
-import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {isAbsoluteURL} from '../page-designer/utils'
 import {useAppOrigin} from './use-app-origin'
-import useExtensionConfig from './use-extension-config'
+import {useExtensionConfig} from './use-extension-config'
 
 export const LOGIN_VIEW = 'login'
 export const REGISTER_VIEW = 'register'
@@ -363,7 +362,8 @@ AuthModal.propTypes = {
  */
 export const useAuthModal = (initialView = LOGIN_VIEW) => {
     const {isOpen, onOpen, onClose} = useDisclosure()
-    const {passwordless = {}, social = {}} = getConfig().app.login || {}
+    const {login} = useExtensionConfig()
+    const {passwordless = {}, social = {}} = login
 
     return {
         initialView,

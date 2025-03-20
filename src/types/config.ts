@@ -46,6 +46,14 @@ type EinsteinAPI = {
     isProduction: boolean
 }
 
+// Configuration settings for connecting to the Data Cloud API.
+type DataCloudAPI = {
+    appSourceId: string
+    tenantId: string
+    siteId: string
+    isProduction: boolean
+}
+
 type ShippingCountry = {
     value: string
     label: string
@@ -104,6 +112,7 @@ export interface UserConfig extends BaseApplicationExtensionConfig {
     defaultAppLocale: string
     defaultSiteTitle: string
     einsteinAPI: EinsteinAPI
+    dataCloudAPI: DataCloudAPI
     login: {
         passwordless: {
             enabled: false

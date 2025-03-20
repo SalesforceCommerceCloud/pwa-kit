@@ -39,7 +39,7 @@ import useEinstein from '../../hooks/use-einstein'
 import {useAuthHelper, AuthHelpers} from '@salesforce/commerce-sdk-react'
 import {useCurrentCustomer} from '../../hooks/use-current-customer'
 import {isHydrated} from '../../utils/utils'
-import {useDataCloud} from '../../hooks/use-data-cloud'
+import {useDataCloud} from '../../hooks/use-datacloud'
 
 const onClient = typeof window !== 'undefined'
 const LogoutButton = ({onClick}) => {
