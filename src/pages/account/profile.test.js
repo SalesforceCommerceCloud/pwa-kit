@@ -12,7 +12,7 @@ import AccountDetail from '../../pages/account/profile'
 import {mockedRegisteredCustomerWithNoNumber, mockedRegisteredCustomer} from '../../mocks/mock-data'
 
 import {Route, Switch} from 'react-router-dom'
-import mockConfig from '@salesforce/retail-react-app/config/mocks/default'
+import mockConfig from '../../mock-config'
 import * as sdk from '@salesforce/commerce-sdk-react'
 
 const MockedComponent = () => {
@@ -57,7 +57,7 @@ test('Allows customer to edit phone number', async () => {
         )
     )
     const {user} = renderWithProviders(<MockedComponent />, {
-        wrapperProps: {siteAlias: 'uk', appConfig: mockConfig.app}
+        wrapperProps: {siteAlias: 'uk', appConfig: mockConfig}
     })
 
     await waitFor(() => {
@@ -95,7 +95,7 @@ test('Non ECOM user cannot see the password card', async () => {
         )
     )
     renderWithProviders(<MockedComponent />, {
-        wrapperProps: {siteAlias: 'uk', appConfig: mockConfig.app}
+        wrapperProps: {siteAlias: 'uk', appConfig: mockConfig}
     })
 
     await waitFor(() => {

@@ -9,7 +9,7 @@ import {screen, waitFor} from '@testing-library/react'
 import {rest} from 'msw'
 import {createPathWithDefaults, renderWithProviders} from '../../utils/test-utils'
 import StoreLocator from '.'
-import mockConfig from '@salesforce/retail-react-app/config/mocks/default'
+import mockConfig from '../../mock-config'
 
 const mockStores = {
     limit: 4,
@@ -127,7 +127,7 @@ test('Allows customer to go to store locator page', async () => {
 
     // render our test component
     const {user} = renderWithProviders(<MockedComponent />, {
-        wrapperProps: {siteAlias: 'uk', appConfig: mockConfig.app}
+        wrapperProps: {siteAlias: 'uk', appConfig: mockConfig}
     })
 
     await user.click(await screen.findByText('Find a Store'))
@@ -149,7 +149,7 @@ test('Show no stores are found if there are no stores', async () => {
 
     // render our test component
     renderWithProviders(<MockedComponent />, {
-        wrapperProps: {siteAlias: 'uk', appConfig: mockConfig.app}
+        wrapperProps: {siteAlias: 'uk', appConfig: mockConfig}
     })
 
     await waitFor(() => {

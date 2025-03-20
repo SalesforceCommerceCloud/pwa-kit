@@ -9,7 +9,7 @@ import PropTypes from 'prop-types'
 import {screen, waitFor, within} from '@testing-library/react'
 import {renderWithProviders} from '../../utils/test-utils'
 import ResetPasswordForm from '.'
-import mockConfig from '@salesforce/retail-react-app/config/mocks/default'
+import mockConfig from '../../mock-config'
 import {useForm} from 'react-hook-form'
 
 const MockedComponent = ({mockSubmitForm, mockClickSignIn}) => {
@@ -60,7 +60,7 @@ test('Allows customer to generate password token and see success message', async
     const {user} = renderWithProviders(
         <MockedComponent mockSubmitForm={mockSubmitForm} mockClickSignIn={mockClickSignIn} />,
         {
-            wrapperProps: {siteAlias: 'uk', appConfig: mockConfig.app}
+            wrapperProps: {siteAlias: 'uk', appConfig: mockConfig}
         }
     )
 

@@ -436,7 +436,7 @@ const useDataCloud = () => {
         }
     }
 
-    // Grab Data Cloud configuration values and intialize the sdk
+    // Grab Data Cloud configuration values and initialize the sdk
     const {dataCloudAPI: config} = useExtensionConfig()
 
     const {appSourceId, tenantId} = config

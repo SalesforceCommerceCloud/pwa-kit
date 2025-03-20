@@ -11,7 +11,7 @@ import {renderWithProviders, createPathWithDefaults} from '../../utils/test-util
 import Login from '.'
 import {BrowserRouter as Router, Route} from 'react-router-dom'
 import Account from '../../pages/account'
-import mockConfig from '@salesforce/retail-react-app/config/mocks/default'
+import mockConfig from '../../mock-config'
 import {mockedRegisteredCustomer} from '../../mocks/mock-data'
 import {AuthHelpers} from '@salesforce/commerce-sdk-react'
 

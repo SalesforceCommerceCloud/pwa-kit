@@ -15,8 +15,8 @@ import useNavigation from '../../hooks/use-navigation'
 import {useAuthHelper, AuthHelpers, useShopperBasketsMutation} from '@salesforce/commerce-sdk-react'
 import {useSearchParams} from '../../hooks'
 import {useCurrentCustomer} from '../../hooks/use-current-customer'
-import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {useAppOrigin} from '../../hooks/use-app-origin'
+import {useExtensionConfig} from '../../hooks/use-extension-config'
 import {getSessionJSONItem, clearSessionJSONItem, buildRedirectURI} from '../../utils/utils'
 import {API_ERROR_MESSAGE} from '../../constants'
 
@@ -28,7 +28,8 @@ const SocialLoginRedirect = () => {
     const {data: customer} = useCurrentCustomer()
     // Build redirectURI from config values
     const appOrigin = useAppOrigin()
-    const redirectPath = getConfig().app.login.social?.redirectURI || ''
+    const {login} = useExtensionConfig()
+    const redirectPath = login?.social?.redirectURI || ''
     const redirectURI = buildRedirectURI(appOrigin, redirectPath)
 
     const locatedFrom = getSessionJSONItem('returnToPage')

@@ -23,7 +23,7 @@ import {
     mockGetBundleChildrenProducts,
     basketWithProductBundle
 } from '../../mocks/product-bundle'
-import {prependHandlersToServer} from '@salesforce/retail-react-app/jest-setup'
+import {prependHandlersToServer} from '../../../jest-setup'
 import {baskets as mockBaskets, products as mockProducts} from '../../pages/cart/cart.mock'
 
 const mockProduct = {

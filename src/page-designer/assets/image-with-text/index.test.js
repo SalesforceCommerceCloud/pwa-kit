@@ -7,7 +7,7 @@
 import React from 'react'
 import ImageWithText from './index'
 import {renderWithProviders} from '../../../utils/test-utils'
-import {mockImageWithText} from '../../../utils/mocks'
+import {mockImageWithText} from '../../../mocks/page-designer'
 
 test('Page renders correct component', () => {
     const {getByText, getByRole} = renderWithProviders(<ImageWithText {...mockImageWithText} />)

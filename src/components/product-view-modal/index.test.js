@@ -12,7 +12,7 @@ import {renderWithProviders} from '../../utils/test-utils'
 import {fireEvent, screen} from '@testing-library/react'
 import {useDisclosure} from '@chakra-ui/react'
 import mockProductDetail from '../../mocks/variant-750518699578M'
-import {prependHandlersToServer} from '@salesforce/retail-react-app/jest-setup'
+import {prependHandlersToServer} from '../../../jest-setup'
 
 const MockComponent = ({updateCart}) => {
     const {isOpen, onOpen, onClose} = useDisclosure()

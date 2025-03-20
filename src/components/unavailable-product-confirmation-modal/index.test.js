@@ -9,7 +9,7 @@ import React from 'react'
 import UnavailableProductConfirmationModal from '../../components/unavailable-product-confirmation-modal/index'
 import {renderWithProviders} from '../../utils/test-utils'
 import {waitFor} from '@testing-library/react'
-import {prependHandlersToServer} from '@salesforce/retail-react-app/jest-setup'
+import {prependHandlersToServer} from '../../../jest-setup'
 const mockProductsWithUnavailableProducts = {
     limit: 0,
     total: 2,

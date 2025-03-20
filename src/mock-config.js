@@ -44,6 +44,26 @@ module.exports = {
         // the is_production property from an MRT target
         isProduction: false
     },
+    dataCloudAPI: {
+        appSourceId: 'fb81edab-24c6-4b40-8684-b67334dfdf32',
+        tenantId: 'mmyw8zrxhfsg09lfmzrd1zjqmg'
+    },
+    login: {
+        passwordless: {
+            enabled: false,
+            callbackURI: '/passwordless-login-callback',
+            landingPath: '/passwordless-login-landing'
+        },
+        social: {
+            enabled: false,
+            idps: ['google', 'apple'],
+            redirectURI: '/social-callback'
+        },
+        resetPassword: {
+            callbackURI: '/reset-password-callback',
+            landingPath: '/reset-password-landing'
+        }
+    },
     maxCacheAge: 900,
     pages: {
         Account: {

@@ -11,7 +11,7 @@ import {renderWithProviders} from '../../utils/test-utils'
 import {waitFor, screen, fireEvent} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import {Accordion} from '@chakra-ui/react'
-import mockConfig from '@salesforce/retail-react-app/config/mocks/default'
+import mockConfig from '../../mock-config'
 
 const mockSearchStoresData = [
     {
@@ -191,7 +191,7 @@ describe('StoresList', () => {
             fireEvent.click(radioButton)
 
             const expectedStoreInfo = {id, name, inventoryId}
-            expect(localStorage.getItem(`store_${mockConfig.app.defaultSite}`)).toEqual(
+            expect(localStorage.getItem(`store_${mockConfig.defaultSite}`)).toEqual(
                 JSON.stringify(expectedStoreInfo)
             )
         })

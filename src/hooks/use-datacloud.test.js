@@ -5,8 +5,9 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React from 'react'
-import {renderHook, waitFor} from '@testing-library/react'
+import React, {useEffect} from 'react'
+import PropTypes from 'prop-types'
+import {waitFor} from '@testing-library/react'
 import useDataCloud from './use-datacloud'
 import {useCurrentCustomer} from './use-current-customer'
 import {useDNT} from '@salesforce/commerce-sdk-react'
@@ -28,22 +29,7 @@ import {
     mockSearchResults,
     mockRecommenderDetails
 } from '../hooks/einstein-mock-data'
-
-const dataCloudConfig = {
-    app: {
-        dataCloudAPI: {
-            appSourceId: '6ebc532a-2247-48e9-8300-d8c2b84eb463',
-            tenantId: 'mvst0mlfmrsd8zbwg8zgmytbg1'
-        },
-        defaultSite: 'test-site'
-    }
-}
-
-jest.mock('@salesforce/pwa-kit-runtime/utils/ssr-config', () => {
-    return {
-        getConfig: jest.fn(() => dataCloudConfig)
-    }
-})
+import {renderWithProviders} from '../utils/test-utils'
 
 jest.mock('@salesforce/commerce-sdk-react', () => {
     const originalModule = jest.requireActual('@salesforce/commerce-sdk-react')
@@ -77,9 +63,15 @@ jest.mock('./use-current-customer', () => ({
         }
     })
 }))
-jest.mock('js-cookie', () => ({
-    get: jest.fn(() => 'mockCookieValue')
-}))
+// jest.mock('js-cookie', () => {
+//     const originalModule = jest.requireActual('js-cookie')
+
+//     return {
+//         ...originalModule,
+//         get: jest.fn(() => 'mockCookieValue')
+//     }
+// })
+
 const mockWebEventsAppSourceIdPost = jest.fn()
 jest.mock('@salesforce/cc-datacloud-typescript', () => {
     return {
@@ -91,17 +83,36 @@ jest.mock('@salesforce/cc-datacloud-typescript', () => {
     }
 })
 
-const mockUseContext = jest.fn().mockImplementation(() => ({site: {id: 'RefArch'}}))
-React.useContext = mockUseContext
+const MockComponent = ({event, args}) => {
+    const dataCloud = useDataCloud()
+
+    // Trigger configured event on mount.
+    useEffect(() => {
+        dataCloud[event](...args)
+    }, [])
+
+    return <></>
+}
+
+MockComponent.propTypes = {
+    event: PropTypes.string,
+    args: PropTypes.array
+}
+
 describe('useDataCloud', function () {
     beforeEach(() => {
         jest.clearAllMocks()
     })
 
     test('sendViewPage', async () => {
-        const {result} = renderHook(() => useDataCloud())
-        expect(result.current).toBeDefined()
-        result.current.sendViewPage('/login')
+        renderWithProviders(<MockComponent event="sendViewPage" args={['/login']} />, {
+            wrapperProps: {
+                site: {
+                    id: 'RefArch'
+                }
+            }
+        })
+
         await waitFor(() => {
             expect(mockWebEventsAppSourceIdPost).toHaveBeenCalledWith(mockLoginViewPageEvent)
         })
@@ -111,18 +122,27 @@ describe('useDataCloud', function () {
         useDNT.mockReturnValueOnce({
             effectiveDnt: true
         })
-        const {result} = renderHook(() => useDataCloud())
-        expect(result.current).toBeDefined()
-        result.current.sendViewPage('/login')
+        renderWithProviders(<MockComponent event="sendViewPage" args={['/login']} />, {
+            wrapperProps: {
+                site: {
+                    id: 'RefArch'
+                }
+            }
+        })
         await waitFor(() => {
             expect(mockWebEventsAppSourceIdPost).toHaveBeenCalledWith(mockLoginViewPageEventDNT)
         })
     })
 
     test('sendViewProduct', async () => {
-        const {result} = renderHook(() => useDataCloud())
-        expect(result.current).toBeDefined()
-        result.current.sendViewProduct(mockProduct)
+        renderWithProviders(<MockComponent event="sendViewProduct" args={[mockProduct]} />, {
+            wrapperProps: {
+                site: {
+                    id: 'RefArch'
+                }
+            }
+        })
+
         await waitFor(() => {
             expect(mockWebEventsAppSourceIdPost).toHaveBeenCalledWith(mockViewProductEvent)
         })
@@ -136,27 +156,61 @@ describe('useDataCloud', function () {
                 lastName: 'Smith'
             }
         })
-        const {result} = renderHook(() => useDataCloud())
-        expect(result.current).toBeDefined()
-        result.current.sendViewCategory(mockCategorySearchParams, mockCategory, mockSearchResults)
+
+        renderWithProviders(
+            <MockComponent
+                event="sendViewCategory"
+                args={[mockCategorySearchParams, mockCategory, mockSearchResults]}
+            />,
+            {
+                wrapperProps: {
+                    site: {
+                        id: 'RefArch'
+                    }
+                }
+            }
+        )
+
         await waitFor(() => {
             expect(mockWebEventsAppSourceIdPost).toHaveBeenCalledWith(mockViewCategoryEvent)
         })
     })
 
     test('sendViewSearchResults with no email', async () => {
-        const {result} = renderHook(() => useDataCloud())
-        expect(result.current).toBeDefined()
-        result.current.sendViewSearchResults(mockSearchParam, mockGloveSearchResult)
+        renderWithProviders(
+            <MockComponent
+                event="sendViewSearchResults"
+                args={[mockSearchParam, mockGloveSearchResult]}
+            />,
+            {
+                wrapperProps: {
+                    site: {
+                        id: 'RefArch'
+                    }
+                }
+            }
+        )
+
         await waitFor(() => {
             expect(mockWebEventsAppSourceIdPost).toHaveBeenCalledWith(mockViewSearchResultsEvent)
         })
     })
 
     test('sendViewRecommendations with non email', async () => {
-        const {result} = renderHook(() => useDataCloud())
-        expect(result.current).toBeDefined()
-        result.current.sendViewRecommendations(mockRecommenderDetails, mockRecommendationIds)
+        renderWithProviders(
+            <MockComponent
+                event="sendViewRecommendations"
+                args={[mockRecommenderDetails, mockRecommendationIds]}
+            />,
+            {
+                wrapperProps: {
+                    site: {
+                        id: 'RefArch'
+                    }
+                }
+            }
+        )
+
         await waitFor(() => {
             expect(mockWebEventsAppSourceIdPost).toHaveBeenCalledWith(mockViewRecommendationsEvent)
         })
