@@ -20,7 +20,7 @@ import {
 import useNavigation from '../../hooks/use-navigation'
 import Seo from '../../components/seo'
 import {useForm} from 'react-hook-form'
-import {useRouteMatch} from 'react-router'
+import {useRouteMatch} from 'react-router-dom'
 import {useLocation} from 'react-router-dom'
 import useEinstein from '../../hooks/use-einstein'
 import useDataCloud from '../../hooks/use-datacloud'
@@ -38,8 +38,8 @@ import {
     USER_NOT_FOUND_ERROR
 } from '../../constants'
 import {usePrevious} from '../../hooks/use-previous'
+import {useExtensionConfig} from '../../hooks'
 import {isServer} from '../../utils/utils'
-import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 
 const LOGIN_ERROR_MESSAGE = defineMessage({
     defaultMessage: 'Incorrect username or password, please try again.',
@@ -58,11 +58,12 @@ const Login = ({initialView = LOGIN_VIEW}) => {
     const {path} = useRouteMatch()
     const einstein = useEinstein()
     const dataCloud = useDataCloud()
+    const {login: loginConfig} = useExtensionConfig()
     const {isRegistered, customerType} = useCustomerType()
     const login = useAuthHelper(AuthHelpers.LoginRegisteredUserB2C)
     const loginPasswordless = useAuthHelper(AuthHelpers.LoginPasswordlessUser)
     const authorizePasswordlessLogin = useAuthHelper(AuthHelpers.AuthorizePasswordless)
-    const {passwordless = {}, social = {}} = getConfig().app.login || {}
+    const {passwordless = {}, social = {}} = loginConfig
     const isPasswordlessEnabled = !!passwordless?.enabled
     const isSocialEnabled = !!social?.enabled
     const idps = social?.idps

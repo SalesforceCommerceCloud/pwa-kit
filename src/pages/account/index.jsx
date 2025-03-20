@@ -36,10 +36,11 @@ import useNavigation from '../../hooks/use-navigation'
 import LoadingSpinner from '../../components/loading-spinner'
 import useMultiSite from '../../hooks/use-multi-site'
 import useEinstein from '../../hooks/use-einstein'
+import useDataCloud from '../../hooks/use-datacloud'
 import {useAuthHelper, AuthHelpers} from '@salesforce/commerce-sdk-react'
 import {useCurrentCustomer} from '../../hooks/use-current-customer'
 import {isHydrated} from '../../utils/utils'
-import {useDataCloud} from '../../hooks/use-datacloud'
+
 
 const onClient = typeof window !== 'undefined'
 const LogoutButton = ({onClick}) => {
