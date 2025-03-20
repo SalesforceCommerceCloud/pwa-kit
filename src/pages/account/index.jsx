@@ -41,7 +41,6 @@ import {useAuthHelper, AuthHelpers} from '@salesforce/commerce-sdk-react'
 import {useCurrentCustomer} from '../../hooks/use-current-customer'
 import {isHydrated} from '../../utils/utils'
 
-
 const onClient = typeof window !== 'undefined'
 const LogoutButton = ({onClick}) => {
     const {formatMessage} = useIntl()

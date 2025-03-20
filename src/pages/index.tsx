@@ -35,7 +35,9 @@ const ProductDetail = loadable(() => import('overridable!./product-detail'), {fa
 const ProductList = loadable(() => import('overridable!./product-list'), {
     fallback
 })
-const SocialLoginRedirect = loadable(() => import('overridable!./social-login-redirect'), {fallback})
+const SocialLoginRedirect = loadable(() => import('overridable!./social-login-redirect'), {
+    fallback
+})
 const Wishlist = loadable(() => import('overridable!./account/wishlist'), {
     fallback
 })
