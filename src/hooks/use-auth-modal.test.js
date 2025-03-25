@@ -6,7 +6,7 @@
  */
 import React from 'react'
 import PropTypes from 'prop-types'
-import {screen, within, waitFor} from '@testing-library/react'
+import {act, screen, within, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import {renderWithProviders, createPathWithDefaults, guestToken} from '../utils/test-utils'
 import {AuthModal, useAuthModal} from '../hooks/use-auth-modal'
@@ -188,20 +188,25 @@ describe('Passwordless enabled', () => {
 
         // open the modal
         const trigger = screen.getByText(/open modal/i)
-        await user.click(trigger)
+        await act(async () => {
+            await user.click(trigger)
+        })
 
         await waitFor(() => {
             expect(screen.getByText(/continue securely/i)).toBeInTheDocument()
         })
 
         // enter a valid email address
-        await user.type(screen.getByLabelText('Email'), validEmail)
+        await act(async () => {
+            await user.type(screen.getByLabelText('Email'), validEmail)
+        })
 
         // initiate passwordless login
         const passwordlessLoginButton = screen.getByText(/continue securely/i)
         // Click the button twice as the isPasswordlessLoginClicked state doesn't change after the first click
         await user.click(passwordlessLoginButton)
         await user.click(passwordlessLoginButton)
+
         expect(
             mockAuthHelperFunctions[AuthHelpers.AuthorizePasswordless].mutateAsync
         ).toHaveBeenCalledWith({

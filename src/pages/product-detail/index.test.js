@@ -45,8 +45,8 @@ jest.mock('@salesforce/commerce-sdk-react', () => {
 })
 
 // NOTE: This is probably going to break.
-jest.mock('../constants', () => {
-    const originalModule = jest.requireActual('../constants')
+jest.mock('../../constants', () => {
+    const originalModule = jest.requireActual('../../constants')
     return {
         ...originalModule,
         DEFAULT_DNT_STATE: false

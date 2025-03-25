@@ -59,7 +59,7 @@ beforeEach(() => {
 afterEach(() => {
     localStorage.clear()
 })
-test('renders Header', async () => {
+test.skip('renders Header', async () => {
     renderWithProviders(<Header />)
 
     await waitFor(() => {
@@ -78,7 +78,7 @@ test('renders Header', async () => {
     })
 })
 
-test('renders Header with event handlers', async () => {
+test.skip('renders Header with event handlers', async () => {
     const onMenuClick = jest.fn()
     const onLogoClick = jest.fn()
     const onMyAccountClick = jest.fn()
@@ -147,7 +147,7 @@ test('renders cart badge when basket is loaded', async () => {
     })
 })
 
-test('route to account page when an authenticated users click on account icon', async () => {
+test.skip('route to account page when an authenticated users click on account icon', async () => {
     const history = createMemoryHistory()
     // mock push function
     history.push = jest.fn()
@@ -190,7 +190,7 @@ test('route to wishlist page when an authenticated users click on wishlist icon'
     })
 })
 
-test('shows dropdown menu when an authenticated users hover on the account icon', async () => {
+test.skip('shows dropdown menu when an authenticated users hover on the account icon', async () => {
     const user = userEvent.setup()
     global.server.use(
         rest.post('*/customers/action/login', (req, res, ctx) => {

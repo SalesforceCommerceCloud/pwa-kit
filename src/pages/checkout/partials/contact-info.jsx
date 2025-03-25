@@ -35,7 +35,8 @@ import {useCurrentBasket} from '../../../hooks/use-current-basket'
 import {isAbsoluteURL} from '../../../page-designer/utils'
 import {useAppOrigin} from '../../../hooks/use-app-origin'
 import {AuthHelpers, useAuthHelper, useShopperBasketsMutation} from '@salesforce/commerce-sdk-react'
-import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
+import {useExtensionConfig} from '../../../hooks/use-extension-config'
+
 import {
     API_ERROR_MESSAGE,
     FEATURE_UNAVAILABLE_ERROR_MESSAGE,
@@ -50,6 +51,7 @@ const ContactInfo = ({isSocialEnabled = false, isPasswordlessEnabled = false, id
     const {data: customer} = useCurrentCustomer()
     const {data: basket} = useCurrentBasket()
     const appOrigin = useAppOrigin()
+    const config = useExtensionConfig()
     const login = useAuthHelper(AuthHelpers.LoginRegisteredUserB2C)
     const logout = useAuthHelper(AuthHelpers.Logout)
     const authorizePasswordlessLogin = useAuthHelper(AuthHelpers.AuthorizePasswordless)
@@ -72,7 +74,7 @@ const ContactInfo = ({isSocialEnabled = false, isPasswordlessEnabled = false, id
     const [authModalView, setAuthModalView] = useState(PASSWORD_VIEW)
     const authModal = useAuthModal(authModalView)
     const [isPasswordlessLoginClicked, setIsPasswordlessLoginClicked] = useState(false)
-    const passwordlessConfigCallback = getConfig().app.login?.passwordless?.callbackURI
+    const passwordlessConfigCallback = config.login?.passwordless?.callbackURI
     const callbackURL = isAbsoluteURL(passwordlessConfigCallback)
         ? passwordlessConfigCallback
         : `${appOrigin}${passwordlessConfigCallback}`

