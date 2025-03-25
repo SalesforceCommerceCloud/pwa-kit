@@ -71,5 +71,8 @@
   },
   "publishConfig": {
     "directory": "dist"
+  },
+  "overrides": {
+    "picocolors":"^1.1.1"
   }
 }

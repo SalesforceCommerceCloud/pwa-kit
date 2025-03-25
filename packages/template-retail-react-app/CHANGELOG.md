@@ -3,6 +3,7 @@
 - Fix hreflang alternate links [#2269](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2269)
 - PDP / PLP: Add page meta data tags that have been defined in BM [#2232](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2232)
 - Send PWA Kit events to Data Cloud [#318] (https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2229)
+- Override picocolors to eliminate warning when building the retail react app [#2331](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2331)
 
 ## v6.0.1 (Mar 05, 2025)
 - Update PWA-Kit SDKs to v3.9.1 [#2301](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2301)

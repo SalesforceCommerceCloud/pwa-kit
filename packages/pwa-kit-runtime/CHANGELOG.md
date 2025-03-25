@@ -1,4 +1,5 @@
 ## v3.10.0-dev (Feb 18, 2025)
+- Override picocolors to eliminate warning when building the retail react app [#2331](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2331)
 
 ## v3.9.2 (Mar 08, 2025)
 - Disable CloudWatch metrics sender retries [#2304](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2304) 
