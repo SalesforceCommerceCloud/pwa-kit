@@ -22,6 +22,7 @@ import {
     ComponentMap
 } from '@salesforce/pwa-kit-extension-sdk/types'
 import {routeComponent} from '@salesforce/pwa-kit-react-sdk/ssr/universal/components/route-component'
+import {ProductList} from '@salesforce/extension-chakra-storefront/pages'
 
 // Local Imports
 import {Config} from './types'
@@ -155,7 +156,7 @@ class CommerceBmSeo extends ApplicationExtension<Config> {
     }
 
     getComponentMap(): ComponentMap {
-        return {}
+        return {'ProductList': ProductList}
     }
 }
 
