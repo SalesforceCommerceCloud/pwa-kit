@@ -7,7 +7,6 @@
 import React from 'react'
 import {Router} from 'react-router-dom'
 
-import {render} from '@testing-library/react'
 import {createMemoryHistory} from 'history'
 import {usePageUrls} from './use-page-urls'
 import {renderWithProviders} from '../utils/test-utils'

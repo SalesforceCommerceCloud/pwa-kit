@@ -8,7 +8,6 @@
 import React from 'react'
 import {Router} from 'react-router-dom'
 
-import {render} from '@testing-library/react'
 import {createMemoryHistory} from 'history'
 import {useSearchParams, stringify, parse} from './use-search-params'
 import {renderWithProviders} from '../utils/test-utils'

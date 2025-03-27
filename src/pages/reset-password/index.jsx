@@ -5,49 +5,52 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, {useState, useEffect} from 'react'
+import React, {useEffect} from 'react'
+import {useIntl} from 'react-intl'
 import PropTypes from 'prop-types'
-import {FormattedMessage} from 'react-intl'
-import {Box, Button, Container, Stack, Text} from '@chakra-ui/react'
+import {Box, Container} from '@chakra-ui/react'
 import {useForm} from 'react-hook-form'
-import {
-    useShopperCustomersMutation,
-    ShopperCustomersMutations
-} from '@salesforce/commerce-sdk-react'
 import Seo from '../../components/seo'
 import ResetPasswordForm from '../../components/reset-password'
-import {BrandLogo} from '../../components/icons'
+import ResetPasswordLanding from '../../pages/reset-password/reset-password-landing'
 import useNavigation from '../../hooks/use-navigation'
 import useEinstein from '../../hooks/use-einstein'
+import useDataCloud from '../../hooks/use-datacloud'
 import {useLocation} from 'react-router-dom'
+import {useRouteMatch} from 'react-router'
+import {usePasswordReset} from '../../hooks/use-password-reset'
+import {
+    RESET_PASSWORD_LANDING_PATH,
+    API_ERROR_MESSAGE,
+    FEATURE_UNAVAILABLE_ERROR_MESSAGE
+} from '../../constants'
 
 const ResetPassword = () => {
+    const {formatMessage} = useIntl()
     const form = useForm()
     const navigate = useNavigation()
-    const [submittedEmail, setSubmittedEmail] = useState('')
-    const [showSubmittedSuccess, setShowSubmittedSuccess] = useState(false)
     const einstein = useEinstein()
+    const dataCloud = useDataCloud()
     const {pathname} = useLocation()
-    const getResetPasswordToken = useShopperCustomersMutation(
-        ShopperCustomersMutations.GetResetPasswordToken
-    )
+    const {path} = useRouteMatch()
+    const {getPasswordResetToken} = usePasswordReset()
 
     const submitForm = async ({email}) => {
-        const body = {
-            login: email
-        }
         try {
-            await getResetPasswordToken.mutateAsync({body})
-            setSubmittedEmail(email)
-            setShowSubmittedSuccess(!showSubmittedSuccess)
-        } catch (error) {
-            form.setError('global', {type: 'manual', message: error.message})
+            await getPasswordResetToken(email)
+        } catch (e) {
+            const message =
+                e.response?.status === 400
+                    ? formatMessage(FEATURE_UNAVAILABLE_ERROR_MESSAGE)
+                    : formatMessage(API_ERROR_MESSAGE)
+            form.setError('global', {type: 'manual', message})
         }
     }
 
     /**************** Einstein ****************/
     useEffect(() => {
         einstein.sendViewPage(pathname)
+        dataCloud.sendViewPage(pathname)
     }, [])
 
     return (
@@ -62,41 +65,14 @@ const ResetPassword = () => {
                 marginBottom={8}
                 borderRadius="base"
             >
-                {!showSubmittedSuccess ? (
+                {path === RESET_PASSWORD_LANDING_PATH ? (
+                    <ResetPasswordLanding />
+                ) : (
                     <ResetPasswordForm
                         form={form}
                         submitForm={submitForm}
                         clickSignIn={() => navigate('/login')}
                     />
-                ) : (
-                    <Stack justify="center" align="center" spacing={6}>
-                        <BrandLogo width="60px" height="auto" />
-                        <Text align="center" fontSize="md">
-                            <FormattedMessage
-                                defaultMessage={'Password Reset'}
-                                id="reset_password.title.password_reset"
-                            />
-                        </Text>
-                        <Stack spacing={6} pt={4}>
-                            <Text align="center" fontSize="sm">
-                                <FormattedMessage
-                                    defaultMessage="You will receive an email at <b>{email}</b> with a link to reset your password shortly."
-                                    id="reset_password.info.receive_email_shortly"
-                                    values={{
-                                        email: submittedEmail,
-
-                                        b: (chunks) => <b>{chunks}</b>
-                                    }}
-                                />
-                            </Text>
-                            <Button onClick={() => navigate('/login')}>
-                                <FormattedMessage
-                                    defaultMessage="Back to Sign In"
-                                    id="reset_password.button.back_to_sign_in"
-                                />
-                            </Button>
-                        </Stack>
-                    </Stack>
                 )}
             </Container>
         </Box>

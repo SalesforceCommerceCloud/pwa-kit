@@ -99,6 +99,7 @@ export const TestProviders = ({
     locale = {id: DEFAULT_LOCALE},
     messages = fallbackMessages,
     config = mockConfig,
+    site,
     siteAlias = DEFAULT_SITE,
     isGuest = false,
     bypassAuth = true
@@ -112,10 +113,10 @@ export const TestProviders = ({
         }
     }, [])
 
+    // Prioritize the site prop over the siteAlias prop or the default site
+    site = site || getSiteByReference(siteAlias || config.defaultSite)
+
     const commerceApiConfig = config.commerceAPI
-
-    const site = getSiteByReference(siteAlias || config.defaultSite)
-
     const buildUrl = createUrlTemplate(config, site?.alias || site?.id, locale.alias || locale.id)
 
     return (
@@ -158,6 +159,7 @@ TestProviders.propTypes = {
     messages: PropTypes.object,
     locale: PropTypes.object,
     config: PropTypes.object,
+    site: PropTypes.object,
     siteAlias: PropTypes.string,
     bypassAuth: PropTypes.bool,
     isGuest: PropTypes.bool

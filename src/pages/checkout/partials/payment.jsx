@@ -218,6 +218,7 @@ const Payment = () => {
                             selectedAddress={selectedBillingAddress}
                             formTitleAriaLabel={billingAddressAriaLabel}
                             hideSubmitButton
+                            isBillingAddress
                         />
                     )}
 

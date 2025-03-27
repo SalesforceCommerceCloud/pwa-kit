@@ -6,26 +6,53 @@
  */
 import React from 'react'
 import PropTypes from 'prop-types'
-import {Stack} from '@chakra-ui/react'
+import {FormattedMessage} from 'react-intl'
+import {Stack, Box, Button} from '@chakra-ui/react'
 import useLoginFields from '../../components/forms/useLoginFields'
 import Field from '../../components/field'
 
-const LoginFields = ({form, prefix = ''}) => {
+const LoginFields = ({
+    form,
+    handleForgotPasswordClick,
+    prefix = '',
+    hideEmail = false,
+    hidePassword = false
+}) => {
     const fields = useLoginFields({form, prefix})
     return (
         <Stack spacing={5}>
-            <Field {...fields.email} />
-            <Field {...fields.password} />
+            {!hideEmail && <Field {...fields.email} />}
+            {!hidePassword && (
+                <Stack>
+                    <Field {...fields.password} />
+                    {handleForgotPasswordClick && (
+                        <Box>
+                            <Button variant="link" size="sm" onClick={handleForgotPasswordClick}>
+                                <FormattedMessage
+                                    defaultMessage="Forgot password?"
+                                    id="login_form.link.forgot_password"
+                                />
+                            </Button>
+                        </Box>
+                    )}
+                </Stack>
+            )}
         </Stack>
     )
 }
 
 LoginFields.propTypes = {
+    handleForgotPasswordClick: PropTypes.func,
+
     /** Object returned from `useForm` */
     form: PropTypes.object.isRequired,
 
     /** Optional prefix for field names */
-    prefix: PropTypes.string
+    prefix: PropTypes.string,
+
+    /** Optional configurations */
+    hideEmail: PropTypes.bool,
+    hidePassword: PropTypes.bool
 }
 
 export default LoginFields

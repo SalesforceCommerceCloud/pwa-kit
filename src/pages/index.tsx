@@ -35,6 +35,12 @@ const ProductDetail = loadable(() => import('overridable!./product-detail'), {fa
 const ProductList = loadable(() => import('overridable!./product-list'), {
     fallback
 })
+const SocialLoginRedirect = loadable(() => import('overridable!./social-login-redirect'), {
+    fallback
+})
+const Wishlist = loadable(() => import('overridable!./account/wishlist'), {
+    fallback
+})
 
 // NOTE: Apply "displayName" for easy filtering. This is a widely use pattern to allow filtering without
 // triggering the loadable logic. Please note that we want to keep these in aligned with name in the
@@ -50,6 +56,7 @@ ResetPassword.displayName = 'ResetPassword'
 LoginRedirect.displayName = 'LoginRedirect'
 ProductDetail.displayName = 'ProductDetail'
 ProductList.displayName = 'ProductList'
+Wishlist.displayName = 'Wishlist'
 
 export {
     Account,
@@ -62,5 +69,7 @@ export {
     ResetPassword,
     LoginRedirect,
     ProductDetail,
-    ProductList
+    ProductList,
+    SocialLoginRedirect,
+    Wishlist
 }

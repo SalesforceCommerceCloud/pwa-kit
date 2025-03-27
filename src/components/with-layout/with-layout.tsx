@@ -24,6 +24,7 @@ import {SkipNavLink, SkipNavContent} from '@chakra-ui/skip-nav'
 
 // Local Project Components
 import {DrawerMenu} from '../drawer-menu'
+import {getPathWithLocale} from '../../utils/url'
 import {HideOnDesktop, HideOnMobile} from '../responsive'
 import {ListMenu, ListMenuContent} from '../list-menu'
 import {withCommerceSdkReactHookData} from '../with-commerce-sdk-react-hook-data'
@@ -237,13 +238,16 @@ const withLayout = <P extends object>(WrappedComponent: React.ComponentType<P>) 
 
                     {/* Urls for all localized versions of this page (including current page)
                     For more details on hrefLang, see https://developers.google.com/search/docs/advanced/crawling/localized-versions */}
-                    {site.l10n?.supportedLocales.map((locale: any) => (
+                    {site.l10n?.supportedLocales.map((locale) => (
                         <link
                             rel="alternate"
                             hrefLang={locale.id.toLowerCase()}
-                            href={`${appOrigin}${
-                                buildUrl(location.pathname, site.id, locale.id) as string
-                            }`}
+                            href={`${appOrigin}${getPathWithLocale(locale.id, buildUrl, {
+                                location: {
+                                    ...location,
+                                    search: ''
+                                }
+                            })}`}
                             key={locale.id}
                         />
                     ))}
@@ -251,9 +255,12 @@ const withLayout = <P extends object>(WrappedComponent: React.ComponentType<P>) 
                     <link
                         rel="alternate"
                         hrefLang={site.l10n.defaultLocale.slice(0, 2)}
-                        href={`${appOrigin}${
-                            buildUrl(location.pathname, site.id, locale.id) as string
-                        }`}
+                        href={`${appOrigin}${getPathWithLocale(locale.id, buildUrl, {
+                            location: {
+                                ...location,
+                                search: ''
+                            }
+                        })}`}
                     />
                     {/* A wider fallback for user locales that the app does not support */}
                     <link rel="alternate" hrefLang="x-default" href={`${appOrigin}/`} />
