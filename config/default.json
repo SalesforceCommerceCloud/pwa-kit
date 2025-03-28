@@ -96,9 +96,6 @@
         },
         "SocialRedirect": {
             "path": "/social-redirect"
-        },
-        "WishList": {
-            "path": "/account/wishlist"
         }
     },
     "search": {

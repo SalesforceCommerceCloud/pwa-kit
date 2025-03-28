@@ -22,6 +22,9 @@ const jwksCachingMiddleware = () => {
         '/jwks/:shortCode/:tenantId',
         asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
             const {shortCode, tenantId} = req.params
+            console.log('shortCode:', shortCode)
+            console.log('tenantId:', tenantId)
+            console.log('res:', res)
             const isValidRequest = tenantIdRegExp.test(tenantId) && shortCodeRegExp.test(shortCode)
 
             if (!isValidRequest) {
@@ -49,9 +52,9 @@ const jwksCachingMiddleware = () => {
     )
 
     // Express error handler
-    router.use((err: Error, req: Request, res: Response) => {
-        res.status(500).json({error: `Internal Server Error: ${err.message}`})
-    })
+    // router.use((err: Error, req: Request, res: Response) => {
+    //     res.status(500).json({error: `Internal Server Error: ${err.message}`})
+    // })
 
     return router
 }

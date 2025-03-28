@@ -56,7 +56,6 @@ ResetPassword.displayName = 'ResetPassword'
 LoginRedirect.displayName = 'LoginRedirect'
 ProductDetail.displayName = 'ProductDetail'
 ProductList.displayName = 'ProductList'
-Wishlist.displayName = 'Wishlist'
 
 export {
     Account,
@@ -70,6 +69,5 @@ export {
     LoginRedirect,
     ProductDetail,
     ProductList,
-    SocialLoginRedirect,
-    Wishlist
+    SocialLoginRedirect
 }
