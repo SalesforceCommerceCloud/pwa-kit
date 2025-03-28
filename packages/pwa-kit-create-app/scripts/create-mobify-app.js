@@ -890,28 +890,39 @@ const processAppExtensions = (
 }
 
 /**
- * Fetch available Application Extensions using npm search command.
- * The command searches for packages starting with '@salesforce/extension-'.
- *
- * Currently, the npm search command is not returning the expected results for known extension packages.
- * Therefore, we are using a static value to ensure the correct extensions are available.
- *
- * @returns {Array} A list of available Application Extension names and their versions.
+ * Fetches the latest version of a package using npm view.
+ * @param {string} packageName - The name of the package (e.g., '@salesforce/extension-chakra-storefront').
+ * @returns {string} - The latest version number (e.g., '1.0.0') or 'latest' if fetching fails.
+ */
+const getLatestVersion = (packageName) => {
+    try {
+        const result = child_proc.execSync(`npm view ${packageName} --json`, {encoding: 'utf8'})
+        const json = JSON.parse(result)
+        const latestVersion = json['dist-tags']?.latest
+        if (!latestVersion) {
+            throw new Error(`No 'dist-tags.latest' found for ${packageName}`)
+        }
+        return latestVersion
+    } catch (err) {
+        console.warn(`Failed to fetch version for ${packageName}: ${err.message}. Using 'latest'.`)
+        return 'latest'
+    }
+}
+
+/**
+ * Fetches available Application Extensions and their latest versions using npm view.
+ * @returns {Array} - A list of objects containing name, value, and version of available extensions.
  */
 const fetchAvailableAppExtensions = () => {
     const filePath = p.join(__dirname, '..', 'assets', 'available-app-extensions.json')
     try {
         const data = fs.readFileSync(filePath)
         const staticResult = JSON.parse(data)
-
-        // Use the static result for names but always use the npm label "latest" for versions
-        return staticResult.map((pkg) => {
-            return {
-                name: pkg.name,
-                value: pkg.name,
-                version: 'latest'
-            }
+        const extensionsWithVersions = staticResult.map((pkg) => {
+            const version = getLatestVersion(pkg.name)
+                return {name: pkg.name, value: pkg.name, version}
         })
+        return extensionsWithVersions
     } catch (error) {
         console.error('Failed to fetch Application Extensions:', error.message)
         return []
@@ -1066,9 +1077,7 @@ const runGenerator = async (
         // Add selected Application Extensions to devDependencies
         devDependencies: selectedAppExtensions.reduce((acc, appExtensionName) => {
             // Find the corresponding Application Extension details
-            const appExtensionDetails = context?.availableAppExtensions?.find(
-                (ext) => ext.value === `${appExtensionName}@latest`
-            )
+            const appExtensionDetails = context?.availableAppExtensions?.find((ext) => ext.value === appExtensionName)
             const version = appExtensionDetails ? appExtensionDetails.version : 'latest'
 
             acc[appExtensionName] = extractAppExtensions
