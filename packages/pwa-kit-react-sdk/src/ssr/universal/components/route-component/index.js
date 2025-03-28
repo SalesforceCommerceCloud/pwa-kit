@@ -405,23 +405,31 @@ export const routeComponent = (Wrapped, isPage, locals) => {
  */
 export const getAllRoutes = async (locals = {}) => {
     const {applicationExtensions = []} = locals
-    const extensionRoutes = (
-        await Promise.all(
-            applicationExtensions.map((extension) =>
-                extension.getRoutesAsync
-                    ? extension.getRoutesAsync({locals})
-                    : extension.getRoutes({locals})
-            )
-        )
-    ).flat()
+
+    let routes = []
+    for (const extension of applicationExtensions) {
+
+        let extensionRoutes
+        if (extension.getRoutesAsync){
+            // Need to call getRoutesAsync so the routes can be cached before deserialize
+            await extension.getRoutesAsync({locals})
+            const componentMap = extension.getComponentMap(routes)
+            console.log('getAllRoutes(): componentMap', componentMap)
+            extensionRoutes = extension.deserialize(componentMap).routes
+        } else {
+            extensionRoutes = extension.getRoutes({locals})
+        }
+
+        routes = [...routes, ...extensionRoutes]
+    }
 
     const allRoutes = [
-        // NOTE: this route needs to be above _routes, in case _routes has a fallback route of `path: '*'`
+        // NOTE: this route needs to be above routes, in case routes has a fallback route of `path: '*'`
         {path: '/__pwa-kit/refresh', component: Refresh},
-        ...extensionRoutes,
+        ...routes,
         ...(typeof appRoutes === 'function' ? appRoutes() : appRoutes),
         {path: '*', component: Throw404}
-    ]
+    ].flat()
 
     return allRoutes.map(({component, ...rest}) => {
         return {

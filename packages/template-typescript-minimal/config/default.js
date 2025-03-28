@@ -8,29 +8,6 @@
 module.exports = {
     app: {
       extensions: [
-        ["@salesforce/extension-commerce-bm-seo", {
-          enabled: true,
-          path: "/sample-page",
-          commerceAPI: {
-              proxyPath: "/mobify/proxy/api",
-              parameters: {
-                  clientId: "c9c45bfd-0ed3-4aa2-9971-40f88962b836",
-                  organizationId: "f_ecom_zzrf_001",
-                  shortCode: "8o7m175y",
-                  siteId: "RefArchGlobal"
-              }
-          },
-          commerceAPIAuth: {
-              propertyNameInLocals: "commerceAPIAuth"
-          },
-          resourceTypeToComponentMap: {
-            category: 'ProductList',
-            product: 'ProductDetail',
-            // TODO: what component should content be mapped to?
-            content_asset: 'ProductList'
-          },
-
-      }],
         [
           "@salesforce/extension-chakra-storefront",
           {
@@ -224,6 +201,29 @@ module.exports = {
             }
           }
         ],
+        ["@salesforce/extension-commerce-bm-seo", {
+          enabled: true,
+          path: "/sample-page",
+          commerceAPI: {
+              proxyPath: "/mobify/proxy/api",
+              parameters: {
+                  clientId: "c9c45bfd-0ed3-4aa2-9971-40f88962b836",
+                  organizationId: "f_ecom_zzrf_001",
+                  shortCode: "8o7m175y",
+                  siteId: "RefArchGlobal"
+              }
+          },
+          commerceAPIAuth: {
+              propertyNameInLocals: "commerceAPIAuth"
+          },
+          resourceTypeToComponentMap: {
+            category: 'ProductList',
+            product: 'ProductDetail',
+            // TODO: what component should content be mapped to?
+            content_asset: 'ProductList'
+          },
+
+      }],
       ]
     },
     ssrEnabled: true,
@@ -250,6 +250,6 @@ module.exports = {
           host: "zzrf-001.dx.commercecloud.salesforce.com",
           path: "ocapi"
         }
-      ]
+      ],
     }
 }

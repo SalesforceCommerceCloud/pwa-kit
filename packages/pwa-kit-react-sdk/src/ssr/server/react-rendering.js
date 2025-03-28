@@ -158,7 +158,7 @@ export const render = async (req, res, next) => {
             .map((extension) => [extension.getName(), extension.serialize()])
             .filter((entry) => Boolean(entry[1]))
     )
-    console.log('--- serialized extensions in react-rendering', serializedExtensions)
+    console.log('react-rendering.js: serialized extensions', serializedExtensions)
 
     // Step 1 - Find the match.
 
@@ -188,8 +188,9 @@ export const render = async (req, res, next) => {
     // Step 2 - Get the component
     res.__performanceTimer.mark(PERFORMANCE_MARKS.loadComponent, 'start')
     // console.log('JINSU react-rendering after beforeRouteMatch:', routes)
-    console.log('JINSU react-rendering after beforeRouteMatch:', route)
+    console.log('react-rendering(): after beforeRouteMatch:', route)
     const component = await route.component.getComponent()
+    console.log('react-rendering(): getComponent:', component)
     res.__performanceTimer.mark(PERFORMANCE_MARKS.loadComponent, 'end')
 
     // Step 3 - Init the app state

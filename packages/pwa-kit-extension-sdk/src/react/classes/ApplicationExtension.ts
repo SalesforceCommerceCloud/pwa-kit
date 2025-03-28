@@ -14,7 +14,6 @@ import {
     ApplicationExtensionConfig,
     BeforeRouteMatchParams,
     ComponentMap,
-    DeserializedExtension,
     GetRoutesParams,
     RouteProps,
     SerializedExtension
@@ -38,12 +37,6 @@ export class ApplicationExtension<
 
     constructor(config: Config) {
         super(config)
-
-        if (!isServerSide()) {
-            // Deserialize the routes on the client to ensure the latest routes are loaded on the client
-            this._cachedRoutes = this.deserialize()?.routes || null
-        }
-
         cacheMethodResult(this, 'getRoutesAsync', '_cachedRoutes')
     }
 
@@ -110,7 +103,7 @@ export class ApplicationExtension<
             throw new Error(`Routes have not been loaded. Call getRoutesAsync() before serializing`)
         }
         console.log(
-            '--- serializing routes for extension',
+            'serialize(): routes for extension',
             this.getName(),
             'cachedRoutes:',
             this._cachedRoutes
@@ -138,9 +131,8 @@ export class ApplicationExtension<
             }
 
             return {
-                path: route.path,
+                ...route,
                 componentName: route.component.displayName,
-                ...(route.exact && {exact: true})
             }
         })
 
@@ -161,10 +153,16 @@ export class ApplicationExtension<
      *
      * It is recommended to use loadable components whenever possible to reduce bundle size.
      *
-     * @protected
      * @returns ComponentMap - The map of component names to components.
      */
-    protected getComponentMap?(): ComponentMap
+    public getComponentMap(allRoutes: RouteProps[]): ComponentMap | undefined {
+        if (typeof this.getRoutesAsync !== 'undefined') {
+            throw new Error(
+                `${this.getComponentMap.name} must be defined when getRoutesAsync() is defined in the ${this.getName()} extension`
+            )
+        }
+        return
+    }
 
     /**
      * Called on the client to deserialize the extension data that was serialized on the server.
@@ -174,28 +172,20 @@ export class ApplicationExtension<
      * @throws Error if getComponentMap() is not defined.
      * @throws Error if the deserialized component cannot be found in the component map.
      */
-    private deserialize(): DeserializedExtension | null {
-        if (isServerSide() || typeof this.getRoutesAsync === 'undefined') {
+    public deserialize(componentMap: ComponentMap) {
+        if (typeof this.getRoutesAsync === 'undefined') {
             return null
         }
 
-        if (!this.getComponentMap) {
-            throw new Error(
-                `getComponentMap() must be defined when getRoutesAsync() is defined in the ${this.getName()} extension`
-            )
+        let serializedRoutes
+        if (!isServerSide()) {
+            serializedRoutes = window.__EXTENSIONS__[this.getName()].routes
+        } else {
+            serializedRoutes = this._cachedRoutes
         }
 
-        console.log(
-            '--- deserializing routes for extension',
-            this.getName(),
-            '- window.__EXTENSIONS__:',
-            window.__EXTENSIONS__
-        )
-        console.log('ComponentMap:', this.getComponentMap())
-        const componentMap = this.getComponentMap()
-        const serializedExtension = window.__EXTENSIONS__[this.getName()]
-
-        const routes = serializedExtension.routes.map(({componentName, ...route}) => {
+        console.log('JINSU deserialize(): serializedRoutes', serializedRoutes)
+        const routes = serializedRoutes?.map(({componentName, ...route}) => {
             if (!componentName) {
                 throw new Error(
                     `Missing componentName for the route with path: "${String(
@@ -214,12 +204,17 @@ export class ApplicationExtension<
                 )
             }
 
+            if (route.props) {
+                // const WrappedComponent = (props: any) => <Component {...props} />
+            }
+
             return {
                 ...route,
                 component
             }
         })
-        console.log('--- deserialized', this.getName(), 'extension :', {routes})
+        console.log('deserialize(): ', this.getName(), 'extension :', {routes})
+        this._cachedRoutes = routes || null
         return {routes}
     }
 }
