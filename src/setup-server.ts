@@ -24,6 +24,10 @@ class RetailReactAppExtension extends ApplicationExtension<Config> {
         const config = this.getConfig()
         const {passwordless: passwordlessConfig, resetPassword: resetPasswordConfig} =
             config?.login || {}
+        const {commerceAPI: commerceAPIConfig} = config
+
+        const {shortCode} = commerceAPIConfig?.parameters || {}
+        const tenantId = commerceAPIConfig?.parameters?.organizationId?.replace(/^f_ecom_/, '')
 
         app.use(express.json()) // To parse JSON payloads
         app.use(express.urlencoded({extended: true}))
@@ -60,7 +64,9 @@ class RetailReactAppExtension extends ApplicationExtension<Config> {
         app.use(
             passwordlessMiddleware({
                 callbackURI: passwordlessConfig?.callbackURI,
-                landingPath: passwordlessConfig?.landingPath
+                landingPath: passwordlessConfig?.landingPath,
+                shortCode,
+                tenantId
             })
         )
 
@@ -68,7 +74,9 @@ class RetailReactAppExtension extends ApplicationExtension<Config> {
         app.use(
             passwordResetMiddleware({
                 callbackURI: resetPasswordConfig?.callbackURI,
-                landingPath: resetPasswordConfig?.landingPath
+                landingPath: resetPasswordConfig?.landingPath,
+                shortCode,
+                tenantId
             })
         )
 

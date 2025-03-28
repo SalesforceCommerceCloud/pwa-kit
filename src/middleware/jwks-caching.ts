@@ -49,7 +49,7 @@ const jwksCachingMiddleware = () => {
     )
 
     // Express error handler
-    router.use((err: Error, req: Request, res: Response, next: NextFunction) => {
+    router.use((err: Error, req: Request, res: Response) => {
         res.status(500).json({error: `Internal Server Error: ${err.message}`})
     })
 

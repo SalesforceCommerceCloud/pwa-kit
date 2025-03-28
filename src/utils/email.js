@@ -34,6 +34,10 @@ function generateUniqueId() {
  * @return {Promise<object>} A promise that resolves to the response object received from the Marketing Cloud API.
  */
 export const emailLink = async (emailId, templateId, magicLink) => {
+    if (!templateId) {
+        throw new Error('templateId is required')
+    }
+
     if (!process.env.MARKETING_CLOUD_CLIENT_ID) {
         console.warn('MARKETING_CLOUD_CLIENT_ID is not set in the environment variables.')
     }
@@ -54,32 +58,6 @@ export const emailLink = async (emailId, templateId, magicLink) => {
         templateId: templateId
     }
     return await sendMarketingCloudEmail(emailId, marketingCloudConfig)
-}
-
-// Reusable function to handle sending a magic link email.
-// By default, this implementation uses Marketing Cloud.
-export const sendMagicLinkEmail = async (req, res, landingPath, emailTemplate, redirectUrl) => {
-    // Extract the base URL from the request
-    const base = req.protocol + '://' + req.get('host')
-
-    // Extract the email_id and token from the request body
-    const {email_id, token} = req.body
-
-    // Construct the magic link URL
-    let magicLink = `${base}${landingPath}?token=${encodeURIComponent(token)}`
-    if (landingPath === config.app.login?.resetPassword?.landingPath) {
-        // Add email query parameter for reset password flow
-        magicLink += `&email=${encodeURIComponent(email_id)}`
-    }
-    if (landingPath === config.app.login?.passwordless?.landingPath && redirectUrl) {
-        magicLink += `&redirect_url=${encodeURIComponent(redirectUrl)}`
-    }
-
-    // Call the emailLink function to send an email with the magic link using Marketing Cloud
-    const emailLinkResponse = await emailLink(email_id, emailTemplate, magicLink)
-
-    // Send the response
-    res.send(emailLinkResponse)
 }
 
 /**
