@@ -920,7 +920,7 @@ const fetchAvailableAppExtensions = () => {
         const staticResult = JSON.parse(data)
         const extensionsWithVersions = staticResult.map((pkg) => {
             const version = getLatestVersion(pkg.name)
-                return {name: pkg.name, value: pkg.name, version}
+            return {name: pkg.name, value: pkg.name, version}
         })
         return extensionsWithVersions
     } catch (error) {
@@ -1077,7 +1077,9 @@ const runGenerator = async (
         // Add selected Application Extensions to devDependencies
         devDependencies: selectedAppExtensions.reduce((acc, appExtensionName) => {
             // Find the corresponding Application Extension details
-            const appExtensionDetails = context?.availableAppExtensions?.find((ext) => ext.value === appExtensionName)
+            const appExtensionDetails = context?.availableAppExtensions?.find(
+                (ext) => ext.value === appExtensionName
+            )
             const version = appExtensionDetails ? appExtensionDetails.version : 'latest'
 
             acc[appExtensionName] = extractAppExtensions
