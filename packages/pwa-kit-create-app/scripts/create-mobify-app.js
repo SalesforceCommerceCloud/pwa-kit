@@ -920,7 +920,9 @@ const fetchAvailableAppExtensions = () => {
         const staticResult = JSON.parse(data)
         const extensionsWithVersions = staticResult.map((pkg) => {
             const version = getLatestVersion(pkg.name)
-            return {name: pkg.name, value: pkg.name, version}
+            // Prepend caret (^) to the version unless it's 'latest'
+            const caretVersion = version === 'latest' ? version : `^${version}`
+            return {name: pkg.name, value: pkg.name, version: caretVersion}
         })
         return extensionsWithVersions
     } catch (error) {
