@@ -33,7 +33,6 @@ import {
     INVALID_TOKEN_ERROR_MESSAGE,
     FEATURE_UNAVAILABLE_ERROR_MESSAGE,
     LOGIN_TYPES,
-    PASSWORDLESS_LOGIN_LANDING_PATH,
     PASSWORDLESS_ERROR_MESSAGES,
     USER_NOT_FOUND_ERROR
 } from '../../constants'
@@ -152,7 +151,7 @@ const Login = ({initialView = LOGIN_VIEW}) => {
     // executing a passwordless login attempt using the token. The process waits for the
     // customer baskets to be loaded to guarantee proper basket merging.
     useEffect(() => {
-        if (path === PASSWORDLESS_LOGIN_LANDING_PATH && isSuccessCustomerBaskets) {
+        if (path === loginConfig.landingPath && isSuccessCustomerBaskets) {
             const token = decodeURIComponent(queryParams.get('token'))
             if (queryParams.get('redirect_url')) {
                 setRedirectPath(decodeURIComponent(queryParams.get('redirect_url')))

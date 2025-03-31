@@ -19,7 +19,7 @@ const jwksCachingMiddleware = () => {
     const router = Router()
 
     router.get(
-        '/jwks/:shortCode/:tenantId',
+        '/:shortCode/:tenantId/oauth2/jwks',
         asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
             const {shortCode, tenantId} = req.params
             console.log('shortCode:', shortCode)

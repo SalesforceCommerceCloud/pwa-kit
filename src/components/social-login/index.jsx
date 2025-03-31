@@ -11,8 +11,8 @@ import {defineMessage, useIntl} from 'react-intl'
 import {Button} from '@chakra-ui/react'
 import logger from '../../utils/logger-instance'
 import {useAuthHelper, AuthHelpers} from '@salesforce/commerce-sdk-react'
-import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {useAppOrigin} from '../../hooks/use-app-origin'
+import {useExtensionConfig} from '../../hooks/use-extension-config'
 import {setSessionJSONItem, buildRedirectURI} from '../../utils/utils'
 
 // Icons
@@ -48,7 +48,8 @@ const SocialLogin = ({form, idps = []}) => {
 
     // Build redirectURI from config values
     const appOrigin = useAppOrigin()
-    const redirectPath = getConfig()?.app?.login?.social?.redirectURI || ''
+    const {login: loginConfig} = useExtensionConfig()
+    const redirectPath = loginConfig?.social?.redirectURI || ''
     const redirectURI = buildRedirectURI(appOrigin, redirectPath)
 
     const isIdpValid = (name) => {
