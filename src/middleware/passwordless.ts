@@ -21,13 +21,13 @@ const asyncHandler =
         Promise.resolve(fn(req, res, next)).catch(next)
     }
 
-const passwordlessMiddleware = (options: PasswordlessOptions = {}) => {
+const passwordlessMiddleware = (options: PasswordlessOptions) => {
     const {
         callbackURI = '/passwordless-login-callback',
         landingPath = '/passwordless-login-landing',
-        shortCode,
-        tenantId
-    } = options
+        shortCode = '',
+        tenantId = ''
+    } = options || {}
     const router = Router()
 
     router.post(
@@ -37,7 +37,7 @@ const passwordlessMiddleware = (options: PasswordlessOptions = {}) => {
             const redirectUrl = req.query.redirectUrl
 
             // This will throw if the token is invalid.
-            await validateSlasCallbackToken(slasCallbackToken, shortCode, tenantId)
+            await validateSlasCallbackToken(slasCallbackToken as string, shortCode, tenantId)
 
             // Extract the base URL from the request
             const base = `${req.protocol}://${req.get('host') || ''}`
