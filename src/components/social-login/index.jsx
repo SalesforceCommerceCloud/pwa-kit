@@ -97,6 +97,7 @@ const SocialLogin = ({form, idps = []}) => {
                         return (
                             config && (
                                 <Button
+                                    key={name}
                                     onClick={() => {
                                         onSocialLoginClick(name)
                                     }}

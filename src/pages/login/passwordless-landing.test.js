@@ -105,7 +105,7 @@ describe('Passwordless landing tests', function () {
             wrapperProps: {
                 siteAlias: 'uk',
                 locale: {id: 'en-GB'},
-                appConfig: mockConfig.app
+                config: mockConfig
             }
         })
 
@@ -134,7 +134,7 @@ describe('Passwordless landing tests', function () {
             wrapperProps: {
                 siteAlias: 'uk',
                 locale: {id: 'en-GB'},
-                appConfig: mockConfig.app
+                config: mockConfig
             }
         })
 

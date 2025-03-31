@@ -151,7 +151,7 @@ const Login = ({initialView = LOGIN_VIEW}) => {
     // executing a passwordless login attempt using the token. The process waits for the
     // customer baskets to be loaded to guarantee proper basket merging.
     useEffect(() => {
-        if (path === loginConfig.landingPath && isSuccessCustomerBaskets) {
+        if (path === loginConfig.passwordless.landingPath && isSuccessCustomerBaskets) {
             const token = decodeURIComponent(queryParams.get('token'))
             if (queryParams.get('redirect_url')) {
                 setRedirectPath(decodeURIComponent(queryParams.get('redirect_url')))
