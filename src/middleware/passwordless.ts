@@ -34,7 +34,7 @@ const passwordlessMiddleware = (options: PasswordlessOptions) => {
         callbackURI,
         asyncHandler(async (req, res) => {
             const slasCallbackToken = req.headers['x-slas-callback-token']
-            const redirectUrl = req.query.redirectUrl
+            const redirectUrl = req.query.redirectUrl as string
 
             // This will throw if the token is invalid.
             await validateSlasCallbackToken(slasCallbackToken as string, shortCode, tenantId)
@@ -49,9 +49,9 @@ const passwordlessMiddleware = (options: PasswordlessOptions) => {
             const emailLinkResponse = await emailLink(
                 email_id,
                 process.env.MARKETING_CLOUD_PASSWORDLESS_LOGIN_TEMPLATE || '',
-                `${base}${landingPath}?token=${encodeURIComponent(
-                    token
-                )}&redirect_url=${encodeURIComponent(redirectUrl as string)}`
+                `${base}${landingPath}?token=${encodeURIComponent(token)}${
+                    redirectUrl ? `&redirect_url=${encodeURIComponent(redirectUrl)}` : ''
+                }`
             )
 
             // Send the response
