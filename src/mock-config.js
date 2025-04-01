@@ -55,7 +55,7 @@ module.exports = {
             landingPath: '/passwordless-login-landing'
         },
         social: {
-            enabled: true,
+            enabled: false,
             idps: ['google', 'apple'],
             redirectURI: '/social-callback'
         },

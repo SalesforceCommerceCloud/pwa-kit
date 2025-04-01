@@ -25,8 +25,8 @@ const passwordlessMiddleware = (options: PasswordlessOptions) => {
     const {
         callbackURI = '/passwordless-login-callback',
         landingPath = '/passwordless-login-landing',
-        shortCode = '',
-        tenantId = ''
+        shortCode,
+        tenantId
     } = options || {}
     const router = Router()
 
