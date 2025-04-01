@@ -21,6 +21,7 @@ import {useShopperOrdersMutation, useShopperBasketsMutation} from '@salesforce/c
 import UnavailableProductConfirmationModal from '../../components/unavailable-product-confirmation-modal'
 import {API_ERROR_MESSAGE, TOAST_MESSAGE_REMOVED_ITEM_FROM_CART} from '../../constants'
 import {useToast} from '../../hooks/use-toast'
+import {useExtensionConfig} from '../../hooks'
 import LoadingSpinner from '../../components/loading-spinner'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 
@@ -32,10 +33,10 @@ const Checkout = () => {
     const {data: basket} = useCurrentBasket()
     const [isLoading, setIsLoading] = useState(false)
     const {mutateAsync: createOrder} = useShopperOrdersMutation('createOrder')
-    const {passwordless = {}, social = {}} = getConfig().app.login || {}
-    const idps = social?.idps
-    const isSocialEnabled = !!social?.enabled
-    const isPasswordlessEnabled = !!passwordless?.enabled
+    const {login: loginConfig} = useExtensionConfig()
+    const {passwordless = {}, social = {}, idps = []} = getConfig().app.login || {}
+    const isSocialEnabled = !!loginConfig?.social?.enabled
+    const isPasswordlessEnabled = !!loginConfig?.passwordless?.enabled
 
     useEffect(() => {
         if (error || step === 4) {
