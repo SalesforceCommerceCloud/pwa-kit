@@ -23,7 +23,6 @@ import {API_ERROR_MESSAGE, TOAST_MESSAGE_REMOVED_ITEM_FROM_CART} from '../../con
 import {useToast} from '../../hooks/use-toast'
 import {useExtensionConfig} from '../../hooks'
 import LoadingSpinner from '../../components/loading-spinner'
-import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 
 const Checkout = () => {
     const {formatMessage} = useIntl()
@@ -34,9 +33,9 @@ const Checkout = () => {
     const [isLoading, setIsLoading] = useState(false)
     const {mutateAsync: createOrder} = useShopperOrdersMutation('createOrder')
     const {login: loginConfig} = useExtensionConfig()
-    const {passwordless = {}, social = {}, idps = []} = getConfig().app.login || {}
     const isSocialEnabled = !!loginConfig?.social?.enabled
     const isPasswordlessEnabled = !!loginConfig?.passwordless?.enabled
+    const idps = loginConfig?.social?.idps || []
 
     useEffect(() => {
         if (error || step === 4) {
