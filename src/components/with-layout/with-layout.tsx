@@ -19,7 +19,7 @@ import {getAppOrigin} from '@salesforce/pwa-kit-react-sdk/utils/url'
 import {useCategory, useShopperBasketsMutation} from '@salesforce/commerce-sdk-react'
 
 // Chakra
-import {Box, Center, Fade, Spinner, useDisclosure, useStyleConfig} from '@chakra-ui/react'
+import {Box, Center, Fade, Spinner, useDisclosure, useStyleConfig, SystemStyleObject} from '@chakra-ui/react'
 import {SkipNavLink, SkipNavContent} from '@chakra-ui/skip-nav'
 
 // Local Project Components
@@ -216,7 +216,8 @@ const withLayout = <P extends object>(WrappedComponent: React.ComponentType<P>) 
 
         // Ensure styles.container is an object
         const containerStyles = (styles.container as React.CSSProperties) || {}
-        const headerWrapperStyles = {display: 'flex'}
+        // @ts-ignore
+        const headerWrapperStyles = styles.headerWrapper || {}
 
         return (
             <Box className="sf-app" {...(containerStyles as any)}>

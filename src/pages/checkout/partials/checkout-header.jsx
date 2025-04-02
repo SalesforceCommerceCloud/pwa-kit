@@ -20,7 +20,7 @@ const CheckoutHeader = () => {
         pages: {Home: homeConfig}
     } = useExtensionConfig()
     return (
-        <Box flex={1} px={[4, 4, 8]} bg="white" borderBottom="1px" borderColor="gray.100">
+        <Box px={[4, 4, 8]} bg="white" borderBottom="1px" borderColor="gray.100">
             <Box maxWidth="container.xxxl" marginLeft="auto" marginRight="auto">
                 <Flex h={{base: '52px', md: '80px'}} align="center" justify="space-between">
                     <Link href={homeConfig.path} title="Back to homepage">
