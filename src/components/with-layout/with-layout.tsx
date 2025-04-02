@@ -216,6 +216,7 @@ const withLayout = <P extends object>(WrappedComponent: React.ComponentType<P>) 
 
         // Ensure styles.container is an object
         const containerStyles = (styles.container as React.CSSProperties) || {}
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
         const headerWrapperStyles = styles.headerWrapper || {}
 
