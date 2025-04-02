@@ -19,7 +19,7 @@ import {getAppOrigin} from '@salesforce/pwa-kit-react-sdk/utils/url'
 import {useCategory, useShopperBasketsMutation} from '@salesforce/commerce-sdk-react'
 
 // Chakra
-import {Box, Center, Fade, Spinner, useDisclosure, useStyleConfig, SystemStyleObject} from '@chakra-ui/react'
+import {Box, Center, Fade, Spinner, useDisclosure, useStyleConfig} from '@chakra-ui/react'
 import {SkipNavLink, SkipNavContent} from '@chakra-ui/skip-nav'
 
 // Local Project Components
