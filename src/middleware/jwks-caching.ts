@@ -22,9 +22,6 @@ const jwksCachingMiddleware = () => {
         '/:shortCode/:tenantId/oauth2/jwks',
         asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
             const {shortCode, tenantId} = req.params
-            console.log('shortCode:', shortCode)
-            console.log('tenantId:', tenantId)
-            console.log('res:', res)
             const isValidRequest = tenantIdRegExp.test(tenantId) && shortCodeRegExp.test(shortCode)
 
             if (!isValidRequest) {
