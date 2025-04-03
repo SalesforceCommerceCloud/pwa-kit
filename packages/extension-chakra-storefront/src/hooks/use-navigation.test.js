@@ -9,13 +9,6 @@ import userEvent from '@testing-library/user-event'
 import useNavigation from './use-navigation'
 import mockConfig from '../mock-config'
 import {renderWithProviders} from '../utils/test-utils'
-import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
-
-// jest.mock('@salesforce/pwa-kit-runtime/utils/ssr-config', () => {
-//     return {
-//         getConfig: jest.fn()
-//     }
-// })
 
 const mockHistoryPush = jest.fn()
 const mockHistoryReplace = jest.fn()

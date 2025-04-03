@@ -7,6 +7,7 @@
 
 // Third-Party Imports
 import {Application} from 'express'
+import express from 'express'
 import helmet from 'helmet'
 
 // Platform Imports
@@ -16,9 +17,20 @@ import {defaultPwaKitSecurityHeaders} from '@salesforce/pwa-kit-runtime/utils/mi
 // Local Imports
 import {Config} from './types'
 import extensionMeta from '../extension-meta.json'
+import {jwksCachingMiddleware, passwordlessMiddleware, passwordResetMiddleware} from './middleware'
 class RetailReactAppExtension extends ApplicationExtension<Config> {
     static readonly id = extensionMeta.id
     extendApp(app: Application): Application {
+        const config = this.getConfig()
+        const {passwordless: passwordlessConfig, resetPassword: resetPasswordConfig} =
+            config?.login || {}
+        const {commerceAPI: commerceAPIConfig} = config
+
+        const {shortCode} = commerceAPIConfig?.parameters || {}
+        const tenantId = commerceAPIConfig?.parameters?.organizationId?.replace(/^f_ecom_/, '')
+
+        app.use(express.json()) // To parse JSON payloads
+        app.use(express.urlencoded({extended: true}))
         // Set default HTTP security headers required by PWA Kit
         app.use(defaultPwaKitSecurityHeaders)
         // Set custom HTTP security headers
@@ -37,10 +49,34 @@ class RetailReactAppExtension extends ApplicationExtension<Config> {
                         ],
                         'connect-src': [
                             // Connect to Einstein APIs
-                            'api.cquotient.com'
+                            'api.cquotient.com',
+                            // Connect to DataCloud APIs
+                            '*.c360a.salesforce.com'
                         ]
                     }
                 }
+            })
+        )
+
+        app.use(jwksCachingMiddleware())
+
+        // Apply middleware passwordless.
+        app.use(
+            passwordlessMiddleware({
+                callbackURI: passwordlessConfig?.callbackURI,
+                landingPath: passwordlessConfig?.landingPath,
+                shortCode,
+                tenantId
+            })
+        )
+
+        // Apply middleware password reset.
+        app.use(
+            passwordResetMiddleware({
+                callbackURI: resetPasswordConfig?.callbackURI,
+                landingPath: resetPasswordConfig?.landingPath,
+                shortCode,
+                tenantId
             })
         )
 

@@ -310,7 +310,7 @@ test('Can proceed through checkout steps as guest', async () => {
     // Set the initial browser router path and render our component tree.
     window.history.pushState({}, 'Checkout', createPathWithDefaults('/checkout'))
     const {user} = renderWithProviders(<WrappedCheckout history={history} />, {
-        wrapperProps: {isGuest: true, siteAlias: 'uk', appConfig: mockConfig.app}
+        wrapperProps: {isGuest: true, siteAlias: 'uk', config: mockConfig}
     })
 
     // Wait for checkout to load and display first step
@@ -437,7 +437,7 @@ test('Can proceed through checkout as registered customer', async () => {
             isGuest: false,
             siteAlias: 'uk',
             locale: {id: 'en-GB'},
-            appConfig: mockConfig.app
+            config: mockConfig
         }
     })
 
@@ -541,7 +541,7 @@ test('Can edit address during checkout as a registered customer', async () => {
             isGuest: false,
             siteAlias: 'uk',
             locale: {id: 'en-GB'},
-            appConfig: mockConfig.app
+            config: mockConfig
         }
     })
 
@@ -584,7 +584,7 @@ test('Can add address during checkout as a registered customer', async () => {
             isGuest: false,
             siteAlias: 'uk',
             locale: {id: 'en-GB'},
-            appConfig: mockConfig.app
+            config: mockConfig
         }
     })
 

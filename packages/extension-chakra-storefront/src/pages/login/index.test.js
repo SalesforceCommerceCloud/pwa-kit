@@ -209,7 +209,7 @@ describe('Navigate away from login page tests', function () {
             wrapperProps: {
                 siteAlias: 'uk',
                 locale: {id: 'en-GB'},
-                appConfig: mockConfig.app,
+                config: mockConfig,
                 isGuest: true
             }
         })

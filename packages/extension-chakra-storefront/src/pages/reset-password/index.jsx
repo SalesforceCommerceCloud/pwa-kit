@@ -16,14 +16,11 @@ import ResetPasswordLanding from '../../pages/reset-password/reset-password-land
 import useNavigation from '../../hooks/use-navigation'
 import useEinstein from '../../hooks/use-einstein'
 import useDataCloud from '../../hooks/use-datacloud'
-import {useLocation} from 'react-router-dom'
-import {useRouteMatch} from 'react-router'
+import {useLocation, useRouteMatch} from 'react-router-dom'
 import {usePasswordReset} from '../../hooks/use-password-reset'
-import {
-    RESET_PASSWORD_LANDING_PATH,
-    API_ERROR_MESSAGE,
-    FEATURE_UNAVAILABLE_ERROR_MESSAGE
-} from '../../constants'
+import {useExtensionConfig} from '../../hooks'
+
+import {API_ERROR_MESSAGE, FEATURE_UNAVAILABLE_ERROR_MESSAGE} from '../../constants'
 
 const ResetPassword = () => {
     const {formatMessage} = useIntl()
@@ -34,6 +31,7 @@ const ResetPassword = () => {
     const {pathname} = useLocation()
     const {path} = useRouteMatch()
     const {getPasswordResetToken} = usePasswordReset()
+    const {login: loginConfig} = useExtensionConfig()
 
     const submitForm = async ({email}) => {
         try {
@@ -65,7 +63,7 @@ const ResetPassword = () => {
                 marginBottom={8}
                 borderRadius="base"
             >
-                {path === RESET_PASSWORD_LANDING_PATH ? (
+                {path === loginConfig.resetPassword.landingPath ? (
                     <ResetPasswordLanding />
                 ) : (
                     <ResetPasswordForm
