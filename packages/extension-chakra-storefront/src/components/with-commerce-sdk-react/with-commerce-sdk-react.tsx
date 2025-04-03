@@ -17,8 +17,6 @@ import {useServerContext} from '@salesforce/pwa-kit-react-sdk/ssr/universal/hook
 import createLogger from '@salesforce/pwa-kit-runtime/utils/logger-factory'
 import {ServerContext} from '@salesforce/commerce-sdk-react/hooks/types'
 
-import {DEFAULT_DNT_STATE} from '../../constants'
-
 // Local Imports
 import {resolveSiteFromUrl, resolveLocaleFromUrl} from '../../utils/site-utils'
 import {useExtensionConfig} from '../../hooks/use-extension-config'
@@ -66,7 +64,7 @@ const withCommerceSDKReact = <P extends object>(WrappedComponent: React.Componen
                 redirectURI={`${appOrigin}/callback`}
                 proxy={`${appOrigin}${config.commerceAPI.proxyPath as string}`}
                 headers={headers}
-                defaultDnt={DEFAULT_DNT_STATE}
+                defaultDnt={config.defaultDnt}
                 // Uncomment 'enablePWAKitPrivateClient' to use SLAS private client login flows.
                 // Make sure to also enable useSLASPrivateClient in ssr.js when enabling this setting.
                 // enablePWAKitPrivateClient={true}

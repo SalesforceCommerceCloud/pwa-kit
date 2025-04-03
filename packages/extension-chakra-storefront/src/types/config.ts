@@ -111,6 +111,7 @@ export interface UserConfig extends BaseApplicationExtensionConfig {
     defaultSite: Site['id']
     defaultAppLocale: string
     defaultSiteTitle: string
+    defaultDnt: boolean
     einsteinAPI: EinsteinAPI
     dataCloudAPI: DataCloudAPI
     login: {
