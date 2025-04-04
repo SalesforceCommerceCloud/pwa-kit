@@ -63,14 +63,6 @@ jest.mock('./use-current-customer', () => ({
         }
     })
 }))
-// jest.mock('js-cookie', () => {
-//     const originalModule = jest.requireActual('js-cookie')
-
-//     return {
-//         ...originalModule,
-//         get: jest.fn(() => 'mockCookieValue')
-//     }
-// })
 
 const mockWebEventsAppSourceIdPost = jest.fn()
 jest.mock('@salesforce/cc-datacloud-typescript', () => {
@@ -99,7 +91,7 @@ MockComponent.propTypes = {
     args: PropTypes.array
 }
 
-describe.skip('useDataCloud', function () {
+describe('useDataCloud', function () {
     beforeEach(() => {
         jest.clearAllMocks()
     })
