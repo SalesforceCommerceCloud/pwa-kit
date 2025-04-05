@@ -45,6 +45,7 @@ import {useExtensionConfig, useCurrentCustomer, useCurrentBasket} from '../../ho
 import {watchOnlineStatus, flatten} from '../../utils/utils'
 import useActiveData from '../../hooks/use-active-data'
 import useMultiSite from '../../hooks/use-multi-site'
+import {DntNotification, useDntNotification} from '../../hooks/use-dnt-notification'
 import {useTheme} from '@chakra-ui/react'
 
 import {UserConfig} from '../../types/config'
@@ -112,6 +113,7 @@ const withLayout = <P extends object>(WrappedComponent: React.ComponentType<P>) 
         const history = useHistory()
         const location = useLocation()
         const authModal = useAuthModal()
+        const dntNotification = useDntNotification()
         const {site, locale, buildUrl} = useMultiSite()
         const [isOnline, setIsOnline] = useState<boolean>(true)
         const styles = useStyleConfig('App')
@@ -336,6 +338,7 @@ const withLayout = <P extends object>(WrappedComponent: React.ComponentType<P>) 
                         {!isCheckout ? <Footer /> : <CheckoutFooter />}
 
                         <AuthModal {...(authModal as any)} />
+                        <DntNotification {...dntNotification} />
                     </AddToCartModalProvider>
                 </Box>
                 {(config.activeDataEnabled as boolean) && (
