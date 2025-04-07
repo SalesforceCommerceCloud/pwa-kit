@@ -6,29 +6,12 @@
  */
 import {expect} from '@jest/globals'
 
-expect.extend({
-    toBeStringOrUndefined(received) {
-        const pass = typeof received === 'string' || received === undefined
-        if (pass) {
-            return {
-                message: () => `expected ${received} not to be a string or undefined`,
-                pass: true
-            }
-        } else {
-            return {
-                message: () => `expected ${received} to be a string or undefined`,
-                pass: false
-            }
-        }
-    }
-})
-
 export const mockLoginViewPageEvent = {
     events: [
         expect.objectContaining({
             guestId: 'guest-usid',
             siteId: 'RefArch',
-            sessionId: expect.toBeStringOrUndefined(),
+            sessionId: expect.any(String),
             deviceId: expect.any(String),
             dateTime: expect.any(String),
             customerId: 1234567890,
@@ -43,7 +26,7 @@ export const mockLoginViewPageEvent = {
         expect.objectContaining({
             guestId: 'guest-usid',
             siteId: 'RefArch',
-            sessionId: expect.toBeStringOrUndefined(),
+            sessionId: expect.any(String),
             deviceId: expect.any(String),
             dateTime: expect.any(String),
             customerId: 1234567890,
@@ -80,7 +63,7 @@ export const mockViewProductEvent = {
         expect.objectContaining({
             guestId: 'guest-usid',
             siteId: 'RefArch',
-            sessionId: expect.toBeStringOrUndefined(),
+            sessionId: expect.any(String),
             deviceId: expect.any(String),
             dateTime: expect.any(String),
             customerId: 1234567890,
@@ -94,7 +77,7 @@ export const mockViewProductEvent = {
         expect.objectContaining({
             guestId: 'guest-usid',
             siteId: 'RefArch',
-            sessionId: expect.toBeStringOrUndefined(),
+            sessionId: expect.any(String),
             deviceId: expect.any(String),
             dateTime: expect.any(String),
             customerId: 1234567890,
@@ -106,7 +89,7 @@ export const mockViewProductEvent = {
         expect.objectContaining({
             guestId: 'guest-usid',
             siteId: 'RefArch',
-            sessionId: expect.toBeStringOrUndefined(),
+            sessionId: expect.any(String),
             deviceId: expect.any(String),
             dateTime: expect.any(String),
             customerId: 1234567890,
@@ -132,7 +115,7 @@ export const mockViewCategoryEvent = {
         expect.objectContaining({
             guestId: 'guest-usid',
             siteId: 'RefArch',
-            sessionId: expect.toBeStringOrUndefined(),
+            sessionId: expect.any(String),
             deviceId: expect.any(String),
             dateTime: expect.any(String),
             customerId: 1234567890,
@@ -146,7 +129,7 @@ export const mockViewCategoryEvent = {
         expect.objectContaining({
             guestId: 'guest-usid',
             siteId: 'RefArch',
-            sessionId: expect.toBeStringOrUndefined(),
+            sessionId: expect.any(String),
             deviceId: expect.any(String),
             dateTime: expect.any(String),
             customerId: 1234567890,
@@ -165,7 +148,7 @@ export const mockViewCategoryEvent = {
         expect.objectContaining({
             guestId: 'guest-usid',
             siteId: 'RefArch',
-            sessionId: expect.toBeStringOrUndefined(),
+            sessionId: expect.any(String),
             deviceId: expect.any(String),
             dateTime: expect.any(String),
             customerId: 1234567890,
@@ -184,7 +167,7 @@ export const mockViewCategoryEvent = {
         expect.objectContaining({
             guestId: 'guest-usid',
             siteId: 'RefArch',
-            sessionId: expect.toBeStringOrUndefined(),
+            sessionId: expect.any(String),
             deviceId: expect.any(String),
             dateTime: expect.any(String),
             customerId: 1234567890,
@@ -203,7 +186,7 @@ export const mockViewCategoryEvent = {
         expect.objectContaining({
             guestId: 'guest-usid',
             siteId: 'RefArch',
-            sessionId: expect.toBeStringOrUndefined(),
+            sessionId: expect.any(String),
             deviceId: expect.any(String),
             dateTime: expect.any(String),
             customerId: 1234567890,
@@ -332,7 +315,7 @@ export const mockViewSearchResultsEvent = {
         expect.objectContaining({
             guestId: 'guest-usid',
             siteId: 'RefArch',
-            sessionId: expect.toBeStringOrUndefined(),
+            sessionId: expect.any(String),
             deviceId: expect.any(String),
             dateTime: expect.any(String),
             customerId: 1234567890,
@@ -346,7 +329,7 @@ export const mockViewSearchResultsEvent = {
         expect.objectContaining({
             guestId: 'guest-usid',
             siteId: 'RefArch',
-            sessionId: expect.toBeStringOrUndefined(),
+            sessionId: expect.any(String),
             deviceId: expect.any(String),
             dateTime: expect.any(String),
             customerId: 1234567890,
@@ -372,7 +355,7 @@ export const mockViewRecommendationsEvent = {
         expect.objectContaining({
             guestId: 'guest-usid',
             siteId: 'RefArch',
-            sessionId: expect.toBeStringOrUndefined(),
+            sessionId: expect.any(String),
             deviceId: expect.any(String),
             dateTime: expect.any(String),
             customerId: 1234567890,
@@ -386,7 +369,7 @@ export const mockViewRecommendationsEvent = {
         expect.objectContaining({
             guestId: 'guest-usid',
             siteId: 'RefArch',
-            sessionId: expect.toBeStringOrUndefined(),
+            sessionId: expect.any(String),
             deviceId: expect.any(String),
             dateTime: expect.any(String),
             customerId: 1234567890,
@@ -403,7 +386,7 @@ export const mockViewRecommendationsEvent = {
         expect.objectContaining({
             guestId: 'guest-usid',
             siteId: 'RefArch',
-            sessionId: expect.toBeStringOrUndefined(),
+            sessionId: expect.any(String),
             deviceId: expect.any(String),
             dateTime: expect.any(String),
             customerId: 1234567890,
