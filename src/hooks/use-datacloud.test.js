@@ -7,6 +7,7 @@
 
 import React, {useEffect} from 'react'
 import PropTypes from 'prop-types'
+import Cookies from 'js-cookie'
 import {waitFor} from '@testing-library/react'
 import useDataCloud from './use-datacloud'
 import {useCurrentCustomer} from './use-current-customer'
@@ -63,14 +64,8 @@ jest.mock('./use-current-customer', () => ({
         }
     })
 }))
-// jest.mock('js-cookie', () => {
-//     const originalModule = jest.requireActual('js-cookie')
 
-//     return {
-//         ...originalModule,
-//         get: jest.fn(() => 'mockCookieValue')
-//     }
-// })
+jest.mock('js-cookie')
 
 const mockWebEventsAppSourceIdPost = jest.fn()
 jest.mock('@salesforce/cc-datacloud-typescript', () => {
@@ -99,7 +94,12 @@ MockComponent.propTypes = {
     args: PropTypes.array
 }
 
-describe.skip('useDataCloud', function () {
+describe('useDataCloud', function () {
+    beforeAll(() => {
+        Cookies.get.mockImplementation((key) => {
+            return key === 'sid' ? 'mocked-sessionId' : undefined
+        })
+    })
     beforeEach(() => {
         jest.clearAllMocks()
     })
