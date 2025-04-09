@@ -26,6 +26,7 @@ import {
 // Hooks
 import {useCurrentBasket, useExtensionConfig, useVariant} from '../../hooks'
 import useNavigation from '../../hooks/use-navigation'
+import {useProductParamsInPDP} from 'overridable!../../hooks/use-product-params'
 import useEinstein from '../../hooks/use-einstein'
 import useDataCloud from '../../hooks/use-datacloud'
 import useActiveData from '../../hooks/use-active-data'
@@ -79,30 +80,14 @@ const ProductDetail = () => {
     /*************************** Product Detail and Category ********************/
     const {productId} = useParams()
     const urlParams = new URLSearchParams(location.search)
+    const parameters = useProductParamsInPDP({urlParams, productId})
     const {
         data: product,
         isLoading: isProductLoading,
         isError: isProductError,
         error: productError
     } = useProduct(
-        {
-            parameters: {
-                id: urlParams.get('pid') || productId,
-                perPricebook: true,
-                expand: [
-                    'availability',
-                    'promotions',
-                    'options',
-                    'images',
-                    'prices',
-                    'variations',
-                    'set_products',
-                    'bundled_products',
-                    'page_meta_tags'
-                ],
-                allImages: true
-            }
-        },
+        {parameters},
         {
             // When shoppers select a different variant (and the app fetches the new data),
             // the old data is still rendered (and not the skeletons).
