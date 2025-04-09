@@ -14,7 +14,6 @@ import {normalizeSetBundleProduct, getUpdateBundleChildArray} from '../../utils/
 // Components
 import {Box, Button, Stack} from '@chakra-ui/react'
 import {
-    useProduct,
     useProducts,
     useCategory,
     useShopperCustomersMutation,
@@ -26,6 +25,7 @@ import {
 // Hooks
 import {useCurrentBasket, useExtensionConfig, useVariant} from '../../hooks'
 import useNavigation from '../../hooks/use-navigation'
+import useProductDetailProduct from 'overridable!../../overrideable/hooks/use-product-detail-product'
 import useEinstein from '../../hooks/use-einstein'
 import useDataCloud from '../../hooks/use-datacloud'
 import useActiveData from '../../hooks/use-active-data'
@@ -84,31 +84,8 @@ const ProductDetail = () => {
         isLoading: isProductLoading,
         isError: isProductError,
         error: productError
-    } = useProduct(
-        {
-            parameters: {
-                id: urlParams.get('pid') || productId,
-                perPricebook: true,
-                expand: [
-                    'availability',
-                    'promotions',
-                    'options',
-                    'images',
-                    'prices',
-                    'variations',
-                    'set_products',
-                    'bundled_products',
-                    'page_meta_tags'
-                ],
-                allImages: true
-            }
-        },
-        {
-            // When shoppers select a different variant (and the app fetches the new data),
-            // the old data is still rendered (and not the skeletons).
-            keepPreviousData: true
-        }
-    )
+    } = useProductDetailProduct({productId, urlParams})
+    console.log('product', product)
 
     // Note: Since category needs id from product detail, it can't be server side rendered atm
     // until we can do dependent query on server
