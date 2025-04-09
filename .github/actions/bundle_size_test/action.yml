@@ -16,6 +16,7 @@ runs:
         node ./scripts/report-bundle-size.js ${{ inputs.cwd }}/build
     shell: bash
 
+  # TODO: is it possible to set size thresholds in the world of extensions?
   # - name: Check bundle size
   #   run: |-
   #       npm run test:max-file-size

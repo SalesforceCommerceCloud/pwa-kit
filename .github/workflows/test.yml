@@ -94,7 +94,7 @@ jobs:
         timeout-minutes: 8
 
       - name: Check and report bundle sizes
-        if: env.IS_NOT_FORK == 'true' && env.IS_MRT_NODE == 'true' && ( env.DEVELOP == 'true' || env.RELEASE == 'true' )
+        if: env.IS_NOT_FORK == 'true' && env.IS_MRT_NODE == 'true'
         uses: "./.github/actions/bundle_size_test"
         with:
           cwd: ${{ env.PROJECT_DIR }}
