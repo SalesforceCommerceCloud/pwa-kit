@@ -1,8 +1,22 @@
 name: bundlesize
+inputs:
+  cwd:
+    required: true
 runs:
   using: composite
   steps:
-  - name: Check bundle size
+  - name: Analyze build
+    working-directory: ${{ inputs.cwd }}
     run: |-
-        npm run test:max-file-size
+        npm run analyze-build
     shell: bash
+
+  - name: Report bundle size
+    run: |-
+        node ./scripts/report-bundle-size.js ${{ inputs.cwd }}/build
+    shell: bash
+
+  # - name: Check bundle size
+  #   run: |-
+  #       npm run test:max-file-size
+  #   shell: bash

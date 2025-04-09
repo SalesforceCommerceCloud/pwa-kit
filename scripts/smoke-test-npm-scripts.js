@@ -25,7 +25,7 @@ program.option('--dir <dir>', `Path to a PWA Kit project`, defaultDir)
 program.parse(process.argv)
 
 const main = () => {
-    const opts = program.opts();
+    const opts = program.opts()
 
     const cwd = path.resolve(opts.dir)
 
@@ -43,7 +43,7 @@ const main = () => {
         /^start.*$/,
         /^compile-translations.*$/,
         /^extract-default-translations.*$/,
-        /^bump-version.*$/
+        /^analyze-build$/
     ]
 
     const scripts = Object.keys(pkg.scripts).filter(
