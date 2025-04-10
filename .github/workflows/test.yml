@@ -356,6 +356,10 @@ jobs:
       matrix:
         node: [22] # Should match node version supported by MRT.
     runs-on: ubuntu-latest
+    env:
+      PROJECT_DIR: generated-retail-react-app-test-project
+      # This path is relative to PROJECT_DIR
+      LIGHTHOUSE_CONFIG_PATH: ../.github/actions/lighthouse_ci/lighthouserc.js
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -369,5 +373,15 @@ jobs:
       - name: Setup Ubuntu Machine
         uses: "./.github/actions/setup_ubuntu"
 
-      # - name: Run Lighthouse CI on the PWA
-      #   uses: "./.github/actions/lighthouse_ci"
+      - name: Generate retail-react-app-test-project
+        run: |-
+          node packages/pwa-kit-create-app/scripts/create-mobify-app-dev.js --outputDir ${{ env.PROJECT_DIR }}
+        env:
+          GENERATOR_PRESET: retail-react-app-test-project
+        timeout-minutes: 8
+
+      - name: Run Lighthouse CI on the generated project
+        uses: "./.github/actions/lighthouse_ci"
+        with:
+          project_dir: ${{ PROJECT_DIR }}
+          lighthouse_config_path: ${{ LIGHTHOUSE_CONFIG_PATH }}
