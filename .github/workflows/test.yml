@@ -349,39 +349,42 @@ jobs:
         with:
           name: verdaccio-log-${{ matrix.template }}
           path: packages/pwa-kit-create-app/local-npm-repo/verdaccio-windows-${{ matrix.template }}.log
-  lighthouse:
-    needs: changelog-check
-    strategy:
-      fail-fast: false
-      matrix:
-        node: [22] # Should match node version supported by MRT.
-    runs-on: ubuntu-latest
-    env:
-      PROJECT_DIR: generated-retail-react-app-test-project
-      # This path is relative to PROJECT_DIR
-      LIGHTHOUSE_CONFIG_PATH: ../.github/actions/lighthouse_ci/lighthouserc.js
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
 
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ matrix.node }}
-          cache: npm
+  # NOTE: Commenting out this lighthouse test because it's run against a _local_ server that skews the performance metrics to be better than they really are.
+  # TODO: perhaps run lighthouse in another workflow (e2e one) that deploys to MRT and test against that.
+  # lighthouse:
+  #   needs: changelog-check
+  #   strategy:
+  #     fail-fast: false
+  #     matrix:
+  #       node: [22] # Should match node version supported by MRT.
+  #   runs-on: ubuntu-latest
+  #   env:
+  #     PROJECT_DIR: generated-retail-react-app-test-project
+  #     # This path is relative to PROJECT_DIR
+  #     LIGHTHOUSE_CONFIG_PATH: ../.github/actions/lighthouse_ci/lighthouserc.js
+  #   steps:
+  #     - name: Checkout
+  #       uses: actions/checkout@v4
 
-      - name: Setup Ubuntu Machine
-        uses: "./.github/actions/setup_ubuntu"
+  #     - name: Setup Node
+  #       uses: actions/setup-node@v4
+  #       with:
+  #         node-version: ${{ matrix.node }}
+  #         cache: npm
 
-      - name: Generate retail-react-app-test-project
-        run: |-
-          node packages/pwa-kit-create-app/scripts/create-mobify-app-dev.js --outputDir ${{ env.PROJECT_DIR }}
-        env:
-          GENERATOR_PRESET: retail-react-app-test-project
-        timeout-minutes: 8
+  #     - name: Setup Ubuntu Machine
+  #       uses: "./.github/actions/setup_ubuntu"
 
-      - name: Run Lighthouse CI on the generated project
-        uses: "./.github/actions/lighthouse_ci"
-        with:
-          project_dir: ${{ env.PROJECT_DIR }}
-          lighthouse_config_path: ${{ env.LIGHTHOUSE_CONFIG_PATH }}
+  #     - name: Generate retail-react-app-test-project
+  #       run: |-
+  #         node packages/pwa-kit-create-app/scripts/create-mobify-app-dev.js --outputDir ${{ env.PROJECT_DIR }}
+  #       env:
+  #         GENERATOR_PRESET: retail-react-app-test-project
+  #       timeout-minutes: 8
+
+  #     - name: Run Lighthouse CI on the generated project
+  #       uses: "./.github/actions/lighthouse_ci"
+  #       with:
+  #         project_dir: ${{ env.PROJECT_DIR }}
+  #         lighthouse_config_path: ${{ env.LIGHTHOUSE_CONFIG_PATH }}
