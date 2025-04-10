@@ -14,9 +14,8 @@ runs:
   - name: Check bundle sizes
     working-directory: ${{ inputs.cwd }}
     run: |-
-        echo ${{ github.action_path }}/bundlesize.config.json
-        cat ${{ github.action_path }}/bundlesize.config.json
-        npx bundlesize --config ${{ github.action_path }}/bundlesize.config.json
+        npx bundlesize -f "build/main.js" -s 10kB
+        npx bundlesize -f "build/vendor.js" -s 390kB
     shell: bash
 
   - name: Report bundle sizes
