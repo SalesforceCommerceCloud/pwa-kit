@@ -133,6 +133,7 @@ export const start = async () => {
     })
 
     const routes = await getAllRoutes(locals)
+    console.log('allRoutes', routes)
     const props = {
         error: window.__ERROR__,
         locals: locals,
