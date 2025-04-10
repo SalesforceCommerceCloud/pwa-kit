@@ -14,6 +14,8 @@ runs:
   - name: Check bundle sizes
     working-directory: ${{ inputs.cwd }}
     run: |-
+        echo ${{ github.action_path }}/bundlesize.config.json
+        cat ${{ github.action_path }}/bundlesize.config.json
         npx bundlesize --config ${{ github.action_path }}/bundlesize.config.json
     shell: bash
 
