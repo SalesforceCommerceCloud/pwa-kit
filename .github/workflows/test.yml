@@ -391,8 +391,6 @@ jobs:
   #   runs-on: ubuntu-latest
   #   env:
   #     PROJECT_DIR: generated-retail-react-app-test-project
-  #     # This path is relative to PROJECT_DIR
-  #     LIGHTHOUSE_CONFIG_PATH: ../.github/actions/lighthouse_ci/lighthouserc.js
   #   steps:
   #     - name: Checkout
   #       uses: actions/checkout@v4
@@ -417,4 +415,3 @@ jobs:
   #       uses: "./.github/actions/lighthouse_ci"
   #       with:
   #         project_dir: ${{ env.PROJECT_DIR }}
-  #         lighthouse_config_path: ${{ env.LIGHTHOUSE_CONFIG_PATH }}

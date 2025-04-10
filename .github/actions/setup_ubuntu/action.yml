@@ -24,6 +24,4 @@ runs:
         # TODO: Latest Snyk CLI version is currently failing on npm i. We use the alternative Snyk GitHub integration.
         # sudo npm install -g snyk
 
-        # Install Lighthouse CI CLI
-        sudo npm install -g @lhci/cli
       shell: bash
