@@ -10,7 +10,7 @@ runs:
   - name: Run Lighthouse CI
     working-directory: ${{ inputs.project_dir }}
     run: |-
-      lighthouse_test="lhci autorun --config=${{ inputs.lighthouse_config_path }}
+      lighthouse_test="lhci autorun --config=${{ inputs.lighthouse_config_path }}"
       # This test is flaky, so let's try it three times!
       $lighthouse_test || $lighthouse_test || $lighthouse_test
     shell: bash
