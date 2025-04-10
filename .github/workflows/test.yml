@@ -383,5 +383,5 @@ jobs:
       - name: Run Lighthouse CI on the generated project
         uses: "./.github/actions/lighthouse_ci"
         with:
-          project_dir: ${{ PROJECT_DIR }}
-          lighthouse_config_path: ${{ LIGHTHOUSE_CONFIG_PATH }}
+          project_dir: ${{ env.PROJECT_DIR }}
+          lighthouse_config_path: ${{ env.LIGHTHOUSE_CONFIG_PATH }}
