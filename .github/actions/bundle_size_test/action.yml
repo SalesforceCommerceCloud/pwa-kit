@@ -11,13 +11,15 @@ runs:
         npm run analyze-build
     shell: bash
 
+  # TODO: is it possible to set size thresholds in the world of extensions? Yes: npx bundlesize --config ../../../bundlesize.config.json
+  - name: Check bundle size
+    working-directory: ${{ inputs.cwd }}
+    run: |-
+        echo ${{ github.action_path }}
+        npx bundlesize
+    shell: bash
+
   - name: Report bundle size
     run: |-
         node ./scripts/report-bundle-size.js ${{ inputs.cwd }}/build
     shell: bash
-
-  # TODO: is it possible to set size thresholds in the world of extensions?
-  # - name: Check bundle size
-  #   run: |-
-  #       npm run test:max-file-size
-  #   shell: bash
