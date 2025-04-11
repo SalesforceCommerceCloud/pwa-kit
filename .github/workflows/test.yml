@@ -381,6 +381,7 @@ jobs:
         uses: "./.github/actions/bundle_size_test"
         with:
           cwd: ${{ env.PROJECT_DIR }}
+          config: '{"build/main.js": "10kB", "build/vendor.js": "390kB"}'
 
   # NOTE: Commenting out this lighthouse test because it's run against a _local_ server that skews the performance metrics to be better than they really are.
   # TODO: perhaps run lighthouse in another workflow (e2e one) that deploys to MRT and test against that.
