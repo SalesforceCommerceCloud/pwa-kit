@@ -4,6 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
+
 module.exports = {
     // The different Lighthouse CI configuration options:
     // https://github.com/GoogleChrome/lighthouse-ci/blob/master/docs/configuration.md

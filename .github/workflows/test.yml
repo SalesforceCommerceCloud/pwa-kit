@@ -415,3 +415,4 @@ jobs:
   #       uses: "./.github/actions/lighthouse_ci"
   #       with:
   #         project_dir: ${{ env.PROJECT_DIR }}
+  #         config_filename: lighthouserc.retail-react-app.js
