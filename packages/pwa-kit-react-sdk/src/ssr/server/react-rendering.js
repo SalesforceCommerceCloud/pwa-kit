@@ -155,6 +155,8 @@ export const render = async (req, res, next) => {
         applicationExtensions.flatMap((extension) => {
             if (typeof extension.getRoutesAsync !== 'function') return []
             const routes = extension.serializeAsyncRoutes()
+            // TODO W-18257236: Use a unique key for each extension like the extension ID from
+            // extension-meta.json
             return [[extension.getName(), {routes}]]
         })
     )
