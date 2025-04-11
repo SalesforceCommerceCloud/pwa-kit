@@ -6,6 +6,7 @@
  */
 
 import {RouteProps} from 'react-router-dom'
+import {ApplicationExtension} from './shared/classes/application-extension-base'
 
 /**
  * This is the base configuration type for all Application Extensions. Modify this
@@ -59,7 +60,9 @@ export interface BeforeRouteMatchParams {
  * when deserializing an extension.
  */
 export type ComponentMap = {
-    [key: string]: React.ComponentType<any>
+    [key in ReturnType<
+        ApplicationExtension<ApplicationExtensionConfig>['getName']
+    >]: React.ComponentType<any>
 }
 
 /**
