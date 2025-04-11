@@ -228,17 +228,17 @@ jobs:
         with:
           cwd: ${{ env.PROJECT_DIR }}
 
+      - name: Smoke test the NPM scripts
+        if: env.IS_TEMPLATE_FROM_RETAIL_REACT_APP == 'true'
+        uses: "./.github/actions/npm_scripts"
+        with:
+          cwd: ${{ env.PROJECT_DIR }}
+
       - name: Run unit tests
         if: env.IS_TEMPLATE_FROM_RETAIL_REACT_APP == 'true'
         uses: "./.github/actions/unit_tests"
         with:
           cwd: ${{ env.PROJECT_DIR }}
-
-      # - name: Run smoke tests
-      #   if: env.IS_TEMPLATE_FROM_RETAIL_REACT_APP == 'true'
-      #   uses: "./.github/actions/smoke_tests"
-      #   with:
-      #     dir: ${{ env.PROJECT_DIR }}
 
       - name: Count Generated Project Dependencies
         id: count_deps
@@ -328,17 +328,17 @@ jobs:
         with:
           cwd: ${{ env.PROJECT_DIR }}
 
+      - name: Smoke test the NPM scripts
+        if: env.IS_TEMPLATE_FROM_RETAIL_REACT_APP == 'true'
+        uses: "./.github/actions/npm_scripts"
+        with:
+          cwd: ${{ env.PROJECT_DIR }}
+
       - name: Run unit tests
         if: env.IS_TEMPLATE_FROM_RETAIL_REACT_APP == 'true'
         uses: "./.github/actions/unit_tests"
         with:
           cwd: ${{ env.PROJECT_DIR }}
-
-      # - name: Run smoke tests
-      #   if: env.IS_TEMPLATE_FROM_RETAIL_REACT_APP == 'true'
-      #   uses: "./.github/actions/smoke_tests"
-      #   with:
-      #     dir: ${{ env.PROJECT_DIR }}
 
       - name: Count Generated Project Dependencies
         if: env.IS_TEMPLATE_FROM_RETAIL_REACT_APP == 'true'

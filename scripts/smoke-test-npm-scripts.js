@@ -42,8 +42,7 @@ const main = () => {
         /^build$/,
         /^start.*$/,
         /^compile-translations.*$/,
-        /^extract-default-translations.*$/,
-        /^analyze-build$/
+        /^extract-default-translations.*$/
     ]
 
     const scripts = Object.keys(pkg.scripts).filter(
