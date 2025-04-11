@@ -16,13 +16,11 @@ runs:
   - name: Check bundle sizes
     working-directory: ${{ inputs.cwd }}
     run: |-
-        # npx bundlesize -f "build/main.js" -s 10kB
-        # npx bundlesize -f "build/vendor.js" -s 390kB
-
         json_string='${{ inputs.config }}'
 
-        # Use jq to parse the JSON string and iterate over each key-value pair
+        # Parse the given json string and build the command to run
         echo $json_string | jq -r 'to_entries[] | "npx bundlesize -f \"" + .key + "\" -s " + .value' | while read -r command; do
+          # Example of command: npx bundlesize -f "build/main.js" -s 10kB
           eval $command
         done
     shell: bash

@@ -10,8 +10,6 @@ runs:
     - name: Install Dependencies
       working-directory: ${{ inputs.cwd }}
       run: |-
-        sudo apt-get update -yq && sudo apt-get install -yq jq
-
         # Install node dependencies
         node ./scripts/gtime.js monorepo_install npm ci
 
