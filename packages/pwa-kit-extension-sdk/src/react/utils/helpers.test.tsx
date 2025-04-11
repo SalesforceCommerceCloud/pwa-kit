@@ -16,7 +16,7 @@ import React from 'react'
 import {render, screen} from '@testing-library/react'
 
 // Local
-import {applyHOCs, cacheMethodResult, isServerSide} from './helpers'
+import {applyHOCs, cacheMethodResult, isServerSide, NOT_CACHED} from './helpers'
 
 // Mock HOC functions
 const withExtraProp = (Component: React.ComponentType<any>) => {
@@ -114,7 +114,7 @@ describe('cacheMethodResult', () => {
 
     it('should cache the result of a sync method', () => {
         cacheMethodResult(instance, 'methodName', '_cache')
-        expect(instance._cache).toBeUndefined()
+        expect(instance._cache).toBe(NOT_CACHED)
 
         const firstCall = instance.methodName()
         expect(firstCall).toBe('result')
@@ -131,7 +131,7 @@ describe('cacheMethodResult', () => {
         instance = new TestClass(methodMock)
 
         cacheMethodResult(instance, 'methodName', '_cache')
-        expect(instance._cache).toBeUndefined()
+        expect(instance._cache).toBe(NOT_CACHED)
 
         await expect(instance.methodName()).resolves.toBe('async result')
         await expect(instance._cache).resolves.toBe('async result')
