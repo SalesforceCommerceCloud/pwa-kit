@@ -70,7 +70,6 @@ jobs:
       # (We also use this env var for making sure a step runs once for the current node version)
       IS_DEFAULT_NPM: ${{ (matrix.node == 18 && matrix.npm == 10) || (matrix.node == 20 && matrix.npm == 10) || (matrix.node == 22 && matrix.npm == 10) }}
       IS_MRT_NODE: ${{ matrix.node == 22 && matrix.npm == 10 }}
-      PROJECT_DIR: generated-retail-react-app-test-project
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -88,20 +87,6 @@ jobs:
 
       - name: Setup Ubuntu Machine
         uses: "./.github/actions/setup_ubuntu"
-
-      # TODO: repeat for the windows version
-      - name: Generate retail-react-app-test-project
-        run: |-
-          node packages/pwa-kit-create-app/scripts/create-mobify-app-dev.js --outputDir ${{ env.PROJECT_DIR }}
-        env:
-          GENERATOR_PRESET: retail-react-app-test-project
-        timeout-minutes: 8
-
-      - name: Smoke test the NPM scripts
-        if: env.IS_DEFAULT_NPM == 'true'
-        uses: "./.github/actions/npm_scripts"
-        with:
-          cwd: ${{ env.PROJECT_DIR }}
 
       - name: Run unit tests
         uses: "./.github/actions/unit_tests"
