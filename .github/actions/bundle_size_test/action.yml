@@ -15,6 +15,9 @@ runs:
 
   - name: Check bundle sizes
     working-directory: ${{ inputs.cwd }}
+    # NOTE: A bug prevented us from running bundlesize with a config file:
+    # npx bundlesize --scope ${{ github.action_path }}/bundlesize.config.json
+    # For more details, see https://github.com/siddharthkp/bundlesize/issues/326
     run: |-
         json_string='${{ inputs.config }}'
 
