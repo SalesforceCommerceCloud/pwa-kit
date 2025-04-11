@@ -158,7 +158,6 @@ export const render = async (req, res, next) => {
             return [[extension.getName(), {routes}]]
         })
     )
-    console.log('--- serialized extensions in react-rendering', serializedExtensions)
 
     // Step 1 - Find the match.
 
