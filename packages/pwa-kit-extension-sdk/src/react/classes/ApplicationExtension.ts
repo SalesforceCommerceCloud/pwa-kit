@@ -7,7 +7,7 @@
 
 // Local
 import {ApplicationExtension as ApplicationExtensionBase} from '../../shared/classes/application-extension-base'
-import {cacheMethodResult, isServerSide} from '../utils/helpers'
+import {cacheMethodResult, isServerSide, NOT_CACHED} from '../utils/helpers'
 
 // Types
 import {RouteProps} from 'react-router-dom'
@@ -33,7 +33,7 @@ export type ReactApplicationExtensionConfig = ApplicationExtensionConfig
 export class ApplicationExtension<
     Config extends ReactApplicationExtensionConfig
 > extends ApplicationExtensionBase<Config> {
-    protected _cachedRoutes: RouteProps[] | null = null
+    protected _cachedRoutes: RouteProps[] | typeof NOT_CACHED = NOT_CACHED
 
     constructor(config: Config) {
         super(config)
@@ -105,7 +105,7 @@ export class ApplicationExtension<
     public serializeAsyncRoutes(): SerializedRouteProps[] {
         if (typeof this.getRoutesAsync === 'undefined') return []
 
-        if (this._cachedRoutes === null) {
+        if (this._cachedRoutes === NOT_CACHED) {
             throw new Error(`Routes have not been loaded. Call getRoutesAsync() before serializing`)
         }
 

@@ -9,6 +9,7 @@ import {RouteProps} from 'react-router-dom'
 
 import {ApplicationExtension} from './ApplicationExtension'
 import {ApplicationExtensionConfig, ComponentMap, SerializedRouteProps} from '../../types'
+import {NOT_CACHED} from '../utils/helpers'
 
 const MockComponent: React.ComponentType<any> = () => {
     return <div>{MockComponent.displayName}</div>
@@ -211,7 +212,7 @@ describe('ApplicationExtension', () => {
             // Simulate server-side
             ;(global as any).window = undefined
             extension = new TestExtensionAsyncRoutes(new TestConfig())
-            expect(extension['_cachedRoutes']).toBeNull()
+            expect(extension['_cachedRoutes']).toEqual(NOT_CACHED)
         })
 
         it('should deserialize routes when client-side', () => {
