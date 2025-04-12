@@ -34,7 +34,8 @@ const main = () => {
                     bundles.forEach((bundle) => {
                         const metric = `mobify_platform_sdks.bundle_size_byte`
                         const value = bundle.size
-                        childProc.spawnSync('dog', [
+                        // TODO: is dog installed yet?
+                        childProc.spawnSync('dogFOOSDFJKLFJKSL', [
                             'metric',
                             'post',
                             metric,
