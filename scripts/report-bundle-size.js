@@ -35,7 +35,7 @@ const main = () => {
                         const metric = `mobify_platform_sdks.bundle_size_byte`
                         const value = bundle.size
                         // TODO: is dog installed yet?
-                        childProc.spawnSync('dogFOOSDFJKLFJKSL', [
+                        const {status, stderr, error} = childProc.spawnSync('dog', [
                             'metric',
                             'post',
                             metric,
@@ -43,6 +43,7 @@ const main = () => {
                             '--host',
                             bundle.name
                         ])
+                        console.log('---', status, stderr, error)
                         console.log(`${metric} ${value} --host ${bundle.name}`)
                     })
                 })
