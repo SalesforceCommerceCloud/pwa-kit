@@ -13,12 +13,6 @@ runs:
         # Install node dependencies
         node ./scripts/gtime.js monorepo_install npm ci
 
-        # Build the PWA
-        # npm run lerna -- run analyze-build --scope "@salesforce/retail-react-app"
-
-        # Report bundle sizes
-        # node ./scripts/report-bundle-size.js
-
         # Install Snyk CLI
         # TODO: Ticket W-12425059. Revisit Snyk CLI integration to monitor manifest files on generated projects.
         # TODO: Latest Snyk CLI version is currently failing on npm i. We use the alternative Snyk GitHub integration.
