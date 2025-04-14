@@ -75,19 +75,12 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ matrix.node }}
-          cache: npm
-
-      - name: Update NPM version
-        if: env.IS_DEFAULT_NPM == 'false'
-        run: |-
-          npm install -g npm@${{ matrix.npm }}
-
       - name: Setup Ubuntu Machine
         uses: "./.github/actions/setup_ubuntu"
+        with:
+          node: ${{ matrix.node }}
+          npm: ${{ matrix.npm }}
+          update_npm: env.IS_DEFAULT_NPM == 'false'
 
       - name: Generate retail-react-app-test-project
         if: env.IS_DEFAULT_NPM == 'true'
@@ -175,19 +168,12 @@ jobs:
         - name: Checkout
           uses: actions/checkout@v4
 
-        - name: Setup Node
-          uses: actions/setup-node@v4
-          with:
-            node-version: ${{ matrix.node }}
-            cache: npm
-
-        - name: Update NPM version
-          if: env.IS_DEFAULT_NPM == 'false'
-          run: |-
-            npm install -g npm@${{ matrix.npm }}
-
         - name: Setup Windows Machine
           uses: "./.github/actions/setup_windows"
+          with:
+            node: ${{ matrix.node }}
+            npm: ${{ matrix.npm }}
+            update_npm: env.IS_DEFAULT_NPM == 'false'
 
         - name: Generate retail-react-app-test-project
           if: env.IS_DEFAULT_NPM == 'true'
@@ -222,13 +208,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.MRT_NODE }}
-
       - name: Setup Ubuntu Machine
         uses: "./.github/actions/setup_ubuntu"
+        with:
+          node: ${{ env.MRT_NODE }}
 
       - name: Generate ${{ matrix.template }} project
         run: |-
@@ -316,13 +299,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.MRT_NODE }}
-
       - name: Setup Windows Machine
         uses: "./.github/actions/setup_windows"
+        with:
+          node: ${{ env.MRT_NODE }}
 
       - name: Generate ${{ matrix.template }} project
         run: |-
@@ -364,14 +344,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.MRT_NODE }}
-          cache: npm
-
       - name: Setup Ubuntu Machine
         uses: "./.github/actions/setup_ubuntu"
+        with:
+          node: ${{ env.MRT_NODE }}
 
       - name: Generate retail-react-app-test-project
         run: |-
@@ -399,14 +375,10 @@ jobs:
   #     - name: Checkout
   #       uses: actions/checkout@v4
 
-  #     - name: Setup Node
-  #       uses: actions/setup-node@v4
-  #       with:
-  #         node-version: ${{ env.MRT_NODE }}
-  #         cache: npm
-
   #     - name: Setup Ubuntu Machine
   #       uses: "./.github/actions/setup_ubuntu"
+  #       with:
+  #         node: ${{ env.MRT_NODE }}
 
   #     - name: Generate retail-react-app-test-project
   #       run: |-

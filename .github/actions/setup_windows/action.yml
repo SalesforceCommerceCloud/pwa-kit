@@ -3,10 +3,28 @@ inputs:
   cwd:
     required: false
     default: "${PWD}"
+  node:
+    required: true
+  npm:
+    required: false
+  update_npm:
+    required: false
+    default: false
 description: "Setup Windows Machine"
 runs:
   using: composite
   steps:
+    - name: Setup Node
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ inputs.node }}
+        cache: npm
+
+    - name: Update NPM version
+      if: inputs.update_npm == 'true'
+      run: |-
+        npm install -g npm@${{ inputs.npm }}
+
     - name: Install Dependencies
       run: |-
         # Install node dependencies
