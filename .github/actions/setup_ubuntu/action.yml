@@ -30,6 +30,8 @@ runs:
       working-directory: ${{ inputs.cwd }}
       run: |-
         # Install node dependencies
+        echo ${{ inputs.update_npm }}
+        node -v
         node ./scripts/gtime.js monorepo_install npm ci
 
         # Install Snyk CLI
