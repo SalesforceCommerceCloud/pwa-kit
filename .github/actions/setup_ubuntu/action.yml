@@ -32,6 +32,7 @@ runs:
         # Install node dependencies
         echo ${{ inputs.update_npm }}
         node -v
+        npm -v
         node ./scripts/gtime.js monorepo_install npm ci
 
         # Install Snyk CLI
