@@ -1,0 +1,32 @@
+name: verify_node_npm_major_versions
+inputs:
+  node:
+    required: false
+    description: Major node version
+  npm:
+    required: false
+    description: Major npm version
+runs:
+  using: composite
+  steps:
+    - run: |-
+        EXPECTED_NODE_VERSION="${{ inputs.node }}"
+        EXPECTED_NPM_VERSION="${{ inputs.npm }}"
+
+        if [ -n "$EXPECTED_NODE_VERSION" ]; then
+          INSTALLED_NODE_VERSION=$(node -v | sed 's/^v\([0-9]*\).*/\1/')
+          if [ "$INSTALLED_NODE_VERSION" != "$EXPECTED_NODE_VERSION" ]; then
+            echo "The node version is incorrect. Expected: v$EXPECTED_NODE_VERSION, but found: v$INSTALLED_NODE_VERSION"
+            exit 1
+          fi
+        fi
+
+        if [ -n "$EXPECTED_NPM_VERSION" ]; then
+          INSTALLED_NPM_VERSION=$(npm -v | sed 's/^\([0-9]*\).*/\1/')
+          if [ "$INSTALLED_NPM_VERSION" != "$EXPECTED_NPM_VERSION" ]; then
+            echo "The npm version is incorrect. Expected: $EXPECTED_NPM_VERSION, but found: $INSTALLED_NPM_VERSION"
+            exit 1
+          fi
+        fi
+        echo "Node/npm version check completed successfully."
+      shell: bash
