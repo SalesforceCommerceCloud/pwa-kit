@@ -5,13 +5,12 @@ inputs:
     default: "${PWD}"
   node:
     required: true
-    type: number
+    description: Major node version
   npm:
     required: false
-    type: number
+    description: Major npm version
   update_npm:
     required: false
-    type: boolean
     default: false
 description: "Setup Windows Machine"
 runs:
@@ -27,6 +26,27 @@ runs:
       if: inputs.update_npm == 'true'
       run: |-
         npm install -g npm@${{ inputs.npm }}
+      shell: bash
+
+    - name: Verify node and npm versions
+      run: |-
+        EXPECTED_NODE_VERSION="${{ inputs.node }}"
+        EXPECTED_NPM_VERSION="${{ inputs.npm }}"
+
+        INSTALLED_NODE_VERSION=$(node -v | grep -oP 'v\K[0-9]+')
+        if [ "$INSTALLED_NODE_VERSION" != "$EXPECTED_NODE_VERSION" ]; then
+          echo "The node version is incorrect. Expected: v$EXPECTED_NODE_VERSION, but found: v$INSTALLED_NODE_VERSION"
+          exit 1
+        fi
+
+        if [ -n "$EXPECTED_NPM_VERSION" ]; then
+          INSTALLED_NPM_VERSION=$(npm -v | grep -oP '^[0-9]+')
+          if [ "$INSTALLED_NPM_VERSION" != "$EXPECTED_NPM_VERSION" ]; then
+            echo "The npm version is incorrect. Expected: $EXPECTED_NPM_VERSION, but found: $INSTALLED_NPM_VERSION"
+            exit 1
+          fi
+        fi
+        echo "Node/npm version check completed successfully."
       shell: bash
 
     - name: Install Dependencies
