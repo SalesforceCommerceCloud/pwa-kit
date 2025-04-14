@@ -21,7 +21,7 @@ runs:
         cache: npm
 
     - name: Update NPM version
-      if: inputs.update_npm == true
+      if: inputs.update_npm
       run: |-
         npm install -g npm@${{ inputs.npm }}
       shell: bash
