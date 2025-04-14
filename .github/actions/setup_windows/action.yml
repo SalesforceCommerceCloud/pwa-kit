@@ -5,10 +5,13 @@ inputs:
     default: "${PWD}"
   node:
     required: true
+    type: number
   npm:
     required: false
+    type: number
   update_npm:
     required: false
+    type: boolean
     default: false
 description: "Setup Windows Machine"
 runs:

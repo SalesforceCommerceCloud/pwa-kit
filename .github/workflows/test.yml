@@ -80,7 +80,7 @@ jobs:
         with:
           node: ${{ matrix.node }}
           npm: ${{ matrix.npm }}
-          update_npm: env.IS_DEFAULT_NPM == 'false'
+          update_npm: ${{ env.IS_DEFAULT_NPM == 'false' }}
 
       - name: Generate retail-react-app-test-project
         if: env.IS_DEFAULT_NPM == 'true'
@@ -173,7 +173,7 @@ jobs:
           with:
             node: ${{ matrix.node }}
             npm: ${{ matrix.npm }}
-            update_npm: env.IS_DEFAULT_NPM == 'false'
+            update_npm: ${{ env.IS_DEFAULT_NPM == 'false' }}
 
         - name: Generate retail-react-app-test-project
           if: env.IS_DEFAULT_NPM == 'true'
