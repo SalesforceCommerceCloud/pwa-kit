@@ -1,0 +1,149 @@
+/*
+ * Copyright (c) 2024, salesforce.com, inc.
+ * All rights reserved.
+ * SPDX-License-Identifier: BSD-3-Clause
+ * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
+ */
+
+import { useEffect, useState } from 'react';
+
+const onClient = typeof window !== 'undefined';
+
+// Function to register event listeners
+const registerEventListeners = (siteId, appOrigin) => {
+    if (!onClient) return;
+
+    const onReadyHandler = (e) => {
+        console.log("Received the onEmbeddedMessagingReady event…", e);
+        window.embeddedservice_bootstrap.prechatAPI.setHiddenPrechatFields({
+            "Site_ID": siteId,
+            "Domain_URL": appOrigin
+        });
+    };
+
+    window.addEventListener("onEmbeddedMessagingReady", onReadyHandler);
+
+   return [
+        { event: "onEmbeddedMessagingReady", handler: onReadyHandler }
+    ];
+};
+
+// Function to initialize embedded messaging
+const initEmbeddedMessaging = (messaging) => {
+    try {
+        if (onClient && messaging && messaging?.embeddedservice_bootstrap?.settings) {
+            messaging.embeddedservice_bootstrap.settings.language = 'en_US';
+            messaging.embeddedservice_bootstrap.init(
+                '00DSB00000MJ7YH',
+                'MIAW_Guided_Shopper_production_functional38',
+                'https://orgfarm-7455a909de.test1.my.pc-rnd.site.com/ESWMIAWGuidedShopperpr1743525851212',
+                {
+                    scrt2URL: 'https://orgfarm-7455a909de.test1.my.pc-rnd.salesforce-scrt.com'
+                }
+            );
+
+            // scom org
+            // messaging.embeddedservice_bootstrap.init(
+			// 	'00DSB00000RmU16',
+			// 	'Buyer_Service_Agent_Embedded_Service_Deployment',
+			// 	'https://orgfarm-9d2e93e7de.test1.my.pc-rnd.site.com/ESWBuyerServiceAgentEm1735264803481',
+			// 	{
+			// 		scrt2URL: 'https://orgfarm-9d2e93e7de.test1.my.pc-rnd.salesforce-scrt.com'
+			// 	}
+			// );
+        }
+    } catch (err) {
+        console.error('Error initializing Embedded Messaging: ', err);
+    }
+};
+
+/**
+ * Custom hook to handle embedded messaging initialization
+ * @param {string} src - The source URL for the embedded messaging script
+ * @returns {Object} The embedded messaging object
+ */
+const useMiaw = (siteId, appOrigin,src) => {
+    const [embeddedMessaging, setEmbeddedMessaging] = useState(null);
+    const [isMiawInitialized, setIsMiawInitialized] = useState(false);
+    
+    // Effect to load and initialize the script
+    useEffect(() => {
+        let miawEventListeners = [];
+
+        if (!src && !siteId) {
+            setEmbeddedMessaging(null);
+            return;
+        }
+        
+        // Check if script already exists
+        let script = document.querySelector(`script[src="${src}"]`);
+        
+        if (!script) {
+            script = document.createElement('script');
+            script.src = src;
+            script.async = true;
+            script.setAttribute("data-status", "loading");
+            document.body.appendChild(script);
+            
+            const setAttributeFromEvent = (event) => {
+                script.setAttribute(
+                    "data-status",
+                    event.type === "load" ? "ready" : "error"
+                );
+            };
+            
+            script.addEventListener("load", setAttributeFromEvent);
+            script.addEventListener("error", setAttributeFromEvent);
+        }
+        
+        const setStateFromEvent = (event) => {
+            const loaded = event.type === "load";
+            if (loaded) {
+                const messaging = {
+                    embeddedservice_bootstrap: window.embeddedservice_bootstrap,
+                    settings: window.embeddedservice_bootstrap.settings,
+                    prechatAPI: window.embeddedservice_bootstrap.prechatAPI,
+                    init: window.embeddedservice_bootstrap.init,
+                    error: false
+                };
+                
+                setEmbeddedMessaging(messaging);
+                
+                // Initialize embedded messaging if not already initialized
+                if (!isMiawInitialized) {
+                    miawEventListeners = registerEventListeners(siteId, appOrigin);
+                    initEmbeddedMessaging(messaging);
+                    setIsMiawInitialized(true);
+                }
+            } else {
+                setEmbeddedMessaging({
+                    error: true
+                });
+            }
+        };
+        
+        script.addEventListener("load", setStateFromEvent);
+        script.addEventListener("error", setStateFromEvent);
+        
+        // Cleanup function to remove script event listeners
+        return () => {
+            if (script) {
+                script.removeEventListener("load", setStateFromEvent);
+                script.removeEventListener("error", setStateFromEvent);
+            }
+
+            // TODO: Remove embedded messaging event listeners
+            // currently in dev mode the listeners get removed inadvertenly
+            // Remove embedded messaging event listeners
+            // if (miawEventListeners.length > 0) {
+            //     miawEventListeners.forEach(({ event, handler }) => {
+            //         window.removeEventListener(event, handler);
+            //     });
+            // }
+        };
+    }, [isMiawInitialized, embeddedMessaging, siteId, appOrigin]);
+    
+    return embeddedMessaging;
+};
+
+export default useMiaw;
