@@ -17,7 +17,7 @@ module.exports = {
                 'http://localhost:3000/global/en-GB/product/25493613M',
                 'http://localhost:3000/global/en-GB/search?q=suit'
             ],
-            startServerReadyPattern: 'First build complete',
+            startServerReadyPattern: 'First build complete test',
             startServerReadyTimeout: 90000
         },
         upload: {
