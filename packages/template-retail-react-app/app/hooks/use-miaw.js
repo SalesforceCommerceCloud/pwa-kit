@@ -59,10 +59,14 @@ const initEmbeddedMessaging = (messaging) => {
 
 /**
  * Custom hook to handle embedded messaging initialization
+ * @param {string} siteId - The site ID for the embedded messaging script
+ * @param {string} slasToken - The SLAS token for the embedded messaging script
+ * @param {string} basketId - The basket ID for the embedded messaging script
+ * @param {string} domainUrl - The domain URL for the embedded messaging script
  * @param {string} src - The source URL for the embedded messaging script
  * @returns {Object} The embedded messaging object
  */
-const useMiaw = (siteId, appOrigin,src) => {
+const useMiaw = (siteId, slasToken, basketId = '', domainUrl, src) => {
     const [embeddedMessaging, setEmbeddedMessaging] = useState(null);
     const [isMiawInitialized, setIsMiawInitialized] = useState(false);
     
@@ -111,7 +115,7 @@ const useMiaw = (siteId, appOrigin,src) => {
                 
                 // Initialize embedded messaging if not already initialized
                 if (!isMiawInitialized) {
-                    miawEventListeners = registerEventListeners(siteId, appOrigin);
+                    miawEventListeners = registerEventListeners(siteId, domainUrl);
                     initEmbeddedMessaging(messaging);
                     setIsMiawInitialized(true);
                 }
@@ -141,7 +145,7 @@ const useMiaw = (siteId, appOrigin,src) => {
             //     });
             // }
         };
-    }, [isMiawInitialized, embeddedMessaging, siteId, appOrigin]);
+    }, [isMiawInitialized, embeddedMessaging, siteId, domainUrl]);
     
     return embeddedMessaging;
 };
