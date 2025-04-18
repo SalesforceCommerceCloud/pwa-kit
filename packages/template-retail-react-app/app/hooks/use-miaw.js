@@ -31,14 +31,14 @@ const registerEventListeners = (siteId, slasToken, basketId, domainUrl) => {
 };
 
 // Function to initialize embedded messaging
-const initEmbeddedMessaging = (messaging, orgId, esdName, esdUrl, scrt2Url) => {
+const initEmbeddedMessaging = (messaging, orgId, embeddedServiceDeploymentName, embeddedServiceDeploymentUrl, scrt2Url) => {
     try {
         if (onClient && messaging && messaging?.embeddedservice_bootstrap?.settings) {
             messaging.embeddedservice_bootstrap.settings.language = 'en_US';
             messaging.embeddedservice_bootstrap.init(
                 orgId,
-                esdName,
-                esdUrl,
+                embeddedServiceDeploymentName,
+                embeddedServiceDeploymentUrl,
                 {
                     scrt2URL: scrt2Url
                 }
@@ -53,8 +53,8 @@ const initEmbeddedMessaging = (messaging, orgId, esdName, esdUrl, scrt2Url) => {
  * Custom hook to handle embedded messaging initialization
  * @param {boolean} enableMiaw - Whether to enable embedded messaging
  * @param {string} orgId - The org ID for the embedded messaging script 
- * @param {string} esdName - The embedded service deployment name for the embedded messaging script
- * @param {string} esdUrl - The embedded service deployment URL for the embedded messaging script
+ * @param {string} embeddedServiceDeploymentName - The embedded service deployment name for the embedded messaging script
+ * @param {string} embeddedServiceDeploymentUrl - The embedded service deployment URL for the embedded messaging script
  * @param {string} scrt2Url - The SCRT2 URL for the embedded messaging script
  * @param {string} siteId - The site ID for the embedded messaging script
  * @param {string} slasToken - The SLAS token for the embedded messaging script
@@ -63,7 +63,7 @@ const initEmbeddedMessaging = (messaging, orgId, esdName, esdUrl, scrt2Url) => {
  * @param {string} src - The source URL for the embedded messaging script
  * @returns {Object} The embedded messaging object
  */
-const useMiaw = (enableMiaw, orgId, esdName, esdUrl, scrt2Url, siteId, slasToken, basketId = '', domainUrl, src) => {
+const useMiaw = (enableMiaw, orgId, embeddedServiceDeploymentName, embeddedServiceDeploymentUrl, scrt2Url, siteId, slasToken, basketId = '', domainUrl, src) => {
     const [embeddedMessaging, setEmbeddedMessaging] = useState(null);
     const [isMiawInitialized, setIsMiawInitialized] = useState(false);
     
@@ -109,12 +109,12 @@ const useMiaw = (enableMiaw, orgId, esdName, esdUrl, scrt2Url, siteId, slasToken
                         error: false
                     };
                     
-                    setEmbeddedMessaging(messaging, orgId, esdName, esdUrl, scrt2Url);
+                    setEmbeddedMessaging(messaging, orgId, embeddedServiceDeploymentName, embeddedServiceDeploymentUrl, scrt2Url);
                     
                     // Initialize embedded messaging if not already initialized
                     if (!isMiawInitialized) {
                         miawEventListeners = registerEventListeners(siteId, slasToken, basketId, domainUrl);
-                        initEmbeddedMessaging(messaging, orgId, esdName, esdUrl, scrt2Url);
+                        initEmbeddedMessaging(messaging, orgId, embeddedServiceDeploymentName, embeddedServiceDeploymentUrl, scrt2Url);
                         setIsMiawInitialized(true);
                     }
                 } else {
