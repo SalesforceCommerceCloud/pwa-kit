@@ -10,12 +10,12 @@ const sites = require('./sites.js')
 module.exports = {
     app: {
         slasToken: process.env.PWA_KIT_SLAS_CLIENT_SECRET || '',
-        commerceAgenticMiawEnabled: process.env.COMMERCE_AGENTIC_MIAW_ENABLED || "true",
+        commerceAgenticMiawEnabled: process.env.COMMERCE_AGENTIC_MIAW_ENABLED || "false",
         commerceAgenticEsdName: process.env.COMMERCE_AGENTIC_EMBEDDED_SERVICE_DEVELOPER_NAME || "Dummy Embedded Service Deployment Name",
         commerceAgenticEsdEndpoint: process.env.COMMERCE_AGENTIC_EMBEDDED_SERVICE_FULL_ENDPOINT || "Dummy Embedded Service Deployment Endpoint",
         commerceAgenticEsdScriptSourceUrl: process.env.COMMERCE_AGENTIC_EMBEDDED_SERVICE_SCRIPT_SOURCE_URL || "https://dummysourceurl.com",
         commerceAgenticScrt2Url: process.env.COMMERCE_AGENTIC_SCRT2_URL || "Dummy SCRT2 URL",
-        salesforceOrgId: process.env.SALESFORCE_ORGANIZATION_ID || "f_ecom_zzrf_001",
+        salesforceOrgId: process.env.SALESFORCE_ORGANIZATION_ID || "00DSB00000MJ7YH",
         salesforceSiteId: process.env.SALESFORCE_SITE_ID || "RefArchGlobal",
         url: {
             site: 'path',
