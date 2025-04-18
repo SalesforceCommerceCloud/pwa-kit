@@ -51,7 +51,8 @@ const initEmbeddedMessaging = (messaging, orgId, esdName, esdUrl, scrt2Url) => {
 
 /**
  * Custom hook to handle embedded messaging initialization
- * @param {string} orgId - The org ID for the embedded messaging script
+ * @param {boolean} enableMiaw - Whether to enable embedded messaging
+ * @param {string} orgId - The org ID for the embedded messaging script 
  * @param {string} esdName - The embedded service deployment name for the embedded messaging script
  * @param {string} esdUrl - The embedded service deployment URL for the embedded messaging script
  * @param {string} scrt2Url - The SCRT2 URL for the embedded messaging script
@@ -62,86 +63,88 @@ const initEmbeddedMessaging = (messaging, orgId, esdName, esdUrl, scrt2Url) => {
  * @param {string} src - The source URL for the embedded messaging script
  * @returns {Object} The embedded messaging object
  */
-const useMiaw = (orgId, esdName, esdUrl, scrt2Url, siteId, slasToken, basketId = '', domainUrl, src) => {
+const useMiaw = (enableMiaw, orgId, esdName, esdUrl, scrt2Url, siteId, slasToken, basketId = '', domainUrl, src) => {
     const [embeddedMessaging, setEmbeddedMessaging] = useState(null);
     const [isMiawInitialized, setIsMiawInitialized] = useState(false);
     
-    // Effect to load and initialize the script
-    useEffect(() => {
-        let miawEventListeners = [];
+    if (enableMiaw) {
+        // Effect to load and initialize the script
+        useEffect(() => {
+            let miawEventListeners = [];
 
-        if (!src && !siteId) {
-            setEmbeddedMessaging(null);
-            return;
-        }
-        
-        // Check if script already exists
-        let script = document.querySelector(`script[src="${src}"]`);
-        
-        if (!script) {
-            script = document.createElement('script');
-            script.src = src;
-            script.async = true;
-            script.setAttribute("data-status", "loading");
-            document.body.appendChild(script);
+            if (!src && !siteId) {
+                setEmbeddedMessaging(null);
+                return;
+            }
             
-            const setAttributeFromEvent = (event) => {
-                script.setAttribute(
-                    "data-status",
-                    event.type === "load" ? "ready" : "error"
-                );
-            };
+            // Check if script already exists
+            let script = document.querySelector(`script[src="${src}"]`);
             
-            script.addEventListener("load", setAttributeFromEvent);
-            script.addEventListener("error", setAttributeFromEvent);
-        }
-        
-        const setStateFromEvent = (event) => {
-            const loaded = event.type === "load";
-            if (loaded) {
-                const messaging = {
-                    embeddedservice_bootstrap: window.embeddedservice_bootstrap,
-                    settings: window.embeddedservice_bootstrap.settings,
-                    prechatAPI: window.embeddedservice_bootstrap.prechatAPI,
-                    init: window.embeddedservice_bootstrap.init,
-                    error: false
+            if (!script) {
+                script = document.createElement('script');
+                script.src = src;
+                script.async = true;
+                script.setAttribute("data-status", "loading");
+                document.body.appendChild(script);
+                
+                const setAttributeFromEvent = (event) => {
+                    script.setAttribute(
+                        "data-status",
+                        event.type === "load" ? "ready" : "error"
+                    );
                 };
                 
-                setEmbeddedMessaging(messaging, orgId, esdName, esdUrl, scrt2Url);
-                
-                // Initialize embedded messaging if not already initialized
-                if (!isMiawInitialized) {
-                    miawEventListeners = registerEventListeners(siteId, slasToken, basketId, domainUrl);
-                    initEmbeddedMessaging(messaging, orgId, esdName, esdUrl, scrt2Url);
-                    setIsMiawInitialized(true);
+                script.addEventListener("load", setAttributeFromEvent);
+                script.addEventListener("error", setAttributeFromEvent);
+            }
+            
+            const setStateFromEvent = (event) => {
+                const loaded = event.type === "load";
+                if (loaded) {
+                    const messaging = {
+                        embeddedservice_bootstrap: window.embeddedservice_bootstrap,
+                        settings: window.embeddedservice_bootstrap.settings,
+                        prechatAPI: window.embeddedservice_bootstrap.prechatAPI,
+                        init: window.embeddedservice_bootstrap.init,
+                        error: false
+                    };
+                    
+                    setEmbeddedMessaging(messaging, orgId, esdName, esdUrl, scrt2Url);
+                    
+                    // Initialize embedded messaging if not already initialized
+                    if (!isMiawInitialized) {
+                        miawEventListeners = registerEventListeners(siteId, slasToken, basketId, domainUrl);
+                        initEmbeddedMessaging(messaging, orgId, esdName, esdUrl, scrt2Url);
+                        setIsMiawInitialized(true);
+                    }
+                } else {
+                    setEmbeddedMessaging({
+                        error: true
+                    });
                 }
-            } else {
-                setEmbeddedMessaging({
-                    error: true
-                });
-            }
-        };
-        
-        script.addEventListener("load", setStateFromEvent);
-        script.addEventListener("error", setStateFromEvent);
-        
-        // Cleanup function to remove script event listeners
-        return () => {
-            if (script) {
-                script.removeEventListener("load", setStateFromEvent);
-                script.removeEventListener("error", setStateFromEvent);
-            }
+            };
+            
+            script.addEventListener("load", setStateFromEvent);
+            script.addEventListener("error", setStateFromEvent);
+            
+            // Cleanup function to remove script event listeners
+            return () => {
+                if (script) {
+                    script.removeEventListener("load", setStateFromEvent);
+                    script.removeEventListener("error", setStateFromEvent);
+                }
 
-            // TODO: Remove embedded messaging event listeners
-            // currently in dev mode the listeners get removed inadvertenly
-            // Remove embedded messaging event listeners
-            // if (miawEventListeners.length > 0) {
-            //     miawEventListeners.forEach(({ event, handler }) => {
-            //         window.removeEventListener(event, handler);
-            //     });
-            // }
-        };
-    }, [isMiawInitialized, embeddedMessaging, siteId, domainUrl]);
+                // TODO: Remove embedded messaging event listeners
+                // currently in dev mode the listeners get removed inadvertenly
+                // Remove embedded messaging event listeners
+                // if (miawEventListeners.length > 0) {
+                //     miawEventListeners.forEach(({ event, handler }) => {
+                //         window.removeEventListener(event, handler);
+                //     });
+                // }
+            };
+        }, [isMiawInitialized, embeddedMessaging, siteId, domainUrl]);
+    }
     
     return embeddedMessaging;
 };
