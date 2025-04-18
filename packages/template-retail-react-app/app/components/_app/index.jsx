@@ -245,16 +245,16 @@ const App = (props) => {
         onClose()
     }, [location])
     
-    if (config.app.commerceAgenticMiawEnabled === 'true') { // Env variables are strings
-        useMiaw(config.app.salesforceOrgId,
-            config.app.commerceAgenticEsdName,
-            config.app.commerceAgenticEsdEndpoint,
-            config.app.commerceAgenticScrt2Url,
-            config.app.salesforceSiteId,
-            config.app.slasToken,
-            basket?.basketId,
-            appOrigin, config.app.commerceAgenticEsdScriptSourceUrl);
-    }
+    useMiaw(config.app.commerceAgenticMiawEnabled === 'true', // Env variables are strings
+        config.app.salesforceOrgId,
+        config.app.commerceAgenticEsdName,
+        config.app.commerceAgenticEsdEndpoint,
+        config.app.commerceAgenticScrt2Url,
+        config.app.salesforceSiteId,
+        config.app.slasToken,
+        basket?.basketId,
+        appOrigin,
+        config.app.commerceAgenticEsdScriptSourceUrl);
 
     const onLogoClick = () => {
         // Goto the home page.
