@@ -10,14 +10,16 @@ import { useEffect, useState } from 'react';
 const onClient = typeof window !== 'undefined';
 
 // Function to register event listeners
-const registerEventListeners = (siteId, appOrigin) => {
+const registerEventListeners = (siteId, slasToken, basketId, domainUrl) => {
     if (!onClient) return;
 
     const onReadyHandler = (e) => {
         console.log("Received the onEmbeddedMessagingReady event…", e);
         window.embeddedservice_bootstrap.prechatAPI.setHiddenPrechatFields({
             "Site_ID": siteId,
-            "Domain_URL": appOrigin
+            "SLAS_TOKEN": slasToken,
+            "Basket_ID": basketId,
+            "Domain_URL": domainUrl,
         });
     };
 
@@ -29,28 +31,18 @@ const registerEventListeners = (siteId, appOrigin) => {
 };
 
 // Function to initialize embedded messaging
-const initEmbeddedMessaging = (messaging) => {
+const initEmbeddedMessaging = (messaging, orgId, esdName, esdUrl, scrt2Url) => {
     try {
         if (onClient && messaging && messaging?.embeddedservice_bootstrap?.settings) {
             messaging.embeddedservice_bootstrap.settings.language = 'en_US';
             messaging.embeddedservice_bootstrap.init(
-                '00DSB00000MJ7YH',
-                'MIAW_Guided_Shopper_production_functional38',
-                'https://orgfarm-7455a909de.test1.my.pc-rnd.site.com/ESWMIAWGuidedShopperpr1743525851212',
+                orgId,
+                esdName,
+                esdUrl,
                 {
-                    scrt2URL: 'https://orgfarm-7455a909de.test1.my.pc-rnd.salesforce-scrt.com'
+                    scrt2URL: scrt2Url
                 }
             );
-
-            // scom org
-            // messaging.embeddedservice_bootstrap.init(
-			// 	'00DSB00000RmU16',
-			// 	'Buyer_Service_Agent_Embedded_Service_Deployment',
-			// 	'https://orgfarm-9d2e93e7de.test1.my.pc-rnd.site.com/ESWBuyerServiceAgentEm1735264803481',
-			// 	{
-			// 		scrt2URL: 'https://orgfarm-9d2e93e7de.test1.my.pc-rnd.salesforce-scrt.com'
-			// 	}
-			// );
         }
     } catch (err) {
         console.error('Error initializing Embedded Messaging: ', err);
@@ -66,7 +58,7 @@ const initEmbeddedMessaging = (messaging) => {
  * @param {string} src - The source URL for the embedded messaging script
  * @returns {Object} The embedded messaging object
  */
-const useMiaw = (siteId, slasToken, basketId = '', domainUrl, src) => {
+const useMiaw = (orgId, esdName, esdUrl, scrt2Url, siteId, slasToken, basketId = '', domainUrl, src) => {
     const [embeddedMessaging, setEmbeddedMessaging] = useState(null);
     const [isMiawInitialized, setIsMiawInitialized] = useState(false);
     
@@ -111,11 +103,11 @@ const useMiaw = (siteId, slasToken, basketId = '', domainUrl, src) => {
                     error: false
                 };
                 
-                setEmbeddedMessaging(messaging);
+                setEmbeddedMessaging(messaging, orgId, esdName, esdUrl, scrt2Url);
                 
                 // Initialize embedded messaging if not already initialized
                 if (!isMiawInitialized) {
-                    miawEventListeners = registerEventListeners(siteId, domainUrl);
+                    miawEventListeners = registerEventListeners(siteId, slasToken, basketId, domainUrl);
                     initEmbeddedMessaging(messaging);
                     setIsMiawInitialized(true);
                 }
