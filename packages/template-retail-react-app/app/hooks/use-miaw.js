@@ -6,7 +6,6 @@
  */
 
 import { useEffect, useState } from 'react';
-import { getConfig } from '@salesforce/pwa-kit-runtime/utils/ssr-config';
 
 const onClient = typeof window !== 'undefined';
 
