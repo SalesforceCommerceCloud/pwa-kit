@@ -51,10 +51,14 @@ const initEmbeddedMessaging = (messaging, orgId, esdName, esdUrl, scrt2Url) => {
 
 /**
  * Custom hook to handle embedded messaging initialization
+ * @param {string} orgId - The org ID for the embedded messaging script
+ * @param {string} esdName - The embedded service deployment name for the embedded messaging script
+ * @param {string} esdUrl - The embedded service deployment URL for the embedded messaging script
+ * @param {string} scrt2Url - The SCRT2 URL for the embedded messaging script
  * @param {string} siteId - The site ID for the embedded messaging script
  * @param {string} slasToken - The SLAS token for the embedded messaging script
  * @param {string} basketId - The basket ID for the embedded messaging script
- * @param {string} domainUrl - The domain URL for the embedded messaging script
+ * @param {string} domainUrl - The domain URL for the embedded messaging script 
  * @param {string} src - The source URL for the embedded messaging script
  * @returns {Object} The embedded messaging object
  */
