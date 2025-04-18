@@ -326,8 +326,9 @@ const {handler} = runtime.createHandler(options, (app) => {
                         '*.site.com'
                     ],
                     'frame-ancestors': [
-                        // Allow frames from Salesforce site.com (Needed for MIAW)
-                        '*.site.com'
+                        // Allow frames from Salesforce site.com and force.com (Needed for MIAW)
+                        '*.site.com',
+                        '*.force.com'
                     ]
                 }
             }
