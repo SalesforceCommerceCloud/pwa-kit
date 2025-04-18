@@ -6,6 +6,7 @@
  */
 
 import { useEffect, useState } from 'react';
+import { getConfig } from '@salesforce/pwa-kit-runtime/utils/ssr-config';
 
 const onClient = typeof window !== 'undefined';
 
@@ -112,7 +113,7 @@ const useMiaw = (orgId, esdName, esdUrl, scrt2Url, siteId, slasToken, basketId =
                 // Initialize embedded messaging if not already initialized
                 if (!isMiawInitialized) {
                     miawEventListeners = registerEventListeners(siteId, slasToken, basketId, domainUrl);
-                    initEmbeddedMessaging(messaging);
+                    initEmbeddedMessaging(messaging, orgId, esdName, esdUrl, scrt2Url);
                     setIsMiawInitialized(true);
                 }
             } else {

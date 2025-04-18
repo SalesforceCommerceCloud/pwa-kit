@@ -318,6 +318,12 @@ const {handler} = runtime.createHandler(options, (app) => {
                         'api.cquotient.com',
                         // Connect to DataCloud APIs
                         '*.c360a.salesforce.com'
+                        // Connect to SCRT2 URLs
+                        '*.salesforce-scrt.com'
+                    ],
+                    'frame-src': [
+                        // Allow frames from Salesforce site.com (Needed for MIAW)
+                        '*.site.com'
                     ]
                 }
             }
