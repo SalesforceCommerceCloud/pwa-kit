@@ -29,7 +29,12 @@ export const useProductViewModal = (initialProduct) => {
     const variant = useVariant(product)
 
     const {data: currentProduct, isFetching} = useProduct(
-        {parameters: {id: (variant || product)?.productId}},
+        {
+            parameters: {
+                id: (variant || product)?.productId,
+                allImages: true
+            }
+        },
         {
             placeholderData: initialProduct,
             select: (data) => {

@@ -21,6 +21,8 @@ import {
 import messages from '@salesforce/retail-react-app/app/static/translations/compiled/en-GB.json'
 import {rest} from 'msw'
 
+import {useProduct} from '@salesforce/commerce-sdk-react'
+
 jest.mock('@salesforce/commerce-sdk-react', () => {
     const originalModule = jest.requireActual('@salesforce/commerce-sdk-react')
     return {
@@ -142,6 +144,27 @@ describe('useProductViewModal hook', () => {
         await waitFor(() => {
             expect(screen.getByTestId('variant')).toHaveTextContent(
                 '{"orderable":true,"price":299.99,"productId":"750518699660M","variationValues":{"color":"BLACKFB","size":"050","width":"V"}}'
+            )
+        })
+    })
+
+    test('calls useProduct with allImages: true', async () => {
+        const history = createMemoryHistory()
+        history.push('/test/path')
+
+        renderWithProviders(<MockComponent product={mockProductDetail} />)
+
+        const toggleButton = screen.getByText(/Toggle the content/)
+        fireEvent.click(toggleButton)
+
+        await waitFor(() => {
+            expect(useProduct).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    parameters: expect.objectContaining({
+                        allImages: true
+                    })
+                }),
+                expect.any(Object)
             )
         })
     })
