@@ -15,6 +15,7 @@ runs:
 
         FULL_NODE_VERSION=$(node -v)
         FULL_NPM_VERSION=$(npm -v)
+        # Parse out the _major_ versions
         INSTALLED_NODE_VERSION=$(echo $FULL_NODE_VERSION | sed 's/^v\([0-9]*\).*/\1/')
         INSTALLED_NPM_VERSION=$(echo $FULL_NPM_VERSION | sed 's/^\([0-9]*\).*/\1/')
 
