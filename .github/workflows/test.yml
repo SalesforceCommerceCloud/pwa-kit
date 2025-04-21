@@ -83,6 +83,7 @@ jobs:
           update_npm: ${{ env.IS_DEFAULT_NPM == 'false' }}
 
       - name: Generate retail-react-app-test-project
+        # Generate project only for those actions that use `env.PROJECT_DIR`
         if: env.IS_DEFAULT_NPM == 'true'
         run: |-
           node packages/pwa-kit-create-app/scripts/create-mobify-app-dev.js --outputDir ${{ env.PROJECT_DIR }}
@@ -90,6 +91,7 @@ jobs:
           GENERATOR_PRESET: retail-react-app-test-project
         timeout-minutes: 8
 
+      # Run the smaller tests first, before the full unit tests
       - name: Smoke test the NPM scripts
         if: env.IS_DEFAULT_NPM == 'true'
         uses: "./.github/actions/npm_scripts"
@@ -176,6 +178,7 @@ jobs:
             update_npm: ${{ env.IS_DEFAULT_NPM == 'false' }}
 
         - name: Generate retail-react-app-test-project
+          # Generate project only for those actions that use `env.PROJECT_DIR`
           if: env.IS_DEFAULT_NPM == 'true'
           run: |-
             node packages/pwa-kit-create-app/scripts/create-mobify-app-dev.js --outputDir ${{ env.PROJECT_DIR }}
@@ -183,6 +186,7 @@ jobs:
             GENERATOR_PRESET: retail-react-app-test-project
           timeout-minutes: 8
 
+        # Run the smaller tests first, before the full unit tests
         - name: Smoke test the NPM scripts
           if: env.IS_DEFAULT_NPM == 'true'
           uses: "./.github/actions/npm_scripts"
