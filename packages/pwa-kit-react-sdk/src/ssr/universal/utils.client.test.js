@@ -30,13 +30,13 @@ describe('getAssetUrl (client-side)', () => {
         expect(utils.getAssetUrl()).toBe('test.com')
     })
     test('should return origin + path', () => {
-        expect(utils.getAssetUrl('/path')).toBe('test.com/path')
+        expect(utils.getAssetUrl('path')).toBe('test.com/path')
     })
 })
 
 describe('getStaticAssetUrl (client-side)', () => {
     beforeEach(() => {
-        global.Progressive = {buildOrigin: 'test.com'}
+        global.Progressive = {buildOrigin: 'test.com/'}
     })
     afterEach(() => {
         delete global.Progressive

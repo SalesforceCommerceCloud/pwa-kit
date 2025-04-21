@@ -5,7 +5,8 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import {RouteProps as _RouteProps} from 'react-router-dom'
+import {RouteProps} from 'react-router-dom'
+import {ApplicationExtension} from './shared/classes/application-extension-base'
 
 /**
  * This is the base configuration type for all Application Extensions. Modify this
@@ -46,17 +47,29 @@ export interface GetRoutesParams {
     locals: Record<string, any>
 }
 
-/*
- * Same as react-router's RouteProps, but now supports `componentName` if the route is meant to be serializable
- */
-export type RouteProps = _RouteProps & {
-    componentName?: string
-}
-
 /**
  * Parameters for the `beforeRouteMatch` method
  */
 export interface BeforeRouteMatchParams {
     allRoutes: RouteProps[]
     locals: Record<string, any>
+}
+
+/**
+ * This type is used in getComponentMap() to map the component name to the component itself
+ * when deserializing an extension.
+ */
+export type ComponentMap = {
+    [key in ReturnType<
+        ApplicationExtension<ApplicationExtensionConfig>['getName']
+    >]: React.ComponentType<any>
+}
+
+/**
+ * This type is represents the serialized version of the route props.
+ * It is used when serializing the route props on the server and when
+ * deserializing them on the client.
+ */
+export type SerializedRouteProps = RouteProps & {
+    componentName?: string
 }

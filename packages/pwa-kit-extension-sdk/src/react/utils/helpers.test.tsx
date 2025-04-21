@@ -16,7 +16,7 @@ import React from 'react'
 import {render, screen} from '@testing-library/react'
 
 // Local
-import {applyHOCs} from './helpers'
+import {applyHOCs, cacheMethodResult, isServerSide, NOT_CACHED} from './helpers'
 
 // Mock HOC functions
 const withExtraProp = (Component: React.ComponentType<any>) => {
@@ -81,5 +81,86 @@ describe('applyHOCs', () => {
 
         // The WrappedComponent should now have the static method from BaseComponent
         expect(typeof WrappedComponent.someStaticMethod).toBe('function')
+    })
+})
+
+class TestClass {
+    _cache: any
+    methodName: () => any
+
+    constructor(methodImplementation: () => any) {
+        this._cache = undefined
+        this.methodName = methodImplementation
+    }
+}
+
+describe('cacheMethodResult', () => {
+    let instance: TestClass
+    let methodMock: jest.Mock
+
+    beforeEach(() => {
+        methodMock = jest.fn().mockImplementation(() => 'result')
+        instance = new TestClass(methodMock)
+    })
+
+    it('should not cache if method does not exist', () => {
+        cacheMethodResult(instance, 'nonExistentMethod', '_cache')
+        expect(instance._cache).toBeUndefined()
+
+        const uncachedMethodCall = instance.methodName()
+        expect(uncachedMethodCall).toBe('result')
+        expect(instance._cache).toBeUndefined()
+    })
+
+    it('should cache the result of a sync method', () => {
+        cacheMethodResult(instance, 'methodName', '_cache')
+        expect(instance._cache).toBe(NOT_CACHED)
+
+        const firstCall = instance.methodName()
+        expect(firstCall).toBe('result')
+        expect(instance._cache).toBe('result')
+        expect(methodMock).toHaveBeenCalledTimes(1)
+
+        const secondCall = instance.methodName()
+        expect(secondCall).toBe('result')
+        expect(methodMock).toHaveBeenCalledTimes(1) // Should not call the original method again
+    })
+
+    it('should cache the result of an async method', async () => {
+        methodMock = jest.fn().mockResolvedValue('async result')
+        instance = new TestClass(methodMock)
+
+        cacheMethodResult(instance, 'methodName', '_cache')
+        expect(instance._cache).toBe(NOT_CACHED)
+
+        await expect(instance.methodName()).resolves.toBe('async result')
+        await expect(instance._cache).resolves.toBe('async result')
+        expect(methodMock).toHaveBeenCalledTimes(1)
+
+        const secondCall = instance.methodName()
+        await expect(secondCall).resolves.toBe('async result')
+        expect(methodMock).toHaveBeenCalledTimes(1) // Should not call the original method again
+    })
+
+    it('should not override the method if it is not a function', () => {
+        ;(instance as any).methodName = 'not a function'
+        cacheMethodResult(instance, 'methodName', '_cache')
+        expect(instance.methodName).toBe('not a function') // Should remain unchanged
+    })
+})
+
+describe('isServerSide', () => {
+    afterEach(() => {
+        delete (global as any).window
+    })
+
+    it('should return true when window is undefined (server-side)', () => {
+        delete (global as any).window
+        expect(isServerSide()).toBe(true)
+    })
+
+    it('should return false when window is defined (client-side)', () => {
+        ;(global as any).window = {}
+        expect(isServerSide()).toBe(false)
     })
 })

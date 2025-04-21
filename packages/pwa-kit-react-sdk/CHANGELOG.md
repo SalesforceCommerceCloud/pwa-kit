@@ -2,6 +2,7 @@
 - Replace `event-emitter` in favor of the native `EventTarget` [#2289](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2289)
 - Call app extension's new methods `getRoutes` and `getRoutesAsync` [#2308](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2308)
 - Call app extension's `beforeRouteMatch` method with updated parameters [#2308](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2308)
+- Enhanced SSR rendering by serializing application extension async routes [#2300](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2300)
 
 ## v4.0.0-extensibility-preview.3 (Dec 13, 2024)
 
