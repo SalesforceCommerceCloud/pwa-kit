@@ -11,8 +11,9 @@ inputs:
 runs:
   using: composite
   steps:
-      - run: |-
-          node packages/pwa-kit-create-app/scripts/create-mobify-app-dev.js --outputDir ${{ inputs.output_dir }}
-        env:
-          GENERATOR_PRESET: ${{ inputs.preset }}
-        timeout-minutes: ${{ inputs.timeout_minutes }}
+    - run: |-
+        node packages/pwa-kit-create-app/scripts/create-mobify-app-dev.js --outputDir ${{ inputs.output_dir }}
+      shell: bash
+      env:
+        GENERATOR_PRESET: ${{ inputs.preset }}
+      timeout-minutes: ${{ inputs.timeout_minutes }}
