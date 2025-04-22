@@ -31,14 +31,14 @@ const registerEventListeners = (siteId, slasToken, basketId, domainUrl) => {
 };
 
 // Function to initialize embedded messaging
-const initEmbeddedMessaging = (messaging, salesforceOrgId, embeddedSvcName, embeddedSvcEndpoint, scrt2Url) => {
+const initEmbeddedMessaging = (messaging, salesforceOrgId, embeddedServiceName, embeddedServiceEndpoint, scrt2Url) => {
     try {
         if (onClient && messaging && messaging?.embeddedservice_bootstrap?.settings) {
             messaging.embeddedservice_bootstrap.settings.language = 'en_US';
             messaging.embeddedservice_bootstrap.init(
                 salesforceOrgId,
-                embeddedSvcName,
-                embeddedSvcEndpoint,
+                embeddedServiceName,
+                embeddedServiceEndpoint,
                 {
                     scrt2URL: scrt2Url
                 }
@@ -59,7 +59,7 @@ const initEmbeddedMessaging = (messaging, salesforceOrgId, embeddedSvcName, embe
 const useMiaw = (commerceAgent, slasToken, basketId = '', domainUrl) => {
     const commerceAgentSettings = JSON.parse(commerceAgent);
 
-    const { enabled, embeddedSvcName, embeddedSvcEndpoint, scrt2Url, salesforceOrgId, siteId, scriptSourceUrl } = commerceAgentSettings;
+    const { enabled, embeddedServiceName, embeddedServiceEndpoint, scrt2Url, salesforceOrgId, siteId, scriptSourceUrl } = commerceAgentSettings;
 
     const [embeddedMessaging, setEmbeddedMessaging] = useState(null);
     const [isMiawInitialized, setIsMiawInitialized] = useState(false);
@@ -106,12 +106,12 @@ const useMiaw = (commerceAgent, slasToken, basketId = '', domainUrl) => {
                         error: false
                     };
                     
-                    setEmbeddedMessaging(messaging, salesforceOrgId, embeddedSvcName, embeddedSvcEndpoint, scrt2Url);
+                    setEmbeddedMessaging(messaging, salesforceOrgId, embeddedServiceName, embeddedServiceEndpoint, scrt2Url);
                     
                     // Initialize embedded messaging if not already initialized
                     if (!isMiawInitialized) {
                         miawEventListeners = registerEventListeners(siteId, slasToken, basketId, domainUrl);
-                        initEmbeddedMessaging(messaging, salesforceOrgId, embeddedSvcName, embeddedSvcEndpoint, scrt2Url);
+                        initEmbeddedMessaging(messaging, salesforceOrgId, embeddedServiceName, embeddedServiceEndpoint, scrt2Url);
                         setIsMiawInitialized(true);
                     }
                 } else {
