@@ -9,8 +9,8 @@ const sites = require('./sites.js')
 
 const defaultCommerceAgentSettings = {
     enabled: "false",
-    embeddedSvcName: "Dummy Embedded Service Deployment Name",
-    embeddedSvcEndpoint: "Dummy Embedded Service Deployment Endpoint",
+    embeddedServiceName: "Dummy Embedded Service Deployment Name",
+    embeddedServiceEndpoint: "Dummy Embedded Service Deployment Endpoint",
     scriptSourceUrl: "Dummy Script Source URL",
     scrt2Url: "Dummy SCRT2 URL",
     salesforceOrgId: "00DSB00000MJ7YH",
