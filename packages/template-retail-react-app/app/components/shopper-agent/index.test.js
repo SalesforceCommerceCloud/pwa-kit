@@ -7,7 +7,7 @@
 
 import React from 'react'
 import {render, screen, act} from '@testing-library/react'
-import ShopperAgent from '@salesforce/retail-react-app/../../app/components/shopper-agent/index'
+import ShopperAgent from '@salesforce/retail-react-app/app/components/shopper-agent/index'
 import useScript from '@salesforce/retail-react-app/app/hooks/use-script'
 // Mock the embeddedservice_bootstrap object
 const mockEmbeddedService = {
@@ -18,18 +18,23 @@ const mockEmbeddedService = {
 
 jest.mock('../../hooks/use-script', () => jest.fn().mockReturnValue({loaded: false, error: false}))
 
+const commerceAgentSettings = {
+    enabled: "true",
+    embeddedServiceName: "MIAW_Guided_Shopper_production",
+    embeddedServiceEndpoint: "https://myorg.salesforce.com/ESWMIAWGuidedShopper",
+    scriptSourceUrl: "https://myorg.salesforce.com/ESWMIAWGuidedShopper/assets/js/bootstrap.min.js",
+    scrt2Url: "https://myorg.salesforce.com-scrt.com",
+    salesforceOrgId: "00DSB00000MJ7YH",
+    siteId: "RefArchGlobal",
+}
+
+const commerceAgentSettingsString = JSON.stringify(commerceAgentSettings);
+
 describe('ShopperAgent Component', () => {
     const defaultProps = {
-        orgId: 'test-org-id',
-        embeddedServiceId: 'test-embedded-service-id',
-        embeddedServiceDeploymentUrl: 'https://test-base-url.com',
-        commerceAgenticEsdScriptSourceUrl: 'https://test-live-agent-url.com/assets/bootstrap.js',
-        embeddedServiceDeploymentName: 'embeddedServiceDeploymentName',
-        scriptUrl: 'https://test-script-url.com',
-        scrt2Url: 'https://test-script-url-scrt2.com',
+        commerceAgent: commerceAgentSettingsString,
         slasToken: 'test-slas-token',
-        basketId: 'test-basket-id',
-        enableMiaw: true
+        basketId: undefined, // TODO
     }
 
     beforeEach(() => {
@@ -84,11 +89,11 @@ describe('ShopperAgent Component', () => {
 
         // Verify embedded service initialization
         expect(mockEmbeddedService.init).toHaveBeenCalledWith(
-            defaultProps.orgId,
-            defaultProps.embeddedServiceDeploymentName,
-            defaultProps.embeddedServiceDeploymentUrl,
+            commerceAgentSettings.salesforceOrgId,
+            commerceAgentSettings.embeddedServiceName,
+            commerceAgentSettings.embeddedServiceEndpoint,
             {
-                scrt2URL: defaultProps.scrt2Url
+                scrt2URL: commerceAgentSettings.scrt2Url
             }
         )
     })
