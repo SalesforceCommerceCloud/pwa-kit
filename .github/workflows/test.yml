@@ -85,11 +85,10 @@ jobs:
       - name: Generate retail-react-app-test-project
         # Generate project only for those actions that use `env.PROJECT_DIR`
         if: env.IS_DEFAULT_NPM == 'true'
-        run: |-
-          node packages/pwa-kit-create-app/scripts/create-mobify-app-dev.js --outputDir ${{ env.PROJECT_DIR }}
-        env:
-          GENERATOR_PRESET: retail-react-app-test-project
-        timeout-minutes: 8
+        uses: "./.github/actions/generate_app_with_preset"
+        with:
+          preset: retail-react-app-test-project
+          output_dir: ${{ env.PROJECT_DIR }}
 
       # Run the smaller tests first, before the full unit tests
       - name: Smoke test the NPM scripts
@@ -180,11 +179,10 @@ jobs:
         - name: Generate retail-react-app-test-project
           # Generate project only for those actions that use `env.PROJECT_DIR`
           if: env.IS_DEFAULT_NPM == 'true'
-          run: |-
-            node packages/pwa-kit-create-app/scripts/create-mobify-app-dev.js --outputDir ${{ env.PROJECT_DIR }}
-          env:
-            GENERATOR_PRESET: retail-react-app-test-project
-          timeout-minutes: 8
+          uses: "./.github/actions/generate_app_with_preset"
+          with:
+            preset: retail-react-app-test-project
+            output_dir: ${{ env.PROJECT_DIR }}
 
         # Run the smaller tests first, before the full unit tests
         - name: Smoke test the NPM scripts
@@ -218,11 +216,10 @@ jobs:
           node: ${{ env.MRT_NODE }}
 
       - name: Generate ${{ matrix.template }} project
-        run: |-
-          node packages/pwa-kit-create-app/scripts/create-mobify-app-dev.js --outputDir ${{ env.PROJECT_DIR }}
-        env:
-          GENERATOR_PRESET: ${{ matrix.template }}
-        timeout-minutes: 8
+        uses: "./.github/actions/generate_app_with_preset"
+        with:
+          preset: ${{ matrix.template }}
+          output_dir: ${{ env.PROJECT_DIR }}
 
       - name: Lint the generated project
         if: env.IS_TEMPLATE_FROM_RETAIL_REACT_APP == 'true'
@@ -309,11 +306,10 @@ jobs:
           node: ${{ env.MRT_NODE }}
 
       - name: Generate ${{ matrix.template }} project
-        run: |-
-          node packages/pwa-kit-create-app/scripts/create-mobify-app-dev.js --outputDir ${{ env.PROJECT_DIR }}
-        env:
-          GENERATOR_PRESET: ${{ matrix.template }}
-        timeout-minutes: 7
+        uses: "./.github/actions/generate_app_with_preset"
+        with:
+          preset: ${{ matrix.template }}
+          output_dir: ${{ env.PROJECT_DIR }}
 
       - name: Lint the generated project
         if: env.IS_TEMPLATE_FROM_RETAIL_REACT_APP == 'true'
@@ -356,11 +352,10 @@ jobs:
   #         node: ${{ env.MRT_NODE }}
 
   #     - name: Generate retail-react-app-test-project
-  #       run: |-
-  #         node packages/pwa-kit-create-app/scripts/create-mobify-app-dev.js --outputDir ${{ env.PROJECT_DIR }}
-  #       env:
-  #         GENERATOR_PRESET: retail-react-app-test-project
-  #       timeout-minutes: 8
+  #       uses: "./.github/actions/generate_app_with_preset"
+  #       with:
+  #         preset: retail-react-app-test-project
+  #         output_dir: ${{ env.PROJECT_DIR }}
 
   #     - name: Run Lighthouse CI on the generated project
   #       uses: "./.github/actions/lighthouse_ci"
@@ -385,11 +380,10 @@ jobs:
           node: ${{ env.MRT_NODE }}
 
       - name: Generate retail-react-app-test-project
-        run: |-
-          node packages/pwa-kit-create-app/scripts/create-mobify-app-dev.js --outputDir ${{ env.PROJECT_DIR }}
-        env:
-          GENERATOR_PRESET: retail-react-app-test-project
-        timeout-minutes: 8
+        uses: "./.github/actions/generate_app_with_preset"
+        with:
+          preset: retail-react-app-test-project
+          output_dir: ${{ env.PROJECT_DIR }}
 
       - name: Check and report bundle sizes
         uses: "./.github/actions/bundle_size_test"

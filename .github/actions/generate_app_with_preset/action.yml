@@ -1,0 +1,18 @@
+name: generate_app_with_preset
+inputs:
+  preset:
+    required: true
+  output_dir:
+    required: false
+    default: generated_pwa
+  timeout_minutes:
+    required: false
+    default: 8
+runs:
+  using: composite
+  steps:
+      - run: |-
+          node packages/pwa-kit-create-app/scripts/create-mobify-app-dev.js --outputDir ${{ inputs.output_dir }}
+        env:
+          GENERATOR_PRESET: ${{ inputs.preset }}
+        timeout-minutes: ${{ inputs.timeout_minutes }}
