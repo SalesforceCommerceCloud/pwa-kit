@@ -22,10 +22,16 @@ runs:
         json_string='${{ inputs.config }}'
 
         # Parse the given json string and build the command to run
-        echo $json_string | jq -r 'to_entries[] | "npx bundlesize -f \"" + .key + "\" -s " + .value' | while read -r command; do
+        while read -r command; do
           # Example of command: npx bundlesize -f "build/main.js" -s 10kB
           eval $command
-        done
+        done < <(echo "$json_string" | jq -r 'to_entries[] | "npx bundlesize -f \"" + .key + "\" -s " + .value')
+
+        # Check the exit status of the jq command
+        if [ "${PIPESTATUS[0]}" -ne 0 ]; then
+          echo "Error: jq failed to parse the JSON input: $json_string" >&2
+          exit 1
+        fi
     shell: bash
 
   - name: Report bundle sizes
