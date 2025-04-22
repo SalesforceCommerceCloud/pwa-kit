@@ -1,0 +1,129 @@
+/*
+ * Copyright (c) 2024, salesforce.com, inc.
+ * All rights reserved.
+ * SPDX-License-Identifier: BSD-3-Clause
+ * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
+ */
+
+import React from 'react'
+import {render, screen, act} from '@testing-library/react'
+import ShopperAgent from '@salesforce/retail-react-app/../../app/components/shopper-agent/index'
+import useScript from '@salesforce/retail-react-app/app/hooks/use-script'
+// Mock the embeddedservice_bootstrap object
+const mockEmbeddedService = {
+    init: jest.fn(),
+    settings: jest.fn(),
+    prechatAPI: jest.fn()
+}
+
+jest.mock('../../hooks/use-script', () => jest.fn().mockReturnValue({loaded: false, error: false}))
+
+describe('ShopperAgent Component', () => {
+    const defaultProps = {
+        orgId: 'test-org-id',
+        embeddedServiceId: 'test-embedded-service-id',
+        embeddedServiceDeploymentUrl: 'https://test-base-url.com',
+        commerceAgenticEsdScriptSourceUrl: 'https://test-live-agent-url.com/assets/bootstrap.js',
+        embeddedServiceDeploymentName: 'embeddedServiceDeploymentName',
+        scriptUrl: 'https://test-script-url.com',
+        scrt2Url: 'https://test-script-url-scrt2.com',
+        slasToken: 'test-slas-token',
+        basketId: 'test-basket-id',
+        enableMiaw: true
+    }
+
+    beforeEach(() => {
+        // Reset all mocks before each test
+        jest.clearAllMocks()
+
+        // Mock the window.embeddedservice_bootstrap object
+        global.window.embeddedservice_bootstrap = mockEmbeddedService
+
+        useScript.mockReturnValue({loaded: false, error: false})
+
+        // Clear any existing scripts
+        const scripts = document.querySelectorAll('script[data-status]')
+        scripts.forEach((script) => script.remove())
+    })
+
+    afterEach(() => {
+        // Clean up the window.embeddedservice_bootstrap mock
+        delete global.window.embeddedservice_bootstrap
+    })
+
+    test('should render nothing when enableMiaw is false', () => {
+        const props = {...defaultProps, enableMiaw: false}
+        const {container} = render(<ShopperAgent {...props} />)
+
+        expect(container.firstChild).toBeNull()
+    })
+
+    test('should not render anything when commerceAgenticEsdScriptSourceUrl is not provided', () => {
+        const props = {...defaultProps, scriptUrl: null}
+        const {container} = render(<ShopperAgent {...props} />)
+        expect(container.firstChild).toBeNull()
+    })
+
+    test('should not render anything when embeddedservice_bootstrap is not available', () => {
+        // Temporarily remove the mock for this test
+        const originalEmbeddedService = global.window.embeddedservice_bootstrap
+        delete global.window.embeddedservice_bootstrap
+        useScript.mockReturnValue({loaded: true, error: false})
+
+        render(<ShopperAgent {...defaultProps} />)
+
+        expect(mockEmbeddedService.init).not.toHaveBeenCalled()
+
+        // Restore the mock
+        global.window.embeddedservice_bootstrap = originalEmbeddedService
+    })
+
+    test('should initialize embedded service when all required props are provided', () => {
+        useScript.mockReturnValue({loaded: true, error: false})
+        render(<ShopperAgent {...defaultProps} />)
+
+        // Verify embedded service initialization
+        expect(mockEmbeddedService.init).toHaveBeenCalledWith(
+            defaultProps.orgId,
+            defaultProps.embeddedServiceDeploymentName,
+            defaultProps.embeddedServiceDeploymentUrl,
+            {
+                scrt2URL: defaultProps.scrt2Url
+            }
+        )
+    })
+
+    test('should handle initialization error from useMiaw hook', () => {
+        // Mock useMiaw to return an error
+        const errorMessage = 'Initialization failed'
+        useScript.mockReturnValue({loaded: true, error: true})
+        mockEmbeddedService.init.mockImplementation(() => {
+            throw new Error(errorMessage)
+        })
+
+        const {container} = render(<ShopperAgent {...defaultProps} />)
+
+        // Component should not render anything when there's an error
+        expect(container.firstChild).toBeNull()
+    })
+
+    test('should not reinitialize embedded service when already initialized', () => {
+        // First render
+        const scriptLoadStatus = {loaded: true, error: false}
+        useScript.mockReturnValue(scriptLoadStatus)
+        const {rerender} = render(<ShopperAgent {...defaultProps} />)
+
+        expect(mockEmbeddedService.init).toHaveBeenCalled()
+
+        // Reset mock call counts
+        jest.clearAllMocks()
+
+        useScript.mockReturnValue(scriptLoadStatus)
+
+        // Re-render with same props
+        rerender(<ShopperAgent {...defaultProps} />)
+
+        // Should not call init or createComponent again
+        expect(mockEmbeddedService.init).not.toHaveBeenCalled()
+    })
+})
