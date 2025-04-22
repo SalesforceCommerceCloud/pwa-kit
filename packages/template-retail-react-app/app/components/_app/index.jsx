@@ -245,16 +245,10 @@ const App = (props) => {
         onClose()
     }, [location])
     
-    useMiaw(config.app.commerceAgenticMiawEnabled === 'true', // Env variables are strings
-        config.app.salesforceOrgId,
-        config.app.commerceAgenticEsdName,
-        config.app.commerceAgenticEsdEndpoint,
-        config.app.commerceAgenticScrt2Url,
-        config.app.salesforceSiteId,
+    useMiaw(config.app.commerceAgent,
         config.app.slasToken,
         basket?.basketId,
-        appOrigin,
-        config.app.commerceAgenticEsdScriptSourceUrl);
+        appOrigin);
 
     const onLogoClick = () => {
         // Goto the home page.

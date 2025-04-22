@@ -7,16 +7,20 @@
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const sites = require('./sites.js')
 
+const defaultCommerceAgentSettings = {
+    enabled: "false",
+    embeddedSvcName: "Dummy Embedded Service Deployment Name",
+    embeddedSvcEndpoint: "Dummy Embedded Service Deployment Endpoint",
+    scriptSourceUrl: "Dummy Script Source URL",
+    scrt2Url: "Dummy SCRT2 URL",
+    salesforceOrgId: "00DSB00000MJ7YH",
+    siteId: "RefArchGlobal",
+};
+
 module.exports = {
     app: {
         slasToken: process.env.PWA_KIT_SLAS_CLIENT_SECRET || '',
-        commerceAgenticMiawEnabled: process.env.COMMERCE_AGENTIC_MIAW_ENABLED || "false",
-        commerceAgenticEsdName: process.env.COMMERCE_AGENTIC_EMBEDDED_SERVICE_DEVELOPER_NAME || "Dummy Embedded Service Deployment Name",
-        commerceAgenticEsdEndpoint: process.env.COMMERCE_AGENTIC_EMBEDDED_SERVICE_FULL_ENDPOINT || "Dummy Embedded Service Deployment Endpoint",
-        commerceAgenticEsdScriptSourceUrl: process.env.COMMERCE_AGENTIC_EMBEDDED_SERVICE_SCRIPT_SOURCE_URL || "https://dummysourceurl.com",
-        commerceAgenticScrt2Url: process.env.COMMERCE_AGENTIC_SCRT2_URL || "Dummy SCRT2 URL",
-        salesforceOrgId: process.env.SALESFORCE_ORGANIZATION_ID || "00DSB00000MJ7YH",
-        salesforceSiteId: process.env.SALESFORCE_SITE_ID || "RefArchGlobal",
+        commerceAgent: process.env.COMMERCE_AGENT_SETTINGS || JSON.stringify(defaultCommerceAgentSettings),
         url: {
             site: 'path',
             locale: 'path',
