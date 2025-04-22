@@ -31,14 +31,14 @@ const registerEventListeners = (siteId, slasToken, basketId, domainUrl) => {
 };
 
 // Function to initialize embedded messaging
-const initEmbeddedMessaging = (messaging, orgId, embeddedServiceDeploymentName, embeddedServiceDeploymentUrl, scrt2Url) => {
+const initEmbeddedMessaging = (messaging, salesforceOrgId, embeddedSvcName, embeddedSvcEndpoint, scrt2Url) => {
     try {
         if (onClient && messaging && messaging?.embeddedservice_bootstrap?.settings) {
             messaging.embeddedservice_bootstrap.settings.language = 'en_US';
             messaging.embeddedservice_bootstrap.init(
-                orgId,
-                embeddedServiceDeploymentName,
-                embeddedServiceDeploymentUrl,
+                salesforceOrgId,
+                embeddedSvcName,
+                embeddedSvcEndpoint,
                 {
                     scrt2URL: scrt2Url
                 }
@@ -51,38 +51,35 @@ const initEmbeddedMessaging = (messaging, orgId, embeddedServiceDeploymentName, 
 
 /**
  * Custom hook to handle embedded messaging initialization
- * @param {boolean} enableMiaw - Whether to enable embedded messaging
- * @param {string} orgId - The org ID for the embedded messaging script 
- * @param {string} embeddedServiceDeploymentName - The embedded service deployment name for the embedded messaging script
- * @param {string} embeddedServiceDeploymentUrl - The embedded service deployment URL for the embedded messaging script
- * @param {string} scrt2Url - The SCRT2 URL for the embedded messaging script
- * @param {string} siteId - The site ID for the embedded messaging script
+ * @param {json} commerceAgent - The commerce agent settings for the embedded messaging script
  * @param {string} slasToken - The SLAS token for the embedded messaging script
  * @param {string} basketId - The basket ID for the embedded messaging script
- * @param {string} domainUrl - The domain URL for the embedded messaging script 
- * @param {string} src - The source URL for the embedded messaging script
  * @returns {Object} The embedded messaging object
  */
-const useMiaw = (enableMiaw, orgId, embeddedServiceDeploymentName, embeddedServiceDeploymentUrl, scrt2Url, siteId, slasToken, basketId = '', domainUrl, src) => {
+const useMiaw = (commerceAgent, slasToken, basketId = '', domainUrl) => {
+    const commerceAgentSettings = JSON.parse(commerceAgent);
+
+    const { enabled, embeddedSvcName, embeddedSvcEndpoint, scrt2Url, salesforceOrgId, siteId, scriptSourceUrl } = commerceAgentSettings;
+
     const [embeddedMessaging, setEmbeddedMessaging] = useState(null);
     const [isMiawInitialized, setIsMiawInitialized] = useState(false);
     
-    if (enableMiaw) {
+    if (enabled) {
         // Effect to load and initialize the script
         useEffect(() => {
             let miawEventListeners = [];
 
-            if (!src && !siteId) {
+            if (!scriptSourceUrl && !siteId) {
                 setEmbeddedMessaging(null);
                 return;
             }
             
             // Check if script already exists
-            let script = document.querySelector(`script[src="${src}"]`);
+            let script = document.querySelector(`script[src="${scriptSourceUrl}"]`);
             
             if (!script) {
                 script = document.createElement('script');
-                script.src = src;
+                script.src = scriptSourceUrl;
                 script.async = true;
                 script.setAttribute("data-status", "loading");
                 document.body.appendChild(script);
@@ -109,12 +106,12 @@ const useMiaw = (enableMiaw, orgId, embeddedServiceDeploymentName, embeddedServi
                         error: false
                     };
                     
-                    setEmbeddedMessaging(messaging, orgId, embeddedServiceDeploymentName, embeddedServiceDeploymentUrl, scrt2Url);
+                    setEmbeddedMessaging(messaging, salesforceOrgId, embeddedSvcName, embeddedSvcEndpoint, scrt2Url);
                     
                     // Initialize embedded messaging if not already initialized
                     if (!isMiawInitialized) {
                         miawEventListeners = registerEventListeners(siteId, slasToken, basketId, domainUrl);
-                        initEmbeddedMessaging(messaging, orgId, embeddedServiceDeploymentName, embeddedServiceDeploymentUrl, scrt2Url);
+                        initEmbeddedMessaging(messaging, salesforceOrgId, embeddedSvcName, embeddedSvcEndpoint, scrt2Url);
                         setIsMiawInitialized(true);
                     }
                 } else {
