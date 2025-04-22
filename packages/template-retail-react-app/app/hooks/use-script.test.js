@@ -7,7 +7,7 @@
 
 import React from 'react'
 import {render, act} from '@testing-library/react'
-import useScript from '@salesforce/retail-react-app/../../app/hooks/use-script'
+import useScript from '@salesforce/retail-react-app/app/hooks/use-script'
 
 // Test component that uses the hook
 const TestComponent = ({src}) => {

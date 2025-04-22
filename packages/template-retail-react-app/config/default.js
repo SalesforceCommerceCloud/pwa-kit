@@ -9,18 +9,17 @@ const sites = require('./sites.js')
 
 const defaultCommerceAgentSettings = {
     enabled: "false",
-    embeddedServiceName: "Dummy Embedded Service Deployment Name",
-    embeddedServiceEndpoint: "Dummy Embedded Service Deployment Endpoint",
-    scriptSourceUrl: "Dummy Script Source URL",
-    scrt2Url: "Dummy SCRT2 URL",
+    embeddedServiceName: "MIAW_Guided_Shopper_production_functional38",
+    embeddedServiceEndpoint: "https://orgfarm-7455a909de.test1.my.pc-rnd.site.com/ESWMIAWGuidedShopperpr1743525851212",
+    scriptSourceUrl: "https://orgfarm-7455a909de.test1.my.pc-rnd.site.com/ESWMIAWGuidedShopperpr1743525851212/assets/js/bootstrap.min.js",
+    scrt2Url: "https://orgfarm-7455a909de.test1.my.pc-rnd.salesforce-scrt.com",
     salesforceOrgId: "00DSB00000MJ7YH",
     siteId: "RefArchGlobal",
 };
 
 module.exports = {
     app: {
-        slasToken: process.env.PWA_KIT_SLAS_CLIENT_SECRET || '',
-        commerceAgent: process.env.COMMERCE_AGENT_SETTINGS || JSON.stringify(defaultCommerceAgentSettings),
+        commerceAgent: JSON.stringify(defaultCommerceAgentSettings), // process.env.COMMERCE_AGENT_SETTINGS || 
         url: {
             site: 'path',
             locale: 'path',
