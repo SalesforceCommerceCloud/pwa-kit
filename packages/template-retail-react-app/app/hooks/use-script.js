@@ -21,10 +21,10 @@ const useScript = (src) => {
         }
 
         // Check if script already exists
-        let script = document.querySelector(`script[src="${src}"]`)
-        console.log(script)
-        if (!script) {
-            script = document.createElement('script')
+        const scriptAlreadyOnPage = document.querySelector(`script[src="${src}"]`)
+
+        if (!scriptAlreadyOnPage) {
+            const script = document.createElement('script')
             script.src = src
             script.async = true
             script.setAttribute('data-status', 'loading')

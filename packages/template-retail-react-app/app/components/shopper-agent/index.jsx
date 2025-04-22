@@ -48,9 +48,7 @@ function useMiaw(
     const [isMiawInitialized, setIsMiawInitialized] = useState(false)
 
     useEffect(() => {
-        console.log('useMiaw', scriptLoadStatus)
         if (scriptLoadStatus.loaded && !scriptLoadStatus.error) {
-            console.log('initEmbeddedMessaging')
             initEmbeddedMessaging(
                 orgId,
                 embeddedServiceDeploymentName,
@@ -78,35 +76,56 @@ function useMiaw(
  * @returns {JSX.Element} The ShopperAgent component
  */
 const ShopperAgent = ({
-    enableMiaw,
-    orgId,
-    commerceAgenticEsdScriptSourceUrl,
-    embeddedServiceDeploymentName,
-    embeddedServiceDeploymentUrl,
-    scrt2Url,
-    slasToken,
-    basketId
+    commerceAgent,
+    domainUrl,
+    basketId,
+    locale,
+    usId,
+    onAgentConversationOpened,
+    onAgentConversationClosed
 }) => {
+    const { enabled, embeddedServiceName, embeddedServiceEndpoint, scriptSourceUrl, scrt2Url, salesforceOrgId, siteId } = JSON.parse(commerceAgent)
+    if (!onClient || !enabled) {
+        return null
+    }
+
     useEffect(() => {
         window.addEventListener('onEmbeddedMessagingReady', (e) => {
-            console.log('Received the onEmbeddedMessagingReady event…', e)
             window.embeddedservice_bootstrap.prechatAPI.setHiddenPrechatFields({
-                SLAS_TOKEN: slasToken,
-                Basket_ID: basketId
-                //"Domain_URL": domainUrl,
+                Domain_URL: domainUrl,
+                SiteId: siteId,
+                BasketId: basketId,
+                Locale: locale,
+                OrganizationId: salesforceOrgId,
+                UsId: usId
+
             })
         })
-    }, [enableMiaw])
+
+        window.addEventListener('onEmbeddedMessagingConversationClosed', (e) => {
+            console.error('Error initializing Embedded Messaging: ', e)
+        })
+
+        window.addEventListener('onEmbeddedMessagingConversationOpened', (e) => {
+            console.log('Conversation opened', e)
+        })
+
+        window.addEventListener('onEmbeddedMessagingConversationEnded', (e) => {
+            console.log('Conversation ended', e)
+        })
+        
+        
+    }, [commerceAgent])
 
     // Load the embedded messaging script
-    const scriptLoadStatus = useScript(commerceAgenticEsdScriptSourceUrl)
-    console.log('scriptLoadStatus', scriptLoadStatus)
+    const scriptLoadStatus = useScript(scriptSourceUrl)
+
     // Initialize the embedded messaging service
     useMiaw(
         scriptLoadStatus,
-        orgId,
-        embeddedServiceDeploymentName,
-        embeddedServiceDeploymentUrl,
+        salesforceOrgId,
+        embeddedServiceName,
+        embeddedServiceEndpoint,
         scrt2Url
     )
 

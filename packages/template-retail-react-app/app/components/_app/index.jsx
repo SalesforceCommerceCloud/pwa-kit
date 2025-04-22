@@ -308,6 +308,8 @@ const App = (props) => {
         trackPage()
     }, [location])
 
+    console.log(config.app.commerceAgent)
+
     return (
         <Box className="sf-app" {...styles.container}>
             <StorefrontPreview getToken={getTokenWhenReady}>
@@ -378,6 +380,14 @@ const App = (props) => {
                             {/* A wider fallback for user locales that the app does not support */}
                             <link rel="alternate" hrefLang="x-default" href={`${appOrigin}/`} />
                         </Seo>
+
+                        <ShopperAgent
+                            commerceAgent={config.app.commerceAgent}
+                            domainUrl={`${appOrigin}${buildUrl(location.pathname)}`}
+                            locale={locale.id}
+                            usId={customer?.id}
+                            basketId={basket?.id}
+                        />
 
                         <ScrollToTop />
 
