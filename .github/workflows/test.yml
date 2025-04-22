@@ -89,6 +89,7 @@ jobs:
         with:
           preset: retail-react-app-test-project
           output_dir: ${{ env.PROJECT_DIR }}
+        timeout-minutes: 8
 
       # Run the smaller tests first, before the full unit tests
       - name: Smoke test the NPM scripts
@@ -183,6 +184,7 @@ jobs:
           with:
             preset: retail-react-app-test-project
             output_dir: ${{ env.PROJECT_DIR }}
+          timeout-minutes: 8
 
         # Run the smaller tests first, before the full unit tests
         - name: Smoke test the NPM scripts
@@ -220,6 +222,7 @@ jobs:
         with:
           preset: ${{ matrix.template }}
           output_dir: ${{ env.PROJECT_DIR }}
+        timeout-minutes: 8
 
       - name: Lint the generated project
         if: env.IS_TEMPLATE_FROM_RETAIL_REACT_APP == 'true'
@@ -310,6 +313,7 @@ jobs:
         with:
           preset: ${{ matrix.template }}
           output_dir: ${{ env.PROJECT_DIR }}
+        timeout-minutes: 8
 
       - name: Lint the generated project
         if: env.IS_TEMPLATE_FROM_RETAIL_REACT_APP == 'true'
@@ -356,6 +360,7 @@ jobs:
   #       with:
   #         preset: retail-react-app-test-project
   #         output_dir: ${{ env.PROJECT_DIR }}
+  #       timeout-minutes: 8
 
   #     - name: Run Lighthouse CI on the generated project
   #       uses: "./.github/actions/lighthouse_ci"
@@ -384,6 +389,7 @@ jobs:
         with:
           preset: retail-react-app-test-project
           output_dir: ${{ env.PROJECT_DIR }}
+        timeout-minutes: 8
 
       - name: Check and report bundle sizes
         uses: "./.github/actions/bundle_size_test"

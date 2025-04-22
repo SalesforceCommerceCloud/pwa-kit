@@ -5,9 +5,6 @@ inputs:
   output_dir:
     required: false
     default: generated_pwa
-  timeout_minutes:
-    required: false
-    default: 8
 runs:
   using: composite
   steps:
@@ -16,4 +13,3 @@ runs:
       shell: bash
       env:
         GENERATOR_PRESET: ${{ inputs.preset }}
-      timeout-minutes: ${{ inputs.timeout_minutes }}
