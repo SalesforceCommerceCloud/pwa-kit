@@ -19,7 +19,7 @@ const defaultCommerceAgentSettings = {
 
 module.exports = {
     app: {
-        commerceAgent: JSON.stringify(defaultCommerceAgentSettings), // process.env.COMMERCE_AGENT_SETTINGS || 
+        commerceAgent: process.env.COMMERCE_AGENT_SETTINGS || JSON.stringify(defaultCommerceAgentSettings),
         url: {
             site: 'path',
             locale: 'path',
