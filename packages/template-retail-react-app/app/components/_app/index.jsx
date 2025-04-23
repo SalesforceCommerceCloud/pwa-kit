@@ -383,7 +383,6 @@ const App = (props) => {
                             commerceAgent={config.app.commerceAgent}
                             domainUrl={`${appOrigin}${buildUrl(location.pathname)}`}
                             locale={locale.id}
-                            usId={customer?.id}
                             basketId={basket?.id}
                         />
 
