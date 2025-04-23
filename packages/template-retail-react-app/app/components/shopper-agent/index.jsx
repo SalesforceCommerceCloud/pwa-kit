@@ -92,7 +92,7 @@ const ShopperAgent = ({
     useEffect(() => {
         window.addEventListener('onEmbeddedMessagingReady', (e) => {
             window.embeddedservice_bootstrap.prechatAPI.setHiddenPrechatFields({
-                Domain_URL: domainUrl,
+                DomainURL: domainUrl,
                 SiteId: siteId,
                 BasketId: basketId,
                 Locale: locale,
