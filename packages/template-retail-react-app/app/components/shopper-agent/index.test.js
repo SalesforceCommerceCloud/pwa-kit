@@ -13,10 +13,19 @@ import useScript from '@salesforce/retail-react-app/app/hooks/use-script'
 const mockEmbeddedService = {
     init: jest.fn(),
     settings: jest.fn(),
-    prechatAPI: jest.fn()
+    prechatAPI: {
+        setHiddenPrechatFields: jest.fn()
+    }
 }
 
 jest.mock('../../hooks/use-script', () => jest.fn().mockReturnValue({loaded: false, error: false}))
+jest.mock('@salesforce/commerce-sdk-react', () => {
+    const originalModule = jest.requireActual('@salesforce/commerce-sdk-react')
+    return {
+        ...originalModule,
+        useUsid: () => ({ usid: 'test-usid' })
+    }
+})
 
 const commerceAgentSettings = {
     enabled: "true",
@@ -130,5 +139,26 @@ describe('ShopperAgent Component', () => {
 
         // Should not call init or createComponent again
         expect(mockEmbeddedService.init).not.toHaveBeenCalled()
+    })
+
+    test('should call the preChatAPI with the correct parameters', async () => {
+        useScript.mockReturnValue({loaded: true, error: false})
+        render(<ShopperAgent {...defaultProps} />)
+
+        await act(async () => {
+            window.dispatchEvent(new Event('onEmbeddedMessagingReady'));
+        });
+
+        // Verify embedded service initialization
+        expect(mockEmbeddedService.prechatAPI.setHiddenPrechatFields).toHaveBeenCalledWith(
+            {
+                BasketId: undefined,
+                Domain_URL: undefined,
+                Locale: undefined,
+                OrganizationId: commerceAgentSettings.salesforceOrgId,
+                SiteId: commerceAgentSettings.siteId,
+                UsId: 'test-usid',
+            }
+        )
     })
 })
