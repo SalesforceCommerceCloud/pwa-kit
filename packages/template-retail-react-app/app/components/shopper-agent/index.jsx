@@ -66,14 +66,12 @@ function useMiaw(
 /**
  * ShopperAgent component that initializes and manages the embedded messaging service
  * @param {Object} props - Component props
- * @param {boolean} props.enableMiaw - Whether to enable embedded messaging
- * @param {string} props.orgId - The org ID for the embedded messaging script
- * @param {string} props.embeddedServiceDeploymentName - The embedded service deployment name
- * @param {string} props.embeddedServiceDeploymentUrl - The embedded service deployment URL
- * @param {string} props.scrt2Url - The SCRT2 URL for the embedded messaging script
- * @param {string} props.siteId - The site ID for the embedded messaging script
- * @param {string} props.slasToken - The SLAS token for the embedded messaging script
+ * @param {string} props.commerceAgent - JSON stringified commerce agent settings
+ * @param {string} props.domainUrl - The domain URL for the embedded messaging script
  * @param {string} props.basketId - The basket ID for the embedded messaging script
+ * @param {string} props.locale - The locale for the embedded messaging script
+ * @param {function} props.onAgentConversationOpened - The callback function for when the conversation is opened
+ * @param {function} props.onAgentConversationClosed - The callback function for when the conversation is closed
  * @returns {JSX.Element} The ShopperAgent component
  */
 const ShopperAgent = ({
