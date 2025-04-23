@@ -306,8 +306,6 @@ const App = (props) => {
         trackPage()
     }, [location])
 
-    console.log(config.app.commerceAgent)
-
     return (
         <Box className="sf-app" {...styles.container}>
             <StorefrontPreview getToken={getTokenWhenReady}>
@@ -382,7 +380,7 @@ const App = (props) => {
                         <ShopperAgent
                             commerceAgent={config.app.commerceAgent}
                             domainUrl={`${appOrigin}${buildUrl(location.pathname)}`}
-                            locale={locale.id}
+                            locale={locale?.id}
                             basketId={basket?.id}
                         />
 
