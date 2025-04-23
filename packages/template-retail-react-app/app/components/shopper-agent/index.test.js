@@ -42,8 +42,9 @@ const commerceAgentSettingsString = JSON.stringify(commerceAgentSettings);
 describe('ShopperAgent Component', () => {
     const defaultProps = {
         commerceAgent: commerceAgentSettingsString,
-        slasToken: 'test-slas-token',
-        basketId: undefined, // TODO
+        domainUrl: 'https://myorg.salesforce.com',
+        basketId: undefined, // TODO: Add basketId
+        locale: 'en-US'
     }
 
     beforeEach(() => {
@@ -153,8 +154,8 @@ describe('ShopperAgent Component', () => {
         expect(mockEmbeddedService.prechatAPI.setHiddenPrechatFields).toHaveBeenCalledWith(
             {
                 BasketId: undefined,
-                Domain_URL: undefined,
-                Locale: undefined,
+                DomainURL: defaultProps.domainUrl,
+                Locale: defaultProps.locale,
                 OrganizationId: commerceAgentSettings.salesforceOrgId,
                 SiteId: commerceAgentSettings.siteId,
                 UsId: 'test-usid',
