@@ -63,6 +63,10 @@ function useMiaw(
     return isMiawInitialized
 }
 
+function isEnabled(enabled) {
+    return enabled === 'true'
+}
+
 /**
  * ShopperAgent component that initializes and manages the embedded messaging service
  * @param {Object} props - Component props
@@ -83,7 +87,7 @@ const ShopperAgent = ({
     onAgentConversationClosed
 }) => {
     const { enabled, embeddedServiceName, embeddedServiceEndpoint, scriptSourceUrl, scrt2Url, salesforceOrgId, siteId } = JSON.parse(commerceAgent)
-    if (!onClient || !enabled) {
+    if (!onClient || !isEnabled(enabled)) {
         return null
     }
 
