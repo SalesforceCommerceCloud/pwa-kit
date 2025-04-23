@@ -162,4 +162,14 @@ describe('ShopperAgent Component', () => {
             }
         )
     })
+
+    test('should not load the script when the commerceAgent is disabled', () => {
+        const commerceAgentSettings = {...defaultProps.commerceAgent, enabled: 'false'};
+        const props = {...defaultProps, commerceAgent: JSON.stringify(commerceAgentSettings)};
+
+        const {container} = render(<ShopperAgent {...props} />)
+
+        // Component should not render anything when there's an error
+        expect(useScript).not.toHaveBeenCalled()
+    })
 })
