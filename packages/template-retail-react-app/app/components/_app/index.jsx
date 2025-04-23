@@ -126,27 +126,6 @@ const ListMenuContentWithData = withCommerceSdkReact(
 
 const onClient = typeof window !== 'undefined'
 
-function initEmbeddedMessaging() {
-    try {
-        if (onClient && embeddedservice_bootstrap && embeddedservice_bootstrap?.settings) {
-            embeddedservice_bootstrap.settings.language = 'en_US'; // For example, enter 'en' or 'en-US'
-			embeddedservice_bootstrap.init(
-				'00DSB00000MJ7YH',
-				'MIAW_Guided_Shopper_production_functional38',
-				'https://orgfarm-7455a909de.test1.my.pc-rnd.site.com/ESWMIAWGuidedShopperpr1743525851212',
-				{
-					scrt2URL: 'https://orgfarm-7455a909de.test1.my.pc-rnd.salesforce-scrt.com'
-				}
-			);
-
-
-        }
-
-    } catch (err) {
-        console.error('Error loading Embedded Messaging: ', err)
-    }
-}
-
 const App = (props) => {
     const {children} = props
     const {data: categoriesTree} = useCategory({
