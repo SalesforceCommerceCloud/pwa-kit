@@ -7,6 +7,7 @@
 
 import {useEffect, useState} from 'react'
 import useScript from '@salesforce/retail-react-app/app/hooks/use-script'
+import {useUsid} from '@salesforce/commerce-sdk-react'
 
 const onClient = typeof window !== 'undefined'
 
@@ -80,7 +81,6 @@ const ShopperAgent = ({
     domainUrl,
     basketId,
     locale,
-    usId,
     onAgentConversationOpened,
     onAgentConversationClosed
 }) => {
@@ -88,6 +88,8 @@ const ShopperAgent = ({
     if (!onClient || !enabled) {
         return null
     }
+
+    const {usid} = useUsid();
 
     useEffect(() => {
         window.addEventListener('onEmbeddedMessagingReady', (e) => {
@@ -97,7 +99,7 @@ const ShopperAgent = ({
                 BasketId: basketId,
                 Locale: locale,
                 OrganizationId: salesforceOrgId,
-                UsId: usId
+                UsId: usid
 
             })
         })
