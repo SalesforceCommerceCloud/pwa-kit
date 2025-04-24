@@ -6,7 +6,7 @@
  */
 
 import React from 'react'
-import {render, screen, act} from '@testing-library/react'
+import {render, act} from '@testing-library/react'
 import ShopperAgent from '@salesforce/retail-react-app/app/components/shopper-agent/index'
 import useScript from '@salesforce/retail-react-app/app/hooks/use-script'
 // Mock the embeddedservice_bootstrap object
@@ -23,21 +23,21 @@ jest.mock('@salesforce/commerce-sdk-react', () => {
     const originalModule = jest.requireActual('@salesforce/commerce-sdk-react')
     return {
         ...originalModule,
-        useUsid: () => ({ usid: 'test-usid' })
+        useUsid: () => ({usid: 'test-usid'})
     }
 })
 
 const commerceAgentSettings = {
-    enabled: "true",
-    embeddedServiceName: "MIAW_Guided_Shopper_production",
-    embeddedServiceEndpoint: "https://myorg.salesforce.com/ESWMIAWGuidedShopper",
-    scriptSourceUrl: "https://myorg.salesforce.com/ESWMIAWGuidedShopper/assets/js/bootstrap.min.js",
-    scrt2Url: "https://myorg.salesforce.com-scrt.com",
-    salesforceOrgId: "00DSB00000MJ7YH",
-    siteId: "RefArchGlobal",
+    enabled: 'true',
+    embeddedServiceName: 'MIAW_Guided_Shopper_production',
+    embeddedServiceEndpoint: 'https://myorg.salesforce.com/ESWMIAWGuidedShopper',
+    scriptSourceUrl: 'https://myorg.salesforce.com/ESWMIAWGuidedShopper/assets/js/bootstrap.min.js',
+    scrt2Url: 'https://myorg.salesforce.com-scrt.com',
+    salesforceOrgId: '00DSB00000MJ7YH',
+    siteId: 'RefArchGlobal'
 }
 
-const commerceAgentSettingsString = JSON.stringify(commerceAgentSettings);
+const commerceAgentSettingsString = JSON.stringify(commerceAgentSettings)
 
 describe('ShopperAgent Component', () => {
     const defaultProps = {
@@ -147,27 +147,25 @@ describe('ShopperAgent Component', () => {
         render(<ShopperAgent {...defaultProps} />)
 
         await act(async () => {
-            window.dispatchEvent(new Event('onEmbeddedMessagingReady'));
-        });
+            window.dispatchEvent(new Event('onEmbeddedMessagingReady'))
+        })
 
         // Verify embedded service initialization
-        expect(mockEmbeddedService.prechatAPI.setHiddenPrechatFields).toHaveBeenCalledWith(
-            {
-                BasketId: undefined,
-                DomainURL: defaultProps.domainUrl,
-                Locale: defaultProps.locale,
-                OrganizationId: commerceAgentSettings.salesforceOrgId,
-                SiteId: commerceAgentSettings.siteId,
-                UsId: 'test-usid',
-            }
-        )
+        expect(mockEmbeddedService.prechatAPI.setHiddenPrechatFields).toHaveBeenCalledWith({
+            BasketId: undefined,
+            DomainURL: defaultProps.domainUrl,
+            Locale: defaultProps.locale,
+            OrganizationId: commerceAgentSettings.salesforceOrgId,
+            SiteId: commerceAgentSettings.siteId,
+            UsId: 'test-usid'
+        })
     })
 
     test('should not load the script when the commerceAgent is disabled', () => {
-        const commerceAgentSettings = {...defaultProps.commerceAgent, enabled: 'false'};
-        const props = {...defaultProps, commerceAgent: JSON.stringify(commerceAgentSettings)};
+        const commerceAgentSettings = {...defaultProps.commerceAgent, enabled: 'false'}
+        const props = {...defaultProps, commerceAgent: JSON.stringify(commerceAgentSettings)}
 
-        const {container} = render(<ShopperAgent {...props} />)
+        render(<ShopperAgent {...props} />)
 
         // Component should not render anything when there's an error
         expect(useScript).not.toHaveBeenCalled()

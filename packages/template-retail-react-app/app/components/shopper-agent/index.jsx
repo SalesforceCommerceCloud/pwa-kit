@@ -5,9 +5,10 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import {useEffect, useState} from 'react'
+import React, {useEffect, useState} from 'react'
 import useScript from '@salesforce/retail-react-app/app/hooks/use-script'
 import {useUsid} from '@salesforce/commerce-sdk-react'
+import PropTypes from 'prop-types'
 
 const onClient = typeof window !== 'undefined'
 
@@ -64,37 +65,36 @@ function useMiaw(
 }
 
 function isEnabled(enabled) {
-    return enabled === 'true'
+    return enabled === 'true' && onClient
 }
 
-/**
- * ShopperAgent component that initializes and manages the embedded messaging service
- * @param {Object} props - Component props
- * @param {string} props.commerceAgent - JSON stringified commerce agent settings
- * @param {string} props.domainUrl - The domain URL for the embedded messaging script
- * @param {string} props.basketId - The basket ID for the embedded messaging script
- * @param {string} props.locale - The locale for the embedded messaging script
- * @param {function} props.onAgentConversationOpened - The callback function for when the conversation is opened
- * @param {function} props.onAgentConversationClosed - The callback function for when the conversation is closed
- * @returns {JSX.Element} The ShopperAgent component
- */
-const ShopperAgent = ({
-    commerceAgent,
-    domainUrl,
-    basketId,
-    locale,
-    onAgentConversationOpened,
-    onAgentConversationClosed
-}) => {
-    const { enabled, embeddedServiceName, embeddedServiceEndpoint, scriptSourceUrl, scrt2Url, salesforceOrgId, siteId } = JSON.parse(commerceAgent)
-    if (!onClient || !isEnabled(enabled)) {
-        return null
+function FeatureToggle({...props}) {
+    if (props.isEnabled) {
+        return props.children
     }
 
-    const {usid} = useUsid();
+    return null
+}
+
+FeatureToggle.propTypes = {
+    isEnabled: PropTypes.bool,
+    children: PropTypes.node
+}
+
+function ShopperAgentWindow({commerceAgent, locale, domainUrl, basketId}) {
+    const {
+        embeddedServiceName,
+        embeddedServiceEndpoint,
+        scriptSourceUrl,
+        scrt2Url,
+        salesforceOrgId,
+        siteId
+    } = JSON.parse(commerceAgent)
+
+    const {usid} = useUsid()
 
     useEffect(() => {
-        window.addEventListener('onEmbeddedMessagingReady', (e) => {
+        window.addEventListener('onEmbeddedMessagingReady', () => {
             window.embeddedservice_bootstrap.prechatAPI.setHiddenPrechatFields({
                 DomainURL: domainUrl,
                 SiteId: siteId,
@@ -102,7 +102,6 @@ const ShopperAgent = ({
                 Locale: locale,
                 OrganizationId: salesforceOrgId,
                 UsId: usid
-
             })
         })
 
@@ -117,8 +116,6 @@ const ShopperAgent = ({
         window.addEventListener('onEmbeddedMessagingConversationEnded', (e) => {
             console.log('Conversation ended', e)
         })
-        
-        
     }, [commerceAgent])
 
     // Load the embedded messaging script
@@ -133,9 +130,46 @@ const ShopperAgent = ({
         scrt2Url
     )
 
-    // The component doesn't render anything visible
-    // It's just a wrapper for the embedded messaging service
     return null
+}
+
+ShopperAgentWindow.propTypes = {
+    commerceAgent: PropTypes.string,
+    domainUrl: PropTypes.string,
+    basketId: PropTypes.string,
+    locale: PropTypes.string
+}
+
+/**
+ * ShopperAgent component that initializes and manages the embedded messaging service
+ * @param {Object} props - Component props
+ * @param {string} props.commerceAgent - JSON stringified commerce agent settings
+ * @param {string} props.domainUrl - The domain URL for the embedded messaging script
+ * @param {string} props.basketId - The basket ID for the embedded messaging script
+ * @param {string} props.locale - The locale for the embedded messaging script
+ * @returns {JSX.Element} The ShopperAgent component
+ */
+function ShopperAgent({commerceAgent, domainUrl, basketId, locale}) {
+    const {enabled} = JSON.parse(commerceAgent)
+    const isShopperAgentEnabled = isEnabled(enabled)
+
+    return (
+        <FeatureToggle isEnabled={isShopperAgentEnabled}>
+            <ShopperAgentWindow
+                commerceAgent={commerceAgent}
+                locale={locale}
+                domainUrl={domainUrl}
+                basketId={basketId}
+            />
+        </FeatureToggle>
+    )
+}
+
+ShopperAgent.propTypes = {
+    commerceAgent: PropTypes.string,
+    domainUrl: PropTypes.string,
+    basketId: PropTypes.string,
+    locale: PropTypes.string
 }
 
 export default ShopperAgent
