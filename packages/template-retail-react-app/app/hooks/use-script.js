@@ -6,6 +6,7 @@
  */
 
 import {useEffect, useState} from 'react'
+import PropTypes from 'prop-types'
 
 /**
  * Custom hook to handle script loading
@@ -44,6 +45,10 @@ const useScript = (src) => {
     }, [src])
 
     return scriptLoadStatus
+}
+
+useScript.propTypes = {
+    src: PropTypes.string
 }
 
 export default useScript

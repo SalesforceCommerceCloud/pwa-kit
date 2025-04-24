@@ -8,12 +8,16 @@
 import React from 'react'
 import {render, act} from '@testing-library/react'
 import useScript from '@salesforce/retail-react-app/app/hooks/use-script'
-
+import PropTypes from 'prop-types'
 // Test component that uses the hook
 const TestComponent = ({src}) => {
     const scriptLoadStatus = useScript(src)
 
     return <div data-testid="script-status">{JSON.stringify(scriptLoadStatus)}</div>
+}
+
+TestComponent.propTypes = {
+    src: PropTypes.string
 }
 
 describe('useScript hook', () => {
