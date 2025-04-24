@@ -9,6 +9,7 @@ import React, {useEffect, useState} from 'react'
 import useScript from '@salesforce/retail-react-app/app/hooks/use-script'
 import {useUsid} from '@salesforce/commerce-sdk-react'
 import PropTypes from 'prop-types'
+import theme from '../shared/theme'
 
 const onClient = typeof window !== 'undefined'
 
@@ -105,16 +106,12 @@ function ShopperAgentWindow({commerceAgent, locale, domainUrl, basketId}) {
             })
         })
 
-        window.addEventListener('onEmbeddedMessagingConversationClosed', (e) => {
-            console.error('Error initializing Embedded Messaging: ', e)
-        })
-
-        window.addEventListener('onEmbeddedMessagingConversationOpened', (e) => {
-            console.log('Conversation opened', e)
-        })
-
-        window.addEventListener('onEmbeddedMessagingConversationEnded', (e) => {
-            console.log('Conversation ended', e)
+        window.addEventListener('onEmbeddedMessagingWindowMaximized', (e) => {
+            const zIndex = theme.zIndices.sticky + 1;
+            const embeddedMessagingFrame = document.body.querySelector('div.embedded-messaging iframe');
+            if (embeddedMessagingFrame) {
+                embeddedMessagingFrame.style.zIndex = zIndex
+            }
         })
     }, [commerceAgent])
 

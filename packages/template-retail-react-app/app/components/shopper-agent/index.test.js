@@ -19,11 +19,21 @@ const mockEmbeddedService = {
 }
 
 jest.mock('../../hooks/use-script', () => jest.fn().mockReturnValue({loaded: false, error: false}))
+
 jest.mock('@salesforce/commerce-sdk-react', () => {
     const originalModule = jest.requireActual('@salesforce/commerce-sdk-react')
     return {
         ...originalModule,
         useUsid: () => ({usid: 'test-usid'})
+    }
+})
+
+// Mock the theme
+jest.mock('../shared/theme', () => {
+    return {
+        zIndices: {
+            sticky: 1100
+        }
     }
 })
 
@@ -169,5 +179,35 @@ describe('ShopperAgent Component', () => {
 
         // Component should not render anything when there's an error
         expect(useScript).not.toHaveBeenCalled()
+    })
+
+    test('should set the z-index of the embedded messaging frame to the sticky z-index + 1 when the window is maximized', async () => {
+        const mockFrame = document.createElement('div')
+        mockFrame.id = 'embeddedMessaging'
+        mockFrame.style.zIndex = '0'
+
+        // Store original querySelector
+        const originalQuerySelector = document.querySelector
+
+        // Mock querySelector to return our mock frame
+        document.body.querySelector = jest.fn().mockImplementation((selector) => {
+            if (selector === 'div.embedded-messaging iframe') {
+                return mockFrame
+            }
+            return originalQuerySelector.call(document, selector)
+        })
+
+        render(<ShopperAgent {...defaultProps} />)
+
+        // Simulate window maximize
+        await act(async () => {
+            window.dispatchEvent(new Event('onEmbeddedMessagingWindowMaximized'))
+        })
+
+        // Verify z-index was updated
+        expect(mockFrame.style.zIndex).toBe('1101') // sticky (1100) + 1
+
+        // Restore original querySelector
+        document.body.querySelector = originalQuerySelector
     })
 })
