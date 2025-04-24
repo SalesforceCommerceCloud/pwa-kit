@@ -12,8 +12,21 @@
  * To ensure that feature work correctly, we test our code with multi-site config in mind, so we created this mock config.
  * A single-site, single-locale config is a special case of multi-site case.
  */
+const commerceAgentSettings = {
+    enabled: 'true',
+    embeddedServiceName: 'MIAW_Guided_Shopper_production',
+    embeddedServiceEndpoint: 'https://myorg.salesforce.com/ESWMIAWGuidedShopper',
+    scriptSourceUrl: 'https://myorg.salesforce.com/ESWMIAWGuidedShopper/assets/js/bootstrap.min.js',
+    scrt2Url: 'https://myorg.salesforce.com-scrt.com',
+    salesforceOrgId: '00DSB00000MJ7YH',
+    siteId: 'RefArchGlobal'
+}
+
+const commerceAgentSettingsString = JSON.stringify(commerceAgentSettings)
+
 module.exports = {
     app: {
+        commerceAgent: commerceAgentSettingsString,
         url: {
             locale: 'path',
             site: 'path',

@@ -124,8 +124,6 @@ const ListMenuContentWithData = withCommerceSdkReact(
     }
 )
 
-const onClient = typeof window !== 'undefined'
-
 const App = (props) => {
     const {children} = props
     const {data: categoriesTree} = useCategory({
