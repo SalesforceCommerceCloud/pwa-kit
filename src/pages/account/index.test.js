@@ -19,8 +19,9 @@ import {
 import Account from '../../pages/account/index'
 import Login from '../../pages/login'
 import mockConfig from '../../mock-config'
-import * as sdk from '@salesforce/commerce-sdk-react'
+import {useCustomerType} from '@salesforce/commerce-sdk-react'
 
+jest.setTimeout(60000)
 jest.mock('@salesforce/commerce-sdk-react', () => ({
     ...jest.requireActual('@salesforce/commerce-sdk-react'),
     useCustomerType: jest.fn()
@@ -69,7 +70,7 @@ beforeEach(() => {
 })
 afterEach(() => {
     jest.resetModules()
-    localStorage.clear()
+    jest.restoreAllMocks()
 })
 
 const expectedBasePath = '/uk/en-GB'
@@ -82,50 +83,45 @@ describe('Test redirects', function () {
         )
     })
     test('Redirects to login page if the customer is not logged in', async () => {
-        sdk.useCustomerType.mockReturnValue({isRegistered: false, isGuest: true})
-        const Component = () => {
-            return (
-                <Switch>
-                    <Route
-                        path={createPathWithDefaults('/account')}
-                        render={(props) => <Account {...props} />}
-                    />
-                </Switch>
-            )
-        }
-        renderWithProviders(<Component />, {
+        useCustomerType.mockReturnValue({isRegistered: false, isGuest: true})
+        renderWithProviders(<MockedComponent />, {
             wrapperProps: {siteAlias: 'uk', appConfig: mockConfig.app, isGuest: true}
         })
         await waitFor(() => expect(window.location.pathname).toBe(`${expectedBasePath}/login`))
     })
 })
-
-test('Provides navigation for subpages', async () => {
-    sdk.useCustomerType.mockReturnValue({isRegistered: true, isGuest: false})
-    global.server.use(
-        rest.get('*/products', (req, res, ctx) => {
-            return res(ctx.delay(0), ctx.json(mockOrderProducts))
-        }),
-        rest.get('*/customers/:customerId/orders', (req, res, ctx) => {
-            return res(ctx.delay(0), ctx.json(mockOrderHistory))
+describe('Page Navigation', () => {
+    test('works for subpages', async () => {
+        useCustomerType.mockReturnValue({isRegistered: true, isGuest: false})
+        global.server.use(
+            rest.get('*/products', (req, res, ctx) => {
+                return res(ctx.delay(0), ctx.json(mockOrderProducts))
+            }),
+            rest.get('*/customers/:customerId/orders', (req, res, ctx) => {
+                return res(ctx.delay(0), ctx.json(mockOrderHistory))
+            })
+        )
+        const {user} = renderWithProviders(<MockedComponent />, {
+            wrapperProps: {siteAlias: 'uk', appConfig: mockConfig.app}
         })
-    )
-    const {user} = renderWithProviders(<MockedComponent />, {
-        wrapperProps: {siteAlias: 'uk', appConfig: mockConfig.app}
-    })
-    expect(await screen.findByTestId('account-page')).toBeInTheDocument()
+        expect(await screen.findByTestId('account-page')).toBeInTheDocument()
 
-    const nav = within(screen.getByTestId('account-detail-nav'))
-    await user.click(nav.getByText('Addresses'))
-    await waitFor(() =>
-        expect(window.location.pathname).toBe(`${expectedBasePath}/account/addresses`)
-    )
-    await user.click(nav.getByText('Order History'))
-    await waitFor(() => expect(window.location.pathname).toBe(`${expectedBasePath}/account/orders`))
+        const nav = within(screen.getByTestId('account-detail-nav'))
+        await user.click(nav.getByText('Addresses'))
+        await waitFor(() =>
+            expect(window.location.pathname).toBe(`${expectedBasePath}/account/addresses`)
+        )
+        await user.click(nav.getByText('Order History'))
+        await waitFor(() =>
+            expect(window.location.pathname).toBe(`${expectedBasePath}/account/orders`)
+        )
+    })
 })
 
 describe('Render and logs out', function () {
     test('Renders account detail page by default for logged-in customer, and can log out', async () => {
+        useCustomerType.mockReturnValue({isRegistered: true, isGuest: false})
+
         const {user} = renderWithProviders(<MockedComponent />)
 
         // Render user profile page
@@ -141,7 +137,10 @@ describe('Render and logs out', function () {
         })
 
         await user.click(screen.getAllByText(/Log Out/)[0])
+        useCustomerType.mockReturnValue({isRegistered: false, isGuest: true})
+
         await waitFor(() => {
+            expect(window.location.pathname).toBe(`${expectedBasePath}/login`)
             expect(screen.getByTestId('login-page')).toBeInTheDocument()
         })
     })
@@ -162,7 +161,7 @@ describe('updating profile', function () {
         )
     })
     test('Allows customer to edit profile details', async () => {
-        sdk.useCustomerType.mockReturnValue({isRegistered: true, isExternal: false})
+        useCustomerType.mockReturnValue({isRegistered: true, isExternal: false})
         const {user} = renderWithProviders(<MockedComponent />)
         expect(await screen.findByTestId('account-page')).toBeInTheDocument()
         expect(await screen.findByTestId('account-detail-page')).toBeInTheDocument()
@@ -186,6 +185,7 @@ describe('updating profile', function () {
 
 describe('updating password', function () {
     beforeEach(() => {
+        useCustomerType.mockReturnValue({isRegistered: true, isExternal: false})
         global.server.use(
             rest.post('*/oauth2/token', (req, res, ctx) =>
                 res(

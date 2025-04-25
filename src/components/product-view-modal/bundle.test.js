@@ -63,6 +63,11 @@ beforeEach(() => {
     )
 })
 
+afterEach(() => {
+    jest.resetModules()
+    jest.restoreAllMocks()
+})
+
 test('renders bundle product view modal', async () => {
     renderWithProviders(<MockComponent />)
     await waitFor(() => {
@@ -165,9 +170,9 @@ test('bundle product view modal disables update button when quantity exceeds chi
     })
 
     // Set product bundle quantity selection to 4
-    quantityInput.focus()
     fireEvent.change(quantityInput, {target: {value: '4'}})
     fireEvent.keyDown(quantityInput, {key: 'Enter', code: 'Enter', charCode: 13})
+
     fireEvent.click(sizeSelectBtn)
 
     await waitFor(() => {

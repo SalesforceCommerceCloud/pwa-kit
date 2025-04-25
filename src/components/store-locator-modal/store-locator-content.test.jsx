@@ -354,7 +354,6 @@ describe('StoreLocatorContent', () => {
                 )
             })
         )
-        screen.debug()
 
         renderWithProviders(
             <WrapperComponent
