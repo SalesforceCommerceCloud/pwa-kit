@@ -53,8 +53,9 @@ describe('ShopperAgent Component', () => {
     const defaultProps = {
         commerceAgent: commerceAgentSettingsString,
         domainUrl: 'https://myorg.salesforce.com',
-        basketId: undefined, // TODO: Add basketId
-        locale: 'en-US'
+        basketId: '4a67cda5b1b9325a29207854c1',
+        locale: 'en-US',
+        basketDoneLoading: true
     }
 
     beforeEach(() => {
@@ -78,6 +79,13 @@ describe('ShopperAgent Component', () => {
 
     test('should render nothing when enableMiaw is false', () => {
         const props = {...defaultProps, enableMiaw: false}
+        const {container} = render(<ShopperAgent {...props} />)
+
+        expect(container.firstChild).toBeNull()
+    })
+
+    test('should render nothing when basketDoneLoading is false', () => {
+        const props = {...defaultProps, basketDoneLoading: false}
         const {container} = render(<ShopperAgent {...props} />)
 
         expect(container.firstChild).toBeNull()
@@ -162,7 +170,7 @@ describe('ShopperAgent Component', () => {
 
         // Verify embedded service initialization
         expect(mockEmbeddedService.prechatAPI.setHiddenPrechatFields).toHaveBeenCalledWith({
-            BasketId: undefined,
+            BasketId: '4a67cda5b1b9325a29207854c1',
             DomainURL: defaultProps.domainUrl,
             Locale: defaultProps.locale,
             OrganizationId: commerceAgentSettings.salesforceOrgId,
