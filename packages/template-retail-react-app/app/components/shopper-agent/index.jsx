@@ -70,7 +70,7 @@ function isEnabled(enabled) {
 }
 
 function FeatureToggle({...props}) {
-    if (props.isEnabled) {
+    if (props.isEnabled && props.basketDoneLoading) {
         return props.children
     }
 
@@ -79,7 +79,8 @@ function FeatureToggle({...props}) {
 
 FeatureToggle.propTypes = {
     isEnabled: PropTypes.bool,
-    children: PropTypes.node
+    children: PropTypes.node,
+    basketDoneLoading: PropTypes.bool
 }
 
 function ShopperAgentWindow({commerceAgent, locale, domainUrl, basketId}) {
@@ -107,8 +108,10 @@ function ShopperAgentWindow({commerceAgent, locale, domainUrl, basketId}) {
         })
 
         window.addEventListener('onEmbeddedMessagingWindowMaximized', (e) => {
-            const zIndex = theme.zIndices.sticky + 1;
-            const embeddedMessagingFrame = document.body.querySelector('div.embedded-messaging iframe');
+            const zIndex = theme.zIndices.sticky + 1
+            const embeddedMessagingFrame = document.body.querySelector(
+                'div.embedded-messaging iframe'
+            )
             if (embeddedMessagingFrame) {
                 embeddedMessagingFrame.style.zIndex = zIndex
             }
@@ -134,7 +137,8 @@ ShopperAgentWindow.propTypes = {
     commerceAgent: PropTypes.string,
     domainUrl: PropTypes.string,
     basketId: PropTypes.string,
-    locale: PropTypes.string
+    locale: PropTypes.string,
+    basketDoneLoading: PropTypes.bool
 }
 
 /**
@@ -146,12 +150,16 @@ ShopperAgentWindow.propTypes = {
  * @param {string} props.locale - The locale for the embedded messaging script
  * @returns {JSX.Element} The ShopperAgent component
  */
-function ShopperAgent({commerceAgent, domainUrl, basketId, locale}) {
+function ShopperAgent({commerceAgent, domainUrl, basketId, locale, basketDoneLoading}) {
     const {enabled} = JSON.parse(commerceAgent)
     const isShopperAgentEnabled = isEnabled(enabled)
 
     return (
-        <FeatureToggle isEnabled={isShopperAgentEnabled}>
+        <FeatureToggle
+            isEnabled={isShopperAgentEnabled}
+            basketId={basketId}
+            basketDoneLoading={basketDoneLoading}
+        >
             <ShopperAgentWindow
                 commerceAgent={commerceAgent}
                 locale={locale}
@@ -166,7 +174,8 @@ ShopperAgent.propTypes = {
     commerceAgent: PropTypes.string,
     domainUrl: PropTypes.string,
     basketId: PropTypes.string,
-    locale: PropTypes.string
+    locale: PropTypes.string,
+    basketDoneLoading: PropTypes.bool
 }
 
 export default ShopperAgent

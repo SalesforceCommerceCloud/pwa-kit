@@ -196,7 +196,7 @@ const App = (props) => {
     // Handle creating a new basket if there isn't one already assigned to the current
     // customer.
     const {data: customer} = useCurrentCustomer()
-    const {data: basket} = useCurrentBasket()
+    const {data: basket, dataUpdatedAt: basketQueryLastUpdateTime} = useCurrentBasket()
     const config = getConfig()
 
     const updateBasket = useShopperBasketsMutation('updateBasket')
@@ -358,7 +358,8 @@ const App = (props) => {
                             commerceAgent={config.app.commerceAgent}
                             domainUrl={`${appOrigin}${buildUrl(location.pathname)}`}
                             locale={locale?.id}
-                            basketId={basket?.id}
+                            basketId={basket?.basketId}
+                            basketDoneLoading={basketQueryLastUpdateTime > 0}
                         />
 
                         <ScrollToTop />
