@@ -53,6 +53,7 @@ const ColorRefinements = ({filter, toggleFilter, selectedFilters}) => {
                                 color={isSelected ? 'black' : 'gray.200'}
                                 border={isSelected ? '1px' : '0'}
                                 aria-checked={isSelected}
+                                role="checkbox"
                                 variant="outline"
                                 marginRight={0}
                                 marginBottom="-1px"

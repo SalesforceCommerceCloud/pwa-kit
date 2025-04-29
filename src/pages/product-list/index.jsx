@@ -791,6 +791,11 @@ const Sort = ({sortUrls, productSearchResult, basePath, ...otherProps}) => {
             {...otherProps}
         >
             <Select
+                id="sf-product-list-sort-select"
+                aria-label={intl.formatMessage({
+                    id: 'product_list.sort_by.label.assistive_msg',
+                    defaultMessage: 'Sort products by'
+                })}
                 value={basePath.replace(/(offset)=(\d+)/i, '$1=0')}
                 onChange={({target}) => {
                     history.push(target.value)

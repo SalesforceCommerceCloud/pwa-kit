@@ -205,8 +205,8 @@ export default function ShippingOptions() {
                 <ToggleCardSummary>
                     <Flex justify="space-between" w="full">
                         <Text>{selectedShippingMethod.name}</Text>
-                        <Flex alignItems="center" aria-label={shippingPriceLabel}>
-                            <Text fontWeight="bold" aria-hidden="true">
+                        <Flex alignItems="center" aria-label={shippingPriceLabel} role="group">
+                            <Text fontWeight="bold" aria-hidden="true" role="presentation">
                                 {selectedMethodDisplayPrice === 0 ? (
                                     freeLabel
                                 ) : (
@@ -224,6 +224,7 @@ export default function ShippingOptions() {
                                     color="gray.600"
                                     marginLeft={1}
                                     aria-hidden="true"
+                                    role="presentation"
                                 >
                                     <FormattedNumber
                                         style="currency"

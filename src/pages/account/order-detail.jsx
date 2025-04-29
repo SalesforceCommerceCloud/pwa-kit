@@ -170,8 +170,8 @@ const AccountOrderDetail = () => {
                             spacing={[0, 3]}
                             divider={
                                 <Divider
-                                    visibility={{base: 'hidden', lg: 'visible'}}
-                                    orientation={{lg: 'vertical'}}
+                                    visibility={{base: 'visible'}}
+                                    orientation="vertical"
                                     h={[0, 4]}
                                 />
                             }

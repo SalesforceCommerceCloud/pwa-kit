@@ -78,6 +78,10 @@ const Pagination = (props) => {
                     }}
                     value={currentURL}
                     height={11}
+                    aria-label={intl.formatMessage({
+                        id: 'pagination.field.page_number_select',
+                        defaultMessage: 'Select page number'
+                    })}
                 >
                     {urls.map((href, index) => (
                         <option key={index} value={href}>
