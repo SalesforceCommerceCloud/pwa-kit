@@ -43,7 +43,8 @@ const commerceAgentSettings = {
     embeddedServiceEndpoint: 'https://myorg.salesforce.com/ESWMIAWGuidedShopper',
     scriptSourceUrl: 'https://myorg.salesforce.com/ESWMIAWGuidedShopper/assets/js/bootstrap.min.js',
     scrt2Url: 'https://myorg.salesforce.com-scrt.com',
-    salesforceOrgId: '00DSB00000MJ7YH',
+    salesforceOrgId: 'mock_salesforce_org_id',
+    commerceOrgId: 'mock_ecom_id',
     siteId: 'RefArchGlobal'
 }
 
@@ -173,10 +174,33 @@ describe('ShopperAgent Component', () => {
             BasketId: '4a67cda5b1b9325a29207854c1',
             DomainURL: defaultProps.domainUrl,
             Locale: defaultProps.locale,
-            OrganizationId: commerceAgentSettings.salesforceOrgId,
+            OrganizationId: commerceAgentSettings.commerceOrgId,
             SiteId: commerceAgentSettings.siteId,
             UsId: 'test-usid'
         })
+    })
+    test('should not render when commerce agent settings are invalid', () => {
+        const invalidCommerceAgentSettings = {
+            enabled: 'true',
+            // Missing required fields
+            embeddedServiceName: 'test-service',
+            scriptSourceUrl: 'https://test.com/script.js'
+        }
+        const props = {
+            ...defaultProps,
+            commerceAgent: JSON.stringify(invalidCommerceAgentSettings)
+        }
+
+        const consoleSpy = jest.spyOn(console, 'error').mockImplementation()
+        const {container} = render(<ShopperAgent {...props} />)
+
+        // Should log error about invalid settings
+        expect(consoleSpy).toHaveBeenCalledWith('Invalid commerce agent settings.')
+        
+        // Component should not render anything
+        expect(container.firstChild).toBeNull()
+
+        consoleSpy.mockRestore()
     })
 
     test('should not load the script when the commerceAgent is disabled', () => {

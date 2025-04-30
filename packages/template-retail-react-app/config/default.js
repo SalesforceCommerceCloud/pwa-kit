@@ -9,13 +9,16 @@ const sites = require('./sites.js')
 
 const defaultCommerceAgentSettings = {
     enabled: 'true',
-    embeddedServiceName: 'MIAW_Guided_Shopper_production_functional38',
+    embeddedServiceName: 'Agentforce_Channel_Web',
     embeddedServiceEndpoint:
-        'https://orgfarm-7455a909de.test1.my.pc-rnd.site.com/ESWMIAWGuidedShopperpr1743525851212',
+        'https://orgfarm-1645fa246c.test1.my.pc-rnd.site.com/ESWAgentforceChannelWeb1745544099167',
+
     scriptSourceUrl:
-        'https://orgfarm-7455a909de.test1.my.pc-rnd.site.com/ESWMIAWGuidedShopperpr1743525851212/assets/js/bootstrap.min.js',
-    scrt2Url: 'https://orgfarm-7455a909de.test1.my.pc-rnd.salesforce-scrt.com',
-    salesforceOrgId: '00DSB00000MJ7YH',
+        'https://orgfarm-1645fa246c.test1.my.pc-rnd.site.com/ESWAgentforceChannelWeb1745544099167/assets/js/bootstrap.min.js',
+
+    scrt2Url: 'https://orgfarm-1645fa246c.test1.my.pc-rnd.salesforce-scrt.com',
+    salesforceOrgId: '00DSG00000RBHqn',
+    commerceOrgId: 'f_ecom_zzeu_052',
     siteId: 'RefArchGlobal'
 }
 
@@ -55,9 +58,9 @@ module.exports = {
         commerceAPI: {
             proxyPath: `/mobify/proxy/api`,
             parameters: {
-                clientId: 'c9c45bfd-0ed3-4aa2-9971-40f88962b836',
-                organizationId: 'f_ecom_zzrf_001',
-                shortCode: '8o7m175y',
+                clientId: '90ed26b1-5f04-413f-9a2e-c78a1a643bad',
+                organizationId: 'f_ecom_zzeu_052',
+                shortCode: 'kv7kzm78',
                 siteId: 'RefArchGlobal'
             }
         },
@@ -92,7 +95,7 @@ module.exports = {
                 path: 'api'
             },
             {
-                host: 'zzrf-001.dx.commercecloud.salesforce.com',
+                host: 'zzeu-052.dx.commercecloud.salesforce.com',
                 path: 'ocapi'
             }
         ]
