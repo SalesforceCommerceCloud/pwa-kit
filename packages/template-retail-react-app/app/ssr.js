@@ -39,7 +39,7 @@ const options = {
     mobify: config,
 
     // The port that the local dev server listens on
-    port: 3000,
+    port: 3001,
 
     // The protocol on which the development Express app listens.
     // Note that http://localhost is treated as a secure context for development,
@@ -309,14 +309,16 @@ const {handler} = runtime.createHandler(options, (app) => {
                     ],
                     'script-src': [
                         // Used by the service worker in /worker/main.js
-                        'storage.googleapis.com'
+                        'storage.googleapis.com',
+                        'https://js.stripe.com'
                     ],
                     'connect-src': [
                         // Connect to Einstein APIs
                         'api.cquotient.com',
                         // Connect to DataCloud APIs
                         '*.c360a.salesforce.com'
-                    ]
+                    ],
+                    'frame-src': ['self', 'https://js.stripe.com']
                 }
             }
         })

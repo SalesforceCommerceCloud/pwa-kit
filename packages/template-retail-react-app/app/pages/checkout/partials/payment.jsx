@@ -7,6 +7,8 @@
 import React, {useState} from 'react'
 import PropTypes from 'prop-types'
 import {defineMessage, FormattedMessage, useIntl} from 'react-intl'
+import {loadStripe} from '@stripe/stripe-js'
+import {Elements} from '@stripe/react-stripe-js';
 import {
     Box,
     Button,
@@ -32,11 +34,13 @@ import {
     ToggleCardEdit,
     ToggleCardSummary
 } from '@salesforce/retail-react-app/app/components/toggle-card'
-import PaymentForm from '@salesforce/retail-react-app/app/pages/checkout/partials/payment-form'
+import PaymentForm from '@salesforce/retail-react-app/app/pages/checkout/partials/sf-payment-form'
 import ShippingAddressSelection from '@salesforce/retail-react-app/app/pages/checkout/partials/shipping-address-selection'
 import AddressDisplay from '@salesforce/retail-react-app/app/components/address-display'
 import {PromoCode, usePromoCode} from '@salesforce/retail-react-app/app/components/promo-code'
 import {API_ERROR_MESSAGE} from '@salesforce/retail-react-app/app/constants'
+
+const stripePromise = loadStripe('pk_test_JsbBx7imKb7n7Xtlb5MH5BNO00ttiURmPV');
 
 const Payment = () => {
     const {formatMessage} = useIntl()
@@ -97,6 +101,30 @@ const Payment = () => {
             body: paymentInstrument
         })
     }
+
+    const handlePaymentMethod = (paymentMethod) => {
+        console.log('Got payment method in parent:', paymentMethod);
+
+        const paymentInstrument = {
+            paymentMethodId: 'CREDIT_CARD',
+            paymentCard: {
+                holder: paymentMethod.billing_details.name,
+                maskedNumber: '************' + paymentMethod.card.last4,
+                cardType:
+                    paymentMethod.card.brand.charAt(0).toUpperCase() +
+                    paymentMethod.card.brand.slice(1),
+                expirationMonth: paymentMethod.card.exp_month,
+                expirationYear: paymentMethod.card.exp_year
+            }
+        }
+
+        return addPaymentInstrumentToBasket({
+            parameters: {basketId: basket?.basketId},
+            body: paymentInstrument
+        })
+        // You can now send paymentMethod.id to your backend
+    }
+
     const onBillingSubmit = async () => {
         const isFormValid = await billingAddressForm.trigger()
 
@@ -169,7 +197,9 @@ const Payment = () => {
 
                 <Stack spacing={6}>
                     {!appliedPayment?.paymentCard ? (
-                        <PaymentForm form={paymentMethodForm} onSubmit={onPaymentSubmit} />
+                        <Elements stripe={stripePromise}>
+                            <PaymentForm form={paymentMethodForm} onPaymentMethod={handlePaymentMethod} />
+                        </Elements>
                     ) : (
                         <Stack spacing={3}>
                             <Heading as="h3" fontSize="md">
