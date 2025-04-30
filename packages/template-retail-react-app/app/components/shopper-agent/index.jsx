@@ -112,7 +112,8 @@ function ShopperAgentWindow({commerceAgent, locale, domainUrl, basketId}) {
         scrt2Url,
         salesforceOrgId,
         commerceOrgId,
-        siteId
+        siteId,
+        cartUrl
     } = JSON.parse(commerceAgent)
 
     const {usid} = useUsid()
@@ -124,7 +125,8 @@ function ShopperAgentWindow({commerceAgent, locale, domainUrl, basketId}) {
                 SiteId: siteId,
                 Locale: locale,
                 OrganizationId: commerceOrgId,
-                UsId: usid
+                UsId: usid,
+                CartURL: cartUrl
             })
         })
 

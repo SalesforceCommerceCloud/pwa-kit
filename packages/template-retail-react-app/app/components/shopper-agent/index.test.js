@@ -45,7 +45,8 @@ const commerceAgentSettings = {
     scrt2Url: 'https://myorg.salesforce.com-scrt.com',
     salesforceOrgId: 'mock_salesforce_org_id',
     commerceOrgId: 'mock_ecom_id',
-    siteId: 'RefArchGlobal'
+    siteId: 'RefArchGlobal',
+    cartUrl: 'https://mocksite.com/cart'
 }
 
 const commerceAgentSettingsString = JSON.stringify(commerceAgentSettings)
@@ -56,7 +57,8 @@ describe('ShopperAgent Component', () => {
         domainUrl: 'https://myorg.salesforce.com',
         basketId: '4a67cda5b1b9325a29207854c1',
         locale: 'en-US',
-        basketDoneLoading: true
+        basketDoneLoading: true,
+        cartUrl: 'https://mocksite.com/cart'
     }
 
     beforeEach(() => {
@@ -176,7 +178,8 @@ describe('ShopperAgent Component', () => {
             Locale: defaultProps.locale,
             OrganizationId: commerceAgentSettings.commerceOrgId,
             SiteId: commerceAgentSettings.siteId,
-            UsId: 'test-usid'
+            UsId: 'test-usid',
+            CartURL: defaultProps.cartUrl
         })
 
         // Reset mock to test button click event
