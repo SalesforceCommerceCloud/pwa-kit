@@ -17,7 +17,7 @@ import {ApplicationExtensionsLoaderOptions} from './webpack/types'
 
 // Register Handlebars helpers
 Handlebars.registerHelper('getInstanceName', (aString: string) => {
-    // Parse the package name to extract namespace and name parts
+    // Explicitly define `namespace` and `name` as strings with fallback values
     let namespace = ''
     let name = aString
 
