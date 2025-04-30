@@ -161,22 +161,34 @@ describe('ShopperAgent Component', () => {
         expect(mockEmbeddedService.init).not.toHaveBeenCalled()
     })
 
-    test('should call the preChatAPI with the correct parameters', async () => {
+    test('should set prechat fields correctly on different events', async () => {
         useScript.mockReturnValue({loaded: true, error: false})
         render(<ShopperAgent {...defaultProps} />)
 
+        // Test initial prechat fields set on ready event
         await act(async () => {
             window.dispatchEvent(new Event('onEmbeddedMessagingReady'))
         })
 
-        // Verify embedded service initialization
         expect(mockEmbeddedService.prechatAPI.setHiddenPrechatFields).toHaveBeenCalledWith({
-            BasketId: '4a67cda5b1b9325a29207854c1',
             DomainURL: defaultProps.domainUrl,
+            SiteId: commerceAgentSettings.siteId,
             Locale: defaultProps.locale,
             OrganizationId: commerceAgentSettings.commerceOrgId,
             SiteId: commerceAgentSettings.siteId,
             UsId: 'test-usid'
+        })
+
+        // Reset mock to test button click event
+        mockEmbeddedService.prechatAPI.setHiddenPrechatFields.mockClear()
+
+        // Test BasketId update when button is clicked
+        await act(async () => {
+            window.dispatchEvent(new Event('onEmbeddedMessagingButtonClicked'))
+        })
+
+        expect(mockEmbeddedService.prechatAPI.setHiddenPrechatFields).toHaveBeenCalledWith({
+            BasketId: defaultProps.basketId
         })
     })
     test('should not render when commerce agent settings are invalid', () => {

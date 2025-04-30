@@ -122,15 +122,13 @@ function ShopperAgentWindow({commerceAgent, locale, domainUrl, basketId}) {
             window.embeddedservice_bootstrap.prechatAPI.setHiddenPrechatFields({
                 DomainURL: domainUrl,
                 SiteId: siteId,
-                BasketId: basketId,
                 Locale: locale,
                 OrganizationId: commerceOrgId,
                 UsId: usid
             })
         })
 
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        window.addEventListener('onEmbeddedMessagingWindowMaximized', (e) => {
+        window.addEventListener('onEmbeddedMessagingWindowMaximized', () => {
             const zIndex = theme.zIndices.sticky + 1
             const embeddedMessagingFrame = document.body.querySelector(
                 'div.embedded-messaging iframe'
@@ -140,6 +138,15 @@ function ShopperAgentWindow({commerceAgent, locale, domainUrl, basketId}) {
             }
         })
     }, [commerceAgent])
+
+    // whenever the basketId changes, update the hidden prechat fields
+    useEffect(() => {
+        window.addEventListener('onEmbeddedMessagingButtonClicked', function () {
+            window.embeddedservice_bootstrap.prechatAPI.setHiddenPrechatFields({
+                BasketId: basketId
+            })
+        })
+    }, [commerceAgent, basketId])
 
     // Load the embedded messaging script
     const scriptLoadStatus = useScript(scriptSourceUrl)
