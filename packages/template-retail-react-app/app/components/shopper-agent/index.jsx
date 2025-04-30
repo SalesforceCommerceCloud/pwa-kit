@@ -66,14 +66,24 @@ function useMiaw(
 }
 
 function validateCommerceAgentSettings(commerceAgent) {
-    return 'enabled' in commerceAgent && typeof commerceAgent.enabled === 'string' &&
-        'embeddedServiceName' in commerceAgent && typeof commerceAgent.embeddedServiceName === 'string' &&
-        'embeddedServiceEndpoint' in commerceAgent && typeof commerceAgent.embeddedServiceEndpoint === 'string' &&
-        'scriptSourceUrl' in commerceAgent && typeof commerceAgent.scriptSourceUrl === 'string' &&
-        'scrt2Url' in commerceAgent && typeof commerceAgent.scrt2Url === 'string' &&
-        'salesforceOrgId' in commerceAgent && typeof commerceAgent.salesforceOrgId === 'string' &&
-        'commerceOrgId' in commerceAgent && typeof commerceAgent.commerceOrgId === 'string' &&
-        'siteId' in commerceAgent && typeof commerceAgent.siteId === 'string';
+    return (
+        'enabled' in commerceAgent &&
+        typeof commerceAgent.enabled === 'string' &&
+        'embeddedServiceName' in commerceAgent &&
+        typeof commerceAgent.embeddedServiceName === 'string' &&
+        'embeddedServiceEndpoint' in commerceAgent &&
+        typeof commerceAgent.embeddedServiceEndpoint === 'string' &&
+        'scriptSourceUrl' in commerceAgent &&
+        typeof commerceAgent.scriptSourceUrl === 'string' &&
+        'scrt2Url' in commerceAgent &&
+        typeof commerceAgent.scrt2Url === 'string' &&
+        'salesforceOrgId' in commerceAgent &&
+        typeof commerceAgent.salesforceOrgId === 'string' &&
+        'commerceOrgId' in commerceAgent &&
+        typeof commerceAgent.commerceOrgId === 'string' &&
+        'siteId' in commerceAgent &&
+        typeof commerceAgent.siteId === 'string'
+    )
 }
 
 function isEnabled(enabled) {
@@ -82,8 +92,8 @@ function isEnabled(enabled) {
 
 function FeatureToggle({...props}) {
     if (!validateCommerceAgentSettings(JSON.parse(props.commerceAgent))) {
-        console.error('Invalid commerce agent settings.');
-        return null;
+        console.error('Invalid commerce agent settings.')
+        return null
     }
 
     if (props.isEnabled && props.basketDoneLoading) {
@@ -125,6 +135,7 @@ function ShopperAgentWindow({commerceAgent, locale, domainUrl, basketId}) {
             })
         })
 
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         window.addEventListener('onEmbeddedMessagingWindowMaximized', (e) => {
             const zIndex = theme.zIndices.sticky + 1
             const embeddedMessagingFrame = document.body.querySelector(

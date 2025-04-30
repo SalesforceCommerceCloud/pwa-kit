@@ -196,7 +196,7 @@ describe('ShopperAgent Component', () => {
 
         // Should log error about invalid settings
         expect(consoleSpy).toHaveBeenCalledWith('Invalid commerce agent settings.')
-        
+
         // Component should not render anything
         expect(container.firstChild).toBeNull()
 
