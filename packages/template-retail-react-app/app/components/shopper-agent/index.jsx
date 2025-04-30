@@ -66,24 +66,18 @@ function useMiaw(
 }
 
 function validateCommerceAgentSettings(commerceAgent) {
-    return (
-        'enabled' in commerceAgent &&
-        typeof commerceAgent.enabled === 'string' &&
-        'embeddedServiceName' in commerceAgent &&
-        typeof commerceAgent.embeddedServiceName === 'string' &&
-        'embeddedServiceEndpoint' in commerceAgent &&
-        typeof commerceAgent.embeddedServiceEndpoint === 'string' &&
-        'scriptSourceUrl' in commerceAgent &&
-        typeof commerceAgent.scriptSourceUrl === 'string' &&
-        'scrt2Url' in commerceAgent &&
-        typeof commerceAgent.scrt2Url === 'string' &&
-        'salesforceOrgId' in commerceAgent &&
-        typeof commerceAgent.salesforceOrgId === 'string' &&
-        'commerceOrgId' in commerceAgent &&
-        typeof commerceAgent.commerceOrgId === 'string' &&
-        'siteId' in commerceAgent &&
-        typeof commerceAgent.siteId === 'string'
-    )
+    const requiredFields = [
+        'enabled',
+        'embeddedServiceName',
+        'embeddedServiceEndpoint',
+        'scriptSourceUrl',
+        'scrt2Url',
+        'salesforceOrgId',
+        'commerceOrgId',
+        'siteId'
+    ]
+
+    return requiredFields.every((key) => typeof commerceAgent[key] === 'string')
 }
 
 function isEnabled(enabled) {
