@@ -38,8 +38,8 @@ import {
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {
     buildAliases,
-    nameRegex,
-    getConfiguredExtensions
+    getConfiguredExtensions,
+    isExtensionPackage
 } from '@salesforce/pwa-kit-extension-sdk/shared/utils'
 
 const projectDir = process.cwd()
@@ -203,7 +203,9 @@ const baseConfig = (target) => {
                         // are configured at build time.
                         ...buildAliases(
                             Object.keys(pkg?.devDependencies || {}).filter((dependency) =>
-                                dependency.match(nameRegex)
+                                isExtensionPackage(
+                                    path.join(projectDir, 'node_modules', dependency)
+                                )
                             )
                         )
                     },
@@ -338,12 +340,32 @@ const ruleForBabelLoader = (babelPlugins) => {
     return {
         id: 'babel-loader',
         test: /(\.js(x?)|\.ts(x?))$/,
-        // NOTE: Because our extensions are just folders containing source code, we need to ensure that the babel-loader processes them.
-        // This regex exclude everything in node_modules, but node_modules/extensions-*/ folders
-        exclude: new RegExp(
-            `node_modules\\${path.sep}(?!(@?[^\\${path.sep}]+\\${path.sep})?extension-).*`,
-            'i'
-        ),
+        // Determine if a module is an extension
+        exclude: (modulePath) => {
+            // Skip node_modules
+            if (!modulePath.includes('node_modules')) {
+                return false
+            }
+
+            // Extract package path from node_modules
+            const nodeModulesPath = modulePath.split('node_modules' + path.sep)[1]
+            if (!nodeModulesPath) {
+                return true
+            }
+
+            // Get the package name portion
+            const packageName = nodeModulesPath.split(path.sep)[0]
+            if (!packageName) {
+                return true
+            }
+
+            // Check if it's an extension package
+            const packagePath = path.join(process.cwd(), 'node_modules', packageName)
+            const isExtension = isExtensionPackage(packagePath)
+
+            // Process extension packages
+            return !isExtension
+        },
         use: [
             {
                 loader: findDepInStack('thread-loader'),

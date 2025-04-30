@@ -10,18 +10,24 @@ import dedent from 'dedent'
 import Handlebars from 'handlebars'
 
 // Local
-import {kebabToUpperCamelCase, nameRegex} from '../shared/utils'
+import {kebabToUpperCamelCase} from '../shared/utils'
 
 // Types
 import {ApplicationExtensionsLoaderOptions} from './webpack/types'
 
 // Register Handlebars helpers
 Handlebars.registerHelper('getInstanceName', (aString: string) => {
-    const match = aString.match(nameRegex)
+    // Parse the package name to extract namespace and name parts
+    let namespace = ''
+    let name = aString
 
-    // Explicitly define `namespace` and `name` as strings with fallback values
-    const namespace = match?.[1] ?? ''
-    const name = match?.[2] ?? ''
+    // If the package name has a namespace, extract it
+    if (aString.startsWith('@') && aString.includes('/')) {
+        const [namespaceWithAt, packageName] = aString.split('/')
+        // Remove the @ prefix
+        namespace = namespaceWithAt.substring(1)
+        name = packageName
+    }
 
     return kebabToUpperCamelCase(`${namespace ? `${namespace}-` : ''}${name}`)
 })

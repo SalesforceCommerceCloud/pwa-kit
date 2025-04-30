@@ -92,19 +92,22 @@ export const findFileWithExtension = (basePath: string, extensions: string[] = [
 }
 
 /**
- * This regular expression is used to identify and validate application extensions.
- * The current formate for a valid extension is an optional package namespace followed by
- * `extension-` string litteral, then the extension name. (E.g. @salesforce/extension-store-finder).
- * This regex has grouping that allows you to pull the namespace and application extension
- * name from the string being matched.
+ * Extensions are identified by the presence of an `extension-meta.json` file in the package directory.
+ * This method allows us to find extensions without relying on any naming convention.
  *
  * @example
  *
  * const installedExtensions = Object.keys(pkg.devDependencies)
- *      .map((packageName) => packageName.match(nameRegex))
- *      .filter(Boolean)
+ *      .filter((packageName) => isExtensionPackage(path.join(projectDir, 'node_modules', packageName)))
  */
-export const nameRegex = /^(?:@([^/]+)\/)?extension-(.+)$/
+export const isExtensionPackage = (packagePath: string): boolean => {
+    try {
+        const extensionMetaPath = path.join(packagePath, 'extension-meta.json')
+        return fse.existsSync(extensionMetaPath)
+    } catch (error) {
+        return false
+    }
+}
 
 /**
  * @private
@@ -163,7 +166,15 @@ const getDependencies = (extension: ApplicationExtensionEntryTuple) => {
     const projectDir = process.cwd()
     const pkg = fse.readJsonSync(resolve(projectDir, 'node_modules', extension[0], 'package.json'))
 
-    return Object.keys(pkg.peerDependencies).filter((name) => name.match(nameRegex) !== null)
+    // Filter dependencies that are extensions by checking for the presence of extension-meta.json
+    return Object.keys(pkg.peerDependencies).filter((dependencyName) => {
+        try {
+            const dependencyPath = resolve(projectDir, 'node_modules', dependencyName)
+            return isExtensionPackage(dependencyPath)
+        } catch (error) {
+            return false
+        }
+    })
 }
 
 const getPreviousExtensions = (

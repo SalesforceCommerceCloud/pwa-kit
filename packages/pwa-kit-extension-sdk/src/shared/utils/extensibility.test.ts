@@ -174,13 +174,19 @@ describe('extensibilityUtils', () => {
 
         test('returns success if the given extensions do NOT depend on other extensions', () => {
             mockPackageJson({
-                'extension-test': {
+                'my-extension': {
                     peerDependencies: {
                         react: '^18.2.0'
                     }
                 }
             })
-            const result = extensionUtils.validateExtensionDependencies(['extension-test'])
+
+            // Mock extension-meta.json existence
+            mockedFse.existsSync.mockImplementation((filePath) => {
+                return filePath.toString().endsWith('extension-meta.json')
+            })
+
+            const result = extensionUtils.validateExtensionDependencies(['my-extension'])
             expect(result).toStrictEqual({
                 success: true
             })
@@ -188,21 +194,27 @@ describe('extensibilityUtils', () => {
 
         test('returns success if the given extensions do depend on other extensions and they are all loaded', () => {
             mockPackageJson({
-                'extension-test': {
+                'package-one': {
                     peerDependencies: {
                         react: '^18.2.0'
                     }
                 },
-                'extension-test-2': {
+                'package-two': {
                     peerDependencies: {
                         react: '^18.2.0',
-                        'extension-test': '1.0.0'
+                        'package-one': '1.0.0'
                     }
                 }
             })
+
+            // Mock extension-meta.json existence for all packages
+            mockedFse.existsSync.mockImplementation((filePath) => {
+                return filePath.toString().endsWith('extension-meta.json')
+            })
+
             const result = extensionUtils.validateExtensionDependencies([
-                'extension-test',
-                'extension-test-2'
+                'package-one',
+                'package-two'
             ])
             expect(result).toStrictEqual({
                 success: true
@@ -211,24 +223,62 @@ describe('extensibilityUtils', () => {
 
         test('returns failure if the given extensions do depend on other extensions and some are NOT loaded', () => {
             mockPackageJson({
-                'extension-test': {
+                'package-one': {
                     peerDependencies: {
                         react: '^18.2.0'
                     }
                 },
-                'extension-test-2': {
+                'package-two': {
                     peerDependencies: {
                         react: '^18.2.0',
-                        'extension-test': '1.0.0'
+                        'package-one': '1.0.0'
                     }
                 }
             })
+
+            // Mock extension-meta.json existence for all packages
+            mockedFse.existsSync.mockImplementation((filePath) => {
+                return filePath.toString().endsWith('extension-meta.json')
+            })
+
             const result = extensionUtils.validateExtensionDependencies([
-                ['extension-test', {enabled: false}],
-                'extension-test-2'
+                ['package-one', {enabled: false}],
+                'package-two'
             ])
             expect(result.success).toBe(false)
             expect(Array.isArray(result.errors) && result.errors.length > 0).toBe(true)
+        })
+    })
+
+    describe('isExtensionPackage', () => {
+        beforeEach(() => {
+            // Reset mocks
+            mockedFse.existsSync.mockReset()
+        })
+
+        test('returns true when extension-meta.json file exists', () => {
+            // Mock the existsSync to return true for extension-meta.json
+            mockedFse.existsSync.mockImplementation((filePath) => {
+                return filePath.toString().endsWith('extension-meta.json')
+            })
+
+            expect(extensionUtils.isExtensionPackage('/path/to/package')).toBe(true)
+        })
+
+        test('returns false when extension-meta.json file does not exist', () => {
+            // Mock the existsSync to return false for extension-meta.json
+            mockedFse.existsSync.mockImplementation(() => false)
+
+            expect(extensionUtils.isExtensionPackage('/path/to/package')).toBe(false)
+        })
+
+        test('returns false when there is an error checking for extension-meta.json', () => {
+            // Mock the existsSync to throw an error
+            mockedFse.existsSync.mockImplementation(() => {
+                throw new Error('Test error')
+            })
+
+            expect(extensionUtils.isExtensionPackage('/path/to/package')).toBe(false)
         })
     })
 })

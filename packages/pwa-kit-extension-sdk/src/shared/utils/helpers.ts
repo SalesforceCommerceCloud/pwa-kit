@@ -61,14 +61,10 @@ export const kebabToLowerCamelCase = (str: string) =>
         )
         .join('')
 
-// Returns true if the entry passes is a ApplicationExtensionEntryTuple type.
-// TODO: This looks like it could be done in a more generic way.
+// Returns true if the entry has a valid format for an ApplicationExtensionEntryTuple
 const isApplicationExtensionEntryTuple = (entry: unknown[]): boolean => {
     const [nameRef, config] = entry || []
-    const isValid =
-        typeof nameRef === 'string' &&
-        typeof config === 'object' &&
-        !!nameRef.match(/^(?:@([^/]+)\/)?extension-(.+)$/)
+    const isValid = typeof nameRef === 'string' && typeof config === 'object'
 
     if (!isValid) {
         // TODO: use our logger factory
