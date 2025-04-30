@@ -19,7 +19,8 @@ const defaultCommerceAgentSettings = {
     scrt2Url: 'https://orgfarm-1645fa246c.test1.my.pc-rnd.salesforce-scrt.com',
     salesforceOrgId: '00DSG00000RBHqn',
     commerceOrgId: 'f_ecom_zzeu_052',
-    siteId: 'RefArchGlobal'
+    siteId: 'RefArchGlobal',
+    cartUrl: 'https://agentgatos-production.mobify-storefront.com/cart'
 }
 
 module.exports = {
