@@ -102,6 +102,11 @@ export const findFileWithExtension = (basePath: string, extensions: string[] = [
  */
 export const isExtensionPackage = (packagePath: string): boolean => {
     try {
+        if (!packagePath) {
+            return false
+        }
+
+        // Simple check just looking for extension-meta.json at the root
         const extensionMetaPath = path.join(packagePath, 'extension-meta.json')
         return fse.existsSync(extensionMetaPath)
     } catch (error) {

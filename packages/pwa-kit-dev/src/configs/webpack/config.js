@@ -145,6 +145,29 @@ const findDepInStack = (pkg) => {
     return candidate
 }
 
+// Helper function to detect extensions
+const detectExtensions = () => {
+    const extensions = []
+
+    // Get all direct dependencies from package.json
+    const allDependencies = [
+        ...Object.keys(pkg.dependencies || {}),
+        ...Object.keys(pkg.devDependencies || {})
+    ]
+
+    for (const dependency of allDependencies) {
+        const packagePath = path.join(projectDir, 'node_modules', dependency)
+
+        if (isExtensionPackage(packagePath)) {
+            extensions.push(dependency)
+        }
+    }
+
+    return extensions
+}
+
+const detectedExtensions = detectExtensions()
+
 const baseConfig = (target) => {
     if (!['web', 'node'].includes(target)) {
         throw Error(`The value "${target}" is not a supported webpack target`)
@@ -198,16 +221,10 @@ const baseConfig = (target) => {
                                 [dep]: findDepInStack(dep)
                             }))
                         ),
-                        // Create alias's for "all" extensions, enabled or disabled, as they as they are being imported from the SDK package
+                        // Create alias's for "all" detected extensions, enabled or disabled, as they are being imported from the SDK package
                         // and cannot be resolved from that location. We create alias's for all because we do not know which extensions
                         // are configured at build time.
-                        ...buildAliases(
-                            Object.keys(pkg?.devDependencies || {}).filter((dependency) =>
-                                isExtensionPackage(
-                                    path.join(projectDir, 'node_modules', dependency)
-                                )
-                            )
-                        )
+                        ...buildAliases(detectedExtensions)
                     },
                     ...(target === 'web' ? {fallback: {crypto: false}} : {})
                 },
@@ -324,11 +341,10 @@ const staticFolderCopyPlugin = new CopyPlugin({
             from: 'app/static/',
             to: 'static/'
         },
-        ...getConfiguredExtensions(getConfig()).map((extension) => {
-            const packageName = extension[0]
+        ...detectedExtensions.map((extension) => {
             return {
-                from: `${projectDir}/node_modules/${packageName}/static`,
-                to: `static/${EXTENIONS_NAMESPACE}/${packageName}`,
+                from: `${projectDir}/node_modules/${extension}/static`,
+                to: `static/${EXTENIONS_NAMESPACE}/${extension}`,
                 // Add exclude for readme file.
                 noErrorOnMissing: true
             }
@@ -337,34 +353,52 @@ const staticFolderCopyPlugin = new CopyPlugin({
 })
 
 const ruleForBabelLoader = (babelPlugins) => {
+    // Handle the case when no extensions are detected
+    if (!detectedExtensions.length) {
+        return {
+            id: 'babel-loader',
+            test: /(\.js(x?)|\.ts(x?))$/,
+            exclude: /node_modules/,
+            use: [
+                {
+                    loader: findDepInStack('thread-loader'),
+                    options: {
+                        // eslint-disable-next-line @typescript-eslint/no-var-requires
+                        workers: Math.min(4, require('os').cpus().length),
+                        workerParallelJobs: 100
+                    }
+                },
+                {
+                    loader: findDepInStack('babel-loader'),
+                    options: {
+                        rootMode: 'upward',
+                        cacheDirectory: true,
+                        ...(babelPlugins ? {plugins: babelPlugins} : {})
+                    }
+                }
+            ]
+        }
+    }
+
+    // Pre-compute the paths to extensions for performance
+    const extensionPaths = detectedExtensions.map((ext) =>
+        path.normalize(`node_modules${path.sep}${ext}${path.sep}`)
+    )
+
     return {
         id: 'babel-loader',
         test: /(\.js(x?)|\.ts(x?))$/,
-        // Determine if a module is an extension
         exclude: (modulePath) => {
-            // Skip node_modules
+            // Not in node_modules. Include it (don't exclude)
             if (!modulePath.includes('node_modules')) {
                 return false
             }
 
-            // Extract package path from node_modules
-            const nodeModulesPath = modulePath.split('node_modules' + path.sep)[1]
-            if (!nodeModulesPath) {
-                return true
-            }
+            // Normalize path for consistent comparison
+            const normalizedPath = path.normalize(modulePath)
 
-            // Get the package name portion
-            const packageName = nodeModulesPath.split(path.sep)[0]
-            if (!packageName) {
-                return true
-            }
-
-            // Check if it's an extension package
-            const packagePath = path.join(process.cwd(), 'node_modules', packageName)
-            const isExtension = isExtensionPackage(packagePath)
-
-            // Process extension packages
-            return !isExtension
+            // Check if the path includes any of our extension paths
+            return !extensionPaths.some((extPath) => normalizedPath.includes(extPath))
         },
         use: [
             {
