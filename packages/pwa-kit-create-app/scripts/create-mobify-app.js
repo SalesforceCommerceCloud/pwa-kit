@@ -48,6 +48,7 @@ const semver = require('semver')
 const slugify = require('slugify')
 const generatorPkg = require('../package.json')
 const Handlebars = require('handlebars')
+const validatePackageName = require('validate-npm-package-name')
 
 const program = new Command()
 
@@ -72,10 +73,11 @@ const validProjectName = (s) => {
     return regex.test(s) || 'Value can only contain letters, numbers, space and hyphens.'
 }
 
-const validAppExtensionNameRegex = /^(@[a-zA-Z0-9-_]+\/)?[a-zA-Z0-9-_]+$/
 const validProjectAppExtensionName = (input) => {
-    if (!validAppExtensionNameRegex.test(input)) {
-        return 'The Application Extension name must follow the format @{namespace}/{package-name} (namespace is optional).'
+    const result = validatePackageName(input)
+    if (!result.validForNewPackages) {
+        const errors = result.errors || []
+        return `Invalid package name: ${errors.join(', ')}`
     }
     return true
 }

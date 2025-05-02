@@ -35,7 +35,8 @@
     "semver": "^7.5.2",
     "shelljs": "^0.8.5",
     "slugify": "^1.6.5",
-    "tar": "^6.2.1"
+    "tar": "^6.2.1",
+    "validate-npm-package-name": "^6.0.0"
   },
   "devDependencies": {
     "@salesforce/pwa-kit-dev": "4.0.0-extensibility-preview.4",
