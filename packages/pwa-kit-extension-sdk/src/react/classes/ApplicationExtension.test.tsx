@@ -54,6 +54,7 @@ class TestExtension extends ApplicationExtension<TestConfig> {
 class TestExtensionAsyncRoutes extends ApplicationExtension<TestConfig> {
     static readonly id = 'test-extension'
 
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     public async getRoutesAsync(params: any): Promise<RouteProps[]> {
         return Promise.resolve(mockRoutes)
     }
@@ -66,6 +67,7 @@ class TestExtensionAsyncRoutes extends ApplicationExtension<TestConfig> {
 class TestExtensionAsyncRoutesNoComponentMap extends ApplicationExtension<TestConfig> {
     static readonly id = 'test-extension'
 
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     public async getRoutesAsync(params: any): Promise<RouteProps[]> {
         return Promise.resolve(mockRoutes)
     }

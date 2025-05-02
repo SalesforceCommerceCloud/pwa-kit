@@ -84,35 +84,39 @@ describe('"expand" util returns correct return value when', () => {
     ;[
         {
             name: 'extensions are all valid package names',
-            input: ['extension-a', 'extension-b', 'extension-c', '@salesforce/extension-d'],
+            input: ['store-locator', 'product-details', 'checkout', '@salesforce/commerce-api'],
             expected: [
-                ['extension-a', {enabled: true}],
-                ['extension-b', {enabled: true}],
-                ['extension-c', {enabled: true}],
-                ['@salesforce/extension-d', {enabled: true}]
+                ['store-locator', {enabled: true}],
+                ['product-details', {enabled: true}],
+                ['checkout', {enabled: true}],
+                ['@salesforce/commerce-api', {enabled: true}]
             ]
         },
         {
             name: 'extensions include falsy values',
-            input: ['extension-a', '', false],
-            expected: [['extension-a', {enabled: true}]]
+            input: ['store-locator', '', false],
+            expected: [['store-locator', {enabled: true}]]
         },
         {
-            name: 'extensions defined do not follow naming convention',
-            input: ['not-the-correct-prefix-a'],
-            expected: []
+            name: 'extensions can have any valid package name (no naming restrictions)',
+            input: ['my-extension', 'not-a-store', 'simple-name'],
+            expected: [
+                ['my-extension', {enabled: true}],
+                ['not-a-store', {enabled: true}],
+                ['simple-name', {enabled: true}]
+            ]
         },
         {
             name: 'extensions have mixed formats',
             input: [
-                '@salesforce/extension-a',
-                ['@salesforce/extension-b', {foo: 'bar'}],
-                ['@salesforce/extension-c']
+                '@salesforce/commerce-api',
+                ['@salesforce/analytics', {foo: 'bar'}],
+                ['@salesforce/payment-gateway']
             ],
             expected: [
-                ['@salesforce/extension-a', {enabled: true}],
-                ['@salesforce/extension-b', {enabled: true, foo: 'bar'}],
-                ['@salesforce/extension-c', {enabled: true}]
+                ['@salesforce/commerce-api', {enabled: true}],
+                ['@salesforce/analytics', {enabled: true, foo: 'bar'}],
+                ['@salesforce/payment-gateway', {enabled: true}]
             ]
         }
     ].forEach((testCase) => {
@@ -129,8 +133,8 @@ describe('getConfiguredExtensions', () => {
         const extensions = getConfiguredExtensions({
             app: {
                 extensions: [
-                    '@salesforce/extension-test',
-                    ['@salesforce/extension-test-2', {foo: 'bar'}]
+                    '@salesforce/store-locator',
+                    ['@salesforce/product-details', {foo: 'bar'}]
                 ]
             }
         })
@@ -138,8 +142,8 @@ describe('getConfiguredExtensions', () => {
         const secondExtension = extensions[1]
 
         expect(Array.isArray(firstExtension)).toBe(true)
-        expect(firstExtension[0]).toBe('@salesforce/extension-test')
-        expect(secondExtension[0]).toBe('@salesforce/extension-test-2')
+        expect(firstExtension[0]).toBe('@salesforce/store-locator')
+        expect(secondExtension[0]).toBe('@salesforce/product-details')
     })
 
     test('returns empty array for config without extensions', () => {

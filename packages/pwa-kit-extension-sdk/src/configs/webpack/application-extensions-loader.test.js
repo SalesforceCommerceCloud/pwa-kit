@@ -68,14 +68,14 @@ describe('Application Extension Loader', () => {
                 const file = dedent`
                     import loadable from '@loadable/component'
 
-                    const SalesforceTestALoader = loadable.lib(() => import('@salesforce/extension-test-a/setup-app'))
+                    const SalesforceExtensionTestALoader = loadable.lib(() => import('@salesforce/extension-test-a/setup-app'))
 
                     const extensionConfigs = {
                         '@salesforce/extension-test-a': {"enabled":true},
                     }
 
                     const getApplicationExtensions = async () => {
-                        const modules = await Promise.all([SalesforceTestALoader.load()])
+                        const modules = await Promise.all([SalesforceExtensionTestALoader.load()])
                         return [new modules[0].default({"enabled":true})]
                     }
 
@@ -107,14 +107,14 @@ describe('Application Extension Loader', () => {
             entryPoint: './app/main.jsx',
             expects: (output) => {
                 const file = dedent`
-                    import SalesforceTestA from '@salesforce/extension-test-a/setup-server'
+                    import SalesforceExtensionTestA from '@salesforce/extension-test-a/setup-server'
 
                     const extensionConfigs = {
                         '@salesforce/extension-test-a': {"enabled":true},
                     }
 
                     const getApplicationExtensions = () => {
-                        return [new SalesforceTestA({"enabled":true})]
+                        return [new SalesforceExtensionTestA({"enabled":true})]
                     }
 
                     export {
