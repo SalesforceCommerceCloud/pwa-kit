@@ -169,9 +169,10 @@ export const validateOverrideSource = (source: string, options: any = {}) => {
     const targetCache = OVERRIDABLE_CACHE[target as keyof typeof OVERRIDABLE_CACHE]
 
     // Extract package path from source to check if it's an extension
-    const packagePath = isMonoRepo
-        ? source.split(`${path.sep}${MONO_REPO_WORKSPACE_FOLDER}${path.sep}`)[1]?.split(path.sep)[0]
-        : source.split(`${path.sep}${NODE_MODULES_FOLDER}${path.sep}`)[1]?.split(path.sep)[0]
+    const folderPattern = `${path.sep}${
+        isMonoRepo ? MONO_REPO_WORKSPACE_FOLDER : NODE_MODULES_FOLDER
+    }${path.sep}`
+    const packagePath = source.split(folderPattern)[1]?.split(path.sep)[0]
 
     if (!packagePath) {
         return false
