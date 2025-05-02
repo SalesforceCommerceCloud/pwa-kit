@@ -12,9 +12,9 @@ import resolve from 'resolve'
 
 // Local Imports
 import {
+    SETUP_FILE_REGEX,
     buildCandidatePaths,
     getPackageName,
-    SETUP_FILE_REGEX,
     isExtensionPackage
 } from '../../shared/utils'
 
