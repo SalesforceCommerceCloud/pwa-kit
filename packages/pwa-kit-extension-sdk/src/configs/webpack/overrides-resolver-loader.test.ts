@@ -11,6 +11,30 @@ import {validateOverrideSource, __OVERRIDABLE_CACHE__} from './overrides-resolve
 import OverrideStatsPlugin, {OverrideStatsEntry} from './override-stats-plugin'
 import * as utils from '../../shared/utils'
 
+// Define mock for isExtensionPackage
+jest.mock('../../shared/utils', () => {
+    const original = jest.requireActual('../../shared/utils')
+    return {
+        ...original,
+        mergeWithDefaultConfig: jest.fn().mockImplementation((extension) => extension),
+        isExtensionPackage: (packagePath: string) => {
+            // Simulate these packages having extension-meta.json files
+            return [
+                'extension-sample',
+                '@salesforce/extension-sample',
+                'packages/extension-sample',
+                'extension-sample-no-mono',
+                'extension-this',
+                '@salesforce/extension-this',
+                'extension-that',
+                '@salesforce/extension-that',
+                'extension-other',
+                '@salesforce/extension-other'
+            ].some((name) => packagePath.toString().includes(name))
+        }
+    }
+})
+
 declare module 'webpack' {
     interface Compilation {
         overrideStats?: OverrideStatsEntry[]
@@ -462,26 +486,15 @@ describe('Overrides Resolver Loader', () => {
     })
 })
 
-// TODO: Fix this test to properly mock isExtensionPackage
-// Skip tests that try to mock isExtensionPackage since it's causing issues
-// eslint-disable-next-line jest/no-disabled-tests
-describe.skip('validateOverrideSource', () => {
-    const isExtensionPackageMock = function (packagePath: string) {
-        const extensionMetaPath = path.join(packagePath.toString(), 'extension-meta.json')
-        return extensionMetaPath.includes('extension-')
-    }
-
+describe('validateOverrideSource', () => {
     beforeEach(() => {
         // Clear the target cache before each test
         __OVERRIDABLE_CACHE__.node = []
         __OVERRIDABLE_CACHE__.web = []
-
-        // Use jest.spyOn to mock the isExtensionPackage function
-        jest.spyOn(utils, 'isExtensionPackage').mockImplementation(isExtensionPackageMock)
     })
 
     afterEach(() => {
-        jest.restoreAllMocks()
+        jest.clearAllMocks()
     })
 
     it('should return false if the file has already been processed', () => {
@@ -497,7 +510,7 @@ describe.skip('validateOverrideSource', () => {
             'home.js'
         )
 
-        // Mock the file being processed bup adding it to the cache
+        // Mock the file being processed by adding it to the cache
         __OVERRIDABLE_CACHE__.node.push(source)
 
         const result = validateOverrideSource(source, {
@@ -592,13 +605,18 @@ describe.skip('validateOverrideSource', () => {
             'projects',
             'pwa',
             'node_modules',
-            'extension-sample',
+            'extension-sample-no-mono',
             'src',
             'pages',
             'home.js'
         )
         const overridables = [
-            `./node_modules/${path.posix.join('extension-sample', 'src', 'pages', 'home.js')}`
+            `./node_modules/${path.posix.join(
+                'extension-sample-no-mono',
+                'src',
+                'pages',
+                'home.js'
+            )}`
         ]
 
         const result = validateOverrideSource(source, {
