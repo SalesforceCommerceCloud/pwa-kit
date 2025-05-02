@@ -179,9 +179,7 @@ export const validateOverrideSource = (source: string, options: any = {}) => {
     }
 
     // Get full package path
-    const fullPackagePath = isMonoRepo
-        ? path.join(projectDir, MONO_REPO_WORKSPACE_FOLDER, packagePath)
-        : path.join(projectDir, NODE_MODULES_FOLDER, packagePath)
+    const fullPackagePath = path.join(projectDir, isMonoRepo ? MONO_REPO_WORKSPACE_FOLDER : NODE_MODULES_FOLDER, packagePath)
 
     // Check if this package is an extension by looking for extension-meta.json
     const isExtensionFile = isExtensionPackage(fullPackagePath)
