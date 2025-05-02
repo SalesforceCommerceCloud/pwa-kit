@@ -166,7 +166,7 @@ const APPLICATION_EXTENSION_QUESTIONS = [
         name: 'project.extensionName',
         message:
             'What is the name of your Application Extension? \n' +
-            'The name must follow the pattern "@{namespace}/{package-name}", where namespace is optional.',
+            'The name must follow standard npm package naming conventions (e.g., "@namespace/package-name" or "package-name").',
         validate: validProjectAppExtensionName
     }
 ]
