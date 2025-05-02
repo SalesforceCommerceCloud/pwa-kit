@@ -17,17 +17,11 @@ import {ApplicationExtensionsLoaderOptions} from './webpack/types'
 
 // Register Handlebars helpers
 Handlebars.registerHelper('getInstanceName', (aString: string) => {
-    // Explicitly define `namespace` and `name` as strings with fallback values
-    let namespace = ''
-    let name = aString
-
-    // If the package name has a namespace, extract it
-    if (aString.startsWith('@') && aString.includes('/')) {
-        const [namespaceWithAt, packageName] = aString.split('/')
-        // Remove the @ prefix
-        namespace = namespaceWithAt.substring(1)
-        name = packageName
-    }
+    // Extract namespace and name from the package identifier
+    const hasNamespace = aString.startsWith('@') && aString.includes('/')
+    const [namespace, name] = hasNamespace
+        ? [aString.slice(1).split('/')[0], aString.split('/')[1]]
+        : ['', aString]
 
     return kebabToUpperCamelCase(`${namespace ? `${namespace}-` : ''}${name}`)
 })
