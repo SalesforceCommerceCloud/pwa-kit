@@ -10,12 +10,34 @@ import {runWebpackCompiler} from './test-utils'
 import {validateOverrideSource, __OVERRIDABLE_CACHE__} from './overrides-resolver-loader'
 import OverrideStatsPlugin, {OverrideStatsEntry} from './override-stats-plugin'
 import * as utils from '../../shared/utils'
+import {ApplicationExtensionEntryTuple, ApplicationExtensionConfig} from '../../types'
 
 // Define mock for isExtensionPackage
 jest.mock('../../shared/utils', () => {
     const original = jest.requireActual('../../shared/utils')
+
+    // Implementation of expand function from shared/utils/helpers.ts
+    const expand = (extensions: unknown[] = []): ApplicationExtensionEntryTuple[] => {
+        const DEFAULT_CONFIG: ApplicationExtensionConfig & Record<string, unknown> = {enabled: true}
+
+        return extensions
+            .filter((extension) => Boolean(extension))
+            .map((extension) => {
+                const tuple: [string, ApplicationExtensionConfig & Record<string, unknown>] =
+                    Array.isArray(extension)
+                        ? [extension[0], {...DEFAULT_CONFIG, ...extension[1]}]
+                        : [extension as string, DEFAULT_CONFIG]
+                return tuple
+            })
+            .filter(([nameRef, config]) => {
+                const isValid = typeof nameRef === 'string' && typeof config === 'object'
+                return isValid
+            })
+    }
+
     return {
         ...original,
+        expand,
         mergeWithDefaultConfig: jest.fn().mockImplementation((extension) => extension),
         isExtensionPackage: (packagePath: string) => {
             // Simulate these packages having extension-meta.json files
