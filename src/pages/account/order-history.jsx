@@ -195,7 +195,7 @@ const AccountOrderHistory = () => {
                                     divider={
                                         <Divider
                                             visibility={{base: 'hidden', lg: 'visible'}}
-                                            orientation={{lg: 'vertical'}}
+                                            orientation={'vertical'}
                                             h={{base: 0, lg: 4}}
                                         />
                                     }

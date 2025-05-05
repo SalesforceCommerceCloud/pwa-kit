@@ -14,11 +14,11 @@ module.exports = {
         ...base.moduleNameMapper,
         '^react$': '<rootDir>/node_modules/react/index.js',
         '^react-router-dom(.*)$': '<rootDir>/node_modules/react-router-dom/index.js',
-        '^@salesforce/retail-react-app(.*)$': '<rootDir>$1',
         '^@tanstack/react-query$':
             '<rootDir>/node_modules/@tanstack/react-query/build/modern/index.cjs',
         '^is-what$': '<rootDir>/node_modules/is-what/dist/cjs/index.cjs',
         '^copy-anything$': '<rootDir>/node_modules/copy-anything/dist/cjs/index.cjs',
+        "^@salesforce/cc-datacloud-typescript$": "<rootDir>/node_modules/@salesforce/cc-datacloud-typescript/dist/index.js",
         // handle pwa-kit extensibility special import
         '^overridable!(.*)': '$1'
     },

@@ -11,14 +11,16 @@ import {
     useAccessToken,
     useUsid,
     useEncUserId,
-    useCustomerType
+    useCustomerType,
+    useDNT
 } from '@salesforce/commerce-sdk-react'
 import {useExtensionConfig} from '../hooks/use-extension-config'
 import {keysToCamel} from '../utils/utils'
 import logger from '../utils/logger-instance'
 
 export class EinsteinAPI {
-    constructor({host, einsteinId, siteId, isProduction}) {
+    constructor({host, einsteinId, siteId, isProduction, dnt}) {
+        this.dnt = dnt
         this.siteId = siteId
         this.isProduction = isProduction
         this.host = host
@@ -110,6 +112,8 @@ export class EinsteinAPI {
     }
 
     async einsteinFetch(endpoint, method, body) {
+        if (this.dnt !== false) return {}
+
         const headers = {
             'Content-Type': 'application/json',
             'x-cq-client-id': this.einsteinId
@@ -389,6 +393,7 @@ export class EinsteinAPI {
 
 const useEinstein = () => {
     const api = useCommerceApi()
+    const {effectiveDnt} = useDNT()
     const {getTokenWhenReady} = useAccessToken()
     const {einsteinAPI: config} = useExtensionConfig()
     const {host, einsteinId, siteId, isProduction} = config
@@ -403,9 +408,10 @@ const useEinstein = () => {
                 host,
                 einsteinId,
                 siteId,
-                isProduction
+                isProduction,
+                dnt: effectiveDnt
             }),
-        [host, einsteinId, siteId, isProduction]
+        [host, einsteinId, siteId, isProduction, effectiveDnt]
     )
     const [isLoading, setIsLoading] = useState(false)
     const [recommendations, setRecommendations] = useState([])

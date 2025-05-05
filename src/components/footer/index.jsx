@@ -62,7 +62,7 @@ const Footer = ({...otherProps}) => {
 
     return (
         <Box as="footer" {...styles.container} {...otherProps}>
-            <Box {...styles.content}>
+            <Box {...styles.content} as="section">
                 <StylesProvider value={styles}>
                     <HideOnMobile>
                         <SimpleGrid columns={4} spacing={3}>
@@ -148,6 +148,10 @@ const Footer = ({...otherProps}) => {
                                         window.location = newUrl
                                     }}
                                     variant="filled"
+                                    aria-label={intl.formatMessage({
+                                        id: 'footer.locale_selector.assistive_msg',
+                                        defaultMessage: 'Select Language'
+                                    })}
                                     {...styles.localeDropdown}
                                 >
                                     {supportedLocaleIds.map((locale) => (
@@ -192,7 +196,7 @@ const Subscribe = ({...otherProps}) => {
     const intl = useIntl()
     return (
         <Box {...styles.subscribe} {...otherProps}>
-            <Heading {...styles.subscribeHeading}>
+            <Heading as="h1" {...styles.subscribeHeading}>
                 {intl.formatMessage({
                     id: 'footer.subscribe.heading.first_to_know',
                     defaultMessage: 'Be the first to know'
@@ -219,7 +223,16 @@ const Subscribe = ({...otherProps}) => {
                             })}
                         </Button>
                     </InputRightElement>
-                    <Input type="email" placeholder="you@email.com" {...styles.subscribeField} />
+                    <Input
+                        type="email"
+                        placeholder="you@email.com"
+                        aria-label={intl.formatMessage({
+                            id: 'footer.subscribe.email.assistive_msg',
+                            defaultMessage: 'Email address for newsletter'
+                        })}
+                        id="subscribe-email"
+                        {...styles.subscribeField}
+                    />
                 </InputGroup>
             </Box>
 

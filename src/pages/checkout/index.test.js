@@ -127,10 +127,10 @@ beforeEach(() => {
                 address1: '123 Main St',
                 city: 'Tampa',
                 countryCode: 'US',
-                firstName: 'Test',
-                fullName: 'Test McTester',
+                firstName: 'John',
+                fullName: 'John Smith',
                 id: '047b18d4aaaf4138f693a4b931',
-                lastName: 'McTester',
+                lastName: 'Smith',
                 phone: '(727) 555-1234',
                 postalCode: '33712',
                 stateCode: 'FL',
@@ -310,7 +310,7 @@ test('Can proceed through checkout steps as guest', async () => {
     // Set the initial browser router path and render our component tree.
     window.history.pushState({}, 'Checkout', createPathWithDefaults('/checkout'))
     const {user} = renderWithProviders(<WrappedCheckout history={history} />, {
-        wrapperProps: {isGuest: true, siteAlias: 'uk', appConfig: mockConfig.app}
+        wrapperProps: {isGuest: true, siteAlias: 'uk', config: mockConfig}
     })
 
     // Wait for checkout to load and display first step
@@ -437,7 +437,7 @@ test('Can proceed through checkout as registered customer', async () => {
             isGuest: false,
             siteAlias: 'uk',
             locale: {id: 'en-GB'},
-            appConfig: mockConfig.app
+            config: mockConfig
         }
     })
 
@@ -447,8 +447,11 @@ test('Can proceed through checkout as registered customer', async () => {
     })
 
     // Select a saved address and continue
-    await user.click(screen.getByDisplayValue('savedaddress1'))
-    await user.click(screen.getByText(/continue to shipping method/i))
+    await waitFor(() => {
+        const address = screen.getByDisplayValue('savedaddress1')
+        user.click(address)
+        user.click(screen.getByText(/continue to shipping method/i))
+    })
 
     // Wait for next step to render
     await waitFor(() => {
@@ -492,6 +495,19 @@ test('Can proceed through checkout as registered customer', async () => {
     const step3Content = within(screen.getByTestId('sf-toggle-card-step-3-content'))
     expect(step3Content.getByText('123 Main St')).toBeInTheDocument()
 
+    // Edit billing address
+    const sameAsShippingBtn = screen.getByText(/same as shipping address/i)
+    await user.click(sameAsShippingBtn)
+
+    const firstNameInput = screen.getByLabelText(/first name/i)
+    const lastNameInput = screen.getByLabelText(/last name/i)
+    expect(step3Content.queryByText(/Set as default/)).not.toBeInTheDocument()
+
+    await user.clear(firstNameInput)
+    await user.clear(lastNameInput)
+    await user.type(firstNameInput, 'John')
+    await user.type(lastNameInput, 'Smith')
+
     // Move to final review step
     await user.click(screen.getByText(/review order/i))
 
@@ -504,6 +520,7 @@ test('Can proceed through checkout as registered customer', async () => {
     expect(step3Content.getByText('•••• 5454')).toBeInTheDocument()
     expect(step3Content.getByText('1/2040')).toBeInTheDocument()
 
+    expect(step3Content.getByText('John Smith')).toBeInTheDocument()
     expect(step3Content.getByText('123 Main St')).toBeInTheDocument()
 
     // Place the order
@@ -524,7 +541,7 @@ test('Can edit address during checkout as a registered customer', async () => {
             isGuest: false,
             siteAlias: 'uk',
             locale: {id: 'en-GB'},
-            appConfig: mockConfig.app
+            config: mockConfig
         }
     })
 
@@ -567,7 +584,7 @@ test('Can add address during checkout as a registered customer', async () => {
             isGuest: false,
             siteAlias: 'uk',
             locale: {id: 'en-GB'},
-            appConfig: mockConfig.app
+            config: mockConfig
         }
     })
 

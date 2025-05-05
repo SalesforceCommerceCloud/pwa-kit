@@ -19,7 +19,7 @@ export const resolveSiteFromUrl = (url) => {
     if (!url) {
         throw new Error('URL is required to find a site object.')
     }
-    const {pathname, search} = new URL(absoluteUrl(url))
+    const {pathname, search} = getPathnameAndSearch(url)
     const path = `${pathname}${search}`
     let site
 
@@ -103,7 +103,7 @@ export const getSiteByReference = (siteRef) => {
  * @returns {{siteRef: string, localeRef: string}} - site and locale reference (it could either be id or alias)
  */
 export const getParamsFromPath = (path) => {
-    const {pathname, search} = new URL(absoluteUrl(path))
+    const {pathname, search} = getPathnameAndSearch(path)
 
     const config = getConfig()
     const {pathMatcher, searchMatcherForSite, searchMatcherForLocale} = getConfigMatcher(config)
@@ -220,4 +220,16 @@ export const resolveLocaleFromUrl = (url) => {
     return supportedLocales.find(
         (locale) => locale.alias === defaultLocale || locale.id === defaultLocale
     )
+}
+
+/**
+ * Extract pathname and search params from a given url
+ * @private
+ * @param url
+ * @returns {{search: (string|string), pathname: string}}
+ */
+function getPathnameAndSearch(url) {
+    // since url is a partial url, we pass in a dummy domain to create a validate url to pass into URL constructor
+    const {pathname, search} = new URL(url, 'https://www.some-domain.com')
+    return {pathname, search}
 }

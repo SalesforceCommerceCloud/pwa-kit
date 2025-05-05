@@ -28,6 +28,7 @@ import {
 import {useCurrentBasket, useExtensionConfig, useVariant} from '../../hooks'
 import useNavigation from '../../hooks/use-navigation'
 import useEinstein from '../../hooks/use-einstein'
+import useDataCloud from '../../hooks/use-datacloud'
 import useActiveData from '../../hooks/use-active-data'
 import {useServerContext} from '@salesforce/pwa-kit-react-sdk/ssr/universal/hooks'
 // Project Components
@@ -56,6 +57,7 @@ const ProductDetail = () => {
     const history = useHistory()
     const location = useLocation()
     const einstein = useEinstein()
+    const dataCloud = useDataCloud()
     const activeData = useActiveData()
     const toast = useToast()
     const navigate = useNavigation()
@@ -96,7 +98,8 @@ const ProductDetail = () => {
                     'prices',
                     'variations',
                     'set_products',
-                    'bundled_products'
+                    'bundled_products',
+                    'page_meta_tags'
                 ],
                 allImages: true
             }
@@ -175,7 +178,7 @@ const ProductDetail = () => {
             case 404:
                 throw new HTTPNotFound('Product Not Found.')
             default:
-                throw new HTTPError(`HTTP Error ${errorStatus} occurred.`)
+                throw new HTTPError(errorStatus, `HTTP Error ${errorStatus} occurred.`)
         }
     }
     if (isCategoryError) {
@@ -184,7 +187,7 @@ const ProductDetail = () => {
             case 404:
                 throw new HTTPNotFound('Category Not Found.')
             default:
-                throw new HTTPError(`HTTP Error ${errorStatus} occurred.`)
+                throw new HTTPError(errorStatus, `HTTP Error ${errorStatus} occurred.`)
         }
     }
 
@@ -419,6 +422,7 @@ const ProductDetail = () => {
     useEffect(() => {
         if (product && product.type.set) {
             einstein.sendViewProduct(product)
+            dataCloud.sendViewProduct(product)
             const childrenProducts = product.setProducts
             childrenProducts.map((child) => {
                 try {
@@ -430,6 +434,7 @@ const ProductDetail = () => {
                     })
                 }
                 activeData.sendViewProduct(category, child, 'detail')
+                dataCloud.sendViewProduct(child)
             })
         } else if (product) {
             try {
@@ -441,6 +446,7 @@ const ProductDetail = () => {
                 })
             }
             activeData.sendViewProduct(category, product, 'detail')
+            dataCloud.sendViewProduct(product)
         }
     }, [product])
 
@@ -452,7 +458,15 @@ const ProductDetail = () => {
         >
             <Helmet>
                 <title>{product?.pageTitle}</title>
-                <meta name="description" content={product?.pageDescription} />
+                {product?.pageMetaTags?.length > 0 &&
+                    product.pageMetaTags.map(({id, value}) => (
+                        <meta name={id} content={value} key={id} />
+                    ))}
+                {/* Fallback for description if not included in pageMetaTags */}
+                {!product?.pageMetaTags?.some((tag) => tag.id === 'description') &&
+                    product?.pageDescription && (
+                        <meta name="description" content={product.pageDescription} />
+                    )}
             </Helmet>
 
             <Stack spacing={16}>

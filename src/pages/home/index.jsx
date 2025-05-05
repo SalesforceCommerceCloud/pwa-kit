@@ -35,6 +35,7 @@ import {heroFeatures, features} from '../../pages/home/data'
 
 //Hooks
 import useEinstein from '../../hooks/use-einstein'
+import useDataCloud from '../../hooks/use-datacloud'
 
 // Constants
 import {useServerContext} from '@salesforce/pwa-kit-react-sdk/ssr/universal/hooks'
@@ -50,6 +51,7 @@ import {useExtensionConfig} from '../../hooks'
 const Home = () => {
     const intl = useIntl()
     const einstein = useEinstein()
+    const dataCloud = useDataCloud()
     const {pathname} = useLocation()
     const {
         pages: {Home: homeConfig},
@@ -78,6 +80,7 @@ const Home = () => {
     /**************** Einstein ****************/
     useEffect(() => {
         einstein.sendViewPage(pathname)
+        dataCloud.sendViewPage(pathname)
     }, [])
 
     return (

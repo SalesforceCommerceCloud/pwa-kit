@@ -7,11 +7,15 @@
 
 // Third-Party
 import React from 'react'
-import {RouteProps} from 'react-router-dom'
 
 // Platform Imports
 import {ApplicationExtension} from '@salesforce/pwa-kit-extension-sdk/react'
 import {applyHOCs} from '@salesforce/pwa-kit-extension-sdk/react/utils'
+import {
+    BeforeRouteMatchParams,
+    GetRoutesParams,
+    RouteProps
+} from '@salesforce/pwa-kit-extension-sdk/types'
 
 // Local Imports
 import {Config} from './types'
@@ -23,11 +27,10 @@ import {withLayout} from './components/with-layout'
 import {withMultiSite} from './components/with-multi-site'
 import {withReactIntl} from './components/with-react-intl'
 import {withStorefrontPreview} from './components/with-storefront-preview'
+import extensionMeta from '../extension-meta.json'
 
 // Pages
 import * as Pages from './pages'
-
-import extensionMeta from '../extension-meta.json'
 
 class ChakraStorefront extends ApplicationExtension<Config> {
     static readonly id = extensionMeta.id
@@ -49,7 +52,7 @@ class ChakraStorefront extends ApplicationExtension<Config> {
         return applyHOCs(App, requiredHOCs)
     }
 
-    extendRoutes(routes: RouteProps[]): RouteProps[] {
+    getRoutes(params: GetRoutesParams): RouteProps[] {
         const config = this.getConfig()
 
         const extensionRoutes = [
@@ -59,7 +62,10 @@ class ChakraStorefront extends ApplicationExtension<Config> {
                 exact: true
             },
             {
-                path: config.pages.Login && config.pages.Login.path,
+                path: [
+                    config.pages.Login && config.pages.Login.path,
+                    config.login.passwordless.enabled && config.login.passwordless.landingPath
+                ].filter(Boolean),
                 component: Pages.Login,
                 exact: true
             },
@@ -69,7 +75,10 @@ class ChakraStorefront extends ApplicationExtension<Config> {
                 exact: true
             },
             {
-                path: config.pages.ResetPassword && config.pages.ResetPassword.path,
+                path: [
+                    config.pages.ResetPassword && config.pages.ResetPassword.path,
+                    config.login.resetPassword && config.login.resetPassword.landingPath
+                ].filter(Boolean),
                 component: Pages.ResetPassword,
                 exact: true
             },
@@ -92,6 +101,11 @@ class ChakraStorefront extends ApplicationExtension<Config> {
                 exact: true
             },
             {
+                path: config.login.social.enabled && config.login.social.redirectURI,
+                component: Pages.SocialLoginRedirect,
+                exact: true
+            },
+            {
                 path: config.pages.Cart && config.pages.Cart.path,
                 component: Pages.Cart,
                 exact: true
@@ -105,11 +119,12 @@ class ChakraStorefront extends ApplicationExtension<Config> {
                 component: Pages.ProductList
             }
         ].filter((route) => route.path !== false)
-        return [...routes, ...(extensionRoutes as RouteProps[])]
+
+        return extensionRoutes as RouteProps[]
     }
 
     // Called before the route with all the routes
-    beforeRouteMatch(allRoutes: RouteProps[]): RouteProps[] {
+    beforeRouteMatch({allRoutes}: BeforeRouteMatchParams): RouteProps[] {
         const config = this.getConfig()
 
         return configureRoutes(allRoutes, config, {

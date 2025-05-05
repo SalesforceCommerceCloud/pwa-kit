@@ -14,8 +14,9 @@ import {Icon, useTheme} from '@chakra-ui/react'
 // during SSR.
 // NOTE: Another solution would be to use `require-context.macro` package to accomplish
 // importing icon svg's.
-import '../../assets/svg/alert.svg'
 import '../../assets/svg/account.svg'
+import '../../assets/svg/alert.svg'
+import '../../assets/svg/apple.svg'
 import '../../assets/svg/basket.svg'
 import '../../assets/svg/check.svg'
 import '../../assets/svg/check-circle.svg'
@@ -37,6 +38,7 @@ import '../../assets/svg/flag-it.svg'
 import '../../assets/svg/flag-cn.svg'
 import '../../assets/svg/flag-jp.svg'
 import '../../assets/svg/github-logo.svg'
+import '../../assets/svg/google.svg'
 import '../../assets/svg/hamburger.svg'
 import '../../assets/svg/info.svg'
 import '../../assets/svg/social-facebook.svg'
@@ -137,9 +139,10 @@ export const icon = (name, passProps, localizationAttributes) => {
 // Export Chakra icon components that use our SVG sprite symbol internally
 // For non-square SVGs, we can use the symbol data from the import to set the
 // proper viewBox attribute on the Icon wrapper.
-export const AmexIcon = icon('cc-amex', {viewBox: AmexSymbol.viewBox})
-export const AlertIcon = icon('alert')
 export const AccountIcon = icon('account')
+export const AlertIcon = icon('alert')
+export const AmexIcon = icon('cc-amex', {viewBox: AmexSymbol.viewBox})
+export const AppleIcon = icon('apple')
 export const BrandLogo = icon('brand-logo', {viewBox: BrandLogoSymbol.viewBox})
 export const BasketIcon = icon('basket')
 export const CheckIcon = icon('check')
@@ -149,6 +152,7 @@ export const ChevronLeftIcon = icon('chevron-left')
 export const ChevronRightIcon = icon('chevron-right')
 export const ChevronUpIcon = icon('chevron-up')
 export const CVVIcon = icon('cc-cvv', {viewBox: CVVSymbol.viewBox})
+export const CloseIcon = icon('close')
 export const DashboardIcon = icon('dashboard')
 export const DiscoverIcon = icon('cc-discover', {viewBox: DiscoverSymbol.viewBox})
 export const FigmaLogo = icon('figma-logo')
@@ -162,7 +166,10 @@ export const FlagITIcon = icon('flag-it')
 export const FlagCNIcon = icon('flag-cn')
 export const FlagJPIcon = icon('flag-jp')
 export const GithubLogo = icon('github-logo')
+export const GoogleIcon = icon('google')
 export const HamburgerIcon = icon('hamburger')
+export const HeartIcon = icon('heart')
+export const HeartSolidIcon = icon('heart-solid')
 export const InfoIcon = icon('info')
 export const LikeIcon = icon('like')
 export const LockIcon = icon(
@@ -198,6 +205,3 @@ export const UserIcon = icon('user')
 export const VisaIcon = icon('cc-visa', {viewBox: VisaSymbol.viewBox})
 export const VisibilityIcon = icon('visibility')
 export const VisibilityOffIcon = icon('visibility-off')
-export const HeartIcon = icon('heart')
-export const HeartSolidIcon = icon('heart-solid')
-export const CloseIcon = icon('close')

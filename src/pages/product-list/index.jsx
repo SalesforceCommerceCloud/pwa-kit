@@ -26,6 +26,7 @@ import {
     SimpleGrid,
     Grid,
     Select,
+    Heading,
     Text,
     FormControl,
     Stack,
@@ -56,6 +57,7 @@ import SelectedRefinements from '../../pages/product-list/partials/selected-refi
 import EmptySearchResults from '../../pages/product-list/partials/empty-results'
 import PageHeader from '../../pages/product-list/partials/page-header'
 import AbovePageHeader from '../../pages/product-list/partials/above-page-header'
+import PageDesignerPromotionalBanner from '../../pages/product-list/partials/page-designer-promotional-banner'
 
 // Icons
 import {FilterIcon, ChevronDownIcon} from '../../components/icons'
@@ -71,6 +73,7 @@ import {
 import {useToast} from '../../hooks/use-toast'
 import useEinstein from '../../hooks/use-einstein'
 import useActiveData from '../../hooks/use-active-data'
+import useDataCloud from '../../hooks/use-datacloud'
 
 // Others
 import {HTTPNotFound, HTTPError} from '@salesforce/pwa-kit-react-sdk/ssr/universal/errors'
@@ -110,6 +113,7 @@ const ProductList = (props) => {
     const location = useLocation()
     const toast = useToast()
     const einstein = useEinstein()
+    const dataCloud = useDataCloud()
     const activeData = useActiveData()
     const {res} = useServerContext()
     const customerId = useCustomerId()
@@ -147,6 +151,7 @@ const ProductList = (props) => {
 
     const {
         isLoading,
+        isFetched,
         isRefetching,
         data: productSearchResult
     } = useProductSearch(
@@ -156,7 +161,14 @@ const ProductList = (props) => {
                 perPricebook: true,
                 allVariationProperties: true,
                 allImages: true,
-                expand: ['promotions', 'variations', 'prices', 'images', 'custom_properties'],
+                expand: [
+                    'promotions',
+                    'variations',
+                    'prices',
+                    'images',
+                    'page_meta_tags',
+                    'custom_properties'
+                ],
                 refine: _refine
             }
         },
@@ -192,7 +204,7 @@ const ProductList = (props) => {
         case 404:
             throw new HTTPNotFound('Category Not Found.')
         default:
-            throw new HTTPError(`HTTP Error ${errorStatus} occurred.`)
+            throw new HTTPError(errorStatus, `HTTP Error ${errorStatus} occurred.`)
     }
 
     /**************** Response Handling ****************/
@@ -381,6 +393,7 @@ const ProductList = (props) => {
                         additionalProperties: {error: err, searchQuery}
                     })
                 }
+                dataCloud.sendViewSearchResults(searchParams, productSearchResult)
                 activeData.sendViewSearch(searchParams, productSearchResult)
             } else {
                 try {
@@ -391,6 +404,7 @@ const ProductList = (props) => {
                         additionalProperties: {error: err, category}
                     })
                 }
+                dataCloud.sendViewCategory(searchParams, category, productSearchResult)
                 activeData.sendViewCategory(searchParams, category, productSearchResult)
             }
         }
@@ -408,12 +422,17 @@ const ProductList = (props) => {
                 <title>{category?.pageTitle ?? searchQuery}</title>
                 <meta name="description" content={category?.pageDescription ?? searchQuery} />
                 <meta name="keywords" content={category?.pageKeywords} />
+                {productSearchResult?.pageMetaTags?.map(({id, value}) => {
+                    return <meta name={id} content={value} key={id} />
+                })}
             </Helmet>
             {showNoResults ? (
                 <EmptySearchResults searchQuery={searchQuery} category={category} />
             ) : (
                 <>
                     <AbovePageHeader />
+                    <PageDesignerPromotionalBanner />
+
                     {/* Header */}
                     <Stack
                         display={{base: 'none', lg: 'flex'}}
@@ -449,6 +468,7 @@ const ProductList = (props) => {
                         </Box>
                     </Stack>
 
+                    {/* Filter Button for Mobile */}
                     <HideOnDesktop>
                         <Stack spacing={6}>
                             <PageHeader
@@ -538,7 +558,8 @@ const ProductList = (props) => {
                                 spacingX={4}
                                 spacingY={{base: 12, lg: 16}}
                             >
-                                {isHydrated() && (isRefetching || !productSearchResult)
+                                {isHydrated() &&
+                                ((isRefetching && !isFetched) || !productSearchResult)
                                     ? new Array(searchParams.limit)
                                           .fill(0)
                                           .map((value, index) => (
@@ -558,6 +579,7 @@ const ProductList = (props) => {
                                                   product={productSearchItem}
                                                   enableFavourite={true}
                                                   isFavourite={isInWishlist}
+                                                  isRefreshingData={isRefetching && isFetched}
                                                   imageViewType={productListConfig.imageViewType}
                                                   selectableAttributeId={
                                                       productListConfig.selectableAttributeId
@@ -634,12 +656,12 @@ const ProductList = (props) => {
                 <ModalOverlay />
                 <ModalContent top={0} marginTop={0}>
                     <ModalHeader>
-                        <Text fontWeight="bold" fontSize="2xl">
+                        <Heading as="h1" fontWeight="bold" fontSize="2xl">
                             <FormattedMessage
                                 defaultMessage="Filter"
                                 id="product_list.modal.title.filter"
                             />
-                        </Text>
+                        </Heading>
                     </ModalHeader>
                     <ModalCloseButton />
                     <ModalBody py={4}>
@@ -770,6 +792,11 @@ const Sort = ({sortUrls, productSearchResult, basePath, ...otherProps}) => {
             {...otherProps}
         >
             <Select
+                id="sf-product-list-sort-select"
+                aria-label={intl.formatMessage({
+                    id: 'product_list.sort_by.label.assistive_msg',
+                    defaultMessage: 'Sort products by'
+                })}
                 value={basePath.replace(/(offset)=(\d+)/i, '$1=0')}
                 onChange={({target}) => {
                     history.push(target.value)

@@ -64,6 +64,7 @@ const withCommerceSDKReact = <P extends object>(WrappedComponent: React.Componen
                 redirectURI={`${appOrigin}/callback`}
                 proxy={`${appOrigin}${config.commerceAPI.proxyPath as string}`}
                 headers={headers}
+                defaultDnt={config.defaultDnt}
                 // Uncomment 'enablePWAKitPrivateClient' to use SLAS private client login flows.
                 // Make sure to also enable useSLASPrivateClient in ssr.js when enabling this setting.
                 // enablePWAKitPrivateClient={true}

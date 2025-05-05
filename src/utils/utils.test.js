@@ -180,3 +180,26 @@ describe('keysToCamel', () => {
         })
     })
 })
+
+describe('buildRedirectURI', function () {
+    test('returns full URI with valid appOrigin and redirectPath', () => {
+        const appOrigin = 'https://example.com'
+        const redirectPath = '/redirect'
+        const result = utils.buildRedirectURI(appOrigin, redirectPath)
+        expect(result).toBe('https://example.com/redirect')
+    })
+
+    test('returns full URI with valid appOrigin and redirectPath missing /', () => {
+        const appOrigin = 'https://example.com'
+        const redirectPath = 'redirect'
+        const result = utils.buildRedirectURI(appOrigin, redirectPath)
+        expect(result).toBe('https://example.com/redirect')
+    })
+
+    test('returns empty string when redirectPath is not passed in', () => {
+        const appOrigin = 'https://example.com'
+        const redirectPath = ''
+        const result = utils.buildRedirectURI(appOrigin, redirectPath)
+        expect(result).toBe('')
+    })
+})

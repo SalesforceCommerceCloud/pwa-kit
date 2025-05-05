@@ -83,7 +83,7 @@ export default function ShippingOptions() {
     })
 
     let shippingPriceLabel = selectedMethodDisplayPrice
-    if (selectedMethodDisplayPrice !== shippingItem.price) {
+    if (selectedMethodDisplayPrice !== shippingItem?.price) {
         const currentPrice =
             selectedMethodDisplayPrice === 0 ? freeLabel : selectedMethodDisplayPrice
 
@@ -93,7 +93,7 @@ export default function ShippingOptions() {
                 id: 'checkout_confirmation.label.shipping.strikethrough.price'
             },
             {
-                originalPrice: shippingItem.price,
+                originalPrice: shippingItem?.price,
                 newPrice: currentPrice
             }
         )
@@ -205,8 +205,8 @@ export default function ShippingOptions() {
                 <ToggleCardSummary>
                     <Flex justify="space-between" w="full">
                         <Text>{selectedShippingMethod.name}</Text>
-                        <Flex alignItems="center" aria-label={shippingPriceLabel}>
-                            <Text fontWeight="bold" aria-hidden="true">
+                        <Flex alignItems="center" aria-label={shippingPriceLabel} role="group">
+                            <Text fontWeight="bold" aria-hidden="true" role="presentation">
                                 {selectedMethodDisplayPrice === 0 ? (
                                     freeLabel
                                 ) : (
@@ -217,18 +217,19 @@ export default function ShippingOptions() {
                                     />
                                 )}
                             </Text>
-                            {selectedMethodDisplayPrice !== shippingItem.price && (
+                            {selectedMethodDisplayPrice !== shippingItem?.price && (
                                 <Text
                                     fontWeight="normal"
                                     textDecoration="line-through"
                                     color="gray.600"
                                     marginLeft={1}
                                     aria-hidden="true"
+                                    role="presentation"
                                 >
                                     <FormattedNumber
                                         style="currency"
                                         currency={currency}
-                                        value={shippingItem.price}
+                                        value={shippingItem?.price}
                                     />
                                 </Text>
                             )}

@@ -46,6 +46,14 @@ type EinsteinAPI = {
     isProduction: boolean
 }
 
+// Configuration settings for connecting to the Data Cloud API.
+type DataCloudAPI = {
+    appSourceId: string
+    tenantId: string
+    siteId: string
+    isProduction: boolean
+}
+
 type ShippingCountry = {
     value: string
     label: string
@@ -83,6 +91,9 @@ type CustomPageConfigs = {
     }
 }
 
+type IDPValues = 'google' | 'apple'
+type IDPArray = IDPValues[]
+
 // Combine inferred pages with specific configurations
 type PageConfigs = {
     [K in keyof Pages]: K extends keyof CustomPageConfigs ? CustomPageConfigs[K] : DefaultPageConfig
@@ -100,7 +111,25 @@ export interface UserConfig extends BaseApplicationExtensionConfig {
     defaultSite: Site['id']
     defaultAppLocale: string
     defaultSiteTitle: string
+    defaultDnt: boolean
     einsteinAPI: EinsteinAPI
+    dataCloudAPI: DataCloudAPI
+    login: {
+        passwordless: {
+            enabled: false
+            callbackURI: string
+            landingPath: string
+        }
+        social: {
+            enabled: false
+            idps: IDPArray
+            redirectURI: string
+        }
+        resetPassword: {
+            callbackURI: string
+            landingPath: string
+        }
+    }
     maxCacheAge: number
     pages?: {
         [K in keyof PageConfigs]: false | PageConfigs[K]

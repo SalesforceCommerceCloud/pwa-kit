@@ -23,7 +23,7 @@ import {
     mockGetBundleChildrenProducts,
     basketWithProductBundle
 } from '../../mocks/product-bundle'
-import {prependHandlersToServer} from '@salesforce/retail-react-app/jest-setup'
+import {prependHandlersToServer} from '../../../jest-setup'
 import {baskets as mockBaskets, products as mockProducts} from '../../pages/cart/cart.mock'
 
 const mockProduct = {
@@ -581,7 +581,7 @@ describe('Product bundles', () => {
                 }
                 return res(ctx.json(updatedBasket))
             }),
-            rest.patch('*/baskets/:basketId/items/:itemId', (req, res, ctx) => {})
+            rest.patch('*/baskets/:basketId/items/:itemId', () => {})
         )
     })
 

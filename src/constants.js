@@ -32,6 +32,19 @@ export const API_ERROR_MESSAGE = defineMessage({
     id: 'global.error.something_went_wrong',
     defaultMessage: 'Something went wrong. Try again!'
 })
+export const INVALID_TOKEN_ERROR_MESSAGE = defineMessage({
+    defaultMessage: 'Invalid token, please try again.',
+    id: 'global.error.invalid_token'
+})
+export const FEATURE_UNAVAILABLE_ERROR_MESSAGE = defineMessage({
+    defaultMessage: 'This feature is not currently available.',
+    id: 'global.error.feature_unavailable'
+})
+export const CREATE_ACCOUNT_FIRST_ERROR_MESSAGE = defineMessage({
+    defaultMessage:
+        'This feature is not currently available. You must create an account to access this feature.',
+    id: 'global.error.create_account'
+})
 
 export const urlPartPositions = {
     PATH: 'path',
@@ -44,6 +57,7 @@ export const urlPartPositions = {
 // extracted into a hook/helper. However, we can still extract the message
 // definitions to a common location (here), so that each message is only defined
 // once.
+
 export const TOAST_MESSAGE_ADDED_TO_WISHLIST = defineMessage({
     id: 'global.info.added_to_wishlist',
     defaultMessage: '{quantity} {quantity, plural, one {item} other {items}} added to wishlist'
@@ -81,6 +95,11 @@ export const EINSTEIN_RECOMMENDERS = {
     EMPTY_SEARCH_RESULTS_MOST_VIEWED: 'products-in-all-categories'
 }
 
+export const SHIPPING_COUNTRY_CODES = [
+    {value: 'CA', label: 'Canada'},
+    {value: 'US', label: 'United States'}
+]
+
 export const REMOVE_UNAVAILABLE_CART_ITEM_DIALOG_CONFIG = {
     dialogTitle: defineMessage({
         defaultMessage: 'Items Unavailable',
@@ -101,3 +120,79 @@ export const REMOVE_UNAVAILABLE_CART_ITEM_DIALOG_CONFIG = {
     }),
     onPrimaryAction: noop
 }
+export const SUPPORTED_STORE_LOCATOR_COUNTRIES = [
+    {
+        countryCode: 'US',
+        countryName: defineMessage({
+            defaultMessage: 'United States',
+            id: 'store_locator.dropdown.united_states'
+        })
+    },
+    {
+        countryCode: 'DE',
+        countryName: defineMessage({
+            defaultMessage: 'Germany',
+            id: 'store_locator.dropdown.germany'
+        })
+    }
+]
+
+export const DEFAULT_STORE_LOCATOR_COUNTRY = {
+    countryCode: 'DE',
+    countryName: defineMessage({
+        defaultMessage: 'Germany',
+        id: 'store_locator.dropdown.germany'
+    })
+}
+export const DEFAULT_STORE_LOCATOR_POSTAL_CODE = '10178'
+export const STORE_LOCATOR_DISTANCE = 100
+export const STORE_LOCATOR_NUM_STORES_PER_LOAD = 10
+export const STORE_LOCATOR_DISTANCE_UNIT = 'km'
+export const STORE_LOCATOR_IS_ENABLED = true
+
+// Constants for shopper context
+// Supported non-string field types used in SHOPPER_CONTEXT_SEARCH_PARAMS below.
+// Only non-string types need to be identified using the "type" field.
+// If no "type" field is present, the value will be parsed as a string by default.
+export const SHOPPER_CONTEXT_FIELD_TYPES = {
+    INT: 'int',
+    DOUBLE: 'double',
+    ARRAY: 'array'
+}
+export const SHOPPER_CONTEXT_SEARCH_PARAMS = {
+    sourceCode: {paramName: 'sourceCode'},
+    geoLocation: {
+        city: {paramName: 'city'},
+        country: {paramName: 'country'},
+        countryCode: {paramName: 'countryCode'},
+        latitude: {paramName: 'latitude', type: SHOPPER_CONTEXT_FIELD_TYPES.DOUBLE},
+        longitude: {paramName: 'longitude', type: SHOPPER_CONTEXT_FIELD_TYPES.DOUBLE},
+        metroCode: {paramName: 'metroCode'},
+        postalCode: {paramName: 'postalCode'},
+        region: {paramName: 'region'},
+        regionCode: {paramName: 'regionCode'}
+    },
+    customQualifiers: {
+        // Add custom qualifiers here
+    },
+    assignmentQualifiers: {
+        // Add assignment qualifiers here
+    }
+}
+
+// Constants for Login
+export const LOGIN_TYPES = {
+    PASSWORD: 'password',
+    PASSWORDLESS: 'passwordless',
+    SOCIAL: 'social'
+}
+
+export const PASSWORDLESS_ERROR_MESSAGES = [
+    /callback_uri doesn't match/i,
+    /passwordless permissions error/i,
+    /client secret is not provided/i
+]
+
+export const INVALID_TOKEN_ERROR = /invalid token/i
+
+export const USER_NOT_FOUND_ERROR = /user not found/i

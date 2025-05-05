@@ -16,6 +16,7 @@ import Seo from '../../components/seo'
 import RegisterForm from '../../components/register'
 import useNavigation from '../../hooks/use-navigation'
 import useEinstein from '../../hooks/use-einstein'
+import useDataCloud from '../../hooks/use-datacloud'
 import {API_ERROR_MESSAGE} from '../../constants'
 
 const Registration = () => {
@@ -24,6 +25,7 @@ const Registration = () => {
     const {isRegistered} = useCustomerType()
     const form = useForm()
     const einstein = useEinstein()
+    const dataCloud = useDataCloud()
     const {pathname} = useLocation()
     const register = useAuthHelper(AuthHelpers.Register)
 
@@ -54,6 +56,7 @@ const Registration = () => {
     /**************** Einstein ****************/
     useEffect(() => {
         einstein.sendViewPage(pathname)
+        dataCloud.sendViewPage(pathname)
     }, [])
 
     return (
