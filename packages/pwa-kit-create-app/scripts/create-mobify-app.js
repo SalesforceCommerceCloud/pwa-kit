@@ -77,7 +77,7 @@ const validProjectAppExtensionName = (input) => {
     const result = validatePackageName(input)
     if (!result.validForNewPackages) {
         const errors = result.errors || []
-        return `Invalid package name: ${errors.join(', ')}`
+        return `Invalid npm package name: ${errors.join(', ')}`
     }
     return true
 }
