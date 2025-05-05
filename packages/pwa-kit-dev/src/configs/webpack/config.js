@@ -146,17 +146,17 @@ const findDepInStack = (pkg) => {
 }
 
 // Helper function to detect extensions
-const detectExtensions = () => {
+const detectExtensions = ({dependencies, projectDir} = {}) => {
     const extensions = []
 
-    // Get all direct dependencies from package.json
-    const allDependencies = [
+    // Use provided dependencies or get them from package.json
+    const allDependencies = dependencies || [
         ...Object.keys(pkg.dependencies || {}),
         ...Object.keys(pkg.devDependencies || {})
     ]
 
     for (const dependency of allDependencies) {
-        const packagePath = path.join(projectDir, 'node_modules', dependency)
+        const packagePath = path.join(projectDir || process.cwd(), 'node_modules', dependency)
 
         if (isExtensionPackage(packagePath)) {
             extensions.push(dependency)
@@ -166,7 +166,9 @@ const detectExtensions = () => {
     return extensions
 }
 
-const detectedExtensions = detectExtensions()
+const detectedExtensions = detectExtensions({
+    projectDir
+})
 
 const baseConfig = (target) => {
     if (!['web', 'node'].includes(target)) {
