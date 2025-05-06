@@ -1,6 +1,6 @@
 {
   "name": "@salesforce/pwa-kit-extension-sdk",
-  "version": "4.0.0-extensibility-preview.4",
+  "version": "4.0.0-extensibility-preview.5",
   "description": "",
   "homepage": "https://github.com/SalesforceCommerceCloud/pwa-kit#readme",
   "bugs": {
@@ -55,7 +55,7 @@
     "@babel/parser": "^7.21.3",
     "@babel/preset-env": "^7.20.2",
     "@loadable/component": "^5.15.3",
-    "@salesforce/pwa-kit-dev": "4.0.0-extensibility-preview.4",
+    "@salesforce/pwa-kit-dev": "4.0.0-extensibility-preview.5",
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^14.0.0",
     "@types/babel__core": "^7.20.5",
@@ -71,7 +71,7 @@
     "@types/supertest": "^6.0.2",
     "@types/webpack": "^5.28.5",
     "express": "^4.19.2",
-    "internal-lib-build": "4.0.0-extensibility-preview.4",
+    "internal-lib-build": "4.0.0-extensibility-preview.5",
     "memfs": "^4.14.0",
     "nodemon": "^2.0.22",
     "react": "^18.2.0",

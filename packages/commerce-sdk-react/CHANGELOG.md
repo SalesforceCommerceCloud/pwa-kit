@@ -1,3 +1,6 @@
+## v3.3.0-extensibility-preview.5 (May 06, 2025)
+## v3.3.0-extensibility-preview.4 (May 06, 2025)
+## v4.0.0-extensibility-preview.5 (May 06, 2025)
 ## v3.3.0-extensibility-preview.4 (Feb 12, 2025)
 - Add `ServerContext` type for `useServerContext` hook [#2239](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2239)
 

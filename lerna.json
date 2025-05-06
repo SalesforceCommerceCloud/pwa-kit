@@ -1,5 +1,5 @@
 {
-  "version": "4.0.0-extensibility-preview.4",
+  "version": "4.0.0-extensibility-preview.5",
   "packages": [
     "packages/*"
   ]
