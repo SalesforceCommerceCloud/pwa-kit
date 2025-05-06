@@ -14,5 +14,5 @@ runs:
       working-directory: ${{ inputs.cwd }}
       run: |-
         # Add credentials file at ~/.mobify so we can upload to Mobify Cloud
-        npm run save-credentials --prefix packages/template-retail-react-app -- --user "${{inputs.mobify_user}}" --key "${{inputs.mobify_api_key}}"
+        npm run save-credentials --prefix packages/template-typescript-minimal -- --user "${{inputs.mobify_user}}" --key "${{inputs.mobify_api_key}}"
       shell: bash
