@@ -39,6 +39,7 @@ jest.mock('../shared/theme', () => {
 
 const commerceAgentSettings = {
     enabled: 'true',
+    askAgentOnSearch: 'true',
     embeddedServiceName: 'MIAW_Guided_Shopper_production',
     embeddedServiceEndpoint: 'https://myorg.salesforce.com/ESWMIAWGuidedShopper',
     scriptSourceUrl: 'https://myorg.salesforce.com/ESWMIAWGuidedShopper/assets/js/bootstrap.min.js',
