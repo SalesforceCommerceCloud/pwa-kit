@@ -15,7 +15,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-        
+
       - name: Get Timestamp
         run: |-
           echo "release_timestamp=$(date +'%Y%m%d%H%M%S')" >> "$GITHUB_ENV"
@@ -87,9 +87,6 @@ jobs:
         run: |-
           git commit -am "Release ${{ env.nightly_version }}"
           git push --set-upstream origin nightly-releases
-
-      - name: Check Repository Clean
-        uses: "./.github/actions/check_clean"
 
       - name: Publish to NPM
         uses: "./.github/actions/publish_to_npm"

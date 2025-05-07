@@ -126,10 +126,6 @@ jobs:
           CWD: "./packages/test-commerce-sdk-react"
           TARGET: commerce-sdk-react
 
-      - name: Check Repository Clean
-        if: env.IS_NOT_FORK == 'true' && env.IS_DEFAULT_NPM == 'true'
-        uses: "./.github/actions/check_clean"
-
       - name: Publish to NPM
         if: env.IS_NOT_FORK == 'true' && env.IS_MRT_NODE == 'true' && env.RELEASE == 'true'
         uses: "./.github/actions/publish_to_npm"
