@@ -45,8 +45,7 @@ const commerceAgentSettings = {
     scrt2Url: 'https://myorg.salesforce.com-scrt.com',
     salesforceOrgId: 'mock_salesforce_org_id',
     commerceOrgId: 'mock_ecom_id',
-    siteId: 'RefArchGlobal',
-    cartUrl: 'https://mocksite.com/cart'
+    siteId: 'RefArchGlobal'
 }
 
 const commerceAgentSettingsString = JSON.stringify(commerceAgentSettings)
@@ -57,8 +56,7 @@ describe('ShopperAgent Component', () => {
         domainUrl: 'https://myorg.salesforce.com',
         basketId: '4a67cda5b1b9325a29207854c1',
         locale: 'en-US',
-        basketDoneLoading: true,
-        cartUrl: 'https://mocksite.com/cart'
+        basketDoneLoading: true
     }
 
     beforeEach(() => {
@@ -173,13 +171,11 @@ describe('ShopperAgent Component', () => {
         })
 
         expect(mockEmbeddedService.prechatAPI.setHiddenPrechatFields).toHaveBeenCalledWith({
-            DomainURL: defaultProps.domainUrl,
+            DomainUrl: defaultProps.domainUrl,
             SiteId: commerceAgentSettings.siteId,
             Locale: defaultProps.locale,
             OrganizationId: commerceAgentSettings.commerceOrgId,
-            SiteId: commerceAgentSettings.siteId,
-            UsId: 'test-usid',
-            CartURL: defaultProps.cartUrl
+            UsId: 'test-usid'
         })
 
         // Reset mock to test button click event
