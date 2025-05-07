@@ -112,8 +112,7 @@ function ShopperAgentWindow({commerceAgent, locale, domainUrl, basketId}) {
         scrt2Url,
         salesforceOrgId,
         commerceOrgId,
-        siteId,
-        cartUrl
+        siteId
     } = JSON.parse(commerceAgent)
 
     const {usid} = useUsid()
@@ -121,12 +120,11 @@ function ShopperAgentWindow({commerceAgent, locale, domainUrl, basketId}) {
     useEffect(() => {
         window.addEventListener('onEmbeddedMessagingReady', () => {
             window.embeddedservice_bootstrap.prechatAPI.setHiddenPrechatFields({
-                DomainURL: domainUrl,
+                DomainUrl: domainUrl,
                 SiteId: siteId,
                 Locale: locale,
                 OrganizationId: commerceOrgId,
-                UsId: usid,
-                CartURL: cartUrl
+                UsId: usid
             })
         })
 
