@@ -13,12 +13,14 @@
  * A single-site, single-locale config is a special case of multi-site case.
  */
 const commerceAgentSettings = {
-    enabled: 'true',
+    enabled: 'false',
+    askAgentOnSearch: 'false',
     embeddedServiceName: 'MIAW_Guided_Shopper_production',
     embeddedServiceEndpoint: 'https://myorg.salesforce.com/ESWMIAWGuidedShopper',
     scriptSourceUrl: 'https://myorg.salesforce.com/ESWMIAWGuidedShopper/assets/js/bootstrap.min.js',
     scrt2Url: 'https://myorg.salesforce.com-scrt.com',
     salesforceOrgId: '00DSB00000MJ7YH',
+    commerceOrgId: 'f_ecom_zzeu_052',
     siteId: 'RefArchGlobal'
 }
 
