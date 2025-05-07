@@ -70,7 +70,9 @@ jobs:
       # (We also use this env var for making sure a step runs once for the current node version)
       IS_DEFAULT_NPM: ${{ (matrix.node == 18 && matrix.npm == 10) || (matrix.node == 20 && matrix.npm == 10) || (matrix.node == 22 && matrix.npm == 10) }}
       IS_MRT_NODE: ${{ matrix.node == 22 && matrix.npm == 10 }}
-      PROJECT_DIR: generated-retail-react-app-test-project
+
+      # Generate project outside of pwa-kit repo. Otherwise, the publish_to_npm action will complain about dirty working tree.
+      PROJECT_DIR: ../generated-retail-react-app-test-project
     steps:
       - name: Checkout
         uses: actions/checkout@v4
