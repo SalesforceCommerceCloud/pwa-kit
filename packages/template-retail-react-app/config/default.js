@@ -9,6 +9,7 @@ const sites = require('./sites.js')
 
 const defaultCommerceAgentSettings = {
     enabled: 'true',
+    askAgentOnSearch: 'true',
     embeddedServiceName: 'Agentforce_Channel_Web',
     embeddedServiceEndpoint:
         'https://orgfarm-1645fa246c.test1.my.pc-rnd.site.com/ESWAgentforceChannelWeb1745544099167',

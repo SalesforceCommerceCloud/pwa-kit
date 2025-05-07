@@ -68,6 +68,7 @@ function useMiaw(
 function validateCommerceAgentSettings(commerceAgent) {
     const requiredFields = [
         'enabled',
+        'askAgentOnSearch',
         'embeddedServiceName',
         'embeddedServiceEndpoint',
         'scriptSourceUrl',
