@@ -49,7 +49,7 @@ const main = () => {
 const publishPackages = (packages = [], isNightly = false) => {
     verifyCleanWorkingTree()
 
-    const publicPackages = JSON.parse(sh.exec('lerna list --json', {silent: true}))
+    const publicPackages = JSON.parse(sh.exec('npx lerna list --json', {silent: true}))
     const packagesToIgnore = publicPackages.filter(
         (pkg) => !packages.includes(pkg.name.replace('@salesforce/', ''))
     )
