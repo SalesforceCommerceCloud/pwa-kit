@@ -44,6 +44,8 @@ import {
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 
 const onClient = typeof window !== 'undefined'
+let newChatLaunched = false
+let hasFired = false
 
 function isAskAgentOnSearchEnabled(enabled, askAgentOnSearch) {
     return enabled === 'true' && askAgentOnSearch == 'true' && onClient
@@ -92,8 +94,6 @@ const formatSuggestions = (searchSuggestions, input) => {
  * @return  {React.ReactElement} - SearchInput component
  */
 const Search = (props) => {
-    let newChatLaunched = false
-    let hasFired = false
     const config = getConfig()
     const {enabled, askAgentOnSearch} = JSON.parse(config.app.commerceAgent)
     const askAgentOnSearchEnabled = isAskAgentOnSearchEnabled(enabled, askAgentOnSearch)
@@ -199,7 +199,7 @@ const Search = (props) => {
             return
         }
 
-        if (askAgentOnSearchEnabled) {
+        if (askAgentOnSearchEnabled && window.embeddedservice_bootstrap) {
             // Add a 500ms delay before sending the message to ensure the experience isn't jarring to the user
             setTimeout(() => {
                 window.embeddedservice_bootstrap.utilAPI
