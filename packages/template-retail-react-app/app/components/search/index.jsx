@@ -183,7 +183,7 @@ const Search = (props) => {
                 if (e.detail.conversationEntry?.sender?.role === 'Chatbot') {
                     hasFired = true
                     setTimeout(() => {
-                        window.embeddedservice_bootstrap.utilAPI.sendTextMessage(searchText)
+                        window.embeddedservice_bootstrap.utilAPI.sendTextMessage(searchInputRef.current.value)
                     }, 500)
                 }
             }
