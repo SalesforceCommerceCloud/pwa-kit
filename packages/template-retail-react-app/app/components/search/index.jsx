@@ -163,7 +163,7 @@ const Search = (props) => {
         setIsOpen(false)
     }
 
-    const launchChat = (searchText) => {
+    const launchChat = () => {
         window.embeddedservice_bootstrap.utilAPI
             .launchChat()
             .then((successMessage) => {
@@ -180,10 +180,10 @@ const Search = (props) => {
 
         window.addEventListener('onEmbeddedMessageSent', (e) => {
             if (!hasFired && newChatLaunched) {
-                if (e.detail.conversationEntry?.sender?.role === 'Chatbot') {
+                if (e.detail.conversationEntry?.sender?.role === 'Chatbot' && searchInputRef?.current?.value) {
                     hasFired = true
                     setTimeout(() => {
-                        window.embeddedservice_bootstrap.utilAPI.sendTextMessage(searchInputRef.current.value)
+                        window.embeddedservice_bootstrap.utilAPI.sendTextMessage(searchInputRef.current.value.trim())
                     }, 500)
                 }
             }
@@ -210,7 +210,7 @@ const Search = (props) => {
                                 'invoke API before the onEmbeddedMessagingConversationOpened event is fired'
                             )
                         ) {
-                            launchChat(searchText)
+                            launchChat()
                         }
                     })
             }, 500)
