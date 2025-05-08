@@ -10,6 +10,7 @@ import PropTypes from 'prop-types'
 import {useHistory, useLocation, useParams} from 'react-router-dom'
 import {FormattedMessage, useIntl} from 'react-intl'
 import {Helmet} from 'react-helmet'
+import {keepPreviousData} from '@tanstack/react-query'
 import {
     useCategory,
     useCustomerId,
@@ -172,7 +173,7 @@ const ProductList = (props) => {
             }
         },
         {
-            keepPreviousData: true
+            placeholderData: keepPreviousData
         }
     )
 
@@ -791,6 +792,11 @@ const Sort = ({sortUrls, productSearchResult, basePath, ...otherProps}) => {
             {...otherProps}
         >
             <Select
+                id="sf-product-list-sort-select"
+                aria-label={intl.formatMessage({
+                    id: 'product_list.sort_by.label.assistive_msg',
+                    defaultMessage: 'Sort products by'
+                })}
                 value={basePath.replace(/(offset)=(\d+)/i, '$1=0')}
                 onChange={({target}) => {
                     history.push(target.value)

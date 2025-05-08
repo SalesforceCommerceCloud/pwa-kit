@@ -23,7 +23,14 @@ const PaymentForm = ({form, onSubmit}) => {
             <Stack spacing={8}>
                 <Stack spacing={5}>
                     <Box border="1px solid" borderColor="gray.100" rounded="base" overflow="hidden">
-                        <RadioGroup value="cc">
+                        <RadioGroup
+                            value="cc"
+                            aria-label={formatMessage({
+                                defaultMessage: 'Payment',
+                                id: 'payment_selection.radio_group.assistive_msg'
+                            })}
+                            name="payment-selection"
+                        >
                             <Box
                                 py={3}
                                 px={[4, 4, 6]}

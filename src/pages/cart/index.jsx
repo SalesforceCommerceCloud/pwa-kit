@@ -4,8 +4,9 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {useState, useMemo} from 'react'
+import React, {useState, useMemo, useEffect} from 'react'
 import {FormattedMessage, useIntl} from 'react-intl'
+import {keepPreviousData} from '@tanstack/react-query'
 
 // Chakra Components
 import {Box, Stack, Grid, GridItem, Container, useDisclosure, Button} from '@chakra-ui/react'
@@ -98,7 +99,7 @@ const Cart = () => {
         },
         {
             enabled: bundleChildVariantIds?.length > 0,
-            keepPreviousData: true,
+            placeholderData: keepPreviousData,
             select: (result) => {
                 return result?.data?.reduce((result, item) => {
                     const key = item.id
@@ -171,7 +172,7 @@ const Cart = () => {
     /******************* Shipping Methods for basket shipment *******************/
     // do this action only if the basket shipping method is not defined
     // we need to fetch the shippment methods to get the default value before we can add it to the basket
-    useShippingMethodsForShipment(
+    const shippingMethodsQuery = useShippingMethodsForShipment(
         {
             parameters: {
                 basketId: basket?.basketId,
@@ -183,20 +184,25 @@ const Cart = () => {
             enabled:
                 !!basket?.basketId &&
                 basket.shipments.length > 0 &&
-                !basket.shipments[0].shippingMethod,
-            onSuccess: (data) => {
-                updateShippingMethodForShipmentsMutation.mutate({
-                    parameters: {
-                        basketId: basket?.basketId,
-                        shipmentId: 'me'
-                    },
-                    body: {
-                        id: data.defaultShippingMethodId
-                    }
-                })
-            }
+                !basket.shipments[0].shippingMethod
         }
     )
+
+    // Handle shipping method update when data is returned
+    useEffect(() => {
+        if (!shippingMethodsQuery.isSuccess || !shippingMethodsQuery.data) {
+            return
+        }
+        updateShippingMethodForShipmentsMutation.mutate({
+            parameters: {
+                basketId: basket?.basketId,
+                shipmentId: 'me'
+            },
+            body: {
+                id: shippingMethodsQuery.data.defaultShippingMethodId
+            }
+        })
+    }, [shippingMethodsQuery.isSuccess, shippingMethodsQuery.data])
 
     /************************* Error handling ***********************/
     const showError = () => {

@@ -17,6 +17,7 @@ import {
     useDisclosure,
     useToast
 } from '@chakra-ui/react'
+import {keepPreviousData} from '@tanstack/react-query'
 import {
     AuthHelpers,
     useAuthHelper,
@@ -100,7 +101,10 @@ export const AuthModal = ({
 
     const {data: baskets} = useCustomerBaskets(
         {parameters: {customerId}},
-        {enabled: !!customerId && !isServer, keepPreviousData: true}
+        {
+            enabled: !!customerId && !isServer,
+            placeholderData: keepPreviousData
+        }
     )
     const mergeBasket = useShopperBasketsMutation('mergeBasket')
 

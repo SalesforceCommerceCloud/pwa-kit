@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, {useEffect, useRef} from 'react'
+import React, {useEffect, useState} from 'react'
 import PropTypes from 'prop-types'
 import {useProducts} from '@salesforce/commerce-sdk-react'
 import {REMOVE_UNAVAILABLE_CART_ITEM_DIALOG_CONFIG} from '../../constants'
@@ -29,52 +29,58 @@ const UnavailableProductConfirmationModal = ({
     productItems = [],
     handleUnavailableProducts = noop
 }) => {
-    const unavailableProductIdsRef = useRef(null)
+    const [unavailableProductIds, setUnavailableProductIds] = useState(null)
     const ids = productIds.length ? productIds : productItems.map((i) => i.productId)
-    useProducts(
+
+    const productsQuery = useProducts(
         {parameters: {ids: ids?.join(','), allImages: true}},
         {
-            enabled: ids?.length > 0,
-            onSuccess: (result) => {
-                const resProductIds = []
-                const unOrderableIds = []
-                result.data?.forEach(({id, inventory}) => {
-                    // when a product is unavailable, the getProducts will not return its product detail.
-                    // we compare the response ids with the ones in basket to figure which product has become unavailable
-                    resProductIds.push(id)
-
-                    // when a product is orderable, but the quantity in the basket is more than the remaining stock
-                    // we want to make sure it is removed before go to checkout page to avoid error when placing order
-                    // we don't need to remove low stock/ out of stock from wishlist
-                    if (productItems.length) {
-                        const productItem = productItems.find((item) => item.productId === id)
-                        // wishlist item will have the property type
-                        const isWishlist = !!productItem?.type
-                        if (
-                            !isWishlist &&
-                            (!inventory?.orderable ||
-                                (inventory?.orderable &&
-                                    productItem?.quantity > inventory.stockLevel))
-                        ) {
-                            unOrderableIds.push(id)
-                        }
-                    }
-                })
-
-                const unavailableProductIds = ids.filter(
-                    (id) => !resProductIds.includes(id) || unOrderableIds.includes(id)
-                )
-
-                unavailableProductIdsRef.current = unavailableProductIds
-            }
+            enabled: ids?.length > 0
         }
     )
+
+    useEffect(() => {
+        if (!productsQuery.isSuccess || !productsQuery.data) {
+            return
+        }
+        const result = productsQuery.data
+        const resProductIds = []
+        const unOrderableIds = []
+
+        result.data?.forEach(({id, inventory}) => {
+            // when a product is unavailable, the getProducts will not return its product detail.
+            // we compare the response ids with the ones in basket to figure which product has become unavailable
+            resProductIds.push(id)
+
+            // when a product is orderable, but the quantity in the basket is more than the remaining stock
+            // we want to make sure it is removed before go to checkout page to avoid error when placing order
+            // we don't need to remove low stock/ out of stock from wishlist
+            if (productItems.length) {
+                const productItem = productItems.find((item) => item.productId === id)
+                // wishlist item will have the property type
+                const isWishlist = !!productItem?.type
+                if (
+                    !isWishlist &&
+                    (!inventory?.orderable ||
+                        (inventory?.orderable && productItem?.quantity > inventory.stockLevel))
+                ) {
+                    unOrderableIds.push(id)
+                }
+            }
+        })
+
+        const unavailableIds = ids.filter(
+            (id) => !resProductIds.includes(id) || unOrderableIds.includes(id)
+        )
+        setUnavailableProductIds(unavailableIds)
+    }, [productsQuery.data, productsQuery.isSuccess])
+
     const unavailableProductsModalProps = useDisclosure()
     useEffect(() => {
-        if (unavailableProductIdsRef.current?.length > 0) {
+        if (unavailableProductIds?.length > 0) {
             unavailableProductsModalProps.onOpen()
         }
-    }, [unavailableProductIdsRef.current])
+    }, [unavailableProductIds])
 
     return (
         <ConfirmationModal
@@ -84,8 +90,8 @@ const UnavailableProductConfirmationModal = ({
             {...REMOVE_UNAVAILABLE_CART_ITEM_DIALOG_CONFIG}
             hideAlternateAction={true}
             onPrimaryAction={async () => {
-                await handleUnavailableProducts(unavailableProductIdsRef.current)
-                unavailableProductIdsRef.current = null
+                await handleUnavailableProducts(unavailableProductIds)
+                setUnavailableProductIds(null)
                 unavailableProductsModalProps.onClose()
             }}
             onAlternateAction={() => {}}

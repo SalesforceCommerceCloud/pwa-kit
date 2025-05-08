@@ -57,7 +57,5 @@ test('renders LinksList with horizontal variant', () => {
             <LinksList links={links} variant="horizontal" />
         </FooterStylesProvider>
     )
-    screen.logTestingPlaygroundURL()
-
     expect(container.querySelector(horizontalVariantSelector)).toBeInTheDocument()
 })

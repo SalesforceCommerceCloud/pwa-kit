@@ -148,6 +148,10 @@ const Footer = ({...otherProps}) => {
                                         window.location = newUrl
                                     }}
                                     variant="filled"
+                                    aria-label={intl.formatMessage({
+                                        id: 'footer.locale_selector.assistive_msg',
+                                        defaultMessage: 'Select Language'
+                                    })}
                                     {...styles.localeDropdown}
                                 >
                                     {supportedLocaleIds.map((locale) => (
@@ -219,7 +223,16 @@ const Subscribe = ({...otherProps}) => {
                             })}
                         </Button>
                     </InputRightElement>
-                    <Input type="email" placeholder="you@email.com" {...styles.subscribeField} />
+                    <Input
+                        type="email"
+                        placeholder="you@email.com"
+                        aria-label={intl.formatMessage({
+                            id: 'footer.subscribe.email.assistive_msg',
+                            defaultMessage: 'Email address for newsletter'
+                        })}
+                        id="subscribe-email"
+                        {...styles.subscribeField}
+                    />
                 </InputGroup>
             </Box>
 
