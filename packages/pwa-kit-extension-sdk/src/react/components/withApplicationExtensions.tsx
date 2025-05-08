@@ -45,14 +45,20 @@ const withApplicationExtensions = <C,>(
     WrappedComponent: React.ComponentType<C>,
     options: withApplicationExtensionsOptions
 ) => {
-    const {applicationExtensions} = options
+    const {applicationExtensions, locals} = options
 
     // Get all application extension higher-order components (HOCs)
     const hocs: GenericHocType<C>[] = applicationExtensions
         .filter((applicationExtension) => applicationExtension.isEnabled())
         // It's counterintuitive: reversing the list is necessary, as we build the React tree from innermost
         .reverse()
-        .map((extension) => extension.extendApp.bind(extension) as GenericHocType<C>)
+        .map(
+            (extension) => (Component: React.ComponentType<C>) =>
+                extension.extendApp(
+                    Component as React.ComponentType<any>,
+                    locals
+                ) as React.ComponentType<C>
+        )
         .filter(Boolean)
 
     const withApplicationExtensionsProvider: GenericHocType<any> = (WrappedComponent) => {

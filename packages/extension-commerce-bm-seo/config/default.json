@@ -1,6 +1,6 @@
 {
     "enabled": true,
-    "commerceAPI": {
+    "commerceApi": {
         "proxyPath": "/mobify/proxy/api",
         "parameters": {
             "clientId": "c9c45bfd-0ed3-4aa2-9971-40f88962b836",

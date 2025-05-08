@@ -20,7 +20,7 @@
   "devDependencies": {
     "@chakra-ui/react": "2.8.2",
     "@loadable/component": "^5.15.3",
-    "@salesforce/commerce-sdk-react": "^3.2.0-extensibility-preview.4",
+    "@salesforce/commerce-sdk-react": "^3.3.0-extensibility-preview.4",
     "@salesforce/pwa-kit-dev": "^4.0.0-extensibility-preview.4",
     "@salesforce/pwa-kit-extension-sdk": "^4.0.0-extensibility-preview.4",
     "@salesforce/pwa-kit-react-sdk": "^4.0.0-extensibility-preview.4",
@@ -41,7 +41,7 @@
   "peerDependencies": {
     "@chakra-ui/react": "^2.8.2",
     "@loadable/component": "^5.15.3",
-    "@salesforce/commerce-sdk-react": "^3.2.0-extensibility-preview.0",
+    "@salesforce/commerce-sdk-react": "^3.3.0-extensibility-preview.0",
     "@salesforce/pwa-kit-extension-sdk": "^4.0.0-extensibility-preview.0",
     "@salesforce/pwa-kit-react-sdk": "^4.0.0-extensibility-preview.0",
     "@salesforce/pwa-kit-runtime": "^4.0.0-extensibility-preview.0",

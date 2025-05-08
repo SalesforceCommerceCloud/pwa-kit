@@ -7,9 +7,15 @@
 
 import React from 'react'
 import {getAppOrigin} from '@salesforce/pwa-kit-react-sdk/utils/url'
-import {CommerceApiProvider, useCommerceApi} from '@salesforce/commerce-sdk-react'
-import {UserConfig} from '../types/config'
-import {logger} from '../logger'
+import {
+    CommerceApiProvider,
+    useCommerceApi,
+    buildCommerceApiClients,
+    ApiClients,
+    initializeAuth
+} from '@salesforce/commerce-sdk-react'
+import {CommerceApiConfig} from '../../types'
+import {logger} from '../../../src/logger'
 
 /**
  * Checks if the CommerceApiProvider is already installed in the component tree.
@@ -35,6 +41,27 @@ const useHasCommerceApiProvider = () => {
 
 type WithOptionalCommerceSdkReactProvider = React.ComponentPropsWithoutRef<any>
 
+const initializeCommerceApi = async (config: CommerceApiConfig, locals: Record<string, any>): Promise<ApiClients> => {
+    const appOrigin = getAppOrigin()
+    const clientConfig = {
+        ...config,
+        proxy: `${appOrigin}${config.proxyPath}`,
+        redirectURI: `${appOrigin}/callback`
+    }
+    
+    // Initialize auth and get access token if not already set
+    if (!locals.__commerceApiAccessToken) {
+        locals.__commerceApiAccessToken = await initializeAuth(clientConfig)
+    }
+
+    // Build API clients if not already set
+    if (!locals.__commerceApiClients) {
+        locals.__commerceApiClients = buildCommerceApiClients(clientConfig)
+    }
+
+    return locals.__commerceApiClients
+}
+
 /**
  * Higher-order component that conditionally installs the CommerceApiProvider if the config is provided.
  *
@@ -44,29 +71,39 @@ type WithOptionalCommerceSdkReactProvider = React.ComponentPropsWithoutRef<any>
  */
 export const withOptionalCommerceSdkReactProvider = <P extends object>(
     WrappedComponent: React.ComponentType<P>,
-    config: UserConfig
+    config: CommerceApiConfig,
+    locals: Record<string, any>
 ) => {
+    // Initialize only if initialization hasn't started yet
+    if (!locals.__commerceApiInitStarted) {
+        locals.__commerceApiInitStarted = true
+        console.log('CommerceApiProvider config.parameters.clientId', config.parameters.clientId)
+        locals.__commerceApiInitPromise = initializeCommerceApi(config, locals)
+    }
+
     const HOC: React.FC<P> = (props: WithOptionalCommerceSdkReactProvider) => {
         if (useHasCommerceApiProvider()) {
             return <WrappedComponent {...(props as P)} />
         }
-        if (!config.commerceApi || !config.commerceApi?.parameters) {
+        if (!config || !config?.parameters) {
             logger.error(
                 'CommerceApiProvider is not installed and no commerceApi config is provided, this extension may not work as expected.'
             )
             return <WrappedComponent {...(props as P)} />
         }
         const appOrigin = getAppOrigin()
+        console.log('CommerceApiProvider locals.__commerceApiAccessToken', locals.__commerceApiAccessToken)
         return (
             <CommerceApiProvider
-                shortCode={config.commerceApi.parameters.shortCode}
-                clientId={config.commerceApi.parameters.clientId}
-                organizationId={config.commerceApi.parameters.organizationId}
-                siteId={config.commerceApi.parameters.siteId}
-                locale={config.commerceApi.parameters.locale}
-                currency={config.commerceApi.parameters.currency}
+                shortCode={config.parameters.shortCode}
+                clientId={config.parameters.clientId}
+                organizationId={config.parameters.organizationId}
+                siteId={config.parameters.siteId}
+                locale={config.parameters.locale ?? ''}
+                currency={config.parameters.currency ?? ''}
                 redirectURI={`${appOrigin}/callback`}
-                proxy={`${appOrigin}${config.commerceApi.proxyPath}`}
+                proxy={`${appOrigin}${config.proxyPath}`}
+                fetchedToken={locals.__commerceApiAccessToken}
             >
                 <WrappedComponent {...(props as P)} />
             </CommerceApiProvider>

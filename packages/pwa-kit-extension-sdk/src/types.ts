@@ -7,6 +7,7 @@
 
 import {RouteProps} from 'react-router-dom'
 import {ApplicationExtension} from './shared/classes/application-extension-base'
+import {ApiClientConfig} from '@salesforce/commerce-sdk-react'
 
 /**
  * This is the base configuration type for all Application Extensions. Modify this
@@ -38,6 +39,10 @@ export type BuildCandidatePathsOptions = {
     canonicalSource: string
     projectDir: string
     extensionEntries: ApplicationExtensionEntry[]
+}
+
+export interface CommerceApiConfig extends Omit<ApiClientConfig, 'proxy'> {
+    proxyPath: string
 }
 
 /**

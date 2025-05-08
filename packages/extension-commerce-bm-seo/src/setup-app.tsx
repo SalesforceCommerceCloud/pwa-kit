@@ -11,7 +11,11 @@ import {RouteProps} from 'react-router-dom'
 
 // Platform Imports
 import {getAppOrigin} from '@salesforce/pwa-kit-react-sdk/utils/url'
-import {ApplicationExtension} from '@salesforce/pwa-kit-extension-sdk/react'
+import {
+    ApplicationExtension,
+    CommerceApiConfig,
+    withOptionalCommerceSdkReactProvider
+} from '@salesforce/pwa-kit-extension-sdk/react'
 import {applyHOCs} from '@salesforce/pwa-kit-extension-sdk/react/utils'
 import {
     AsyncRouteProps,
@@ -23,14 +27,13 @@ import {
 import {ShopperSeo} from 'commerce-sdk-isomorphic'
 
 // Local Imports
-import {Config, CommerceAPIConfig} from './types'
+import {Config} from './types'
 import {
     createPlaceholderComponent,
     getComponentForUrlMapping,
     PlaceholderComponent,
     withPropsWrapper
 } from './utils/component-utils'
-import {getShopperSeoClient} from './utils/shopper-seo-utils'
 
 // Others
 import extensionMeta from '../extension-meta.json'
@@ -44,9 +47,14 @@ class CommerceBmSeo extends ApplicationExtension<Config> {
      * or add things like providers and contexts to be used throughout your app.
      */
     extendApp<T extends React.ComponentType<T>>(
-        App: React.ComponentType<T>
+        App: React.ComponentType<T>,
+        locals: Record<string, any>
     ): React.ComponentType<T> {
-        const HOCs: any[] = []
+        const {commerceApi} = this.getConfig()
+        const HOCs: any[] = [
+            (component: React.ComponentType<any>) =>
+                withOptionalCommerceSdkReactProvider(component, commerceApi, locals)
+        ]
 
         return applyHOCs(App, HOCs)
     }
@@ -60,14 +68,23 @@ class CommerceBmSeo extends ApplicationExtension<Config> {
      */
     async getRoutesAsync({locals}: GetRoutesParams): Promise<AsyncRouteProps[]> {
         let urlMapping:
-            | Awaited<ReturnType<ShopperSeo<CommerceAPIConfig['parameters']>['getUrlMapping']>>
+            | Awaited<ReturnType<ShopperSeo<CommerceApiConfig['parameters']>['getUrlMapping']>>
             | undefined
         const config = this.getConfig()
         const appOrigin = getAppOrigin()
 
+        // Wait for commerce API initialization if it's still in progress
+        if (locals.__commerceApiInitPromise) {
+            await locals.__commerceApiInitPromise
+        }
+
         // Make SEO GET Url Mapping API call
         const urlSegment: string = locals.originalUrl.split('?')[0]
-        const shopperSeo = await getShopperSeoClient(locals, config)
+        console.log('CommerceBmSeo.getRoutesAsync locals.__commerceApiAccessTokens', locals.__commerceApiAccessToken)
+        const shopperSeo = locals.__commerceApiClients.shopperSeo
+        shopperSeo.clientConfig.headers = {
+            authorization: `Bearer ${locals.__commerceApiAccessToken as string}`
+        }
         try {
             urlMapping = await shopperSeo.getUrlMapping({
                 parameters: {urlSegment}

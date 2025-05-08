@@ -12,14 +12,15 @@ import React from 'react'
 import {
     ApplicationExtension,
     SliceInitializer,
-    withApplicationExtensionStore
+    withApplicationExtensionStore,
+    withOptionalCommerceSdkReactProvider
 } from '@salesforce/pwa-kit-extension-sdk/react'
 import {applyHOCs} from '@salesforce/pwa-kit-extension-sdk/react/utils'
 import {GetRoutesParams, RouteProps} from '@salesforce/pwa-kit-extension-sdk/types'
 
+
 // Local Imports
 import {withOptionalChakra} from './components/with-optional-chakra-provider'
-import {withOptionalCommerceSdkReactProvider} from './components/with-optional-commerce-sdk-react-provider'
 import {withStoreLocator} from './components/with-store-locator'
 import {Config} from './types'
 
@@ -46,7 +47,8 @@ class StoreLocatorExtension extends ApplicationExtension<Config> {
     static readonly id = extensionMeta.id
 
     extendApp<T extends React.ComponentType<T>>(
-        App: React.ComponentType<T>
+        App: React.ComponentType<T>,
+        locals: Record<string, any>
     ): React.ComponentType<T> {
         const config = this.getConfig()
 
@@ -64,7 +66,7 @@ class StoreLocatorExtension extends ApplicationExtension<Config> {
                 }),
             (component: React.ComponentType<any>) => withStoreLocator(component, config),
             (component: React.ComponentType<any>) =>
-                withOptionalCommerceSdkReactProvider(component, config),
+                withOptionalCommerceSdkReactProvider(component, config.commerceApi, locals),
             (component: React.ComponentType<any>) => withOptionalChakra(component)
         ]
 

@@ -58,7 +58,8 @@ export class ApplicationExtension<
      * @returns EnhancedApp - The enhanced application component.
      */
     public extendApp<T extends React.ComponentType<T>>(
-        App: React.ComponentType<T>
+        App: React.ComponentType<T>,
+        locals: Record<string, any>
     ): React.ComponentType<T> {
         return App
     }

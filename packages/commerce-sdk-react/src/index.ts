@@ -5,6 +5,8 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import CommerceApiProvider from './provider'
+export {buildCommerceApiClients, initializeAuth} from './provider'
+export type {ApiClientConfig} from './provider'
 export * from './hooks/types'
 export * from './hooks'
 

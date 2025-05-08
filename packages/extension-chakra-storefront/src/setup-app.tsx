@@ -36,7 +36,8 @@ class ChakraStorefront extends ApplicationExtension<Config> {
     static readonly id = extensionMeta.id
 
     extendApp<T extends React.ComponentType<T>>(
-        App: React.ComponentType<T>
+        App: React.ComponentType<T>,
+        locals: Record<string, any>
     ): React.ComponentType<T> {
         // NOTE: The order of these HOCs is important!
         const requiredHOCs = [

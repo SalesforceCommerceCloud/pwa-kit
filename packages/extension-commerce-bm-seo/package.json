@@ -9,7 +9,7 @@
     "test": "pwa-kit-dev test"
   },
   "devDependencies": {
-    "@salesforce/commerce-sdk-react": "^3.2.0-extensibility-preview.4",
+    "@salesforce/commerce-sdk-react": "^3.3.0-extensibility-preview.4",
     "@loadable/component": "^5.15.3",
     "@salesforce/pwa-kit-dev": "4.0.0-extensibility-preview.4",
     "@salesforce/pwa-kit-extension-sdk": "4.0.0-extensibility-preview.4",
@@ -27,7 +27,7 @@
     "react-dom": "^18.2.0"
   },
   "peerDependencies": {
-    "@salesforce/commerce-sdk-react": "^3.2.0-extensibility-preview.4",
+    "@salesforce/commerce-sdk-react": "^3.3.0-extensibility-preview.4",
     "@loadable/component": "^5.15.3",
     "@salesforce/pwa-kit-extension-sdk": "^4.0.0-extensibility-preview.0",
     "@salesforce/pwa-kit-react-sdk": "^4.0.0-extensibility-preview.0",

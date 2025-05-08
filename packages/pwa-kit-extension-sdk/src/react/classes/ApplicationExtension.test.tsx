@@ -111,7 +111,7 @@ describe('ApplicationExtension', () => {
 
     describe('extendApp', () => {
         test('should return the provided component without modification', () => {
-            const result = extension.extendApp(MockComponent)
+            const result = extension.extendApp(MockComponent, {})
             expect(result).toBe(MockComponent)
         })
     })
