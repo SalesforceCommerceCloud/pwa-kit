@@ -15,7 +15,6 @@ import {
     initializeAuth
 } from '@salesforce/commerce-sdk-react'
 import {CommerceApiConfig} from '../../types'
-import {logger} from '../../../src/logger'
 
 /**
  * Checks if the CommerceApiProvider is already installed in the component tree.
@@ -41,14 +40,17 @@ const useHasCommerceApiProvider = () => {
 
 type WithOptionalCommerceSdkReactProvider = React.ComponentPropsWithoutRef<any>
 
-const initializeCommerceApi = async (config: CommerceApiConfig, locals: Record<string, any>): Promise<ApiClients> => {
+const initializeCommerceApi = async (
+    config: CommerceApiConfig,
+    locals: Record<string, any>
+): Promise<ApiClients> => {
     const appOrigin = getAppOrigin()
     const clientConfig = {
         ...config,
         proxy: `${appOrigin}${config.proxyPath}`,
         redirectURI: `${appOrigin}/callback`
     }
-    
+
     // Initialize auth and get access token if not already set
     if (!locals.__commerceApiAccessToken) {
         locals.__commerceApiAccessToken = await initializeAuth(clientConfig)
@@ -86,13 +88,16 @@ export const withOptionalCommerceSdkReactProvider = <P extends object>(
             return <WrappedComponent {...(props as P)} />
         }
         if (!config || !config?.parameters) {
-            logger.error(
+            console.error(
                 'CommerceApiProvider is not installed and no commerceApi config is provided, this extension may not work as expected.'
             )
             return <WrappedComponent {...(props as P)} />
         }
         const appOrigin = getAppOrigin()
-        console.log('CommerceApiProvider locals.__commerceApiAccessToken', locals.__commerceApiAccessToken)
+        console.log(
+            'CommerceApiProvider locals.__commerceApiAccessToken',
+            locals.__commerceApiAccessToken
+        )
         return (
             <CommerceApiProvider
                 shortCode={config.parameters.shortCode}
