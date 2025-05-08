@@ -4,8 +4,10 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-export default {
-    baseStyle: {
+import {defineRecipe} from '@chakra-ui/react'
+
+export default defineRecipe({
+    base: {
         header: {
             paddingTop: 1,
             paddingRight: [4, 4, 6, 6],
@@ -23,4 +25,4 @@ export default {
             paddingLeft: [4, 4, 6, 6]
         }
     }
-}
+})

@@ -25,11 +25,6 @@ export default {
     variants: {
         vertical: {},
         horizontal: {
-            list: {
-                display: 'flex',
-                flexDirection: 'row',
-                gap: '0.5rem'
-            },
             listItem: {
                 borderLeft: '1px solid',
                 paddingLeft: 2

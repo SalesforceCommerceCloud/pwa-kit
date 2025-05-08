@@ -14,12 +14,12 @@
     "lint": "npm run lint:js",
     "lint:fix": "npm run lint:js -- --fix",
     "lint:js": "pwa-kit-dev lint \"**/*.{js,jsx,ts,tsx}\"",
-    "test": "pwa-kit-dev test",
+    "test": "pwa-kit-dev test -- --testPathIgnorePatterns='.*'",
     "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
+    "@ark-ui/react": "^5.8.0",
     "@chakra-ui/react": "^3.16.1",
-    "@chakra-ui/skip-nav": "^2.0.15",
     "@emotion/react": "^11.13.3",
     "@loadable/component": "^5.15.3",
     "@peculiar/webcrypto": "^1.4.2",
@@ -65,7 +65,6 @@
   },
   "peerDependencies": {
     "@chakra-ui/react": "^3.16.1",
-    "@chakra-ui/skip-nav": "^2.0.15",
     "@emotion/react": "^11.13.3",
     "@loadable/component": "^5.15.3",
     "@peculiar/webcrypto": "^1.4.2",

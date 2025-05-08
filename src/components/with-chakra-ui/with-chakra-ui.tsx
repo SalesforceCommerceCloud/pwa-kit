@@ -18,7 +18,7 @@ type WithChakraUIProps = React.ComponentPropsWithoutRef<any>
 const withChakraUI = <P extends object>(WrappedComponent: React.ComponentType<P>) => {
     const WithChakraUI: React.FC<P> = (props: WithChakraUIProps) => {
         return (
-            <ChakraProvider theme={theme}>
+            <ChakraProvider value={theme}>
                 <WrappedComponent {...(props as P)} />
             </ChakraProvider>
         )

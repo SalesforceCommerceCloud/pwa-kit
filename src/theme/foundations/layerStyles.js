@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
+import {defineLayerStyles} from '@chakra-ui/react'
+
 const card = {
     py: 6,
     px: 4,
@@ -19,7 +21,7 @@ const cardBordered = {
     borderColor: 'gray.50'
 }
 
-export default {
+export default defineLayerStyles({
     card,
 
     cardBordered,
@@ -30,12 +32,15 @@ export default {
     },
 
     page: {
-        px: [4, 4, 6, 6, 8],
-        paddingTop: [4, 4, 6, 6, 8],
-        paddingBottom: 32,
-        width: '100%',
-        maxWidth: 'container.xxxl',
-        marginLeft: 'auto',
-        marginRight: 'auto'
+        description: 'Page layout styles',
+        value: {
+            px: [4, 4, 6, 6, 8],
+            paddingTop: [4, 4, 6, 6, 8],
+            paddingBottom: 32,
+            width: '100%',
+            maxWidth: 'container.xxxl',
+            marginLeft: 'auto',
+            marginRight: 'auto'
+        }
     }
-}
+})

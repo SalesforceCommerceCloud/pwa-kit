@@ -19,8 +19,18 @@ import {getAppOrigin} from '@salesforce/pwa-kit-react-sdk/utils/url'
 import {useCategory, useShopperBasketsMutation} from '@salesforce/commerce-sdk-react'
 
 // Chakra
-import {Box, Center, Fade, Spinner, useDisclosure, useStyleConfig} from '@chakra-ui/react'
-import {SkipNavLink, SkipNavContent} from '@chakra-ui/skip-nav'
+import {
+    Box,
+    Center,
+    Button,
+    Flex,
+    // Fade,
+    Heading,
+    Spinner,
+    useDisclosure,
+    useSlotRecipe,
+    useToken
+} from '@chakra-ui/react'
 
 // Local Project Components
 import {DrawerMenu} from '../drawer-menu'
@@ -29,24 +39,23 @@ import {HideOnDesktop, HideOnMobile} from '../responsive'
 import {ListMenu, ListMenuContent} from '../list-menu'
 import {withCommerceSdkReactHookData} from '../with-commerce-sdk-react-hook-data'
 import AboveHeader from '../above-header'
-import CheckoutHeader from '../../pages/checkout/partials/checkout-header'
-import CheckoutFooter from '../../pages/checkout/partials/checkout-footer'
-import Footer from '../footer'
-import Header from '../header'
-import OfflineBanner from '../offline-banner'
-import OfflineBoundary from '../offline-boundary'
+// import CheckoutHeader from '../../pages/checkout/partials/checkout-header'
+// import CheckoutFooter from '../../pages/checkout/partials/checkout-footer'
+// import Footer from '../footer'
+// import Header from '../header'
+// import OfflineBanner from '../offline-banner'
+// import OfflineBoundary from '../offline-boundary'
 import Seo from '../seo'
 import ScrollToTop from '../scroll-to-top'
 
 // Local Project Hooks
-import {AuthModal, useAuthModal} from '../../hooks/use-auth-modal'
-import {AddToCartModalProvider} from '../../hooks/use-add-to-cart-modal'
+// import {AuthModal, useAuthModal} from '../../hooks/use-auth-modal'
+// import {AddToCartModalProvider} from '../../hooks/use-add-to-cart-modal'
 import {useExtensionConfig, useCurrentCustomer, useCurrentBasket} from '../../hooks'
 import {watchOnlineStatus, flatten} from '../../utils/utils'
 import useActiveData from '../../hooks/use-active-data'
 import useMultiSite from '../../hooks/use-multi-site'
-import {DntNotification, useDntNotification} from '../../hooks/use-dnt-notification'
-import {useTheme} from '@chakra-ui/react'
+// import {DntNotification, useDntNotification} from '../../hooks/use-dnt-notification'
 
 import {UserConfig} from '../../types/config'
 
@@ -59,40 +68,40 @@ const PlaceholderComponent: React.FC = () => (
     </Center>
 )
 
-const DrawerMenuItemWithData = withCommerceSdkReactHookData(
-    ({itemComponent: ItemComponent, data, ...rest}: any) => (
-        <Fade in={true}>
-            <ItemComponent {...rest} item={data} itemComponent={DrawerMenuItemWithData} />
-        </Fade>
-    ),
-    {
-        hook: useCategory,
-        queryOptions: ({item}: {item: {id: string}}) => ({
-            parameters: {
-                id: item.id
-            }
-        }),
-        placeholder: PlaceholderComponent
-    }
-)
-
-const ListMenuContentWithData = withCommerceSdkReactHookData(
-    ({data, ...rest}: any) => (
-        <Fade in={true}>
-            <ListMenuContent {...rest} item={data} />
-        </Fade>
-    ),
-    {
-        hook: useCategory,
-        queryOptions: ({item}: {item: {id: string}}) => ({
-            parameters: {
-                id: item.id,
-                levels: 2
-            }
-        }),
-        placeholder: PlaceholderComponent
-    }
-)
+// const DrawerMenuItemWithData = withCommerceSdkReactHookData(
+//     ({itemComponent: ItemComponent, data, ...rest}: any) => (
+//         <Fade in={true}>
+//             <ItemComponent {...rest} item={data} itemComponent={DrawerMenuItemWithData} />
+//         </Fade>
+//     ),
+//     {
+//         hook: useCategory,
+//         queryOptions: ({item}: {item: {id: string}}) => ({
+//             parameters: {
+//                 id: item.id
+//             }
+//         }),
+//         placeholder: PlaceholderComponent
+//     }
+// )
+//
+// const ListMenuContentWithData = withCommerceSdkReactHookData(
+//     ({data, ...rest}: any) => (
+//         <Fade in={true}>
+//             <ListMenuContent {...rest} item={data} />
+//         </Fade>
+//     ),
+//     {
+//         hook: useCategory,
+//         queryOptions: ({item}: {item: {id: string}}) => ({
+//             parameters: {
+//                 id: item.id,
+//                 levels: 2
+//             }
+//         }),
+//         placeholder: PlaceholderComponent
+//     }
+// )
 
 // Define the HOC function
 const withLayout = <P extends object>(WrappedComponent: React.ComponentType<P>) => {
@@ -112,13 +121,17 @@ const withLayout = <P extends object>(WrappedComponent: React.ComponentType<P>) 
         const activeData = useActiveData()
         const history = useHistory()
         const location = useLocation()
-        const authModal = useAuthModal()
-        const dntNotification = useDntNotification()
+        // const authModal = useAuthModal()
+        // const dntNotification = useDntNotification()
         const {site, locale, buildUrl} = useMultiSite()
         const [isOnline, setIsOnline] = useState<boolean>(true)
-        const styles = useStyleConfig('App')
-        const {colors} = useTheme()
-        const {isOpen, onOpen, onClose} = useDisclosure()
+
+        // Apply styles from the theme
+        const recipe = useSlotRecipe({key: 'app'})
+        const styles = recipe()
+        // https://www.chakra-ui.com/docs/theming/overview#tokens-1
+        const [themeColor] = useToken('colors.blue', '600')
+        const {open, onOpen, onClose} = useDisclosure()
 
         // Used to conditionally render header/footer for checkout page
         const isCheckout = /\/checkout$/.test(location?.pathname)
@@ -216,14 +229,13 @@ const withLayout = <P extends object>(WrappedComponent: React.ComponentType<P>) 
             trackPage()
         }, [location])
 
-        // Ensure styles.container is an object
-        const containerStyles = (styles.container as React.CSSProperties) || {}
+        // const containerStyles = (styles.container as React.CSSProperties) || {}
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
-        const headerWrapperStyles = styles.headerWrapper || {}
+        // const headerWrapperStyles = styles.headerWrapper || {}
 
         return (
-            <Box className="sf-app" {...(containerStyles as any)}>
+            <Box className="sf-app" css={styles.container}>
                 <Helmet>
                     {config.activeDataEnabled && (
                         <script
@@ -237,7 +249,7 @@ const withLayout = <P extends object>(WrappedComponent: React.ComponentType<P>) 
                 </Helmet>
 
                 <Seo>
-                    <meta name="theme-color" content={colors.blue['600']} />
+                    <meta name="theme-color" content={themeColor} />
                     <meta name="apple-mobile-web-app-title" content={config.defaultSiteTitle} />
 
                     {/* Urls for all localized versions of this page (including current page)
@@ -273,73 +285,78 @@ const withLayout = <P extends object>(WrappedComponent: React.ComponentType<P>) 
                 <ScrollToTop />
 
                 <Box id="app" display="flex" flexDirection="column" flex={1}>
-                    <SkipNavLink zIndex="skipLink">Skip to Content</SkipNavLink>
-                    <Box {...headerWrapperStyles}>
+                    {/*TODO: recreating this component because @chakra-ui/skip-nav does not have V3 version*/}
+                    {/*<SkipNavLink zIndex="skipLink">Skip to Content</SkipNavLink>*/}
+                    <Box css={styles.headerWrapper}>
                         {!isCheckout ? (
                             <>
                                 <AboveHeader />
-                                <Header
-                                    onMenuClick={onOpen}
-                                    onLogoClick={onLogoClick}
-                                    onMyCartClick={onCartClick}
-                                    onMyAccountClick={onAccountClick}
-                                    onWishlistClick={onWishlistClick}
-                                >
-                                    <HideOnDesktop>
-                                        <DrawerMenu
-                                            isOpen={isOpen}
-                                            onClose={onClose}
-                                            onLogoClick={onLogoClick}
-                                            root={categories?.[CAT_MENU_DEFAULT_ROOT_CATEGORY]}
-                                            itemsKey="categories"
-                                            itemsCountKey="onlineSubCategoriesCount"
-                                            itemComponent={DrawerMenuItemWithData}
-                                        />
-                                    </HideOnDesktop>
+                                <div>Header</div>
+                                {/*<Header*/}
+                                {/*    onMenuClick={onOpen}*/}
+                                {/*    onLogoClick={onLogoClick}*/}
+                                {/*    onMyCartClick={onCartClick}*/}
+                                {/*    onMyAccountClick={onAccountClick}*/}
+                                {/*    onWishlistClick={onWishlistClick}*/}
+                                {/*>*/}
+                                {/*    <HideOnDesktop>*/}
+                                {/*        <DrawerMenu*/}
+                                {/*            isOpen={isOpen}*/}
+                                {/*            onClose={onClose}*/}
+                                {/*            onLogoClick={onLogoClick}*/}
+                                {/*            root={categories?.[CAT_MENU_DEFAULT_ROOT_CATEGORY]}*/}
+                                {/*            itemsKey="categories"*/}
+                                {/*            itemsCountKey="onlineSubCategoriesCount"*/}
+                                {/*            itemComponent={DrawerMenuItemWithData}*/}
+                                {/*        />*/}
+                                {/*    </HideOnDesktop>*/}
 
-                                    <HideOnMobile>
-                                        <ListMenu
-                                            root={categories?.[CAT_MENU_DEFAULT_ROOT_CATEGORY]}
-                                            itemsKey="categories"
-                                            itemsCountKey="onlineSubCategoriesCount"
-                                            contentComponent={ListMenuContentWithData}
-                                        />
-                                    </HideOnMobile>
-                                </Header>
+                                {/*    <HideOnMobile>*/}
+                                {/*        <ListMenu*/}
+                                {/*            root={categories?.[CAT_MENU_DEFAULT_ROOT_CATEGORY]}*/}
+                                {/*            itemsKey="categories"*/}
+                                {/*            itemsCountKey="onlineSubCategoriesCount"*/}
+                                {/*            contentComponent={ListMenuContentWithData}*/}
+                                {/*        />*/}
+                                {/*    </HideOnMobile>*/}
+                                {/*</Header>*/}
                             </>
                         ) : (
-                            <CheckoutHeader />
+                            <div>Checkout Header</div>
+                            // <CheckoutHeader />
                         )}
                     </Box>
-                    {!isOnline && <OfflineBanner />}
-                    <AddToCartModalProvider>
-                        <SkipNavContent
-                            style={{
-                                display: 'flex',
-                                flexDirection: 'column',
-                                flex: 1,
-                                outline: 0
-                            }}
-                        >
-                            <Box
-                                as="main"
-                                id="app-main"
-                                role="main"
-                                display="flex"
-                                flexDirection="column"
-                                flex="1"
-                            >
-                                <OfflineBoundary isOnline={false}>
-                                    <WrappedComponent {...(props as P)} />
-                                </OfflineBoundary>
-                            </Box>
-                        </SkipNavContent>
+                    {/*{!isOnline && <OfflineBanner />}*/}
+                    {/*<AddToCartModalProvider>*/}
+                    {/*TODO: recreating this component because @chakra-ui/skip-nav does not have V3 version*/}
+                    {/*<SkipNavContent*/}
+                    {/*    style={{*/}
+                    {/*        display: 'flex',*/}
+                    {/*        flexDirection: 'column',*/}
+                    {/*        flex: 1,*/}
+                    {/*        outline: 0*/}
+                    {/*    }}*/}
+                    {/*>*/}
+                    <Box
+                        as="main"
+                        id="app-main"
+                        role="main"
+                        display="flex"
+                        flexDirection="column"
+                        flex="1"
+                    >
+                        {/*<OfflineBoundary isOnline={false}>*/}
 
-                        {!isCheckout ? <Footer /> : <CheckoutFooter />}
+                        <WrappedComponent {...(props as P)} />
+                        {/*</OfflineBoundary>*/}
+                    </Box>
+                    {/*</SkipNavContent>*/}
 
-                        <AuthModal {...(authModal as any)} />
-                        <DntNotification {...dntNotification} />
-                    </AddToCartModalProvider>
+                    {/*{!isCheckout ? <Footer /> : <CheckoutFooter />}*/}
+
+                    {/*<AuthModal {...(authModal as any)} />*/}
+                    {/*<DntNotification {...dntNotification} />*/}
+                    {/*</AddToCartModalProvider>*/}
                 </Box>
                 {(config.activeDataEnabled as boolean) && (
                     <script
