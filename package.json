@@ -1,6 +1,6 @@
 {
   "name": "@salesforce/extension-chakra-storefront",
-  "version": "0.1.0-extensibility-preview.4",
+  "version": "0.1.0-extensibility-preview.5",
   "bugs": {
     "url": "https://github.com/SalesforceCommerceCloud/pwa-kit/issues"
   },
@@ -24,10 +24,10 @@
     "@peculiar/webcrypto": "^1.4.2",
     "@salesforce/cc-datacloud-typescript": "^1.0.10",
     "@salesforce/commerce-sdk-react": "4.0.0-extensibility-preview.1",
-    "@salesforce/pwa-kit-dev": "^4.0.0-extensibility-preview.4",
-    "@salesforce/pwa-kit-extension-sdk": "^4.0.0-extensibility-preview.4",
-    "@salesforce/pwa-kit-react-sdk": "^4.0.0-extensibility-preview.4",
-    "@salesforce/pwa-kit-runtime": "^4.0.0-extensibility-preview.4",
+    "@salesforce/pwa-kit-dev": "^4.0.0-extensibility-preview.5",
+    "@salesforce/pwa-kit-extension-sdk": "^4.0.0-extensibility-preview.5",
+    "@salesforce/pwa-kit-react-sdk": "^4.0.0-extensibility-preview.5",
+    "@salesforce/pwa-kit-runtime": "^4.0.0-extensibility-preview.5",
     "@tanstack/react-query": "^5.67.1",
     "@tanstack/react-query-devtools": "^5.67.1",
     "@testing-library/jest-dom": "^5.16.5",
@@ -93,7 +93,7 @@
     "react-router-dom": "^5.3.4"
   },
   "overrides": {
-    "react-router" : {
+    "react-router": {
       "path-to-regexp": "^1.9.0"
     }
   },
