@@ -77,7 +77,7 @@ const OverrideResolverLoader = function (this: LoaderContext<any>) {
     }
 
     // Lets use the compiler configuration to ensure we are resolving the correct file extensions.
-    const fileExtensions = options?.resolveExtensions
+    const fileExtensions = compiler.options?.resolve?.extensions || options?.resolveExtensions
     const basedir = options?.baseDir || process.cwd()
     const applicationExtensions = options?.extensions || compiler?.custom?.extensions || []
 
@@ -161,40 +161,32 @@ const OverrideResolverLoader = function (this: LoaderContext<any>) {
  * @returns {boolean} - A boolean indicating if the source file should be processed by the override loader.
  */
 export const validateOverrideSource = (source: string, options: any = {}) => {
-    const {
-        isMonoRepo = false,
-        target = 'node',
-        overridables = [],
-        projectDir = process.cwd()
-    } = options
+    const {isMonoRepo = false, target = 'node', overridables = []} = options
     const isSetupFile = SETUP_FILE_REGEX.test(source)
     const targetCache = OVERRIDABLE_CACHE[target as keyof typeof OVERRIDABLE_CACHE]
 
-    // Extract package path from source to check if it's an extension
-    const folderPattern = `${path.sep}${
-        isMonoRepo ? MONO_REPO_WORKSPACE_FOLDER : NODE_MODULES_FOLDER
-    }${path.sep}`
-    const packagePath = source.split(folderPattern)[1]?.split(path.sep)[0]
-
-    if (!packagePath) {
+    // Exit early if we have:
+    // 1. Processed this file already.
+    // 2. The file is an extension setup file.
+    if (targetCache.includes(source) || isSetupFile) {
         return false
     }
 
-    // Get full package path
-    const fullPackagePath = path.join(
-        projectDir,
-        isMonoRepo ? MONO_REPO_WORKSPACE_FOLDER : NODE_MODULES_FOLDER,
-        packagePath
-    )
+    // Check if the file is inside a 'src' directory
+    const srcSeparator = `${SRC_FOLDER}${path.sep}`
 
-    // Check if this package is an extension by looking for extension-meta.json
-    const isExtensionFile = isExtensionPackage(fullPackagePath)
+    // Compute the projectPath (package directory)
+    const projectPath = source.split(srcSeparator)[0]
 
-    // Exit early if we have:
-    // 1. Processed this file already.
-    // 2. The file is not an extension file.
-    // 3. The file is an extension setup file.
-    if (targetCache.includes(source) || !isExtensionFile || isSetupFile) {
+    console.log('projectPath:', projectPath)
+    console.log('source:', source)
+
+    // Check if it's an extension package
+    const isExtensionFile = isExtensionPackage(projectPath)
+
+
+    // Exit if it's not an extension file
+    if (!isExtensionFile ) {
         return false
     }
 

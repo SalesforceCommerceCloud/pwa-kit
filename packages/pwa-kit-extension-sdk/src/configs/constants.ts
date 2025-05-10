@@ -7,7 +7,6 @@
 
 // Constants // TODO: Move to a shared location
 export const LOCAL_EXTENSIONS_DIR = 'application-extensions'
-export const EXTENSION_PACKAGE_PREFIX = 'extension-'
 export const EXTENSION_PACKAGE_NAMESPACE = '@salesforce'
 export const IMPORT_REGEX = /import\s+(?:(?:[\w*\s{},]*)\s+from\s+)?['"](\..*?)['"]/g
 export const OVERRIDABLE_FILE_NAME = '.force_overrides'
