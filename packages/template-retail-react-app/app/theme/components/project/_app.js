@@ -18,16 +18,7 @@ export default {
         headerWrapper: {
             position: 'sticky',
             top: 0,
-            zIndex: {
-                base: theme.zIndices.sticky,
-                sm: theme.zIndices.base,
-                md: theme.zIndices.base
-            }
-        }
-    },
-    sizes: {
-        headerWrapper: {
-            zIndex: theme.zIndices.base
+            zIndex: theme.zIndices.sticky
         }
     },
     parts: ['container']
