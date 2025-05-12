@@ -7,26 +7,9 @@
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const sites = require('./sites.js')
 
-const defaultCommerceAgentSettings = {
-    enabled: 'true',
-    askAgentOnSearch: 'true',
-    embeddedServiceName: 'Agentforce_Channel_Web',
-    embeddedServiceEndpoint:
-        'https://orgfarm-1645fa246c.test1.my.pc-rnd.site.com/ESWAgentforceChannelWeb1745544099167',
-
-    scriptSourceUrl:
-        'https://orgfarm-1645fa246c.test1.my.pc-rnd.site.com/ESWAgentforceChannelWeb1745544099167/assets/js/bootstrap.min.js',
-
-    scrt2Url: 'https://orgfarm-1645fa246c.test1.my.pc-rnd.salesforce-scrt.com',
-    salesforceOrgId: '00DSG00000RBHqn',
-    commerceOrgId: 'f_ecom_zzeu_052',
-    siteId: 'RefArchGlobal'
-}
-
 module.exports = {
     app: {
-        commerceAgent:
-            process.env.COMMERCE_AGENT_SETTINGS || JSON.stringify(defaultCommerceAgentSettings),
+        commerceAgent: process.env.COMMERCE_AGENT_SETTINGS || JSON.stringify({enabled: 'false'}),
         url: {
             site: 'path',
             locale: 'path',
@@ -96,7 +79,7 @@ module.exports = {
                 path: 'api'
             },
             {
-                host: 'zzeu-052.dx.commercecloud.salesforce.com',
+                host: 'zzrf-001.dx.commercecloud.salesforce.com',
                 path: 'ocapi'
             }
         ]
