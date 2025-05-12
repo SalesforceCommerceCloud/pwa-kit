@@ -26,10 +26,10 @@ export const defaultPwaKitSecurityHeaders = (req, res, next) => {
      * @type Object.<string, string[] | boolean>
      */
     const directives = {
-        'connect-src': ["'self'", runtimeAdmin],
+        'connect-src': ["'self'", runtimeAdmin, '*.salesforce-scrt.com'],
         'frame-ancestors': [runtimeAdmin],
         'img-src': ["'self'", 'data:'],
-        'script-src': ["'self'", "'unsafe-eval'", runtimeAdmin],
+        'script-src': ["'self'", "'unsafe-eval'", runtimeAdmin, '*.site.com'],
         // Always upgrade insecure requests when deployed, never upgrade on local dev server
         'upgrade-insecure-requests': isRemote()
     }

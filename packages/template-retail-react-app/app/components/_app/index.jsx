@@ -58,7 +58,7 @@ import {AddToCartModalProvider} from '@salesforce/retail-react-app/app/hooks/use
 import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
-// import {useUpdateShopperContext} from '@salesforce/retail-react-app/app/hooks/use-update-shopper-context'
+import {useUpdateShopperContext} from '@salesforce/retail-react-app/app/hooks/use-update-shopper-context'
 
 // HOCs
 import {withCommerceSdkReact} from '@salesforce/retail-react-app/app/components/with-commerce-sdk-react/with-commerce-sdk-react'
@@ -81,7 +81,8 @@ import {
 
 import Seo from '@salesforce/retail-react-app/app/components/seo'
 import {Helmet} from 'react-helmet'
-import ShopperAgent from '../shopper-agent/index'
+import ShopperAgent from '@salesforce/retail-react-app/app/components/shopper-agent'
+import {getPathWithLocale} from '@salesforce/retail-react-app/app/utils/url'
 
 const PlaceholderComponent = () => (
     <Center p="2">
@@ -237,7 +238,7 @@ const App = (props) => {
     }, [])
 
     // Handle updating the shopper context
-    // useUpdateShopperContext()
+    useUpdateShopperContext()
 
     useEffect(() => {
         // Lets automatically close the mobile navigation when the
