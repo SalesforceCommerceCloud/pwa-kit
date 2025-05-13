@@ -16,12 +16,10 @@ import {
     Flex,
     HStack,
     Spinner,
-    IconButton,
-    useSlotRecipe,
-    useStyles
+    useSlotRecipe
 } from '@chakra-ui/react'
 import SearchSuggestions from '../../components/search/partials/search-suggestions'
-import {SearchIcon, CloseIcon} from '../../components/icons'
+import {SearchIcon} from '../../components/icons'
 import {
     capitalize,
     boldString,
