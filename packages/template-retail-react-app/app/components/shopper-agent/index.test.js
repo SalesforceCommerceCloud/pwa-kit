@@ -28,12 +28,17 @@ jest.mock('@salesforce/commerce-sdk-react', () => {
     }
 })
 
-// Mock the theme
-jest.mock('../shared/theme', () => {
+jest.mock('@salesforce/retail-react-app/app/components/shared/ui', () => {
+    const originalModule = jest.requireActual(
+        '@salesforce/retail-react-app/app/components/shared/ui'
+    )
     return {
-        zIndices: {
-            sticky: 1100
-        }
+        ...originalModule,
+        useTheme: jest.fn().mockReturnValue({
+            zIndices: {
+                sticky: 1100
+            }
+        })
     }
 })
 
@@ -81,6 +86,14 @@ describe('ShopperAgent Component', () => {
 
     test('should render nothing when enableMiaw is false', () => {
         const props = {...defaultProps, enableMiaw: false}
+        const {container} = render(<ShopperAgent {...props} />)
+
+        expect(container.firstChild).toBeNull()
+    })
+
+    test('should render nothing when commerceAgent is not provided via an environment variable', () => {
+        const commerceAgent = JSON.stringify({enabled: 'false'})
+        const props = {commerceAgent, enableMiaw: false}
         const {container} = render(<ShopperAgent {...props} />)
 
         expect(container.firstChild).toBeNull()

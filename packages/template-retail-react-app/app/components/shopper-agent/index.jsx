@@ -9,7 +9,7 @@ import React, {useEffect, useState} from 'react'
 import useScript from '@salesforce/retail-react-app/app/hooks/use-script'
 import {useUsid} from '@salesforce/commerce-sdk-react'
 import PropTypes from 'prop-types'
-import theme from '../shared/theme'
+import {useTheme} from '@salesforce/retail-react-app/app/components/shared/ui'
 
 const onClient = typeof window !== 'undefined'
 
@@ -48,8 +48,6 @@ function useMiaw(
     embeddedServiceDeploymentUrl,
     scrt2Url
 ) {
-    const [isMiawInitialized, setIsMiawInitialized] = useState(false)
-
     useEffect(() => {
         if (scriptLoadStatus.loaded && !scriptLoadStatus.error) {
             initEmbeddedMessaging(
@@ -58,11 +56,8 @@ function useMiaw(
                 embeddedServiceDeploymentUrl,
                 scrt2Url
             )
-            setIsMiawInitialized(true)
         }
     }, [scriptLoadStatus])
-
-    return isMiawInitialized
 }
 
 function validateCommerceAgentSettings(commerceAgent) {
@@ -78,34 +73,19 @@ function validateCommerceAgentSettings(commerceAgent) {
         'siteId'
     ]
 
-    return requiredFields.every((key) => typeof commerceAgent[key] === 'string')
+    const isValid = requiredFields.every((key) => typeof commerceAgent[key] === 'string')
+    if (!isValid) {
+        console.error('Invalid commerce agent settings.')
+    }
+    return isValid
 }
 
 function isEnabled(enabled) {
     return enabled === 'true' && onClient
 }
 
-function FeatureToggle({...props}) {
-    if (!validateCommerceAgentSettings(JSON.parse(props.commerceAgent))) {
-        console.error('Invalid commerce agent settings.')
-        return null
-    }
-
-    if (props.isEnabled && props.basketDoneLoading) {
-        return props.children
-    }
-
-    return null
-}
-
-FeatureToggle.propTypes = {
-    commerceAgent: PropTypes.string,
-    isEnabled: PropTypes.bool,
-    children: PropTypes.node,
-    basketDoneLoading: PropTypes.bool
-}
-
 function ShopperAgentWindow({commerceAgent, locale, domainUrl, basketId}) {
+    const theme = useTheme()
     const {
         embeddedServiceName,
         embeddedServiceEndpoint,
@@ -184,21 +164,16 @@ function ShopperAgent({commerceAgent, domainUrl, basketId, locale, basketDoneLoa
     const {enabled} = JSON.parse(commerceAgent)
     const isShopperAgentEnabled = isEnabled(enabled)
 
-    return (
-        <FeatureToggle
+    return isShopperAgentEnabled &&
+        basketDoneLoading &&
+        validateCommerceAgentSettings(JSON.parse(commerceAgent)) ? (
+        <ShopperAgentWindow
             commerceAgent={commerceAgent}
-            isEnabled={isShopperAgentEnabled}
+            locale={locale}
+            domainUrl={domainUrl}
             basketId={basketId}
-            basketDoneLoading={basketDoneLoading}
-        >
-            <ShopperAgentWindow
-                commerceAgent={commerceAgent}
-                locale={locale}
-                domainUrl={domainUrl}
-                basketId={basketId}
-            />
-        </FeatureToggle>
-    )
+        />
+    ) : null
 }
 
 ShopperAgent.propTypes = {
