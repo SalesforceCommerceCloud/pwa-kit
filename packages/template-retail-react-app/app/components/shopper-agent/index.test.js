@@ -6,7 +6,7 @@
  */
 
 import React from 'react'
-import {render, act} from '@testing-library/react'
+import {render, act, fireEvent} from '@testing-library/react'
 import ShopperAgent from '@salesforce/retail-react-app/app/components/shopper-agent/index'
 import useScript from '@salesforce/retail-react-app/app/hooks/use-script'
 // Mock the embeddedservice_bootstrap object
@@ -57,14 +57,6 @@ const commerceAgentSettings = {
 const commerceAgentSettingsString = JSON.stringify(commerceAgentSettings)
 
 describe('ShopperAgent Component', () => {
-    const defaultProps = {
-        commerceAgent: commerceAgentSettingsString,
-        domainUrl: 'https://myorg.salesforce.com',
-        basketId: '4a67cda5b1b9325a29207854c1',
-        locale: 'en-US',
-        basketDoneLoading: true
-    }
-
     beforeEach(() => {
         // Reset all mocks before each test
         jest.clearAllMocks()
@@ -83,6 +75,14 @@ describe('ShopperAgent Component', () => {
         // Clean up the window.embeddedservice_bootstrap mock
         delete global.window.embeddedservice_bootstrap
     })
+
+    const defaultProps = {
+        commerceAgent: commerceAgentSettingsString,
+        domainUrl: 'https://myorg.salesforce.com',
+        basketId: '4a67cda5b1b9325a29207854c1',
+        locale: 'en-US',
+        basketDoneLoading: true
+    }
 
     test('should render nothing when enableMiaw is false', () => {
         const props = {...defaultProps, enableMiaw: false}
@@ -266,5 +266,120 @@ describe('ShopperAgent Component', () => {
 
         // Restore original querySelector
         document.body.querySelector = originalQuerySelector
+    })
+
+    describe('Event Listener Cleanup', () => {
+        let originalAddEventListener
+        let originalRemoveEventListener
+        const mockAddEventListener = jest.fn()
+        const mockRemoveEventListener = jest.fn()
+
+        const mockCommerceAgent = {
+            enabled: 'true',
+            askAgentOnSearch: 'true',
+            embeddedServiceName: 'TestService',
+            embeddedServiceEndpoint: 'https://test.endpoint.com',
+            scriptSourceUrl: 'https://test.script.com',
+            scrt2Url: 'https://test.scrt.com',
+            salesforceOrgId: 'test-org-id',
+            commerceOrgId: 'test-commerce-id',
+            siteId: 'test-site-id'
+        }
+
+        beforeEach(() => {
+            originalAddEventListener = window.addEventListener
+            originalRemoveEventListener = window.removeEventListener
+            window.addEventListener = mockAddEventListener
+            window.removeEventListener = mockRemoveEventListener
+        })
+
+        afterEach(() => {
+            window.addEventListener = originalAddEventListener
+            window.removeEventListener = originalRemoveEventListener
+        })
+
+        it('should remove event listeners when component unmounts', () => {
+            // Render the component
+            const {unmount} = render(
+                <ShopperAgent
+                    commerceAgent={JSON.stringify(mockCommerceAgent)}
+                    domainUrl="https://test.domain.com"
+                    basketId="test-basket-id"
+                    locale="en-US"
+                    basketDoneLoading={true}
+                />
+            )
+
+            // Get the handler functions that were added
+            const readyHandler = mockAddEventListener.mock.calls.find(
+                (call) => call[0] === 'onEmbeddedMessagingReady'
+            )[1]
+            const maximizeHandler = mockAddEventListener.mock.calls.find(
+                (call) => call[0] === 'onEmbeddedMessagingWindowMaximized'
+            )[1]
+            const buttonClickHandler = mockAddEventListener.mock.calls.find(
+                (call) => call[0] === 'onEmbeddedMessagingButtonClicked'
+            )[1]
+
+            // Verify all event listeners were added
+            expect(mockAddEventListener).toHaveBeenCalledTimes(3)
+            expect(mockAddEventListener).toHaveBeenCalledWith(
+                'onEmbeddedMessagingReady',
+                readyHandler
+            )
+            expect(mockAddEventListener).toHaveBeenCalledWith(
+                'onEmbeddedMessagingWindowMaximized',
+                maximizeHandler
+            )
+            expect(mockAddEventListener).toHaveBeenCalledWith(
+                'onEmbeddedMessagingButtonClicked',
+                buttonClickHandler
+            )
+
+            // Unmount the component
+            unmount()
+
+            // Verify all event listeners were removed with the same handlers
+            expect(mockRemoveEventListener).toHaveBeenCalledTimes(3)
+            expect(mockRemoveEventListener).toHaveBeenCalledWith(
+                'onEmbeddedMessagingReady',
+                readyHandler
+            )
+            expect(mockRemoveEventListener).toHaveBeenCalledWith(
+                'onEmbeddedMessagingWindowMaximized',
+                maximizeHandler
+            )
+            expect(mockRemoveEventListener).toHaveBeenCalledWith(
+                'onEmbeddedMessagingButtonClicked',
+                buttonClickHandler
+            )
+        })
+
+        it('should not add event listeners when component is disabled', () => {
+            const disabledCommerceAgent = {
+                ...mockCommerceAgent,
+                enabled: 'false'
+            }
+
+            // Render the component with disabled commerce agent
+            const {unmount} = render(
+                <ShopperAgent
+                    commerceAgent={JSON.stringify(disabledCommerceAgent)}
+                    domainUrl="https://test.domain.com"
+                    basketId="test-basket-id"
+                    locale="en-US"
+                    basketDoneLoading={true}
+                />
+            )
+
+            // Verify no event listeners were added
+            expect(mockAddEventListener).not.toHaveBeenCalled()
+
+            // Unmount the component
+            unmount()
+
+            // Verify no event listeners were removed
+            expect(mockRemoveEventListener).not.toHaveBeenCalled()
+        })
     })
 })

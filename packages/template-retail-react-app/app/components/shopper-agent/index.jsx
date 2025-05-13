@@ -99,7 +99,7 @@ function ShopperAgentWindow({commerceAgent, locale, domainUrl, basketId}) {
     const {usid} = useUsid()
 
     useEffect(() => {
-        window.addEventListener('onEmbeddedMessagingReady', () => {
+        const handleEmbeddedMessagingReady = () => {
             window.embeddedservice_bootstrap.prechatAPI.setHiddenPrechatFields({
                 DomainUrl: domainUrl,
                 SiteId: siteId,
@@ -107,9 +107,9 @@ function ShopperAgentWindow({commerceAgent, locale, domainUrl, basketId}) {
                 OrganizationId: commerceOrgId,
                 UsId: usid
             })
-        })
+        }
 
-        window.addEventListener('onEmbeddedMessagingWindowMaximized', () => {
+        const handleEmbeddedMessagingWindowMaximized = () => {
             const zIndex = theme.zIndices.sticky + 1
             const embeddedMessagingFrame = document.body.querySelector(
                 'div.embedded-messaging iframe'
@@ -117,16 +117,44 @@ function ShopperAgentWindow({commerceAgent, locale, domainUrl, basketId}) {
             if (embeddedMessagingFrame) {
                 embeddedMessagingFrame.style.zIndex = zIndex
             }
-        })
+        }
+
+        window.addEventListener('onEmbeddedMessagingReady', handleEmbeddedMessagingReady)
+        window.addEventListener(
+            'onEmbeddedMessagingWindowMaximized',
+            handleEmbeddedMessagingWindowMaximized
+        )
+
+        // Cleanup function
+        return () => {
+            window.removeEventListener('onEmbeddedMessagingReady', handleEmbeddedMessagingReady)
+            window.removeEventListener(
+                'onEmbeddedMessagingWindowMaximized',
+                handleEmbeddedMessagingWindowMaximized
+            )
+        }
     }, [commerceAgent])
 
     // whenever the basketId changes, update the hidden prechat fields
     useEffect(() => {
-        window.addEventListener('onEmbeddedMessagingButtonClicked', function () {
+        const handleEmbeddedMessagingButtonClicked = () => {
             window.embeddedservice_bootstrap.prechatAPI.setHiddenPrechatFields({
                 BasketId: basketId
             })
-        })
+        }
+
+        window.addEventListener(
+            'onEmbeddedMessagingButtonClicked',
+            handleEmbeddedMessagingButtonClicked
+        )
+
+        // Cleanup function
+        return () => {
+            window.removeEventListener(
+                'onEmbeddedMessagingButtonClicked',
+                handleEmbeddedMessagingButtonClicked
+            )
+        }
     }, [commerceAgent, basketId])
 
     // Load the embedded messaging script
