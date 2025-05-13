@@ -44,8 +44,6 @@ import {
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 
 const onClient = typeof window !== 'undefined'
-let newChatLaunched = false
-let hasFired = false
 
 function isAskAgentOnSearchEnabled(enabled, askAgentOnSearch) {
     return enabled === 'true' && askAgentOnSearch == 'true' && onClient
@@ -111,6 +109,7 @@ const Search = (props) => {
         }
     )
     const searchInputRef = useRef()
+    const chatLaunchedRef = useRef({newChatLaunched: false, hasFired: false})
     const recentSearches = getSessionJSONItem(RECENT_SEARCH_KEY)
     const searchSuggestions = useMemo(
         () => formatSuggestions(searchSuggestion.data, searchInputRef?.current?.value),
@@ -170,8 +169,8 @@ const Search = (props) => {
                 /* TODO: With the Salesforce Winter '26 release, we will be able to use the
                  * onEmbeddedMessagingFirstBotMessageSent event instead, and get rid of this logic. */
                 if (successMessage.includes('Successfully initialized the messaging client')) {
-                    hasFired = false //We want the logic in onEmbeddedMessageSent to happen once per new conversation
-                    newChatLaunched = true
+                    chatLaunchedRef.current.hasFired = false //We want the logic in onEmbeddedMessageSent to happen once per new conversation
+                    chatLaunchedRef.current.newChatLaunched = true
                 }
             })
             .catch((err) => {
@@ -179,11 +178,13 @@ const Search = (props) => {
             })
 
         window.addEventListener('onEmbeddedMessageSent', (e) => {
-            if (!hasFired && newChatLaunched) {
+            if (!chatLaunchedRef.current.hasFired && chatLaunchedRef.current.newChatLaunched) {
                 if (e.detail.conversationEntry?.sender?.role === 'Chatbot' && searchInputRef?.current?.value) {
-                    hasFired = true
+                    chatLaunchedRef.current.hasFired = true
                     setTimeout(() => {
-                        window.embeddedservice_bootstrap.utilAPI.sendTextMessage(searchInputRef.current.value.trim())
+                        window.embeddedservice_bootstrap.utilAPI.sendTextMessage(
+                            searchInputRef.current.value.trim()
+                        )
                     }, 500)
                 }
             }
@@ -205,6 +206,7 @@ const Search = (props) => {
                 window.embeddedservice_bootstrap.utilAPI
                     .sendTextMessage(searchText)
                     .catch((err) => {
+                        console.error(err)
                         if (
                             err.includes(
                                 'invoke API before the onEmbeddedMessagingConversationOpened event is fired'
