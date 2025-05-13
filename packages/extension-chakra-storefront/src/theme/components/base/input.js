@@ -6,16 +6,8 @@
  */
 import {defineRecipe} from '@chakra-ui/react'
 
-const mdSize = {height: 11, borderRadius: 'sm'}
-
 export default defineRecipe({
-    base: {
-        field: {
-            _focus: {
-                borderColor: 'blue.600'
-            }
-        }
-    },
+    base: {},
     variants: {
         variant: {
             outline: {
@@ -45,12 +37,9 @@ export default defineRecipe({
                     color: 'gray.700'
                 }
             }
-        },
-        size: {
-            md: {
-                ...mdSize,
-                px: 3
-            }
         }
+    },
+    defaultVariants: {
+        size: 'lg'
     }
 })
