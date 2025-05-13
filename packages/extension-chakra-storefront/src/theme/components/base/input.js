@@ -24,23 +24,25 @@ export default defineRecipe({
                 }
             },
             filled: {
-                // we use filled variant for
-                // search input
-                field: {
-                    borderColor: 'gray.600',
+                border: '2px solid {colors.gray.600}',
+                backgroundColor: 'gray.100',
+                focusVisibleRing: 'inside',
+                focusRingColor: 'var(--focus-color)',
+                _focus: {
+                    backgroundColor: 'white'
+                },
+                _focusVisible: {
+                    background: 'transparent',
+                    borderColor: 'blue.500'
+                },
+                _hover: {
                     backgroundColor: 'gray.100',
                     _focus: {
                         backgroundColor: 'white'
-                    },
-                    _hover: {
-                        backgroundColor: 'gray.100',
-                        _focus: {
-                            backgroundColor: 'white'
-                        }
-                    },
-                    _placeholder: {
-                        color: 'gray.700'
                     }
+                },
+                _placeholder: {
+                    color: 'gray.700'
                 }
             }
         },

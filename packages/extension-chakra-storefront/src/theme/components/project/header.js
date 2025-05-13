@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, salesforce.com, inc.
+ * Copyright (c) 2025, salesforce.com, inc.
  * All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
@@ -7,7 +7,18 @@
 import {defineRecipe} from '@chakra-ui/react'
 
 export default defineRecipe({
-    slots: ['container', 'content', 'searchContainer', 'bodyContainer', 'logo', 'icons', 'signout'],
+    slots: [
+        'container',
+        'content',
+        'searchContainer',
+        'bodyContainer',
+        'logo',
+        'icons',
+        'accountIconButton',
+        'wishListIconButton',
+        'arrowDownIconButton',
+        'signout'
+    ],
     base: {
         container: {
             minWidth: 'xs',
@@ -41,7 +52,7 @@ export default defineRecipe({
         icons: {
             marginBottom: [1, 1, 2, 0]
         },
-        accountIcon: {
+        accountIconButton: {
             height: 11,
             minWidth: 'auto',
             cursor: 'pointer',
@@ -53,7 +64,7 @@ export default defineRecipe({
                 outline: 0
             }
         },
-        arrowDown: {
+        arrowDownIconButton: {
             height: 11,
             minWidth: 'auto',
             marginRight: 0,
@@ -67,7 +78,7 @@ export default defineRecipe({
             },
             display: ['none', 'none', 'none', 'block']
         },
-        wishlistIcon: {
+        wishListIconButton: {
             // More breathing room between the account and wishlist icons
             marginLeft: 2
         },

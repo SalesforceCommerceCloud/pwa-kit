@@ -33,7 +33,7 @@ import {
 import {useCurrentBasket} from '../../hooks/use-current-basket'
 
 import Link from '../../components/link'
-// import Search from '../../components/search'
+import Search from '../../components/search'
 // import withRegistration from '../../components/with-registration'
 import {
     AccountIcon,
@@ -49,7 +49,7 @@ import {
 // import {navLinks, messages} from '../../pages/account/constant'
 import useNavigation from '../../hooks/use-navigation'
 import LoadingSpinner from '../../components/loading-spinner'
-// import {HideOnDesktop, HideOnMobile} from '../responsive'
+import {HideOnDesktop, HideOnMobile} from '../responsive'
 import {isHydrated, noop} from '../../utils/utils'
 
 // const IconButtonWithRegistration = withRegistration(IconButton)
@@ -64,20 +64,20 @@ import {isHydrated, noop} from '../../utils/utils'
  * @param props {object} the component props
  * @returns {Element} the search bar element
  */
-// const SearchBar = (props) => {
-//     const recipe = useSlotRecipe({key: 'header'})
-//     const styles = recipe()
-//     const intl = useIntl()
-//     const placeholder = intl.formatMessage({
-//         id: 'header.field.placeholder.search_for_products',
-//         defaultMessage: 'Search for products...'
-//     })
-//     return (
-//         <Box css={styles.searchContainer}>
-//             <Search aria-label={placeholder} placeholder={placeholder} {...props} />
-//         </Box>
-//     )
-// }
+const SearchBar = (props) => {
+    const recipe = useSlotRecipe({key: 'header'})
+    const styles = recipe()
+    const intl = useIntl()
+    const placeholder = intl.formatMessage({
+        id: 'header.field.placeholder.search_for_products',
+        defaultMessage: 'Search for products...'
+    })
+    return (
+        <Box css={styles.searchContainer} id="search-box-container">
+            <Search aria-label={placeholder} placeholder={placeholder} {...props} />
+        </Box>
+    )
+}
 /**
  * The header is the main source for accessing
  * navigation, search, basket, and other
@@ -144,7 +144,6 @@ const Header = ({
         navigate('/login')
         setShowLoading(false)
     }
-
     const handleIconsMouseLeave = () => {
         // don't close the menu if users enter the popover content
         setTimeout(() => {
@@ -193,9 +192,9 @@ const Header = ({
                         <BrandLogo css={styles.logo} />
                     </IconButton>
                     <Box css={styles.bodyContainer}>{children}</Box>
-                    {/*<HideOnMobile>*/}
-                    {/*    <SearchBar />*/}
-                    {/*</HideOnMobile>*/}
+                    <HideOnMobile>
+                        <SearchBar />
+                    </HideOnMobile>
                     {/*<IconButtonWithRegistration*/}
                     {/*    icon={<AccountIcon />}*/}
                     {/*    aria-label={intl.formatMessage({*/}
@@ -214,12 +213,12 @@ const Header = ({
                             id: 'header.button.assistive_msg.my_account',
                             defaultMessage: 'My Account'
                         })}
+                        css={{...styles.icons, ...styles.accountIconButton}}
                         variant="unstyled"
-                        css={{...styles.icons, ...styles.accountIcon}}
                         onClick={onMyAccountClick}
                         onMouseOver={isDesktop ? onAccountMenuOpen : noop}
                     >
-                        <AccountIcon />
+                        <AccountIcon boxSize={6} />
                     </IconButton>
                     {isRegistered && isHydrated() && (
                         <Popover.Root
@@ -230,15 +229,14 @@ const Header = ({
                             onClose={onAccountMenuClose}
                             onOpen={onAccountMenuOpen}
                         >
-                            <Popover.Trigger>
+                            <Popover.Trigger asChild>
                                 <IconButton
                                     aria-label={intl.formatMessage({
                                         id: 'header.button.assistive_msg.my_account_menu',
                                         defaultMessage: 'Open account menu'
                                     })}
                                     variant="unstyled"
-                                    css={{...styles.icons, ...styles.arrowDown}}
-                                    {...getAccountMenuButtonProps()}
+                                    css={{...styles.icons, ...styles.arrowDownIconButton}}
                                     onMouseOver={onAccountMenuOpen}
                                     onMouseLeave={handleIconsMouseLeave}
                                     ref={popoverTriggerRef}
@@ -259,7 +257,6 @@ const Header = ({
                                         onMouseOver={() => {
                                             hasEnterPopoverContent.current = true
                                         }}
-                                        {...getAccountMenuDisclosureProps()}
                                     >
                                         <Popover.Arrow />
                                         <Popover.Header>
@@ -282,45 +279,46 @@ const Header = ({
                                                     as="ul"
                                                     data-testid="account-detail-nav"
                                                 >
-                                                    {navLinks.map((link) => {
-                                                        const LinkIcon = link.icon
-                                                        return (
-                                                            <Box
-                                                                key={link.name}
-                                                                position="relative"
-                                                                as="li"
-                                                                listStyleType="none"
-                                                            >
-                                                                <Button
-                                                                    as={Link}
-                                                                    to={`/account${link.path}`}
-                                                                    useNavLink={true}
-                                                                    variant="menu-link"
-                                                                    leftIcon={
-                                                                        <LinkIcon boxSize={5} />
-                                                                    }
-                                                                    width="100%"
-                                                                >
-                                                                    {intl.formatMessage(
-                                                                        messages[link.name]
-                                                                    )}
-                                                                </Button>
-                                                            </Box>
-                                                        )
-                                                    })}
+                                                    navLinks
+                                                    {/*{navLinks.map((link) => {*/}
+                                                    {/*    const LinkIcon = link.icon*/}
+                                                    {/*    return (*/}
+                                                    {/*        <Box*/}
+                                                    {/*            key={link.name}*/}
+                                                    {/*            position="relative"*/}
+                                                    {/*            as="li"*/}
+                                                    {/*            listStyleType="none"*/}
+                                                    {/*        >*/}
+                                                    {/*            <Button*/}
+                                                    {/*                as={Link}*/}
+                                                    {/*                to={`/account${link.path}`}*/}
+                                                    {/*                useNavLink={true}*/}
+                                                    {/*                variant="menu-link"*/}
+                                                    {/*                leftIcon={*/}
+                                                    {/*                    <LinkIcon boxSize={6} />*/}
+                                                    {/*                }*/}
+                                                    {/*                width="100%"*/}
+                                                    {/*            >*/}
+                                                    {/*                {intl.formatMessage(*/}
+                                                    {/*                    messages[link.name]*/}
+                                                    {/*                )}*/}
+                                                    {/*            </Button>*/}
+                                                    {/*        </Box>*/}
+                                                    {/*    )*/}
+                                                    {/*})}*/}
                                                 </Stack>
                                             </Box>
                                         </Popover.Body>
                                         <Popover.Footer onClick={onSignoutClick} cursor="pointer">
                                             <Separator colorPallete="gray" />
-                                            <Button variant="unstyled" {...styles.signout}>
+                                            <Button variant="unstyled" css={styles.signout}>
                                                 <Flex>
                                                     <SignoutIcon
                                                         aria-hidden={true}
-                                                        boxSize={5}
-                                                        {...styles.signoutIcon}
+                                                        boxSize={6}
+                                                        css={styles.signoutIcon}
                                                     />
-                                                    <Text as="span" {...styles.signoutText}>
+                                                    <Text as="span" css={styles.signoutText}>
                                                         {intl.formatMessage({
                                                             defaultMessage: 'Log out',
                                                             id: 'header.popover.action.log_out'
@@ -345,43 +343,55 @@ const Header = ({
                     {/*    {...styles.wishlistIcon}*/}
                     {/*    onClick={onWishlistClick}*/}
                     {/*/>*/}
-                    {/*{isStoreLocatorEnabled && (*/}
-                    {/*    <IconButton*/}
-                    {/*        aria-label={intl.formatMessage({*/}
-                    {/*            defaultMessage: 'Store Locator',*/}
-                    {/*            id: 'header.button.assistive_msg.store_locator'*/}
-                    {/*        })}*/}
-                    {/*        icon={<StoreIcon />}*/}
-                    {/*        {...styles.icons}*/}
-                    {/*        variant="unstyled"*/}
-                    {/*        onClick={() => {*/}
-                    {/*            openModal()*/}
-                    {/*        }}*/}
-                    {/*    />*/}
-                    {/*)}*/}
-                    {/*<IconButton*/}
-                    {/*    aria-label={intl.formatMessage(*/}
-                    {/*        {*/}
-                    {/*            id: 'header.button.assistive_msg.my_cart_with_num_items',*/}
-                    {/*            defaultMessage: 'My cart, number of items: {numItems}'*/}
-                    {/*        },*/}
-                    {/*        {numItems: totalItems}*/}
-                    {/*    )}*/}
-                    {/*    icon={*/}
-                    {/*        <>*/}
-                    {/*            <BasketIcon />*/}
-                    {/*            {basket && totalItems > 0 && (*/}
-                    {/*                <Badge variant="notification">{totalItems}</Badge>*/}
-                    {/*            )}*/}
-                    {/*        </>*/}
-                    {/*    }*/}
-                    {/*    variant="unstyled"*/}
-                    {/*    {...styles.icons}*/}
-                    {/*    onClick={onMyCartClick}*/}
-                    {/*/>*/}
-                    {/*<HideOnDesktop display={{base: 'contents', lg: 'none'}}>*/}
-                    {/*    <SearchBar />*/}
-                    {/*</HideOnDesktop>*/}
+
+                    <IconButton
+                        aria-label={intl.formatMessage({
+                            defaultMessage: 'Wishlist',
+                            id: 'header.button.assistive_msg.wishlist'
+                        })}
+                        css={{...styles.icons, ...styles.wishListIconButton}}
+                        variant="unstyled"
+                        onClick={onWishlistClick}
+                    >
+                        <HeartIcon boxSize={6} />
+                    </IconButton>
+                    {
+                        <IconButton
+                            aria-label={intl.formatMessage({
+                                defaultMessage: 'Store Locator',
+                                id: 'header.button.assistive_msg.store_locator'
+                            })}
+                            css={styles.icons}
+                            variant="unstyled"
+                            onClick={() => {
+                                openModal()
+                            }}
+                        >
+                            <StoreIcon boxSize={6} />
+                        </IconButton>
+                    }
+                    <IconButton
+                        aria-label={intl.formatMessage(
+                            {
+                                id: 'header.button.assistive_msg.my_cart_with_num_items',
+                                defaultMessage: 'My cart, number of items: {numItems}'
+                            },
+                            {numItems: totalItems}
+                        )}
+                        variant="unstyled"
+                        css={styles.icons}
+                        onClick={onMyCartClick}
+                    >
+                        <>
+                            <BasketIcon boxSize={6} />
+                            {basket && totalItems > 0 && (
+                                <Badge variant="notification">{totalItems}</Badge>
+                            )}
+                        </>
+                    </IconButton>
+                    <HideOnDesktop display={{base: 'contents', lg: 'none'}}>
+                        <SearchBar />
+                    </HideOnDesktop>
                 </Flex>
             </Box>
         </Box>

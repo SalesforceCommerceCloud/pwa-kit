@@ -14,8 +14,8 @@ export default defineSlotRecipe({
             marginTop: 4
         },
         icon: {
-            width: 5,
-            height: 5
+            // width: 5,
+            // height: 5
         },
         item: {
             textAlign: 'center'
