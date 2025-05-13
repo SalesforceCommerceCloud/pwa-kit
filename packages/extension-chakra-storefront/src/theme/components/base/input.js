@@ -15,6 +15,8 @@ export default defineRecipe({
                     borderColor: 'gray.500'
                 }
             },
+            // Note: Chakra v3 input has removed filled variant
+            // we added it back to preserve the style in the template
             filled: {
                 border: '2px solid {colors.gray.600}',
                 backgroundColor: 'gray.100',
