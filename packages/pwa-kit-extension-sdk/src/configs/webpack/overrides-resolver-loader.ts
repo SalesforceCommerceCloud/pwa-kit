@@ -172,16 +172,12 @@ export const validateOverrideSource = (source: string, options: any = {}) => {
         return false
     }
 
-    // Log source for debugging
-    console.log('source:', source)
-
-    // Determine project path and check if it's an extension
     let projectPath = ''
     let isExtensionFile = false
 
     // Check for extension in monorepo packages or node_modules
     if (source.includes(`${path.sep}${MONO_REPO_WORKSPACE_FOLDER}${path.sep}`)) {
-        // Handle monorepo packages path
+        // Extract package path from monorepo structure
         const [basePath, remainingPath] = source.split(
             `${path.sep}${MONO_REPO_WORKSPACE_FOLDER}${path.sep}`
         )
@@ -189,7 +185,7 @@ export const validateOverrideSource = (source: string, options: any = {}) => {
             remainingPath.split(path.sep)[0]
         }`
     } else if (source.includes(`${path.sep}${NODE_MODULES_FOLDER}${path.sep}`)) {
-        // Handle node_modules path (including scoped packages)
+        // Special handling for scoped packages (@namespace/package)
         const [basePath, packagePath] = source.split(`${path.sep}${NODE_MODULES_FOLDER}${path.sep}`)
         const packageParts = packagePath.split(path.sep)
 
@@ -197,20 +193,15 @@ export const validateOverrideSource = (source: string, options: any = {}) => {
             ? `${basePath}${path.sep}${NODE_MODULES_FOLDER}${path.sep}${packageParts[0]}${path.sep}${packageParts[1]}`
             : `${basePath}${path.sep}${NODE_MODULES_FOLDER}${path.sep}${packageParts[0]}`
     } else if (source.includes(`${path.sep}${SRC_FOLDER}${path.sep}`)) {
-        // Fallback to traditional src folder check
         projectPath = source.split(`${SRC_FOLDER}${path.sep}`)[0]
     }
 
-    // Check if it's an extension package
     isExtensionFile = isExtensionPackage(projectPath)
 
     // Exit if it's not an extension file
     if (!isExtensionFile) {
         return false
     }
-
-    // Log the determined project path
-    console.log('projectPath:', projectPath)
 
     // Normalize the source path
     // We are only concerned with the source path relative to the extension package namespace
@@ -223,18 +214,18 @@ export const validateOverrideSource = (source: string, options: any = {}) => {
             )
             .pop() ?? ''
 
-    // At this point the path is either POSIX or windows, we need to normalize it to POSIX
+    // At this point the path is either POSIX or windows, we need to normalize it to POSIX.
     let normalizedSource = packagePath.replace(/\\/g, '/')
 
-    // Add appropriate prefixes for mono-repo packages in the @salesforce namespace
+    // Add appropriate prefixes for mono-repo packages in the @salesforce namespace.
     normalizedSource = `./${NODE_MODULES_FOLDER}/${
         isMonoRepo ? `${EXTENSION_PACKAGE_NAMESPACE}${path.posix.sep}` : ''
     }${normalizedSource}`
 
-    // Check if the normalized source is in the list of overridables
+    // Check if the normalized source is in the list of overridables.
     const hasOverride = overridables.includes(normalizedSource)
 
-    // If we have an override, add it to the cache so we don't process it again
+    // If we have an override, add it to the cache so we don't process it again.
     if (hasOverride) {
         targetCache.push(source)
     }
