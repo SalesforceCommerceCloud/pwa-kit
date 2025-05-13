@@ -172,31 +172,49 @@ export const validateOverrideSource = (source: string, options: any = {}) => {
         return false
     }
 
-    // Check if the file is inside a 'src' directory
-    const srcSeparator = `${SRC_FOLDER}${path.sep}`
-
-    // Compute the projectPath (package directory)
-    const projectPath = source.split(srcSeparator)[0]
-
-    console.log('projectPath:', projectPath)
+    // Log source for debugging
     console.log('source:', source)
 
-    // Check if it's an extension package
-    const isExtensionFile = isExtensionPackage(projectPath)
+    // Determine project path and check if it's an extension
+    let projectPath = ''
+    let isExtensionFile = false
 
+    // Check for extension in monorepo packages or node_modules
+    if (source.includes(`${path.sep}${MONO_REPO_WORKSPACE_FOLDER}${path.sep}`)) {
+        // Handle monorepo packages path
+        const [basePath, remainingPath] = source.split(
+            `${path.sep}${MONO_REPO_WORKSPACE_FOLDER}${path.sep}`
+        )
+        projectPath = `${basePath}${path.sep}${MONO_REPO_WORKSPACE_FOLDER}${path.sep}${
+            remainingPath.split(path.sep)[0]
+        }`
+    } else if (source.includes(`${path.sep}${NODE_MODULES_FOLDER}${path.sep}`)) {
+        // Handle node_modules path (including scoped packages)
+        const [basePath, packagePath] = source.split(`${path.sep}${NODE_MODULES_FOLDER}${path.sep}`)
+        const packageParts = packagePath.split(path.sep)
+
+        projectPath = packageParts[0].startsWith('@')
+            ? `${basePath}${path.sep}${NODE_MODULES_FOLDER}${path.sep}${packageParts[0]}${path.sep}${packageParts[1]}`
+            : `${basePath}${path.sep}${NODE_MODULES_FOLDER}${path.sep}${packageParts[0]}`
+    } else if (source.includes(`${path.sep}${SRC_FOLDER}${path.sep}`)) {
+        // Fallback to traditional src folder check
+        projectPath = source.split(`${SRC_FOLDER}${path.sep}`)[0]
+    }
+
+    // Check if it's an extension package
+    isExtensionFile = isExtensionPackage(projectPath)
 
     // Exit if it's not an extension file
-    if (!isExtensionFile ) {
+    if (!isExtensionFile) {
         return false
     }
 
-    // Because our webpack configuration is setup to resolve symlinks, we need to normalize the source path because
-    // the source path passed to the loaded is not representative of what you would see in a generated project (e.g.
-    // it doesn't resolve to being in the node_modules folder).
-    let normalizedSource = ''
+    // Log the determined project path
+    console.log('projectPath:', projectPath)
 
-    // We are only concerned with the source path relative to the extension package namespace.
-    normalizedSource = `${
+    // Normalize the source path
+    // We are only concerned with the source path relative to the extension package namespace
+    const packagePath =
         source
             .split(
                 `${path.sep}${isMonoRepo ? MONO_REPO_WORKSPACE_FOLDER : NODE_MODULES_FOLDER}${
@@ -204,22 +222,19 @@ export const validateOverrideSource = (source: string, options: any = {}) => {
                 }`
             )
             .pop() ?? ''
-    }`
 
-    // At this point the path is either POSIX or windows, we need to normalize it to POSIX.
-    normalizedSource = normalizedSource.replace(/\\/g, '/')
+    // At this point the path is either POSIX or windows, we need to normalize it to POSIX
+    let normalizedSource = packagePath.replace(/\\/g, '/')
 
-    // NOTE:
-    // For now we are going to make the assumption that all the extension projects in our mono repo
-    // are part of the `@salesforce` namespace, this is pretty safe. So we are going to add the namespace.
+    // Add appropriate prefixes for mono-repo packages in the @salesforce namespace
     normalizedSource = `./${NODE_MODULES_FOLDER}/${
-        isMonoRepo ? EXTENSION_PACKAGE_NAMESPACE + path.posix.sep : ''
+        isMonoRepo ? `${EXTENSION_PACKAGE_NAMESPACE}${path.posix.sep}` : ''
     }${normalizedSource}`
 
-    // Check if the normalized source is in the list of overridables.
+    // Check if the normalized source is in the list of overridables
     const hasOverride = overridables.includes(normalizedSource)
 
-    // If we have an override, add it to the cache so we don't process it again.
+    // If we have an override, add it to the cache so we don't process it again
     if (hasOverride) {
         targetCache.push(source)
     }
