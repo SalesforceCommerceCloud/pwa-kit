@@ -8,4 +8,4 @@
 // PLACE THE RELATIVE __POSIX__ PATH TO THE EXTENSION FILE YOU WANT TO OVERRIDE STARTING WITH THE EXTENSION PACKAGE NAME.
 // MULTIPLE OVERRIDES CAN BE ADDED TO THIS FILE, ONE PER LINE.
 // EXAMPLE:
-./node_modules/@salesforce/extension-chakra-store-locator/src/components/content.tsx
+// ./node_modules/@salesforce/extension-chakra-store-locator/src/components/content.tsx
