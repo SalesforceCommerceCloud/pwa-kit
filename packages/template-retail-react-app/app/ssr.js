@@ -323,6 +323,9 @@ const {handler} = runtime.createHandler(options, (app) => {
                         // Allow frames from Salesforce site.com (Needed for MIAW)
                         '*.site.com'
                     ]
+                },
+                referrerPolicy: {
+                    policy: 'strict-origin-when-cross-origin'
                 }
             }
         })

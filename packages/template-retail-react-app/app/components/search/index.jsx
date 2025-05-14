@@ -109,7 +109,10 @@ const Search = (props) => {
         }
     )
     const searchInputRef = useRef()
-    const chatLaunchedRef = useRef({newChatLaunched: false, hasFired: false})
+    const miawChatRef = useRef({
+        newChatLaunched: false,
+        hasFired: false
+    })
     const recentSearches = getSessionJSONItem(RECENT_SEARCH_KEY)
     const searchSuggestions = useMemo(
         () => formatSuggestions(searchSuggestion.data, searchInputRef?.current?.value),
@@ -162,25 +165,14 @@ const Search = (props) => {
         setIsOpen(false)
     }
 
-    const launchChat = () => {
-        window.embeddedservice_bootstrap.utilAPI
-            .launchChat()
-            .then((successMessage) => {
-                /* TODO: With the Salesforce Winter '26 release, we will be able to use the
-                 * onEmbeddedMessagingFirstBotMessageSent event instead, and get rid of this logic. */
-                if (successMessage.includes('Successfully initialized the messaging client')) {
-                    chatLaunchedRef.current.hasFired = false //We want the logic in onEmbeddedMessageSent to happen once per new conversation
-                    chatLaunchedRef.current.newChatLaunched = true
-                }
-            })
-            .catch((err) => {
-                console.error('launchChat error', err)
-            })
-
-        window.addEventListener('onEmbeddedMessageSent', (e) => {
-            if (!chatLaunchedRef.current.hasFired && chatLaunchedRef.current.newChatLaunched) {
-                if (e.detail.conversationEntry?.sender?.role === 'Chatbot' && searchInputRef?.current?.value) {
-                    chatLaunchedRef.current.hasFired = true
+    useEffect(() => {
+        const handleEmbeddedMessageSent = (e) => {
+            if (!miawChatRef.current.hasFired && miawChatRef.current.newChatLaunched) {
+                if (
+                    e.detail.conversationEntry?.sender?.role === 'Chatbot' &&
+                    searchInputRef?.current?.value
+                ) {
+                    miawChatRef.current.hasFired = true
                     setTimeout(() => {
                         window.embeddedservice_bootstrap.utilAPI.sendTextMessage(
                             searchInputRef.current.value.trim()
@@ -188,7 +180,29 @@ const Search = (props) => {
                     }, 500)
                 }
             }
-        })
+        }
+
+        window.addEventListener('onEmbeddedMessageSent', handleEmbeddedMessageSent)
+
+        return () => {
+            // Clean up
+            window.removeEventListener('onEmbeddedMessageSent', handleEmbeddedMessageSent)
+        }
+    }, [])
+    const launchChat = () => {
+        window.embeddedservice_bootstrap.utilAPI
+            .launchChat()
+            .then((successMessage) => {
+                /* TODO: With the Salesforce Winter '26 release, we will be able to use the
+                 * onEmbeddedMessagingFirstBotMessageSent event instead, and get rid of this logic. */
+                if (successMessage.includes('Successfully initialized the messaging client')) {
+                    miawChatRef.current.hasFired = false //We want the logic in onEmbeddedMessageSent to happen once per new conversation
+                    miawChatRef.current.newChatLaunched = true
+                }
+            })
+            .catch((err) => {
+                console.error('launchChat error', err)
+            })
     }
 
     const onSubmitSearch = (e) => {
