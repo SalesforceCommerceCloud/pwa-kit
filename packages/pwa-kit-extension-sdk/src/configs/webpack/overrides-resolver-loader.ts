@@ -149,6 +149,32 @@ const OverrideResolverLoader = function (this: LoaderContext<any>) {
 }
 
 /**
+ * Extracts the absolute path to an extension package root from a source file path.
+ *
+ * @param source - The source file path to analyze
+ * @returns The absolute path to an extension package root if found, empty string otherwise
+ */
+const getExtensionPath = (source: string): string => {
+    const isMonoRepoPath = source.includes(`${path.sep}${MONO_REPO_WORKSPACE_FOLDER}${path.sep}`)
+    const isNodeModulesPath = source.includes(`${path.sep}${NODE_MODULES_FOLDER}${path.sep}`)
+
+    if (!isMonoRepoPath && !isNodeModulesPath) {
+        return ''
+    }
+
+    const folderType = isMonoRepoPath ? MONO_REPO_WORKSPACE_FOLDER : NODE_MODULES_FOLDER
+    const containerFolder = `${path.sep}${folderType}${path.sep}`
+    const [basePath, relativeExtensionPath] = source.split(containerFolder)
+
+    if (folderType === NODE_MODULES_FOLDER && relativeExtensionPath.startsWith('@')) {
+        const packageParts = relativeExtensionPath.split(path.sep)
+        return `${basePath}${containerFolder}${packageParts[0]}${path.sep}${packageParts[1]}`
+    }
+
+    return `${basePath}${containerFolder}${relativeExtensionPath.split(path.sep)[0]}`
+}
+
+/**
  * Return a boolean indicating if the source file should be processed by the override loader based on
  * various conditions including the cache state, the source file type, and the presence of an override file
  * in the provided overridables list.
@@ -172,32 +198,10 @@ export const validateOverrideSource = (source: string, options: any = {}) => {
         return false
     }
 
-    let projectPath = ''
-    let isExtensionFile = false
+    const extensionPath = getExtensionPath(source)
 
-    // Check for extension in monorepo packages or node_modules
-    if (source.includes(`${path.sep}${MONO_REPO_WORKSPACE_FOLDER}${path.sep}`)) {
-        // Extract package path from monorepo structure
-        const [basePath, remainingPath] = source.split(
-            `${path.sep}${MONO_REPO_WORKSPACE_FOLDER}${path.sep}`
-        )
-        projectPath = `${basePath}${path.sep}${MONO_REPO_WORKSPACE_FOLDER}${path.sep}${
-            remainingPath.split(path.sep)[0]
-        }`
-    } else if (source.includes(`${path.sep}${NODE_MODULES_FOLDER}${path.sep}`)) {
-        // Special handling for scoped packages (@namespace/package)
-        const [basePath, packagePath] = source.split(`${path.sep}${NODE_MODULES_FOLDER}${path.sep}`)
-        const packageParts = packagePath.split(path.sep)
-
-        projectPath = packageParts[0].startsWith('@')
-            ? `${basePath}${path.sep}${NODE_MODULES_FOLDER}${path.sep}${packageParts[0]}${path.sep}${packageParts[1]}`
-            : `${basePath}${path.sep}${NODE_MODULES_FOLDER}${path.sep}${packageParts[0]}`
-    }
-
-    isExtensionFile = isExtensionPackage(projectPath)
-
-    // Exit if it's not an extension file
-    if (!isExtensionFile) {
+    // Exit if the source path doesn't belong to an extension package
+    if (!isExtensionPackage(extensionPath)) {
         return false
     }
 
