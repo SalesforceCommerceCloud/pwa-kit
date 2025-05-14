@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, {useState, useEffect} from 'react'
+import React, {useState, useEffect, useMemo} from 'react'
 import PropTypes from 'prop-types'
 import {useHistory, useLocation} from 'react-router-dom'
 import {StorefrontPreview} from '@salesforce/commerce-sdk-react/components'
@@ -213,6 +213,11 @@ const App = (props) => {
         }
     }, [basket?.currency])
 
+    const commerceAgentConfiguration = useMemo(() => {
+        const {commerceAgent} = config.app
+        return JSON.parse(commerceAgent)
+    }, [config?.app])
+
     useEffect(() => {
         // update the basket customer email
         if (
@@ -356,7 +361,7 @@ const App = (props) => {
                         </Seo>
 
                         <ShopperAgent
-                            commerceAgent={config.app.commerceAgent}
+                            commerceAgentConfiguration={commerceAgentConfiguration}
                             domainUrl={`${appOrigin}${buildUrl(location.pathname)}`}
                             locale={locale?.id}
                             basketId={basket?.basketId}
