@@ -217,7 +217,7 @@ export const validateOverrideSource = (source: string, options: any = {}) => {
             .pop() ?? ''
 
     // At this point the path is either POSIX or windows, we need to normalize it to POSIX.
-    let normalizedSource = packagePath.replace(/\\/g, '/')
+    let normalizedSource = path.posix.normalize(packagePath.replace(/\\/g, '/'))
 
     // Add appropriate prefixes for mono-repo packages in the @salesforce namespace.
     normalizedSource = `./${NODE_MODULES_FOLDER}/${
