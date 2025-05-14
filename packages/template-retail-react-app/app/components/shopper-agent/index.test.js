@@ -54,8 +54,6 @@ const commerceAgentSettings = {
     siteId: 'RefArchGlobal'
 }
 
-const commerceAgentSettingsString = JSON.stringify(commerceAgentSettings)
-
 describe('ShopperAgent Component', () => {
     beforeEach(() => {
         // Reset all mocks before each test
@@ -77,7 +75,7 @@ describe('ShopperAgent Component', () => {
     })
 
     const defaultProps = {
-        commerceAgent: commerceAgentSettingsString,
+        commerceAgentConfiguration: commerceAgentSettings,
         domainUrl: 'https://myorg.salesforce.com',
         basketId: '4a67cda5b1b9325a29207854c1',
         locale: 'en-US',
@@ -92,8 +90,8 @@ describe('ShopperAgent Component', () => {
     })
 
     test('should render nothing when commerceAgent is not provided via an environment variable', () => {
-        const commerceAgent = JSON.stringify({enabled: 'false'})
-        const props = {commerceAgent, enableMiaw: false}
+        const commerceAgent = {enabled: 'false'}
+        const props = {commerceAgentConfiguration: commerceAgent, enableMiaw: false}
         const {container} = render(<ShopperAgent {...props} />)
 
         expect(container.firstChild).toBeNull()
@@ -213,7 +211,7 @@ describe('ShopperAgent Component', () => {
         }
         const props = {
             ...defaultProps,
-            commerceAgent: JSON.stringify(invalidCommerceAgentSettings)
+            commerceAgentConfiguration: invalidCommerceAgentSettings
         }
 
         const consoleSpy = jest.spyOn(console, 'error').mockImplementation()
@@ -230,7 +228,7 @@ describe('ShopperAgent Component', () => {
 
     test('should not load the script when the commerceAgent is disabled', () => {
         const commerceAgentSettings = {...defaultProps.commerceAgent, enabled: 'false'}
-        const props = {...defaultProps, commerceAgent: JSON.stringify(commerceAgentSettings)}
+        const props = {...defaultProps, commerceAgentConfiguration: commerceAgentSettings}
 
         render(<ShopperAgent {...props} />)
 
@@ -302,7 +300,7 @@ describe('ShopperAgent Component', () => {
             // Render the component
             const {unmount} = render(
                 <ShopperAgent
-                    commerceAgent={JSON.stringify(mockCommerceAgent)}
+                    commerceAgentConfiguration={mockCommerceAgent}
                     domainUrl="https://test.domain.com"
                     basketId="test-basket-id"
                     locale="en-US"
@@ -364,7 +362,7 @@ describe('ShopperAgent Component', () => {
             // Render the component with disabled commerce agent
             const {unmount} = render(
                 <ShopperAgent
-                    commerceAgent={JSON.stringify(disabledCommerceAgent)}
+                    commerceAgentConfiguration={disabledCommerceAgent}
                     domainUrl="https://test.domain.com"
                     basketId="test-basket-id"
                     locale="en-US"
