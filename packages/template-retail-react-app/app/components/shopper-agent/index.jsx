@@ -84,7 +84,7 @@ function isEnabled(enabled) {
     return enabled === 'true' && onClient
 }
 
-function ShopperAgentWindow({commerceAgent, locale, domainUrl, basketId}) {
+function ShopperAgentWindow({commerceAgentConfiguration, locale, domainUrl, basketId}) {
     const theme = useTheme()
     const {
         embeddedServiceName,
@@ -94,7 +94,7 @@ function ShopperAgentWindow({commerceAgent, locale, domainUrl, basketId}) {
         salesforceOrgId,
         commerceOrgId,
         siteId
-    } = JSON.parse(commerceAgent)
+    } = commerceAgentConfiguration
 
     const {usid} = useUsid()
 
@@ -133,7 +133,7 @@ function ShopperAgentWindow({commerceAgent, locale, domainUrl, basketId}) {
                 handleEmbeddedMessagingWindowMaximized
             )
         }
-    }, [commerceAgent])
+    }, [commerceAgentConfiguration])
 
     // whenever the basketId changes, update the hidden prechat fields
     useEffect(() => {
@@ -155,7 +155,7 @@ function ShopperAgentWindow({commerceAgent, locale, domainUrl, basketId}) {
                 handleEmbeddedMessagingButtonClicked
             )
         }
-    }, [commerceAgent, basketId])
+    }, [commerceAgentConfiguration, basketId])
 
     // Load the embedded messaging script
     const scriptLoadStatus = useScript(scriptSourceUrl)
@@ -173,7 +173,7 @@ function ShopperAgentWindow({commerceAgent, locale, domainUrl, basketId}) {
 }
 
 ShopperAgentWindow.propTypes = {
-    commerceAgent: PropTypes.string,
+    commerceAgentConfiguration: PropTypes.object,
     domainUrl: PropTypes.string,
     basketId: PropTypes.string,
     locale: PropTypes.string
@@ -182,21 +182,27 @@ ShopperAgentWindow.propTypes = {
 /**
  * ShopperAgent component that initializes and manages the embedded messaging service
  * @param {Object} props - Component props
- * @param {string} props.commerceAgent - JSON stringified commerce agent settings
+ * @param {Object} props.commerceAgentConfiguration - Commerce agent settings
  * @param {string} props.domainUrl - The domain URL for the embedded messaging script
  * @param {string} props.basketId - The basket ID for the embedded messaging script
  * @param {string} props.locale - The locale for the embedded messaging script
  * @returns {JSX.Element} The ShopperAgent component
  */
-function ShopperAgent({commerceAgent, domainUrl, basketId, locale, basketDoneLoading}) {
-    const {enabled} = JSON.parse(commerceAgent)
+function ShopperAgent({
+    commerceAgentConfiguration,
+    domainUrl,
+    basketId,
+    locale,
+    basketDoneLoading
+}) {
+    const {enabled} = commerceAgentConfiguration
     const isShopperAgentEnabled = isEnabled(enabled)
 
     return isShopperAgentEnabled &&
         basketDoneLoading &&
-        validateCommerceAgentSettings(JSON.parse(commerceAgent)) ? (
+        validateCommerceAgentSettings(commerceAgentConfiguration) ? (
         <ShopperAgentWindow
-            commerceAgent={commerceAgent}
+            commerceAgentConfiguration={commerceAgentConfiguration}
             locale={locale}
             domainUrl={domainUrl}
             basketId={basketId}
@@ -205,7 +211,7 @@ function ShopperAgent({commerceAgent, domainUrl, basketId, locale, basketDoneLoa
 }
 
 ShopperAgent.propTypes = {
-    commerceAgent: PropTypes.string,
+    commerceAgentConfiguration: PropTypes.object,
     domainUrl: PropTypes.string,
     basketId: PropTypes.string,
     locale: PropTypes.string,
