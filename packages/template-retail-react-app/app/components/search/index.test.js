@@ -50,6 +50,12 @@ function getMockedConfigWithCommerceAgentSettings(mockConfig, enabled, askAgentO
     }
 }
 
+function setupUserEvent() {
+    return userEvent.setup({
+        advanceTimers: () => jest.runOnlyPendingTimers()
+    })
+}
+
 beforeEach(() => {
     clearSessionJSONItem(RECENT_SEARCH_KEY)
     jest.resetModules()
@@ -62,6 +68,7 @@ beforeEach(() => {
         })
     )
     getConfig.mockImplementation(() => mockConfig)
+    jest.useFakeTimers()
 })
 
 test('renders SearchInput', () => {
@@ -71,7 +78,7 @@ test('renders SearchInput', () => {
 })
 
 test('changes url when enter is pressed', async () => {
-    const user = userEvent.setup()
+    const user = setupUserEvent()
 
     renderWithProviders(<SearchInput />, {
         wrapperProps: {siteAlias: 'uk', appConfig: mockConfig.app}
@@ -87,7 +94,7 @@ test('changes url when enter is pressed', async () => {
 })
 
 test('shows previously searched items when focused', async () => {
-    const user = userEvent.setup()
+    const user = setupUserEvent()
 
     setSessionJSONItem(RECENT_SEARCH_KEY, ['Dresses', 'Suits', 'Tops'])
     renderWithProviders(<SearchInput />)
@@ -103,7 +110,7 @@ test('shows previously searched items when focused', async () => {
 })
 
 test('saves recent searches on submit', async () => {
-    const user = userEvent.setup()
+    const user = setupUserEvent()
     setSessionJSONItem(RECENT_SEARCH_KEY, ['Dresses', 'Suits', 'Tops'])
     renderWithProviders(<SearchInput />)
     const searchInput = document.querySelector('input[type="search"]')
@@ -112,7 +119,7 @@ test('saves recent searches on submit', async () => {
 })
 
 test('limits number of saved recent searches', async () => {
-    const user = userEvent.setup()
+    const user = setupUserEvent()
 
     setSessionJSONItem(RECENT_SEARCH_KEY, ['Dresses', 'Suits', 'Tops', 'Gloves', 'Bracelets'])
     renderWithProviders(<SearchInput />)
@@ -122,12 +129,15 @@ test('limits number of saved recent searches', async () => {
 })
 
 test('suggestions render when there are some', async () => {
+    jest.useRealTimers()
     const user = userEvent.setup()
     renderWithProviders(<SearchInput />)
     const searchInput = document.querySelector('input[type="search"]')
     await user.type(searchInput, 'Dress')
+
     expect(searchInput.value).toBe('Dress')
     const suggestionPopoverEl = await screen.getByTestId('sf-suggestion-popover')
+
     await waitFor(() => {
         const suggestionsEl = within(suggestionPopoverEl).getByTestId('sf-suggestion')
         expect(suggestionsEl.querySelector('button').textContent).toBe('Dresses')
@@ -135,7 +145,7 @@ test('suggestions render when there are some', async () => {
 })
 
 test('clicking clear searches clears recent searches', async () => {
-    const user = userEvent.setup()
+    const user = setupUserEvent()
     setSessionJSONItem(RECENT_SEARCH_KEY, ['Dresses', 'Suits', 'Tops'])
     renderWithProviders(<SearchInput />)
     const searchInput = document.querySelector('input[type="search"]')
@@ -153,7 +163,7 @@ test('passing undefined to Suggestions returns undefined', async () => {
 })
 
 test('when commerceAgent is disabled, chat functions are not called', async () => {
-    const user = userEvent.setup()
+    const user = setupUserEvent()
 
     getConfig.mockImplementation(() =>
         getMockedConfigWithCommerceAgentSettings(mockConfig, 'false', 'true')
@@ -183,7 +193,7 @@ test('when commerceAgent is disabled, chat functions are not called', async () =
 })
 
 test('when askAgentOnSearch is disabled, chat functions are not called', async () => {
-    const user = userEvent.setup()
+    const user = setupUserEvent()
 
     getConfig.mockImplementation(() =>
         getMockedConfigWithCommerceAgentSettings(mockConfig, 'false', 'true')
@@ -213,7 +223,8 @@ test('when askAgentOnSearch is disabled, chat functions are not called', async (
 })
 
 test('when askAgentOnSearch is enabled and sendTextMessage succeeds, launchChat is not called', async () => {
-    const user = userEvent.setup()
+    jest.useFakeTimers()
+    const user = setupUserEvent()
 
     getConfig.mockImplementation(() =>
         getMockedConfigWithCommerceAgentSettings(mockConfig, 'true', 'true')
@@ -238,7 +249,7 @@ test('when askAgentOnSearch is enabled and sendTextMessage succeeds, launchChat 
     await user.type(searchInput, 'test search{enter}')
 
     // Wait for the setTimeout in onSubmitSearch
-    await new Promise((resolve) => setTimeout(resolve, 500))
+    jest.advanceTimersByTime(500)
 
     // Verify sendTextMessage was called but launchChat was not
     expect(sendTextMessageSpy).toHaveBeenCalledWith('test search')
@@ -246,7 +257,7 @@ test('when askAgentOnSearch is enabled and sendTextMessage succeeds, launchChat 
 })
 
 test('when sendTextMessage fails and launchChat succeeds, sends message after bot response', async () => {
-    const user = userEvent.setup()
+    const user = setupUserEvent()
 
     getConfig.mockImplementation(() =>
         getMockedConfigWithCommerceAgentSettings(mockConfig, 'true', 'true')
@@ -278,7 +289,7 @@ test('when sendTextMessage fails and launchChat succeeds, sends message after bo
     await user.type(searchInput, 'test search{enter}')
 
     // Wait for the setTimeout in onSubmitSearch
-    await new Promise((resolve) => setTimeout(resolve, 500))
+    jest.advanceTimersByTime(500)
 
     // Verify first sendTextMessage failed and triggered launchChat
     expect(sendTextMessageSpy).toHaveBeenCalledWith('test search')
@@ -298,7 +309,7 @@ test('when sendTextMessage fails and launchChat succeeds, sends message after bo
     )
 
     // Wait for the setTimeout after bot message
-    await new Promise((resolve) => setTimeout(resolve, 500))
+    jest.advanceTimersByTime(500)
 
     // Verify second sendTextMessage was called
     expect(sendTextMessageSpy).toHaveBeenCalledTimes(2)
@@ -318,14 +329,15 @@ test('when sendTextMessage fails and launchChat succeeds, sends message after bo
     )
 
     // Wait for the setTimeout after bot message
-    await new Promise((resolve) => setTimeout(resolve, 500))
+    jest.advanceTimersByTime(500)
 
     // Verify sendTextMessage was not called again
     expect(sendTextMessageSpy).toHaveBeenCalledTimes(2)
 })
 
 test('when sendTextMessage fails and launchChat returns maximized message, no additional send text is triggered', async () => {
-    const user = userEvent.setup()
+    jest.useFakeTimers()
+    const user = setupUserEvent()
 
     getConfig.mockImplementation(() =>
         getMockedConfigWithCommerceAgentSettings(mockConfig, 'true', 'true')
@@ -354,21 +366,22 @@ test('when sendTextMessage fails and launchChat returns maximized message, no ad
     await user.type(searchInput, 'test search{enter}')
 
     // Wait for the setTimeout in onSubmitSearch
-    await new Promise((resolve) => setTimeout(resolve, 500))
+    jest.advanceTimersByTime(500)
 
     // Verify sendTextMessage was called and failed
     expect(sendTextMessageSpy).toHaveBeenCalledWith('test search')
     expect(launchChatSpy).toHaveBeenCalled()
 
     // Wait for any potential setTimeout after launchChat
-    await new Promise((resolve) => setTimeout(resolve, 500))
+    jest.advanceTimersByTime(500)
 
     // Verify sendTextMessage was only called once
     expect(sendTextMessageSpy).toHaveBeenCalledTimes(1)
 })
 
 test('when sendTextMessage and launchChat both fail, no additional send text is triggered', async () => {
-    const user = userEvent.setup()
+    jest.useFakeTimers()
+    const user = setupUserEvent()
 
     getConfig.mockImplementation(() =>
         getMockedConfigWithCommerceAgentSettings(mockConfig, 'true', 'true')
@@ -397,14 +410,14 @@ test('when sendTextMessage and launchChat both fail, no additional send text is 
     await user.type(searchInput, 'test search{enter}')
 
     // Wait for the setTimeout in onSubmitSearch
-    await new Promise((resolve) => setTimeout(resolve, 500))
+    jest.advanceTimersByTime(500)
 
     // Verify sendTextMessage was called and failed
     expect(sendTextMessageSpy).toHaveBeenCalledWith('test search')
     expect(launchChatSpy).toHaveBeenCalled()
 
     // Wait for any potential setTimeout after launchChat
-    await new Promise((resolve) => setTimeout(resolve, 500))
+    jest.advanceTimersByTime(500)
 
     // Verify sendTextMessage was only called once
     expect(sendTextMessageSpy).toHaveBeenCalledTimes(1)

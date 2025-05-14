@@ -6,7 +6,7 @@
  */
 
 import React from 'react'
-import {render, act, fireEvent} from '@testing-library/react'
+import {render, act} from '@testing-library/react'
 import ShopperAgent from '@salesforce/retail-react-app/app/components/shopper-agent/index'
 import useScript from '@salesforce/retail-react-app/app/hooks/use-script'
 // Mock the embeddedservice_bootstrap object
