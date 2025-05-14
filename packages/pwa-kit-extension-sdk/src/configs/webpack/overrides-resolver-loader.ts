@@ -192,8 +192,6 @@ export const validateOverrideSource = (source: string, options: any = {}) => {
         projectPath = packageParts[0].startsWith('@')
             ? `${basePath}${path.sep}${NODE_MODULES_FOLDER}${path.sep}${packageParts[0]}${path.sep}${packageParts[1]}`
             : `${basePath}${path.sep}${NODE_MODULES_FOLDER}${path.sep}${packageParts[0]}`
-    } else if (source.includes(`${path.sep}${SRC_FOLDER}${path.sep}`)) {
-        projectPath = source.split(`${SRC_FOLDER}${path.sep}`)[0]
     }
 
     isExtensionFile = isExtensionPackage(projectPath)
