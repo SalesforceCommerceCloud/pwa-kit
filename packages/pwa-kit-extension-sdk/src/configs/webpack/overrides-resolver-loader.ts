@@ -152,14 +152,14 @@ const OverrideResolverLoader = function (this: LoaderContext<any>) {
  * Extracts the absolute path to an extension package root from a source file path.
  *
  * @param source - The source file path to analyze
- * @returns The absolute path to an extension package root if found, empty string otherwise
+ * @returns The absolute path to an extension package root if found, undefined otherwise
  */
-const getExtensionPath = (source: string): string => {
+const getExtensionPath = (source: string): string | undefined => {
     const isMonoRepoPath = source.includes(`${path.sep}${MONO_REPO_WORKSPACE_FOLDER}${path.sep}`)
     const isNodeModulesPath = source.includes(`${path.sep}${NODE_MODULES_FOLDER}${path.sep}`)
 
     if (!isMonoRepoPath && !isNodeModulesPath) {
-        return ''
+        return undefined
     }
 
     const folderType = isMonoRepoPath ? MONO_REPO_WORKSPACE_FOLDER : NODE_MODULES_FOLDER
@@ -199,9 +199,10 @@ export const validateOverrideSource = (source: string, options: any = {}) => {
     }
 
     const extensionPath = getExtensionPath(source)
+    const isExtensionFile = extensionPath ? isExtensionPackage(extensionPath) : false
 
     // Exit if the source path doesn't belong to an extension package
-    if (!isExtensionPackage(extensionPath)) {
+    if (!isExtensionFile) {
         return false
     }
 
