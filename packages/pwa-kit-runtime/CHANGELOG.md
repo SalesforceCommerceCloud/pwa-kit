@@ -4,6 +4,8 @@
 
 ## v3.10.0 (May 22, 2025)
 
+- Add referrer policy `strict-origin-when-cross-origin` and CSP relaxations for MIAW scripts [#2416](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2416)
+
 ## v3.9.2 (Mar 08, 2025)
 - Disable CloudWatch metrics sender retries [#2304](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2304) 
 
