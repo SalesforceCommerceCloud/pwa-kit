@@ -6,7 +6,13 @@
  */
 import React from 'react'
 import PropTypes from 'prop-types'
-import {Box, List, ListItem, Heading, useMultiStyleConfig} from '@chakra-ui/react'
+import {
+    Box,
+    Heading,
+    List,
+    // hooks
+    useSlotRecipe
+} from '@chakra-ui/react'
 import Link from '../../components/link'
 
 const LinksList = ({
@@ -18,55 +24,53 @@ const LinksList = ({
     headingLinkRef,
     ...otherProps
 }) => {
-    const styles = useMultiStyleConfig('LinksList', {variant})
+    const recipe = useSlotRecipe({key: 'linkList'})
+    const styles = recipe({variant})
     return (
-        <Box {...styles.container} {...(color ? {color: color} : {})} {...otherProps}>
+        <Box
+            css={{
+                ...styles.container,
+                ...(color ? {color} : {})
+            }}
+            {...otherProps}
+        >
             {heading &&
                 (heading.href ? (
                     <Link
                         to={heading.href}
                         onClick={onLinkClick}
                         ref={headingLinkRef}
-                        {...styles.headingLink}
+                        css={styles.headingLink}
                     >
-                        <Heading {...styles.heading} {...(heading.styles ? heading.styles : {})}>
+                        <Heading
+                            css={{...styles.heading, ...(heading.styles ? heading.styles : {})}}
+                        >
                             {heading.text}
                         </Heading>
                     </Link>
                 ) : (
-                    <Heading {...styles.heading}>{heading}</Heading>
+                    <Heading css={styles.heading}>{heading}</Heading>
                 ))}
 
-            {links &&
-                (variant === 'horizontal' ? (
-                    <List {...styles.list} data-testid="horizontal-list">
-                        {links.map((link, i) => (
-                            <ListItem key={i} {...styles.listItem} sx={styles.listItemSx}>
-                                <Link
-                                    to={link.href}
-                                    onClick={onLinkClick}
-                                    {...(link.styles ? link.styles : {})}
-                                >
-                                    {link.text}
-                                </Link>
-                            </ListItem>
-                        ))}
-                    </List>
-                ) : (
-                    <List spacing={5} {...styles.list}>
-                        {links.map((link, i) => (
-                            <ListItem key={i}>
-                                <Link
-                                    to={link.href}
-                                    onClick={onLinkClick}
-                                    {...(link.styles ? link.styles : {})}
-                                >
-                                    {link.text}
-                                </Link>
-                            </ListItem>
-                        ))}
-                    </List>
-                ))}
+            {links && (
+                <List.Root
+                    variant="plain"
+                    css={styles.list}
+                    data-testid={variant === 'horizontal' ? 'horizontal-list' : undefined}
+                >
+                    {links.map((link, i) => (
+                        <List.Item key={i} css={styles.listItem}>
+                            <Link
+                                css={{...styles.link, ...(link.styles ? link.styles : {})}}
+                                to={link.href}
+                                onClick={onLinkClick}
+                            >
+                                {link.text}
+                            </Link>
+                        </List.Item>
+                    ))}
+                </List.Root>
+            )}
         </Box>
     )
 }
@@ -79,7 +83,10 @@ LinksList.propTypes = {
         })
     ).isRequired,
     heading: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
-    variant: PropTypes.oneOf(['vertical', 'horizontal']),
+    variant: PropTypes.oneOfType([
+        PropTypes.oneOf(['vertical', 'horizontal']),
+        PropTypes.object // For responsive variants like {base: 'vertical', lg: 'horizontal'}
+    ]),
     color: PropTypes.string,
     onLinkClick: PropTypes.func,
     headingLinkRef: PropTypes.object

@@ -1,12 +1,14 @@
 /*
- * Copyright (c) 2021, salesforce.com, inc.
+ * Copyright (c) 2025, salesforce.com, inc.
  * All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-export default {
-    parts: ['container', 'list', 'listItem', 'listItemSx', 'heading'],
-    baseStyle: {
+import {defineSlotRecipe} from '@chakra-ui/react'
+
+export default defineSlotRecipe({
+    slots: ['container', 'list', 'listItem', 'listItemSx', 'heading', 'link'],
+    base: {
         container: {
             color: 'white'
         },
@@ -17,27 +19,39 @@ export default {
             display: 'inline-flex'
         },
         heading: {
+            lineHeight: 1.2,
             fontSize: 'md',
             paddingTop: 3,
             paddingBottom: 3
+        },
+        link: {
+            color: 'inherit'
         }
     },
     variants: {
-        vertical: {},
-        horizontal: {
-            listItem: {
-                borderLeft: '1px solid',
-                paddingLeft: 2
+        variant: {
+            vertical: {
+                list: {
+                    gap: 5
+                }
             },
-            listItemSx: {
-                '&:first-of-type': {
-                    borderLeft: 0,
-                    paddingLeft: 0
+            horizontal: {
+                list: {
+                    flexDirection: 'row',
+                    gap: 2
+                },
+                listItem: {
+                    borderLeft: '1px solid',
+                    paddingLeft: 2,
+                    '&:first-of-type': {
+                        borderLeft: 0,
+                        paddingLeft: 0
+                    }
                 }
             }
         }
     },
-    defaultProps: {
+    defaultVariants: {
         variant: 'vertical'
     }
-}
+})

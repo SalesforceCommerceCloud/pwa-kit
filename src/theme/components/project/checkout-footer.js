@@ -5,24 +5,25 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import Footer from './footer'
+import {defineSlotRecipe} from '@chakra-ui/react'
 
-const {baseStyle} = Footer
+const {base: baseStyle} = Footer
 
-export default {
-    parts: [
+export default defineSlotRecipe({
+    slots: [
         'container',
         'content',
         'horizontalRule',
-        'bottomHalf',
+        'legalSection',
         'copyright',
         'creditCardIcon',
         'customerService'
     ],
-    baseStyle: {
+    base: {
         container: baseStyle.container,
         content: baseStyle.content,
         horizontalRule: baseStyle.horizontalRule,
-        bottomHalf: baseStyle.bottomHalf,
+        legalSection: baseStyle.legalSection,
         copyright: baseStyle.copyright,
         creditCardIcon: {
             width: '38px',
@@ -32,4 +33,4 @@ export default {
             marginBottom: 6
         }
     }
-}
+})

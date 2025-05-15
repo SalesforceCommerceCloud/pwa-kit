@@ -27,26 +27,26 @@ import icon from './components/base/icon'
 import input from './components/base/input'
 import modal from './components/base/modal'
 import radio from './components/base/radio'
-import select from './components/base/select'
+import nativeSelect from './components/base/native-select'
 import skeleton from './components/base/skeleton'
 import tooltip from './components/base/tooltip'
 import popover from './components/base/popover'
 //
 // // Project Component style overrides
-import appRecipe from './components/project/_app'
+import app from './components/project/_app'
 // import Breadcrumb from './components/project/breadcrumb'
-import headerRecipe from './components/project/header'
+import header from './components/project/header'
 // import ListMenu from './components/project/list-menu'
-// import Footer from './components/project/footer'
-// import CheckoutFooter from './components/project/checkout-footer'
-// import LinksList from './components/project/links-list'
+import footer from './components/project/footer'
+import checkoutFooter from './components/project/checkout-footer'
+import linkList from './components/project/links-list'
 // import DrawerMenu from './components/project/drawer-menu'
 // import NestedAccordion from './components/project/nested-accordion'
 // import LocaleSelector from './components/project/locale-selector'
-import offlineBannerRecipe from './components/project/offline-banner'
+import offlineBanner from './components/project/offline-banner'
 // import Pagination from './components/project/pagination'
 // import ProductTile from './components/project/product-tile'
-// import SocialIcons from './components/project/social-icons'
+import socialIcons from './components/project/social-icons'
 // import SwatchGroup from './components/project/swatch-group'
 // import ImageGallery from './components/project/image-gallery'
 
@@ -82,7 +82,6 @@ export const overrides = defineConfig({
             input,
             modal,
             radio,
-            select,
             skeleton,
             popover
         },
@@ -93,12 +92,18 @@ export const overrides = defineConfig({
             drawer,
             checkbox,
             tooltip,
+            nativeSelect,
 
             // project components
-            app: appRecipe,
-            header: headerRecipe,
-            offlineBanner: offlineBannerRecipe
+            app,
+            checkoutFooter,
+            footer,
+            header,
+            linkList,
+            offlineBanner,
+            socialIcons
         }
+        // keep these here for reference til we finish the components
         // components: {
         //     // base components
         //     Accordion,

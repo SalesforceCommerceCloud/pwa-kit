@@ -7,7 +7,7 @@
 import React, {forwardRef, useContext} from 'react'
 import {defineMessage, IntlContext} from 'react-intl'
 import PropTypes from 'prop-types'
-import {Icon, useTheme} from '@chakra-ui/react'
+import {Icon, useRecipe} from '@chakra-ui/react'
 
 // Our own SVG imports. These will be extracted to a single sprite sheet by the
 // svg-sprite-loader webpack plugin at build time and injected in the <body> tag
@@ -100,10 +100,11 @@ export const icon = (name, passProps, localizationAttributes) => {
         .replace(/(?:^|[\s-/])\w/g, (match) => match.toUpperCase())
         .replace(/-/g, '')
     const component = forwardRef((props, ref) => {
-        const theme = useTheme()
         // NOTE: We want to avoid `useIntl` here because that throws when <IntlProvider> is not in
         // the component ancestry, but we only enforce `intl` if we have `localizationAttributes`.
         let intl = useContext(IntlContext)
+        const recipe = useRecipe({key: 'icon'})
+        const baseStyles = recipe()
         if (localizationAttributes) {
             if (props?.intl) {
                 const {intl: intlProp, ...otherProps} = props
@@ -120,16 +121,26 @@ export const icon = (name, passProps, localizationAttributes) => {
                 passProps[key] = intl.formatMessage(localizationAttributes[key])
             })
         }
-        const baseStyle = theme?.components?.Icon?.baseStyle
+        const {css = {}, ...restOfProps} = props
         return (
-            <Icon ref={ref} role="img" aria-label={name} {...baseStyle} {...props} {...passProps}>
+            <Icon
+                ref={ref}
+                viewBox="0 0 24 24"
+                role="img"
+                aria-label={name}
+                as="svg"
+                css={{...baseStyles, ...css}}
+                {...restOfProps}
+                {...passProps}
+            >
                 <use role="presentation" xlinkHref={`#${name}`} />
             </Icon>
         )
     })
 
     component.propTypes = {
-        intl: PropTypes.object
+        intl: PropTypes.object,
+        css: PropTypes.object
     }
 
     component.displayName = `${displayName}Icon`

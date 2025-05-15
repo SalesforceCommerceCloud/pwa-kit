@@ -9,6 +9,14 @@ const path = require('path')
 const base = require('@salesforce/pwa-kit-dev/configs/jest/jest.config.js')
 module.exports = {
     ...base,
+
+    //NOTE: we manually re-enable tests here until we finish migrating to Chakra v3
+    testMatch: [
+        '<rootDir>/src/components/footer/**/*.test.js',
+        '<rootDir>/src/components/links-list/**/*.test.js',
+        '<rootDir>/src/components/icons/**/*.test.js',
+        '<rootDir>/src/components/social-icons/**/*.test.js'
+    ],
     moduleNameMapper: {
         ...base.moduleNameMapper,
         '^react$': '<rootDir>/node_modules/react/index.js',
@@ -24,15 +32,15 @@ module.exports = {
             '<rootDir>/node_modules/@ark-ui/react/dist/components/$1/index.cjs',
             '<rootDir>/node_modules/@ark-ui/react/dist/components/$1.cjs',
             '<rootDir>/node_modules/@ark-ui/react/dist/providers/$1/index.cjs',
-            '<rootDir>/node_modules/@ark-ui/react/dist/providers/$1.cjs',
+            '<rootDir>/node_modules/@ark-ui/react/dist/providers/$1.cjs'
         ],
         '^@chakra-ui/react/(.*)$': [
             '<rootDir>/node_modules/@chakra-ui/react/dist/cjs/$1/index.cjs',
-            '<rootDir>/node_modules/@chakra-ui/react/dist/cjs/index.cjs',
+            '<rootDir>/node_modules/@chakra-ui/react/dist/cjs/index.cjs'
         ],
         '^@chakra-ui/skip-nav/(.*)$': [
             '<rootDir>/node_modules/@chakra-ui/skip-nav/dist/index.js',
-            '<rootDir>/node_modules/@chakra-ui/skip-nav/dist/$1.js',
+            '<rootDir>/node_modules/@chakra-ui/skip-nav/dist/$1.js'
         ],
         '^proxy-compare$': '<rootDir>/node_modules/proxy-compare/dist/cjs/index.js',
         '^uqr$': '<rootDir>/node_modules/uqr/dist/index.cjs',
