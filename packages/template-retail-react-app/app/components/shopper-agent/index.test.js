@@ -127,6 +127,9 @@ describe('ShopperAgent Component', () => {
     test('should initialize embedded service when all required props are provided', () => {
         useScript.mockReturnValue({loaded: true, error: false})
         render(<ShopperAgent {...defaultProps} />)
+        // Verify settings were configured correctly
+        expect(mockEmbeddedService.settings.language).toBe('en-US')
+        expect(mockEmbeddedService.settings.disableStreamingResponses).toBe(true)
 
         // Verify embedded service initialization
         expect(mockEmbeddedService.init).toHaveBeenCalledWith(
