@@ -18,7 +18,8 @@ const initEmbeddedMessaging = (
     salesforceOrgId,
     embeddedServiceDeploymentName,
     embeddedServiceDeploymentUrl,
-    scrt2Url
+    scrt2Url,
+    locale
 ) => {
     try {
         if (
@@ -26,7 +27,8 @@ const initEmbeddedMessaging = (
             window.embeddedservice_bootstrap &&
             window.embeddedservice_bootstrap.settings
         ) {
-            window.embeddedservice_bootstrap.settings.language = 'en_US'
+            window.embeddedservice_bootstrap.settings.language = locale
+            window.embeddedservice_bootstrap.settings.disableStreamingResponses = true
             window.embeddedservice_bootstrap.init(
                 salesforceOrgId,
                 embeddedServiceDeploymentName,
@@ -46,7 +48,8 @@ function useMiaw(
     salesforceOrgId,
     embeddedServiceDeploymentName,
     embeddedServiceDeploymentUrl,
-    scrt2Url
+    scrt2Url,
+    locale
 ) {
     useEffect(() => {
         if (scriptLoadStatus.loaded && !scriptLoadStatus.error) {
@@ -54,7 +57,8 @@ function useMiaw(
                 salesforceOrgId,
                 embeddedServiceDeploymentName,
                 embeddedServiceDeploymentUrl,
-                scrt2Url
+                scrt2Url,
+                locale
             )
         }
     }, [scriptLoadStatus])
@@ -166,7 +170,8 @@ function ShopperAgentWindow({commerceAgentConfiguration, locale, domainUrl, bask
         salesforceOrgId,
         embeddedServiceName,
         embeddedServiceEndpoint,
-        scrt2Url
+        scrt2Url,
+        locale
     )
 
     return null
