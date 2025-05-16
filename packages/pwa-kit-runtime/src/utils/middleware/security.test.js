@@ -43,7 +43,7 @@ describe('Content-Security-Policy enforcement', () => {
         res.setHeader(CSP, '')
         expectDirectives([
             "connect-src 'self' localhost:* *.salesforce-scrt.com",
-            "frame-src *.site.com",
+            'frame-src *.site.com',
             'frame-ancestors localhost:*',
             "img-src 'self' data:",
             "script-src 'self' 'unsafe-eval' localhost:* *.site.com"
@@ -67,8 +67,8 @@ describe('Content-Security-Policy enforcement', () => {
         expectDirectives([
             "connect-src test:* 'self' localhost:* *.salesforce-scrt.com",
             "script-src 'unsafe-eval' test:* 'self' localhost:* *.site.com",
-            "frame-src *.site.com",
-            "frame-ancestors localhost:*",
+            'frame-src *.site.com',
+            'frame-ancestors localhost:*',
             "img-src 'self' data:"
         ])
     })
