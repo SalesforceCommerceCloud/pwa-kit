@@ -38,7 +38,7 @@ module.exports = {
         '!app/theme/**',
         '!node_modules/**'
     ],
-    //@TODO: Revert this threshold back to original numbers stattements: 80, branches: 72, functions: 78, lines: 83
+    //@TODO: Revert this threshold back to original numbers statements: 80, branches: 72, functions: 78, lines: 83
     coverageThreshold: {
         global: {
             statements: 73,

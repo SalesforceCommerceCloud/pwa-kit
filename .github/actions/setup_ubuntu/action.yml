@@ -37,8 +37,16 @@ runs:
     - name: Install Dependencies
       working-directory: ${{ inputs.cwd }}
       run: |-
+        # Build packages
+        # npx lerna run build --stream
         # Install node dependencies
-        node ./scripts/gtime.js monorepo_install npm ci
+        npm i
+
+        echo "=== node_modules directory ==="
+        ls -al /home/runner/work/pwa-kit/pwa-kit/packages/extension-commerce-bm-seo/node_modules/
+
+        echo "=== node_modules/.bin directory ==="
+        ls -al /home/runner/work/pwa-kit/pwa-kit/packages/extension-commerce-bm-seo/node_modules/.bin/
 
         # Install Snyk CLI
         # TODO: Ticket W-12425059. Revisit Snyk CLI integration to monitor manifest files on generated projects.

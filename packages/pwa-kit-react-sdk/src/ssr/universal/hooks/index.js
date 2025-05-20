@@ -6,7 +6,8 @@
  */
 /* istanbul ignore file */
 
-import React, {useContext} from 'react'
+import React, {useContext, useEffect, useRef, useState} from 'react'
+import {useHistory} from 'react-router-dom'
 import {CorrelationIdContext, ServerContext, RoutesContext} from '../contexts'
 
 /**
@@ -72,6 +73,34 @@ export const useOrigin = ({fromXForwardedHeader = false}) => {
 }
 
 /**
+ * Blocks navigation and runs a provided async function whenever a new page is being navigated to.
+ *
+ * @param {function} func - Async function to run on navigation. Receives (location, action).
+ * @returns {{isBlocked: boolean}} An object with isBlocked set to true during navigation blocking, false otherwise.
+ */
+export const useBlockNavigation = (func) => {
+    const {block, push, location} = useHistory()
+    const lastLocation = useRef()
+    const [isBlocked, setIsBlocked] = useState(false)
+    const funcRef = useRef(func)
+
+    useEffect(() => {
+        const unblock = block(async (location, action) => {
+            if (location?.pathname !== lastLocation.current?.pathname && funcRef.current) {
+                lastLocation.current = location
+                setIsBlocked(true)
+                await funcRef.current(location, action)
+                setIsBlocked(false)
+                push(location?.pathname)
+            }
+        })
+        return () => unblock()
+    }, [])
+
+    return {isBlocked}
+}
+
+/*
  * Use this hook to get the routes value of the closest RoutesProvider component.
  *
  * @returns {object} array of routes

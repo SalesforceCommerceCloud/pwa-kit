@@ -74,7 +74,12 @@ const RoutesProvider = ({routes, children}) => {
     const [_routes, setRoutes] = useState(routes)
 
     return (
-        <RoutesContext.Provider value={{routes: _routes, setRoutes}}>
+        <RoutesContext.Provider
+            value={{
+                routes: _routes,
+                setRoutes
+            }}
+        >
             {children}
         </RoutesContext.Provider>
     )

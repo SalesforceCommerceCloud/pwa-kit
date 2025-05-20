@@ -132,8 +132,9 @@ const ProductList = (props) => {
     let searchQuery = urlParams.get('q')
     const isSearch = !!searchQuery
 
-    if (params.categoryId) {
-        searchParams._refine.push(`cgid=${params.categoryId}`)
+    const categoryId = props?.categoryId || params?.categoryId
+    if (categoryId) {
+        searchParams._refine.push(`cgid=${categoryId}`)
     }
 
     /**************** Mutation Actions ****************/
@@ -143,7 +144,6 @@ const ProductList = (props) => {
     const {mutateAsync: deleteCustomerProductListItem} = useShopperCustomersMutation(
         'deleteCustomerProductListItem'
     )
-
     /**************** Query Actions ****************/
     // _refine is an invalid param for useProductSearch, we don't want to pass it to API call
     const {_refine, ...restOfParams} = searchParams
@@ -175,15 +175,14 @@ const ProductList = (props) => {
             keepPreviousData: true
         }
     )
-
     const {error, data: category} = useCategory(
         {
             parameters: {
-                id: params.categoryId
+                id: categoryId
             }
         },
         {
-            enabled: !isSearch && !!params.categoryId
+            enabled: !isSearch && !!categoryId
         }
     )
 
@@ -770,7 +769,9 @@ ProductList.getTemplateName = () => 'product-list'
 ProductList.propTypes = {
     onAddToWishlistClick: PropTypes.func,
     onRemoveWishlistClick: PropTypes.func,
-    category: PropTypes.object
+    category: PropTypes.object,
+    productId: PropTypes.string,
+    categoryId: PropTypes.string
 }
 
 export default ProductList

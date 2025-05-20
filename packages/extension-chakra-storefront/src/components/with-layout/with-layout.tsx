@@ -8,6 +8,7 @@
 // Third-Party Imports
 import React, {useState, useEffect} from 'react'
 import {useHistory, useLocation} from 'react-router-dom'
+import {useConfig} from '@salesforce/commerce-sdk-react'
 import {Helmet} from 'react-helmet'
 
 // Removes focus for non-keyboard interactions for the whole application
@@ -42,6 +43,7 @@ import ScrollToTop from '../scroll-to-top'
 import {AuthModal, useAuthModal} from '../../hooks/use-auth-modal'
 import {AddToCartModalProvider} from '../../hooks/use-add-to-cart-modal'
 import {useExtensionConfig, useCurrentCustomer, useCurrentBasket} from '../../hooks'
+import {useApplicationExtensionsStore} from '@salesforce/pwa-kit-extension-sdk/react'
 import {watchOnlineStatus, flatten} from '../../utils/utils'
 import useActiveData from '../../hooks/use-active-data'
 import useMultiSite from '../../hooks/use-multi-site'
@@ -49,15 +51,16 @@ import {DntNotification, useDntNotification} from '../../hooks/use-dnt-notificat
 import {useTheme} from '@chakra-ui/react'
 
 import {UserConfig} from '../../types/config'
-
 // Define a type for the HOC props
 type WithAppLayoutProps = React.ComponentPropsWithoutRef<any>
 
-const PlaceholderComponent: React.FC = () => (
-    <Center p="2">
-        <Spinner size="lg" />
-    </Center>
-)
+const PlaceholderComponent: React.FC = () => {
+    return (
+        <Center p="2">
+            <Spinner size="lg" />
+        </Center>
+    )
+}
 
 const DrawerMenuItemWithData = withCommerceSdkReactHookData(
     ({itemComponent: ItemComponent, data, ...rest}: any) => (
@@ -94,10 +97,16 @@ const ListMenuContentWithData = withCommerceSdkReactHookData(
     }
 )
 
+const SEO_STATE_WITHOUT_EXTENSION = {
+    isNavigationBlocked: false,
+    setSiteLocale: () => {}
+}
+
 // Define the HOC function
 const withLayout = <P extends object>(WrappedComponent: React.ComponentType<P>) => {
     const WithLayout: React.FC<P> = (props: WithAppLayoutProps) => {
         const config = useExtensionConfig() as UserConfig
+        const siteConfig = useConfig()
 
         const CAT_MENU_DEFAULT_ROOT_CATEGORY = String(config.categoryNav.defaultRootCategory)
         const CAT_MENU_DEFAULT_NAV_SSR_DEPTH = config.categoryNav.defaultNavSsrDepth
@@ -113,13 +122,18 @@ const withLayout = <P extends object>(WrappedComponent: React.ComponentType<P>) 
         const history = useHistory()
         const location = useLocation()
         const authModal = useAuthModal()
+        const {isNavigationBlocked} = useApplicationExtensionsStore((state) => {
+            return (
+                state.state['@salesforce/extension-commerce-bm-seo'] || SEO_STATE_WITHOUT_EXTENSION
+            )
+        })
+
         const dntNotification = useDntNotification()
         const {site, locale, buildUrl} = useMultiSite()
         const [isOnline, setIsOnline] = useState<boolean>(true)
         const styles = useStyleConfig('App')
         const {colors} = useTheme()
         const {isOpen, onOpen, onClose} = useDisclosure()
-
         // Used to conditionally render header/footer for checkout page
         const isCheckout = /\/checkout$/.test(location?.pathname)
 
@@ -135,7 +149,6 @@ const withLayout = <P extends object>(WrappedComponent: React.ComponentType<P>) 
 
         const updateBasket = useShopperBasketsMutation('updateBasket')
         const updateCustomerForBasket = useShopperBasketsMutation('updateCustomerForBasket')
-
         useEffect(() => {
             // update the basket currency if it doesn't match the current locale currency
             if (basket?.currency && basket?.currency !== currency) {
@@ -221,7 +234,6 @@ const withLayout = <P extends object>(WrappedComponent: React.ComponentType<P>) 
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
         const headerWrapperStyles = styles.headerWrapper || {}
-
         return (
             <Box className="sf-app" {...(containerStyles as any)}>
                 <Helmet>
@@ -318,7 +330,8 @@ const withLayout = <P extends object>(WrappedComponent: React.ComponentType<P>) 
                                 display: 'flex',
                                 flexDirection: 'column',
                                 flex: 1,
-                                outline: 0
+                                outline: 0,
+                                position: 'relative' // Needed for overlay positioning
                             }}
                         >
                             <Box
@@ -333,8 +346,24 @@ const withLayout = <P extends object>(WrappedComponent: React.ComponentType<P>) 
                                     <WrappedComponent {...(props as P)} />
                                 </OfflineBoundary>
                             </Box>
+                            {isNavigationBlocked && (
+                                <Box
+                                    position="absolute"
+                                    top={0}
+                                    left={0}
+                                    width="100%"
+                                    height="40%"
+                                    zIndex={9999}
+                                    justifyContent="center"
+                                    alignItems="flex-start"
+                                    pt={400}
+                                    display="flex"
+                                    background="#fff"
+                                >
+                                    <PlaceholderComponent />
+                                </Box>
+                            )}
                         </SkipNavContent>
-
                         {!isCheckout ? <Footer /> : <CheckoutFooter />}
 
                         <AuthModal {...(authModal as any)} />

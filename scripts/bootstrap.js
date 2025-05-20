@@ -22,13 +22,17 @@ const npmCmd = process.env.npm_config_argv
     : process.env.npm_command
 const ciCommand = npmCmd === 'ci'
 
+// Run build before bootstrap
+// childProc.execSync('npx lerna run build --stream', {stdio: 'inherit'})
+
+// childProc.execSync('npx lerna bootstrap --scope @salesforce/pwa-kit-extension-sdk', {stdio: 'inherit'})
+// childProc.execSync('ls /home/runner/work/pwa-kit/pwa-kit/packages/pwa-kit-extension-sdk', {stdio: 'inherit'})
 // Note: We reduce concurrency and increase verbosity on CI environments.
 // They are often memory-constrained and kill processes which produce no
 // output for too long.
 const commandArgs = ciCommand ? '--ci' : '--no-ci'
 const environmentArgs = ciEnvironment ? '--concurrency 1 --loglevel debug' : ''
 const cmd = `npm run lerna -- bootstrap ${commandArgs} ${environmentArgs}`
-
 childProc.execSync(cmd, {stdio: 'inherit'})
 
 // Symlink local dependencies

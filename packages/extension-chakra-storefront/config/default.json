@@ -186,5 +186,10 @@
         "locale": "path",
         "showDefaults": true,
         "interpretPlusSignAsSpace": false
+    },
+    "resourceTypeToComponentMap": {
+        "category": "ProductList",
+        "product": "ProductDetail",
+        "content_asset": "ProductList"
     }
 }

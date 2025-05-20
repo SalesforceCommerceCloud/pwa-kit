@@ -51,7 +51,7 @@ import {useHistory, useLocation, useParams} from 'react-router-dom'
 import {useToast} from '../../hooks/use-toast'
 import {useWishList} from '../../hooks/use-wish-list'
 
-const ProductDetail = () => {
+const ProductDetail = (props) => {
     const {formatMessage} = useIntl()
     const history = useHistory()
     const location = useLocation()
@@ -87,7 +87,7 @@ const ProductDetail = () => {
     } = useProduct(
         {
             parameters: {
-                id: urlParams.get('pid') || productId,
+                id: props.productId || urlParams.get('pid') || productId,
                 perPricebook: true,
                 expand: [
                     'availability',
@@ -632,7 +632,8 @@ ProductDetail.propTypes = {
     /**
      * The current react router match object. (Provided internally)
      */
-    match: PropTypes.object
+    match: PropTypes.object,
+    productId: PropTypes.string
 }
 
 export default ProductDetail

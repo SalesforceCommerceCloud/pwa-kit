@@ -1,0 +1,5 @@
+build
+coverage
+docs
+static
+jest.config.js
