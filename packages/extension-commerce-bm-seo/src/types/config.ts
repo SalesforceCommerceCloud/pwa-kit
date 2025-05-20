@@ -25,10 +25,13 @@ export type CommerceAPIConfig = {
     }
 }
 
+export type RoutingMode = 'router_first' | 'api_first'
+
 /**
  * This defines how your extension can be configured in the user's project. Please update it to your specific needs!
  */
 export interface UserConfig extends ApplicationExtensionConfig {
+    routingMode: RoutingMode
     commerceAPI: CommerceAPIConfig
     resourceTypeToComponentMap: ResourceTypeToComponentMap
 }

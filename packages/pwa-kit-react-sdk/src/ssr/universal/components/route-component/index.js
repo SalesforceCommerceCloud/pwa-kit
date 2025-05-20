@@ -405,22 +405,40 @@ export const routeComponent = (Wrapped, isPage, locals) => {
  * @private
  */
 export const getAllRoutes = async (locals = {}) => {
+    if (!locals.currentRoutes) {
+        locals.currentRoutes = []
+    }
+
+    // Get the application routes
+    const applicationRoutes = typeof appRoutes === 'function' ? appRoutes() : appRoutes
+    locals.currentRoutes.push(...applicationRoutes)
+
+    // Get the extension routes
     const {applicationExtensions = []} = locals
-    const extensionRoutes = (
-        await Promise.all(
-            applicationExtensions.map((extension) =>
+    await Promise.all(
+        applicationExtensions.map(async (extension) => {
+            const routes =
                 typeof extension.getRoutesAsync === 'function'
-                    ? extension.getRoutesAsync({locals})
+                    ? await extension.getRoutesAsync({locals})
                     : extension.getRoutes({locals})
-            )
-        )
-    ).flat()
+            const safeRoutes = Array.isArray(routes) ? routes : routes ? [routes] : []
+            locals.currentRoutes.unshift(...safeRoutes)
+        })
+    )
+
+    // Check if an instance of 'CommerceBmSeo' is in the array and not the last extension
+    const isCommerceBmSeo = (extension) => extension.constructor.name === 'CommerceBmSeo'
+    const commerceBmSeoIndex = applicationExtensions.findIndex(isCommerceBmSeo)
+    if (commerceBmSeoIndex !== -1 && commerceBmSeoIndex !== applicationExtensions.length - 1) {
+        console.warn([
+            'Route resolution may not work as expected because CommerceBmSeo is not the last extension'
+        ])
+    }
 
     const allRoutes = [
         // NOTE: this route needs to be above _routes, in case _routes has a fallback route of `path: '*'`
         {path: '/__pwa-kit/refresh', component: Refresh},
-        ...extensionRoutes,
-        ...(typeof appRoutes === 'function' ? appRoutes() : appRoutes),
+        ...locals.currentRoutes,
         {path: '*', component: Throw404}
     ]
 

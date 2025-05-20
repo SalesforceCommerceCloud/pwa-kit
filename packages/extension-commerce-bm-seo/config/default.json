@@ -1,5 +1,6 @@
 {
     "enabled": true,
+    "routingMode": "router_first",
     "commerceAPI": {
         "proxyPath": "/mobify/proxy/api",
         "parameters": {

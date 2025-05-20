@@ -10,7 +10,6 @@ import {buildBabelExtensibilityArgs} from './babel/utils'
 import {ApplicationExtensionEntry, ApplicationExtensionEntryTuple} from '../types'
 import {LOCAL_EXTENSIONS_DIR, OVERRIDABLE_FILE_NAME, NODE_MODULES_FOLDER} from './constants'
 import {getOverridesFromFile, getForceOverridesFilePaths} from './utils'
-import e from 'express'
 
 jest.mock('fs-extra', () => ({
     ...jest.requireActual('fs-extra'),

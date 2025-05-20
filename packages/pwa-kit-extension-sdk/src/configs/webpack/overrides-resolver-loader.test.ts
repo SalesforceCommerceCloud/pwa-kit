@@ -9,7 +9,6 @@ import path from 'path'
 import {runWebpackCompiler} from './test-utils'
 import {validateOverrideSource, __OVERRIDABLE_CACHE__} from './overrides-resolver-loader'
 import OverrideStatsPlugin, {OverrideStatsEntry} from './override-stats-plugin'
-import * as utils from '../../shared/utils'
 import {ApplicationExtensionEntryTuple, ApplicationExtensionConfig} from '../../types'
 
 // Define mock for isExtensionPackage

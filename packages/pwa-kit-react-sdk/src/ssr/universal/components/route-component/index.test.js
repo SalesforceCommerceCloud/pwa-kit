@@ -300,6 +300,96 @@ describe('getAllRoutes', () => {
         const expected404Name = 'WithErrorHandling(withRouter(routeComponent(Throw404)))'
         expect(third.component.displayName).toBe(expected404Name)
     })
+
+    test('returns default routes when applicationExtensions is empty', async () => {
+        const locals = {currentRoutes: []}
+        const routes = await getAllRoutes(locals)
+        expect(routes).toEqual([
+            {path: '/__pwa-kit/refresh', component: expect.any(Function)},
+            {path: '', component: expect.any(Function), exact: true},
+            {path: '*', component: expect.any(Function)}
+        ])
+    })
+
+    test('returns routes from extension with getRoutesAsync', async () => {
+        const mockExtension = {
+            getRoutesAsync: jest
+                .fn()
+                .mockReturnValue([{path: '/async-route', component: jest.fn()}])
+        }
+        const locals = {currentRoutes: [], applicationExtensions: [mockExtension]}
+        const routes = await getAllRoutes(locals)
+        expect(routes).toEqual(
+            expect.arrayContaining([{path: '/async-route', component: expect.any(Function)}])
+        )
+    })
+
+    test('returns routes from extension with getRoutes', async () => {
+        const mockExtension = {
+            getRoutes: jest.fn().mockReturnValue([{path: '/sync-route', component: jest.fn()}])
+        }
+        const locals = {currentRoutes: [], applicationExtensions: [mockExtension]}
+        const routes = await getAllRoutes(locals)
+        expect(routes).toEqual(
+            expect.arrayContaining([{path: '/sync-route', component: expect.any(Function)}])
+        )
+    })
+
+    test('returns routes from multiple extensions', async () => {
+        const mockExtension1 = {
+            getRoutesAsync: jest.fn().mockReturnValue({path: '/async-route', component: jest.fn()})
+        }
+        const mockExtension2 = {
+            getRoutes: jest.fn().mockReturnValue({path: '/sync-route', component: jest.fn()})
+        }
+        const locals = {currentRoutes: [], applicationExtensions: [mockExtension1, mockExtension2]}
+        const routes = await getAllRoutes(locals)
+        expect(routes).toEqual(
+            expect.arrayContaining([
+                {path: '/async-route', component: expect.any(Function)},
+                {path: '/sync-route', component: expect.any(Function)}
+            ])
+        )
+    })
+
+    test('modifies locals.currentRoutes with routes from extensions', async () => {
+        const initialRoutes = [{path: '/initial', component: jest.fn()}]
+        const mockExtension = {
+            getRoutes: jest.fn().mockReturnValue([{path: '/new-route', component: jest.fn()}])
+        }
+        const locals = {currentRoutes: [...initialRoutes], applicationExtensions: [mockExtension]}
+
+        await getAllRoutes(locals)
+
+        expect(locals.currentRoutes).toEqual(
+            expect.arrayContaining([
+                ...initialRoutes,
+                {path: '/new-route', component: expect.any(Function)}
+            ])
+        )
+    })
+
+    test('logs a warning if SEO extension is enabled but not the last extension', async () => {
+        const mockExtension1 = {
+            constructor: {name: 'CommerceBmSeo'},
+            getRoutes: jest.fn().mockReturnValue([{path: '/commerce-route', component: jest.fn()}])
+        }
+        const mockExtension2 = {
+            constructor: {name: 'ChakraStorefront'},
+            getRoutes: jest.fn().mockReturnValue([{path: '/other-route', component: jest.fn()}])
+        }
+        const locals = {currentRoutes: [], applicationExtensions: [mockExtension1, mockExtension2]}
+
+        const consoleWarnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {})
+
+        await getAllRoutes(locals)
+
+        expect(consoleWarnSpy).toHaveBeenCalledWith([
+            'Route resolution may not work as expected because CommerceBmSeo is not the last extension'
+        ])
+
+        consoleWarnSpy.mockRestore()
+    })
 })
 
 /**
