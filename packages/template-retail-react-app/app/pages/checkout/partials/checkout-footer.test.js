@@ -14,3 +14,10 @@ test('renders component', () => {
     renderWithProviders(<CheckoutFooter />)
     expect(screen.getByRole('link', {name: 'Shipping'})).toBeInTheDocument()
 })
+
+test('displays copyright message with current year', () => {
+    renderWithProviders(<CheckoutFooter />)
+    const currentYear = new Date().getFullYear()
+    const copyrightText = `© ${currentYear} Salesforce or its affiliates. All rights reserved. This is a demo store only. Orders made WILL NOT be processed.`
+    expect(screen.getByText(copyrightText)).toBeInTheDocument()
+})
