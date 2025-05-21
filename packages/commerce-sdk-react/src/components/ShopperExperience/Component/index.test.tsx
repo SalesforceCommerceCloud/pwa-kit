@@ -55,7 +55,7 @@ test('Page renders correct component', () => {
     // Component are in document.
     expect(container.querySelectorAll('.component')?.length).toBe(1)
 
-    // Prodived components are in document. (Note: Sub-regions/components aren't rendered because that is
+    // Provided components are in document. (Note: Sub-regions/components aren't rendered because that is
     // the responsibility of the component definition.)
     expect(container.querySelectorAll('.carousel')?.length).toBe(1)
 })
