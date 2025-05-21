@@ -10,7 +10,7 @@ import {MultiSiteContext} from '@salesforce/retail-react-app/app/contexts'
 
 /**
  * Custom React hook to get the function that returns usefule multi-site values, the site, the locale and
- * the funtion used to build URLs following the App configuration.
+ * the function used to build URLs following the App configuration.
  * @returns {{site, locale, buildUrl: (function(*, *, *): *)}}
  */
 const useMultiSite = () => {
