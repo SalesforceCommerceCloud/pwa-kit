@@ -1,4 +1,6 @@
 ## v3.3.0-dev.1 (Apr 30, 2025)
+- Fix inconsistency between dwsid and access token for guest login when hybrid authentication is enabled [#2397](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2397)
+
 ## v3.3.0-dev (Feb 18, 2025)
 - Invalidate cache instead of removing cache when triggering logout [#2323](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2323)
 - Fix dependencies vulnerabilities [#2338](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2338)

@@ -892,6 +892,57 @@ describe('Auth', () => {
         await waitFor(() => {
             expect(auth.getDnt()).toBeUndefined()
         })
+        getSpiedOn.mockRestore()
+        parseSlasJWTSpiedOn.mockRestore()
+    })
+
+    test('token call clears SFRA auth token cookie and sets all token from the response', async () => {
+        const getDntSpy = jest.spyOn(Auth.prototype, 'getDnt')
+        getDntSpy.mockImplementation((options?: {includeDefaults: boolean}) => {
+            if (options?.includeDefaults) {
+                return false
+            }
+            return undefined
+        })
+        const auth = new Auth(config)
+
+        // Set up initial SFRA auth token
+        // @ts-expect-error private method
+        auth.set('access_token_sfra', 'sfra_token')
+
+        // Verify the token was set correctly
+        expect(auth.get('access_token_sfra')).toBe('sfra_token')
+
+        // Mock the token response that loginGuestUser will return
+        const tokenResponse: ShopperLoginTypes.TokenResponse = {
+            access_token:
+                'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjYy1zbGFzOjp6enJmXzAwMTo6c2NpZDpjOWM0NWJmZC0wZWQzLTRhYTIteHh4eC00MGY4ODk2MmI4MzY6OnVzaWQ6YjQ4NjUyMzMtZGU5Mi00MDM5LXh4eHgtYWEyZGZjOGMxZWE1IiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyLCJpc2IiOiJ1aWRvOmVjb206OnVwbjpHdWVzdHx8am9obi5kb2VAZXhhbXBsZS5jb206OnVpZG46Sm9obiBEb2U6OmdjaWQ6Z3Vlc3QtMTIzNDU6OnJjaWQ6cmVnaXN0ZXJlZC02Nzg5MCIsImRudCI6InRlc3QifQ.9yKtUb22ExO-Q4VNQRAyIgTm63l3x5z45Uu1FIQa5dQ',
+            customer_id: 'customer_id_xyz',
+            enc_user_id: 'enc_user_id_xyz',
+            expires_in: 1800,
+            id_token: 'id_token_xyz',
+            refresh_token: 'refresh_token_xyz',
+            token_type: 'token_type_abc',
+            usid: 'usid_xyz',
+            idp_access_token: 'idp_access_token_xyz',
+            refresh_token_expires_in: DEFAULT_SLAS_REFRESH_TOKEN_GUEST_TTL
+        }
+
+        // Mock the helper to return token response
+        const loginGuestUserSpy = jest.spyOn(helpers, 'loginGuestUser')
+        loginGuestUserSpy.mockResolvedValueOnce(tokenResponse)
+
+        // Make the token call
+        await auth.loginGuestUser()
+
+        // Verify SFRA auth token is cleared
+        expect(auth.get('access_token_sfra')).toBeFalsy()
+
+        // Verify all token data is set correctly
+        expect(auth.get('access_token')).toBe(tokenResponse.access_token)
+
+        // Clean up the spy
+        getDntSpy.mockRestore()
     })
 })
 

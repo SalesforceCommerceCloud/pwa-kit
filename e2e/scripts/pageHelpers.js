@@ -595,8 +595,8 @@ export const wishlistFlow = async ({page, registeredUserCredentials, a11y = {}})
     }
 
     // The consent form does not stick after registration
-    await page.waitForLoadState()
     await answerConsentTrackingForm(page)
+    await page.waitForLoadState()
 
     await expect(page.getByRole('heading', {name: /Account Details/i})).toBeVisible({
         timeout: 20000
