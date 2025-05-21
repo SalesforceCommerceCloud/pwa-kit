@@ -195,7 +195,79 @@ const ProductDetail = () => {
     }
 
     const [primaryCategory, setPrimaryCategory] = useState(category)
-    const variant = useVariant(product)
+    const variant = useVariant(product) // `variant` will hold the currently selected product variant
+
+    // Function to generate Product Schema.org JSON-LD
+    const generateProductSchema = (productData, currentVariant) => {
+        if (!productData) {
+            return null
+        }
+
+        const {
+            id,
+            name,
+            pageDescription,
+            shortDescription,
+            imageGroups,
+            currency,
+            price, // Master product price
+            brand,
+            inventory // Master product inventory
+        } = productData
+
+        // Use variant details if available and relevant, otherwise fallback to master product
+        const displaySku = currentVariant?.productId || id
+        const displayPrice = currentVariant?.price || price
+        const displayInventory = currentVariant?.inventory || inventory
+
+        let images = []
+        if (imageGroups) {
+            const largeImages = imageGroups.find((ig) => ig.viewType === 'large')?.images
+            if (largeImages && largeImages.length > 0) {
+                images = largeImages.map((img) => img.link)
+            } else if (imageGroups.length > 0 && imageGroups[0].images?.length > 0) {
+                // Fallback to first image group if 'large' is not found or has no images
+                images = imageGroups[0].images.map((img) => img.link)
+            }
+        }
+        // Ensure there's at least one image if product has one, even if not in 'large'
+        if (images.length === 0 && productData.image) {
+            images = [productData.image]
+        }
+
+
+        const schema = {
+            '@context': 'https://schema.org/',
+            '@type': 'Product',
+            name: name,
+            description: pageDescription || shortDescription || '',
+            sku: displaySku,
+            image: images,
+            offers: {
+                '@type': 'Offer',
+                priceCurrency: currency,
+                price: displayPrice,
+                availability: displayInventory?.orderable
+                    ? 'https://schema.org/InStock'
+                    : 'https://schema.org/OutOfStock',
+                // Using window.location.href for URL, assuming client-side rendering for Helmet population
+                url: typeof window !== 'undefined' ? window.location.href : '',
+                // priceValidUntil: // No obvious source for this in the typical product data
+            }
+        }
+
+        if (brand) {
+            schema.brand = {
+                '@type': 'Brand',
+                name: brand
+            }
+        }
+
+        return schema
+    }
+
+    const productSchema = generateProductSchema(product, variant)
+
     // This page uses the `primaryCategoryId` to retrieve the category data. This attribute
     // is only available on `master` products. Since a variation will be loaded once all the
     // attributes are selected (to get the correct inventory values), the category information
@@ -461,15 +533,18 @@ const ProductDetail = () => {
         >
             <Helmet>
                 <title>{product?.pageTitle}</title>
-                {product?.pageMetaTags?.length > 0 &&
-                    product.pageMetaTags.map(({id, value}) => (
-                        <meta name={id} content={value} key={id} />
-                    ))}
+                {product?.pageMetaTags?.map(({id, value}) => (
+                    <meta name={id} content={value} key={id} />
+                ))}
                 {/* Fallback for description if not included in pageMetaTags */}
                 {!product?.pageMetaTags?.some((tag) => tag.id === 'description') &&
                     product?.pageDescription && (
                         <meta name="description" content={product.pageDescription} />
                     )}
+                {/* Product Schema.org JSON-LD */}
+                {productSchema && (
+                    <script type="application/ld+json">{JSON.stringify(productSchema)}</script>
+                )}
             </Helmet>
 
             <Stack spacing={16}>

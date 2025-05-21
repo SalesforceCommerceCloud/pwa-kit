@@ -371,6 +371,101 @@ const {handler} = runtime.createHandler(options, (app) => {
     app.get('/robots.txt', runtime.serveStaticFile('static/robots.txt'))
     app.get('/favicon.ico', runtime.serveStaticFile('static/ico/favicon.ico'))
 
+    app.get('/sitemap.xml', async (req, res, next) => {
+        try {
+            const appOrigin = getAppOrigin() // Use the utility to get the actual app origin
+            res.set('Content-Type', 'application/xml')
+
+            // Get API client configuration
+            // The existing 'config' variable at the top of the file should be the result of sdkGetConfig()
+            // However, that 'config' is the general app config. We need commerce API specific config.
+            // Let's re-fetch it or ensure we get the correct part.
+            // The commerceAPI config is usually under `app.commerceAPI` in the main config.
+            const commerceAPIConfig = config.app.commerceAPI
+
+            const apiConfig = {
+                proxy: `/mobify/proxy/api`, // Standard proxy path
+                headers: {
+                    'correlation-id': `${req.correlationId}`
+                },
+                parameters: {
+                    clientId: commerceAPIConfig.parameters.clientId,
+                    organizationId: commerceAPIConfig.parameters.organizationId,
+                    shortCode: commerceAPIConfig.parameters.shortCode,
+                    siteId: commerceAPIConfig.parameters.siteId
+                },
+                throwErrors: true // Ensure SDK throws errors for easier catching
+            }
+
+            const productsClient = new ShopperProducts(apiConfig)
+            const categoriesClient = new ShopperCategories(apiConfig)
+
+            let xmlString = `<?xml version="1.0" encoding="UTF-8"?>\n`
+            xmlString += `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n`
+
+            const today = new Date().toISOString().split('T')[0]
+
+            // Add homepage
+            xmlString += `  <url>\n`
+            xmlString += `    <loc>${appOrigin}/</loc>\n`
+            xmlString += `    <lastmod>${today}</lastmod>\n`
+            xmlString += `  </url>\n`
+
+            // Fetch and add categories
+            try {
+                const categoryResult = await categoriesClient.getCategories({
+                    parameters: {ids: 'root', levels: 2} // Fetch root category and its direct children
+                })
+                if (categoryResult?.data) {
+                    categoryResult.data.forEach((category) => {
+                        xmlString += `  <url>\n`
+                        xmlString += `    <loc>${appOrigin}/category/${category.id}</loc>\n`
+                        xmlString += `    <lastmod>${today}</lastmod>\n`
+                        xmlString += `  </url>\n`
+                        // Add subcategories if they exist (for levels: 2)
+                        if (category.categories) {
+                            category.categories.forEach((subCategory) => {
+                                xmlString += `  <url>\n`
+                                xmlString += `    <loc>${appOrigin}/category/${subCategory.id}</loc>\n`
+                                xmlString += `    <lastmod>${today}</lastmod>\n`
+                                xmlString += `  </url>\n`
+                            })
+                        }
+                    })
+                }
+            } catch (e) {
+                console.error(`Error fetching categories for sitemap: ${e.message}`, e)
+                // Optionally, you can add a comment to the sitemap indicating categories couldn't be fetched
+            }
+
+            // Fetch and add products (limit to 20 for now)
+            try {
+                const productResult = await productsClient.getProducts({
+                    parameters: {limit: 20}
+                })
+                if (productResult?.data) {
+                    productResult.data.forEach((product) => {
+                        xmlString += `  <url>\n`
+                        xmlString += `    <loc>${appOrigin}/product/${product.id}</loc>\n`
+                        xmlString += `    <lastmod>${today}</lastmod>\n`
+                        xmlString += `  </url>\n`
+                    })
+                }
+            } catch (e) {
+                console.error(`Error fetching products for sitemap: ${e.message}`, e)
+                // Optionally, add a comment for products
+            }
+
+            xmlString += `</urlset>`
+            res.send(xmlString)
+        } catch (err) {
+            console.error('Error generating sitemap:', err)
+            if (!res.headersSent) {
+                res.status(500).send('Error generating sitemap')
+            }
+        }
+    })
+
     app.get('/worker.js(.map)?', runtime.serveServiceWorker)
     app.get('*', runtime.render)
 })
