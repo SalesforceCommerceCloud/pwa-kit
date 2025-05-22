@@ -14,12 +14,12 @@ import {
     AspectRatio,
     Badge,
     Box,
-    Skeleton as ChakraSkeleton,
-    Text,
-    Stack,
-    useMultiStyleConfig,
+    HStack,
     IconButton,
-    HStack
+    Skeleton as ChakraSkeleton,
+    Stack,
+    Text,
+    useSlotRecipe
 } from '@chakra-ui/react'
 import DynamicImage from '../../components/dynamic-image'
 
@@ -50,7 +50,7 @@ const IconButtonWithRegistration = withRegistration(IconButton)
 // Component Skeleton
 const PricingAndPromotionsSkeleton = () => {
     return (
-        <Stack spacing={2} data-testid="sf-product-tile-pricing-and-promotions-skeleton">
+        <Stack gap={2} data-testid="sf-product-tile-pricing-and-promotions-skeleton">
             <ChakraSkeleton width="80px" height="20px" />
             <ChakraSkeleton width={{base: '120px', md: '220px'}} height="12px" />
         </Stack>
@@ -58,12 +58,13 @@ const PricingAndPromotionsSkeleton = () => {
 }
 
 export const Skeleton = () => {
-    const styles = useMultiStyleConfig('ProductTile')
+    const recipe = useSlotRecipe({key: 'productTile'})
+    const styles = recipe()
     return (
         <Box data-testid="sf-product-tile-skeleton">
-            <Stack spacing={2}>
-                <Box {...styles.imageWrapper}>
-                    <AspectRatio ratio={1} {...styles.image}>
+            <Stack gap={2}>
+                <Box css={styles.imageWrapper}>
+                    <AspectRatio ratio={1} css={styles.aspectRatio}>
                         <ChakraSkeleton />
                     </AspectRatio>
                 </Box>
@@ -96,7 +97,8 @@ const ProductTile = (props) => {
     const intl = useIntl()
     const {currency} = useCurrency()
     const isFavouriteLoading = useRef(false)
-    const styles = useMultiStyleConfig('ProductTile')
+    const recipe = useSlotRecipe({key: 'productTile'})
+    const styles = recipe()
 
     const isMasterVariant = !!variants
     const initialVariationValue =
@@ -179,10 +181,10 @@ const ProductTile = (props) => {
     }, [product, badgeDetails])
 
     return (
-        <Box {...styles.container}>
-            <Link data-testid="product-tile" to={productUrl} {...styles.link} {...rest}>
-                <Box {...styles.imageWrapper}>
-                    <AspectRatio {...styles.image}>
+        <Box css={styles.container}>
+            <Link data-testid="product-tile" to={productUrl} css={styles.link} {...rest}>
+                <Box css={styles.imageWrapper}>
+                    <AspectRatio ratio={1} css={styles.aspectRatio}>
                         <DynamicImage
                             data-testid="product-tile-image"
                             src={`${
@@ -198,6 +200,7 @@ const ProductTile = (props) => {
                                 // which can cause confusion for individuals who uses screen readers
                                 alt: '',
                                 loading: 'lazy',
+                                css: styles.image,
                                 ...dynamicImageProps?.imageProps
                             }}
                         />
@@ -249,7 +252,7 @@ const ProductTile = (props) => {
                     ))}
 
                 {/* Title */}
-                <Text {...styles.title}>{localizedProductName}</Text>
+                <Text css={styles.title}>{localizedProductName}</Text>
 
                 {isRefreshingData ? (
                     <PricingAndPromotionsSkeleton />
@@ -294,7 +297,7 @@ const ProductTile = (props) => {
                                   )
                         }
                         icon={isFavourite ? <HeartSolidIcon /> : <HeartIcon />}
-                        {...styles.favIcon}
+                        css={styles.favIcon}
                         onClick={async () => {
                             if (!isFavouriteLoading.current) {
                                 isFavouriteLoading.current = true
@@ -306,9 +309,15 @@ const ProductTile = (props) => {
                 </Box>
             )}
             {filteredLabels.size > 0 && (
-                <HStack {...styles.badgeGroup}>
+                <HStack css={styles.badgeGroup}>
                     {Array.from(filteredLabels.entries()).map(([label, colorScheme]) => (
-                        <Badge key={label} data-testid="product-badge" colorScheme={colorScheme}>
+                        <Badge
+                            key={label}
+                            data-testid="product-badge"
+                            colorPalette={colorScheme}
+                            textTransform="uppercase"
+                            fontWeight={{base: 'medium', md: 'bold'}}
+                        >
                             {label}
                         </Badge>
                     ))}
@@ -356,7 +365,6 @@ ProductTile.propTypes = {
         variants: PropTypes.array,
         type: PropTypes.shape({
             set: PropTypes.bool,
-
             bundle: PropTypes.bool,
             item: PropTypes.bool
         })

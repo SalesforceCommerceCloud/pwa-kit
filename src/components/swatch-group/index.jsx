@@ -7,7 +7,7 @@
 
 import React, {Children, useCallback, useEffect, useRef, useState} from 'react'
 import PropTypes from 'prop-types'
-import {Flex, Box, HStack, useStyleConfig} from '@chakra-ui/react'
+import {Box, Flex, HStack, useSlotRecipe} from '@chakra-ui/react'
 import {FormattedMessage} from 'react-intl'
 import {noop} from '../../utils/utils'
 
@@ -23,7 +23,8 @@ const DIRECTIONS = {
 const SwatchGroup = (props) => {
     const {ariaLabel, displayName, children, label = '', value, handleChange = noop} = props
 
-    const styles = useStyleConfig('SwatchGroup')
+    const recipe = useSlotRecipe({key: 'swatchgroup'})
+    const styles = recipe()
     const [selectedIndex, setSelectedIndex] = useState(0)
     const wrapperRef = useRef(null)
 

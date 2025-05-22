@@ -49,7 +49,7 @@ const ProductScroller = forwardRef(
 
         return (
             <Box position="relative" data-testid="product-scroller" ref={ref}>
-                <Stack spacing={6} {...props}>
+                <Stack gap={6} {...props}>
                     {isLoading && <Skeleton height={6} width="150px" m="auto" />}
 
                     {title && !header && !isLoading && (
@@ -63,17 +63,17 @@ const ProductScroller = forwardRef(
                     <Stack
                         ref={scrollRef}
                         direction="row"
-                        spacing={4}
+                        gap={4}
                         wrap="nowrap"
                         overflowX="scroll"
                         px={{base: 4, md: 8, lg: 0}}
                         py={1}
                         {...scrollProps}
-                        sx={{
+                        css={{
                             scrollPadding: {base: 16, md: 32, lg: 0},
                             scrollSnapType: 'x mandatory',
                             WebkitOverflowScrolling: 'touch', // Safari touch scrolling needed for scroll snap
-                            ...scrollProps?.sx
+                            ...scrollProps?.css
                         }}
                     >
                         {isLoading
@@ -89,7 +89,7 @@ const ProductScroller = forwardRef(
                                               <AspectRatio ratio={1}>
                                                   <Skeleton />
                                               </AspectRatio>
-                                              <Stack spacing={2}>
+                                              <Stack gap={2}>
                                                   <Skeleton width="150px" height={5} />
                                                   <Skeleton width="75px" height={5} />
                                               </Stack>
@@ -139,11 +139,13 @@ const ProductScroller = forwardRef(
                                     id: 'product_scroller.assistive_msg.scroll_left',
                                     defaultMessage: 'Scroll products left'
                                 })}
-                                icon={<ChevronLeftIcon color="black" />}
                                 borderRadius="full"
-                                colorScheme="whiteAlpha"
+                                bg="white/36"
+                                _hover={{bg: 'white/48'}}
                                 onClick={() => scroll(-1)}
-                            />
+                            >
+                                <ChevronLeftIcon color="black" />
+                            </IconButton>
                         </Box>
 
                         <Box
@@ -162,11 +164,13 @@ const ProductScroller = forwardRef(
                                     id: 'product_scroller.assistive_msg.scroll_right',
                                     defaultMessage: 'Scroll products right'
                                 })}
-                                icon={<ChevronRightIcon color="black" />}
                                 borderRadius="full"
-                                colorScheme="whiteAlpha"
+                                bg="white/36"
+                                _hover={{bg: 'white/48'}}
                                 onClick={() => scroll(1)}
-                            />
+                            >
+                                <ChevronRightIcon color="black" />
+                            </IconButton>
                         </Box>
                     </>
                 )}

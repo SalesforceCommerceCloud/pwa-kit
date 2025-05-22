@@ -56,11 +56,11 @@ class ChakraStorefront extends ApplicationExtension<Config> {
         const config = this.getConfig()
 
         const extensionRoutes = [
-            // {
-            //     path: config.pages.Home && config.pages.Home.path,
-            //     component: Pages.Home,
-            //     exact: true
-            // }
+            {
+                path: config.pages.Home && config.pages.Home.path,
+                component: Pages.Home,
+                exact: true
+            }
             // {
             //     path: [
             //         config.pages.Login && config.pages.Login.path,

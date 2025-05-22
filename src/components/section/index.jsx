@@ -17,15 +17,15 @@ import {Box, Heading, Stack, Text, Container} from '@chakra-ui/react'
 const Section = ({title, subtitle, actions, maxWidth, children, ...props}) => {
     const sectionMaxWidth = maxWidth || '3xl'
     return (
-        <Box as={'section'} paddingBottom="16" {...props}>
-            <Stack spacing={4} as={Container} maxW={sectionMaxWidth} textAlign={'center'}>
+        <Box as="section" paddingBottom="16" {...props}>
+            <Stack gap={6} as={Container} maxW={sectionMaxWidth} textAlign="center">
                 {title && (
-                    <Heading as="h2" fontSize={40} textAlign="center">
+                    <Heading as="h2" fontSize={40} textAlign="center" fontWeight="bold">
                         {title}
                     </Heading>
                 )}
                 {subtitle && (
-                    <Text color={'gray.700'} fontWeight={600}>
+                    <Text color="gray.700" fontWeight={600}>
                         {subtitle}
                     </Text>
                 )}

@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import {theme} from '@chakra-ui/theme'
+import {breakpoints as defaultBreakpoints} from '../theme'
 import logger from './logger-instance'
 
 /**
@@ -17,7 +17,6 @@ const getBreakpointLabels = (breakpoints) =>
         .sort((a, b) => parseFloat(a[1]) - parseFloat(b[1]))
         .map(([key]) => key)
 
-const {breakpoints: defaultBreakpoints} = theme
 let themeBreakpoints = defaultBreakpoints
 let breakpointLabels = getBreakpointLabels(themeBreakpoints)
 

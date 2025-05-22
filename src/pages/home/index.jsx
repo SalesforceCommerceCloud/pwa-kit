@@ -103,7 +103,7 @@ const Home = () => {
                     alt: 'npx pwa-kit-create-app'
                 }}
                 actions={
-                    <Stack spacing={{base: 4, sm: 6}} direction={{base: 'column', sm: 'row'}}>
+                    <Stack gap={{base: 4, sm: 6}} direction={{base: 'column', sm: 'row'}}>
                         <Button
                             as={Link}
                             href="https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/getting-started.html"
@@ -111,6 +111,8 @@ const Home = () => {
                             width={{base: 'full', md: 'inherit'}}
                             paddingX={7}
                             _hover={{textDecoration: 'none'}}
+                            fontSize={{base: 'sm', md: 'md'}}
+                            fontWeight={{base: 'medium', md: 'semibold'}}
                         >
                             <FormattedMessage
                                 defaultMessage="Get started"
@@ -122,7 +124,7 @@ const Home = () => {
             />
 
             <Section
-                background={'gray.50'}
+                bg="gray.50"
                 marginX="auto"
                 paddingY={{base: 8, md: 16}}
                 paddingX={{base: 4, md: 8}}
@@ -136,24 +138,25 @@ const Home = () => {
             >
                 <SimpleGrid
                     columns={{base: 1, md: 1, lg: 3}}
-                    spacingX={{base: 1, md: 4}}
-                    spacingY={{base: 4, md: 14}}
+                    columnGap={{base: 1, md: 4}}
+                    rowGap={{base: 4, md: 14}}
                 >
                     {heroFeatures.map((feature, index) => {
                         const featureMessage = feature.message
                         return (
                             <Link key={index} target="_blank" href={feature.href}>
                                 <Box
-                                    background={'white'}
+                                    bg="white"
                                     boxShadow="0px 2px 2px rgba(0, 0, 0, 0.1)"
-                                    borderRadius={'4px'}
+                                    borderRadius="4px"
+                                    w="full"
                                 >
                                     <HStack>
                                         <Flex
                                             paddingLeft={6}
                                             height={24}
-                                            align={'center'}
-                                            justify={'center'}
+                                            align="center"
+                                            justify="center"
                                         >
                                             {feature.icon}
                                         </Flex>
@@ -191,15 +194,17 @@ const Home = () => {
                                     href={'https://sfdc.co/business-manager-manage-catalogs'}
                                     textDecoration={'none'}
                                     position={'relative'}
-                                    _after={{
-                                        position: 'absolute',
-                                        content: `""`,
-                                        height: '2px',
-                                        bottom: '-2px',
-                                        margin: '0 auto',
-                                        left: 0,
-                                        right: 0,
-                                        background: 'gray.700'
+                                    css={{
+                                        '&::after': {
+                                            position: 'absolute',
+                                            content: '""',
+                                            height: '2px',
+                                            bottom: '-2px',
+                                            margin: '0 auto',
+                                            left: 0,
+                                            right: 0,
+                                            background: 'gray.700'
+                                        }
                                     }}
                                     _hover={{textDecoration: 'none'}}
                                 >
@@ -212,7 +217,7 @@ const Home = () => {
                         }
                     )}
                 >
-                    <Stack pt={8} spacing={16}>
+                    <Stack pt={8} gap={16}>
                         <ProductScroller
                             products={productSearchResult?.hits}
                             isLoading={isLoading}
@@ -234,32 +239,26 @@ const Home = () => {
                     id: 'home.description.features'
                 })}
             >
-                <Container maxW={'6xl'} marginTop={10}>
-                    <SimpleGrid columns={{base: 1, md: 2, lg: 3}} spacing={10}>
+                <Container maxW="6xl" marginTop={10}>
+                    <SimpleGrid columns={{base: 1, md: 2, lg: 3}} gap={10}>
                         {features.map((feature, index) => {
                             const featureMessage = feature.message
                             return (
-                                <HStack key={index} align={'top'}>
-                                    <VStack align={'start'}>
+                                <HStack key={index} align="top">
+                                    <VStack align="start">
                                         <Flex
                                             width={16}
                                             height={16}
-                                            align={'center'}
-                                            justify={'left'}
-                                            color={'gray.900'}
-                                            paddingX={2}
+                                            align="center"
+                                            justify="left"
+                                            color="gray.900"
                                         >
                                             {feature.icon}
                                         </Flex>
-                                        <Text
-                                            as="h3"
-                                            color={'black'}
-                                            fontWeight={700}
-                                            fontSize={20}
-                                        >
+                                        <Text as="h3" color="black" fontWeight="700" fontSize="xl">
                                             {intl.formatMessage(featureMessage.title)}
                                         </Text>
-                                        <Text color={'black'}>
+                                        <Text color="black">
                                             {intl.formatMessage(featureMessage.text)}
                                         </Text>
                                     </VStack>
@@ -299,14 +298,16 @@ const Home = () => {
                         as={Link}
                         href="https://help.salesforce.com/s/?language=en_US"
                         target="_blank"
-                        width={'auto'}
+                        width="auto"
                         paddingX={7}
+                        fontSize={{base: 'sm', md: 'md'}}
+                        fontWeight={{base: 'medium', md: 'semibold'}}
                         _hover={{textDecoration: 'none'}}
                     >
                         <FormattedMessage defaultMessage="Contact Us" id="home.link.contact_us" />
                     </Button>
                 }
-                maxWidth={'xl'}
+                maxWidth="xl"
             />
         </Box>
     )
