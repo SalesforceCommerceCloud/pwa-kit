@@ -3,6 +3,7 @@
 ### Other Changes
 
 - Improved the layout of product tiles in product scroll and product list [#2446](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2446)
+- Update the configuration of datacloud [#2467](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2467)
 
 ## v6.1.0-dev (Feb 18, 2025)
 
