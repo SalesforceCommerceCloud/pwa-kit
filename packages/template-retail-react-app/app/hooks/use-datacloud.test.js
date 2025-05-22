@@ -32,8 +32,8 @@ import {
 const dataCloudConfig = {
     app: {
         dataCloudAPI: {
-            appSourceId: '6ebc532a-2247-48e9-8300-d8c2b84eb463',
-            tenantId: 'mvst0mlfmrsd8zbwg8zgmytbg1'
+            appSourceId: 'f22ae831-ac03-4bf6-afc1-3a0b19f1ea8e',
+            tenantId: 'mmydmztgh04dczjzmnsw0zd0g8.pc-rnd'
         },
         defaultSite: 'test-site'
     }
