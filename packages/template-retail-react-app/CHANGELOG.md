@@ -1,3 +1,9 @@
+## v7.0.0-dev (May 20, 2025)
+
+### Other Changes
+
+- Improved the layout of product tiles in product scroll and product list [#2446](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2446)
+
 ## v6.1.0-dev (Feb 18, 2025)
 
 - Fix hreflang alternate links [#2269](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2269)
@@ -99,6 +105,7 @@
 - A11y: Replace `<p>` tags with header tag in home page Features section [#1902](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1902)
 - Add aria-label for Checkout's action buttons [#1906](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1906)
 - Avoid forced focus changes that are not user-initiated [#1940](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1940)
+
 
 ## v3.0.2 (Jul 11, 2024)
 

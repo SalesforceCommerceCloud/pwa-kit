@@ -99,6 +99,39 @@ describe('Logging in tests', function () {
         )
     })
 
+    test('Shows inline error when email is empty', async () => {
+        const {user} = renderWithProviders(<MockedComponent />, {
+            wrapperProps: {
+                siteAlias: 'uk',
+                locale: {id: 'en-GB'},
+                appConfig: mockConfig.app,
+                bypassAuth: false
+            }
+        })
+
+        // Only fill password, leave email empty
+        await user.type(screen.getByLabelText('Password'), 'Password!1')
+        // Try to submit the form
+        await user.click(screen.getByText(/sign in/i))
+        expect(await screen.findByText(/Please enter your email address\./i)).toBeInTheDocument()
+    })
+
+    test('Shows inline error when password is empty', async () => {
+        const {user} = renderWithProviders(<MockedComponent />, {
+            wrapperProps: {
+                siteAlias: 'uk',
+                locale: {id: 'en-GB'},
+                appConfig: mockConfig.app,
+                bypassAuth: false
+            }
+        })
+        // Only fill email, leave password empty
+        await user.type(screen.getByLabelText('Email'), 'customer@test.com')
+        // Try to submit the form
+        await user.click(screen.getByText(/sign in/i))
+        expect(await screen.findByText(/Please enter your password\./i)).toBeInTheDocument()
+    })
+
     test('Allows customer to sign in to their account', async () => {
         const {user} = renderWithProviders(<MockedComponent />, {
             wrapperProps: {

@@ -549,6 +549,128 @@ describe('Update this is a gift option', function () {
         })
     })
 })
+describe('Update this is not a gift option', function () {
+    beforeEach(() => {
+        global.server.use(
+            rest.patch('*/baskets/:basketId/items/:itemId', (req, res, ctx) => {
+                const basket = mockCustomerBaskets.baskets[0]
+                const updatedBasket = {
+                    ...basket,
+                    productItems: [
+                        {
+                            adjustedTax: 2.93,
+                            basePrice: 61.43,
+                            bonusProductLineItem: false,
+                            gift: false,
+                            itemId: '4a9af0a24fe46c3f6d8721b371',
+                            itemText: 'Belted Cardigan With Studs',
+                            price: 61.43,
+                            priceAfterItemDiscount: 61.43,
+                            priceAfterOrderDiscount: 61.43,
+                            productId: '701642889830M',
+                            productName: 'Belted Cardigan With Studs',
+                            quantity: 2,
+                            shipmentId: 'me',
+                            tax: 2.93,
+                            taxBasis: 61.43,
+                            taxClassId: 'standard',
+                            taxRate: 0.05
+                        }
+                    ]
+                }
+                return res(ctx.json(updatedBasket))
+            }),
+            rest.get('*/customers/:customerId/baskets', (req, res, ctx) => {
+                return res(
+                    ctx.delay(0),
+                    ctx.json({
+                        baskets: [
+                            {
+                                ...mockCustomerBaskets.baskets[0],
+                                productItems: [
+                                    {
+                                        adjustedTax: 2.93,
+                                        basePrice: 61.43,
+                                        bonusProductLineItem: false,
+                                        gift: true,
+                                        itemId: '4a9af0a24fe46c3f6d8721b371',
+                                        itemText: 'Belted Cardigan With Studs',
+                                        price: 61.43,
+                                        priceAfterItemDiscount: 61.43,
+                                        priceAfterOrderDiscount: 61.43,
+                                        productId: '701642889830M',
+                                        productName: 'Belted Cardigan With Studs',
+                                        quantity: 2,
+                                        shipmentId: 'me',
+                                        tax: 2.93,
+                                        taxBasis: 61.43,
+                                        taxClassId: 'standard',
+                                        taxRate: 0.05
+                                    }
+                                ]
+                            }
+                        ],
+                        total: 1
+                    })
+                )
+            })
+        )
+    })
+    test('can update cart item when user unchecks the gift checkbox', async () => {
+        const {user} = renderWithProviders(<Cart />)
+        await waitFor(() => {
+            expect(screen.getByTestId('sf-cart-container')).toBeInTheDocument()
+            expect(screen.getByText(/Belted Cardigan With Studs/i)).toBeInTheDocument()
+
+            const cartItem = screen.getByTestId('sf-cart-item-701642889830M')
+            expect(cartItem).toBeInTheDocument()
+        })
+
+        const giftCheckbox = screen.getByRole('checkbox')
+        expect(giftCheckbox).toBeChecked()
+        await user.click(giftCheckbox)
+        global.server.use(
+            rest.get('*/customers/:customerId/baskets', (req, res, ctx) => {
+                return res.once(
+                    ctx.delay(0),
+                    ctx.json({
+                        baskets: [
+                            {
+                                ...mockCustomerBaskets.baskets[0],
+                                productItems: [
+                                    {
+                                        adjustedTax: 2.93,
+                                        basePrice: 61.43,
+                                        bonusProductLineItem: false,
+                                        gift: false,
+                                        itemId: '4a9af0a24fe46c3f6d8721b371',
+                                        itemText: 'Belted Cardigan With Studs',
+                                        price: 61.43,
+                                        priceAfterItemDiscount: 61.43,
+                                        priceAfterOrderDiscount: 61.43,
+                                        productId: '701642889830M',
+                                        productName: 'Belted Cardigan With Studs',
+                                        quantity: 2,
+                                        shipmentId: 'me',
+                                        tax: 2.93,
+                                        taxBasis: 61.43,
+                                        taxClassId: 'standard',
+                                        taxRate: 0.05
+                                    }
+                                ]
+                            }
+                        ],
+                        total: 1
+                    })
+                )
+            })
+        )
+
+        await waitFor(() => {
+            expect(giftCheckbox).not.toBeChecked()
+        })
+    })
+})
 
 describe('Product bundles', () => {
     beforeEach(() => {
