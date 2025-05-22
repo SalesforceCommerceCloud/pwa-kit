@@ -27,11 +27,11 @@ import {
 import Hero from '../../components/hero'
 import Seo from '../../components/seo'
 import Section from '../../components/section'
-// import ProductScroller from '../../components/product-scroller'
+import ProductScroller from '../../components/product-scroller'
 
 // Others
 import {getStaticAssetUrl} from '@salesforce/pwa-kit-react-sdk/ssr/universal/utils'
-// import {heroFeatures, features} from '../../pages/home/data'
+import {heroFeatures, features} from '../../pages/home/data'
 
 //Hooks
 import useEinstein from '../../hooks/use-einstein'
@@ -83,7 +83,6 @@ const Home = () => {
         dataCloud.sendViewPage(pathname)
     }, [])
 
-    return <div>Home</div>
     return (
         <Box data-testid="home-page" layerStyle="page">
             <Seo

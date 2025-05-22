@@ -6,7 +6,13 @@
  */
 import React from 'react'
 import PropTypes from 'prop-types'
-import {Box, List, Heading, useSlotRecipe} from '@chakra-ui/react'
+import {
+    Box,
+    Heading,
+    List,
+    // hooks
+    useSlotRecipe
+} from '@chakra-ui/react'
 import Link from '../../components/link'
 
 const LinksList = ({
@@ -77,7 +83,10 @@ LinksList.propTypes = {
         })
     ).isRequired,
     heading: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
-    variant: PropTypes.oneOf(['vertical', 'horizontal']),
+    variant: PropTypes.oneOfType([
+        PropTypes.oneOf(['vertical', 'horizontal']),
+        PropTypes.object // For responsive variants like {base: 'vertical', lg: 'horizontal'}
+    ]),
     color: PropTypes.string,
     onLinkClick: PropTypes.func,
     headingLinkRef: PropTypes.object

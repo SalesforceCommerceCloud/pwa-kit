@@ -58,8 +58,7 @@ export default defineSlotRecipe({
             marginBottom: 4
         },
         localeSelectorWrapper: {
-            width: 'auto',
-            maxWidth: '246px',
+            display: 'inline-block',
             marginTop: 8
         },
         localeSelectorRoot: {},

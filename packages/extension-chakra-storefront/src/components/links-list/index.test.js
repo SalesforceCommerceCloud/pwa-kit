@@ -5,8 +5,6 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
-import PropTypes from 'prop-types'
-import {StylesProvider, useMultiStyleConfig} from '@chakra-ui/react'
 import {screen} from '@testing-library/react'
 
 import {renderWithProviders} from '../../utils/test-utils'
@@ -20,20 +18,8 @@ const links = [
 ]
 const horizontalVariantSelector = 'ul > li'
 
-const FooterStylesProvider = ({children}) => {
-    const styles = useMultiStyleConfig('Footer')
-    return <StylesProvider value={styles}>{children}</StylesProvider>
-}
-FooterStylesProvider.propTypes = {
-    children: PropTypes.node
-}
-
 test('renders LinksList with default arguments', () => {
-    renderWithProviders(
-        <FooterStylesProvider>
-            <LinksList links={links} />
-        </FooterStylesProvider>
-    )
+    renderWithProviders(<LinksList links={links} />)
 
     expect(screen.getAllByRole('listitem')).toHaveLength(1)
     expect(screen.getByRole('link', {name: links[0].text})).toBeInTheDocument()
@@ -42,20 +28,12 @@ test('renders LinksList with default arguments', () => {
 })
 
 test('renders LinksList with heading', () => {
-    renderWithProviders(
-        <FooterStylesProvider>
-            <LinksList links={links} heading="Customer Support" />
-        </FooterStylesProvider>
-    )
+    renderWithProviders(<LinksList links={links} heading="Customer Support" />)
 
     expect(screen.getByRole('heading')).toBeInTheDocument()
 })
 
 test('renders LinksList with horizontal variant', () => {
-    const {container} = renderWithProviders(
-        <FooterStylesProvider>
-            <LinksList links={links} variant="horizontal" />
-        </FooterStylesProvider>
-    )
+    const {container} = renderWithProviders(<LinksList links={links} variant="horizontal" />)
     expect(container.querySelector(horizontalVariantSelector)).toBeInTheDocument()
 })

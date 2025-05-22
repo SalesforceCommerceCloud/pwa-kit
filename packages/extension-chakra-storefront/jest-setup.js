@@ -146,7 +146,24 @@ global.TextDecoder = require('util').TextDecoder
 
 // JSDOM environment doesn't natively implement this modern Web API function.
 // Chakra v3 is using it, so we need to mock it here
-global.structuredClone = (v) => JSON.parse(JSON.stringify(v))
+global.structuredClone = (val) => {
+    if (val === undefined) return undefined
+
+    if (val === null) return null
+
+    if (typeof val !== 'object' && typeof val !== 'function') {
+        return val
+    }
+
+    try {
+        return JSON.parse(JSON.stringify(val))
+    } catch (e) {
+        // Fallback for values that can't be JSON serialized
+        // This is a simplified version that won't handle all cases
+        // but should work for most Chakra UI scenarios
+        return {...val}
+    }
+}
 
 // This file consists of global mocks for jsdom.
 class StorageMock {

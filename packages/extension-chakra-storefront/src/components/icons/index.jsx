@@ -121,26 +121,15 @@ export const icon = (name, passProps, localizationAttributes) => {
                 passProps[key] = intl.formatMessage(localizationAttributes[key])
             })
         }
-        
-        // Extract css from props and merge it with baseStyles
-        const {css: propsCss, ...restOfProps} = props
-        
-        // Remove console logs in production
-        // console.log('name', name)
-        // console.log('props', props) 
-        // console.log('restOfProps', restOfProps)
-        // console.log('passProps', passProps)
-        
+        const {css = {}, ...restOfProps} = props
         return (
             <Icon
                 ref={ref}
+                viewBox="0 0 24 24"
                 role="img"
                 aria-label={name}
                 as="svg"
-                viewBox="0 0 24 24"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-                css={{...baseStyles, ...(propsCss || {})}}
+                css={{...baseStyles, ...css}}
                 {...restOfProps}
                 {...passProps}
             >
@@ -150,7 +139,8 @@ export const icon = (name, passProps, localizationAttributes) => {
     })
 
     component.propTypes = {
-        intl: PropTypes.object
+        intl: PropTypes.object,
+        css: PropTypes.object
     }
 
     component.displayName = `${displayName}Icon`
