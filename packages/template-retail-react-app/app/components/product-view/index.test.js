@@ -128,6 +128,29 @@ test('Product View can update quantity', async () => {
     })
 })
 
+describe('ProductView Component', () => {
+    test('Quantity Buttons can update quantity', async () => {
+        const user = userEvent.setup()
+        renderWithProviders(<ProductView product={mockProductDetail} />)
+
+        const quantityInput = await screen.findByRole('spinbutton')
+        const incrementButton = screen.getByTestId('quantity-increment')
+        const decrementButton = screen.getByTestId('quantity-decrement')
+
+        // Click increment
+        await user.click(incrementButton)
+        await waitFor(() => {
+            expect(quantityInput).toHaveValue('2')
+        })
+
+        // Click decrement
+        await user.click(decrementButton)
+        await waitFor(() => {
+            expect(quantityInput).toHaveValue('1')
+        })
+    })
+})
+
 test('renders a product set properly - parent item', () => {
     const parent = mockProductSet
     renderWithProviders(
