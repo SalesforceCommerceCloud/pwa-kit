@@ -18,7 +18,7 @@ export const STALE_WHILE_REVALIDATE = 60 * 15 // 15 min
 export const DEFAULT_SEARCH_PARAMS = {limit: 25, offset: 0, sort: 'best-matches', refine: []}
 export const DEFAULT_LIMIT_VALUES = [25, 50, 100] // Page sizes
 
-//Constants for customer orders searching.
+// Constants for customer orders searching.
 export const DEFAULT_ORDERS_SEARCH_PARAMS = {limit: 10, offset: 0, sort: 'best-matches', refine: []}
 
 // Constants for Search Component

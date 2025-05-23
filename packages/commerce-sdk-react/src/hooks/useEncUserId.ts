@@ -7,8 +7,7 @@
 import useAuthContext from './useAuthContext'
 import useLocalStorage from './useLocalStorage'
 import useConfig from './useConfig'
-
-const onClient = typeof window !== 'undefined'
+import {onClient} from '../utils'
 
 /**
  * @group Shopper Authentication helpers
@@ -31,7 +30,7 @@ const useEncUserId = (): EncUserId => {
     const config = useConfig()
     const auth = useAuthContext()
 
-    const encUserId = onClient
+    const encUserId = onClient()
         ? // This conditional is a constant value based on the environment, so the same path will
           // always be followed., and the "rule of hooks" is not violated.
           // eslint-disable-next-line react-hooks/rules-of-hooks

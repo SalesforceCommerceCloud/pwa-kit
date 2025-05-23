@@ -56,7 +56,7 @@ export const generateCustomEndpointOptions = (
             method: options.options?.method || 'GET',
             headers: {
                 Authorization: `Bearer ${access_token}`,
-                // Note the order of the following destructured objects is important.
+                // Note the order of the following de-structured objects is important.
                 // Priority in ascending order: global config < query/mutation config < mutate func args
                 ...globalHeaders,
                 ...options.options?.headers,

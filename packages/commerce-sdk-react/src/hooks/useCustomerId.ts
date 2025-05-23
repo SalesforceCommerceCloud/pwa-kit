@@ -7,8 +7,7 @@
 import useAuthContext from './useAuthContext'
 import useLocalStorage from './useLocalStorage'
 import useConfig from './useConfig'
-
-const onClient = typeof window !== 'undefined'
+import {onClient} from '../utils'
 
 /**
  * Hook that returns the customer ID.
@@ -17,7 +16,7 @@ const onClient = typeof window !== 'undefined'
  * @category Shopper Authentication
  */
 const useCustomerId = (): string | null => {
-    if (onClient) {
+    if (onClient()) {
         // `onClient` is a constant, so the hooks will always have the same execution order,
         // despite technically being inside a conditional.
         // eslint-disable-next-line react-hooks/rules-of-hooks
