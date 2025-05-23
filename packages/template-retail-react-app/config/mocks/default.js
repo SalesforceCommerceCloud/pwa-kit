@@ -97,8 +97,8 @@ module.exports = {
             isProduction: false
         },
         dataCloudAPI: {
-            appSourceId: '23df7335-2e9d-4fbc-bc34-7e93649e69b7',
-            tenantId: '5zqheixqu9vji7spdkzxwh4hpz'
+            appSourceId: 'f22ae831-ac03-4bf6-afc1-3a0b19f1ea8e',
+            tenantId: 'mmydmztgh04dczjzmnsw0zd0g8.pc-rnd'
         }
     },
     // This list contains server-side only libraries that you don't want to be compiled by webpack

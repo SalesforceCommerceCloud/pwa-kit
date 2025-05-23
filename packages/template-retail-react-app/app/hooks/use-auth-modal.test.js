@@ -357,7 +357,7 @@ test('Allows customer to create an account', async () => {
     )
 })
 
-// TODO: investingate why this test is failing when running with other tests
+// TODO: investigate why this test is failing when running with other tests
 // eslint-disable-next-line jest/no-disabled-tests
 test.skip('Allows customer to sign in to their account', async () => {
     const user = userEvent.setup()
