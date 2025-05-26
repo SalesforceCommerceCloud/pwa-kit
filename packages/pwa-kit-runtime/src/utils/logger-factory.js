@@ -20,6 +20,49 @@ export class PWAKitLogger {
     }
 
     /**
+     * Serializes objects for logging, handling Error objects and other non-serializable values.
+     * @param {*} obj - The object to serialize. If it's not an object, it will be returned as is.
+     * @returns {*} - A serializable version of the object.
+     */
+    #serializeForLogging(obj) {
+        if (obj instanceof Error) {
+            const errorObj = {
+                name: obj.name,
+                message: obj.message,
+                stack: obj.stack
+            }
+
+            // Only recurse for Error.cause (typically 1-2 levels max)
+            if (obj.cause instanceof Error) {
+                errorObj.cause = this.#serializeForLogging(obj.cause)
+            } else if (obj.cause) {
+                errorObj.cause = obj.cause // Keep non-Error causes as-is
+            }
+
+            return errorObj
+        }
+
+        // For plain objects, only go one level deep to handle Error properties
+        if (obj && typeof obj === 'object' && obj.constructor === Object) {
+            const serialized = {}
+            for (const [key, value] of Object.entries(obj)) {
+                // Only serialize Error objects, keep everything else as-is
+                serialized[key] = value instanceof Error ? this.#serializeForLogging(value) : value
+            }
+            return serialized
+        }
+
+        // For arrays, only serialize Error objects within them
+        if (Array.isArray(obj)) {
+            return obj.map((item) =>
+                item instanceof Error ? this.#serializeForLogging(item) : item
+            )
+        }
+
+        return obj
+    }
+
+    /**
      * Formats the log message.
      *
      * @param {string} message - The log message.
@@ -37,8 +80,13 @@ export class PWAKitLogger {
             finalNamespace = namespace
         }
 
+        const serializedProperties = additionalProperties
+            ? // TODO: verify with a remote environment
+              this.#serializeForLogging(additionalProperties)
+            : null
+
         return `${finalNamespace} ${level.toUpperCase()} ${message}${
-            additionalProperties ? ` ${JSON.stringify(additionalProperties)}` : ''
+            serializedProperties ? ` ${JSON.stringify(serializedProperties)}` : ''
         }`
     }
 
