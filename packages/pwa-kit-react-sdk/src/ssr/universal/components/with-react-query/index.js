@@ -93,6 +93,7 @@ export const withReactQuery = (Wrapped, options = {}) => {
                         })
                         // Now we move on to the next query
                     } finally {
+                        // Close the timer, regardless of the fetch result
                         res.__performanceTimer.mark(
                             `${PERFORMANCE_MARKS.reactQueryUseQuery}.${displayName}`,
                             'end',
