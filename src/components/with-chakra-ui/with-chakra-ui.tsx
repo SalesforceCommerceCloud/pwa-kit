@@ -7,6 +7,7 @@
 
 import React from 'react'
 import {ChakraProvider} from '@chakra-ui/react'
+import Toaster, { toaster } from '../toaster'
 
 // Local
 import theme from '../../theme'
@@ -20,6 +21,7 @@ const withChakraUI = <P extends object>(WrappedComponent: React.ComponentType<P>
         return (
             <ChakraProvider value={theme}>
                 <WrappedComponent {...(props as P)} />
+                <Toaster toaster={toaster} />
             </ChakraProvider>
         )
     }

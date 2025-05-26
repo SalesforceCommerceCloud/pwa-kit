@@ -12,12 +12,12 @@ import {
   Toast
 } from "@chakra-ui/react"
 
-// export const toaster = createToaster({
-//   placement: "bottom-end",
-//   pauseOnPageIdle: true,
-// })
+// A toaster is a shared global instance that can be used to create and manage toasts.
+export const toaster = createToaster({
+  placement: "top-end"
+})
 
-export const Toaster = ({ toaster }) => {
+export default function Toaster({ toaster }) {
   return (
     <Portal>
       <ChakraToaster toaster={toaster} insetInline={{ mdDown: "4" }}>
