@@ -29,16 +29,9 @@ export class PWAKitLogger {
             const errorObj = {
                 name: obj.name,
                 message: obj.message,
-                stack: obj.stack
+                stack: obj.stack,
+                ...(obj.cause ? this.#serializeForLogging(obj.cause) : {})
             }
-
-            // Only recurse for Error.cause (typically 1-2 levels max)
-            if (obj.cause instanceof Error) {
-                errorObj.cause = this.#serializeForLogging(obj.cause)
-            } else if (obj.cause) {
-                errorObj.cause = obj.cause // Keep non-Error causes as-is
-            }
-
             return errorObj
         }
 
