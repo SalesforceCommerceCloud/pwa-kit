@@ -20,7 +20,7 @@ export class PWAKitLogger {
     }
 
     /**
-     * Serializes objects for logging, handling Error objects and other non-serializable values.
+     * Serializes objects for logging, mainly for handling Error objects
      * @param {*} obj - The object to serialize. If it's not an object, it will be returned as is.
      * @returns {*} - A serializable version of the object.
      */
