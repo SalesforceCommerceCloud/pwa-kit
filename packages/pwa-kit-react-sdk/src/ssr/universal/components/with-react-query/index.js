@@ -82,15 +82,15 @@ export const withReactQuery = (Wrapped, options = {}) => {
                         `${PERFORMANCE_MARKS.reactQueryUseQuery}.${displayName}`,
                         'start'
                     )
+
                     try {
                         const result = await q.fetch()
                         return result
                     } catch (err) {
                         logger.error('Query during SSR results in an error', {
                             namespace: 'with-react-query.doInitAppState',
-                            additionalProperties: {error: err, queryHash: q.queryHash}
+                            additionalProperties: {queryHash: q.queryHash, error: err}
                         })
-
                         // Now we move on to the next query
                     } finally {
                         res.__performanceTimer.mark(
