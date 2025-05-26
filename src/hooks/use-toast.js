@@ -7,6 +7,28 @@
 import { useCallback } from 'react'
 import { toaster } from '../components/toaster'
 
+/**
+ * This is a convenient hook that returns a function for creating toasts.
+ * 
+ * It's a wrapper around the Ark UI `toaster.create` method.
+ * See https://ark-ui.com/docs/components/toast
+ * 
+ * @example
+ * const toast = useToast()
+ * toast({
+ *     title: 'Hello',
+ *     description: 'World',
+ *     type: 'success',
+ *     action: {
+ *         label: 'Click me',
+ *         onClick: () => {
+ *             console.log('clicked')
+ *         }
+ *     }
+ * })
+ *
+ * @returns {Function} - A function for creating toasts. 
+ */
 export default function useToast() {
     const toast = useCallback((options) => {
         return toaster.create(options)
