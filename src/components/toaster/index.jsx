@@ -9,7 +9,8 @@ import {
   Toaster as ChakraToaster,
   Portal,
   Stack,
-  Toast
+  Toast,
+  createToaster
 } from "@chakra-ui/react"
 
 // A toaster is a shared global instance that can be used to create and manage toasts.

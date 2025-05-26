@@ -36,6 +36,7 @@ import {heroFeatures, features} from '../../pages/home/data'
 //Hooks
 import useEinstein from '../../hooks/use-einstein'
 import useDataCloud from '../../hooks/use-datacloud'
+import useToast from '../../hooks/use-toast'
 
 // Constants
 import {useServerContext} from '@salesforce/pwa-kit-react-sdk/ssr/universal/hooks'
@@ -53,6 +54,7 @@ const Home = () => {
     const einstein = useEinstein()
     const dataCloud = useDataCloud()
     const {pathname} = useLocation()
+    const toast = useToast()
     const {
         pages: {Home: homeConfig},
         maxCacheAge: MAX_CACHE_AGE,
@@ -105,8 +107,22 @@ const Home = () => {
                 actions={
                     <Stack gap={{base: 4, sm: 6}} direction={{base: 'column', sm: 'row'}}>
                         <Button
-                            as={Link}
-                            href="https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/getting-started.html"
+                            onClick={() => {
+                                console.log('clicked')
+                                toast({
+                                    title: 'Hello',
+                                    description: 'World',
+                                    type: 'success',
+                                    action: {
+                                        label: 'Click me',
+                                        onClick: () => {
+                                            console.log('clicked')
+                                        }
+                                    }
+                                })
+                            }}
+                            // as={Link}
+                            // href="https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/getting-started.html"
                             target="_blank"
                             width={{base: 'full', md: 'inherit'}}
                             paddingX={7}
