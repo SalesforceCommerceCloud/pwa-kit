@@ -4999,6 +4999,20 @@
       "value": "]"
     }
   ],
+  "login_form.button.social": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 1,
+      "value": "message"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
   "login_form.link.forgot_password": [
     {
       "type": 0,

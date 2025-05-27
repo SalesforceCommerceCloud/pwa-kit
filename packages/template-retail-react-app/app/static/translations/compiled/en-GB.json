@@ -2335,6 +2335,12 @@
       "value": "Sign In"
     }
   ],
+  "login_form.button.social": [
+    {
+      "type": 1,
+      "value": "message"
+    }
+  ],
   "login_form.link.forgot_password": [
     {
       "type": 0,

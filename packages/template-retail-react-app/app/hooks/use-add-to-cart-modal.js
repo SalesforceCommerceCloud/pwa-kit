@@ -208,17 +208,17 @@ export const AddToCartModal = () => {
                                 itemsAdded.map(({product, variant, quantity}, index) => {
                                     const image = findImageGroupBy(product.imageGroups, {
                                         viewType: 'small',
-                                        selectedVariationAttributes: variant.variationValues
+                                        selectedVariationAttributes: variant?.variationValues
                                     })?.images?.[0]
                                     const priceData = getPriceData(product, {quantity})
                                     const variationAttributeValues = getDisplayVariationValues(
                                         product.variationAttributes,
-                                        variant.variationValues
+                                        variant?.variationValues
                                     )
 
                                     return (
                                         <Flex
-                                            key={variant.productId}
+                                            key={variant?.productId || product.id}
                                             justifyContent="space-between"
                                             marginBottom={index < itemsAdded - 1 ? 0 : 4}
                                             paddingBottom={4}
@@ -248,7 +248,7 @@ export const AddToCartModal = () => {
                                                         fontSize="sm"
                                                         fontWeight="400"
                                                     >
-                                                        {Object.entries(
+                                                        {variationAttributeValues && Object.entries(
                                                             variationAttributeValues
                                                         ).map(([name, value]) => {
                                                             return (

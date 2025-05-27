@@ -114,6 +114,8 @@ const ProductDetail = () => {
         }
     )
 
+    console.log("(JEREMY) product: ", product)
+
     // Note: Since category needs id from product detail, it can't be server side rendered atm
     // until we can do dependent query on server
     const {
@@ -129,7 +131,9 @@ const ProductDetail = () => {
 
     /****************************** Sets and Bundles *********************************/
     const [childProductSelection, setChildProductSelection] = useState({})
+    console.log("(JEREMY) childProductSelection: ", childProductSelection)
     const [childProductOrderability, setChildProductOrderability] = useState({})
+    console.log("(JEREMY) childProductOrderability: ", childProductOrderability)
     const [selectedBundleQuantity, setSelectedBundleQuantity] = useState(1)
     const childProductRefs = React.useRef({})
     const isProductASet = product?.type.set
@@ -296,11 +300,14 @@ const ProductDetail = () => {
 
     const handleAddToCart = async (productSelectionValues) => {
         try {
-            const productItems = productSelectionValues.map(({variant, quantity}) => ({
-                productId: variant.productId,
-                price: variant.price,
+            console.log("(JEREMY) productSelectionValues: ", productSelectionValues)
+            const productItems = productSelectionValues.map(({variant, product, quantity}) => ({
+                productId: variant?.productId || product.id,
+                price: variant?.price || product.price,
                 quantity
             }))
+
+            console.log("(JEREMY) productItems going into basket: ", productItems)
 
             await addItemToNewOrExistingBasket(productItems)
 
@@ -317,6 +324,7 @@ const ProductDetail = () => {
 
     /**************** Product Set/Bundles Handlers ****************/
     const handleChildProductValidation = useCallback(() => {
+        console.log("(JEREMY) handleChildProductValidation")
         // Run validation for all child products. This will ensure the error
         // messages are shown.
         Object.values(childProductRefs.current).forEach(({validateOrderability}) => {
@@ -352,6 +360,7 @@ const ProductDetail = () => {
         // Get all the selected products, and pass them to the addToCart handler which
         // accepts an array.
         const productSelectionValues = Object.values(childProductSelection)
+        console.log("(JEREMY) productSelectionValues: ", productSelectionValues)
         return handleAddToCart(productSelectionValues)
     }
 
