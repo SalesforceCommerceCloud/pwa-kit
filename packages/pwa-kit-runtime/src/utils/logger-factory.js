@@ -21,7 +21,7 @@ export class PWAKitLogger {
 
     /**
      * Serializes objects for logging, mainly for handling Error objects
-     * @param {*} obj - The object to serialize. If it's not an object, it will be returned as is.
+     * @param {*} obj - The object to serialize.
      * @returns {*} - A serializable version of the object.
      */
     #serializeForLogging(obj) {
@@ -35,6 +35,13 @@ export class PWAKitLogger {
             return errorObj
         }
 
+        // For arrays, only serialize Error objects within them
+        if (Array.isArray(obj)) {
+            return obj.map((item) =>
+                item instanceof Error ? this.#serializeForLogging(item) : item
+            )
+        }
+
         // For plain objects, only go one level deep to handle Error properties
         if (obj && typeof obj === 'object' && obj.constructor === Object) {
             const serialized = {}
@@ -45,13 +52,6 @@ export class PWAKitLogger {
                         : value
             }
             return serialized
-        }
-
-        // For arrays, only serialize Error objects within them
-        if (Array.isArray(obj)) {
-            return obj.map((item) =>
-                item instanceof Error ? this.#serializeForLogging(item) : item
-            )
         }
 
         return obj
