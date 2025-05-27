@@ -39,8 +39,10 @@ export class PWAKitLogger {
         if (obj && typeof obj === 'object' && obj.constructor === Object) {
             const serialized = {}
             for (const [key, value] of Object.entries(obj)) {
-                // Only serialize Error objects, keep everything else as-is
-                serialized[key] = value instanceof Error ? this.#serializeForLogging(value) : value
+                serialized[key] =
+                    value instanceof Error || Array.isArray(value)
+                        ? this.#serializeForLogging(value)
+                        : value
             }
             return serialized
         }
@@ -74,8 +76,7 @@ export class PWAKitLogger {
         }
 
         const serializedProperties = additionalProperties
-            ? // TODO: verify with a remote environment
-              this.#serializeForLogging(additionalProperties)
+            ? this.#serializeForLogging(additionalProperties)
             : null
 
         return `${finalNamespace} ${level.toUpperCase()} ${message}${
