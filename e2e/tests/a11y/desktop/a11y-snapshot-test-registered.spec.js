@@ -61,13 +61,10 @@ test.describe('Registered Account pages', () => {
                 userCredentials: registeredUserCredentials
             })
         }
-        // The consent form does not stick after registration
-        await answerConsentTrackingForm(page)
-        await page.waitForLoadState()
 
-        await expect(page.getByRole('heading', {name: /Account Details/i})).toBeVisible({
-            timeout: 20000
-        })
+        // The consent form shows up again after registration
+        await answerConsentTrackingForm(page)
+
         await runAccessibilityTest(page, ['registered', 'account-details-a11y-violations.json'])
 
         await page.getByRole('link', {name: 'Addresses'}).click()

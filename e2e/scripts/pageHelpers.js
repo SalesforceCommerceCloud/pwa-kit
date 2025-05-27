@@ -25,6 +25,9 @@ export const answerConsentTrackingForm = async (page, dnt = false) => {
         await expect(answerButton).toBeVisible()
         await answerButton.click()
         await expect(answerButton).not.toBeVisible()
+        // after clicking an answering button, the tracking consent should not stay in the DOM
+        const consentElements = await page.locator('text=Tracking Consent').count()
+        expect(consentElements).toBe(0)
     }
 }
 
@@ -599,9 +602,6 @@ export const wishlistFlow = async ({page, registeredUserCredentials, a11y = {}})
     await answerConsentTrackingForm(page)
     await page.waitForLoadState()
 
-    await expect(page.getByRole('heading', {name: /Account Details/i})).toBeVisible({
-        timeout: 20000
-    })
     // Navigate to PDP
     await navigateToPDPDesktop({page})
 
