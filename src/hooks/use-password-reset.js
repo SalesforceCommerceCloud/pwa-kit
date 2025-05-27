@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import {AuthHelpers, useAuthHelper} from '@salesforce/commerce-sdk-react'
-import {useToast} from './use-toast'
+import useToast from './use-toast'
 import {useIntl} from 'react-intl'
 import {useAppOrigin} from './use-app-origin'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
@@ -15,7 +15,7 @@ import {isAbsoluteURL} from '../page-designer/utils'
  * This hook provides commerce-react-sdk hooks to simplify the reset password flow.
  */
 export const usePasswordReset = () => {
-    const showToast = useToast()
+    const toast = useToast()
     const {formatMessage} = useIntl()
     const appOrigin = useAppOrigin()
     const config = getConfig()
@@ -40,13 +40,12 @@ export const usePasswordReset = () => {
             {user_id: email, pwd_action_token: token, new_password: newPassword},
             {
                 onSuccess: () => {
-                    showToast({
+                    toast({
                         title: formatMessage({
                             defaultMessage: 'Password Reset Success',
                             id: 'password_reset_success.toast'
                         }),
-                        status: 'success',
-                        position: 'bottom-right'
+                        type: 'success'
                     })
                 }
             }

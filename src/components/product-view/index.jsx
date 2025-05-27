@@ -113,7 +113,7 @@ const ProductView = forwardRef(
         ref
     ) => {
         const {currency: activeCurrency} = useCurrency()
-        const showToast = useToast()
+        const toast = useToast()
         const intl = useIntl()
         const location = useLocation()
         const {
@@ -243,9 +243,9 @@ const ProductView = forwardRef(
             }
 
             const showError = () => {
-                showToast({
+                toast({
                     title: intl.formatMessage(API_ERROR_MESSAGE),
-                    status: 'error'
+                    type: 'error'
                 })
             }
 

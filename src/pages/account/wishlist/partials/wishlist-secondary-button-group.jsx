@@ -10,7 +10,7 @@ import {Button, ButtonGroup, useDisclosure} from '@chakra-ui/react'
 import {useIntl, defineMessage, FormattedMessage} from 'react-intl'
 import {useShopperCustomersMutation} from '@salesforce/commerce-sdk-react'
 
-import {useToast} from '../../../../hooks/use-toast'
+import useToast from '../../../../hooks/use-toast'
 import {useCurrentCustomer} from '../../../../hooks/use-current-customer'
 import {useWishList} from '../../../../hooks/use-wish-list'
 
@@ -90,14 +90,14 @@ const WishlistSecondaryButtonGroup = ({
                     defaultMessage: 'Item removed from wishlist',
                     id: 'wishlist_secondary_button_group.info.item_removed'
                 }),
-                status: 'success'
+                type: 'success'
             })
 
             // After we remove an item from the wishlist
             // we need to place focus to the next logical place for accessibility
             focusElementOnRemove?.current?.focus()
         } catch {
-            toast({title: formatMessage(API_ERROR_MESSAGE), status: 'error'})
+            toast({title: formatMessage(API_ERROR_MESSAGE), type: 'error'})
         }
     }
 

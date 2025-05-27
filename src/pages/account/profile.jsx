@@ -16,8 +16,7 @@ import {
     SimpleGrid,
     Skeleton as ChakraSkeleton,
     Stack,
-    Text,
-    useToast
+    Text
 } from '@chakra-ui/react'
 import {useForm} from 'react-hook-form'
 import {AlertIcon} from '../../components/icons'
@@ -32,6 +31,7 @@ import {
     useCustomerType
 } from '@salesforce/commerce-sdk-react'
 import {useCurrentCustomer} from '../../hooks/use-current-customer'
+import useToast from '../../hooks/use-toast'
 
 /**
  * This is a specialized Skeleton component that which uses the customers authtype as the
@@ -115,8 +115,7 @@ const ProfileCard = ({allowPasswordChange = false}) => {
                                 defaultMessage: 'Profile updated',
                                 id: 'profile_card.info.profile_updated'
                             }),
-                            status: 'success',
-                            isClosable: true
+                            type: 'success'
                         })
                         headingRef?.current?.focus()
                     }
@@ -260,8 +259,7 @@ const PasswordCard = () => {
                     defaultMessage: 'Password updated',
                     id: 'password_card.info.password_updated'
                 }),
-                status: 'success',
-                isClosable: true
+                type: 'success'
             })
             headingRef?.current?.focus()
             form.reset()

@@ -14,8 +14,7 @@ import {
     ModalCloseButton,
     ModalContent,
     ModalOverlay,
-    useDisclosure,
-    useToast
+    useDisclosure
 } from '@chakra-ui/react'
 import {keepPreviousData} from '@tanstack/react-query'
 import {
@@ -41,6 +40,7 @@ import {
     USER_NOT_FOUND_ERROR
 } from '../constants'
 import useNavigation from './use-navigation'
+import useToast from './use-toast'
 import {usePrevious} from './use-previous'
 import {usePasswordReset} from './use-password-reset'
 import {isServer} from '../utils/utils'
@@ -253,7 +253,6 @@ export const AuthModal = ({
         // Show a toast only for those registed users returning to the site.
         if (loggingIn) {
             toast({
-                variant: 'subtle',
                 title: `${formatMessage(
                     {
                         defaultMessage: 'Welcome {name},',
@@ -267,9 +266,7 @@ export const AuthModal = ({
                     defaultMessage: "You're now signed in.",
                     id: 'auth_modal.description.now_signed_in'
                 })}`,
-                status: 'success',
-                position: 'top-right',
-                isClosable: true
+                type: 'success'
             })
 
             // Execute action to be performed on successful login

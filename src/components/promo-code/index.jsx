@@ -13,8 +13,7 @@ import {
     Accordion,
     AccordionButton,
     AccordionItem,
-    AccordionPanel,
-    useToast
+    AccordionPanel
 } from '@chakra-ui/react'
 import {useForm} from 'react-hook-form'
 import {ChevronDownIcon, ChevronUpIcon} from '../../components/icons'
@@ -22,6 +21,7 @@ import PromoCodeFields from '../../components/forms/promo-code-fields'
 import {API_ERROR_MESSAGE} from '../../constants'
 import {useShopperBasketsMutation} from '@salesforce/commerce-sdk-react'
 import {useCurrentBasket} from '../../hooks/use-current-basket'
+import useToast from '../../hooks/use-toast'
 
 export const usePromoCode = () => {
     const {formatMessage} = useIntl()
@@ -48,9 +48,7 @@ export const usePromoCode = () => {
                     defaultMessage: 'Promotion applied',
                     id: 'use_promocode.info.promo_applied'
                 }),
-                status: 'success',
-                position: 'top-right',
-                isClosable: true
+                type: 'success'
             })
         } catch (e) {
             form.setError(
@@ -80,17 +78,13 @@ export const usePromoCode = () => {
                             defaultMessage: 'Promotion removed',
                             id: 'use_promocode.info.promo_removed'
                         }),
-                        status: 'success',
-                        position: 'top-right',
-                        isClosable: true
+                        type: 'success'
                     })
                 },
                 onError: () => {
                     toast({
                         title: formatMessage(API_ERROR_MESSAGE),
-                        status: 'error',
-                        position: 'top-right',
-                        isClosable: true
+                        type: 'error'
                     })
                 }
             }
