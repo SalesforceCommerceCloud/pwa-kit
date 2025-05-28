@@ -20,40 +20,20 @@ export class PWAKitLogger {
     }
 
     /**
-     * Serializes objects for logging, mainly for handling Error objects
-     * @param {*} obj - The object to serialize.
-     * @returns {*} - A serializable version of the object.
+     * Given an object, serialize those properties that are Error.
+     * Why? We found that Error objects are shown as empty object in our logs
+     * JSON.stringify({err: new Error()}) => shown as {err: {}}
      */
-    #serializeForLogging(obj) {
-        if (obj instanceof Error) {
-            const errorObj = {
-                name: obj.name,
-                message: obj.message,
-                stack: obj.stack,
-                ...(obj.cause ? this.#serializeForLogging(obj.cause) : {})
+    #serializeError(object) {
+        const obj = {...object}
+        Object.entries(obj).forEach(([key, value]) => {
+            if (obj[key] instanceof Error) {
+                const {name, message, stack} = value
+                obj[key] = {name, message, stack}
+                // This is intentionally simplistic implementation.
+                // If we want a more robust solution, we can look into 3PP like `serialize-error`.
             }
-            return errorObj
-        }
-
-        // For arrays, only serialize Error objects within them
-        if (Array.isArray(obj)) {
-            return obj.map((item) =>
-                item instanceof Error ? this.#serializeForLogging(item) : item
-            )
-        }
-
-        // For plain objects, only go one level deep to handle Error properties
-        if (obj && typeof obj === 'object' && obj.constructor === Object) {
-            const serialized = {}
-            for (const [key, value] of Object.entries(obj)) {
-                serialized[key] =
-                    value instanceof Error || Array.isArray(value)
-                        ? this.#serializeForLogging(value)
-                        : value
-            }
-            return serialized
-        }
-
+        })
         return obj
     }
 
@@ -76,7 +56,7 @@ export class PWAKitLogger {
         }
 
         const serializedProperties = additionalProperties
-            ? this.#serializeForLogging(additionalProperties)
+            ? this.#serializeError(additionalProperties)
             : null
 
         return `${finalNamespace} ${level.toUpperCase()} ${message}${

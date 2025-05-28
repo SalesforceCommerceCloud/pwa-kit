@@ -74,7 +74,7 @@ describe('PWAKitLogger', () => {
         expect(console.info).toHaveBeenCalledWith('testNamespace INFO This is an info message')
     })
 
-    describe('serializeForLogging method', () => {
+    describe('serializeError method', () => {
         let logger
 
         beforeEach(() => {
@@ -100,141 +100,41 @@ describe('PWAKitLogger', () => {
             )
         })
 
-        test('should serialize Error objects with cause recursively', () => {
-            const rootCause = new Error('Root cause')
-            rootCause.stack = 'Error: Root cause\n    at root.js:1:1'
-
-            const mainError = new Error('Main error')
-            mainError.cause = rootCause
-            mainError.stack = 'Error: Main error\n    at main.js:1:1'
-
-            logger.info('Nested error occurred', {
-                additionalProperties: {error: mainError}
-            })
-
-            const expectedRootCause = {
-                name: 'Error',
-                message: 'Root cause',
-                stack: 'Error: Root cause\n    at root.js:1:1'
-            }
-
-            const expectedMainError = {
-                name: 'Error',
-                message: 'Main error',
-                stack: 'Error: Main error\n    at main.js:1:1',
-                ...expectedRootCause
-            }
-
-            expect(console.info).toHaveBeenCalledWith(
-                `test-package INFO Nested error occurred {"error":${JSON.stringify(
-                    expectedMainError
-                )}}`
-            )
-        })
-
-        test('should serialize plain objects with Error properties', () => {
-            const error = new Error('Test error')
-            error.stack = 'Error: Test error\n    at test.js:1:1'
-
-            const plainObject = {
-                message: 'Something went wrong',
-                error: error,
-                count: 5,
-                isValid: true
-            }
-
-            logger.info('Object with error', {
-                additionalProperties: plainObject
-            })
-
-            const expectedErrorObj = {
-                name: 'Error',
-                message: 'Test error',
-                stack: 'Error: Test error\n    at test.js:1:1'
-            }
-
-            const expectedObject = {
-                message: 'Something went wrong',
-                error: expectedErrorObj,
-                count: 5,
-                isValid: true
-            }
-
-            expect(console.info).toHaveBeenCalledWith(
-                `test-package INFO Object with error ${JSON.stringify(expectedObject)}`
-            )
-        })
-
-        test('should serialize arrays containing Error objects', () => {
+        test('should serialize multiple Error objects in the same object', () => {
             const error1 = new Error('First error')
             error1.stack = 'Error: First error\n    at test1.js:1:1'
 
             const error2 = new Error('Second error')
             error2.stack = 'Error: Second error\n    at test2.js:1:1'
 
-            const arrayWithErrors = ['string item', error1, 42, error2, {key: 'value'}]
-
-            logger.info('Array with errors', {
-                additionalProperties: {errors: arrayWithErrors}
+            logger.info('Multiple errors occurred', {
+                additionalProperties: {
+                    primaryError: error1,
+                    secondaryError: error2,
+                    message: 'Both errors occurred'
+                }
             })
 
-            // Get the actual call
-            const actualCall = console.info.mock.calls[0][0]
-
-            // Build expected string with all the components that should be present
-            const expectedString =
-                'test-package INFO Array with errors {"errors":["string item",{"name":"Error","message":"First error","stack":"Error: First error\\n    at test1.js:1:1"},42,{"name":"Error","message":"Second error","stack":"Error: Second error\\n    at test2.js:1:1"},{"key":"value"}]}'
-
-            expect(actualCall).toBe(expectedString)
-        })
-
-        test('should return primitive values as-is', () => {
-            const primitives = [
-                {value: 'string', expected: '"string"'},
-                {value: 42, expected: '42'},
-                {value: true, expected: 'true'},
-                {value: false, expected: 'false'},
-                {value: null, expected: 'null'}
-            ]
-
-            primitives.forEach(({value, expected}, index) => {
-                logger.info(`Primitive test ${index}`, {
-                    additionalProperties: {value}
-                })
-
-                expect(console.info).toHaveBeenCalledWith(
-                    `test-package INFO Primitive test ${index} {"value":${expected}}`
-                )
-            })
-        })
-
-        test('should handle undefined values', () => {
-            logger.info('Undefined test', {
-                additionalProperties: {value: undefined}
-            })
-
-            // undefined values are omitted from JSON.stringify output
-            expect(console.info).toHaveBeenCalledWith('test-package INFO Undefined test {}')
-        })
-
-        test('should handle Error objects without cause', () => {
-            const simpleError = new Error('Simple error')
-            simpleError.stack = 'Error: Simple error\n    at simple.js:1:1'
-            // Explicitly ensure no cause property
-            delete simpleError.cause
-
-            logger.info('Simple error test', {
-                additionalProperties: {error: simpleError}
-            })
-
-            const expectedError = {
+            const expectedError1 = {
                 name: 'Error',
-                message: 'Simple error',
-                stack: 'Error: Simple error\n    at simple.js:1:1'
+                message: 'First error',
+                stack: 'Error: First error\n    at test1.js:1:1'
+            }
+
+            const expectedError2 = {
+                name: 'Error',
+                message: 'Second error',
+                stack: 'Error: Second error\n    at test2.js:1:1'
+            }
+
+            const expectedObject = {
+                primaryError: expectedError1,
+                secondaryError: expectedError2,
+                message: 'Both errors occurred'
             }
 
             expect(console.info).toHaveBeenCalledWith(
-                `test-package INFO Simple error test {"error":${JSON.stringify(expectedError)}}`
+                `test-package INFO Multiple errors occurred ${JSON.stringify(expectedObject)}`
             )
         })
 
@@ -265,16 +165,86 @@ describe('PWAKitLogger', () => {
             )
         })
 
-        test('should handle empty objects and arrays', () => {
-            logger.info('Empty structures test', {
-                additionalProperties: {
-                    emptyObject: {},
-                    emptyArray: []
-                }
+        test('should leave non-Error properties unchanged', () => {
+            const error = new Error('Test error')
+            error.stack = 'Error: Test error\n    at test.js:1:1'
+
+            const plainObject = {
+                message: 'Something went wrong',
+                error: error,
+                count: 5,
+                isValid: true,
+                data: {nested: 'object'},
+                items: ['array', 'values']
+            }
+
+            logger.info('Object with error and other properties', {
+                additionalProperties: plainObject
+            })
+
+            const expectedErrorObj = {
+                name: 'Error',
+                message: 'Test error',
+                stack: 'Error: Test error\n    at test.js:1:1'
+            }
+
+            const expectedObject = {
+                message: 'Something went wrong',
+                error: expectedErrorObj,
+                count: 5,
+                isValid: true,
+                data: {nested: 'object'},
+                items: ['array', 'values']
+            }
+
+            expect(console.info).toHaveBeenCalledWith(
+                `test-package INFO Object with error and other properties ${JSON.stringify(
+                    expectedObject
+                )}`
+            )
+        })
+
+        test('should handle objects with no Error properties', () => {
+            const plainObject = {
+                message: 'No errors here',
+                count: 42,
+                isValid: true,
+                data: {nested: 'object'}
+            }
+
+            logger.info('Plain object test', {
+                additionalProperties: plainObject
             })
 
             expect(console.info).toHaveBeenCalledWith(
-                'test-package INFO Empty structures test {"emptyObject":{},"emptyArray":[]}'
+                `test-package INFO Plain object test ${JSON.stringify(plainObject)}`
+            )
+        })
+
+        test('should handle empty objects', () => {
+            logger.info('Empty object test', {
+                additionalProperties: {}
+            })
+
+            expect(console.info).toHaveBeenCalledWith('test-package INFO Empty object test {}')
+        })
+
+        test('should handle Error objects without stack property', () => {
+            const error = new Error('Error without stack')
+            delete error.stack
+
+            logger.info('Error without stack', {
+                additionalProperties: {error}
+            })
+
+            const expectedError = {
+                name: 'Error',
+                message: 'Error without stack',
+                stack: undefined
+            }
+
+            expect(console.info).toHaveBeenCalledWith(
+                `test-package INFO Error without stack {"error":${JSON.stringify(expectedError)}}`
             )
         })
     })
