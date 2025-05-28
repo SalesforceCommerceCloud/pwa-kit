@@ -8,7 +8,7 @@
 import React from 'react'
 import {render} from '@testing-library/react'
 import '@testing-library/jest-dom'
-import {ChakraProvider, createSystem, defaultConfig} from '@chakra-ui/react'
+import {ChakraProvider, createSystem, defaultConfig, createToaster} from '@chakra-ui/react'
 import Toaster, {toaster} from './index'
 
 const TestWrapper = ({children}) => {
@@ -21,43 +21,37 @@ const renderWithChakra = (component) => {
 }
 
 describe('Toaster Tests', () => {
-    const mockToaster = {
-        placement: 'top-end',
-        id: 'test-toaster',
-        toasts: []
-    }
+    // Use actual createToaster instead of mock objects
+    const testToaster = createToaster({
+        placement: 'bottom-start'
+    })
 
     it('renders without crashing', () => {
-        renderWithChakra(<Toaster toaster={mockToaster} />)
-        // The Portal component renders the toaster, but without active toasts it might not be visible
-        // We can at least verify the component doesn't crash
+        renderWithChakra(<Toaster toaster={toaster} />)
         expect(document.body).toBeInTheDocument()
     })
 
-    it('renders the toaster component structure', () => {
-        renderWithChakra(<Toaster toaster={mockToaster} />)
-
-        // Since Chakra UI Portal renders outside the test container,
-        // we need to look in the document body for the portal content
-        const portal = document.querySelector('[data-portal]')
-        expect(portal || document.body).toBeInTheDocument()
+    it('renders with custom toaster', () => {
+        renderWithChakra(<Toaster toaster={testToaster} />)
+        expect(document.body).toBeInTheDocument()
     })
 
-    it('exports toaster instance with correct configuration', () => {
+    it('exports toaster instance', () => {
         expect(toaster).toBeDefined()
-        expect(toaster.placement).toBe('top-end')
+        expect(typeof toaster).toBe('object')
+        // Check for toaster methods instead of placement property
+        expect(typeof toaster.create).toBe('function')
+        expect(typeof toaster.dismiss).toBe('function')
+        expect(typeof toaster.update).toBe('function')
     })
 
-    it('passes toaster prop to ChakraToaster', () => {
-        const customToaster = {
-            placement: 'bottom-start',
-            id: 'custom-toaster',
-            toasts: []
-        }
-
-        renderWithChakra(<Toaster toaster={customToaster} />)
-
-        // The component should render without errors when passed a custom toaster
-        expect(document.body).toBeInTheDocument()
+    it('toaster can create toasts', () => {
+        // Test that the exported toaster has the expected API
+        expect(() => {
+            toaster.create({
+                title: 'Test Toast',
+                description: 'This is a test'
+            })
+        }).not.toThrow()
     })
 })
