@@ -55,12 +55,10 @@ export class PWAKitLogger {
             finalNamespace = namespace
         }
 
-        const serializedProperties = additionalProperties
-            ? this.#serializeError(additionalProperties)
-            : null
-
         return `${finalNamespace} ${level.toUpperCase()} ${message}${
-            serializedProperties ? ` ${JSON.stringify(serializedProperties)}` : ''
+            additionalProperties
+                ? ` ${JSON.stringify(this.#serializeError(additionalProperties))}`
+                : ''
         }`
     }
 
