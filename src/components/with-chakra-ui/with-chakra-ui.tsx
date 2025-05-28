@@ -7,7 +7,7 @@
 
 import React from 'react'
 import {ChakraProvider} from '@chakra-ui/react'
-import Toaster, { toaster } from '../toaster'
+import Toaster, {toaster} from '../toaster'
 
 // Local
 import theme from '../../theme'

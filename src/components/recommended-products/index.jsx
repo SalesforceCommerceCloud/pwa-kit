@@ -169,7 +169,7 @@ const RecommendedProducts = ({zone, recommender, products, title, shouldFetch, .
             })
             toast({
                 title: formatMessage(TOAST_MESSAGE_REMOVED_FROM_WISHLIST),
-                type: 'success',
+                type: 'success'
             })
         } catch {
             toast({

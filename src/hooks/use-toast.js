@@ -4,15 +4,15 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import { useCallback } from 'react'
-import { toaster } from '../components/toaster'
+import {useCallback} from 'react'
+import {toaster} from '../components/toaster'
 
 /**
  * This is a convenient hook that returns a function for creating toasts.
- * 
+ *
  * It's a wrapper around the Ark UI `toaster.create` method.
  * See https://ark-ui.com/docs/components/toast
- * 
+ *
  * @example
  * const toast = useToast()
  * toast({
@@ -27,7 +27,7 @@ import { toaster } from '../components/toaster'
  *     }
  * })
  *
- * @returns {Function} - A function for creating toasts. 
+ * @returns {Function} - A function for creating toasts.
  */
 export default function useToast() {
     const createToast = useCallback((options) => {
