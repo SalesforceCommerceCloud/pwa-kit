@@ -730,6 +730,15 @@ describe('The Node SSR Environment', () => {
                 expect(res.headers['server-timing']).toContain('render-to-string;dur=')
                 expect(res.headers['server-timing']).toContain('total;dur=')
             }
+        },
+        {
+            description: `Cache-Control header is set to no-cache when __server_timing is used`,
+            req: {url: '/pwa/', query: {__server_timing: '1'}},
+            assertions: (res) => {
+                expect(res.headers['cache-control']).toBe(
+                    'max-age=0, nocache, nostore, must-revalidate'
+                )
+            }
         }
     ]
 
