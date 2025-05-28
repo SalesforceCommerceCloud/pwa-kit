@@ -1,58 +1,138 @@
-// /*
-//  * Copyright (c) 2021, salesforce.com, inc.
-//  * All rights reserved.
-//  * SPDX-License-Identifier: BSD-3-Clause
-//  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
-//  */
-// import React from 'react'
-// import {useToast} from './use-toast'
-// import {Button} from '@chakra-ui/react'
-// import {renderWithProviders} from '../utils/test-utils'
-// import {screen, waitFor} from '@testing-library/react'
-// import userEvent from '@testing-library/user-event'
+/*
+ * Copyright (c) 2025, salesforce.com, inc.
+ * All rights reserved.
+ * SPDX-License-Identifier: BSD-3-Clause
+ * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
+ */
+import { renderHook } from '@testing-library/react'
+import useToast from './use-toast'
+import { toaster } from '../components/toaster'
 
-// jest.setTimeout(60000)
-// const MockedComponent = (props) => {
-//     const showToast = useToast()
+// Mock the toaster dependency
+jest.mock('../components/toaster', () => ({
+    toaster: {
+        create: jest.fn()
+    }
+}))
 
-//     const renderToast = () => {
-//         showToast({
-//             ...props,
-//             title: 'Demo Notification',
-//             status: 'success',
-//             duration: 1000,
-//             variant: 'subtle'
-//         })
-//     }
-//     return (
-//         <>
-//             <Button onClick={renderToast}>show toast</Button>
-//         </>
-//     )
-// }
+describe('useToast', () => {
+    beforeEach(() => {
+        // Clear all mocks before each test
+        jest.clearAllMocks()
+    })
 
-// // Set up and clean up
-// beforeEach(() => {
-//     jest.resetModules()
-// })
+    it('should return a function', () => {
+        const { result } = renderHook(() => useToast())
+        
+        expect(typeof result.current).toBe('function')
+    })
 
-// test('renders toast with action', async () => {
-//     const user = userEvent.setup()
-//     const handleActionClick = jest.fn()
-//     const toastAction = <Button onClick={handleActionClick}>action</Button>
+    it('should call toaster.create with provided options', () => {
+        const { result } = renderHook(() => useToast())
+        const toast = result.current
+        
+        const options = {
+            title: 'Test Title',
+            description: 'Test Description',
+            type: 'success'
+        }
+        
+        toast(options)
+        
+        expect(toaster.create).toHaveBeenCalledWith(options)
+        expect(toaster.create).toHaveBeenCalledTimes(1)
+    })
 
-//     renderWithProviders(<MockedComponent action={toastAction} />)
+    it('should return the result from toaster.create', () => {
+        const mockResult = { id: 'toast-123', dismiss: jest.fn() }
+        toaster.create.mockReturnValue(mockResult)
+        
+        const { result } = renderHook(() => useToast())
+        const toast = result.current
+        
+        const returnValue = toast({ title: 'Test' })
+        
+        expect(returnValue).toBe(mockResult)
+    })
 
-//     const toastTrigger = await screen.findByRole('button', {name: /show toast/i})
-//     await user.click(toastTrigger)
+    it('should handle multiple calls correctly', () => {
+        const { result } = renderHook(() => useToast())
+        const toast = result.current
+        
+        const options1 = { title: 'First Toast', type: 'success' }
+        const options2 = { title: 'Second Toast', type: 'error' }
+        
+        toast(options1)
+        toast(options2)
+        
+        expect(toaster.create).toHaveBeenCalledTimes(2)
+        expect(toaster.create).toHaveBeenNthCalledWith(1, options1)
+        expect(toaster.create).toHaveBeenNthCalledWith(2, options2)
+    })
 
-//     await waitFor(() => {
-//         // Chakra UI renders multiple elements with toast title in DOM for accessibility.
-//         // We need to assert the actual text within the alert
-//         expect(screen.getByRole('alert')).toHaveTextContent(/demo notification/i)
-//     })
+    it('should handle options with action property', () => {
+        const { result } = renderHook(() => useToast())
+        const toast = result.current
+        
+        const mockAction = {
+            label: 'Click me',
+            onClick: jest.fn()
+        }
+        
+        const options = {
+            title: 'Toast with Action',
+            description: 'This toast has an action',
+            type: 'info',
+            action: mockAction
+        }
+        
+        toast(options)
+        
+        expect(toaster.create).toHaveBeenCalledWith(options)
+    })
 
-//     const toastActionTrigger = await screen.findByRole('button', {name: /action/i})
-//     await user.click(toastActionTrigger)
-//     expect(handleActionClick).toHaveBeenCalledTimes(1)
-// })
+    it('should handle empty or undefined options', () => {
+        const { result } = renderHook(() => useToast())
+        const toast = result.current
+        
+        toast()
+        toast(undefined)
+        toast({})
+        
+        expect(toaster.create).toHaveBeenCalledTimes(3)
+        expect(toaster.create).toHaveBeenNthCalledWith(1, undefined)
+        expect(toaster.create).toHaveBeenNthCalledWith(2, undefined)
+        expect(toaster.create).toHaveBeenNthCalledWith(3, {})
+    })
+
+    it('should maintain function reference stability (memoization)', () => {
+        const { result, rerender } = renderHook(() => useToast())
+        const firstRender = result.current
+        
+        rerender()
+        const secondRender = result.current
+        
+        expect(firstRender).toBe(secondRender)
+    })
+
+    it('should handle all toast types', () => {
+        const { result } = renderHook(() => useToast())
+        const toast = result.current
+        
+        const types = ['success', 'error', 'warning', 'info']
+        
+        types.forEach((type, index) => {
+            toast({
+                title: `${type} toast`,
+                type
+            })
+            
+            expect(toaster.create).toHaveBeenNthCalledWith(index + 1, {
+                title: `${type} toast`,
+                type
+            })
+        })
+        
+        expect(toaster.create).toHaveBeenCalledTimes(4)
+    })
+})
