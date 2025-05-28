@@ -78,10 +78,8 @@ export const withReactQuery = (Wrapped, options = {}) => {
                 queries.map(async (q, i) => {
                     // always include the index to avoid duplicate entries
                     const displayName = q.meta?.displayName ? `${q.meta?.displayName}-${i}` : `${i}`
-                    res.__performanceTimer.mark(
-                        `${PERFORMANCE_MARKS.reactQueryUseQuery}.${displayName}`,
-                        'start'
-                    )
+                    const useQueryMarker = `${PERFORMANCE_MARKS.reactQueryUseQuery}.${displayName}`
+                    res.__performanceTimer.mark(useQueryMarker, 'start')
 
                     try {
                         const result = await q.fetch()
@@ -94,13 +92,9 @@ export const withReactQuery = (Wrapped, options = {}) => {
                         // Now we move on to the next query
                     } finally {
                         // Close the timer, regardless of the fetch result
-                        res.__performanceTimer.mark(
-                            `${PERFORMANCE_MARKS.reactQueryUseQuery}.${displayName}`,
-                            'end',
-                            {
-                                detail: q.queryHash
-                            }
-                        )
+                        res.__performanceTimer.mark(useQueryMarker, 'end', {
+                            detail: q.queryHash
+                        })
                     }
                 })
             )
