@@ -451,6 +451,7 @@ describe('withReactQuery', function () {
             'start'
         )
         expect(mockPerformanceTimer.mark).toHaveBeenCalledWith(
+            // Since this query does not have a displayName, the query index is used instead. That's why it says '2' here.
             `${PERFORMANCE_MARKS.reactQueryUseQuery}.2`,
             'start'
         )
@@ -471,6 +472,7 @@ describe('withReactQuery', function () {
             })
         )
         expect(mockPerformanceTimer.mark).toHaveBeenCalledWith(
+            // Since this query does not have a displayName, the query index is used instead. That's why it says '2' here.
             `${PERFORMANCE_MARKS.reactQueryUseQuery}.2`,
             'end',
             expect.objectContaining({
