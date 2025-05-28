@@ -107,22 +107,8 @@ const Home = () => {
                 actions={
                     <Stack gap={{base: 4, sm: 6}} direction={{base: 'column', sm: 'row'}}>
                         <Button
-                            onClick={() => {
-                                console.log('clicked')
-                                toast({
-                                    title: 'Hello',
-                                    description: 'World',
-                                    type: 'success',
-                                    action: {
-                                        label: 'Click me',
-                                        onClick: () => {
-                                            console.log('clicked')
-                                        }
-                                    }
-                                })
-                            }}
-                            // as={Link}
-                            // href="https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/getting-started.html"
+                            as={Link}
+                            href="https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/getting-started.html"
                             target="_blank"
                             width={{base: 'full', md: 'inherit'}}
                             paddingX={7}
@@ -134,6 +120,67 @@ const Home = () => {
                                 defaultMessage="Get started"
                                 id="home.link.get_started"
                             />
+                        </Button>
+                        {/* Prior to merging the PR, remove the buttons below */}
+                        <Button
+                            onClick={() => {
+                                console.log('clicked')
+                                toast({
+                                    title: 'Hello',
+                                    description: 'World',
+                                    type: 'success',
+                                })
+                            }}
+                            target="_blank"
+                            width={{base: 'full', md: 'inherit'}}
+                            paddingX={7}
+                            _hover={{textDecoration: 'none'}}
+                            fontSize={{base: 'sm', md: 'md'}}
+                            fontWeight={{base: 'medium', md: 'semibold'}}
+                        >
+                            success toast
+                        </Button>
+                        <Button
+                            onClick={() => {
+                                console.log('clicked')
+                                toast({
+                                    title: 'Hello',
+                                    description: 'World',
+                                    type: 'error',
+                                })
+                            }}
+                            target="_blank"
+                            width={{base: 'full', md: 'inherit'}}
+                            paddingX={7}
+                            _hover={{textDecoration: 'none'}}
+                            fontSize={{base: 'sm', md: 'md'}}
+                            fontWeight={{base: 'medium', md: 'semibold'}}
+                        >
+                            error toast
+                        </Button>
+                        <Button
+                            onClick={() => {
+                                console.log('clicked')
+                                toast({
+                                    title: 'Hello',
+                                    description: 'World',
+                                    type: 'info',
+                                    action: {
+                                        label: 'Click me',
+                                        onClick: () => {
+                                            console.log('clicked')
+                                        }
+                                    }
+                                })
+                            }}
+                            target="_blank"
+                            width={{base: 'full', md: 'inherit'}}
+                            paddingX={7}
+                            _hover={{textDecoration: 'none'}}
+                            fontSize={{base: 'sm', md: 'md'}}
+                            fontWeight={{base: 'medium', md: 'semibold'}}
+                        >
+                            action toast
                         </Button>
                     </Stack>
                 }
