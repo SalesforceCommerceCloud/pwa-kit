@@ -72,8 +72,8 @@ describe('boldString & Capitalize test', () => {
     })
 
     test('capitalize capitalizes a string', () => {
-        const stringToCapitlize = utils.capitalize('capitalize string test')
-        expect(stringToCapitlize).toBe('Capitalize String Test')
+        const stringToCapitalize = utils.capitalize('capitalize string test')
+        expect(stringToCapitalize).toBe('Capitalize String Test')
     })
 })
 
