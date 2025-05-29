@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
-import {screen, waitFor} from '@testing-library/react'
+import {screen, waitFor, within} from '@testing-library/react'
 import {rest} from 'msw'
 import {
     createPathWithDefaults,
@@ -138,6 +138,48 @@ test('Allows customer to go to store locator page', async () => {
     await waitFor(() => {
         expect(window.location.pathname).toBe('/uk/en-GB/store-locator')
     })
+})
+
+test('Allows customer to go to store locator page and then select a new store', async () => {
+    global.server.use(
+        rest.get(
+            'https://www.domain.com/mobify/proxy/api/store/shopper-stores/v1/organizations/:organizationId/store-search',
+            (req, res, ctx) => {
+                return res(ctx.delay(0), ctx.status(200), ctx.json(mockStores))
+            }
+        )
+    )
+
+    const {user} = renderWithProviders(<MockedComponent />, {
+        wrapperProps: {siteAlias: 'uk', appConfig: mockConfig.app}
+    })
+
+    await user.click(await screen.findByText('Find a Store'))
+
+    const countrySelect = await screen.findByDisplayValue('Select a country')
+    await user.selectOptions(countrySelect, 'DE')
+
+    await user.type(screen.getByPlaceholderText(/Enter postal code/i), '69117')
+
+    const findButtonInForm = screen.getByRole('button', {name: 'Find'})
+    await user.click(findButtonInForm)
+
+    const storeToSelect = 'Heidelberg Tech Mart'
+    await waitFor(() => {
+        expect(screen.getByText(storeToSelect)).toBeInTheDocument()
+    })
+
+    const storeNameElement = await screen.findByText(storeToSelect)
+
+    const storeAccordionItem = storeNameElement.closest('.chakra-accordion__item')
+    if (!storeAccordionItem) {
+        throw new Error(`Could not find parent .chakra-accordion__item for store: ${storeToSelect}`)
+    }
+
+    const storeRadio = within(storeAccordionItem).getByRole('radio')
+
+    await user.click(storeRadio)
+    expect(storeRadio).toBeChecked()
 })
 
 test('Show no stores are found if there are no stores', async () => {
