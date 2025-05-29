@@ -7,7 +7,6 @@
 
 import React, {useEffect, useState} from 'react'
 import PropTypes from 'prop-types'
-import {useQuery} from '@tanstack/react-query'
 import {useHistory, useLocation, useParams} from 'react-router-dom'
 import {FormattedMessage, useIntl} from 'react-intl'
 import {Helmet} from 'react-helmet'
@@ -107,21 +106,6 @@ const REFINEMENT_DISALLOW_LIST = ['c_isNew']
  * allowable filters and sort refinements.
  */
 const ProductList = (props) => {
-    // DEBUG
-    // On how react-query handles errors: https://tanstack.com/query/latest/docs/framework/react/guides/query-functions#handling-and-throwing-errors
-    const errorQuery = useQuery(
-        ['query-with-error'],
-        () =>
-            new Promise((resolve, reject) => {
-                setTimeout(() => {
-                    reject(new Error('ERROR 1'))
-                }, 1000)
-            })
-    )
-    const errorQuery2 = useQuery(['query-with-error-2'], async () => {
-        throw new Error('ERROR 2')
-    })
-
     // Using destructuring to omit properties; we must rename `isLoading` because we use a different
     // `isLoading` later in this function.
     // eslint-disable-next-line react/prop-types, @typescript-eslint/no-unused-vars
