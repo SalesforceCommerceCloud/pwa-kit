@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, salesforce.com, inc.
+ * Copyright (c) 2025, Salesforce, Inc.
  * All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
@@ -13,14 +13,13 @@ import {useLocation} from 'react-router-dom'
 import {
     AspectRatio,
     Box,
-    Img,
+    Image,
     Flex,
 
     // Hooks
     Skeleton as ChakraSkeleton,
-    ListItem,
     List,
-    useMultiStyleConfig
+    useSlotRecipe
 } from '@chakra-ui/react'
 import {findImageGroupBy} from '../../utils/image-groups-utils'
 import DynamicImage from '../../components/dynamic-image'
@@ -35,17 +34,18 @@ const SMALL = 'small'
  * you are waiting for product data to be returnd from the server.
  */
 export const Skeleton = ({size}) => {
-    const styles = useMultiStyleConfig('ImageGallery', {size})
+    const recipe = useSlotRecipe({key: 'imageGallery'})
+    const styles = recipe({size})
 
     return (
         <Box data-testid="sf-image-gallery-skeleton">
             <Flex flexDirection="column">
-                <AspectRatio ratio={1} {...styles.heroImageSkeleton}>
+                <AspectRatio ratio={1} css={styles.heroImageSkeleton}>
                     <ChakraSkeleton />
                 </AspectRatio>
                 <Flex>
                     {new Array(4).fill(0).map((_, index) => (
-                        <AspectRatio ratio={1} {...styles.thumbnailImageSkeleton} key={index}>
+                        <AspectRatio ratio={1} css={styles.thumbnailImageSkeleton} key={index}>
                             <ChakraSkeleton />
                         </AspectRatio>
                     ))}
@@ -65,7 +65,8 @@ Skeleton.propTypes = {
  */
 const ImageGallery = ({imageGroups = [], selectedVariationAttributes = {}, size, lazy = false}) => {
     const [selectedIndex, setSelectedIndex] = useState(0)
-    const styles = useMultiStyleConfig('ImageGallery', {size})
+    const recipe = useSlotRecipe({key: 'imageGallery'})
+    const styles = recipe({size})
     const location = useLocation()
 
     // Get the 'hero' image for the current variation.
@@ -99,13 +100,13 @@ const ImageGallery = ({imageGroups = [], selectedVariationAttributes = {}, size,
     const thumbnailImages = thumbnailImageGroup?.images || []
     const loadingStrategy = lazy ? 'lazy' : 'eager'
 
-    const heroImageMaxWidth = styles.heroImage.maxWidth[3] // in px
+    const heroImageMaxWidth = styles.heroImage['@layer recipes'].maxWidth // in px
 
     return (
         <Flex direction="column">
             {heroImage && (
-                <Box {...styles.heroImageGroup}>
-                    <AspectRatio {...styles.heroImage} ratio={1}>
+                <Box css={styles.heroImageGroup}>
+                    <AspectRatio css={styles.heroImage} ratio={1}>
                         <DynamicImage
                             src={`${heroImage.disBaseLink || heroImage.link}[?sw={width}&q=60]`}
                             widths={{
@@ -121,12 +122,12 @@ const ImageGallery = ({imageGroups = [], selectedVariationAttributes = {}, size,
                 </Box>
             )}
 
-            <List display={'flex'} flexWrap={'wrap'}>
+        <List.Root css={styles.thumbnailImageGroup}>
                 {thumbnailImages.map((image, index) => {
                     const selected = index === selectedIndex
                     return (
-                        <ListItem
-                            {...styles.thumbnailImageItem}
+                        <List.Item
+                            css={styles.thumbnailImageItem}
                             key={index}
                             borderColor={`${selected ? 'black' : ''}`}
                             borderWidth={`${selected ? '1px' : 0}`}
@@ -143,17 +144,17 @@ const ImageGallery = ({imageGroups = [], selectedVariationAttributes = {}, size,
                                     onClick={() => setSelectedIndex(index)}
                                     data-testid="image-gallery-thumbnails"
                                 >
-                                    <Img
+                                    <Image
                                         alt={image.alt}
                                         src={image.disBaseLink || image.link}
                                         loading={loadingStrategy}
                                     />
                                 </Box>
                             </AspectRatio>
-                        </ListItem>
+                        </List.Item>
                     )
                 })}
-            </List>
+            </List.Root>
         </Flex>
     )
 }
