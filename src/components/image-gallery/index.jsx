@@ -19,6 +19,7 @@ import {
     // Hooks
     Skeleton as ChakraSkeleton,
     List,
+    useBreakpointValue,
     useSlotRecipe
 } from '@chakra-ui/react'
 import {findImageGroupBy} from '../../utils/image-groups-utils'
@@ -63,7 +64,7 @@ Skeleton.propTypes = {
  * The image gallery displays a hero image and thumbnails below it. You can control which
  * image groups that are use by passing in the current selected variation values.
  */
-const ImageGallery = ({imageGroups = [], selectedVariationAttributes = {}, size, lazy = false}) => {
+const ImageGallery = ({imageGroups = [], selectedVariationAttributes = {}, size = 'md', lazy = false}) => {
     const [selectedIndex, setSelectedIndex] = useState(0)
     const recipe = useSlotRecipe({key: 'imageGallery'})
     const styles = recipe({size})
@@ -100,7 +101,8 @@ const ImageGallery = ({imageGroups = [], selectedVariationAttributes = {}, size,
     const thumbnailImages = thumbnailImageGroup?.images || []
     const loadingStrategy = lazy ? 'lazy' : 'eager'
 
-    const heroImageMaxWidth = styles.heroImage['@layer recipes'].maxWidth // in px
+    const responsiveMaxWidthValues = Object.values(styles.heroImage.maxWidth['@layer recipes'])
+    const heroImageMaxWidth = useBreakpointValue(responsiveMaxWidthValues) // in px
 
     return (
         <Flex direction="column">
@@ -122,7 +124,7 @@ const ImageGallery = ({imageGroups = [], selectedVariationAttributes = {}, size,
                 </Box>
             )}
 
-        <List.Root css={styles.thumbnailImageGroup}>
+            <List.Root css={styles.thumbnailImageGroup}>
                 {thumbnailImages.map((image, index) => {
                     const selected = index === selectedIndex
                     return (
