@@ -128,7 +128,7 @@ const Home = () => {
                                 toast({
                                     title: 'Hello',
                                     description: 'World',
-                                    type: 'success',
+                                    type: 'success'
                                 })
                             }}
                             target="_blank"
@@ -146,7 +146,7 @@ const Home = () => {
                                 toast({
                                     title: 'Hello',
                                     description: 'World',
-                                    type: 'error',
+                                    type: 'error'
                                 })
                             }}
                             target="_blank"

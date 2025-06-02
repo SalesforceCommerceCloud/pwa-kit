@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-/* eslint-disable react/prop-types */
+
 import React from 'react'
 import {waitFor, within} from '@testing-library/react'
 import '@testing-library/jest-dom'
@@ -15,7 +15,7 @@ import {renderWithProviders} from '../../utils/test-utils'
 describe('Toaster Tests', () => {
     it('renders toast group container', () => {
         renderWithProviders(<Toaster toaster={toaster} />)
-        
+
         const toastGroup = document.querySelector('[data-scope="toast"]')
         expect(toastGroup).toBeInTheDocument()
     })
@@ -60,7 +60,9 @@ describe('Toaster Tests', () => {
 
         await waitFor(() => {
             expect(within(document.body).getByText('Test Toast')).toBeInTheDocument()
-            expect(within(document.body).getByText('This is a test description')).toBeInTheDocument()
+            expect(
+                within(document.body).getByText('This is a test description')
+            ).toBeInTheDocument()
         })
     })
 })
