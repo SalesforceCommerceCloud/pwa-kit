@@ -24,6 +24,8 @@ module.exports = {
         '<rootDir>/src/components/swatch-group/**/*.test.js',
         '<rootDir>/src/utils/responsive-image.test.js',
         '<rootDir>/src/pages/home/**/*.test.js',
+        '<rootDir>/src/components/toaster/**/*.test.jsx',
+        '<rootDir>/src/hooks/use-toast.test.js',
     ],
     moduleNameMapper: {
         ...base.moduleNameMapper,

@@ -10,7 +10,7 @@ import PropTypes from 'prop-types'
 import {noop} from '../../utils/utils'
 import {useIntl} from 'react-intl'
 import {useLocation} from 'react-router-dom'
-import {useToast} from '../../hooks/use-toast'
+import useToast from '../../hooks/use-toast'
 import {useCurrentCustomer} from '../../hooks/use-current-customer'
 
 /**
@@ -29,7 +29,7 @@ const withRegistration = (
     const WrappedComponent = ({onClick = noop, ...passThroughProps}) => {
         const {data: customer} = useCurrentCustomer()
         const authModal = useAuthModal()
-        const showToast = useToast()
+        const toast = useToast()
         const location = useLocation()
         const {formatMessage, locale} = useIntl()
 
@@ -38,12 +38,12 @@ const withRegistration = (
             if (!customer.isRegistered) {
                 // Do not show auth modal if users is already on the login page
                 if (isLoginPage(location, locale)) {
-                    showToast({
+                    toast({
                         title: formatMessage({
                             defaultMessage: 'Please sign in to continue!',
                             id: 'with_registration.info.please_sign_in'
                         }),
-                        status: 'info'
+                        type: 'info'
                     })
                 } else {
                     authModal.onOpen()

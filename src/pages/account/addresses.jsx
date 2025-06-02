@@ -24,7 +24,7 @@ import {
 } from '@chakra-ui/react'
 import FormActionButtons from '../../components/forms/form-action-buttons'
 import {useForm} from 'react-hook-form'
-import {useToast} from '../../hooks/use-toast'
+import useToast from '../../hooks/use-toast'
 
 import LoadingSpinner from '../../components/loading-spinner'
 import {LocationIcon, PlusIcon} from '../../components/icons'
@@ -144,7 +144,7 @@ const AccountAddresses = () => {
 
     const [isEditing, setIsEditing] = useState(false)
     const [selectedAddressId, setSelectedAddressId] = useState(false)
-    const showToast = useToast()
+    const toast = useToast()
     const form = useForm()
 
     const headingRef = useRef()
@@ -165,9 +165,9 @@ const AccountAddresses = () => {
 
     const hasAddresses = addresses?.length > 0
     const showError = () => {
-        showToast({
+        toast({
             title: formatMessage(API_ERROR_MESSAGE),
-            status: 'error'
+            type: 'error'
         })
     }
     const submitForm = async (address) => {
@@ -198,12 +198,11 @@ const AccountAddresses = () => {
             }
             if (data) {
                 toggleEdit()
-                showToast({
+                toast({
                     title: selectedAddressId
                         ? formatMessage(successfullyUpdatedAddress)
                         : formatMessage(successfullyAddedAddress),
-                    status: 'success',
-                    isClosable: true
+                    type: 'success'
                 })
             }
         } catch (error) {
@@ -227,10 +226,9 @@ const AccountAddresses = () => {
                 },
                 {
                     onSuccess: () => {
-                        showToast({
+                        toast({
                             title: formatMessage(successfullyRemovedAddress),
-                            status: 'success',
-                            isClosable: true
+                            type: 'success'
                         })
                         // Move focus to header after we successfully remove address
                         headingRef?.current?.focus()
