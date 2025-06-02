@@ -64,7 +64,12 @@ Skeleton.propTypes = {
  * The image gallery displays a hero image and thumbnails below it. You can control which
  * image groups that are use by passing in the current selected variation values.
  */
-const ImageGallery = ({imageGroups = [], selectedVariationAttributes = {}, size = 'md', lazy = false}) => {
+const ImageGallery = ({
+    imageGroups = [],
+    selectedVariationAttributes = {},
+    size = 'md',
+    lazy = false
+}) => {
     const [selectedIndex, setSelectedIndex] = useState(0)
     const recipe = useSlotRecipe({key: 'imageGallery'})
     const styles = recipe({size})
