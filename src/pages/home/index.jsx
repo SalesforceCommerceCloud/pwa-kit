@@ -165,12 +165,7 @@ const Home = () => {
                                     title: 'Hello',
                                     description: 'World',
                                     type: 'info',
-                                    action: {
-                                        label: 'Click me',
-                                        onClick: () => {
-                                            console.log('clicked')
-                                        }
-                                    }
+                                    action: <Button>Click me</Button>
                                 })
                             }}
                             target="_blank"

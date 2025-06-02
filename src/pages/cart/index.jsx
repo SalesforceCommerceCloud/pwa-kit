@@ -247,19 +247,21 @@ const Cart = () => {
                 toast({
                     title: formatMessage(TOAST_MESSAGE_ADDED_TO_WISHLIST, {quantity: 1}),
                     type: 'success',
-                    action: {
-                        label: formatMessage(TOAST_ACTION_VIEW_WISHLIST),
-                        onClick: () => navigate('/account/wishlist')
-                    }
+                    action: (
+                        <Button variant="link" onClick={() => navigate('/account/wishlist')}>
+                            {formatMessage(TOAST_ACTION_VIEW_WISHLIST)}
+                        </Button>
+                    )
                 })
             } else {
                 toast({
                     title: formatMessage(TOAST_MESSAGE_ALREADY_IN_WISHLIST),
                     type: 'info',
-                    action: {
-                        label: formatMessage(TOAST_ACTION_VIEW_WISHLIST),
-                        onClick: () => navigate('/account/wishlist')
-                    }
+                    action: (
+                        <Button variant="link" onClick={() => navigate('/account/wishlist')}>
+                            {formatMessage(TOAST_ACTION_VIEW_WISHLIST)}
+                        </Button>
+                    )
                 })
             }
         } catch {

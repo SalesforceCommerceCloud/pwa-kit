@@ -264,10 +264,11 @@ const ProductList = (props) => {
                     toast({
                         title: formatMessage(TOAST_MESSAGE_ADDED_TO_WISHLIST, {quantity: 1}),
                         type: 'success',
-                        action: {
-                            label: formatMessage(TOAST_ACTION_VIEW_WISHLIST),
-                            onClick: () => navigate('/account/wishlist')
-                        }
+                        action: (
+                            <Button variant="link" onClick={() => navigate('/account/wishlist')}>
+                                {formatMessage(TOAST_ACTION_VIEW_WISHLIST)}
+                            </Button>
+                        )
                     })
                 },
                 onSettled: () => {

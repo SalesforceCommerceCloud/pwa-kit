@@ -27,7 +27,7 @@ export default function Toaster({toaster}) {
                             )}
                         </Stack>
                         {toast.action && (
-                            <Toast.ActionTrigger>{toast.action.label}</Toast.ActionTrigger>
+                            <Toast.ActionTrigger asChild>{toast.action}</Toast.ActionTrigger>
                         )}
                         {toast.closable && <Toast.CloseTrigger />}
                     </Toast.Root>
