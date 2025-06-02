@@ -19,12 +19,7 @@ import {toaster} from '../components/toaster'
  *     title: 'Hello',
  *     description: 'World',
  *     type: 'success',
- *     action: {
- *         label: 'Click me',
- *         onClick: () => {
- *             console.log('clicked')
- *         }
- *     }
+ *     action: <Button>Click me</Button>
  * })
  *
  * @returns {Function} - A function for creating toasts.
