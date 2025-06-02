@@ -20,6 +20,7 @@ module.exports = {
         '<rootDir>/src/components/display-price/**/*.test.js',
         '<rootDir>/src/components/product-scroller/**/*.test.js',
         '<rootDir>/src/components/product-tile/**/*.test.js',
+        '<rootDir>/src/components/quantity-picker/**/*.test.js',
         '<rootDir>/src/components/swatch-group/**/*.test.js',
         '<rootDir>/src/utils/responsive-image.test.js',
         '<rootDir>/src/pages/home/**/*.test.js',
