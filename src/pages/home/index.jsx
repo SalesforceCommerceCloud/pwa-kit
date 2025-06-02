@@ -36,7 +36,6 @@ import {heroFeatures, features} from '../../pages/home/data'
 //Hooks
 import useEinstein from '../../hooks/use-einstein'
 import useDataCloud from '../../hooks/use-datacloud'
-import useToast from '../../hooks/use-toast'
 
 // Constants
 import {useServerContext} from '@salesforce/pwa-kit-react-sdk/ssr/universal/hooks'
@@ -54,7 +53,6 @@ const Home = () => {
     const einstein = useEinstein()
     const dataCloud = useDataCloud()
     const {pathname} = useLocation()
-    const toast = useToast()
     const {
         pages: {Home: homeConfig},
         maxCacheAge: MAX_CACHE_AGE,
@@ -120,62 +118,6 @@ const Home = () => {
                                 defaultMessage="Get started"
                                 id="home.link.get_started"
                             />
-                        </Button>
-                        {/* Prior to merging the PR, remove the buttons below */}
-                        <Button
-                            onClick={() => {
-                                console.log('clicked')
-                                toast({
-                                    title: 'Hello',
-                                    description: 'World',
-                                    type: 'success'
-                                })
-                            }}
-                            target="_blank"
-                            width={{base: 'full', md: 'inherit'}}
-                            paddingX={7}
-                            _hover={{textDecoration: 'none'}}
-                            fontSize={{base: 'sm', md: 'md'}}
-                            fontWeight={{base: 'medium', md: 'semibold'}}
-                        >
-                            success toast
-                        </Button>
-                        <Button
-                            onClick={() => {
-                                console.log('clicked')
-                                toast({
-                                    title: 'Hello',
-                                    description: 'World',
-                                    type: 'error'
-                                })
-                            }}
-                            target="_blank"
-                            width={{base: 'full', md: 'inherit'}}
-                            paddingX={7}
-                            _hover={{textDecoration: 'none'}}
-                            fontSize={{base: 'sm', md: 'md'}}
-                            fontWeight={{base: 'medium', md: 'semibold'}}
-                        >
-                            error toast
-                        </Button>
-                        <Button
-                            onClick={() => {
-                                console.log('clicked')
-                                toast({
-                                    title: 'Hello',
-                                    description: 'World',
-                                    type: 'info',
-                                    action: <Button>Click me</Button>
-                                })
-                            }}
-                            target="_blank"
-                            width={{base: 'full', md: 'inherit'}}
-                            paddingX={7}
-                            _hover={{textDecoration: 'none'}}
-                            fontSize={{base: 'sm', md: 'md'}}
-                            fontWeight={{base: 'medium', md: 'semibold'}}
-                        >
-                            action toast
                         </Button>
                     </Stack>
                 }
