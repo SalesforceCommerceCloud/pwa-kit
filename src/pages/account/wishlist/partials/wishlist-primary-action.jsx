@@ -9,7 +9,7 @@ import {Button, useDisclosure} from '@chakra-ui/react'
 import {FormattedMessage, useIntl} from 'react-intl'
 import {useItemVariant} from '../../../../components/item-variant'
 import ProductViewModal from '../../../../components/product-view-modal'
-import {useToast} from '../../../../hooks/use-toast'
+import useToast from '../../../../hooks/use-toast'
 import {API_ERROR_MESSAGE} from '../../../../constants'
 import Link from '../../../../components/link'
 import {useShopperBasketsMutationHelper} from '@salesforce/commerce-sdk-react'
@@ -26,7 +26,7 @@ const WishlistPrimaryAction = () => {
     const isMasterProduct = variant?.type?.master || false
     const isProductASet = variant?.type?.set
     const isProductABundle = variant?.type?.bundle
-    const showToast = useToast()
+    const toast = useToast()
     const [isLoading, setIsLoading] = useState(false)
     const {isOpen, onOpen, onClose} = useDisclosure()
 
@@ -50,7 +50,7 @@ const WishlistPrimaryAction = () => {
 
         try {
             await addItemToNewOrExistingBasket(productItems)
-            showToast({
+            toast({
                 title: formatMessage(
                     {
                         defaultMessage:
@@ -59,13 +59,13 @@ const WishlistPrimaryAction = () => {
                     },
                     {quantity: isAddingASet ? quantity * item.setProducts.length : quantity}
                 ),
-                status: 'success'
+                type: 'success'
             })
             onClose()
         } catch (e) {
-            showToast({
+            toast({
                 title: formatMessage(API_ERROR_MESSAGE),
-                status: 'error'
+                type: 'error'
             })
         } finally {
             setIsLoading(false)

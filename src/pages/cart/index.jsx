@@ -25,7 +25,7 @@ import BundleProductViewModal from '../../components/product-view-modal/bundle'
 import RecommendedProducts from '../../components/recommended-products'
 
 // Hooks
-import {useToast} from '../../hooks/use-toast'
+import useToast from '../../hooks/use-toast'
 import useNavigation from '../../hooks/use-navigation'
 import {useWishList} from '../../hooks/use-wish-list'
 
@@ -208,7 +208,7 @@ const Cart = () => {
     const showError = () => {
         toast({
             title: formatMessage(API_ERROR_MESSAGE),
-            status: 'error'
+            type: 'error'
         })
     }
     /************************* Error handling ***********************/
@@ -246,13 +246,8 @@ const Cart = () => {
                 })
                 toast({
                     title: formatMessage(TOAST_MESSAGE_ADDED_TO_WISHLIST, {quantity: 1}),
-                    status: 'success',
+                    type: 'success',
                     action: (
-                        // it would be better if we could use <Button as={Link}>
-                        // but unfortunately the Link component is not compatible
-                        // with Chakra Toast, since the ToastManager is rendered via portal
-                        // and the toast doesn't have access to intl provider, which is a
-                        // requirement of the Link component.
                         <Button variant="link" onClick={() => navigate('/account/wishlist')}>
                             {formatMessage(TOAST_ACTION_VIEW_WISHLIST)}
                         </Button>
@@ -261,7 +256,7 @@ const Cart = () => {
             } else {
                 toast({
                     title: formatMessage(TOAST_MESSAGE_ALREADY_IN_WISHLIST),
-                    status: 'info',
+                    type: 'info',
                     action: (
                         <Button variant="link" onClick={() => navigate('/account/wishlist')}>
                             {formatMessage(TOAST_ACTION_VIEW_WISHLIST)}
@@ -503,7 +498,7 @@ const Cart = () => {
                 onSuccess: () => {
                     toast({
                         title: formatMessage(TOAST_MESSAGE_REMOVED_ITEM_FROM_CART, {quantity: 1}),
-                        status: 'success'
+                        type: 'success'
                     })
                 },
                 onError: () => {

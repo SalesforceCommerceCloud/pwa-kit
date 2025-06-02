@@ -20,7 +20,7 @@ import CheckoutSkeleton from '../../pages/checkout/partials/checkout-skeleton'
 import {useShopperOrdersMutation, useShopperBasketsMutation} from '@salesforce/commerce-sdk-react'
 import UnavailableProductConfirmationModal from '../../components/unavailable-product-confirmation-modal'
 import {API_ERROR_MESSAGE, TOAST_MESSAGE_REMOVED_ITEM_FROM_CART} from '../../constants'
-import {useToast} from '../../hooks/use-toast'
+import useToast from '../../hooks/use-toast'
 import {useExtensionConfig} from '../../hooks'
 import LoadingSpinner from '../../components/loading-spinner'
 
@@ -172,13 +172,13 @@ const CheckoutContainer = () => {
                 onSuccess: () => {
                     toast({
                         title: formatMessage(TOAST_MESSAGE_REMOVED_ITEM_FROM_CART, {quantity: 1}),
-                        status: 'success'
+                        type: 'success'
                     })
                 },
                 onError: () => {
                     toast({
                         title: formatMessage(API_ERROR_MESSAGE),
-                        status: 'error'
+                        type: 'error'
                     })
                 }
             }
