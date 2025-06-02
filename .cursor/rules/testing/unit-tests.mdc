@@ -1,0 +1,75 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# 🧪 Cursor Unit Test Rules for Components (.mdc)
+
+> These rules are enforced by Cursor IDE for all unit tests in `app/components`.
+
+---
+
+## File Naming & Location
+- Test files are named `index.test.js`.
+- Test files are colocated with the component they test.
+
+## Imports
+- Import React, the component under test, and utilities from `@testing-library/react` and `@testing-library/user-event`.
+- Use `renderWithProviders` for rendering components.
+- Import mocks/helpers at the top.
+
+## Test Structure
+- Use `describe` blocks to group related tests.
+- Use `test` (or `it`) for individual test cases.
+- Use `beforeEach`, `afterEach`, or `beforeAll` for setup/teardown.
+
+## Arrange-Act-Assert Pattern
+- **Arrange**: Set up props, mocks, and data.
+- **Act**: Render with `renderWithProviders`, simulate user actions with `userEvent`/`fireEvent`.
+- **Assert**: Use `screen` queries for DOM/text/behavior checks.
+- For async, use `await` and `waitFor` for assertions.
+
+## Mocking
+- Use `jest.fn()` for event handler mocks.
+- Use `prependHandlersToServer` or `msw` for API mocking.
+- Use `jest.mock` for modules/hooks.
+- Clear mocks/storage after each test.
+
+## Assertions
+- Use `expect(...).toBeInTheDocument()`, `.toHaveBeenCalledTimes()`, `.toHaveTextContent()`, etc.
+- For async, wrap in `await waitFor(() => { ... })`.
+
+## Accessibility
+- Prefer `getByLabelText`, `getByRole`, `getByTestId` for queries.
+
+## General Style
+- Use arrow functions for tests/helpers.
+- Keep tests focused: one behavior per test.
+- Use clear, descriptive test names.
+
+---
+
+## 📝 Example Test Skeleton
+
+```js
+import React from 'react'
+import {screen, waitFor} from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
+import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
+import MyComponent from '.'
+
+describe('MyComponent', () => {
+    beforeEach(() => {
+        jest.clearAllMocks()
+    })
+
+    test('renders expected content', async () => {
+        renderWithProviders(<MyComponent />)
+        expect(screen.getByText('Expected Text')).toBeInTheDocument()
+    })
+})
+```
+
+---
+
+**Cursor will show this checklist when you create or edit unit tests in this folder!**
