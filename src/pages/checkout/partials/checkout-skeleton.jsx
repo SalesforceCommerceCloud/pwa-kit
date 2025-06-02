@@ -18,7 +18,7 @@ const CheckoutSkeleton = () => {
             >
                 <Grid templateColumns={{base: '1fr', lg: '66% 1fr'}} gap={{base: 10, lg: 20}}>
                     <GridItem>
-                        <Stack spacing={4}>
+                        <Stack gap={4}>
                             <Skeleton height="78px" />
                             <Skeleton height="78px" />
                             <Skeleton height="78px" />
@@ -27,13 +27,13 @@ const CheckoutSkeleton = () => {
                     </GridItem>
 
                     <GridItem py={6} px={[4, 4, 0]}>
-                        <Stack spacing={5}>
+                        <Stack gap={5}>
                             <Skeleton height="30px" width="50%" />
 
-                            <Stack spacing={5}>
+                            <Stack gap={5}>
                                 <Skeleton height="30px" width="65%" />
 
-                                <Stack w="full" py={4} borderY="1px" borderColor="gray.200">
+                                <Stack w="full" py={4} borderY="1px" borderColor="gray.200" borderStyle="solid">
                                     <Skeleton height={6} />
                                     <Skeleton height={6} />
                                     <Skeleton height={6} />

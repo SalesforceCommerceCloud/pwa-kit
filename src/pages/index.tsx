@@ -18,9 +18,9 @@ const fallback = <Skeleton height="75vh" width="100%" />
 // Page Loadables
 // const Account = loadable(() => import('overridable!./account'), {fallback})
 // const Cart = loadable(() => import('overridable!./cart'), {fallback})
-// const Checkout = loadable(() => import('overridable!./checkout'), {
-//     fallback
-// })
+const Checkout = loadable(() => import('overridable!./checkout'), {
+    fallback
+})
 // const CheckoutConfirmation = loadable(() => import('overridable!./checkout/confirmation'), {
 //     fallback
 // })
@@ -60,7 +60,7 @@ Home.displayName = 'Home'
 export {
     // Account,
     // Cart,
-    // Checkout,
+    Checkout,
     // CheckoutConfirmation,
     Home
     // Login,
