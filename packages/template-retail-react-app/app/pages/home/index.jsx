@@ -87,6 +87,9 @@ const Home = () => {
 
     return (
         <Box data-testid="home-page" layerStyle="page">
+            <Link color="teal.500" to={'/product-search?q=shirt'}>
+                Product Search Page
+            </Link>
             <Seo
                 title="Home Page"
                 description="Commerce Cloud Retail React App"
