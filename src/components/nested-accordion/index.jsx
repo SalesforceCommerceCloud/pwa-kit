@@ -26,7 +26,7 @@ import {ChevronDownIcon, ChevronRightIcon} from '../../components/icons'
 /**
  * The nested accordion allows you to create, as the name suggest, a nests
  * accordion given a hierarchical data structure. Each nests accordion will
- * be indented to further enhance the hierary view.
+ * be indented to further enhance the hierarchy view.
  */
 const NestedAccordion = (props) => {
     const recipe = useSlotRecipe({key: 'nestedAccordion'})
@@ -55,66 +55,74 @@ const NestedAccordion = (props) => {
     const ItemComponent = props?.itemComponent || NestedAccordion
 
     return (
-        <Accordion.Root className="sf-nested-accordion" {...rest}>
-            {/* Optional accordion items before others in items list.  */}
-            {typeof itemsBefore === 'function' ? itemsBefore({item, depth}) : itemsBefore}
+        <Accordion.Root className="sf-nested-accordion" collapsible lazyMount {...rest}>
+            <Accordion.Context>
+                {(context) => (
+                    <>
+                        {/* Optional accordion items before others in items list.  */}
+                        {typeof itemsBefore === 'function'
+                            ? itemsBefore({item, depth})
+                            : itemsBefore}
 
-            {items.filter(filter).map((item) => {
-                const {id, name} = item
-                const itemsCount = item[itemsCountKey] || item[itemsKey]?.length || 0
+                        {items.filter(filter).map((item) => {
+                            const {id, name} = item
+                            const itemsCount = item[itemsCountKey] || item[itemsKey]?.length || 0
+                            const itemState = context.getItemState(item)
 
-                return (
-                    <Accordion.Item key={id} border="none">
-                        {/* Show item as a leaf node if it has no visible child items. */}
-                        {itemsCount > 0 ? (
-                            <Accordion.ItemTrigger {...styles.internalButton}>
-                                <Accordion.Context>
-                                    {(context) => {
-                                        const {expanded} = context.getItemState(item)
-                                        // {/* Replace default expanded/collapsed icons. */}
-                                        return expanded ? (
-                                            <ChevronDownIcon {...styles.internalButtonIcon} />
-                                        ) : (
-                                            <ChevronRightIcon {...styles.internalButtonIcon} />
-                                        )
-                                    }}
-                                </Accordion.Context>
+                            return (
+                                <Accordion.Item key={id} value={item} border="none">
+                                    {/* Show item as a leaf node if it has no visible child items. */}
+                                    {itemsCount > 0 ? (
+                                        <Accordion.ItemTrigger gap={0} css={styles.internalButton}>
+                                            {itemState.expanded ? (
+                                                <ChevronDownIcon css={styles.internalButtonIcon} />
+                                            ) : (
+                                                <ChevronRightIcon css={styles.internalButtonIcon} />
+                                            )}
 
-                                <Text fontSize={fontSizes[depth]} fontWeight={fontWeights[depth]}>
-                                    {name}
-                                </Text>
-                            </Accordion.ItemTrigger>
-                        ) : (
-                            <Accordion.ItemTrigger
-                                {...styles.leafButton}
-                                as={Link}
-                                to={urlBuilder(item)}
-                            >
-                                <Text fontSize={fontSizes[depth]} fontWeight={fontWeights[depth]}>
-                                    {name}
-                                </Text>
-                            </Accordion.ItemTrigger>
-                        )}
+                                            <Text
+                                                fontSize={fontSizes[depth]}
+                                                fontWeight={fontWeights[depth]}
+                                            >
+                                                {name}
+                                            </Text>
+                                        </Accordion.ItemTrigger>
+                                    ) : (
+                                        <Accordion.ItemTrigger
+                                            css={styles.leafButton}
+                                            as={Link}
+                                            gap={0}
+                                            to={urlBuilder(item)}
+                                        >
+                                            <Text
+                                                fontSize={fontSizes[depth]}
+                                                fontWeight={fontWeights[depth]}
+                                            >
+                                                {name}
+                                            </Text>
+                                        </Accordion.ItemTrigger>
+                                    )}
 
-                        <Accordion.ItemContent {...styles.panel}>
-                            <Accordion.ItemBody>
-                                <ItemComponent
-                                    {...styles.nestedAccordion}
-                                    {...props}
-                                    item={item}
-                                    itemsKey={itemsKey}
-                                    itemsCountKey={itemsCountKey}
-                                    initialDepth={depth + 1}
-                                    itemComponent={NestedAccordion}
-                                />
-                            </Accordion.ItemBody>
-                        </Accordion.ItemContent>
-                    </Accordion.Item>
-                )
-            })}
+                                    <Accordion.ItemContent>
+                                        <ItemComponent
+                                            css={styles.nestedAccordion}
+                                            {...props}
+                                            item={item}
+                                            itemsKey={itemsKey}
+                                            itemsCountKey={itemsCountKey}
+                                            initialDepth={depth + 1}
+                                            itemComponent={NestedAccordion}
+                                        />
+                                    </Accordion.ItemContent>
+                                </Accordion.Item>
+                            )
+                        })}
 
-            {/* Optional accordion items after others in items list.  */}
-            {typeof itemsAfter === 'function' ? itemsAfter({item, depth}) : itemsAfter}
+                        {/* Optional accordion items after others in items list.  */}
+                        {typeof itemsAfter === 'function' ? itemsAfter({item, depth}) : itemsAfter}
+                    </>
+                )}
+            </Accordion.Context>
         </Accordion.Root>
     )
 }
@@ -128,14 +136,14 @@ NestedAccordion.propTypes = {
      */
     item: PropTypes.object.isRequired,
     /**
-     * An array of `AccordionItem` components that will be displayed after all
+     * An array of `Accordion.Item` components that will be displayed after all
      * of the child items. Alternatively you can pass a function that will receive
      * the current item and it's depth, your should return an `AccordionItem` or
      * array of `AccordionItem`'s.
      */
     itemsAfter: PropTypes.oneOfType([PropTypes.array, PropTypes.func]),
     /**
-     * An array of `AccordionItem` components that will be displayed before all
+     * An array of `Accordion.Item` components that will be displayed before all
      * of the child items. Alternatively you can pass a function that will receive
      * the current item and it's depth, your should return an `AccordionItem` or
      * array of `AccordionItem`'s.
