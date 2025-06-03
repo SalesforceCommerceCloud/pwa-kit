@@ -56,25 +56,22 @@ const NestedAccordion = (props) => {
 
     return (
         <Accordion.Root className="sf-nested-accordion" collapsible lazyMount {...rest}>
-            <Accordion.Context>
-                {(context) => (
-                    <>
-                        {/* Optional accordion items before others in items list.  */}
-                        {typeof itemsBefore === 'function'
-                            ? itemsBefore({item, depth})
-                            : itemsBefore}
+            {/* Optional accordion items before others in items list.  */}
+            {typeof itemsBefore === 'function' ? itemsBefore({item, depth}) : itemsBefore}
 
-                        {items.filter(filter).map((item) => {
-                            const {id, name} = item
-                            const itemsCount = item[itemsCountKey] || item[itemsKey]?.length || 0
-                            const itemState = context.getItemState(item)
+            {items.filter(filter).map((item) => {
+                const {id, name} = item
+                const itemsCount = item[itemsCountKey] || item[itemsKey]?.length || 0
 
-                            return (
-                                <Accordion.Item key={id} value={item} border="none">
+                return (
+                    <Accordion.Item key={id} id={id} value={id} border="none">
+                        <Accordion.ItemContext>
+                            {(context) => (
+                                <>
                                     {/* Show item as a leaf node if it has no visible child items. */}
                                     {itemsCount > 0 ? (
                                         <Accordion.ItemTrigger gap={0} css={styles.internalButton}>
-                                            {itemState.expanded ? (
+                                            {context.expanded ? (
                                                 <ChevronDownIcon css={styles.internalButtonIcon} />
                                             ) : (
                                                 <ChevronRightIcon css={styles.internalButtonIcon} />
@@ -114,15 +111,15 @@ const NestedAccordion = (props) => {
                                             itemComponent={NestedAccordion}
                                         />
                                     </Accordion.ItemContent>
-                                </Accordion.Item>
-                            )
-                        })}
+                                </>
+                            )}
+                        </Accordion.ItemContext>
+                    </Accordion.Item>
+                )
+            })}
 
-                        {/* Optional accordion items after others in items list.  */}
-                        {typeof itemsAfter === 'function' ? itemsAfter({item, depth}) : itemsAfter}
-                    </>
-                )}
-            </Accordion.Context>
+            {/* Optional accordion items after others in items list.  */}
+            {typeof itemsAfter === 'function' ? itemsAfter({item, depth}) : itemsAfter}
         </Accordion.Root>
     )
 }
