@@ -29,6 +29,9 @@ import {withReactIntl} from './components/with-react-intl'
 import {withStorefrontPreview} from './components/with-storefront-preview'
 import extensionMeta from '../extension-meta.json'
 
+// THIS CODE IS FOR TESTING ONLY
+import ImageGallery from './components/image-gallery'
+
 // Pages
 import * as Pages from './pages'
 

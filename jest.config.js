@@ -17,6 +17,7 @@ module.exports = {
         '<rootDir>/src/components/icons/**/*.test.js',
         '<rootDir>/src/components/social-icons/**/*.test.js',
         '<rootDir>/src/components/hero/**/*.test.js',
+        '<rootDir>/src/components/image-gallery/**/*.test.js',
         '<rootDir>/src/components/display-price/**/*.test.js',
         '<rootDir>/src/components/product-scroller/**/*.test.js',
         '<rootDir>/src/components/product-tile/**/*.test.js',
