@@ -35,21 +35,6 @@ import * as Pages from './pages'
 // THIS CODE IS FOR TESTING ONLY
 import QuantityPicker from './components/quantity-picker'
 
-const QuantityPickerPage = () => {
-    const [quantity, setQuantity] = useState(0)
-    return (
-        <QuantityPicker
-            id="quantity"
-            step={1}
-            value={quantity}
-            min={0}
-            onValueChange={({value, valueAsNumber}: {value: string; valueAsNumber: number}) => {
-                setQuantity(valueAsNumber)
-            }}
-            productName="T-Shirt"
-        />
-    )
-}
 class ChakraStorefront extends ApplicationExtension<Config> {
     static readonly id = extensionMeta.id
 
@@ -74,11 +59,6 @@ class ChakraStorefront extends ApplicationExtension<Config> {
         const config = this.getConfig()
 
         const extensionRoutes = [
-            {
-                path: '/quantity-picker',
-                component: QuantityPickerPage,
-                exact: true
-            },
             {
                 path: config.pages.Home && config.pages.Home.path,
                 component: Pages.Home,

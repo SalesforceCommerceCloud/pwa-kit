@@ -51,6 +51,10 @@ const QuantityPicker = (props) => {
             <HStack>
                 <NumberInput.DecrementTrigger asChild>
                     <Button
+                        // NOTE: Adding css directly because it isn't working via the recipe.
+                        _active={{
+                            bg: 'blue.100'
+                        }}
                         css={styles.decrementTrigger}
                         data-testid="quantity-decrement"
                         variant="outline"
@@ -79,6 +83,10 @@ const QuantityPicker = (props) => {
                 />
                 <NumberInput.IncrementTrigger asChild>
                     <Button
+                        // NOTE: Adding css directly because it isn't working via the recipe.
+                        _active={{
+                            bg: 'blue.100'
+                        }}
                         css={styles.incrementTrigger}
                         data-testid="quantity-increment"
                         variant="outline"

@@ -22,13 +22,13 @@ export default defineSlotRecipe({
         },
         incrementTrigger: {
             _active: {
-                bgColor: 'blue.500'
+                bgColor: 'blue.100'
             },
             borderColor: 'blue.500'
         },
         decrementTrigger: {
             _active: {
-                bgColor: 'blue.500'
+                bgColor: 'blue.100'
             },
             borderColor: 'blue.500'
         }
