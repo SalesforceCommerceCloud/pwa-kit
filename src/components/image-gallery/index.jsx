@@ -39,7 +39,7 @@ export const Skeleton = ({size}) => {
     const styles = recipe({size})
 
     return (
-        <Box data-testid="sf-image-gallery-skeleton">
+        <Box data-testid="sf-image-gallery-skeleton" css={styles.container}>
             <Flex flexDirection="column">
                 <AspectRatio ratio={1} css={styles.heroImageSkeleton}>
                     <ChakraSkeleton />
