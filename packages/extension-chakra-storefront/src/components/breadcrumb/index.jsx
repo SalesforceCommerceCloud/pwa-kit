@@ -44,16 +44,16 @@ const Breadcrumb = ({categories, ...rest}) => {
                     <Fragment key={category.id}>
                         <ChakraBreadcrumb.Item data-testid="sf-crumb-item">
                             <ChakraBreadcrumb.Link
-                        as={RouteLink}
-                        to={categoryUrlBuilder(category, intl.locale)}
+                                as={RouteLink}
+                                to={categoryUrlBuilder(category, intl.locale)}
                                 css={styles.link}
-                    >
-                        {category.name}
+                            >
+                                {category.name}
                             </ChakraBreadcrumb.Link>
                         </ChakraBreadcrumb.Item>
                         {index < categories.length - 1 && <ChakraBreadcrumb.Separator />}
                     </Fragment>
-            ))}
+                ))}
             </ChakraBreadcrumb.List>
         </ChakraBreadcrumb.Root>
     )

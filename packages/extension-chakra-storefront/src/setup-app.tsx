@@ -7,14 +7,14 @@
 
 // Third-Party
 import React from 'react'
+import {RouteProps} from 'react-router-dom'
 
 // Platform Imports
 import {ApplicationExtension} from '@salesforce/pwa-kit-extension-sdk/react'
 import {applyHOCs} from '@salesforce/pwa-kit-extension-sdk/react/utils'
 import {
     BeforeRouteMatchParams,
-    GetRoutesParams,
-    RouteProps
+    GetRoutesParams
 } from '@salesforce/pwa-kit-extension-sdk/types'
 
 // Local Imports
@@ -31,6 +31,9 @@ import extensionMeta from '../extension-meta.json'
 
 // Pages
 import * as Pages from './pages'
+
+// Components
+import Breadcrumb from './components/breadcrumb'
 
 class ChakraStorefront extends ApplicationExtension<Config> {
     static readonly id = extensionMeta.id
@@ -59,6 +62,74 @@ class ChakraStorefront extends ApplicationExtension<Config> {
             {
                 path: config.pages.Home && config.pages.Home.path,
                 component: Pages.Home,
+                exact: true
+            },
+            {
+                path: '/breadcrumb-test',
+                component: () => {
+                    const fullCategoryPath = [
+                        {
+                            id: 'root',
+                            name: 'Home'
+                        },
+                        {
+                            id: 'womens',
+                            name: "Women's"
+                        },
+                        {
+                            id: 'clothing',
+                            name: 'Clothing'
+                        },
+                        {
+                            id: 'dresses',
+                            name: 'Dresses'
+                        }
+                    ]
+
+                    const shortPath = [
+                        {
+                            id: 'root',
+                            name: 'Home'
+                        },
+                        {
+                            id: 'mens',
+                            name: "Men's"
+                        }
+                    ]
+
+                    const singleItem = [
+                        {
+                            id: 'root',
+                            name: 'Home'
+                        }
+                    ]
+
+                    return (
+                        <div style={{ padding: '32px', maxWidth: '1200px', margin: '0 auto' }}>
+                            <h1 style={{ fontSize: '2rem', marginBottom: '24px' }}>Breadcrumb Component Examples</h1>
+                            
+                            <div style={{ marginBottom: '24px' }}>
+                                <h2 style={{ fontSize: '1.5rem', marginBottom: '16px' }}>Full Category Path</h2>
+                                <Breadcrumb categories={fullCategoryPath} />
+                            </div>
+
+                            <div style={{ marginBottom: '24px' }}>
+                                <h2 style={{ fontSize: '1.5rem', marginBottom: '16px' }}>Short Path</h2>
+                                <Breadcrumb categories={shortPath} />
+                            </div>
+
+                            <div style={{ marginBottom: '24px' }}>
+                                <h2 style={{ fontSize: '1.5rem', marginBottom: '16px' }}>Single Item</h2>
+                                <Breadcrumb categories={singleItem} />
+                            </div>
+
+                            <div style={{ marginBottom: '24px' }}>
+                                <h2 style={{ fontSize: '1.5rem', marginBottom: '16px' }}>Empty State</h2>
+                                <Breadcrumb categories={[]} />
+                            </div>
+                        </div>
+                    )
+                },
                 exact: true
             }
             // {
