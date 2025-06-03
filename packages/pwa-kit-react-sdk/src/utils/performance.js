@@ -5,6 +5,8 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import logger from './logger-instance'
+import {createChildSpan, endSpan, logPerformanceMetric} from './opentelemetry'
+
 export const PERFORMANCE_MARKS = {
     total: 'ssr.total',
     renderToString: 'ssr.render-to-string',
@@ -37,6 +39,7 @@ export default class PerformanceTimer {
             end: new Map()
         }
         this.metrics = []
+        this.spans = new Map()
     }
 
     /**
@@ -61,17 +64,18 @@ export default class PerformanceTimer {
     }
 
     /**
-     * A utility function to format and log the performance metrics.
-     *
-     * @function
-     * @private
+     * Logs all performance metrics
      */
     log() {
+        // Log each metric once with the standardized format
         this.metrics.forEach((metric) => {
-            logger.info(`${metric.name} - ${metric.duration}ms ${metric.detail || ''}`, {
-                namespace: 'performance'
+            logPerformanceMetric(metric.name, metric.duration, {
+                'performance.detail': metric.detail || ''
             })
         })
+
+        // Clear the metrics after logging
+        this.metrics = []
     }
 
     /**
@@ -81,47 +85,79 @@ export default class PerformanceTimer {
      * @function
      * @private
      */
-    mark(name, type, options = {}) {
-        if (!this.enabled) {
+    mark(name, type, detail = '') {
+        if (!name || !type || !this.enabled) {
             return
         }
 
-        if (!name) {
-            logger.warn('Performance mark cannot be created because the name is undefined.', {
-                namespace: 'performance'
-            })
-            return
-        }
+        try {
+            // Format detail as a string if it's an object
+            const formattedDetail = typeof detail === 'object' ? JSON.stringify(detail) : detail
 
-        if (type !== this.MARKER_TYPES.START && type !== this.MARKER_TYPES.END) {
-            logger.warn(
-                'Performance mark cannot be created because the type must be either "start" or "end".',
-                {
-                    namespace: 'performance'
-                }
-            )
-            return
-        }
-
-        const timestamp = performance.now()
-        const isEnd = type === this.MARKER_TYPES.END
-        const storage = isEnd ? this.marks.end : this.marks.start
-        storage.set(name, {
-            name,
-            timestamp,
-            detail: options.detail
-        })
-
-        if (isEnd) {
-            const startMark = this.marks.start.get(name)
-            if (startMark) {
-                const measurement = {
-                    name,
-                    duration: timestamp - startMark.timestamp,
-                    detail: options.detail
-                }
-                this.metrics.push(measurement)
+            const mark = {
+                name: `${name}.${type}`,
+                entryType: 'mark',
+                startTime: performance.now(),
+                detail: formattedDetail
             }
+
+            performance.mark(mark.name, {
+                detail: mark.detail
+            })
+
+            // Only create spans for 'start' events and store them for later use
+            if (type === 'start') {
+                if (!this.spans.has(name)) {
+                    const span = createChildSpan(name, {
+                        performance_mark: name,
+                        performance_type: type,
+                        performance_detail: formattedDetail
+                    })
+                    if (span) {
+                        this.spans.set(name, span)
+                    }
+                }
+            } else if (type === 'end') {
+                const startMark = `${name}.start`
+                const endMark = `${name}.end`
+
+                try {
+                    const measure = performance.measure(name, startMark, endMark)
+
+                    // Add the metric to the metrics array for Server-Timing header
+                    this.metrics.push({
+                        name,
+                        duration: measure.duration,
+                        detail: formattedDetail
+                    })
+
+                    // End the corresponding span if it exists
+                    const span = this.spans.get(name)
+                    if (span) {
+                        endSpan(span)
+                        this.spans.delete(name)
+                    }
+
+                    // Clear the marks
+                    performance.clearMarks(startMark)
+                    performance.clearMarks(endMark)
+                    performance.clearMeasures(name)
+                } catch (error) {
+                    logger.warn('Failed to measure performance mark', {
+                        name,
+                        error: error.message,
+                        startMark,
+                        endMark
+                    })
+                }
+            }
+        } catch (error) {
+            logger.error('Error creating performance mark', {
+                name,
+                type,
+                error: error.message,
+                stack: error.stack
+            })
         }
     }
 }
