@@ -1,15 +1,21 @@
 /*
- * Copyright (c) 2021, salesforce.com, inc.
+ * Copyright (c) 2025, salesforce.com, inc.
  * All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-export default {
-    baseStyle: {
+/*
+ * Copyright (c) 2025, Salesforce, Inc.
+ * All rights reserved.
+ * SPDX-License-Identifier: BSD-3-Clause
+ * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
+ */
+import {defineSlotRecipe} from '@chakra-ui/react'
+
+export default defineSlotRecipe({
+    slots: ['container', 'internalButton', 'internalButtonIcon', 'leafButton', 'nestedAccordion'],
+    base: {
         container: {},
-        nestedAccordion: {
-            paddingLeft: 4
-        },
         internalButton: {},
         internalButtonIcon: {
             color: 'grey',
@@ -20,7 +26,9 @@ export default {
             paddingLeft: 8,
             paddingTop: 2,
             paddingBottom: 2
+        },
+        nestedAccordion: {
+            paddingLeft: 4
         }
-    },
-    parts: ['container', 'nestedAccordion', 'internalButton', 'leafButtonIcon', 'leafButton']
-}
+    }
+})

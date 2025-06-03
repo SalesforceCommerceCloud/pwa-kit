@@ -41,8 +41,8 @@ import footer from './components/project/footer'
 import checkoutFooter from './components/project/checkout-footer'
 import linkList from './components/project/links-list'
 // import DrawerMenu from './components/project/drawer-menu'
-// import NestedAccordion from './components/project/nested-accordion'
 // import LocaleSelector from './components/project/locale-selector'
+import nestedAccordion from './components/project/nested-accordion'
 import offlineBanner from './components/project/offline-banner'
 // import Pagination from './components/project/pagination'
 import productTile from './components/project/product-tile'
@@ -110,6 +110,7 @@ export const overrides = defineConfig({
             footer,
             header,
             linkList,
+            nestedAccordion,
             offlineBanner,
             productTile,
             socialIcons,

@@ -32,6 +32,39 @@ import extensionMeta from '../extension-meta.json'
 // Pages
 import * as Pages from './pages'
 
+// THIS CODE IS FOR TESTING ONLY
+import NestedAccordion from './components/nested-accordion'
+
+const NestedAccordionPage = () => {
+    return (
+        <NestedAccordion
+            item={{
+                id: 't1',
+                name: 'Test One',
+                items: [
+                    {
+                        id: 't1-1',
+                        name: 'Test One One'
+                    },
+                    {
+                        id: 't1-2',
+                        name: 'Test One Two',
+                        items: [
+                            {
+                                id: 't1-2-1',
+                                name: 'Test One Two One'
+                            },
+                            {
+                                id: 't1-2-2',
+                                name: 'Test One Two Two'
+                            }
+                        ]
+                    }
+                ]
+            }}
+        />
+    )
+}
 class ChakraStorefront extends ApplicationExtension<Config> {
     static readonly id = extensionMeta.id
 
@@ -56,6 +89,11 @@ class ChakraStorefront extends ApplicationExtension<Config> {
         const config = this.getConfig()
 
         const extensionRoutes = [
+            {
+                path: '/nested-accordion',
+                component: NestedAccordionPage,
+                exact: true
+            },
             {
                 path: config.pages.Home && config.pages.Home.path,
                 component: Pages.Home,
