@@ -1,6 +1,6 @@
 {
   "name": "@salesforce/retail-react-app",
-  "version": "6.1.0-dev.1",
+  "version": "6.1.0",
   "license": "See license in LICENSE",
   "author": "cc-pwa-kit@salesforce.com",
   "ccExtensibility": {
@@ -35,6 +35,7 @@
     "last 4 ChromeAndroid versions"
   ],
   "dependencies": {
+    "@adyen/adyen-salesforce-pwa": "^2.0.1",
     "@chakra-ui/icons": "^2.0.19",
     "@chakra-ui/react": "^2.6.0",
     "@chakra-ui/skip-nav": "^2.0.15",
@@ -46,10 +47,10 @@
     "@loadable/component": "^5.15.3",
     "@peculiar/webcrypto": "^1.4.2",
     "@salesforce/cc-datacloud-typescript": "1.1.2",
-    "@salesforce/commerce-sdk-react": "3.3.0-dev.1",
-    "@salesforce/pwa-kit-dev": "3.10.0-dev.1",
-    "@salesforce/pwa-kit-react-sdk": "3.10.0-dev.1",
-    "@salesforce/pwa-kit-runtime": "3.10.0-dev.1",
+    "@salesforce/commerce-sdk-react": "3.3.0",
+    "@salesforce/pwa-kit-dev": "3.10.0",
+    "@salesforce/pwa-kit-react-sdk": "3.10.0",
+    "@salesforce/pwa-kit-runtime": "3.10.0",
     "@tanstack/react-query": "^4.28.0",
     "@tanstack/react-query-devtools": "^4.29.1",
     "@testing-library/dom": "^9.0.1",
@@ -86,7 +87,9 @@
     "react-router-dom": "^5.3.4"
   },
   "devDependencies": {
-    "cross-env": "^5.2.1"
+    "cross-env": "^5.2.1",
+    "css-loader": "^6.8.1",
+    "style-loader": "^3.3.3"
   },
   "overrides": {
     "react-router": {
