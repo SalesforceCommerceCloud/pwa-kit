@@ -1,8 +1,9 @@
 ## v3.11.0-dev.0 (May 23, 2025)
 - Change the default ECOM instance in the generated application [#2610](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2610)
+- Load active data scripts on demand only [#2623](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2623)
 
 ## v3.10.0 (May 22, 2025)
-- Add Data Cloud API configuration to `default.js`. [#2318] (https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2229)
+- Add Data Cloud API configuration to `default.js`. [#2318](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2318)
 - Fix dependencies vulnerabilities [#2338](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2338)
 
 ## v3.9.1 (Mar 05, 2025)
@@ -10,9 +11,9 @@
 
 ## v3.9.0 (Feb 18, 2025)
 
-- Update `default.js` and `ssr.js` template to support new passwordless, social, and reset password flows. [#2263] (https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2263)
+- Update `default.js` and `ssr.js` template to support new passwordless, social, and reset password flows. [#2263](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2263)
 - Support Node 22 [#2218](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2218)
-- Update `default.js` template to include new login configurations [#2079] (https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2079)
+- Update `default.js` template to include new login configurations [#2079](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2079)
 - Handle import error when ssr.js imports from template retail react app [#2270](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2270)
 
 ## v3.8.0 (Oct 28, 2024)
