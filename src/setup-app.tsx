@@ -6,7 +6,7 @@
  */
 
 // Third-Party
-import React from 'react'
+import React, {useState} from 'react'
 
 // Platform Imports
 import {ApplicationExtension} from '@salesforce/pwa-kit-extension-sdk/react'
@@ -28,6 +28,9 @@ import {withMultiSite} from './components/with-multi-site'
 import {withReactIntl} from './components/with-react-intl'
 import {withStorefrontPreview} from './components/with-storefront-preview'
 import extensionMeta from '../extension-meta.json'
+
+// THIS CODE IS FOR TESTING ONLY
+import ImageGallery from './components/image-gallery'
 
 // Pages
 import * as Pages from './pages'
@@ -379,6 +382,7 @@ const NestedAccordionPage = () => {
         />
     )
 }
+
 class ChakraStorefront extends ApplicationExtension<Config> {
     static readonly id = extensionMeta.id
 
