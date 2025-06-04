@@ -32,7 +32,7 @@ import extensionMeta from '../extension-meta.json'
 // Pages
 import * as Pages from './pages'
 
-// THIS CODE IS FOR TESTING ONLY
+// THIS CODE IS FOR TESTING ONLY AND WILL BE REMOVED BEFORE MERGING
 import {Accordion} from '@chakra-ui/react'
 
 import NestedAccordion from './components/nested-accordion'
@@ -350,6 +350,7 @@ const NestedAccordionPage = () => {
     return (
         <NestedAccordion
             multiple
+            urlBuilder={() => '/mock-path'}
             item={mockCategories.root}
             itemsKey="categories"
             itemsFilter="c_showInMenu"
