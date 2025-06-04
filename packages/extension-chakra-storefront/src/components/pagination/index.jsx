@@ -11,13 +11,7 @@ import {useIntl} from 'react-intl'
 import {Link as RouteLink, useHistory} from 'react-router-dom'
 
 // Components
-import {
-    Button,
-    Flex,
-    Text,
-    NativeSelect,
-    useSlotRecipe
-} from '@chakra-ui/react'
+import {Button, Flex, Text, NativeSelect, useSlotRecipe} from '@chakra-ui/react'
 
 // Icons
 import {ChevronLeftIcon, ChevronRightIcon} from '../../components/icons'
@@ -83,10 +77,7 @@ const Pagination = (props) => {
             <Flex paddingLeft={4} paddingRight={4} alignItems="center">
                 {urls.length > 1 ? (
                     <Flex alignItems="center" gap={2}>
-                        <NativeSelect.Root 
-                            size="sm"
-                            css={styles.text}
-                        >
+                        <NativeSelect.Root size="sm" css={styles.text}>
                             <NativeSelect.Field
                                 value={currentURL}
                                 onChange={(e) => {
