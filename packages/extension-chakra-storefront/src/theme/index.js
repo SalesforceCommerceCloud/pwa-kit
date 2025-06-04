@@ -44,7 +44,7 @@ import linkList from './components/project/links-list'
 // import NestedAccordion from './components/project/nested-accordion'
 // import LocaleSelector from './components/project/locale-selector'
 import offlineBanner from './components/project/offline-banner'
-// import Pagination from './components/project/pagination'
+import pagination from './components/project/pagination'
 import productTile from './components/project/product-tile'
 import quantityPicker from './components/project/quantity-picker'
 import socialIcons from './components/project/social-icons'
@@ -113,6 +113,7 @@ export const overrides = defineConfig({
             imageGallery,
             linkList,
             offlineBanner,
+            pagination,
             productTile,
             quantityPicker,
             socialIcons,

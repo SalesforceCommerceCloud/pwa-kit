@@ -7,14 +7,14 @@
 
 // Third-Party
 import React, {useState} from 'react'
+import {RouteProps} from 'react-router-dom'
 
 // Platform Imports
 import {ApplicationExtension} from '@salesforce/pwa-kit-extension-sdk/react'
 import {applyHOCs} from '@salesforce/pwa-kit-extension-sdk/react/utils'
 import {
     BeforeRouteMatchParams,
-    GetRoutesParams,
-    RouteProps
+    GetRoutesParams
 } from '@salesforce/pwa-kit-extension-sdk/types'
 
 // Local Imports
@@ -29,14 +29,11 @@ import {withReactIntl} from './components/with-react-intl'
 import {withStorefrontPreview} from './components/with-storefront-preview'
 import extensionMeta from '../extension-meta.json'
 
-// THIS CODE IS FOR TESTING ONLY
-import ImageGallery from './components/image-gallery'
-
 // Pages
 import * as Pages from './pages'
 
-// THIS CODE IS FOR TESTING ONLY
-import QuantityPicker from './components/quantity-picker'
+//TODO: THIS CODE IS FOR TESTING ONLY
+import Pagination from './components/pagination'
 
 class ChakraStorefront extends ApplicationExtension<Config> {
     static readonly id = extensionMeta.id
@@ -65,6 +62,79 @@ class ChakraStorefront extends ApplicationExtension<Config> {
             {
                 path: config.pages.Home && config.pages.Home.path,
                 component: Pages.Home,
+                exact: true
+            },
+            //TODO: THIS CODE IS FOR TESTING ONLY
+            {
+                path: '/pagination-test',
+                component: () => {
+                    // Sample URLs for testing pagination
+                    const sampleUrls = [
+                        '/products?page=1',
+                        '/products?page=2',
+                        '/products?page=3',
+                        '/products?page=4',
+                        '/products?page=5',
+                        '/products?page=6',
+                        '/products?page=7',
+                        '/products?page=8',
+                        '/products?page=9',
+                        '/products?page=10'
+                    ]
+
+                    return (
+                        <div style={{padding: '32px', maxWidth: '1200px', margin: '0 auto'}}>
+                            <h1 style={{fontSize: '2rem', marginBottom: '24px'}}>
+                                Pagination Component Examples
+                            </h1>
+
+                            <div style={{marginBottom: '32px'}}>
+                                <h2 style={{fontSize: '1.5rem', marginBottom: '16px'}}>
+                                    First Page (Page 1 of 10)
+                                </h2>
+                                <Pagination urls={sampleUrls} currentURL="/products?page=1" />
+                            </div>
+
+                            <div style={{marginBottom: '32px'}}>
+                                <h2 style={{fontSize: '1.5rem', marginBottom: '16px'}}>
+                                    Middle Page (Page 5 of 10)
+                                </h2>
+                                <Pagination urls={sampleUrls} currentURL="/products?page=5" />
+                            </div>
+
+                            <div style={{marginBottom: '32px'}}>
+                                <h2 style={{fontSize: '1.5rem', marginBottom: '16px'}}>
+                                    Last Page (Page 10 of 10)
+                                </h2>
+                                <Pagination urls={sampleUrls} currentURL="/products?page=10" />
+                            </div>
+
+                            <div style={{marginBottom: '32px'}}>
+                                <h2 style={{fontSize: '1.5rem', marginBottom: '16px'}}>
+                                    Single Page (1 of 1)
+                                </h2>
+                                <Pagination
+                                    urls={['/products?page=1']}
+                                    currentURL="/products?page=1"
+                                />
+                            </div>
+
+                            <div style={{marginBottom: '32px'}}>
+                                <h2 style={{fontSize: '1.5rem', marginBottom: '16px'}}>
+                                    Three Pages (Page 2 of 3)
+                                </h2>
+                                <Pagination
+                                    urls={[
+                                        '/products?page=1',
+                                        '/products?page=2',
+                                        '/products?page=3'
+                                    ]}
+                                    currentURL="/products?page=2"
+                                />
+                            </div>
+                        </div>
+                    )
+                },
                 exact: true
             }
             // {
