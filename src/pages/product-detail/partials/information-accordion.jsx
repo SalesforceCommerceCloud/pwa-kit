@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Salesforce, Inc.
+ * Copyright (c) 2025, Salesforce, Inc.
  * All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
@@ -7,15 +7,7 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import {
-    Accordion,
-    AccordionItem,
-    AccordionButton,
-    AccordionPanel,
-    AccordionIcon,
-    Box,
-    Stack
-} from '@chakra-ui/react'
+import {Accordion, Box, Span, Stack} from '@chakra-ui/react'
 import {useIntl} from 'react-intl'
 
 const InformationAccordion = ({product}) => {
@@ -23,92 +15,93 @@ const InformationAccordion = ({product}) => {
 
     return (
         <Stack direction="row" spacing={[0, 0, 0, 16]}>
-            <Accordion allowMultiple maxWidth={'896px'} flex={[1, 1, 1, 5]}>
+            <Accordion.Root collapsible multiple maxWidth={'896px'} flex={[1, 1, 1, 5]}>
                 {/* Details */}
-                <AccordionItem>
-                    <h2>
-                        <AccordionButton height="64px">
-                            <Box flex="1" textAlign="left" fontWeight="bold" fontSize="lg">
-                                {formatMessage({
-                                    defaultMessage: 'Product Detail',
-                                    id: 'product_detail.accordion.button.product_detail'
-                                })}
-                            </Box>
-                            <AccordionIcon />
-                        </AccordionButton>
-                    </h2>
-                    <AccordionPanel mb={6} mt={4}>
-                        <div
-                            dangerouslySetInnerHTML={{
-                                __html: product?.longDescription
-                            }}
-                        />
-                    </AccordionPanel>
-                </AccordionItem>
+                <Accordion.Item key="details" value="details">
+                    <Accordion.ItemTrigger height="64px">
+                        <Span flex="1" textAlign="left" fontWeight="bold" fontSize="lg">
+                            {formatMessage({
+                                defaultMessage: 'Product Detail',
+                                id: 'product_detail.accordion.button.product_detail'
+                            })}
+                        </Span>
+                        <Accordion.ItemIndicator />
+                    </Accordion.ItemTrigger>
+                    <Accordion.ItemContent>
+                        <Accordion.ItemBody>
+                            <div
+                                dangerouslySetInnerHTML={{
+                                    __html: product?.longDescription
+                                }}
+                            />
+                        </Accordion.ItemBody>
+                    </Accordion.ItemContent>
+                </Accordion.Item>
 
                 {/* Size & Fit */}
-                <AccordionItem>
-                    <h2>
-                        <AccordionButton height="64px">
-                            <Box flex="1" textAlign="left" fontWeight="bold" fontSize="lg">
-                                {formatMessage({
-                                    defaultMessage: 'Size & Fit',
-                                    id: 'product_detail.accordion.button.size_fit'
-                                })}
-                            </Box>
-                            <AccordionIcon />
-                        </AccordionButton>
-                    </h2>
-                    <AccordionPanel mb={6} mt={4}>
-                        {formatMessage({
-                            defaultMessage: 'Coming Soon',
-                            id: 'product_detail.accordion.message.coming_soon'
-                        })}
-                    </AccordionPanel>
-                </AccordionItem>
+                <Accordion.Item key="size&fit" value="size&fit">
+                    <Accordion.ItemTrigger height="64px">
+                        <Span flex="1" textAlign="left" fontWeight="bold" fontSize="lg">
+                            {formatMessage({
+                                defaultMessage: 'Size & Fit',
+                                id: 'product_detail.accordion.button.size_fit'
+                            })}
+                        </Span>
+                        <Accordion.ItemIndicator />
+                    </Accordion.ItemTrigger>
+                    <Accordion.ItemContent>
+                        <Accordion.ItemBody>
+                            {formatMessage({
+                                defaultMessage: 'Coming Soon',
+                                id: 'product_detail.accordion.message.coming_soon'
+                            })}
+                        </Accordion.ItemBody>
+                    </Accordion.ItemContent>
+                </Accordion.Item>
 
                 {/* Reviews */}
-                <AccordionItem>
-                    <h2>
-                        <AccordionButton height="64px">
-                            <Box flex="1" textAlign="left" fontWeight="bold" fontSize="lg">
-                                {formatMessage({
-                                    defaultMessage: 'Reviews',
-                                    id: 'product_detail.accordion.button.reviews'
-                                })}
-                            </Box>
-                            <AccordionIcon />
-                        </AccordionButton>
-                    </h2>
-                    <AccordionPanel mb={6} mt={4}>
-                        {formatMessage({
-                            defaultMessage: 'Coming Soon',
-                            id: 'product_detail.accordion.message.coming_soon'
-                        })}
-                    </AccordionPanel>
-                </AccordionItem>
+                <Accordion.Item key="reviews" value="reviews">
+                    <Accordion.ItemTrigger height="64px">
+                        <Span flex="1" textAlign="left" fontWeight="bold" fontSize="lg">
+                            {formatMessage({
+                                defaultMessage: 'Reviews',
+                                id: 'product_detail.accordion.button.reviews'
+                            })}
+                        </Span>
+                        <Accordion.ItemIndicator />
+                    </Accordion.ItemTrigger>
+                    <Accordion.ItemContent>
+                        <Accordion.ItemBody>
+                            {formatMessage({
+                                defaultMessage: 'Coming Soon',
+                                id: 'product_detail.accordion.message.coming_soon'
+                            })}
+                        </Accordion.ItemBody>
+                    </Accordion.ItemContent>
+                </Accordion.Item>
 
                 {/* Questions */}
-                <AccordionItem>
-                    <h2>
-                        <AccordionButton height="64px">
-                            <Box flex="1" textAlign="left" fontWeight="bold" fontSize="lg">
-                                {formatMessage({
-                                    defaultMessage: 'Questions',
-                                    id: 'product_detail.accordion.button.questions'
-                                })}
-                            </Box>
-                            <AccordionIcon />
-                        </AccordionButton>
-                    </h2>
-                    <AccordionPanel mb={6} mt={4}>
-                        {formatMessage({
-                            defaultMessage: 'Coming Soon',
-                            id: 'product_detail.accordion.message.coming_soon'
-                        })}
-                    </AccordionPanel>
-                </AccordionItem>
-            </Accordion>
+                <Accordion.Item key="questions" value="questions">
+                    <Accordion.ItemTrigger height="64px">
+                        <Span flex="1" textAlign="left" fontWeight="bold" fontSize="lg">
+                            {formatMessage({
+                                defaultMessage: 'Questions',
+                                id: 'product_detail.accordion.button.questions'
+                            })}
+                        </Span>
+                        <Accordion.ItemIndicator />
+                    </Accordion.ItemTrigger>
+                    <Accordion.ItemContent>
+                        <Accordion.ItemBody>
+                            {formatMessage({
+                                defaultMessage: 'Coming Soon',
+                                id: 'product_detail.accordion.message.coming_soon'
+                            })}
+                        </Accordion.ItemBody>
+                    </Accordion.ItemContent>
+                </Accordion.Item>
+            </Accordion.Root>
+
             <Box display={['none', 'none', 'none', 'block']} flex={4}></Box>
         </Stack>
     )

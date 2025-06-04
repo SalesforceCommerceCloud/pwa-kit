@@ -8,7 +8,6 @@ import {defineRecipe} from '@chakra-ui/react'
 
 export default defineRecipe({
     base: {
-        borderRadius: 'base',
-        opacity: 0.3
+        borderRadius: 'base'
     }
 })

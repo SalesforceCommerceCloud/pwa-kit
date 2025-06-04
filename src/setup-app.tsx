@@ -6,7 +6,7 @@
  */
 
 // Third-Party
-import React from 'react'
+import React, {useState} from 'react'
 
 // Platform Imports
 import {ApplicationExtension} from '@salesforce/pwa-kit-extension-sdk/react'
@@ -61,63 +61,11 @@ class ChakraStorefront extends ApplicationExtension<Config> {
                 component: Pages.Home,
                 exact: true
             },
-            // {
-            //     path: [
-            //         config.pages.Login && config.pages.Login.path,
-            //         config.login.passwordless.enabled && config.login.passwordless.landingPath
-            //     ].filter(Boolean),
-            //     component: Pages.Login,
-            //     exact: true
-            // },
-            // {
-            //     path: config.pages.Registration && config.pages.Registration.path,
-            //     component: Pages.Registration,
-            //     exact: true
-            // },
-            // {
-            //     path: [
-            //         config.pages.ResetPassword && config.pages.ResetPassword.path,
-            //         config.login.resetPassword && config.login.resetPassword.landingPath
-            //     ].filter(Boolean),
-            //     component: Pages.ResetPassword,
-            //     exact: true
-            // },
-            // {
-            //     path: config.pages.Account && config.pages.Account.path,
-            //     component: Pages.Account
-            // },
             {
                 path: config.pages.Checkout && config.pages.Checkout.path,
                 component: Pages.Checkout,
                 exact: true
             }
-            // {
-            //     path: config.pages.CheckoutConfirmation && config.pages.CheckoutConfirmation.path,
-            //     component: Pages.CheckoutConfirmation
-            // },
-            // {
-            //     path: config.pages.LoginRedirect && config.pages.LoginRedirect.path,
-            //     component: Pages.LoginRedirect,
-            //     exact: true
-            // },
-            // {
-            //     path: config.login.social.enabled && config.login.social.redirectURI,
-            //     component: Pages.SocialLoginRedirect,
-            //     exact: true
-            // },
-            // {
-            //     path: config.pages.Cart && config.pages.Cart.path,
-            //     component: Pages.Cart,
-            //     exact: true
-            // },
-            // {
-            //     path: config.pages.ProductDetail && config.pages.ProductDetail.path,
-            //     component: Pages.ProductDetail
-            // },
-            // {
-            //     path: config.pages.ProductList && config.pages.ProductList.path,
-            //     component: Pages.ProductList
-            // }
         ].filter((route) => route.path !== false)
 
         return extensionRoutes as RouteProps[]

@@ -1,11 +1,23 @@
 /*
- * Copyright (c) 2021, salesforce.com, inc.
+ * Copyright (c) 2025, salesforce.com, inc.
  * All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-export default {
-    baseStyle: {
+import {defineSlotRecipe} from '@chakra-ui/react'
+
+export default defineSlotRecipe({
+    slots: [
+        'container',
+        'heroImageGroup',
+        'heroImage',
+        'heroImageSkeleton',
+        'thumbnailImageGroup',
+        'thumbnailImageItem',
+        'thumbnailImageSkeleton'
+    ],
+
+    base: {
         container: {},
         heroImage: {},
         heroImageGroup: {
@@ -14,7 +26,12 @@ export default {
         heroImageSkeleton: {
             marginBottom: 2
         },
-        thumbnailImageGroup: {},
+        thumbnailImageGroup: {
+            display: 'flex',
+            flexDirection: 'row',
+            flexWrap: 'wrap',
+            listStyleType: 'none'
+        },
         thumbnailImageItem: {
             flexShrink: 0,
             cursor: 'pointer',
@@ -34,26 +51,29 @@ export default {
             width: [20, 20, 24, 24]
         }
     },
-    sizes: {
-        sm: {
-            heroImageSkeleton: {
-                maxWidth: ['none', 'none', 'none', '500px']
+
+    variants: {
+        size: {
+            sm: {
+                heroImageSkeleton: {
+                    maxWidth: ['none', 'none', 'none', '500px']
+                },
+                heroImage: {
+                    maxWidth: ['none', 'none', 'none', '500px']
+                }
             },
-            heroImage: {
-                maxWidth: ['none', 'none', 'none', '500px']
-            }
-        },
-        md: {
-            heroImageSkeleton: {
-                maxWidth: ['none', 'none', 'none', '680px']
-            },
-            heroImage: {
-                maxWidth: ['none', 'none', 'none', '680px']
+            md: {
+                heroImageSkeleton: {
+                    maxWidth: ['none', 'none', 'none', '680px']
+                },
+                heroImage: {
+                    maxWidth: ['none', 'none', 'none', '680px']
+                }
             }
         }
     },
+
     defaultProps: {
         size: 'md'
-    },
-    parts: ['container', 'heroImageGroup', 'heroImage', 'heroImageSkeleton', 'thumbnailImageGroup']
-}
+    }
+})
