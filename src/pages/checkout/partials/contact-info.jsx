@@ -253,7 +253,7 @@ const ContactInfo = ({isSocialEnabled = false, isPasswordlessEnabled = false, id
                 <AuthModal {...authModal} initialEmail={form.getValues().email} />
             </ToggleCardEdit>
             <ToggleCardSummary>
-                {/* <Text>{basket?.customerInfo?.email || customer?.email}</Text>
+                <Text>{basket?.customerInfo?.email || customer?.email}</Text>
 
                 <SignOutConfirmationDialog
                     isOpen={signOutConfirmDialogIsOpen}
@@ -263,7 +263,7 @@ const ContactInfo = ({isSocialEnabled = false, isPasswordlessEnabled = false, id
                         navigate('/login')
                         setSignOutConfirmDialogIsOpen(false)
                     }}
-                /> */}
+                />
             </ToggleCardSummary>
         </ToggleCard>
     )
