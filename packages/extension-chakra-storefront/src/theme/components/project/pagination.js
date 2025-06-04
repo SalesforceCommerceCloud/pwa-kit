@@ -34,28 +34,5 @@ export default defineSlotRecipe({
             fontSize: 'sm',
             fontWeight: 'normal'
         }
-    },
-    variants: {
-        size: {
-            sm: {
-                button: {
-                    fontSize: 'sm'
-                },
-                text: {
-                    fontSize: 'sm'
-                }
-            },
-            md: {
-                button: {
-                    fontSize: 'md'
-                },
-                text: {
-                    fontSize: 'md'
-                }
-            }
-        }
-    },
-    defaultVariants: {
-        size: 'sm'
     }
 })
