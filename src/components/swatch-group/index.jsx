@@ -23,7 +23,7 @@ const DIRECTIONS = {
 const SwatchGroup = (props) => {
     const {ariaLabel, displayName, children, label = '', value, handleChange = noop} = props
 
-    const recipe = useSlotRecipe({key: 'swatchgroup'})
+    const recipe = useSlotRecipe({key: 'swatchGroup'})
     const styles = recipe()
     const [selectedIndex, setSelectedIndex] = useState(0)
     const wrapperRef = useRef(null)

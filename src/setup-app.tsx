@@ -60,7 +60,7 @@ class ChakraStorefront extends ApplicationExtension<Config> {
                 path: config.pages.Home && config.pages.Home.path,
                 component: Pages.Home,
                 exact: true
-            }
+            },
             // {
             //     path: [
             //         config.pages.Login && config.pages.Login.path,
@@ -110,10 +110,10 @@ class ChakraStorefront extends ApplicationExtension<Config> {
             //     component: Pages.Cart,
             //     exact: true
             // },
-            // {
-            //     path: config.pages.ProductDetail && config.pages.ProductDetail.path,
-            //     component: Pages.ProductDetail
-            // },
+            {
+                path: config.pages.ProductDetail && config.pages.ProductDetail.path,
+                component: Pages.ProductDetail
+            }
             // {
             //     path: config.pages.ProductList && config.pages.ProductList.path,
             //     component: Pages.ProductList

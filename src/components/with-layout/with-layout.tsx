@@ -50,7 +50,7 @@ import ScrollToTop from '../scroll-to-top'
 
 // Local Project Hooks
 // import {AuthModal, useAuthModal} from '../../hooks/use-auth-modal'
-// import {AddToCartModalProvider} from '../../hooks/use-add-to-cart-modal'
+import {AddToCartModalProvider} from '../../hooks/use-add-to-cart-modal'
 import {useExtensionConfig, useCurrentCustomer, useCurrentBasket} from '../../hooks'
 import {watchOnlineStatus, flatten} from '../../utils/utils'
 import useActiveData from '../../hooks/use-active-data'
@@ -322,35 +322,35 @@ const withLayout = <P extends object>(WrappedComponent: React.ComponentType<P>) 
                         )}
                     </Box>
                     {/*{!isOnline && <OfflineBanner />}*/}
-                    {/*<AddToCartModalProvider>*/}
-                    {/*TODO: recreating this component because @chakra-ui/skip-nav does not have V3 version*/}
-                    {/*<SkipNavContent*/}
-                    {/*    style={{*/}
-                    {/*        display: 'flex',*/}
-                    {/*        flexDirection: 'column',*/}
-                    {/*        flex: 1,*/}
-                    {/*        outline: 0*/}
-                    {/*    }}*/}
-                    {/*>*/}
-                    <Box
-                        as="main"
-                        id="app-main"
-                        role="main"
-                        display="flex"
-                        flexDirection="column"
-                        flex="1"
-                    >
-                        {/*<OfflineBoundary isOnline={false}>*/}
+                    <AddToCartModalProvider>
+                        {/*TODO: recreating this component because @chakra-ui/skip-nav does not have V3 version*/}
+                        {/*<SkipNavContent*/}
+                        {/*    style={{*/}
+                        {/*        display: 'flex',*/}
+                        {/*        flexDirection: 'column',*/}
+                        {/*        flex: 1,*/}
+                        {/*        outline: 0*/}
+                        {/*    }}*/}
+                        {/*>*/}
+                        <Box
+                            as="main"
+                            id="app-main"
+                            role="main"
+                            display="flex"
+                            flexDirection="column"
+                            flex="1"
+                        >
+                            {/*<OfflineBoundary isOnline={false}>*/}
 
-                        <WrappedComponent {...(props as P)} />
-                        {/*</OfflineBoundary>*/}
-                    </Box>
-                    {/*</SkipNavContent>*/}
+                            <WrappedComponent {...(props as P)} />
+                            {/*</OfflineBoundary>*/}
+                        </Box>
+                        {/*</SkipNavContent>*/}
 
-                    {!isCheckout ? <Footer /> : <CheckoutFooter />}
-                    {/*<AuthModal {...(authModal as any)} />*/}
-                    {/*<DntNotification {...dntNotification} />*/}
-                    {/*</AddToCartModalProvider>*/}
+                        {!isCheckout ? <Footer /> : <CheckoutFooter />}
+                        {/*<AuthModal {...(authModal as any)} />*/}
+                        {/*<DntNotification {...dntNotification} />*/}
+                    </AddToCartModalProvider>
                 </Box>
                 {(config.activeDataEnabled as boolean) && (
                     <script

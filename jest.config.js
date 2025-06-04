@@ -12,6 +12,7 @@ module.exports = {
 
     //NOTE: we manually re-enable tests here until we finish migrating to Chakra v3
     testMatch: [
+        '<rootDir>/src/components/fade/**/*.test.js',
         '<rootDir>/src/components/footer/**/*.test.js',
         '<rootDir>/src/components/links-list/**/*.test.js',
         '<rootDir>/src/components/icons/**/*.test.js',

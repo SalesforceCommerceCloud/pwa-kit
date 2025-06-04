@@ -10,19 +10,20 @@ import PropTypes from 'prop-types'
 import {useLocation} from 'react-router-dom'
 import {useIntl, FormattedMessage} from 'react-intl'
 
-import {Flex, Heading, Button, Skeleton, Box, Text, VStack, Fade, useTheme} from '@chakra-ui/react'
+import {Flex, Heading, Button, Skeleton, Box, Text, VStack, useToken} from '@chakra-ui/react'
 import {useCurrency, useDerivedProduct} from '../../hooks'
 import {useAddToCartModalContext} from '../../hooks/use-add-to-cart-modal'
 
 // project components
 import ImageGallery from '../../components/image-gallery'
 import Breadcrumb from '../../components/breadcrumb'
+import Fade from '../../components/fade'
 import Link from '../../components/link'
 import withRegistration from '../../components/with-registration'
 import {Skeleton as ImageGallerySkeleton} from '../../components/image-gallery'
 import {HideOnDesktop, HideOnMobile} from '../../components/responsive'
 import QuantityPicker from '../../components/quantity-picker'
-import {useToast} from '../../hooks/use-toast'
+import useToast from '../../hooks/use-toast'
 import {API_ERROR_MESSAGE} from '../../constants'
 import DisplayPrice from '../../components/display-price'
 import Swatch from '../../components/swatch-group/swatch'
@@ -41,25 +42,25 @@ const ProductViewHeader = ({
     return (
         <VStack mr={4} spacing={2} align="flex-start" marginBottom={[4, 4, 4, 0, 0]}>
             {category && (
-                <Skeleton isLoaded={category} minWidth={64}>
+                <Skeleton loading={!category} minWidth={64}>
                     <Breadcrumb categories={category} />
                 </Skeleton>
             )}
 
             {/* Title */}
-            <Skeleton isLoaded={name}>
+            <Skeleton loading={!name}>
                 <Heading fontSize="2xl">{`${name}`}</Heading>
             </Skeleton>
 
             {!isProductPartOfBundle && (
                 <>
-                    <Skeleton isLoaded={priceData?.currentPrice}>
+                    <Skeleton loading={!priceData?.currentPrice}>
                         {priceData?.currentPrice && (
                             <DisplayPrice priceData={priceData} currency={currency} />
                         )}
                     </Skeleton>
 
-                    <Skeleton isLoaded={product}>
+                    <Skeleton loading={!product}>
                         {product?.productPromotions && <PromoCallout product={product} />}
                     </Skeleton>
                 </>
@@ -121,7 +122,6 @@ const ProductView = forwardRef(
             onOpen: onAddToCartModalOpen,
             onClose: onAddToCartModalClose
         } = useAddToCartModalContext()
-        const theme = useTheme()
         const [showOptionsMessage, toggleShowOptionsMessage] = useState(false)
         const {
             showLoading,
@@ -557,16 +557,16 @@ const ProductView = forwardRef(
                                         step={stepQuantity}
                                         value={quantity}
                                         min={minOrderQuantity}
-                                        onChange={(stringValue, numberValue) => {
+                                        onValueChange={({value, valueAsNumber}) => {
                                             // Set the Quantity of product to value of input if value number
-                                            if (numberValue >= 0) {
-                                                setQuantity(numberValue)
+                                            if (valueAsNumber >= 0) {
+                                                setQuantity(valueAsNumber)
                                                 if (isProductABundle)
-                                                    setSelectedBundleQuantity(numberValue)
-                                            } else if (stringValue === '') {
+                                                    setSelectedBundleQuantity(valueAsNumber)
+                                            } else if (value === '') {
                                                 // We want to allow the use to clear the input to start a new input so here we set the quantity to '' so NAN is not displayed
                                                 // User will not be able to add '' qauntity to the cart due to the add to cart button enablement rules
-                                                setQuantity(stringValue)
+                                                setQuantity(value)
                                             }
                                         }}
                                         onBlur={(e) => {
@@ -656,7 +656,8 @@ const ProductView = forwardRef(
                     left={0}
                     bottom={0}
                     zIndex={2}
-                    boxShadow={theme.shadows.top}
+                    // boxShadow={theme.shadows.top}
+                    boxShadow="top"
                 >
                     {renderActionButtons()}
                 </Box>

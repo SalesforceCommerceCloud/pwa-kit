@@ -31,7 +31,7 @@ const Home = loadable(() => import('overridable!./home'), {fallback})
 // })
 // const ResetPassword = loadable(() => import('overridable!./reset-password'), {fallback})
 // const LoginRedirect = loadable(() => import('overridable!./login-redirect'), {fallback})
-// const ProductDetail = loadable(() => import('overridable!./product-detail'), {fallback})
+const ProductDetail = loadable(() => import('overridable!./product-detail'), {fallback})
 // const ProductList = loadable(() => import('overridable!./product-list'), {
 //     fallback
 // })
@@ -54,7 +54,7 @@ Home.displayName = 'Home'
 // Registration.displayName = 'Registration'
 // ResetPassword.displayName = 'ResetPassword'
 // LoginRedirect.displayName = 'LoginRedirect'
-// ProductDetail.displayName = 'ProductDetail'
+ProductDetail.displayName = 'ProductDetail'
 // ProductList.displayName = 'ProductList'
 
 export {
@@ -62,12 +62,12 @@ export {
     // Cart,
     // Checkout,
     // CheckoutConfirmation,
-    Home
+    Home,
     // Login,
     // Registration,
     // ResetPassword,
     // LoginRedirect,
-    // ProductDetail,
+    ProductDetail
     // ProductList,
     // SocialLoginRedirect
 }
