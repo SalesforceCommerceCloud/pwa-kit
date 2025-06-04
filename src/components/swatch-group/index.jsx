@@ -86,9 +86,9 @@ const SwatchGroup = (props) => {
 
     return (
         <Box onKeyDown={onKeyDown}>
-            <Flex {...styles.swatchGroup} role="radiogroup" aria-label={ariaLabel || label}>
+            <Flex css={styles.swatchGroup} role="radiogroup" aria-label={ariaLabel || label}>
                 {label && (
-                    <HStack {...styles.swatchLabel}>
+                    <HStack css={styles.swatchLabel}>
                         <Box fontWeight="semibold">
                             <FormattedMessage
                                 id="swatch_group.selected.label"
@@ -99,7 +99,7 @@ const SwatchGroup = (props) => {
                         <Box>{displayName}</Box>
                     </HStack>
                 )}
-                <Flex ref={wrapperRef} {...styles.swatchesWrapper}>
+                <Flex ref={wrapperRef} css={styles.swatchesWrapper}>
                     {Children.toArray(children).map((child, index) => {
                         const selected = child.props.value === value
                         return React.cloneElement(child, {
