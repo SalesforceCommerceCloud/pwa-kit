@@ -6,13 +6,16 @@
  */
 
 // Third-Party
-import React from 'react'
-import {RouteProps} from 'react-router-dom'
+import React, {useState} from 'react'
 
 // Platform Imports
 import {ApplicationExtension} from '@salesforce/pwa-kit-extension-sdk/react'
 import {applyHOCs} from '@salesforce/pwa-kit-extension-sdk/react/utils'
-import {BeforeRouteMatchParams, GetRoutesParams} from '@salesforce/pwa-kit-extension-sdk/types'
+import {
+    BeforeRouteMatchParams,
+    GetRoutesParams,
+    RouteProps
+} from '@salesforce/pwa-kit-extension-sdk/types'
 
 // Local Imports
 import {Config} from './types'
@@ -28,181 +31,6 @@ import extensionMeta from '../extension-meta.json'
 
 // Pages
 import * as Pages from './pages'
-
-//TODO: THIS CODE IS FOR TESTING ONLY
-import SwatchGroup from './components/swatch-group'
-import Swatch from './components/swatch-group/swatch'
-
-// Test components for development
-const SwatchGroupTestPage = () => {
-    const [selectedColor, setSelectedColor] = React.useState('red')
-    const [selectedSize, setSelectedSize] = React.useState('M')
-
-    // Color swatch data for circle variant
-    const colorSwatches = [
-        {value: 'red', name: 'Red', color: '#FF0000'},
-        {value: 'blue', name: 'Blue', color: '#0000FF'},
-        {value: 'green', name: 'Green', color: '#00FF00'},
-        {value: 'black', name: 'Black', color: '#000000'},
-        {value: 'white', name: 'White', color: '#FFFFFF'}
-    ]
-
-    // Size swatch data for square variant
-    const sizeSwatches = [
-        {value: 'XS', name: 'Extra Small'},
-        {value: 'S', name: 'Small'},
-        {value: 'M', name: 'Medium'},
-        {value: 'L', name: 'Large'},
-        {value: 'XL', name: 'Extra Large'}
-    ]
-
-    return (
-        <div style={{padding: '32px', maxWidth: '1200px', margin: '0 auto'}}>
-            <h1 style={{fontSize: '2rem', marginBottom: '24px'}}>SwatchGroup Component Examples</h1>
-
-            <div style={{marginBottom: '40px'}}>
-                <h2 style={{fontSize: '1.5rem', marginBottom: '16px'}}>
-                    Color Swatches (Circle Variant)
-                </h2>
-                <p style={{marginBottom: '16px', color: '#666'}}>
-                    Selected: {colorSwatches.find((c) => c.value === selectedColor)?.name}
-                </p>
-                <SwatchGroup
-                    label="Color"
-                    value={selectedColor}
-                    handleChange={setSelectedColor}
-                    displayName={colorSwatches.find((c) => c.value === selectedColor)?.name}
-                >
-                    {colorSwatches.map((color) => (
-                        <Swatch
-                            key={color.value}
-                            value={color.value}
-                            name={color.name}
-                            variant="circle"
-                        >
-                            <div
-                                style={{
-                                    width: '100%',
-                                    height: '100%',
-                                    backgroundColor: color.color,
-                                    border: color.value === 'white' ? '1px solid #ccc' : 'none',
-                                    borderRadius: '50%'
-                                }}
-                            />
-                        </Swatch>
-                    ))}
-                </SwatchGroup>
-            </div>
-
-            <div style={{marginBottom: '40px'}}>
-                <h2 style={{fontSize: '1.5rem', marginBottom: '16px'}}>
-                    Size Swatches (Square Variant)
-                </h2>
-                <p style={{marginBottom: '16px', color: '#666'}}>
-                    Selected: {sizeSwatches.find((s) => s.value === selectedSize)?.name}
-                </p>
-                <SwatchGroup
-                    label="Size"
-                    value={selectedSize}
-                    handleChange={setSelectedSize}
-                    displayName={sizeSwatches.find((s) => s.value === selectedSize)?.name}
-                >
-                    {sizeSwatches.map((size) => (
-                        <Swatch
-                            key={size.value}
-                            value={size.value}
-                            name={size.name}
-                            variant="square"
-                        >
-                            {size.value}
-                        </Swatch>
-                    ))}
-                </SwatchGroup>
-            </div>
-
-            <div style={{marginBottom: '40px'}}>
-                <h2 style={{fontSize: '1.5rem', marginBottom: '16px'}}>Mixed State Examples</h2>
-                <div style={{marginBottom: '24px'}}>
-                    <h3 style={{fontSize: '1.2rem', marginBottom: '12px'}}>
-                        Colors with Disabled State
-                    </h3>
-                    <SwatchGroup label="Color" value="available-red" handleChange={() => {}}>
-                        <Swatch value="available-red" name="Available Red" variant="circle">
-                            <div
-                                style={{
-                                    width: '100%',
-                                    height: '100%',
-                                    backgroundColor: '#FF0000',
-                                    borderRadius: '50%'
-                                }}
-                            />
-                        </Swatch>
-                        <Swatch
-                            value="disabled-blue"
-                            name="Disabled Blue"
-                            variant="circle"
-                            disabled
-                        >
-                            <div
-                                style={{
-                                    width: '100%',
-                                    height: '100%',
-                                    backgroundColor: '#0000FF',
-                                    borderRadius: '50%'
-                                }}
-                            />
-                        </Swatch>
-                        <Swatch value="available-green" name="Available Green" variant="circle">
-                            <div
-                                style={{
-                                    width: '100%',
-                                    height: '100%',
-                                    backgroundColor: '#00FF00',
-                                    borderRadius: '50%'
-                                }}
-                            />
-                        </Swatch>
-                    </SwatchGroup>
-                </div>
-
-                <div style={{marginBottom: '24px'}}>
-                    <h3 style={{fontSize: '1.2rem', marginBottom: '12px'}}>Single Option</h3>
-                    <SwatchGroup label="Size" value="only-option" handleChange={() => {}}>
-                        <Swatch value="only-option" name="Only Available Size" variant="square">
-                            L
-                        </Swatch>
-                    </SwatchGroup>
-                </div>
-
-                <div style={{marginBottom: '24px'}}>
-                    <h3 style={{fontSize: '1.2rem', marginBottom: '12px'}}>No Label Example</h3>
-                    <SwatchGroup value="no-label" handleChange={() => {}}>
-                        <Swatch value="no-label" name="Red" variant="circle">
-                            <div
-                                style={{
-                                    width: '100%',
-                                    height: '100%',
-                                    backgroundColor: '#FF0000',
-                                    borderRadius: '50%'
-                                }}
-                            />
-                        </Swatch>
-                        <Swatch value="blue" name="Blue" variant="circle">
-                            <div
-                                style={{
-                                    width: '100%',
-                                    height: '100%',
-                                    backgroundColor: '#0000FF',
-                                    borderRadius: '50%'
-                                }}
-                            />
-                        </Swatch>
-                    </SwatchGroup>
-                </div>
-            </div>
-        </div>
-    )
-}
 
 class ChakraStorefront extends ApplicationExtension<Config> {
     static readonly id = extensionMeta.id
@@ -224,19 +52,13 @@ class ChakraStorefront extends ApplicationExtension<Config> {
         return applyHOCs(App, requiredHOCs)
     }
 
-    getRoutes(_: GetRoutesParams): RouteProps[] {
+    getRoutes(params: GetRoutesParams): RouteProps[] {
         const config = this.getConfig()
 
         const extensionRoutes = [
             {
                 path: config.pages.Home && config.pages.Home.path,
                 component: Pages.Home,
-                exact: true
-            },
-            //TODO: THIS CODE IS FOR TESTING ONLY
-            {
-                path: '/swatch-group-test',
-                component: SwatchGroupTestPage,
                 exact: true
             }
         ].filter((route) => route.path !== false)
