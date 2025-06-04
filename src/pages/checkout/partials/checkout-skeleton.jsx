@@ -33,7 +33,13 @@ const CheckoutSkeleton = () => {
                             <Stack gap={5}>
                                 <Skeleton height="30px" width="65%" />
 
-                                <Stack w="full" py={4} borderY="1px" borderColor="gray.200" borderStyle="solid">
+                                <Stack
+                                    w="full"
+                                    py={4}
+                                    borderY="1px"
+                                    borderColor="gray.200"
+                                    borderStyle="solid"
+                                >
                                     <Skeleton height={6} />
                                     <Skeleton height={6} />
                                     <Skeleton height={6} />
