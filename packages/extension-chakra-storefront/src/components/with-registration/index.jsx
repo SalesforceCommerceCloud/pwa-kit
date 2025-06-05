@@ -56,7 +56,8 @@ const withRegistration = (
         return (
             <React.Fragment>
                 <Component {...passThroughProps} onClick={handleClick} />
-                <AuthModal {...authModal} onLoginSuccess={onClick} />
+                {/* TODO: Re-enable this once the AuthModal is migrated to Chakra V3 */}
+                {/* <AuthModal {...authModal} onLoginSuccess={onClick} /> */}
             </React.Fragment>
         )
     }
