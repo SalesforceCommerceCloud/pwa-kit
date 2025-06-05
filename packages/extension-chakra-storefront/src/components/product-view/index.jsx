@@ -40,7 +40,7 @@ const ProductViewHeader = ({
     isProductPartOfBundle
 }) => {
     return (
-        <VStack mr={4} spacing={2} align="flex-start" marginBottom={[4, 4, 4, 0, 0]}>
+        <VStack mr={4} gap={2} align="flex-start" marginBottom={[4, 4, 4, 0, 0]}>
             {category && (
                 <Skeleton loading={!category} minWidth={64}>
                     <Breadcrumb categories={category} />
