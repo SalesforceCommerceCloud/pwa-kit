@@ -112,7 +112,7 @@ export class EinsteinAPI {
     }
 
     async einsteinFetch(endpoint, method, body) {
-        if (this.dnt !== false) return {}
+        // if (this.dnt !== false) return {}
 
         const headers = {
             'Content-Type': 'application/json',
