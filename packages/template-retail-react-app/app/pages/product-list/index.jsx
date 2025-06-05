@@ -59,7 +59,7 @@ import EmptySearchResults from '@salesforce/retail-react-app/app/pages/product-l
 import PageHeader from '@salesforce/retail-react-app/app/pages/product-list/partials/page-header'
 import AbovePageHeader from '@salesforce/retail-react-app/app/pages/product-list/partials/above-page-header'
 import PageDesignerPromotionalBanner from '@salesforce/retail-react-app/app/pages/product-list/partials/page-designer-promotional-banner'
-import BopisFilter from './partials/bopis-filter'
+import StoreInventoryFilter from './partials/bopis-filter'
 
 // Icons
 import {FilterIcon, ChevronDownIcon} from '@salesforce/retail-react-app/app/components/icons'
@@ -543,8 +543,8 @@ const ProductList = (props) => {
                             <Refinements
                                 itemsBefore={
                                     category?.categories
-                                        ? [<CategoryLinks key="itemsBefore" category={category} />, <BopisFilter key="bopisFilter" />]
-                                        : [<BopisFilter key="bopisFilter" />]
+                                        ? [<CategoryLinks key="itemsBefore" category={category} />, <StoreInventoryFilter key="storeInventoryFilter" />]
+                                        : [<StoreInventoryFilter key="storeInventoryFilter" />]
                                 }
                                 isLoading={filtersLoading}
                                 toggleFilter={toggleFilter}
@@ -678,9 +678,10 @@ const ProductList = (props) => {
                                               key="itemsBefore"
                                               category={category}
                                               onSelect={onClose}
-                                          />
+                                          />,
+                                          <StoreInventoryFilter key="storeInventoryFilter" />  // Add this line
                                       ]
-                                    : undefined
+                                    : [<StoreInventoryFilter key="storeInventoryFilter" />]     // Add this line
                             }
                             excludedFilters={['cgid']}
                         />
