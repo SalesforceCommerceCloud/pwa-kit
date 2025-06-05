@@ -32,38 +32,6 @@ import extensionMeta from '../extension-meta.json'
 // Pages
 import * as Pages from './pages'
 
-// CONTENT BELOW IS FOR TESTING ONLY. REMOVE BEFORE MERGING.
-import {AddToCartModalProvider, useAddToCartModalContext} from './hooks/use-add-to-cart-modal'
-import {Button} from '@chakra-ui/react'
-import variant750518699578M from './mocks/variant-750518699578M'
-import basketWithSuit from './mocks/basket-with-suit'
-import {productsResponse} from './mocks/mock-data'
-
-const AddToCartModalPage = () => {
-    console.log('AddToCartModalPage: ', useAddToCartModalContext())
-    const {
-        isOpen: isAddToCartModalOpen,
-        onOpen: onAddToCartModalOpen,
-        onClose: onAddToCartModalClose
-    } = useAddToCartModalContext()
-
-    const handleOpenAddToCartModal = () => {
-        onAddToCartModalOpen({
-            product: productsResponse.data[0],
-            itemsAdded: [
-                {
-                    product: productsResponse.data[0],
-                    variant: productsResponse.data[0].variants[0],
-                    quantity: 1
-                }
-            ],
-            selectedQuantity: 1
-        })
-    }
-
-    return <Button onClick={handleOpenAddToCartModal}>Open Add to Cart Modal</Button>
-}
-
 class ChakraStorefront extends ApplicationExtension<Config> {
     static readonly id = extensionMeta.id
 
@@ -96,17 +64,6 @@ class ChakraStorefront extends ApplicationExtension<Config> {
             {
                 path: config.pages.Checkout && config.pages.Checkout.path,
                 component: Pages.Checkout,
-                exact: true
-            },
-            {
-                path: '/use-add-to-cart-modal',
-                component: () => {
-                    return (
-                        <AddToCartModalProvider>
-                            <AddToCartModalPage />
-                        </AddToCartModalProvider>
-                    )
-                },
                 exact: true
             }
         ].filter((route) => route.path !== false)

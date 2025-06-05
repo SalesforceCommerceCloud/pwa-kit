@@ -63,8 +63,7 @@ export const AddToCartModal = () => {
         derivedData: {totalItems}
     } = useCurrentBasket()
     const size = useBreakpointValue({base: 'full', lg: 'lg', xl: 'xl'})
-    // TODO: Remove defaults before merging, this was only for testing
-    const {currency = 'usd', productSubTotal = 99.99} = basket
+    const {currency, productSubTotal} = basket
     const numberOfItemsAdded = isProductABundle
         ? selectedQuantity
         : itemsAdded.reduce((acc, {quantity}) => acc + quantity, 0)
