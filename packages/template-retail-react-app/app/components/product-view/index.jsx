@@ -23,6 +23,7 @@ import {
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 import {useCurrency, useDerivedProduct} from '@salesforce/retail-react-app/app/hooks'
 import {useAddToCartModalContext} from '@salesforce/retail-react-app/app/hooks/use-add-to-cart-modal'
+import {useBonusProductModalContext} from '@salesforce/retail-react-app/app/hooks/use-bonus-product-modal'
 
 // project components
 import ImageGallery from '@salesforce/retail-react-app/app/components/image-gallery'
@@ -131,8 +132,14 @@ const ProductView = forwardRef(
             onOpen: onAddToCartModalOpen,
             onClose: onAddToCartModalClose
         } = useAddToCartModalContext()
+        const {
+            isOpen: isBonusProductModalOpen,
+            onOpen: onBonusProductModalOpen,
+            onClose: onBonusProductModalClose
+        } = useBonusProductModalContext()
         const theme = useTheme()
         const [showOptionsMessage, toggleShowOptionsMessage] = useState(false)
+        const [bonusProducts, setBonusProducts] = useState([])
         const {
             showLoading,
             showInventoryMessage,
@@ -273,6 +280,22 @@ const ProductView = forwardRef(
                 }
                 try {
                     const itemsAdded = await addToCart(variant, quantity)
+                    // Compare existing bonus products with new bonus discount line items
+                    const newBonusItems = itemsAdded?.bonusDiscountLineItems?.filter(newItem => 
+                        !bonusProducts.some(existingItem => 
+                            existingItem.productId === newItem.productId
+                        )
+                    ) || []
+                    
+                    // Update bonus products state with new items
+                    if (itemsAdded) {
+                        setBonusProducts(prev => [...prev, ...newBonusItems])
+                        onBonusProductModalOpen({
+                            newBonusItems,
+                            allBonusItems: itemsAdded.bonusDiscountLineItems
+                        })
+                    }
+                    
                     // Open modal only when `addToCart` returns some data
                     // It's possible that the item has been added to cart, but we don't want to open the modal.
                     // See wishlist_primary_action for example.
@@ -363,6 +386,12 @@ const ProductView = forwardRef(
         useEffect(() => {
             if (isAddToCartModalOpen) {
                 onAddToCartModalClose()
+            }
+        }, [location.pathname])
+
+        useEffect(() => {
+            if (isBonusProductModalOpen) {
+                onBonusProductModalClose()
             }
         }, [location.pathname])
 
