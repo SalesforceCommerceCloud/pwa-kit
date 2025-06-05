@@ -112,6 +112,7 @@ export class EinsteinAPI {
     }
 
     async einsteinFetch(endpoint, method, body) {
+        // TODO: Re-enable this before merging
         // if (this.dnt !== false) return {}
 
         const headers = {

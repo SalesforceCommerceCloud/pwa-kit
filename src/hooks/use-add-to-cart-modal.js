@@ -56,13 +56,14 @@ export const AddToCartModal = () => {
     const {isOpen, onClose, data} = useAddToCartModalContext()
     const {product, itemsAdded = [], selectedQuantity} = data || {}
     const isProductABundle = !!product?.type.bundle
-    console.log('isProductABundle: ', isProductABundle)
+
     const intl = useIntl()
     const {
         data: basket = {},
         derivedData: {totalItems}
     } = useCurrentBasket()
     const size = useBreakpointValue({base: 'full', lg: 'lg', xl: 'xl'})
+    // TODO: Remove defaults before merging, this was only for testing
     const {currency = 'usd', productSubTotal = 99.99} = basket
     const numberOfItemsAdded = isProductABundle
         ? selectedQuantity
@@ -75,7 +76,7 @@ export const AddToCartModal = () => {
     const bundleImage = findImageGroupBy(product.imageGroups, {
         viewType: 'small'
     })?.images?.[0]
-    console.log('bundleImage: ', bundleImage)
+    
     return (
         <Dialog.Root
             size={size}
