@@ -417,6 +417,7 @@ export const AddToCartModal = () => {
                                         defaultMessage: 'Proceed to Checkout',
                                         id: 'add_to_cart_modal.link.checkout'
                                     })}
+                                    <LockIcon />
                                 </Button>
                             </Stack>
                         </Dialog.Footer>
