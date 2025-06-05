@@ -188,6 +188,16 @@ const Search = (props) => {
         onSearchChange(e)
         shouldOpenPopover()
     }
+
+    const onClearSearch = () => {
+        if (searchInputRef.current) {
+            searchInputRef.current.value = ''
+        }
+        setSearchQuery('')
+        searchInputRef.current?.focus()
+        shouldOpenPopover()
+    }
+
     return (
         <Box css={styles.searchContainer}>
             <Popover.Root open={isOpen} isLazy initialFocusEl={() => searchInputRef.current}>
@@ -206,14 +216,7 @@ const Search = (props) => {
                                                 id: 'header.button.assistive_msg.clear_search',
                                                 defaultMessage: 'Clear Search'
                                             })}
-                                            onClick={() => {
-                                                if (searchInputRef.current) {
-                                                    searchInputRef.current.value = ''
-                                                }
-                                                setSearchQuery('')
-                                                searchInputRef.current?.focus()
-                                                shouldOpenPopover()
-                                            }}
+                                            onClick={onClearSearch}
                                         />
                                     ) : undefined
                                 }
