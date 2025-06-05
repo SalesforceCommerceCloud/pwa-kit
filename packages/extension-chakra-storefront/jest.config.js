@@ -23,6 +23,7 @@ module.exports = {
         '<rootDir>/src/components/nested-accordion/**/*.test.js',
         '<rootDir>/src/components/product-scroller/**/*.test.js',
         '<rootDir>/src/components/product-tile/**/*.test.js',
+        '<rootDir>/src/components/product-view/**/*.test.js',
         '<rootDir>/src/components/quantity-picker/**/*.test.js',
         '<rootDir>/src/components/swatch-group/**/*.test.js',
         '<rootDir>/src/utils/responsive-image.test.js',

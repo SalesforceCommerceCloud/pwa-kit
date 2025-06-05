@@ -36,10 +36,7 @@ const Fade = ({in: isVisible, children, ...rest}) => {
     useEffect(() => {
         setIsMounted(true)
     }, [])
-    console.log('isVisible: ', isVisible)
-    console.log('isMounted: ', isMounted)
-    console.log('isVisible && isMounted: ', isVisible && isMounted)
-    console.log('opacity: ', isVisible && isMounted ? 1 : 0)
+
     return (
         <Box
             opacity={isVisible && isMounted ? 1 : 0}

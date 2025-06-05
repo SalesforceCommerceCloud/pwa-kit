@@ -10,7 +10,7 @@ import PropTypes from 'prop-types'
 import {useLocation} from 'react-router-dom'
 import {useIntl, FormattedMessage} from 'react-intl'
 
-import {Flex, Heading, Button, Skeleton, Box, Text, VStack, useToken} from '@chakra-ui/react'
+import {Flex, Heading, Button, Skeleton, Box, Text, VStack} from '@chakra-ui/react'
 import {useCurrency, useDerivedProduct} from '../../hooks'
 import {useAddToCartModalContext} from '../../hooks/use-add-to-cart-modal'
 
@@ -656,7 +656,6 @@ const ProductView = forwardRef(
                     left={0}
                     bottom={0}
                     zIndex={2}
-                    // boxShadow={theme.shadows.top}
                     boxShadow="top"
                 >
                     {renderActionButtons()}
