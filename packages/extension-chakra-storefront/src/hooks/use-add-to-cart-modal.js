@@ -76,7 +76,7 @@ export const AddToCartModal = () => {
     const bundleImage = findImageGroupBy(product.imageGroups, {
         viewType: 'small'
     })?.images?.[0]
-    
+
     return (
         <Dialog.Root
             size={size}
