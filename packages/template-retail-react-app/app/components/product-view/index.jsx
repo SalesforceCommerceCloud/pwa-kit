@@ -114,8 +114,8 @@ const ProductView = forwardRef(
             setChildProductOrderability,
             isBasketLoading = false,
             onVariantSelected = () => {},
-            validateOrderability = (variant, quantity, stockLevel) =>
-                !isProductLoading && variant?.orderable && quantity > 0 && quantity <= stockLevel,
+            validateOrderability = (variant, product, quantity, stockLevel) =>
+                !isProductLoading && (variant?.orderable || product?.inventory?.orderable) && quantity > 0 && quantity <= stockLevel,
             showImageGallery = true,
             setSelectedBundleQuantity = () => {},
             selectedBundleParentQuantity = 1
@@ -203,7 +203,8 @@ const ProductView = forwardRef(
         const validateAndShowError = (opts = {}) => {
             const {scrollErrorIntoView = true} = opts
             // Validate that all attributes are selected before proceeding.
-            const hasValidSelection = validateOrderability(variant, quantity, stockLevel)
+            // TODO: check variant for standard product
+            const hasValidSelection = validateOrderability(variant, product, quantity, stockLevel)
             const showError = !isProductASet && !isProductABundle && !hasValidSelection
             const scrollToError = showError && scrollErrorIntoView
 
@@ -272,7 +273,7 @@ const ProductView = forwardRef(
                     return
                 }
                 try {
-                    const itemsAdded = await addToCart(variant, quantity)
+                    const itemsAdded = await addToCart(variant || product, quantity)
                     // Open modal only when `addToCart` returns some data
                     // It's possible that the item has been added to cart, but we don't want to open the modal.
                     // See wishlist_primary_action for example.

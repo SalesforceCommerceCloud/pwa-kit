@@ -86,6 +86,14 @@ const Home = () => {
 
     return (
         <Box data-testid="home-page" layerStyle="page">
+            <Box bg="gray.50" py={6} px={[4, 4, 8]} borderBottom="1px" borderColor="gray.100">
+                <Container maxWidth="container.xxxl">
+                    <Text fontSize="3xl" fontWeight="bold" textAlign="center">
+                        Hello I'm HERE
+                    </Text>
+                </Container>
+            </Box>
+
             <Seo
                 title="Home Page"
                 description="Commerce Cloud Retail React App"

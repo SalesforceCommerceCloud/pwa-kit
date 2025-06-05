@@ -138,7 +138,8 @@ const ProductDetail = () => {
     let bundleChildVariantIds = ''
     if (isProductABundle)
         bundleChildVariantIds = Object.keys(childProductSelection)
-            ?.map((key) => childProductSelection[key].variant.productId)
+            // TODO: maybe if bundles/sets have standard products?
+            ?.map((key) => childProductSelection[key].variant.productId || childProductSelection[key].product.id)
             .join(',')
 
     const {data: bundleChildrenData} = useProducts(
@@ -296,9 +297,9 @@ const ProductDetail = () => {
 
     const handleAddToCart = async (productSelectionValues) => {
         try {
-            const productItems = productSelectionValues.map(({variant, quantity}) => ({
-                productId: variant.productId,
-                price: variant.price,
+            const productItems = productSelectionValues.map(({variant, product, quantity}) => ({
+                productId: variant?.productId || product.id,
+                price: variant?.price || product.price,
                 quantity
             }))
 
@@ -371,7 +372,8 @@ const ProductDetail = () => {
                     // with the chosen variant selections
                     bundledProductItems: childProductSelections.map((child) => {
                         return {
-                            productId: child.variant.productId,
+                            // TODO: standard product in bundles/sets?
+                            productId: child.variant.productId || child.product.id,
                             quantity: child.quantity
                         }
                     })
