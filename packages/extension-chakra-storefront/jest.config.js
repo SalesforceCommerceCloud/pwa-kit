@@ -12,21 +12,22 @@ module.exports = {
 
     //NOTE: we manually re-enable tests here until we finish migrating to Chakra v3
     testMatch: [
-        '<rootDir>/src/components/footer/**/*.test.js',
-        '<rootDir>/src/components/links-list/**/*.test.js',
-        '<rootDir>/src/components/icons/**/*.test.js',
-        '<rootDir>/src/components/social-icons/**/*.test.js',
-        '<rootDir>/src/components/hero/**/*.test.js',
-        '<rootDir>/src/components/image-gallery/**/*.test.js',
         '<rootDir>/src/components/display-price/**/*.test.js',
+        '<rootDir>/src/components/footer/**/*.test.js',
+        '<rootDir>/src/components/hero/**/*.test.js',
+        '<rootDir>/src/components/icons/**/*.test.js',
+        '<rootDir>/src/components/image-gallery/**/*.test.js',
+        '<rootDir>/src/components/links-list/**/*.test.js',
         '<rootDir>/src/components/product-scroller/**/*.test.js',
         '<rootDir>/src/components/product-tile/**/*.test.js',
         '<rootDir>/src/components/quantity-picker/**/*.test.js',
+        '<rootDir>/src/components/search/**/*.test.js',
+        '<rootDir>/src/components/social-icons/**/*.test.js',
         '<rootDir>/src/components/swatch-group/**/*.test.js',
-        '<rootDir>/src/utils/responsive-image.test.js',
-        '<rootDir>/src/pages/home/**/*.test.js',
         '<rootDir>/src/components/toaster/**/*.test.jsx',
+        '<rootDir>/src/pages/home/**/*.test.js',
         '<rootDir>/src/hooks/use-toast.test.js',
+        '<rootDir>/src/utils/responsive-image.test.js'
     ],
     moduleNameMapper: {
         ...base.moduleNameMapper,

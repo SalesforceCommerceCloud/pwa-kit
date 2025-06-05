@@ -23,7 +23,7 @@ export default defineRecipe({
         container: {
             minWidth: 'xs',
             width: 'full',
-            boxShadow: 'base',
+            shadow: 'xs',
             backgroundColor: 'white'
         },
         content: {
@@ -41,7 +41,6 @@ export default defineRecipe({
             marginRight: [0, 0, 0, 4],
             marginBottom: [1, 1, 2, 0]
         },
-
         bodyContainer: {
             flex: '1'
         },
@@ -52,7 +51,7 @@ export default defineRecipe({
         icons: {
             marginBottom: [1, 1, 2, 0]
         },
-        accountIconButton: {
+        accountIcon: {
             height: 11,
             minWidth: 'auto',
             cursor: 'pointer',
@@ -64,7 +63,7 @@ export default defineRecipe({
                 outline: 0
             }
         },
-        arrowDownIconButton: {
+        arrowDown: {
             height: 11,
             minWidth: 'auto',
             marginRight: 0,
@@ -78,7 +77,7 @@ export default defineRecipe({
             },
             display: ['none', 'none', 'none', 'block']
         },
-        wishListIconButton: {
+        wishlistIcon: {
             // More breathing room between the account and wishlist icons
             marginLeft: 2
         },
