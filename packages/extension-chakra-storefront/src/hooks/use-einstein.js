@@ -112,7 +112,8 @@ export class EinsteinAPI {
     }
 
     async einsteinFetch(endpoint, method, body) {
-        if (this.dnt !== false) return {}
+        // TODO: Re-enable this before merging
+        // if (this.dnt !== false) return {}
 
         const headers = {
             'Content-Type': 'application/json',

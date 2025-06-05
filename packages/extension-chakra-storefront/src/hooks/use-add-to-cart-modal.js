@@ -12,16 +12,12 @@ import {
     AspectRatio,
     Box,
     Button,
+    CloseButton,
+    Dialog,
     Flex,
     Heading,
+    Portal,
     Text,
-    Modal,
-    ModalHeader,
-    ModalBody,
-    ModalCloseButton,
-    ModalContent,
-    ModalFooter,
-    ModalOverlay,
     Stack,
     useBreakpointValue
 } from '@chakra-ui/react'
@@ -59,15 +55,16 @@ AddToCartModalProvider.propTypes = {
 export const AddToCartModal = () => {
     const {isOpen, onClose, data} = useAddToCartModalContext()
     const {product, itemsAdded = [], selectedQuantity} = data || {}
-    const isProductABundle = product?.type.bundle
+    const isProductABundle = !!product?.type.bundle
 
     const intl = useIntl()
     const {
         data: basket = {},
         derivedData: {totalItems}
     } = useCurrentBasket()
-    const size = useBreakpointValue({base: 'full', lg: '2xl', xl: '4xl'})
-    const {currency, productSubTotal} = basket
+    const size = useBreakpointValue({base: 'full', lg: 'lg', xl: 'xl'})
+    // TODO: Remove defaults before merging, this was only for testing
+    const {currency = 'usd', productSubTotal = 99.99} = basket
     const numberOfItemsAdded = isProductABundle
         ? selectedQuantity
         : itemsAdded.reduce((acc, {quantity}) => acc + quantity, 0)
@@ -81,98 +78,199 @@ export const AddToCartModal = () => {
     })?.images?.[0]
 
     return (
-        <Modal size={size} isOpen={isOpen} onClose={onClose} scrollBehavior="inside" isCentered>
-            <ModalOverlay />
-            <ModalContent
-                margin="0"
-                borderRadius={{base: 'none', md: 'base'}}
-                bgColor="gray.50"
-                containerProps={{'data-testid': 'add-to-cart-modal'}}
-            >
-                <ModalHeader paddingY="8" bgColor="white">
-                    <Heading as="h1" fontSize="2xl">
-                        {intl.formatMessage(
-                            {
-                                defaultMessage:
-                                    '{quantity} {quantity, plural, one {item} other {items}} added to cart',
-                                id: 'add_to_cart_modal.info.added_to_cart'
-                            },
-                            {quantity: numberOfItemsAdded}
-                        )}
-                    </Heading>
-                </ModalHeader>
-                <ModalCloseButton />
-                <ModalBody bgColor="white" padding="0" marginBottom={{base: 40, lg: 0}}>
-                    <Flex
-                        flexDirection={{base: 'column', lg: 'row'}}
-                        justifyContent="space-between"
-                        paddingBottom={{base: '0', lg: '8'}}
-                        paddingX="4"
+        <Dialog.Root
+            size={size}
+            open={isOpen}
+            onOpenChange={onClose}
+            scrollBehavior="inside"
+            placement="center"
+        >
+            <Portal>
+                <Dialog.Backdrop />
+                <Dialog.Positioner>
+                    <Dialog.Content
+                        margin="0"
+                        borderRadius={{base: 'none', md: 'base'}}
+                        bgColor="gray.50"
+                        containerProps={{'data-testid': 'add-to-cart-modal'}}
                     >
-                        <Box
-                            flex="1"
-                            paddingX={{lg: '4', xl: '8'}}
-                            // divider style
-                            borderRightWidth={{lg: '1px'}}
-                            borderColor="gray.200"
-                            borderStyle="solid"
-                        >
-                            {isProductABundle && (
-                                <Flex
-                                    key={product.id}
-                                    justifyContent="space-between"
-                                    paddingBottom={4}
-                                    borderBottomWidth={{base: '1px', lg: '0px'}}
+                        <Dialog.Header paddingY="8" bgColor="white">
+                            <Heading as="h1" fontSize="2xl">
+                                {intl.formatMessage(
+                                    {
+                                        defaultMessage:
+                                            '{quantity} {quantity, plural, one {item} other {items}} added to cart',
+                                        id: 'add_to_cart_modal.info.added_to_cart'
+                                    },
+                                    {quantity: numberOfItemsAdded}
+                                )}
+                            </Heading>
+                        </Dialog.Header>
+                        <Dialog.Body bgColor="white" padding="0" marginBottom={{base: 40, lg: 0}}>
+                            <Flex
+                                flexDirection={{base: 'column', lg: 'row'}}
+                                justifyContent="space-between"
+                                paddingBottom={{base: '0', lg: '8'}}
+                                paddingX="4"
+                            >
+                                <Box
+                                    flex="1"
+                                    paddingX={{lg: '4', xl: '8'}}
+                                    // divider style
+                                    borderRightWidth={{lg: '1px'}}
                                     borderColor="gray.200"
                                     borderStyle="solid"
-                                    data-testid="product-added"
                                 >
-                                    <Flex gridGap="4">
-                                        <Box w="24" flex="none">
-                                            <AspectRatio ratio="1">
-                                                <img src={bundleImage.link} alt={bundleImage.alt} />
-                                            </AspectRatio>
-                                        </Box>
+                                    {isProductABundle && (
+                                        <Flex
+                                            key={product.id}
+                                            justifyContent="space-between"
+                                            paddingBottom={4}
+                                            borderBottomWidth={{base: '1px', lg: '0px'}}
+                                            borderColor="gray.200"
+                                            borderStyle="solid"
+                                            data-testid="product-added"
+                                        >
+                                            <Flex gridGap="4">
+                                                <Box w="24" flex="none">
+                                                    <AspectRatio ratio="1">
+                                                        <img
+                                                            src={bundleImage.link}
+                                                            alt={bundleImage.alt}
+                                                        />
+                                                    </AspectRatio>
+                                                </Box>
 
-                                        <Box>
-                                            <Text fontWeight="700">{product.name}</Text>
-                                            <Box color="gray.600" fontSize="sm" fontWeight="400">
+                                                <Box>
+                                                    <Text fontWeight="700">{product.name}</Text>
+                                                    <Box
+                                                        color="gray.600"
+                                                        fontSize="sm"
+                                                        fontWeight="400"
+                                                    >
+                                                        <Text>
+                                                            {intl.formatMessage({
+                                                                defaultMessage: 'Qty',
+                                                                id: 'add_to_cart_modal.label.quantity'
+                                                            })}
+                                                            : {numberOfItemsAdded}
+                                                        </Text>
+                                                    </Box>
+                                                    <Flex
+                                                        flexDirection="column"
+                                                        justifyContent="space-between"
+                                                        marginTop={4}
+                                                        gridGap={4}
+                                                    >
+                                                        {itemsAdded.map(
+                                                            ({product, variant, quantity}) => {
+                                                                const variationAttributeValues =
+                                                                    getDisplayVariationValues(
+                                                                        product.variationAttributes,
+                                                                        variant.variationValues
+                                                                    )
+                                                                return (
+                                                                    <Box key={variant.productId}>
+                                                                        <Text
+                                                                            color="gray.700"
+                                                                            fontWeight="700"
+                                                                            fontSize="sm"
+                                                                        >
+                                                                            {product.name}{' '}
+                                                                            {quantity > 1
+                                                                                ? `(${quantity})`
+                                                                                : ''}
+                                                                        </Text>
+                                                                        <Box
+                                                                            color="gray.600"
+                                                                            fontSize="sm"
+                                                                            fontWeight="500"
+                                                                        >
+                                                                            {Object.entries(
+                                                                                variationAttributeValues
+                                                                            ).map(
+                                                                                ([name, value]) => {
+                                                                                    return (
+                                                                                        <Text
+                                                                                            key={
+                                                                                                value
+                                                                                            }
+                                                                                        >
+                                                                                            {name}:{' '}
+                                                                                            {value}
+                                                                                        </Text>
+                                                                                    )
+                                                                                }
+                                                                            )}
+                                                                        </Box>
+                                                                    </Box>
+                                                                )
+                                                            }
+                                                        )}
+                                                    </Flex>
+                                                </Box>
+                                            </Flex>
+
+                                            <Box flex="none" alignSelf="flex-end" fontWeight="600">
                                                 <Text>
-                                                    {intl.formatMessage({
-                                                        defaultMessage: 'Qty',
-                                                        id: 'add_to_cart_modal.label.quantity'
-                                                    })}
-                                                    : {numberOfItemsAdded}
+                                                    {intl.formatNumber(
+                                                        product.price * numberOfItemsAdded,
+                                                        {
+                                                            style: 'currency',
+                                                            currency: currency
+                                                        }
+                                                    )}
                                                 </Text>
                                             </Box>
-                                            <Flex
-                                                flexDirection="column"
-                                                justifyContent="space-between"
-                                                marginTop={4}
-                                                gridGap={4}
-                                            >
-                                                {itemsAdded.map(({product, variant, quantity}) => {
-                                                    const variationAttributeValues =
-                                                        getDisplayVariationValues(
-                                                            product.variationAttributes,
-                                                            variant.variationValues
-                                                        )
-                                                    return (
-                                                        <Box key={variant.productId}>
-                                                            <Text
-                                                                color="gray.700"
+                                        </Flex>
+                                    )}
+                                    {!isProductABundle &&
+                                        itemsAdded.map(({product, variant, quantity}, index) => {
+                                            const image = findImageGroupBy(product.imageGroups, {
+                                                viewType: 'small',
+                                                selectedVariationAttributes: variant.variationValues
+                                            })?.images?.[0]
+                                            const priceData = getPriceData(product, {quantity})
+                                            const variationAttributeValues =
+                                                getDisplayVariationValues(
+                                                    product.variationAttributes,
+                                                    variant.variationValues
+                                                )
+
+                                            return (
+                                                <Flex
+                                                    key={variant.productId}
+                                                    justifyContent="space-between"
+                                                    marginBottom={index < itemsAdded - 1 ? 0 : 4}
+                                                    paddingBottom={4}
+                                                    borderBottomWidth={{base: '1px', lg: '0px'}}
+                                                    borderColor="gray.200"
+                                                    borderStyle="solid"
+                                                    data-testid="product-added"
+                                                >
+                                                    <Flex gridGap="4">
+                                                        <Box w="24" flex="none">
+                                                            <AspectRatio ratio="1">
+                                                                <img
+                                                                    src={image.link}
+                                                                    alt={image.alt}
+                                                                />
+                                                            </AspectRatio>
+                                                        </Box>
+
+                                                        <Box>
+                                                            <Heading
+                                                                as="h2"
+                                                                fontSize="md"
+                                                                fontFamily="body"
                                                                 fontWeight="700"
-                                                                fontSize="sm"
                                                             >
-                                                                {product.name}{' '}
-                                                                {quantity > 1
-                                                                    ? `(${quantity})`
-                                                                    : ''}
-                                                            </Text>
+                                                                {product.name}
+                                                            </Heading>
                                                             <Box
                                                                 color="gray.600"
                                                                 fontSize="sm"
-                                                                fontWeight="500"
+                                                                fontWeight="400"
                                                             >
                                                                 {Object.entries(
                                                                     variationAttributeValues
@@ -183,106 +281,105 @@ export const AddToCartModal = () => {
                                                                         </Text>
                                                                     )
                                                                 })}
+                                                                <Text>
+                                                                    {intl.formatMessage({
+                                                                        defaultMessage: 'Qty',
+                                                                        id: 'add_to_cart_modal.label.quantity'
+                                                                    })}
+                                                                    : {quantity}
+                                                                </Text>
                                                             </Box>
                                                         </Box>
-                                                    )
-                                                })}
-                                            </Flex>
-                                        </Box>
-                                    </Flex>
+                                                    </Flex>
 
-                                    <Box flex="none" alignSelf="flex-end" fontWeight="600">
-                                        <Text>
-                                            {intl.formatNumber(product.price * numberOfItemsAdded, {
-                                                style: 'currency',
-                                                currency: currency
-                                            })}
-                                        </Text>
-                                    </Box>
-                                </Flex>
-                            )}
-                            {!isProductABundle &&
-                                itemsAdded.map(({product, variant, quantity}, index) => {
-                                    const image = findImageGroupBy(product.imageGroups, {
-                                        viewType: 'small',
-                                        selectedVariationAttributes: variant.variationValues
-                                    })?.images?.[0]
-                                    const priceData = getPriceData(product, {quantity})
-                                    const variationAttributeValues = getDisplayVariationValues(
-                                        product.variationAttributes,
-                                        variant.variationValues
-                                    )
-
-                                    return (
-                                        <Flex
-                                            key={variant.productId}
-                                            justifyContent="space-between"
-                                            marginBottom={index < itemsAdded - 1 ? 0 : 4}
-                                            paddingBottom={4}
-                                            borderBottomWidth={{base: '1px', lg: '0px'}}
-                                            borderColor="gray.200"
-                                            borderStyle="solid"
-                                            data-testid="product-added"
-                                        >
-                                            <Flex gridGap="4">
-                                                <Box w="24" flex="none">
-                                                    <AspectRatio ratio="1">
-                                                        <img src={image.link} alt={image.alt} />
-                                                    </AspectRatio>
-                                                </Box>
-
-                                                <Box>
-                                                    <Heading
-                                                        as="h2"
-                                                        fontSize="md"
-                                                        fontFamily="body"
-                                                        fontWeight="700"
-                                                    >
-                                                        {product.name}
-                                                    </Heading>
                                                     <Box
-                                                        color="gray.600"
-                                                        fontSize="sm"
-                                                        fontWeight="400"
+                                                        flex="none"
+                                                        alignSelf="flex-end"
+                                                        fontWeight="600"
                                                     >
-                                                        {Object.entries(
-                                                            variationAttributeValues
-                                                        ).map(([name, value]) => {
-                                                            return (
-                                                                <Text key={value}>
-                                                                    {name}: {value}
-                                                                </Text>
-                                                            )
-                                                        })}
-                                                        <Text>
-                                                            {intl.formatMessage({
-                                                                defaultMessage: 'Qty',
-                                                                id: 'add_to_cart_modal.label.quantity'
-                                                            })}
-                                                            : {quantity}
-                                                        </Text>
+                                                        <DisplayPrice
+                                                            priceData={priceData}
+                                                            quantity={quantity}
+                                                            currency={currency}
+                                                        />
                                                     </Box>
-                                                </Box>
-                                            </Flex>
+                                                </Flex>
+                                            )
+                                        })}
+                                </Box>
+                                <Box
+                                    display={['none', 'none', 'none', 'block']}
+                                    flex="1"
+                                    paddingX={{lg: '4', xl: '8'}}
+                                    paddingY={{base: '4', lg: '0'}}
+                                >
+                                    <Flex justifyContent="space-between" marginBottom="8">
+                                        <Text fontWeight="700">
+                                            {intl.formatMessage(
+                                                {
+                                                    defaultMessage:
+                                                        'Cart Subtotal ({itemAccumulatedCount} item)',
+                                                    id: 'add_to_cart_modal.label.cart_subtotal'
+                                                },
+                                                {itemAccumulatedCount: totalItems}
+                                            )}
+                                        </Text>
+                                        <Text alignSelf="flex-end" fontWeight="600">
+                                            {productSubTotal &&
+                                                intl.formatNumber(productSubTotal, {
+                                                    style: 'currency',
+                                                    currency: currency
+                                                })}
+                                        </Text>
+                                    </Flex>
+                                    <Stack gap="4">
+                                        <Button as={Link} to="/cart" width="100%" variant="solid">
+                                            {intl.formatMessage({
+                                                defaultMessage: 'View Cart',
+                                                id: 'add_to_cart_modal.link.view_cart'
+                                            })}
+                                        </Button>
 
-                                            <Box flex="none" alignSelf="flex-end" fontWeight="600">
-                                                <DisplayPrice
-                                                    priceData={priceData}
-                                                    quantity={quantity}
-                                                    currency={currency}
-                                                />
-                                            </Box>
-                                        </Flex>
-                                    )
-                                })}
-                        </Box>
-                        <Box
-                            display={['none', 'none', 'none', 'block']}
-                            flex="1"
-                            paddingX={{lg: '4', xl: '8'}}
-                            paddingY={{base: '4', lg: '0'}}
+                                        <Button
+                                            as={Link}
+                                            to="/checkout"
+                                            width="100%"
+                                            variant="outline"
+                                        >
+                                            {intl.formatMessage({
+                                                defaultMessage: 'Proceed to Checkout',
+                                                id: 'add_to_cart_modal.link.checkout'
+                                            })}
+                                            <LockIcon />
+                                        </Button>
+                                    </Stack>
+                                </Box>
+                            </Flex>
+                            <Box padding="8" bgColor="gray.50">
+                                <RecommendedProducts
+                                    title={
+                                        <FormattedMessage
+                                            defaultMessage="You Might Also Like"
+                                            id="add_to_cart_modal.recommended_products.title.might_also_like"
+                                        />
+                                    }
+                                    recommender={EINSTEIN_RECOMMENDERS.ADD_TO_CART_MODAL}
+                                    products={[product]}
+                                    mx={{base: -4, md: -8, lg: 0}}
+                                    shouldFetch={() => product?.id}
+                                />
+                            </Box>
+                        </Dialog.Body>
+                        <Dialog.Footer
+                            position="fixed"
+                            bg="white"
+                            width="100%"
+                            display={['block', 'block', 'block', 'none']}
+                            p={[4, 4, 6]}
+                            left={0}
+                            bottom={0}
                         >
-                            <Flex justifyContent="space-between" marginBottom="8">
+                            <Flex justifyContent="space-between" marginBottom="4">
                                 <Text fontWeight="700">
                                     {intl.formatMessage(
                                         {
@@ -301,7 +398,7 @@ export const AddToCartModal = () => {
                                         })}
                                 </Text>
                             </Flex>
-                            <Stack spacing="4">
+                            <Stack gap="4">
                                 <Button as={Link} to="/cart" width="100%" variant="solid">
                                     {intl.formatMessage({
                                         defaultMessage: 'View Cart',
@@ -320,76 +417,17 @@ export const AddToCartModal = () => {
                                         defaultMessage: 'Proceed to Checkout',
                                         id: 'add_to_cart_modal.link.checkout'
                                     })}
+                                    <LockIcon />
                                 </Button>
                             </Stack>
-                        </Box>
-                    </Flex>
-                    <Box padding="8" bgColor="gray.50">
-                        <RecommendedProducts
-                            title={
-                                <FormattedMessage
-                                    defaultMessage="You Might Also Like"
-                                    id="add_to_cart_modal.recommended_products.title.might_also_like"
-                                />
-                            }
-                            recommender={EINSTEIN_RECOMMENDERS.ADD_TO_CART_MODAL}
-                            products={[product]}
-                            mx={{base: -4, md: -8, lg: 0}}
-                            shouldFetch={() => product?.id}
-                        />
-                    </Box>
-                </ModalBody>
-                <ModalFooter
-                    position="fixed"
-                    bg="white"
-                    width="100%"
-                    display={['block', 'block', 'block', 'none']}
-                    p={[4, 4, 6]}
-                    left={0}
-                    bottom={0}
-                >
-                    <Flex justifyContent="space-between" marginBottom="4">
-                        <Text fontWeight="700">
-                            {intl.formatMessage(
-                                {
-                                    defaultMessage: 'Cart Subtotal ({itemAccumulatedCount} item)',
-                                    id: 'add_to_cart_modal.label.cart_subtotal'
-                                },
-                                {itemAccumulatedCount: totalItems}
-                            )}
-                        </Text>
-                        <Text alignSelf="flex-end" fontWeight="600">
-                            {productSubTotal &&
-                                intl.formatNumber(productSubTotal, {
-                                    style: 'currency',
-                                    currency: currency
-                                })}
-                        </Text>
-                    </Flex>
-                    <Stack spacing="4">
-                        <Button as={Link} to="/cart" width="100%" variant="solid">
-                            {intl.formatMessage({
-                                defaultMessage: 'View Cart',
-                                id: 'add_to_cart_modal.link.view_cart'
-                            })}
-                        </Button>
-
-                        <Button
-                            as={Link}
-                            to="/checkout"
-                            width="100%"
-                            variant="outline"
-                            rightIcon={<LockIcon />}
-                        >
-                            {intl.formatMessage({
-                                defaultMessage: 'Proceed to Checkout',
-                                id: 'add_to_cart_modal.link.checkout'
-                            })}
-                        </Button>
-                    </Stack>
-                </ModalFooter>
-            </ModalContent>
-        </Modal>
+                        </Dialog.Footer>
+                        <Dialog.CloseTrigger asChild>
+                            <CloseButton size="md" />
+                        </Dialog.CloseTrigger>
+                    </Dialog.Content>
+                </Dialog.Positioner>
+            </Portal>
+        </Dialog.Root>
     )
 }
 
