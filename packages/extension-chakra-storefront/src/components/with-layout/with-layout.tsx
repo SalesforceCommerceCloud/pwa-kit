@@ -39,7 +39,7 @@ import {HideOnDesktop, HideOnMobile} from '../responsive'
 import {ListMenu, ListMenuContent} from '../list-menu'
 import {withCommerceSdkReactHookData} from '../with-commerce-sdk-react-hook-data'
 import AboveHeader from '../above-header'
-// import CheckoutHeader from '../../pages/checkout/partials/checkout-header'
+import CheckoutHeader from '../../pages/checkout/partials/checkout-header'
 import CheckoutFooter from '../../pages/checkout/partials/checkout-footer'
 import Footer from '../footer'
 import Header from '../header'
@@ -317,8 +317,7 @@ const withLayout = <P extends object>(WrappedComponent: React.ComponentType<P>) 
                                 {/*</Header>*/}
                             </>
                         ) : (
-                            <div>Checkout Header</div>
-                            // <CheckoutHeader />
+                            <CheckoutHeader />
                         )}
                     </Box>
                     {/*{!isOnline && <OfflineBanner />}*/}
