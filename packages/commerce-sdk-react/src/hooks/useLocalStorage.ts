@@ -30,7 +30,7 @@ function useLocalStorage(key: string): Value {
 
     if (useSyncExternalStore) {
         // Make sure to cache this subscribe function. Otherwise, React will re-subscribe on every render.
-        const subscribeToLocalStorage = useCallback(
+        const subscribeToKeyChanges = useCallback(
             (callback: () => void) => {
                 const handleStorageChange = (e: StorageEvent) => {
                     if (e.key === key) {
@@ -43,18 +43,18 @@ function useLocalStorage(key: string): Value {
             [key]
         )
 
-        const getLocalStorageSnapshot = useCallback(() => readValue(key), [key])
-        const getLocalStorageServerSnapshot = useCallback(() => {
+        const getSnapshot = useCallback(() => readValue(key), [key])
+        const getServerSnapshot = useCallback(() => {
             // local storage is not available on the server
             return null
         }, [])
 
-        const store: Value = useSyncExternalStore(
-            subscribeToLocalStorage,
-            getLocalStorageSnapshot,
-            getLocalStorageServerSnapshot
+        const value: Value = useSyncExternalStore(
+            subscribeToKeyChanges,
+            getSnapshot,
+            getServerSnapshot
         )
-        return store
+        return value
     }
 
     // Now, fallback implementation for the older React 17
