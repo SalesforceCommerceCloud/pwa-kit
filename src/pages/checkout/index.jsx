@@ -71,7 +71,7 @@ const Checkout = () => {
             >
                 <Grid templateColumns={{base: '1fr', lg: '66% 1fr'}} gap={{base: 10, xl: 20}}>
                     <GridItem>
-                        <Stack spacing={4}>
+                        <Stack gap={4}>
                             {error && (
                                 <Alert status="error" variant="left-accent">
                                     <AlertIcon />
