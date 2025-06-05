@@ -19,32 +19,6 @@ const readValue = (key: string): Value => {
     return window.localStorage.getItem(key)
 }
 
-/**
- * @internal
- */
-const subscribeToLocalStorage = (key: string) => (callback: () => void) => {
-    const handleStorageChange = (e: StorageEvent) => {
-        if (e.key === key) {
-            callback()
-        }
-    }
-    window.addEventListener('storage', handleStorageChange)
-    return () => window.removeEventListener('storage', handleStorageChange)
-}
-
-/**
- * @internal
- */
-const getLocalStorageSnapshot = (key: string) => () => readValue(key)
-
-/**
- * @internal
- */
-const getLocalStorageServerSnapshot = () => {
-    // local storage is not available on the server
-    return null
-}
-
 /* eslint-disable react-hooks/rules-of-hooks */
 // NOTE: it's ok to ignore the rules-of-hooks because the existence of useSyncExternalStore will be consistent
 /**
@@ -55,12 +29,29 @@ function useLocalStorage(key: string): Value {
     const useSyncExternalStore = (React as any).useSyncExternalStore
 
     if (useSyncExternalStore) {
-        const _getLocalStorageSnapshot = useCallback(getLocalStorageSnapshot(key), [key])
-        const _subscribeToLocalStorage = useCallback(subscribeToLocalStorage(key), [key])
+        // Make sure to cache this subscribe function. Otherwise, React will re-subscribe on every render.
+        const subscribeToLocalStorage = useCallback(
+            (callback: () => void) => {
+                const handleStorageChange = (e: StorageEvent) => {
+                    if (e.key === key) {
+                        callback()
+                    }
+                }
+                window.addEventListener('storage', handleStorageChange)
+                return () => window.removeEventListener('storage', handleStorageChange)
+            },
+            [key]
+        )
+
+        const getLocalStorageSnapshot = useCallback(() => readValue(key), [key])
+        const getLocalStorageServerSnapshot = useCallback(() => {
+            // local storage is not available on the server
+            return null
+        }, [])
 
         const store: Value = useSyncExternalStore(
-            _subscribeToLocalStorage,
-            _getLocalStorageSnapshot,
+            subscribeToLocalStorage,
+            getLocalStorageSnapshot,
             getLocalStorageServerSnapshot
         )
         return store
