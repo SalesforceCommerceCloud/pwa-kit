@@ -10,7 +10,7 @@ import PropTypes from 'prop-types'
 import {useLocation} from 'react-router-dom'
 import {useIntl, FormattedMessage} from 'react-intl'
 
-import {Flex, Heading, Button, Skeleton, Box, Text, VStack} from '@chakra-ui/react'
+import {Box, Button, Flex, Heading, Skeleton, Text, VStack} from '@chakra-ui/react'
 import {useCurrency, useDerivedProduct} from '../../hooks'
 import {useAddToCartModalContext} from '../../hooks/use-add-to-cart-modal'
 
