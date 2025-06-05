@@ -345,7 +345,6 @@ export const AddToCartModal = () => {
                                             to="/checkout"
                                             width="100%"
                                             variant="outline"
-                                            rightIcon={<LockIcon />}
                                         >
                                             {intl.formatMessage({
                                                 defaultMessage: 'Proceed to Checkout',
