@@ -7,7 +7,6 @@
 import {start, registerServiceWorker} from '@salesforce/pwa-kit-react-sdk/ssr/browser/main'
 
 const main = () => {
-    console.log('main.jsx called')
     // The path to your service worker should match what is set up in ssr.js
     return Promise.all([start(), registerServiceWorker('/worker.js')])
 }

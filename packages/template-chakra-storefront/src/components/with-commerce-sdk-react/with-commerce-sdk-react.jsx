@@ -19,8 +19,6 @@ import React from 'react'
  * @returns {Component} - the enhanced component.
  */
 const withCommerceSdkReact = (Component, opts = {}) => {
-    console.log('>> 121 withCommerceSdkReact Component:', Component);
-    console.log('>> 122 withCommerceSdkReact opts:', opts);
     const WrappedComponent = (props) => {
         const {hook, queryOptions, placeholder: Placeholder} = opts
         const {data, isLoading} = hook(
