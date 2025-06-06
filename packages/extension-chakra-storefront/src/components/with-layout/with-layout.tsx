@@ -287,34 +287,34 @@ const withLayout = <P extends object>(WrappedComponent: React.ComponentType<P>) 
                         {!isCheckout ? (
                             <>
                                 <AboveHeader />
-                                <div>Header</div>
-                                {/*<Header*/}
-                                {/*    onMenuClick={onOpen}*/}
-                                {/*    onLogoClick={onLogoClick}*/}
-                                {/*    onMyCartClick={onCartClick}*/}
-                                {/*    onMyAccountClick={onAccountClick}*/}
-                                {/*    onWishlistClick={onWishlistClick}*/}
-                                {/*>*/}
-                                {/*    <HideOnDesktop>*/}
-                                {/*        <DrawerMenu*/}
-                                {/*            isOpen={isOpen}*/}
-                                {/*            onClose={onClose}*/}
-                                {/*            onLogoClick={onLogoClick}*/}
-                                {/*            root={categories?.[CAT_MENU_DEFAULT_ROOT_CATEGORY]}*/}
-                                {/*            itemsKey="categories"*/}
-                                {/*            itemsCountKey="onlineSubCategoriesCount"*/}
-                                {/*            itemComponent={DrawerMenuItemWithData}*/}
-                                {/*        />*/}
-                                {/*    </HideOnDesktop>*/}
-                                {/*    <HideOnMobile>*/}
-                                {/*        <ListMenu*/}
-                                {/*            root={categories?.[CAT_MENU_DEFAULT_ROOT_CATEGORY]}*/}
-                                {/*            itemsKey="categories"*/}
-                                {/*            itemsCountKey="onlineSubCategoriesCount"*/}
-                                {/*            contentComponent={ListMenuContentWithData}*/}
-                                {/*        />*/}
-                                {/*    </HideOnMobile>*/}
-                                {/*</Header>*/}
+                                <Header
+                                    onMenuClick={onOpen}
+                                    onLogoClick={onLogoClick}
+                                    onMyCartClick={onCartClick}
+                                    onMyAccountClick={onAccountClick}
+                                    onWishlistClick={onWishlistClick}
+                                >
+                                    Header
+                                    {/*    <HideOnDesktop>*/}
+                                    {/*        <DrawerMenu*/}
+                                    {/*            isOpen={isOpen}*/}
+                                    {/*            onClose={onClose}*/}
+                                    {/*            onLogoClick={onLogoClick}*/}
+                                    {/*            root={categories?.[CAT_MENU_DEFAULT_ROOT_CATEGORY]}*/}
+                                    {/*            itemsKey="categories"*/}
+                                    {/*            itemsCountKey="onlineSubCategoriesCount"*/}
+                                    {/*            itemComponent={DrawerMenuItemWithData}*/}
+                                    {/*        />*/}
+                                    {/*    </HideOnDesktop>*/}
+                                    {/*    <HideOnMobile>*/}
+                                    {/*        <ListMenu*/}
+                                    {/*            root={categories?.[CAT_MENU_DEFAULT_ROOT_CATEGORY]}*/}
+                                    {/*            itemsKey="categories"*/}
+                                    {/*            itemsCountKey="onlineSubCategoriesCount"*/}
+                                    {/*            contentComponent={ListMenuContentWithData}*/}
+                                    {/*        />*/}
+                                    {/*    </HideOnMobile>*/}
+                                </Header>
                             </>
                         ) : (
                             <CheckoutHeader />
