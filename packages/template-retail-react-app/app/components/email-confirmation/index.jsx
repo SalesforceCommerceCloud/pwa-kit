@@ -13,11 +13,15 @@ import {BrandLogo} from '@salesforce/retail-react-app/app/components/icons'
 
 /**
  * PasswordlessEmailConfirmation Component
- * 
- * This component displays a confirmation screen after sending a passwordless login link.
- * It shows a message to check email, displays the email address the link was sent to,
- * and provides an option to resend the link if needed.
+ 
  */
+
+//* added voiceover functionalities
+
+//added multiple aria-labels to tags
+
+// useRef and useEffect are used here to set focus to the main content for accessibility when the component mounts
+
 const PasswordlessEmailConfirmation = ({form, submitForm, email = ''}) => {
     const contentRef = useRef(null)
 
@@ -101,6 +105,7 @@ const PasswordlessEmailConfirmation = ({form, submitForm, email = ''}) => {
                     <FormattedMessage
                         defaultMessage="Resend Link"
                         id="auth_modal.check_email.button.resend_link"
+                        aria-label="Resend Link"
                     />
                 </Button>
             </Stack>
