@@ -6,7 +6,6 @@
  */
 import {defineRecipe} from '@chakra-ui/react'
 
-//Chakra v3 has remove the input
 export default defineRecipe({
     slots: ['cancelButton', 'clearIcon', 'searchContainer', 'searchIcon', 'searchInput'],
     base: {
