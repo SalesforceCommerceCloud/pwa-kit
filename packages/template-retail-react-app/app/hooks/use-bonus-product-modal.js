@@ -10,6 +10,7 @@ import {
     ModalBody,
     Heading
 } from '@salesforce/retail-react-app/app/components/shared/ui'
+import {useAddToCartModalContext} from '@salesforce/retail-react-app/app/hooks/use-add-to-cart-modal'
 
 export const BonusProductModalContext = React.createContext();
 
@@ -60,6 +61,7 @@ export const useBonusState = () => {
         data: {}
     });
     const {pathname} = useLocation();
+    const {onOpen: onAddToCartModalOpen} = useAddToCartModalContext();
 
     useEffect(() => {
         if(state.isOpen) {
@@ -78,6 +80,14 @@ export const useBonusState = () => {
                 isOpen: false,
                 data: {}
             });
+            // Show AddToCartModal after BonusProductModal is closed
+            if (state.data.product) {
+                onAddToCartModalOpen({
+                    product: state.data.product,
+                    itemsAdded: state.data.itemsAdded,
+                    selectedQuantity: state.data.selectedQuantity
+                });
+            }
         },
         onOpen: (data) => {
             setState({

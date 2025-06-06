@@ -290,21 +290,24 @@ const ProductView = forwardRef(
                     // Update bonus products state with new items
                     if (itemsAdded) {
                         setBonusProducts(prev => [...prev, ...newBonusItems])
-                        onBonusProductModalOpen({
-                            newBonusItems,
-                            allBonusItems: itemsAdded.bonusDiscountLineItems
-                        })
-                    }
-                    
-                    // Open modal only when `addToCart` returns some data
-                    // It's possible that the item has been added to cart, but we don't want to open the modal.
-                    // See wishlist_primary_action for example.
-                    if (itemsAdded) {
-                        onAddToCartModalOpen({
-                            product,
-                            itemsAdded,
-                            selectedQuantity: quantity
-                        })
+                        
+                        // Show bonus product modal first if there are bonus items
+                        if (newBonusItems.length > 0) {
+                            onBonusProductModalOpen({
+                                newBonusItems,
+                                allBonusItems: itemsAdded.bonusDiscountLineItems,
+                                product,
+                                itemsAdded,
+                                selectedQuantity: quantity
+                            })
+                        } else {
+                            // If no bonus items, just show add to cart modal
+                            onAddToCartModalOpen({
+                                product,
+                                itemsAdded,
+                                selectedQuantity: quantity
+                            })
+                        }
                     }
                 } catch (e) {
                     showError()
