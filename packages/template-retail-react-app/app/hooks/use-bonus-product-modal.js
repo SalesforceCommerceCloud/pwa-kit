@@ -11,6 +11,7 @@ import {
     Heading
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 import {useAddToCartModalContext} from '@salesforce/retail-react-app/app/hooks/use-add-to-cart-modal'
+import {isServer} from '@salesforce/retail-react-app/app/utils/utils'
 
 export const BonusProductModalContext = React.createContext();
 
@@ -58,28 +59,57 @@ export const BonusProductModal = () => {
 export const useBonusState = () => {
     const [state, setState] = useState({
         isOpen: false,
-        data: {}
+        data: {},
+        bonusProducts: !isServer ? JSON.parse(localStorage.getItem('bonusProducts') || '[]') : []
     });
     const {pathname} = useLocation();
     const {onOpen: onAddToCartModalOpen} = useAddToCartModalContext();
 
     useEffect(() => {
         if(state.isOpen) {
-            setState({
-                ...state,
+            setState(prev => ({
+                ...prev,
                 isOpen: false
-            });
+            }));
         }
     }, [pathname]);
+
+    const addBonusProducts = (newBonusItems) => {
+        setState(prev => {
+            const updatedBonusProducts = [...prev.bonusProducts, ...newBonusItems];
+            // Store in localStorage only in browser environment
+            if (!isServer) {
+                localStorage.setItem('bonusProducts', JSON.stringify(updatedBonusProducts));
+            }
+            return {
+                ...prev,
+                bonusProducts: updatedBonusProducts
+            }
+        })
+    }
+
+    const clearBonusProducts = () => {
+        setState(prev => ({
+            ...prev,
+            bonusProducts: []
+        }));
+        if (!isServer) {
+            localStorage.removeItem('bonusProducts');
+        }
+    }
 
     return {
         isOpen: state.isOpen,
         data: state.data,
+        bonusProducts: state.bonusProducts,
+        addBonusProducts,
+        clearBonusProducts,
         onClose: () => {
-            setState({
+            setState(prev => ({
+                ...prev,
                 isOpen: false,
                 data: {}
-            });
+            }));
             // Show AddToCartModal after BonusProductModal is closed
             if (state.data.product) {
                 onAddToCartModalOpen({
@@ -90,10 +120,11 @@ export const useBonusState = () => {
             }
         },
         onOpen: (data) => {
-            setState({
+            setState(prev => ({
+                ...prev,
                 isOpen: true,
                 data
-            });
+            }));
         }
     };
 }

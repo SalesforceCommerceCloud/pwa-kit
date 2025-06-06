@@ -302,13 +302,16 @@ const ProductDetail = () => {
                 quantity
             }))
 
-            await addItemToNewOrExistingBasket(productItems)
+            const response = await addItemToNewOrExistingBasket(productItems)
 
             einstein.sendAddToCart(productItems)
 
             // If the items were successfully added, set the return value to be used
             // by the add to cart modal.
-            return productSelectionValues
+            return {
+                ...response, 
+                productSelectionValues
+            }
         } catch (error) {
             console.log('error', error)
             showError(error)

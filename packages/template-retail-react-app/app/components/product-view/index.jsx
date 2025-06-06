@@ -135,11 +135,12 @@ const ProductView = forwardRef(
         const {
             isOpen: isBonusProductModalOpen,
             onOpen: onBonusProductModalOpen,
-            onClose: onBonusProductModalClose
+            onClose: onBonusProductModalClose,
+            bonusProducts,
+            addBonusProducts
         } = useBonusProductModalContext()
         const theme = useTheme()
         const [showOptionsMessage, toggleShowOptionsMessage] = useState(false)
-        const [bonusProducts, setBonusProducts] = useState([])
         const {
             showLoading,
             showInventoryMessage,
@@ -279,23 +280,25 @@ const ProductView = forwardRef(
                     return
                 }
                 try {
-                    const itemsAdded = await addToCart(variant, quantity)
+                    const addToCartResponse = await addToCart(variant, quantity)
+                    const itemsAdded = addToCartResponse?.productSelectionValues
+                    
                     // Compare existing bonus products with new bonus discount line items
-                    const newBonusItems = itemsAdded?.bonusDiscountLineItems?.filter(newItem => 
+                    const newBonusItems = addToCartResponse?.bonusDiscountLineItems?.filter(newItem => 
                         !bonusProducts.some(existingItem => 
-                            existingItem.productId === newItem.productId
+                            existingItem.id === newItem.id
                         )
                     ) || []
                     
-                    // Update bonus products state with new items
                     if (itemsAdded) {
-                        setBonusProducts(prev => [...prev, ...newBonusItems])
-                        
                         // Show bonus product modal first if there are bonus items
                         if (newBonusItems.length > 0) {
+                            // Modify this logic and update bonusProducts list in localStorage with the new bonus items
+                            // that are added to the cart
+                            addBonusProducts(newBonusItems)
                             onBonusProductModalOpen({
                                 newBonusItems,
-                                allBonusItems: itemsAdded.bonusDiscountLineItems,
+                                allBonusItems: addToCartResponse.bonusDiscountLineItems,
                                 product,
                                 itemsAdded,
                                 selectedQuantity: quantity
