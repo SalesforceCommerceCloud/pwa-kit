@@ -20,7 +20,7 @@
     "test:e2e:ui": "npx playwright test --ui",
     "test": "lerna run --stream --concurrency=1 test",
     "test:max-file-size": "lerna run --stream test:max-file-size",
-    "check-dep-version": "syncpack list-mismatches"
+    "check-dep-version": "syncpack list-mismatches --types prod,dev"
   },
   "devDependencies": {
     "@playwright/test": "^1.49.0",
