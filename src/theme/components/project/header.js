@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, salesforce.com, inc.
+ * Copyright (c) 2025, salesforce.com, inc.
  * All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
@@ -7,12 +7,23 @@
 import {defineRecipe} from '@chakra-ui/react'
 
 export default defineRecipe({
-    slots: ['container', 'content', 'searchContainer', 'bodyContainer', 'logo', 'icons', 'signout'],
+    slots: [
+        'container',
+        'content',
+        'searchContainer',
+        'bodyContainer',
+        'logo',
+        'icons',
+        'accountIconButton',
+        'wishListIconButton',
+        'arrowDownIconButton',
+        'signout'
+    ],
     base: {
         container: {
             minWidth: 'xs',
             width: 'full',
-            boxShadow: 'base',
+            shadow: 'xs',
             backgroundColor: 'white'
         },
         content: {
@@ -30,7 +41,6 @@ export default defineRecipe({
             marginRight: [0, 0, 0, 4],
             marginBottom: [1, 1, 2, 0]
         },
-
         bodyContainer: {
             flex: '1'
         },
