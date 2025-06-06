@@ -12,6 +12,7 @@ module.exports = {
 
     //NOTE: we manually re-enable tests here until we finish migrating to Chakra v3
     testMatch: [
+        '<rootDir>/src/components/fade/**/*.test.js',
         '<rootDir>/src/components/footer/**/*.test.js',
         '<rootDir>/src/components/links-list/**/*.test.js',
         '<rootDir>/src/components/icons/**/*.test.js',
@@ -22,6 +23,7 @@ module.exports = {
         '<rootDir>/src/components/nested-accordion/**/*.test.js',
         '<rootDir>/src/components/product-scroller/**/*.test.js',
         '<rootDir>/src/components/product-tile/**/*.test.js',
+        '<rootDir>/src/components/product-view/**/*.test.js',
         '<rootDir>/src/components/quantity-picker/**/*.test.js',
         '<rootDir>/src/components/swatch-group/**/*.test.js',
         '<rootDir>/src/utils/responsive-image.test.js',

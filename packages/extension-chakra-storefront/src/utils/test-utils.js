@@ -11,7 +11,7 @@ import {ChakraProvider} from '@chakra-ui/react'
 import PropTypes from 'prop-types'
 
 import theme from '../theme'
-// import {AddToCartModalProvider} from '../hooks/use-add-to-cart-modal'
+import {AddToCartModalProvider} from '../hooks/use-add-to-cart-modal'
 import {ServerContext} from '@salesforce/pwa-kit-react-sdk/ssr/universal/contexts'
 import {IntlProvider} from 'react-intl'
 import {CommerceApiProvider} from '@salesforce/commerce-sdk-react'
@@ -140,8 +140,7 @@ export const TestProviders = ({
                             <CurrencyProvider currency={DEFAULT_CURRENCY}>
                                 <Router>
                                     <ChakraProvider value={theme}>
-                                        {children}
-                                        {/*<AddToCartModalProvider>{children}</AddToCartModalProvider>*/}
+                                        <AddToCartModalProvider>{children}</AddToCartModalProvider>
                                     </ChakraProvider>
                                 </Router>
                             </CurrencyProvider>
