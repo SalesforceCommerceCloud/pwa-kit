@@ -1,4 +1,5 @@
 ## v3.4.0-dev.0 (May 23, 2025)
+- Now compatible with either React 17 and 18 [#2506](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2506)
 
 ## v3.3.0 (May 22, 2025)
 
