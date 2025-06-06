@@ -353,7 +353,7 @@ test('renders a product bundle properly - child item', () => {
     expect(quantityPicker).toBeNull()
 })
 
-test('Pickup in store checkbox is enabled when inventoryId is present in localStorage', async () => {
+test('Pickup in store radio is enabled when inventoryId is present in localStorage', async () => {
     // Arrange: Set up localStorage with inventoryId for the current site
     const siteId = 'site-1'
     const storeInfoKey = `store_${siteId}`
@@ -362,12 +362,12 @@ test('Pickup in store checkbox is enabled when inventoryId is present in localSt
 
     renderWithProviders(<MockComponent product={mockProductDetail} />)
 
-    // Assert: Checkbox is enabled
-    const pickupCheckbox = await screen.findByLabelText(/pickup in store/i)
-    expect(pickupCheckbox).toBeEnabled()
+    // Assert: Radio is enabled
+    const pickupRadio = await screen.findByRole('radio', {name: /pickup in store/i})
+    expect(pickupRadio).toBeEnabled()
 })
 
-test('Pickup in store checkbox is disabled when inventoryId is NOT present in localStorage', async () => {
+test('Pickup in store radio is disabled when inventoryId is NOT present in localStorage', async () => {
     // Arrange: Ensure localStorage does not have inventoryId for the current site
     const siteId = 'site-1'
     const storeInfoKey = `store_${siteId}`
@@ -375,13 +375,12 @@ test('Pickup in store checkbox is disabled when inventoryId is NOT present in lo
 
     renderWithProviders(<MockComponent product={mockProductDetail} />)
 
-    // Assert: Checkbox is disabled
-    const pickupCheckbox = await screen.findByLabelText(/pickup in store/i)
-    expect(pickupCheckbox).toBeDisabled()
+    // Assert: Radio is disabled
+    const pickupRadio = await screen.findByRole('radio', {name: /pickup in store/i})
+    expect(pickupRadio).toBeDisabled()
 })
 
-
-test('Add to Cart includes inventoryId when Pickup in store is checked and product is orderable', async () => {
+test('Add to Cart (Pickup in Store) includes inventoryId for the selected variant', async () => {
     // Arrange: Set up localStorage with inventoryId for the current site
     const siteId = 'site-1'
     const storeInfoKey = `store_${siteId}`
@@ -391,6 +390,7 @@ test('Add to Cart includes inventoryId when Pickup in store is checked and produ
     // Mock product with inventories array, orderable: true, and imageGroups
     const mockProductWithOrderableInventory = {
         ...mockProductDetail,
+        productId: 'variant-123', // ensure this is set for the variant
         imageGroups: mockProductDetail.imageGroups || [
             {
                 viewType: 'small',
@@ -411,13 +411,13 @@ test('Add to Cart includes inventoryId when Pickup in store is checked and produ
 
     // Mock addToCart to capture the productItems argument
     let receivedProductItems = null
-    const addToCart = jest.fn((variant, quantity) => {
-        receivedProductItems = {variant, quantity}
+    const addToCart = jest.fn((items) => {
+        receivedProductItems = items
         return Promise.resolve([
             {
-                product: mockProductWithOrderableInventory, // include the full product object
-                variant,
-                quantity
+                product: mockProductWithOrderableInventory,
+                variant: mockProductWithOrderableInventory,
+                quantity: 1
             }
         ])
     })
@@ -439,8 +439,7 @@ test('Add to Cart includes inventoryId when Pickup in store is checked and produ
     // Assert: addToCart was called and inventoryId is present in the product item
     await waitFor(() => {
         expect(addToCart).toHaveBeenCalled()
+        expect(receivedProductItems[0].inventoryId).toBe(inventoryId)
+        expect(receivedProductItems[0].productId).toBe('variant-123')
     })
-    // In a real integration, you'd check the POST body, but here we check the call
-    // If you want to check the actual POST, you'd need to mock the network layer
-    // For now, just ensure the test structure is in place
 })

@@ -20,7 +20,10 @@ import {
     VStack,
     Fade,
     useTheme,
-    Checkbox
+    Checkbox,
+    Stack,
+    Radio,
+    RadioGroup
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 import {useCurrency, useDerivedProduct} from '@salesforce/retail-react-app/app/hooks'
 import {useAddToCartModalContext} from '@salesforce/retail-react-app/app/hooks/use-add-to-cart-modal'
@@ -449,34 +452,6 @@ const ProductView = forwardRef(
             }
         }, [site?.id])
 
-        const handlePickupInStoreChange = (e) => {
-            const checked = e.target.checked
-            setPickupInStore(checked)
-            setPickupError('')
-            if (checked && pickupEnabled) {
-                const storeInfoKey = `store_${site.id}`
-                let inventoryId = null
-                let storeName = null
-                try {
-                    const storeInfo = JSON.parse(window.localStorage.getItem(storeInfoKey))
-                    inventoryId = storeInfo?.inventoryId
-                    storeName = storeInfo?.name
-                } catch (e) {}
-                if (inventoryId && product?.inventories) {
-                    const inventoryObj = product.inventories.find(inv => inv.id === inventoryId)
-                    if (!inventoryObj?.orderable) {
-                        setPickupInStore(false)
-                        setPickupError(
-                            intl.formatMessage({
-                                id: 'product_view.error.not_available_for_pickup',
-                                defaultMessage: 'Out of Stock in {storeName}'
-                            }, {storeName: storeName || ''})
-                        )
-                    }
-                }
-            }
-        }
-
         return (
             <Flex direction={'column'} data-testid="product-view" ref={ref}>
                 {/* Basic information etc. title, price, breadcrumb*/}
@@ -720,22 +695,58 @@ const ProductView = forwardRef(
                                 </Fade>
                             )}
                             <Box>
-                                {/* Pickup in store checkbox just before Add to Cart */}
                                 <Box mb={1}>
                                     <Text as="label" fontWeight="bold" mb={1} display="block">
                                         <FormattedMessage defaultMessage="Delivery:" id="product_view.label.delivery" />
                                     </Text>
-                                    <Checkbox
-                                        isChecked={pickupInStore}
-                                        onChange={handlePickupInStoreChange}
+                                    <RadioGroup
+                                        value={pickupInStore ? 'pickup' : 'ship'}
+                                        onChange={(value) => {
+                                            setPickupError('');
+                                            if (value === 'pickup') {
+                                                if (pickupEnabled) {
+                                                    const storeInfoKey = `store_${site.id}`;
+                                                    let inventoryId = null;
+                                                    let storeName = null;
+                                                    try {
+                                                        const storeInfo = JSON.parse(window.localStorage.getItem(storeInfoKey));
+                                                        inventoryId = storeInfo?.inventoryId;
+                                                        storeName = storeInfo?.name;
+                                                    } catch (e) {}
+                                                    if (inventoryId && product?.inventories) {
+                                                        const inventoryObj = product.inventories.find(inv => inv.id === inventoryId);
+                                                        if (!inventoryObj?.orderable) {
+                                                            setPickupInStore(false);
+                                                            setPickupError(
+                                                                intl.formatMessage({
+                                                                    id: 'product_view.error.not_available_for_pickup',
+                                                                    defaultMessage: 'Out of Stock in {storeName}'
+                                                                }, {storeName: storeName || ''})
+                                                            );
+                                                            return;
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                            setPickupInStore(value === 'pickup');
+                                        }}
                                         mb={1}
-                                        disabled={!pickupEnabled || (storeName && inventoryId && storeStockStatus === false)}
                                     >
-                                        <FormattedMessage
-                                            defaultMessage="Pickup in store"
-                                            id="product_view.label.pickup_in_store"
-                                        />
-                                    </Checkbox>
+                                        <Stack direction="column" spacing={2}>
+                                            <Radio value="ship">
+                                                <FormattedMessage
+                                                    defaultMessage="Ship to Address"
+                                                    id="product_view.label.ship_to_address"
+                                                />
+                                            </Radio>
+                                            <Radio value="pickup" isDisabled={!pickupEnabled || (storeName && inventoryId && storeStockStatus === false)}>
+                                                <FormattedMessage
+                                                    defaultMessage="Pickup in Store"
+                                                    id="product_view.label.pickup_in_store"
+                                                />
+                                            </Radio>
+                                        </Stack>
+                                    </RadioGroup>
                                 </Box>
                                 {storeName && inventoryId && (
                                     <Text color="black" fontWeight={600} mb={2} data-testid="store-stock-status-msg">
