@@ -10,7 +10,7 @@ import PropTypes from 'prop-types'
 import {useIntl} from 'react-intl'
 
 // Project Components
-// import LocaleSelector from '../../components/locale-selector'
+import LocaleSelector from '../../components/locale-selector'
 import NestedAccordion from '../../components/nested-accordion'
 import SocialIcons from '../../components/social-icons'
 
@@ -267,7 +267,7 @@ const DrawerMenu = ({
                             </Box>
                             {showLocaleSelector && (
                                 <Box py={1}>
-                                    {/* <LocaleSelector
+                                    <LocaleSelector
                                         selectedLocale={intl.locale}
                                         locales={supportedLocaleIds}
                                         onSelect={(newLocale) => {
@@ -277,7 +277,7 @@ const DrawerMenu = ({
                                             })
                                             window.location = newUrl
                                         }}
-                                    /> */}
+                                    />
                                 </Box>
                             )}
                         </VStack>

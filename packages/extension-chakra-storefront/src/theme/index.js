@@ -41,7 +41,7 @@ import header from './components/project/header'
 import footer from './components/project/footer'
 import checkoutFooter from './components/project/checkout-footer'
 import linkList from './components/project/links-list'
-// import LocaleSelector from './components/project/locale-selector'
+import localeSelector from './components/project/locale-selector'
 import nestedAccordion from './components/project/nested-accordion'
 import offlineBanner from './components/project/offline-banner'
 import pagination from './components/project/pagination'
@@ -113,6 +113,7 @@ export const overrides = defineConfig({
             header,
             imageGallery,
             linkList,
+            localeSelector,
             nestedAccordion,
             offlineBanner,
             pagination,
