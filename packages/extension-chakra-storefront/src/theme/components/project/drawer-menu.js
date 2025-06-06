@@ -4,22 +4,47 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-export default {
-    baseStyle: {
-        container: {},
-        socialsContainer: {
+import {defineSlotRecipe} from '@chakra-ui/react'
+
+export default defineSlotRecipe({
+    slots: [
+        'root',
+        'backdrop',
+        'content',
+        'header',
+        'body',
+        'footer',
+        'socialsItem',
+        'actions',
+        'actionsItem',
+        'localeSelector',
+        'signout'
+    ],
+    base: {
+        root: {},
+        content: {
+            borderRadius: '0px',
+            width: '100%',
+            height: '100%',
+            maxHeight: '100%',
+            maxWidth: '320px',
+            bg: 'white',
+            display: 'flex',
+            flexDirection: 'column'
+        },
+        header: {
+            boxShadow: 'sm',
+            paddingTop: 1,
+            paddingBottom: 1,
+            paddingLeft: 4,
+            paddingRight: 4
+        },
+        body: {
             flex: 1,
-            justifyContent: 'flex-start'
+            overflowY: 'auto',
+            padding: 4
         },
-        icon: {
-            color: 'gray.900',
-            width: 5,
-            height: 5
-        },
-        logo: {
-            width: 12,
-            height: 8
-        },
+        footer: {},
         socialsItem: {
             textAlign: 'center',
             paddingLeft: 2,
@@ -38,29 +63,7 @@ export default {
             paddingBottom: 1
         },
         signout: {
-            width: '100%',
-            paddingLeft: 8,
-            paddingTop: 2,
-            paddingBottom: 2,
-            _focus: {
-                borderRadius: 0,
-                boxShadow: 'outline'
-            }
-        },
-        signoutText: {
-            marginLeft: 2,
-            fontSize: 14,
-            fontWeight: 'normal'
+            width: '100%'
         }
-    },
-    parts: [
-        'actions',
-        'actionsItem',
-        'container',
-        'icon',
-        'localeSelector',
-        'socials',
-        'socialsItem',
-        'signout'
-    ]
-}
+    }
+})

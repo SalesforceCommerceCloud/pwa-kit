@@ -6,7 +6,7 @@
  */
 
 // Third-Party
-import React, {useState} from 'react'
+import React, {Fragment, useState} from 'react'
 
 // Platform Imports
 import {ApplicationExtension} from '@salesforce/pwa-kit-extension-sdk/react'
@@ -31,6 +31,135 @@ import extensionMeta from '../extension-meta.json'
 
 // Pages
 import * as Pages from './pages'
+import {DrawerMenu} from './components/drawer-menu'
+// import {mockCategories} from './mocks/mock-data'
+import {Button} from '@chakra-ui/react'
+
+const mockCategories = {
+    categories: [
+        {
+            id: 'newarrivals',
+            name: 'New Arrivals',
+            onlineSubCategoriesCount: 2,
+            pageDescription:
+                'Shop all new arrivals including women and mens clothing, jewelry, accessories, suits & more at Commerce Cloud',
+            pageTitle: 'Women and Mens New Arrivals in Clothing, Jewelry, Accessories & More',
+            parentCategoryId: 'root',
+            parentCategoryTree: [
+                {
+                    id: 'newarrivals',
+                    name: 'New Arrivals'
+                }
+            ],
+            c_enableCompare: false,
+            c_headerMenuBanner:
+                '<img alt="New Arrivals Image" src="https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-storefront-catalog-m-non-en/default/dwcb06580a/images/slot/landing/cat-landing-slotbottom-womens-clothing.jpg" width="225" />',
+            c_headerMenuOrientation: 'Vertical',
+            c_showInMenu: true
+        },
+        {
+            id: 'womens',
+            name: 'Womens',
+            onlineSubCategoriesCount: 3,
+            pageDescription:
+                "Women's range. Fashionable and stylish Shoes, jackets and  all other clothing for unbeatable comfort day in, day out. Practical and fashionable styles wherever the occasion.",
+            pageKeywords:
+                'womens boots, womens shoes, wome sandals, womens clothing, womens apparel, womens jackets',
+            pageTitle: "Women's Footwear, Outerwear, Clothing & Accessories",
+            parentCategoryId: 'root',
+            parentCategoryTree: [
+                {
+                    id: 'womens',
+                    name: 'Womens'
+                }
+            ],
+            c_enableCompare: true,
+            c_headerMenuBanner:
+                '<img alt="Women\'s Catalog Image" src="https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-storefront-catalog-m-non-en/default/dw80e8e893/images/slot/landing/cat-landing-slotbanner-womens.jpg" width="480" />',
+            c_headerMenuOrientation: 'Horizontal',
+            c_showInMenu: true,
+            c_slotBannerImage:
+                'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-storefront-catalog-m-non-en/default/dw80e8e893/images/slot/landing/cat-landing-slotbanner-womens.jpg'
+        },
+        {
+            id: 'mens',
+            name: 'Mens',
+            onlineSubCategoriesCount: 2,
+            pageDescription:
+                "Men's range. Hard-wearing boots, jackets and clothing for unbeatable comfort day in, day out. Practical, easy-to-wear styles wherever you're headed.",
+            pageKeywords: 'mens boots, mens shoes, mens clothing, mens apparel, mens jackets',
+            pageTitle: "Men's Footwear, Outerwear, Clothing & Accessories",
+            parentCategoryId: 'root',
+            parentCategoryTree: [
+                {
+                    id: 'mens',
+                    name: 'Mens'
+                }
+            ],
+            c_enableCompare: true,
+            c_headerMenuBanner:
+                '<img alt="Men\'s Category Image" src="https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-storefront-catalog-m-non-en/default/dwa6379acf/images/slot/landing/cat-landing-slotbanner-mens.jpg" width="433" />',
+            c_headerMenuOrientation: 'Horizontal',
+            c_showInMenu: true,
+            c_slotBannerImage:
+                'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.static/-/Sites-storefront-catalog-m-non-en/default/dwa6379acf/images/slot/landing/cat-landing-slotbanner-mens.jpg'
+        },
+        {
+            id: 'gift-certificates',
+            name: 'Gift Certificates',
+            onlineSubCategoriesCount: 0,
+            parentCategoryId: 'root',
+            parentCategoryTree: [
+                {
+                    id: 'gift-certificates',
+                    name: 'Gift Certificates'
+                }
+            ],
+            c_alternativeUrl:
+                'https://zzrf-001.dx.commercecloud.salesforce.com/s/RefArchGlobal/en_US/giftcertpurchase',
+            c_enableCompare: false,
+            c_showInMenu: true
+        },
+        {
+            id: 'top-seller',
+            name: 'Top Sellers',
+            onlineSubCategoriesCount: 0,
+            parentCategoryId: 'root',
+            parentCategoryTree: [
+                {
+                    id: 'top-seller',
+                    name: 'Top Sellers'
+                }
+            ],
+            c_alternativeUrl:
+                'https://zzrf-001.dx.commercecloud.salesforce.com/s/RefArchGlobal/en_US/search?cgid=root&amp;srule=top-sellers',
+            c_enableCompare: false,
+            c_showInMenu: true
+        }
+    ],
+    id: 'root',
+    name: 'Storefront Catalog - Non-EN',
+    onlineSubCategoriesCount: 5
+}
+// TODO: THE CODE BELOW IS ONLY USED FOR TESTING PURPOSES.
+// IT WILL BE REMOVED IN THE FUTURE.
+
+const DrawerMenuPage = () => {
+    const [open, setOpen] = useState(false)
+    return (
+        <Fragment>
+            <DrawerMenu
+                isOpen={open}
+                onClose={() => setOpen(false)}
+                // onLogoClick={onLogoClick}
+                root={mockCategories}
+                itemsKey="categories"
+                itemsCountKey="onlineSubCategoriesCount"
+            />
+            <Button onClick={() => setOpen(true)}>Open Drawer</Button>
+        </Fragment>
+    )
+}
 
 class ChakraStorefront extends ApplicationExtension<Config> {
     static readonly id = extensionMeta.id
@@ -56,6 +185,11 @@ class ChakraStorefront extends ApplicationExtension<Config> {
         const config = this.getConfig()
 
         const extensionRoutes = [
+            {
+                path: '/drawer-menu',
+                component: DrawerMenuPage,
+                exact: true
+            },
             {
                 path: config.pages.Home && config.pages.Home.path,
                 component: Pages.Home,
