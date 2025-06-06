@@ -292,7 +292,7 @@ const ProductView = forwardRef(
                     
                     if (itemsAdded) {
                         // Show bonus product modal first if there are bonus items
-                        if (newBonusItems.length > 0) {
+                        if (newBonusItems?.length > 0) {
                             // Modify this logic and update bonusProducts list in localStorage with the new bonus items
                             // that are added to the cart
                             addBonusProducts(newBonusItems)
