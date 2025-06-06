@@ -106,8 +106,7 @@ const ImageGallery = ({
     const thumbnailImages = thumbnailImageGroup?.images || []
     const loadingStrategy = lazy ? 'lazy' : 'eager'
 
-    const responsiveMaxWidthValues = Object.values(styles.heroImage.maxWidth['@layer recipes'])
-    const heroImageMaxWidth = useBreakpointValue(responsiveMaxWidthValues) // in px
+    const heroImageMaxWidth = styles.heroImage['@layer recipes'].maxWidth
 
     return (
         <Flex direction="column">

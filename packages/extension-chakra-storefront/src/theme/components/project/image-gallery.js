@@ -56,18 +56,18 @@ export default defineSlotRecipe({
         size: {
             sm: {
                 heroImageSkeleton: {
-                    maxWidth: ['none', 'none', 'none', '500px']
+                    maxWidth: '500px'
                 },
                 heroImage: {
-                    maxWidth: ['none', 'none', 'none', '500px']
+                    maxWidth: '500px'
                 }
             },
             md: {
                 heroImageSkeleton: {
-                    maxWidth: ['none', 'none', 'none', '680px']
+                    maxWidth: '680px'
                 },
                 heroImage: {
-                    maxWidth: ['none', 'none', 'none', '680px']
+                    maxWidth: '680px'
                 }
             }
         }

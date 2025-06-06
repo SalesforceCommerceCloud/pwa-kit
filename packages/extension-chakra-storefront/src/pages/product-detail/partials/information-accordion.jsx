@@ -14,7 +14,7 @@ const InformationAccordion = ({product}) => {
     const {formatMessage} = useIntl()
 
     return (
-        <Stack direction="row" spacing={[0, 0, 0, 16]}>
+        <Stack direction="row" gap={[0, 0, 0, 16]}>
             <Accordion.Root collapsible multiple maxWidth={'896px'} flex={[1, 1, 1, 5]}>
                 {/* Details */}
                 <Accordion.Item key="details" value="details">
