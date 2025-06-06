@@ -332,23 +332,11 @@ const ProductDetail = () => {
 
     const handleAddToCart = async (productSelectionValues = []) => {
         try {
-            // Debug: Log all productSelectionValues
-            // eslint-disable-next-line no-console
-            console.log('DEBUG AddToCart: productSelectionValues', productSelectionValues);
             const productItems = productSelectionValues.map((item) => {
                 const {variant, quantity} = item;
                 // Use variant if present, otherwise use the main product
                 const prod = variant || item.product || product;
-                // Debug: Log the variant and product being used
-                // eslint-disable-next-line no-console
-                console.log('DEBUG AddToCart: variant', variant);
-                // eslint-disable-next-line no-console
-                console.log('DEBUG AddToCart: prod', prod);
                 const prodKey = prod.productId || prod.id;
-                // eslint-disable-next-line no-console
-                console.log('DEBUG AddToCart: pickupInStoreMap', pickupInStoreMap);
-                // eslint-disable-next-line no-console
-                console.log('DEBUG AddToCart: prodKey', prodKey);
                 let result = {
                     productId: prod.productId || prod.id, // productId for variant, id for product
                     price: prod.price,
@@ -365,46 +353,27 @@ const ProductDetail = () => {
                         inventoryId = storeInfo?.inventoryId;
                         storeName = storeInfo?.name;
                     } catch (e) {}
-                    // Debug logs
-                    // eslint-disable-next-line no-console
-                    console.log('DEBUG AddToCart: pickupInStore:', pickupInStoreMap[prodKey]);
-                    // eslint-disable-next-line no-console
-                    console.log('DEBUG AddToCart: inventoryId:', inventoryId);
-                    // eslint-disable-next-line no-console
-                    console.log('DEBUG AddToCart: localStorage:', window.localStorage.getItem(storeInfoKey));
-                    // eslint-disable-next-line no-console
-                    console.log('DEBUG AddToCart: product.inventories:', prod.inventories);
                     if (inventoryId) {
                         result.inventoryId = inventoryId;
                     }
                 }
                 return result;
             });
-            // Debug: Log error check state
-            // eslint-disable-next-line no-console
-            console.log('DEBUG AddToCart: error check', productItems, pickupInStoreMap);
             // Defensive check: This block ensures that if, for any reason, pickup is selected for a product but no store (inventoryId) is set,
             // we show an error. With the current UI logic, this should never be reached, but it guards against unexpected state.
             if (productItems.some(item => item.inventoryId === undefined && pickupInStoreMap[item.productId || item.id])) {
-                // eslint-disable-next-line no-console
-                console.error('DEBUG AddToCart: No valid store or inventory found for pickup', productItems);
                 showError(formatMessage({
                     id: 'product_view.error.no_store_selected_for_pickup',
                     defaultMessage: 'No valid store or inventory found for pickup'
                 }));
                 return;
             }
-            // Debug: Log final productItems array
-            // eslint-disable-next-line no-console
-            console.log('DEBUG AddToCart: final productItems', productItems);
             await addItemToNewOrExistingBasket(productItems);
             einstein.sendAddToCart(productItems);
             // Open modal with itemsAdded
             addToCartModal.onOpen({ product, itemsAdded: productSelectionValues });
             return productSelectionValues;
         } catch (error) {
-            // eslint-disable-next-line no-console
-            console.error('DEBUG AddToCart: error', error);
             showError(error);
         }
     };
