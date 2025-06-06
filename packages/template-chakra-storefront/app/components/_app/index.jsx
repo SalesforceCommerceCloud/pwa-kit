@@ -250,7 +250,7 @@ const App = (props) => {
 
     const onLogoClick = () => {
         // Goto the home page.
-        const path = buildUrl(appConfig.homeHref)
+        const path = buildUrl(appConfig.pages.home.path)
 
         history.push(path)
 
