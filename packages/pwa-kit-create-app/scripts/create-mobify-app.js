@@ -987,7 +987,7 @@ const runGenerator = (
     copyAllFiles(packagePath, outputDir)
 
     // Convert selected plugins array to object with true values
-    if (configPlugins?.plugins?.length > 0 && selectedPlugins) {
+    if (pluginConfig?.plugins?.length > 0 && selectedPlugins) {
         treeShake(outputDir, selectedPlugins)
     }
     
