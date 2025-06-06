@@ -49,6 +49,8 @@ const slugify = require('slugify')
 const generatorPkg = require('../package.json')
 const Handlebars = require('handlebars')
 const validatePackageName = require('validate-npm-package-name')
+const treeShake = require('./tree-shake')
+const pluginConfig = require('../assets/plugin-config');
 
 const program = new Command()
 
@@ -139,27 +141,7 @@ const INITIAL_QUESTION = [
     }
 ]
 
-const askApplicationExtensibilityQuestions = (availableAppExtensions) => {
-    return [
-        {
-            name: 'project.selectedAppExtensions',
-            message: 'Which Application Extensions do you want to install?',
-            type: 'checkbox',
-            choices: availableAppExtensions
-        },
-        {
-            name: 'project.extractAppExtensions',
-            message:
-                '⚠️ WARNING: If you choose to extract the Application Extension code,\n' +
-                'you will NO LONGER be able to consume upgrades from NPM. All changes\n' +
-                'made to the extracted code will be YOUR RESPONSIBILITY.\n' +
-                '\n' +
-                'Do you want to proceed with extracting the Application Extensions code?',
-            type: 'confirm',
-            default: false
-        }
-    ]
-}
+const selectedPlugins = {}
 
 const APPLICATION_EXTENSION_QUESTIONS = [
     {
@@ -264,7 +246,7 @@ const RETAIL_REACT_APP_QUESTIONS = [
 // Project dictionary describing details and how the generator should ask questions etc.
 const PRESETS = [
     {
-        id: 'retail-react-app',
+        id: 'chakra-storefront',
         name: 'Retail React App',
         description: `
             Generate a project using custom settings by answering questions about a
@@ -275,7 +257,7 @@ const PRESETS = [
         shortDescription: 'The Retail app using your own Commerce Cloud instance',
         templateSource: {
             type: TEMPLATE_SOURCE_NPM,
-            id: '@salesforce/retail-react-app'
+            id: '@salesforce/chakra-storefront'
         },
         questions: [...RETAIL_REACT_APP_QUESTIONS],
         assets: ['translations'],
@@ -1004,6 +986,11 @@ const runGenerator = (
     // Copy the base template either from the package or npm.
     copyAllFiles(packagePath, outputDir)
 
+    // Convert selected plugins array to object with true values
+    if (configPlugins?.plugins?.length > 0 && selectedPlugins) {
+        treeShake(outputDir, selectedPlugins)
+    }
+    
     // Copy template specific assets over.
     const assetsDir = p.join(ASSETS_TEMPLATES_DIR, id)
     if (sh.test('-e', assetsDir)) {
@@ -1192,42 +1179,6 @@ const main = async (opts) => {
         process.exit(1)
     }
 
-    // If no preset argument is provided, ask Application Extensibility questions
-    if (!presetId) {
-        // Ask initial question
-        const initialAnswers = await inquirer.prompt(INITIAL_QUESTION)
-        context = {...context, answers: {project: initialAnswers.project}}
-
-        if (initialAnswers.project.type === 'PWAKitAppExtensionProject') {
-            // Ask for extension name if Application Extension is selected
-            const extensionNameAnswers = await inquirer.prompt(APPLICATION_EXTENSION_QUESTIONS)
-            const extensionName = extensionNameAnswers.project.extensionName
-
-            // Get the preset and set extension name in all required places
-            context.preset = {
-                ...PRESETS.find(({id}) => id === 'extension-starter'),
-                answers: {
-                    'project.type': 'PWAKitAppExtensionProject',
-                    'project.name': extensionName,
-                    'project.extensionName': extensionName
-                }
-            }
-        } else {
-            const availableAppExtensions = fetchAvailableAppExtensions()
-
-            // Include version info in context
-            context.availableAppExtensions = availableAppExtensions
-
-            const generationAnswers = await prompt(
-                askApplicationExtensibilityQuestions(availableAppExtensions)
-            )
-            context = merge(context, {answers: expandObject(generationAnswers)})
-
-            // Default to 'typescript-minimal' preset when no preset is specified
-            context.preset = PRESETS.find(({id}) => id === 'typescript-minimal')
-        }
-    }
-
     // Set the preset based on presetId if provided
     if (presetId && !context.preset) {
         context.preset = PRESETS.find(({id}) => id === presetId)
@@ -1241,6 +1192,28 @@ const main = async (opts) => {
         context = merge(context, {
             answers: expandObject(projectAnswers)
         })
+    }
+
+    // Prompt user for plugin selection
+    if (pluginConfig?.plugins?.length > 0) {
+        const pluginChoices = Object.entries(pluginConfig.plugins).map(([key, config]) => ({
+            name: config.description,
+            value: key
+        }));
+
+        const pluginAnswers = await inquirer.prompt([
+            {
+                type: 'checkbox',
+                name: 'selectedPlugins',
+                message: 'Which extensions would you like to enable?',
+                choices: pluginChoices
+            }
+        ]);
+
+        // Convert selected plugins array to object with true values
+        pluginAnswers.selectedPlugins.forEach((plugin) => {
+            selectedPlugins[plugin] = true;
+        });
     }
 
     if (!OUTPUT_DIR_FLAG_ACTIVE) {

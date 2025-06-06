@@ -39,6 +39,8 @@
     "npm": "^8.0.0 || ^9.0.0 || ^10.0.0 || ^11.0.0"
   },
   "dependencies": {
+    "@babel/parser": "^7.27.5",
+    "@babel/traverse": "^7.27.4",
     "node-fetch": "^2.6.9"
   }
 }
