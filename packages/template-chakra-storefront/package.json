@@ -1,5 +1,5 @@
 {
-  "name": "@salesforce/template-chakra-storefront",
+  "name": "@salesforce/chakra-storefront",
   "version": "0.1.0-extensibility-preview.5",
   "bugs": {
     "url": "https://github.com/SalesforceCommerceCloud/pwa-kit/issues"

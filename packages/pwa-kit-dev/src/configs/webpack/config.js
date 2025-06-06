@@ -182,12 +182,20 @@ const baseConfig = (target) => {
                     },
                     ...(target === 'web' ? {fallback: {crypto: false}} : {})
                 },
+                // To add a new config for an extension, you can add a new element to the plugins array with the key and value as follows:
+                // The key should be the name of the plugin, and the value should be a boolean.
+                // The value should be true if the plugin is enabled, and false if it is disabled.
+                // The key should start with SFDC_EXT_, so that it's clear that it is an extension and not part of the core PWA Kit.
+                // For example, to add a new config for the Hello World extension, you can add the following:
+                // new webpack.DefinePlugin({
+                //     SFDC_EXT_HELLO_WORLD_ENABLED: true
+                // })
                 plugins: [
                     new webpack.DefinePlugin({
                         DEBUG,
                         NODE_ENV: `'${process.env.NODE_ENV}'`,
                         WEBPACK_TARGET: `'${target}'`,
-                        ['global.GENTLY']: false
+                        ['global.GENTLY']: false,
                     }),
                     process.env.RECORD_OVERRIDES === 'true' && new OverrideStatsPlugin(),
                     // new SharedStatePlugin(),
