@@ -10,6 +10,7 @@ export default defineSlotRecipe({
     slots: ['container', 'item', 'icon'],
     base: {
         container: {
+            display: 'flex',
             flex: 1,
             marginTop: 4
         },

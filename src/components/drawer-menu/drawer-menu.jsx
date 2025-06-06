@@ -10,26 +10,19 @@ import PropTypes from 'prop-types'
 import {useIntl} from 'react-intl'
 
 // Project Components
-import LocaleSelector from '../../components/locale-selector'
+// import LocaleSelector from '../../components/locale-selector'
 import NestedAccordion from '../../components/nested-accordion'
 import SocialIcons from '../../components/social-icons'
 
 // Components
 import {
     Box,
-    AccordionButton,
-    AccordionItem,
+    Accordion,
     Button,
     Center,
-    Divider,
-    Drawer,
-    DrawerBody,
-    DrawerFooter,
-    DrawerHeader,
-    DrawerOverlay,
-    DrawerContent,
-    DrawerCloseButton,
-    Fade,
+    CloseButton,
+    Separator,
+    Dialog,
     HStack,
     IconButton,
     Flex,
@@ -39,7 +32,7 @@ import {
 
     // Hooks
     useBreakpointValue,
-    useMultiStyleConfig
+    useSlotRecipe
 } from '@chakra-ui/react'
 import {AuthHelpers, useAuthHelper, useCustomerType} from '@salesforce/commerce-sdk-react'
 import Link from '../../components/link'
@@ -54,6 +47,9 @@ import LoadingSpinner from '../../components/loading-spinner'
 import useNavigation from '../../hooks/use-navigation'
 import useMultiSite from '../../hooks/use-multi-site'
 
+// Project Components
+import Fade from '../../components/fade'
+
 // The FONT_SIZES and FONT_WEIGHTS constants are used to control the styling for
 // the accordion buttons as their current depth. In the below definition we assign
 // values for depths 0 - 3, any depth deeper than that will use the default styling.
@@ -64,7 +60,7 @@ const TABLET_DRAWER_SIZE = 'lg'
 
 const DrawerSeparator = () => (
     <Box paddingTop="6" paddingBottom="6">
-        <Divider />
+        <Separator />
     </Box>
 )
 
@@ -88,7 +84,6 @@ const DrawerMenu = ({
     const intl = useIntl()
     const {isRegistered} = useCustomerType()
     const navigate = useNavigation()
-    const styles = useMultiStyleConfig('DrawerMenu')
     const drawerSize = useBreakpointValue({sm: PHONE_DRAWER_SIZE, md: TABLET_DRAWER_SIZE})
     const socialIconVariant = useBreakpointValue({base: 'flex', md: 'flex-start'})
     const {site, buildUrl} = useMultiSite()
@@ -96,6 +91,9 @@ const DrawerMenu = ({
     const [showLoading, setShowLoading] = useState(false)
     const [ariaBusy, setAriaBusy] = useState('true')
     const logout = useAuthHelper(AuthHelpers.Logout)
+    const recipe = useSlotRecipe({key: 'drawerMenu'})
+    const styles = recipe()
+    console.log('socialIconVariant', socialIconVariant)
     const onSignoutClick = async () => {
         setShowLoading(true)
         await logout.mutateAsync()
@@ -111,28 +109,34 @@ const DrawerMenu = ({
     }, [])
 
     return (
-        <Drawer isOpen={isOpen} onClose={onClose} placement="left" size={drawerSize}>
-            <DrawerOverlay>
-                <DrawerContent>
+        <Dialog.Root
+            css={styles.root}
+            open={isOpen}
+            onOpenChange={onClose}
+            placement="left"
+            motionPreset="slide-in-left"
+            size={drawerSize}
+            scrollBehavior="inside"
+        >
+            <Dialog.Backdrop css={styles.backdrop} />
+            <Dialog.Positioner style={{justifyContent: 'flex-start', alignItems: 'flex-start'}}>
+                <Dialog.Content css={styles.content}>
                     {/* Header Content */}
-                    <DrawerHeader
+                    <Dialog.Header
+                        css={styles.header}
                         aria-label={intl.formatMessage({
                             id: 'drawer_menu.header.assistive_msg.title',
                             defaultMessage: 'Menu Drawer'
                         })}
                     >
-                        <IconButton
-                            icon={<BrandLogo {...styles.logo} />}
-                            variant="unstyled"
-                            onClick={onLogoClick}
-                        />
-
-                        <DrawerCloseButton />
-                    </DrawerHeader>
+                        <IconButton variant="unstyled" onClick={onLogoClick}>
+                            <BrandLogo css={styles.logo} />
+                        </IconButton>
+                    </Dialog.Header>
 
                     {/* Main Content */}
-                    <DrawerBody>
-                        <div
+                    <Dialog.Body css={styles.body}>
+                        <Box
                             id="category-nav"
                             aria-live="polite"
                             aria-busy={ariaBusy}
@@ -152,27 +156,25 @@ const DrawerMenu = ({
                                         fontSizes={FONT_SIZES}
                                         fontWeights={FONT_WEIGHTS}
                                         itemsBefore={({depth, item}) =>
-                                            depth > 0 ? (
-                                                [
-                                                    <AccordionItem border="none" key="show-all">
-                                                        <AccordionButton
-                                                            paddingLeft={8}
-                                                            as={Link}
-                                                            to={categoryUrlBuilder(item)}
-                                                            fontSize={FONT_SIZES[depth]}
-                                                            fontWeight={FONT_WEIGHTS[depth]}
-                                                            color="black"
-                                                        >
-                                                            {intl.formatMessage({
-                                                                id: 'drawer_menu.link.shop_all',
-                                                                defaultMessage: 'Shop All'
-                                                            })}
-                                                        </AccordionButton>
-                                                    </AccordionItem>
-                                                ]
-                                            ) : (
-                                                <></>
-                                            )
+                                            depth > 0
+                                                ? [
+                                                      <Accordion.Item border="none" key="show-all">
+                                                          <Accordion.ItemTrigger
+                                                              paddingLeft={8}
+                                                              as={Link}
+                                                              to={categoryUrlBuilder(item)}
+                                                              fontSize={FONT_SIZES[depth]}
+                                                              fontWeight={FONT_WEIGHTS[depth]}
+                                                              color="black"
+                                                          >
+                                                              {intl.formatMessage({
+                                                                  id: 'drawer_menu.link.shop_all',
+                                                                  defaultMessage: 'Shop All'
+                                                              })}
+                                                          </Accordion.ItemTrigger>
+                                                      </Accordion.Item>
+                                                  ]
+                                                : []
                                         }
                                         urlBuilder={categoryUrlBuilder}
                                         itemComponent={itemComponent}
@@ -183,13 +185,13 @@ const DrawerMenu = ({
                                     <Spinner size="xl" />
                                 </Center>
                             )}
-                        </div>
+                        </Box>
 
                         <DrawerSeparator />
 
                         {/* Application Actions */}
-                        <VStack align="stretch" spacing={0} {...styles.actions} px={0}>
-                            <Box {...styles.actionsItem}>
+                        <VStack align="stretch" gap={0} px={4}>
+                            <Box py={3}>
                                 {isRegistered ? (
                                     <NestedAccordion
                                         urlBuilder={(item, locale) =>
@@ -197,14 +199,10 @@ const DrawerMenu = ({
                                         }
                                         itemsAfter={({depth}) =>
                                             depth === 1 && (
-                                                <Button
-                                                    {...styles.signout}
-                                                    variant="unstyled"
-                                                    onClick={onSignoutClick}
-                                                >
+                                                <Button variant="unstyled" onClick={onSignoutClick}>
                                                     <Flex align={'center'}>
-                                                        <SignoutIcon boxSize={5} />
-                                                        <Text {...styles.signoutText} as="span">
+                                                        <SignoutIcon />
+                                                        <Text as="span">
                                                             {intl.formatMessage({
                                                                 id: 'drawer_menu.button.log_out',
                                                                 defaultMessage: 'Log Out'
@@ -256,7 +254,7 @@ const DrawerMenu = ({
                                 ) : (
                                     <Link to={SIGN_IN_HREF}>
                                         <HStack>
-                                            <UserIcon {...styles.icon} />{' '}
+                                            <UserIcon boxSize={5} color="gray.900" />
                                             <Text>
                                                 {intl.formatMessage({
                                                     id: 'drawer_menu.link.sign_in',
@@ -268,9 +266,8 @@ const DrawerMenu = ({
                                 )}
                             </Box>
                             {showLocaleSelector && (
-                                <Box>
-                                    <LocaleSelector
-                                        {...styles.localeSelector}
+                                <Box py={1}>
+                                    {/* <LocaleSelector
                                         selectedLocale={intl.locale}
                                         locales={supportedLocaleIds}
                                         onSelect={(newLocale) => {
@@ -280,7 +277,7 @@ const DrawerMenu = ({
                                             })
                                             window.location = newUrl
                                         }}
-                                    />
+                                    /> */}
                                 </Box>
                             )}
                         </VStack>
@@ -369,14 +366,18 @@ const DrawerMenu = ({
                         />
 
                         <DrawerSeparator />
-                    </DrawerBody>
+                    </Dialog.Body>
 
-                    <DrawerFooter>
+                    <Dialog.Footer css={styles.footer}>
                         <SocialIcons variant={socialIconVariant} />
-                    </DrawerFooter>
-                </DrawerContent>
-            </DrawerOverlay>
-        </Drawer>
+                    </Dialog.Footer>
+
+                    <Dialog.CloseTrigger asChild>
+                        <CloseButton size="sm" {...styles.closeButton} />
+                    </Dialog.CloseTrigger>
+                </Dialog.Content>
+            </Dialog.Positioner>
+        </Dialog.Root>
     )
 }
 
