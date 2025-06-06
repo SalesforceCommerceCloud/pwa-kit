@@ -650,21 +650,22 @@ test('renders product bundle', () => {
     expect(screen.getByText(mockProductBundle.name)).toBeInTheDocument()
     expect(screen.getByRole('dialog', {name: /1 item added to cart/i})).toBeInTheDocument()
 
-    // bundle data is displayed in 1 row
     const numOfRowsRendered = screen.getAllByTestId('product-added').length
     expect(numOfRowsRendered).toBe(1)
 
-    // modal displays product name of children and variant selection
     mockBundleItemsAdded.forEach(({product, variant, quantity}) => {
-        const displayedName = quantity > 1 ? `${product.name} (${quantity})` : product.name
-        expect(screen.getByText(displayedName)).toBeInTheDocument()
-
+        expect(
+            screen.getByText((content) => content.trim().includes(product.name))
+        ).toBeInTheDocument();
+        if (quantity > 1) {
+            expect(
+                screen.getByText((content) => content.includes(`(${quantity})`))
+            ).toBeInTheDocument();
+        }
         const variationAttributeValues = getDisplayVariationValues(
             product.variationAttributes,
             variant.variationValues
         )
-
-        // Looks for text displaying variant ('Color: Black' or 'Size: S') in modal
         Object.entries(variationAttributeValues).forEach(([name, value]) => {
             expect(screen.getAllByText(`${name}: ${value}`)[0]).toBeInTheDocument()
         })

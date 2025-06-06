@@ -1258,6 +1258,12 @@
   "product_view.link.full_details": {
     "defaultMessage": "See full details"
   },
+  "product_view.label.pickup_in_store": {
+    "defaultMessage": "Pickup in store"
+  },
+  "product_view.label.delivery": {
+    "defaultMessage": "Delivery:"
+  },
   "profile_card.info.profile_updated": {
     "defaultMessage": "Profile updated"
   },
@@ -1776,5 +1782,17 @@
   },
   "with_registration.info.please_sign_in": {
     "defaultMessage": "Please sign in to continue!"
+  },
+  "product_view.error.not_available_for_pickup": {
+    "defaultMessage": "Out of Stock in Store"
+  },
+  "product_view.error.no_store_selected_for_pickup": {
+    "defaultMessage": "No store selected for pickup"
+  },
+  "product_view.status.in_stock_at_store": {
+    "defaultMessage": "In Stock at {storeName}"
+  },
+  "product_view.status.out_of_stock_at_store": {
+    "defaultMessage": "Out of Stock at {storeName}"
   }
 }

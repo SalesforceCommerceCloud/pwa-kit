@@ -488,3 +488,26 @@ describe('product bundles', () => {
         })
     })
 })
+
+test('fetches product with inventoryIds from localStorage if present', async () => {
+    // Arrange: Set up localStorage with inventoryId for the current site
+    const siteId = 'site-1' // Use the actual site id used in your test context
+    const storeInfoKey = `store_${siteId}`
+    const inventoryId = 'inventory_m_store_store1'
+    window.localStorage.setItem(storeInfoKey, JSON.stringify({inventoryId}))
+
+    // Mock the product API to check for inventoryIds param
+    let inventoryIdsParam
+    global.server.use(
+        rest.get('*/products/:productId', (req, res, ctx) => {
+            inventoryIdsParam = req.url.searchParams.get('inventoryIds')
+            return res(ctx.json(masterProduct))
+        })
+    )
+
+    renderWithProviders(<MockedComponent />)
+
+    // Assert: Product page loads and inventoryIds param was sent
+    expect(await screen.findByTestId('product-details-page')).toBeInTheDocument()
+    expect(inventoryIdsParam).toBe(inventoryId)
+})

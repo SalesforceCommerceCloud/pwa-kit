@@ -19,10 +19,12 @@ import {
     Text,
     VStack,
     Fade,
-    useTheme
+    useTheme,
+    Checkbox
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 import {useCurrency, useDerivedProduct} from '@salesforce/retail-react-app/app/hooks'
 import {useAddToCartModalContext} from '@salesforce/retail-react-app/app/hooks/use-add-to-cart-modal'
+import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
 
 // project components
 import ImageGallery from '@salesforce/retail-react-app/app/components/image-gallery'
@@ -118,7 +120,9 @@ const ProductView = forwardRef(
                 !isProductLoading && variant?.orderable && quantity > 0 && quantity <= stockLevel,
             showImageGallery = true,
             setSelectedBundleQuantity = () => {},
-            selectedBundleParentQuantity = 1
+            selectedBundleParentQuantity = 1,
+            pickupInStore,
+            setPickupInStore
         },
         ref
     ) => {
@@ -155,6 +159,28 @@ const ProductView = forwardRef(
         const isProductASet = product?.type.set
         const isProductABundle = product?.type.bundle
         const errorContainerRef = useRef(null)
+        const [pickupEnabled, setPickupEnabled] = useState(false)
+        const [pickupError, setPickupError] = useState('')
+        const {site} = useMultiSite()
+
+        // Get store info from localStorage for stock status display (move to main render scope)
+        let storeName = null
+        let inventoryId = null
+        let storeStockStatus = null
+        if (typeof window !== 'undefined' && site?.id && product?.inventories) {
+            const storeInfoKey = `store_${site.id}`
+            try {
+                const storeInfo = JSON.parse(window.localStorage.getItem(storeInfoKey))
+                inventoryId = storeInfo?.inventoryId
+                storeName = storeInfo?.name
+                if (inventoryId) {
+                    const inventoryObj = product.inventories.find(inv => inv.id === inventoryId)
+                    if (inventoryObj) {
+                        storeStockStatus = inventoryObj.orderable
+                    }
+                }
+            } catch (e) {}
+        }
 
         const {disableButton, customInventoryMessage} = useMemo(() => {
             let shouldDisableButton = showInventoryMessage
@@ -272,14 +298,17 @@ const ProductView = forwardRef(
                     return
                 }
                 try {
-                    const itemsAdded = await addToCart(variant, quantity)
+                    const itemsAdded = await addToCart([{variant, quantity}])
                     // Open modal only when `addToCart` returns some data
                     // It's possible that the item has been added to cart, but we don't want to open the modal.
                     // See wishlist_primary_action for example.
                     if (itemsAdded) {
                         onAddToCartModalOpen({
                             product,
-                            itemsAdded,
+                            itemsAdded: itemsAdded.map(item => ({
+                                ...item,
+                                product // attach the full product object
+                            })),
                             selectedQuantity: quantity
                         })
                     }
@@ -398,6 +427,55 @@ const ProductView = forwardRef(
                 }))
             }
         }, [showInventoryMessage, inventoryMessage])
+
+        useEffect(() => {
+            if (site?.id) {
+                const storeInfoKey = `store_${site.id}`
+                let inventoryId = null
+                let storeName = null
+                let storeStockStatus = null
+                try {
+                    const storeInfo = JSON.parse(window.localStorage.getItem(storeInfoKey))
+                    inventoryId = storeInfo?.inventoryId
+                    storeName = storeInfo?.name
+                    if (inventoryId) {
+                        const inventoryObj = product.inventories.find(inv => inv.id === inventoryId)
+                        if (inventoryObj) {
+                            storeStockStatus = inventoryObj.orderable
+                        }
+                    }
+                } catch (e) {}
+                setPickupEnabled(!!inventoryId)
+            }
+        }, [site?.id])
+
+        const handlePickupInStoreChange = (e) => {
+            const checked = e.target.checked
+            setPickupInStore(checked)
+            setPickupError('')
+            if (checked && pickupEnabled) {
+                const storeInfoKey = `store_${site.id}`
+                let inventoryId = null
+                let storeName = null
+                try {
+                    const storeInfo = JSON.parse(window.localStorage.getItem(storeInfoKey))
+                    inventoryId = storeInfo?.inventoryId
+                    storeName = storeInfo?.name
+                } catch (e) {}
+                if (inventoryId && product?.inventories) {
+                    const inventoryObj = product.inventories.find(inv => inv.id === inventoryId)
+                    if (!inventoryObj?.orderable) {
+                        setPickupInStore(false)
+                        setPickupError(
+                            intl.formatMessage({
+                                id: 'product_view.error.not_available_for_pickup',
+                                defaultMessage: 'Out of Stock in {storeName}'
+                            }, {storeName: storeName || ''})
+                        )
+                    }
+                }
+            }
+        }
 
         return (
             <Flex direction={'column'} data-testid="product-view" ref={ref}>
@@ -552,8 +630,8 @@ const ProductView = forwardRef(
                             )}
 
                             {!isProductASet && !isProductPartOfBundle && (
-                                <VStack align="stretch" maxWidth={'200px'}>
-                                    <Box fontWeight="bold">
+                                <VStack align="stretch" maxWidth={'200px'} spacing={2} mb={0}>
+                                    <Box fontWeight="bold" mb={1}>
                                         <label htmlFor="quantity">
                                             {intl.formatMessage({
                                                 defaultMessage: 'Quantity:',
@@ -641,12 +719,49 @@ const ProductView = forwardRef(
                                     </Text>
                                 </Fade>
                             )}
-                            <Box
-                                display={
-                                    isProductPartOfSet ? 'block' : ['none', 'none', 'none', 'block']
-                                }
-                            >
-                                {renderActionButtons()}
+                            <Box>
+                                {/* Pickup in store checkbox just before Add to Cart */}
+                                <Box mb={1}>
+                                    <Text as="label" fontWeight="bold" mb={1} display="block">
+                                        <FormattedMessage defaultMessage="Delivery:" id="product_view.label.delivery" />
+                                    </Text>
+                                    <Checkbox
+                                        isChecked={pickupInStore}
+                                        onChange={handlePickupInStoreChange}
+                                        mb={1}
+                                        disabled={!pickupEnabled || (storeName && inventoryId && storeStockStatus === false)}
+                                    >
+                                        <FormattedMessage
+                                            defaultMessage="Pickup in store"
+                                            id="product_view.label.pickup_in_store"
+                                        />
+                                    </Checkbox>
+                                </Box>
+                                {storeName && inventoryId && (
+                                    <Text color="black" fontWeight={600} mb={2} data-testid="store-stock-status-msg">
+                                        {storeStockStatus
+                                            ? intl.formatMessage({
+                                                id: 'product_view.status.in_stock_at_store',
+                                                defaultMessage: 'In Stock at {storeName}'
+                                            }, {storeName: <Link to="/store-locator" color="blue.600" textDecoration="underline">{storeName}</Link>})
+                                            : intl.formatMessage({
+                                                id: 'product_view.status.out_of_stock_at_store',
+                                                defaultMessage: 'Out of Stock at {storeName}'
+                                            }, {storeName: <Link to="/store-locator" color="blue.600" textDecoration="underline">{storeName}</Link>})}
+                                    </Text>
+                                )}
+                                {pickupError && (
+                                    <Text color="orange.600" fontWeight={600} mb={3} data-testid="pickup-error-msg">
+                                        {pickupError}
+                                    </Text>
+                                )}
+                                <Box
+                                    display={
+                                        isProductPartOfSet ? 'block' : ['none', 'none', 'none', 'block']
+                                    }
+                                >
+                                    {renderActionButtons()}
+                                </Box>
                             </Box>
                         </Box>
                     </VStack>
@@ -698,7 +813,9 @@ ProductView.propTypes = {
     validateOrderability: PropTypes.func,
     showImageGallery: PropTypes.bool,
     setSelectedBundleQuantity: PropTypes.func,
-    selectedBundleParentQuantity: PropTypes.number
+    selectedBundleParentQuantity: PropTypes.number,
+    pickupInStore: PropTypes.bool,
+    setPickupInStore: PropTypes.func
 }
 
 export default ProductView
