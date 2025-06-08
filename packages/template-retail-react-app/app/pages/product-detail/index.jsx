@@ -287,20 +287,30 @@ const ProductDetail = () => {
 
     /**************** Add To Cart ****************/
     const showToast = useToast()
-    const showError = () => {
+    const showError = (quantity) => {
         showToast({
-            title: formatMessage(API_ERROR_MESSAGE),
+            //title: formatMessage(API_ERROR_MESSAGE),
+            
+            // This error will inform the user that their specified input is no longer available
+            title: `The item is not available at the requested quantity of ${quantity}`,
             status: 'error'
         })
     }
 
     const handleAddToCart = async (productSelectionValues) => {
+        // Make a variable to store the quantity added in case we need to display it in an error message
+        let error_quantity = 0
+
         try {
             const productItems = productSelectionValues.map(({variant, quantity}) => ({
                 productId: variant.productId,
                 price: variant.price,
                 quantity
             }))
+            
+            // Set error_quantity to the quantity element in productItems
+            // DevTools showed that productItems = [{"productId": ID, "price": price, "quantity": quantity}]
+            error_quantity = productItems[0]["quantity"]
 
             await addItemToNewOrExistingBasket(productItems)
 
@@ -311,9 +321,12 @@ const ProductDetail = () => {
             return productSelectionValues
         } catch (error) {
             console.log('error', error)
-            showError(error)
+            //showError(error)
+            showError(error_quantity.toString())
         }
     }
+
+
 
     /**************** Product Set/Bundles Handlers ****************/
     const handleChildProductValidation = useCallback(() => {
