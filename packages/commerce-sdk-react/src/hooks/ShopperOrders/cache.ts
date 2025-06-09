@@ -16,7 +16,9 @@ import {
 } from '../types'
 import {getOrder} from './queryKeyHelpers'
 
-type Client = ApiClients['shopperOrders']
+const CLIENT_KEY = 'shopperOrders' as const
+type Client = NonNullable<ApiClients[typeof CLIENT_KEY]>
+
 /** Parameters that get passed around, includes client config and possible parameters from other endpoints */
 type GetOrderParameters = MergedOptions<Client, Argument<Client['getOrder']>>['parameters']
 
