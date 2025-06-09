@@ -22,7 +22,8 @@ import {
 } from './queryKeyHelpers'
 import {getCustomerBaskets} from '../ShopperCustomers/queryKeyHelpers'
 
-type Client = ApiClients['shopperBaskets']
+const CLIENT_KEY = 'shopperBaskets' as const
+type Client = NonNullable<ApiClients[typeof CLIENT_KEY]>
 /** Data returned by every Shopper Baskets endpoint (except `deleteBasket`) */
 type Basket = ShopperBasketsTypes.Basket
 /** Data returned by `getCustomerBaskets` */

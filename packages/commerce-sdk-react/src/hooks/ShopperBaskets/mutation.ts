@@ -7,10 +7,11 @@
 import {ApiClients, ApiMethod, Argument, CacheUpdateGetter, DataType, MergedOptions} from '../types'
 import {useMutation} from '../useMutation'
 import {UseMutationResult} from '@tanstack/react-query'
-import useCommerceApi from '../useCommerceApi'
 import {cacheUpdateMatrix} from './cache'
+import {useResolvedClient} from '../useResolvedClient'
 
-type Client = ApiClients['shopperBaskets']
+const CLIENT_KEY = 'shopperBaskets' as const
+type Client = NonNullable<ApiClients[typeof CLIENT_KEY]>
 
 /**
  * Mutations available for Shopper Baskets.
@@ -179,13 +180,13 @@ export function useShopperBasketsMutation<Mutation extends ShopperBasketsMutatio
     mutation: Mutation
 ): UseMutationResult<DataType<Client[Mutation]>, unknown, Argument<Client[Mutation]>> {
     const getCacheUpdates = cacheUpdateMatrix[mutation]
+    const client = useResolvedClient(CLIENT_KEY)
 
     // The `Options` and `Data` types for each mutation are similar, but distinct, and the union
     // type generated from `Client[Mutation]` seems to be too complex for TypeScript to handle.
     // I'm not sure if there's a way to avoid the type assertions in here for the methods that
     // use them. However, I'm fairly confident that they are safe to do, as they seem to be simply
     // re-asserting what we already have.
-    const {shopperBaskets: client} = useCommerceApi()
     type Options = Argument<Client[Mutation]>
     type Data = DataType<Client[Mutation]>
     return useMutation({

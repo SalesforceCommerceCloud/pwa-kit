@@ -29,7 +29,8 @@ jest.mock('../../auth/index.ts', () => {
     return mockAuth
 })
 
-type Client = ApiClients['shopperBaskets']
+const CLIENT_KEY = 'shopperBaskets' as const
+type Client = NonNullable<ApiClients[typeof CLIENT_KEY]>
 type Basket = ShopperBasketsTypes.Basket
 type BasketsResult = ShopperCustomersTypes.BasketsResult
 

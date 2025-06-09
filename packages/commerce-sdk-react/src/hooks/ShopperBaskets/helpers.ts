@@ -9,7 +9,8 @@ import {useCustomerId, useShopperBasketsMutation} from '../index'
 import {useCustomerBaskets} from '../ShopperCustomers'
 import {ApiClients, Argument} from '../types'
 import {ShopperBasketsTypes} from 'commerce-sdk-isomorphic'
-type Client = ApiClients['shopperBaskets']
+const CLIENT_KEY = 'shopperBaskets' as const
+type Client = NonNullable<ApiClients[typeof CLIENT_KEY]>
 type Basket = ShopperBasketsTypes.Basket
 
 /**
