@@ -435,6 +435,24 @@ test('Pickup in store radio is disabled when inventoryId is present but product 
     expect(pickupRadio).not.toBeChecked()
 })
 
+test('shows "Pickup in Select Store" label when pickup is disabled due to no store/inventoryId', async () => {
+    // Arrange: Ensure localStorage does not have inventoryId for the current site
+    const siteId = 'site-1'
+    const storeInfoKey = `store_${siteId}`
+    window.localStorage.removeItem(storeInfoKey)
+
+    renderWithProviders(<MockComponent product={mockProductDetail} />)
+
+    // Assert: The label is present and the link is correct
+    const label = await screen.findByTestId('pickup-select-store-msg')
+    expect(label).toBeInTheDocument()
+    expect(label).toHaveTextContent(/Pickup in/i)
+    const link = label.querySelector('a')
+    expect(link).toBeInTheDocument()
+    expect(link.getAttribute('href')).toMatch(/store-locator/)
+    expect(link).toHaveTextContent(/Select Store/i)
+})
+
 describe('ProductView stock status messages', () => {
     const siteId = 'site-1'
     const storeInfoKey = `store_${siteId}`
