@@ -7,12 +7,13 @@
 import {UseQueryResult} from '@tanstack/react-query'
 import {ShopperStores} from 'commerce-sdk-isomorphic'
 import {ApiClients, ApiQueryOptions, Argument, DataType, NullableParameters} from '../types'
-import useCommerceApi from '../useCommerceApi'
 import {useQuery} from '../useQuery'
 import {mergeOptions, omitNullableParameters, pickValidParams} from '../utils'
 import * as queryKeyHelpers from './queryKeyHelpers'
+import {useResolvedClient} from '../useResolvedClient'
 
-type Client = ApiClients['shopperStores']
+const CLIENT_KEY = 'shopperStores' as const
+type Client = NonNullable<ApiClients[typeof CLIENT_KEY]>
 
 /**
  * This resource retrieves a list of stores for the given site that are within a configured distance of a geolocation.
@@ -37,7 +38,7 @@ export const useSearchStores = (
 ): UseQueryResult<DataType<Client['searchStores']>> => {
     type Options = Argument<Client['searchStores']>
     type Data = DataType<Client['searchStores']>
-    const {shopperStores: client} = useCommerceApi()
+    const client = useResolvedClient(CLIENT_KEY)
     const methodName = 'searchStores'
     const requiredParameters = ShopperStores.paramKeys[`${methodName}Required`]
 
@@ -80,7 +81,7 @@ export const useStores = (
 ): UseQueryResult<DataType<Client['getStores']>> => {
     type Options = Argument<Client['getStores']>
     type Data = DataType<Client['getStores']>
-    const {shopperStores: client} = useCommerceApi()
+    const client = useResolvedClient(CLIENT_KEY)
     const methodName = 'getStores'
     const requiredParameters = ShopperStores.paramKeys[`${methodName}Required`]
 
