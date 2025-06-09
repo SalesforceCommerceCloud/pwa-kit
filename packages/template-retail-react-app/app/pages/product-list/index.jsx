@@ -427,133 +427,133 @@ const ProductList = (props) => {
                     return <meta name={id} content={value} key={id} />
                 })}
             </Helmet>
-            {showNoResults ? (
-                <EmptySearchResults searchQuery={searchQuery} category={category} />
-            ) : (
-                <>
-                    <AbovePageHeader />
-                    <PageDesignerPromotionalBanner />
+            <AbovePageHeader />
+            <PageDesignerPromotionalBanner />
 
-                    {/* Header */}
+            {/* Header */}
+            <Stack
+                display={{base: 'none', lg: 'flex'}}
+                direction="row"
+                justify="flex-start"
+                align="flex-start"
+                spacing={4}
+                marginBottom={6}
+            >
+                <Flex align="left" width="287px">
+                    <PageHeader
+                        searchQuery={searchQuery}
+                        category={category}
+                        productSearchResult={productSearchResult}
+                        isLoading={isLoading}
+                    />
+                </Flex>
+
+                <Box flex={1} paddingTop={'45px'}>
+                    <SelectedRefinements
+                        filters={productSearchResult?.refinements}
+                        toggleFilter={toggleFilter}
+                        handleReset={resetFilters}
+                        selectedFilterValues={productSearchResult?.selectedRefinements}
+                    />
+                </Box>
+                <Box paddingTop={'45px'}>
+                    <Sort
+                        sortUrls={sortUrls}
+                        productSearchResult={productSearchResult}
+                        basePath={basePath}
+                    />
+                </Box>
+            </Stack>
+
+            {/* Filter Button for Mobile */}
+            <HideOnDesktop>
+                <Stack spacing={6}>
+                    <PageHeader
+                        searchQuery={searchQuery}
+                        category={category}
+                        productSearchResult={productSearchResult}
+                        isLoading={isLoading}
+                    />
                     <Stack
-                        display={{base: 'none', lg: 'flex'}}
+                        display={{base: 'flex', md: 'none'}}
                         direction="row"
                         justify="flex-start"
-                        align="flex-start"
-                        spacing={4}
-                        marginBottom={6}
+                        align="center"
+                        spacing={1}
+                        height={12}
+                        borderColor="gray.100"
                     >
-                        <Flex align="left" width="287px">
-                            <PageHeader
-                                searchQuery={searchQuery}
-                                category={category}
-                                productSearchResult={productSearchResult}
-                                isLoading={isLoading}
-                            />
-                        </Flex>
-
-                        <Box flex={1} paddingTop={'45px'}>
-                            <SelectedRefinements
-                                filters={productSearchResult?.refinements}
-                                toggleFilter={toggleFilter}
-                                handleReset={resetFilters}
-                                selectedFilterValues={productSearchResult?.selectedRefinements}
-                            />
-                        </Box>
-                        <Box paddingTop={'45px'}>
-                            <Sort
-                                sortUrls={sortUrls}
-                                productSearchResult={productSearchResult}
-                                basePath={basePath}
-                            />
-                        </Box>
-                    </Stack>
-
-                    {/* Filter Button for Mobile */}
-                    <HideOnDesktop>
-                        <Stack spacing={6}>
-                            <PageHeader
-                                searchQuery={searchQuery}
-                                category={category}
-                                productSearchResult={productSearchResult}
-                                isLoading={isLoading}
-                            />
-                            <Stack
-                                display={{base: 'flex', md: 'none'}}
-                                direction="row"
-                                justify="flex-start"
-                                align="center"
-                                spacing={1}
-                                height={12}
-                                borderColor="gray.100"
+                        <Flex align="center">
+                            <Button
+                                fontSize="sm"
+                                colorScheme="black"
+                                variant="outline"
+                                marginRight={2}
+                                display="inline-flex"
+                                leftIcon={<FilterIcon boxSize={5} />}
+                                onClick={onOpen}
                             >
-                                <Flex align="center">
-                                    <Button
-                                        fontSize="sm"
-                                        colorScheme="black"
-                                        variant="outline"
-                                        marginRight={2}
-                                        display="inline-flex"
-                                        leftIcon={<FilterIcon boxSize={5} />}
-                                        onClick={onOpen}
-                                    >
-                                        <FormattedMessage
-                                            defaultMessage="Filter"
-                                            id="product_list.button.filter"
-                                        />
-                                    </Button>
-                                </Flex>
-                                <Flex align="center">
-                                    <Button
-                                        maxWidth="245px"
-                                        fontSize="sm"
-                                        marginRight={2}
-                                        colorScheme="black"
-                                        variant="outline"
-                                        display="inline-flex"
-                                        rightIcon={<ChevronDownIcon boxSize={5} />}
-                                        onClick={() => setSortOpen(true)}
-                                    >
-                                        {formatMessage(
-                                            {
-                                                id: 'product_list.button.sort_by',
-                                                defaultMessage: 'Sort By: {sortOption}'
-                                            },
-                                            {
-                                                sortOption: selectedSortingOptionLabel?.label
-                                            }
-                                        )}
-                                    </Button>
-                                </Flex>
-                            </Stack>
-                        </Stack>
-                        <Box marginBottom={4}>
-                            <SelectedRefinements
-                                filters={productSearchResult?.refinements}
-                                toggleFilter={toggleFilter}
-                                handleReset={resetFilters}
-                                selectedFilterValues={productSearchResult?.selectedRefinements}
-                            />
-                        </Box>
-                    </HideOnDesktop>
+                                <FormattedMessage
+                                    defaultMessage="Filter"
+                                    id="product_list.button.filter"
+                                />
+                            </Button>
+                        </Flex>
+                        <Flex align="center">
+                            <Button
+                                maxWidth="245px"
+                                fontSize="sm"
+                                marginRight={2}
+                                colorScheme="black"
+                                variant="outline"
+                                display="inline-flex"
+                                rightIcon={<ChevronDownIcon boxSize={5} />}
+                                onClick={() => setSortOpen(true)}
+                            >
+                                {formatMessage(
+                                    {
+                                        id: 'product_list.button.sort_by',
+                                        defaultMessage: 'Sort By: {sortOption}'
+                                    },
+                                    {
+                                        sortOption: selectedSortingOptionLabel?.label
+                                    }
+                                )}
+                            </Button>
+                        </Flex>
+                    </Stack>
+                </Stack>
+                <Box marginBottom={4}>
+                    <SelectedRefinements
+                        filters={productSearchResult?.refinements}
+                        toggleFilter={toggleFilter}
+                        handleReset={resetFilters}
+                        selectedFilterValues={productSearchResult?.selectedRefinements}
+                    />
+                </Box>
+            </HideOnDesktop>
 
-                    {/* Body  */}
-                    <Grid templateColumns={{base: '1fr', md: '280px 1fr'}} columnGap={6}>
-                        <Stack display={{base: 'none', md: 'flex'}}>
-                            <Refinements
-                                itemsBefore={
-                                    category?.categories
-                                        ? [<CategoryLinks key="itemsBefore" category={category} />, <StoreInventoryFilter key="storeInventoryFilter" />]
-                                        : [<StoreInventoryFilter key="storeInventoryFilter" />]
-                                }
-                                isLoading={filtersLoading}
-                                toggleFilter={toggleFilter}
-                                filters={productSearchResult?.refinements}
-                                excludedFilters={['cgid']}
-                                selectedFilters={searchParams.refine}
-                            />
-                        </Stack>
-                        <Box>
+            {/* Body  */}
+            <Grid templateColumns={{base: '1fr', md: '280px 1fr'}} columnGap={6}>
+                <Stack display={{base: 'none', md: 'flex'}}>
+                    <Refinements
+                        itemsBefore={
+                            category?.categories
+                                ? [<CategoryLinks key="itemsBefore" category={category} />, <StoreInventoryFilter key="storeInventoryFilter" toggleFilter={toggleFilter} selectedFilters={searchParams.refine} />]
+                                : [<StoreInventoryFilter key="storeInventoryFilter" toggleFilter={toggleFilter} selectedFilters={searchParams.refine} />]
+                        }
+                        isLoading={filtersLoading}
+                        toggleFilter={toggleFilter}
+                        filters={productSearchResult?.refinements}
+                        excludedFilters={['cgid']}
+                        selectedFilters={searchParams.refine}
+                    />
+                </Stack>
+                <Box>
+                    {showNoResults ? (
+                        <EmptySearchResults searchQuery={searchQuery} category={category} />
+                    ) : (
+                        <>
                             <SimpleGrid
                                 columns={[2, 2, 4, 5]}
                                 spacingX={4}
@@ -642,10 +642,10 @@ const ProductList = (props) => {
                                     ))}
                                 </Select>
                             </Flex>
-                        </Box>
-                    </Grid>
-                </>
-            )}
+                        </>
+                    )}
+                </Box>
+            </Grid>
             {/* Modal for filter options on mobile */}
             <Modal
                 isOpen={isOpen}
@@ -679,9 +679,9 @@ const ProductList = (props) => {
                                               category={category}
                                               onSelect={onClose}
                                           />,
-                                          <StoreInventoryFilter key="storeInventoryFilter" />  // Add this line
+                                          <StoreInventoryFilter key="storeInventoryFilter" toggleFilter={toggleFilter} selectedFilters={searchParams.refine} />  // Add this line
                                       ]
-                                    : [<StoreInventoryFilter key="storeInventoryFilter" />]     // Add this line
+                                    : [<StoreInventoryFilter key="storeInventoryFilter" toggleFilter={toggleFilter} selectedFilters={searchParams.refine} />]     // Add this line
                             }
                             excludedFilters={['cgid']}
                         />

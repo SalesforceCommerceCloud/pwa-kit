@@ -11,22 +11,33 @@ import PropTypes from 'prop-types'
 import {Box, Button, Wrap, WrapItem} from '@salesforce/retail-react-app/app/components/shared/ui'
 import {CloseIcon} from '@salesforce/retail-react-app/app/components/icons'
 import {REMOVE_FILTER} from '@salesforce/retail-react-app/app/pages/product-list/partials/refinements-utils'
+import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
 
 const SelectedRefinements = ({toggleFilter, selectedFilterValues, filters, handleReset}) => {
     const {formatMessage} = useIntl()
+    const {site} = useMultiSite()
     const priceFilterValues = filters?.find((filter) => filter.attributeId === 'price')
-
     let selectedFilters = []
     for (const key in selectedFilterValues) {
         const filters = selectedFilterValues[key].split('|')
         filters?.forEach((filter) => {
+            let uiLabel = filter
+            
+            if (key === 'price') {
+                uiLabel = priceFilterValues?.values?.find(
+                    (priceFilter) => priceFilter.value === filter
+                )?.label || filter
+            } else if (key === 'ilids' && typeof window !== 'undefined') {
+                // For inventory filters, get store name from current site's localStorage
+                const storeInfoKey = `store_${site.id}`
+                const storeInfo = JSON.parse(window.localStorage.getItem(storeInfoKey) || 'null')
+                if (storeInfo?.inventoryId === filter && storeInfo?.name) {
+                    uiLabel = `In Store at ${storeInfo.name}`
+                }
+            }
+
             const selected = {
-                uiLabel:
-                    key === 'price'
-                        ? priceFilterValues?.values?.find(
-                              (priceFilter) => priceFilter.value === filter
-                          )?.label
-                        : filter,
+                uiLabel,
                 value: key,
                 apiLabel: filter
             }

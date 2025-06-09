@@ -9,31 +9,40 @@ import {
 import StoreLocatorModal from '@salesforce/retail-react-app/app/components/store-locator-modal'
 import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
 
-const StoreInventoryFilter = () => {
-    const [isChecked, setIsChecked] = React.useState(false)
+const StoreInventoryFilter = ({ toggleFilter, selectedFilters }) => {
+    // const [isChecked, setIsChecked] = selectedFilters.ilids !== undefined
     const [selectedStore, setSelectedStore] = React.useState(null)
     const {isOpen, onOpen, onClose} = useDisclosure()
     const {site} = useMultiSite()
+     
+    const isChecked = selectedFilters.ilids !== undefined
 
     useEffect(() => {
-        const checkSelectedStore = () => {
-            const storeInfoKey = `store_${site.id}`
-            const storeInfo = JSON.parse(window.localStorage.getItem(storeInfoKey))
-            
-            if (storeInfo?.name) {
-                setSelectedStore(storeInfo)
-            } else {
-                setSelectedStore(null)
-                setIsChecked(false)
-            }
+        const storeInfoKey = `store_${site.id}`
+        const storeInfo = JSON.parse(window.localStorage.getItem(storeInfoKey) || 'null')
+        
+        if (storeInfo?.name && storeInfo?.inventoryId) {
+            setSelectedStore(storeInfo)
         }
+    }, [site.id])
 
-        checkSelectedStore()
-    }, [site.id, isOpen])
 
     const handleCheckboxChange = (e) => {
+        // If no store is selected or no inventoryId, open store locator
+        if (!selectedStore?.inventoryId) {
+            e.preventDefault() // Prevent checkbox from being checked
+            onOpen() // Open store locator
+            return
+        }
+        
+        // Normal checkbox behavior when store is selected
         const checked = e.target.checked
-        setIsChecked(checked)
+        toggleFilter(
+            { value: selectedStore.inventoryId }, 
+            'ilids', 
+            !checked,
+            false
+        )
     }
 
     const handleStoreNameClick = (e) => {
@@ -46,9 +55,15 @@ const StoreInventoryFilter = () => {
         const storeInfoKey = `store_${site.id}`
         const storeInfo = JSON.parse(window.localStorage.getItem(storeInfoKey))
         
-        if (storeInfo?.name) {
+        // Only proceed if both name AND inventoryId exist
+        if (storeInfo?.name && storeInfo?.inventoryId) {
             setSelectedStore(storeInfo)
-            setIsChecked(true) // Auto-check when store is selected
+            toggleFilter(
+                { value: storeInfo.inventoryId }, 
+                'ilids', 
+                false,
+                false
+            )
         }
         
         onClose()
