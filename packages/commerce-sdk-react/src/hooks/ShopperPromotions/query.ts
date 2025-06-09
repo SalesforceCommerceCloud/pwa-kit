@@ -7,12 +7,13 @@
 import {UseQueryResult} from '@tanstack/react-query'
 import {ShopperPromotions} from 'commerce-sdk-isomorphic'
 import {ApiClients, ApiQueryOptions, Argument, DataType, NullableParameters} from '../types'
-import useCommerceApi from '../useCommerceApi'
 import {useQuery} from '../useQuery'
 import {mergeOptions, omitNullableParameters, pickValidParams} from '../utils'
 import * as queryKeyHelpers from './queryKeyHelpers'
+import { useResolvedClient } from '../useResolvedClient'
 
-type Client = ApiClients['shopperPromotions']
+const CLIENT_KEY = 'shopperPromotions' as const
+type Client = NonNullable<ApiClients[typeof CLIENT_KEY]>
 
 /**
  * Returns an array of enabled promotions for a list of specified IDs. In the request URL, you can specify up to 50 IDs. If you specify an ID that contains either parentheses or the separator characters, you must URL encode these characters. Each request returns only enabled promotions as the server does not consider promotion qualifiers or schedules.
@@ -31,7 +32,7 @@ export const usePromotions = (
 ): UseQueryResult<DataType<Client['getPromotions']>> => {
     type Options = Argument<Client['getPromotions']>
     type Data = DataType<Client['getPromotions']>
-    const {shopperPromotions: client} = useCommerceApi()
+    const client = useResolvedClient(CLIENT_KEY)
     const methodName = 'getPromotions'
     const requiredParameters = ShopperPromotions.paramKeys[`${methodName}Required`]
 
@@ -80,7 +81,7 @@ export const usePromotionsForCampaign = (
 ): UseQueryResult<DataType<Client['getPromotionsForCampaign']>> => {
     type Options = Argument<Client['getPromotionsForCampaign']>
     type Data = DataType<Client['getPromotionsForCampaign']>
-    const {shopperPromotions: client} = useCommerceApi()
+    const client = useResolvedClient(CLIENT_KEY)
     const methodName = 'getPromotionsForCampaign'
     const requiredParameters = ShopperPromotions.paramKeys[`${methodName}Required`]
 
