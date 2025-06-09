@@ -656,12 +656,10 @@ test('renders product bundle', () => {
     mockBundleItemsAdded.forEach(({product, variant, quantity}) => {
         expect(
             screen.getByText((content) => content.trim().includes(product.name))
-        ).toBeInTheDocument();
-        if (quantity > 1) {
-            expect(
-                screen.getByText((content) => content.includes(`(${quantity})`))
-            ).toBeInTheDocument();
-        }
+        ).toBeInTheDocument()
+        const quantityText = `(${quantity})`
+        const found = !!screen.queryByText((content) => content.includes(quantityText))
+        expect(found).toBe(quantity > 1)
         const variationAttributeValues = getDisplayVariationValues(
             product.variationAttributes,
             variant.variationValues

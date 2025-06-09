@@ -15,7 +15,7 @@ import {
 } from '@salesforce/retail-react-app/app/utils/product-utils'
 
 // Components
-import {Box, Button, Stack, Checkbox} from '@salesforce/retail-react-app/app/components/shared/ui'
+import {Box, Button, Stack} from '@salesforce/retail-react-app/app/components/shared/ui'
 import {
     useProduct,
     useProducts,
@@ -75,22 +75,28 @@ const ProductDetail = () => {
     // --- Add state for inventoryId ---
     const [selectedInventoryId, setSelectedInventoryId] = useState(() => {
         try {
-            return JSON.parse(window.localStorage.getItem(storeInfoKey))?.inventoryId || null;
-        } catch (e) { return null; }
-    });
+            return JSON.parse(window.localStorage.getItem(storeInfoKey))?.inventoryId || null
+        } catch (e) {
+            return null
+        }
+    })
 
     // --- Listen for store changes in localStorage ---
     useEffect(() => {
         function handleStorageChange() {
             try {
-                setSelectedInventoryId(JSON.parse(window.localStorage.getItem(storeInfoKey))?.inventoryId || null);
-            } catch (e) { setSelectedInventoryId(null); }
+                setSelectedInventoryId(
+                    JSON.parse(window.localStorage.getItem(storeInfoKey))?.inventoryId || null
+                )
+            } catch (e) {
+                setSelectedInventoryId(null)
+            }
         }
-        window.addEventListener('storage', handleStorageChange);
+        window.addEventListener('storage', handleStorageChange)
         // Also update on mount in case store was changed in this tab
-        handleStorageChange();
-        return () => window.removeEventListener('storage', handleStorageChange);
-    }, [storeInfoKey]);
+        handleStorageChange()
+        return () => window.removeEventListener('storage', handleStorageChange)
+    }, [storeInfoKey])
 
     /****************************** Basket *********************************/
     const {isLoading: isBasketLoading} = useCurrentBasket()
@@ -328,55 +334,63 @@ const ProductDetail = () => {
         }))
     }
 
-    const addToCartModal = useAddToCartModalContext();
+    const addToCartModal = useAddToCartModalContext()
 
     const handleAddToCart = async (productSelectionValues = []) => {
         try {
             const productItems = productSelectionValues.map((item) => {
-                const {variant, quantity} = item;
+                const {variant, quantity} = item
                 // Use variant if present, otherwise use the main product
-                const prod = variant || item.product || product;
-                const prodKey = prod.productId || prod.id;
+                const prod = variant || item.product || product
+                const prodKey = prod.productId || prod.id
                 let result = {
                     productId: prod.productId || prod.id, // productId for variant, id for product
                     price: prod.price,
                     quantity
-                };
+                }
                 // Robustly fetch inventoryId from localStorage if pickupInStore is true
                 if (pickupInStoreMap[prodKey]) {
-                    const siteId = site?.id || (window.SFCC && window.SFCC.siteId);
-                    const storeInfoKey = `store_${siteId}`;
-                    let inventoryId = undefined;
-                    let storeName = undefined;
+                    const siteId = site?.id || (window.SFCC && window.SFCC.siteId)
+                    const storeInfoKey = `store_${siteId}`
+                    let inventoryId = undefined
                     try {
-                        const storeInfo = JSON.parse(window.localStorage.getItem(storeInfoKey));
-                        inventoryId = storeInfo?.inventoryId;
-                        storeName = storeInfo?.name;
-                    } catch (e) {}
+                        const storeInfo = JSON.parse(window.localStorage.getItem(storeInfoKey))
+                        inventoryId = storeInfo?.inventoryId
+                    } catch (e) {
+                        // intentionally empty: ignore errors
+                    }
                     if (inventoryId) {
-                        result.inventoryId = inventoryId;
+                        result.inventoryId = inventoryId
                     }
                 }
-                return result;
-            });
+                return result
+            })
             // Defensive check: This block ensures that if, for any reason, pickup is selected for a product but no store (inventoryId) is set,
             // we show an error. With the current UI logic, this should never be reached, but it guards against unexpected state.
-            if (productItems.some(item => item.inventoryId === undefined && pickupInStoreMap[item.productId || item.id])) {
-                showError(formatMessage({
-                    id: 'product_view.error.no_store_selected_for_pickup',
-                    defaultMessage: 'No valid store or inventory found for pickup'
-                }));
-                return;
+            if (
+                productItems.some(
+                    (item) =>
+                        item.inventoryId === undefined &&
+                        pickupInStoreMap[item.productId || item.id]
+                )
+            ) {
+                showError(
+                    formatMessage({
+                        id: 'product_view.error.no_store_selected_for_pickup',
+                        defaultMessage: 'No valid store or inventory found for pickup'
+                    })
+                )
+                return
             }
-            await addItemToNewOrExistingBasket(productItems);
-            einstein.sendAddToCart(productItems);
+            await addItemToNewOrExistingBasket(productItems)
+            einstein.sendAddToCart(productItems)
             // Open modal with itemsAdded
-            addToCartModal.onOpen({ product, itemsAdded: productSelectionValues });
-            return productSelectionValues;
+            addToCartModal.onOpen({product, itemsAdded: productSelectionValues})
+            return productSelectionValues
         } catch (error) {
-            showError(error);
+            showError(error)
         }
-    };
+    }
 
     /**************** Product Set/Bundles Handlers ****************/
     const handleChildProductValidation = useCallback(() => {
@@ -464,7 +478,7 @@ const ProductDetail = () => {
             }
             einstein.sendAddToCart(productItems)
             // Open modal with itemsAdded and selectedQuantity for bundles
-            addToCartModal.onOpen({ product, itemsAdded: childProductSelections, selectedQuantity });
+            addToCartModal.onOpen({product, itemsAdded: childProductSelections, selectedQuantity})
             return childProductSelections
         } catch (error) {
             showError(error)
@@ -542,7 +556,9 @@ const ProductDetail = () => {
                             setSelectedBundleQuantity={setSelectedBundleQuantity}
                             selectedBundleParentQuantity={selectedBundleQuantity}
                             pickupInStore={!!pickupInStoreMap[product?.id]}
-                            setPickupInStore={(checked) => product && handlePickupInStoreChange(product.id, checked)}
+                            setPickupInStore={(checked) =>
+                                product && handlePickupInStoreChange(product.id, checked)
+                            }
                         />
 
                         <hr />
@@ -608,7 +624,10 @@ const ProductDetail = () => {
                                                 setChildProductOrderability
                                             }
                                             pickupInStore={!!pickupInStoreMap[childProduct?.id]}
-                                            setPickupInStore={(checked) => childProduct && handlePickupInStoreChange(childProduct.id, checked)}
+                                            setPickupInStore={(checked) =>
+                                                childProduct &&
+                                                handlePickupInStoreChange(childProduct.id, checked)
+                                            }
                                         />
                                         <InformationAccordion product={childProduct} />
 
@@ -636,7 +655,9 @@ const ProductDetail = () => {
                             setSelectedBundleQuantity={setSelectedBundleQuantity}
                             selectedBundleParentQuantity={selectedBundleQuantity}
                             pickupInStore={!!pickupInStoreMap[product?.id]}
-                            setPickupInStore={(checked) => product && handlePickupInStoreChange(product.id, checked)}
+                            setPickupInStore={(checked) =>
+                                product && handlePickupInStoreChange(product.id, checked)
+                            }
                         />
                         <InformationAccordion product={product} />
                     </Fragment>

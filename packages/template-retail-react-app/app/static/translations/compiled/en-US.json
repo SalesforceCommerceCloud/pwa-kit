@@ -2899,6 +2899,18 @@
       "value": "Update"
     }
   ],
+  "product_view.error.no_store_selected_for_pickup": [
+    {
+      "type": 0,
+      "value": "No store selected for pickup"
+    }
+  ],
+  "product_view.error.not_available_for_pickup": [
+    {
+      "type": 0,
+      "value": "Out of Stock in Store"
+    }
+  ],
   "product_view.label.assistive_msg.quantity_decrement": [
     {
       "type": 0,
@@ -2917,6 +2929,18 @@
     {
       "type": 1,
       "value": "productName"
+    }
+  ],
+  "product_view.label.delivery": [
+    {
+      "type": 0,
+      "value": "Delivery:"
+    }
+  ],
+  "product_view.label.pickup_in_store": [
+    {
+      "type": 0,
+      "value": "Pickup in store"
     }
   ],
   "product_view.label.quantity": [
@@ -2947,6 +2971,26 @@
     {
       "type": 0,
       "value": "See full details"
+    }
+  ],
+  "product_view.status.in_stock_at_store": [
+    {
+      "type": 0,
+      "value": "In Stock at "
+    },
+    {
+      "type": 1,
+      "value": "storeName"
+    }
+  ],
+  "product_view.status.out_of_stock_at_store": [
+    {
+      "type": 0,
+      "value": "Out of Stock at "
+    },
+    {
+      "type": 1,
+      "value": "storeName"
     }
   ],
   "profile_card.info.profile_updated": [

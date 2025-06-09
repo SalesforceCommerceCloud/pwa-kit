@@ -6163,6 +6163,34 @@
       "value": "]"
     }
   ],
+  "product_view.error.no_store_selected_for_pickup": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ƞǿǿ şŧǿǿřḗḗ şḗḗŀḗḗƈŧḗḗḓ ƒǿǿř ƥīƈķŭŭƥ"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "product_view.error.not_available_for_pickup": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ǿŭŭŧ ǿǿƒ Şŧǿǿƈķ īƞ Şŧǿǿřḗḗ"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
   "product_view.label.assistive_msg.quantity_decrement": [
     {
       "type": 0,
@@ -6193,6 +6221,34 @@
     {
       "type": 1,
       "value": "productName"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "product_view.label.delivery": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ḓḗḗŀīṽḗḗřẏ:"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "product_view.label.pickup_in_store": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ƥīƈķŭŭƥ īƞ şŧǿǿřḗḗ"
     },
     {
       "type": 0,
@@ -6263,6 +6319,42 @@
     {
       "type": 0,
       "value": "Şḗḗḗḗ ƒŭŭŀŀ ḓḗḗŧȧȧīŀş"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "product_view.status.in_stock_at_store": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Īƞ Şŧǿǿƈķ ȧȧŧ "
+    },
+    {
+      "type": 1,
+      "value": "storeName"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "product_view.status.out_of_stock_at_store": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ǿŭŭŧ ǿǿƒ Şŧǿǿƈķ ȧȧŧ "
+    },
+    {
+      "type": 1,
+      "value": "storeName"
     },
     {
       "type": 0,

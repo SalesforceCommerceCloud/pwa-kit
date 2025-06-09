@@ -155,17 +155,24 @@ export const AddToCartModal = () => {
                                                 gridGap={4}
                                             >
                                                 {itemsAdded.map(({product, variant, quantity}) => {
-                                                    const displayProduct = variant || product
-                                                    const variationAttributeValues = variant && product.variationAttributes
-                                                        ? getDisplayVariationValues(
-                                                            product.variationAttributes,
-                                                            variant.variationValues
-                                                        )
-                                                        : {}
+                                                    const variationAttributeValues =
+                                                        variant && product.variationAttributes
+                                                            ? getDisplayVariationValues(
+                                                                  product.variationAttributes,
+                                                                  variant.variationValues
+                                                              )
+                                                            : {}
                                                     return (
                                                         <Box key={variant?.productId || product.id}>
-                                                            <Text color="gray.700" fontWeight="700" fontSize="sm">
-                                                                {(variant.name || product.name) + (quantity > 1 ? ` (${quantity})` : '')}
+                                                            <Text
+                                                                color="gray.700"
+                                                                fontWeight="700"
+                                                                fontSize="sm"
+                                                            >
+                                                                {(variant.name || product.name) +
+                                                                    (quantity > 1
+                                                                        ? ` (${quantity})`
+                                                                        : '')}
                                                             </Text>
                                                             <Box
                                                                 color="gray.600"
@@ -201,22 +208,22 @@ export const AddToCartModal = () => {
                             )}
                             {!isProductABundle &&
                                 itemsAdded.map(({product, variant, quantity}, index) => {
-                                    const displayProduct = variant || product
                                     const image = findImageGroupBy(product.imageGroups, {
                                         viewType: 'small',
                                         selectedVariationAttributes: variant?.variationValues
                                     })?.images?.[0]
-                                    const priceData = getPriceData(displayProduct, {quantity})
-                                    const variationAttributeValues = variant && product.variationAttributes
-                                        ? getDisplayVariationValues(
-                                            product.variationAttributes,
-                                            variant.variationValues
-                                        )
-                                        : {}
+                                    const priceData = getPriceData(product, {quantity})
+                                    const variationAttributeValues =
+                                        variant && product.variationAttributes
+                                            ? getDisplayVariationValues(
+                                                  product.variationAttributes,
+                                                  variant.variationValues
+                                              )
+                                            : {}
 
                                     return (
                                         <Flex
-                                            key={displayProduct.productId || displayProduct.id}
+                                            key={product.productId || product.id}
                                             justifyContent="space-between"
                                             marginBottom={index < itemsAdded.length - 1 ? 0 : 4}
                                             paddingBottom={4}
@@ -239,7 +246,7 @@ export const AddToCartModal = () => {
                                                         fontFamily="body"
                                                         fontWeight="700"
                                                     >
-                                                        {displayProduct.name || product.name}
+                                                        {product.name || product.name}
                                                     </Heading>
                                                     <Box
                                                         color="gray.600"
