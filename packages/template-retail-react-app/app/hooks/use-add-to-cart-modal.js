@@ -246,7 +246,7 @@ export const AddToCartModal = () => {
                                                         fontFamily="body"
                                                         fontWeight="700"
                                                     >
-                                                        {product.name || product.name}
+                                                        {product.name}
                                                     </Heading>
                                                     <Box
                                                         color="gray.600"

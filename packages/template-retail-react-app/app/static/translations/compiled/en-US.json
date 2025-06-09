@@ -2902,13 +2902,17 @@
   "product_view.error.no_store_selected_for_pickup": [
     {
       "type": 0,
-      "value": "No store selected for pickup"
+      "value": "No valid store or inventory found for pickup"
     }
   ],
   "product_view.error.not_available_for_pickup": [
     {
       "type": 0,
-      "value": "Out of Stock in Store"
+      "value": "Out of Stock in "
+    },
+    {
+      "type": 1,
+      "value": "storeName"
     }
   ],
   "product_view.label.assistive_msg.quantity_decrement": [
@@ -2940,7 +2944,7 @@
   "product_view.label.pickup_in_store": [
     {
       "type": 0,
-      "value": "Pickup in store"
+      "value": "Pickup in Store"
     }
   ],
   "product_view.label.quantity": [
@@ -2959,6 +2963,12 @@
     {
       "type": 0,
       "value": "+"
+    }
+  ],
+  "product_view.label.ship_to_address": [
+    {
+      "type": 0,
+      "value": "Ship to Address"
     }
   ],
   "product_view.label.variant_type": [

@@ -182,7 +182,7 @@ const ProductView = forwardRef(
                     }
                 }
             } catch (e) {
-                // intentionally empty: ignore errors
+                showError()
             }
         }
 
@@ -446,6 +446,13 @@ const ProductView = forwardRef(
                 setPickupEnabled(!!inventoryId)
             }
         }, [site?.id])
+
+        const showError = (error) => {
+            showToast({
+                title: error?.message || 'An error occurred',
+                status: 'error'
+            })
+        }
 
         return (
             <Flex direction={'column'} data-testid="product-view" ref={ref}>
@@ -715,7 +722,7 @@ const ProductView = forwardRef(
                                                         inventoryId = storeInfo?.inventoryId
                                                         storeName = storeInfo?.name
                                                     } catch (e) {
-                                                        // intentionally empty: ignore errors
+                                                        showError()
                                                     }
                                                     if (inventoryId && product?.inventories) {
                                                         const inventoryObj =

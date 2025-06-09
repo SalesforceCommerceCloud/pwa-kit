@@ -1237,11 +1237,23 @@
   "product_view.button.update": {
     "defaultMessage": "Update"
   },
+  "product_view.error.no_store_selected_for_pickup": {
+    "defaultMessage": "No valid store or inventory found for pickup"
+  },
+  "product_view.error.not_available_for_pickup": {
+    "defaultMessage": "Out of Stock in {storeName}"
+  },
   "product_view.label.assistive_msg.quantity_decrement": {
     "defaultMessage": "Decrement Quantity for {productName}"
   },
   "product_view.label.assistive_msg.quantity_increment": {
     "defaultMessage": "Increment Quantity for {productName}"
+  },
+  "product_view.label.delivery": {
+    "defaultMessage": "Delivery:"
+  },
+  "product_view.label.pickup_in_store": {
+    "defaultMessage": "Pickup in Store"
   },
   "product_view.label.quantity": {
     "defaultMessage": "Quantity"
@@ -1252,11 +1264,20 @@
   "product_view.label.quantity_increment": {
     "defaultMessage": "+"
   },
+  "product_view.label.ship_to_address": {
+    "defaultMessage": "Ship to Address"
+  },
   "product_view.label.variant_type": {
     "defaultMessage": "{variantType}"
   },
   "product_view.link.full_details": {
     "defaultMessage": "See full details"
+  },
+  "product_view.status.in_stock_at_store": {
+    "defaultMessage": "In Stock at {storeName}"
+  },
+  "product_view.status.out_of_stock_at_store": {
+    "defaultMessage": "Out of Stock at {storeName}"
   },
   "profile_card.info.profile_updated": {
     "defaultMessage": "Profile updated"

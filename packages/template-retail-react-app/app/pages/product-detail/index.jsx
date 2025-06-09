@@ -357,7 +357,7 @@ const ProductDetail = () => {
                         const storeInfo = JSON.parse(window.localStorage.getItem(storeInfoKey))
                         inventoryId = storeInfo?.inventoryId
                     } catch (e) {
-                        // intentionally empty: ignore errors
+                        showError()
                     }
                     if (inventoryId) {
                         result.inventoryId = inventoryId
@@ -438,13 +438,13 @@ const ProductDetail = () => {
     // Top level bundle does not have variants
     const handleProductBundleAddToCart = async (variantOrArray, selectedQuantity) => {
         // Support both signatures: (variant, selectedQuantity) and ([{variant, quantity}])
-        let quantity;
+        let quantity
         if (Array.isArray(variantOrArray)) {
-            quantity = variantOrArray[0]?.quantity;
+            quantity = variantOrArray[0]?.quantity
         } else {
-            quantity = selectedQuantity;
+            quantity = selectedQuantity
         }
-        
+
         try {
             const childProductSelections = Object.values(childProductSelection)
             const productItems = [
@@ -460,7 +460,7 @@ const ProductDetail = () => {
                     })
                 }
             ]
-            
+
             const res = await addItemToNewOrExistingBasket(productItems)
             const bundleChildMasterIds = childProductSelections.map((child) => {
                 return child.product.id
