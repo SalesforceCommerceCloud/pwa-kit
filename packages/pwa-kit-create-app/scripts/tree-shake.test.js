@@ -5,7 +5,6 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 const fs = require('fs');
-const path = require('path');
 
 jest.mock('../assets/plugin-config', () => ({
     plugins: {
