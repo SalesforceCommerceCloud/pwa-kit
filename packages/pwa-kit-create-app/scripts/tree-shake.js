@@ -95,7 +95,7 @@ function processFile(filePath, plugins) {
     };
 
     // Helper to process plugin-guarded LogicalExpressions
-    function processPluginLogicalExpression(path) {
+    const processPluginLogicalExpression = (path) => {
         if (path.node.type === 'LogicalExpression') {
             const shouldKeep = evaluateLogicalExpression(path.node);
             if (!shouldKeep) {
@@ -104,16 +104,7 @@ function processFile(filePath, plugins) {
                 path.parentPath.replaceWith(findRightmostExpression(path.node));
             }
             modified = true;
-        } else if (path.node.type === 'ConditionalExpression') {
-            // Handle ternary expressions: PLUGIN_NAME ? expr1 : expr2
-            const testValue = evaluateLogicalExpression(path.node.test);
-            if (testValue === true) {
-                path.replaceWith(path.node.consequent);
-            } else {
-                path.replaceWith(path.node.alternate);
-            }
-            modified = true;
-        }
+        } 
     }
 
     // Traverse AST and remove nodes guarded by plugin flags
@@ -143,6 +134,14 @@ function processFile(filePath, plugins) {
                         nodePath.remove();
                     } else {
                         declaration.init = findRightmostExpression(declaration.init);
+                    }
+                    modified = true;
+                } else if (declaration?.init?.type === 'ConditionalExpression') {
+                    const testValue = evaluateLogicalExpression(declaration.init.test);
+                    if (testValue === true) {
+                        declaration.init = declaration.init.consequent;
+                    } else {
+                        declaration.init = declaration.init.alternate;
                     }
                     modified = true;
                 }
@@ -268,7 +267,6 @@ function removeUnusedComponents(directory) {
                 traverse(ast, {
                     ImportDeclaration(astPath) {
                         const importPath = astPath.node.source.value;
-                        // Skip node_modules imports
                         if (importPath.startsWith('.')) {
                             // Resolve the import path relative to the current file
                             let absoluteImportPath = path.resolve(
@@ -344,14 +342,14 @@ function removeUnusedComponents(directory) {
     return unusedFiles;
 }
 
-// Allow running from command line
-if (require.main === module) {
-    const directory = process.argv[2];
-    if (!directory) {
-        console.error('Please provide a directory path');
-        process.exit(1);
-    }
-    treeShake(directory, {});
-}
+// // Allow running from command line - keeping this for manual testing purposes
+// if (require.main === module) {
+//     const directory = process.argv[2];
+//     if (!directory) {
+//         console.error('Please provide a directory path');
+//         process.exit(1);
+//     }
+//     treeShake(directory, {});
+// }
 
 module.exports = treeShake;
