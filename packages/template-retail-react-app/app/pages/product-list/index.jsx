@@ -427,225 +427,227 @@ const ProductList = (props) => {
                     return <meta name={id} content={value} key={id} />
                 })}
             </Helmet>
-            <AbovePageHeader />
-            <PageDesignerPromotionalBanner />
+            <>
+                <AbovePageHeader />
+                <PageDesignerPromotionalBanner />
 
-            {/* Header */}
-            <Stack
-                display={{base: 'none', lg: 'flex'}}
-                direction="row"
-                justify="flex-start"
-                align="flex-start"
-                spacing={4}
-                marginBottom={6}
-            >
-                <Flex align="left" width="287px">
-                    <PageHeader
-                        searchQuery={searchQuery}
-                        category={category}
-                        productSearchResult={productSearchResult}
-                        isLoading={isLoading}
-                    />
-                </Flex>
+                {/* Header */}
+                <Stack
+                    display={{base: 'none', lg: 'flex'}}
+                    direction="row"
+                    justify="flex-start"
+                    align="flex-start"
+                    spacing={4}
+                    marginBottom={6}
+                >
+                    <Flex align="left" width="287px">
+                        <PageHeader
+                            searchQuery={searchQuery}
+                            category={category}
+                            productSearchResult={productSearchResult}
+                            isLoading={isLoading}
+                        />
+                    </Flex>
 
-                <Box flex={1} paddingTop={'45px'}>
-                    <SelectedRefinements
-                        filters={productSearchResult?.refinements}
-                        toggleFilter={toggleFilter}
-                        handleReset={resetFilters}
-                        selectedFilterValues={productSearchResult?.selectedRefinements}
-                    />
-                </Box>
-                <Box paddingTop={'45px'}>
-                    <Sort
-                        sortUrls={sortUrls}
-                        productSearchResult={productSearchResult}
-                        basePath={basePath}
-                    />
-                </Box>
-            </Stack>
-
-            {/* Filter Button for Mobile */}
-            <HideOnDesktop>
-                <Stack spacing={6}>
-                    <PageHeader
-                        searchQuery={searchQuery}
-                        category={category}
-                        productSearchResult={productSearchResult}
-                        isLoading={isLoading}
-                    />
-                    <Stack
-                        display={{base: 'flex', md: 'none'}}
-                        direction="row"
-                        justify="flex-start"
-                        align="center"
-                        spacing={1}
-                        height={12}
-                        borderColor="gray.100"
-                    >
-                        <Flex align="center">
-                            <Button
-                                fontSize="sm"
-                                colorScheme="black"
-                                variant="outline"
-                                marginRight={2}
-                                display="inline-flex"
-                                leftIcon={<FilterIcon boxSize={5} />}
-                                onClick={onOpen}
-                            >
-                                <FormattedMessage
-                                    defaultMessage="Filter"
-                                    id="product_list.button.filter"
-                                />
-                            </Button>
-                        </Flex>
-                        <Flex align="center">
-                            <Button
-                                maxWidth="245px"
-                                fontSize="sm"
-                                marginRight={2}
-                                colorScheme="black"
-                                variant="outline"
-                                display="inline-flex"
-                                rightIcon={<ChevronDownIcon boxSize={5} />}
-                                onClick={() => setSortOpen(true)}
-                            >
-                                {formatMessage(
-                                    {
-                                        id: 'product_list.button.sort_by',
-                                        defaultMessage: 'Sort By: {sortOption}'
-                                    },
-                                    {
-                                        sortOption: selectedSortingOptionLabel?.label
-                                    }
-                                )}
-                            </Button>
-                        </Flex>
-                    </Stack>
+                    <Box flex={1} paddingTop={'45px'}>
+                        <SelectedRefinements
+                            filters={productSearchResult?.refinements}
+                            toggleFilter={toggleFilter}
+                            handleReset={resetFilters}
+                            selectedFilterValues={productSearchResult?.selectedRefinements}
+                        />
+                    </Box>
+                    <Box paddingTop={'45px'}>
+                        <Sort
+                            sortUrls={sortUrls}
+                            productSearchResult={productSearchResult}
+                            basePath={basePath}
+                        />
+                    </Box>
                 </Stack>
-                <Box marginBottom={4}>
-                    <SelectedRefinements
-                        filters={productSearchResult?.refinements}
-                        toggleFilter={toggleFilter}
-                        handleReset={resetFilters}
-                        selectedFilterValues={productSearchResult?.selectedRefinements}
-                    />
-                </Box>
-            </HideOnDesktop>
 
-            {/* Body  */}
-            <Grid templateColumns={{base: '1fr', md: '280px 1fr'}} columnGap={6}>
-                <Stack display={{base: 'none', md: 'flex'}}>
-                    <Refinements
-                        itemsBefore={
-                            category?.categories
-                                ? [<CategoryLinks key="itemsBefore" category={category} />, <StoreInventoryFilter key="storeInventoryFilter" toggleFilter={toggleFilter} selectedFilters={searchParams.refine} />]
-                                : [<StoreInventoryFilter key="storeInventoryFilter" toggleFilter={toggleFilter} selectedFilters={searchParams.refine} />]
-                        }
-                        isLoading={filtersLoading}
-                        toggleFilter={toggleFilter}
-                        filters={productSearchResult?.refinements}
-                        excludedFilters={['cgid']}
-                        selectedFilters={searchParams.refine}
-                    />
-                </Stack>
-                <Box>
-                    {showNoResults ? (
-                        <EmptySearchResults searchQuery={searchQuery} category={category} />
-                    ) : (
-                        <>
-                            <SimpleGrid
-                                columns={[2, 2, 4, 5]}
-                                spacingX={4}
-                                spacingY={{base: 12, lg: 16}}
-                            >
-                                {isHydrated() &&
-                                ((isRefetching && !isFetched) || !productSearchResult)
-                                    ? new Array(searchParams.limit)
-                                          .fill(0)
-                                          .map((value, index) => (
-                                              <ProductTileSkeleton key={index} />
-                                          ))
-                                    : productSearchResult?.hits?.map((productSearchItem) => {
-                                          const productId = productSearchItem.productId
-                                          const isInWishlist =
-                                              !!wishlist?.customerProductListItems?.find(
-                                                  (item) => item.productId === productId
-                                              )
-
-                                          return (
-                                              <ProductTile
-                                                  data-testid={`sf-product-tile-${productSearchItem.productId}`}
-                                                  key={productSearchItem.productId}
-                                                  product={productSearchItem}
-                                                  enableFavourite={true}
-                                                  isFavourite={isInWishlist}
-                                                  isRefreshingData={isRefetching && isFetched}
-                                                  imageViewType={PRODUCT_LIST_IMAGE_VIEW_TYPE}
-                                                  selectableAttributeId={
-                                                      PRODUCT_LIST_SELECTABLE_ATTRIBUTE_ID
-                                                  }
-                                                  onClick={() => {
-                                                      if (searchQuery) {
-                                                          einstein.sendClickSearch(
-                                                              searchQuery,
-                                                              productSearchItem
-                                                          )
-                                                      } else if (category) {
-                                                          einstein.sendClickCategory(
-                                                              category,
-                                                              productSearchItem
-                                                          )
-                                                      }
-                                                  }}
-                                                  onFavouriteToggle={(toBeFavourite) => {
-                                                      const action = toBeFavourite
-                                                          ? addItemToWishlist
-                                                          : removeItemFromWishlist
-                                                      return action(productSearchItem)
-                                                  }}
-                                                  dynamicImageProps={{
-                                                      widths: [
-                                                          '50vw',
-                                                          '50vw',
-                                                          '20vw',
-                                                          '20vw',
-                                                          '25vw'
-                                                      ]
-                                                  }}
-                                              />
-                                          )
-                                      })}
-                            </SimpleGrid>
-                            {/* Footer */}
-                            <Flex
-                                justifyContent={['center', 'center', 'flex-start']}
-                                paddingTop={8}
-                            >
-                                <Pagination currentURL={basePath} urls={pageUrls} />
-
-                                {/*
-                            Our design doesn't call for a page size select. Show this element if you want
-                            to add one to your design.
-                        */}
-                                <Select
-                                    display="none"
-                                    value={basePath}
-                                    onChange={({target}) => {
-                                        history.push(target.value)
-                                    }}
+                {/* Filter Button for Mobile */}
+                <HideOnDesktop>
+                    <Stack spacing={6}>
+                        <PageHeader
+                            searchQuery={searchQuery}
+                            category={category}
+                            productSearchResult={productSearchResult}
+                            isLoading={isLoading}
+                        />
+                        <Stack
+                            display={{base: 'flex', md: 'none'}}
+                            direction="row"
+                            justify="flex-start"
+                            align="center"
+                            spacing={1}
+                            height={12}
+                            borderColor="gray.100"
+                        >
+                            <Flex align="center">
+                                <Button
+                                    fontSize="sm"
+                                    colorScheme="black"
+                                    variant="outline"
+                                    marginRight={2}
+                                    display="inline-flex"
+                                    leftIcon={<FilterIcon boxSize={5} />}
+                                    onClick={onOpen}
                                 >
-                                    {limitUrls.map((href, index) => (
-                                        <option key={href} value={href}>
-                                            {DEFAULT_LIMIT_VALUES[index]}
-                                        </option>
-                                    ))}
-                                </Select>
+                                    <FormattedMessage
+                                        defaultMessage="Filter"
+                                        id="product_list.button.filter"
+                                    />
+                                </Button>
                             </Flex>
-                        </>
-                    )}
-                </Box>
-            </Grid>
+                            <Flex align="center">
+                                <Button
+                                    maxWidth="245px"
+                                    fontSize="sm"
+                                    marginRight={2}
+                                    colorScheme="black"
+                                    variant="outline"
+                                    display="inline-flex"
+                                    rightIcon={<ChevronDownIcon boxSize={5} />}
+                                    onClick={() => setSortOpen(true)}
+                                >
+                                    {formatMessage(
+                                        {
+                                            id: 'product_list.button.sort_by',
+                                            defaultMessage: 'Sort By: {sortOption}'
+                                        },
+                                        {
+                                            sortOption: selectedSortingOptionLabel?.label
+                                        }
+                                    )}
+                                </Button>
+                            </Flex>
+                        </Stack>
+                    </Stack>
+                    <Box marginBottom={4}>
+                        <SelectedRefinements
+                            filters={productSearchResult?.refinements}
+                            toggleFilter={toggleFilter}
+                            handleReset={resetFilters}
+                            selectedFilterValues={productSearchResult?.selectedRefinements}
+                        />
+                    </Box>
+                </HideOnDesktop>
+
+                {/* Body  */}
+                <Grid templateColumns={{base: '1fr', md: '280px 1fr'}} columnGap={6}>
+                    <Stack display={{base: 'none', md: 'flex'}}>
+                        <Refinements
+                            itemsBefore={
+                                category?.categories
+                                    ? [<CategoryLinks key="itemsBefore" category={category} />, <StoreInventoryFilter key="storeInventoryFilter" toggleFilter={toggleFilter} selectedFilters={searchParams.refine} />]
+                                    : [<StoreInventoryFilter key="storeInventoryFilter" toggleFilter={toggleFilter} selectedFilters={searchParams.refine} />]
+                            }
+                            isLoading={filtersLoading}
+                            toggleFilter={toggleFilter}
+                            filters={productSearchResult?.refinements}
+                            excludedFilters={['cgid']}
+                            selectedFilters={searchParams.refine}
+                        />
+                    </Stack>
+                    <Box>
+                        {showNoResults ? (
+                            <EmptySearchResults searchQuery={searchQuery} category={category} />
+                        ) : (
+                            <>
+                                <SimpleGrid
+                                    columns={[2, 2, 4, 5]}
+                                    spacingX={4}
+                                    spacingY={{base: 12, lg: 16}}
+                                >
+                                    {isHydrated() &&
+                                    ((isRefetching && !isFetched) || !productSearchResult)
+                                        ? new Array(searchParams.limit)
+                                              .fill(0)
+                                              .map((value, index) => (
+                                                  <ProductTileSkeleton key={index} />
+                                              ))
+                                        : productSearchResult?.hits?.map((productSearchItem) => {
+                                              const productId = productSearchItem.productId
+                                              const isInWishlist =
+                                                  !!wishlist?.customerProductListItems?.find(
+                                                      (item) => item.productId === productId
+                                                  )
+
+                                              return (
+                                                  <ProductTile
+                                                      data-testid={`sf-product-tile-${productSearchItem.productId}`}
+                                                      key={productSearchItem.productId}
+                                                      product={productSearchItem}
+                                                      enableFavourite={true}
+                                                      isFavourite={isInWishlist}
+                                                      isRefreshingData={isRefetching && isFetched}
+                                                      imageViewType={PRODUCT_LIST_IMAGE_VIEW_TYPE}
+                                                      selectableAttributeId={
+                                                          PRODUCT_LIST_SELECTABLE_ATTRIBUTE_ID
+                                                      }
+                                                      onClick={() => {
+                                                          if (searchQuery) {
+                                                              einstein.sendClickSearch(
+                                                                  searchQuery,
+                                                                  productSearchItem
+                                                              )
+                                                          } else if (category) {
+                                                              einstein.sendClickCategory(
+                                                                  category,
+                                                                  productSearchItem
+                                                              )
+                                                          }
+                                                      }}
+                                                      onFavouriteToggle={(toBeFavourite) => {
+                                                          const action = toBeFavourite
+                                                              ? addItemToWishlist
+                                                              : removeItemFromWishlist
+                                                          return action(productSearchItem)
+                                                      }}
+                                                      dynamicImageProps={{
+                                                          widths: [
+                                                              '50vw',
+                                                              '50vw',
+                                                              '20vw',
+                                                              '20vw',
+                                                              '25vw'
+                                                          ]
+                                                      }}
+                                                  />
+                                              )
+                                          })}
+                                </SimpleGrid>
+                                {/* Footer */}
+                                <Flex
+                                    justifyContent={['center', 'center', 'flex-start']}
+                                    paddingTop={8}
+                                >
+                                    <Pagination currentURL={basePath} urls={pageUrls} />
+
+                                    {/*
+                                Our design doesn't call for a page size select. Show this element if you want
+                                to add one to your design.
+                            */}
+                                    <Select
+                                        display="none"
+                                        value={basePath}
+                                        onChange={({target}) => {
+                                            history.push(target.value)
+                                        }}
+                                    >
+                                        {limitUrls.map((href, index) => (
+                                            <option key={href} value={href}>
+                                                {DEFAULT_LIMIT_VALUES[index]}
+                                            </option>
+                                        ))}
+                                    </Select>
+                                </Flex>
+                            </>
+                        )}
+                    </Box>
+                </Grid>
+            </>
             {/* Modal for filter options on mobile */}
             <Modal
                 isOpen={isOpen}
@@ -679,9 +681,9 @@ const ProductList = (props) => {
                                               category={category}
                                               onSelect={onClose}
                                           />,
-                                          <StoreInventoryFilter key="storeInventoryFilter" toggleFilter={toggleFilter} selectedFilters={searchParams.refine} />  // Add this line
+                                          <StoreInventoryFilter key="storeInventoryFilter" />  // Add this line
                                       ]
-                                    : [<StoreInventoryFilter key="storeInventoryFilter" toggleFilter={toggleFilter} selectedFilters={searchParams.refine} />]     // Add this line
+                                    : [<StoreInventoryFilter key="storeInventoryFilter" />]     // Add this line
                             }
                             excludedFilters={['cgid']}
                         />
