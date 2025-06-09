@@ -13,7 +13,6 @@ import {BrandLogo} from '@salesforce/retail-react-app/app/components/icons'
 
 /**
  * PasswordlessEmailConfirmation Component
- 
  */
 
 //* added voiceover functionalities
