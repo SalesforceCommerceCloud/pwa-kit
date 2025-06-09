@@ -2941,6 +2941,12 @@
       "value": "Delivery:"
     }
   ],
+  "product_view.label.pickup_in_select_store_prefix": [
+    {
+      "type": 0,
+      "value": "Pickup in"
+    }
+  ],
   "product_view.label.pickup_in_store": [
     {
       "type": 0,
@@ -2963,6 +2969,12 @@
     {
       "type": 0,
       "value": "+"
+    }
+  ],
+  "product_view.label.select_store_link": [
+    {
+      "type": 0,
+      "value": "Select Store"
     }
   ],
   "product_view.label.ship_to_address": [

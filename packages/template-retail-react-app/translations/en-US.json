@@ -1252,6 +1252,9 @@
   "product_view.label.delivery": {
     "defaultMessage": "Delivery:"
   },
+  "product_view.label.pickup_in_select_store_prefix": {
+    "defaultMessage": "Pickup in"
+  },
   "product_view.label.pickup_in_store": {
     "defaultMessage": "Pickup in Store"
   },
@@ -1263,6 +1266,9 @@
   },
   "product_view.label.quantity_increment": {
     "defaultMessage": "+"
+  },
+  "product_view.label.select_store_link": {
+    "defaultMessage": "Select Store"
   },
   "product_view.label.ship_to_address": {
     "defaultMessage": "Ship to Address"

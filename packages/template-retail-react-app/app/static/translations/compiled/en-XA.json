@@ -6245,6 +6245,20 @@
       "value": "]"
     }
   ],
+  "product_view.label.pickup_in_select_store_prefix": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ƥīƈķŭŭƥ īƞ"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
   "product_view.label.pickup_in_store": [
     {
       "type": 0,
@@ -6295,6 +6309,20 @@
     {
       "type": 0,
       "value": "+"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "product_view.label.select_store_link": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Şḗḗŀḗḗƈŧ Şŧǿǿřḗḗ"
     },
     {
       "type": 0,

@@ -831,6 +831,30 @@ const ProductView = forwardRef(
                                             : ['none', 'none', 'none', 'block']
                                     }
                                 >
+                                    {/* Show label if pickup is disabled due to no store/inventoryId */}
+                                    {!pickupEnabled && (
+                                        <Text
+                                            color="black"
+                                            fontWeight={600}
+                                            mb={3}
+                                            data-testid="pickup-select-store-msg"
+                                        >
+                                            <FormattedMessage
+                                                defaultMessage="Pickup in "
+                                                id="product_view.label.pickup_in_select_store_prefix"
+                                            />{' '}
+                                            <Link
+                                                to="/store-locator"
+                                                color="blue.600"
+                                                textDecoration="underline"
+                                            >
+                                                <FormattedMessage
+                                                    defaultMessage="Select Store"
+                                                    id="product_view.label.select_store_link"
+                                                />
+                                            </Link>
+                                        </Text>
+                                    )}
                                     {renderActionButtons()}
                                 </Box>
                             </Box>
