@@ -49,7 +49,7 @@ import Seo from '../seo'
 import ScrollToTop from '../scroll-to-top'
 
 // Local Project Hooks
-// import {AuthModal, useAuthModal} from '../../hooks/use-auth-modal'
+import {AuthModal, useAuthModal} from '../../hooks/use-auth-modal'
 import {AddToCartModalProvider} from '../../hooks/use-add-to-cart-modal'
 import {useExtensionConfig, useCurrentCustomer, useCurrentBasket} from '../../hooks'
 import {watchOnlineStatus, flatten} from '../../utils/utils'
@@ -121,7 +121,7 @@ const withLayout = <P extends object>(WrappedComponent: React.ComponentType<P>) 
         const activeData = useActiveData()
         const history = useHistory()
         const location = useLocation()
-        // const authModal = useAuthModal()
+        const authModal = useAuthModal()
         // const dntNotification = useDntNotification()
         const {site, locale, buildUrl} = useMultiSite()
         const [isOnline, setIsOnline] = useState<boolean>(true)
@@ -347,7 +347,7 @@ const withLayout = <P extends object>(WrappedComponent: React.ComponentType<P>) 
                         {/*</SkipNavContent>*/}
 
                         {!isCheckout ? <Footer /> : <CheckoutFooter />}
-                        {/*<AuthModal {...(authModal as any)} />*/}
+                        <AuthModal {...(authModal as any)} />
                         {/*<DntNotification {...dntNotification} />*/}
                     </AddToCartModalProvider>
                 </Box>
