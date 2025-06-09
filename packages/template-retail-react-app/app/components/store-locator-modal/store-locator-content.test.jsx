@@ -270,8 +270,8 @@ describe('StoreLocatorContent', () => {
         renderWithProviders(
             <WrapperComponent
                 searchStoresParams={{
-                    postalCode: '10178',
-                    countryCode: 'DE',
+                    postalCode: '90210',
+                    countryCode: 'US',
                     limit: STORE_LOCATOR_NUM_STORES_PER_LOAD
                 }}
                 userHasSetManualGeolocation={true}
@@ -282,7 +282,7 @@ describe('StoreLocatorContent', () => {
             const findButton = screen.getByRole('button', {name: /Find/i})
             const useMyLocationButton = screen.getByRole('button', {name: /Use My Location/i})
             const descriptionFindAStore = screen.getByText(/Find a Store/i)
-            const viewing = screen.getByText(/Viewing stores within 100km of 10178 in Germany/i)
+            const viewing = screen.getByText(/Viewing stores within 100km of 90210 in United States/i)
 
             expect(findButton).toBeInTheDocument()
             expect(useMyLocationButton).toBeInTheDocument()

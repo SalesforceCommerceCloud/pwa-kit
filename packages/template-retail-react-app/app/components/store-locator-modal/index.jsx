@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, {useState, createContext} from 'react'
+import React, {useState, useEffect, createContext} from 'react'
 import PropTypes from 'prop-types'
 
 // Components
@@ -26,16 +26,29 @@ import {
 } from '@salesforce/retail-react-app/app/constants'
 
 export const StoreLocatorContext = createContext()
-export const useStoreLocator = () => {
+export const useStoreLocator = (initialParams) => {
     const [userHasSetManualGeolocation, setUserHasSetManualGeolocation] = useState(false)
     const [automaticGeolocationHasFailed, setAutomaticGeolocationHasFailed] = useState(false)
     const [userWantsToShareLocation, setUserWantsToShareLocation] = useState(false)
 
     const [searchStoresParams, setSearchStoresParams] = useState({
-        countryCode: DEFAULT_STORE_LOCATOR_COUNTRY.countryCode,
-        postalCode: DEFAULT_STORE_LOCATOR_POSTAL_CODE,
-        limit: STORE_LOCATOR_NUM_STORES_PER_LOAD
+        countryCode: initialParams?.countryCode || DEFAULT_STORE_LOCATOR_COUNTRY.countryCode,
+        postalCode: initialParams?.postalCode || DEFAULT_STORE_LOCATOR_POSTAL_CODE,
+        latitude: initialParams?.latitude,
+        longitude: initialParams?.longitude,
+        limit: initialParams?.limit || STORE_LOCATOR_NUM_STORES_PER_LOAD
     })
+    
+    // Update search parameters when initialParams are provided (for GMB)
+    useEffect(() => {
+        if (initialParams) {
+            setSearchStoresParams(prevParams => ({
+                ...prevParams,
+                ...initialParams
+            }))
+            setUserHasSetManualGeolocation(true)
+        }
+    }, [initialParams])
 
     return {
         userHasSetManualGeolocation,
@@ -49,8 +62,8 @@ export const useStoreLocator = () => {
     }
 }
 
-const StoreLocatorModal = ({isOpen, onClose}) => {
-    const storeLocator = useStoreLocator()
+const StoreLocatorModal = ({isOpen, onClose, initialParams}) => {
+    const storeLocator = useStoreLocator(initialParams)
     const isDesktopView = useBreakpointValue({base: false, lg: true})
 
     return (
@@ -96,7 +109,8 @@ const StoreLocatorModal = ({isOpen, onClose}) => {
 
 StoreLocatorModal.propTypes = {
     isOpen: PropTypes.bool,
-    onClose: PropTypes.func
+    onClose: PropTypes.func,
+    initialParams: PropTypes.object
 }
 
 export default StoreLocatorModal

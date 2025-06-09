@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, {useState, useContext} from 'react'
+import React, {useState, useContext, useMemo} from 'react'
 import {useIntl} from 'react-intl'
 
 // Components
@@ -34,6 +34,7 @@ const NUM_STORES_PER_REQUEST_API_MAX = 200
 // Hooks
 import {useSearchStores} from '@salesforce/commerce-sdk-react'
 import {useForm} from 'react-hook-form'
+import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
 
 import {StoreLocatorContext} from '@salesforce/retail-react-app/app/components/store-locator-modal/index'
 
@@ -46,6 +47,7 @@ const StoreLocatorContent = () => {
     } = useContext(StoreLocatorContext)
     const {countryCode, postalCode, latitude, longitude, limit} = searchStoresParams
     const intl = useIntl()
+    const {site} = useMultiSite()
     const form = useForm({
         mode: 'onChange',
         reValidateMode: 'onChange',
@@ -75,10 +77,28 @@ const StoreLocatorContent = () => {
         }
     })
 
+    const sortedStoresData = useMemo(() => {
+        if (!searchStoresData?.data) return []
+        
+        const storeInfoKey = `store_${site.id}`
+        const selectedStoreInfo = JSON.parse(window.localStorage.getItem(storeInfoKey) || '{}')
+        const selectedStoreId = selectedStoreInfo.id
+        
+        if (!selectedStoreId) {
+            return searchStoresData.data
+        }
+        
+        return [...searchStoresData.data].sort((a, b) => {
+            if (a.id === selectedStoreId) return -1
+            if (b.id === selectedStoreId) return 1
+            return 0
+        })
+    }, [searchStoresData?.data, site.id])
+
     const storesInfo =
         isLoading || isFetching
             ? undefined
-            : searchStoresData?.data?.slice(0, numStoresToShow) || []
+            : sortedStoresData?.slice(0, numStoresToShow) || []
     const numStores = searchStoresData?.total || 0
 
     const submitForm = async (formData) => {
@@ -120,7 +140,17 @@ const StoreLocatorContent = () => {
                 id: 'store_locator.description.no_locations',
                 defaultMessage: 'Sorry, there are no locations in this area'
             })
-        if (searchStoresParams.postalCode !== undefined)
+        
+        // If we have a postal code (either from direct search or from nearest store)
+        if (searchStoresParams.postalCode !== undefined) {
+            const countryName = searchStoresParams.countryCode && SUPPORTED_STORE_LOCATOR_COUNTRIES.length !== 0
+                ? intl.formatMessage(
+                      SUPPORTED_STORE_LOCATOR_COUNTRIES.find(
+                          (o) => o.countryCode === searchStoresParams.countryCode
+                      )?.countryName || DEFAULT_STORE_LOCATOR_COUNTRY.countryName
+                  )
+                : intl.formatMessage(DEFAULT_STORE_LOCATOR_COUNTRY.countryName)
+
             return `${intl.formatMessage(
                 {
                     id: 'store_locator.description.viewing_near_postal_code',
@@ -132,21 +162,31 @@ const StoreLocatorContent = () => {
                     distanceUnit: STORE_LOCATOR_DISTANCE_UNIT,
                     postalCode: searchStoresParams.postalCode
                 }
-            )}
-                ${
-                    SUPPORTED_STORE_LOCATOR_COUNTRIES.length !== 0
-                        ? intl.formatMessage(
-                              SUPPORTED_STORE_LOCATOR_COUNTRIES.find(
-                                  (o) => o.countryCode === searchStoresParams.countryCode
-                              ).countryName
-                          )
-                        : intl.formatMessage(DEFAULT_STORE_LOCATOR_COUNTRY.countryName)
-                }`
-        else
-            return intl.formatMessage({
-                id: 'store_locator.description.viewing_near_your_location',
-                defaultMessage: 'Viewing stores near your location'
-            })
+            )} ${countryName}`
+        }
+        
+        // If we have coordinates but no postal code, show coordinate-based message
+        if (searchStoresParams.latitude !== undefined && searchStoresParams.longitude !== undefined) {
+            const coordinates = `${searchStoresParams.latitude.toFixed(4)}, ${searchStoresParams.longitude.toFixed(4)}`
+            
+            return intl.formatMessage(
+                {
+                    id: 'store_locator.description.viewing_near_coordinates',
+                    defaultMessage: 'Viewing stores within {distance}{distanceUnit} of coordinates {coordinates}'
+                },
+                {
+                    distance: STORE_LOCATOR_DISTANCE,
+                    distanceUnit: STORE_LOCATOR_DISTANCE_UNIT,
+                    coordinates: coordinates
+                }
+            )
+        }
+        
+        // Default fallback
+        return intl.formatMessage({
+            id: 'store_locator.description.viewing_near_your_location',
+            defaultMessage: 'Viewing stores near your location'
+        })
     }
 
     return (
