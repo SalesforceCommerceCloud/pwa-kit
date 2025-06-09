@@ -436,14 +436,22 @@ const ProductDetail = () => {
 
     /**************** Product Bundle Handlers ****************/
     // Top level bundle does not have variants
-    const handleProductBundleAddToCart = async (variant, selectedQuantity) => {
+    const handleProductBundleAddToCart = async (variantOrArray, selectedQuantity) => {
+        // Support both signatures: (variant, selectedQuantity) and ([{variant, quantity}])
+        let quantity;
+        if (Array.isArray(variantOrArray)) {
+            quantity = variantOrArray[0]?.quantity;
+        } else {
+            quantity = selectedQuantity;
+        }
+        
         try {
             const childProductSelections = Object.values(childProductSelection)
             const productItems = [
                 {
                     productId: product.id,
                     price: product.price,
-                    quantity: selectedQuantity,
+                    quantity: quantity,
                     bundledProductItems: childProductSelections.map((child) => {
                         return {
                             productId: child.variant.productId,
@@ -452,6 +460,7 @@ const ProductDetail = () => {
                     })
                 }
             ]
+            
             const res = await addItemToNewOrExistingBasket(productItems)
             const bundleChildMasterIds = childProductSelections.map((child) => {
                 return child.product.id
