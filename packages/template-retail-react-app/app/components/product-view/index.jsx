@@ -23,6 +23,7 @@ import {
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 import {useCurrency, useDerivedProduct} from '@salesforce/retail-react-app/app/hooks'
 import {useAddToCartModalContext} from '@salesforce/retail-react-app/app/hooks/use-add-to-cart-modal'
+import {useBonusProductModalContext} from '@salesforce/retail-react-app/app/hooks/use-bonus-product-modal'
 
 // project components
 import ImageGallery from '@salesforce/retail-react-app/app/components/image-gallery'
@@ -131,6 +132,13 @@ const ProductView = forwardRef(
             onOpen: onAddToCartModalOpen,
             onClose: onAddToCartModalClose
         } = useAddToCartModalContext()
+        const {
+            isOpen: isBonusProductModalOpen,
+            onOpen: onBonusProductModalOpen,
+            onClose: onBonusProductModalClose,
+            bonusProducts,
+            addBonusProducts
+        } = useBonusProductModalContext()
         const theme = useTheme()
         const [showOptionsMessage, toggleShowOptionsMessage] = useState(false)
         const {
@@ -272,16 +280,39 @@ const ProductView = forwardRef(
                     return
                 }
                 try {
-                    const itemsAdded = await addToCart(variant, quantity)
-                    // Open modal only when `addToCart` returns some data
-                    // It's possible that the item has been added to cart, but we don't want to open the modal.
-                    // See wishlist_primary_action for example.
+                    const addToCartResponse = await addToCart(variant, quantity)
+                    const itemsAdded = addToCartResponse?.productSelectionValues
+
+                    // Compare existing bonus products with new bonus discount line items
+                    const newBonusItems =
+                        addToCartResponse?.bonusDiscountLineItems?.filter(
+                            (newItem) =>
+                                !bonusProducts.some(
+                                    (existingItem) => existingItem.id === newItem.id
+                                )
+                        ) || []
+
                     if (itemsAdded) {
-                        onAddToCartModalOpen({
-                            product,
-                            itemsAdded,
-                            selectedQuantity: quantity
-                        })
+                        // Show bonus product modal first if there are bonus items
+                        if (newBonusItems?.length > 0) {
+                            // Modify this logic and update bonusProducts list in localStorage with the new bonus items
+                            // that are added to the cart
+                            addBonusProducts(newBonusItems)
+                            onBonusProductModalOpen({
+                                newBonusItems,
+                                allBonusItems: addToCartResponse.bonusDiscountLineItems,
+                                product,
+                                itemsAdded,
+                                selectedQuantity: quantity
+                            })
+                        } else {
+                            // If no bonus items, just show add to cart modal
+                            onAddToCartModalOpen({
+                                product,
+                                itemsAdded,
+                                selectedQuantity: quantity
+                            })
+                        }
                     }
                 } catch (e) {
                     showError()
@@ -363,6 +394,12 @@ const ProductView = forwardRef(
         useEffect(() => {
             if (isAddToCartModalOpen) {
                 onAddToCartModalClose()
+            }
+        }, [location.pathname])
+
+        useEffect(() => {
+            if (isBonusProductModalOpen) {
+                onBonusProductModalClose()
             }
         }, [location.pathname])
 
