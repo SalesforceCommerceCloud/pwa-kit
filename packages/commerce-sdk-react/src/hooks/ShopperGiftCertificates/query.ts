@@ -6,13 +6,14 @@
  */
 import {UseQueryResult} from '@tanstack/react-query'
 import {ApiClients, ApiQueryOptions, Argument, DataType, NullableParameters} from '../types'
-import useCommerceApi from '../useCommerceApi'
 import {useQuery} from '../useQuery'
 import {mergeOptions, omitNullableParameters, pickValidParams} from '../utils'
 import * as queryKeyHelpers from './queryKeyHelpers'
 import {ShopperGiftCertificates} from 'commerce-sdk-isomorphic'
+import {useResolvedClient} from '../useResolvedClient'
 
-type Client = ApiClients['shopperGiftCertificates']
+const CLIENT_KEY = 'shopperGiftCertificates' as const
+type Client = NonNullable<ApiClients[typeof CLIENT_KEY]>
 
 /**
  * Action to retrieve an existing gift certificate.
@@ -31,7 +32,7 @@ export const useGiftCertificate = (
 ): UseQueryResult<DataType<Client['getGiftCertificate']>> => {
     type Options = Argument<Client['getGiftCertificate']>
     type Data = DataType<Client['getGiftCertificate']>
-    const {shopperGiftCertificates: client} = useCommerceApi()
+    const client = useResolvedClient(CLIENT_KEY)
     const methodName = 'getGiftCertificate'
     const requiredParameters = ShopperGiftCertificates.paramKeys[`${methodName}Required`]
 
