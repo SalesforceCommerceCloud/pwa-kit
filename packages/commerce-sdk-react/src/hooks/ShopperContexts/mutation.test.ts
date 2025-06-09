@@ -26,7 +26,8 @@ jest.mock('../../auth/index.ts', () => {
     }))
 })
 
-type Client = ApiClients['shopperContexts']
+const CLIENT_KEY = 'shopperContexts' as const
+type Client = NonNullable<ApiClients[typeof CLIENT_KEY]>
 
 const contextEndpoint = '/shopper/shopper-context/'
 

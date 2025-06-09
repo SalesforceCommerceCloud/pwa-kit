@@ -7,7 +7,8 @@
 import {ApiClients, CacheUpdateMatrix} from '../types'
 import {getShopperContext} from './queryKeyHelpers'
 
-type Client = ApiClients['shopperContexts']
+const CLIENT_KEY = 'shopperContexts' as const
+type Client = NonNullable<ApiClients[typeof CLIENT_KEY]>
 
 // TODO: Complete cache invalidation https://gus.lightning.force.com/lightning/_classic/%2Fa07EE00001NoYplYAF
 export const cacheUpdateMatrix: CacheUpdateMatrix<Client> = {

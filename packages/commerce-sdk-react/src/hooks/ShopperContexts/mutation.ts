@@ -8,10 +8,11 @@ import {ApiClients, ApiMethod, Argument, CacheUpdateGetter, DataType, MergedOpti
 import {useMutation} from '../useMutation'
 import {UseMutationResult} from '@tanstack/react-query'
 import {NotImplementedError} from '../utils'
-import useCommerceApi from '../useCommerceApi'
 import {cacheUpdateMatrix} from './cache'
+import { useResolvedClient } from '../useResolvedClient'
 
-type Client = ApiClients['shopperContexts']
+const CLIENT_KEY = 'shopperContexts' as const
+type Client = NonNullable<ApiClients[typeof CLIENT_KEY]>
 
 /**
  * Mutation for Shopper Contexts.
@@ -62,7 +63,7 @@ export function useShopperContextsMutation<Mutation extends ShopperContextsMutat
     // I'm not sure if there's a way to avoid the type assertions in here for the methods that
     // use them. However, I'm fairly confident that they are safe to do, as they seem to be simply
     // re-asserting what we already have.
-    const {shopperContexts: client} = useCommerceApi()
+    const client = useResolvedClient(CLIENT_KEY)
     type Options = Argument<Client[Mutation]>
     type Data = DataType<Client[Mutation]>
     return useMutation({
