@@ -7,12 +7,13 @@
 import {UseQueryResult} from '@tanstack/react-query'
 import {ShopperLogin} from 'commerce-sdk-isomorphic'
 import {ApiClients, ApiQueryOptions, Argument, DataType, NullableParameters} from '../types'
-import useCommerceApi from '../useCommerceApi'
 import {useQuery} from '../useQuery'
 import {mergeOptions, omitNullableParameters, pickValidParams} from '../utils'
 import * as queryKeyHelpers from './queryKeyHelpers'
+import { useResolvedClient } from '../useResolvedClient'
 
-type Client = ApiClients['shopperLogin']
+const CLIENT_KEY = 'shopperLogin' as const
+type Client = NonNullable<ApiClients[typeof CLIENT_KEY]>
 
 /**
  * Returns a JSON listing of claims about the currently authenticated user.
@@ -31,7 +32,7 @@ export const useUserInfo = (
 ): UseQueryResult<DataType<Client['getUserInfo']>> => {
     type Options = Argument<Client['getUserInfo']>
     type Data = DataType<Client['getUserInfo']>
-    const {shopperLogin: client} = useCommerceApi()
+    const client = useResolvedClient(CLIENT_KEY)
     const methodName = 'getUserInfo'
     const requiredParameters = ShopperLogin.paramKeys[`${methodName}Required`]
 
@@ -73,7 +74,7 @@ export const useWellknownOpenidConfiguration = (
 ): UseQueryResult<DataType<Client['getWellknownOpenidConfiguration']>> => {
     type Options = Argument<Client['getWellknownOpenidConfiguration']>
     type Data = DataType<Client['getWellknownOpenidConfiguration']>
-    const {shopperLogin: client} = useCommerceApi()
+    const client = useResolvedClient(CLIENT_KEY)
     const methodName = 'getWellknownOpenidConfiguration'
     const requiredParameters = ShopperLogin.paramKeys[`${methodName}Required`]
 
@@ -115,7 +116,7 @@ export const useJwksUri = (
 ): UseQueryResult<DataType<Client['getJwksUri']>> => {
     type Options = Argument<Client['getJwksUri']>
     type Data = DataType<Client['getJwksUri']>
-    const {shopperLogin: client} = useCommerceApi()
+    const client = useResolvedClient(CLIENT_KEY)
     const methodName = 'getJwksUri'
     const requiredParameters = ShopperLogin.paramKeys[`${methodName}Required`]
 

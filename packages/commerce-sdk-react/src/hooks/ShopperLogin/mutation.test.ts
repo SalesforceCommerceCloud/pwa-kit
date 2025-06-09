@@ -23,7 +23,9 @@ jest.mock('../../auth/index.ts', () => {
     return mockAuth
 })
 
-type Client = ApiClients['shopperLogin']
+const CLIENT_KEY = 'shopperLogin' as const
+type Client = NonNullable<ApiClients[typeof CLIENT_KEY]>
+
 const loginEndpoint = '/shopper/auth/'
 // Additional properties are ignored, so we can use this mega-options object for all endpoints
 const OPTIONS = {

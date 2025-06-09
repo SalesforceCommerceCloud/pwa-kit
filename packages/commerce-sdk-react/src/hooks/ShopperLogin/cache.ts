@@ -8,7 +8,10 @@ import {ApiClients, CacheUpdateMatrix} from '../types'
 
 const noop = () => ({})
 
-export const cacheUpdateMatrix: CacheUpdateMatrix<ApiClients['shopperLogin']> = {
+const CLIENT_KEY = 'shopperLogin' as const
+type Client = NonNullable<ApiClients[typeof CLIENT_KEY]>
+
+export const cacheUpdateMatrix: CacheUpdateMatrix<Client> = {
     authorizePasswordlessCustomer: noop,
     logoutCustomer: () => {
         return {
