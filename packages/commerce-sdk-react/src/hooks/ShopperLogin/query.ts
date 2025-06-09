@@ -11,8 +11,9 @@ import {useQuery} from '../useQuery'
 import {mergeOptions, omitNullableParameters, pickValidParams} from '../utils'
 import * as queryKeyHelpers from './queryKeyHelpers'
 import {useResolvedClient} from '../useResolvedClient'
+import {CLIENT_KEYS} from '../../constant'
 
-const CLIENT_KEY = 'shopperLogin' as const
+const CLIENT_KEY = CLIENT_KEYS.SHOPPER_LOGIN
 type Client = NonNullable<ApiClients[typeof CLIENT_KEY]>
 
 /**

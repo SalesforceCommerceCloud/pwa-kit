@@ -10,8 +10,9 @@ import {UseMutationResult} from '@tanstack/react-query'
 import {NotImplementedError} from '../utils'
 import {cacheUpdateMatrix} from './cache'
 import {useResolvedClient} from '../useResolvedClient'
+import {CLIENT_KEYS} from '../../constant'
 
-const CLIENT_KEY = 'shopperCustomers' as const
+const CLIENT_KEY = CLIENT_KEYS.SHOPPER_CUSTOMERS
 type Client = NonNullable<ApiClients[typeof CLIENT_KEY]>
 
 /**

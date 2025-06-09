@@ -49,3 +49,18 @@ export const EXCLUDE_COOKIE_SUFFIX = [DWSID_COOKIE_NAME, DNT_COOKIE_NAME]
  * Use the header key below to send dwsid value with SCAPI/OCAPI requests.
  */
 export const SERVER_AFFINITY_HEADER_KEY = 'sfdc_dwsid'
+
+export const CLIENT_KEYS = {
+    SHOPPER_BASKETS: 'shopperBaskets',
+    SHOPPER_CONTEXTS: 'shopperContexts',
+    SHOPPER_CUSTOMERS: 'shopperCustomers',
+    SHOPPER_EXPERIENCE: 'shopperExperience',
+    SHOPPER_GIFT_CERTIFICATES: 'shopperGiftCertificates',
+    SHOPPER_LOGIN: 'shopperLogin',
+    SHOPPER_ORDERS: 'shopperOrders',
+    SHOPPER_PRODUCTS: 'shopperProducts',
+    SHOPPER_PROMOTIONS: 'shopperPromotions',
+    SHOPPER_SEARCH: 'shopperSearch',
+    SHOPPER_SEO: 'shopperSeo',
+    SHOPPER_STORES: 'shopperStores'
+} as const

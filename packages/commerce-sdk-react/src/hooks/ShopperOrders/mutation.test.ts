@@ -18,6 +18,7 @@ import {
 import {ApiClients, Argument} from '../types'
 import {ShopperOrdersMutation, useShopperOrdersMutation} from './mutation'
 import * as queries from './query'
+import {CLIENT_KEYS} from '../../constant'
 
 jest.mock('../../auth/index.ts', () => {
     const {default: mockAuth} = jest.requireActual('../../auth/index.ts')
@@ -25,7 +26,7 @@ jest.mock('../../auth/index.ts', () => {
     return mockAuth
 })
 
-const CLIENT_KEY = 'shopperOrders' as const
+const CLIENT_KEY = CLIENT_KEYS.SHOPPER_ORDERS
 type Client = NonNullable<ApiClients[typeof CLIENT_KEY]>
 const ordersEndpoint = '/checkout/shopper-orders/'
 const OPTIONS: Argument<Client[ShopperOrdersMutation]> = {

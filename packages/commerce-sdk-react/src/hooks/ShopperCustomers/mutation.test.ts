@@ -18,6 +18,7 @@ import {
 import {ShopperCustomersMutation, useShopperCustomersMutation} from '../ShopperCustomers'
 import {ApiClients, Argument, DataType, RequireKeys} from '../types'
 import * as queries from './query'
+import {CLIENT_KEYS} from '../../constant'
 
 jest.mock('../../auth/index.ts', () => {
     const {default: mockAuth} = jest.requireActual('../../auth/index.ts')
@@ -25,7 +26,7 @@ jest.mock('../../auth/index.ts', () => {
     return mockAuth
 })
 
-const CLIENT_KEY = 'shopperCustomers' as const
+const CLIENT_KEY = CLIENT_KEYS.SHOPPER_CUSTOMERS
 type Client = NonNullable<ApiClients[typeof CLIENT_KEY]>
 const customersEndpoint = '/customer/shopper-customers/'
 /** All Shopper Customers parameters. Can be used for all endpoints, as unused params are ignored. */

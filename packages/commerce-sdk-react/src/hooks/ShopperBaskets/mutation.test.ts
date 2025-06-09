@@ -22,6 +22,7 @@ import {useCustomerBaskets} from '../ShopperCustomers'
 import {ApiClients, Argument} from '../types'
 import {ShopperBasketsMutation, useShopperBasketsMutation} from './mutation'
 import * as queries from './query'
+import {CLIENT_KEYS} from '../../constant'
 
 jest.mock('../../auth/index.ts', () => {
     const {default: mockAuth} = jest.requireActual('../../auth/index.ts')
@@ -29,7 +30,7 @@ jest.mock('../../auth/index.ts', () => {
     return mockAuth
 })
 
-const CLIENT_KEY = 'shopperBaskets' as const
+const CLIENT_KEY = CLIENT_KEYS.SHOPPER_BASKETS
 type Client = NonNullable<ApiClients[typeof CLIENT_KEY]>
 type Basket = ShopperBasketsTypes.Basket
 type BasketsResult = ShopperCustomersTypes.BasketsResult

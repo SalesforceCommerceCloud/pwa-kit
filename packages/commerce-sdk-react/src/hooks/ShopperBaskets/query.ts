@@ -11,7 +11,9 @@ import {mergeOptions, omitNullableParameters, pickValidParams} from '../utils'
 import * as queryKeyHelpers from './queryKeyHelpers'
 import {ShopperBaskets} from 'commerce-sdk-isomorphic'
 import {useResolvedClient} from '../useResolvedClient'
-const CLIENT_KEY = 'shopperBaskets' as const
+import {CLIENT_KEYS} from '../../constant'
+
+const CLIENT_KEY = CLIENT_KEYS.SHOPPER_BASKETS
 type Client = NonNullable<ApiClients[typeof CLIENT_KEY]>
 
 /**

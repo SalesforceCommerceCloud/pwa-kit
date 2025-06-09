@@ -5,11 +5,12 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
+import {CLIENT_KEYS} from '../../constant'
 import {ApiClients, DataType} from '../../hooks/types' // TODO: Should we be moving these types to a more global place.
 
 type ArrayElement<ArrayType extends readonly unknown[]> = ArrayType[number]
 
-const CLIENT_KEY = 'shopperExperience' as const
+const CLIENT_KEY = CLIENT_KEYS.SHOPPER_EXPERIENCE
 type Client = NonNullable<ApiClients[typeof CLIENT_KEY]>
 
 export type Page = DataType<Client['getPage']>

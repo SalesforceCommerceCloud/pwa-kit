@@ -18,6 +18,7 @@ import {
     waitAndExpectError,
     waitAndExpectSuccess
 } from '../../test-utils'
+import {CLIENT_KEYS} from '../../constant'
 
 jest.mock('../../auth/index.ts', () => {
     return jest.fn().mockImplementation(() => ({
@@ -26,7 +27,7 @@ jest.mock('../../auth/index.ts', () => {
     }))
 })
 
-const CLIENT_KEY = 'shopperContexts' as const
+const CLIENT_KEY = CLIENT_KEYS.SHOPPER_CONTEXTS
 type Client = NonNullable<ApiClients[typeof CLIENT_KEY]>
 
 const contextEndpoint = '/shopper/shopper-context/'

@@ -4,6 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
+import {CLIENT_KEYS} from '../../constant'
 import {getCustomerBaskets} from '../ShopperCustomers/queryKeyHelpers'
 import {
     ApiClients,
@@ -16,7 +17,7 @@ import {
 } from '../types'
 import {getOrder} from './queryKeyHelpers'
 
-const CLIENT_KEY = 'shopperOrders' as const
+const CLIENT_KEY = CLIENT_KEYS.SHOPPER_ORDERS
 type Client = NonNullable<ApiClients[typeof CLIENT_KEY]>
 
 /** Parameters that get passed around, includes client config and possible parameters from other endpoints */
