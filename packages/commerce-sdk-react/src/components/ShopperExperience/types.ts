@@ -9,7 +9,8 @@ import {ApiClients, DataType} from '../../hooks/types' // TODO: Should we be mov
 
 type ArrayElement<ArrayType extends readonly unknown[]> = ArrayType[number]
 
-type Client = ApiClients['shopperExperience']
+const CLIENT_KEY = 'shopperExperience' as const
+type Client = NonNullable<ApiClients[typeof CLIENT_KEY]>
 
 export type Page = DataType<Client['getPage']>
 
