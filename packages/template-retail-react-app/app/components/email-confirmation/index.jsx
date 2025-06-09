@@ -11,15 +11,6 @@ import {FormattedMessage} from 'react-intl'
 import {Button, Stack, Text} from '@salesforce/retail-react-app/app/components/shared/ui'
 import {BrandLogo} from '@salesforce/retail-react-app/app/components/icons'
 
-/**
- * PasswordlessEmailConfirmation Component
- */
-
-//* added voiceover functionalities
-
-//added multiple aria-labels to tags
-
-// useRef and useEffect are used here to set focus to the main content for accessibility when the component mounts
 
 const PasswordlessEmailConfirmation = ({form, submitForm, email = ''}) => {
     const contentRef = useRef(null)
