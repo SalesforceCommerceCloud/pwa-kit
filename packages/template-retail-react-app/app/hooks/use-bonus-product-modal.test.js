@@ -6,12 +6,8 @@
  */
 import React from 'react'
 import {renderHook, act} from '@testing-library/react'
-import {
-    useBonusState,
-    BonusProductModalProvider,
-    useBonusProductModalContext
-} from './use-bonus-product-modal'
-import {useAddToCartModalContext} from './use-add-to-cart-modal'
+import {useBonusState} from '@salesforce/retail-react-app/app/hooks/use-bonus-product-modal'
+import {useAddToCartModalContext} from '@salesforce/retail-react-app/app/hooks/use-add-to-cart-modal'
 import {useLocation} from 'react-router-dom'
 
 // Mock the dependencies
