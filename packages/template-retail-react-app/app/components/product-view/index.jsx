@@ -182,7 +182,7 @@ const ProductView = forwardRef(
                     }
                 }
             } catch (e) {
-                showError()
+                // intentionally empty: ignore errors
             }
         }
 
@@ -440,7 +440,7 @@ const ProductView = forwardRef(
                     const storeInfo = JSON.parse(window.localStorage.getItem(storeInfoKey))
                     inventoryId = storeInfo?.inventoryId
                 } catch (e) {
-                    showError()
+                    // intentionally empty: ignore errors
                 }
                 setPickupEnabled(!!inventoryId)
             }
@@ -451,6 +451,44 @@ const ProductView = forwardRef(
                 title: error?.message || 'An error occurred',
                 status: 'error'
             })
+        }
+
+        // Refactored handler for delivery option change
+        const handleDeliveryOptionChange = (value) => {
+            setPickupError('')
+            if (value === 'pickup') {
+                if (pickupEnabled) {
+                    const storeInfoKey = `store_${site.id}`
+                    let inventoryId = null
+                    let storeName = null
+                    try {
+                        const storeInfo = JSON.parse(window.localStorage.getItem(storeInfoKey))
+                        inventoryId = storeInfo?.inventoryId
+                        storeName = storeInfo?.name
+                    } catch (e) {
+                        showError()
+                    }
+                    if (inventoryId && product?.inventories) {
+                        const inventoryObj = product.inventories.find(
+                            (inv) => inv.id === inventoryId
+                        )
+                        if (!inventoryObj?.orderable) {
+                            setPickupInStore(false)
+                            setPickupError(
+                                intl.formatMessage(
+                                    {
+                                        id: 'product_view.error.not_available_for_pickup',
+                                        defaultMessage: 'Out of Stock in {storeName}'
+                                    },
+                                    {storeName: storeName || ''}
+                                )
+                            )
+                            return
+                        }
+                    }
+                }
+            }
+            setPickupInStore(value === 'pickup')
         }
 
         return (
@@ -705,48 +743,7 @@ const ProductView = forwardRef(
                                     </Text>
                                     <RadioGroup
                                         value={pickupInStore ? 'pickup' : 'ship'}
-                                        onChange={(value) => {
-                                            setPickupError('')
-                                            if (value === 'pickup') {
-                                                if (pickupEnabled) {
-                                                    const storeInfoKey = `store_${site.id}`
-                                                    let inventoryId = null
-                                                    let storeName = null
-                                                    try {
-                                                        const storeInfo = JSON.parse(
-                                                            window.localStorage.getItem(
-                                                                storeInfoKey
-                                                            )
-                                                        )
-                                                        inventoryId = storeInfo?.inventoryId
-                                                        storeName = storeInfo?.name
-                                                    } catch (e) {
-                                                        showError()
-                                                    }
-                                                    if (inventoryId && product?.inventories) {
-                                                        const inventoryObj =
-                                                            product.inventories.find(
-                                                                (inv) => inv.id === inventoryId
-                                                            )
-                                                        if (!inventoryObj?.orderable) {
-                                                            setPickupInStore(false)
-                                                            setPickupError(
-                                                                intl.formatMessage(
-                                                                    {
-                                                                        id: 'product_view.error.not_available_for_pickup',
-                                                                        defaultMessage:
-                                                                            'Out of Stock in {storeName}'
-                                                                    },
-                                                                    {storeName: storeName || ''}
-                                                                )
-                                                            )
-                                                            return
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                            setPickupInStore(value === 'pickup')
-                                        }}
+                                        onChange={handleDeliveryOptionChange}
                                         mb={1}
                                     >
                                         <Stack direction="column" spacing={2}>
