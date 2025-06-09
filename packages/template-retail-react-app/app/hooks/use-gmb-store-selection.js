@@ -348,10 +348,42 @@ const useGMBStoreSelection = () => {
             const selectedStore = findMatchingStore(storeSearchData.data, searchCriteria) || storeSearchData.data[0]
             
             if (selectedStore) {
+                // Determine which search parameters were used to find this store
+                let gmbSearchParams = {}
+                if (locationData.latitude && locationData.longitude) {
+                    gmbSearchParams = {
+                        latitude: locationData.latitude,
+                        longitude: locationData.longitude,
+                        countryCode: selectedStore?.countryCode
+                    }
+                } else if (locationData.zipcode) {
+                    gmbSearchParams = {
+                        postalCode: locationData.zipcode,
+                        countryCode: countryCode
+                    }
+                } else if (locationData.city && cityCoords) {
+                    if (cityCoords.postalCode) {
+                        gmbSearchParams = {
+                            postalCode: cityCoords.postalCode,
+                            countryCode: cityCoords.country
+                        }
+                    } else {
+                        gmbSearchParams = {
+                            latitude: cityCoords.lat,
+                            longitude: cityCoords.lng,
+                            countryCode: cityCoords.country
+                        }
+                    }
+                }
+
+                // Add GMB flag to distinguish from manual selections and store search context
                 window.localStorage.setItem(storeInfoKey, JSON.stringify({
                     id: selectedStore.id,
                     name: selectedStore.name || null,
-                    inventoryId: selectedStore.inventoryId || null
+                    inventoryId: selectedStore.inventoryId || null,
+                    isGMBSelection: true, // Flag to indicate this was a GMB selection
+                    timestamp: Date.now(), // Add timestamp for potential future use
+                    gmbSearchParams: gmbSearchParams // Store the search parameters that found this store
                 }))
                 
                 if (locationData.latitude && locationData.longitude) {
@@ -406,7 +438,24 @@ const useGMBStoreSelection = () => {
                            urlParams.has('zipcode') || urlParams.has('postal') || urlParams.has('city') || 
                            urlParams.has('store') || urlParams.has('country')
 
-        if (!hasGMBParams) return
+        if (!hasGMBParams) {
+            // Check if there's an existing GMB selection that should be displayed
+            const existingStore = window.localStorage.getItem(storeInfoKey)
+            if (existingStore) {
+                try {
+                    const storeData = JSON.parse(existingStore)
+                    // If this is a GMB selection and we don't have URL parameters, 
+                    // we don't need to do anything - let the existing selection persist
+                    if (storeData.isGMBSelection) {
+                        // GMB selection persists, no action needed
+                        return
+                    }
+                } catch (e) {
+                    // Invalid localStorage data, ignore
+                }
+            }
+            return
+        }
 
         const lat = urlParams.get('lat') || urlParams.get('latitude')
         const lng = urlParams.get('lng') || urlParams.get('longitude') || urlParams.get('lon')
@@ -454,7 +503,7 @@ const useGMBStoreSelection = () => {
                 countryCode: finalCountryCode
             })
         }
-    }, [getCountryForPostalSearch])
+    }, [getCountryForPostalSearch, storeInfoKey])
 
     return {
         isProcessing: isProcessing || isLoadingStores,

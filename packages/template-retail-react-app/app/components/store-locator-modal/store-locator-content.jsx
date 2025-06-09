@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, {useState, useContext, useMemo} from 'react'
+import React, {useState, useContext, useMemo, useEffect} from 'react'
 import {useIntl} from 'react-intl'
 
 // Components
@@ -58,6 +58,7 @@ const StoreLocatorContent = () => {
     })
 
     const [numStoresToShow, setNumStoresToShow] = useState(limit)
+
     // Either the countryCode & postalCode or latitude & longitude are defined, never both
     const {
         data: searchStoresData,

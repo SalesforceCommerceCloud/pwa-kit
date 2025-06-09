@@ -24,20 +24,63 @@ import {
     DEFAULT_STORE_LOCATOR_POSTAL_CODE,
     STORE_LOCATOR_NUM_STORES_PER_LOAD
 } from '@salesforce/retail-react-app/app/constants'
+import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
 
 export const StoreLocatorContext = createContext()
 export const useStoreLocator = (initialParams) => {
+    const {site} = useMultiSite()
     const [userHasSetManualGeolocation, setUserHasSetManualGeolocation] = useState(false)
     const [automaticGeolocationHasFailed, setAutomaticGeolocationHasFailed] = useState(false)
     const [userWantsToShareLocation, setUserWantsToShareLocation] = useState(false)
 
-    const [searchStoresParams, setSearchStoresParams] = useState({
-        countryCode: initialParams?.countryCode || DEFAULT_STORE_LOCATOR_COUNTRY.countryCode,
-        postalCode: initialParams?.postalCode || DEFAULT_STORE_LOCATOR_POSTAL_CODE,
-        latitude: initialParams?.latitude,
-        longitude: initialParams?.longitude,
-        limit: initialParams?.limit || STORE_LOCATOR_NUM_STORES_PER_LOAD
-    })
+    // Function to get search parameters that will include existing GMB selection
+    const getSearchParamsForGMBSelection = () => {
+        if (initialParams) {
+            // If we have explicit initialParams, use them
+            return {
+                countryCode: initialParams.countryCode || DEFAULT_STORE_LOCATOR_COUNTRY.countryCode,
+                postalCode: initialParams.postalCode || DEFAULT_STORE_LOCATOR_POSTAL_CODE,
+                latitude: initialParams.latitude,
+                longitude: initialParams.longitude,
+                limit: initialParams.limit || STORE_LOCATOR_NUM_STORES_PER_LOAD
+            }
+        }
+
+        try {
+            const storeInfoKey = `store_${site.id}`
+            const existingStore = window.localStorage.getItem(storeInfoKey)
+            if (existingStore) {
+                const storeData = JSON.parse(existingStore)
+                
+                // Use stored search parameters for GMB selections
+                if (storeData.isGMBSelection && storeData.gmbSearchParams) {
+                    return {
+                        ...storeData.gmbSearchParams,
+                        limit: STORE_LOCATOR_NUM_STORES_PER_LOAD
+                    }
+                }
+                
+                // Use stored search parameters for manual selections
+                if (!storeData.isGMBSelection && storeData.manualSearchParams) {
+                    return {
+                        ...storeData.manualSearchParams,
+                        limit: STORE_LOCATOR_NUM_STORES_PER_LOAD
+                    }
+                }
+            }
+        } catch (e) {
+            // Invalid localStorage data, ignore
+        }
+
+        // Fallback to defaults (when no stored data exists)
+        return {
+            countryCode: DEFAULT_STORE_LOCATOR_COUNTRY.countryCode,
+            postalCode: DEFAULT_STORE_LOCATOR_POSTAL_CODE,
+            limit: STORE_LOCATOR_NUM_STORES_PER_LOAD
+        }
+    }
+
+    const [searchStoresParams, setSearchStoresParams] = useState(() => getSearchParamsForGMBSelection())
     
     // Update search parameters when initialParams are provided (for GMB)
     useEffect(() => {

@@ -30,21 +30,55 @@ const StoresList = ({storesInfo}) => {
     const storeInfoKey = `store_${site.id}`
     const [selectedStore, setSelectedStore] = useState('')
 
+    // Consolidated useEffect to handle localStorage reading and selection preservation
     useEffect(() => {
-        setSelectedStore(JSON.parse(window.localStorage.getItem(storeInfoKey))?.id || '')
-    }, [storeInfoKey])
+        const existingStore = window.localStorage.getItem(storeInfoKey)
+        
+        if (existingStore) {
+            try {
+                const storeData = JSON.parse(existingStore)
+                
+                if (storeData.id) {
+                    setSelectedStore(storeData.id)
+                }
+            } catch (e) {
+                // Invalid localStorage data, ignore
+            }
+        } else {
+            setSelectedStore('')
+        }
+    }, [storeInfoKey, storesInfo]) // Adding storesInfo as dependency to re-run when stores load
 
     const handleChange = (storeId) => {
         setSelectedStore(storeId)
         const store = storesInfo.find((store) => store.id === storeId)
-        window.localStorage.setItem(
-            storeInfoKey,
-            JSON.stringify({
-                id: storeId,
-                name: store.name || null,
-                inventoryId: store.inventoryId || null
-            })
-        )
+        
+        // For manual selections, we need to store search parameters that will include this store
+        // Use the store's location to determine appropriate search parameters
+        const manualSearchParams = {}
+        if (store.postalCode && store.countryCode) {
+            manualSearchParams.postalCode = store.postalCode
+            manualSearchParams.countryCode = store.countryCode
+        } else if (store.latitude && store.longitude) {
+            manualSearchParams.latitude = store.latitude
+            manualSearchParams.longitude = store.longitude
+            manualSearchParams.countryCode = store.countryCode
+        } else if (store.countryCode) {
+            // Fallback: just use the store's country
+            manualSearchParams.countryCode = store.countryCode
+        }
+        
+        // Save the new manual selection with search context
+        const newStoreData = {
+            id: storeId,
+            name: store.name || null,
+            inventoryId: store.inventoryId || null,
+            isGMBSelection: false, // Explicitly mark as manual selection
+            timestamp: Date.now(),
+            manualSearchParams: manualSearchParams // Store search params for manual selections
+        }
+        
+        window.localStorage.setItem(storeInfoKey, JSON.stringify(newStoreData))
     }
 
     return (
