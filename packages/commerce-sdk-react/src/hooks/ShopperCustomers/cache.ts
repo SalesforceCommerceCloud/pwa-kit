@@ -17,7 +17,9 @@ import {
 } from './queryKeyHelpers'
 import {and, clone, pathStartsWith} from '../utils'
 
-type Client = ApiClients['shopperCustomers']
+const CLIENT_KEY = 'shopperCustomers' as const
+type Client = NonNullable<ApiClients[typeof CLIENT_KEY]>
+
 type Customer = ShopperCustomersTypes.Customer
 type CustomerProductList = ShopperCustomersTypes.CustomerProductList
 type CustomerProductListResult = ShopperCustomersTypes.CustomerProductListResult

@@ -25,7 +25,8 @@ jest.mock('../../auth/index.ts', () => {
     return mockAuth
 })
 
-type Client = ApiClients['shopperCustomers']
+const CLIENT_KEY = 'shopperCustomers' as const
+type Client = NonNullable<ApiClients[typeof CLIENT_KEY]>
 const customersEndpoint = '/customer/shopper-customers/'
 /** All Shopper Customers parameters. Can be used for all endpoints, as unused params are ignored. */
 const PARAMETERS = {

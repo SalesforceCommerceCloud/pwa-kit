@@ -86,7 +86,7 @@ export type ApiClientConfigParams = {
 export interface ApiClients {
     shopperBaskets?: ShopperBaskets<ApiClientConfigParams>
     shopperContexts?: ShopperContexts<ApiClientConfigParams>
-    shopperCustomers: ShopperCustomers<ApiClientConfigParams>
+    shopperCustomers?: ShopperCustomers<ApiClientConfigParams>
     shopperExperience: ShopperExperience<ApiClientConfigParams>
     shopperGiftCertificates: ShopperGiftCertificates<ApiClientConfigParams>
     shopperLogin: ShopperLogin<ApiClientConfigParams>

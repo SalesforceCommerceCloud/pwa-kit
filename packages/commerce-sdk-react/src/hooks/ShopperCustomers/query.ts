@@ -7,12 +7,13 @@
 import {UseQueryResult} from '@tanstack/react-query'
 import {ShopperCustomers} from 'commerce-sdk-isomorphic'
 import {ApiClients, ApiQueryOptions, Argument, DataType, NullableParameters} from '../types'
-import useCommerceApi from '../useCommerceApi'
 import {useQuery} from '../useQuery'
 import {mergeOptions, omitNullableParameters, pickValidParams} from '../utils'
 import * as queryKeyHelpers from './queryKeyHelpers'
+import { useResolvedClient } from '../useResolvedClient'
 
-type Client = ApiClients['shopperCustomers']
+const CLIENT_KEY = 'shopperCustomers' as const
+type Client = NonNullable<ApiClients[typeof CLIENT_KEY]>
 
 // TODO: Re-implement (and update description from RAML spec) when the endpoint exits closed beta.
 // /**
@@ -68,7 +69,7 @@ export const useCustomer = (
 ): UseQueryResult<DataType<Client['getCustomer']>> => {
     type Options = Argument<Client['getCustomer']>
     type Data = DataType<Client['getCustomer']>
-    const {shopperCustomers: client} = useCommerceApi()
+    const client = useResolvedClient(CLIENT_KEY)
     const methodName = 'getCustomer'
     const requiredParameters = ShopperCustomers.paramKeys[`${methodName}Required`]
 
@@ -111,7 +112,7 @@ export const useCustomerAddress = (
 ): UseQueryResult<DataType<Client['getCustomerAddress']>> => {
     type Options = Argument<Client['getCustomerAddress']>
     type Data = DataType<Client['getCustomerAddress']>
-    const {shopperCustomers: client} = useCommerceApi()
+    const client = useResolvedClient(CLIENT_KEY)
     const methodName = 'getCustomerAddress'
     const requiredParameters = ShopperCustomers.paramKeys[`${methodName}Required`]
 
@@ -156,7 +157,7 @@ export const useCustomerBaskets = (
 ): UseQueryResult<DataType<Client['getCustomerBaskets']>> => {
     type Options = Argument<Client['getCustomerBaskets']>
     type Data = DataType<Client['getCustomerBaskets']>
-    const {shopperCustomers: client} = useCommerceApi()
+    const client = useResolvedClient(CLIENT_KEY)
     const methodName = 'getCustomerBaskets'
     const requiredParameters = ShopperCustomers.paramKeys[`${methodName}Required`]
 
@@ -203,7 +204,7 @@ export const useCustomerOrders = (
 ): UseQueryResult<DataType<Client['getCustomerOrders']>> => {
     type Options = Argument<Client['getCustomerOrders']>
     type Data = DataType<Client['getCustomerOrders']>
-    const {shopperCustomers: client} = useCommerceApi()
+    const client = useResolvedClient(CLIENT_KEY)
     const methodName = 'getCustomerOrders'
     const requiredParameters = ShopperCustomers.paramKeys[`${methodName}Required`]
 
@@ -248,7 +249,7 @@ export const useCustomerPaymentInstrument = (
 ): UseQueryResult<DataType<Client['getCustomerPaymentInstrument']>> => {
     type Options = Argument<Client['getCustomerPaymentInstrument']>
     type Data = DataType<Client['getCustomerPaymentInstrument']>
-    const {shopperCustomers: client} = useCommerceApi()
+    const client = useResolvedClient(CLIENT_KEY)
     const methodName = 'getCustomerPaymentInstrument'
     const requiredParameters = ShopperCustomers.paramKeys[`${methodName}Required`]
 
@@ -293,7 +294,7 @@ export const useCustomerProductLists = (
 ): UseQueryResult<DataType<Client['getCustomerProductLists']>> => {
     type Options = Argument<Client['getCustomerProductLists']>
     type Data = DataType<Client['getCustomerProductLists']>
-    const {shopperCustomers: client} = useCommerceApi()
+    const client = useResolvedClient(CLIENT_KEY)
     const methodName = 'getCustomerProductLists'
     const requiredParameters = ShopperCustomers.paramKeys[`${methodName}Required`]
 
@@ -338,7 +339,7 @@ export const useCustomerProductList = (
 ): UseQueryResult<DataType<Client['getCustomerProductList']>> => {
     type Options = Argument<Client['getCustomerProductList']>
     type Data = DataType<Client['getCustomerProductList']>
-    const {shopperCustomers: client} = useCommerceApi()
+    const client = useResolvedClient(CLIENT_KEY)
     const methodName = 'getCustomerProductList'
     const requiredParameters = ShopperCustomers.paramKeys[`${methodName}Required`]
 
@@ -383,7 +384,7 @@ export const useCustomerProductListItem = (
 ): UseQueryResult<DataType<Client['getCustomerProductListItem']>> => {
     type Options = Argument<Client['getCustomerProductListItem']>
     type Data = DataType<Client['getCustomerProductListItem']>
-    const {shopperCustomers: client} = useCommerceApi()
+    const client = useResolvedClient(CLIENT_KEY)
     const methodName = 'getCustomerProductListItem'
     const requiredParameters = ShopperCustomers.paramKeys[`${methodName}Required`]
 
@@ -428,7 +429,7 @@ export const usePublicProductListsBySearchTerm = (
 ): UseQueryResult<DataType<Client['getPublicProductListsBySearchTerm']>> => {
     type Options = Argument<Client['getPublicProductListsBySearchTerm']>
     type Data = DataType<Client['getPublicProductListsBySearchTerm']>
-    const {shopperCustomers: client} = useCommerceApi()
+    const client = useResolvedClient(CLIENT_KEY)
     const methodName = 'getPublicProductListsBySearchTerm'
     const requiredParameters = ShopperCustomers.paramKeys[`${methodName}Required`]
 
@@ -473,7 +474,7 @@ export const usePublicProductList = (
 ): UseQueryResult<DataType<Client['getPublicProductList']>> => {
     type Options = Argument<Client['getPublicProductList']>
     type Data = DataType<Client['getPublicProductList']>
-    const {shopperCustomers: client} = useCommerceApi()
+    const client = useResolvedClient(CLIENT_KEY)
     const methodName = 'getPublicProductList'
     const requiredParameters = ShopperCustomers.paramKeys[`${methodName}Required`]
 
@@ -518,7 +519,7 @@ export const useProductListItem = (
 ): UseQueryResult<DataType<Client['getProductListItem']>> => {
     type Options = Argument<Client['getProductListItem']>
     type Data = DataType<Client['getProductListItem']>
-    const {shopperCustomers: client} = useCommerceApi()
+    const client = useResolvedClient(CLIENT_KEY)
     const methodName = 'getProductListItem'
     const requiredParameters = ShopperCustomers.paramKeys[`${methodName}Required`]
 
