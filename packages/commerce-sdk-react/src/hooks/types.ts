@@ -91,7 +91,7 @@ export interface ApiClients {
     shopperGiftCertificates?: ShopperGiftCertificates<ApiClientConfigParams>
     shopperLogin?: ShopperLogin<ApiClientConfigParams>
     shopperOrders?: ShopperOrders<ApiClientConfigParams>
-    shopperProducts: ShopperProducts<ApiClientConfigParams>
+    shopperProducts?: ShopperProducts<ApiClientConfigParams>
     shopperPromotions: ShopperPromotions<ApiClientConfigParams>
     shopperSearch: ShopperSearch<ApiClientConfigParams>
     shopperSeo: ShopperSeo<ApiClientConfigParams>
