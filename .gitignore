@@ -14,5 +14,5 @@ lerna-debug.log
 /test-results/
 /playwright-report/
 /playwright/.cache/
-my-test-project/
+
 
