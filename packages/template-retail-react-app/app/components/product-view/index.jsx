@@ -439,9 +439,8 @@ const ProductView = forwardRef(
                 try {
                     const storeInfo = JSON.parse(window.localStorage.getItem(storeInfoKey))
                     inventoryId = storeInfo?.inventoryId
-                    // storeName and storeStockStatus are not used, so removed
                 } catch (e) {
-                    // intentionally empty: ignore errors
+                    showError()
                 }
                 setPickupEnabled(!!inventoryId)
             }
