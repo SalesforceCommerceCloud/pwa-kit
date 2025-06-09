@@ -32,7 +32,7 @@ module.exports = {
                 landingPath: '/reset-password-landing'
             }
         },
-        defaultSite: 'RefArch',
+        defaultSite: 'RefArchGlobal',
         siteAliases: {
             RefArch: 'us',
             RefArchGlobal: 'global'

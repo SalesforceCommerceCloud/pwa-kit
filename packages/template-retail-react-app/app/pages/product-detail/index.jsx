@@ -138,8 +138,7 @@ const ProductDetail = () => {
     let bundleChildVariantIds = ''
     if (isProductABundle)
         bundleChildVariantIds = Object.keys(childProductSelection)
-            // TODO: maybe if bundles/sets have standard products?
-            ?.map((key) => childProductSelection[key].variant.productId || childProductSelection[key].product.id)
+            ?.map((key) => childProductSelection[key].variant.productId)
             .join(',')
 
     const {data: bundleChildrenData} = useProducts(
@@ -372,8 +371,7 @@ const ProductDetail = () => {
                     // with the chosen variant selections
                     bundledProductItems: childProductSelections.map((child) => {
                         return {
-                            // TODO: standard product in bundles/sets?
-                            productId: child.variant.productId || child.product.id,
+                            productId: child.variant.productId,
                             quantity: child.quantity
                         }
                     })
