@@ -10,7 +10,7 @@ import {useQuery} from '../useQuery'
 import {mergeOptions, omitNullableParameters, pickValidParams} from '../utils'
 import * as queryKeyHelpers from './queryKeyHelpers'
 import {ShopperContexts} from 'commerce-sdk-isomorphic'
-import { useResolvedClient } from '../useResolvedClient'
+import {useResolvedClient} from '../useResolvedClient'
 
 const CLIENT_KEY = 'shopperContexts' as const
 type Client = NonNullable<ApiClients[typeof CLIENT_KEY]>

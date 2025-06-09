@@ -53,7 +53,9 @@ const newBasket: Basket = {basketId: BASKET_ID, mockData: 'new basket'}
 // --- getCustomerBaskets constants --- //
 const customersEndpoint = '/customer/shopper-customers/'
 const CUSTOMER_ID = 'customer_id'
-const getCustomerBasketsOptions: Argument<NonNullable<ApiClients['shopperCustomers']>['getCustomerBaskets']> = {
+const getCustomerBasketsOptions: Argument<
+    NonNullable<ApiClients['shopperCustomers']>['getCustomerBaskets']
+> = {
     parameters: {
         customerId: CUSTOMER_ID
     }
