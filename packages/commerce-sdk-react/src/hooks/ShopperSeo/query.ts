@@ -7,12 +7,13 @@
 import {UseQueryResult} from '@tanstack/react-query'
 import {ShopperSeo} from 'commerce-sdk-isomorphic'
 import {ApiClients, ApiQueryOptions, Argument, DataType, NullableParameters} from '../types'
-import useCommerceApi from '../useCommerceApi'
 import {useQuery} from '../useQuery'
 import {mergeOptions, omitNullableParameters, pickValidParams} from '../utils'
 import * as queryKeyHelpers from './queryKeyHelpers'
+import {useResolvedClient} from '../useResolvedClient'
 
-type Client = ApiClients['shopperSeo']
+const CLIENT_KEY = 'shopperSeo' as const
+type Client = NonNullable<ApiClients[typeof CLIENT_KEY]>
 
 /**
  * Gets URL mapping information for a URL that a shopper clicked or typed in.
@@ -34,7 +35,7 @@ export const useUrlMapping = (
 ): UseQueryResult<DataType<Client['getUrlMapping']>> => {
     type Options = Argument<Client['getUrlMapping']>
     type Data = DataType<Client['getUrlMapping']>
-    const {shopperSeo: client} = useCommerceApi()
+    const client = useResolvedClient(CLIENT_KEY)
     const methodName = 'getUrlMapping'
     const requiredParameters = ShopperSeo.paramKeys[`${methodName}Required`]
 
