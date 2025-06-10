@@ -174,6 +174,9 @@
   "cart.info.removed_from_cart": {
     "defaultMessage": "항목이 카트에서 제거됨"
   },
+  "cart.product_edit_modal.modal_label": {
+    "defaultMessage": "{productName}에 대한 모달 편집"
+  },
   "cart.recommended_products.title.may_also_like": {
     "defaultMessage": "추천 상품"
   },
@@ -203,6 +206,9 @@
   },
   "cart_title.title.cart_num_of_items": {
     "defaultMessage": "카트({itemCount, plural, =0 {0개 항목} one {#개 항목} other {#개 항목}})"
+  },
+  "category_links.button_text": {
+    "defaultMessage": "카테고리"
   },
   "cc_radio_group.action.remove": {
     "defaultMessage": "제거"
@@ -260,6 +266,9 @@
   },
   "checkout_confirmation.label.shipping": {
     "defaultMessage": "배송"
+  },
+  "checkout_confirmation.label.shipping.strikethrough.price": {
+    "defaultMessage": "원래 가격: {originalPrice} , 현재 가격: {newPrice}"
   },
   "checkout_confirmation.label.subtotal": {
     "defaultMessage": "소계"
@@ -319,6 +328,9 @@
   "checkout_payment.heading.credit_card": {
     "defaultMessage": "신용카드"
   },
+  "checkout_payment.label.billing_address_form": {
+    "defaultMessage": "청구 주소 양식"
+  },
   "checkout_payment.label.same_as_shipping": {
     "defaultMessage": "배송 주소와 동일"
   },
@@ -334,6 +346,12 @@
   "confirmation_modal.default.action.yes": {
     "defaultMessage": "예"
   },
+  "confirmation_modal.default.assistive_msg.no": {
+    "defaultMessage": "아니요, 작업을 취소합니다."
+  },
+  "confirmation_modal.default.assistive_msg.yes": {
+    "defaultMessage": "예, 작업을 확인합니다"
+  },
   "confirmation_modal.default.message.you_want_to_continue": {
     "defaultMessage": "계속하시겠습니까?"
   },
@@ -347,6 +365,15 @@
     "defaultMessage": "제거"
   },
   "confirmation_modal.remove_cart_item.action.yes": {
+    "defaultMessage": "예. 항목을 제거합니다."
+  },
+  "confirmation_modal.remove_cart_item.assistive_msg.no": {
+    "defaultMessage": "아니요. 항목을 그대로 둡니다."
+  },
+  "confirmation_modal.remove_cart_item.assistive_msg.remove": {
+    "defaultMessage": "사용할 수 없는 제품 제거"
+  },
+  "confirmation_modal.remove_cart_item.assistive_msg.yes": {
     "defaultMessage": "예. 항목을 제거합니다."
   },
   "confirmation_modal.remove_cart_item.message.need_to_remove_due_to_unavailability": {
@@ -405,6 +432,21 @@
   "credit_card_fields.tool_tip.security_code_aria_label": {
     "defaultMessage": "보안 코드 정보"
   },
+  "display_price.assistive_msg.current_price": {
+    "defaultMessage": "현재 가격 {currentPrice}"
+  },
+  "display_price.assistive_msg.current_price_with_range": {
+    "defaultMessage": "현재 가격 {currentPrice}에서"
+  },
+  "display_price.assistive_msg.strikethrough_price": {
+    "defaultMessage": "원래 가격 {listPrice}"
+  },
+  "display_price.assistive_msg.strikethrough_price_with_range": {
+    "defaultMessage": "원래 가격 {listPrice}에서"
+  },
+  "display_price.label.current_price_with_range": {
+    "defaultMessage": "{currentPrice}부터 시작"
+  },
   "drawer_menu.button.account_details": {
     "defaultMessage": "계정 세부 정보"
   },
@@ -419,6 +461,9 @@
   },
   "drawer_menu.button.order_history": {
     "defaultMessage": "주문 내역"
+  },
+  "drawer_menu.header.assistive_msg.title": {
+    "defaultMessage": "메뉴 서랍"
   },
   "drawer_menu.link.about_us": {
     "defaultMessage": "회사 정보"
@@ -582,6 +627,9 @@
   "header.button.assistive_msg.menu": {
     "defaultMessage": "메뉴"
   },
+  "header.button.assistive_msg.menu.open_dialog": {
+    "defaultMessage": "대화창 열기"
+  },
   "header.button.assistive_msg.my_account": {
     "defaultMessage": "내 계정"
   },
@@ -590,6 +638,9 @@
   },
   "header.button.assistive_msg.my_cart_with_num_items": {
     "defaultMessage": "내 카트, 품목 수: {numItems}"
+  },
+  "header.button.assistive_msg.store_locator": {
+    "defaultMessage": "매장 찾기"
   },
   "header.button.assistive_msg.wishlist": {
     "defaultMessage": "위시리스트"
@@ -691,6 +742,9 @@
   "item_attributes.label.quantity": {
     "defaultMessage": "수량: {quantity}"
   },
+  "item_attributes.label.selected_options": {
+    "defaultMessage": "선택한 옵션"
+  },
   "item_image.label.sale": {
     "defaultMessage": "판매",
     "description": "A sale badge placed on top of a product image"
@@ -699,8 +753,11 @@
     "defaultMessage": "사용 불가",
     "description": "A unavailable badge placed on top of a product image"
   },
-  "item_price.label.starting_at": {
-    "defaultMessage": "시작가"
+  "item_variant.assistive_msg.quantity": {
+    "defaultMessage": "수량 {quantity}"
+  },
+  "item_variant.quantity.label": {
+    "defaultMessage": "{productName}에 대한 수량 선택기 선택한 수량은 {quantity}개입니다."
   },
   "lCPCxk": {
     "defaultMessage": "위에서 옵션을 모두 선택하세요."
@@ -1063,8 +1120,17 @@
   "product_tile.assistive_msg.remove_from_wishlist": {
     "defaultMessage": "위시리스트에서 {product} 제거"
   },
-  "product_tile.label.starting_at_price": {
-    "defaultMessage": "시작가: {price}"
+  "product_tile.badge.label.new": {
+    "defaultMessage": "신규"
+  },
+  "product_tile.badge.label.sale": {
+    "defaultMessage": "판매"
+  },
+  "product_view.button.add_bundle_to_cart": {
+    "defaultMessage": "카트에 번들 추가"
+  },
+  "product_view.button.add_bundle_to_wishlist": {
+    "defaultMessage": "위시리스트에 번들 추가"
   },
   "product_view.button.add_set_to_cart": {
     "defaultMessage": "카트에 세트 추가"
@@ -1082,10 +1148,10 @@
     "defaultMessage": "업데이트"
   },
   "product_view.label.assistive_msg.quantity_decrement": {
-    "defaultMessage": "수량 줄이기"
+    "defaultMessage": "{productName}의 감소 수량"
   },
   "product_view.label.assistive_msg.quantity_increment": {
-    "defaultMessage": "수량 늘리기"
+    "defaultMessage": "{productName}에 대한 증분 수량"
   },
   "product_view.label.quantity": {
     "defaultMessage": "수량"
@@ -1095,9 +1161,6 @@
   },
   "product_view.label.quantity_increment": {
     "defaultMessage": "+"
-  },
-  "product_view.label.starting_at_price": {
-    "defaultMessage": "시작가"
   },
   "product_view.label.variant_type": {
     "defaultMessage": "{variantType}"
@@ -1151,7 +1214,7 @@
     "defaultMessage": "이제 시작하세요!"
   },
   "register_form.message.agree_to_policy_terms": {
-    "defaultMessage": "계정을 만들면 Salesforce <policy>개인정보보호 정책</policy>과 <terms>이용 약관</terms>에 동의한 것으로 간주됩니다."
+    "defaultMessage": "계정을 만들면 Salesforce <policy>개인정보 보호정책</policy> 및 <terms>약관</terms>에 동의하는 것입니다."
   },
   "register_form.message.already_have_account": {
     "defaultMessage": "계정이 이미 있습니까?"
@@ -1195,6 +1258,15 @@
   },
   "shipping_address.button.continue_to_shipping": {
     "defaultMessage": "배송 방법으로 계속 진행하기"
+  },
+  "shipping_address.label.edit_button": {
+    "defaultMessage": "{address} 편집"
+  },
+  "shipping_address.label.remove_button": {
+    "defaultMessage": "{address} 제거"
+  },
+  "shipping_address.label.shipping_address_form": {
+    "defaultMessage": "배송 주소 양식"
   },
   "shipping_address.title.shipping_address": {
     "defaultMessage": "배송 주소"
@@ -1241,11 +1313,80 @@
   "signout_confirmation_dialog.message.sure_to_sign_out": {
     "defaultMessage": "로그아웃하시겠습니까? 현재 주문을 처리하려면 다시 로그인해야 합니다."
   },
+  "store_locator.action.find": {
+    "defaultMessage": "찾기"
+  },
+  "store_locator.action.select_a_country": {
+    "defaultMessage": "국가 선택"
+  },
+  "store_locator.action.use_my_location": {
+    "defaultMessage": "내 위치 사용"
+  },
+  "store_locator.action.viewMore": {
+    "defaultMessage": "자세히 보기"
+  },
+  "store_locator.description.away": {
+    "defaultMessage": "떨어진 곳에 위치"
+  },
+  "store_locator.description.loading_locations": {
+    "defaultMessage": "위치 로드 중..."
+  },
+  "store_locator.description.no_locations": {
+    "defaultMessage": "죄송하지만 이 지역에는 위치가 없습니다."
+  },
+  "store_locator.description.or": {
+    "defaultMessage": "Or"
+  },
+  "store_locator.description.phone": {
+    "defaultMessage": "전화번호:"
+  },
+  "store_locator.description.viewing_near_postal_code": {
+    "defaultMessage": "{postalCode}에서 {distance}{distanceUnit} 내에 위치한 매장 보기"
+  },
+  "store_locator.description.viewing_near_your_location": {
+    "defaultMessage": "현재 위치에서 가까운 매장 보기"
+  },
+  "store_locator.dropdown.germany": {
+    "defaultMessage": "독일"
+  },
+  "store_locator.dropdown.united_states": {
+    "defaultMessage": "미국"
+  },
+  "store_locator.error.agree_to_share_your_location": {
+    "defaultMessage": "위치 공유에 동의하십시오."
+  },
+  "store_locator.error.please_enter_a_postal_code": {
+    "defaultMessage": "우편번호를 입력해 주세요."
+  },
+  "store_locator.error.please_select_a_country": {
+    "defaultMessage": "국가를 선택하십시오."
+  },
+  "store_locator.field.placeholder.enter_postal_code": {
+    "defaultMessage": "우편번호 입력"
+  },
+  "store_locator.pagination.load_more": {
+    "defaultMessage": "추가 로드"
+  },
+  "store_locator.title": {
+    "defaultMessage": "매장 찾기"
+  },
   "swatch_group.selected.label": {
     "defaultMessage": "{label}:"
   },
   "toggle_card.action.edit": {
     "defaultMessage": "편집"
+  },
+  "toggle_card.action.editContactInfo": {
+    "defaultMessage": "연락처 정보 편집"
+  },
+  "toggle_card.action.editPaymentInfo": {
+    "defaultMessage": "결제 정보 편집"
+  },
+  "toggle_card.action.editShippingAddress": {
+    "defaultMessage": "배송 주소 편집"
+  },
+  "toggle_card.action.editShippingOptions": {
+    "defaultMessage": "배송 옵션 편집"
   },
   "update_password_fields.button.forgot_password": {
     "defaultMessage": "암호가 기억나지 않습니까?"
@@ -1260,7 +1401,8 @@
     "defaultMessage": "전화번호를 입력하십시오."
   },
   "use_address_fields.error.please_enter_your_postal_or_zip": {
-    "defaultMessage": "우편번호를 입력하십시오."
+    "defaultMessage": "우편번호를 입력하십시오.",
+    "description": "Error message for a blank zip code (US-specific checkout)"
   },
   "use_address_fields.error.please_select_your_address": {
     "defaultMessage": "주소를 입력하십시오."
@@ -1272,7 +1414,8 @@
     "defaultMessage": "국가를 선택하십시오."
   },
   "use_address_fields.error.please_select_your_state_or_province": {
-    "defaultMessage": "시/도를 선택하십시오."
+    "defaultMessage": "주를 선택하십시오.",
+    "description": "Error message for a blank state (US-specific checkout)"
   },
   "use_address_fields.error.required": {
     "defaultMessage": "필수"
@@ -1373,8 +1516,14 @@
   "use_product.message.inventory_remaining": {
     "defaultMessage": "품절 임박({stockLevel}개 남음)"
   },
+  "use_product.message.inventory_remaining_for_product": {
+    "defaultMessage": "{productName}이(가) {stockLevel}개 남았습니다!"
+  },
   "use_product.message.out_of_stock": {
     "defaultMessage": "품절"
+  },
+  "use_product.message.out_of_stock_for_product": {
+    "defaultMessage": "{productName}이(가) 품절입니다."
   },
   "use_profile_fields.error.required_email": {
     "defaultMessage": "유효한 이메일 주소를 입력하십시오."
@@ -1490,11 +1639,20 @@
   "use_update_password_fields.label.new_password": {
     "defaultMessage": "새 암호"
   },
+  "wishlist_primary_action.button.addSetToCart.label": {
+    "defaultMessage": "카트에 {productName} 세트 추가"
+  },
+  "wishlist_primary_action.button.addToCart.label": {
+    "defaultMessage": "카트에 {productName} 추가"
+  },
   "wishlist_primary_action.button.add_set_to_cart": {
     "defaultMessage": "카트에 세트 추가"
   },
   "wishlist_primary_action.button.add_to_cart": {
     "defaultMessage": "카트에 추가"
+  },
+  "wishlist_primary_action.button.viewFullDetails.label": {
+    "defaultMessage": "{productName}에 대한 전체 세부 정보 보기"
   },
   "wishlist_primary_action.button.view_full_details": {
     "defaultMessage": "전체 세부 정보 보기"
@@ -1502,11 +1660,17 @@
   "wishlist_primary_action.button.view_options": {
     "defaultMessage": "옵션 보기"
   },
+  "wishlist_primary_action.button.view_options.label": {
+    "defaultMessage": "{productName}에 대한 보기 옵션"
+  },
   "wishlist_primary_action.info.added_to_cart": {
     "defaultMessage": "{quantity} {quantity, plural, one {개 항목} other {개 항목}}이 카트에 추가됨"
   },
   "wishlist_secondary_button_group.action.remove": {
     "defaultMessage": "제거"
+  },
+  "wishlist_secondary_button_group.info.item.remove.label": {
+    "defaultMessage": "{productName} 제거"
   },
   "wishlist_secondary_button_group.info.item_removed": {
     "defaultMessage": "항목이 위시리스트에서 제거됨"
