@@ -76,7 +76,13 @@ const StoreInventoryFilter = ({ toggleFilter, selectedFilters }) => {
 
     return (
         <>
-            <Stack spacing={4} paddingTop={0} paddingBottom={6} borderBottom="1px solid gray.200">
+            <Stack 
+                spacing={4} 
+                paddingTop={0} 
+                paddingBottom={6} 
+                borderBottom="1px solid gray.200"
+                data-testid="sf-store-inventory-filter"
+            >
                 <Heading
                     as="h2"
                     fontSize="md"

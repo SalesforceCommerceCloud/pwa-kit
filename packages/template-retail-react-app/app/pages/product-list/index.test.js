@@ -307,3 +307,16 @@ test('clicking a filter on search result will change url', async () => {
         )
     )
 })
+
+test('should display Store Inventory Filter component', async () => {
+    window.history.pushState({}, 'ProductList', '/uk/en-GB/category/mens-clothing-jackets')
+    renderWithProviders(<MockedComponent />, {
+        wrapperProps: {siteAlias: 'uk', locale: {id: 'en-GB'}}
+    })
+    
+    // Wait for the page to load
+    expect(await screen.findByTestId('sf-product-list-page')).toBeInTheDocument()
+    
+    // Check that the Store Inventory Filter component is present
+    expect(await screen.findByTestId('sf-store-inventory-filter')).toBeInTheDocument()
+})
