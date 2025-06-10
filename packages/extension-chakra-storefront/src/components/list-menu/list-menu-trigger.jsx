@@ -9,11 +9,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import {Link as RouteLink} from 'react-router-dom'
 
-import {
-    Box,
-    Popover,
-    useSlotRecipe
-} from '@chakra-ui/react'
+import {Box, Popover, useSlotRecipe} from '@chakra-ui/react'
 
 import Link from '../../components/link'
 import {ChevronDownIcon} from '../../components/icons'
@@ -37,24 +33,22 @@ const ListMenuTrigger = ({item, name, isOpen, onOpen, onClose}) => {
                 onMouseOver={onOpen}
                 css={styles.listMenuTriggerLink}
                 {...{name: name + ' __'}}
-                {...(isOpen ? {css: styles.listMenuTriggerLinkActive} : {})}
+                // {...(isOpen ? {css: styles.listMenuTriggerLinkActive} : {})}
             >
                 {name}
             </Link>
 
-            <Popover.Trigger>
-                <Link
-                    as={RouteLink}
-                    to={'#'}
-                    onMouseOver={onOpen}
-                    onKeyDown={(e) => {
-                        keyMap[e.key]?.(e)
-                    }}
-                    css={styles.listMenuTriggerLinkIcon}
-                >
-                    <ChevronDownIcon />
-                </Link>
-            </Popover.Trigger>
+            <Link
+                as={RouteLink}
+                to={'#'}
+                onMouseOver={onOpen}
+                onKeyDown={(e) => {
+                    keyMap[e.key]?.(e)
+                }}
+                css={styles.listMenuTriggerLinkIcon}
+            >
+                <ChevronDownIcon />
+            </Link>
         </Box>
     )
 }
