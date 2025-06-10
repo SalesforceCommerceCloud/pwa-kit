@@ -52,7 +52,6 @@ const Checkout = () => {
     const isSocialEnabled = !!social?.enabled
     const isPasswordlessEnabled = !!passwordless?.enabled
 
-
     useEffect(() => {
         if (error || step === 4) {
             window.scrollTo({top: 0})
