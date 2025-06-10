@@ -15,7 +15,8 @@ import {
     GridItem,
     Container,
     useDisclosure,
-    Button
+    Button,
+    Heading
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 
 // Project Components
@@ -23,6 +24,7 @@ import CartCta from '@salesforce/retail-react-app/app/pages/cart/partials/cart-c
 import CartSecondaryButtonGroup from '@salesforce/retail-react-app/app/pages/cart/partials/cart-secondary-button-group'
 import CartSkeleton from '@salesforce/retail-react-app/app/pages/cart/partials/cart-skeleton'
 import CartTitle from '@salesforce/retail-react-app/app/pages/cart/partials/cart-title'
+import BonusProductsTitle from '@salesforce/retail-react-app/app/pages/cart/partials/bonus-products-title'
 import ConfirmationModal from '@salesforce/retail-react-app/app/components/confirmation-modal'
 import EmptyCart from '@salesforce/retail-react-app/app/pages/cart/partials/empty-cart'
 import OrderSummary from '@salesforce/retail-react-app/app/components/order-summary'
@@ -541,53 +543,120 @@ const Cart = () => {
                         >
                             <GridItem>
                                 <Stack spacing={4}>
-                                    {basket.productItems?.map((productItem, idx) => {
-                                        return (
-                                            <ProductItem
-                                                key={productItem.itemId}
-                                                index={idx}
-                                                secondaryActions={
-                                                    <CartSecondaryButtonGroup
-                                                        isAGift={
-                                                            localIsGiftItems[productItem.itemId]
-                                                                ? localIsGiftItems[
-                                                                      productItem.itemId
-                                                                  ]
-                                                                : productItem.gift
-                                                        }
-                                                        onIsAGiftChange={handleIsAGiftChange}
-                                                        onAddToWishlistClick={handleAddToWishlist}
-                                                        onEditClick={(product) => {
-                                                            setSelectedItem(product)
-                                                            onOpen()
-                                                        }}
-                                                        onRemoveItemClick={handleRemoveItem}
-                                                    />
-                                                }
-                                                product={{
-                                                    ...productItem,
-                                                    ...(productsByItemId &&
-                                                        productsByItemId[productItem.itemId]),
-                                                    isProductUnavailable: !isProductsLoading
-                                                        ? !productsByItemId?.[productItem.itemId]
-                                                        : undefined,
-                                                    price: productItem.price,
-                                                    quantity: localQuantity[productItem.itemId]
-                                                        ? localQuantity[productItem.itemId]
-                                                        : productItem.quantity
-                                                }}
-                                                onItemQuantityChange={handleChangeItemQuantity.bind(
-                                                    this,
-                                                    productItem
-                                                )}
-                                                showLoading={
-                                                    isCartItemLoading &&
-                                                    selectedItem?.itemId === productItem.itemId
-                                                }
-                                                handleRemoveItem={handleRemoveItem}
-                                            />
-                                        )
-                                    })}
+                                    {/* Regular Products */}
+                                    {basket.productItems
+                                        ?.filter((item) => !item.bonusProductLineItem)
+                                        .map((productItem, idx) => {
+                                            return (
+                                                <ProductItem
+                                                    key={productItem.itemId}
+                                                    index={idx}
+                                                    secondaryActions={
+                                                        <CartSecondaryButtonGroup
+                                                            isAGift={
+                                                                localIsGiftItems[productItem.itemId]
+                                                                    ? localIsGiftItems[
+                                                                          productItem.itemId
+                                                                      ]
+                                                                    : productItem.gift
+                                                            }
+                                                            onIsAGiftChange={handleIsAGiftChange}
+                                                            onAddToWishlistClick={
+                                                                handleAddToWishlist
+                                                            }
+                                                            onEditClick={(product) => {
+                                                                setSelectedItem(product)
+                                                                onOpen()
+                                                            }}
+                                                            onRemoveItemClick={handleRemoveItem}
+                                                        />
+                                                    }
+                                                    product={{
+                                                        ...productItem,
+                                                        ...(productsByItemId &&
+                                                            productsByItemId[productItem.itemId]),
+                                                        isProductUnavailable: !isProductsLoading
+                                                            ? !productsByItemId?.[
+                                                                  productItem.itemId
+                                                              ]
+                                                            : undefined,
+                                                        price: productItem.price,
+                                                        quantity: localQuantity[productItem.itemId]
+                                                            ? localQuantity[productItem.itemId]
+                                                            : productItem.quantity
+                                                    }}
+                                                    onItemQuantityChange={handleChangeItemQuantity.bind(
+                                                        this,
+                                                        productItem
+                                                    )}
+                                                    showLoading={
+                                                        isCartItemLoading &&
+                                                        selectedItem?.itemId === productItem.itemId
+                                                    }
+                                                    handleRemoveItem={handleRemoveItem}
+                                                />
+                                            )
+                                        })}
+
+                                    {/* Bonus Products Title */}
+                                    {basket.productItems?.some(
+                                        (item) => item.bonusProductLineItem === true
+                                    ) && (
+                                        <Box>
+                                            <BonusProductsTitle />
+                                        </Box>
+                                    )}
+
+                                    {/* Bonus Products */}
+                                    {basket.productItems
+                                        ?.filter((item) => item.bonusProductLineItem === true)
+                                        .map((productItem, idx) => {
+                                            return (
+                                                <ProductItem
+                                                    key={productItem.itemId}
+                                                    index={idx}
+                                                    secondaryActions={
+                                                        <CartSecondaryButtonGroup
+                                                            isAGift={
+                                                                localIsGiftItems[productItem.itemId]
+                                                                    ? localIsGiftItems[
+                                                                          productItem.itemId
+                                                                      ]
+                                                                    : productItem.gift
+                                                            }
+                                                            onIsAGiftChange={handleIsAGiftChange}
+                                                            onAddToWishlistClick={
+                                                                handleAddToWishlist
+                                                            }
+                                                            onEditClick={(product) => {
+                                                                setSelectedItem(product)
+                                                                onOpen()
+                                                            }}
+                                                            onRemoveItemClick={handleRemoveItem}
+                                                        />
+                                                    }
+                                                    product={{
+                                                        ...productItem,
+                                                        ...(productsByItemId &&
+                                                            productsByItemId[productItem.itemId]),
+                                                        isProductUnavailable: !isProductsLoading
+                                                            ? !productsByItemId?.[
+                                                                  productItem.itemId
+                                                              ]
+                                                            : undefined,
+                                                        price: productItem.price,
+                                                        quantity: localQuantity[productItem.itemId]
+                                                            ? localQuantity[productItem.itemId]
+                                                            : productItem.quantity
+                                                    }}
+                                                    showLoading={
+                                                        isCartItemLoading &&
+                                                        selectedItem?.itemId === productItem.itemId
+                                                    }
+                                                    handleRemoveItem={handleRemoveItem}
+                                                />
+                                            )
+                                        })}
                                 </Stack>
                                 <Box>
                                     {isOpen && !selectedItem.bundledProductItems && (

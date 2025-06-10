@@ -80,67 +80,94 @@ const ProductItem = ({
 
                             <Flex align="flex-end" justify="space-between">
                                 <Stack spacing={1}>
-                                    <Text
-                                        fontSize="sm"
-                                        color="gray.700"
-                                        aria-label={intl.formatMessage(
-                                            {
-                                                id: 'item_variant.quantity.label',
-                                                defaultMessage:
-                                                    'Quantity selector for {productName}. Selected quantity is {quantity}'
-                                            },
-                                            {
-                                                quantity: product?.quantity,
-                                                productName: product?.name
-                                            }
-                                        )}
-                                    >
-                                        <FormattedMessage
-                                            defaultMessage="Quantity:"
-                                            id="product_item.label.quantity"
-                                        />
-                                    </Text>
-                                    <QuantityPicker
-                                        step={stepQuantity}
-                                        value={quantity}
-                                        min={0}
-                                        clampValueOnBlur={false}
-                                        onBlur={(e) => {
-                                            // Default to last known quantity if a user leaves the box with an invalid value
-                                            const {value} = e.target
+                                    {product.bonusProductLineItem ? (
+                                        <Text
+                                            fontSize="sm"
+                                            color="gray.700"
+                                            aria-label={intl.formatMessage(
+                                                {
+                                                    id: 'item_variant.assistive_msg.quantity',
+                                                    defaultMessage: 'Quantity {quantity}'
+                                                },
+                                                {
+                                                    quantity: product?.quantity
+                                                }
+                                            )}
+                                        >
+                                            <FormattedMessage
+                                                defaultMessage="Quantity: {quantity}"
+                                                id="bonusproduct_item.label.quantity"
+                                                values={{
+                                                    quantity: product.quantity
+                                                }}
+                                            />
+                                        </Text>
+                                    ) : (
+                                        <>
+                                            <Text
+                                                fontSize="sm"
+                                                color="gray.700"
+                                                aria-label={intl.formatMessage(
+                                                    {
+                                                        id: 'item_variant.quantity.label',
+                                                        defaultMessage:
+                                                            'Quantity selector for {productName}. Selected quantity is {quantity}'
+                                                    },
+                                                    {
+                                                        quantity: product?.quantity,
+                                                        productName: product?.name
+                                                    }
+                                                )}
+                                            >
+                                                <FormattedMessage
+                                                    defaultMessage="Quantity:"
+                                                    id="product_item.label.quantity"
+                                                />
+                                            </Text>
+                                            <QuantityPicker
+                                                step={stepQuantity}
+                                                value={quantity}
+                                                min={0}
+                                                clampValueOnBlur={false}
+                                                onBlur={(e) => {
+                                                    // Default to last known quantity if a user leaves the box with an invalid value
+                                                    const {value} = e.target
 
-                                            if (!value) {
-                                                setQuantity(product.quantity)
-                                            }
-                                        }}
-                                        onChange={(stringValue, numberValue) => {
-                                            // Set the Quantity of product to value of input if value number
-                                            if (numberValue >= 0) {
-                                                // Call handler
-                                                onItemQuantityChange(numberValue).then(
-                                                    (isValidChange) =>
-                                                        isValidChange && setQuantity(numberValue)
-                                                )
-                                            } else if (stringValue === '') {
-                                                // We want to allow the use to clear the input to start a new input so here we set the quantity to '' so NAN is not displayed
-                                                // User will not be able to add '' quantity to the cart due to the add to cart button enablement rules
-                                                setQuantity(stringValue)
-                                            }
-                                        }}
-                                        productName={product?.name}
-                                    />
-                                    <VisuallyHidden role="status">
-                                        {product?.name}
-                                        {intl.formatMessage(
-                                            {
-                                                id: 'item_variant.assistive_msg.quantity',
-                                                defaultMessage: 'Quantity {quantity}'
-                                            },
-                                            {
-                                                quantity: product?.quantity
-                                            }
-                                        )}
-                                    </VisuallyHidden>
+                                                    if (!value) {
+                                                        setQuantity(product.quantity)
+                                                    }
+                                                }}
+                                                onChange={(stringValue, numberValue) => {
+                                                    // Set the Quantity of product to value of input if value number
+                                                    if (numberValue >= 0) {
+                                                        // Call handler
+                                                        onItemQuantityChange(numberValue).then(
+                                                            (isValidChange) =>
+                                                                isValidChange &&
+                                                                setQuantity(numberValue)
+                                                        )
+                                                    } else if (stringValue === '') {
+                                                        // We want to allow the use to clear the input to start a new input so here we set the quantity to '' so NAN is not displayed
+                                                        // User will not be able to add '' quantity to the cart due to the add to cart button enablement rules
+                                                        setQuantity(stringValue)
+                                                    }
+                                                }}
+                                                productName={product?.name}
+                                            />
+                                            <VisuallyHidden role="status">
+                                                {product?.name}
+                                                {intl.formatMessage(
+                                                    {
+                                                        id: 'item_variant.assistive_msg.quantity',
+                                                        defaultMessage: 'Quantity {quantity}'
+                                                    },
+                                                    {
+                                                        quantity: product?.quantity
+                                                    }
+                                                )}
+                                            </VisuallyHidden>
+                                        </>
+                                    )}
                                 </Stack>
                                 <Stack>
                                     <HideOnMobile>
