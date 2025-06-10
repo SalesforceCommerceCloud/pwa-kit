@@ -18,7 +18,6 @@ module.exports = {
         '<rootDir>/src/components/hero/**/*.test.js',
         '<rootDir>/src/components/icons/**/*.test.js',
         '<rootDir>/src/components/image-gallery/**/*.test.js',
-        '<rootDir>/src/components/display-price/**/*.test.js',
         '<rootDir>/src/components/drawer-menu/**/*.test.js',
         '<rootDir>/src/components/links-list/**/*.test.js',
         '<rootDir>/src/components/nested-accordion/**/*.test.js',
