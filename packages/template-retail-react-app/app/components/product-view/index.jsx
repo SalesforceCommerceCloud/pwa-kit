@@ -115,7 +115,10 @@ const ProductView = forwardRef(
             isBasketLoading = false,
             onVariantSelected = () => {},
             validateOrderability = (variant, product, quantity, stockLevel) =>
-                !isProductLoading && (variant?.orderable || product?.inventory?.orderable) && quantity > 0 && quantity <= stockLevel,
+                !isProductLoading &&
+                (variant?.orderable || product?.inventory?.orderable) &&
+                quantity > 0 &&
+                quantity <= stockLevel,
             showImageGallery = true,
             setSelectedBundleQuantity = () => {},
             selectedBundleParentQuantity = 1
@@ -203,7 +206,6 @@ const ProductView = forwardRef(
         const validateAndShowError = (opts = {}) => {
             const {scrollErrorIntoView = true} = opts
             // Validate that all attributes are selected before proceeding.
-            // TODO: check variant for standard product
             const hasValidSelection = validateOrderability(variant, product, quantity, stockLevel)
             const showError = !isProductASet && !isProductABundle && !hasValidSelection
             const scrollToError = showError && scrollErrorIntoView
