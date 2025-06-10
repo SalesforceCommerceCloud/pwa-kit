@@ -58,6 +58,7 @@ import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
 import {useUpdateShopperContext} from '@salesforce/retail-react-app/app/hooks/use-update-shopper-context'
+import SeInputHandler from '@salesforce/retail-react-app/app/components/se-input-handler'
 
 // HOCs
 import {withCommerceSdkReact} from '@salesforce/retail-react-app/app/components/with-commerce-sdk-react/with-commerce-sdk-react'
@@ -146,6 +147,9 @@ const App = (props) => {
         onOpen: onOpenStoreLocator,
         onClose: onCloseStoreLocator
     } = useDisclosure()
+
+    // State for Search Engine store locator parameters
+    const [seStoreLocatorParams, setSeStoreLocatorParams] = useState(null)
 
     const targetLocale = getTargetLocale({
         getUserPreferredLocales: () => {
@@ -322,6 +326,10 @@ const App = (props) => {
                     defaultLocale={DEFAULT_LOCALE}
                 >
                     <CurrencyProvider currency={currency}>
+                        <SeInputHandler 
+                            onOpenStoreLocator={onOpenStoreLocator} 
+                            onSeParametersReady={setSeStoreLocatorParams}
+                        />
                         <Seo>
                             <meta name="theme-color" content={THEME_COLOR} />
                             <meta name="apple-mobile-web-app-title" content={DEFAULT_SITE_TITLE} />
@@ -368,6 +376,7 @@ const App = (props) => {
                             <StoreLocatorModal
                                 isOpen={isOpenStoreLocator}
                                 onClose={onCloseStoreLocator}
+                                initialParams={seStoreLocatorParams}
                             />
                             <Box {...styles.headerWrapper}>
                                 {!isCheckout ? (
