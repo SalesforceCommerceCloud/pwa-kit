@@ -223,7 +223,7 @@ export const AddToCartModal = () => {
 
                                     return (
                                         <Flex
-                                            key={product.productId || product.id}
+                                            key={variant?.productId || product.productId || product.id}
                                             justifyContent="space-between"
                                             marginBottom={index < itemsAdded.length - 1 ? 0 : 4}
                                             paddingBottom={4}
