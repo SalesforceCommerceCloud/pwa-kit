@@ -24,7 +24,6 @@ import {
     Center,
     Button,
     Flex,
-    // Fade,
     Heading,
     Spinner,
     useDisclosure,
@@ -85,23 +84,19 @@ const PlaceholderComponent: React.FC = () => (
 //     }
 // )
 //
-// const ListMenuContentWithData = withCommerceSdkReactHookData(
-//     ({data, ...rest}: any) => (
-//         <Fade in={true}>
-//             <ListMenuContent {...rest} item={data} />
-//         </Fade>
-//     ),
-//     {
-//         hook: useCategory,
-//         queryOptions: ({item}: {item: {id: string}}) => ({
-//             parameters: {
-//                 id: item.id,
-//                 levels: 2
-//             }
-//         }),
-//         placeholder: PlaceholderComponent
-//     }
-// )
+const ListMenuContentWithData = withCommerceSdkReactHookData(
+    ({data, ...rest}: any) => <ListMenuContent {...rest} item={data} />,
+    {
+        hook: useCategory,
+        queryOptions: ({item}: {item: {id: string}}) => ({
+            parameters: {
+                id: item.id,
+                levels: 2
+            }
+        }),
+        placeholder: PlaceholderComponent
+    }
+)
 
 // Define the HOC function
 const withLayout = <P extends object>(WrappedComponent: React.ComponentType<P>) => {
@@ -306,14 +301,14 @@ const withLayout = <P extends object>(WrappedComponent: React.ComponentType<P>) 
                                     {/*            itemComponent={DrawerMenuItemWithData}*/}
                                     {/*        />*/}
                                     {/*    </HideOnDesktop>*/}
-                                    {/*    <HideOnMobile>*/}
-                                    {/*        <ListMenu*/}
-                                    {/*            root={categories?.[CAT_MENU_DEFAULT_ROOT_CATEGORY]}*/}
-                                    {/*            itemsKey="categories"*/}
-                                    {/*            itemsCountKey="onlineSubCategoriesCount"*/}
-                                    {/*            contentComponent={ListMenuContentWithData}*/}
-                                    {/*        />*/}
-                                    {/*    </HideOnMobile>*/}
+                                       <HideOnMobile>
+                                           <ListMenu
+                                                root={categories?.[CAT_MENU_DEFAULT_ROOT_CATEGORY]}
+                                                itemsKey="categories"
+                                                itemsCountKey="onlineSubCategoriesCount"
+                                                contentComponent={ListMenuContentWithData}
+                                            />
+                                        </HideOnMobile>
                                 </Header>
                             </>
                         ) : (
