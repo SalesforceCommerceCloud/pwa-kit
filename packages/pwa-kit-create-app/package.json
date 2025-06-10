@@ -18,7 +18,8 @@
   "files": [
     "assets",
     "templates",
-    "scripts/tree-shake.js"
+    "scripts/tree-shake.js",
+    "scripts/checksum.js"
   ],
   "scripts": {
     "format": "internal-lib-build format \"**/*.{js,jsx}\"",

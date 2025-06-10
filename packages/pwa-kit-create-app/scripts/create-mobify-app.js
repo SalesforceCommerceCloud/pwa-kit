@@ -51,6 +51,7 @@ const Handlebars = require('handlebars')
 const validatePackageName = require('validate-npm-package-name')
 const treeShake = require('./tree-shake')
 const pluginConfig = require('../assets/plugin-config');
+const computeChecksum = require('./checksum');
 
 const program = new Command()
 
