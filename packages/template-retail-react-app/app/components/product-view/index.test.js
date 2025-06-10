@@ -413,6 +413,20 @@ test('Pickup in store radio is disabled when inventoryId is NOT present in local
     expect(pickupRadio).toBeDisabled()
 })
 
+test('Pickup in store radio is disabled when inventoryId is NULL within localStorage', async () => {
+    // Arrange: Ensure localStorage does not have inventoryId for the current site
+    const siteId = 'site-1'
+    const storeInfoKey = `store_${siteId}`
+    const inventoryId = null
+    window.localStorage.removeItem(storeInfoKey)
+
+    renderWithProviders(<MockComponent product={mockProductDetail} />)
+
+    // Assert: Radio is disabled
+    const pickupRadio = await screen.findByRole('radio', {name: /pickup in store/i})
+    expect(pickupRadio).toBeDisabled()
+})
+
 test('Pickup in store radio is disabled when inventoryId is present but product is out of stock', async () => {
     const user = userEvent.setup()
     const siteId = 'site-1'
