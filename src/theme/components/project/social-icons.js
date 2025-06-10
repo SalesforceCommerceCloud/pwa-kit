@@ -11,8 +11,7 @@ export default defineSlotRecipe({
     base: {
         container: {
             display: 'flex',
-            flex: 1,
-            marginTop: 4
+            flex: 1
         },
         icon: {
             width: 5,

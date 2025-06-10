@@ -8,20 +8,32 @@ import {defineSlotRecipe} from '@chakra-ui/react'
 
 export default defineSlotRecipe({
     slots: [
-        'root',
-        'backdrop',
-        'content',
-        'header',
-        'body',
-        'footer',
-        'socialsItem',
         'actions',
         'actionsItem',
+        'backdrop',
+        'body',
+        'content',
+        'footer',
+        'header',
         'localeSelector',
-        'signout'
+        'logo',
+        'signout',
+        'socialsItem'
     ],
     base: {
-        root: {},
+        actions: {
+            paddingLeft: 4,
+            paddingRight: 4
+        },
+        actionsItem: {
+            paddingTop: 3,
+            paddingBottom: 3
+        },
+        body: {
+            flex: 1,
+            overflowY: 'auto',
+            padding: 4
+        },
         content: {
             borderRadius: '0px',
             width: '100%',
@@ -32,6 +44,12 @@ export default defineSlotRecipe({
             display: 'flex',
             flexDirection: 'column'
         },
+        footer: {
+            paddingTop: 6,
+            paddingBottom: 11,
+            paddingLeft: 4,
+            paddingRight: 4
+        },
         header: {
             boxShadow: 'sm',
             paddingTop: 1,
@@ -39,31 +57,17 @@ export default defineSlotRecipe({
             paddingLeft: 4,
             paddingRight: 4
         },
-        body: {
-            flex: 1,
-            overflowY: 'auto',
-            padding: 4
-        },
-        footer: {},
-        socialsItem: {
-            textAlign: 'center',
-            paddingLeft: 2,
-            paddingRight: 2
-        },
-        actions: {
-            paddingLeft: 4,
-            paddingRight: 4
-        },
-        actionsItem: {
-            paddingTop: 3,
-            paddingBottom: 3
-        },
         localeSelector: {
             paddingTop: 1,
             paddingBottom: 1
         },
+        logo: {
+            width: 12,
+            height: 8
+        },
         signout: {
             width: '100%'
-        }
+        },
+        socialsItem: {}
     }
 })
