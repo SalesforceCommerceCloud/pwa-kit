@@ -5,137 +5,140 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
-import {renderHook, act} from '@testing-library/react'
-import {useBonusState} from '@salesforce/retail-react-app/app/hooks/use-bonus-product-modal'
-import {useAddToCartModalContext} from '@salesforce/retail-react-app/app/hooks/use-add-to-cart-modal'
+import {renderHook, act, render} from '@testing-library/react'
+import {ChakraProvider} from '@chakra-ui/react'
 import {useLocation} from 'react-router-dom'
+import {
+    useBonusState,
+    BonusProductModalProvider,
+    useBonusProductModalContext,
+    BonusProductModal
+} from '@salesforce/retail-react-app/app/hooks/use-bonus-product-modal'
 
-// Mock the dependencies
+// Mock react-router-dom's useLocation
 jest.mock('react-router-dom', () => ({
+    ...jest.requireActual('react-router-dom'),
     useLocation: jest.fn()
 }))
 
-jest.mock('./use-add-to-cart-modal', () => ({
-    useAddToCartModalContext: jest.fn()
+// Mock useAddToCartModalContext
+const mockOnAddToCartModalOpen = jest.fn()
+jest.mock('@salesforce/retail-react-app/app/hooks/use-add-to-cart-modal', () => ({
+    useAddToCartModalContext: () => ({onOpen: mockOnAddToCartModalOpen})
 }))
-
-// Mock localStorage
-const localStorageMock = (() => {
-    let store = {}
-    return {
-        getItem: jest.fn((key) => store[key]),
-        setItem: jest.fn((key, value) => {
-            store[key] = value
-        }),
-        removeItem: jest.fn((key) => {
-            delete store[key]
-        }),
-        clear: jest.fn(() => {
-            store = {}
-        })
-    }
-})()
-
-Object.defineProperty(window, 'localStorage', {
-    value: localStorageMock
-})
 
 describe('useBonusState', () => {
     beforeEach(() => {
-        // Reset all mocks before each test
         jest.clearAllMocks()
-        localStorageMock.clear()
-        useLocation.mockReturnValue({pathname: '/'})
-        useAddToCartModalContext.mockReturnValue({
-            onOpen: jest.fn()
-        })
+        useLocation.mockReturnValue({pathname: '/initial'})
     })
 
-    it('should initialize with empty state', () => {
-        const {result} = renderHook(() => useBonusState())
-
+    it('initializes with correct state from basket', () => {
+        const basket = {bonusDiscountLineItems: [{id: 'b1'}]}
+        const {result} = renderHook(() => useBonusState(basket))
         expect(result.current.isOpen).toBe(false)
         expect(result.current.data).toEqual({})
-        expect(result.current.bonusProducts).toEqual([])
+        expect(result.current.bonusProducts).toEqual([{id: 'b1'}])
     })
 
-    it('should load products from localStorage on initialization', () => {
-        const mockProducts = [{id: 1, name: 'Product 1'}]
-        localStorageMock.setItem('bonusProducts', JSON.stringify(mockProducts))
-
-        const {result} = renderHook(() => useBonusState())
-
-        expect(result.current.bonusProducts).toEqual(mockProducts)
-    })
-
-    it('should add products and update localStorage', () => {
-        const {result} = renderHook(() => useBonusState())
-        const newProducts = [{id: 2, name: 'Product 2'}]
-
-        act(() => {
-            result.current.addBonusProducts(newProducts)
+    it('updates bonusProducts when basket changes', () => {
+        const {result, rerender} = renderHook(({basket}) => useBonusState(basket), {
+            initialProps: {basket: {bonusDiscountLineItems: [{id: 'b1'}]}}
         })
-
-        expect(result.current.bonusProducts).toEqual(newProducts)
-        expect(localStorageMock.setItem).toHaveBeenCalledWith(
-            'bonusProducts',
-            JSON.stringify(newProducts)
-        )
+        rerender({basket: {bonusDiscountLineItems: [{id: 'b2'}]}})
+        expect(result.current.bonusProducts).toEqual([{id: 'b2'}])
     })
 
-    it('should clear products and remove from localStorage', () => {
+    it('addBonusProducts adds items', () => {
         const {result} = renderHook(() => useBonusState())
-
-        // First add some products
         act(() => {
-            result.current.addBonusProducts([{id: 1, name: 'Product 1'}])
+            result.current.addBonusProducts([{id: 'b3'}])
         })
+        expect(result.current.bonusProducts).toEqual([{id: 'b3'}])
+    })
 
-        // Then clear them
+    it('clearBonusProducts empties bonusProducts', () => {
+        const {result} = renderHook(() => useBonusState())
+        act(() => {
+            result.current.addBonusProducts([{id: 'b4'}])
+        })
         act(() => {
             result.current.clearBonusProducts()
         })
-
         expect(result.current.bonusProducts).toEqual([])
-        expect(localStorageMock.removeItem).toHaveBeenCalledWith('bonusProducts')
     })
 
-    it('should handle modal open/close state', () => {
+    it('onOpen sets modal open and stores data', () => {
         const {result} = renderHook(() => useBonusState())
-        const modalData = {product: {id: 1}, itemsAdded: 1, selectedQuantity: 1}
-
         act(() => {
-            result.current.onOpen(modalData)
+            result.current.onOpen({foo: 'bar'})
         })
-
         expect(result.current.isOpen).toBe(true)
-        expect(result.current.data).toEqual(modalData)
+        expect(result.current.data).toEqual({foo: 'bar'})
+    })
 
+    it('onClose closes modal and clears data', () => {
+        const {result} = renderHook(() => useBonusState())
+        act(() => {
+            result.current.onOpen({foo: 'bar'})
+        })
         act(() => {
             result.current.onClose()
         })
-
         expect(result.current.isOpen).toBe(false)
         expect(result.current.data).toEqual({})
     })
 
-    it('should close modal and open add to cart modal when closing with product data', () => {
-        const mockOnAddToCartModalOpen = jest.fn()
-        useAddToCartModalContext.mockReturnValue({
-            onOpen: mockOnAddToCartModalOpen
-        })
-
+    it('onClose calls onAddToCartModalOpen if needed', () => {
         const {result} = renderHook(() => useBonusState())
-        const modalData = {product: {id: 1}, itemsAdded: 1, selectedQuantity: 1}
-
+        const data = {
+            openAddToCartModalIfNeeded: true,
+            product: {id: 'p1'},
+            itemsAdded: 2,
+            selectedQuantity: 1
+        }
         act(() => {
-            result.current.onOpen(modalData)
+            result.current.onOpen(data)
         })
-
         act(() => {
             result.current.onClose()
         })
+        expect(mockOnAddToCartModalOpen).toHaveBeenCalledWith({
+            product: {id: 'p1'},
+            itemsAdded: 2,
+            selectedQuantity: 1
+        })
+    })
 
-        expect(mockOnAddToCartModalOpen).toHaveBeenCalledWith(modalData)
+    it('closes modal on location change', () => {
+        let location = {pathname: '/foo'}
+        useLocation.mockImplementation(() => location)
+        const {result, rerender} = renderHook(() => useBonusState())
+        act(() => {
+            result.current.onOpen({foo: 'bar'})
+        })
+        expect(result.current.isOpen).toBe(true)
+        // Simulate location change
+        location = {pathname: '/bar'}
+        rerender()
+        expect(result.current.isOpen).toBe(false)
+    })
+})
+
+describe('BonusProductModalProvider', () => {
+    it('provides context to children', () => {
+        const basket = {bonusDiscountLineItems: [{id: 'b1'}]}
+        const TestChild = () => {
+            const ctx = useBonusProductModalContext()
+            return <div data-testid="ctx">{JSON.stringify(ctx.bonusProducts)}</div>
+        }
+        const {getByTestId} = render(
+            <ChakraProvider>
+                <BonusProductModalProvider basket={basket}>
+                    <TestChild />
+                </BonusProductModalProvider>
+            </ChakraProvider>
+        )
+        expect(getByTestId('ctx').textContent).toContain('b1')
     })
 })

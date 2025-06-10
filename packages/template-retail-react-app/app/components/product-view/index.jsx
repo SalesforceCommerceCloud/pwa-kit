@@ -301,6 +301,7 @@ const ProductView = forwardRef(
                             onBonusProductModalOpen({
                                 newBonusItems,
                                 allBonusItems: addToCartResponse.bonusDiscountLineItems,
+                                openAddToCartModalIfNeeded: true,
                                 product,
                                 itemsAdded,
                                 selectedQuantity: quantity
