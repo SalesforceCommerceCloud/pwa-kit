@@ -7,32 +7,57 @@
 import {defineSlotRecipe} from '@chakra-ui/react'
 
 export default defineSlotRecipe({
-    slots: ['container', 'button', 'text'],
+    slots: ['container', 'button', 'text', 'select', 'selectField', 'selectIndicator'],
     base: {
         container: {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            gap: 2
+            gap: 1
         },
         button: {
             color: 'black',
+            fontSize: 'sm',
+            fontWeight: 'normal',
+            gap: 1,
+            px: 2,
+            py: 1,
+            minW: 'auto',
+            h: 'auto',
             _hover: {
                 textDecoration: 'none'
             },
             _disabled: {
-                opacity: 0.5,
+                opacity: 0.4,
                 cursor: 'not-allowed'
             }
         },
         text: {
             whiteSpace: 'nowrap',
-            paddingLeft: 4,
-            paddingRight: 4,
-            paddingTop: 2,
-            paddingBottom: 2,
             fontSize: 'sm',
-            fontWeight: 'normal'
+            fontWeight: 'normal',
+            color: 'black'
+        },
+        select: {
+            fontSize: 'sm',
+            fontWeight: 'normal',
+            mx: 2
+        },
+        selectField: {
+            bg: 'white',
+            border: '1px solid',
+            borderColor: 'gray.300',
+            borderRadius: 'sm',
+            fontSize: 'sm',
+            fontWeight: 'normal',
+            px: 3,
+            py: 2,
+            minH: 'auto',
+            h: '40px',
+            minW: '60px'
+        },
+        selectIndicator: {
+            color: 'black',
         }
     }
 })

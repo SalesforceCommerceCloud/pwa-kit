@@ -68,8 +68,8 @@ const Pagination = (props) => {
                 variant="link"
                 isDisabled={!prev}
             >
-                <ChevronLeftIcon />
-                <Text>
+                <ChevronLeftIcon boxSize={4} color="black" />
+                <Text css={styles.text}>
                     {intl.formatMessage({
                         id: 'pagination.link.prev',
                         defaultMessage: 'Prev'
@@ -78,15 +78,15 @@ const Pagination = (props) => {
             </Button>
 
             {/* Direct Page Selection */}
-            <Flex paddingLeft={4} paddingRight={4} alignItems="center">
-                <NativeSelect.Root css={styles.text}>
+            <Flex alignItems="center" css={styles.select}>
+                <NativeSelect.Root>
                     <NativeSelect.Field
+                        css={styles.selectField}
                         id={SELECT_ID}
                         onChange={(e) => {
                             history.push(e.target.value)
                         }}
                         value={currentURL}
-                        height={11}
                         aria-label={intl.formatMessage({
                             id: 'pagination.field.page_number_select',
                             defaultMessage: 'Select page number'
@@ -98,9 +98,9 @@ const Pagination = (props) => {
                             </option>
                         ))}
                     </NativeSelect.Field>
-                    <NativeSelect.Indicator />
+                    <NativeSelect.Indicator css={styles.selectIndicator} />
                 </NativeSelect.Root>
-                <Text css={styles.text}>
+                <Text css={styles.text} ml={2}>
                     {intl.formatMessage(
                         {
                             id: 'pagination.field.num_of_pages',
@@ -127,13 +127,13 @@ const Pagination = (props) => {
                 variant="link"
                 isDisabled={!next}
             >
-                <Text>
+                <Text css={styles.text}>
                     {intl.formatMessage({
                         id: 'pagination.link.next',
                         defaultMessage: 'Next'
                     })}
                 </Text>
-                <ChevronRightIcon />
+                <ChevronRightIcon boxSize={4} color="black" />
             </Button>
         </Flex>
     )
