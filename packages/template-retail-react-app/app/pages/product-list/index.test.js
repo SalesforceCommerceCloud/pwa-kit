@@ -323,7 +323,7 @@ test('should filter out refinements in the disallow list', async () => {
         expect(screen.getByText('Size')).toBeInTheDocument()
         expect(screen.getByText('Price')).toBeInTheDocument()
     })
-
+})
 test('should display Store Inventory Filter component', async () => {
     window.history.pushState({}, 'ProductList', '/uk/en-GB/category/mens-clothing-jackets')
     renderWithProviders(<MockedComponent />, {

@@ -23,11 +23,11 @@ const SelectedRefinements = ({toggleFilter, selectedFilterValues, filters, handl
         const filters = selectedFilterValues[key].split('|')
         filters?.forEach((filter) => {
             let uiLabel = filter
-            
+
             if (key === 'price') {
-                uiLabel = priceFilterValues?.values?.find(
-                    (priceFilter) => priceFilter.value === filter
-                )?.label || filter
+                uiLabel =
+                    priceFilterValues?.values?.find((priceFilter) => priceFilter.value === filter)
+                        ?.label || filter
             } else if (key === 'ilids') {
                 // Fallback text for in stock selected filter
                 uiLabel = formatMessage({
@@ -37,12 +37,15 @@ const SelectedRefinements = ({toggleFilter, selectedFilterValues, filters, handl
 
                 const storeInfo = getSelectedStoreData(site?.id)
                 if (storeInfo?.inventoryId === filter && storeInfo?.name) {
-                    uiLabel = formatMessage({
-                        id: 'store_inventory_filter.checkbox.label',
-                        defaultMessage: 'In Stock at {storeName}'
-                    }, {
-                        storeName: storeInfo.name
-                    })
+                    uiLabel = formatMessage(
+                        {
+                            id: 'store_inventory_filter.checkbox.label',
+                            defaultMessage: 'In Stock at {storeName}'
+                        },
+                        {
+                            storeName: storeInfo.name
+                        }
+                    )
                 }
             }
 
