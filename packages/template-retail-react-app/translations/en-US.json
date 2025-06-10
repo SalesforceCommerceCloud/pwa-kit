@@ -1776,5 +1776,29 @@
   },
   "with_registration.info.please_sign_in": {
     "defaultMessage": "Please sign in to continue!"
+  },
+  "store_inventory_filter.heading.shop_by_availability": {
+    "defaultMessage": "Shop by Availability"
+  },
+  "store_inventory_filter.checkbox.label": {
+    "defaultMessage": "In Stock at {storeLink}"
+  },
+  "store_inventory_filter.checkbox.assistive_msg": {
+    "defaultMessage": "Filter products by store availability at {storeName}"
+  },
+  "store_inventory_filter.link.assistive_msg": {
+    "defaultMessage": "Open store locator to {action}"
+  },
+  "store_inventory_filter.action.select_store": {
+    "defaultMessage": "Select Store"
+  },
+  "store_inventory_filter.action.change_store": {
+    "defaultMessage": "change store"
+  },
+  "store_inventory_filter.action.select_store_link": {
+    "defaultMessage": "select a store"
+  },
+  "selected_refinements.filter.in_stock": {
+    "defaultMessage": "In Stock"
   }
 }
