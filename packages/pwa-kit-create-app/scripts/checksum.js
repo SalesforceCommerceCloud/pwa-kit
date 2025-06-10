@@ -43,6 +43,6 @@ function computeFileChecksum(filePath) {
   return hash;
 }
 
-const directory = process.argv[2];
-const checksums = computeChecksum(directory);
-console.log(JSON.stringify(checksums, null, 2));
+// const directory = process.argv[2];
+// const checksums = computeChecksum(directory);
+// console.log(JSON.stringify(checksums, null, 2));
