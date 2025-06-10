@@ -9,30 +9,25 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import {useIntl} from 'react-intl'
 
-// Components
 import {
     Container,
     SimpleGrid,
     Stack,
-
-    // Hooks
-    useTheme
+    useSlotRecipe
 } from '@chakra-ui/react'
 
-// Project Components
 import LinksList from '../../components/links-list'
 
-// Others
 import {categoryUrlBuilder} from '../../utils/url'
 
 const ListMenuContent = ({maxColumns, item, itemsKey, onClose, initialFocusRef}) => {
-    const theme = useTheme()
-    const {baseStyle} = theme.components.ListMenu
+    const recipe = useSlotRecipe({key: 'listMenu'})
+    const styles = recipe()
     const {locale} = useIntl()
     const items = item?.[itemsKey] || []
 
     return (
-        <Container as={Stack} {...baseStyle.popoverContainer}>
+        <Container as={Stack} css={styles.popoverContainer}>
             <SimpleGrid
                 spacing={8}
                 justifyContent={'left'}
