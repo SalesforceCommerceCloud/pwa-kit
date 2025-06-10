@@ -54,4 +54,4 @@ const useExternalSearch = () => {
     }, [location?.pathname, searchParams?.q, searchParams?.search, searchParams?.query, history])
 }
 
-export default useExternalSearch 
+export default useExternalSearch
