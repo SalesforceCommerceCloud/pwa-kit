@@ -6,8 +6,7 @@
  */
 import React, {useState, useMemo} from 'react'
 import {FormattedMessage, useIntl} from 'react-intl'
-
-// Chakra Components
+ƒ
 import {
     Box,
     Stack,
@@ -616,17 +615,6 @@ const Cart = () => {
                                                     index={idx}
                                                     secondaryActions={
                                                         <CartSecondaryButtonGroup
-                                                            isAGift={
-                                                                localIsGiftItems[productItem.itemId]
-                                                                    ? localIsGiftItems[
-                                                                          productItem.itemId
-                                                                      ]
-                                                                    : productItem.gift
-                                                            }
-                                                            onIsAGiftChange={handleIsAGiftChange}
-                                                            onAddToWishlistClick={
-                                                                handleAddToWishlist
-                                                            }
                                                             onEditClick={(product) => {
                                                                 setSelectedItem(product)
                                                                 onOpen()
