@@ -254,7 +254,7 @@ const DrawerMenu = ({
                                 ) : (
                                     <Link to={SIGN_IN_HREF}>
                                         <HStack>
-                                            <UserIcon css={styles.icon} />
+                                            <UserIcon css={styles.icon} />{' '}
                                             <Text>
                                                 {intl.formatMessage({
                                                     id: 'drawer_menu.link.sign_in',
