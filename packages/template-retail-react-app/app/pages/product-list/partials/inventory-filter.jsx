@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2025, Salesforce, Inc.
+ * All rights reserved.
+ * SPDX-License-Identifier: BSD-3-Clause
+ * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
+ */
+
 import React, {useEffect, useState} from 'react'
 import {useIntl, FormattedMessage} from 'react-intl'
 import {
@@ -30,8 +37,8 @@ const StoreInventoryFilter = ({ toggleFilter, selectedFilters }) => {
     const handleCheckboxChange = (e) => {
         // If no store is selected or no inventoryId, open store locator
         if (!selectedStore?.inventoryId) {
-            e.preventDefault() // Prevent checkbox from being checked
-            onOpen() // Open store locator
+            e.preventDefault() 
+            onOpen()
             return
         }
         
@@ -45,10 +52,11 @@ const StoreInventoryFilter = ({ toggleFilter, selectedFilters }) => {
         )
     }
 
+     // Always open store locator when store name text is clicked
     const handleStoreNameClick = (e) => {
-        e.stopPropagation() // Prevent checkbox from being triggered
+        e.stopPropagation()
         e.preventDefault()
-        onOpen() // Always open store locator when store name text is clicked
+        onOpen()
     }
 
     const handleStoreLocatorClose = () => {

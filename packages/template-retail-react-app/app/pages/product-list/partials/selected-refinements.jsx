@@ -29,10 +29,12 @@ const SelectedRefinements = ({toggleFilter, selectedFilterValues, filters, handl
                     (priceFilter) => priceFilter.value === filter
                 )?.label || filter
             } else if (key === 'ilids') {
+                // Fallback text for in stock selected filter
                 uiLabel = formatMessage({
                     id: 'selected_refinements.filter.in_stock',
                     defaultMessage: 'In Stock'
                 })
+
                 const storeInfo = getSelectedStoreData(site?.id)
                 if (storeInfo?.inventoryId === filter && storeInfo?.name) {
                     uiLabel = formatMessage({
