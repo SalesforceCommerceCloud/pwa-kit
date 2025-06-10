@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, {forwardRef} from 'react'
+import React from 'react'
 import PropTypes from 'prop-types'
 import {Link as RouteLink} from 'react-router-dom'
 
@@ -19,14 +19,6 @@ import Link from '../../components/link'
 import {ChevronDownIcon} from '../../components/icons'
 
 import {categoryUrlBuilder} from '../../utils/url'
-
-const ChevronIconTrigger = forwardRef(function ChevronIconTrigger(props, ref) {
-    return (
-        <Box {...props} ref={ref}>
-            <ChevronDownIcon />
-        </Box>
-    )
-})
 
 const ListMenuTrigger = ({item, name, isOpen, onOpen, onClose}) => {
     const recipe = useSlotRecipe({key: 'listMenu'})
@@ -60,7 +52,7 @@ const ListMenuTrigger = ({item, name, isOpen, onOpen, onClose}) => {
                     }}
                     css={styles.listMenuTriggerLinkIcon}
                 >
-                    <ChevronIconTrigger />
+                    <ChevronDownIcon />
                 </Link>
             </Popover.Trigger>
         </Box>
