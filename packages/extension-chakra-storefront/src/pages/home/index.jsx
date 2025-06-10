@@ -28,7 +28,7 @@ import Hero from '../../components/hero'
 import Seo from '../../components/seo'
 import Section from '../../components/section'
 import ProductScroller from '../../components/product-scroller'
-import {AuthModal, useAuthModal} from '../../hooks/use-auth-modal'
+import {AuthModal, REGISTER_VIEW, useAuthModal} from '../../hooks/use-auth-modal'
 
 // Others
 import {getStaticAssetUrl} from '@salesforce/pwa-kit-react-sdk/ssr/universal/utils'
@@ -62,7 +62,7 @@ const Home = () => {
     const {res} = useServerContext()
 
     // Auth Modal for testing
-    const authModal = useAuthModal('login')
+    const authModal = useAuthModal(REGISTER_VIEW)
 
     if (res) {
         res.set(

@@ -7,21 +7,11 @@
 import React, {useState} from 'react'
 import PropTypes from 'prop-types'
 import {Controller} from 'react-hook-form'
-import {
-    FormControl,
-    FormLabel,
-    FormErrorMessage,
-    IconButton,
-    Input,
-    InputGroup,
-    InputRightElement,
-    Select,
-    Checkbox
-} from '@chakra-ui/react'
+import {Field, IconButton, Input, InputGroup, NativeSelect, Checkbox} from '@chakra-ui/react'
 import {VisibilityIcon, VisibilityOffIcon, AlertIcon} from '../../components/icons'
 import {useIntl} from 'react-intl'
 
-const Field = ({
+const FieldComponent = ({
     name,
     label,
     formLabel,
@@ -64,14 +54,24 @@ const Field = ({
                     typeof inputProps === 'function' ? inputProps({value, onChange}) : inputProps
 
                 return (
-                    <FormControl id={name} isInvalid={error}>
+                    <Field.Root id={name} invalid={!!error}>
                         {!['checkbox', 'radio', 'hidden'].includes(type) &&
-                            (formLabel || <FormLabel>{label}</FormLabel>)}
+                            (formLabel || <Field.Label>{label}</Field.Label>)}
 
-                        <InputGroup>
-                            {['text', 'password', 'email', 'phone', 'tel', 'number'].includes(
-                                type
-                            ) && (
+                        {['text', 'password', 'email', 'phone', 'tel', 'number'].includes(type) && (
+                            <InputGroup
+                                endElement={
+                                    type === 'password' ? (
+                                        <IconButton
+                                            variant="ghosted"
+                                            aria-label={passwordIconLabel}
+                                            onClick={() => setHidePassword(!hidePassword)}
+                                        >
+                                            <PasswordIcon color="gray.500" boxSize={6} />
+                                        </IconButton>
+                                    ) : undefined
+                                }
+                            >
                                 <Input
                                     ref={(node) => {
                                         ref(node)
@@ -84,75 +84,62 @@ const Field = ({
                                     autoComplete={autoComplete}
                                     {..._inputProps}
                                 />
-                            )}
+                            </InputGroup>
+                        )}
 
-                            {type === 'hidden' && (
-                                <input
-                                    ref={ref}
-                                    onChange={onChange}
-                                    value={value}
-                                    type="hidden"
-                                    {..._inputProps}
-                                />
-                            )}
+                        {type === 'hidden' && (
+                            <input
+                                ref={ref}
+                                onChange={onChange}
+                                value={value}
+                                type="hidden"
+                                {..._inputProps}
+                            />
+                        )}
 
-                            {type === 'password' && (
-                                <InputRightElement>
-                                    <IconButton
-                                        variant="ghosted"
-                                        aria-label={passwordIconLabel}
-                                        icon={<PasswordIcon color="gray.500" boxSize={6} />}
-                                        onClick={() => setHidePassword(!hidePassword)}
-                                    />
-                                </InputRightElement>
-                            )}
-
-                            {type === 'select' && (
-                                <Select
-                                    ref={ref}
-                                    onChange={onChange}
-                                    value={value}
-                                    placeholder={placeholder}
-                                    {..._inputProps}
-                                >
+                        {type === 'select' && (
+                            <NativeSelect.Root ref={ref} value={value} {..._inputProps}>
+                                <NativeSelect.Field onChange={onChange} placeholder={placeholder}>
                                     {options.map((opt) => (
                                         <option key={`${opt.label}-${opt.value}`} value={opt.value}>
                                             {opt.label}
                                         </option>
                                     ))}
-                                </Select>
-                            )}
+                                </NativeSelect.Field>
+                                <NativeSelect.Indicator />
+                            </NativeSelect.Root>
+                        )}
 
-                            {type === 'checkbox' && (
-                                <Checkbox
-                                    ref={ref}
-                                    onChange={(e) => onChange(e.target.checked)}
-                                    isChecked={value}
-                                    {..._inputProps}
-                                >
-                                    {formLabel || label}
-                                </Checkbox>
-                            )}
+                        {type === 'checkbox' && (
+                            <Checkbox.Root
+                                checked={value}
+                                onCheckedChange={(details) => onChange(details.checked)}
+                                {..._inputProps}
+                            >
+                                <Checkbox.HiddenInput ref={ref} />
+                                <Checkbox.Control />
+                                <Checkbox.Label>{formLabel || label}</Checkbox.Label>
+                            </Checkbox.Root>
+                        )}
 
-                            {children}
-                        </InputGroup>
+                        {children}
 
                         {error && type !== 'hidden' && (
-                            <FormErrorMessage color="red.600">
+                            <Field.ErrorText color="red.600">
                                 <AlertIcon aria-hidden="true" mr={2} />
                                 {error.message}
-                            </FormErrorMessage>
+                            </Field.ErrorText>
                         )}
 
                         {helpText}
-                    </FormControl>
+                    </Field.Root>
                 )
             }}
         />
     )
 }
 
-Field.propTypes = {
+FieldComponent.propTypes = {
     name: PropTypes.string,
     label: PropTypes.string,
     autoComplete: PropTypes.string,
@@ -180,4 +167,4 @@ Field.propTypes = {
     inputRef: PropTypes.object
 }
 
-export default Field
+export default FieldComponent

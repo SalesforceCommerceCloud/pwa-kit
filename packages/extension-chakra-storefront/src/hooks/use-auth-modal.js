@@ -311,13 +311,17 @@ export const AuthModal = ({
                                     setLoginType={setLoginType}
                                 />
                             )}
-                            {!form.formState.isSubmitSuccessful && currentView === REGISTER_VIEW && (
-                                <RegisterForm
-                                    form={form}
-                                    submitForm={submitForm}
-                                    clickSignIn={onBackToSignInClick}
-                                />
-                            )}
+                            */}
+
+                            {!form.formState.isSubmitSuccessful &&
+                                currentView === REGISTER_VIEW && (
+                                    <RegisterForm
+                                        form={form}
+                                        submitForm={submitForm}
+                                        clickSignIn={onBackToSignInClick}
+                                    />
+                                )}
+
                             {currentView === PASSWORD_VIEW && (
                                 <ResetPasswordForm
                                     form={form}
@@ -325,6 +329,8 @@ export const AuthModal = ({
                                     clickSignIn={onBackToSignInClick}
                                 />
                             )}
+
+                            {/*
                             {currentView === EMAIL_VIEW && (
                                 <PasswordlessEmailConfirmation
                                     form={form}
