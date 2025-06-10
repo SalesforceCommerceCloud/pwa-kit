@@ -1,11 +1,14 @@
 /*
- * Copyright (c) 2021, salesforce.com, inc.
+ * Copyright (c) 2025, salesforce.com, inc.
  * All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-export default {
-    baseStyle: {
+import {defineSlotRecipe} from '@chakra-ui/react'
+
+export default defineSlotRecipe({
+    slots: ['container', 'stackContainer', 'popoverContent', 'popoverContainer', 'listMenuTriggerContainer', 'listMenuTriggerLink', 'listMenuTriggerLinkActive', 'listMenuTriggerLinkIcon'],
+    base: {
         container: {
             minWidth: 'xs',
             width: 'full',
@@ -91,15 +94,5 @@ export default {
                 textDecoration: 'none'
             }
         }
-    },
-    parts: [
-        'container',
-        'stackContainer',
-        'popoverContent',
-        'popoverContainer',
-        'listMenuTriggerContainer',
-        'listMenuTriggerLink',
-        'listMenuTriggerLinkActive',
-        'listMenuTriggerIcon'
-    ]
-}
+    }
+})

@@ -10,16 +10,13 @@ import PropTypes from 'prop-types'
 import {useIntl} from 'react-intl'
 import {Link as RouteLink} from 'react-router-dom'
 
-// Components
 import {
     Box,
     Center,
     Flex,
     Spinner,
     Stack,
-
-    // Hooks
-    useTheme
+    useSlotRecipe
 } from '@chakra-ui/react'
 
 // Project Components
@@ -48,12 +45,12 @@ const ListMenu = ({
     itemsCountKey,
     maxColumns = MAXIMUM_NUMBER_COLUMNS
 }) => {
-    const theme = useTheme()
+    const recipe = useSlotRecipe({key: 'listMenu'})
     const [ariaBusy, setAriaBusy] = useState(true)
     const [activeLink, setActiveLink] = useState()
     const intl = useIntl()
 
-    const {baseStyle} = theme.components.ListMenu
+    const styles = recipe()
     const items = root?.[itemsKey]
 
     useEffect(() => {
@@ -71,9 +68,9 @@ const ListMenu = ({
             aria-busy={ariaBusy}
             aria-atomic="true"
         >
-            <Flex {...baseStyle.container}>
+            <Flex css={styles.container}>
                 {items ? (
-                    <Stack direction={'row'} spacing={0} {...baseStyle.stackContainer}>
+                    <Stack direction={'row'} spacing={0} css={styles.stackContainer}>
                         {items?.map?.((item) => {
                             const {id, name} = item
                             const itemsCount = item[itemsCountKey] || item[itemsKey]?.length || 0
@@ -81,25 +78,28 @@ const ListMenu = ({
                             return (
                                 <Box key={id}>
                                     {itemsCount > 0 ? (
-                                        <ListMenuPopover
-                                            key={id}
-                                            maxColumns={maxColumns}
-                                            item={item}
-                                            name={name}
-                                            items={item?.[itemsKey]}
-                                            itemsKey={itemsKey}
-                                            contentComponent={contentComponent}
-                                        />
+                                        // <ListMenuPopover
+                                        //     key={id}
+                                        //     maxColumns={maxColumns}
+                                        //     item={item}
+                                        //     name={name}
+                                        //     items={item?.[itemsKey]}
+                                        //     itemsKey={itemsKey}
+                                        //     contentComponent={contentComponent}
+                                        // />
+                                        <div>
+                                            <h1>ListMenuPopover</h1>
+                                        </div>
                                     ) : (
                                         <Link
                                             as={RouteLink}
                                             to={categoryUrlBuilder(item)}
                                             onMouseOver={setActiveLink.bind(this, id)}
                                             onMouseOut={setActiveLink.bind(this)}
-                                            {...baseStyle.listMenuTriggerLink}
+                                            {...styles.listMenuTriggerLink}
                                             {...{name: name + ' __'}}
                                             {...(activeLink === id
-                                                ? baseStyle.listMenuTriggerlessLinkActive
+                                                ? {css: styles.listMenuTriggerlessLinkActive}
                                                 : {})}
                                         >
                                             {name}
