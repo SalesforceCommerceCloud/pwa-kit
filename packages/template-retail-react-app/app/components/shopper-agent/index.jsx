@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, {useEffect, useState} from 'react'
+import React, {useEffect} from 'react'
 import useScript from '@salesforce/retail-react-app/app/hooks/use-script'
 import {useUsid} from '@salesforce/commerce-sdk-react'
 import PropTypes from 'prop-types'
@@ -109,7 +109,8 @@ function ShopperAgentWindow({commerceAgentConfiguration, locale, domainUrl, bask
                 SiteId: siteId,
                 Locale: locale,
                 OrganizationId: commerceOrgId,
-                UsId: usid
+                UsId: usid,
+                PwaKit: true
             })
         }
 
@@ -186,7 +187,7 @@ ShopperAgentWindow.propTypes = {
 
 /**
  * ShopperAgent component that initializes and manages the embedded messaging service
- * @param {Object} props - Component props
+ * @param {Object} props - Component props 
  * @param {Object} props.commerceAgentConfiguration - Commerce agent settings
  * @param {string} props.domainUrl - The domain URL for the embedded messaging script
  * @param {string} props.basketId - The basket ID for the embedded messaging script
