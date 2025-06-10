@@ -2,85 +2,85 @@
   "account.accordion.button.my_account": [
     {
       "type": 0,
-      "value": "My Account"
+      "value": "Min konto"
     }
   ],
   "account.heading.my_account": [
     {
       "type": 0,
-      "value": "My Account"
+      "value": "Min konto"
     }
   ],
   "account.logout_button.button.log_out": [
     {
       "type": 0,
-      "value": "Log Out"
+      "value": "Log ud"
     }
   ],
   "account_addresses.badge.default": [
     {
       "type": 0,
-      "value": "Default"
+      "value": "Standard"
     }
   ],
   "account_addresses.button.add_address": [
     {
       "type": 0,
-      "value": "Add Address"
+      "value": "Tilføj adresse"
     }
   ],
   "account_addresses.info.address_removed": [
     {
       "type": 0,
-      "value": "Address removed"
+      "value": "Adressen blev fjernet"
     }
   ],
   "account_addresses.info.address_updated": [
     {
       "type": 0,
-      "value": "Address updated"
+      "value": "Adressen blev opdateret"
     }
   ],
   "account_addresses.info.new_address_saved": [
     {
       "type": 0,
-      "value": "New address saved"
+      "value": "Ny adresse blev gemt"
     }
   ],
   "account_addresses.page_action_placeholder.button.add_address": [
     {
       "type": 0,
-      "value": "Add Address"
+      "value": "Tilføj adresse"
     }
   ],
   "account_addresses.page_action_placeholder.heading.no_saved_addresses": [
     {
       "type": 0,
-      "value": "No Saved Addresses"
+      "value": "Ingen gemte adresser"
     }
   ],
   "account_addresses.page_action_placeholder.message.add_new_address": [
     {
       "type": 0,
-      "value": "Add a new address method for faster checkout."
+      "value": "Tilføj en ny adressemetode for hurtigere udtjekning."
     }
   ],
   "account_addresses.title.addresses": [
     {
       "type": 0,
-      "value": "Addresses"
+      "value": "Adresser"
     }
   ],
   "account_detail.title.account_details": [
     {
       "type": 0,
-      "value": "Account Details"
+      "value": "Kontooplysninger"
     }
   ],
   "account_order_detail.heading.billing_address": [
     {
       "type": 0,
-      "value": "Billing Address"
+      "value": "Faktureringsadresse"
     }
   ],
   "account_order_detail.heading.num_of_items": [
@@ -90,31 +90,31 @@
     },
     {
       "type": 0,
-      "value": " items"
+      "value": " varer"
     }
   ],
   "account_order_detail.heading.payment_method": [
     {
       "type": 0,
-      "value": "Payment Method"
+      "value": "Betalingsmetode"
     }
   ],
   "account_order_detail.heading.shipping_address": [
     {
       "type": 0,
-      "value": "Shipping Address"
+      "value": "Leveringsadresse"
     }
   ],
   "account_order_detail.heading.shipping_method": [
     {
       "type": 0,
-      "value": "Shipping Method"
+      "value": "Forsendelsesmetode"
     }
   ],
   "account_order_detail.label.order_number": [
     {
       "type": 0,
-      "value": "Order Number: "
+      "value": "Ordrenummer: "
     },
     {
       "type": 1,
@@ -124,7 +124,7 @@
   "account_order_detail.label.ordered_date": [
     {
       "type": 0,
-      "value": "Ordered: "
+      "value": "Bestilt: "
     },
     {
       "type": 1,
@@ -134,61 +134,61 @@
   "account_order_detail.label.pending_tracking_number": [
     {
       "type": 0,
-      "value": "Pending"
+      "value": "Afventer"
     }
   ],
   "account_order_detail.label.tracking_number": [
     {
       "type": 0,
-      "value": "Tracking Number"
+      "value": "Sporingsnummer"
     }
   ],
   "account_order_detail.link.back_to_history": [
     {
       "type": 0,
-      "value": "Back to Order History"
+      "value": "Tilbage til ordrehistorik"
     }
   ],
   "account_order_detail.shipping_status.not_shipped": [
     {
       "type": 0,
-      "value": "Not shipped"
+      "value": "Ikke afsendt"
     }
   ],
   "account_order_detail.shipping_status.part_shipped": [
     {
       "type": 0,
-      "value": "Partially shipped"
+      "value": "Delvist afsendt"
     }
   ],
   "account_order_detail.shipping_status.shipped": [
     {
       "type": 0,
-      "value": "Shipped"
+      "value": "Afsendt"
     }
   ],
   "account_order_detail.title.order_details": [
     {
       "type": 0,
-      "value": "Order Details"
+      "value": "Ordreinformation"
     }
   ],
   "account_order_history.button.continue_shopping": [
     {
       "type": 0,
-      "value": "Continue Shopping"
+      "value": "Fortsæt med at handle"
     }
   ],
   "account_order_history.description.once_you_place_order": [
     {
       "type": 0,
-      "value": "Once you place an order the details will show up here."
+      "value": "Når du har afgivet en ordre, bliver oplysningerne vist her."
     }
   ],
   "account_order_history.heading.no_order_yet": [
     {
       "type": 0,
-      "value": "You haven't placed an order yet."
+      "value": "Du har ikke afgivet en ordre endnu."
     }
   ],
   "account_order_history.label.num_of_items": [
@@ -198,13 +198,13 @@
     },
     {
       "type": 0,
-      "value": " items"
+      "value": " varer"
     }
   ],
   "account_order_history.label.order_number": [
     {
       "type": 0,
-      "value": "Order Number: "
+      "value": "Ordrenummer: "
     },
     {
       "type": 1,
@@ -214,7 +214,7 @@
   "account_order_history.label.ordered_date": [
     {
       "type": 0,
-      "value": "Ordered: "
+      "value": "Bestilt: "
     },
     {
       "type": 1,
@@ -224,7 +224,7 @@
   "account_order_history.label.shipped_to": [
     {
       "type": 0,
-      "value": "Shipped to: "
+      "value": "Sendes til: "
     },
     {
       "type": 1,
@@ -234,49 +234,49 @@
   "account_order_history.link.view_details": [
     {
       "type": 0,
-      "value": "View details"
+      "value": "Se oplysninger"
     }
   ],
   "account_order_history.title.order_history": [
     {
       "type": 0,
-      "value": "Order History"
+      "value": "Ordrehistorik"
     }
   ],
   "account_wishlist.button.continue_shopping": [
     {
       "type": 0,
-      "value": "Continue Shopping"
+      "value": "Fortsæt med at handle"
     }
   ],
   "account_wishlist.description.continue_shopping": [
     {
       "type": 0,
-      "value": "Continue shopping and add items to your wishlist."
+      "value": "Fortsæt med at handle, og tilføj varer til din ønskeliste."
     }
   ],
   "account_wishlist.heading.no_wishlist": [
     {
       "type": 0,
-      "value": "No Wishlist Items"
+      "value": "Ingen varer på ønskelisten"
     }
   ],
   "account_wishlist.title.wishlist": [
     {
       "type": 0,
-      "value": "Wishlist"
+      "value": "Ønskeliste"
     }
   ],
   "action_card.action.edit": [
     {
       "type": 0,
-      "value": "Edit"
+      "value": "Rediger"
     }
   ],
   "action_card.action.remove": [
     {
       "type": 0,
-      "value": "Remove"
+      "value": "Fjern"
     }
   ],
   "add_to_cart_modal.info.added_to_cart": [
@@ -295,7 +295,7 @@
           "value": [
             {
               "type": 0,
-              "value": "item"
+              "value": "vare"
             }
           ]
         },
@@ -303,7 +303,7 @@
           "value": [
             {
               "type": 0,
-              "value": "items"
+              "value": "varer"
             }
           ]
         }
@@ -314,13 +314,13 @@
     },
     {
       "type": 0,
-      "value": " added to cart"
+      "value": " lagt i kurv"
     }
   ],
   "add_to_cart_modal.label.cart_subtotal": [
     {
       "type": 0,
-      "value": "Cart Subtotal ("
+      "value": "Kurvens subtotal ("
     },
     {
       "type": 1,
@@ -328,109 +328,71 @@
     },
     {
       "type": 0,
-      "value": " item)"
+      "value": " vare)"
     }
   ],
   "add_to_cart_modal.label.quantity": [
     {
       "type": 0,
-      "value": "Qty"
+      "value": "Antal"
     }
   ],
   "add_to_cart_modal.link.checkout": [
     {
       "type": 0,
-      "value": "Proceed to Checkout"
+      "value": "Fortsæt til kassen"
     }
   ],
   "add_to_cart_modal.link.view_cart": [
     {
       "type": 0,
-      "value": "View Cart"
+      "value": "Vis kurv"
     }
   ],
   "add_to_cart_modal.recommended_products.title.might_also_like": [
     {
       "type": 0,
-      "value": "You Might Also Like"
+      "value": "Du vil måske også synes om"
     }
   ],
   "auth_modal.button.close.assistive_msg": [
     {
       "type": 0,
-      "value": "Close login form"
-    }
-  ],
-  "auth_modal.check_email.button.resend_link": [
-    {
-      "type": 0,
-      "value": "Resend Link"
-    }
-  ],
-  "auth_modal.check_email.description.check_spam_folder": [
-    {
-      "type": 0,
-      "value": "The link may take a few minutes to arrive, check your spam folder if you're having trouble finding it"
-    }
-  ],
-  "auth_modal.check_email.description.just_sent": [
-    {
-      "type": 0,
-      "value": "We just sent a login link to "
-    },
-    {
-      "children": [
-        {
-          "type": 1,
-          "value": "email"
-        }
-      ],
-      "type": 8,
-      "value": "b"
-    }
-  ],
-  "auth_modal.check_email.title.check_your_email": [
-    {
-      "type": 0,
-      "value": "Check Your Email"
+      "value": "Luk login-formularen"
     }
   ],
   "auth_modal.description.now_signed_in": [
     {
       "type": 0,
-      "value": "You're now signed in."
+      "value": "Du er nu logget ind."
     }
   ],
   "auth_modal.error.incorrect_email_or_password": [
     {
       "type": 0,
-      "value": "Something's not right with your email or password. Try again."
+      "value": "Der er noget galt med din e-mail eller adgangskode. Prøv igen"
     }
   ],
   "auth_modal.info.welcome_user": [
     {
       "type": 0,
-      "value": "Welcome "
+      "value": "Velkommen "
     },
     {
       "type": 1,
       "value": "name"
-    },
-    {
-      "type": 0,
-      "value": ","
     }
   ],
   "auth_modal.password_reset_success.button.back_to_sign_in": [
     {
       "type": 0,
-      "value": "Back to Sign In"
+      "value": "Tilbage til Log ind"
     }
   ],
   "auth_modal.password_reset_success.info.will_email_shortly": [
     {
       "type": 0,
-      "value": "You will receive an email at "
+      "value": "Du vil snart modtage en e-mail på "
     },
     {
       "children": [
@@ -444,37 +406,37 @@
     },
     {
       "type": 0,
-      "value": " with a link to reset your password shortly."
+      "value": " med et link til at nulstille din adgangskode."
     }
   ],
   "auth_modal.password_reset_success.title.password_reset": [
     {
       "type": 0,
-      "value": "Password Reset"
+      "value": "Nulstilling af adgangskode"
     }
   ],
   "carousel.button.scroll_left.assistive_msg": [
     {
       "type": 0,
-      "value": "Scroll carousel left"
+      "value": "Rul karrusellen til venstre"
     }
   ],
   "carousel.button.scroll_right.assistive_msg": [
     {
       "type": 0,
-      "value": "Scroll carousel right"
+      "value": "Rul karrusellen til højre"
     }
   ],
   "cart.info.removed_from_cart": [
     {
       "type": 0,
-      "value": "Item removed from cart"
+      "value": "Varen er fjernet fra kurv"
     }
   ],
   "cart.product_edit_modal.modal_label": [
     {
       "type": 0,
-      "value": "Edit modal for "
+      "value": "Rediger måde for "
     },
     {
       "type": 1,
@@ -484,61 +446,61 @@
   "cart.recommended_products.title.may_also_like": [
     {
       "type": 0,
-      "value": "You May Also Like"
+      "value": "Du vil måske også synes om"
     }
   ],
   "cart.recommended_products.title.recently_viewed": [
     {
       "type": 0,
-      "value": "Recently Viewed"
+      "value": "Set for nylig"
     }
   ],
   "cart_cta.link.checkout": [
     {
       "type": 0,
-      "value": "Proceed to Checkout"
+      "value": "Fortsæt til kassen"
     }
   ],
   "cart_secondary_button_group.action.added_to_wishlist": [
     {
       "type": 0,
-      "value": "Add to Wishlist"
+      "value": "Tilføj til ønskeliste"
     }
   ],
   "cart_secondary_button_group.action.edit": [
     {
       "type": 0,
-      "value": "Edit"
+      "value": "Rediger"
     }
   ],
   "cart_secondary_button_group.action.remove": [
     {
       "type": 0,
-      "value": "Remove"
+      "value": "Fjern"
     }
   ],
   "cart_secondary_button_group.label.this_is_gift": [
     {
       "type": 0,
-      "value": "This is a gift."
+      "value": "Dette er en gave."
     }
   ],
   "cart_skeleton.heading.order_summary": [
     {
       "type": 0,
-      "value": "Order Summary"
+      "value": "Ordreoversigt"
     }
   ],
   "cart_skeleton.title.cart": [
     {
       "type": 0,
-      "value": "Cart"
+      "value": "Kurv"
     }
   ],
   "cart_title.title.cart_num_of_items": [
     {
       "type": 0,
-      "value": "Cart ("
+      "value": "Kurv ("
     },
     {
       "offset": 0,
@@ -547,7 +509,7 @@
           "value": [
             {
               "type": 0,
-              "value": "0 items"
+              "value": "0 varer"
             }
           ]
         },
@@ -558,7 +520,7 @@
             },
             {
               "type": 0,
-              "value": " item"
+              "value": " vare"
             }
           ]
         },
@@ -569,7 +531,7 @@
             },
             {
               "type": 0,
-              "value": " items"
+              "value": " varer"
             }
           ]
         }
@@ -586,127 +548,127 @@
   "category_links.button_text": [
     {
       "type": 0,
-      "value": "Categories"
+      "value": "Kategorier"
     }
   ],
   "cc_radio_group.action.remove": [
     {
       "type": 0,
-      "value": "Remove"
+      "value": "Fjern"
     }
   ],
   "cc_radio_group.button.add_new_card": [
     {
       "type": 0,
-      "value": "Add New Card"
+      "value": "Tilføj nyt kort"
     }
   ],
   "checkout.button.place_order": [
     {
       "type": 0,
-      "value": "Place Order"
+      "value": "Afgiv ordre"
     }
   ],
   "checkout.message.generic_error": [
     {
       "type": 0,
-      "value": "An unexpected error occurred during checkout."
+      "value": "Der opstod en uventet fejl under udtjekning."
     }
   ],
   "checkout_confirmation.button.create_account": [
     {
       "type": 0,
-      "value": "Create Account"
+      "value": "Opret konto"
     }
   ],
   "checkout_confirmation.heading.billing_address": [
     {
       "type": 0,
-      "value": "Billing Address"
+      "value": "Faktureringsadresse"
     }
   ],
   "checkout_confirmation.heading.create_account": [
     {
       "type": 0,
-      "value": "Create an account for faster checkout"
+      "value": "Opret en konto for hurtigere betaling"
     }
   ],
   "checkout_confirmation.heading.credit_card": [
     {
       "type": 0,
-      "value": "Credit Card"
+      "value": "Kreditkort"
     }
   ],
   "checkout_confirmation.heading.delivery_details": [
     {
       "type": 0,
-      "value": "Delivery Details"
+      "value": "Leveringsinformation"
     }
   ],
   "checkout_confirmation.heading.order_summary": [
     {
       "type": 0,
-      "value": "Order Summary"
+      "value": "Ordreoversigt"
     }
   ],
   "checkout_confirmation.heading.payment_details": [
     {
       "type": 0,
-      "value": "Payment Details"
+      "value": "Betalingsoplysninger"
     }
   ],
   "checkout_confirmation.heading.shipping_address": [
     {
       "type": 0,
-      "value": "Shipping Address"
+      "value": "Leveringsadresse"
     }
   ],
   "checkout_confirmation.heading.shipping_method": [
     {
       "type": 0,
-      "value": "Shipping Method"
+      "value": "Forsendelsesmetode"
     }
   ],
   "checkout_confirmation.heading.thank_you_for_order": [
     {
       "type": 0,
-      "value": "Thank you for your order!"
+      "value": "Tak for din bestilling!"
     }
   ],
   "checkout_confirmation.label.free": [
     {
       "type": 0,
-      "value": "Free"
+      "value": "Gratis"
     }
   ],
   "checkout_confirmation.label.order_number": [
     {
       "type": 0,
-      "value": "Order Number"
+      "value": "Ordrenummer"
     }
   ],
   "checkout_confirmation.label.order_total": [
     {
       "type": 0,
-      "value": "Order Total"
+      "value": "Samlet ordre"
     }
   ],
   "checkout_confirmation.label.promo_applied": [
     {
       "type": 0,
-      "value": "Promotion applied"
+      "value": "Kampagnekode blev anvendt"
     }
   ],
   "checkout_confirmation.label.shipping": [
     {
       "type": 0,
-      "value": "Shipping"
+      "value": "Forsendelse"
     }
   ],
   "checkout_confirmation.label.shipping.strikethrough.price": [
     {
       "type": 0,
-      "value": "Originally "
+      "value": "Oprindeligt "
     },
     {
       "type": 1,
@@ -714,7 +676,7 @@
     },
     {
       "type": 0,
-      "value": ", now "
+      "value": ", nu "
     },
     {
       "type": 1,
@@ -730,25 +692,25 @@
   "checkout_confirmation.label.tax": [
     {
       "type": 0,
-      "value": "Tax"
+      "value": "Moms"
     }
   ],
   "checkout_confirmation.link.continue_shopping": [
     {
       "type": 0,
-      "value": "Continue Shopping"
+      "value": "Fortsæt med at handle"
     }
   ],
   "checkout_confirmation.link.login": [
     {
       "type": 0,
-      "value": "Log in here"
+      "value": "Log ind her"
     }
   ],
   "checkout_confirmation.message.already_has_account": [
     {
       "type": 0,
-      "value": "This email already has an account."
+      "value": "Denne e-mail har allerede en konto."
     }
   ],
   "checkout_confirmation.message.num_of_items_in_order": [
@@ -759,7 +721,7 @@
           "value": [
             {
               "type": 0,
-              "value": "0 items"
+              "value": "0 varer"
             }
           ]
         },
@@ -770,7 +732,7 @@
             },
             {
               "type": 0,
-              "value": " item"
+              "value": " vare"
             }
           ]
         },
@@ -781,7 +743,7 @@
             },
             {
               "type": 0,
-              "value": " items"
+              "value": " varer"
             }
           ]
         }
@@ -794,7 +756,7 @@
   "checkout_confirmation.message.will_email_shortly": [
     {
       "type": 0,
-      "value": "We will send an email to "
+      "value": "Vi sender en e-mail til "
     },
     {
       "children": [
@@ -808,49 +770,49 @@
     },
     {
       "type": 0,
-      "value": " with your confirmation number and receipt shortly."
+      "value": " med dit bekræftelsesnummer og din kvittering inden for kort tid."
     }
   ],
   "checkout_footer.link.privacy_policy": [
     {
       "type": 0,
-      "value": "Privacy Policy"
+      "value": "Privatlivspolitik"
     }
   ],
   "checkout_footer.link.returns_exchanges": [
     {
       "type": 0,
-      "value": "Returns & Exchanges"
+      "value": "Returnering og ombytning"
     }
   ],
   "checkout_footer.link.shipping": [
     {
       "type": 0,
-      "value": "Shipping"
+      "value": "Forsendelse"
     }
   ],
   "checkout_footer.link.site_map": [
     {
       "type": 0,
-      "value": "Site Map"
+      "value": "Sitemap"
     }
   ],
   "checkout_footer.link.terms_conditions": [
     {
       "type": 0,
-      "value": "Terms & Conditions"
+      "value": "Vilkår og betingelser"
     }
   ],
   "checkout_footer.message.copyright": [
     {
       "type": 0,
-      "value": "Salesforce or its affiliates. All rights reserved. This is a demo store only. Orders made WILL NOT be processed."
+      "value": "Salesforce eller dets datterselskaber. Alle rettigheder forbeholdes. Dette er kun en demobutik. Afgivne bestillinger vil IKKE blive behandlet."
     }
   ],
   "checkout_header.link.assistive_msg.cart": [
     {
       "type": 0,
-      "value": "Back to cart, number of items: "
+      "value": "Tilbage til kurven, antal varer: "
     },
     {
       "type": 1,
@@ -860,49 +822,49 @@
   "checkout_header.link.cart": [
     {
       "type": 0,
-      "value": "Back to cart"
+      "value": "Tilbage til kurven"
     }
   ],
   "checkout_payment.action.remove": [
     {
       "type": 0,
-      "value": "Remove"
+      "value": "Fjern"
     }
   ],
   "checkout_payment.button.review_order": [
     {
       "type": 0,
-      "value": "Review Order"
+      "value": "Gennemse ordre"
     }
   ],
   "checkout_payment.heading.billing_address": [
     {
       "type": 0,
-      "value": "Billing Address"
+      "value": "Faktureringsadresse"
     }
   ],
   "checkout_payment.heading.credit_card": [
     {
       "type": 0,
-      "value": "Credit Card"
+      "value": "Kreditkort"
     }
   ],
   "checkout_payment.label.billing_address_form": [
     {
       "type": 0,
-      "value": "Billing Address Form"
+      "value": "Formular til faktureringsadresse"
     }
   ],
   "checkout_payment.label.same_as_shipping": [
     {
       "type": 0,
-      "value": "Same as shipping address"
+      "value": "Samme som leveringsadresse"
     }
   ],
   "checkout_payment.title.payment": [
     {
       "type": 0,
-      "value": "Payment"
+      "value": "Betaling"
     }
   ],
   "colorRefinements.label.hitCount": [
@@ -926,211 +888,187 @@
   "confirmation_modal.default.action.no": [
     {
       "type": 0,
-      "value": "No"
+      "value": "Nej"
     }
   ],
   "confirmation_modal.default.action.yes": [
     {
       "type": 0,
-      "value": "Yes"
+      "value": "Ja"
     }
   ],
   "confirmation_modal.default.assistive_msg.no": [
     {
       "type": 0,
-      "value": "No, cancel action"
+      "value": "Nej, annuller handling"
     }
   ],
   "confirmation_modal.default.assistive_msg.yes": [
     {
       "type": 0,
-      "value": "Yes, confirm action"
+      "value": "Ja, bekræft handling"
     }
   ],
   "confirmation_modal.default.message.you_want_to_continue": [
     {
       "type": 0,
-      "value": "Are you sure you want to continue?"
+      "value": "Er du sikker på, at du vil fortsætte?"
     }
   ],
   "confirmation_modal.default.title.confirm_action": [
     {
       "type": 0,
-      "value": "Confirm Action"
+      "value": "Bekræft handling"
     }
   ],
   "confirmation_modal.remove_cart_item.action.no": [
     {
       "type": 0,
-      "value": "No, keep item"
+      "value": "Nej, behold varen"
     }
   ],
   "confirmation_modal.remove_cart_item.action.remove": [
     {
       "type": 0,
-      "value": "Remove"
+      "value": "Fjern"
     }
   ],
   "confirmation_modal.remove_cart_item.action.yes": [
     {
       "type": 0,
-      "value": "Yes, remove item"
+      "value": "Ja, fjern varen"
     }
   ],
   "confirmation_modal.remove_cart_item.assistive_msg.no": [
     {
       "type": 0,
-      "value": "No, keep item"
+      "value": "Nej, behold varen"
     }
   ],
   "confirmation_modal.remove_cart_item.assistive_msg.remove": [
     {
       "type": 0,
-      "value": "Remove unavailable products"
+      "value": "Fjern utilgængelige produkter"
     }
   ],
   "confirmation_modal.remove_cart_item.assistive_msg.yes": [
     {
       "type": 0,
-      "value": "Yes, remove item"
+      "value": "Ja, fjern varen"
     }
   ],
   "confirmation_modal.remove_cart_item.message.need_to_remove_due_to_unavailability": [
     {
       "type": 0,
-      "value": "Some items are no longer available online and will be removed from your cart."
+      "value": "Nogle varer er ikke længere tilgængelige online og vil blive fjernet fra din kurv."
     }
   ],
   "confirmation_modal.remove_cart_item.message.sure_to_remove": [
     {
       "type": 0,
-      "value": "Are you sure you want to remove this item from your cart?"
+      "value": "Er du sikker på, at du vil fjerne denne vare fra din kurv?"
     }
   ],
   "confirmation_modal.remove_cart_item.title.confirm_remove": [
     {
       "type": 0,
-      "value": "Confirm Remove Item"
+      "value": "Bekræft Fjern vare"
     }
   ],
   "confirmation_modal.remove_cart_item.title.items_unavailable": [
     {
       "type": 0,
-      "value": "Items Unavailable"
+      "value": "Utilgængelige varer"
     }
   ],
   "confirmation_modal.remove_wishlist_item.action.no": [
     {
       "type": 0,
-      "value": "No, keep item"
+      "value": "Nej, behold varen"
     }
   ],
   "confirmation_modal.remove_wishlist_item.action.yes": [
     {
       "type": 0,
-      "value": "Yes, remove item"
+      "value": "Ja, fjern varen"
     }
   ],
   "confirmation_modal.remove_wishlist_item.message.sure_to_remove": [
     {
       "type": 0,
-      "value": "Are you sure you want to remove this item from your wishlist?"
+      "value": "Er du sikker på, at du vil fjerne denne vare fra din ønskeliste?"
     }
   ],
   "confirmation_modal.remove_wishlist_item.title.confirm_remove": [
     {
       "type": 0,
-      "value": "Confirm Remove Item"
+      "value": "Bekræft Fjern vare"
     }
   ],
   "contact_info.action.sign_out": [
     {
       "type": 0,
-      "value": "Sign Out"
+      "value": "Log ud"
     }
   ],
   "contact_info.button.already_have_account": [
     {
       "type": 0,
-      "value": "Already have an account? Log in"
-    }
-  ],
-  "contact_info.button.back_to_sign_in_options": [
-    {
-      "type": 0,
-      "value": "Back to Sign In Options"
+      "value": "Har du allerede en konto? Log ind"
     }
   ],
   "contact_info.button.checkout_as_guest": [
     {
       "type": 0,
-      "value": "Checkout as Guest"
+      "value": "Afslut køb som gæst"
     }
   ],
   "contact_info.button.login": [
     {
       "type": 0,
-      "value": "Log In"
-    }
-  ],
-  "contact_info.button.password": [
-    {
-      "type": 0,
-      "value": "Password"
-    }
-  ],
-  "contact_info.button.secure_link": [
-    {
-      "type": 0,
-      "value": "Secure Link"
+      "value": "Log ind"
     }
   ],
   "contact_info.error.incorrect_username_or_password": [
     {
       "type": 0,
-      "value": "Incorrect username or password, please try again."
+      "value": "Forkert brugernavn eller adgangskode, prøv igen."
     }
   ],
   "contact_info.link.forgot_password": [
     {
       "type": 0,
-      "value": "Forgot password?"
-    }
-  ],
-  "contact_info.message.or_login_with": [
-    {
-      "type": 0,
-      "value": "Or Login With"
+      "value": "Glemt din adgangskode?"
     }
   ],
   "contact_info.title.contact_info": [
     {
       "type": 0,
-      "value": "Contact Info"
+      "value": "Kontaktoplysninger"
     }
   ],
   "credit_card_fields.tool_tip.security_code": [
     {
       "type": 0,
-      "value": "This 3-digit code can be found on the back of your card."
+      "value": "Denne 3-cifrede kode finder du på bagsiden af dit kort."
     }
   ],
   "credit_card_fields.tool_tip.security_code.american_express": [
     {
       "type": 0,
-      "value": "This 4-digit code can be found on the front of your card."
+      "value": "Denne 4-cifrede kode finder du på forsiden af dit kort."
     }
   ],
   "credit_card_fields.tool_tip.security_code_aria_label": [
     {
       "type": 0,
-      "value": "Security code info"
+      "value": "Info om sikkerhedskode"
     }
   ],
   "display_price.assistive_msg.current_price": [
     {
       "type": 0,
-      "value": "current price "
+      "value": "nuværende pris "
     },
     {
       "type": 1,
@@ -1140,7 +1078,7 @@
   "display_price.assistive_msg.current_price_with_range": [
     {
       "type": 0,
-      "value": "From current price "
+      "value": "Fra nuværende pris "
     },
     {
       "type": 1,
@@ -1150,7 +1088,7 @@
   "display_price.assistive_msg.strikethrough_price": [
     {
       "type": 0,
-      "value": "original price "
+      "value": "oprindelig pris "
     },
     {
       "type": 1,
@@ -1160,7 +1098,7 @@
   "display_price.assistive_msg.strikethrough_price_with_range": [
     {
       "type": 0,
-      "value": "From original price "
+      "value": "Fra oprindelig pris "
     },
     {
       "type": 1,
@@ -1170,197 +1108,155 @@
   "display_price.label.current_price_with_range": [
     {
       "type": 0,
-      "value": "From "
+      "value": "Fra "
     },
     {
       "type": 1,
       "value": "currentPrice"
     }
   ],
-  "dnt_notification.button.accept": [
-    {
-      "type": 0,
-      "value": "Accept"
-    }
-  ],
-  "dnt_notification.button.assistive_msg.accept": [
-    {
-      "type": 0,
-      "value": "Accept tracking"
-    }
-  ],
-  "dnt_notification.button.assistive_msg.close": [
-    {
-      "type": 0,
-      "value": "Close consent tracking form"
-    }
-  ],
-  "dnt_notification.button.assistive_msg.decline": [
-    {
-      "type": 0,
-      "value": "Decline tracking"
-    }
-  ],
-  "dnt_notification.button.decline": [
-    {
-      "type": 0,
-      "value": "Decline"
-    }
-  ],
-  "dnt_notification.description": [
-    {
-      "type": 0,
-      "value": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur."
-    }
-  ],
-  "dnt_notification.title": [
-    {
-      "type": 0,
-      "value": "Tracking Consent"
-    }
-  ],
   "drawer_menu.button.account_details": [
     {
       "type": 0,
-      "value": "Account Details"
+      "value": "Kontooplysninger"
     }
   ],
   "drawer_menu.button.addresses": [
     {
       "type": 0,
-      "value": "Addresses"
+      "value": "Adresser"
     }
   ],
   "drawer_menu.button.log_out": [
     {
       "type": 0,
-      "value": "Log Out"
+      "value": "Log ud"
     }
   ],
   "drawer_menu.button.my_account": [
     {
       "type": 0,
-      "value": "My Account"
+      "value": "Min konto"
     }
   ],
   "drawer_menu.button.order_history": [
     {
       "type": 0,
-      "value": "Order History"
+      "value": "Ordrehistorik"
     }
   ],
   "drawer_menu.header.assistive_msg.title": [
     {
       "type": 0,
-      "value": "Menu Drawer"
+      "value": "Menu"
     }
   ],
   "drawer_menu.link.about_us": [
     {
       "type": 0,
-      "value": "About Us"
+      "value": "Om os"
     }
   ],
   "drawer_menu.link.customer_support": [
     {
       "type": 0,
-      "value": "Customer Support"
+      "value": "Kundesupport"
     }
   ],
   "drawer_menu.link.customer_support.contact_us": [
     {
       "type": 0,
-      "value": "Contact Us"
+      "value": "Kontakt os"
     }
   ],
   "drawer_menu.link.customer_support.shipping_and_returns": [
     {
       "type": 0,
-      "value": "Shipping & Returns"
+      "value": "Forsendelse og returneringer"
     }
   ],
   "drawer_menu.link.our_company": [
     {
       "type": 0,
-      "value": "Our Company"
+      "value": "Vores virksomhed"
     }
   ],
   "drawer_menu.link.privacy_and_security": [
     {
       "type": 0,
-      "value": "Privacy & Security"
+      "value": "Privatliv og sikkerhed"
     }
   ],
   "drawer_menu.link.privacy_policy": [
     {
       "type": 0,
-      "value": "Privacy Policy"
+      "value": "Privatlivspolitik"
     }
   ],
   "drawer_menu.link.shop_all": [
     {
       "type": 0,
-      "value": "Shop All"
+      "value": "Køb alle"
     }
   ],
   "drawer_menu.link.sign_in": [
     {
       "type": 0,
-      "value": "Sign In"
+      "value": "Log ind"
     }
   ],
   "drawer_menu.link.site_map": [
     {
       "type": 0,
-      "value": "Site Map"
+      "value": "Sitemap"
     }
   ],
   "drawer_menu.link.store_locator": [
     {
       "type": 0,
-      "value": "Store Locator"
+      "value": "Find butik"
     }
   ],
   "drawer_menu.link.terms_and_conditions": [
     {
       "type": 0,
-      "value": "Terms & Conditions"
+      "value": "Vilkår og betingelser"
     }
   ],
   "empty_cart.description.empty_cart": [
     {
       "type": 0,
-      "value": "Your cart is empty."
+      "value": "Din kurv er tom."
     }
   ],
   "empty_cart.link.continue_shopping": [
     {
       "type": 0,
-      "value": "Continue Shopping"
+      "value": "Fortsæt med at handle"
     }
   ],
   "empty_cart.link.sign_in": [
     {
       "type": 0,
-      "value": "Sign In"
+      "value": "Log ind"
     }
   ],
   "empty_cart.message.continue_shopping": [
     {
       "type": 0,
-      "value": "Continue shopping to add items to your cart."
+      "value": "Fortsæt med at handle for at tilføje varer til din kurv."
     }
   ],
   "empty_cart.message.sign_in_or_continue_shopping": [
     {
       "type": 0,
-      "value": "Sign in to retrieve your saved items or continue shopping."
+      "value": "Log ind for at hente dine gemte varer eller fortsætte med at handle."
     }
   ],
   "empty_search_results.info.cant_find_anything_for_category": [
     {
       "type": 0,
-      "value": "We couldn’t find anything for "
+      "value": "Vi kunne ikke finde noget for "
     },
     {
       "type": 1,
@@ -1368,7 +1264,7 @@
     },
     {
       "type": 0,
-      "value": ". Try searching for a product or "
+      "value": ". Prøv at søge efter et produkt eller "
     },
     {
       "type": 1,
@@ -1382,7 +1278,7 @@
   "empty_search_results.info.cant_find_anything_for_query": [
     {
       "type": 0,
-      "value": "We couldn’t find anything for \""
+      "value": "Vi kunne ikke finde noget for \""
     },
     {
       "type": 1,
@@ -1396,7 +1292,7 @@
   "empty_search_results.info.double_check_spelling": [
     {
       "type": 0,
-      "value": "Double-check your spelling and try again or "
+      "value": "Dobbelttjek din stavning, og prøv igen eller "
     },
     {
       "type": 1,
@@ -1410,199 +1306,169 @@
   "empty_search_results.link.contact_us": [
     {
       "type": 0,
-      "value": "Contact Us"
+      "value": "Kontakt os"
     }
   ],
   "empty_search_results.recommended_products.title.most_viewed": [
     {
       "type": 0,
-      "value": "Most Viewed"
+      "value": "Mest sete"
     }
   ],
   "empty_search_results.recommended_products.title.top_sellers": [
     {
       "type": 0,
-      "value": "Top Sellers"
+      "value": "Bestsellere"
     }
   ],
   "field.password.assistive_msg.hide_password": [
     {
       "type": 0,
-      "value": "Hide password"
+      "value": "Skjul adgangskode"
     }
   ],
   "field.password.assistive_msg.show_password": [
     {
       "type": 0,
-      "value": "Show password"
+      "value": "Vis adgangskode"
     }
   ],
   "footer.column.account": [
     {
       "type": 0,
-      "value": "Account"
+      "value": "Konto"
     }
   ],
   "footer.column.customer_support": [
     {
       "type": 0,
-      "value": "Customer Support"
+      "value": "Kundesupport"
     }
   ],
   "footer.column.our_company": [
     {
       "type": 0,
-      "value": "Our Company"
+      "value": "Vores virksomhed"
     }
   ],
   "footer.link.about_us": [
     {
       "type": 0,
-      "value": "About Us"
+      "value": "Om os"
     }
   ],
   "footer.link.contact_us": [
     {
       "type": 0,
-      "value": "Contact Us"
+      "value": "Kontakt os"
     }
   ],
   "footer.link.order_status": [
     {
       "type": 0,
-      "value": "Order Status"
+      "value": "Ordrestatus"
     }
   ],
   "footer.link.privacy_policy": [
     {
       "type": 0,
-      "value": "Privacy Policy"
+      "value": "Privatlivspolitik"
     }
   ],
   "footer.link.shipping": [
     {
       "type": 0,
-      "value": "Shipping"
+      "value": "Forsendelse"
     }
   ],
   "footer.link.signin_create_account": [
     {
       "type": 0,
-      "value": "Sign in or create account"
+      "value": "Log ind eller opret en konto"
     }
   ],
   "footer.link.site_map": [
     {
       "type": 0,
-      "value": "Site Map"
+      "value": "Sitemap"
     }
   ],
   "footer.link.store_locator": [
     {
       "type": 0,
-      "value": "Store Locator"
+      "value": "Find butik"
     }
   ],
   "footer.link.terms_conditions": [
     {
       "type": 0,
-      "value": "Terms & Conditions"
-    }
-  ],
-  "footer.locale_selector.assistive_msg": [
-    {
-      "type": 0,
-      "value": "Select Language"
+      "value": "Vilkår og betingelser"
     }
   ],
   "footer.message.copyright": [
     {
       "type": 0,
-      "value": "Salesforce or its affiliates. All rights reserved. This is a demo store only. Orders made WILL NOT be processed."
+      "value": "Salesforce eller dets datterselskaber. Alle rettigheder forbeholdes. Dette er kun en demobutik. Afgivne bestillinger vil IKKE blive behandlet."
     }
   ],
   "footer.subscribe.button.sign_up": [
     {
       "type": 0,
-      "value": "Sign Up"
+      "value": "Tilmeld dig"
     }
   ],
   "footer.subscribe.description.sign_up": [
     {
       "type": 0,
-      "value": "Sign up to stay in the loop about the hottest deals"
-    }
-  ],
-  "footer.subscribe.email.assistive_msg": [
-    {
-      "type": 0,
-      "value": "Email address for newsletter"
+      "value": "Tilmeld dig for at holde dig opdateret om de bedste tilbud"
     }
   ],
   "footer.subscribe.heading.first_to_know": [
     {
       "type": 0,
-      "value": "Be the first to know"
+      "value": "Vær blandt de første, der får besked"
     }
   ],
   "form_action_buttons.button.cancel": [
     {
       "type": 0,
-      "value": "Cancel"
+      "value": "Annuller"
     }
   ],
   "form_action_buttons.button.save": [
     {
       "type": 0,
-      "value": "Save"
+      "value": "Gem"
     }
   ],
   "global.account.link.account_details": [
     {
       "type": 0,
-      "value": "Account Details"
+      "value": "Kontooplysninger"
     }
   ],
   "global.account.link.addresses": [
     {
       "type": 0,
-      "value": "Addresses"
+      "value": "Adresser"
     }
   ],
   "global.account.link.order_history": [
     {
       "type": 0,
-      "value": "Order History"
+      "value": "Ordrehistorik"
     }
   ],
   "global.account.link.wishlist": [
     {
       "type": 0,
-      "value": "Wishlist"
-    }
-  ],
-  "global.error.create_account": [
-    {
-      "type": 0,
-      "value": "This feature is not currently available. You must create an account to access this feature."
-    }
-  ],
-  "global.error.feature_unavailable": [
-    {
-      "type": 0,
-      "value": "This feature is not currently available."
-    }
-  ],
-  "global.error.invalid_token": [
-    {
-      "type": 0,
-      "value": "Invalid token, please try again."
+      "value": "Ønskeliste"
     }
   ],
   "global.error.something_went_wrong": [
     {
       "type": 0,
-      "value": "Something went wrong. Try again!"
+      "value": "Noget gik galt. Prøv igen!"
     }
   ],
   "global.info.added_to_wishlist": [
@@ -1621,7 +1487,7 @@
           "value": [
             {
               "type": 0,
-              "value": "item"
+              "value": "vare"
             }
           ]
         },
@@ -1629,7 +1495,7 @@
           "value": [
             {
               "type": 0,
-              "value": "items"
+              "value": "varer"
             }
           ]
         }
@@ -1640,25 +1506,25 @@
     },
     {
       "type": 0,
-      "value": " added to wishlist"
+      "value": " blev tilføjet til ønskeliste"
     }
   ],
   "global.info.already_in_wishlist": [
     {
       "type": 0,
-      "value": "Item is already in wishlist"
+      "value": "Varen er allerede på ønskelisten"
     }
   ],
   "global.info.removed_from_wishlist": [
     {
       "type": 0,
-      "value": "Item removed from wishlist"
+      "value": "Varen er fjernet fra ønskelisten"
     }
   ],
   "global.link.added_to_wishlist.view_wishlist": [
     {
       "type": 0,
-      "value": "View"
+      "value": "Vis"
     }
   ],
   "header.button.assistive_msg.logo": [
@@ -1676,25 +1542,25 @@
   "header.button.assistive_msg.menu.open_dialog": [
     {
       "type": 0,
-      "value": "Opens a dialog"
+      "value": "Åbner en dialogboks"
     }
   ],
   "header.button.assistive_msg.my_account": [
     {
       "type": 0,
-      "value": "My Account"
+      "value": "Min konto"
     }
   ],
   "header.button.assistive_msg.my_account_menu": [
     {
       "type": 0,
-      "value": "Open account menu"
+      "value": "Åbn kontomenu"
     }
   ],
   "header.button.assistive_msg.my_cart_with_num_items": [
     {
       "type": 0,
-      "value": "My cart, number of items: "
+      "value": "Min kurv, antal varer: "
     },
     {
       "type": 1,
@@ -1704,55 +1570,55 @@
   "header.button.assistive_msg.store_locator": [
     {
       "type": 0,
-      "value": "Store Locator"
+      "value": "Find butik"
     }
   ],
   "header.button.assistive_msg.wishlist": [
     {
       "type": 0,
-      "value": "Wishlist"
+      "value": "Ønskeliste"
     }
   ],
   "header.field.placeholder.search_for_products": [
     {
       "type": 0,
-      "value": "Search for products..."
+      "value": "Søg efter produkter ..."
     }
   ],
   "header.popover.action.log_out": [
     {
       "type": 0,
-      "value": "Log out"
+      "value": "Log ud"
     }
   ],
   "header.popover.title.my_account": [
     {
       "type": 0,
-      "value": "My Account"
+      "value": "Min konto"
     }
   ],
   "home.description.features": [
     {
       "type": 0,
-      "value": "Out-of-the-box features so that you focus only on adding enhancements."
+      "value": "Ekstrafunktioner, så du kun skal fokusere på at tilføje forbedringer."
     }
   ],
   "home.description.here_to_help": [
     {
       "type": 0,
-      "value": "Contact our support staff."
+      "value": "Kontakt vores supportteam."
     }
   ],
   "home.description.here_to_help_line_2": [
     {
       "type": 0,
-      "value": "They will get you to the right place."
+      "value": "De vil hjælpe dig til det rette sted."
     }
   ],
   "home.description.shop_products": [
     {
       "type": 0,
-      "value": "This section contains content from the catalog. "
+      "value": "Dette afsnit omhandler indhold fra kataloget. "
     },
     {
       "type": 1,
@@ -1760,163 +1626,157 @@
     },
     {
       "type": 0,
-      "value": " on how to replace it."
+      "value": ", hvordan du udskifter det."
     }
   ],
   "home.features.description.cart_checkout": [
     {
       "type": 0,
-      "value": "Ecommerce best practice for a shopper's cart and checkout experience."
+      "value": "Bedste praksis for e-handel for en god købsoplevelse."
     }
   ],
   "home.features.description.components": [
     {
       "type": 0,
-      "value": "Built using Chakra UI, a simple, modular and accessible React component library."
+      "value": "Bygget ved hjælp af Chakra UI, et enkelt, modulært og tilgængeligt React-komponentbibliotek."
     }
   ],
   "home.features.description.einstein_recommendations": [
     {
       "type": 0,
-      "value": "Deliver the next best product or offer to every shopper through product recommendations."
+      "value": "Levér det næstbedste produkt eller tilbud til alle kunder gennem produktanbefalinger."
     }
   ],
   "home.features.description.my_account": [
     {
       "type": 0,
-      "value": "Shoppers can manage account information such as their profile, addresses, payments and orders."
+      "value": "Kunderne kan administrere kontooplysninger som f.eks. deres profil, adresser, betalinger og ordrer."
     }
   ],
   "home.features.description.shopper_login": [
     {
       "type": 0,
-      "value": "Enable shoppers to easily log in with a more personalized shopping experience."
+      "value": "Giv kunderne mulighed for nemt at logge ind med en mere personlig shoppingoplevelse."
     }
   ],
   "home.features.description.wishlist": [
     {
       "type": 0,
-      "value": "Registered shoppers can add product items to their wishlist from purchasing later."
+      "value": "Registrerede kunder kan tilføje produkter til deres ønskeliste, så de kan købe dem senere."
     }
   ],
   "home.features.heading.cart_checkout": [
     {
       "type": 0,
-      "value": "Cart & Checkout"
+      "value": "Kurv og køb"
     }
   ],
   "home.features.heading.components": [
     {
       "type": 0,
-      "value": "Components & Design Kit"
+      "value": "Komponenter og designkit"
     }
   ],
   "home.features.heading.einstein_recommendations": [
     {
       "type": 0,
-      "value": "Einstein Recommendations"
+      "value": "Einsteins anbefalinger"
     }
   ],
   "home.features.heading.my_account": [
     {
       "type": 0,
-      "value": "My Account"
+      "value": "Min konto"
     }
   ],
   "home.features.heading.shopper_login": [
     {
       "type": 0,
-      "value": "Shopper Login and API Access Service"
+      "value": "Login og API-adgangstjeneste"
     }
   ],
   "home.features.heading.wishlist": [
     {
       "type": 0,
-      "value": "Wishlist"
+      "value": "Ønskeliste"
     }
   ],
   "home.heading.features": [
     {
       "type": 0,
-      "value": "Features"
+      "value": "Funktioner"
     }
   ],
   "home.heading.here_to_help": [
     {
       "type": 0,
-      "value": "We're here to help"
+      "value": "Vi er her for at hjælpe"
     }
   ],
   "home.heading.shop_products": [
     {
       "type": 0,
-      "value": "Shop Products"
+      "value": "Køb produkter"
     }
   ],
   "home.hero_features.link.design_kit": [
     {
       "type": 0,
-      "value": "Create with the Figma PWA Design Kit"
+      "value": "Skab med Figma PWA Designkit"
     }
   ],
   "home.hero_features.link.on_github": [
     {
       "type": 0,
-      "value": "Download on Github"
+      "value": "Download på Github"
     }
   ],
   "home.hero_features.link.on_managed_runtime": [
     {
       "type": 0,
-      "value": "Deploy on Managed Runtime"
+      "value": "Udrulning på Managed Runtime"
     }
   ],
   "home.link.contact_us": [
     {
       "type": 0,
-      "value": "Contact Us"
+      "value": "Kontakt os"
     }
   ],
   "home.link.get_started": [
     {
       "type": 0,
-      "value": "Get started"
+      "value": "Kom godt i gang"
     }
   ],
   "home.link.read_docs": [
     {
       "type": 0,
-      "value": "Read docs"
+      "value": "Læs dokumenter"
     }
   ],
   "home.title.react_starter_store": [
     {
       "type": 0,
-      "value": "The React PWA Starter Store for Retail"
+      "value": "React PWA-startbutikken til detailhandel"
     }
   ],
   "icons.assistive_msg.lock": [
     {
       "type": 0,
-      "value": "Secure"
-    }
-  ],
-  "item_attributes.label.is_bonus_product": [
-    {
-      "type": 0,
-      "value": "Bonus Product"
+      "value": "Sikker"
     }
   ],
   "item_attributes.label.promotions": [
     {
       "type": 0,
-      "value": "Promotions"
+      "value": "Kampagnekoder"
     }
   ],
   "item_attributes.label.quantity": [
     {
       "type": 0,
-      "value": "Quantity: "
+      "value": "Antal: "
     },
     {
       "type": 1,
@@ -1926,25 +1786,25 @@
   "item_attributes.label.selected_options": [
     {
       "type": 0,
-      "value": "Selected Options"
+      "value": "Udvalgte muligheder"
     }
   ],
   "item_image.label.sale": [
     {
       "type": 0,
-      "value": "Sale"
+      "value": "Udsalg"
     }
   ],
   "item_image.label.unavailable": [
     {
       "type": 0,
-      "value": "Unavailable"
+      "value": "Ikke tilgængelig"
     }
   ],
   "item_variant.assistive_msg.quantity": [
     {
       "type": 0,
-      "value": "Quantity "
+      "value": "Antal "
     },
     {
       "type": 1,
@@ -1954,7 +1814,7 @@
   "item_variant.quantity.label": [
     {
       "type": 0,
-      "value": "Quantity selector for "
+      "value": "Mængdevælger til "
     },
     {
       "type": 1,
@@ -1962,7 +1822,7 @@
     },
     {
       "type": 0,
-      "value": ". Selected quantity is "
+      "value": ". Det valgte antal er "
     },
     {
       "type": 1,
@@ -1972,19 +1832,19 @@
   "lCPCxk": [
     {
       "type": 0,
-      "value": "Please select all your options above"
+      "value": "Vælg alle dine muligheder ovenfor"
     }
   ],
   "list_menu.nav.assistive_msg": [
     {
       "type": 0,
-      "value": "Main navigation"
+      "value": "Hovedmenu"
     }
   ],
   "locale_text.message.ar-SA": [
     {
       "type": 0,
-      "value": "Arabic (Saudi Arabia)"
+      "value": "Arabisk (Saudi-Arabien)"
     }
   ],
   "locale_text.message.bn-BD": [
@@ -1996,271 +1856,271 @@
   "locale_text.message.bn-IN": [
     {
       "type": 0,
-      "value": "Bangla (India)"
+      "value": "Bangla (Indien)"
     }
   ],
   "locale_text.message.cs-CZ": [
     {
       "type": 0,
-      "value": "Czech (Czech Republic)"
+      "value": "Tjekkisk (Den Tjekkiske Republik)"
     }
   ],
   "locale_text.message.da-DK": [
     {
       "type": 0,
-      "value": "Danish (Denmark)"
+      "value": "Dansk (Danmark)"
     }
   ],
   "locale_text.message.de-AT": [
     {
       "type": 0,
-      "value": "German (Austria)"
+      "value": "Tysk (Østrig)"
     }
   ],
   "locale_text.message.de-CH": [
     {
       "type": 0,
-      "value": "German (Switzerland)"
+      "value": "Tysk (Schweiz)"
     }
   ],
   "locale_text.message.de-DE": [
     {
       "type": 0,
-      "value": "German (Germany)"
+      "value": "Tysk (Tyskland)"
     }
   ],
   "locale_text.message.el-GR": [
     {
       "type": 0,
-      "value": "Greek (Greece)"
+      "value": "Græsk (Grækenland)"
     }
   ],
   "locale_text.message.en-AU": [
     {
       "type": 0,
-      "value": "English (Australia)"
+      "value": "Engelsk (Australien)"
     }
   ],
   "locale_text.message.en-CA": [
     {
       "type": 0,
-      "value": "English (Canada)"
+      "value": "Engelsk (Canada)"
     }
   ],
   "locale_text.message.en-GB": [
     {
       "type": 0,
-      "value": "English (United Kingdom)"
+      "value": "Engelsk (Storbritannien)"
     }
   ],
   "locale_text.message.en-IE": [
     {
       "type": 0,
-      "value": "English (Ireland)"
+      "value": "Engelsk (Irland)"
     }
   ],
   "locale_text.message.en-IN": [
     {
       "type": 0,
-      "value": "English (India)"
+      "value": "Engelsk (Indien)"
     }
   ],
   "locale_text.message.en-NZ": [
     {
       "type": 0,
-      "value": "English (New Zealand)"
+      "value": "Engelsk (New Zealand)"
     }
   ],
   "locale_text.message.en-US": [
     {
       "type": 0,
-      "value": "English (United States)"
+      "value": "Engelsk (USA)"
     }
   ],
   "locale_text.message.en-ZA": [
     {
       "type": 0,
-      "value": "English (South Africa)"
+      "value": "Engelsk (Sydafrika)"
     }
   ],
   "locale_text.message.es-AR": [
     {
       "type": 0,
-      "value": "Spanish (Argentina)"
+      "value": "Spansk (Argentina)"
     }
   ],
   "locale_text.message.es-CL": [
     {
       "type": 0,
-      "value": "Spanish (Chile)"
+      "value": "Spansk (Chile)"
     }
   ],
   "locale_text.message.es-CO": [
     {
       "type": 0,
-      "value": "Spanish (Columbia)"
+      "value": "Spansk (Columbia)"
     }
   ],
   "locale_text.message.es-ES": [
     {
       "type": 0,
-      "value": "Spanish (Spain)"
+      "value": "Spansk (Spanien)"
     }
   ],
   "locale_text.message.es-MX": [
     {
       "type": 0,
-      "value": "Spanish (Mexico)"
+      "value": "Spansk (Mexico)"
     }
   ],
   "locale_text.message.es-US": [
     {
       "type": 0,
-      "value": "Spanish (United States)"
+      "value": "Spansk (USA)"
     }
   ],
   "locale_text.message.fi-FI": [
     {
       "type": 0,
-      "value": "Finnish (Finland)"
+      "value": "Finsk (Finland)"
     }
   ],
   "locale_text.message.fr-BE": [
     {
       "type": 0,
-      "value": "French (Belgium)"
+      "value": "Fransk (Belgien)"
     }
   ],
   "locale_text.message.fr-CA": [
     {
       "type": 0,
-      "value": "French (Canada)"
+      "value": "Fransk (Canada)"
     }
   ],
   "locale_text.message.fr-CH": [
     {
       "type": 0,
-      "value": "French (Switzerland)"
+      "value": "Fransk (Schweiz)"
     }
   ],
   "locale_text.message.fr-FR": [
     {
       "type": 0,
-      "value": "French (France)"
+      "value": "Fransk (Frankrig)"
     }
   ],
   "locale_text.message.he-IL": [
     {
       "type": 0,
-      "value": "Hebrew (Israel)"
+      "value": "Hebraisk (Israel)"
     }
   ],
   "locale_text.message.hi-IN": [
     {
       "type": 0,
-      "value": "Hindi (India)"
+      "value": "Hindi (Indien)"
     }
   ],
   "locale_text.message.hu-HU": [
     {
       "type": 0,
-      "value": "Hungarian (Hungary)"
+      "value": "Ungarsk (Ungarn)"
     }
   ],
   "locale_text.message.id-ID": [
     {
       "type": 0,
-      "value": "Indonesian (Indonesia)"
+      "value": "Indonesisk (Indonesien)"
     }
   ],
   "locale_text.message.it-CH": [
     {
       "type": 0,
-      "value": "Italian (Switzerland)"
+      "value": "Italiensk (Schweiz)"
     }
   ],
   "locale_text.message.it-IT": [
     {
       "type": 0,
-      "value": "Italian (Italy)"
+      "value": "Italiensk (Italien)"
     }
   ],
   "locale_text.message.ja-JP": [
     {
       "type": 0,
-      "value": "Japanese (Japan)"
+      "value": "Japansk (Japan)"
     }
   ],
   "locale_text.message.ko-KR": [
     {
       "type": 0,
-      "value": "Korean (Republic of Korea)"
+      "value": "Koreansk (Republikken Korea)"
     }
   ],
   "locale_text.message.nl-BE": [
     {
       "type": 0,
-      "value": "Dutch (Belgium)"
+      "value": "Hollandsk (Belgien)"
     }
   ],
   "locale_text.message.nl-NL": [
     {
       "type": 0,
-      "value": "Dutch (The Netherlands)"
+      "value": "Hollandsk (Holland)"
     }
   ],
   "locale_text.message.no-NO": [
     {
       "type": 0,
-      "value": "Norwegian (Norway)"
+      "value": "Norsk (Norge)"
     }
   ],
   "locale_text.message.pl-PL": [
     {
       "type": 0,
-      "value": "Polish (Poland)"
+      "value": "Polsk (Polen)"
     }
   ],
   "locale_text.message.pt-BR": [
     {
       "type": 0,
-      "value": "Portuguese (Brazil)"
+      "value": "Portugisisk (Brasilien)"
     }
   ],
   "locale_text.message.pt-PT": [
     {
       "type": 0,
-      "value": "Portuguese (Portugal)"
+      "value": "Portugisisk (Portugal)"
     }
   ],
   "locale_text.message.ro-RO": [
     {
       "type": 0,
-      "value": "Romanian (Romania)"
+      "value": "Rumænsk (Rumænien)"
     }
   ],
   "locale_text.message.ru-RU": [
     {
       "type": 0,
-      "value": "Russian (Russian Federation)"
+      "value": "Russisk (Den Russiske Føderation)"
     }
   ],
   "locale_text.message.sk-SK": [
     {
       "type": 0,
-      "value": "Slovak (Slovakia)"
+      "value": "Slovakisk (Slovakiet)"
     }
   ],
   "locale_text.message.sv-SE": [
     {
       "type": 0,
-      "value": "Swedish (Sweden)"
+      "value": "Svensk (Sverige)"
     }
   ],
   "locale_text.message.ta-IN": [
     {
       "type": 0,
-      "value": "Tamil (India)"
+      "value": "Tamil (Indien)"
     }
   ],
   "locale_text.message.ta-LK": [
@@ -2278,109 +2138,73 @@
   "locale_text.message.tr-TR": [
     {
       "type": 0,
-      "value": "Turkish (Turkey)"
+      "value": "Tyrkisk (Tyrkiet)"
     }
   ],
   "locale_text.message.zh-CN": [
     {
       "type": 0,
-      "value": "Chinese (China)"
+      "value": "Kinesisk (Kina)"
     }
   ],
   "locale_text.message.zh-HK": [
     {
       "type": 0,
-      "value": "Chinese (Hong Kong)"
+      "value": "Kinesisk (Hong Kong)"
     }
   ],
   "locale_text.message.zh-TW": [
     {
       "type": 0,
-      "value": "Chinese (Taiwan)"
+      "value": "Kinesisk (Taiwan)"
     }
   ],
   "login_form.action.create_account": [
     {
       "type": 0,
-      "value": "Create account"
-    }
-  ],
-  "login_form.button.apple": [
-    {
-      "type": 0,
-      "value": "Apple"
-    }
-  ],
-  "login_form.button.back": [
-    {
-      "type": 0,
-      "value": "Back to Sign In Options"
-    }
-  ],
-  "login_form.button.continue_securely": [
-    {
-      "type": 0,
-      "value": "Continue Securely"
-    }
-  ],
-  "login_form.button.google": [
-    {
-      "type": 0,
-      "value": "Google"
-    }
-  ],
-  "login_form.button.password": [
-    {
-      "type": 0,
-      "value": "Password"
+      "value": "Opret konto"
     }
   ],
   "login_form.button.sign_in": [
     {
       "type": 0,
-      "value": "Sign In"
+      "value": "Log ind"
     }
   ],
   "login_form.link.forgot_password": [
     {
       "type": 0,
-      "value": "Forgot password?"
+      "value": "Glemt din adgangskode?"
     }
   ],
   "login_form.message.dont_have_account": [
     {
       "type": 0,
-      "value": "Don't have an account?"
-    }
-  ],
-  "login_form.message.or_login_with": [
-    {
-      "type": 0,
-      "value": "Or Login With"
+      "value": "Har du ikke en konto?"
     }
   ],
   "login_form.message.welcome_back": [
     {
       "type": 0,
-      "value": "Welcome Back"
+      "value": "Velkommen tilbage"
     }
   ],
   "login_page.error.incorrect_username_or_password": [
     {
       "type": 0,
-      "value": "Incorrect username or password, please try again."
+      "value": "Forkert brugernavn eller adgangskode, prøv igen."
     }
   ],
   "offline_banner.description.browsing_offline_mode": [
     {
       "type": 0,
-      "value": "You're currently browsing in offline mode"
+      "value": "Du er i øjeblikket offline"
     }
   ],
   "order_summary.action.remove_promo": [
     {
       "type": 0,
-      "value": "Remove"
+      "value": "Fjern"
     }
   ],
   "order_summary.cart_items.action.num_of_items_in_cart": [
@@ -2391,7 +2215,7 @@
           "value": [
             {
               "type": 0,
-              "value": "0 items"
+              "value": "0 varer"
             }
           ]
         },
@@ -2402,7 +2226,7 @@
             },
             {
               "type": 0,
-              "value": " item"
+              "value": " vare"
             }
           ]
         },
@@ -2413,7 +2237,7 @@
             },
             {
               "type": 0,
-              "value": " items"
+              "value": " varer"
             }
           ]
         }
@@ -2424,55 +2248,55 @@
     },
     {
       "type": 0,
-      "value": " in cart"
+      "value": " i kurv"
     }
   ],
   "order_summary.cart_items.link.edit_cart": [
     {
       "type": 0,
-      "value": "Edit cart"
+      "value": "Rediger kurv"
     }
   ],
   "order_summary.heading.order_summary": [
     {
       "type": 0,
-      "value": "Order Summary"
+      "value": "Ordreoversigt"
     }
   ],
   "order_summary.label.estimated_total": [
     {
       "type": 0,
-      "value": "Estimated Total"
+      "value": "Anslået total"
     }
   ],
   "order_summary.label.free": [
     {
       "type": 0,
-      "value": "Free"
+      "value": "Gratis"
     }
   ],
   "order_summary.label.order_total": [
     {
       "type": 0,
-      "value": "Order Total"
+      "value": "Samlet ordre"
     }
   ],
   "order_summary.label.promo_applied": [
     {
       "type": 0,
-      "value": "Promotion applied"
+      "value": "Kampagnekode blev anvendt"
     }
   ],
   "order_summary.label.promotions_applied": [
     {
       "type": 0,
-      "value": "Promotions applied"
+      "value": "Anvendte kampagnekoder"
     }
   ],
   "order_summary.label.shipping": [
     {
       "type": 0,
-      "value": "Shipping"
+      "value": "Forsendelse"
     }
   ],
   "order_summary.label.subtotal": [
@@ -2484,143 +2308,125 @@
   "order_summary.label.tax": [
     {
       "type": 0,
-      "value": "Tax"
+      "value": "Moms"
     }
   ],
   "page_not_found.action.go_back": [
     {
       "type": 0,
-      "value": "Back to previous page"
+      "value": "Tilbage til forrige side"
     }
   ],
   "page_not_found.link.homepage": [
     {
       "type": 0,
-      "value": "Go to home page"
+      "value": "Gå til startsiden"
     }
   ],
   "page_not_found.message.suggestion_to_try": [
     {
       "type": 0,
-      "value": "Please try retyping the address, going back to the previous page, or going to the home page."
+      "value": "Prøv at indtaste adressen igen, gå tilbage til den forrige side eller gå til startsiden."
     }
   ],
   "page_not_found.title.page_cant_be_found": [
     {
       "type": 0,
-      "value": "The page you're looking for can't be found."
+      "value": "Den side, du leder efter, kan ikke findes."
     }
   ],
   "pagination.field.num_of_pages": [
     {
       "type": 0,
-      "value": "of "
+      "value": "af "
     },
     {
       "type": 1,
       "value": "numOfPages"
     }
   ],
-  "pagination.field.page_number_select": [
-    {
-      "type": 0,
-      "value": "Select page number"
-    }
-  ],
   "pagination.link.next": [
     {
       "type": 0,
-      "value": "Next"
+      "value": "Næste"
     }
   ],
   "pagination.link.next.assistive_msg": [
     {
       "type": 0,
-      "value": "Next Page"
+      "value": "Næste side"
     }
   ],
   "pagination.link.prev": [
     {
       "type": 0,
-      "value": "Prev"
+      "value": "Forrige"
     }
   ],
   "pagination.link.prev.assistive_msg": [
     {
       "type": 0,
-      "value": "Previous Page"
+      "value": "Forrige side"
     }
   ],
   "password_card.info.password_updated": [
     {
       "type": 0,
-      "value": "Password updated"
+      "value": "Adgangskoden blev opdateret"
     }
   ],
   "password_card.label.password": [
     {
       "type": 0,
-      "value": "Password"
+      "value": "Adgangskode"
     }
   ],
   "password_card.title.password": [
     {
       "type": 0,
-      "value": "Password"
+      "value": "Adgangskode"
     }
   ],
   "password_requirements.error.eight_letter_minimum": [
     {
       "type": 0,
-      "value": "8 characters minimum"
+      "value": "Mindst 8 tegn"
     }
   ],
   "password_requirements.error.one_lowercase_letter": [
     {
       "type": 0,
-      "value": "1 lowercase letter"
+      "value": "1 lille bogstav"
     }
   ],
   "password_requirements.error.one_number": [
     {
       "type": 0,
-      "value": "1 number"
+      "value": "1 tal"
     }
   ],
   "password_requirements.error.one_special_character": [
     {
       "type": 0,
-      "value": "1 special character (example: , S ! % #)"
+      "value": "1 specialtegn (f.eks , ! % #)"
     }
   ],
   "password_requirements.error.one_uppercase_letter": [
     {
       "type": 0,
-      "value": "1 uppercase letter"
-    }
-  ],
-  "password_reset_success.toast": [
-    {
-      "type": 0,
-      "value": "Password Reset Success"
+      "value": "1 stort bogstav"
     }
   ],
   "payment_selection.heading.credit_card": [
     {
       "type": 0,
-      "value": "Credit Card"
-    }
-  ],
-  "payment_selection.radio_group.assistive_msg": [
-    {
-      "type": 0,
-      "value": "Payment"
+      "value": "Kreditkort"
     }
   ],
   "payment_selection.tooltip.secure_payment": [
     {
       "type": 0,
-      "value": "This is a secure SSL encrypted payment."
+      "value": "Dette er en sikker SSL-krypteret betaling."
     }
   ],
   "price_per_item.label.each": [
@@ -2632,67 +2438,67 @@
   "product_detail.accordion.button.product_detail": [
     {
       "type": 0,
-      "value": "Product Detail"
+      "value": "Produkinformation"
     }
   ],
   "product_detail.accordion.button.questions": [
     {
       "type": 0,
-      "value": "Questions"
+      "value": "Spørgsmål"
     }
   ],
   "product_detail.accordion.button.reviews": [
     {
       "type": 0,
-      "value": "Reviews"
+      "value": "Anmeldelser"
     }
   ],
   "product_detail.accordion.button.size_fit": [
     {
       "type": 0,
-      "value": "Size & Fit"
+      "value": "Størrelse og pasform"
     }
   ],
   "product_detail.accordion.message.coming_soon": [
     {
       "type": 0,
-      "value": "Coming Soon"
+      "value": "Kommer snart"
     }
   ],
   "product_detail.recommended_products.title.complete_set": [
     {
       "type": 0,
-      "value": "Complete the Set"
+      "value": "Færdiggør indstillingen"
     }
   ],
   "product_detail.recommended_products.title.might_also_like": [
     {
       "type": 0,
-      "value": "You might also like"
+      "value": "Du vil måske også synes om"
     }
   ],
   "product_detail.recommended_products.title.recently_viewed": [
     {
       "type": 0,
-      "value": "Recently Viewed"
+      "value": "Set for nylig"
     }
   ],
   "product_item.label.quantity": [
     {
       "type": 0,
-      "value": "Quantity:"
+      "value": "Antal:"
     }
   ],
   "product_list.button.filter": [
     {
       "type": 0,
-      "value": "Filter"
+      "value": "Filtrér"
     }
   ],
   "product_list.button.sort_by": [
     {
       "type": 0,
-      "value": "Sort By: "
+      "value": "Sorter efter: "
     },
     {
       "type": 1,
@@ -2702,19 +2508,19 @@
   "product_list.drawer.title.sort_by": [
     {
       "type": 0,
-      "value": "Sort By"
+      "value": "Sorter efter"
     }
   ],
   "product_list.modal.button.clear_filters": [
     {
       "type": 0,
-      "value": "Clear Filters"
+      "value": "Ryd filtre"
     }
   ],
   "product_list.modal.button.view_items": [
     {
       "type": 0,
-      "value": "View "
+      "value": "Se "
     },
     {
       "type": 1,
@@ -2722,19 +2528,19 @@
     },
     {
       "type": 0,
-      "value": " items"
+      "value": " varer"
     }
   ],
   "product_list.modal.title.filter": [
     {
       "type": 0,
-      "value": "Filter"
+      "value": "Filtrér"
     }
   ],
   "product_list.refinements.button.assistive_msg.add_filter": [
     {
       "type": 0,
-      "value": "Add filter: "
+      "value": "Tilføj filter: "
     },
     {
       "type": 1,
@@ -2744,7 +2550,7 @@
   "product_list.refinements.button.assistive_msg.add_filter_with_hit_count": [
     {
       "type": 0,
-      "value": "Add filter: "
+      "value": "Tilføj filter: "
     },
     {
       "type": 1,
@@ -2766,7 +2572,7 @@
   "product_list.refinements.button.assistive_msg.remove_filter": [
     {
       "type": 0,
-      "value": "Remove filter: "
+      "value": "Fjern filter: "
     },
     {
       "type": 1,
@@ -2776,7 +2582,7 @@
   "product_list.refinements.button.assistive_msg.remove_filter_with_hit_count": [
     {
       "type": 0,
-      "value": "Remove filter: "
+      "value": "Fjern filter: "
     },
     {
       "type": 1,
@@ -2798,35 +2604,29 @@
   "product_list.select.sort_by": [
     {
       "type": 0,
-      "value": "Sort By: "
+      "value": "Sorter efter: "
     },
     {
       "type": 1,
       "value": "sortOption"
     }
   ],
-  "product_list.sort_by.label.assistive_msg": [
-    {
-      "type": 0,
-      "value": "Sort products by"
-    }
-  ],
   "product_scroller.assistive_msg.scroll_left": [
     {
       "type": 0,
-      "value": "Scroll products left"
+      "value": "Rul produkter til venstre"
     }
   ],
   "product_scroller.assistive_msg.scroll_right": [
     {
       "type": 0,
-      "value": "Scroll products right"
+      "value": "Rul produkter til højre"
     }
   ],
   "product_tile.assistive_msg.add_to_wishlist": [
     {
       "type": 0,
-      "value": "Add "
+      "value": "Tilføj "
     },
     {
       "type": 1,
@@ -2834,13 +2634,13 @@
     },
     {
       "type": 0,
-      "value": " to wishlist"
+      "value": " til din ønskeliste"
     }
   ],
   "product_tile.assistive_msg.remove_from_wishlist": [
     {
       "type": 0,
-      "value": "Remove "
+      "value": "Fjern "
     },
     {
       "type": 1,
@@ -2848,67 +2648,67 @@
     },
     {
       "type": 0,
-      "value": " from wishlist"
+      "value": " fra din ønskeliste"
     }
   ],
   "product_tile.badge.label.new": [
     {
       "type": 0,
-      "value": "New"
+      "value": "Ny"
     }
   ],
   "product_tile.badge.label.sale": [
     {
       "type": 0,
-      "value": "Sale"
+      "value": "Udsalg"
     }
   ],
   "product_view.button.add_bundle_to_cart": [
     {
       "type": 0,
-      "value": "Add Bundle to Cart"
+      "value": "Læg pakke i kurv"
     }
   ],
   "product_view.button.add_bundle_to_wishlist": [
     {
       "type": 0,
-      "value": "Add Bundle to Wishlist"
+      "value": "Tilføj pakke til ønskeliste"
     }
   ],
   "product_view.button.add_set_to_cart": [
     {
       "type": 0,
-      "value": "Add Set to Cart"
+      "value": "Læg sæt i kurv"
     }
   ],
   "product_view.button.add_set_to_wishlist": [
     {
       "type": 0,
-      "value": "Add Set to Wishlist"
+      "value": "Tilføj sæt til ønskeliste"
     }
   ],
   "product_view.button.add_to_cart": [
     {
       "type": 0,
-      "value": "Add to Cart"
+      "value": "Læg i kurv"
     }
   ],
   "product_view.button.add_to_wishlist": [
     {
       "type": 0,
-      "value": "Add to Wishlist"
+      "value": "Tilføj til ønskeliste"
     }
   ],
   "product_view.button.update": [
     {
       "type": 0,
-      "value": "Update"
+      "value": "Opdater"
     }
   ],
   "product_view.label.assistive_msg.quantity_decrement": [
     {
       "type": 0,
-      "value": "Decrement Quantity for "
+      "value": "Mindsk antallet af "
     },
     {
       "type": 1,
@@ -2918,7 +2718,7 @@
   "product_view.label.assistive_msg.quantity_increment": [
     {
       "type": 0,
-      "value": "Increment Quantity for "
+      "value": "Øg antallet af "
     },
     {
       "type": 1,
@@ -2928,13 +2728,13 @@
   "product_view.label.quantity": [
     {
       "type": 0,
-      "value": "Quantity"
+      "value": "Antal"
     }
   ],
   "product_view.label.quantity_decrement": [
     {
       "type": 0,
-      "value": "−"
+      "value": "-"
     }
   ],
   "product_view.label.quantity_increment": [
@@ -2952,55 +2752,49 @@
   "product_view.link.full_details": [
     {
       "type": 0,
-      "value": "See full details"
+      "value": "Se alle oplysninger"
     }
   ],
   "profile_card.info.profile_updated": [
     {
       "type": 0,
-      "value": "Profile updated"
+      "value": "Profilen blev opdateret"
     }
   ],
   "profile_card.label.email": [
     {
       "type": 0,
-      "value": "Email"
+      "value": "E-mail"
     }
   ],
   "profile_card.label.full_name": [
     {
       "type": 0,
-      "value": "Full Name"
+      "value": "Fulde navn"
     }
   ],
   "profile_card.label.phone": [
     {
       "type": 0,
-      "value": "Phone Number"
+      "value": "Telefonnummer"
     }
   ],
   "profile_card.message.not_provided": [
     {
       "type": 0,
-      "value": "Not provided"
+      "value": "Ikke oplyst"
     }
   ],
   "profile_card.title.my_profile": [
     {
       "type": 0,
-      "value": "My Profile"
-    }
-  ],
-  "profile_fields.label.profile_form": [
-    {
-      "type": 0,
-      "value": "Profile Form"
+      "value": "Min profil"
     }
   ],
   "promo_code_fields.button.apply": [
     {
       "type": 0,
-      "value": "Apply"
+      "value": "Anvend"
     }
   ],
   "promo_popover.assistive_msg.info": [
@@ -3012,55 +2806,55 @@
   "promo_popover.heading.promo_applied": [
     {
       "type": 0,
-      "value": "Promotions Applied"
+      "value": "Anvendte kampagnekoder"
     }
   ],
   "promocode.accordion.button.have_promocode": [
     {
       "type": 0,
-      "value": "Do you have a promo code?"
+      "value": "Har du en kampagnekode?"
     }
   ],
   "recent_searches.action.clear_searches": [
     {
       "type": 0,
-      "value": "Clear recent searches"
+      "value": "Ryd seneste søgninger"
     }
   ],
   "recent_searches.heading.recent_searches": [
     {
       "type": 0,
-      "value": "Recent Searches"
+      "value": "Seneste søgninger"
     }
   ],
   "register_form.action.sign_in": [
     {
       "type": 0,
-      "value": "Sign in"
+      "value": "Log ind"
     }
   ],
   "register_form.button.create_account": [
     {
       "type": 0,
-      "value": "Create Account"
+      "value": "Opret konto"
     }
   ],
   "register_form.heading.lets_get_started": [
     {
       "type": 0,
-      "value": "Let's get started!"
+      "value": "Lad os komme i gang!"
     }
   ],
   "register_form.message.agree_to_policy_terms": [
     {
       "type": 0,
-      "value": "By creating an account, you agree to Salesforce "
+      "value": "Ved at oprette en konto accepterer du Salesforces "
     },
     {
       "children": [
         {
           "type": 0,
-          "value": "Privacy Policy"
+          "value": "Privatlivspolitik"
         }
       ],
       "type": 8,
@@ -3068,13 +2862,13 @@
     },
     {
       "type": 0,
-      "value": " and "
+      "value": " og "
     },
     {
       "children": [
         {
           "type": 0,
-          "value": "Terms & Conditions"
+          "value": "Vilkår og betingelser"
         }
       ],
       "type": 8,
@@ -3084,73 +2878,105 @@
   "register_form.message.already_have_account": [
     {
       "type": 0,
-      "value": "Already have an account?"
+      "value": "Har du allerede en konto?"
     }
   ],
   "register_form.message.create_an_account": [
     {
       "type": 0,
-      "value": "Create an account and get first access to the very best products, inspiration and community."
+      "value": "Opret en konto og få først adgang til de allerbedste produkter, inspiration og fællesskab."
+    }
+  ],
+  "reset_password.button.back_to_sign_in": [
+    {
+      "type": 0,
+      "value": "Tilbage til Log ind"
+    }
+  ],
+  "reset_password.info.receive_email_shortly": [
+    {
+      "type": 0,
+      "value": "Du vil snart modtage en e-mail på "
+    },
+    {
+      "children": [
+        {
+          "type": 1,
+          "value": "email"
+        }
+      ],
+      "type": 8,
+      "value": "b"
+    },
+    {
+      "type": 0,
+      "value": " med et link til at nulstille din adgangskode."
+    }
+  ],
+  "reset_password.title.password_reset": [
+    {
+      "type": 0,
+      "value": "Nulstilling af adgangskode"
     }
   ],
   "reset_password_form.action.sign_in": [
     {
       "type": 0,
-      "value": "Sign in"
+      "value": "Log ind"
     }
   ],
   "reset_password_form.button.reset_password": [
     {
       "type": 0,
-      "value": "Reset Password"
+      "value": "Nulstil adgangskode"
     }
   ],
   "reset_password_form.message.enter_your_email": [
     {
       "type": 0,
-      "value": "Enter your email to receive instructions on how to reset your password"
+      "value": "Indtast din e-mail for at modtage instruktioner om, hvordan du nulstiller din adgangskode"
     }
   ],
   "reset_password_form.message.return_to_sign_in": [
     {
       "type": 0,
-      "value": "Or return to"
+      "value": "Eller vend tilbage til"
     }
   ],
   "reset_password_form.title.reset_password": [
     {
       "type": 0,
-      "value": "Reset Password"
+      "value": "Nulstil adgangskode"
     }
   ],
   "search.action.cancel": [
     {
       "type": 0,
-      "value": "Cancel"
+      "value": "Annuller"
     }
   ],
   "selected_refinements.action.assistive_msg.clear_all": [
     {
       "type": 0,
-      "value": "Clear all filters"
+      "value": "Ryd alle filtre"
     }
   ],
   "selected_refinements.action.clear_all": [
     {
       "type": 0,
-      "value": "Clear All"
+      "value": "Ryd alt"
     }
   ],
   "shipping_address.button.continue_to_shipping": [
     {
       "type": 0,
-      "value": "Continue to Shipping Method"
+      "value": "Fortsæt til Leveringsmetode"
     }
   ],
   "shipping_address.label.edit_button": [
     {
       "type": 0,
-      "value": "Edit "
+      "value": "Rediger "
     },
     {
       "type": 1,
@@ -3160,7 +2986,7 @@
   "shipping_address.label.remove_button": [
     {
       "type": 0,
-      "value": "Remove "
+      "value": "Fjern "
     },
     {
       "type": 1,
@@ -3170,123 +2996,97 @@
   "shipping_address.label.shipping_address_form": [
     {
       "type": 0,
-      "value": "Shipping Address Form"
+      "value": "Formular til leveringsadresse"
     }
   ],
   "shipping_address.title.shipping_address": [
     {
       "type": 0,
-      "value": "Shipping Address"
+      "value": "Leveringsadresse"
     }
   ],
   "shipping_address_edit_form.button.save_and_continue": [
     {
       "type": 0,
-      "value": "Save & Continue to Shipping Method"
+      "value": "Gem og fortsæt til leveringsmetode"
     }
   ],
   "shipping_address_form.heading.edit_address": [
     {
       "type": 0,
-      "value": "Edit Address"
+      "value": "Rediger adresse"
     }
   ],
   "shipping_address_form.heading.new_address": [
     {
       "type": 0,
-      "value": "Add New Address"
+      "value": "Tilføj ny adresse"
     }
   ],
   "shipping_address_selection.button.add_address": [
     {
       "type": 0,
-      "value": "Add New Address"
+      "value": "Tilføj ny adresse"
     }
   ],
   "shipping_address_selection.button.submit": [
     {
       "type": 0,
-      "value": "Submit"
+      "value": "Indsend"
     }
   ],
   "shipping_address_selection.title.add_address": [
     {
       "type": 0,
-      "value": "Add New Address"
+      "value": "Tilføj ny adresse"
     }
   ],
   "shipping_address_selection.title.edit_shipping": [
     {
       "type": 0,
-      "value": "Edit Shipping Address"
+      "value": "Rediger leveringsadresse"
     }
   ],
   "shipping_options.action.send_as_a_gift": [
     {
       "type": 0,
-      "value": "Do you want to send this as a gift?"
+      "value": "Vil du sende den som en gave?"
     }
   ],
   "shipping_options.button.continue_to_payment": [
     {
       "type": 0,
-      "value": "Continue to Payment"
+      "value": "Fortsæt til betaling"
     }
   ],
   "shipping_options.title.shipping_gift_options": [
     {
       "type": 0,
-      "value": "Shipping & Gift Options"
+      "value": "Forsendelse og gavemuligheder"
     }
   ],
   "signout_confirmation_dialog.button.cancel": [
     {
       "type": 0,
-      "value": "Cancel"
+      "value": "Annuller"
     }
   ],
   "signout_confirmation_dialog.button.sign_out": [
     {
       "type": 0,
-      "value": "Sign Out"
+      "value": "Log ud"
     }
   ],
   "signout_confirmation_dialog.heading.sign_out": [
     {
       "type": 0,
-      "value": "Sign Out"
+      "value": "Log ud"
     }
   ],
   "signout_confirmation_dialog.message.sure_to_sign_out": [
     {
       "type": 0,
-      "value": "Are you sure you want to sign out? You will need to sign back in to proceed with your current order."
-    }
-  ],
-  "social_login_redirect.message.authenticating": [
-    {
-      "type": 0,
-      "value": "Authenticating..."
-    }
-  ],
-  "social_login_redirect.message.redirect_link": [
-    {
-      "type": 0,
-      "value": "If you are not automatically redirected, click "
-    },
-    {
-      "children": [
-        {
-          "type": 0,
-          "value": "this link"
-        }
-      ],
-      "type": 8,
-      "value": "link"
-    },
-    {
-      "type": 0,
-      "value": " to proceed."
+      "value": "Er du sikker på, at du vil logge ud? Du skal logge ind igen for at fortsætte med din nuværende ordre."
     }
   ],
   "store_locator.action.find": [
@@ -3298,55 +3098,55 @@
   "store_locator.action.select_a_country": [
     {
       "type": 0,
-      "value": "Select a country"
+      "value": "Vælg et land"
     }
   ],
   "store_locator.action.use_my_location": [
     {
       "type": 0,
-      "value": "Use My Location"
+      "value": "Brug min placering"
     }
   ],
   "store_locator.action.viewMore": [
     {
       "type": 0,
-      "value": "View More"
+      "value": "Se mere"
     }
   ],
   "store_locator.description.away": [
     {
       "type": 0,
-      "value": "away"
+      "value": "væk"
     }
   ],
   "store_locator.description.loading_locations": [
     {
       "type": 0,
-      "value": "Loading locations..."
+      "value": "Indlæser steder ..."
     }
   ],
   "store_locator.description.no_locations": [
     {
       "type": 0,
-      "value": "Sorry, there are no locations in this area"
+      "value": "Beklager, der er ingen steder i dette område"
     }
   ],
   "store_locator.description.or": [
     {
       "type": 0,
-      "value": "Or"
+      "value": "Eller"
     }
   ],
   "store_locator.description.phone": [
     {
       "type": 0,
-      "value": "Phone:"
+      "value": "Telefon:"
     }
   ],
   "store_locator.description.viewing_near_postal_code": [
     {
       "type": 0,
-      "value": "Viewing stores within "
+      "value": "Viser butikker inden for "
     },
     {
       "type": 1,
@@ -3358,7 +3158,7 @@
     },
     {
       "type": 0,
-      "value": " of "
+      "value": " af "
     },
     {
       "type": 1,
@@ -3366,61 +3166,61 @@
     },
     {
       "type": 0,
-      "value": " in"
+      "value": " i"
     }
   ],
   "store_locator.description.viewing_near_your_location": [
     {
       "type": 0,
-      "value": "Viewing stores near your location"
+      "value": "Viser butikker i nærheden af din placering"
     }
   ],
   "store_locator.dropdown.germany": [
     {
       "type": 0,
-      "value": "Germany"
+      "value": "Tyskland"
     }
   ],
   "store_locator.dropdown.united_states": [
     {
       "type": 0,
-      "value": "United States"
+      "value": "USA"
     }
   ],
   "store_locator.error.agree_to_share_your_location": [
     {
       "type": 0,
-      "value": "Please agree to share your location"
+      "value": "Acceptér at dele din placering"
     }
   ],
   "store_locator.error.please_enter_a_postal_code": [
     {
       "type": 0,
-      "value": "Please enter a postal code."
+      "value": "Indtast et postnummer."
     }
   ],
   "store_locator.error.please_select_a_country": [
     {
       "type": 0,
-      "value": "Please select a country."
+      "value": "Vælg et land."
     }
   ],
   "store_locator.field.placeholder.enter_postal_code": [
     {
       "type": 0,
-      "value": "Enter postal code"
+      "value": "Indtast postnummer"
     }
   ],
   "store_locator.pagination.load_more": [
     {
       "type": 0,
-      "value": "Load More"
+      "value": "Indlæs flere"
     }
   ],
   "store_locator.title": [
     {
       "type": 0,
-      "value": "Find a Store"
+      "value": "Find en butik"
     }
   ],
   "swatch_group.selected.label": [
@@ -3436,283 +3236,283 @@
   "toggle_card.action.edit": [
     {
       "type": 0,
-      "value": "Edit"
+      "value": "Rediger"
     }
   ],
   "toggle_card.action.editContactInfo": [
     {
       "type": 0,
-      "value": "Edit Contact Info"
+      "value": "Rediger kontaktoplysninger"
     }
   ],
   "toggle_card.action.editPaymentInfo": [
     {
       "type": 0,
-      "value": "Edit Payment Info"
+      "value": "Rediger betalingsoplysninger"
     }
   ],
   "toggle_card.action.editShippingAddress": [
     {
       "type": 0,
-      "value": "Edit Shipping Address"
+      "value": "Rediger leveringsadresse"
     }
   ],
   "toggle_card.action.editShippingOptions": [
     {
       "type": 0,
-      "value": "Edit Shipping Options"
+      "value": "Rediger leveringsmuligheder"
     }
   ],
   "update_password_fields.button.forgot_password": [
     {
       "type": 0,
-      "value": "Forgot Password?"
+      "value": "Glemt din adgangskode?"
     }
   ],
   "use_address_fields.error.please_enter_first_name": [
     {
       "type": 0,
-      "value": "Please enter your first name."
+      "value": "Indtast dit fornavn."
     }
   ],
   "use_address_fields.error.please_enter_last_name": [
     {
       "type": 0,
-      "value": "Please enter your last name."
+      "value": "Indtast dit efternavn."
     }
   ],
   "use_address_fields.error.please_enter_phone_number": [
     {
       "type": 0,
-      "value": "Please enter your phone number."
+      "value": "Indtast dit telefonnummer."
     }
   ],
   "use_address_fields.error.please_enter_your_postal_or_zip": [
     {
       "type": 0,
-      "value": "Please enter your zip code."
+      "value": "Indtast dit postnummer."
     }
   ],
   "use_address_fields.error.please_select_your_address": [
     {
       "type": 0,
-      "value": "Please enter your address."
+      "value": "Indtast din adresse."
     }
   ],
   "use_address_fields.error.please_select_your_city": [
     {
       "type": 0,
-      "value": "Please enter your city."
+      "value": "Indtast din by."
     }
   ],
   "use_address_fields.error.please_select_your_country": [
     {
       "type": 0,
-      "value": "Please select your country."
+      "value": "Vælg dit land."
     }
   ],
   "use_address_fields.error.please_select_your_state_or_province": [
     {
       "type": 0,
-      "value": "Please select your state."
+      "value": "Vælg din stat."
     }
   ],
   "use_address_fields.error.required": [
     {
       "type": 0,
-      "value": "Required"
+      "value": "Påkrævet"
     }
   ],
   "use_address_fields.error.state_code_invalid": [
     {
       "type": 0,
-      "value": "Please enter 2-letter state/province."
+      "value": "Indtast stat/provins på 2 bogstaver."
     }
   ],
   "use_address_fields.label.address": [
     {
       "type": 0,
-      "value": "Address"
+      "value": "Adresse"
     }
   ],
   "use_address_fields.label.address_form": [
     {
       "type": 0,
-      "value": "Address Form"
+      "value": "Adresseformular"
     }
   ],
   "use_address_fields.label.city": [
     {
       "type": 0,
-      "value": "City"
+      "value": "By"
     }
   ],
   "use_address_fields.label.country": [
     {
       "type": 0,
-      "value": "Country"
+      "value": "Land"
     }
   ],
   "use_address_fields.label.first_name": [
     {
       "type": 0,
-      "value": "First Name"
+      "value": "Fornavn"
     }
   ],
   "use_address_fields.label.last_name": [
     {
       "type": 0,
-      "value": "Last Name"
+      "value": "Efternavn"
     }
   ],
   "use_address_fields.label.phone": [
     {
       "type": 0,
-      "value": "Phone"
+      "value": "Telefon"
     }
   ],
   "use_address_fields.label.postal_code": [
     {
       "type": 0,
-      "value": "Postal Code"
+      "value": "Postnummer"
     }
   ],
   "use_address_fields.label.preferred": [
     {
       "type": 0,
-      "value": "Set as default"
+      "value": "Indstil som standard"
     }
   ],
   "use_address_fields.label.province": [
     {
       "type": 0,
-      "value": "Province"
+      "value": "Provins"
     }
   ],
   "use_address_fields.label.state": [
     {
       "type": 0,
-      "value": "State"
+      "value": "Stat"
     }
   ],
   "use_address_fields.label.zipCode": [
     {
       "type": 0,
-      "value": "Zip Code"
+      "value": "Postnummer"
     }
   ],
   "use_credit_card_fields.error.required": [
     {
       "type": 0,
-      "value": "Required"
+      "value": "Påkrævet"
     }
   ],
   "use_credit_card_fields.error.required_card_number": [
     {
       "type": 0,
-      "value": "Please enter your card number."
+      "value": "Indtast dit kortnummer."
     }
   ],
   "use_credit_card_fields.error.required_expiry": [
     {
       "type": 0,
-      "value": "Please enter your expiration date."
+      "value": "Indtast din udløbsdato."
     }
   ],
   "use_credit_card_fields.error.required_name": [
     {
       "type": 0,
-      "value": "Please enter your name as shown on your card."
+      "value": "Indtast dit navn som vist på dit kort."
     }
   ],
   "use_credit_card_fields.error.required_security_code": [
     {
       "type": 0,
-      "value": "Please enter your security code."
+      "value": "Indtast din sikkerhedskode."
     }
   ],
   "use_credit_card_fields.error.valid_card_number": [
     {
       "type": 0,
-      "value": "Please enter a valid card number."
+      "value": "Indtast et gyldigt kortnummer."
     }
   ],
   "use_credit_card_fields.error.valid_date": [
     {
       "type": 0,
-      "value": "Please enter a valid date."
+      "value": "Indtast en gyldig dato."
     }
   ],
   "use_credit_card_fields.error.valid_name": [
     {
       "type": 0,
-      "value": "Please enter a valid name."
+      "value": "Indtast et gyldigt navn."
     }
   ],
   "use_credit_card_fields.error.valid_security_code": [
     {
       "type": 0,
-      "value": "Please enter a valid security code."
+      "value": "Indtast en gyldig sikkerhedskode."
     }
   ],
   "use_credit_card_fields.label.card_number": [
     {
       "type": 0,
-      "value": "Card Number"
+      "value": "Kortnummer"
     }
   ],
   "use_credit_card_fields.label.card_type": [
     {
       "type": 0,
-      "value": "Card Type"
+      "value": "Korttype"
     }
   ],
   "use_credit_card_fields.label.expiry": [
     {
       "type": 0,
-      "value": "Expiration Date"
+      "value": "Udløbsdato"
     }
   ],
   "use_credit_card_fields.label.name": [
     {
       "type": 0,
-      "value": "Name on Card"
+      "value": "Navn på kort"
     }
   ],
   "use_credit_card_fields.label.security_code": [
     {
       "type": 0,
-      "value": "Security Code"
+      "value": "Sikkerhedskode"
     }
   ],
   "use_login_fields.error.required_email": [
     {
       "type": 0,
-      "value": "Please enter your email address."
+      "value": "Indtast din e-mailadresse."
     }
   ],
   "use_login_fields.error.required_password": [
     {
       "type": 0,
-      "value": "Please enter your password."
+      "value": "Indtast din adgangskode."
     }
   ],
   "use_login_fields.label.email": [
     {
       "type": 0,
-      "value": "Email"
+      "value": "E-mail"
     }
   ],
   "use_login_fields.label.password": [
     {
       "type": 0,
-      "value": "Password"
+      "value": "Adgangskode"
     }
   ],
   "use_product.message.inventory_remaining": [
     {
       "type": 0,
-      "value": "Only "
+      "value": "Kun "
     },
     {
       "type": 1,
@@ -3720,13 +3520,13 @@
     },
     {
       "type": 0,
-      "value": " left!"
+      "value": " tilbage!"
     }
   ],
   "use_product.message.inventory_remaining_for_product": [
     {
       "type": 0,
-      "value": "Only "
+      "value": "Kun "
     },
     {
       "type": 1,
@@ -3734,7 +3534,7 @@
     },
     {
       "type": 0,
-      "value": " left for "
+      "value": " tilbage til "
     },
     {
       "type": 1,
@@ -3748,13 +3548,13 @@
   "use_product.message.out_of_stock": [
     {
       "type": 0,
-      "value": "Out of stock"
+      "value": "Ikke på lager"
     }
   ],
   "use_product.message.out_of_stock_for_product": [
     {
       "type": 0,
-      "value": "Out of stock for "
+      "value": "Ikke på lager i "
     },
     {
       "type": 1,
@@ -3764,253 +3564,235 @@
   "use_profile_fields.error.required_email": [
     {
       "type": 0,
-      "value": "Please enter a valid email address."
+      "value": "Indtast en gyldig e-mailadresse."
     }
   ],
   "use_profile_fields.error.required_first_name": [
     {
       "type": 0,
-      "value": "Please enter your first name."
+      "value": "Indtast dit fornavn."
     }
   ],
   "use_profile_fields.error.required_last_name": [
     {
       "type": 0,
-      "value": "Please enter your last name."
+      "value": "Indtast dit efternavn."
     }
   ],
   "use_profile_fields.error.required_phone": [
     {
       "type": 0,
-      "value": "Please enter your phone number."
+      "value": "Indtast dit telefonnummer."
     }
   ],
   "use_profile_fields.label.email": [
     {
       "type": 0,
-      "value": "Email"
+      "value": "E-mail"
     }
   ],
   "use_profile_fields.label.first_name": [
     {
       "type": 0,
-      "value": "First Name"
+      "value": "Fornavn"
     }
   ],
   "use_profile_fields.label.last_name": [
     {
       "type": 0,
-      "value": "Last Name"
+      "value": "Efternavn"
     }
   ],
   "use_profile_fields.label.phone": [
     {
       "type": 0,
-      "value": "Phone Number"
+      "value": "Telefonnummer"
     }
   ],
   "use_promo_code_fields.error.required_promo_code": [
     {
       "type": 0,
-      "value": "Please provide a valid promo code."
+      "value": "Angiv en gyldig kampagnekode."
     }
   ],
   "use_promo_code_fields.label.promo_code": [
     {
       "type": 0,
-      "value": "Promo Code"
+      "value": "Kampagnekode"
     }
   ],
   "use_promocode.error.check_the_code": [
     {
       "type": 0,
-      "value": "Check the code and try again, it may already be applied or the promo has expired."
+      "value": "Tjek koden, og prøv igen. Den har måske været anvendt før, eller også er kampagnen udløbet."
     }
   ],
   "use_promocode.info.promo_applied": [
     {
       "type": 0,
-      "value": "Promotion applied"
+      "value": "Kampagnekode blev anvendt"
     }
   ],
   "use_promocode.info.promo_removed": [
     {
       "type": 0,
-      "value": "Promotion removed"
+      "value": "Kampagnekode blev fjernet"
     }
   ],
   "use_registration_fields.error.contain_number": [
     {
       "type": 0,
-      "value": "Password must contain at least one number."
+      "value": "Adgangskoden skal indeholde mindst ét tal."
     }
   ],
   "use_registration_fields.error.lowercase_letter": [
     {
       "type": 0,
-      "value": "Password must contain at least one lowercase letter."
+      "value": "Adgangskoden skal indeholde mindst et lille bogstav."
     }
   ],
   "use_registration_fields.error.minimum_characters": [
     {
       "type": 0,
-      "value": "Password must contain at least 8 characters."
+      "value": "Adgangskoden skal indeholde mindst 8 tegn."
     }
   ],
   "use_registration_fields.error.required_email": [
     {
       "type": 0,
-      "value": "Please enter a valid email address."
+      "value": "Indtast en gyldig e-mailadresse."
     }
   ],
   "use_registration_fields.error.required_first_name": [
     {
       "type": 0,
-      "value": "Please enter your first name."
+      "value": "Indtast dit fornavn."
     }
   ],
   "use_registration_fields.error.required_last_name": [
     {
       "type": 0,
-      "value": "Please enter your last name."
+      "value": "Indtast dit efternavn."
     }
   ],
   "use_registration_fields.error.required_password": [
     {
       "type": 0,
-      "value": "Please create a password."
+      "value": "Opret en adgangskode."
     }
   ],
   "use_registration_fields.error.special_character": [
     {
       "type": 0,
-      "value": "Password must contain at least one special character."
+      "value": "Adgangskoden skal indeholde mindst ét specialtegn."
     }
   ],
   "use_registration_fields.error.uppercase_letter": [
     {
       "type": 0,
-      "value": "Password must contain at least one uppercase letter."
+      "value": "Adgangskoden skal indeholde mindst ét stort bogstav."
     }
   ],
   "use_registration_fields.label.email": [
     {
       "type": 0,
-      "value": "Email"
+      "value": "E-mail"
     }
   ],
   "use_registration_fields.label.first_name": [
     {
       "type": 0,
-      "value": "First Name"
+      "value": "Fornavn"
     }
   ],
   "use_registration_fields.label.last_name": [
     {
       "type": 0,
-      "value": "Last Name"
+      "value": "Efternavn"
     }
   ],
   "use_registration_fields.label.password": [
     {
       "type": 0,
-      "value": "Password"
+      "value": "Adgangskode"
     }
   ],
   "use_registration_fields.label.sign_up_to_emails": [
     {
       "type": 0,
-      "value": "Sign me up for Salesforce emails (you can unsubscribe at any time)"
+      "value": "Tilmeld mig e-mails fra Salesforce (du kan til enhver tid afmelde dig igen)"
     }
   ],
   "use_reset_password_fields.error.required_email": [
     {
       "type": 0,
-      "value": "Please enter a valid email address."
+      "value": "Indtast en gyldig e-mailadresse."
     }
   ],
   "use_reset_password_fields.label.email": [
     {
       "type": 0,
-      "value": "Email"
+      "value": "E-mail"
     }
   ],
   "use_update_password_fields.error.contain_number": [
     {
       "type": 0,
-      "value": "Password must contain at least one number."
+      "value": "Adgangskoden skal indeholde mindst ét tal."
     }
   ],
   "use_update_password_fields.error.lowercase_letter": [
     {
       "type": 0,
-      "value": "Password must contain at least one lowercase letter."
+      "value": "Adgangskoden skal indeholde mindst et lille bogstav."
     }
   ],
   "use_update_password_fields.error.minimum_characters": [
     {
       "type": 0,
-      "value": "Password must contain at least 8 characters."
-    }
-  ],
-  "use_update_password_fields.error.password_mismatch": [
-    {
-      "type": 0,
-      "value": "Passwords do not match."
-    }
-  ],
-  "use_update_password_fields.error.required_confirm_password": [
-    {
-      "type": 0,
-      "value": "Please confirm your password."
+      "value": "Adgangskoden skal indeholde mindst 8 tegn."
     }
   ],
   "use_update_password_fields.error.required_new_password": [
     {
       "type": 0,
-      "value": "Please provide a new password."
+      "value": "Angiv en ny adgangskode."
     }
   ],
   "use_update_password_fields.error.required_password": [
     {
       "type": 0,
-      "value": "Please enter your password."
+      "value": "Indtast din adgangskode."
     }
   ],
   "use_update_password_fields.error.special_character": [
     {
       "type": 0,
-      "value": "Password must contain at least one special character."
+      "value": "Adgangskoden skal indeholde mindst ét specialtegn."
     }
   ],
   "use_update_password_fields.error.uppercase_letter": [
     {
       "type": 0,
-      "value": "Password must contain at least one uppercase letter."
-    }
-  ],
-  "use_update_password_fields.label.confirm_new_password": [
-    {
-      "type": 0,
-      "value": "Confirm New Password"
+      "value": "Adgangskoden skal indeholde mindst ét stort bogstav."
     }
   ],
   "use_update_password_fields.label.current_password": [
     {
       "type": 0,
-      "value": "Current Password"
+      "value": "Nuværende adgangskode"
     }
   ],
   "use_update_password_fields.label.new_password": [
     {
       "type": 0,
-      "value": "New Password"
+      "value": "Ny adgangskode"
     }
   ],
   "wishlist_primary_action.button.addSetToCart.label": [
     {
       "type": 0,
-      "value": "Add "
+      "value": "Tilføj "
     },
     {
       "type": 1,
@@ -4018,13 +3800,13 @@
     },
     {
       "type": 0,
-      "value": " set to cart"
+      "value": " sæt til kurv"
     }
   ],
   "wishlist_primary_action.button.addToCart.label": [
     {
       "type": 0,
-      "value": "Add "
+      "value": "Tilføj "
     },
     {
       "type": 1,
@@ -4032,25 +3814,25 @@
     },
     {
       "type": 0,
-      "value": " to cart"
+      "value": " til kurv"
     }
   ],
   "wishlist_primary_action.button.add_set_to_cart": [
     {
       "type": 0,
-      "value": "Add Set to Cart"
+      "value": "Læg sæt i kurv"
     }
   ],
   "wishlist_primary_action.button.add_to_cart": [
     {
       "type": 0,
-      "value": "Add to Cart"
+      "value": "Læg i kurv"
     }
   ],
   "wishlist_primary_action.button.viewFullDetails.label": [
     {
       "type": 0,
-      "value": "View full details for "
+      "value": "Se alle oplysninger for "
     },
     {
       "type": 1,
@@ -4060,19 +3842,19 @@
   "wishlist_primary_action.button.view_full_details": [
     {
       "type": 0,
-      "value": "View Full Details"
+      "value": "Se alle oplysninger"
     }
   ],
   "wishlist_primary_action.button.view_options": [
     {
       "type": 0,
-      "value": "View Options"
+      "value": "Se valg"
     }
   ],
   "wishlist_primary_action.button.view_options.label": [
     {
       "type": 0,
-      "value": "View Options for "
+      "value": "Se valg for "
     },
     {
       "type": 1,
@@ -4095,7 +3877,7 @@
           "value": [
             {
               "type": 0,
-              "value": "item"
+              "value": "vare"
             }
           ]
         },
@@ -4103,7 +3885,7 @@
           "value": [
             {
               "type": 0,
-              "value": "items"
+              "value": "varer"
             }
           ]
         }
@@ -4114,19 +3896,19 @@
     },
     {
       "type": 0,
-      "value": " added to cart"
+      "value": " lagt i kurv"
     }
   ],
   "wishlist_secondary_button_group.action.remove": [
     {
       "type": 0,
-      "value": "Remove"
+      "value": "Fjern"
     }
   ],
   "wishlist_secondary_button_group.info.item.remove.label": [
     {
       "type": 0,
-      "value": "Remove "
+      "value": "Fjern "
     },
     {
       "type": 1,
@@ -4136,13 +3918,13 @@
   "wishlist_secondary_button_group.info.item_removed": [
     {
       "type": 0,
-      "value": "Item removed from wishlist"
+      "value": "Varen er fjernet fra ønskelisten"
     }
   ],
   "with_registration.info.please_sign_in": [
     {
       "type": 0,
-      "value": "Please sign in to continue!"
+      "value": "Log ind for at fortsætte!"
     }
   ]
 }

@@ -75,29 +75,27 @@ export const withReactQuery = (Wrapped, options = {}) => {
             const queryCache = queryClient.getQueryCache()
             const queries = queryCache.getAll().filter((q) => q.options.enabled !== false)
             await Promise.all(
-                queries.map((q, i) => {
+                queries.map(async (q, i) => {
                     // always include the index to avoid duplicate entries
                     const displayName = q.meta?.displayName ? `${q.meta?.displayName}-${i}` : `${i}`
-                    res.__performanceTimer.mark(
-                        `${PERFORMANCE_MARKS.reactQueryUseQuery}.${displayName}`,
-                        'start'
-                    )
-                    return q
-                        .fetch()
-                        .then((result) => {
-                            res.__performanceTimer.mark(
-                                `${PERFORMANCE_MARKS.reactQueryUseQuery}.${displayName}`,
-                                'end',
-                                {
-                                    detail: q.queryHash
-                                }
-                            )
-                            return result
+                    const useQueryMarker = `${PERFORMANCE_MARKS.reactQueryUseQuery}.${displayName}`
+                    res.__performanceTimer.mark(useQueryMarker, 'start')
+
+                    try {
+                        const result = await q.fetch()
+                        return result
+                    } catch (err) {
+                        logger.error('Query during SSR results in an error', {
+                            namespace: 'with-react-query.doInitAppState',
+                            additionalProperties: {queryHash: q.queryHash, error: err}
                         })
-                        .catch(() => {
-                            // If there's an error in this fetch, react-query will log the error
-                            // On our end, simply catch any error and move on to the next query
+                        // Now we move on to the next query
+                    } finally {
+                        // Close the timer, regardless of the fetch result
+                        res.__performanceTimer.mark(useQueryMarker, 'end', {
+                            detail: q.queryHash
                         })
+                    }
                 })
             )
 

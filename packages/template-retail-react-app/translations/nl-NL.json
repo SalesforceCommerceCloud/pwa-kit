@@ -1,685 +1,625 @@
 {
   "account.accordion.button.my_account": {
-    "defaultMessage": "My Account"
+    "defaultMessage": "Mijn account"
   },
   "account.heading.my_account": {
-    "defaultMessage": "My Account"
+    "defaultMessage": "Mijn account"
   },
   "account.logout_button.button.log_out": {
-    "defaultMessage": "Log Out"
+    "defaultMessage": "Afmelden"
   },
   "account_addresses.badge.default": {
-    "defaultMessage": "Default"
+    "defaultMessage": "Standaard"
   },
   "account_addresses.button.add_address": {
-    "defaultMessage": "Add Address"
+    "defaultMessage": "Adres toevoegen"
   },
   "account_addresses.info.address_removed": {
-    "defaultMessage": "Address removed"
+    "defaultMessage": "Adres verwijderd"
   },
   "account_addresses.info.address_updated": {
-    "defaultMessage": "Address updated"
+    "defaultMessage": "Adres bijgewerkt"
   },
   "account_addresses.info.new_address_saved": {
-    "defaultMessage": "New address saved"
+    "defaultMessage": "Nieuw adres opgeslagen"
   },
   "account_addresses.page_action_placeholder.button.add_address": {
-    "defaultMessage": "Add Address"
+    "defaultMessage": "Adres toevoegen"
   },
   "account_addresses.page_action_placeholder.heading.no_saved_addresses": {
-    "defaultMessage": "No Saved Addresses"
+    "defaultMessage": "Geen opgeslagen adressen"
   },
   "account_addresses.page_action_placeholder.message.add_new_address": {
-    "defaultMessage": "Add a new address method for faster checkout."
+    "defaultMessage": "Voeg een nieuwe adresmethode toe voor sneller afrekenen."
   },
   "account_addresses.title.addresses": {
-    "defaultMessage": "Addresses"
+    "defaultMessage": "Adressen"
   },
   "account_detail.title.account_details": {
-    "defaultMessage": "Account Details"
+    "defaultMessage": "Accountgegevens"
   },
   "account_order_detail.heading.billing_address": {
-    "defaultMessage": "Billing Address"
+    "defaultMessage": "Factuuradres"
   },
   "account_order_detail.heading.num_of_items": {
     "defaultMessage": "{count} items"
   },
   "account_order_detail.heading.payment_method": {
-    "defaultMessage": "Payment Method"
+    "defaultMessage": "Betalingsmethode"
   },
   "account_order_detail.heading.shipping_address": {
-    "defaultMessage": "Shipping Address"
+    "defaultMessage": "Verzendadres"
   },
   "account_order_detail.heading.shipping_method": {
-    "defaultMessage": "Shipping Method"
+    "defaultMessage": "Verzendmethode"
   },
   "account_order_detail.label.order_number": {
-    "defaultMessage": "Order Number: {orderNumber}"
+    "defaultMessage": "Ordernummer: {orderNumber}"
   },
   "account_order_detail.label.ordered_date": {
-    "defaultMessage": "Ordered: {date}"
+    "defaultMessage": "Besteld: {date}"
   },
   "account_order_detail.label.pending_tracking_number": {
-    "defaultMessage": "Pending"
+    "defaultMessage": "Openstaand"
   },
   "account_order_detail.label.tracking_number": {
-    "defaultMessage": "Tracking Number"
+    "defaultMessage": "Trackingnummer"
   },
   "account_order_detail.link.back_to_history": {
-    "defaultMessage": "Back to Order History"
+    "defaultMessage": "Terug naar ordergeschiedenis"
   },
   "account_order_detail.shipping_status.not_shipped": {
-    "defaultMessage": "Not shipped"
+    "defaultMessage": "Niet verzonden"
   },
   "account_order_detail.shipping_status.part_shipped": {
-    "defaultMessage": "Partially shipped"
+    "defaultMessage": "Gedeeltelijk verzonden"
   },
   "account_order_detail.shipping_status.shipped": {
-    "defaultMessage": "Shipped"
+    "defaultMessage": "Verzonden"
   },
   "account_order_detail.title.order_details": {
-    "defaultMessage": "Order Details"
+    "defaultMessage": "Ordergegevens"
   },
   "account_order_history.button.continue_shopping": {
-    "defaultMessage": "Continue Shopping"
+    "defaultMessage": "Doorgaan met shoppen"
   },
   "account_order_history.description.once_you_place_order": {
-    "defaultMessage": "Once you place an order the details will show up here."
+    "defaultMessage": "Nadat je een order hebt geplaatst, worden de details hier weergegeven."
   },
   "account_order_history.heading.no_order_yet": {
-    "defaultMessage": "You haven't placed an order yet."
+    "defaultMessage": "Je hebt nog geen order geplaatst."
   },
   "account_order_history.label.num_of_items": {
     "defaultMessage": "{count} items",
     "description": "Number of items in order"
   },
   "account_order_history.label.order_number": {
-    "defaultMessage": "Order Number: {orderNumber}"
+    "defaultMessage": "Ordernummer: {orderNumber}"
   },
   "account_order_history.label.ordered_date": {
-    "defaultMessage": "Ordered: {date}"
+    "defaultMessage": "Besteld: {date}"
   },
   "account_order_history.label.shipped_to": {
-    "defaultMessage": "Shipped to: {name}"
+    "defaultMessage": "Verzonden naar: {name}"
   },
   "account_order_history.link.view_details": {
-    "defaultMessage": "View details"
+    "defaultMessage": "Details weergeven"
   },
   "account_order_history.title.order_history": {
-    "defaultMessage": "Order History"
+    "defaultMessage": "Ordergeschiedenis"
   },
   "account_wishlist.button.continue_shopping": {
-    "defaultMessage": "Continue Shopping"
+    "defaultMessage": "Doorgaan met shoppen"
   },
   "account_wishlist.description.continue_shopping": {
-    "defaultMessage": "Continue shopping and add items to your wishlist."
+    "defaultMessage": "Ga door met shoppen en voeg artikelen toe aan je verlanglijst."
   },
   "account_wishlist.heading.no_wishlist": {
-    "defaultMessage": "No Wishlist Items"
+    "defaultMessage": "Geen artikelen op verlanglijst"
   },
   "account_wishlist.title.wishlist": {
-    "defaultMessage": "Wishlist"
+    "defaultMessage": "Verlanglijst"
   },
   "action_card.action.edit": {
-    "defaultMessage": "Edit"
+    "defaultMessage": "Bewerken"
   },
   "action_card.action.remove": {
-    "defaultMessage": "Remove"
+    "defaultMessage": "Verwijderen"
   },
   "add_to_cart_modal.info.added_to_cart": {
-    "defaultMessage": "{quantity} {quantity, plural, one {item} other {items}} added to cart"
+    "defaultMessage": "{quantity} {quantity, plural, one {artikel} other {artikelen}} toegevoegd aan winkelwagen"
   },
   "add_to_cart_modal.label.cart_subtotal": {
-    "defaultMessage": "Cart Subtotal ({itemAccumulatedCount} item)"
+    "defaultMessage": "Subtotaal winkelwagen ({itemAccumulatedCount} artikel)"
   },
   "add_to_cart_modal.label.quantity": {
-    "defaultMessage": "Qty"
+    "defaultMessage": "Aantal"
   },
   "add_to_cart_modal.link.checkout": {
-    "defaultMessage": "Proceed to Checkout"
+    "defaultMessage": "Doorgaan naar afrekenen"
   },
   "add_to_cart_modal.link.view_cart": {
-    "defaultMessage": "View Cart"
+    "defaultMessage": "Winkelwagen bekijken"
   },
   "add_to_cart_modal.recommended_products.title.might_also_like": {
-    "defaultMessage": "You Might Also Like"
+    "defaultMessage": "Dit vind je misschien ook leuk"
   },
   "auth_modal.button.close.assistive_msg": {
-    "defaultMessage": "Close login form"
-  },
-  "auth_modal.check_email.button.resend_link": {
-    "defaultMessage": "Resend Link"
-  },
-  "auth_modal.check_email.description.check_spam_folder": {
-    "defaultMessage": "The link may take a few minutes to arrive, check your spam folder if you're having trouble finding it"
-  },
-  "auth_modal.check_email.description.just_sent": {
-    "defaultMessage": "We just sent a login link to <b>{email}</b>"
-  },
-  "auth_modal.check_email.title.check_your_email": {
-    "defaultMessage": "Check Your Email"
+    "defaultMessage": "Aanmeldformulier sluiten"
   },
   "auth_modal.description.now_signed_in": {
-    "defaultMessage": "You're now signed in."
+    "defaultMessage": "Je bent nu aangemeld."
   },
   "auth_modal.error.incorrect_email_or_password": {
-    "defaultMessage": "Something's not right with your email or password. Try again."
+    "defaultMessage": "Er klopt iets niet in je e-mailadres of wachtwoord. Probeer het opnieuw."
   },
   "auth_modal.info.welcome_user": {
-    "defaultMessage": "Welcome {name},"
+    "defaultMessage": "Welkom {name},"
   },
   "auth_modal.password_reset_success.button.back_to_sign_in": {
-    "defaultMessage": "Back to Sign In"
+    "defaultMessage": "Terug naar Aanmelden"
   },
   "auth_modal.password_reset_success.info.will_email_shortly": {
-    "defaultMessage": "You will receive an email at <b>{email}</b> with a link to reset your password shortly."
+    "defaultMessage": "Je ontvangt binnenkort een e-mail op <b>{email}</b> met een link om je wachtwoord opnieuw in te stellen."
   },
   "auth_modal.password_reset_success.title.password_reset": {
-    "defaultMessage": "Password Reset"
+    "defaultMessage": "Wachtwoord opnieuw instellen"
   },
   "carousel.button.scroll_left.assistive_msg": {
-    "defaultMessage": "Scroll carousel left"
+    "defaultMessage": "Carrousel naar links scrollen"
   },
   "carousel.button.scroll_right.assistive_msg": {
-    "defaultMessage": "Scroll carousel right"
+    "defaultMessage": "Carrousel naar rechts scrollen"
   },
   "cart.info.removed_from_cart": {
-    "defaultMessage": "Item removed from cart"
+    "defaultMessage": "Artikel verwijderd uit winkelwagen"
   },
   "cart.product_edit_modal.modal_label": {
-    "defaultMessage": "Edit modal for {productName}"
+    "defaultMessage": "Dialoogvenster voor {productName} bewerken"
   },
   "cart.recommended_products.title.may_also_like": {
-    "defaultMessage": "You May Also Like"
+    "defaultMessage": "Dit vind je misschien ook leuk"
   },
   "cart.recommended_products.title.recently_viewed": {
-    "defaultMessage": "Recently Viewed"
+    "defaultMessage": "Onlangs bekeken"
   },
   "cart_cta.link.checkout": {
-    "defaultMessage": "Proceed to Checkout"
+    "defaultMessage": "Doorgaan naar afrekenen"
   },
   "cart_secondary_button_group.action.added_to_wishlist": {
-    "defaultMessage": "Add to Wishlist"
+    "defaultMessage": "Toevoegen aan verlanglijst"
   },
   "cart_secondary_button_group.action.edit": {
-    "defaultMessage": "Edit"
+    "defaultMessage": "Bewerken"
   },
   "cart_secondary_button_group.action.remove": {
-    "defaultMessage": "Remove"
+    "defaultMessage": "Verwijderen"
   },
   "cart_secondary_button_group.label.this_is_gift": {
-    "defaultMessage": "This is a gift."
+    "defaultMessage": "Dit is een cadeau."
   },
   "cart_skeleton.heading.order_summary": {
-    "defaultMessage": "Order Summary"
+    "defaultMessage": "Orderoverzicht"
   },
   "cart_skeleton.title.cart": {
-    "defaultMessage": "Cart"
+    "defaultMessage": "Winkelwagen"
   },
   "cart_title.title.cart_num_of_items": {
-    "defaultMessage": "Cart ({itemCount, plural, =0 {0 items} one {# item} other {# items}})"
+    "defaultMessage": "Winkelwagen ({itemCount, plural, =0 {0 artikelen} one {# artikel} other {# artikelen}})"
   },
   "category_links.button_text": {
-    "defaultMessage": "Categories"
+    "defaultMessage": "Categorieën"
   },
   "cc_radio_group.action.remove": {
-    "defaultMessage": "Remove"
+    "defaultMessage": "Verwijderen"
   },
   "cc_radio_group.button.add_new_card": {
-    "defaultMessage": "Add New Card"
+    "defaultMessage": "Nieuwe kaart toevoegen"
   },
   "checkout.button.place_order": {
-    "defaultMessage": "Place Order"
+    "defaultMessage": "Order plaatsen"
   },
   "checkout.message.generic_error": {
-    "defaultMessage": "An unexpected error occurred during checkout."
+    "defaultMessage": "Er is een onverwachte fout opgetreden tijdens het afrekenen."
   },
   "checkout_confirmation.button.create_account": {
-    "defaultMessage": "Create Account"
+    "defaultMessage": "Account maken"
   },
   "checkout_confirmation.heading.billing_address": {
-    "defaultMessage": "Billing Address"
+    "defaultMessage": "Factuuradres"
   },
   "checkout_confirmation.heading.create_account": {
-    "defaultMessage": "Create an account for faster checkout"
+    "defaultMessage": "Account maken om sneller af te rekenen"
   },
   "checkout_confirmation.heading.credit_card": {
-    "defaultMessage": "Credit Card"
+    "defaultMessage": "Creditcard"
   },
   "checkout_confirmation.heading.delivery_details": {
-    "defaultMessage": "Delivery Details"
+    "defaultMessage": "Leveringsgegevens"
   },
   "checkout_confirmation.heading.order_summary": {
-    "defaultMessage": "Order Summary"
+    "defaultMessage": "Orderoverzicht"
   },
   "checkout_confirmation.heading.payment_details": {
-    "defaultMessage": "Payment Details"
+    "defaultMessage": "Betalingsgegevens"
   },
   "checkout_confirmation.heading.shipping_address": {
-    "defaultMessage": "Shipping Address"
+    "defaultMessage": "Verzendadres"
   },
   "checkout_confirmation.heading.shipping_method": {
-    "defaultMessage": "Shipping Method"
+    "defaultMessage": "Verzendmethode"
   },
   "checkout_confirmation.heading.thank_you_for_order": {
-    "defaultMessage": "Thank you for your order!"
+    "defaultMessage": "Bedankt voor je order!"
   },
   "checkout_confirmation.label.free": {
-    "defaultMessage": "Free"
+    "defaultMessage": "Gratis"
   },
   "checkout_confirmation.label.order_number": {
-    "defaultMessage": "Order Number"
+    "defaultMessage": "Ordernummer"
   },
   "checkout_confirmation.label.order_total": {
-    "defaultMessage": "Order Total"
+    "defaultMessage": "Ordertotaal"
   },
   "checkout_confirmation.label.promo_applied": {
-    "defaultMessage": "Promotion applied"
+    "defaultMessage": "Promotie toegepast"
   },
   "checkout_confirmation.label.shipping": {
-    "defaultMessage": "Shipping"
+    "defaultMessage": "Verzending"
   },
   "checkout_confirmation.label.shipping.strikethrough.price": {
-    "defaultMessage": "Originally {originalPrice}, now {newPrice}"
+    "defaultMessage": "Oorspronkelijk {originalPrice}, nu {newPrice}"
   },
   "checkout_confirmation.label.subtotal": {
-    "defaultMessage": "Subtotal"
+    "defaultMessage": "Subtotaal"
   },
   "checkout_confirmation.label.tax": {
-    "defaultMessage": "Tax"
+    "defaultMessage": "Belasting"
   },
   "checkout_confirmation.link.continue_shopping": {
-    "defaultMessage": "Continue Shopping"
+    "defaultMessage": "Doorgaan met shoppen"
   },
   "checkout_confirmation.link.login": {
-    "defaultMessage": "Log in here"
+    "defaultMessage": "Hier aanmelden"
   },
   "checkout_confirmation.message.already_has_account": {
-    "defaultMessage": "This email already has an account."
+    "defaultMessage": "Er is al een account voor dit e-mailadres."
   },
   "checkout_confirmation.message.num_of_items_in_order": {
-    "defaultMessage": "{itemCount, plural, =0 {0 items} one {# item} other {# items}}",
+    "defaultMessage": "{itemCount, plural, =0 {0 artikelen} one {# artikel} other {# artikelen}}",
     "description": "# item(s) in order"
   },
   "checkout_confirmation.message.will_email_shortly": {
-    "defaultMessage": "We will send an email to <b>{email}</b> with your confirmation number and receipt shortly."
+    "defaultMessage": "We sturen binnenkort een e-mail naar <b>{email}</b> met je bevestigingsnummer en ontvangstbewijs."
   },
   "checkout_footer.link.privacy_policy": {
-    "defaultMessage": "Privacy Policy"
+    "defaultMessage": "Privacybeleid"
   },
   "checkout_footer.link.returns_exchanges": {
-    "defaultMessage": "Returns & Exchanges"
+    "defaultMessage": "Retourneren en ruilen"
   },
   "checkout_footer.link.shipping": {
-    "defaultMessage": "Shipping"
+    "defaultMessage": "Verzending"
   },
   "checkout_footer.link.site_map": {
-    "defaultMessage": "Site Map"
+    "defaultMessage": "Siteplattegrond"
   },
   "checkout_footer.link.terms_conditions": {
-    "defaultMessage": "Terms & Conditions"
+    "defaultMessage": "Algemene voorwaarden"
   },
   "checkout_footer.message.copyright": {
-    "defaultMessage": "Salesforce or its affiliates. All rights reserved. This is a demo store only. Orders made WILL NOT be processed."
+    "defaultMessage": "Salesforce of aan Salesforce gelieerde bedrijven. Alle rechten voorbehouden. Dit is een demowinkel. Geplaatste orders WORDEN NIET verwerkt."
   },
   "checkout_header.link.assistive_msg.cart": {
-    "defaultMessage": "Back to cart, number of items: {numItems}"
+    "defaultMessage": "Terug naar winkelwagen, aantal artikelen: {numItems}"
   },
   "checkout_header.link.cart": {
-    "defaultMessage": "Back to cart"
+    "defaultMessage": "Terug naar winkelwagen"
   },
   "checkout_payment.action.remove": {
-    "defaultMessage": "Remove"
+    "defaultMessage": "Verwijderen"
   },
   "checkout_payment.button.review_order": {
-    "defaultMessage": "Review Order"
+    "defaultMessage": "Order controleren"
   },
   "checkout_payment.heading.billing_address": {
-    "defaultMessage": "Billing Address"
+    "defaultMessage": "Factuuradres"
   },
   "checkout_payment.heading.credit_card": {
-    "defaultMessage": "Credit Card"
+    "defaultMessage": "Creditcard"
   },
   "checkout_payment.label.billing_address_form": {
-    "defaultMessage": "Billing Address Form"
+    "defaultMessage": "Adresformulier voor facturen"
   },
   "checkout_payment.label.same_as_shipping": {
-    "defaultMessage": "Same as shipping address"
+    "defaultMessage": "Zelfde als verzendadres"
   },
   "checkout_payment.title.payment": {
-    "defaultMessage": "Payment"
+    "defaultMessage": "Betaling"
   },
   "colorRefinements.label.hitCount": {
     "defaultMessage": "{colorLabel} ({colorHitCount})"
   },
   "confirmation_modal.default.action.no": {
-    "defaultMessage": "No"
+    "defaultMessage": "Nee"
   },
   "confirmation_modal.default.action.yes": {
-    "defaultMessage": "Yes"
+    "defaultMessage": "Ja"
   },
   "confirmation_modal.default.assistive_msg.no": {
-    "defaultMessage": "No, cancel action"
+    "defaultMessage": "Nee, actie annuleren"
   },
   "confirmation_modal.default.assistive_msg.yes": {
-    "defaultMessage": "Yes, confirm action"
+    "defaultMessage": "Ja, actie bevestigen"
   },
   "confirmation_modal.default.message.you_want_to_continue": {
-    "defaultMessage": "Are you sure you want to continue?"
+    "defaultMessage": "Weet je zeker dat je wilt doorgaan?"
   },
   "confirmation_modal.default.title.confirm_action": {
-    "defaultMessage": "Confirm Action"
+    "defaultMessage": "Actie bevestigen"
   },
   "confirmation_modal.remove_cart_item.action.no": {
-    "defaultMessage": "No, keep item"
+    "defaultMessage": "Nee, artikel bewaren"
   },
   "confirmation_modal.remove_cart_item.action.remove": {
-    "defaultMessage": "Remove"
+    "defaultMessage": "Verwijderen"
   },
   "confirmation_modal.remove_cart_item.action.yes": {
-    "defaultMessage": "Yes, remove item"
+    "defaultMessage": "Ja, artikel verwijderen"
   },
   "confirmation_modal.remove_cart_item.assistive_msg.no": {
-    "defaultMessage": "No, keep item"
+    "defaultMessage": "Nee, artikel bewaren"
   },
   "confirmation_modal.remove_cart_item.assistive_msg.remove": {
-    "defaultMessage": "Remove unavailable products"
+    "defaultMessage": "Niet-beschikbare producten verwijderen"
   },
   "confirmation_modal.remove_cart_item.assistive_msg.yes": {
-    "defaultMessage": "Yes, remove item"
+    "defaultMessage": "Ja, artikel verwijderen"
   },
   "confirmation_modal.remove_cart_item.message.need_to_remove_due_to_unavailability": {
-    "defaultMessage": "Some items are no longer available online and will be removed from your cart."
+    "defaultMessage": "Sommige artikelen zijn niet meer online beschikbaar. Ze worden uit je winkelwagen verwijderd."
   },
   "confirmation_modal.remove_cart_item.message.sure_to_remove": {
-    "defaultMessage": "Are you sure you want to remove this item from your cart?"
+    "defaultMessage": "Weet je zeker dat je dit artikel uit je winkelwagen wilt verwijderen?"
   },
   "confirmation_modal.remove_cart_item.title.confirm_remove": {
-    "defaultMessage": "Confirm Remove Item"
+    "defaultMessage": "Verwijderen van artikel bevestigen"
   },
   "confirmation_modal.remove_cart_item.title.items_unavailable": {
-    "defaultMessage": "Items Unavailable"
+    "defaultMessage": "Artikelen niet beschikbaar"
   },
   "confirmation_modal.remove_wishlist_item.action.no": {
-    "defaultMessage": "No, keep item"
+    "defaultMessage": "Nee, artikel bewaren"
   },
   "confirmation_modal.remove_wishlist_item.action.yes": {
-    "defaultMessage": "Yes, remove item"
+    "defaultMessage": "Ja, artikel verwijderen"
   },
   "confirmation_modal.remove_wishlist_item.message.sure_to_remove": {
-    "defaultMessage": "Are you sure you want to remove this item from your wishlist?"
+    "defaultMessage": "Weet je zeker dat je dit artikel uit je verlanglijstje wilt verwijderen?"
   },
   "confirmation_modal.remove_wishlist_item.title.confirm_remove": {
-    "defaultMessage": "Confirm Remove Item"
+    "defaultMessage": "Verwijderen van artikel bevestigen"
   },
   "contact_info.action.sign_out": {
-    "defaultMessage": "Sign Out"
+    "defaultMessage": "Afmelden"
   },
   "contact_info.button.already_have_account": {
-    "defaultMessage": "Already have an account? Log in"
-  },
-  "contact_info.button.back_to_sign_in_options": {
-    "defaultMessage": "Back to Sign In Options"
+    "defaultMessage": "Heb je al een account? Aanmelden"
   },
   "contact_info.button.checkout_as_guest": {
-    "defaultMessage": "Checkout as Guest"
+    "defaultMessage": "Afrekenen als gast"
   },
   "contact_info.button.login": {
-    "defaultMessage": "Log In"
-  },
-  "contact_info.button.password": {
-    "defaultMessage": "Password"
-  },
-  "contact_info.button.secure_link": {
-    "defaultMessage": "Secure Link"
+    "defaultMessage": "Aanmelden"
   },
   "contact_info.error.incorrect_username_or_password": {
-    "defaultMessage": "Incorrect username or password, please try again."
+    "defaultMessage": "Onjuiste gebruikersnaam of onjuist wachtwoord. Probeer het opnieuw."
   },
   "contact_info.link.forgot_password": {
-    "defaultMessage": "Forgot password?"
-  },
-  "contact_info.message.or_login_with": {
-    "defaultMessage": "Or Login With"
+    "defaultMessage": "Wachtwoord vergeten?"
   },
   "contact_info.title.contact_info": {
-    "defaultMessage": "Contact Info"
+    "defaultMessage": "Contactgegevens"
   },
   "credit_card_fields.tool_tip.security_code": {
-    "defaultMessage": "This 3-digit code can be found on the back of your card.",
+    "defaultMessage": "Deze code van 3 cijfers staat op de achterkant van je kaart.",
     "description": "Generic credit card security code help text"
   },
   "credit_card_fields.tool_tip.security_code.american_express": {
-    "defaultMessage": "This 4-digit code can be found on the front of your card.",
+    "defaultMessage": "Deze code van 4 cijfers staat op de voorkant van je kaart.",
     "description": "American Express security code help text"
   },
   "credit_card_fields.tool_tip.security_code_aria_label": {
-    "defaultMessage": "Security code info"
+    "defaultMessage": "Info over beveiligingscode"
   },
   "display_price.assistive_msg.current_price": {
-    "defaultMessage": "current price {currentPrice}"
+    "defaultMessage": "huidige prijs {currentPrice}"
   },
   "display_price.assistive_msg.current_price_with_range": {
-    "defaultMessage": "From current price {currentPrice}"
+    "defaultMessage": "Van huidige prijs {currentPrice}"
   },
   "display_price.assistive_msg.strikethrough_price": {
-    "defaultMessage": "original price {listPrice}"
+    "defaultMessage": "oorspronkelijke prijs {listPrice}"
   },
   "display_price.assistive_msg.strikethrough_price_with_range": {
-    "defaultMessage": "From original price {listPrice}"
+    "defaultMessage": "Van oorspronkelijke prijs {listPrice}"
   },
   "display_price.label.current_price_with_range": {
-    "defaultMessage": "From {currentPrice}"
-  },
-  "dnt_notification.button.accept": {
-    "defaultMessage": "Accept"
-  },
-  "dnt_notification.button.assistive_msg.accept": {
-    "defaultMessage": "Accept tracking"
-  },
-  "dnt_notification.button.assistive_msg.close": {
-    "defaultMessage": "Close consent tracking form"
-  },
-  "dnt_notification.button.assistive_msg.decline": {
-    "defaultMessage": "Decline tracking"
-  },
-  "dnt_notification.button.decline": {
-    "defaultMessage": "Decline"
-  },
-  "dnt_notification.description": {
-    "defaultMessage": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur."
-  },
-  "dnt_notification.title": {
-    "defaultMessage": "Tracking Consent"
+    "defaultMessage": "Van {currentPrice}"
   },
   "drawer_menu.button.account_details": {
-    "defaultMessage": "Account Details"
+    "defaultMessage": "Accountgegevens"
   },
   "drawer_menu.button.addresses": {
-    "defaultMessage": "Addresses"
+    "defaultMessage": "Adressen"
   },
   "drawer_menu.button.log_out": {
-    "defaultMessage": "Log Out"
+    "defaultMessage": "Afmelden"
   },
   "drawer_menu.button.my_account": {
-    "defaultMessage": "My Account"
+    "defaultMessage": "Mijn account"
   },
   "drawer_menu.button.order_history": {
-    "defaultMessage": "Order History"
+    "defaultMessage": "Ordergeschiedenis"
   },
   "drawer_menu.header.assistive_msg.title": {
-    "defaultMessage": "Menu Drawer"
+    "defaultMessage": "Menulade"
   },
   "drawer_menu.link.about_us": {
-    "defaultMessage": "About Us"
+    "defaultMessage": "Over ons"
   },
   "drawer_menu.link.customer_support": {
-    "defaultMessage": "Customer Support"
+    "defaultMessage": "Klantenservice"
   },
   "drawer_menu.link.customer_support.contact_us": {
-    "defaultMessage": "Contact Us"
+    "defaultMessage": "Contact opnemen"
   },
   "drawer_menu.link.customer_support.shipping_and_returns": {
-    "defaultMessage": "Shipping & Returns"
+    "defaultMessage": "Verzenden en retourneren"
   },
   "drawer_menu.link.our_company": {
-    "defaultMessage": "Our Company"
+    "defaultMessage": "Ons bedrijf"
   },
   "drawer_menu.link.privacy_and_security": {
-    "defaultMessage": "Privacy & Security"
+    "defaultMessage": "Privacy en beveiliging"
   },
   "drawer_menu.link.privacy_policy": {
-    "defaultMessage": "Privacy Policy"
+    "defaultMessage": "Privacybeleid"
   },
   "drawer_menu.link.shop_all": {
-    "defaultMessage": "Shop All"
+    "defaultMessage": "Alles shoppen"
   },
   "drawer_menu.link.sign_in": {
-    "defaultMessage": "Sign In"
+    "defaultMessage": "Aanmelden"
   },
   "drawer_menu.link.site_map": {
-    "defaultMessage": "Site Map"
+    "defaultMessage": "Siteplattegrond"
   },
   "drawer_menu.link.store_locator": {
-    "defaultMessage": "Store Locator"
+    "defaultMessage": "Winkellocator"
   },
   "drawer_menu.link.terms_and_conditions": {
-    "defaultMessage": "Terms & Conditions"
+    "defaultMessage": "Algemene voorwaarden"
   },
   "empty_cart.description.empty_cart": {
-    "defaultMessage": "Your cart is empty."
+    "defaultMessage": "Je winkelwagen is leeg."
   },
   "empty_cart.link.continue_shopping": {
-    "defaultMessage": "Continue Shopping"
+    "defaultMessage": "Doorgaan met shoppen"
   },
   "empty_cart.link.sign_in": {
-    "defaultMessage": "Sign In"
+    "defaultMessage": "Aanmelden"
   },
   "empty_cart.message.continue_shopping": {
-    "defaultMessage": "Continue shopping to add items to your cart."
+    "defaultMessage": "Ga door met shoppen om artikelen aan je winkelwagen toe te voegen."
   },
   "empty_cart.message.sign_in_or_continue_shopping": {
-    "defaultMessage": "Sign in to retrieve your saved items or continue shopping."
+    "defaultMessage": "Meld je aan om je opgeslagen artikelen terug te halen of om door te gaan met shoppen."
   },
   "empty_search_results.info.cant_find_anything_for_category": {
-    "defaultMessage": "We couldn’t find anything for {category}. Try searching for a product or {link}."
+    "defaultMessage": "We hebben niets gevonden voor {category}. Probeer te zoeken naar een product of {link}."
   },
   "empty_search_results.info.cant_find_anything_for_query": {
-    "defaultMessage": "We couldn’t find anything for \"{searchQuery}\"."
+    "defaultMessage": "We hebben niets gevonden voor \"{searchQuery}\"."
   },
   "empty_search_results.info.double_check_spelling": {
-    "defaultMessage": "Double-check your spelling and try again or {link}."
+    "defaultMessage": "Controleer de spelling en probeer het opnieuw of {link}."
   },
   "empty_search_results.link.contact_us": {
-    "defaultMessage": "Contact Us"
+    "defaultMessage": "Contact opnemen"
   },
   "empty_search_results.recommended_products.title.most_viewed": {
-    "defaultMessage": "Most Viewed"
+    "defaultMessage": "Meest bekeken"
   },
   "empty_search_results.recommended_products.title.top_sellers": {
-    "defaultMessage": "Top Sellers"
+    "defaultMessage": "Best verkopend"
   },
   "field.password.assistive_msg.hide_password": {
-    "defaultMessage": "Hide password"
+    "defaultMessage": "Wachtwoord verbergen"
   },
   "field.password.assistive_msg.show_password": {
-    "defaultMessage": "Show password"
+    "defaultMessage": "Wachtwoord weergeven"
   },
   "footer.column.account": {
     "defaultMessage": "Account"
   },
   "footer.column.customer_support": {
-    "defaultMessage": "Customer Support"
+    "defaultMessage": "Klantenservice"
   },
   "footer.column.our_company": {
-    "defaultMessage": "Our Company"
+    "defaultMessage": "Ons bedrijf"
   },
   "footer.link.about_us": {
-    "defaultMessage": "About Us"
+    "defaultMessage": "Over ons"
   },
   "footer.link.contact_us": {
-    "defaultMessage": "Contact Us"
+    "defaultMessage": "Contact opnemen"
   },
   "footer.link.order_status": {
-    "defaultMessage": "Order Status"
+    "defaultMessage": "Orderstatus"
   },
   "footer.link.privacy_policy": {
-    "defaultMessage": "Privacy Policy"
+    "defaultMessage": "Privacybeleid"
   },
   "footer.link.shipping": {
-    "defaultMessage": "Shipping"
+    "defaultMessage": "Verzending"
   },
   "footer.link.signin_create_account": {
-    "defaultMessage": "Sign in or create account"
+    "defaultMessage": "Aanmelden of account maken"
   },
   "footer.link.site_map": {
-    "defaultMessage": "Site Map"
+    "defaultMessage": "Siteplattegrond"
   },
   "footer.link.store_locator": {
-    "defaultMessage": "Store Locator"
+    "defaultMessage": "Winkellocator"
   },
   "footer.link.terms_conditions": {
-    "defaultMessage": "Terms & Conditions"
-  },
-  "footer.locale_selector.assistive_msg": {
-    "defaultMessage": "Select Language"
+    "defaultMessage": "Algemene voorwaarden"
   },
   "footer.message.copyright": {
-    "defaultMessage": "Salesforce or its affiliates. All rights reserved. This is a demo store only. Orders made WILL NOT be processed."
+    "defaultMessage": "Salesforce of aan Salesforce gelieerde bedrijven. Alle rechten voorbehouden. Dit is een demowinkel. Geplaatste orders WORDEN NIET verwerkt."
   },
   "footer.subscribe.button.sign_up": {
-    "defaultMessage": "Sign Up"
+    "defaultMessage": "Registreren"
   },
   "footer.subscribe.description.sign_up": {
-    "defaultMessage": "Sign up to stay in the loop about the hottest deals"
-  },
-  "footer.subscribe.email.assistive_msg": {
-    "defaultMessage": "Email address for newsletter"
+    "defaultMessage": "Registreer je om op de hoogte te blijven van de beste aanbiedingen"
   },
   "footer.subscribe.heading.first_to_know": {
-    "defaultMessage": "Be the first to know"
+    "defaultMessage": "Zorg dat je als eerste op de hoogte bent"
   },
   "form_action_buttons.button.cancel": {
-    "defaultMessage": "Cancel"
+    "defaultMessage": "Annuleren"
   },
   "form_action_buttons.button.save": {
-    "defaultMessage": "Save"
+    "defaultMessage": "Opslaan"
   },
   "global.account.link.account_details": {
-    "defaultMessage": "Account Details"
+    "defaultMessage": "Accountgegevens"
   },
   "global.account.link.addresses": {
-    "defaultMessage": "Addresses"
+    "defaultMessage": "Adressen"
   },
   "global.account.link.order_history": {
-    "defaultMessage": "Order History"
+    "defaultMessage": "Ordergeschiedenis"
   },
   "global.account.link.wishlist": {
-    "defaultMessage": "Wishlist"
-  },
-  "global.error.create_account": {
-    "defaultMessage": "This feature is not currently available. You must create an account to access this feature."
-  },
-  "global.error.feature_unavailable": {
-    "defaultMessage": "This feature is not currently available."
-  },
-  "global.error.invalid_token": {
-    "defaultMessage": "Invalid token, please try again."
+    "defaultMessage": "Verlanglijst"
   },
   "global.error.something_went_wrong": {
-    "defaultMessage": "Something went wrong. Try again!"
+    "defaultMessage": "Er is iets mis gegaan. Probeer het opnieuw."
   },
   "global.info.added_to_wishlist": {
-    "defaultMessage": "{quantity} {quantity, plural, one {item} other {items}} added to wishlist"
+    "defaultMessage": "{quantity} {quantity, plural, one {artikel} other {artikelen}} toegevoegd aan verlanglijst"
   },
   "global.info.already_in_wishlist": {
-    "defaultMessage": "Item is already in wishlist"
+    "defaultMessage": "Artikel staat al op verlanglijst"
   },
   "global.info.removed_from_wishlist": {
-    "defaultMessage": "Item removed from wishlist"
+    "defaultMessage": "Artikel verwijderd uit verlanglijst"
   },
   "global.link.added_to_wishlist.view_wishlist": {
-    "defaultMessage": "View"
+    "defaultMessage": "Bekijken"
   },
   "header.button.assistive_msg.logo": {
     "defaultMessage": "Logo"
@@ -688,148 +628,145 @@
     "defaultMessage": "Menu"
   },
   "header.button.assistive_msg.menu.open_dialog": {
-    "defaultMessage": "Opens a dialog"
+    "defaultMessage": "Hiermee wordt een dialoogvenster geopend"
   },
   "header.button.assistive_msg.my_account": {
-    "defaultMessage": "My Account"
+    "defaultMessage": "Mijn account"
   },
   "header.button.assistive_msg.my_account_menu": {
-    "defaultMessage": "Open account menu"
+    "defaultMessage": "Accountmenu openen"
   },
   "header.button.assistive_msg.my_cart_with_num_items": {
-    "defaultMessage": "My cart, number of items: {numItems}"
+    "defaultMessage": "Mijn winkelwagen, aantal artikelen: {numItems}"
   },
   "header.button.assistive_msg.store_locator": {
-    "defaultMessage": "Store Locator"
+    "defaultMessage": "Winkellocator"
   },
   "header.button.assistive_msg.wishlist": {
-    "defaultMessage": "Wishlist"
+    "defaultMessage": "Verlanglijst"
   },
   "header.field.placeholder.search_for_products": {
-    "defaultMessage": "Search for products..."
+    "defaultMessage": "Producten zoeken..."
   },
   "header.popover.action.log_out": {
-    "defaultMessage": "Log out"
+    "defaultMessage": "Afmelden"
   },
   "header.popover.title.my_account": {
-    "defaultMessage": "My Account"
+    "defaultMessage": "Mijn account"
   },
   "home.description.features": {
-    "defaultMessage": "Out-of-the-box features so that you focus only on adding enhancements."
+    "defaultMessage": "Kant en klare functies, zodat jij je alleen hoeft te focussen op het toevoegen van verbeteringen."
   },
   "home.description.here_to_help": {
-    "defaultMessage": "Contact our support staff."
+    "defaultMessage": "Neem contact op met onze klantenservice."
   },
   "home.description.here_to_help_line_2": {
-    "defaultMessage": "They will get you to the right place."
+    "defaultMessage": "Zij vertellen je waar je moet zijn."
   },
   "home.description.shop_products": {
-    "defaultMessage": "This section contains content from the catalog. {docLink} on how to replace it.",
+    "defaultMessage": "Deze sectie bevat content uit de catalogus. Lees {docLink} over hoe je deze vervangt.",
     "description": "{docLink} is a html button that links the user to https://sfdc.co/business-manager-manage-catalogs"
   },
   "home.features.description.cart_checkout": {
-    "defaultMessage": "Ecommerce best practice for a shopper's cart and checkout experience."
+    "defaultMessage": "Aanbevolen werkwijzen in e-commerce voor de ervaringen van shoppers met winkelwagens en afrekenen."
   },
   "home.features.description.components": {
-    "defaultMessage": "Built using Chakra UI, a simple, modular and accessible React component library."
+    "defaultMessage": "Gebouwd met de Chakra-gebruikersinterface, een eenvoudige, modulaire en toegankelijke bibliotheek met React-componenten."
   },
   "home.features.description.einstein_recommendations": {
-    "defaultMessage": "Deliver the next best product or offer to every shopper through product recommendations."
+    "defaultMessage": "Bied elke shopper het op een na beste product of de op een na beste aanbieding via productaanbevelingen."
   },
   "home.features.description.my_account": {
-    "defaultMessage": "Shoppers can manage account information such as their profile, addresses, payments and orders."
+    "defaultMessage": "Shoppers kunnen de informatie in hun account beheren, zoals hun profiel, adressen, betalingen en orders."
   },
   "home.features.description.shopper_login": {
-    "defaultMessage": "Enable shoppers to easily log in with a more personalized shopping experience."
+    "defaultMessage": "Stel shoppers in staat zicht eenvoudig aan te melden met een meer gepersonaliseerde winkelbeleving."
   },
   "home.features.description.wishlist": {
-    "defaultMessage": "Registered shoppers can add product items to their wishlist from purchasing later."
+    "defaultMessage": "Geregistreerde shoppers kunnen producten toevoegen aan hun verlanglijst om deze later te kopen."
   },
   "home.features.heading.cart_checkout": {
-    "defaultMessage": "Cart & Checkout"
+    "defaultMessage": "Winkelwagen en afrekenen"
   },
   "home.features.heading.components": {
-    "defaultMessage": "Components & Design Kit"
+    "defaultMessage": "Componenten en ontwerppakket"
   },
   "home.features.heading.einstein_recommendations": {
-    "defaultMessage": "Einstein Recommendations"
+    "defaultMessage": "Einstein-aanbevelingen"
   },
   "home.features.heading.my_account": {
-    "defaultMessage": "My Account"
+    "defaultMessage": "Mijn account"
   },
   "home.features.heading.shopper_login": {
-    "defaultMessage": "Shopper Login and API Access Service"
+    "defaultMessage": "Aanmeldgegevens van shoppers en API-toegangsservice"
   },
   "home.features.heading.wishlist": {
-    "defaultMessage": "Wishlist"
+    "defaultMessage": "Verlanglijst"
   },
   "home.heading.features": {
-    "defaultMessage": "Features"
+    "defaultMessage": "Functies"
   },
   "home.heading.here_to_help": {
-    "defaultMessage": "We're here to help"
+    "defaultMessage": "We zijn er om je te helpen"
   },
   "home.heading.shop_products": {
-    "defaultMessage": "Shop Products"
+    "defaultMessage": "Producten shoppen"
   },
   "home.hero_features.link.design_kit": {
-    "defaultMessage": "Create with the Figma PWA Design Kit"
+    "defaultMessage": "Ontwerpen maken met de PWA Design Kit van Figma"
   },
   "home.hero_features.link.on_github": {
-    "defaultMessage": "Download on Github"
+    "defaultMessage": "Downloaden op Github"
   },
   "home.hero_features.link.on_managed_runtime": {
-    "defaultMessage": "Deploy on Managed Runtime"
+    "defaultMessage": "Implementeren op beheerde runtime"
   },
   "home.link.contact_us": {
-    "defaultMessage": "Contact Us"
+    "defaultMessage": "Contact opnemen"
   },
   "home.link.get_started": {
-    "defaultMessage": "Get started"
+    "defaultMessage": "Aan de slag"
   },
   "home.link.read_docs": {
-    "defaultMessage": "Read docs"
+    "defaultMessage": "Documenten lezen"
   },
   "home.title.react_starter_store": {
-    "defaultMessage": "The React PWA Starter Store for Retail"
+    "defaultMessage": "De React PWA Starter Store voor de retailsector"
   },
   "icons.assistive_msg.lock": {
-    "defaultMessage": "Secure"
-  },
-  "item_attributes.label.is_bonus_product": {
-    "defaultMessage": "Bonus Product"
+    "defaultMessage": "Veilig"
   },
   "item_attributes.label.promotions": {
-    "defaultMessage": "Promotions"
+    "defaultMessage": "Promoties"
   },
   "item_attributes.label.quantity": {
-    "defaultMessage": "Quantity: {quantity}"
+    "defaultMessage": "Hoeveelheid: {quantity}"
   },
   "item_attributes.label.selected_options": {
-    "defaultMessage": "Selected Options"
+    "defaultMessage": "Geselecteerde opties"
   },
   "item_image.label.sale": {
-    "defaultMessage": "Sale",
+    "defaultMessage": "Uitverkoop",
     "description": "A sale badge placed on top of a product image"
   },
   "item_image.label.unavailable": {
-    "defaultMessage": "Unavailable",
+    "defaultMessage": "Niet beschikbaar",
     "description": "A unavailable badge placed on top of a product image"
   },
   "item_variant.assistive_msg.quantity": {
-    "defaultMessage": "Quantity {quantity}"
+    "defaultMessage": "Hoeveelheid {quantity}"
   },
   "item_variant.quantity.label": {
-    "defaultMessage": "Quantity selector for {productName}. Selected quantity is {quantity}"
+    "defaultMessage": "Hoeveelheidskiezer voor {productName}. De geselecteerde hoeveelheid is {quantity}"
   },
   "lCPCxk": {
-    "defaultMessage": "Please select all your options above"
+    "defaultMessage": "Selecteer hierboven al je opties"
   },
   "list_menu.nav.assistive_msg": {
-    "defaultMessage": "Main navigation"
+    "defaultMessage": "Hoofdnavigatie"
   },
   "locale_text.message.ar-SA": {
-    "defaultMessage": "Arabic (Saudi Arabia)"
+    "defaultMessage": "Arabisch (Saoedi-Arabië)"
   },
   "locale_text.message.bn-BD": {
     "defaultMessage": "Bangla (Bangladesh)"
@@ -838,133 +775,133 @@
     "defaultMessage": "Bangla (India)"
   },
   "locale_text.message.cs-CZ": {
-    "defaultMessage": "Czech (Czech Republic)"
+    "defaultMessage": "Tsjechisch (Tsjechië)"
   },
   "locale_text.message.da-DK": {
-    "defaultMessage": "Danish (Denmark)"
+    "defaultMessage": "Deens (Denemarken)"
   },
   "locale_text.message.de-AT": {
-    "defaultMessage": "German (Austria)"
+    "defaultMessage": "Duits (Oostenrijk)"
   },
   "locale_text.message.de-CH": {
-    "defaultMessage": "German (Switzerland)"
+    "defaultMessage": "Duits (Zwitserland)"
   },
   "locale_text.message.de-DE": {
-    "defaultMessage": "German (Germany)"
+    "defaultMessage": "Duits (Duitsland)"
   },
   "locale_text.message.el-GR": {
-    "defaultMessage": "Greek (Greece)"
+    "defaultMessage": "Grieks (Griekenland)"
   },
   "locale_text.message.en-AU": {
-    "defaultMessage": "English (Australia)"
+    "defaultMessage": "Engels (Australië)"
   },
   "locale_text.message.en-CA": {
-    "defaultMessage": "English (Canada)"
+    "defaultMessage": "Engels (Canada)"
   },
   "locale_text.message.en-GB": {
-    "defaultMessage": "English (United Kingdom)"
+    "defaultMessage": "Engels (Verenigd Koninkrijk)"
   },
   "locale_text.message.en-IE": {
-    "defaultMessage": "English (Ireland)"
+    "defaultMessage": "Engels (Ierland)"
   },
   "locale_text.message.en-IN": {
-    "defaultMessage": "English (India)"
+    "defaultMessage": "Engels (India)"
   },
   "locale_text.message.en-NZ": {
-    "defaultMessage": "English (New Zealand)"
+    "defaultMessage": "Engels (Nieuw-Zeeland)"
   },
   "locale_text.message.en-US": {
-    "defaultMessage": "English (United States)"
+    "defaultMessage": "Engels (Verenigde Staten)"
   },
   "locale_text.message.en-ZA": {
-    "defaultMessage": "English (South Africa)"
+    "defaultMessage": "Engels (Zuid-Afrika)"
   },
   "locale_text.message.es-AR": {
-    "defaultMessage": "Spanish (Argentina)"
+    "defaultMessage": "Spaans (Argentinië)"
   },
   "locale_text.message.es-CL": {
-    "defaultMessage": "Spanish (Chile)"
+    "defaultMessage": "Spaans (Chili)"
   },
   "locale_text.message.es-CO": {
-    "defaultMessage": "Spanish (Columbia)"
+    "defaultMessage": "Spaans (Colombia)"
   },
   "locale_text.message.es-ES": {
-    "defaultMessage": "Spanish (Spain)"
+    "defaultMessage": "Spaans (Spanje)"
   },
   "locale_text.message.es-MX": {
-    "defaultMessage": "Spanish (Mexico)"
+    "defaultMessage": "Spaans (Mexico)"
   },
   "locale_text.message.es-US": {
-    "defaultMessage": "Spanish (United States)"
+    "defaultMessage": "Spaans (Verenigde Staten)"
   },
   "locale_text.message.fi-FI": {
-    "defaultMessage": "Finnish (Finland)"
+    "defaultMessage": "Fins (Finland)"
   },
   "locale_text.message.fr-BE": {
-    "defaultMessage": "French (Belgium)"
+    "defaultMessage": "Frans (België)"
   },
   "locale_text.message.fr-CA": {
-    "defaultMessage": "French (Canada)"
+    "defaultMessage": "Frans (Canada)"
   },
   "locale_text.message.fr-CH": {
-    "defaultMessage": "French (Switzerland)"
+    "defaultMessage": "Frans (Zwitserland)"
   },
   "locale_text.message.fr-FR": {
-    "defaultMessage": "French (France)"
+    "defaultMessage": "Frans (Frankrijk)"
   },
   "locale_text.message.he-IL": {
-    "defaultMessage": "Hebrew (Israel)"
+    "defaultMessage": "Hebreeuws (Israël)"
   },
   "locale_text.message.hi-IN": {
     "defaultMessage": "Hindi (India)"
   },
   "locale_text.message.hu-HU": {
-    "defaultMessage": "Hungarian (Hungary)"
+    "defaultMessage": "Hongaars (Hongarije)"
   },
   "locale_text.message.id-ID": {
-    "defaultMessage": "Indonesian (Indonesia)"
+    "defaultMessage": "Indonesisch (Indonesië)"
   },
   "locale_text.message.it-CH": {
-    "defaultMessage": "Italian (Switzerland)"
+    "defaultMessage": "Italiaans (Zwitserland)"
   },
   "locale_text.message.it-IT": {
-    "defaultMessage": "Italian (Italy)"
+    "defaultMessage": "Italiaans (Italië)"
   },
   "locale_text.message.ja-JP": {
-    "defaultMessage": "Japanese (Japan)"
+    "defaultMessage": "Japans (Japan)"
   },
   "locale_text.message.ko-KR": {
-    "defaultMessage": "Korean (Republic of Korea)"
+    "defaultMessage": "Koreaans (Republiek Korea)"
   },
   "locale_text.message.nl-BE": {
-    "defaultMessage": "Dutch (Belgium)"
+    "defaultMessage": "Nederlands (België)"
   },
   "locale_text.message.nl-NL": {
-    "defaultMessage": "Dutch (The Netherlands)"
+    "defaultMessage": "Nederlands (Nederland)"
   },
   "locale_text.message.no-NO": {
-    "defaultMessage": "Norwegian (Norway)"
+    "defaultMessage": "Noors (Noorwegen)"
   },
   "locale_text.message.pl-PL": {
-    "defaultMessage": "Polish (Poland)"
+    "defaultMessage": "Pools (Polen)"
   },
   "locale_text.message.pt-BR": {
-    "defaultMessage": "Portuguese (Brazil)"
+    "defaultMessage": "Portugees (Brazilië)"
   },
   "locale_text.message.pt-PT": {
-    "defaultMessage": "Portuguese (Portugal)"
+    "defaultMessage": "Portugees (Portugal)"
   },
   "locale_text.message.ro-RO": {
-    "defaultMessage": "Romanian (Romania)"
+    "defaultMessage": "Roemeens (Roemenië)"
   },
   "locale_text.message.ru-RU": {
-    "defaultMessage": "Russian (Russian Federation)"
+    "defaultMessage": "Russisch (Russische Federatie)"
   },
   "locale_text.message.sk-SK": {
-    "defaultMessage": "Slovak (Slovakia)"
+    "defaultMessage": "Slowaaks (Slowakije)"
   },
   "locale_text.message.sv-SE": {
-    "defaultMessage": "Swedish (Sweden)"
+    "defaultMessage": "Zweeds (Zweden)"
   },
   "locale_text.message.ta-IN": {
     "defaultMessage": "Tamil (India)"
@@ -973,281 +910,251 @@
     "defaultMessage": "Tamil (Sri Lanka)"
   },
   "locale_text.message.th-TH": {
-    "defaultMessage": "Thai (Thailand)"
+    "defaultMessage": "Thais (Thailand)"
   },
   "locale_text.message.tr-TR": {
-    "defaultMessage": "Turkish (Turkey)"
+    "defaultMessage": "Turks (Turkije)"
   },
   "locale_text.message.zh-CN": {
-    "defaultMessage": "Chinese (China)"
+    "defaultMessage": "Chinees (China)"
   },
   "locale_text.message.zh-HK": {
-    "defaultMessage": "Chinese (Hong Kong)"
+    "defaultMessage": "Chinees (Hongkong)"
   },
   "locale_text.message.zh-TW": {
-    "defaultMessage": "Chinese (Taiwan)"
+    "defaultMessage": "Chinees (Taiwan)"
   },
   "login_form.action.create_account": {
-    "defaultMessage": "Create account"
-  },
-  "login_form.button.apple": {
-    "defaultMessage": "Apple"
-  },
-  "login_form.button.back": {
-    "defaultMessage": "Back to Sign In Options"
-  },
-  "login_form.button.continue_securely": {
-    "defaultMessage": "Continue Securely"
-  },
-  "login_form.button.google": {
-    "defaultMessage": "Google"
-  },
-  "login_form.button.password": {
-    "defaultMessage": "Password"
+    "defaultMessage": "Account maken"
   },
   "login_form.button.sign_in": {
-    "defaultMessage": "Sign In"
+    "defaultMessage": "Aanmelden"
   },
   "login_form.link.forgot_password": {
-    "defaultMessage": "Forgot password?"
+    "defaultMessage": "Wachtwoord vergeten?"
   },
   "login_form.message.dont_have_account": {
-    "defaultMessage": "Don't have an account?"
-  },
-  "login_form.message.or_login_with": {
-    "defaultMessage": "Or Login With"
+    "defaultMessage": "Heb je geen account?"
   },
   "login_form.message.welcome_back": {
-    "defaultMessage": "Welcome Back"
+    "defaultMessage": "Welkom terug"
   },
   "login_page.error.incorrect_username_or_password": {
-    "defaultMessage": "Incorrect username or password, please try again."
+    "defaultMessage": "Onjuiste gebruikersnaam of onjuist wachtwoord. Probeer het opnieuw."
   },
   "offline_banner.description.browsing_offline_mode": {
-    "defaultMessage": "You're currently browsing in offline mode"
+    "defaultMessage": "Je bekijkt het momenteel in offline modus"
   },
   "order_summary.action.remove_promo": {
-    "defaultMessage": "Remove"
+    "defaultMessage": "Verwijderen"
   },
   "order_summary.cart_items.action.num_of_items_in_cart": {
-    "defaultMessage": "{itemCount, plural, =0 {0 items} one {# item} other {# items}} in cart",
+    "defaultMessage": "{itemCount, plural, =0 {0 artikelen} one {# artikel} other {# artikelen}} in winkelwagen",
     "description": "clicking it would expand/show the items in cart"
   },
   "order_summary.cart_items.link.edit_cart": {
-    "defaultMessage": "Edit cart"
+    "defaultMessage": "Winkelwagen bewerken"
   },
   "order_summary.heading.order_summary": {
-    "defaultMessage": "Order Summary"
+    "defaultMessage": "Orderoverzicht"
   },
   "order_summary.label.estimated_total": {
-    "defaultMessage": "Estimated Total"
+    "defaultMessage": "Geschat totaal"
   },
   "order_summary.label.free": {
-    "defaultMessage": "Free"
+    "defaultMessage": "Gratis"
   },
   "order_summary.label.order_total": {
-    "defaultMessage": "Order Total"
+    "defaultMessage": "Ordertotaal"
   },
   "order_summary.label.promo_applied": {
-    "defaultMessage": "Promotion applied"
+    "defaultMessage": "Promotie toegepast"
   },
   "order_summary.label.promotions_applied": {
-    "defaultMessage": "Promotions applied"
+    "defaultMessage": "Promoties toegepast"
   },
   "order_summary.label.shipping": {
-    "defaultMessage": "Shipping"
+    "defaultMessage": "Verzending"
   },
   "order_summary.label.subtotal": {
-    "defaultMessage": "Subtotal"
+    "defaultMessage": "Subtotaal"
   },
   "order_summary.label.tax": {
-    "defaultMessage": "Tax"
+    "defaultMessage": "Belasting"
   },
   "page_not_found.action.go_back": {
-    "defaultMessage": "Back to previous page"
+    "defaultMessage": "Terug naar vorige pagina"
   },
   "page_not_found.link.homepage": {
-    "defaultMessage": "Go to home page"
+    "defaultMessage": "Naar startpagina"
   },
   "page_not_found.message.suggestion_to_try": {
-    "defaultMessage": "Please try retyping the address, going back to the previous page, or going to the home page."
+    "defaultMessage": "Probeer om het adres opnieuw in te typen, ga terug naar de vorige pagina of ga naar de startpagina."
   },
   "page_not_found.title.page_cant_be_found": {
-    "defaultMessage": "The page you're looking for can't be found."
+    "defaultMessage": "Kan de pagina die je zoekt niet vinden."
   },
   "pagination.field.num_of_pages": {
-    "defaultMessage": "of {numOfPages}"
-  },
-  "pagination.field.page_number_select": {
-    "defaultMessage": "Select page number"
+    "defaultMessage": "van {numOfPages}"
   },
   "pagination.link.next": {
-    "defaultMessage": "Next"
+    "defaultMessage": "Volgende"
   },
   "pagination.link.next.assistive_msg": {
-    "defaultMessage": "Next Page"
+    "defaultMessage": "Volgende pagina"
   },
   "pagination.link.prev": {
-    "defaultMessage": "Prev"
+    "defaultMessage": "Vorige"
   },
   "pagination.link.prev.assistive_msg": {
-    "defaultMessage": "Previous Page"
+    "defaultMessage": "Vorige pagina"
   },
   "password_card.info.password_updated": {
-    "defaultMessage": "Password updated"
+    "defaultMessage": "Wachtwoord bijgewerkt"
   },
   "password_card.label.password": {
-    "defaultMessage": "Password"
+    "defaultMessage": "Wachtwoord"
   },
   "password_card.title.password": {
-    "defaultMessage": "Password"
+    "defaultMessage": "Wachtwoord"
   },
   "password_requirements.error.eight_letter_minimum": {
-    "defaultMessage": "8 characters minimum",
+    "defaultMessage": "minimaal 8 tekens",
     "description": "Password requirement"
   },
   "password_requirements.error.one_lowercase_letter": {
-    "defaultMessage": "1 lowercase letter",
+    "defaultMessage": "1 kleine letter",
     "description": "Password requirement"
   },
   "password_requirements.error.one_number": {
-    "defaultMessage": "1 number",
+    "defaultMessage": "1 cijfer",
     "description": "Password requirement"
   },
   "password_requirements.error.one_special_character": {
-    "defaultMessage": "1 special character (example: , S ! % #)",
+    "defaultMessage": "1 speciaal teken (bijvoorbeeld , S ! % #)",
     "description": "Password requirement"
   },
   "password_requirements.error.one_uppercase_letter": {
-    "defaultMessage": "1 uppercase letter",
+    "defaultMessage": "1 hoofdletter",
     "description": "Password requirement"
   },
-  "password_reset_success.toast": {
-    "defaultMessage": "Password Reset Success"
-  },
   "payment_selection.heading.credit_card": {
-    "defaultMessage": "Credit Card"
-  },
-  "payment_selection.radio_group.assistive_msg": {
-    "defaultMessage": "Payment"
+    "defaultMessage": "Creditcard"
   },
   "payment_selection.tooltip.secure_payment": {
-    "defaultMessage": "This is a secure SSL encrypted payment."
+    "defaultMessage": "Dit is een beveiligde betaling met SSL-versleuteling."
   },
   "price_per_item.label.each": {
     "defaultMessage": "ea",
     "description": "Abbreviated 'each', follows price per item, like $10/ea"
   },
   "product_detail.accordion.button.product_detail": {
-    "defaultMessage": "Product Detail"
+    "defaultMessage": "Productgegeven"
   },
   "product_detail.accordion.button.questions": {
-    "defaultMessage": "Questions"
+    "defaultMessage": "Vragen"
   },
   "product_detail.accordion.button.reviews": {
-    "defaultMessage": "Reviews"
+    "defaultMessage": "Beoordelingen"
   },
   "product_detail.accordion.button.size_fit": {
-    "defaultMessage": "Size & Fit"
+    "defaultMessage": "Maat en pasvorm"
   },
   "product_detail.accordion.message.coming_soon": {
-    "defaultMessage": "Coming Soon"
+    "defaultMessage": "Binnenkort beschikbaar"
   },
   "product_detail.recommended_products.title.complete_set": {
-    "defaultMessage": "Complete the Set"
+    "defaultMessage": "Set completeren"
   },
   "product_detail.recommended_products.title.might_also_like": {
-    "defaultMessage": "You might also like"
+    "defaultMessage": "Dit vind je misschien ook leuk"
   },
   "product_detail.recommended_products.title.recently_viewed": {
-    "defaultMessage": "Recently Viewed"
+    "defaultMessage": "Onlangs bekeken"
   },
   "product_item.label.quantity": {
-    "defaultMessage": "Quantity:"
+    "defaultMessage": "Hoeveelheid:"
   },
   "product_list.button.filter": {
-    "defaultMessage": "Filter"
+    "defaultMessage": "Filteren"
   },
   "product_list.button.sort_by": {
-    "defaultMessage": "Sort By: {sortOption}"
+    "defaultMessage": "Sorteren op: {sortOption}"
   },
   "product_list.drawer.title.sort_by": {
-    "defaultMessage": "Sort By"
+    "defaultMessage": "Sorteren op"
   },
   "product_list.modal.button.clear_filters": {
-    "defaultMessage": "Clear Filters"
+    "defaultMessage": "Filters wissen"
   },
   "product_list.modal.button.view_items": {
-    "defaultMessage": "View {prroductCount} items"
+    "defaultMessage": "{prroductCount} artikelen weergeven"
   },
   "product_list.modal.title.filter": {
-    "defaultMessage": "Filter"
+    "defaultMessage": "Filteren"
   },
   "product_list.refinements.button.assistive_msg.add_filter": {
-    "defaultMessage": "Add filter: {label}"
+    "defaultMessage": "Filter toevoegen: {label}"
   },
   "product_list.refinements.button.assistive_msg.add_filter_with_hit_count": {
-    "defaultMessage": "Add filter: {label} ({hitCount})"
+    "defaultMessage": "Filter toevoegen: {label} ({hitCount})"
   },
   "product_list.refinements.button.assistive_msg.remove_filter": {
-    "defaultMessage": "Remove filter: {label}"
+    "defaultMessage": "Filter verwijderen: {label}"
   },
   "product_list.refinements.button.assistive_msg.remove_filter_with_hit_count": {
-    "defaultMessage": "Remove filter: {label} ({hitCount})"
+    "defaultMessage": "Filter verwijderen: {label} ({hitCount})"
   },
   "product_list.select.sort_by": {
-    "defaultMessage": "Sort By: {sortOption}"
-  },
-  "product_list.sort_by.label.assistive_msg": {
-    "defaultMessage": "Sort products by"
+    "defaultMessage": "Sorteren op: {sortOption}"
   },
   "product_scroller.assistive_msg.scroll_left": {
-    "defaultMessage": "Scroll products left"
+    "defaultMessage": "Scrollen door producten links"
   },
   "product_scroller.assistive_msg.scroll_right": {
-    "defaultMessage": "Scroll products right"
+    "defaultMessage": "Scrollen door producten rechts"
   },
   "product_tile.assistive_msg.add_to_wishlist": {
-    "defaultMessage": "Add {product} to wishlist"
+    "defaultMessage": "{product} toevoegen aan verlanglijst"
   },
   "product_tile.assistive_msg.remove_from_wishlist": {
-    "defaultMessage": "Remove {product} from wishlist"
+    "defaultMessage": "{product} verwijderen uit verlanglijst"
   },
   "product_tile.badge.label.new": {
-    "defaultMessage": "New"
+    "defaultMessage": "Nieuw"
   },
   "product_tile.badge.label.sale": {
-    "defaultMessage": "Sale"
+    "defaultMessage": "Uitverkoop"
   },
   "product_view.button.add_bundle_to_cart": {
-    "defaultMessage": "Add Bundle to Cart"
+    "defaultMessage": "Bundel toevoegen aan winkelwagen"
   },
   "product_view.button.add_bundle_to_wishlist": {
-    "defaultMessage": "Add Bundle to Wishlist"
+    "defaultMessage": "Bundel toevoegen aan verlanglijst"
   },
   "product_view.button.add_set_to_cart": {
-    "defaultMessage": "Add Set to Cart"
+    "defaultMessage": "Set toevoegen aan winkelwagen"
   },
   "product_view.button.add_set_to_wishlist": {
-    "defaultMessage": "Add Set to Wishlist"
+    "defaultMessage": "Set toevoegen aan verlanglijst"
   },
   "product_view.button.add_to_cart": {
-    "defaultMessage": "Add to Cart"
+    "defaultMessage": "Toevoegen aan winkelwagen"
   },
   "product_view.button.add_to_wishlist": {
-    "defaultMessage": "Add to Wishlist"
+    "defaultMessage": "Toevoegen aan verlanglijst"
   },
   "product_view.button.update": {
-    "defaultMessage": "Update"
+    "defaultMessage": "Bijwerken"
   },
   "product_view.label.assistive_msg.quantity_decrement": {
-    "defaultMessage": "Decrement Quantity for {productName}"
+    "defaultMessage": "Hoeveelheid voor {productName} verlagen"
   },
   "product_view.label.assistive_msg.quantity_increment": {
-    "defaultMessage": "Increment Quantity for {productName}"
+    "defaultMessage": "Hoeveelheid voor {productName} verhogen"
   },
   "product_view.label.quantity": {
-    "defaultMessage": "Quantity"
+    "defaultMessage": "Hoeveelheid"
   },
   "product_view.label.quantity_decrement": {
     "defaultMessage": "−"
@@ -1259,525 +1166,516 @@
     "defaultMessage": "{variantType}"
   },
   "product_view.link.full_details": {
-    "defaultMessage": "See full details"
+    "defaultMessage": "Alle gegevens bekijken"
   },
   "profile_card.info.profile_updated": {
-    "defaultMessage": "Profile updated"
+    "defaultMessage": "Profiel bijgewerkt"
   },
   "profile_card.label.email": {
-    "defaultMessage": "Email"
+    "defaultMessage": "E-mailadres"
   },
   "profile_card.label.full_name": {
-    "defaultMessage": "Full Name"
+    "defaultMessage": "Volledige naam"
   },
   "profile_card.label.phone": {
-    "defaultMessage": "Phone Number"
+    "defaultMessage": "Telefoonnummer"
   },
   "profile_card.message.not_provided": {
-    "defaultMessage": "Not provided"
+    "defaultMessage": "Niet opgegeven"
   },
   "profile_card.title.my_profile": {
-    "defaultMessage": "My Profile"
-  },
-  "profile_fields.label.profile_form": {
-    "defaultMessage": "Profile Form"
+    "defaultMessage": "Mijn profiel"
   },
   "promo_code_fields.button.apply": {
-    "defaultMessage": "Apply"
+    "defaultMessage": "Toepassen"
   },
   "promo_popover.assistive_msg.info": {
     "defaultMessage": "Info"
   },
   "promo_popover.heading.promo_applied": {
-    "defaultMessage": "Promotions Applied"
+    "defaultMessage": "Promoties toegepast"
   },
   "promocode.accordion.button.have_promocode": {
-    "defaultMessage": "Do you have a promo code?"
+    "defaultMessage": "Heb je een promotiecode?"
   },
   "recent_searches.action.clear_searches": {
-    "defaultMessage": "Clear recent searches"
+    "defaultMessage": "Recente zoekopdrachten wissen"
   },
   "recent_searches.heading.recent_searches": {
-    "defaultMessage": "Recent Searches"
+    "defaultMessage": "Recente zoekopdrachten"
   },
   "register_form.action.sign_in": {
-    "defaultMessage": "Sign in"
+    "defaultMessage": "Aanmelden"
   },
   "register_form.button.create_account": {
-    "defaultMessage": "Create Account"
+    "defaultMessage": "Account maken"
   },
   "register_form.heading.lets_get_started": {
-    "defaultMessage": "Let's get started!"
+    "defaultMessage": "We gaan beginnen!"
   },
   "register_form.message.agree_to_policy_terms": {
-    "defaultMessage": "By creating an account, you agree to Salesforce <policy>Privacy Policy</policy> and <terms>Terms & Conditions</terms>"
+    "defaultMessage": "Als je een account maakt, ga je akkoord met het <policy>Privacybeleid</policy> en de <terms>Algemene voorwaarden</terms> van Salesforce"
   },
   "register_form.message.already_have_account": {
-    "defaultMessage": "Already have an account?"
+    "defaultMessage": "Heb je al een account?"
   },
   "register_form.message.create_an_account": {
-    "defaultMessage": "Create an account and get first access to the very best products, inspiration and community."
+    "defaultMessage": "Maak een account en krijg als eerste toegang tot de allerbeste producten, inspiratie en de community."
+  },
+  "reset_password.button.back_to_sign_in": {
+    "defaultMessage": "Terug naar Aanmelden"
+  },
+  "reset_password.info.receive_email_shortly": {
+    "defaultMessage": "Je ontvangt binnenkort een e-mail op <b>{email}</b> met een link om je wachtwoord opnieuw in te stellen."
+  },
+  "reset_password.title.password_reset": {
+    "defaultMessage": "Wachtwoord opnieuw instellen"
   },
   "reset_password_form.action.sign_in": {
-    "defaultMessage": "Sign in"
+    "defaultMessage": "Aanmelden"
   },
   "reset_password_form.button.reset_password": {
-    "defaultMessage": "Reset Password"
+    "defaultMessage": "Wachtwoord opnieuw instellen"
   },
   "reset_password_form.message.enter_your_email": {
-    "defaultMessage": "Enter your email to receive instructions on how to reset your password"
+    "defaultMessage": "Voer je e-mailadres in om instructies voor het opnieuw instellen van je wachtwoord te ontvangen"
   },
   "reset_password_form.message.return_to_sign_in": {
-    "defaultMessage": "Or return to",
+    "defaultMessage": "Of ga terug naar",
     "description": "Precedes link to return to sign in"
   },
   "reset_password_form.title.reset_password": {
-    "defaultMessage": "Reset Password"
+    "defaultMessage": "Wachtwoord opnieuw instellen"
   },
   "search.action.cancel": {
-    "defaultMessage": "Cancel"
+    "defaultMessage": "Annuleren"
   },
   "selected_refinements.action.assistive_msg.clear_all": {
-    "defaultMessage": "Clear all filters"
+    "defaultMessage": "Alle filters wissen"
   },
   "selected_refinements.action.clear_all": {
-    "defaultMessage": "Clear All"
+    "defaultMessage": "Alles wissen"
   },
   "shipping_address.button.continue_to_shipping": {
-    "defaultMessage": "Continue to Shipping Method"
+    "defaultMessage": "Doorgaan naar verzendmethode"
   },
   "shipping_address.label.edit_button": {
-    "defaultMessage": "Edit {address}"
+    "defaultMessage": "{address} bewerken"
   },
   "shipping_address.label.remove_button": {
-    "defaultMessage": "Remove {address}"
+    "defaultMessage": "{address} verwijderen"
   },
   "shipping_address.label.shipping_address_form": {
-    "defaultMessage": "Shipping Address Form"
+    "defaultMessage": "Formulier voor verzendadres"
   },
   "shipping_address.title.shipping_address": {
-    "defaultMessage": "Shipping Address"
+    "defaultMessage": "Verzendadres"
   },
   "shipping_address_edit_form.button.save_and_continue": {
-    "defaultMessage": "Save & Continue to Shipping Method"
+    "defaultMessage": "Opslaan en doorgaan naar verzendmethode"
   },
   "shipping_address_form.heading.edit_address": {
-    "defaultMessage": "Edit Address"
+    "defaultMessage": "Adres bewerken"
   },
   "shipping_address_form.heading.new_address": {
-    "defaultMessage": "Add New Address"
+    "defaultMessage": "Nieuw adres toevoegen"
   },
   "shipping_address_selection.button.add_address": {
-    "defaultMessage": "Add New Address"
+    "defaultMessage": "Nieuw adres toevoegen"
   },
   "shipping_address_selection.button.submit": {
-    "defaultMessage": "Submit"
+    "defaultMessage": "Verzenden"
   },
   "shipping_address_selection.title.add_address": {
-    "defaultMessage": "Add New Address"
+    "defaultMessage": "Nieuw adres toevoegen"
   },
   "shipping_address_selection.title.edit_shipping": {
-    "defaultMessage": "Edit Shipping Address"
+    "defaultMessage": "Verzendadres bewerken"
   },
   "shipping_options.action.send_as_a_gift": {
-    "defaultMessage": "Do you want to send this as a gift?"
+    "defaultMessage": "Wil je dit als cadeau versturen?"
   },
   "shipping_options.button.continue_to_payment": {
-    "defaultMessage": "Continue to Payment"
+    "defaultMessage": "Doorgaan naar betalen"
   },
   "shipping_options.title.shipping_gift_options": {
-    "defaultMessage": "Shipping & Gift Options"
+    "defaultMessage": "Verzending en cadeau-opties"
   },
   "signout_confirmation_dialog.button.cancel": {
-    "defaultMessage": "Cancel"
+    "defaultMessage": "Annuleren"
   },
   "signout_confirmation_dialog.button.sign_out": {
-    "defaultMessage": "Sign Out"
+    "defaultMessage": "Afmelden"
   },
   "signout_confirmation_dialog.heading.sign_out": {
-    "defaultMessage": "Sign Out"
+    "defaultMessage": "Afmelden"
   },
   "signout_confirmation_dialog.message.sure_to_sign_out": {
-    "defaultMessage": "Are you sure you want to sign out? You will need to sign back in to proceed with your current order."
-  },
-  "social_login_redirect.message.authenticating": {
-    "defaultMessage": "Authenticating..."
-  },
-  "social_login_redirect.message.redirect_link": {
-    "defaultMessage": "If you are not automatically redirected, click <link>this link</link> to proceed."
+    "defaultMessage": "Weet je zeker dat je je wilt afmelden? Je moet je opnieuw aanmelden om verder te gaan met je huidige order."
   },
   "store_locator.action.find": {
-    "defaultMessage": "Find"
+    "defaultMessage": "Zoeken"
   },
   "store_locator.action.select_a_country": {
-    "defaultMessage": "Select a country"
+    "defaultMessage": "Selecteer een land"
   },
   "store_locator.action.use_my_location": {
-    "defaultMessage": "Use My Location"
+    "defaultMessage": "Mijn locatie gebruiken"
   },
   "store_locator.action.viewMore": {
-    "defaultMessage": "View More"
+    "defaultMessage": "Meer weergeven"
   },
   "store_locator.description.away": {
-    "defaultMessage": "away"
+    "defaultMessage": "verwijderd"
   },
   "store_locator.description.loading_locations": {
-    "defaultMessage": "Loading locations..."
+    "defaultMessage": "Locaties laden..."
   },
   "store_locator.description.no_locations": {
-    "defaultMessage": "Sorry, there are no locations in this area"
+    "defaultMessage": "Er zijn geen locaties in dit gebied"
   },
   "store_locator.description.or": {
-    "defaultMessage": "Or"
+    "defaultMessage": "Of"
   },
   "store_locator.description.phone": {
-    "defaultMessage": "Phone:"
+    "defaultMessage": "Telefoonnummer:"
   },
   "store_locator.description.viewing_near_postal_code": {
-    "defaultMessage": "Viewing stores within {distance}{distanceUnit} of {postalCode} in"
+    "defaultMessage": "Weergave van winkels binnen {distance}{distanceUnit} van {postalCode} in"
   },
   "store_locator.description.viewing_near_your_location": {
-    "defaultMessage": "Viewing stores near your location"
+    "defaultMessage": "Weergave van winkels in de buurt van je locatie"
   },
   "store_locator.dropdown.germany": {
-    "defaultMessage": "Germany"
+    "defaultMessage": "Duitsland"
   },
   "store_locator.dropdown.united_states": {
-    "defaultMessage": "United States"
+    "defaultMessage": "Verenigde Staten"
   },
   "store_locator.error.agree_to_share_your_location": {
-    "defaultMessage": "Please agree to share your location"
+    "defaultMessage": "Geef toestemming voor het delen van je locatie"
   },
   "store_locator.error.please_enter_a_postal_code": {
-    "defaultMessage": "Please enter a postal code."
+    "defaultMessage": "Voer een postcode in."
   },
   "store_locator.error.please_select_a_country": {
-    "defaultMessage": "Please select a country."
+    "defaultMessage": "Selecteer een land."
   },
   "store_locator.field.placeholder.enter_postal_code": {
-    "defaultMessage": "Enter postal code"
+    "defaultMessage": "Postcode invoeren"
   },
   "store_locator.pagination.load_more": {
-    "defaultMessage": "Load More"
+    "defaultMessage": "Meer laden"
   },
   "store_locator.title": {
-    "defaultMessage": "Find a Store"
+    "defaultMessage": "Een winkel zoeken"
   },
   "swatch_group.selected.label": {
     "defaultMessage": "{label}:"
   },
   "toggle_card.action.edit": {
-    "defaultMessage": "Edit"
+    "defaultMessage": "Bewerken"
   },
   "toggle_card.action.editContactInfo": {
-    "defaultMessage": "Edit Contact Info"
+    "defaultMessage": "Contactgegevens bewerken"
   },
   "toggle_card.action.editPaymentInfo": {
-    "defaultMessage": "Edit Payment Info"
+    "defaultMessage": "Betalingsinfo bewerken"
   },
   "toggle_card.action.editShippingAddress": {
-    "defaultMessage": "Edit Shipping Address"
+    "defaultMessage": "Verzendadres bewerken"
   },
   "toggle_card.action.editShippingOptions": {
-    "defaultMessage": "Edit Shipping Options"
+    "defaultMessage": "Verzendopties bewerken"
   },
   "update_password_fields.button.forgot_password": {
-    "defaultMessage": "Forgot Password?"
+    "defaultMessage": "Wachtwoord vergeten?"
   },
   "use_address_fields.error.please_enter_first_name": {
-    "defaultMessage": "Please enter your first name."
+    "defaultMessage": "Voer je voornaam in."
   },
   "use_address_fields.error.please_enter_last_name": {
-    "defaultMessage": "Please enter your last name."
+    "defaultMessage": "Voer je achternaam in."
   },
   "use_address_fields.error.please_enter_phone_number": {
-    "defaultMessage": "Please enter your phone number."
+    "defaultMessage": "Voer je telefoonnummer in."
   },
   "use_address_fields.error.please_enter_your_postal_or_zip": {
-    "defaultMessage": "Please enter your zip code.",
+    "defaultMessage": "Voer je postcode in.",
     "description": "Error message for a blank zip code (US-specific checkout)"
   },
   "use_address_fields.error.please_select_your_address": {
-    "defaultMessage": "Please enter your address."
+    "defaultMessage": "Voer je adres in."
   },
   "use_address_fields.error.please_select_your_city": {
-    "defaultMessage": "Please enter your city."
+    "defaultMessage": "Voer je plaats in."
   },
   "use_address_fields.error.please_select_your_country": {
-    "defaultMessage": "Please select your country."
+    "defaultMessage": "Selecteer je land."
   },
   "use_address_fields.error.please_select_your_state_or_province": {
-    "defaultMessage": "Please select your state.",
+    "defaultMessage": "Selecteer je staat of provincie.",
     "description": "Error message for a blank state (US-specific checkout)"
   },
   "use_address_fields.error.required": {
-    "defaultMessage": "Required"
+    "defaultMessage": "Verplicht"
   },
   "use_address_fields.error.state_code_invalid": {
-    "defaultMessage": "Please enter 2-letter state/province."
+    "defaultMessage": "Voer de 2 letters van de staat/provincie in."
   },
   "use_address_fields.label.address": {
-    "defaultMessage": "Address"
+    "defaultMessage": "Adres"
   },
   "use_address_fields.label.address_form": {
-    "defaultMessage": "Address Form"
+    "defaultMessage": "Adresformulier"
   },
   "use_address_fields.label.city": {
-    "defaultMessage": "City"
+    "defaultMessage": "Plaats"
   },
   "use_address_fields.label.country": {
-    "defaultMessage": "Country"
+    "defaultMessage": "Land"
   },
   "use_address_fields.label.first_name": {
-    "defaultMessage": "First Name"
+    "defaultMessage": "Voornaam"
   },
   "use_address_fields.label.last_name": {
-    "defaultMessage": "Last Name"
+    "defaultMessage": "Achternaam"
   },
   "use_address_fields.label.phone": {
-    "defaultMessage": "Phone"
+    "defaultMessage": "Telefoonnummer"
   },
   "use_address_fields.label.postal_code": {
-    "defaultMessage": "Postal Code"
+    "defaultMessage": "Postcode"
   },
   "use_address_fields.label.preferred": {
-    "defaultMessage": "Set as default"
+    "defaultMessage": "Instellen als standaard"
   },
   "use_address_fields.label.province": {
-    "defaultMessage": "Province"
+    "defaultMessage": "Provincie"
   },
   "use_address_fields.label.state": {
-    "defaultMessage": "State"
+    "defaultMessage": "Staat"
   },
   "use_address_fields.label.zipCode": {
-    "defaultMessage": "Zip Code"
+    "defaultMessage": "Postcode"
   },
   "use_credit_card_fields.error.required": {
-    "defaultMessage": "Required"
+    "defaultMessage": "Verplicht"
   },
   "use_credit_card_fields.error.required_card_number": {
-    "defaultMessage": "Please enter your card number."
+    "defaultMessage": "Voer het kaartnummer in."
   },
   "use_credit_card_fields.error.required_expiry": {
-    "defaultMessage": "Please enter your expiration date."
+    "defaultMessage": "Voer de vervaldatum in."
   },
   "use_credit_card_fields.error.required_name": {
-    "defaultMessage": "Please enter your name as shown on your card."
+    "defaultMessage": "Voer je naam in zoals die op de kaart staat."
   },
   "use_credit_card_fields.error.required_security_code": {
-    "defaultMessage": "Please enter your security code."
+    "defaultMessage": "Voer de beveiligingscode in."
   },
   "use_credit_card_fields.error.valid_card_number": {
-    "defaultMessage": "Please enter a valid card number."
+    "defaultMessage": "Voer een geldig kaartnummer in."
   },
   "use_credit_card_fields.error.valid_date": {
-    "defaultMessage": "Please enter a valid date."
+    "defaultMessage": "Voer een geldige datum in."
   },
   "use_credit_card_fields.error.valid_name": {
-    "defaultMessage": "Please enter a valid name."
+    "defaultMessage": "Voer een geldige naam in."
   },
   "use_credit_card_fields.error.valid_security_code": {
-    "defaultMessage": "Please enter a valid security code."
+    "defaultMessage": "Voer een geldige beveiligingscode in."
   },
   "use_credit_card_fields.label.card_number": {
-    "defaultMessage": "Card Number"
+    "defaultMessage": "Kaartnummer"
   },
   "use_credit_card_fields.label.card_type": {
-    "defaultMessage": "Card Type"
+    "defaultMessage": "Kaarttype:"
   },
   "use_credit_card_fields.label.expiry": {
-    "defaultMessage": "Expiration Date"
+    "defaultMessage": "Vervaldatum"
   },
   "use_credit_card_fields.label.name": {
-    "defaultMessage": "Name on Card"
+    "defaultMessage": "Naam op kaart"
   },
   "use_credit_card_fields.label.security_code": {
-    "defaultMessage": "Security Code"
+    "defaultMessage": "Beveiligingscode"
   },
   "use_login_fields.error.required_email": {
-    "defaultMessage": "Please enter your email address."
+    "defaultMessage": "Voer je e-mailadres in."
   },
   "use_login_fields.error.required_password": {
-    "defaultMessage": "Please enter your password."
+    "defaultMessage": "Voer je wachtwoord in."
   },
   "use_login_fields.label.email": {
-    "defaultMessage": "Email"
+    "defaultMessage": "E-mailadres"
   },
   "use_login_fields.label.password": {
-    "defaultMessage": "Password"
+    "defaultMessage": "Wachtwoord"
   },
   "use_product.message.inventory_remaining": {
-    "defaultMessage": "Only {stockLevel} left!"
+    "defaultMessage": "Nog maar {stockLevel} over!"
   },
   "use_product.message.inventory_remaining_for_product": {
-    "defaultMessage": "Only {stockLevel} left for {productName}!"
+    "defaultMessage": "Nog maar {stockLevel} over voor {productName}!"
   },
   "use_product.message.out_of_stock": {
-    "defaultMessage": "Out of stock"
+    "defaultMessage": "Niet op voorraad"
   },
   "use_product.message.out_of_stock_for_product": {
-    "defaultMessage": "Out of stock for {productName}"
+    "defaultMessage": "Niet op voorraad voor {productName}"
   },
   "use_profile_fields.error.required_email": {
-    "defaultMessage": "Please enter a valid email address."
+    "defaultMessage": "Voer een geldig e-mailadres in."
   },
   "use_profile_fields.error.required_first_name": {
-    "defaultMessage": "Please enter your first name."
+    "defaultMessage": "Voer je voornaam in."
   },
   "use_profile_fields.error.required_last_name": {
-    "defaultMessage": "Please enter your last name."
+    "defaultMessage": "Voer je achternaam in."
   },
   "use_profile_fields.error.required_phone": {
-    "defaultMessage": "Please enter your phone number."
+    "defaultMessage": "Voer je telefoonnummer in."
   },
   "use_profile_fields.label.email": {
-    "defaultMessage": "Email"
+    "defaultMessage": "E-mailadres"
   },
   "use_profile_fields.label.first_name": {
-    "defaultMessage": "First Name"
+    "defaultMessage": "Voornaam"
   },
   "use_profile_fields.label.last_name": {
-    "defaultMessage": "Last Name"
+    "defaultMessage": "Achternaam"
   },
   "use_profile_fields.label.phone": {
-    "defaultMessage": "Phone Number"
+    "defaultMessage": "Telefoonnummer"
   },
   "use_promo_code_fields.error.required_promo_code": {
-    "defaultMessage": "Please provide a valid promo code."
+    "defaultMessage": "Geef een geldige promotiecode op."
   },
   "use_promo_code_fields.label.promo_code": {
-    "defaultMessage": "Promo Code"
+    "defaultMessage": "Promotiecode"
   },
   "use_promocode.error.check_the_code": {
-    "defaultMessage": "Check the code and try again, it may already be applied or the promo has expired."
+    "defaultMessage": "Controleer de code en probeer het opnieuw. Mogelijk is de code al gebruikt of is de promotie verlopen."
   },
   "use_promocode.info.promo_applied": {
-    "defaultMessage": "Promotion applied"
+    "defaultMessage": "Promotie toegepast"
   },
   "use_promocode.info.promo_removed": {
-    "defaultMessage": "Promotion removed"
+    "defaultMessage": "Promotie verwijderd"
   },
   "use_registration_fields.error.contain_number": {
-    "defaultMessage": "Password must contain at least one number."
+    "defaultMessage": "Het wachtwoord moet minstens één cijfer bevatten."
   },
   "use_registration_fields.error.lowercase_letter": {
-    "defaultMessage": "Password must contain at least one lowercase letter."
+    "defaultMessage": "Het wachtwoord moet minstens één kleine letter bevatten."
   },
   "use_registration_fields.error.minimum_characters": {
-    "defaultMessage": "Password must contain at least 8 characters."
+    "defaultMessage": "Het wachtwoord moet minstens 8 tekens bevatten."
   },
   "use_registration_fields.error.required_email": {
-    "defaultMessage": "Please enter a valid email address."
+    "defaultMessage": "Voer een geldig e-mailadres in."
   },
   "use_registration_fields.error.required_first_name": {
-    "defaultMessage": "Please enter your first name."
+    "defaultMessage": "Voer je voornaam in."
   },
   "use_registration_fields.error.required_last_name": {
-    "defaultMessage": "Please enter your last name."
+    "defaultMessage": "Voer je achternaam in."
   },
   "use_registration_fields.error.required_password": {
-    "defaultMessage": "Please create a password."
+    "defaultMessage": "Stel een wachtwoord in."
   },
   "use_registration_fields.error.special_character": {
-    "defaultMessage": "Password must contain at least one special character."
+    "defaultMessage": "Het wachtwoord moet minstens één speciaal teken bevatten."
   },
   "use_registration_fields.error.uppercase_letter": {
-    "defaultMessage": "Password must contain at least one uppercase letter."
+    "defaultMessage": "Het wachtwoord moet minstens één hoofdletter bevatten."
   },
   "use_registration_fields.label.email": {
-    "defaultMessage": "Email"
+    "defaultMessage": "E-mailadres"
   },
   "use_registration_fields.label.first_name": {
-    "defaultMessage": "First Name"
+    "defaultMessage": "Voornaam"
   },
   "use_registration_fields.label.last_name": {
-    "defaultMessage": "Last Name"
+    "defaultMessage": "Achternaam"
   },
   "use_registration_fields.label.password": {
-    "defaultMessage": "Password"
+    "defaultMessage": "Wachtwoord"
   },
   "use_registration_fields.label.sign_up_to_emails": {
-    "defaultMessage": "Sign me up for Salesforce emails (you can unsubscribe at any time)"
+    "defaultMessage": "Meld me aan voor e-mails van Salesforce (je kunt je op elk moment weer afmelden)"
   },
   "use_reset_password_fields.error.required_email": {
-    "defaultMessage": "Please enter a valid email address."
+    "defaultMessage": "Voer een geldig e-mailadres in."
   },
   "use_reset_password_fields.label.email": {
-    "defaultMessage": "Email"
+    "defaultMessage": "E-mailadres"
   },
   "use_update_password_fields.error.contain_number": {
-    "defaultMessage": "Password must contain at least one number."
+    "defaultMessage": "Het wachtwoord moet minstens één cijfer bevatten."
   },
   "use_update_password_fields.error.lowercase_letter": {
-    "defaultMessage": "Password must contain at least one lowercase letter."
+    "defaultMessage": "Het wachtwoord moet minstens één kleine letter bevatten."
   },
   "use_update_password_fields.error.minimum_characters": {
-    "defaultMessage": "Password must contain at least 8 characters."
-  },
-  "use_update_password_fields.error.password_mismatch": {
-    "defaultMessage": "Passwords do not match."
-  },
-  "use_update_password_fields.error.required_confirm_password": {
-    "defaultMessage": "Please confirm your password."
+    "defaultMessage": "Het wachtwoord moet minstens 8 tekens bevatten."
   },
   "use_update_password_fields.error.required_new_password": {
-    "defaultMessage": "Please provide a new password."
+    "defaultMessage": "Geef een nieuw wachtwoord op."
   },
   "use_update_password_fields.error.required_password": {
-    "defaultMessage": "Please enter your password."
+    "defaultMessage": "Voer je wachtwoord in."
   },
   "use_update_password_fields.error.special_character": {
-    "defaultMessage": "Password must contain at least one special character."
+    "defaultMessage": "Het wachtwoord moet minstens één speciaal teken bevatten."
   },
   "use_update_password_fields.error.uppercase_letter": {
-    "defaultMessage": "Password must contain at least one uppercase letter."
-  },
-  "use_update_password_fields.label.confirm_new_password": {
-    "defaultMessage": "Confirm New Password"
+    "defaultMessage": "Het wachtwoord moet minstens één hoofdletter bevatten."
   },
   "use_update_password_fields.label.current_password": {
-    "defaultMessage": "Current Password"
+    "defaultMessage": "Huidig wachtwoord:"
   },
   "use_update_password_fields.label.new_password": {
-    "defaultMessage": "New Password"
+    "defaultMessage": "Nieuw wachtwoord"
   },
   "wishlist_primary_action.button.addSetToCart.label": {
-    "defaultMessage": "Add {productName} set to cart"
+    "defaultMessage": "Set {productName} toevoegen aan winkelwagen"
   },
   "wishlist_primary_action.button.addToCart.label": {
-    "defaultMessage": "Add {productName} to cart"
+    "defaultMessage": "{productName} toevoegen aan winkelwagen"
   },
   "wishlist_primary_action.button.add_set_to_cart": {
-    "defaultMessage": "Add Set to Cart"
+    "defaultMessage": "Set toevoegen aan winkelwagen"
   },
   "wishlist_primary_action.button.add_to_cart": {
-    "defaultMessage": "Add to Cart"
+    "defaultMessage": "Toevoegen aan winkelwagen"
   },
   "wishlist_primary_action.button.viewFullDetails.label": {
-    "defaultMessage": "View full details for {productName}"
+    "defaultMessage": "Alle gegevens voor {productName} weergeven"
   },
   "wishlist_primary_action.button.view_full_details": {
-    "defaultMessage": "View Full Details"
+    "defaultMessage": "Alle gegevens weergeven"
   },
   "wishlist_primary_action.button.view_options": {
-    "defaultMessage": "View Options"
+    "defaultMessage": "Opties weergeven"
   },
   "wishlist_primary_action.button.view_options.label": {
-    "defaultMessage": "View Options for {productName}"
+    "defaultMessage": "Opties voor {productName} weergeven"
   },
   "wishlist_primary_action.info.added_to_cart": {
-    "defaultMessage": "{quantity} {quantity, plural, one {item} other {items}} added to cart"
+    "defaultMessage": "{quantity} {quantity, plural, one {artikel} other {artikelen}} toegevoegd aan winkelwagen"
   },
   "wishlist_secondary_button_group.action.remove": {
-    "defaultMessage": "Remove"
+    "defaultMessage": "Verwijderen"
   },
   "wishlist_secondary_button_group.info.item.remove.label": {
-    "defaultMessage": "Remove {productName}"
+    "defaultMessage": "{productName} verwijderen"
   },
   "wishlist_secondary_button_group.info.item_removed": {
-    "defaultMessage": "Item removed from wishlist"
+    "defaultMessage": "Artikel verwijderd uit verlanglijst"
   },
   "with_registration.info.please_sign_in": {
-    "defaultMessage": "Please sign in to continue!"
+    "defaultMessage": "Meld je aan om verder te gaan."
   }
 }

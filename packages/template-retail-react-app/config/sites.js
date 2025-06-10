@@ -32,6 +32,10 @@ module.exports = [
             defaultCurrency: 'GBP',
             supportedLocales: [
                 {
+                    id: 'da-DK',
+                    preferredCurrency: 'EUR'
+                },
+                {
                     id: 'de-DE',
                     preferredCurrency: 'EUR'
                 },
@@ -42,6 +46,10 @@ module.exports = [
                 {
                     id: 'es-MX',
                     preferredCurrency: 'MXN'
+                },
+                {
+                    id: 'fi-FI',
+                    preferredCurrency: 'EUR'
                 },
                 {
                     id: 'fr-FR',
@@ -60,8 +68,24 @@ module.exports = [
                     preferredCurrency: 'KRW'
                 },
                 {
+                    id: 'nl-NL',
+                    preferredCurrency: 'EUR'
+                },
+                {
+                    id: 'no-NO',
+                    preferredCurrency: 'EUR'
+                },
+                {
+                    id: 'pl-PL',
+                    preferredCurrency: 'EUR'
+                },
+                {
                     id: 'pt-BR',
                     preferredCurrency: 'BRL'
+                },
+                {
+                    id: 'sv-SE',
+                    preferredCurrency: 'EUR'
                 },
                 {
                     id: 'zh-CN',

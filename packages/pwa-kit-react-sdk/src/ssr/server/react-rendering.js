@@ -21,6 +21,7 @@ import sprite from 'svg-sprite-loader/runtime/sprite.build'
 import {isRemote} from '@salesforce/pwa-kit-runtime/utils/ssr-server'
 import {proxyConfigs} from '@salesforce/pwa-kit-runtime/utils/ssr-shared'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
+import {NO_CACHE} from '@salesforce/pwa-kit-runtime/ssr/server/constants'
 
 import {getAssetUrl} from '../universal/utils'
 import {ServerContext, CorrelationIdProvider} from '../universal/contexts'
@@ -236,6 +237,11 @@ export const render = async (req, res, next) => {
 
     if (includeServerTimingHeader) {
         res.setHeader('Server-Timing', res.__performanceTimer.buildServerTimingHeader())
+
+        // Override cache-control header to no caching when __server_timing is used
+        // This happens after React rendering is complete, ensuring it overrides any
+        // cache headers set by individual page components
+        res.set('Cache-Control', NO_CACHE)
     }
 
     if (redirectUrl) {

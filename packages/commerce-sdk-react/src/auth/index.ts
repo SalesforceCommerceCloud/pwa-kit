@@ -315,7 +315,7 @@ class Auth {
          * priority and we ignore whatever was set for clientSecret. This prints a warning about the clientSecret
          * being ignored.
          *
-         * If both enablePWAKitPrivateClient and clientSecret are falsey, we are in SLAS public client mode.
+         * If both enablePWAKitPrivateClient and clientSecret are falsy, we are in SLAS public client mode.
          */
         if (config.enablePWAKitPrivateClient && config.clientSecret) {
             this.logWarning(SLAS_SECRET_OVERRIDE_MSG)

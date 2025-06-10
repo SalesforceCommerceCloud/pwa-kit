@@ -1,970 +1,907 @@
 {
   "account.accordion.button.my_account": {
-    "defaultMessage": "My Account"
+    "defaultMessage": "Min konto"
   },
   "account.heading.my_account": {
-    "defaultMessage": "My Account"
+    "defaultMessage": "Min konto"
   },
   "account.logout_button.button.log_out": {
-    "defaultMessage": "Log Out"
+    "defaultMessage": "Logg ut"
   },
   "account_addresses.badge.default": {
-    "defaultMessage": "Default"
+    "defaultMessage": "Standard"
   },
   "account_addresses.button.add_address": {
-    "defaultMessage": "Add Address"
+    "defaultMessage": "Legg til adresse"
   },
   "account_addresses.info.address_removed": {
-    "defaultMessage": "Address removed"
+    "defaultMessage": "Adresse fjernet"
   },
   "account_addresses.info.address_updated": {
-    "defaultMessage": "Address updated"
+    "defaultMessage": "Adresse oppdatert"
   },
   "account_addresses.info.new_address_saved": {
-    "defaultMessage": "New address saved"
+    "defaultMessage": "Ny adresse lagret"
   },
   "account_addresses.page_action_placeholder.button.add_address": {
-    "defaultMessage": "Add Address"
+    "defaultMessage": "Legg til adresse"
   },
   "account_addresses.page_action_placeholder.heading.no_saved_addresses": {
-    "defaultMessage": "No Saved Addresses"
+    "defaultMessage": "Ingen lagrede adresser"
   },
   "account_addresses.page_action_placeholder.message.add_new_address": {
-    "defaultMessage": "Add a new address method for faster checkout."
+    "defaultMessage": "Legg til en ny adressemetode for raskere betaling."
   },
   "account_addresses.title.addresses": {
-    "defaultMessage": "Addresses"
+    "defaultMessage": "Adresser"
   },
   "account_detail.title.account_details": {
-    "defaultMessage": "Account Details"
+    "defaultMessage": "Kontoopplysninger"
   },
   "account_order_detail.heading.billing_address": {
-    "defaultMessage": "Billing Address"
+    "defaultMessage": "Faktureringsadresse"
   },
   "account_order_detail.heading.num_of_items": {
-    "defaultMessage": "{count} items"
+    "defaultMessage": "{count} artikler"
   },
   "account_order_detail.heading.payment_method": {
-    "defaultMessage": "Payment Method"
+    "defaultMessage": "Betalingsmetode"
   },
   "account_order_detail.heading.shipping_address": {
-    "defaultMessage": "Shipping Address"
+    "defaultMessage": "Leveringsadresse"
   },
   "account_order_detail.heading.shipping_method": {
-    "defaultMessage": "Shipping Method"
+    "defaultMessage": "Fraktmetode"
   },
   "account_order_detail.label.order_number": {
-    "defaultMessage": "Order Number: {orderNumber}"
+    "defaultMessage": "Ordrenummer: {orderNumber}"
   },
   "account_order_detail.label.ordered_date": {
-    "defaultMessage": "Ordered: {date}"
+    "defaultMessage": "Bestilt: {date}"
   },
   "account_order_detail.label.pending_tracking_number": {
-    "defaultMessage": "Pending"
+    "defaultMessage": "Avventer"
   },
   "account_order_detail.label.tracking_number": {
-    "defaultMessage": "Tracking Number"
+    "defaultMessage": "Sporingsnummer"
   },
   "account_order_detail.link.back_to_history": {
-    "defaultMessage": "Back to Order History"
+    "defaultMessage": "Tilbake til ordrehistorikk"
   },
   "account_order_detail.shipping_status.not_shipped": {
-    "defaultMessage": "Not shipped"
+    "defaultMessage": "Ikke sendt"
   },
   "account_order_detail.shipping_status.part_shipped": {
-    "defaultMessage": "Partially shipped"
+    "defaultMessage": "Delvis sendt"
   },
   "account_order_detail.shipping_status.shipped": {
-    "defaultMessage": "Shipped"
+    "defaultMessage": "Sendt"
   },
   "account_order_detail.title.order_details": {
-    "defaultMessage": "Order Details"
+    "defaultMessage": "Ordredetaljer"
   },
   "account_order_history.button.continue_shopping": {
-    "defaultMessage": "Continue Shopping"
+    "defaultMessage": "Fortsett å handle"
   },
   "account_order_history.description.once_you_place_order": {
-    "defaultMessage": "Once you place an order the details will show up here."
+    "defaultMessage": "Når du har lagt inn en ordre, vil detaljene vises her."
   },
   "account_order_history.heading.no_order_yet": {
-    "defaultMessage": "You haven't placed an order yet."
+    "defaultMessage": "Du har ikke lagt inn en ordre ennå."
   },
   "account_order_history.label.num_of_items": {
-    "defaultMessage": "{count} items",
+    "defaultMessage": "{count} artikler",
     "description": "Number of items in order"
   },
   "account_order_history.label.order_number": {
-    "defaultMessage": "Order Number: {orderNumber}"
+    "defaultMessage": "Ordrenummer: {orderNumber}"
   },
   "account_order_history.label.ordered_date": {
-    "defaultMessage": "Ordered: {date}"
+    "defaultMessage": "Bestilt: {date}"
   },
   "account_order_history.label.shipped_to": {
-    "defaultMessage": "Shipped to: {name}"
+    "defaultMessage": "Sendt til: {name}"
   },
   "account_order_history.link.view_details": {
-    "defaultMessage": "View details"
+    "defaultMessage": "Vis detaljer"
   },
   "account_order_history.title.order_history": {
-    "defaultMessage": "Order History"
+    "defaultMessage": "Ordrehistorikk"
   },
   "account_wishlist.button.continue_shopping": {
-    "defaultMessage": "Continue Shopping"
+    "defaultMessage": "Fortsett å handle"
   },
   "account_wishlist.description.continue_shopping": {
-    "defaultMessage": "Continue shopping and add items to your wishlist."
+    "defaultMessage": "Fortsett å handle og legg til artikler på ønskelisten."
   },
   "account_wishlist.heading.no_wishlist": {
-    "defaultMessage": "No Wishlist Items"
+    "defaultMessage": "Ingen artikler på ønskelisten"
   },
   "account_wishlist.title.wishlist": {
-    "defaultMessage": "Wishlist"
+    "defaultMessage": "Ønskeliste"
   },
   "action_card.action.edit": {
-    "defaultMessage": "Edit"
+    "defaultMessage": "Rediger"
   },
   "action_card.action.remove": {
-    "defaultMessage": "Remove"
+    "defaultMessage": "Fjern"
   },
   "add_to_cart_modal.info.added_to_cart": {
-    "defaultMessage": "{quantity} {quantity, plural, one {item} other {items}} added to cart"
+    "defaultMessage": "{quantity} {quantity, plural, one {artikkel} other {artikler}} lagt til i kurven"
   },
   "add_to_cart_modal.label.cart_subtotal": {
-    "defaultMessage": "Cart Subtotal ({itemAccumulatedCount} item)"
+    "defaultMessage": "Delsum for kurv ({itemAccumulatedCount} artikkel)"
   },
   "add_to_cart_modal.label.quantity": {
-    "defaultMessage": "Qty"
+    "defaultMessage": "Antall"
   },
   "add_to_cart_modal.link.checkout": {
-    "defaultMessage": "Proceed to Checkout"
+    "defaultMessage": "Gå til betaling"
   },
   "add_to_cart_modal.link.view_cart": {
-    "defaultMessage": "View Cart"
+    "defaultMessage": "Vis kurv"
   },
   "add_to_cart_modal.recommended_products.title.might_also_like": {
-    "defaultMessage": "You Might Also Like"
+    "defaultMessage": "Du vil kanskje også like"
   },
   "auth_modal.button.close.assistive_msg": {
-    "defaultMessage": "Close login form"
-  },
-  "auth_modal.check_email.button.resend_link": {
-    "defaultMessage": "Resend Link"
-  },
-  "auth_modal.check_email.description.check_spam_folder": {
-    "defaultMessage": "The link may take a few minutes to arrive, check your spam folder if you're having trouble finding it"
-  },
-  "auth_modal.check_email.description.just_sent": {
-    "defaultMessage": "We just sent a login link to <b>{email}</b>"
-  },
-  "auth_modal.check_email.title.check_your_email": {
-    "defaultMessage": "Check Your Email"
+    "defaultMessage": "Lukk skjema for pålogging"
   },
   "auth_modal.description.now_signed_in": {
-    "defaultMessage": "You're now signed in."
+    "defaultMessage": "Du er nå pålogget."
   },
   "auth_modal.error.incorrect_email_or_password": {
-    "defaultMessage": "Something's not right with your email or password. Try again."
+    "defaultMessage": "Det er noe som ikke stemmer med e-postadressen eller passordet ditt. Prøv igjen."
   },
   "auth_modal.info.welcome_user": {
-    "defaultMessage": "Welcome {name},"
+    "defaultMessage": "Velkommen, {name}!"
   },
   "auth_modal.password_reset_success.button.back_to_sign_in": {
-    "defaultMessage": "Back to Sign In"
+    "defaultMessage": "Tilbake til pålogging"
   },
   "auth_modal.password_reset_success.info.will_email_shortly": {
-    "defaultMessage": "You will receive an email at <b>{email}</b> with a link to reset your password shortly."
+    "defaultMessage": "Du vil om kort tid motta en e-post på <b>{email}</b> med en lenke for å tilbakestille passordet ditt."
   },
   "auth_modal.password_reset_success.title.password_reset": {
-    "defaultMessage": "Password Reset"
+    "defaultMessage": "Tilbakestille passord"
   },
   "carousel.button.scroll_left.assistive_msg": {
-    "defaultMessage": "Scroll carousel left"
+    "defaultMessage": "Bla karusell til venstre"
   },
   "carousel.button.scroll_right.assistive_msg": {
-    "defaultMessage": "Scroll carousel right"
+    "defaultMessage": "Bla karusell til høyre"
   },
   "cart.info.removed_from_cart": {
-    "defaultMessage": "Item removed from cart"
+    "defaultMessage": "Artikkel fjernet fra kurv"
   },
   "cart.product_edit_modal.modal_label": {
-    "defaultMessage": "Edit modal for {productName}"
+    "defaultMessage": "Rediger modal for {productName}"
   },
   "cart.recommended_products.title.may_also_like": {
-    "defaultMessage": "You May Also Like"
+    "defaultMessage": "Du vil kanskje også like"
   },
   "cart.recommended_products.title.recently_viewed": {
-    "defaultMessage": "Recently Viewed"
+    "defaultMessage": "Nylig vist"
   },
   "cart_cta.link.checkout": {
-    "defaultMessage": "Proceed to Checkout"
+    "defaultMessage": "Gå til betaling"
   },
   "cart_secondary_button_group.action.added_to_wishlist": {
-    "defaultMessage": "Add to Wishlist"
+    "defaultMessage": "Legg til på ønskeliste"
   },
   "cart_secondary_button_group.action.edit": {
-    "defaultMessage": "Edit"
+    "defaultMessage": "Rediger"
   },
   "cart_secondary_button_group.action.remove": {
-    "defaultMessage": "Remove"
+    "defaultMessage": "Fjern"
   },
   "cart_secondary_button_group.label.this_is_gift": {
-    "defaultMessage": "This is a gift."
+    "defaultMessage": "Dette er en gave."
   },
   "cart_skeleton.heading.order_summary": {
-    "defaultMessage": "Order Summary"
+    "defaultMessage": "Ordresammendrag"
   },
   "cart_skeleton.title.cart": {
-    "defaultMessage": "Cart"
+    "defaultMessage": "Kurv"
   },
   "cart_title.title.cart_num_of_items": {
-    "defaultMessage": "Cart ({itemCount, plural, =0 {0 items} one {# item} other {# items}})"
+    "defaultMessage": "Kurv ({itemCount, plural, =0 {0 artikler} one {# artikkel} other {# artikler}})"
   },
   "category_links.button_text": {
-    "defaultMessage": "Categories"
+    "defaultMessage": "Kategorier"
   },
   "cc_radio_group.action.remove": {
-    "defaultMessage": "Remove"
+    "defaultMessage": "Fjern"
   },
   "cc_radio_group.button.add_new_card": {
-    "defaultMessage": "Add New Card"
+    "defaultMessage": "Legg til nytt kort"
   },
   "checkout.button.place_order": {
-    "defaultMessage": "Place Order"
+    "defaultMessage": "Legg inn ordre"
   },
   "checkout.message.generic_error": {
-    "defaultMessage": "An unexpected error occurred during checkout."
+    "defaultMessage": "Det oppstod en uventet feil under betalingen."
   },
   "checkout_confirmation.button.create_account": {
-    "defaultMessage": "Create Account"
+    "defaultMessage": "Opprett konto"
   },
   "checkout_confirmation.heading.billing_address": {
-    "defaultMessage": "Billing Address"
+    "defaultMessage": "Faktureringsadresse"
   },
   "checkout_confirmation.heading.create_account": {
-    "defaultMessage": "Create an account for faster checkout"
+    "defaultMessage": "Opprett en konto for raskere betaling"
   },
   "checkout_confirmation.heading.credit_card": {
-    "defaultMessage": "Credit Card"
+    "defaultMessage": "Kredittkort"
   },
   "checkout_confirmation.heading.delivery_details": {
-    "defaultMessage": "Delivery Details"
+    "defaultMessage": "Leveringsopplysninger"
   },
   "checkout_confirmation.heading.order_summary": {
-    "defaultMessage": "Order Summary"
+    "defaultMessage": "Ordresammendrag"
   },
   "checkout_confirmation.heading.payment_details": {
-    "defaultMessage": "Payment Details"
+    "defaultMessage": "Betalingsopplysninger"
   },
   "checkout_confirmation.heading.shipping_address": {
-    "defaultMessage": "Shipping Address"
+    "defaultMessage": "Leveringsadresse"
   },
   "checkout_confirmation.heading.shipping_method": {
-    "defaultMessage": "Shipping Method"
+    "defaultMessage": "Fraktmetode"
   },
   "checkout_confirmation.heading.thank_you_for_order": {
-    "defaultMessage": "Thank you for your order!"
+    "defaultMessage": "Takk for ordren!"
   },
   "checkout_confirmation.label.free": {
-    "defaultMessage": "Free"
+    "defaultMessage": "Gratis"
   },
   "checkout_confirmation.label.order_number": {
-    "defaultMessage": "Order Number"
+    "defaultMessage": "Ordrenummer"
   },
   "checkout_confirmation.label.order_total": {
-    "defaultMessage": "Order Total"
+    "defaultMessage": "Ordre totalt"
   },
   "checkout_confirmation.label.promo_applied": {
-    "defaultMessage": "Promotion applied"
+    "defaultMessage": "Kampanje tatt i bruk"
   },
   "checkout_confirmation.label.shipping": {
-    "defaultMessage": "Shipping"
+    "defaultMessage": "Frakt"
   },
   "checkout_confirmation.label.shipping.strikethrough.price": {
-    "defaultMessage": "Originally {originalPrice}, now {newPrice}"
+    "defaultMessage": "Opprinnelig {originalPrice}, nå {newPrice}"
   },
   "checkout_confirmation.label.subtotal": {
-    "defaultMessage": "Subtotal"
+    "defaultMessage": "Delsum"
   },
   "checkout_confirmation.label.tax": {
-    "defaultMessage": "Tax"
+    "defaultMessage": "Avgift"
   },
   "checkout_confirmation.link.continue_shopping": {
-    "defaultMessage": "Continue Shopping"
+    "defaultMessage": "Fortsett å handle"
   },
   "checkout_confirmation.link.login": {
-    "defaultMessage": "Log in here"
+    "defaultMessage": "Logg inn her"
   },
   "checkout_confirmation.message.already_has_account": {
-    "defaultMessage": "This email already has an account."
+    "defaultMessage": "Denne e-postadressen har allerede en konto."
   },
   "checkout_confirmation.message.num_of_items_in_order": {
-    "defaultMessage": "{itemCount, plural, =0 {0 items} one {# item} other {# items}}",
+    "defaultMessage": "{itemCount, plural, =0 {0 artikler} one {# artikkel} other {# artikler}}",
     "description": "# item(s) in order"
   },
   "checkout_confirmation.message.will_email_shortly": {
-    "defaultMessage": "We will send an email to <b>{email}</b> with your confirmation number and receipt shortly."
+    "defaultMessage": "Vi sender en e-post til <b>{email}</b> med bekreftelsesnummer og kvittering innen kort tid."
   },
   "checkout_footer.link.privacy_policy": {
-    "defaultMessage": "Privacy Policy"
+    "defaultMessage": "Retningslinjer for personvern"
   },
   "checkout_footer.link.returns_exchanges": {
-    "defaultMessage": "Returns & Exchanges"
+    "defaultMessage": "Returer og bytter"
   },
   "checkout_footer.link.shipping": {
-    "defaultMessage": "Shipping"
+    "defaultMessage": "Frakt"
   },
   "checkout_footer.link.site_map": {
-    "defaultMessage": "Site Map"
+    "defaultMessage": "Nettstedskart"
   },
   "checkout_footer.link.terms_conditions": {
-    "defaultMessage": "Terms & Conditions"
+    "defaultMessage": "Vilkår og betingelser"
   },
   "checkout_footer.message.copyright": {
-    "defaultMessage": "Salesforce or its affiliates. All rights reserved. This is a demo store only. Orders made WILL NOT be processed."
+    "defaultMessage": "Salesforce eller dets tilknyttede selskaper. Alle rettigheter forbeholdt. Denne butikken er kun for demonstrasjonsformål. Ordrer som legges inn, vil IKKE bli behandlet."
   },
   "checkout_header.link.assistive_msg.cart": {
-    "defaultMessage": "Back to cart, number of items: {numItems}"
+    "defaultMessage": "Tilbake til kurv, antall artikler: {numItems}"
   },
   "checkout_header.link.cart": {
-    "defaultMessage": "Back to cart"
+    "defaultMessage": "Tilbake til kurv"
   },
   "checkout_payment.action.remove": {
-    "defaultMessage": "Remove"
+    "defaultMessage": "Fjern"
   },
   "checkout_payment.button.review_order": {
-    "defaultMessage": "Review Order"
+    "defaultMessage": "Gjennomgå ordre"
   },
   "checkout_payment.heading.billing_address": {
-    "defaultMessage": "Billing Address"
+    "defaultMessage": "Faktureringsadresse"
   },
   "checkout_payment.heading.credit_card": {
-    "defaultMessage": "Credit Card"
+    "defaultMessage": "Kredittkort"
   },
   "checkout_payment.label.billing_address_form": {
-    "defaultMessage": "Billing Address Form"
+    "defaultMessage": "Skjema for faktureringsadresse"
   },
   "checkout_payment.label.same_as_shipping": {
-    "defaultMessage": "Same as shipping address"
+    "defaultMessage": "Samme som leveringsadresse"
   },
   "checkout_payment.title.payment": {
-    "defaultMessage": "Payment"
+    "defaultMessage": "Betaling"
   },
   "colorRefinements.label.hitCount": {
     "defaultMessage": "{colorLabel} ({colorHitCount})"
   },
   "confirmation_modal.default.action.no": {
-    "defaultMessage": "No"
+    "defaultMessage": "Nei"
   },
   "confirmation_modal.default.action.yes": {
-    "defaultMessage": "Yes"
+    "defaultMessage": "Ja"
   },
   "confirmation_modal.default.assistive_msg.no": {
-    "defaultMessage": "No, cancel action"
+    "defaultMessage": "Nei, avbryt handling"
   },
   "confirmation_modal.default.assistive_msg.yes": {
-    "defaultMessage": "Yes, confirm action"
+    "defaultMessage": "Ja, bekreft handling"
   },
   "confirmation_modal.default.message.you_want_to_continue": {
-    "defaultMessage": "Are you sure you want to continue?"
+    "defaultMessage": "Er du sikker på at du vil fortsette?"
   },
   "confirmation_modal.default.title.confirm_action": {
-    "defaultMessage": "Confirm Action"
+    "defaultMessage": "Bekreft handling"
   },
   "confirmation_modal.remove_cart_item.action.no": {
-    "defaultMessage": "No, keep item"
+    "defaultMessage": "Nei, behold artikkel"
   },
   "confirmation_modal.remove_cart_item.action.remove": {
-    "defaultMessage": "Remove"
+    "defaultMessage": "Fjern"
   },
   "confirmation_modal.remove_cart_item.action.yes": {
-    "defaultMessage": "Yes, remove item"
+    "defaultMessage": "Ja, fjern artikkel"
   },
   "confirmation_modal.remove_cart_item.assistive_msg.no": {
-    "defaultMessage": "No, keep item"
+    "defaultMessage": "Nei, behold artikkel"
   },
   "confirmation_modal.remove_cart_item.assistive_msg.remove": {
-    "defaultMessage": "Remove unavailable products"
+    "defaultMessage": "Fjern utilgjengelige produkter"
   },
   "confirmation_modal.remove_cart_item.assistive_msg.yes": {
-    "defaultMessage": "Yes, remove item"
+    "defaultMessage": "Ja, fjern artikkel"
   },
   "confirmation_modal.remove_cart_item.message.need_to_remove_due_to_unavailability": {
-    "defaultMessage": "Some items are no longer available online and will be removed from your cart."
+    "defaultMessage": "Noen artikler er ikke lenger tilgjengelige på nett og vil bli fjernet fra kurven."
   },
   "confirmation_modal.remove_cart_item.message.sure_to_remove": {
-    "defaultMessage": "Are you sure you want to remove this item from your cart?"
+    "defaultMessage": "Er du sikker på at du vil fjerne denne artikkelen fra kurven?"
   },
   "confirmation_modal.remove_cart_item.title.confirm_remove": {
-    "defaultMessage": "Confirm Remove Item"
+    "defaultMessage": "Bekreft fjerning av artikkel"
   },
   "confirmation_modal.remove_cart_item.title.items_unavailable": {
-    "defaultMessage": "Items Unavailable"
+    "defaultMessage": "Artikler utilgjengelige"
   },
   "confirmation_modal.remove_wishlist_item.action.no": {
-    "defaultMessage": "No, keep item"
+    "defaultMessage": "Nei, behold artikkel"
   },
   "confirmation_modal.remove_wishlist_item.action.yes": {
-    "defaultMessage": "Yes, remove item"
+    "defaultMessage": "Ja, fjern artikkel"
   },
   "confirmation_modal.remove_wishlist_item.message.sure_to_remove": {
-    "defaultMessage": "Are you sure you want to remove this item from your wishlist?"
+    "defaultMessage": "Er du sikker på at du vil fjerne denne artikkelen fra ønskelisten?"
   },
   "confirmation_modal.remove_wishlist_item.title.confirm_remove": {
-    "defaultMessage": "Confirm Remove Item"
+    "defaultMessage": "Bekreft fjerning av artikkel"
   },
   "contact_info.action.sign_out": {
-    "defaultMessage": "Sign Out"
+    "defaultMessage": "Logg ut"
   },
   "contact_info.button.already_have_account": {
-    "defaultMessage": "Already have an account? Log in"
-  },
-  "contact_info.button.back_to_sign_in_options": {
-    "defaultMessage": "Back to Sign In Options"
+    "defaultMessage": "Har du allerede en konto? Logg inn"
   },
   "contact_info.button.checkout_as_guest": {
-    "defaultMessage": "Checkout as Guest"
+    "defaultMessage": "Utfør betaling som gjest"
   },
   "contact_info.button.login": {
-    "defaultMessage": "Log In"
-  },
-  "contact_info.button.password": {
-    "defaultMessage": "Password"
-  },
-  "contact_info.button.secure_link": {
-    "defaultMessage": "Secure Link"
+    "defaultMessage": "Logg inn"
   },
   "contact_info.error.incorrect_username_or_password": {
-    "defaultMessage": "Incorrect username or password, please try again."
+    "defaultMessage": "Feil brukernavn eller passord, vennligst prøv igjen."
   },
   "contact_info.link.forgot_password": {
-    "defaultMessage": "Forgot password?"
-  },
-  "contact_info.message.or_login_with": {
-    "defaultMessage": "Or Login With"
+    "defaultMessage": "Glemt passordet?"
   },
   "contact_info.title.contact_info": {
-    "defaultMessage": "Contact Info"
+    "defaultMessage": "Kontaktinformasjon"
   },
   "credit_card_fields.tool_tip.security_code": {
-    "defaultMessage": "This 3-digit code can be found on the back of your card.",
+    "defaultMessage": "Denne tresifrede koden finner du på baksiden av kortet ditt.",
     "description": "Generic credit card security code help text"
   },
   "credit_card_fields.tool_tip.security_code.american_express": {
-    "defaultMessage": "This 4-digit code can be found on the front of your card.",
+    "defaultMessage": "Denne firesifrede koden finner du på forsiden av kortet ditt.",
     "description": "American Express security code help text"
   },
   "credit_card_fields.tool_tip.security_code_aria_label": {
-    "defaultMessage": "Security code info"
+    "defaultMessage": "Informasjon om sikkerhetskode"
   },
   "display_price.assistive_msg.current_price": {
-    "defaultMessage": "current price {currentPrice}"
+    "defaultMessage": "nåværende pris {currentPrice}"
   },
   "display_price.assistive_msg.current_price_with_range": {
-    "defaultMessage": "From current price {currentPrice}"
+    "defaultMessage": "Fra nåværende pris {currentPrice}"
   },
   "display_price.assistive_msg.strikethrough_price": {
-    "defaultMessage": "original price {listPrice}"
+    "defaultMessage": "opprinnelig pris {listPrice}"
   },
   "display_price.assistive_msg.strikethrough_price_with_range": {
-    "defaultMessage": "From original price {listPrice}"
+    "defaultMessage": "Fra opprinnelig pris {listPrice}"
   },
   "display_price.label.current_price_with_range": {
-    "defaultMessage": "From {currentPrice}"
-  },
-  "dnt_notification.button.accept": {
-    "defaultMessage": "Accept"
-  },
-  "dnt_notification.button.assistive_msg.accept": {
-    "defaultMessage": "Accept tracking"
-  },
-  "dnt_notification.button.assistive_msg.close": {
-    "defaultMessage": "Close consent tracking form"
-  },
-  "dnt_notification.button.assistive_msg.decline": {
-    "defaultMessage": "Decline tracking"
-  },
-  "dnt_notification.button.decline": {
-    "defaultMessage": "Decline"
-  },
-  "dnt_notification.description": {
-    "defaultMessage": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur."
-  },
-  "dnt_notification.title": {
-    "defaultMessage": "Tracking Consent"
+    "defaultMessage": "Fra {currentPrice}"
   },
   "drawer_menu.button.account_details": {
-    "defaultMessage": "Account Details"
+    "defaultMessage": "Kontoopplysninger"
   },
   "drawer_menu.button.addresses": {
-    "defaultMessage": "Addresses"
+    "defaultMessage": "Adresser"
   },
   "drawer_menu.button.log_out": {
-    "defaultMessage": "Log Out"
+    "defaultMessage": "Logg ut"
   },
   "drawer_menu.button.my_account": {
-    "defaultMessage": "My Account"
+    "defaultMessage": "Min konto"
   },
   "drawer_menu.button.order_history": {
-    "defaultMessage": "Order History"
+    "defaultMessage": "Ordrehistorikk"
   },
   "drawer_menu.header.assistive_msg.title": {
-    "defaultMessage": "Menu Drawer"
+    "defaultMessage": "Menyboks"
   },
   "drawer_menu.link.about_us": {
-    "defaultMessage": "About Us"
+    "defaultMessage": "Om oss"
   },
   "drawer_menu.link.customer_support": {
-    "defaultMessage": "Customer Support"
+    "defaultMessage": "Kundestøtte"
   },
   "drawer_menu.link.customer_support.contact_us": {
-    "defaultMessage": "Contact Us"
+    "defaultMessage": "Kontakt oss"
   },
   "drawer_menu.link.customer_support.shipping_and_returns": {
-    "defaultMessage": "Shipping & Returns"
+    "defaultMessage": "Frakt og returer"
   },
   "drawer_menu.link.our_company": {
-    "defaultMessage": "Our Company"
+    "defaultMessage": "Selskapet vårt"
   },
   "drawer_menu.link.privacy_and_security": {
-    "defaultMessage": "Privacy & Security"
+    "defaultMessage": "Personvern og sikkerhet"
   },
   "drawer_menu.link.privacy_policy": {
-    "defaultMessage": "Privacy Policy"
+    "defaultMessage": "Retningslinjer for personvern"
   },
   "drawer_menu.link.shop_all": {
-    "defaultMessage": "Shop All"
+    "defaultMessage": "Shop alt"
   },
   "drawer_menu.link.sign_in": {
-    "defaultMessage": "Sign In"
+    "defaultMessage": "Logg inn"
   },
   "drawer_menu.link.site_map": {
-    "defaultMessage": "Site Map"
+    "defaultMessage": "Nettstedskart"
   },
   "drawer_menu.link.store_locator": {
-    "defaultMessage": "Store Locator"
+    "defaultMessage": "Butikkfinner"
   },
   "drawer_menu.link.terms_and_conditions": {
-    "defaultMessage": "Terms & Conditions"
+    "defaultMessage": "Vilkår og betingelser"
   },
   "empty_cart.description.empty_cart": {
-    "defaultMessage": "Your cart is empty."
+    "defaultMessage": "Kurven er tom."
   },
   "empty_cart.link.continue_shopping": {
-    "defaultMessage": "Continue Shopping"
+    "defaultMessage": "Fortsett å handle"
   },
   "empty_cart.link.sign_in": {
-    "defaultMessage": "Sign In"
+    "defaultMessage": "Logg inn"
   },
   "empty_cart.message.continue_shopping": {
-    "defaultMessage": "Continue shopping to add items to your cart."
+    "defaultMessage": "Fortsett å handle for å legge til artikler i kurven."
   },
   "empty_cart.message.sign_in_or_continue_shopping": {
-    "defaultMessage": "Sign in to retrieve your saved items or continue shopping."
+    "defaultMessage": "Logg inn for å hente lagrede artikler eller fortsette å handle."
   },
   "empty_search_results.info.cant_find_anything_for_category": {
-    "defaultMessage": "We couldn’t find anything for {category}. Try searching for a product or {link}."
+    "defaultMessage": "Vi fant ikke noe for {category}. Prøv å søke etter et produkt eller {link}."
   },
   "empty_search_results.info.cant_find_anything_for_query": {
-    "defaultMessage": "We couldn’t find anything for \"{searchQuery}\"."
+    "defaultMessage": "Vi fant ingenting for «{searchQuery}»."
   },
   "empty_search_results.info.double_check_spelling": {
-    "defaultMessage": "Double-check your spelling and try again or {link}."
+    "defaultMessage": "Dobbeltsjekk stavemåten og prøv igjen, eller {link}."
   },
   "empty_search_results.link.contact_us": {
-    "defaultMessage": "Contact Us"
+    "defaultMessage": "Kontakt oss"
   },
   "empty_search_results.recommended_products.title.most_viewed": {
-    "defaultMessage": "Most Viewed"
+    "defaultMessage": "Mest vist"
   },
   "empty_search_results.recommended_products.title.top_sellers": {
-    "defaultMessage": "Top Sellers"
+    "defaultMessage": "Ledende selgere"
   },
   "field.password.assistive_msg.hide_password": {
-    "defaultMessage": "Hide password"
+    "defaultMessage": "Skjul passord"
   },
   "field.password.assistive_msg.show_password": {
-    "defaultMessage": "Show password"
+    "defaultMessage": "Vis passord"
   },
   "footer.column.account": {
-    "defaultMessage": "Account"
+    "defaultMessage": "Konto"
   },
   "footer.column.customer_support": {
-    "defaultMessage": "Customer Support"
+    "defaultMessage": "Kundestøtte"
   },
   "footer.column.our_company": {
-    "defaultMessage": "Our Company"
+    "defaultMessage": "Selskapet vårt"
   },
   "footer.link.about_us": {
-    "defaultMessage": "About Us"
+    "defaultMessage": "Om oss"
   },
   "footer.link.contact_us": {
-    "defaultMessage": "Contact Us"
+    "defaultMessage": "Kontakt oss"
   },
   "footer.link.order_status": {
-    "defaultMessage": "Order Status"
+    "defaultMessage": "Ordrestatus"
   },
   "footer.link.privacy_policy": {
-    "defaultMessage": "Privacy Policy"
+    "defaultMessage": "Retningslinjer for personvern"
   },
   "footer.link.shipping": {
-    "defaultMessage": "Shipping"
+    "defaultMessage": "Frakt"
   },
   "footer.link.signin_create_account": {
-    "defaultMessage": "Sign in or create account"
+    "defaultMessage": "Logg inn eller opprett konto"
   },
   "footer.link.site_map": {
-    "defaultMessage": "Site Map"
+    "defaultMessage": "Nettstedskart"
   },
   "footer.link.store_locator": {
-    "defaultMessage": "Store Locator"
+    "defaultMessage": "Butikkfinner"
   },
   "footer.link.terms_conditions": {
-    "defaultMessage": "Terms & Conditions"
-  },
-  "footer.locale_selector.assistive_msg": {
-    "defaultMessage": "Select Language"
+    "defaultMessage": "Vilkår og betingelser"
   },
   "footer.message.copyright": {
-    "defaultMessage": "Salesforce or its affiliates. All rights reserved. This is a demo store only. Orders made WILL NOT be processed."
+    "defaultMessage": "Salesforce eller dets tilknyttede selskaper. Alle rettigheter forbeholdt. Denne butikken er kun for demonstrasjonsformål. Ordrer som legges inn, vil IKKE bli behandlet."
   },
   "footer.subscribe.button.sign_up": {
-    "defaultMessage": "Sign Up"
+    "defaultMessage": "Registrer deg"
   },
   "footer.subscribe.description.sign_up": {
-    "defaultMessage": "Sign up to stay in the loop about the hottest deals"
-  },
-  "footer.subscribe.email.assistive_msg": {
-    "defaultMessage": "Email address for newsletter"
+    "defaultMessage": "Registrer deg for å holde deg oppdatert om de beste tilbudene"
   },
   "footer.subscribe.heading.first_to_know": {
-    "defaultMessage": "Be the first to know"
+    "defaultMessage": "Bli den første som får vite det"
   },
   "form_action_buttons.button.cancel": {
-    "defaultMessage": "Cancel"
+    "defaultMessage": "Avbryt"
   },
   "form_action_buttons.button.save": {
-    "defaultMessage": "Save"
+    "defaultMessage": "Lagre"
   },
   "global.account.link.account_details": {
-    "defaultMessage": "Account Details"
+    "defaultMessage": "Kontoopplysninger"
   },
   "global.account.link.addresses": {
-    "defaultMessage": "Addresses"
+    "defaultMessage": "Adresser"
   },
   "global.account.link.order_history": {
-    "defaultMessage": "Order History"
+    "defaultMessage": "Ordrehistorikk"
   },
   "global.account.link.wishlist": {
-    "defaultMessage": "Wishlist"
-  },
-  "global.error.create_account": {
-    "defaultMessage": "This feature is not currently available. You must create an account to access this feature."
-  },
-  "global.error.feature_unavailable": {
-    "defaultMessage": "This feature is not currently available."
-  },
-  "global.error.invalid_token": {
-    "defaultMessage": "Invalid token, please try again."
+    "defaultMessage": "Ønskeliste"
   },
   "global.error.something_went_wrong": {
-    "defaultMessage": "Something went wrong. Try again!"
+    "defaultMessage": "Noe gikk galt. Prøv igjen."
   },
   "global.info.added_to_wishlist": {
-    "defaultMessage": "{quantity} {quantity, plural, one {item} other {items}} added to wishlist"
+    "defaultMessage": "{quantity} {quantity, plural, one {artikkel} other {artikler}} lagt til på ønskeliste"
   },
   "global.info.already_in_wishlist": {
-    "defaultMessage": "Item is already in wishlist"
+    "defaultMessage": "Artikkel er allerede på ønskeliste"
   },
   "global.info.removed_from_wishlist": {
-    "defaultMessage": "Item removed from wishlist"
+    "defaultMessage": "Artikkel fjernet fra ønskeliste"
   },
   "global.link.added_to_wishlist.view_wishlist": {
-    "defaultMessage": "View"
+    "defaultMessage": "Visning"
   },
   "header.button.assistive_msg.logo": {
     "defaultMessage": "Logo"
   },
   "header.button.assistive_msg.menu": {
-    "defaultMessage": "Menu"
+    "defaultMessage": "Meny"
   },
   "header.button.assistive_msg.menu.open_dialog": {
-    "defaultMessage": "Opens a dialog"
+    "defaultMessage": "Åpner en dialogboks"
   },
   "header.button.assistive_msg.my_account": {
-    "defaultMessage": "My Account"
+    "defaultMessage": "Min konto"
   },
   "header.button.assistive_msg.my_account_menu": {
-    "defaultMessage": "Open account menu"
+    "defaultMessage": "Åpne kontomeny"
   },
   "header.button.assistive_msg.my_cart_with_num_items": {
-    "defaultMessage": "My cart, number of items: {numItems}"
+    "defaultMessage": "Min kurv, antall artikler: {numItems}"
   },
   "header.button.assistive_msg.store_locator": {
-    "defaultMessage": "Store Locator"
+    "defaultMessage": "Butikkfinner"
   },
   "header.button.assistive_msg.wishlist": {
-    "defaultMessage": "Wishlist"
+    "defaultMessage": "Ønskeliste"
   },
   "header.field.placeholder.search_for_products": {
-    "defaultMessage": "Search for products..."
+    "defaultMessage": "Søk etter produkter ..."
   },
   "header.popover.action.log_out": {
-    "defaultMessage": "Log out"
+    "defaultMessage": "Logg ut"
   },
   "header.popover.title.my_account": {
-    "defaultMessage": "My Account"
+    "defaultMessage": "Min konto"
   },
   "home.description.features": {
-    "defaultMessage": "Out-of-the-box features so that you focus only on adding enhancements."
+    "defaultMessage": "Ferdigutviklede funksjoner gjør at du kan fokusere kun på å legge til forbedringer."
   },
   "home.description.here_to_help": {
-    "defaultMessage": "Contact our support staff."
+    "defaultMessage": "Ta kontakt med kundestøtte."
   },
   "home.description.here_to_help_line_2": {
-    "defaultMessage": "They will get you to the right place."
+    "defaultMessage": "De vil hjelpe deg videre."
   },
   "home.description.shop_products": {
-    "defaultMessage": "This section contains content from the catalog. {docLink} on how to replace it.",
+    "defaultMessage": "Denne delen inneholder innhold fra katalogen. {docLink} om hvordan du endrer det.",
     "description": "{docLink} is a html button that links the user to https://sfdc.co/business-manager-manage-catalogs"
   },
   "home.features.description.cart_checkout": {
-    "defaultMessage": "Ecommerce best practice for a shopper's cart and checkout experience."
+    "defaultMessage": "Beste praksis for e-handel for kundens opplevelse av kurv og betaling."
   },
   "home.features.description.components": {
-    "defaultMessage": "Built using Chakra UI, a simple, modular and accessible React component library."
+    "defaultMessage": "Bygget ved hjelp av Chakra-brukergrensesnitt, et enkelt, modulært og tilgjengelig React-komponentbibliotek."
   },
   "home.features.description.einstein_recommendations": {
-    "defaultMessage": "Deliver the next best product or offer to every shopper through product recommendations."
+    "defaultMessage": "Tilby hver kunde det kommende beste produktet eller tilbudet ved bruk av produktanbefalinger."
   },
   "home.features.description.my_account": {
-    "defaultMessage": "Shoppers can manage account information such as their profile, addresses, payments and orders."
+    "defaultMessage": "Kunder kan administrere kontoinformasjon som profil, adresser, betalinger og ordrer."
   },
   "home.features.description.shopper_login": {
-    "defaultMessage": "Enable shoppers to easily log in with a more personalized shopping experience."
+    "defaultMessage": "Gjør det enkelt for kundene å logge inn med en mer individuelt tilpasset shoppingopplevelse."
   },
   "home.features.description.wishlist": {
-    "defaultMessage": "Registered shoppers can add product items to their wishlist from purchasing later."
+    "defaultMessage": "Registrerte kunder kan legge til produkter på ønskelisten sin for senere kjøp."
   },
   "home.features.heading.cart_checkout": {
-    "defaultMessage": "Cart & Checkout"
+    "defaultMessage": "Kurv og betaling"
   },
   "home.features.heading.components": {
-    "defaultMessage": "Components & Design Kit"
+    "defaultMessage": "Komponenter og designsett"
   },
   "home.features.heading.einstein_recommendations": {
-    "defaultMessage": "Einstein Recommendations"
+    "defaultMessage": "Einstein-anbefalinger"
   },
   "home.features.heading.my_account": {
-    "defaultMessage": "My Account"
+    "defaultMessage": "Min konto"
   },
   "home.features.heading.shopper_login": {
-    "defaultMessage": "Shopper Login and API Access Service"
+    "defaultMessage": "Kundepålogging og API-tilgangstjeneste"
   },
   "home.features.heading.wishlist": {
-    "defaultMessage": "Wishlist"
+    "defaultMessage": "Ønskeliste"
   },
   "home.heading.features": {
-    "defaultMessage": "Features"
+    "defaultMessage": "Funksjoner"
   },
   "home.heading.here_to_help": {
-    "defaultMessage": "We're here to help"
+    "defaultMessage": "Vi er her for å hjelpe"
   },
   "home.heading.shop_products": {
-    "defaultMessage": "Shop Products"
+    "defaultMessage": "Shop produkter"
   },
   "home.hero_features.link.design_kit": {
-    "defaultMessage": "Create with the Figma PWA Design Kit"
+    "defaultMessage": "Opprett med Figma PWA-designsett"
   },
   "home.hero_features.link.on_github": {
-    "defaultMessage": "Download on Github"
+    "defaultMessage": "Last ned på Github"
   },
   "home.hero_features.link.on_managed_runtime": {
-    "defaultMessage": "Deploy on Managed Runtime"
+    "defaultMessage": "Distribuer på Managed Runtime"
   },
   "home.link.contact_us": {
-    "defaultMessage": "Contact Us"
+    "defaultMessage": "Kontakt oss"
   },
   "home.link.get_started": {
-    "defaultMessage": "Get started"
+    "defaultMessage": "Kom i gang"
   },
   "home.link.read_docs": {
-    "defaultMessage": "Read docs"
+    "defaultMessage": "Les dokumentasjonen"
   },
   "home.title.react_starter_store": {
-    "defaultMessage": "The React PWA Starter Store for Retail"
+    "defaultMessage": "React PWA-startbutikk for handel"
   },
   "icons.assistive_msg.lock": {
-    "defaultMessage": "Secure"
-  },
-  "item_attributes.label.is_bonus_product": {
-    "defaultMessage": "Bonus Product"
+    "defaultMessage": "Sikker"
   },
   "item_attributes.label.promotions": {
-    "defaultMessage": "Promotions"
+    "defaultMessage": "Kampanjer"
   },
   "item_attributes.label.quantity": {
-    "defaultMessage": "Quantity: {quantity}"
+    "defaultMessage": "Antall: {quantity}"
   },
   "item_attributes.label.selected_options": {
-    "defaultMessage": "Selected Options"
+    "defaultMessage": "Valgte alternativer"
   },
   "item_image.label.sale": {
-    "defaultMessage": "Sale",
+    "defaultMessage": "Salg",
     "description": "A sale badge placed on top of a product image"
   },
   "item_image.label.unavailable": {
-    "defaultMessage": "Unavailable",
+    "defaultMessage": "Ikke tilgjengelig",
     "description": "A unavailable badge placed on top of a product image"
   },
   "item_variant.assistive_msg.quantity": {
-    "defaultMessage": "Quantity {quantity}"
+    "defaultMessage": "Antall {quantity}"
   },
   "item_variant.quantity.label": {
-    "defaultMessage": "Quantity selector for {productName}. Selected quantity is {quantity}"
+    "defaultMessage": "Antall-velger for {productName}. Valgt antall er {quantity}"
   },
   "lCPCxk": {
-    "defaultMessage": "Please select all your options above"
+    "defaultMessage": "Velg alle alternativene dine ovenfor"
   },
   "list_menu.nav.assistive_msg": {
-    "defaultMessage": "Main navigation"
+    "defaultMessage": "Hovednavigasjon"
   },
   "locale_text.message.ar-SA": {
-    "defaultMessage": "Arabic (Saudi Arabia)"
+    "defaultMessage": "Arabisk (Saudi-Arabia)"
   },
   "locale_text.message.bn-BD": {
-    "defaultMessage": "Bangla (Bangladesh)"
+    "defaultMessage": "Bengali (Bangladesh)"
   },
   "locale_text.message.bn-IN": {
-    "defaultMessage": "Bangla (India)"
+    "defaultMessage": "Bengali (India)"
   },
   "locale_text.message.cs-CZ": {
-    "defaultMessage": "Czech (Czech Republic)"
+    "defaultMessage": "Tsjekkisk (Tsjekkia)"
   },
   "locale_text.message.da-DK": {
-    "defaultMessage": "Danish (Denmark)"
+    "defaultMessage": "Dansk (Danmark)"
   },
   "locale_text.message.de-AT": {
-    "defaultMessage": "German (Austria)"
+    "defaultMessage": "Tysk (Østerrike)"
   },
   "locale_text.message.de-CH": {
-    "defaultMessage": "German (Switzerland)"
+    "defaultMessage": "Tysk (Sveits)"
   },
   "locale_text.message.de-DE": {
-    "defaultMessage": "German (Germany)"
+    "defaultMessage": "Tysk (Tyskland)"
   },
   "locale_text.message.el-GR": {
-    "defaultMessage": "Greek (Greece)"
+    "defaultMessage": "Gresk (Hellas)"
   },
   "locale_text.message.en-AU": {
-    "defaultMessage": "English (Australia)"
+    "defaultMessage": "Engelsk (Australia)"
   },
   "locale_text.message.en-CA": {
-    "defaultMessage": "English (Canada)"
+    "defaultMessage": "Engelsk (Canada)"
   },
   "locale_text.message.en-GB": {
-    "defaultMessage": "English (United Kingdom)"
+    "defaultMessage": "Engelsk (Storbritannia)"
   },
   "locale_text.message.en-IE": {
-    "defaultMessage": "English (Ireland)"
+    "defaultMessage": "Engelsk (Irland)"
   },
   "locale_text.message.en-IN": {
-    "defaultMessage": "English (India)"
+    "defaultMessage": "Engelsk (India)"
   },
   "locale_text.message.en-NZ": {
-    "defaultMessage": "English (New Zealand)"
+    "defaultMessage": "Engelsk (New Zealand)"
   },
   "locale_text.message.en-US": {
-    "defaultMessage": "English (United States)"
+    "defaultMessage": "Engelsk (USA)"
   },
   "locale_text.message.en-ZA": {
-    "defaultMessage": "English (South Africa)"
+    "defaultMessage": "Engelsk (Sør-Afrika)"
   },
   "locale_text.message.es-AR": {
-    "defaultMessage": "Spanish (Argentina)"
+    "defaultMessage": "Spansk (Argentina)"
   },
   "locale_text.message.es-CL": {
-    "defaultMessage": "Spanish (Chile)"
+    "defaultMessage": "Spansk (Chile)"
   },
   "locale_text.message.es-CO": {
-    "defaultMessage": "Spanish (Columbia)"
+    "defaultMessage": "Spansk (Colombia)"
   },
   "locale_text.message.es-ES": {
-    "defaultMessage": "Spanish (Spain)"
+    "defaultMessage": "Spansk (Spania)"
   },
   "locale_text.message.es-MX": {
-    "defaultMessage": "Spanish (Mexico)"
+    "defaultMessage": "Spansk (Mexico)"
   },
   "locale_text.message.es-US": {
-    "defaultMessage": "Spanish (United States)"
+    "defaultMessage": "Spansk (USA)"
   },
   "locale_text.message.fi-FI": {
-    "defaultMessage": "Finnish (Finland)"
+    "defaultMessage": "Finsk (Finland)"
   },
   "locale_text.message.fr-BE": {
-    "defaultMessage": "French (Belgium)"
+    "defaultMessage": "Fransk (Belgia)"
   },
   "locale_text.message.fr-CA": {
-    "defaultMessage": "French (Canada)"
+    "defaultMessage": "Fransk (Canada)"
   },
   "locale_text.message.fr-CH": {
-    "defaultMessage": "French (Switzerland)"
+    "defaultMessage": "Fransk (Sveits)"
   },
   "locale_text.message.fr-FR": {
-    "defaultMessage": "French (France)"
+    "defaultMessage": "Fransk (Frankrike)"
   },
   "locale_text.message.he-IL": {
-    "defaultMessage": "Hebrew (Israel)"
+    "defaultMessage": "Hebraisk (Israel)"
   },
   "locale_text.message.hi-IN": {
     "defaultMessage": "Hindi (India)"
   },
   "locale_text.message.hu-HU": {
-    "defaultMessage": "Hungarian (Hungary)"
+    "defaultMessage": "Ungarsk (Ungarn)"
   },
   "locale_text.message.id-ID": {
-    "defaultMessage": "Indonesian (Indonesia)"
+    "defaultMessage": "Indonesisk (Indonesia)"
   },
   "locale_text.message.it-CH": {
-    "defaultMessage": "Italian (Switzerland)"
+    "defaultMessage": "Italiensk (Sveits)"
   },
   "locale_text.message.it-IT": {
-    "defaultMessage": "Italian (Italy)"
+    "defaultMessage": "Italiensk (Italia)"
   },
   "locale_text.message.ja-JP": {
-    "defaultMessage": "Japanese (Japan)"
+    "defaultMessage": "Japansk (Japan)"
   },
   "locale_text.message.ko-KR": {
-    "defaultMessage": "Korean (Republic of Korea)"
+    "defaultMessage": "Koreansk (Sør-Korea)"
   },
   "locale_text.message.nl-BE": {
-    "defaultMessage": "Dutch (Belgium)"
+    "defaultMessage": "Nederlandsk (Belgia)"
   },
   "locale_text.message.nl-NL": {
-    "defaultMessage": "Dutch (The Netherlands)"
+    "defaultMessage": "Nederlandsk (Nederland)"
   },
   "locale_text.message.no-NO": {
-    "defaultMessage": "Norwegian (Norway)"
+    "defaultMessage": "Norsk (Norge)"
   },
   "locale_text.message.pl-PL": {
-    "defaultMessage": "Polish (Poland)"
+    "defaultMessage": "Polsk (Polen)"
   },
   "locale_text.message.pt-BR": {
-    "defaultMessage": "Portuguese (Brazil)"
+    "defaultMessage": "Portugisisk (Brasil)"
   },
   "locale_text.message.pt-PT": {
-    "defaultMessage": "Portuguese (Portugal)"
+    "defaultMessage": "Portugisisk (Portugal)"
   },
   "locale_text.message.ro-RO": {
-    "defaultMessage": "Romanian (Romania)"
+    "defaultMessage": "Rumensk (Romania)"
   },
   "locale_text.message.ru-RU": {
-    "defaultMessage": "Russian (Russian Federation)"
+    "defaultMessage": "Russisk (Russland)"
   },
   "locale_text.message.sk-SK": {
-    "defaultMessage": "Slovak (Slovakia)"
+    "defaultMessage": "Slovakisk (Slovakia)"
   },
   "locale_text.message.sv-SE": {
-    "defaultMessage": "Swedish (Sweden)"
+    "defaultMessage": "Svensk (Sverige)"
   },
   "locale_text.message.ta-IN": {
     "defaultMessage": "Tamil (India)"
@@ -976,281 +913,251 @@
     "defaultMessage": "Thai (Thailand)"
   },
   "locale_text.message.tr-TR": {
-    "defaultMessage": "Turkish (Turkey)"
+    "defaultMessage": "Tyrkisk (Tyrkia)"
   },
   "locale_text.message.zh-CN": {
-    "defaultMessage": "Chinese (China)"
+    "defaultMessage": "Kinesisk (Kina)"
   },
   "locale_text.message.zh-HK": {
-    "defaultMessage": "Chinese (Hong Kong)"
+    "defaultMessage": "Kinesisk (Hong Kong)"
   },
   "locale_text.message.zh-TW": {
-    "defaultMessage": "Chinese (Taiwan)"
+    "defaultMessage": "Kinesisk (Taiwan)"
   },
   "login_form.action.create_account": {
-    "defaultMessage": "Create account"
-  },
-  "login_form.button.apple": {
-    "defaultMessage": "Apple"
-  },
-  "login_form.button.back": {
-    "defaultMessage": "Back to Sign In Options"
-  },
-  "login_form.button.continue_securely": {
-    "defaultMessage": "Continue Securely"
-  },
-  "login_form.button.google": {
-    "defaultMessage": "Google"
-  },
-  "login_form.button.password": {
-    "defaultMessage": "Password"
+    "defaultMessage": "Opprett konto"
   },
   "login_form.button.sign_in": {
-    "defaultMessage": "Sign In"
+    "defaultMessage": "Logg inn"
   },
   "login_form.link.forgot_password": {
-    "defaultMessage": "Forgot password?"
+    "defaultMessage": "Glemt passordet?"
   },
   "login_form.message.dont_have_account": {
-    "defaultMessage": "Don't have an account?"
-  },
-  "login_form.message.or_login_with": {
-    "defaultMessage": "Or Login With"
+    "defaultMessage": "Har du ikke en konto?"
   },
   "login_form.message.welcome_back": {
-    "defaultMessage": "Welcome Back"
+    "defaultMessage": "Velkommen tilbake"
   },
   "login_page.error.incorrect_username_or_password": {
-    "defaultMessage": "Incorrect username or password, please try again."
+    "defaultMessage": "Feil brukernavn eller passord, vennligst prøv igjen."
   },
   "offline_banner.description.browsing_offline_mode": {
-    "defaultMessage": "You're currently browsing in offline mode"
+    "defaultMessage": "Du er for øyeblikket i frakoblet modus"
   },
   "order_summary.action.remove_promo": {
-    "defaultMessage": "Remove"
+    "defaultMessage": "Fjern"
   },
   "order_summary.cart_items.action.num_of_items_in_cart": {
-    "defaultMessage": "{itemCount, plural, =0 {0 items} one {# item} other {# items}} in cart",
+    "defaultMessage": "{itemCount, plural, =0 {0 artikler} one {# artikkel} other {# artikler}} i kurv",
     "description": "clicking it would expand/show the items in cart"
   },
   "order_summary.cart_items.link.edit_cart": {
-    "defaultMessage": "Edit cart"
+    "defaultMessage": "Rediger kurv"
   },
   "order_summary.heading.order_summary": {
-    "defaultMessage": "Order Summary"
+    "defaultMessage": "Ordresammendrag"
   },
   "order_summary.label.estimated_total": {
-    "defaultMessage": "Estimated Total"
+    "defaultMessage": "Estimert total"
   },
   "order_summary.label.free": {
-    "defaultMessage": "Free"
+    "defaultMessage": "Gratis"
   },
   "order_summary.label.order_total": {
-    "defaultMessage": "Order Total"
+    "defaultMessage": "Ordre totalt"
   },
   "order_summary.label.promo_applied": {
-    "defaultMessage": "Promotion applied"
+    "defaultMessage": "Kampanje tatt i bruk"
   },
   "order_summary.label.promotions_applied": {
-    "defaultMessage": "Promotions applied"
+    "defaultMessage": "Kampanjer tatt i bruk"
   },
   "order_summary.label.shipping": {
-    "defaultMessage": "Shipping"
+    "defaultMessage": "Frakt"
   },
   "order_summary.label.subtotal": {
-    "defaultMessage": "Subtotal"
+    "defaultMessage": "Delsum"
   },
   "order_summary.label.tax": {
-    "defaultMessage": "Tax"
+    "defaultMessage": "Avgift"
   },
   "page_not_found.action.go_back": {
-    "defaultMessage": "Back to previous page"
+    "defaultMessage": "Tilbake til forrige side"
   },
   "page_not_found.link.homepage": {
-    "defaultMessage": "Go to home page"
+    "defaultMessage": "Gå til hjemmesiden"
   },
   "page_not_found.message.suggestion_to_try": {
-    "defaultMessage": "Please try retyping the address, going back to the previous page, or going to the home page."
+    "defaultMessage": "Prøv å skrive inn adressen på nytt, gå tilbake til forrige side eller gå til hjemmesiden."
   },
   "page_not_found.title.page_cant_be_found": {
-    "defaultMessage": "The page you're looking for can't be found."
+    "defaultMessage": "Vi finner ikke siden du leter etter."
   },
   "pagination.field.num_of_pages": {
-    "defaultMessage": "of {numOfPages}"
-  },
-  "pagination.field.page_number_select": {
-    "defaultMessage": "Select page number"
+    "defaultMessage": "av {numOfPages}"
   },
   "pagination.link.next": {
-    "defaultMessage": "Next"
+    "defaultMessage": "Neste"
   },
   "pagination.link.next.assistive_msg": {
-    "defaultMessage": "Next Page"
+    "defaultMessage": "Neste side"
   },
   "pagination.link.prev": {
-    "defaultMessage": "Prev"
+    "defaultMessage": "Forrige"
   },
   "pagination.link.prev.assistive_msg": {
-    "defaultMessage": "Previous Page"
+    "defaultMessage": "Forrige side"
   },
   "password_card.info.password_updated": {
-    "defaultMessage": "Password updated"
+    "defaultMessage": "Passord oppdatert"
   },
   "password_card.label.password": {
-    "defaultMessage": "Password"
+    "defaultMessage": "Passord"
   },
   "password_card.title.password": {
-    "defaultMessage": "Password"
+    "defaultMessage": "Passord"
   },
   "password_requirements.error.eight_letter_minimum": {
-    "defaultMessage": "8 characters minimum",
+    "defaultMessage": "minimum 8 tegn",
     "description": "Password requirement"
   },
   "password_requirements.error.one_lowercase_letter": {
-    "defaultMessage": "1 lowercase letter",
+    "defaultMessage": "1 liten bokstav",
     "description": "Password requirement"
   },
   "password_requirements.error.one_number": {
-    "defaultMessage": "1 number",
+    "defaultMessage": "1 tall",
     "description": "Password requirement"
   },
   "password_requirements.error.one_special_character": {
-    "defaultMessage": "1 special character (example: , S ! % #)",
+    "defaultMessage": "1 spesialtegn (for eksempel: , S ! % #)",
     "description": "Password requirement"
   },
   "password_requirements.error.one_uppercase_letter": {
-    "defaultMessage": "1 uppercase letter",
+    "defaultMessage": "1 stor bokstav",
     "description": "Password requirement"
   },
-  "password_reset_success.toast": {
-    "defaultMessage": "Password Reset Success"
-  },
   "payment_selection.heading.credit_card": {
-    "defaultMessage": "Credit Card"
-  },
-  "payment_selection.radio_group.assistive_msg": {
-    "defaultMessage": "Payment"
+    "defaultMessage": "Kredittkort"
   },
   "payment_selection.tooltip.secure_payment": {
-    "defaultMessage": "This is a secure SSL encrypted payment."
+    "defaultMessage": "Dette er en sikker SSL-kryptert betaling."
   },
   "price_per_item.label.each": {
-    "defaultMessage": "ea",
+    "defaultMessage": "stk.",
     "description": "Abbreviated 'each', follows price per item, like $10/ea"
   },
   "product_detail.accordion.button.product_detail": {
-    "defaultMessage": "Product Detail"
+    "defaultMessage": "Produktdetaljer"
   },
   "product_detail.accordion.button.questions": {
-    "defaultMessage": "Questions"
+    "defaultMessage": "Spørsmål"
   },
   "product_detail.accordion.button.reviews": {
-    "defaultMessage": "Reviews"
+    "defaultMessage": "Omtaler"
   },
   "product_detail.accordion.button.size_fit": {
-    "defaultMessage": "Size & Fit"
+    "defaultMessage": "Størrelse og passform"
   },
   "product_detail.accordion.message.coming_soon": {
-    "defaultMessage": "Coming Soon"
+    "defaultMessage": "Kommer snart"
   },
   "product_detail.recommended_products.title.complete_set": {
-    "defaultMessage": "Complete the Set"
+    "defaultMessage": "Fullfør settet"
   },
   "product_detail.recommended_products.title.might_also_like": {
-    "defaultMessage": "You might also like"
+    "defaultMessage": "Du vil kanskje også like"
   },
   "product_detail.recommended_products.title.recently_viewed": {
-    "defaultMessage": "Recently Viewed"
+    "defaultMessage": "Nylig vist"
   },
   "product_item.label.quantity": {
-    "defaultMessage": "Quantity:"
+    "defaultMessage": "Antall:"
   },
   "product_list.button.filter": {
     "defaultMessage": "Filter"
   },
   "product_list.button.sort_by": {
-    "defaultMessage": "Sort By: {sortOption}"
+    "defaultMessage": "Sorter etter: {sortOption}"
   },
   "product_list.drawer.title.sort_by": {
-    "defaultMessage": "Sort By"
+    "defaultMessage": "Sorter etter"
   },
   "product_list.modal.button.clear_filters": {
-    "defaultMessage": "Clear Filters"
+    "defaultMessage": "Tøm filtre"
   },
   "product_list.modal.button.view_items": {
-    "defaultMessage": "View {prroductCount} items"
+    "defaultMessage": "Vis {prroductCount} artikler"
   },
   "product_list.modal.title.filter": {
     "defaultMessage": "Filter"
   },
   "product_list.refinements.button.assistive_msg.add_filter": {
-    "defaultMessage": "Add filter: {label}"
+    "defaultMessage": "Legg til filter: {label}"
   },
   "product_list.refinements.button.assistive_msg.add_filter_with_hit_count": {
-    "defaultMessage": "Add filter: {label} ({hitCount})"
+    "defaultMessage": "Legg til filter: {label} ({hitCount})"
   },
   "product_list.refinements.button.assistive_msg.remove_filter": {
-    "defaultMessage": "Remove filter: {label}"
+    "defaultMessage": "Fjern filter: {label}"
   },
   "product_list.refinements.button.assistive_msg.remove_filter_with_hit_count": {
-    "defaultMessage": "Remove filter: {label} ({hitCount})"
+    "defaultMessage": "Fjern filter: {label} ({hitCount})"
   },
   "product_list.select.sort_by": {
-    "defaultMessage": "Sort By: {sortOption}"
-  },
-  "product_list.sort_by.label.assistive_msg": {
-    "defaultMessage": "Sort products by"
+    "defaultMessage": "Sorter etter: {sortOption}"
   },
   "product_scroller.assistive_msg.scroll_left": {
-    "defaultMessage": "Scroll products left"
+    "defaultMessage": "Bla produkter til venstre"
   },
   "product_scroller.assistive_msg.scroll_right": {
-    "defaultMessage": "Scroll products right"
+    "defaultMessage": "Bla produkter til høyre"
   },
   "product_tile.assistive_msg.add_to_wishlist": {
-    "defaultMessage": "Add {product} to wishlist"
+    "defaultMessage": "Legg til {product} på ønskeliste"
   },
   "product_tile.assistive_msg.remove_from_wishlist": {
-    "defaultMessage": "Remove {product} from wishlist"
+    "defaultMessage": "Fjern {product} fra ønskeliste"
   },
   "product_tile.badge.label.new": {
-    "defaultMessage": "New"
+    "defaultMessage": "Ny"
   },
   "product_tile.badge.label.sale": {
-    "defaultMessage": "Sale"
+    "defaultMessage": "Salg"
   },
   "product_view.button.add_bundle_to_cart": {
-    "defaultMessage": "Add Bundle to Cart"
+    "defaultMessage": "Legg til pakke i kurv"
   },
   "product_view.button.add_bundle_to_wishlist": {
-    "defaultMessage": "Add Bundle to Wishlist"
+    "defaultMessage": "Legg til pakke på ønskeliste"
   },
   "product_view.button.add_set_to_cart": {
-    "defaultMessage": "Add Set to Cart"
+    "defaultMessage": "Legg til sett i kurv"
   },
   "product_view.button.add_set_to_wishlist": {
-    "defaultMessage": "Add Set to Wishlist"
+    "defaultMessage": "Legg til sett på ønskeliste"
   },
   "product_view.button.add_to_cart": {
-    "defaultMessage": "Add to Cart"
+    "defaultMessage": "Legg til i kurv"
   },
   "product_view.button.add_to_wishlist": {
-    "defaultMessage": "Add to Wishlist"
+    "defaultMessage": "Legg til på ønskeliste"
   },
   "product_view.button.update": {
-    "defaultMessage": "Update"
+    "defaultMessage": "Oppdater"
   },
   "product_view.label.assistive_msg.quantity_decrement": {
-    "defaultMessage": "Decrement Quantity for {productName}"
+    "defaultMessage": "Reduser antall for {productName}"
   },
   "product_view.label.assistive_msg.quantity_increment": {
-    "defaultMessage": "Increment Quantity for {productName}"
+    "defaultMessage": "Øk antall for {productName}"
   },
   "product_view.label.quantity": {
-    "defaultMessage": "Quantity"
+    "defaultMessage": "Antall"
   },
   "product_view.label.quantity_decrement": {
-    "defaultMessage": "−"
+    "defaultMessage": "-"
   },
   "product_view.label.quantity_increment": {
     "defaultMessage": "+"
@@ -1259,525 +1166,516 @@
     "defaultMessage": "{variantType}"
   },
   "product_view.link.full_details": {
-    "defaultMessage": "See full details"
+    "defaultMessage": "Vis alle detaljer"
   },
   "profile_card.info.profile_updated": {
-    "defaultMessage": "Profile updated"
+    "defaultMessage": "Profilen er oppdatert"
   },
   "profile_card.label.email": {
-    "defaultMessage": "Email"
+    "defaultMessage": "E-post"
   },
   "profile_card.label.full_name": {
-    "defaultMessage": "Full Name"
+    "defaultMessage": "Fullt navn"
   },
   "profile_card.label.phone": {
-    "defaultMessage": "Phone Number"
+    "defaultMessage": "Telefonnummer"
   },
   "profile_card.message.not_provided": {
-    "defaultMessage": "Not provided"
+    "defaultMessage": "Ikke oppgitt"
   },
   "profile_card.title.my_profile": {
-    "defaultMessage": "My Profile"
-  },
-  "profile_fields.label.profile_form": {
-    "defaultMessage": "Profile Form"
+    "defaultMessage": "Min profil"
   },
   "promo_code_fields.button.apply": {
-    "defaultMessage": "Apply"
+    "defaultMessage": "Bruk"
   },
   "promo_popover.assistive_msg.info": {
     "defaultMessage": "Info"
   },
   "promo_popover.heading.promo_applied": {
-    "defaultMessage": "Promotions Applied"
+    "defaultMessage": "Kampanjer tatt i bruk"
   },
   "promocode.accordion.button.have_promocode": {
-    "defaultMessage": "Do you have a promo code?"
+    "defaultMessage": "Har du en kampanjekode?"
   },
   "recent_searches.action.clear_searches": {
-    "defaultMessage": "Clear recent searches"
+    "defaultMessage": "Tøm nylige søk"
   },
   "recent_searches.heading.recent_searches": {
-    "defaultMessage": "Recent Searches"
+    "defaultMessage": "Nylige søk"
   },
   "register_form.action.sign_in": {
-    "defaultMessage": "Sign in"
+    "defaultMessage": "Logg inn"
   },
   "register_form.button.create_account": {
-    "defaultMessage": "Create Account"
+    "defaultMessage": "Opprett konto"
   },
   "register_form.heading.lets_get_started": {
-    "defaultMessage": "Let's get started!"
+    "defaultMessage": "La oss komme i gang!"
   },
   "register_form.message.agree_to_policy_terms": {
-    "defaultMessage": "By creating an account, you agree to Salesforce <policy>Privacy Policy</policy> and <terms>Terms & Conditions</terms>"
+    "defaultMessage": "Ved å opprette en konto godtar du Salesforce sine <policy>Retningslinjer for personvern</policy> og <terms>Vilkår og betingelser</terms>"
   },
   "register_form.message.already_have_account": {
-    "defaultMessage": "Already have an account?"
+    "defaultMessage": "Har du allerede en konto?"
   },
   "register_form.message.create_an_account": {
-    "defaultMessage": "Create an account and get first access to the very best products, inspiration and community."
+    "defaultMessage": "Opprett en konto og få tidlig tilgang til det aller beste innen produkter, inspirasjon og fellesskap."
+  },
+  "reset_password.button.back_to_sign_in": {
+    "defaultMessage": "Tilbake til pålogging"
+  },
+  "reset_password.info.receive_email_shortly": {
+    "defaultMessage": "Du vil om kort tid motta en e-post på <b>{email}</b> med en lenke for å tilbakestille passordet ditt."
+  },
+  "reset_password.title.password_reset": {
+    "defaultMessage": "Tilbakestille passord"
   },
   "reset_password_form.action.sign_in": {
-    "defaultMessage": "Sign in"
+    "defaultMessage": "Logg inn"
   },
   "reset_password_form.button.reset_password": {
-    "defaultMessage": "Reset Password"
+    "defaultMessage": "Tilbakestill passord"
   },
   "reset_password_form.message.enter_your_email": {
-    "defaultMessage": "Enter your email to receive instructions on how to reset your password"
+    "defaultMessage": "Skriv inn e-postadressen din for å motta instruksjoner om hvordan du tilbakestiller passordet ditt"
   },
   "reset_password_form.message.return_to_sign_in": {
-    "defaultMessage": "Or return to",
+    "defaultMessage": "Eller gå tilbake til",
     "description": "Precedes link to return to sign in"
   },
   "reset_password_form.title.reset_password": {
-    "defaultMessage": "Reset Password"
+    "defaultMessage": "Tilbakestill passord"
   },
   "search.action.cancel": {
-    "defaultMessage": "Cancel"
+    "defaultMessage": "Avbryt"
   },
   "selected_refinements.action.assistive_msg.clear_all": {
-    "defaultMessage": "Clear all filters"
+    "defaultMessage": "Tøm alle filtre"
   },
   "selected_refinements.action.clear_all": {
-    "defaultMessage": "Clear All"
+    "defaultMessage": "Tøm alt"
   },
   "shipping_address.button.continue_to_shipping": {
-    "defaultMessage": "Continue to Shipping Method"
+    "defaultMessage": "Fortsett til fraktmetode"
   },
   "shipping_address.label.edit_button": {
-    "defaultMessage": "Edit {address}"
+    "defaultMessage": "Rediger {address}"
   },
   "shipping_address.label.remove_button": {
-    "defaultMessage": "Remove {address}"
+    "defaultMessage": "Fjern {address}"
   },
   "shipping_address.label.shipping_address_form": {
-    "defaultMessage": "Shipping Address Form"
+    "defaultMessage": "Skjema for leveringsadresse"
   },
   "shipping_address.title.shipping_address": {
-    "defaultMessage": "Shipping Address"
+    "defaultMessage": "Leveringsadresse"
   },
   "shipping_address_edit_form.button.save_and_continue": {
-    "defaultMessage": "Save & Continue to Shipping Method"
+    "defaultMessage": "Lagre og fortsett til fraktmetode"
   },
   "shipping_address_form.heading.edit_address": {
-    "defaultMessage": "Edit Address"
+    "defaultMessage": "Rediger adresse"
   },
   "shipping_address_form.heading.new_address": {
-    "defaultMessage": "Add New Address"
+    "defaultMessage": "Legg til ny adresse"
   },
   "shipping_address_selection.button.add_address": {
-    "defaultMessage": "Add New Address"
+    "defaultMessage": "Legg til ny adresse"
   },
   "shipping_address_selection.button.submit": {
-    "defaultMessage": "Submit"
+    "defaultMessage": "Send inn"
   },
   "shipping_address_selection.title.add_address": {
-    "defaultMessage": "Add New Address"
+    "defaultMessage": "Legg til ny adresse"
   },
   "shipping_address_selection.title.edit_shipping": {
-    "defaultMessage": "Edit Shipping Address"
+    "defaultMessage": "Rediger leveringsadresse"
   },
   "shipping_options.action.send_as_a_gift": {
-    "defaultMessage": "Do you want to send this as a gift?"
+    "defaultMessage": "Ønsker du å sende dette som en gave?"
   },
   "shipping_options.button.continue_to_payment": {
-    "defaultMessage": "Continue to Payment"
+    "defaultMessage": "Fortsett til betaling"
   },
   "shipping_options.title.shipping_gift_options": {
-    "defaultMessage": "Shipping & Gift Options"
+    "defaultMessage": "Frakt- og gavealternativer"
   },
   "signout_confirmation_dialog.button.cancel": {
-    "defaultMessage": "Cancel"
+    "defaultMessage": "Avbryt"
   },
   "signout_confirmation_dialog.button.sign_out": {
-    "defaultMessage": "Sign Out"
+    "defaultMessage": "Logg ut"
   },
   "signout_confirmation_dialog.heading.sign_out": {
-    "defaultMessage": "Sign Out"
+    "defaultMessage": "Logg ut"
   },
   "signout_confirmation_dialog.message.sure_to_sign_out": {
-    "defaultMessage": "Are you sure you want to sign out? You will need to sign back in to proceed with your current order."
-  },
-  "social_login_redirect.message.authenticating": {
-    "defaultMessage": "Authenticating..."
-  },
-  "social_login_redirect.message.redirect_link": {
-    "defaultMessage": "If you are not automatically redirected, click <link>this link</link> to proceed."
+    "defaultMessage": "Er du sikker på at du vil logge ut? Du må logge inn igjen for å fortsette med din nåværende ordre."
   },
   "store_locator.action.find": {
-    "defaultMessage": "Find"
+    "defaultMessage": "Finn"
   },
   "store_locator.action.select_a_country": {
-    "defaultMessage": "Select a country"
+    "defaultMessage": "Velg et land"
   },
   "store_locator.action.use_my_location": {
-    "defaultMessage": "Use My Location"
+    "defaultMessage": "Bruk mitt sted"
   },
   "store_locator.action.viewMore": {
-    "defaultMessage": "View More"
+    "defaultMessage": "Vis mer"
   },
   "store_locator.description.away": {
-    "defaultMessage": "away"
+    "defaultMessage": "unna"
   },
   "store_locator.description.loading_locations": {
-    "defaultMessage": "Loading locations..."
+    "defaultMessage": "Laster inn steder ..."
   },
   "store_locator.description.no_locations": {
-    "defaultMessage": "Sorry, there are no locations in this area"
+    "defaultMessage": "Beklager, det finnes ingen steder i dette området"
   },
   "store_locator.description.or": {
-    "defaultMessage": "Or"
+    "defaultMessage": "Eller"
   },
   "store_locator.description.phone": {
-    "defaultMessage": "Phone:"
+    "defaultMessage": "Telefon:"
   },
   "store_locator.description.viewing_near_postal_code": {
-    "defaultMessage": "Viewing stores within {distance}{distanceUnit} of {postalCode} in"
+    "defaultMessage": "Viser butikker innenfor {distance}{distanceUnit} fra {postalCode} i"
   },
   "store_locator.description.viewing_near_your_location": {
-    "defaultMessage": "Viewing stores near your location"
+    "defaultMessage": "Viser butikker i nærheten av stedet der du befinner deg"
   },
   "store_locator.dropdown.germany": {
-    "defaultMessage": "Germany"
+    "defaultMessage": "Tyskland"
   },
   "store_locator.dropdown.united_states": {
-    "defaultMessage": "United States"
+    "defaultMessage": "USA"
   },
   "store_locator.error.agree_to_share_your_location": {
-    "defaultMessage": "Please agree to share your location"
+    "defaultMessage": "Vennligst godta å dele stedet der du befinner deg"
   },
   "store_locator.error.please_enter_a_postal_code": {
-    "defaultMessage": "Please enter a postal code."
+    "defaultMessage": "Oppgi et postnummer."
   },
   "store_locator.error.please_select_a_country": {
-    "defaultMessage": "Please select a country."
+    "defaultMessage": "Velg et land."
   },
   "store_locator.field.placeholder.enter_postal_code": {
-    "defaultMessage": "Enter postal code"
+    "defaultMessage": "Skriv inn postnummer"
   },
   "store_locator.pagination.load_more": {
-    "defaultMessage": "Load More"
+    "defaultMessage": "Last inn mer"
   },
   "store_locator.title": {
-    "defaultMessage": "Find a Store"
+    "defaultMessage": "Finn en butikk"
   },
   "swatch_group.selected.label": {
     "defaultMessage": "{label}:"
   },
   "toggle_card.action.edit": {
-    "defaultMessage": "Edit"
+    "defaultMessage": "Rediger"
   },
   "toggle_card.action.editContactInfo": {
-    "defaultMessage": "Edit Contact Info"
+    "defaultMessage": "Rediger kontaktinformasjon"
   },
   "toggle_card.action.editPaymentInfo": {
-    "defaultMessage": "Edit Payment Info"
+    "defaultMessage": "Rediger betalingsinformasjon"
   },
   "toggle_card.action.editShippingAddress": {
-    "defaultMessage": "Edit Shipping Address"
+    "defaultMessage": "Rediger leveringsadresse"
   },
   "toggle_card.action.editShippingOptions": {
-    "defaultMessage": "Edit Shipping Options"
+    "defaultMessage": "Rediger fraktalternativer"
   },
   "update_password_fields.button.forgot_password": {
-    "defaultMessage": "Forgot Password?"
+    "defaultMessage": "Glemt passordet?"
   },
   "use_address_fields.error.please_enter_first_name": {
-    "defaultMessage": "Please enter your first name."
+    "defaultMessage": "Skriv inn fornavnet ditt."
   },
   "use_address_fields.error.please_enter_last_name": {
-    "defaultMessage": "Please enter your last name."
+    "defaultMessage": "Skriv inn etternavnet ditt."
   },
   "use_address_fields.error.please_enter_phone_number": {
-    "defaultMessage": "Please enter your phone number."
+    "defaultMessage": "Skriv inn telefonnummeret ditt."
   },
   "use_address_fields.error.please_enter_your_postal_or_zip": {
-    "defaultMessage": "Please enter your zip code.",
+    "defaultMessage": "Skriv inn postnummeret ditt.",
     "description": "Error message for a blank zip code (US-specific checkout)"
   },
   "use_address_fields.error.please_select_your_address": {
-    "defaultMessage": "Please enter your address."
+    "defaultMessage": "Skriv inn adressen din."
   },
   "use_address_fields.error.please_select_your_city": {
-    "defaultMessage": "Please enter your city."
+    "defaultMessage": "Skriv inn byen din."
   },
   "use_address_fields.error.please_select_your_country": {
-    "defaultMessage": "Please select your country."
+    "defaultMessage": "Velg landet ditt."
   },
   "use_address_fields.error.please_select_your_state_or_province": {
-    "defaultMessage": "Please select your state.",
+    "defaultMessage": "Velg delstaten din.",
     "description": "Error message for a blank state (US-specific checkout)"
   },
   "use_address_fields.error.required": {
-    "defaultMessage": "Required"
+    "defaultMessage": "Nødvendig"
   },
   "use_address_fields.error.state_code_invalid": {
-    "defaultMessage": "Please enter 2-letter state/province."
+    "defaultMessage": "Skriv inn to bokstaver for delstat/provins."
   },
   "use_address_fields.label.address": {
-    "defaultMessage": "Address"
+    "defaultMessage": "Adresse"
   },
   "use_address_fields.label.address_form": {
-    "defaultMessage": "Address Form"
+    "defaultMessage": "Adresseskjema"
   },
   "use_address_fields.label.city": {
-    "defaultMessage": "City"
+    "defaultMessage": "By"
   },
   "use_address_fields.label.country": {
-    "defaultMessage": "Country"
+    "defaultMessage": "Land"
   },
   "use_address_fields.label.first_name": {
-    "defaultMessage": "First Name"
+    "defaultMessage": "Fornavn"
   },
   "use_address_fields.label.last_name": {
-    "defaultMessage": "Last Name"
+    "defaultMessage": "Etternavn"
   },
   "use_address_fields.label.phone": {
-    "defaultMessage": "Phone"
+    "defaultMessage": "Telefon"
   },
   "use_address_fields.label.postal_code": {
-    "defaultMessage": "Postal Code"
+    "defaultMessage": "Postnummer"
   },
   "use_address_fields.label.preferred": {
-    "defaultMessage": "Set as default"
+    "defaultMessage": "Angi som standard"
   },
   "use_address_fields.label.province": {
-    "defaultMessage": "Province"
+    "defaultMessage": "Provins"
   },
   "use_address_fields.label.state": {
-    "defaultMessage": "State"
+    "defaultMessage": "Status"
   },
   "use_address_fields.label.zipCode": {
-    "defaultMessage": "Zip Code"
+    "defaultMessage": "Postnummer"
   },
   "use_credit_card_fields.error.required": {
-    "defaultMessage": "Required"
+    "defaultMessage": "Nødvendig"
   },
   "use_credit_card_fields.error.required_card_number": {
-    "defaultMessage": "Please enter your card number."
+    "defaultMessage": "Skriv inn kortnummeret ditt."
   },
   "use_credit_card_fields.error.required_expiry": {
-    "defaultMessage": "Please enter your expiration date."
+    "defaultMessage": "Skriv inn utløpsdatoen."
   },
   "use_credit_card_fields.error.required_name": {
-    "defaultMessage": "Please enter your name as shown on your card."
+    "defaultMessage": "Skriv inn navnet ditt slik det er oppført på kortet ditt."
   },
   "use_credit_card_fields.error.required_security_code": {
-    "defaultMessage": "Please enter your security code."
+    "defaultMessage": "Skriv inn sikkerhetskoden."
   },
   "use_credit_card_fields.error.valid_card_number": {
-    "defaultMessage": "Please enter a valid card number."
+    "defaultMessage": "Vennligst skriv inn et gyldig kortnummer."
   },
   "use_credit_card_fields.error.valid_date": {
-    "defaultMessage": "Please enter a valid date."
+    "defaultMessage": "Vennligst skriv inn en gyldig dato."
   },
   "use_credit_card_fields.error.valid_name": {
-    "defaultMessage": "Please enter a valid name."
+    "defaultMessage": "Vennligst skriv inn et gyldig navn."
   },
   "use_credit_card_fields.error.valid_security_code": {
-    "defaultMessage": "Please enter a valid security code."
+    "defaultMessage": "Vennligst skriv inn en gyldig sikkerhetskode."
   },
   "use_credit_card_fields.label.card_number": {
-    "defaultMessage": "Card Number"
+    "defaultMessage": "Kortnummer"
   },
   "use_credit_card_fields.label.card_type": {
-    "defaultMessage": "Card Type"
+    "defaultMessage": "Korttype"
   },
   "use_credit_card_fields.label.expiry": {
-    "defaultMessage": "Expiration Date"
+    "defaultMessage": "Utløpsdato"
   },
   "use_credit_card_fields.label.name": {
-    "defaultMessage": "Name on Card"
+    "defaultMessage": "Navn på kort"
   },
   "use_credit_card_fields.label.security_code": {
-    "defaultMessage": "Security Code"
+    "defaultMessage": "Sikkerhetskode"
   },
   "use_login_fields.error.required_email": {
-    "defaultMessage": "Please enter your email address."
+    "defaultMessage": "Skriv inn e-postadressen din."
   },
   "use_login_fields.error.required_password": {
-    "defaultMessage": "Please enter your password."
+    "defaultMessage": "Skriv inn passordet ditt."
   },
   "use_login_fields.label.email": {
-    "defaultMessage": "Email"
+    "defaultMessage": "E-post"
   },
   "use_login_fields.label.password": {
-    "defaultMessage": "Password"
+    "defaultMessage": "Passord"
   },
   "use_product.message.inventory_remaining": {
-    "defaultMessage": "Only {stockLevel} left!"
+    "defaultMessage": "Kun {stockLevel} igjen!"
   },
   "use_product.message.inventory_remaining_for_product": {
-    "defaultMessage": "Only {stockLevel} left for {productName}!"
+    "defaultMessage": "Kun {stockLevel} igjen av {productName}!"
   },
   "use_product.message.out_of_stock": {
-    "defaultMessage": "Out of stock"
+    "defaultMessage": "Ikke på lager"
   },
   "use_product.message.out_of_stock_for_product": {
-    "defaultMessage": "Out of stock for {productName}"
+    "defaultMessage": "{productName} er ikke på lager"
   },
   "use_profile_fields.error.required_email": {
-    "defaultMessage": "Please enter a valid email address."
+    "defaultMessage": "Vennligst skriv inn en gyldig e-post adresse."
   },
   "use_profile_fields.error.required_first_name": {
-    "defaultMessage": "Please enter your first name."
+    "defaultMessage": "Skriv inn fornavnet ditt."
   },
   "use_profile_fields.error.required_last_name": {
-    "defaultMessage": "Please enter your last name."
+    "defaultMessage": "Skriv inn etternavnet ditt."
   },
   "use_profile_fields.error.required_phone": {
-    "defaultMessage": "Please enter your phone number."
+    "defaultMessage": "Skriv inn telefonnummeret ditt."
   },
   "use_profile_fields.label.email": {
-    "defaultMessage": "Email"
+    "defaultMessage": "E-post"
   },
   "use_profile_fields.label.first_name": {
-    "defaultMessage": "First Name"
+    "defaultMessage": "Fornavn"
   },
   "use_profile_fields.label.last_name": {
-    "defaultMessage": "Last Name"
+    "defaultMessage": "Etternavn"
   },
   "use_profile_fields.label.phone": {
-    "defaultMessage": "Phone Number"
+    "defaultMessage": "Telefonnummer"
   },
   "use_promo_code_fields.error.required_promo_code": {
-    "defaultMessage": "Please provide a valid promo code."
+    "defaultMessage": "Vennligst oppgi en gyldig kampanjekode."
   },
   "use_promo_code_fields.label.promo_code": {
-    "defaultMessage": "Promo Code"
+    "defaultMessage": "Kampanjekode"
   },
   "use_promocode.error.check_the_code": {
-    "defaultMessage": "Check the code and try again, it may already be applied or the promo has expired."
+    "defaultMessage": "Kontroller koden og prøv igjen, det kan hende at den allerede er brukt eller at kampanjen har utløpt."
   },
   "use_promocode.info.promo_applied": {
-    "defaultMessage": "Promotion applied"
+    "defaultMessage": "Kampanje tatt i bruk"
   },
   "use_promocode.info.promo_removed": {
-    "defaultMessage": "Promotion removed"
+    "defaultMessage": "Kampanje fjernet"
   },
   "use_registration_fields.error.contain_number": {
-    "defaultMessage": "Password must contain at least one number."
+    "defaultMessage": "Passordet må inneholde minst ett tall."
   },
   "use_registration_fields.error.lowercase_letter": {
-    "defaultMessage": "Password must contain at least one lowercase letter."
+    "defaultMessage": "Passordet må inneholde minst én liten bokstav."
   },
   "use_registration_fields.error.minimum_characters": {
-    "defaultMessage": "Password must contain at least 8 characters."
+    "defaultMessage": "Passordet må inneholde minst 8 tegn."
   },
   "use_registration_fields.error.required_email": {
-    "defaultMessage": "Please enter a valid email address."
+    "defaultMessage": "Vennligst skriv inn en gyldig e-post adresse."
   },
   "use_registration_fields.error.required_first_name": {
-    "defaultMessage": "Please enter your first name."
+    "defaultMessage": "Skriv inn fornavnet ditt."
   },
   "use_registration_fields.error.required_last_name": {
-    "defaultMessage": "Please enter your last name."
+    "defaultMessage": "Skriv inn etternavnet ditt."
   },
   "use_registration_fields.error.required_password": {
-    "defaultMessage": "Please create a password."
+    "defaultMessage": "Opprett et passord."
   },
   "use_registration_fields.error.special_character": {
-    "defaultMessage": "Password must contain at least one special character."
+    "defaultMessage": "Passordet må inneholde minst ett spesialtegn."
   },
   "use_registration_fields.error.uppercase_letter": {
-    "defaultMessage": "Password must contain at least one uppercase letter."
+    "defaultMessage": "Passordet må inneholde minst én stor bokstav."
   },
   "use_registration_fields.label.email": {
-    "defaultMessage": "Email"
+    "defaultMessage": "E-post"
   },
   "use_registration_fields.label.first_name": {
-    "defaultMessage": "First Name"
+    "defaultMessage": "Fornavn"
   },
   "use_registration_fields.label.last_name": {
-    "defaultMessage": "Last Name"
+    "defaultMessage": "Etternavn"
   },
   "use_registration_fields.label.password": {
-    "defaultMessage": "Password"
+    "defaultMessage": "Passord"
   },
   "use_registration_fields.label.sign_up_to_emails": {
-    "defaultMessage": "Sign me up for Salesforce emails (you can unsubscribe at any time)"
+    "defaultMessage": "Registrer meg for mottak av e-post fra Salesforce (du kan melde deg av når som helst)"
   },
   "use_reset_password_fields.error.required_email": {
-    "defaultMessage": "Please enter a valid email address."
+    "defaultMessage": "Vennligst skriv inn en gyldig e-post adresse."
   },
   "use_reset_password_fields.label.email": {
-    "defaultMessage": "Email"
+    "defaultMessage": "E-post"
   },
   "use_update_password_fields.error.contain_number": {
-    "defaultMessage": "Password must contain at least one number."
+    "defaultMessage": "Passordet må inneholde minst ett tall."
   },
   "use_update_password_fields.error.lowercase_letter": {
-    "defaultMessage": "Password must contain at least one lowercase letter."
+    "defaultMessage": "Passordet må inneholde minst én liten bokstav."
   },
   "use_update_password_fields.error.minimum_characters": {
-    "defaultMessage": "Password must contain at least 8 characters."
-  },
-  "use_update_password_fields.error.password_mismatch": {
-    "defaultMessage": "Passwords do not match."
-  },
-  "use_update_password_fields.error.required_confirm_password": {
-    "defaultMessage": "Please confirm your password."
+    "defaultMessage": "Passordet må inneholde minst 8 tegn."
   },
   "use_update_password_fields.error.required_new_password": {
-    "defaultMessage": "Please provide a new password."
+    "defaultMessage": "Oppgi et nytt passord."
   },
   "use_update_password_fields.error.required_password": {
-    "defaultMessage": "Please enter your password."
+    "defaultMessage": "Skriv inn passordet ditt."
   },
   "use_update_password_fields.error.special_character": {
-    "defaultMessage": "Password must contain at least one special character."
+    "defaultMessage": "Passordet må inneholde minst ett spesialtegn."
   },
   "use_update_password_fields.error.uppercase_letter": {
-    "defaultMessage": "Password must contain at least one uppercase letter."
-  },
-  "use_update_password_fields.label.confirm_new_password": {
-    "defaultMessage": "Confirm New Password"
+    "defaultMessage": "Passordet må inneholde minst én stor bokstav."
   },
   "use_update_password_fields.label.current_password": {
-    "defaultMessage": "Current Password"
+    "defaultMessage": "Gjeldende passord"
   },
   "use_update_password_fields.label.new_password": {
-    "defaultMessage": "New Password"
+    "defaultMessage": "Nytt passord"
   },
   "wishlist_primary_action.button.addSetToCart.label": {
-    "defaultMessage": "Add {productName} set to cart"
+    "defaultMessage": "Legg til {productName}-sett i kurv"
   },
   "wishlist_primary_action.button.addToCart.label": {
-    "defaultMessage": "Add {productName} to cart"
+    "defaultMessage": "Legg til {productName} i kurv"
   },
   "wishlist_primary_action.button.add_set_to_cart": {
-    "defaultMessage": "Add Set to Cart"
+    "defaultMessage": "Legg til sett i kurv"
   },
   "wishlist_primary_action.button.add_to_cart": {
-    "defaultMessage": "Add to Cart"
+    "defaultMessage": "Legg til i kurv"
   },
   "wishlist_primary_action.button.viewFullDetails.label": {
-    "defaultMessage": "View full details for {productName}"
+    "defaultMessage": "Vis alle opplysninger for {productName}"
   },
   "wishlist_primary_action.button.view_full_details": {
-    "defaultMessage": "View Full Details"
+    "defaultMessage": "Vis alle opplysninger"
   },
   "wishlist_primary_action.button.view_options": {
-    "defaultMessage": "View Options"
+    "defaultMessage": "Vis alternativer"
   },
   "wishlist_primary_action.button.view_options.label": {
-    "defaultMessage": "View Options for {productName}"
+    "defaultMessage": "Vis alternativer for {productName}"
   },
   "wishlist_primary_action.info.added_to_cart": {
-    "defaultMessage": "{quantity} {quantity, plural, one {item} other {items}} added to cart"
+    "defaultMessage": "{quantity} {quantity, plural, one {artikkel} other {artikler}} lagt til i kurven"
   },
   "wishlist_secondary_button_group.action.remove": {
-    "defaultMessage": "Remove"
+    "defaultMessage": "Fjern"
   },
   "wishlist_secondary_button_group.info.item.remove.label": {
-    "defaultMessage": "Remove {productName}"
+    "defaultMessage": "Fjern {productName}"
   },
   "wishlist_secondary_button_group.info.item_removed": {
-    "defaultMessage": "Item removed from wishlist"
+    "defaultMessage": "Artikkel fjernet fra ønskeliste"
   },
   "with_registration.info.please_sign_in": {
-    "defaultMessage": "Please sign in to continue!"
+    "defaultMessage": "Vennligst logg inn for å fortsette."
   }
 }

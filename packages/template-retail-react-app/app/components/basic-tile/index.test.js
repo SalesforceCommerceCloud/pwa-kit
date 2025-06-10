@@ -7,8 +7,10 @@
 import React from 'react'
 import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
 import BasicTile from '@salesforce/retail-react-app/app/components/basic-tile/index'
+import {screen} from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 
-test('BasicTile renders without errors', () => {
+describe('BasicTile', () => {
     const data = {
         title: 'title',
         href: '/category/womens-outfits',
@@ -17,7 +19,42 @@ test('BasicTile renders without errors', () => {
             alt: 'alt'
         }
     }
-    const {getByText} = renderWithProviders(<BasicTile {...data} />)
 
-    expect(getByText('title')).toBeInTheDocument()
+    test('BasicTile renders without errors', () => {
+        const {getByText} = renderWithProviders(<BasicTile {...data} />)
+        expect(getByText('title')).toBeInTheDocument()
+    })
+
+    test('renders image with correct attributes', () => {
+        renderWithProviders(<BasicTile {...data} />)
+        const image = screen.getByAltText('alt')
+        expect(image).toBeInTheDocument()
+        expect(image).toHaveAttribute('src', 'src')
+    })
+
+    test('renders with custom props', () => {
+        const custom = {
+            ...data,
+            padding: '4',
+            margin: '2'
+        }
+        renderWithProviders(<BasicTile {...custom} />)
+        const container = screen.getByText('title').closest('div').parentElement
+        expect(container).toHaveStyle('padding: 4')
+        expect(container).toHaveStyle('margin: 2')
+    })
+
+    test('renders image link with correct href', () => {
+        renderWithProviders(<BasicTile {...data} />)
+        const imageLink = screen.getByAltText('alt').closest('a')
+        expect(imageLink).toHaveAttribute('href', '/category/womens-outfits')
+    })
+
+    test('correctly applies hover styles to title', async () => {
+        const user = userEvent.setup()
+        renderWithProviders(<BasicTile {...data} />)
+        const title = screen.getByText('title')
+        await user.hover(title)
+        expect(title).toHaveStyle('text-decoration: underline')
+    })
 })
