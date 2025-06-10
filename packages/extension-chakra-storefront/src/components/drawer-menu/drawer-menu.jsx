@@ -191,7 +191,7 @@ const DrawerMenu = ({
 
                         {/* Application Actions */}
                         <VStack align="stretch" gap={0} px={4}>
-                            <Box py={3}>
+                            <Box>
                                 {isRegistered ? (
                                     <NestedAccordion
                                         urlBuilder={(item, locale) =>
@@ -201,7 +201,7 @@ const DrawerMenu = ({
                                             depth === 1 && (
                                                 <Button variant="unstyled" onClick={onSignoutClick}>
                                                     <Flex align={'center'}>
-                                                        <SignoutIcon />
+                                                        <SignoutIcon boxSize={5} />
                                                         <Text as="span">
                                                             {intl.formatMessage({
                                                                 id: 'drawer_menu.button.log_out',
@@ -254,7 +254,7 @@ const DrawerMenu = ({
                                 ) : (
                                     <Link to={SIGN_IN_HREF}>
                                         <HStack>
-                                            <UserIcon boxSize={5} color="gray.900" />
+                                            <UserIcon css={styles.icon} />
                                             <Text>
                                                 {intl.formatMessage({
                                                     id: 'drawer_menu.link.sign_in',
@@ -266,7 +266,7 @@ const DrawerMenu = ({
                                 )}
                             </Box>
                             {showLocaleSelector && (
-                                <Box py={1}>
+                                <Box>
                                     <LocaleSelector
                                         selectedLocale={intl.locale}
                                         locales={supportedLocaleIds}

@@ -15,6 +15,7 @@ export default defineSlotRecipe({
         'content',
         'footer',
         'header',
+        'icon',
         'localeSelector',
         'logo',
         'signout',
@@ -56,6 +57,11 @@ export default defineSlotRecipe({
             paddingBottom: 1,
             paddingLeft: 4,
             paddingRight: 4
+        },
+        icon: {
+            color: 'gray.900',
+            width: 5,
+            height: 5
         },
         localeSelector: {
             paddingTop: 1,
