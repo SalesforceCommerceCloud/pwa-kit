@@ -10,8 +10,8 @@ import {ApiClients, ApiQueryOptions, Argument, DataType, NullableParameters} fro
 import {useQuery} from '../useQuery'
 import {mergeOptions, omitNullableParameters, pickValidParams} from '../utils'
 import * as queryKeyHelpers from './queryKeyHelpers'
-import {useResolvedClient} from '../useResolvedClient'
 import {CLIENT_KEYS} from '../../constant'
+import useCommerceApi from '../useCommerceApi'
 
 const CLIENT_KEY = CLIENT_KEYS.SHOPPER_CUSTOMERS
 type Client = NonNullable<ApiClients[typeof CLIENT_KEY]>
@@ -70,7 +70,7 @@ export const useCustomer = (
 ): UseQueryResult<DataType<Client['getCustomer']>> => {
     type Options = Argument<Client['getCustomer']>
     type Data = DataType<Client['getCustomer']>
-    const client = useResolvedClient(CLIENT_KEY)
+    const client = useCommerceApi(CLIENT_KEY)
     const methodName = 'getCustomer'
     const requiredParameters = ShopperCustomers.paramKeys[`${methodName}Required`]
 
@@ -113,7 +113,7 @@ export const useCustomerAddress = (
 ): UseQueryResult<DataType<Client['getCustomerAddress']>> => {
     type Options = Argument<Client['getCustomerAddress']>
     type Data = DataType<Client['getCustomerAddress']>
-    const client = useResolvedClient(CLIENT_KEY)
+    const client = useCommerceApi(CLIENT_KEY)
     const methodName = 'getCustomerAddress'
     const requiredParameters = ShopperCustomers.paramKeys[`${methodName}Required`]
 
@@ -158,7 +158,7 @@ export const useCustomerBaskets = (
 ): UseQueryResult<DataType<Client['getCustomerBaskets']>> => {
     type Options = Argument<Client['getCustomerBaskets']>
     type Data = DataType<Client['getCustomerBaskets']>
-    const client = useResolvedClient(CLIENT_KEY)
+    const client = useCommerceApi(CLIENT_KEY)
     const methodName = 'getCustomerBaskets'
     const requiredParameters = ShopperCustomers.paramKeys[`${methodName}Required`]
 
@@ -205,7 +205,7 @@ export const useCustomerOrders = (
 ): UseQueryResult<DataType<Client['getCustomerOrders']>> => {
     type Options = Argument<Client['getCustomerOrders']>
     type Data = DataType<Client['getCustomerOrders']>
-    const client = useResolvedClient(CLIENT_KEY)
+    const client = useCommerceApi(CLIENT_KEY)
     const methodName = 'getCustomerOrders'
     const requiredParameters = ShopperCustomers.paramKeys[`${methodName}Required`]
 
@@ -250,7 +250,7 @@ export const useCustomerPaymentInstrument = (
 ): UseQueryResult<DataType<Client['getCustomerPaymentInstrument']>> => {
     type Options = Argument<Client['getCustomerPaymentInstrument']>
     type Data = DataType<Client['getCustomerPaymentInstrument']>
-    const client = useResolvedClient(CLIENT_KEY)
+    const client = useCommerceApi(CLIENT_KEY)
     const methodName = 'getCustomerPaymentInstrument'
     const requiredParameters = ShopperCustomers.paramKeys[`${methodName}Required`]
 
@@ -295,7 +295,7 @@ export const useCustomerProductLists = (
 ): UseQueryResult<DataType<Client['getCustomerProductLists']>> => {
     type Options = Argument<Client['getCustomerProductLists']>
     type Data = DataType<Client['getCustomerProductLists']>
-    const client = useResolvedClient(CLIENT_KEY)
+    const client = useCommerceApi(CLIENT_KEY)
     const methodName = 'getCustomerProductLists'
     const requiredParameters = ShopperCustomers.paramKeys[`${methodName}Required`]
 
@@ -340,7 +340,7 @@ export const useCustomerProductList = (
 ): UseQueryResult<DataType<Client['getCustomerProductList']>> => {
     type Options = Argument<Client['getCustomerProductList']>
     type Data = DataType<Client['getCustomerProductList']>
-    const client = useResolvedClient(CLIENT_KEY)
+    const client = useCommerceApi(CLIENT_KEY)
     const methodName = 'getCustomerProductList'
     const requiredParameters = ShopperCustomers.paramKeys[`${methodName}Required`]
 
@@ -385,7 +385,7 @@ export const useCustomerProductListItem = (
 ): UseQueryResult<DataType<Client['getCustomerProductListItem']>> => {
     type Options = Argument<Client['getCustomerProductListItem']>
     type Data = DataType<Client['getCustomerProductListItem']>
-    const client = useResolvedClient(CLIENT_KEY)
+    const client = useCommerceApi(CLIENT_KEY)
     const methodName = 'getCustomerProductListItem'
     const requiredParameters = ShopperCustomers.paramKeys[`${methodName}Required`]
 
@@ -430,7 +430,7 @@ export const usePublicProductListsBySearchTerm = (
 ): UseQueryResult<DataType<Client['getPublicProductListsBySearchTerm']>> => {
     type Options = Argument<Client['getPublicProductListsBySearchTerm']>
     type Data = DataType<Client['getPublicProductListsBySearchTerm']>
-    const client = useResolvedClient(CLIENT_KEY)
+    const client = useCommerceApi(CLIENT_KEY)
     const methodName = 'getPublicProductListsBySearchTerm'
     const requiredParameters = ShopperCustomers.paramKeys[`${methodName}Required`]
 
@@ -475,7 +475,7 @@ export const usePublicProductList = (
 ): UseQueryResult<DataType<Client['getPublicProductList']>> => {
     type Options = Argument<Client['getPublicProductList']>
     type Data = DataType<Client['getPublicProductList']>
-    const client = useResolvedClient(CLIENT_KEY)
+    const client = useCommerceApi(CLIENT_KEY)
     const methodName = 'getPublicProductList'
     const requiredParameters = ShopperCustomers.paramKeys[`${methodName}Required`]
 
@@ -520,7 +520,7 @@ export const useProductListItem = (
 ): UseQueryResult<DataType<Client['getProductListItem']>> => {
     type Options = Argument<Client['getProductListItem']>
     type Data = DataType<Client['getProductListItem']>
-    const client = useResolvedClient(CLIENT_KEY)
+    const client = useCommerceApi(CLIENT_KEY)
     const methodName = 'getProductListItem'
     const requiredParameters = ShopperCustomers.paramKeys[`${methodName}Required`]
 

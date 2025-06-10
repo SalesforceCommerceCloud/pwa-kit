@@ -10,8 +10,8 @@ import {useQuery} from '../useQuery'
 import {mergeOptions, omitNullableParameters, pickValidParams} from '../utils'
 import * as queryKeyHelpers from './queryKeyHelpers'
 import {ShopperProducts} from 'commerce-sdk-isomorphic'
-import {useResolvedClient} from '../useResolvedClient'
 import {CLIENT_KEYS} from '../../constant'
+import useCommerceApi from '../useCommerceApi'
 
 const CLIENT_KEY = CLIENT_KEYS.SHOPPER_PRODUCTS
 type Client = NonNullable<ApiClients[typeof CLIENT_KEY]>
@@ -33,7 +33,7 @@ export const useProducts = (
 ): UseQueryResult<DataType<Client['getProducts']>> => {
     type Options = Argument<Client['getProducts']>
     type Data = DataType<Client['getProducts']>
-    const client = useResolvedClient(CLIENT_KEY)
+    const client = useCommerceApi(CLIENT_KEY)
     const methodName = 'getProducts'
     const requiredParameters = ShopperProducts.paramKeys[`${methodName}Required`]
 
@@ -75,7 +75,7 @@ export const useProduct = (
 ): UseQueryResult<DataType<Client['getProduct']>> => {
     type Options = Argument<Client['getProduct']>
     type Data = DataType<Client['getProduct']>
-    const client = useResolvedClient(CLIENT_KEY)
+    const client = useCommerceApi(CLIENT_KEY)
     const methodName = 'getProduct'
     const requiredParameters = ShopperProducts.paramKeys[`${methodName}Required`]
 
@@ -117,7 +117,7 @@ export const useCategories = (
 ): UseQueryResult<DataType<Client['getCategories']>> => {
     type Options = Argument<Client['getCategories']>
     type Data = DataType<Client['getCategories']>
-    const client = useResolvedClient(CLIENT_KEY)
+    const client = useCommerceApi(CLIENT_KEY)
     const methodName = 'getCategories'
     const requiredParameters = ShopperProducts.paramKeys[`${methodName}Required`]
 
@@ -161,7 +161,7 @@ export const useCategory = (
 ): UseQueryResult<DataType<Client['getCategory']>> => {
     type Options = Argument<Client['getCategory']>
     type Data = DataType<Client['getCategory']>
-    const client = useResolvedClient(CLIENT_KEY)
+    const client = useCommerceApi(CLIENT_KEY)
     const methodName = 'getCategory'
     const requiredParameters = ShopperProducts.paramKeys[`${methodName}Required`]
 

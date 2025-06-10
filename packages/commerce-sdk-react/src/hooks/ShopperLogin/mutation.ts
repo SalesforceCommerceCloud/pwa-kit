@@ -9,8 +9,8 @@ import {useMutation} from '../useMutation'
 import {UseMutationResult} from '@tanstack/react-query'
 import {NotImplementedError} from '../utils'
 import {cacheUpdateMatrix} from './cache'
-import {useResolvedClient} from '../useResolvedClient'
 import {CLIENT_KEYS} from '../../constant'
+import useCommerceApi from '../useCommerceApi'
 
 const CLIENT_KEY = CLIENT_KEYS.SHOPPER_LOGIN
 type Client = NonNullable<ApiClients[typeof CLIENT_KEY]>
@@ -125,7 +125,7 @@ export function useShopperLoginMutation<Mutation extends ShopperLoginMutation>(
     // I'm not sure if there's a way to avoid the type assertions in here for the methods that
     // use them. However, I'm fairly confident that they are safe to do, as they seem to be simply
     // re-asserting what we already have.
-    const client = useResolvedClient(CLIENT_KEY)
+    const client = useCommerceApi(CLIENT_KEY)
     type Options = Argument<Client[Mutation]>
     type Data = DataType<Client[Mutation]>
     return useMutation({

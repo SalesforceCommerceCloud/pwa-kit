@@ -10,8 +10,8 @@ import {ApiClients, ApiQueryOptions, Argument, DataType, NullableParameters} fro
 import {useQuery} from '../useQuery'
 import {mergeOptions, omitNullableParameters, pickValidParams} from '../utils'
 import * as queryKeyHelpers from './queryKeyHelpers'
-import {useResolvedClient} from '../useResolvedClient'
 import {CLIENT_KEYS} from '../../constant'
+import useCommerceApi from '../useCommerceApi'
 
 const CLIENT_KEY = CLIENT_KEYS.SHOPPER_LOGIN
 type Client = NonNullable<ApiClients[typeof CLIENT_KEY]>
@@ -33,7 +33,7 @@ export const useUserInfo = (
 ): UseQueryResult<DataType<Client['getUserInfo']>> => {
     type Options = Argument<Client['getUserInfo']>
     type Data = DataType<Client['getUserInfo']>
-    const client = useResolvedClient(CLIENT_KEY)
+    const client = useCommerceApi(CLIENT_KEY)
     const methodName = 'getUserInfo'
     const requiredParameters = ShopperLogin.paramKeys[`${methodName}Required`]
 
@@ -75,7 +75,7 @@ export const useWellknownOpenidConfiguration = (
 ): UseQueryResult<DataType<Client['getWellknownOpenidConfiguration']>> => {
     type Options = Argument<Client['getWellknownOpenidConfiguration']>
     type Data = DataType<Client['getWellknownOpenidConfiguration']>
-    const client = useResolvedClient(CLIENT_KEY)
+    const client = useCommerceApi(CLIENT_KEY)
     const methodName = 'getWellknownOpenidConfiguration'
     const requiredParameters = ShopperLogin.paramKeys[`${methodName}Required`]
 
@@ -117,7 +117,7 @@ export const useJwksUri = (
 ): UseQueryResult<DataType<Client['getJwksUri']>> => {
     type Options = Argument<Client['getJwksUri']>
     type Data = DataType<Client['getJwksUri']>
-    const client = useResolvedClient(CLIENT_KEY)
+    const client = useCommerceApi(CLIENT_KEY)
     const methodName = 'getJwksUri'
     const requiredParameters = ShopperLogin.paramKeys[`${methodName}Required`]
 

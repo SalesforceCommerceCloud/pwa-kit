@@ -10,8 +10,8 @@ import {ApiClients, ApiQueryOptions, Argument, DataType, NullableParameters} fro
 import {useQuery} from '../useQuery'
 import {mergeOptions, omitNullableParameters, pickValidParams} from '../utils'
 import * as queryKeyHelpers from './queryKeyHelpers'
-import {useResolvedClient} from '../useResolvedClient'
 import {CLIENT_KEYS} from '../../constant'
+import useCommerceApi from '../useCommerceApi'
 
 const CLIENT_KEY = CLIENT_KEYS.SHOPPER_STORES
 type Client = NonNullable<ApiClients[typeof CLIENT_KEY]>
@@ -39,7 +39,7 @@ export const useSearchStores = (
 ): UseQueryResult<DataType<Client['searchStores']>> => {
     type Options = Argument<Client['searchStores']>
     type Data = DataType<Client['searchStores']>
-    const client = useResolvedClient(CLIENT_KEY)
+    const client = useCommerceApi(CLIENT_KEY)
     const methodName = 'searchStores'
     const requiredParameters = ShopperStores.paramKeys[`${methodName}Required`]
 
@@ -82,7 +82,7 @@ export const useStores = (
 ): UseQueryResult<DataType<Client['getStores']>> => {
     type Options = Argument<Client['getStores']>
     type Data = DataType<Client['getStores']>
-    const client = useResolvedClient(CLIENT_KEY)
+    const client = useCommerceApi(CLIENT_KEY)
     const methodName = 'getStores'
     const requiredParameters = ShopperStores.paramKeys[`${methodName}Required`]
 

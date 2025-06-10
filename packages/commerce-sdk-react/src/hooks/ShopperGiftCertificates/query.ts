@@ -10,8 +10,8 @@ import {useQuery} from '../useQuery'
 import {mergeOptions, omitNullableParameters, pickValidParams} from '../utils'
 import * as queryKeyHelpers from './queryKeyHelpers'
 import {ShopperGiftCertificates} from 'commerce-sdk-isomorphic'
-import {useResolvedClient} from '../useResolvedClient'
 import {CLIENT_KEYS} from '../../constant'
+import useCommerceApi from '../useCommerceApi'
 
 const CLIENT_KEY = CLIENT_KEYS.SHOPPER_GIFT_CERTIFICATES
 type Client = NonNullable<ApiClients[typeof CLIENT_KEY]>
@@ -33,7 +33,7 @@ export const useGiftCertificate = (
 ): UseQueryResult<DataType<Client['getGiftCertificate']>> => {
     type Options = Argument<Client['getGiftCertificate']>
     type Data = DataType<Client['getGiftCertificate']>
-    const client = useResolvedClient(CLIENT_KEY)
+    const client = useCommerceApi(CLIENT_KEY)
     const methodName = 'getGiftCertificate'
     const requiredParameters = ShopperGiftCertificates.paramKeys[`${methodName}Required`]
 

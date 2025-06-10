@@ -10,8 +10,8 @@ import {ApiClients, ApiQueryOptions, Argument, DataType, NullableParameters} fro
 import {useQuery} from '../useQuery'
 import {mergeOptions, omitNullableParameters, pickValidParams} from '../utils'
 import * as queryKeyHelpers from './queryKeyHelpers'
-import {useResolvedClient} from '../useResolvedClient'
 import {CLIENT_KEYS} from '../../constant'
+import useCommerceApi from '../useCommerceApi'
 
 const CLIENT_KEY = CLIENT_KEYS.SHOPPER_SEO
 type Client = NonNullable<ApiClients[typeof CLIENT_KEY]>
@@ -36,7 +36,7 @@ export const useUrlMapping = (
 ): UseQueryResult<DataType<Client['getUrlMapping']>> => {
     type Options = Argument<Client['getUrlMapping']>
     type Data = DataType<Client['getUrlMapping']>
-    const client = useResolvedClient(CLIENT_KEY)
+    const client = useCommerceApi(CLIENT_KEY)
     const methodName = 'getUrlMapping'
     const requiredParameters = ShopperSeo.paramKeys[`${methodName}Required`]
 

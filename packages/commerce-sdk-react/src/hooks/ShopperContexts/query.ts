@@ -10,8 +10,8 @@ import {useQuery} from '../useQuery'
 import {mergeOptions, omitNullableParameters, pickValidParams} from '../utils'
 import * as queryKeyHelpers from './queryKeyHelpers'
 import {ShopperContexts} from 'commerce-sdk-isomorphic'
-import {useResolvedClient} from '../useResolvedClient'
 import {CLIENT_KEYS} from '../../constant'
+import useCommerceApi from '../useCommerceApi'
 
 const CLIENT_KEY = CLIENT_KEYS.SHOPPER_CONTEXTS
 type Client = NonNullable<ApiClients[typeof CLIENT_KEY]>
@@ -33,7 +33,7 @@ export const useShopperContext = (
 ): UseQueryResult<DataType<Client['getShopperContext']>> => {
     type Options = Argument<Client['getShopperContext']>
     type Data = DataType<Client['getShopperContext']>
-    const client = useResolvedClient(CLIENT_KEY)
+    const client = useCommerceApi(CLIENT_KEY)
     const methodName = 'getShopperContext'
     const requiredParameters = ShopperContexts.paramKeys[`${methodName}Required`]
 
