@@ -599,7 +599,7 @@ const Cart = () => {
 
                                     {/* Bonus Products Title */}
                                     {basket.productItems?.some(
-                                        (item) => item.bonusProductLineItem === true
+                                        (item) => item.bonusProductLineItem
                                     ) && (
                                         <Box>
                                             <BonusProductsTitle />
@@ -608,7 +608,7 @@ const Cart = () => {
 
                                     {/* Bonus Products */}
                                     {basket.productItems
-                                        ?.filter((item) => item.bonusProductLineItem === true)
+                                        ?.filter((item) => item.bonusProductLineItem)
                                         .map((productItem, idx) => {
                                             return (
                                                 <ProductItem
