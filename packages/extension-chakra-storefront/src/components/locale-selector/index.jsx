@@ -7,65 +7,99 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import {useIntl} from 'react-intl'
 
 // Components
-import {Box, Button, Menu, MenuButton, MenuList, MenuItem, Text} from '@chakra-ui/react'
+import {
+    Accordion,
+    AccordionButton,
+    AccordionItem,
+    AccordionPanel,
+    Box,
+    Text,
 
-// Hooks
-import {useLocale} from '../../hooks'
+    // Hooks
+    useStyleConfig
+} from '@chakra-ui/react'
 
 // Icons
-import {ChevronDownIcon} from '../icons'
+import {
+    CheckIcon,
+    ChevronDownIcon,
+    ChevronRightIcon,
+    FlagGBIcon,
+    FlagFRIcon,
+    FlagITIcon,
+    FlagCNIcon,
+    FlagJPIcon
+} from '../../components/icons'
 
-// Utils
-import {getUrlWithLocale} from '../../utils/url'
+import LocaleText from '../../components/locale-text'
+
+// NOTE: If you want to have flags shown next to a selectable locale, update this
+// mapping object with the short code as the key for the desired icon.
+const flags = {
+    'en-GB': <FlagGBIcon />,
+    'fr-FR': <FlagFRIcon />,
+    'it-IT': <FlagITIcon />,
+    'zh-CN': <FlagCNIcon />,
+    'ja-JP': <FlagJPIcon />
+}
 
 /**
- * The LocaleSelector component renders a menu for selecting a locale.
+ * The Locale Selector is a disclosure in the form of an accordion. It is
+ * populated with all the supported locales for the application allowing the
+ * user to change the current locale.
  */
-const LocaleSelector = ({variant = 'menu', ...rest}) => {
-    const intl = useIntl()
-    const {locale, buildLocalizedHref} = useLocale()
-
-    const supportedLocales = intl.messages?.['global']?.['locales'] || {}
-
+const LocaleSelector = ({selectedLocale = '', locales = [], onSelect = () => {}, ...props}) => {
+    const styles = useStyleConfig('LocaleSelector')
     return (
-        <Box {...rest}>
-            {variant === 'menu' && (
-                <Menu>
-                    <MenuButton
-                        as={Button}
-                        variant="ghost"
-                        rightIcon={<ChevronDownIcon />}
-                        fontSize="sm"
-                    >
-                        {supportedLocales[locale] || locale}
-                    </MenuButton>
-                    <MenuList>
-                        {Object.keys(supportedLocales).map((localeKey) => (
-                            <MenuItem key={localeKey} as="a" href={buildLocalizedHref(localeKey)}>
-                                {supportedLocales[localeKey]}
-                            </MenuItem>
-                        ))}
-                    </MenuList>
-                </Menu>
-            )}
-            {variant === 'radio' && (
-                <Box>
-                    {Object.keys(supportedLocales).map((localeKey) => (
-                        <Box key={localeKey} mb={2}>
-                            <Text
-                                as="a"
-                                href={buildLocalizedHref(localeKey)}
-                                fontWeight={locale === localeKey ? 'bold' : 'normal'}
-                            >
-                                {supportedLocales[localeKey]}
-                            </Text>
-                        </Box>
-                    ))}
-                </Box>
-            )}
+        <Box className="sf-locale-selector">
+            <Accordion allowToggle={true} {...props}>
+                <AccordionItem border="none">
+                    {({isExpanded}) => (
+                        <>
+                            <AccordionButton {...styles.selectedButton}>
+                                {/* Replace default expanded/collapsed icons. */}
+                                {isExpanded ? (
+                                    <ChevronDownIcon {...styles.selectedButtonIcon} />
+                                ) : (
+                                    <ChevronRightIcon {...styles.selectedButtonIcon} />
+                                )}
+                                {/* Display flag icon if one exists */}
+                                {flags[selectedLocale]}
+                                <Text {...styles.selectedText}>
+                                    <LocaleText shortCode={selectedLocale} />
+                                </Text>
+                            </AccordionButton>
+                            <AccordionPanel>
+                                <Accordion allowToggle={true} {...styles.accordion}>
+                                    {locales.map((locale) => (
+                                        <AccordionItem border="none" key={locale}>
+                                            <AccordionButton
+                                                {...styles.optionButton}
+                                                onClick={() => onSelect(locale)}
+                                            >
+                                                {/* Display flag icon if one exists */}
+                                                {flags[locale]}
+
+                                                {/* Locale name */}
+                                                <Text {...styles.optionText}>
+                                                    <LocaleText shortCode={locale} />
+                                                </Text>
+
+                                                {/* Selection indicator */}
+                                                {selectedLocale === locale && (
+                                                    <CheckIcon {...styles.selectedIcon} />
+                                                )}
+                                            </AccordionButton>
+                                        </AccordionItem>
+                                    ))}
+                                </Accordion>
+                            </AccordionPanel>
+                        </>
+                    )}
+                </AccordionItem>
+            </Accordion>
         </Box>
     )
 }
@@ -74,9 +108,17 @@ LocaleSelector.displayName = 'LocaleSelector'
 
 LocaleSelector.propTypes = {
     /**
-     * The variant of the locale selector
+     * A complete list of all the locales supported. This array must have content.
      */
-    variant: PropTypes.oneOf(['menu', 'radio'])
+    locales: PropTypes.arrayOf(PropTypes.string).isRequired,
+    /**
+     * The current locales shortcode.
+     */
+    selectedLocale: PropTypes.string.isRequired,
+    /**
+     * Function called when a locale is selected.
+     */
+    onSelect: PropTypes.func
 }
 
 export default LocaleSelector
