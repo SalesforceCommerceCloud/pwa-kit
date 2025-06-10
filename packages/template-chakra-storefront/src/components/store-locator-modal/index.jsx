@@ -23,7 +23,7 @@ import {
     DEFAULT_STORE_LOCATOR_COUNTRY,
     DEFAULT_STORE_LOCATOR_POSTAL_CODE,
     STORE_LOCATOR_NUM_STORES_PER_LOAD
-} from '../../constants'
+} from '../../../config/constants'
 
 export const StoreLocatorContext = createContext()
 export const useStoreLocator = () => {

@@ -8,7 +8,7 @@
 import React, {useEffect, useRef} from 'react'
 import PropTypes from 'prop-types'
 import {useProducts} from '@salesforce/commerce-sdk-react'
-import {REMOVE_UNAVAILABLE_CART_ITEM_DIALOG_CONFIG} from '../../constants'
+import {REMOVE_UNAVAILABLE_CART_ITEM_DIALOG_CONFIG} from '../../../config/constants'
 import ConfirmationModal from '../../components/confirmation-modal'
 import {useDisclosure} from '@chakra-ui/react'
 import {noop} from '../../utils/utils'

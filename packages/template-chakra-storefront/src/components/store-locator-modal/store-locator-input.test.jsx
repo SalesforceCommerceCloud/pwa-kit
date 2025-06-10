@@ -13,7 +13,7 @@ import {useForm} from 'react-hook-form'
 import PropTypes from 'prop-types'
 import {StoreLocatorContext} from '../../components/store-locator-modal/index'
 import {useStoreLocator} from '../../components/store-locator-modal/index'
-import {STORE_LOCATOR_NUM_STORES_PER_LOAD} from '../../constants'
+import {STORE_LOCATOR_NUM_STORES_PER_LOAD} from '../../../config/constants'
 
 const WrapperComponent = ({userHasSetManualGeolocation}) => {
     const form = useForm({

@@ -10,7 +10,7 @@ import StoreLocatorContent from '../../components/store-locator-modal/store-loca
 import {renderWithProviders} from '../../utils/test-utils'
 import {waitFor, screen} from '@testing-library/react'
 import PropTypes from 'prop-types'
-import {STORE_LOCATOR_NUM_STORES_PER_LOAD} from '../../constants'
+import {STORE_LOCATOR_NUM_STORES_PER_LOAD} from '../../../config/constants'
 import {rest} from 'msw'
 import {StoreLocatorContext} from '../../components/store-locator-modal/index'
 import {useStoreLocator} from '../../components/store-locator-modal/index'

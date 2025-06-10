@@ -19,7 +19,7 @@ import {
 import {useForm} from 'react-hook-form'
 import {ChevronDownIcon, ChevronUpIcon} from '../../components/icons'
 import PromoCodeFields from '../../components/forms/promo-code-fields'
-import {API_ERROR_MESSAGE} from '../../constants'
+import {API_ERROR_MESSAGE} from '../../../config/constants'
 import {useShopperBasketsMutation} from '@salesforce/commerce-sdk-react'
 import {useCurrentBasket} from '../../hooks/use-current-basket'
 

@@ -36,7 +36,7 @@ import {
     TOAST_MESSAGE_ADDED_TO_WISHLIST,
     TOAST_MESSAGE_REMOVED_ITEM_FROM_CART,
     TOAST_MESSAGE_ALREADY_IN_WISHLIST
-} from '../../constants'
+} from '../../../config/constants'
 import {REMOVE_CART_ITEM_CONFIRMATION_DIALOG_CONFIG} from '../../pages/cart/partials/cart-secondary-button-group'
 
 // Utilities

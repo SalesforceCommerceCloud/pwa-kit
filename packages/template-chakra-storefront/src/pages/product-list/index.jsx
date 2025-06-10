@@ -62,12 +62,7 @@ import PageDesignerPromotionalBanner from '../../pages/product-list/partials/pag
 import {FilterIcon, ChevronDownIcon} from '../../components/icons'
 
 // Hooks
-import {
-    useLimitUrls,
-    usePageUrls,
-    useSortUrls,
-    useSearchParams
-} from '../../hooks'
+import {useLimitUrls, usePageUrls, useSortUrls, useSearchParams} from '../../hooks'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {useToast} from '../../hooks/use-toast'
 import useEinstein from '../../hooks/use-einstein'
@@ -84,7 +79,7 @@ import {
     TOAST_ACTION_VIEW_WISHLIST,
     TOAST_MESSAGE_ADDED_TO_WISHLIST,
     TOAST_MESSAGE_REMOVED_FROM_WISHLIST
-} from '../../constants'
+} from '../../../config/constants'
 import useNavigation from '../../hooks/use-navigation'
 import LoadingSpinner from '../../components/loading-spinner'
 import {useWishList} from '../../hooks/use-wish-list'

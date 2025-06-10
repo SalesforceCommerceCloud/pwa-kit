@@ -13,7 +13,7 @@ import {
     useShopperContextSearchParams,
     getShopperContextFromSearchParams
 } from '../hooks/use-shopper-context-search-params'
-import {SHOPPER_CONTEXT_FIELD_TYPES, SHOPPER_CONTEXT_SEARCH_PARAMS} from '../constants'
+import {SHOPPER_CONTEXT_FIELD_TYPES, SHOPPER_CONTEXT_SEARCH_PARAMS} from '../../config/constants'
 
 afterEach(() => {
     jest.clearAllMocks()
