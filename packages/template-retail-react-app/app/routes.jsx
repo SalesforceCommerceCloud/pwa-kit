@@ -54,6 +54,10 @@ const StoreLocator = loadable(() => import('./pages/store-locator'), {
 const Wishlist = loadable(() => import('./pages/account/wishlist'), {
     fallback
 })
+const ComponentShowcase = loadable(() => import('./pages/component-showcase'), {
+    fallback
+})
+const PageShowcase = loadable(() => import('./pages/page-showcase'), {fallback})
 const PageNotFound = loadable(() => import('./pages/page-not-found'))
 
 export const routes = [
@@ -134,6 +138,16 @@ export const routes = [
     {
         path: '/store-locator',
         component: StoreLocator
+    },
+    {
+        path: '/component-showcase',
+        component: ComponentShowcase,
+        exact: true
+    },
+    {
+        path: '/page-showcase',
+        component: PageShowcase,
+        exact: true
     },
     {
         path: '*',
