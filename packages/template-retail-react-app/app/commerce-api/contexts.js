@@ -14,7 +14,7 @@ import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
  * Provider and associated hook for accessing the Commerce API in React components.
  */
 export const CommerceAPIContext = createContext()
-// export const CommerceAPIProvider = CommerceAPIContext.Provider
+/* eslint-disable react/prop-types */
 export const CommerceAPIProvider = ({value, children}) => {
     const {api, site, locale} = value
     const apiClients = api._sdkInstances
@@ -78,6 +78,7 @@ export const CommerceAPIProvider = ({value, children}) => {
         </CommerceAPIContext.Provider>
     )
 }
+
 export const useCommerceAPI = () => useContext(CommerceAPIContext)
 
 /**

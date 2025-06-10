@@ -11,12 +11,11 @@ import {getAppOrigin} from 'pwa-kit-react-sdk/utils/url'
 import {detectStorefrontPreview} from 'pwa-kit-react-sdk/ssr/universal/components/storefront-preview/utils'
 import ShopperBaskets from './shopper-baskets'
 import OcapiShopperOrders from './ocapi-shopper-orders'
-import {isError} from './utils'
 import Auth from '@salesforce/commerce-sdk-react/auth'
 import EinsteinAPI from './einstein'
 import {DWSID_HEADER_KEY} from './constants'
 
-import {withParameterInjection} from '@salesforce/commerce-sdk-react/provider'
+import {transformSDKClient} from '@salesforce/commerce-sdk-react/utils'
 
 /**
  * The configuration details for the connecting to the API.
@@ -127,7 +126,7 @@ class CommerceAPI {
             const sdkClient = new SdkClass(this._config)
             self._sdkInstances = {
                 ...self._sdkInstances,
-                [key]: withParameterInjection(sdkClient, {
+                [key]: transformSDKClient(sdkClient, {
                     props: this._config,
                     transformer: async (_, methodName, options) => {
                         const {fetchOptions = {}} = options

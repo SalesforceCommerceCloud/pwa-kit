@@ -114,8 +114,8 @@ export default function useCustomer() {
              * and retrive a guest access token
              */
             async logout() {
-                await logout.mutateAsync();
-                await api.auth.ready();
+                await logout.mutateAsync()
+                await api.auth.ready()
                 const skeletonCustomer = getSkeletonCustomer()
                 setCustomer(skeletonCustomer)
             },
