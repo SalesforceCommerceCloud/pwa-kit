@@ -20,6 +20,7 @@ module.exports = {
         '<rootDir>/src/components/image-gallery/**/*.test.js',
         '<rootDir>/src/components/drawer-menu/**/*.test.js',
         '<rootDir>/src/components/links-list/**/*.test.js',
+        '<rootDir>/src/components/locale-selector/**/*.test.js',
         '<rootDir>/src/components/nested-accordion/**/*.test.js',
         '<rootDir>/src/components/product-scroller/**/*.test.js',
         '<rootDir>/src/components/product-tile/**/*.test.js',
