@@ -562,10 +562,10 @@
     "defaultMessage": "Sign in to retrieve your saved items or continue shopping."
   },
   "empty_search_results.info.cant_find_anything_for_category": {
-    "defaultMessage": "We couldn't find anything for {category}. Try searching for a product or {link}."
+    "defaultMessage": "We couldn’t find anything for {category}. Try searching for a product or {link}."
   },
   "empty_search_results.info.cant_find_anything_for_query": {
-    "defaultMessage": "We couldn't find anything for \"{searchQuery}\"."
+    "defaultMessage": "We couldn’t find anything for \"{searchQuery}\"."
   },
   "empty_search_results.info.double_check_spelling": {
     "defaultMessage": "Double-check your spelling and try again or {link}."
@@ -1343,6 +1343,9 @@
   "selected_refinements.action.clear_all": {
     "defaultMessage": "Clear All"
   },
+  "selected_refinements.filter.in_stock": {
+    "defaultMessage": "In Stock"
+  },
   "shipping_address.button.continue_to_shipping": {
     "defaultMessage": "Continue to Shipping Method"
   },
@@ -1405,6 +1408,27 @@
   },
   "social_login_redirect.message.redirect_link": {
     "defaultMessage": "If you are not automatically redirected, click <link>this link</link> to proceed."
+  },
+  "store_inventory_filter.action.change_store": {
+    "defaultMessage": "Change Store"
+  },
+  "store_inventory_filter.action.select_store": {
+    "defaultMessage": "Select Store"
+  },
+  "store_inventory_filter.action.select_store_link": {
+    "defaultMessage": "Select a Store"
+  },
+  "store_inventory_filter.checkbox.assistive_msg": {
+    "defaultMessage": "Filter Products by Store Availability at {storeName}"
+  },
+  "store_inventory_filter.checkbox.label": {
+    "defaultMessage": "In Stock at {storeName}"
+  },
+  "store_inventory_filter.heading.shop_by_availability": {
+    "defaultMessage": "Shop by Availability"
+  },
+  "store_inventory_filter.link.assistive_msg": {
+    "defaultMessage": "Open Store Locator to {action}"
   },
   "store_locator.action.find": {
     "defaultMessage": "Find"
@@ -1779,29 +1803,5 @@
   },
   "with_registration.info.please_sign_in": {
     "defaultMessage": "Please sign in to continue!"
-  },
-  "store_inventory_filter.heading.shop_by_availability": {
-    "defaultMessage": "Shop by Availability"
-  },
-  "store_inventory_filter.checkbox.label": {
-    "defaultMessage": "In Stock at {storeLink}"
-  },
-  "store_inventory_filter.checkbox.assistive_msg": {
-    "defaultMessage": "Filter Products by Store Availability at {storeName}"
-  },
-  "store_inventory_filter.link.assistive_msg": {
-    "defaultMessage": "Open Store Locator to {action}"
-  },
-  "store_inventory_filter.action.select_store": {
-    "defaultMessage": "Select Store"
-  },
-  "store_inventory_filter.action.change_store": {
-    "defaultMessage": "Change Store"
-  },
-  "store_inventory_filter.action.select_store_link": {
-    "defaultMessage": "Select a Store"
-  },
-  "selected_refinements.filter.in_stock": {
-    "defaultMessage": "In Stock"
   }
 }
