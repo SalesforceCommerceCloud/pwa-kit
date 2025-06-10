@@ -27,12 +27,12 @@ function useCommerceApi(): ApiClients
 function useCommerceApi<T extends keyof ApiClients>(clientName: T): NonNullable<ApiClients[T]>
 function useCommerceApi<T extends keyof ApiClients>(clientName?: T) {
     const api = React.useContext(CommerceApiContext)
-    
+
     // If no client name is provided, return the full API object (backwards compatibility)
     if (clientName === undefined) {
         return api
     }
-    
+
     // If a client name is provided, validate and return the specific client
     const client = api[clientName]
     if (!client) {
