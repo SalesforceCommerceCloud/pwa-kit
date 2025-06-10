@@ -190,7 +190,8 @@ describe('ShopperAgent Component', () => {
             SiteId: commerceAgentSettings.siteId,
             Locale: defaultProps.locale,
             OrganizationId: commerceAgentSettings.commerceOrgId,
-            UsId: 'test-usid'
+            UsId: 'test-usid',
+            PwaKit: true
         })
 
         // Reset mock to test button click event
