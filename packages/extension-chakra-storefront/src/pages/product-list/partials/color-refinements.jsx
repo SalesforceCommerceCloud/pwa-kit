@@ -6,60 +6,113 @@
  */
 
 import React from 'react'
+import {
+    Box,
+    SimpleGrid,
+    HStack,
+    Text,
+    Button,
+    Center,
+    useSlotRecipe,
+    useTheme
+} from '@chakra-ui/react'
 import PropTypes from 'prop-types'
 import {useIntl} from 'react-intl'
-import {Button, SimpleGrid, Tooltip} from '@chakra-ui/react'
+import {
+    ADD_FILTER_HIT_COUNT,
+    REMOVE_FILTER_HIT_COUNT
+} from '../../../pages/product-list/partials/refinements-utils'
 
 const ColorRefinements = ({filter, toggleFilter, selectedFilters}) => {
     const intl = useIntl()
+    const recipe = useSlotRecipe({
+        key: 'swatchGroup',
+        variant: 'circle'
+    })
+    const styles = recipe()
+    const theme = useTheme()
+    const cssColorGroups = theme.colors.cssColorGroups
 
     return (
-        <SimpleGrid columns={6} spacing={2}>
-            {filter.values
-                ?.filter((refinementValue) => refinementValue.hitCount)
-                .map((value, idx) => {
-                    const isSelected = selectedFilters.includes(value.value)
-                    const color = value.presentationId || value.value
+        <SimpleGrid columns={2} spacing={2} mt={1}>
+            {filter.values.map((value, idx) => {
+                const isSelected = selectedFilters.includes(value.value)
 
-                    return (
-                        <Tooltip
-                            key={idx}
-                            label={intl.formatMessage(
-                                {
-                                    id: 'colorRefinements.label.hitCount',
-                                    defaultMessage: '{colorLabel} ({colorHitCount})'
-                                },
-                                {
-                                    colorLabel: value.label,
-                                    colorHitCount: value.hitCount
-                                }
-                            )}
+                // Don't display refinements with no results, unless we got there by selecting too
+                // many refinements
+                if (value.hitCount === 0 && !isSelected) return
+
+                return (
+                    <Box key={idx}>
+                        <HStack
+                            onClick={() => toggleFilter(value, filter.attributeId, isSelected)}
+                            spacing={1}
+                            cursor="pointer"
                         >
                             <Button
-                                aria-label={value.label}
-                                width="32px"
-                                height="32px"
-                                minWidth="32px"
-                                borderRadius="full"
-                                backgroundColor={color}
-                                border={isSelected ? '3px solid' : '1px solid'}
-                                borderColor={isSelected ? 'blue.500' : 'gray.300'}
-                                _hover={{
-                                    borderColor: 'blue.400',
-                                    transform: 'scale(1.1)'
-                                }}
-                                onClick={() => toggleFilter(value, filter.attributeId, isSelected)}
-                            />
-                        </Tooltip>
-                    )
-                })}
+                                css={styles.swatch}
+                                color={isSelected ? 'black' : 'gray.200'}
+                                border={isSelected ? '1px' : '0'}
+                                data-state={isSelected ? 'selected' : 'unselected'}
+                                aria-checked={isSelected}
+                                role="checkbox"
+                                variant="outline"
+                                marginRight={0}
+                                marginBottom="-1px"
+                                aria-label={intl.formatMessage(
+                                    isSelected ? REMOVE_FILTER_HIT_COUNT : ADD_FILTER_HIT_COUNT,
+                                    value
+                                )}
+                            >
+                                <Center
+                                    css={styles.swatchButton}
+                                    marginRight={0}
+                                    border="1px solid black"
+                                >
+                                    <Box
+                                        marginRight={0}
+                                        height="100%"
+                                        width="100%"
+                                        minWidth="32px"
+                                        backgroundRepeat="no-repeat"
+                                        backgroundSize="cover"
+                                        backgroundColor={
+                                            cssColorGroups[value.presentationId?.toLowerCase()]
+                                        }
+                                        background={
+                                            value.presentationId?.toLowerCase() ===
+                                                'miscellaneous' &&
+                                            cssColorGroups[value.presentationId?.toLowerCase()]
+                                        }
+                                    />
+                                </Center>
+                            </Button>
+                            <Text
+                                display="flex"
+                                alignItems="center"
+                                fontSize="sm"
+                                marginBottom="1px"
+                                aria-hidden="true" // avoid redundant readout since swatch has aria label
+                            >
+                                {intl.formatMessage(
+                                    {
+                                        id: 'colorRefinements.label.hitCount',
+                                        defaultMessage: '{colorLabel} ({colorHitCount})'
+                                    },
+                                    {colorLabel: value.label, colorHitCount: value.hitCount}
+                                )}
+                            </Text>
+                        </HStack>
+                    </Box>
+                )
+            })}
         </SimpleGrid>
     )
 }
 
 ColorRefinements.propTypes = {
-    filter: PropTypes.object.isRequired,
-    toggleFilter: PropTypes.func.isRequired,
+    filter: PropTypes.object,
+    toggleFilter: PropTypes.func,
     selectedFilters: PropTypes.array
 }
 
