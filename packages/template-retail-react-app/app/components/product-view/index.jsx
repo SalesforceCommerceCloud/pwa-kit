@@ -644,8 +644,8 @@ const ProductView = forwardRef(
                             )}
 
                             {!isProductASet && !isProductPartOfBundle && (
-                                <VStack align="stretch" maxWidth={'200px'} spacing={2} mb={0}>
-                                    <Box fontWeight="bold" mb={1}>
+                                  <VStack align="stretch" maxWidth={'200px'}>
+                                    <Box fontWeight="bold">
                                         <label htmlFor="quantity">
                                             {intl.formatMessage({
                                                 defaultMessage: 'Quantity:',
