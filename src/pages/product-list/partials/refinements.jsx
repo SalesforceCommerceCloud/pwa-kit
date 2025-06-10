@@ -82,7 +82,7 @@ const Refinements = ({
     }
 
     return (
-        <Stack spacing={8}>
+        <Stack gap={8}>
             {/* Wait to have filters before rendering the Accordion to allow the default indexes to be accurate */}
             {filtersIndexes && (
                 <Accordion
