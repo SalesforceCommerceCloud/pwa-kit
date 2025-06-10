@@ -39,7 +39,6 @@ import CheckoutFooter from '../../../pages/checkout/partials/checkout-footer'
 import {DrawerMenu} from '../../../components/drawer-menu'
 import {ListMenu, ListMenuContent} from '../../../components/list-menu'
 import {HideOnDesktop, HideOnMobile} from '../../../components/responsive'
-// import AboveHeader from '../../../src/components/_app/partials/above-header'
 import StoreLocatorModal from '../../../components/store-locator-modal'
 // Hooks
 import {AuthModal, useAuthModal} from '../../../hooks/use-auth-modal'
