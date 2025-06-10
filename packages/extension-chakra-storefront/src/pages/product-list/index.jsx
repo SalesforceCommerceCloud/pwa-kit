@@ -33,7 +33,8 @@ import {
     Field,
     Dialog,
     Portal,
-    Drawer
+    Drawer,
+    NativeSelect
 } from '@chakra-ui/react'
 
 // Project Components
@@ -753,45 +754,54 @@ const Sort = ({sortUrls, productSearchResult, basePath, ...otherProps}) => {
             width="auto"
             {...otherProps}
         >
-            <Box
-                as="select"
-                id="sf-product-list-sort-select"
-                aria-label={intl.formatMessage({
-                    id: 'product_list.sort_by.label.assistive_msg',
-                    defaultMessage: 'Sort products by'
-                })}
-                value={basePath.replace(/(offset)=(\d+)/i, '$1=0')}
-                onChange={(e) => {
-                    history.push(e.target.value)
-                }}
-                height={11}
-                width="240px"
-                border="1px solid"
-                borderColor="gray.200"
-                borderRadius="md"
-                px={3}
-                py={2}
-                fontSize="sm"
-                bg="white"
-                _focus={{
-                    borderColor: 'blue.500',
-                    boxShadow: '0 0 0 1px blue.500'
-                }}
-            >
-                {sortUrls.map((href, index) => (
-                    <option key={href} value={href}>
-                        {intl.formatMessage(
-                            {
-                                id: 'product_list.select.sort_by',
-                                defaultMessage: 'Sort By: {sortOption}'
-                            },
-                            {
-                                sortOption: productSearchResult?.sortingOptions[index]?.label
-                            }
-                        )}
-                    </option>
-                ))}
-            </Box>
+            <NativeSelect.Root>
+                <NativeSelect.Field
+                    id="sf-product-list-sort-select"
+                    aria-label={intl.formatMessage({
+                        id: 'product_list.sort_by.label.assistive_msg',
+                        defaultMessage: 'Sort products by'
+                    })}
+                    value={basePath.replace(/(offset)=(\d+)/i, '$1=0')}
+                    onChange={(e) => {
+                        history.push(e.target.value)
+                    }}
+                    height={11}
+                    width="240px"
+                    border="1px solid"
+                    borderColor="gray.200"
+                    borderRadius="md"
+                    px={3}
+                    py={2}
+                    fontSize="sm"
+                    bg="white"
+                    _focus={{
+                        borderColor: 'blue.500',
+                        boxShadow: '0 0 0 1px blue.500'
+                    }}
+                >
+                    {sortUrls.map((href, index) => (
+                        <option key={href} value={href}>
+                            {intl.formatMessage(
+                                {
+                                    id: 'product_list.select.sort_by',
+                                    defaultMessage: 'Sort By: {sortOption}'
+                                },
+                                {
+                                    sortOption: productSearchResult?.sortingOptions[index]?.label
+                                }
+                            )}
+                        </option>
+                    ))}
+                </NativeSelect.Field>
+                <NativeSelect.Indicator 
+                    position="absolute"
+                    right={3}
+                    top="50%"
+                    transform="translateY(-50%)"
+                    pointerEvents="none"
+                    color="gray.600"
+                />
+            </NativeSelect.Root>
         </Field.Root>
     )
 }
