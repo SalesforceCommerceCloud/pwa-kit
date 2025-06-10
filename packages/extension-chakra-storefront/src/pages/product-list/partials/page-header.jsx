@@ -9,6 +9,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 // Components
 import {Box, Heading, Flex, Text} from '@chakra-ui/react'
+import Fade from '../../../components/fade'
 
 // Project Components
 import Breadcrumb from '../../../components/breadcrumb'
@@ -25,7 +26,7 @@ const PageHeader = ({category, productSearchResult, isLoading, searchQuery, ...o
                     {`${category?.name || searchQuery || ''}`}
                 </Heading>
                 <Heading as="h2" size="lg" marginRight={2}>
-                    {!isLoading && <>({productSearchResult?.total})</>}
+                    {!isLoading && <Fade in={true}>({productSearchResult?.total})</Fade>}
                 </Heading>
             </Flex>
         </Box>
