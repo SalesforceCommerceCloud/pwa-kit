@@ -5,9 +5,10 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
+import PropTypes from 'prop-types'
 import {render, screen} from '@testing-library/react'
 import {IntlProvider} from 'react-intl'
-import BonusProductsTitle from './bonus-products-title'
+import BonusProductsTitle from '@salesforce/retail-react-app/app/pages/cart/partials/bonus-products-title'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
 
 // Mock the useCurrentBasket hook
@@ -20,6 +21,17 @@ const MockedComponent = ({basketData}) => {
             <BonusProductsTitle />
         </IntlProvider>
     )
+}
+
+MockedComponent.propTypes = {
+    basketData: PropTypes.shape({
+        productItems: PropTypes.arrayOf(
+            PropTypes.shape({
+                id: PropTypes.string,
+                bonusProductLineItem: PropTypes.bool
+            })
+        )
+    })
 }
 
 describe('BonusProductsTitle', () => {
@@ -49,4 +61,4 @@ describe('BonusProductsTitle', () => {
         render(<MockedComponent basketData={basketData} />)
         expect(screen.getByText('Bonus Products (2 items)')).toBeInTheDocument()
     })
-}) 
+})

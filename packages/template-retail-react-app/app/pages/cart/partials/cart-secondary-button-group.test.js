@@ -113,7 +113,6 @@ test('hides wishlist and gift checkbox for bonus product', async () => {
 
     expect(screen.getByRole('button', {name: /remove/i})).toBeInTheDocument()
     expect(screen.getByRole('button', {name: /edit/i})).toBeInTheDocument()
-    
 
     expect(screen.queryByRole('button', {name: /add to wishlist/i})).not.toBeInTheDocument()
     expect(screen.queryByRole('checkbox', {name: /this is a gift/i})).not.toBeInTheDocument()
