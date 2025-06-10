@@ -9,21 +9,16 @@ import React, {forwardRef} from 'react'
 import PropTypes from 'prop-types'
 import {Link as RouteLink} from 'react-router-dom'
 
-// Components
 import {
     Box,
-    PopoverTrigger,
-
-    // Hooks
-    useTheme
+    Popover,
+    useSlotRecipe
 } from '@chakra-ui/react'
 
-// Project Components
 import Link from '../../components/link'
-
-// Others
-import {categoryUrlBuilder} from '../../utils/url'
 import {ChevronDownIcon} from '../../components/icons'
+
+import {categoryUrlBuilder} from '../../utils/url'
 
 const ChevronIconTrigger = forwardRef(function ChevronIconTrigger(props, ref) {
     return (
@@ -34,8 +29,8 @@ const ChevronIconTrigger = forwardRef(function ChevronIconTrigger(props, ref) {
 })
 
 const ListMenuTrigger = ({item, name, isOpen, onOpen, onClose}) => {
-    const theme = useTheme()
-    const {baseStyle} = theme.components.ListMenu
+    const recipe = useSlotRecipe({key: 'listMenu'})
+    const styles = recipe()
 
     const keyMap = {
         Escape: () => onClose(),
@@ -43,19 +38,19 @@ const ListMenuTrigger = ({item, name, isOpen, onOpen, onClose}) => {
     }
 
     return (
-        <Box {...baseStyle.listMenuTriggerContainer}>
+        <Box css={styles.listMenuTriggerContainer}>
             <Link
                 as={RouteLink}
                 to={categoryUrlBuilder(item)}
                 onMouseOver={onOpen}
-                {...baseStyle.listMenuTriggerLink}
+                css={styles.listMenuTriggerLink}
                 {...{name: name + ' __'}}
-                {...(isOpen ? baseStyle.listMenuTriggerLinkActive : {})}
+                {...(isOpen ? {css: styles.listMenuTriggerLinkActive} : {})}
             >
                 {name}
             </Link>
 
-            <PopoverTrigger>
+            <Popover.Trigger>
                 <Link
                     as={RouteLink}
                     to={'#'}
@@ -63,11 +58,11 @@ const ListMenuTrigger = ({item, name, isOpen, onOpen, onClose}) => {
                     onKeyDown={(e) => {
                         keyMap[e.key]?.(e)
                     }}
-                    {...baseStyle.listMenuTriggerLinkIcon}
+                    css={styles.listMenuTriggerLinkIcon}
                 >
-                    <ChevronIconTrigger {...baseStyle.selectedButtonIcon} />
+                    <ChevronIconTrigger />
                 </Link>
-            </PopoverTrigger>
+            </Popover.Trigger>
         </Box>
     )
 }

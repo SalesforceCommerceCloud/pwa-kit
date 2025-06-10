@@ -37,13 +37,13 @@ const ListMenuPopover = ({contentComponent, item, name, itemsKey, maxColumns}) =
                 variant="fullWidth"
             >
                 <Fragment>
-                    {/* <ListMenuTrigger
+                    <ListMenuTrigger
                         item={item}
                         name={name}
                         isOpen={isOpen}
                         onOpen={onOpen}
                         onClose={onClose}
-                    /> */}
+                    />
                     {isOpen && (
                         <Popover.Content data-testid="popover-menu" css={styles.popoverContent}>
                             <Popover.Body css={styles.popoverBody}>
