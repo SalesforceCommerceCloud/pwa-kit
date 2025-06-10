@@ -208,3 +208,49 @@ test('Show no stores are found if there are no stores', async () => {
         expect(window.location.pathname).toBe('/uk/en-GB/store-locator')
     })
 })
+
+test('Allows customer to search for stores and expand to view store details', async () => {
+    global.server.use(
+        rest.get('*/shopper-stores/v1/organizations/*/store-search', (req, res, ctx) => {
+            return res(ctx.delay(0), ctx.status(200), ctx.json(mockStores))
+        })
+    )
+    const {user} = renderWithProviders(<MockedComponent />, {
+        wrapperProps: {siteAlias: 'uk', appConfig: mockConfig.app}
+    })
+
+    await user.click(await screen.findByText('Find a Store'))
+
+    const countrySelect = await screen.findByDisplayValue('Select a country')
+    await user.selectOptions(countrySelect, 'DE')
+
+    const postalCodeInput = screen.getByPlaceholderText(/Enter postal code/i)
+    await user.type(postalCodeInput, '65185')
+
+    const findButton = screen.getByRole('button', {name: 'Find'})
+    await user.click(findButton)
+
+    await waitFor(() => {
+        expect(screen.getByText('Wiesbaden Tech Depot')).toBeInTheDocument()
+        expect(screen.getByText('Frankfurt Electronics Store')).toBeInTheDocument()
+    })
+
+    await waitFor(() => {
+        expect(screen.getByText('Kirchgasse 12')).toBeInTheDocument()
+        expect(screen.getByText(/Phone:\s*\+49 611 876543/)).toBeInTheDocument()
+        expect(screen.getByText('0.74 km away')).toBeInTheDocument()
+    })
+
+    const wiesbadenStoreElement = await screen.findByText('Wiesbaden Tech Depot')
+    const wiesbadenAccordionItem = wiesbadenStoreElement.closest('.chakra-accordion__item')
+
+    expect(wiesbadenAccordionItem).toBeTruthy()
+
+    const viewMoreButton = within(wiesbadenAccordionItem).getByText('View More')
+    await user.click(viewMoreButton)
+
+    await waitFor(() => {
+        expect(within(wiesbadenAccordionItem).getByText(/Monday 9 AM–7 PM/)).toBeInTheDocument()
+        expect(within(wiesbadenAccordionItem).getByText(/Sunday Closed/)).toBeInTheDocument()
+    })
+})
