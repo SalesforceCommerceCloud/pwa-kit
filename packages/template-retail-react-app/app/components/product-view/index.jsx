@@ -281,11 +281,13 @@ const ProductView = forwardRef(
                 }
                 try {
                     const addToCartResponse = await addToCart(variant, quantity)
-                    
+
                     // For regular products: addToCartResponse has productSelectionValues and possibly bonusDiscountLineItems
                     // For product bundles: addToCartResponse is just the childProductSelections array
-                    const itemsAdded = addToCartResponse?.productSelectionValues || addToCartResponse
-                    const isValidResponse = itemsAdded && (Array.isArray(itemsAdded) || itemsAdded.length > 0)
+                    const itemsAdded =
+                        addToCartResponse?.productSelectionValues || addToCartResponse
+                    const isValidResponse =
+                        itemsAdded && (Array.isArray(itemsAdded) || itemsAdded.length > 0)
 
                     // Compare existing bonus products with new bonus discount line items
                     // Only regular products (not bundles) can have bonusDiscountLineItems
