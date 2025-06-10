@@ -10,7 +10,7 @@
 require('cross-fetch/polyfill')
 require('raf/polyfill') // fix requestAnimationFrame issue with polyfill
 require('@testing-library/jest-dom/extend-expect')
-const mockConfig = require('./src/mock-config')
+const mockConfig = require('./mock-config')
 
 const mockAppConfig = {
     app: {
@@ -26,7 +26,7 @@ const {
     mockedRegisteredCustomer,
     exampleTokenReponse,
     mockCustomerBaskets
-} = require('./src/mocks/mock-data')
+} = require('./mocks/mock-data')
 
 // set jsdom in https context to allow read/write secure cookies
 global.jsdom.reconfigure({url: 'https://www.domain.com'})
