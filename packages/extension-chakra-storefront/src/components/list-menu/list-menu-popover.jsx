@@ -8,32 +8,26 @@
 import React, {Fragment, useRef} from 'react'
 import PropTypes from 'prop-types'
 
-// Project Components
 import {ListMenuContent} from '../../components/list-menu/list-menu-content'
 import {ListMenuTrigger} from '../../components/list-menu/list-menu-trigger'
 
-// Components
 import {
     Box,
     Popover,
-    PopoverContent,
-    PopoverBody,
-
-    // Hooks
     useDisclosure,
-    useTheme
+    useSlotRecipe
 } from '@chakra-ui/react'
 
 const ListMenuPopover = ({contentComponent, item, name, itemsKey, maxColumns}) => {
     const initialFocusRef = useRef()
     const {isOpen, onClose, onOpen} = useDisclosure()
     const ContentComponent = contentComponent || ListMenuContent
-    const theme = useTheme()
-    const {baseStyle} = theme.components.ListMenu
+    const recipe = useSlotRecipe({key: 'listMenu'})
+    const styles = recipe()
 
     return (
         <Box onMouseLeave={onClose}>
-            <Popover
+            <Popover.Root
                 isLazy
                 placement={'bottom-start'}
                 initialFocusRef={initialFocusRef}
@@ -43,16 +37,16 @@ const ListMenuPopover = ({contentComponent, item, name, itemsKey, maxColumns}) =
                 variant="fullWidth"
             >
                 <Fragment>
-                    <ListMenuTrigger
+                    {/* <ListMenuTrigger
                         item={item}
                         name={name}
                         isOpen={isOpen}
                         onOpen={onOpen}
                         onClose={onClose}
-                    />
+                    /> */}
                     {isOpen && (
-                        <PopoverContent data-testid="popover-menu" {...baseStyle.popoverContent}>
-                            <PopoverBody {...baseStyle.popoverBody}>
+                        <Popover.Content data-testid="popover-menu" css={styles.popoverContent}>
+                            <Popover.Body css={styles.popoverBody}>
                                 <ContentComponent
                                     item={item}
                                     itemsKey={itemsKey}
@@ -60,11 +54,11 @@ const ListMenuPopover = ({contentComponent, item, name, itemsKey, maxColumns}) =
                                     onClose={onClose}
                                     maxColumns={maxColumns}
                                 />
-                            </PopoverBody>
-                        </PopoverContent>
+                            </Popover.Body>
+                        </Popover.Content>
                     )}
                 </Fragment>
-            </Popover>
+            </Popover.Root>
         </Box>
     )
 }

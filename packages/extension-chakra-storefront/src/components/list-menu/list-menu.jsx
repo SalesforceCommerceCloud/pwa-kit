@@ -78,18 +78,15 @@ const ListMenu = ({
                             return (
                                 <Box key={id}>
                                     {itemsCount > 0 ? (
-                                        // <ListMenuPopover
-                                        //     key={id}
-                                        //     maxColumns={maxColumns}
-                                        //     item={item}
-                                        //     name={name}
-                                        //     items={item?.[itemsKey]}
-                                        //     itemsKey={itemsKey}
-                                        //     contentComponent={contentComponent}
-                                        // />
-                                        <div>
-                                            <h1>ListMenuPopover</h1>
-                                        </div>
+                                        <ListMenuPopover
+                                            key={id}
+                                            maxColumns={maxColumns}
+                                            item={item}
+                                            name={name}
+                                            items={item?.[itemsKey]}
+                                            itemsKey={itemsKey}
+                                            contentComponent={contentComponent}
+                                        />
                                     ) : (
                                         <Link
                                             as={RouteLink}
