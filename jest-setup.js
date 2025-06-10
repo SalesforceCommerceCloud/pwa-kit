@@ -144,6 +144,13 @@ jest.mock('@salesforce/cc-datacloud-typescript', () => ({
 global.TextEncoder = require('util').TextEncoder
 global.TextDecoder = require('util').TextDecoder
 
+// Add ResizeObserver polyfill for Chakra UI testing
+global.ResizeObserver = jest.fn().mockImplementation(() => ({
+    observe: jest.fn(),
+    unobserve: jest.fn(),
+    disconnect: jest.fn()
+}))
+
 // JSDOM environment doesn't natively implement this modern Web API function.
 // Chakra v3 is using it, so we need to mock it here
 global.structuredClone = (val) => {

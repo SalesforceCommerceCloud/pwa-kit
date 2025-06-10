@@ -7,24 +7,23 @@
 import React, {useEffect, useMemo, useRef, useState} from 'react'
 import {useSearchSuggestions} from '@salesforce/commerce-sdk-react'
 import {
+    CloseButton,
     Input,
     InputGroup,
-    InputLeftElement,
     Popover,
-    PopoverTrigger,
-    PopoverContent,
     Button,
     Box,
     Flex,
     HStack,
-    Spinner
+    Spinner,
+    useSlotRecipe
 } from '@chakra-ui/react'
 import SearchSuggestions from '../../components/search/partials/search-suggestions'
 import {SearchIcon} from '../../components/icons'
 import {capitalize, boldString, getSessionJSONItem, setSessionJSONItem} from '../../utils/utils'
 import useNavigation from '../../hooks/use-navigation'
-import {HideOnDesktop, HideOnMobile} from '../../components/responsive'
-import {FormattedMessage} from 'react-intl'
+import {HideOnDesktop, HideOnMobile} from '../responsive'
+import {FormattedMessage, useIntl} from 'react-intl'
 import debounce from 'lodash/debounce'
 import {productUrlBuilder, searchUrlBuilder, categoryUrlBuilder} from '../../utils/url'
 import {useExtensionConfig} from '../../hooks'
@@ -75,6 +74,7 @@ const Search = (props) => {
     const [isOpen, setIsOpen] = useState(false)
     const [searchQuery, setSearchQuery] = useState('')
     const navigate = useNavigation()
+    const intl = useIntl()
     const {search: searchConfig} = useExtensionConfig()
     const searchSuggestion = useSearchSuggestions(
         {
@@ -87,7 +87,13 @@ const Search = (props) => {
         }
     )
     const searchInputRef = useRef()
-    const recentSearches = getSessionJSONItem(searchConfig.recentSearchKey)
+    const [recentSearches, setRecentSearches] = useState([])
+    const recipe = useSlotRecipe({key: 'search'})
+    const styles = recipe()
+
+    useEffect(() => {
+        setRecentSearches(getSessionJSONItem(searchConfig.recentSearchKey) || [])
+    }, [])
     const searchSuggestions = useMemo(
         () => formatSuggestions(searchSuggestion.data, searchInputRef?.current?.value),
         [searchSuggestion]
@@ -118,6 +124,7 @@ const Search = (props) => {
 
         // Replace the save resent search with the updated value.
         setSessionJSONItem(searchConfig.recentSearchKey, searches)
+        setRecentSearches(getSessionJSONItem(searchConfig.recentSearchKey) || [])
     }
 
     const debouncedSearch = debounce((input) => {
@@ -161,6 +168,7 @@ const Search = (props) => {
             setIsOpen(false)
             navigate(link)
         }
+        setRecentSearches([])
     }
 
     const shouldOpenPopover = () => {
@@ -181,16 +189,38 @@ const Search = (props) => {
         shouldOpenPopover()
     }
 
+    const onClearSearch = () => {
+        if (searchInputRef.current) {
+            searchInputRef.current.value = ''
+        }
+        setSearchQuery('')
+        searchInputRef.current?.focus()
+        shouldOpenPopover()
+    }
+
     return (
-        <Box>
-            <Popover isOpen={isOpen} isLazy initialFocusRef={searchInputRef}>
-                <PopoverTrigger>
+        <Box css={styles.searchContainer}>
+            <Popover.Root open={isOpen} isLazy initialFocusEl={() => searchInputRef.current}>
+                <Popover.Trigger asChild>
                     <form onSubmit={onSubmitSearch}>
                         <HStack>
-                            <InputGroup>
-                                <InputLeftElement pointerEvents="none">
-                                    <SearchIcon />
-                                </InputLeftElement>
+                            <InputGroup
+                                startElement={<SearchIcon css={styles.searchIcon} />}
+                                endElement={
+                                    searchQuery.length ? (
+                                        <CloseButton
+                                            size="xs"
+                                            css={styles.clearIcon}
+                                            variant="unstyled"
+                                            aria-label={intl.formatMessage({
+                                                id: 'header.button.assistive_msg.clear_search',
+                                                defaultMessage: 'Clear Search'
+                                            })}
+                                            onClick={onClearSearch}
+                                        />
+                                    ) : undefined
+                                }
+                            >
                                 <Input
                                     autoComplete="off"
                                     id="search-input"
@@ -199,6 +229,7 @@ const Search = (props) => {
                                     onBlur={() => setIsOpen(false)}
                                     type="search"
                                     ref={searchInputRef}
+                                    css={styles.searchInput}
                                     {...props}
                                     variant="filled"
                                 />
@@ -208,6 +239,7 @@ const Search = (props) => {
                                     display={isOpen ? 'block' : 'none'}
                                     variant="link"
                                     size="sm"
+                                    css={styles.cancelButton}
                                     onMouseDown={() => closeAndNavigate(false)}
                                 >
                                     <FormattedMessage
@@ -218,18 +250,19 @@ const Search = (props) => {
                             </HideOnDesktop>
                         </HStack>
                     </form>
-                </PopoverTrigger>
-
-                <HideOnMobile>
-                    <PopoverContent data-testid="sf-suggestion-popover">
-                        <SearchSuggestions
-                            closeAndNavigate={closeAndNavigate}
-                            recentSearches={recentSearches}
-                            searchSuggestions={searchSuggestions}
-                        />
-                    </PopoverContent>
-                </HideOnMobile>
-            </Popover>
+                </Popover.Trigger>
+                <Popover.Positioner>
+                    <HideOnMobile>
+                        <Popover.Content data-testid="sf-suggestion-popover">
+                            <SearchSuggestions
+                                closeAndNavigate={closeAndNavigate}
+                                recentSearches={recentSearches}
+                                searchSuggestions={searchSuggestions}
+                            />
+                        </Popover.Content>
+                    </HideOnMobile>
+                </Popover.Positioner>
+            </Popover.Root>
             <HideOnDesktop>
                 <Flex
                     display={isOpen || searchInputRef?.value?.length > 0 ? 'block' : 'none'}
