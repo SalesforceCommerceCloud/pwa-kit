@@ -281,9 +281,14 @@ const ProductView = forwardRef(
                 }
                 try {
                     const addToCartResponse = await addToCart(variant, quantity)
-                    const itemsAdded = addToCartResponse?.productSelectionValues
+                    
+                    // For regular products: addToCartResponse has productSelectionValues and possibly bonusDiscountLineItems
+                    // For product bundles: addToCartResponse is just the childProductSelections array
+                    const itemsAdded = addToCartResponse?.productSelectionValues || addToCartResponse
+                    const isValidResponse = itemsAdded && (Array.isArray(itemsAdded) || itemsAdded.length > 0)
 
                     // Compare existing bonus products with new bonus discount line items
+                    // Only regular products (not bundles) can have bonusDiscountLineItems
                     const newBonusItems =
                         addToCartResponse?.bonusDiscountLineItems?.filter(
                             (newItem) =>
@@ -292,11 +297,10 @@ const ProductView = forwardRef(
                                 )
                         ) || []
 
-                    if (itemsAdded) {
+                    if (isValidResponse) {
                         // Show bonus product modal first if there are bonus items
                         if (newBonusItems?.length > 0) {
-                            // Modify this logic and update bonusProducts list in localStorage with the new bonus items
-                            // that are added to the cart
+                            // Update bonusProducts list with the new bonus items
                             addBonusProducts(newBonusItems)
                             onBonusProductModalOpen({
                                 newBonusItems,
