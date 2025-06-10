@@ -4,8 +4,11 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-export default {
-    baseStyle: {
+import {defineSlotRecipe} from '@chakra-ui/react'
+
+export default defineSlotRecipe({
+    slots: ['container', 'icon', 'link'],
+    base: {
         container: {
             minHeight: 4,
             fontSize: 'sm'
@@ -16,10 +19,9 @@ export default {
             color: 'grey'
         },
         link: {
-            paddingTop: 3,
-            paddingBottom: 3,
+            pt: 3,
+            pb: 3,
             textDecoration: 'none'
         }
-    },
-    parts: ['container', 'icon', 'link']
-}
+    }
+})
