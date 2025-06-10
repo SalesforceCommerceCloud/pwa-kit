@@ -57,7 +57,7 @@ export default defineSlotRecipe({
             minW: '60px'
         },
         selectIndicator: {
-            color: 'black',
+            color: 'black'
         }
     }
 })

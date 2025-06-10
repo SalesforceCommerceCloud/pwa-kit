@@ -793,7 +793,7 @@ const Sort = ({sortUrls, productSearchResult, basePath, ...otherProps}) => {
                         </option>
                     ))}
                 </NativeSelect.Field>
-                <NativeSelect.Indicator 
+                <NativeSelect.Indicator
                     position="absolute"
                     right={3}
                     top="50%"
