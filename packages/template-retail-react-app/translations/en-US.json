@@ -562,10 +562,10 @@
     "defaultMessage": "Sign in to retrieve your saved items or continue shopping."
   },
   "empty_search_results.info.cant_find_anything_for_category": {
-    "defaultMessage": "We couldn’t find anything for {category}. Try searching for a product or {link}."
+    "defaultMessage": "We couldn't find anything for {category}. Try searching for a product or {link}."
   },
   "empty_search_results.info.cant_find_anything_for_query": {
-    "defaultMessage": "We couldn’t find anything for \"{searchQuery}\"."
+    "defaultMessage": "We couldn't find anything for \"{searchQuery}\"."
   },
   "empty_search_results.info.double_check_spelling": {
     "defaultMessage": "Double-check your spelling and try again or {link}."
@@ -1787,19 +1787,19 @@
     "defaultMessage": "In Stock at {storeLink}"
   },
   "store_inventory_filter.checkbox.assistive_msg": {
-    "defaultMessage": "Filter products by store availability at {storeName}"
+    "defaultMessage": "Filter Products by Store Availability at {storeName}"
   },
   "store_inventory_filter.link.assistive_msg": {
-    "defaultMessage": "Open store locator to {action}"
+    "defaultMessage": "Open Store Locator to {action}"
   },
   "store_inventory_filter.action.select_store": {
     "defaultMessage": "Select Store"
   },
   "store_inventory_filter.action.change_store": {
-    "defaultMessage": "change store"
+    "defaultMessage": "Change Store"
   },
   "store_inventory_filter.action.select_store_link": {
-    "defaultMessage": "select a store"
+    "defaultMessage": "Select a Store"
   },
   "selected_refinements.filter.in_stock": {
     "defaultMessage": "In Stock"

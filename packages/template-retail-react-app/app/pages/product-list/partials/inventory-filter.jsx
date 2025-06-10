@@ -95,7 +95,7 @@ const StoreInventoryFilter = ({toggleFilter, selectedFilters}) => {
                     onChange={handleCheckboxChange}
                     aria-label={formatMessage(
                         {
-                            defaultMessage: 'Filter products by store availability at {storeName}',
+                            defaultMessage: 'Filter Products by Store Availability at {storeName}',
                             id: 'store_inventory_filter.checkbox.assistive_msg'
                         },
                         {
@@ -104,7 +104,7 @@ const StoreInventoryFilter = ({toggleFilter, selectedFilters}) => {
                     )}
                 >
                     <FormattedMessage
-                        defaultMessage="In stock at {storeLink}"
+                        defaultMessage="In Stock at {storeLink}"
                         id="store_inventory_filter.checkbox.label"
                         values={{
                             storeLink: (
@@ -116,17 +116,17 @@ const StoreInventoryFilter = ({toggleFilter, selectedFilters}) => {
                                     _hover={{color: 'blue.500'}}
                                     aria-label={formatMessage(
                                         {
-                                            defaultMessage: 'Open store locator to {action}',
+                                            defaultMessage: 'Open Store Locator to {action}',
                                             id: 'store_inventory_filter.link.assistive_msg'
                                         },
                                         {
                                             action: selectedStore?.name
                                                 ? formatMessage({
-                                                      defaultMessage: 'change store',
+                                                      defaultMessage: 'Change Store',
                                                       id: 'store_inventory_filter.action.change_store'
                                                   })
                                                 : formatMessage({
-                                                      defaultMessage: 'select a store',
+                                                      defaultMessage: 'Select a Store',
                                                       id: 'store_inventory_filter.action.select_store_link'
                                                   })
                                         }
