@@ -17,10 +17,10 @@ import {AlertIcon} from '../../components/icons'
 /**
  * A banner component that displays when the user is offline.
  */
-const OfflineBanner = ({...rest}) => {
+const OfflineBanner = ({...props}) => {
     const intl = useIntl()
     return (
-        <Alert status="warning" {...rest}>
+        <Alert status="warning" {...props}>
             <Flex align="center">
                 <AlertIcon mr={2} />
                 <AlertDescription>
