@@ -32,7 +32,6 @@ import extensionMeta from '../extension-meta.json'
 // Pages
 import * as Pages from './pages'
 import {DrawerMenu} from './components/drawer-menu'
-// import {mockCategories} from './mocks/mock-data'
 import {Button} from '@chakra-ui/react'
 
 const mockCategories = {
@@ -151,7 +150,6 @@ const DrawerMenuPage = () => {
             <DrawerMenu
                 isOpen={open}
                 onClose={() => setOpen(false)}
-                // onLogoClick={onLogoClick}
                 root={mockCategories}
                 itemsKey="categories"
                 itemsCountKey="onlineSubCategoriesCount"

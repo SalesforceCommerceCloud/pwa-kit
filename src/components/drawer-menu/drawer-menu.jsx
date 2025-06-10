@@ -93,7 +93,7 @@ const DrawerMenu = ({
     const logout = useAuthHelper(AuthHelpers.Logout)
     const recipe = useSlotRecipe({key: 'drawerMenu'})
     const styles = recipe()
-    console.log('socialIconVariant', socialIconVariant)
+
     const onSignoutClick = async () => {
         setShowLoading(true)
         await logout.mutateAsync()
@@ -148,7 +148,7 @@ const DrawerMenu = ({
                             {root?.[itemsKey] ? (
                                 <Fade in={true}>
                                     <NestedAccordion
-                                        allowMultiple={true}
+                                        multiple={true}
                                         item={root}
                                         itemsCountKey={itemsCountKey}
                                         itemsKey={itemsKey}
@@ -286,7 +286,7 @@ const DrawerMenu = ({
 
                         {/* Support Links */}
                         <NestedAccordion
-                            allowMultiple={true}
+                            multiple={true}
                             // NOTE: Modify this content and builder as you see fit.
                             urlBuilder={() => '/'}
                             item={{
