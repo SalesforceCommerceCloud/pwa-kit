@@ -74,7 +74,7 @@ const QuantityPicker = (props) => {
                 </NumberInput.DecrementTrigger>
                 <NumberInput.Input
                     css={styles.input}
-                    ariaLabel={intl.formatMessage({
+                    aria-label={intl.formatMessage({
                         defaultMessage: 'Quantity',
                         id: 'product_view.label.quantity'
                     })}
