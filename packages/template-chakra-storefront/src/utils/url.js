@@ -12,7 +12,7 @@ import {
     getDefaultSite,
     getSiteByReference
 } from './site-utils'
-import {urlPartPositions} from '../constants'
+import {urlPartPositions} from '../../config/constants'
 
 /**
  * A function that takes a path and qualifies it with the current host and protocol.

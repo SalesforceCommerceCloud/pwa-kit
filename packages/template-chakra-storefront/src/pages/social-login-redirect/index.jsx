@@ -18,7 +18,7 @@ import {useCurrentCustomer} from '../../hooks/use-current-customer'
 import {useAppOrigin} from '../../hooks/use-app-origin'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {getSessionJSONItem, clearSessionJSONItem, buildRedirectURI} from '../../utils/utils'
-import {API_ERROR_MESSAGE} from '../../constants'
+import {API_ERROR_MESSAGE} from '../../../config/constants'
 
 const SocialLoginRedirect = () => {
     const {formatMessage} = useIntl()

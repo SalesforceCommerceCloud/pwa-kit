@@ -11,7 +11,7 @@ import {useHistory, useLocation} from 'react-router-dom'
 import {useVariant} from './use-variant'
 import {useToast} from './use-toast'
 import {useIntl} from 'react-intl'
-import {API_ERROR_MESSAGE} from '../constants'
+import {API_ERROR_MESSAGE} from '../../config/constants'
 import {useProduct} from '@salesforce/commerce-sdk-react'
 
 /**

@@ -20,7 +20,7 @@ import {useLocation, useRouteMatch} from 'react-router-dom'
 import {usePasswordReset} from '../../hooks/use-password-reset'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 
-import {API_ERROR_MESSAGE, FEATURE_UNAVAILABLE_ERROR_MESSAGE} from '../../constants'
+import {API_ERROR_MESSAGE, FEATURE_UNAVAILABLE_ERROR_MESSAGE} from '../../../config/constants'
 
 const ResetPassword = () => {
     const {formatMessage} = useIntl()

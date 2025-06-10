@@ -35,7 +35,7 @@ import CartItemVariantName from '../../components/item-variant/item-name'
 import CartItemVariantAttributes from '../../components/item-variant/item-attributes'
 import CartItemVariantPrice from '../../components/item-variant/item-price'
 import {useCurrentCustomer} from '../../hooks/use-current-customer'
-import {API_ERROR_MESSAGE} from '../../constants'
+import {API_ERROR_MESSAGE} from '../../../config/constants'
 import {useCurrency} from '../../hooks'
 
 const onClient = typeof window !== 'undefined'

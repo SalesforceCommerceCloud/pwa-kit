@@ -24,10 +24,7 @@ import theme from '../../../src/theme'
 // import {MultiSiteProvider, AppConfigProvider} from '../../../src/contexts'
 import {MultiSiteProvider} from '../../../src/contexts'
 import {useAppOrigin} from '../../../src/hooks/use-app-origin'
-import {
-    resolveSiteFromUrl,
-    resolveLocaleFromUrl
-} from '../../../src/utils/site-utils'
+import {resolveSiteFromUrl, resolveLocaleFromUrl} from '../../../src/utils/site-utils'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {createUrlTemplate} from '../../../src/utils/url'
 import createLogger from '@salesforce/pwa-kit-runtime/utils/logger-factory'
@@ -36,7 +33,7 @@ import {CommerceApiProvider} from '@salesforce/commerce-sdk-react'
 import {withReactQuery} from '@salesforce/pwa-kit-react-sdk/ssr/universal/components/with-react-query'
 import {useCorrelationId} from '@salesforce/pwa-kit-react-sdk/ssr/universal/hooks'
 import {ReactQueryDevtools} from '@tanstack/react-query-devtools'
-import {DEFAULT_DNT_STATE} from '../../../src/constants'
+import {DEFAULT_DNT_STATE} from '../../../config/constants'
 
 /**
  * Use the AppConfig component to inject extra arguments into the getProps
@@ -56,37 +53,48 @@ const AppConfig = ({children, locals = {}}) => {
     const appOrigin = useAppOrigin()
     const passwordlessCallback = locals.appConfig.login?.passwordless?.callbackURI
 
-    const memoizedHeaders = useMemo(() => headers, [/* dependencies */])
+    const memoizedHeaders = useMemo(
+        () => headers,
+        [
+            /* dependencies */
+        ]
+    )
     const memoizedLogger = useMemo(() => createLogger({packageName: 'commerce-sdk-react'}), [])
 
-    const siteId = useMemo(() => locals.site?.id, [locals.site?.id]);
-    const locale = useMemo(() => locals.locale?.id, [locals.locale?.id]);
-    const currency = useMemo(() => locals.locale?.preferredCurrency, [locals.locale?.preferredCurrency]);
-    const proxy = useMemo(() => `${appOrigin}${commerceApiConfig.proxyPath}`, [appOrigin, commerceApiConfig.proxyPath]);
-    const redirectURI = useMemo(() => `${appOrigin}/callback`, [appOrigin]);
-    const passwordlessLoginCallbackURI = useMemo(() => passwordlessCallback, [passwordlessCallback]);
-    const defaultDnt = useMemo(() => locals.appConfig.dnt, [locals.appConfig.dnt]);
+    const siteId = useMemo(() => locals.site?.id, [locals.site?.id])
+    const locale = useMemo(() => locals.locale?.id, [locals.locale?.id])
+    const currency = useMemo(
+        () => locals.locale?.preferredCurrency,
+        [locals.locale?.preferredCurrency]
+    )
+    const proxy = useMemo(
+        () => `${appOrigin}${commerceApiConfig.proxyPath}`,
+        [appOrigin, commerceApiConfig.proxyPath]
+    )
+    const redirectURI = useMemo(() => `${appOrigin}/callback`, [appOrigin])
+    const passwordlessLoginCallbackURI = useMemo(() => passwordlessCallback, [passwordlessCallback])
+    const defaultDnt = useMemo(() => locals.appConfig.dnt, [locals.appConfig.dnt])
 
     return (
-            <CommerceApiProvider
-                shortCode={commerceApiConfig.parameters.shortCode}
-                clientId={commerceApiConfig.parameters.clientId}
-                organizationId={commerceApiConfig.parameters.organizationId}
-                siteId={siteId}
-                locale={locale}
-                currency={currency}
-                redirectURI={redirectURI}
-                passwordlessLoginCallbackURI={passwordlessLoginCallbackURI}
-                proxy={proxy}
-                headers={memoizedHeaders}
-                defaultDnt={defaultDnt}
-                logger={memoizedLogger}
-            >
-                    <MultiSiteProvider site={locals.site} locale={locals.locale} buildUrl={locals.buildUrl}>
-                        <ChakraProvider theme={theme}>{children}</ChakraProvider>
-                    </MultiSiteProvider>
-                <ReactQueryDevtools />
-            </CommerceApiProvider>
+        <CommerceApiProvider
+            shortCode={commerceApiConfig.parameters.shortCode}
+            clientId={commerceApiConfig.parameters.clientId}
+            organizationId={commerceApiConfig.parameters.organizationId}
+            siteId={siteId}
+            locale={locale}
+            currency={currency}
+            redirectURI={redirectURI}
+            passwordlessLoginCallbackURI={passwordlessLoginCallbackURI}
+            proxy={proxy}
+            headers={memoizedHeaders}
+            defaultDnt={defaultDnt}
+            logger={memoizedLogger}
+        >
+            <MultiSiteProvider site={locals.site} locale={locals.locale} buildUrl={locals.buildUrl}>
+                <ChakraProvider theme={theme}>{children}</ChakraProvider>
+            </MultiSiteProvider>
+            <ReactQueryDevtools />
+        </CommerceApiProvider>
     )
 }
 
@@ -119,7 +127,7 @@ AppConfig.extraGetPropsArgs = (locals = {}) => {
     return {
         buildUrl: locals.buildUrl,
         site: locals.site,
-        locale: locals.locale,
+        locale: locals.locale
         // appConfig: locals.appConfig
     }
 }

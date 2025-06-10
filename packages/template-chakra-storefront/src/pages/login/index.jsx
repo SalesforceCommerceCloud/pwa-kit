@@ -35,7 +35,7 @@ import {
     LOGIN_TYPES,
     PASSWORDLESS_ERROR_MESSAGES,
     USER_NOT_FOUND_ERROR
-} from '../../constants'
+} from '../../../config/constants'
 import {usePrevious} from '../../hooks/use-previous'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {isServer} from '../../utils/utils'

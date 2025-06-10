@@ -46,7 +46,7 @@ import {
     TOAST_ACTION_VIEW_WISHLIST,
     TOAST_MESSAGE_ADDED_TO_WISHLIST,
     TOAST_MESSAGE_ALREADY_IN_WISHLIST
-} from '../../constants'
+} from '../../../config/constants'
 import {rebuildPathWithParams} from '../../utils/url'
 import {useHistory, useLocation, useParams} from 'react-router-dom'
 import {useToast} from '../../hooks/use-toast'

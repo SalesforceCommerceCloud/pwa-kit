@@ -20,7 +20,7 @@ import {
     STORE_LOCATOR_DISTANCE,
     STORE_LOCATOR_NUM_STORES_PER_LOAD,
     STORE_LOCATOR_DISTANCE_UNIT
-} from '../../constants'
+} from '../../../config/constants'
 
 //This is an API limit and is therefore not configurable
 const NUM_STORES_PER_REQUEST_API_MAX = 200

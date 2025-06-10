@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import {urlPartPositions} from '../constants'
+import {urlPartPositions} from '../../config/constants'
 
 /**
  * Construct literal routes based on url config

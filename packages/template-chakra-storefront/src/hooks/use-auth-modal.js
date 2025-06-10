@@ -38,7 +38,7 @@ import {
     LOGIN_TYPES,
     PASSWORDLESS_ERROR_MESSAGES,
     USER_NOT_FOUND_ERROR
-} from '../constants'
+} from '../../config/constants'
 import useNavigation from './use-navigation'
 import {usePrevious} from './use-previous'
 import {usePasswordReset} from './use-password-reset'

@@ -18,7 +18,7 @@ import {setSessionJSONItem, buildRedirectURI} from '../../utils/utils'
 // Icons
 import {AppleIcon, GoogleIcon} from '../../components/icons'
 
-import {API_ERROR_MESSAGE, FEATURE_UNAVAILABLE_ERROR_MESSAGE} from '../../constants'
+import {API_ERROR_MESSAGE, FEATURE_UNAVAILABLE_ERROR_MESSAGE} from '../../../config/constants'
 
 const IDP_CONFIG = {
     apple: {

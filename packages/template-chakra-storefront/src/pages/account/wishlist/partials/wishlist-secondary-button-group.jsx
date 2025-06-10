@@ -17,7 +17,7 @@ import {useWishList} from '../../../../hooks/use-wish-list'
 import ConfirmationModal from '../../../../components/confirmation-modal/index'
 import {useItemVariant} from '../../../../components/item-variant'
 import {noop} from '../../../../utils/utils'
-import {API_ERROR_MESSAGE} from '../../../../constants'
+import {API_ERROR_MESSAGE} from '../../../../../config/constants'
 
 export const REMOVE_WISHLIST_ITEM_CONFIRMATION_DIALOG_CONFIG = {
     dialogTitle: defineMessage({

@@ -23,7 +23,7 @@ import PaymentForm from '../../../pages/checkout/partials/payment-form'
 import ShippingAddressSelection from '../../../pages/checkout/partials/shipping-address-selection'
 import AddressDisplay from '../../../components/address-display'
 import {PromoCode, usePromoCode} from '../../../components/promo-code'
-import {API_ERROR_MESSAGE} from '../../../constants'
+import {API_ERROR_MESSAGE} from '../../../../config/constants'
 
 const Payment = () => {
     const {formatMessage} = useIntl()

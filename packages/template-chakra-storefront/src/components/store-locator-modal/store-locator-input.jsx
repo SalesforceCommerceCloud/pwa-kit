@@ -23,7 +23,10 @@ import {AlertIcon} from '../../components/icons'
 import {Controller} from 'react-hook-form'
 
 // Others
-import {SUPPORTED_STORE_LOCATOR_COUNTRIES, STORE_LOCATOR_NUM_STORES_PER_LOAD} from '../../constants'
+import {
+    SUPPORTED_STORE_LOCATOR_COUNTRIES,
+    STORE_LOCATOR_NUM_STORES_PER_LOAD
+} from '../../../config/constants'
 import {StoreLocatorContext} from '../../components/store-locator-modal/index'
 
 const useGeolocation = () => {

@@ -12,7 +12,7 @@ import {Button, Divider, Stack, Text} from '@chakra-ui/react'
 import LoginFields from '../forms/login-fields'
 import StandardLogin from '../standard-login'
 import SocialLogin from '../social-login'
-import {LOGIN_TYPES} from '../../constants'
+import {LOGIN_TYPES} from '../../../config/constants'
 
 const PasswordlessLogin = ({
     form,

@@ -19,7 +19,7 @@ import ProductItem from '../../../components/product-item'
 import WishlistPrimaryAction from '../../../pages/account/wishlist/partials/wishlist-primary-action'
 import WishlistSecondaryButtonGroup from '../../../pages/account/wishlist/partials/wishlist-secondary-button-group'
 
-import {API_ERROR_MESSAGE} from '../../../constants'
+import {API_ERROR_MESSAGE} from '../../../../config/constants'
 import {useCurrentCustomer} from '../../../hooks/use-current-customer'
 import UnavailableProductConfirmationModal from '../../../components/unavailable-product-confirmation-modal'
 

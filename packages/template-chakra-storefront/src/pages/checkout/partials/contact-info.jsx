@@ -43,7 +43,7 @@ import {
     CREATE_ACCOUNT_FIRST_ERROR_MESSAGE,
     PASSWORDLESS_ERROR_MESSAGES,
     USER_NOT_FOUND_ERROR
-} from '../../../constants'
+} from '../../../../config/constants'
 
 const ContactInfo = ({isSocialEnabled = false, isPasswordlessEnabled = false, idps = []}) => {
     const {formatMessage} = useIntl()

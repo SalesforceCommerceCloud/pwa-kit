@@ -23,7 +23,7 @@ import {
     TOAST_ACTION_VIEW_WISHLIST,
     TOAST_MESSAGE_ADDED_TO_WISHLIST,
     TOAST_MESSAGE_REMOVED_FROM_WISHLIST
-} from '../../constants'
+} from '../../../config/constants'
 import {useShopperCustomersMutation} from '@salesforce/commerce-sdk-react'
 
 /**
