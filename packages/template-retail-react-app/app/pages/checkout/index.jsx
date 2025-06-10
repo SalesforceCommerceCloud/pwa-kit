@@ -38,7 +38,6 @@ import {
 import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
 import LoadingSpinner from '@salesforce/retail-react-app/app/components/loading-spinner'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
-import {useBonusProductModalContext} from '@salesforce/retail-react-app/app/hooks/use-bonus-product-modal'
 
 const Checkout = () => {
     const {formatMessage} = useIntl()
@@ -52,7 +51,7 @@ const Checkout = () => {
     const idps = social?.idps
     const isSocialEnabled = !!social?.enabled
     const isPasswordlessEnabled = !!passwordless?.enabled
-    const {clearBonusProducts} = useBonusProductModalContext()
+
 
     useEffect(() => {
         if (error || step === 4) {
@@ -66,7 +65,6 @@ const Checkout = () => {
             const order = await createOrder({
                 body: {basketId: basket.basketId}
             })
-            clearBonusProducts()
             navigate(`/checkout/confirmation/${order.orderNo}`)
         } catch (error) {
             const message = formatMessage({
