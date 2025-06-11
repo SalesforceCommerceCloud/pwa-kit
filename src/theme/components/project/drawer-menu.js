@@ -35,6 +35,7 @@ export default defineSlotRecipe({
             overflowY: 'auto',
             padding: 4
         },
+        closeButton: {},
         content: {
             borderRadius: '0px',
             width: '100%',
