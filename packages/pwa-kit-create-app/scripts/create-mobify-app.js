@@ -1155,6 +1155,29 @@ const requiredNode = generatorPkg.engines.node
 const isUsingCompatibleNode = semver.satisfies(foundNode, new semver.Range(requiredNode))
 
 const main = async (opts) => {
+    console.log('plugins', pluginConfig?.plugins)
+    // Prompt user for plugin selection
+    if (pluginConfig?.plugins?.length > 0) {
+        const pluginChoices = Object.entries(pluginConfig.plugins).map(([key, config]) => ({
+            name: config.description,
+            value: key
+        }))
+
+        const pluginAnswers = await inquirer.prompt([
+            {
+                type: 'checkbox',
+                name: 'selectedPlugins',
+                message: 'Which extensions would you like to enable?',
+                choices: pluginChoices
+            }
+        ])
+
+        // Convert selected plugins array to object with true values
+        pluginAnswers.selectedPlugins.forEach((plugin) => {
+            selectedPlugins[plugin] = true
+        })
+    }
+
     if (!isUsingCompatibleNode) {
         console.log('')
         console.warn(
