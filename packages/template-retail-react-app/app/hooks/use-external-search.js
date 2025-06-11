@@ -11,7 +11,7 @@ import {useSearchParams} from '@salesforce/retail-react-app/app/hooks/use-search
 import {searchUrlBuilder} from '@salesforce/retail-react-app/app/utils/url'
 
 /**
- * routing when external search parameters are present in the URL to the appropriate search results
+ * Routing when external search parameters are present in the URL to the appropriate search results
  */
 const useExternalSearch = () => {
     const history = useHistory()
@@ -33,7 +33,7 @@ const useExternalSearch = () => {
             return
         }
 
-        // we need to pre-process out filler words like location hints, and handle multi-word searches
+        // need to pre-process out filler words like location hints, and handle multi-word searches
         const rawQuery = searchParams?.q ?? searchParams?.search ?? searchParams?.query;
         const query = (typeof rawQuery === 'string' ? rawQuery : '').trim();
 

@@ -129,10 +129,7 @@ const App = (props) => {
     const {data: categoriesTree} = useCategory({
         parameters: {id: CAT_MENU_DEFAULT_ROOT_CATEGORY, levels: CAT_MENU_DEFAULT_NAV_SSR_DEPTH}
     })
-
-    //perhaps wrap in useEffect to run once
     useExternalSearch()
-
     const categories = flatten(categoriesTree || {}, 'categories')
     const {getTokenWhenReady} = useAccessToken()
     const appOrigin = useAppOrigin()
