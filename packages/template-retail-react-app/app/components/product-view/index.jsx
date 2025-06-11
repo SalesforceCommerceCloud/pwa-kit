@@ -155,8 +155,8 @@ const ProductView = forwardRef(
             return getPriceData(product, {quantity})
         }, [product, quantity])
         const canAddToWishlist = !isProductLoading
-        const isProductASet = product?.type.set
-        const isProductABundle = product?.type.bundle
+        const isProductASet = product?.type?.set
+        const isProductABundle = product?.type?.bundle
         const errorContainerRef = useRef(null)
 
         const {disableButton, customInventoryMessage} = useMemo(() => {
@@ -373,7 +373,7 @@ const ProductView = forwardRef(
             if (
                 !isProductASet &&
                 !isProductABundle &&
-                validateOrderability(variant, quantity, stockLevel)
+                validateOrderability(variant, product, quantity, stockLevel)
             ) {
                 toggleShowOptionsMessage(false)
             }

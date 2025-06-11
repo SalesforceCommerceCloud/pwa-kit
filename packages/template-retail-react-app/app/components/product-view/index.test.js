@@ -11,6 +11,10 @@ import {fireEvent, screen, waitFor} from '@testing-library/react'
 import mockProductDetail from '@salesforce/retail-react-app/app/mocks/variant-750518699578M'
 import mockProductSet from '@salesforce/retail-react-app/app/mocks/product-set-winter-lookM'
 import {mockProductBundle} from '@salesforce/retail-react-app/app/mocks/product-bundle'
+import {
+    mockStandardProductOrderable,
+    mockStandardProductNotOrderable
+} from '@salesforce/retail-react-app/app/mocks/standard-product'
 import ProductView from '@salesforce/retail-react-app/app/components/product-view'
 import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
 import userEvent from '@testing-library/user-event'
@@ -368,4 +372,96 @@ test('renders "Add to Cart" and "Add to Wishlist" buttons in French', async () =
     expect(
         screen.getByRole('button', {name: /ajouter à la liste de souhaits/i})
     ).toBeInTheDocument()
+})
+
+describe('validateOrderability function tests', () => {
+    test('validateOrderability returns true when variant is undefined but product is orderable', () => {
+        const validateOrderability = (variant, product, quantity, stockLevel) =>
+            (variant?.orderable || product?.inventory?.orderable) &&
+            quantity > 0 &&
+            quantity <= stockLevel
+
+        const variant = undefined
+        const product = mockStandardProductOrderable
+        const quantity = 1
+        const stockLevel = 999999
+
+        const result = validateOrderability(variant, product, quantity, stockLevel)
+        expect(result).toBe(true)
+    })
+
+    test('validateOrderability returns false when variant is undefined and product is not orderable', () => {
+        const validateOrderability = (variant, product, quantity, stockLevel) =>
+            (variant?.orderable || product?.inventory?.orderable) &&
+            quantity > 0 &&
+            quantity <= stockLevel
+
+        const variant = undefined
+        const product = mockStandardProductNotOrderable
+        const quantity = 1
+        const stockLevel = 0
+
+        const result = validateOrderability(variant, product, quantity, stockLevel)
+        expect(result).toBe(false)
+    })
+
+    test('validateOrderability returns true when variant is orderable regardless of product orderability', () => {
+        const validateOrderability = (variant, product, quantity, stockLevel) =>
+            (variant?.orderable || product?.inventory?.orderable) &&
+            quantity > 0 &&
+            quantity <= stockLevel
+
+        const variant = {orderable: true}
+        const product = mockStandardProductNotOrderable // product is not orderable
+        const quantity = 1
+        const stockLevel = 999999
+
+        const result = validateOrderability(variant, product, quantity, stockLevel)
+        expect(result).toBe(true)
+    })
+
+    test('validateOrderability returns false when both variant and product are not orderable', () => {
+        const validateOrderability = (variant, product, quantity, stockLevel) =>
+            (variant?.orderable || product?.inventory?.orderable) &&
+            quantity > 0 &&
+            quantity <= stockLevel
+
+        const variant = {orderable: false}
+        const product = mockStandardProductNotOrderable
+        const quantity = 1
+        const stockLevel = 0
+
+        const result = validateOrderability(variant, product, quantity, stockLevel)
+        expect(result).toBe(false)
+    })
+
+    test('validateOrderability returns false when quantity is invalid even if product/variant are orderable', () => {
+        const validateOrderability = (variant, product, quantity, stockLevel) =>
+            (variant?.orderable || product?.inventory?.orderable) &&
+            quantity > 0 &&
+            quantity <= stockLevel
+
+        const variant = undefined
+        const product = mockStandardProductOrderable
+        const quantity = 0 // invalid quantity
+        const stockLevel = 999999
+
+        const result = validateOrderability(variant, product, quantity, stockLevel)
+        expect(result).toBe(false)
+    })
+
+    test('validateOrderability returns false when quantity exceeds stock level', () => {
+        const validateOrderability = (variant, product, quantity, stockLevel) =>
+            (variant?.orderable || product?.inventory?.orderable) &&
+            quantity > 0 &&
+            quantity <= stockLevel
+
+        const variant = undefined
+        const product = mockStandardProductOrderable
+        const quantity = 1000000 // exceeds stock level
+        const stockLevel = 999999
+
+        const result = validateOrderability(variant, product, quantity, stockLevel)
+        expect(result).toBe(false)
+    })
 })
