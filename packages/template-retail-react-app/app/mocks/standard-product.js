@@ -68,8 +68,7 @@ export const mockStandardProductOrderable = {
         },
         {
             id: 'og:url',
-            value:
-                'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.store/s/RefArchGlobal/dw/shop/v99_9/products/a-standard-dress?currency=GBP&locale=en-GB&expand=availability,promotions,options,images,prices,variations,set_products,bundled_products,page_meta_tags&all_images=true'
+            value: 'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.store/s/RefArchGlobal/dw/shop/v99_9/products/a-standard-dress?currency=GBP&locale=en-GB&expand=availability,promotions,options,images,prices,variations,set_products,bundled_products,page_meta_tags&all_images=true'
         },
         {
             id: 'title',
@@ -80,7 +79,8 @@ export const mockStandardProductOrderable = {
     pricePerUnit: 4,
     primaryCategoryId: 'womens-outfits',
     shortDescription: 'A Standard Dress',
-    slugUrl: 'https://zzrf-001.dx.commercecloud.salesforce.com/s/RefArchGlobal/en_GB/product/a-standard-dress/a-standard-dress.html',
+    slugUrl:
+        'https://zzrf-001.dx.commercecloud.salesforce.com/s/RefArchGlobal/en_GB/product/a-standard-dress/a-standard-dress.html',
     stepQuantity: 1,
     type: {
         item: true

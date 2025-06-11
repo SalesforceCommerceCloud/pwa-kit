@@ -56,7 +56,9 @@ describe('ProductView Component', () => {
         test('renders properly with all expected elements', async () => {
             const addToCart = jest.fn()
             renderWithProviders(<MockComponent product={mockProductDetail} addToCart={addToCart} />)
-            expect(screen.getAllByText(/Black Single Pleat Athletic Fit Wool Suit/i)).toHaveLength(2)
+            expect(screen.getAllByText(/Black Single Pleat Athletic Fit Wool Suit/i)).toHaveLength(
+                2
+            )
             expect(screen.getAllByText(/299\.99/)).toHaveLength(4)
             expect(screen.getAllByText(/Add to cart/i)).toHaveLength(2)
             expect(screen.getAllByRole('radiogroup')).toHaveLength(3)
@@ -67,7 +69,9 @@ describe('ProductView Component', () => {
     describe('Event Handlers', () => {
         test('calls addToCart when add to cart button is clicked', async () => {
             const addToCart = jest.fn()
-            await renderWithProviders(<MockComponent product={mockProductDetail} addToCart={addToCart} />)
+            await renderWithProviders(
+                <MockComponent product={mockProductDetail} addToCart={addToCart} />
+            )
 
             const addToCartButton = screen.getAllByText(/add to cart/i)[0]
             fireEvent.click(addToCartButton)
@@ -164,7 +168,9 @@ describe('ProductView Component', () => {
         test('can update quantity through input field', async () => {
             const user = userEvent.setup()
             const addToCart = jest.fn()
-            await renderWithProviders(<MockComponent product={mockProductDetail} addToCart={addToCart} />)
+            await renderWithProviders(
+                <MockComponent product={mockProductDetail} addToCart={addToCart} />
+            )
 
             let quantityBox
             await waitFor(() => {
@@ -266,7 +272,9 @@ describe('ProductView Component', () => {
 
             const fromAtLabel = screen.getAllByText(/from/i)[0]
             const addSetToCartButton = screen.getAllByRole('button', {name: /add set to cart/i})[0]
-            const addSetToWishlistButton = screen.getAllByRole('button', {name: /add set to wishlist/i})[0]
+            const addSetToWishlistButton = screen.getAllByRole('button', {
+                name: /add set to wishlist/i
+            })[0]
             const variationAttributes = screen.queryAllByRole('radiogroup') // e.g. sizes, colors
             const quantityPicker = screen.queryByRole('spinbutton', {name: /quantity/i})
 
@@ -316,7 +324,9 @@ describe('ProductView Component', () => {
 
             // NOTE: there can be duplicates of the same element, due to mobile and desktop views
             // (they're hidden with display:none style)
-            const addBundleToCartButton = screen.getAllByRole('button', {name: /add bundle to cart/i})[0]
+            const addBundleToCartButton = screen.getAllByRole('button', {
+                name: /add bundle to cart/i
+            })[0]
             const addBundleToWishlistButton = screen.getAllByRole('button', {
                 name: /add bundle to wishlist/i
             })[0]
