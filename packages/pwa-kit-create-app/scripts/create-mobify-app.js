@@ -988,7 +988,7 @@ const runGenerator = (
     copyAllFiles(packagePath, outputDir)
 
     // Convert selected plugins array to object with true values
-    if (pluginConfig?.plugins?.length > 0 && selectedPlugins) {
+    if (Object.keys(pluginConfig?.plugins || {}).length > 0 && selectedPlugins) {
         treeShake(outputDir, selectedPlugins)
     }
 
@@ -1202,7 +1202,7 @@ const main = async (opts) => {
     }
 
     // Prompt user for plugin selection
-    if (pluginConfig?.plugins?.length > 0) {
+    if (Object.keys(pluginConfig?.plugins || {}).length > 0) {
         const pluginChoices = Object.entries(pluginConfig.plugins).map(([key, config]) => ({
             name: config.description,
             value: key
