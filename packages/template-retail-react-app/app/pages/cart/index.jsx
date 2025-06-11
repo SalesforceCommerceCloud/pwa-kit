@@ -557,10 +557,9 @@ const Cart = () => {
                             <GridItem>
                                 <Stack spacing={4}>
                                     {/* Regular Products */}
-                                    {categorizedProducts.regularProducts.map((productItem, idx) => (
+                                    {categorizedProducts.regularProducts.map((productItem) => (
                                         <ProductItem
                                             key={productItem.itemId}
-                                            index={idx}
                                             secondaryActions={
                                                 <CartSecondaryButtonGroup
                                                     isAGift={
@@ -608,10 +607,9 @@ const Cart = () => {
                                                 <BonusProductsTitle />
                                             </Box>
                                             {categorizedProducts.bonusProducts.map(
-                                                (productItem, idx) => (
+                                                (productItem) => (
                                                     <ProductItem
                                                         key={productItem.itemId}
-                                                        index={idx}
                                                         secondaryActions={
                                                             <CartSecondaryButtonGroup
                                                                 isAGift={
