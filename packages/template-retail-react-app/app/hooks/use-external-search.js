@@ -29,16 +29,16 @@ const useExternalSearch = () => {
             return
         }
 
-        if (typeof window === 'undefined'){
+        if (typeof window === 'undefined') {
             return
         }
 
         // need to pre-process out filler words like location hints, and handle multi-word searches
-        const rawQuery = searchParams?.q ?? searchParams?.search ?? searchParams?.query;
-        const query = (typeof rawQuery === 'string' ? rawQuery : '').trim();
+        const rawQuery = searchParams?.q ?? searchParams?.search ?? searchParams?.query
+        const query = (typeof rawQuery === 'string' ? rawQuery : '').trim()
 
         if (!query) {
-            return;
+            return
         }
 
         if (location?.pathname?.startsWith('/search')) {
@@ -56,8 +56,14 @@ const useExternalSearch = () => {
         } catch (error) {
             console.warn(error)
         }
-
-    }, [hasExternalSearchParams, location?.pathname, searchParams?.q, searchParams?.search, searchParams?.query, history])
+    }, [
+        hasExternalSearchParams,
+        location?.pathname,
+        searchParams?.q,
+        searchParams?.search,
+        searchParams?.query,
+        history
+    ])
 }
 
 export default useExternalSearch
