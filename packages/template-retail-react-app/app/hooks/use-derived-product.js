@@ -15,6 +15,13 @@ import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
 const OUT_OF_STOCK = 'OUT_OF_STOCK'
 const UNFULFILLABLE = 'UNFULFILLABLE'
 
+const getInventoryById = (product, inventoryId) => {
+    if (!inventoryId || !product?.inventories) {
+        return null
+    }
+    return product.inventories.find((inv) => inv.id === inventoryId)
+}
+
 // TODO: This needs to be refactored.
 export const useDerivedProduct = (
     product,
@@ -41,14 +48,7 @@ export const useDerivedProduct = (
     const [quantity, setQuantity] = useState(initialQuantity)
     const {site} = useMultiSite()
 
-    // Helper function to get inventory by ID
-    const getInventoryById = (inventoryId) => {
-        if (!inventoryId || !product?.inventories) {
-            return null
-        }
-        return product.inventories.find((inv) => inv.id === inventoryId)
-    }
-
+    // TODO: This should be moved to a hook W-18751492
     const selectedStore = (() => {
         try {
             if (typeof window !== 'undefined' && site?.id) {
@@ -60,7 +60,7 @@ export const useDerivedProduct = (
         return null
     })()
 
-    const selectedStoreInventory = getInventoryById(selectedStore?.inventoryId)
+    const selectedStoreInventory = getInventoryById(product, selectedStore?.inventoryId)
     const selectedStoreStockLevel = selectedStoreInventory?.stockLevel || 0
     // selectedStoreStockLevel and selectedStoreInventory are already variant specific,
     // so we don't need to check for variation attributes
