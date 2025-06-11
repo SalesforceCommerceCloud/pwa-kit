@@ -5,14 +5,14 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
-import {renderHook, act, render} from '@testing-library/react'
+import {renderHook, act} from '@testing-library/react'
 import {ChakraProvider} from '@chakra-ui/react'
 import {useLocation} from 'react-router-dom'
+import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
 import {
     useBonusState,
     BonusProductModalProvider,
-    useBonusProductModalContext,
-    BonusProductModal
+    useBonusProductModalContext
 } from '@salesforce/retail-react-app/app/hooks/use-bonus-product-modal'
 
 // Mock react-router-dom's useLocation
@@ -55,17 +55,6 @@ describe('useBonusState', () => {
             result.current.addBonusProducts([{id: 'b3'}])
         })
         expect(result.current.bonusProducts).toEqual([{id: 'b3'}])
-    })
-
-    test('clearBonusProducts empties bonusProducts', () => {
-        const {result} = renderHook(() => useBonusState())
-        act(() => {
-            result.current.addBonusProducts([{id: 'b4'}])
-        })
-        act(() => {
-            result.current.clearBonusProducts()
-        })
-        expect(result.current.bonusProducts).toEqual([])
     })
 
     test('onOpen sets modal open and stores data', () => {
@@ -125,23 +114,5 @@ describe('useBonusState', () => {
         rerender()
 
         expect(result.current.isOpen).toBe(false)
-    })
-})
-
-describe('BonusProductModalProvider', () => {
-    test('provides context to children', () => {
-        const basket = {bonusDiscountLineItems: [{id: 'b1'}]}
-        const TestChild = () => {
-            const ctx = useBonusProductModalContext()
-            return <div data-testid="ctx">{JSON.stringify(ctx.bonusProducts)}</div>
-        }
-        const {getByTestId} = render(
-            <ChakraProvider>
-                <BonusProductModalProvider basket={basket}>
-                    <TestChild />
-                </BonusProductModalProvider>
-            </ChakraProvider>
-        )
-        expect(getByTestId('ctx').textContent).toContain('b1')
     })
 })

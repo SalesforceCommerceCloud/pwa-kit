@@ -8,6 +8,7 @@ import React, {useContext, useState, useEffect} from 'react'
 import {useLocation} from 'react-router-dom'
 import {useAddToCartModalContext} from '@salesforce/retail-react-app/app/hooks/use-add-to-cart-modal'
 import PropTypes from 'prop-types'
+import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
 import {
     Modal,
     ModalCloseButton,
@@ -23,7 +24,8 @@ export const BonusProductModalContext = React.createContext()
 
 export const useBonusProductModalContext = () => useContext(BonusProductModalContext)
 
-export const BonusProductModalProvider = ({children, basket}) => {
+export const BonusProductModalProvider = ({children}) => {
+    const {data: basket} = useCurrentBasket()
     const bonusProductState = useBonusState(basket)
 
     return (
@@ -34,8 +36,7 @@ export const BonusProductModalProvider = ({children, basket}) => {
     )
 }
 BonusProductModalProvider.propTypes = {
-    children: PropTypes.node.isRequired,
-    basket: PropTypes.object
+    children: PropTypes.node.isRequired
 }
 
 export const BonusProductModal = () => {
@@ -101,19 +102,11 @@ export const useBonusState = (basket) => {
         })
     }
 
-    const clearBonusProducts = () => {
-        setState((prev) => ({
-            ...prev,
-            bonusProducts: []
-        }))
-    }
-
     return {
         isOpen: state.isOpen,
         data: state.data,
         bonusProducts: state.bonusProducts,
         addBonusProducts,
-        clearBonusProducts,
         onClose: () => {
             setState((prev) => ({
                 ...prev,

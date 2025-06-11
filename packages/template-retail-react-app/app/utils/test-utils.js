@@ -140,7 +140,7 @@ export const TestProviders = ({
                             <Router>
                                 <ChakraProvider theme={theme}>
                                     <AddToCartModalProvider>
-                                        <BonusProductModalProvider basket={basket}>
+                                        <BonusProductModalProvider>
                                             {children}
                                         </BonusProductModalProvider>
                                     </AddToCartModalProvider>
