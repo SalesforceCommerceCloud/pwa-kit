@@ -22,12 +22,14 @@ import {
     Container,
     Link
 } from '@chakra-ui/react'
-
+import loadable from '@loadable/component'
 // Project Components
 import Hero from '../../components/hero'
 import Seo from '../../components/seo'
 import Section from '../../components/section'
 import ProductScroller from '../../components/product-scroller'
+const StoreLocator =
+    SFDC_EXT_STORE_LOCATOR_ENABLED && loadable(() => import('../../components/_fake-store-locator'))
 
 // Others
 import {getStaticAssetUrl} from '@salesforce/pwa-kit-react-sdk/ssr/universal/utils'
@@ -92,6 +94,8 @@ const Home = () => {
                 description="Commerce Cloud Retail React App"
                 keywords="Commerce Cloud, Retail React App, React Storefront"
             />
+
+            {SFDC_EXT_STORE_LOCATOR_ENABLED && <StoreLocator />}
 
             <Hero
                 title={intl.formatMessage({

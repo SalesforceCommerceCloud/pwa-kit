@@ -196,8 +196,9 @@ const baseConfig = (target) => {
                         NODE_ENV: `'${process.env.NODE_ENV}'`,
                         WEBPACK_TARGET: `'${target}'`,
                         ['global.GENTLY']: false,
+                        SFDC_EXT_STORE_LOCATOR_ENABLED: true
                     }),
-                    process.env.RECORD_OVERRIDES === 'true' && new OverrideStatsPlugin(),
+                    process.env.RECORD_OVERRIDES === 'true',
                     // new SharedStatePlugin(),
                     mode === development && new webpack.NoEmitOnErrorsPlugin(),
 
