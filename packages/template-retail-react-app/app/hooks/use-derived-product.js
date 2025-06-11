@@ -49,21 +49,8 @@ export const useDerivedProduct = (
         return product.inventories.find((inv) => inv.id === inventoryId)
     }
 
-    // Helper function to check out of stock conditions
-    // A product is considered out of stock if the stock level is 0 or if we have all our
-    // variation attributes selected, but don't have a variant. We do this because the API
-    // will sometimes return all the variants even if they are out of stock, but for other
-    // products it won't.
-    const checkOutOfStockConditions = (currentStockLevel) => {
-        return !currentStockLevel ||
-            (!isProductABundle &&
-                !variant &&
-                Object.keys(variationParams).length === variationAttributes.length) ||
-            (!isProductABundle && variant && !variant.orderable)
-    }
-
     const selectedStore = (() => {
-        try{
+        try {
             if (typeof window !== 'undefined' && site?.id) {
                 return JSON.parse(window.localStorage.getItem(`store_${site.id}`))
             }
@@ -73,9 +60,12 @@ export const useDerivedProduct = (
         return null
     })()
 
-    const selectedStoreInventory = getInventoryById(selectedStore?.inventoryId);
+    const selectedStoreInventory = getInventoryById(selectedStore?.inventoryId)
     const selectedStoreStockLevel = selectedStoreInventory?.stockLevel || 0
-    const isSelectedStoreOutOfStock = !selectedStoreStockLevel || selectedStoreStockLevel < quantity || !selectedStoreInventory?.orderable
+    const isSelectedStoreOutOfStock =
+        !selectedStoreStockLevel ||
+        selectedStoreStockLevel < quantity ||
+        !selectedStoreInventory?.orderable
     // A product is considered out of stock if the stock level is 0 or if we have all our
     // variation attributes selected, but don't have a variant. We do this because the API
     // will sometimes return all the variants even if they are out of stock, but for other

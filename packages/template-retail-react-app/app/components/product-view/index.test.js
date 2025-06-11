@@ -417,7 +417,6 @@ test('Pickup in store radio is disabled when inventoryId is NULL within localSto
     // Arrange: Ensure localStorage does not have inventoryId for the current site
     const siteId = 'site-1'
     const storeInfoKey = `store_${siteId}`
-    const inventoryId = null
     window.localStorage.removeItem(storeInfoKey)
 
     renderWithProviders(<MockComponent product={mockProductDetail} />)
@@ -481,7 +480,7 @@ describe('ProductView stock status messages', () => {
         window.localStorage.setItem(storeInfoKey, JSON.stringify({inventoryId, name: storeName}))
         const mockProduct = {
             ...mockProductDetail,
-            inventories: [{id: inventoryId, orderable: true}],
+            inventories: [{id: inventoryId, orderable: true, stockLevel: 10}],
             name: 'Test Product'
         }
         renderWithProviders(<MockComponent product={mockProduct} />)
