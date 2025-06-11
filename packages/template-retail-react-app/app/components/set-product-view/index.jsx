@@ -46,8 +46,10 @@ const SetProductView = ({
     const handleChildProductValidation = useCallback(() => {
         // Run validation for all child products. This will ensure the error
         // messages are shown.
-        Object.values(childProductRefs.current).forEach(({validateOrderability}) => {
-            validateOrderability({scrollErrorIntoView: false})
+        Object.values(childProductRefs.current).forEach((childRef) => {
+            if (childRef && childRef.validateOrderability) {
+                childRef.validateOrderability({scrollErrorIntoView: false})
+            }
         })
 
         // Using ot state for which child products are selected, scroll to the first
@@ -59,10 +61,10 @@ const SetProductView = ({
 
         if (firstUnselectedProduct) {
             // Get the reference to the product view and scroll to it.
-            const {ref} = childProductRefs.current[firstUnselectedProduct.id]
+            const childRef = childProductRefs.current[firstUnselectedProduct.id]
 
-            if (ref.scrollIntoView) {
-                ref.scrollIntoView({
+            if (childRef && childRef.scrollIntoView) {
+                childRef.scrollIntoView({
                     behavior: 'smooth',
                     block: 'end'
                 })
@@ -103,12 +105,7 @@ const SetProductView = ({
                         <SetProductChildItem
                             ref={(componentRef) => {
                                 if (componentRef) {
-                                    childProductRefs.current[childProduct.id] = {
-                                        ref: componentRef,
-                                        validateOrderability: componentRef.validateOrderability || (() => {
-                                            return true
-                                        })
-                                    }
+                                    childProductRefs.current[childProduct.id] = componentRef
                                 } else {
                                     // Clean up ref when component unmounts
                                     delete childProductRefs.current[childProduct.id]

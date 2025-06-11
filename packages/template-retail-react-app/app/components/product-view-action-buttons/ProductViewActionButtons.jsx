@@ -78,7 +78,6 @@ const ProductViewActionButtons = ({
             return
         }
         try {
-            // (JEREMY) here the variant just the basic stuff.
             const itemsAdded = await addToCart({variant, quantity})
             if (itemsAdded && onAddToCartModalOpen) {
                 onAddToCartModalOpen({

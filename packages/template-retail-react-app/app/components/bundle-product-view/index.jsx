@@ -1,7 +1,6 @@
 import React, {useCallback, useState, useRef} from 'react'
 import PropTypes from 'prop-types'
 import {Box} from '@salesforce/retail-react-app/app/components/shared/ui'
-import ProductView from '@salesforce/retail-react-app/app/components/product-view'
 import InformationAccordion from '@salesforce/retail-react-app/app/pages/product-detail/partials/information-accordion'
 import {
     normalizeSetBundleProduct,
@@ -10,7 +9,6 @@ import {
     useProducts,
 } from '@salesforce/commerce-sdk-react'
 import {getAddToCartHandler} from '@salesforce/retail-react-app/app/utils/cart-handlers'
-import BundleProductHeaderView from '@salesforce/retail-react-app/app/components/bundle-product-view/partials/BundleProductHeader'
 import BundleProductHeader from '@salesforce/retail-react-app/app/components/bundle-product-view/partials/BundleProductHeader'
 import BundleProductChildItem from '@salesforce/retail-react-app/app/components/bundle-product-view/partials/BundleProductChildItem'
 const BundleProductView = ({

@@ -116,7 +116,7 @@ test('should render product details page', async () => {
         expect(screen.getAllByText(/£15\.36/i)).toHaveLength(4)
         expect(screen.getAllByText(/Add to Cart/)).toHaveLength(2)
         expect(screen.getAllByText(/Add to Wishlist/)).toHaveLength(2)
-        expect(screen.getAllByTestId('product-view')).toHaveLength(1)
+        expect(screen.getAllByTestId('variation-group-view')).toHaveLength(1)
         expect(screen.getByText(/You might also like/i)).toBeInTheDocument()
     })
 })

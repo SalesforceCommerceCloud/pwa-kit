@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, {forwardRef, useEffect, useMemo, useRef, useState} from 'react'
+import React, {forwardRef, useEffect, useMemo, useRef, useState, useImperativeHandle} from 'react'
 import PropTypes from 'prop-types'
 import {useLocation} from 'react-router-dom'
 import {useCurrency, useDerivedProduct} from '@salesforce/retail-react-app/app/hooks'
@@ -81,7 +81,7 @@ const SetProductChildItem = forwardRef(
             const scrollToError = showError && scrollErrorIntoView
             toggleShowOptionsMessage(showError)
 
-            if (scrollToError) {
+            if (scrollToError && errorContainerRef.current && typeof errorContainerRef.current.scrollIntoView === 'function') {
                 errorContainerRef.current.scrollIntoView({
                     behavior: 'smooth',
                     block: 'center'
@@ -91,11 +91,15 @@ const SetProductChildItem = forwardRef(
             return hasValidSelection
         }
 
-        // Bind the reference with our `scope` that includes the internal validate function for this component.
-        // Other values can be added to this scope as required.
-        if (typeof ref === 'function') {
-            ref = ref.bind({validateOrderability: validateAndShowError})
-        }
+        // Use useImperativeHandle to properly expose methods to parent components
+        useImperativeHandle(ref, () => ({
+            validateOrderability: validateAndShowError,
+            scrollIntoView: (options) => {
+                if (errorContainerRef.current && typeof errorContainerRef.current.scrollIntoView === 'function') {
+                    errorContainerRef.current.scrollIntoView(options)
+                }
+            }
+        }), [validateAndShowError])
 
         useEffect(() => {
             if (isAddToCartModalOpen) {

@@ -59,9 +59,7 @@ const VariationGroupView = forwardRef(
             variationParams,
             variationAttributes,
             stockLevel,
-            stepQuantity,
-            isOutOfStock,
-            unfulfillable
+            stepQuantity
         } = useDerivedProduct(product, false, false)
         const priceData = useMemo(() => {
             return getPriceData(product, {quantity})
@@ -76,7 +74,6 @@ const VariationGroupView = forwardRef(
             const hasValidSelection = validateOrderability(variant, quantity, stockLevel)
             const showError = !hasValidSelection
             const scrollToError = showError && scrollErrorIntoView
-
             toggleShowOptionsMessage(showError)
 
             if (scrollToError) {
