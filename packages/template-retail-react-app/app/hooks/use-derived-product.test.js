@@ -19,8 +19,17 @@ jest.mock('@salesforce/retail-react-app/app/hooks/use-variant', () => ({
     useVariant: jest.fn()
 }))
 
+// Ensure useMultiSite returns site.id = 'site-1' for all tests
+jest.mock('@salesforce/retail-react-app/app/hooks/use-multi-site', () => ({
+    __esModule: true,
+    default: () => ({
+        site: {id: 'site-1'},
+        buildUrl: (url) => url // identity function for tests
+    })
+}))
+
 const MockComponent = ({product}) => {
-    const {inventoryMessage, quantity, variationParams, variant} = useDerivedProduct(product)
+    const {inventoryMessage, quantity, variationParams, variant, isSelectedStoreOutOfStock, selectedStore} = useDerivedProduct(product)
 
     return (
         <div>
@@ -28,6 +37,8 @@ const MockComponent = ({product}) => {
             <div>{inventoryMessage}</div>
             <div>{JSON.stringify(variant)}</div>
             <div>{JSON.stringify(variationParams)}</div>
+            <div>{`isStoreOutOfStock: ${isSelectedStoreOutOfStock}`}</div>
+            <div>{JSON.stringify(selectedStore)}</div>
         </div>
     )
 }
@@ -163,4 +174,102 @@ describe('useDerivedProduct hook', () => {
 
         expect(screen.getByText(/Only 5 left!/)).toBeInTheDocument()
     })
+
+    describe('when store is selected', () => {
+        const siteId = 'site-1'
+        const storeInfoKey = `store_${siteId}`
+        const inventoryId = 'inventory_m_store_store1'
+
+        beforeEach(() => {
+            window.localStorage.setItem(storeInfoKey, JSON.stringify({inventoryId}))
+        })
+
+        afterEach(() => {
+            window.localStorage.removeItem(storeInfoKey)
+        })
+
+    test('when store is selected, should return product is in stock when storestockLevel is greater then 0 and greater then asked quantity', () => {
+
+        // Mock useVariant to return a valid variant
+        useVariant.mockReturnValue({
+            orderable: true,
+            price: 299.99,
+            productId: '750518699578M',
+            variationValues: {color: 'BLACKFB', size: '038', width: 'V'}
+        })
+
+        const mockData = {
+            ...mockProductDetail,
+            quantity: 10,
+            inventories: [{
+                ats: 0,
+                backorderable: false,
+                id: 'inventory_m_store_store1',
+                orderable: true,
+                preorderable: false,
+                stockLevel: 15
+            }]
+        }
+
+        renderWithProviders(<MockComponent product={mockData} />)
+
+        expect(screen.getByText(/isStoreOutOfStock: false/)).toBeInTheDocument()
+    })
+
+    test('when store is selected, should return product is out of stock message when storestockLevel is 0 or less then asked quantity', () => {
+
+        // Mock useVariant to return a valid variant
+        useVariant.mockReturnValue({
+            orderable: true,
+            price: 299.99,
+            productId: '750518699578M',
+            variationValues: {color: 'BLACKFB', size: '038', width: 'V'}
+        })
+
+        const mockData = {
+            ...mockProductDetail,
+            quantity: 10,
+            inventories: [{
+                ats: 0,
+                backorderable: false,
+                id: 'inventory_m_store_store1',
+                orderable: true,
+                preorderable: false,
+                stockLevel: 5
+            }]
+        }
+
+        renderWithProviders(<MockComponent product={mockData} />)
+
+        expect(screen.getByText(/isStoreOutOfStock: true/)).toBeInTheDocument()
+    })
+
+    test('when store is selected, should show selected store info', () => {
+
+        // Mock useVariant to return a valid variant
+        useVariant.mockReturnValue({
+            orderable: true,
+            price: 299.99,
+            productId: '750518699578M',
+            variationValues: {color: 'BLACKFB', size: '038', width: 'V'}
+        })
+
+        const mockData = {
+            ...mockProductDetail,
+            quantity: 10,
+            inventories: [{
+                ats: 0,
+                backorderable: false,
+                id: 'inventory_m_store_store1',
+                orderable: false,
+                preorderable: false,
+                stockLevel: 5
+            }]
+        }
+
+        renderWithProviders(<MockComponent product={mockData} />)
+
+        expect(screen.getByText(/{"inventoryId":"inventory_m_store_store1"}/)).toBeInTheDocument()
+    })
+})
 })
