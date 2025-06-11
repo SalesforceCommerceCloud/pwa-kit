@@ -1,0 +1,24 @@
+---
+description:
+globs:
+alwaysApply: false
+---
+These are the steps to upgrade an existing store front application with the "Store Locator" extension by installing the necessary code to the destination application.
+
+## Step 1. First ask the user where the destination application is located. This can be an absolute path, or a relative path. The answer will be referred as [target] in the following steps.
+
+## Step 2. Copy the `<project root>/packages/template-chakra-storefront/components/_fake-store-locator` folder to the [target]/components folder. Skip this step and proceed to the next step if the folder already exists.
+
+## Step 3. Apply the following code changes to [target]/pages/home/index.jsx. Skip a step if the code change has already been applied.
+
+### Step 3.1 Insert the following line at the end of the import block:
+`import loadable from '@loadable/component'`
+
+### Step 3.2 Insert the following lines at the end of the const declaration block:
+`const StoreLocator = loadable(() => import('../components/_fake-store-locator'))`
+
+### Step 3.3 Insert the following line in the JSX element return statement, beween the <Seo> and the <Hero> components.
+`<StoreLocator />`
+
+
+
