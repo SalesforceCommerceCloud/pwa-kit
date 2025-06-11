@@ -6,6 +6,8 @@
  */
 import React, {useContext, useState, useEffect} from 'react'
 import {useLocation} from 'react-router-dom'
+import {useAddToCartModalContext} from '@salesforce/retail-react-app/app/hooks/use-add-to-cart-modal'
+import PropTypes from 'prop-types'
 import {
     Modal,
     ModalCloseButton,
@@ -16,8 +18,6 @@ import {
     ModalBody,
     Heading
 } from '@salesforce/retail-react-app/app/components/shared/ui'
-import {useAddToCartModalContext} from '@salesforce/retail-react-app/app/hooks/use-add-to-cart-modal'
-import PropTypes from 'prop-types'
 
 export const BonusProductModalContext = React.createContext()
 

@@ -5392,7 +5392,8 @@ export const mockCustomerBaskets = {
             shippingTotal: null,
             shippingTotalTax: null,
             taxation: 'gross',
-            taxTotal: null
+            taxTotal: null,
+            bonusDiscountLineItems: []
         }
     ],
     total: 1

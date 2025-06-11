@@ -33,7 +33,7 @@ describe('useBonusState', () => {
         useLocation.mockReturnValue({pathname: '/initial'})
     })
 
-    it('initializes with correct state from basket', () => {
+    test('initializes with correct state from basket', () => {
         const basket = {bonusDiscountLineItems: [{id: 'b1'}]}
         const {result} = renderHook(() => useBonusState(basket))
         expect(result.current.isOpen).toBe(false)
@@ -41,7 +41,7 @@ describe('useBonusState', () => {
         expect(result.current.bonusProducts).toEqual([{id: 'b1'}])
     })
 
-    it('updates bonusProducts when basket changes', () => {
+    test('updates bonusProducts when basket changes', () => {
         const {result, rerender} = renderHook(({basket}) => useBonusState(basket), {
             initialProps: {basket: {bonusDiscountLineItems: [{id: 'b1'}]}}
         })
@@ -49,7 +49,7 @@ describe('useBonusState', () => {
         expect(result.current.bonusProducts).toEqual([{id: 'b2'}])
     })
 
-    it('addBonusProducts adds items', () => {
+    test('addBonusProducts adds items', () => {
         const {result} = renderHook(() => useBonusState())
         act(() => {
             result.current.addBonusProducts([{id: 'b3'}])
@@ -57,7 +57,7 @@ describe('useBonusState', () => {
         expect(result.current.bonusProducts).toEqual([{id: 'b3'}])
     })
 
-    it('clearBonusProducts empties bonusProducts', () => {
+    test('clearBonusProducts empties bonusProducts', () => {
         const {result} = renderHook(() => useBonusState())
         act(() => {
             result.current.addBonusProducts([{id: 'b4'}])
@@ -68,7 +68,7 @@ describe('useBonusState', () => {
         expect(result.current.bonusProducts).toEqual([])
     })
 
-    it('onOpen sets modal open and stores data', () => {
+    test('onOpen sets modal open and stores data', () => {
         const {result} = renderHook(() => useBonusState())
         act(() => {
             result.current.onOpen({foo: 'bar'})
@@ -77,7 +77,7 @@ describe('useBonusState', () => {
         expect(result.current.data).toEqual({foo: 'bar'})
     })
 
-    it('onClose closes modal and clears data', () => {
+    test('onClose closes modal and clears data', () => {
         const {result} = renderHook(() => useBonusState())
         act(() => {
             result.current.onOpen({foo: 'bar'})
@@ -89,7 +89,7 @@ describe('useBonusState', () => {
         expect(result.current.data).toEqual({})
     })
 
-    it('onClose calls onAddToCartModalOpen if needed', () => {
+    test('onClose calls onAddToCartModalOpen if needed', () => {
         const {result} = renderHook(() => useBonusState())
         const data = {
             openAddToCartModalIfNeeded: true,
@@ -110,23 +110,26 @@ describe('useBonusState', () => {
         })
     })
 
-    it('closes modal on location change', () => {
-        let location = {pathname: '/foo'}
-        useLocation.mockImplementation(() => location)
+    test('closes modal on location change', () => {
+        // Initial location
+        useLocation.mockReturnValue({pathname: '/foo'})
         const {result, rerender} = renderHook(() => useBonusState())
+
         act(() => {
             result.current.onOpen({foo: 'bar'})
         })
         expect(result.current.isOpen).toBe(true)
-        // Simulate location change
-        location = {pathname: '/bar'}
+
+        // Change location
+        useLocation.mockReturnValue({pathname: '/bar'})
         rerender()
+
         expect(result.current.isOpen).toBe(false)
     })
 })
 
 describe('BonusProductModalProvider', () => {
-    it('provides context to children', () => {
+    test('provides context to children', () => {
         const basket = {bonusDiscountLineItems: [{id: 'b1'}]}
         const TestChild = () => {
             const ctx = useBonusProductModalContext()
