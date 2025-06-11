@@ -62,7 +62,7 @@ export const useDerivedProduct = (
 
     const selectedStoreInventory = getInventoryById(selectedStore?.inventoryId)
     const selectedStoreStockLevel = selectedStoreInventory?.stockLevel || 0
-    // selectedStoreStockLevel and selectedStoreInventory are already variant specific, 
+    // selectedStoreStockLevel and selectedStoreInventory are already variant specific,
     // so we don't need to check for variation attributes
     const isSelectedStoreOutOfStock =
         !selectedStoreStockLevel ||
