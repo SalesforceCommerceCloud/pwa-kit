@@ -373,7 +373,7 @@ const DrawerMenu = ({
                     </Dialog.Footer>
 
                     <Dialog.CloseTrigger asChild>
-                        <CloseButton size="sm" {...styles.closeButton} />
+                        <CloseButton size="sm" css={styles.closeButton} />
                     </Dialog.CloseTrigger>
                 </Dialog.Content>
             </Dialog.Positioner>
