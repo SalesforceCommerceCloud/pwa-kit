@@ -190,10 +190,15 @@ describe('StoresList', () => {
             const radioButton = screen.getByDisplayValue(id)
             fireEvent.click(radioButton)
 
-            const expectedStoreInfo = {id, name, inventoryId}
-            expect(localStorage.getItem(`store_${mockConfig.app.defaultSite}`)).toEqual(
-                JSON.stringify(expectedStoreInfo)
-            )
+            const storedValue = localStorage.getItem(`store_${mockConfig.app.defaultSite}`)
+            const parsedValue = JSON.parse(storedValue)
+
+            expect(parsedValue.id).toEqual(id)
+            expect(parsedValue.name).toEqual(name)
+            expect(parsedValue.inventoryId).toEqual(inventoryId)
+            expect(parsedValue.isSESelection).toBe(false)
+            expect(parsedValue).toHaveProperty('timestamp')
+            expect(parsedValue).toHaveProperty('manualSearchParams')
         })
     })
 })
