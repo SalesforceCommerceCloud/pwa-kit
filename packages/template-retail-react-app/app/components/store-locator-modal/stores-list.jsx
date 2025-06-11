@@ -21,7 +21,6 @@ import {
     RadioGroup
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 
-// Hooks
 import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
 
 const StoresList = ({storesInfo}) => {
@@ -51,8 +50,7 @@ const StoresList = ({storesInfo}) => {
     const handleChange = (storeId) => {
         setSelectedStore(storeId)
         const store = storesInfo.find((store) => store.id === storeId)
-        // For manual selections, we need to store search parameters that will include this store
-        // Use the store's location to determine appropriate search parameters
+
         const manualSearchParams = {}
         if (store.postalCode && store.countryCode) {
             manualSearchParams.postalCode = store.postalCode
@@ -62,18 +60,16 @@ const StoresList = ({storesInfo}) => {
             manualSearchParams.longitude = store.longitude
             manualSearchParams.countryCode = store.countryCode
         } else if (store.countryCode) {
-            // Fallback: just use the store's country
             manualSearchParams.countryCode = store.countryCode
         }
 
-        // Save the new manual selection with search context
         const newStoreData = {
             id: storeId,
             name: store.name || null,
             inventoryId: store.inventoryId || null,
-            isSESelection: false, // Explicitly mark as manual selection
+            isSESelection: false,
             timestamp: Date.now(),
-            manualSearchParams: manualSearchParams // Store search params for manual selections
+            manualSearchParams: manualSearchParams
         }
 
         window.localStorage.setItem(storeInfoKey, JSON.stringify(newStoreData))

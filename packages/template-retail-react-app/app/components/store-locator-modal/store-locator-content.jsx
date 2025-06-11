@@ -96,9 +96,7 @@ const StoreLocatorContent = () => {
     }, [searchStoresData?.data, site.id])
 
     const storesInfo =
-        isLoading || isFetching
-            ? undefined
-            : sortedStoresData?.slice(0, numStoresToShow) || []
+        isLoading || isFetching ? undefined : sortedStoresData?.slice(0, numStoresToShow) || []
     const numStores = searchStoresData?.total || 0
 
     const submitForm = async (formData) => {
@@ -141,21 +139,20 @@ const StoreLocatorContent = () => {
                 defaultMessage: 'Sorry, there are no locations in this area'
             })
 
-        // If we have a postal code (either from direct search or from nearest store)
         if (searchStoresParams.postalCode !== undefined) {
-            const countryName = searchStoresParams.countryCode && SUPPORTED_STORE_LOCATOR_COUNTRIES.length !== 0
-                ? intl.formatMessage(
-                      SUPPORTED_STORE_LOCATOR_COUNTRIES.find(
-                          (o) => o.countryCode === searchStoresParams.countryCode
-                      )?.countryName || DEFAULT_STORE_LOCATOR_COUNTRY.countryName
-                  )
-                : intl.formatMessage(DEFAULT_STORE_LOCATOR_COUNTRY.countryName)
+            const countryName =
+                searchStoresParams.countryCode && SUPPORTED_STORE_LOCATOR_COUNTRIES.length !== 0
+                    ? intl.formatMessage(
+                          SUPPORTED_STORE_LOCATOR_COUNTRIES.find(
+                              (o) => o.countryCode === searchStoresParams.countryCode
+                          )?.countryName || DEFAULT_STORE_LOCATOR_COUNTRY.countryName
+                      )
+                    : intl.formatMessage(DEFAULT_STORE_LOCATOR_COUNTRY.countryName)
 
             return `${intl.formatMessage(
                 {
                     id: 'store_locator.description.viewing_near_postal_code',
-                    defaultMessage:
-                        'Viewing stores within {distance}{distanceUnit} of {postalCode} in '
+                    defaultMessage: 'Viewing stores within {distance}{distanceUnit} of {postalCode} in '
                 },
                 {
                     distance: STORE_LOCATOR_DISTANCE,
@@ -165,28 +162,20 @@ const StoreLocatorContent = () => {
             )} ${countryName}`
         }
 
-        // If we have coordinates but no postal code, show coordinate-based message
-        if (searchStoresParams.latitude !== undefined && searchStoresParams.longitude !== undefined) {
-            const coordinates = `${searchStoresParams.latitude.toFixed(4)}, ${searchStoresParams.longitude.toFixed(4)}`
-
-            return intl.formatMessage(
-                {
-                    id: 'store_locator.description.viewing_near_coordinates',
-                    defaultMessage: 'Viewing stores within {distance}{distanceUnit} of coordinates {coordinates}'
-                },
-                {
-                    distance: STORE_LOCATOR_DISTANCE,
-                    distanceUnit: STORE_LOCATOR_DISTANCE_UNIT,
-                    coordinates: coordinates
-                }
-            )
+        if (
+            searchStoresParams.latitude !== undefined &&
+            searchStoresParams.longitude !== undefined
+        ) {
+            return intl.formatMessage({
+                id: 'store_locator.description.viewing_near_your_location',
+                defaultMessage: 'Viewing stores near your location'
+            })
         }
 
-        // Default fallback
         return intl.formatMessage({
             id: 'store_locator.description.viewing_near_your_location',
             defaultMessage: 'Viewing stores near your location'
-        })  
+        })
     }
 
     return (

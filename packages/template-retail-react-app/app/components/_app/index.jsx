@@ -148,7 +148,6 @@ const App = (props) => {
         onClose: onCloseStoreLocator
     } = useDisclosure()
 
-    // State for Search Engine store locator parameters
     const [seStoreLocatorParams, setSeStoreLocatorParams] = useState(null)
 
     const targetLocale = getTargetLocale({
@@ -326,8 +325,8 @@ const App = (props) => {
                     defaultLocale={DEFAULT_LOCALE}
                 >
                     <CurrencyProvider currency={currency}>
-                        <SeInputHandler 
-                            onOpenStoreLocator={onOpenStoreLocator} 
+                        <SeInputHandler
+                            onOpenStoreLocator={onOpenStoreLocator}
                             onSeParametersReady={setSeStoreLocatorParams}
                         />
                         <Seo>

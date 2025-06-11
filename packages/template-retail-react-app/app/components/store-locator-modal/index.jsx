@@ -18,7 +18,6 @@ import {
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 import StoreLocatorContent from '@salesforce/retail-react-app/app/components/store-locator-modal/store-locator-content'
 
-// Others
 import {
     DEFAULT_STORE_LOCATOR_COUNTRY,
     DEFAULT_STORE_LOCATOR_POSTAL_CODE,
@@ -33,10 +32,8 @@ export const useStoreLocator = (initialParams) => {
     const [automaticGeolocationHasFailed, setAutomaticGeolocationHasFailed] = useState(false)
     const [userWantsToShareLocation, setUserWantsToShareLocation] = useState(false)
 
-    // Function to get search parameters that will include existing SE selection
     const getSearchParamsForSESelection = () => {
         if (initialParams) {
-            // If we have explicit initialParams, use them
             return {
                 countryCode: initialParams.countryCode || DEFAULT_STORE_LOCATOR_COUNTRY.countryCode,
                 postalCode: initialParams.postalCode || DEFAULT_STORE_LOCATOR_POSTAL_CODE,
@@ -52,7 +49,6 @@ export const useStoreLocator = (initialParams) => {
             if (existingStore) {
                 const storeData = JSON.parse(existingStore)
 
-                // Use stored search parameters for SE selections
                 if (storeData.isSESelection && storeData.seSearchParams) {
                     return {
                         ...storeData.seSearchParams,
@@ -60,7 +56,6 @@ export const useStoreLocator = (initialParams) => {
                     }
                 }
 
-                // Use stored search parameters for manual selections
                 if (!storeData.isSESelection && storeData.manualSearchParams) {
                     return {
                         ...storeData.manualSearchParams,
@@ -72,7 +67,6 @@ export const useStoreLocator = (initialParams) => {
             // Invalid localStorage data, ignore
         }
 
-        // Fallback to defaults (when no stored data exists)
         return {
             countryCode: DEFAULT_STORE_LOCATOR_COUNTRY.countryCode,
             postalCode: DEFAULT_STORE_LOCATOR_POSTAL_CODE,
@@ -80,12 +74,13 @@ export const useStoreLocator = (initialParams) => {
         }
     }
 
-    const [searchStoresParams, setSearchStoresParams] = useState(() => getSearchParamsForSESelection())
+    const [searchStoresParams, setSearchStoresParams] = useState(() =>
+        getSearchParamsForSESelection()
+    )
 
-    // Update search parameters when initialParams are provided (for SE)
     useEffect(() => {
         if (initialParams) {
-            setSearchStoresParams(prevParams => ({
+            setSearchStoresParams((prevParams) => ({
                 ...prevParams,
                 ...initialParams
             }))
