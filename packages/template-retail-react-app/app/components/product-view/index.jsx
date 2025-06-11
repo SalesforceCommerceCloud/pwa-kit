@@ -114,11 +114,21 @@ const ProductView = forwardRef(
             setChildProductOrderability,
             isBasketLoading = false,
             onVariantSelected = () => {},
-            validateOrderability = (variant, product, quantity, stockLevel) =>
-                !isProductLoading &&
-                (variant?.orderable || product?.inventory?.orderable) &&
-                quantity > 0 &&
-                quantity <= stockLevel,
+            validateOrderability = (variant, product, quantity, stockLevel) => {
+                if (isProductLoading) return false
+
+                // If product has variations, a variant must be selected
+                if (product?.variationAttributes?.length > 0 && !variant) {
+                    return false
+                }
+
+                // Check if product (either variant or standard) is orderable and if quantity is valid
+                return (
+                    (variant?.orderable || product?.inventory?.orderable) &&
+                    quantity > 0 &&
+                    quantity <= stockLevel
+                )
+            },
             showImageGallery = true,
             setSelectedBundleQuantity = () => {},
             selectedBundleParentQuantity = 1
