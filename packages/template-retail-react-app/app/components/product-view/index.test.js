@@ -51,305 +51,313 @@ afterEach(() => {
     sessionStorage.clear()
 })
 
-test('ProductView Component renders properly', async () => {
-    const addToCart = jest.fn()
-    renderWithProviders(<MockComponent product={mockProductDetail} addToCart={addToCart} />)
-    expect(screen.getAllByText(/Black Single Pleat Athletic Fit Wool Suit/i)).toHaveLength(2)
-    expect(screen.getAllByText(/299\.99/)).toHaveLength(4)
-    expect(screen.getAllByText(/Add to cart/i)).toHaveLength(2)
-    expect(screen.getAllByRole('radiogroup')).toHaveLength(3)
-    expect(screen.getAllByText(/add to cart/i)).toHaveLength(2)
-})
-
-test('ProductView Component renders with addToCart event handler', async () => {
-    const addToCart = jest.fn()
-    await renderWithProviders(<MockComponent product={mockProductDetail} addToCart={addToCart} />)
-
-    const addToCartButton = screen.getAllByText(/add to cart/i)[0]
-    fireEvent.click(addToCartButton)
-
-    await waitFor(() => {
-        expect(addToCart).toHaveBeenCalledTimes(1)
-    })
-})
-
-test('ProductView Component renders with addToWishList event handler', async () => {
-    const addToWishlist = jest.fn()
-
-    await renderWithProviders(
-        <MockComponent product={mockProductDetail} addToWishlist={addToWishlist} />
-    )
-
-    await waitFor(() => {
-        expect(screen.getByText(/customer: registered/)).toBeInTheDocument()
-    })
-
-    await waitFor(() => {
-        const addToWishListButton = screen.getAllByText(/Add to wishlist/i)[0]
-
-        fireEvent.click(addToWishListButton)
-        expect(addToWishlist).toHaveBeenCalledTimes(1)
-    })
-})
-
-test('ProductView Component renders with updateWishlist event handler', async () => {
-    const updateWishlist = jest.fn()
-
-    await renderWithProviders(
-        <MockComponent product={mockProductDetail} updateWishlist={updateWishlist} />
-    )
-
-    await waitFor(() => {
-        expect(screen.getByText(/customer: registered/)).toBeInTheDocument()
-    })
-
-    await waitFor(() => {
-        const updateWishlistButton = screen.getAllByText(/Update/i)[0]
-
-        fireEvent.click(updateWishlistButton)
-        expect(updateWishlist).toHaveBeenCalledTimes(1)
-    })
-})
-
-test('Product View can update quantity', async () => {
-    const user = userEvent.setup()
-    const addToCart = jest.fn()
-    await renderWithProviders(<MockComponent product={mockProductDetail} addToCart={addToCart} />)
-
-    let quantityBox
-    await waitFor(() => {
-        quantityBox = screen.getByRole('spinbutton')
-    })
-
-    await waitFor(() => {
-        expect(quantityBox).toHaveValue('1')
-    })
-
-    // update item quantity
-    await user.type(quantityBox, '{backspace}3')
-
-    await waitFor(() => {
-        expect(quantityBox).toHaveValue('3')
-    })
-})
-
-test('Product View handles invalid quantity inputs', async () => {
-    const user = userEvent.setup()
-
-    // Any invalid input should be reset to minOrderQuantity
-    await renderWithProviders(<MockComponent product={mockProductDetail} />)
-
-    const quantityInput = screen.getByRole('spinbutton', {name: /quantity/i})
-    const minQuantity = mockProductDetail.minOrderQuantity.toString()
-
-    // Quantity is empty
-    await user.clear(quantityInput)
-    await user.tab()
-    await waitFor(() => {
-        expect(quantityInput).toHaveValue(minQuantity)
-    })
-
-    // Quantity is zero
-    await user.clear(quantityInput)
-    await user.type(quantityInput, '0')
-    await user.tab()
-    await waitFor(() => {
-        expect(quantityInput).toHaveValue(minQuantity)
-    })
-})
-
 describe('ProductView Component', () => {
-    test('increases quantity when increment button is clicked', async () => {
-        const user = userEvent.setup()
-        renderWithProviders(<ProductView product={mockProductDetail} />)
-
-        const quantityInput = await screen.findByRole('spinbutton')
-        const incrementButton = screen.getByTestId('quantity-increment')
-        const decrementButton = screen.getByTestId('quantity-decrement')
-
-        // Click increment
-        await user.click(incrementButton)
-        await waitFor(() => {
-            expect(quantityInput).toHaveValue('2')
-        })
-
-        // Click decrement
-        await user.click(decrementButton)
-        await waitFor(() => {
-            expect(quantityInput).toHaveValue('1')
+    describe('Basic Rendering', () => {
+        test('renders properly with all expected elements', async () => {
+            const addToCart = jest.fn()
+            renderWithProviders(<MockComponent product={mockProductDetail} addToCart={addToCart} />)
+            expect(screen.getAllByText(/Black Single Pleat Athletic Fit Wool Suit/i)).toHaveLength(2)
+            expect(screen.getAllByText(/299\.99/)).toHaveLength(4)
+            expect(screen.getAllByText(/Add to cart/i)).toHaveLength(2)
+            expect(screen.getAllByRole('radiogroup')).toHaveLength(3)
+            expect(screen.getAllByText(/add to cart/i)).toHaveLength(2)
         })
     })
-})
 
-test('renders a product set properly - parent item', () => {
-    const parent = mockProductSet
-    renderWithProviders(
-        <MockComponent product={parent} addToCart={() => {}} addToWishlist={() => {}} />
-    )
+    describe('Event Handlers', () => {
+        test('calls addToCart when add to cart button is clicked', async () => {
+            const addToCart = jest.fn()
+            await renderWithProviders(<MockComponent product={mockProductDetail} addToCart={addToCart} />)
 
-    // NOTE: there can be duplicates of the same element, due to mobile and desktop views
-    // (they're hidden with display:none style)
+            const addToCartButton = screen.getAllByText(/add to cart/i)[0]
+            fireEvent.click(addToCartButton)
 
-    const fromAtLabel = screen.getAllByText(/from/i)[0]
-    const addSetToCartButton = screen.getAllByRole('button', {name: /add set to cart/i})[0]
-    const addSetToWishlistButton = screen.getAllByRole('button', {name: /add set to wishlist/i})[0]
-    const variationAttributes = screen.queryAllByRole('radiogroup') // e.g. sizes, colors
-    const quantityPicker = screen.queryByRole('spinbutton', {name: /quantity/i})
+            await waitFor(() => {
+                expect(addToCart).toHaveBeenCalledTimes(1)
+            })
+        })
 
-    // What should exist:
-    expect(fromAtLabel).toBeInTheDocument()
-    expect(addSetToCartButton).toBeInTheDocument()
-    expect(addSetToWishlistButton).toBeInTheDocument()
+        test('calls addToWishlist when add to wishlist button is clicked', async () => {
+            const addToWishlist = jest.fn()
 
-    // What should _not_ exist:
-    expect(variationAttributes).toHaveLength(0)
-    expect(quantityPicker).toBeNull()
-})
+            await renderWithProviders(
+                <MockComponent product={mockProductDetail} addToWishlist={addToWishlist} />
+            )
 
-test('renders a product set properly - child item', () => {
-    const child = mockProductSet.setProducts[0]
-    renderWithProviders(
-        <MockComponent product={child} addToCart={() => {}} addToWishlist={() => {}} />
-    )
+            await waitFor(() => {
+                expect(screen.getByText(/customer: registered/)).toBeInTheDocument()
+            })
 
-    // NOTE: there can be duplicates of the same element, due to mobile and desktop views
-    // (they're hidden with display:none style)
+            await waitFor(() => {
+                const addToWishListButton = screen.getAllByText(/Add to wishlist/i)[0]
 
-    const addToCartButton = screen.getAllByRole('button', {name: /add to cart/i})[0]
-    const addToWishlistButton = screen.getAllByRole('button', {name: /add to wishlist/i})[0]
-    const variationAttributes = screen.getAllByRole('radiogroup') // e.g. sizes, colors
-    const quantityPicker = screen.getByRole('spinbutton', {name: /quantity/i})
-    const fromLabels = screen.queryAllByText(/from/i)
+                fireEvent.click(addToWishListButton)
+                expect(addToWishlist).toHaveBeenCalledTimes(1)
+            })
+        })
 
-    // What should exist:
-    expect(addToCartButton).toBeInTheDocument()
-    expect(addToWishlistButton).toBeInTheDocument()
-    expect(variationAttributes).toHaveLength(2)
-    expect(quantityPicker).toBeInTheDocument()
+        test('calls updateWishlist when update button is clicked', async () => {
+            const updateWishlist = jest.fn()
 
-    // since setProducts are master products, as pricing now display From X (cross) Y where X Y are sale and lis price respectively
-    // of the variant that has lowest price (including promotional price)
-    expect(fromLabels).toHaveLength(4)
-})
+            await renderWithProviders(
+                <MockComponent product={mockProductDetail} updateWishlist={updateWishlist} />
+            )
 
-test('validateOrderability callback is called when adding a set to cart', async () => {
-    const user = userEvent.setup()
+            await waitFor(() => {
+                expect(screen.getByText(/customer: registered/)).toBeInTheDocument()
+            })
 
-    const parent = mockProductSet
-    const validateOrderability = jest.fn()
+            await waitFor(() => {
+                const updateWishlistButton = screen.getAllByText(/Update/i)[0]
 
-    renderWithProviders(
-        <MockComponent
-            product={parent}
-            validateOrderability={validateOrderability}
-            addToCart={() => {}}
-            addToWishlist={() => {}}
-        />
-    )
+                fireEvent.click(updateWishlistButton)
+                expect(updateWishlist).toHaveBeenCalledTimes(1)
+            })
+        })
 
-    const button = screen.getByRole('button', {name: /add set to cart/i})
-    await user.click(button)
+        test('calls onVariantSelected after variant selection', async () => {
+            const user = userEvent.setup()
+            const onVariantSelected = jest.fn()
+            const child = mockProductSet.setProducts[0]
 
-    await waitFor(() => {
-        expect(validateOrderability).toHaveBeenCalledTimes(1)
-    })
-})
+            renderWithProviders(
+                <MockComponent
+                    product={child}
+                    onVariantSelected={onVariantSelected}
+                    addToCart={() => {}}
+                    addToWishlist={() => {}}
+                />
+            )
 
-test('onVariantSelected callback is called after successfully selected a variant', async () => {
-    const user = userEvent.setup()
+            const size = screen.getByRole('radio', {name: /xl/i})
+            await user.click(size)
 
-    const onVariantSelected = jest.fn()
-    const child = mockProductSet.setProducts[0]
+            await waitFor(() => {
+                expect(onVariantSelected).toHaveBeenCalledTimes(1)
+            })
+        })
 
-    renderWithProviders(
-        <MockComponent
-            product={child}
-            onVariantSelected={onVariantSelected}
-            addToCart={() => {}}
-            addToWishlist={() => {}}
-        />
-    )
+        test('calls validateOrderability when adding a set to cart', async () => {
+            const user = userEvent.setup()
+            const parent = mockProductSet
+            const validateOrderability = jest.fn()
 
-    const size = screen.getByRole('radio', {name: /xl/i})
-    await user.click(size)
+            renderWithProviders(
+                <MockComponent
+                    product={parent}
+                    validateOrderability={validateOrderability}
+                    addToCart={() => {}}
+                    addToWishlist={() => {}}
+                />
+            )
 
-    await waitFor(() => {
-        expect(onVariantSelected).toHaveBeenCalledTimes(1)
-    })
-})
+            const button = screen.getByRole('button', {name: /add set to cart/i})
+            await user.click(button)
 
-describe('add to cart button loading tests', () => {
-    test('add to cart button is disabled if isBasketLoading is true', async () => {
-        renderWithProviders(
-            <MockComponent
-                product={mockProductDetail}
-                addToCart={() => {}}
-                isBasketLoading={true}
-            />
-        )
-        expect(screen.getByRole('button', {name: /add to cart/i})).toBeDisabled()
+            await waitFor(() => {
+                expect(validateOrderability).toHaveBeenCalledTimes(1)
+            })
+        })
     })
 
-    test('add to cart button is enabled if isBasketLoading is false', async () => {
-        renderWithProviders(
-            <MockComponent
-                product={mockProductDetail}
-                addToCart={() => {}}
-                isBasketLoading={false}
-            />
-        )
-        expect(screen.getByRole('button', {name: /add to cart/i})).toBeEnabled()
+    describe('Quantity Management', () => {
+        test('can update quantity through input field', async () => {
+            const user = userEvent.setup()
+            const addToCart = jest.fn()
+            await renderWithProviders(<MockComponent product={mockProductDetail} addToCart={addToCart} />)
+
+            let quantityBox
+            await waitFor(() => {
+                quantityBox = screen.getByRole('spinbutton')
+            })
+
+            await waitFor(() => {
+                expect(quantityBox).toHaveValue('1')
+            })
+
+            // update item quantity
+            await user.type(quantityBox, '{backspace}3')
+
+            await waitFor(() => {
+                expect(quantityBox).toHaveValue('3')
+            })
+        })
+
+        test('handles invalid quantity inputs by resetting to minimum', async () => {
+            const user = userEvent.setup()
+
+            // Any invalid input should be reset to minOrderQuantity
+            await renderWithProviders(<MockComponent product={mockProductDetail} />)
+
+            const quantityInput = screen.getByRole('spinbutton', {name: /quantity/i})
+            const minQuantity = mockProductDetail.minOrderQuantity.toString()
+
+            // Quantity is empty
+            await user.clear(quantityInput)
+            await user.tab()
+            await waitFor(() => {
+                expect(quantityInput).toHaveValue(minQuantity)
+            })
+
+            // Quantity is zero
+            await user.clear(quantityInput)
+            await user.type(quantityInput, '0')
+            await user.tab()
+            await waitFor(() => {
+                expect(quantityInput).toHaveValue(minQuantity)
+            })
+        })
+
+        test('increases and decreases quantity with increment/decrement buttons', async () => {
+            const user = userEvent.setup()
+            renderWithProviders(<ProductView product={mockProductDetail} />)
+
+            const quantityInput = await screen.findByRole('spinbutton')
+            const incrementButton = screen.getByTestId('quantity-increment')
+            const decrementButton = screen.getByTestId('quantity-decrement')
+
+            // Click increment
+            await user.click(incrementButton)
+            await waitFor(() => {
+                expect(quantityInput).toHaveValue('2')
+            })
+
+            // Click decrement
+            await user.click(decrementButton)
+            await waitFor(() => {
+                expect(quantityInput).toHaveValue('1')
+            })
+        })
     })
-})
 
-test('renders a product bundle properly - parent item', () => {
-    const parent = mockProductBundle
-    renderWithProviders(
-        <MockComponent product={parent} addToCart={() => {}} addToWishlist={() => {}} />
-    )
+    describe('Loading States', () => {
+        test('disables add to cart button when basket is loading', async () => {
+            renderWithProviders(
+                <MockComponent
+                    product={mockProductDetail}
+                    addToCart={() => {}}
+                    isBasketLoading={true}
+                />
+            )
+            expect(screen.getByRole('button', {name: /add to cart/i})).toBeDisabled()
+        })
 
-    // NOTE: there can be duplicates of the same element, due to mobile and desktop views
-    // (they're hidden with display:none style)
-    const addBundleToCartButton = screen.getAllByRole('button', {name: /add bundle to cart/i})[0]
-    const addBundleToWishlistButton = screen.getAllByRole('button', {
-        name: /add bundle to wishlist/i
-    })[0]
-    const quantityPicker = screen.getByRole('spinbutton', {name: /quantity/i})
-    const variationAttributes = screen.queryAllByRole('radiogroup') // e.g. sizes, colors
+        test('enables add to cart button when basket is not loading', async () => {
+            renderWithProviders(
+                <MockComponent
+                    product={mockProductDetail}
+                    addToCart={() => {}}
+                    isBasketLoading={false}
+                />
+            )
+            expect(screen.getByRole('button', {name: /add to cart/i})).toBeEnabled()
+        })
+    })
 
-    // What should exist:
-    expect(addBundleToCartButton).toBeInTheDocument()
-    expect(addBundleToWishlistButton).toBeInTheDocument()
-    expect(quantityPicker).toBeInTheDocument()
+    describe('Product Sets', () => {
+        test('renders parent item correctly', () => {
+            const parent = mockProductSet
+            renderWithProviders(
+                <MockComponent product={parent} addToCart={() => {}} addToWishlist={() => {}} />
+            )
 
-    // What should _not_ exist:
-    expect(variationAttributes).toHaveLength(0)
-})
+            // NOTE: there can be duplicates of the same element, due to mobile and desktop views
+            // (they're hidden with display:none style)
 
-test('renders a product bundle properly - child item', () => {
-    const child = mockProductBundle.bundledProducts[0].product
-    renderWithProviders(
-        <MockComponent
-            product={child}
-            addToCart={() => {}}
-            addToWishlist={() => {}}
-            isProductPartOfBundle={true}
-            setChildProductOrderability={() => {}}
-        />
-    )
+            const fromAtLabel = screen.getAllByText(/from/i)[0]
+            const addSetToCartButton = screen.getAllByRole('button', {name: /add set to cart/i})[0]
+            const addSetToWishlistButton = screen.getAllByRole('button', {name: /add set to wishlist/i})[0]
+            const variationAttributes = screen.queryAllByRole('radiogroup') // e.g. sizes, colors
+            const quantityPicker = screen.queryByRole('spinbutton', {name: /quantity/i})
 
-    const addToCartButton = screen.queryByRole('button', {name: /add to cart/i})
-    const addToWishlistButton = screen.queryByRole('button', {name: /add to wishlist/i})
-    const variationAttributes = screen.getAllByRole('radiogroup') // e.g. sizes, colors
-    const quantityPicker = screen.queryByRole('spinbutton', {name: /quantity:/i})
+            // What should exist:
+            expect(fromAtLabel).toBeInTheDocument()
+            expect(addSetToCartButton).toBeInTheDocument()
+            expect(addSetToWishlistButton).toBeInTheDocument()
 
-    // What should exist:
-    expect(variationAttributes).toHaveLength(2)
+            // What should _not_ exist:
+            expect(variationAttributes).toHaveLength(0)
+            expect(quantityPicker).toBeNull()
+        })
 
-    // What should _not_ exist:
-    expect(addToCartButton).toBeNull()
-    expect(addToWishlistButton).toBeNull()
-    expect(quantityPicker).toBeNull()
+        test('renders child item correctly', () => {
+            const child = mockProductSet.setProducts[0]
+            renderWithProviders(
+                <MockComponent product={child} addToCart={() => {}} addToWishlist={() => {}} />
+            )
+
+            // NOTE: there can be duplicates of the same element, due to mobile and desktop views
+            // (they're hidden with display:none style)
+
+            const addToCartButton = screen.getAllByRole('button', {name: /add to cart/i})[0]
+            const addToWishlistButton = screen.getAllByRole('button', {name: /add to wishlist/i})[0]
+            const variationAttributes = screen.getAllByRole('radiogroup') // e.g. sizes, colors
+            const quantityPicker = screen.getByRole('spinbutton', {name: /quantity/i})
+            const fromLabels = screen.queryAllByText(/from/i)
+
+            // What should exist:
+            expect(addToCartButton).toBeInTheDocument()
+            expect(addToWishlistButton).toBeInTheDocument()
+            expect(variationAttributes).toHaveLength(2)
+            expect(quantityPicker).toBeInTheDocument()
+
+            // since setProducts are master products, as pricing now display From X (cross) Y where X Y are sale and lis price respectively
+            // of the variant that has lowest price (including promotional price)
+            expect(fromLabels).toHaveLength(4)
+        })
+    })
+
+    describe('Product Bundles', () => {
+        test('renders parent item correctly', () => {
+            const parent = mockProductBundle
+            renderWithProviders(
+                <MockComponent product={parent} addToCart={() => {}} addToWishlist={() => {}} />
+            )
+
+            // NOTE: there can be duplicates of the same element, due to mobile and desktop views
+            // (they're hidden with display:none style)
+            const addBundleToCartButton = screen.getAllByRole('button', {name: /add bundle to cart/i})[0]
+            const addBundleToWishlistButton = screen.getAllByRole('button', {
+                name: /add bundle to wishlist/i
+            })[0]
+            const quantityPicker = screen.getByRole('spinbutton', {name: /quantity/i})
+            const variationAttributes = screen.queryAllByRole('radiogroup') // e.g. sizes, colors
+
+            // What should exist:
+            expect(addBundleToCartButton).toBeInTheDocument()
+            expect(addBundleToWishlistButton).toBeInTheDocument()
+            expect(quantityPicker).toBeInTheDocument()
+
+            // What should _not_ exist:
+            expect(variationAttributes).toHaveLength(0)
+        })
+
+        test('renders child item correctly', () => {
+            const child = mockProductBundle.bundledProducts[0].product
+            renderWithProviders(
+                <MockComponent
+                    product={child}
+                    addToCart={() => {}}
+                    addToWishlist={() => {}}
+                    isProductPartOfBundle={true}
+                    setChildProductOrderability={() => {}}
+                />
+            )
+
+            const addToCartButton = screen.queryByRole('button', {name: /add to cart/i})
+            const addToWishlistButton = screen.queryByRole('button', {name: /add to wishlist/i})
+            const variationAttributes = screen.getAllByRole('radiogroup') // e.g. sizes, colors
+            const quantityPicker = screen.queryByRole('spinbutton', {name: /quantity:/i})
+
+            // What should exist:
+            expect(variationAttributes).toHaveLength(2)
+
+            // What should _not_ exist:
+            expect(addToCartButton).toBeNull()
+            expect(addToWishlistButton).toBeNull()
+            expect(quantityPicker).toBeNull()
+        })
+    })
 })
 
 test('renders "Add to Cart" and "Add to Wishlist" buttons in French', async () => {
@@ -374,8 +382,8 @@ test('renders "Add to Cart" and "Add to Wishlist" buttons in French', async () =
     ).toBeInTheDocument()
 })
 
-describe('validateOrderability function tests', () => {
-    test('validateOrderability returns true when variant is undefined but product is orderable', () => {
+describe('validateOrderability', () => {
+    test('returns true when variant is undefined but product is orderable', () => {
         const validateOrderability = (variant, product, quantity, stockLevel) =>
             (variant?.orderable || product?.inventory?.orderable) &&
             quantity > 0 &&
@@ -390,7 +398,7 @@ describe('validateOrderability function tests', () => {
         expect(result).toBe(true)
     })
 
-    test('validateOrderability returns false when variant is undefined and product is not orderable', () => {
+    test('returns false when variant is undefined and product is not orderable', () => {
         const validateOrderability = (variant, product, quantity, stockLevel) =>
             (variant?.orderable || product?.inventory?.orderable) &&
             quantity > 0 &&
@@ -405,7 +413,7 @@ describe('validateOrderability function tests', () => {
         expect(result).toBe(false)
     })
 
-    test('validateOrderability returns true when variant is orderable regardless of product orderability', () => {
+    test('returns true when variant is orderable regardless of product orderability', () => {
         const validateOrderability = (variant, product, quantity, stockLevel) =>
             (variant?.orderable || product?.inventory?.orderable) &&
             quantity > 0 &&
@@ -420,7 +428,7 @@ describe('validateOrderability function tests', () => {
         expect(result).toBe(true)
     })
 
-    test('validateOrderability returns false when both variant and product are not orderable', () => {
+    test('returns false when both variant and product are not orderable', () => {
         const validateOrderability = (variant, product, quantity, stockLevel) =>
             (variant?.orderable || product?.inventory?.orderable) &&
             quantity > 0 &&
@@ -435,7 +443,7 @@ describe('validateOrderability function tests', () => {
         expect(result).toBe(false)
     })
 
-    test('validateOrderability returns false when quantity is invalid even if product/variant are orderable', () => {
+    test('returns false when quantity is invalid even if product/variant are orderable', () => {
         const validateOrderability = (variant, product, quantity, stockLevel) =>
             (variant?.orderable || product?.inventory?.orderable) &&
             quantity > 0 &&
@@ -450,7 +458,7 @@ describe('validateOrderability function tests', () => {
         expect(result).toBe(false)
     })
 
-    test('validateOrderability returns false when quantity exceeds stock level', () => {
+    test('returns false when quantity exceeds stock level', () => {
         const validateOrderability = (variant, product, quantity, stockLevel) =>
             (variant?.orderable || product?.inventory?.orderable) &&
             quantity > 0 &&
