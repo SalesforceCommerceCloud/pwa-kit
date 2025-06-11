@@ -34,6 +34,7 @@ import useEinstein from '@salesforce/retail-react-app/app/hooks/use-einstein'
 import useDataCloud from '@salesforce/retail-react-app/app/hooks/use-datacloud'
 import useActiveData from '@salesforce/retail-react-app/app/hooks/use-active-data'
 import {useServerContext} from '@salesforce/pwa-kit-react-sdk/ssr/universal/hooks'
+import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
 // Project Components
 import RecommendedProducts from '@salesforce/retail-react-app/app/components/recommended-products'
 import ProductView from '@salesforce/retail-react-app/app/components/product-view'
@@ -56,6 +57,7 @@ import {rebuildPathWithParams} from '@salesforce/retail-react-app/app/utils/url'
 import {useHistory, useLocation, useParams} from 'react-router-dom'
 import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
 import {useWishList} from '@salesforce/retail-react-app/app/hooks/use-wish-list'
+import {useAddToCartModalContext} from '@salesforce/retail-react-app/app/hooks/use-add-to-cart-modal'
 
 const ProductDetail = () => {
     const {formatMessage} = useIntl()
@@ -67,6 +69,34 @@ const ProductDetail = () => {
     const toast = useToast()
     const navigate = useNavigation()
     const customerId = useCustomerId()
+    const {site} = useMultiSite()
+    const storeInfoKey = `store_${site.id}`
+
+    // --- Add state for inventoryId ---
+    const [selectedInventoryId, setSelectedInventoryId] = useState(() => {
+        try {
+            return JSON.parse(window.localStorage.getItem(storeInfoKey))?.inventoryId || null
+        } catch (e) {
+            return null
+        }
+    })
+
+    // --- Listen for store changes in localStorage ---
+    useEffect(() => {
+        function handleStorageChange() {
+            try {
+                setSelectedInventoryId(
+                    JSON.parse(window.localStorage.getItem(storeInfoKey))?.inventoryId || null
+                )
+            } catch (e) {
+                setSelectedInventoryId(null)
+            }
+        }
+        window.addEventListener('storage', handleStorageChange)
+        // Also update on mount in case store was changed in this tab
+        handleStorageChange()
+        return () => window.removeEventListener('storage', handleStorageChange)
+    }, [storeInfoKey])
 
     /****************************** Basket *********************************/
     const {isLoading: isBasketLoading} = useCurrentBasket()
@@ -104,7 +134,8 @@ const ProductDetail = () => {
                     'bundled_products',
                     'page_meta_tags'
                 ],
-                allImages: true
+                allImages: true,
+                ...(selectedInventoryId ? {inventoryIds: selectedInventoryId} : {})
             }
         },
         {
@@ -294,23 +325,69 @@ const ProductDetail = () => {
         })
     }
 
-    const handleAddToCart = async (productSelectionValues) => {
+    const [pickupInStoreMap, setPickupInStoreMap] = useState({})
+
+    const handlePickupInStoreChange = (productId, checked) => {
+        setPickupInStoreMap((prev) => ({
+            ...prev,
+            [productId]: checked
+        }))
+    }
+
+    const addToCartModal = useAddToCartModalContext()
+
+    const handleAddToCart = async (productSelectionValues = []) => {
         try {
-            const productItems = productSelectionValues.map(({variant, quantity}) => ({
-                productId: variant.productId,
-                price: variant.price,
-                quantity
-            }))
-
+            const productItems = productSelectionValues.map((item) => {
+                const {variant, quantity} = item
+                // Use variant if present, otherwise use the main product
+                const prod = variant || item.product || product
+                const prodKey = prod.productId || prod.id
+                let result = {
+                    productId: prod.productId || prod.id, // productId for variant, id for product
+                    price: prod.price,
+                    quantity
+                }
+                // Robustly fetch inventoryId from localStorage if pickupInStore is true
+                if (pickupInStoreMap[prodKey]) {
+                    const siteId = site?.id || (window.SFCC && window.SFCC.siteId)
+                    const storeInfoKey = `store_${siteId}`
+                    let inventoryId = undefined
+                    try {
+                        const storeInfo = JSON.parse(window.localStorage.getItem(storeInfoKey))
+                        inventoryId = storeInfo?.inventoryId
+                    } catch (e) {
+                        showError()
+                    }
+                    if (inventoryId) {
+                        result.inventoryId = inventoryId
+                    }
+                }
+                return result
+            })
+            // Defensive check: This block ensures that if, for any reason, pickup is selected for a product but no store (inventoryId) is set,
+            // we show an error. With the current UI logic, this should never be reached, but it guards against unexpected state.
+            if (
+                productItems.some(
+                    (item) =>
+                        item.inventoryId === undefined &&
+                        pickupInStoreMap[item.productId || item.id]
+                )
+            ) {
+                showError(
+                    formatMessage({
+                        id: 'product_view.error.no_store_selected_for_pickup',
+                        defaultMessage: 'No valid store or inventory found for pickup'
+                    })
+                )
+                return
+            }
             await addItemToNewOrExistingBasket(productItems)
-
             einstein.sendAddToCart(productItems)
-
-            // If the items were successfully added, set the return value to be used
-            // by the add to cart modal.
+            // Open modal with itemsAdded
+            addToCartModal.onOpen({product, itemsAdded: productSelectionValues})
             return productSelectionValues
         } catch (error) {
-            console.log('error', error)
             showError(error)
         }
     }
@@ -326,7 +403,7 @@ const ProductDetail = () => {
         // Using ot state for which child products are selected, scroll to the first
         // one that isn't selected.
         const selectedProductIds = Object.keys(childProductSelection)
-        const firstUnselectedProduct = comboProduct.childProducts.find(
+        const firstUnselectedProduct = comboProduct.childProducts?.find(
             ({product: childProduct}) => !selectedProductIds.includes(childProduct.id)
         )?.product
 
@@ -347,28 +424,34 @@ const ProductDetail = () => {
         return true
     }, [product, childProductSelection])
 
-    /**************** Product Set Handlers ****************/
+    // Handles adding a product set to the cart.
+    // 1. Gather the selected child products from state.
+    // 2. Call handleAddToCart with the selected products.
+    // 3. The add-to-cart modal will be opened in handleAddToCart.
     const handleProductSetAddToCart = () => {
-        // Get all the selected products, and pass them to the addToCart handler which
-        // accepts an array.
         const productSelectionValues = Object.values(childProductSelection)
-        return handleAddToCart(productSelectionValues)
+        handleAddToCart(productSelectionValues)
+        // Modal will be opened in handleAddToCart
     }
 
     /**************** Product Bundle Handlers ****************/
     // Top level bundle does not have variants
-    const handleProductBundleAddToCart = async (variant, selectedQuantity) => {
+    const handleProductBundleAddToCart = async (variantOrArray, selectedQuantity) => {
+        // Support both signatures: (variant, selectedQuantity) and ([{variant, quantity}])
+        let quantity
+        if (Array.isArray(variantOrArray)) {
+            quantity = variantOrArray[0]?.quantity
+        } else {
+            quantity = selectedQuantity
+        }
+
         try {
             const childProductSelections = Object.values(childProductSelection)
-
             const productItems = [
                 {
                     productId: product.id,
                     price: product.price,
-                    quantity: selectedQuantity,
-                    // The add item endpoint in the shopper baskets API does not respect variant selections
-                    // for bundle children, so we have to make a follow up call to update the basket
-                    // with the chosen variant selections
+                    quantity: quantity,
                     bundledProductItems: childProductSelections.map((child) => {
                         return {
                             productId: child.variant.productId,
@@ -379,31 +462,21 @@ const ProductDetail = () => {
             ]
 
             const res = await addItemToNewOrExistingBasket(productItems)
-
             const bundleChildMasterIds = childProductSelections.map((child) => {
                 return child.product.id
             })
-
-            // since the returned data includes all products in basket
-            // here we compare list of productIds in bundleProductItems of each productItem to filter out the
-            // current bundle that was last added into cart
             const currentBundle = res.productItems.find((productItem) => {
                 if (!productItem.bundledProductItems?.length) return
                 const bundleChildIds = productItem.bundledProductItems?.map((item) => {
-                    // seek out the bundle child that still uses masterId as product id
                     return item.productId
                 })
                 return bundleChildIds.every((id) => bundleChildMasterIds.includes(id))
             })
-
             const itemsToBeUpdated = getUpdateBundleChildArray(
                 currentBundle,
                 childProductSelections
             )
-
             if (itemsToBeUpdated.length) {
-                // make a follow up call to update child variant selection for product bundle
-                // since add item endpoint doesn't currently consider product bundle child variants
                 await updateItemsInBasketMutation.mutateAsync({
                     method: 'PATCH',
                     parameters: {
@@ -412,9 +485,9 @@ const ProductDetail = () => {
                     body: itemsToBeUpdated
                 })
             }
-
             einstein.sendAddToCart(productItems)
-
+            // Open modal with itemsAdded and selectedQuantity for bundles
+            addToCartModal.onOpen({product, itemsAdded: childProductSelections, selectedQuantity})
             return childProductSelections
         } catch (error) {
             showError(error)
@@ -490,6 +563,11 @@ const ProductDetail = () => {
                             validateOrderability={handleChildProductValidation}
                             childProductOrderability={childProductOrderability}
                             setSelectedBundleQuantity={setSelectedBundleQuantity}
+                            selectedBundleParentQuantity={selectedBundleQuantity}
+                            pickupInStore={!!pickupInStoreMap[product?.id]}
+                            setPickupInStore={(checked) =>
+                                product && handlePickupInStoreChange(product.id, checked)
+                            }
                         />
 
                         <hr />
@@ -554,6 +632,11 @@ const ProductDetail = () => {
                                             setChildProductOrderability={
                                                 setChildProductOrderability
                                             }
+                                            pickupInStore={!!pickupInStoreMap[childProduct?.id]}
+                                            setPickupInStore={(checked) =>
+                                                childProduct &&
+                                                handlePickupInStoreChange(childProduct.id, checked)
+                                            }
                                         />
                                         <InformationAccordion product={childProduct} />
 
@@ -570,13 +653,20 @@ const ProductDetail = () => {
                         <ProductView
                             product={product}
                             category={primaryCategory?.parentCategoryTree || []}
-                            addToCart={(variant, quantity) =>
-                                handleAddToCart([{product, variant, quantity}])
-                            }
+                            addToCart={handleAddToCart}
                             addToWishlist={handleAddToWishlist}
                             isProductLoading={isProductLoading}
                             isBasketLoading={isBasketLoading}
                             isWishlistLoading={isWishlistLoading}
+                            validateOrderability={handleChildProductValidation}
+                            childProductOrderability={childProductOrderability}
+                            setChildProductOrderability={setChildProductOrderability}
+                            setSelectedBundleQuantity={setSelectedBundleQuantity}
+                            selectedBundleParentQuantity={selectedBundleQuantity}
+                            pickupInStore={!!pickupInStoreMap[product?.id]}
+                            setPickupInStore={(checked) =>
+                                product && handlePickupInStoreChange(product.id, checked)
+                            }
                         />
                         <InformationAccordion product={product} />
                     </Fragment>
