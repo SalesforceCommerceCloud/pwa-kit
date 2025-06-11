@@ -11,9 +11,7 @@ import {useSearchParams} from '@salesforce/retail-react-app/app/hooks/use-search
 import {searchUrlBuilder} from '@salesforce/retail-react-app/app/utils/url'
 
 /**
- * routing external search queries to the appropriate product page. It leverages the existing search
- * - Detects external search URLs (e.g., yoursite.com/?q=search-term)
- * - Redirects to the existing search page using searchUrlBuilder
+ * routing external search queries to the appropriate search results page
  */
 const useExternalSearch = () => {
     const history = useHistory()
@@ -25,11 +23,6 @@ const useExternalSearch = () => {
             return
         }
 
-        if (location?.pathname?.startsWith('/search')) {
-            return
-        }
-
-        // Get the search query from URL parameters - 
         // we need to pre-process out filler words like location hints etc
         const rawQuery = searchParams?.q ?? searchParams?.search ?? searchParams?.query;
         const query = (typeof rawQuery === 'string' ? rawQuery : '').trim();
@@ -38,7 +31,11 @@ const useExternalSearch = () => {
             return;
         }
 
-        // Validate we have history API
+        //avoid redirect when already on search page.
+        if (location?.pathname?.startsWith('/search')) {
+            return
+        }
+
         if (!history || !history.push) {
             return
         }
