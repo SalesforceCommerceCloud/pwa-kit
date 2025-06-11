@@ -12,6 +12,8 @@ import SwatchGroup from '@salesforce/retail-react-app/app/components/swatch-grou
 import ProductViewActionButtons from '@salesforce/retail-react-app/app/components/product-view-action-buttons/ProductViewActionButtons'
 import ProductViewHeader from '@salesforce/retail-react-app/app/components/product-view/partials/ProductViewHeader'
 import {Skeleton as ImageGallerySkeleton} from '@salesforce/retail-react-app/app/components/image-gallery'
+import {useTheme} from '@salesforce/retail-react-app/app/components/shared/ui'
+import {useIntl} from 'react-intl'
 
 const SetProductChildItemView = forwardRef((props, ref) => {
     const {
@@ -28,7 +30,6 @@ const SetProductChildItemView = forwardRef((props, ref) => {
         showImageGallery,
         priceData,
         activeCurrency,
-        intl,
         showLoading,
         showInventoryMessage,
         inventoryMessage,
@@ -45,8 +46,10 @@ const SetProductChildItemView = forwardRef((props, ref) => {
         errorContainerRef,
         customInventoryMessage,
         onAddToCartModalOpen,
-        theme
+        validateAndShowError
     } = props
+    const intl = useIntl()
+    const theme = useTheme()
     return (
         <Flex direction={'column'} data-testid="product-view" ref={ref}>
             {/* Basic information etc. title, price, breadcrumb*/}
@@ -271,6 +274,7 @@ const SetProductChildItemView = forwardRef((props, ref) => {
                                 product={product}
                                 quantity={quantity}
                                 onAddToCartModalOpen={onAddToCartModalOpen}
+                                validateAndShowError={validateAndShowError}
                             />
                         </Box>
                     </Box>
@@ -308,6 +312,7 @@ const SetProductChildItemView = forwardRef((props, ref) => {
                     product={product}
                     quantity={quantity}
                     onAddToCartModalOpen={onAddToCartModalOpen}
+                    validateAndShowError={validateAndShowError}
                 />
             </Box>
         </Flex>

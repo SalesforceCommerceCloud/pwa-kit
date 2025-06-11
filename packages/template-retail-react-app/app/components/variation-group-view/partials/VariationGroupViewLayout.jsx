@@ -11,6 +11,8 @@ import SwatchGroup from '@salesforce/retail-react-app/app/components/swatch-grou
 import ProductViewActionButtons from '@salesforce/retail-react-app/app/components/product-view-action-buttons/ProductViewActionButtons'
 import ProductViewHeader from '@salesforce/retail-react-app/app/components/product-view/partials/ProductViewHeader'
 import {Skeleton as ImageGallerySkeleton} from '@salesforce/retail-react-app/app/components/image-gallery'
+import {useIntl} from 'react-intl'
+import {useTheme} from '@salesforce/retail-react-app/app/components/shared/ui'
 
 const VariationGroupViewLayout = forwardRef((props, ref) => {
     const {
@@ -27,7 +29,6 @@ const VariationGroupViewLayout = forwardRef((props, ref) => {
         showImageGallery,
         priceData,
         activeCurrency,
-        intl,
         showLoading,
         showInventoryMessage,
         inventoryMessage,
@@ -43,9 +44,11 @@ const VariationGroupViewLayout = forwardRef((props, ref) => {
         showOptionsMessage,
         errorContainerRef,
         onAddToCartModalOpen,
-        theme
+        validateAndShowError,
     } = props
-    
+    const intl = useIntl()
+    const theme = useTheme()
+
     return (
         <Flex direction={'column'} data-testid="variation-group-view" ref={ref}>
             {/* Basic information etc. title, price, breadcrumb*/}
@@ -262,6 +265,7 @@ const VariationGroupViewLayout = forwardRef((props, ref) => {
                                 product={product}
                                 quantity={quantity}
                                 onAddToCartModalOpen={onAddToCartModalOpen}
+                                validateAndShowError={validateAndShowError}
                             />
                         </Box>
                     </Box>
@@ -297,6 +301,7 @@ const VariationGroupViewLayout = forwardRef((props, ref) => {
                     product={product}
                     quantity={quantity}
                     onAddToCartModalOpen={onAddToCartModalOpen}
+                    validateAndShowError={validateAndShowError}
                 />
             </Box>
         </Flex>

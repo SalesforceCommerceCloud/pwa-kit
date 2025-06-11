@@ -322,9 +322,7 @@ const ProductDetail = () => {
                 <VariationGroupView
                     product={product}
                     category={primaryCategory?.parentCategoryTree || []}
-                    addToCart={(variant, quantity) =>
-                        handleAddToCart({variant, quantity})
-                    }
+                    addToCart={handleAddToCart}
                     addToWishlist={handleAddToWishlist}
                     isProductLoading={isProductLoading}
                     isBasketLoading={isBasketLoading}

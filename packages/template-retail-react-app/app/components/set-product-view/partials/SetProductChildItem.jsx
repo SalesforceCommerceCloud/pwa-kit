@@ -8,17 +8,10 @@
 import React, {forwardRef, useEffect, useMemo, useRef, useState} from 'react'
 import PropTypes from 'prop-types'
 import {useLocation} from 'react-router-dom'
-import {useIntl} from 'react-intl'
-
-import {
-    Button,
-    useTheme
-} from '@salesforce/retail-react-app/app/components/shared/ui'
 import {useCurrency, useDerivedProduct} from '@salesforce/retail-react-app/app/hooks'
 import {useAddToCartModalContext} from '@salesforce/retail-react-app/app/hooks/use-add-to-cart-modal'
 
 // project components
-import withRegistration from '@salesforce/retail-react-app/app/components/with-registration'
 import {getPriceData} from '@salesforce/retail-react-app/app/utils/product-utils'
 import SetProductChildItemView from '@salesforce/retail-react-app/app/components/set-product-view/partials/SetProductChildItemView'
 /**
@@ -39,28 +32,22 @@ const SetProductChildItem = forwardRef(
             addToWishlist,
             updateWishlist,
             isProductLoading,
-            childOfBundleQuantity = 0,
-            childProductOrderability,
             setChildProductOrderability,
             isBasketLoading = false,
             onVariantSelected = () => {},
             validateOrderability = (variant, quantity, stockLevel) =>
                 !isProductLoading && variant?.orderable && quantity > 0 && quantity <= stockLevel,
-            showImageGallery = true,
-            setSelectedBundleQuantity = () => {},
-            selectedBundleParentQuantity = 1
+            showImageGallery = true
         },
         ref
     ) => {
         const {currency: activeCurrency} = useCurrency()
-        const intl = useIntl()
         const location = useLocation()
         const {
             isOpen: isAddToCartModalOpen,
             onOpen: onAddToCartModalOpen,
             onClose: onAddToCartModalClose
         } = useAddToCartModalContext()
-        const theme = useTheme()
         const [showOptionsMessage, toggleShowOptionsMessage] = useState(false)
         const {
             showLoading,
@@ -157,19 +144,10 @@ const SetProductChildItem = forwardRef(
                 updateCart={updateCart}
                 addToWishlist={addToWishlist}
                 updateWishlist={updateWishlist}
-                isProductLoading={isProductLoading}
-                childOfBundleQuantity={childOfBundleQuantity}
-                childProductOrderability={childProductOrderability}
-                setChildProductOrderability={setChildProductOrderability}
                 isBasketLoading={isBasketLoading}
-                onVariantSelected={onVariantSelected}
-                validateOrderability={validateOrderability}
                 showImageGallery={showImageGallery}
-                setSelectedBundleQuantity={setSelectedBundleQuantity}
-                selectedBundleParentQuantity={selectedBundleParentQuantity}
                 priceData={priceData}
                 activeCurrency={activeCurrency}
-                intl={intl}
                 showLoading={showLoading}
                 showInventoryMessage={showInventoryMessage}
                 inventoryMessage={inventoryMessage}
@@ -179,17 +157,14 @@ const SetProductChildItem = forwardRef(
                 variant={variant}
                 variationParams={variationParams}
                 variationAttributes={variationAttributes}
-                stockLevel={stockLevel}
                 stepQuantity={stepQuantity}
-                isOutOfStock={isOutOfStock}
-                unfulfillable={unfulfillable}
                 disableButton={disableButton}
                 canAddToWishlist={canAddToWishlist}
                 showOptionsMessage={showOptionsMessage}
                 errorContainerRef={errorContainerRef}
                 customInventoryMessage={customInventoryMessage}
                 onAddToCartModalOpen={onAddToCartModalOpen}
-                theme={theme}
+                validateAndShowError={validateAndShowError}
             />
         )
     }
@@ -201,7 +176,6 @@ SetProductChildItem.propTypes = {
     product: PropTypes.object,
     isProductPartOfSet: PropTypes.bool,
     isProductPartOfBundle: PropTypes.bool,
-    childOfBundleQuantity: PropTypes.number,
     category: PropTypes.array,
     isProductLoading: PropTypes.bool,
     isBasketLoading: PropTypes.bool,
@@ -212,13 +186,10 @@ SetProductChildItem.propTypes = {
     updateWishlist: PropTypes.func,
     showFullLink: PropTypes.bool,
     imageSize: PropTypes.oneOf(['sm', 'md']),
-    childProductOrderability: PropTypes.object,
     setChildProductOrderability: PropTypes.func,
     onVariantSelected: PropTypes.func,
     validateOrderability: PropTypes.func,
-    showImageGallery: PropTypes.bool,
-    setSelectedBundleQuantity: PropTypes.func,
-    selectedBundleParentQuantity: PropTypes.number
+    showImageGallery: PropTypes.bool
 }
 
 export default SetProductChildItem

@@ -11,6 +11,7 @@ import {
 } from '@salesforce/commerce-sdk-react'
 import {getAddToCartHandler} from '@salesforce/retail-react-app/app/utils/cart-handlers'
 import BundleProductHeaderView from '@salesforce/retail-react-app/app/components/bundle-product-view/partials/BundleProductHeader'
+import BundleProductHeader from '@salesforce/retail-react-app/app/components/bundle-product-view/partials/BundleProductHeader'
 import BundleProductChildItem from '@salesforce/retail-react-app/app/components/bundle-product-view/partials/BundleProductChildItem'
 const BundleProductView = ({
     product,
@@ -85,6 +86,7 @@ const BundleProductView = ({
         const firstUnselectedProduct = comboProduct.childProducts.find(
             ({product: childProduct}) => !selectedProductIds.includes(childProduct.id)
         )?.product
+ 
 
         if (firstUnselectedProduct) {
             // Get the reference to the product view and scroll to it.
@@ -103,16 +105,18 @@ const BundleProductView = ({
         return true
     }, [product, childProductSelection])
 
-
     return (
         <>
-            <BundleProductHeaderView
+            <BundleProductHeader
                 product={product}
                 category={primaryCategory?.parentCategoryTree || []}
                 addToCart={handleAddToCart}
                 addToWishlist={handleAddToWishlist}
                 isProductLoading={isProductLoading}
                 validateOrderability={handleChildProductValidation}
+                childProductOrderability={childProductOrderability}
+                isBasketLoading={isBasketLoading}
+                setSelectedBundleQuantity={setSelectedBundleQuantity}
             />
 
             <hr />

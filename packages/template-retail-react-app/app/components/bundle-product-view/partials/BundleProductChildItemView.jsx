@@ -26,6 +26,7 @@ const BundleProductChildItemView = forwardRef((props, ref) => {
         addToWishlist,
         updateWishlist,
         childOfBundleQuantity,
+        validateAndShowError,
         isBasketLoading,
         showImageGallery,
         priceData,
@@ -228,6 +229,7 @@ const BundleProductChildItemView = forwardRef((props, ref) => {
                                 updateWishlist={updateWishlist}
                                 isProductASet={false}
                                 isProductPartOfSet={false}
+                                validateAndShowError={validateAndShowError}
                                 isProductABundle={false}
                                 isProductPartOfBundle={true}
                                 disableButton={disableButton}

@@ -8,17 +8,10 @@
 import React, {forwardRef, useEffect, useMemo, useRef, useState} from 'react'
 import PropTypes from 'prop-types'
 import {useLocation} from 'react-router-dom'
-import {useIntl} from 'react-intl'
-
-import {
-    Button,
-    useTheme
-} from '@salesforce/retail-react-app/app/components/shared/ui'
 import {useCurrency, useDerivedProduct} from '@salesforce/retail-react-app/app/hooks'
 import {useAddToCartModalContext} from '@salesforce/retail-react-app/app/hooks/use-add-to-cart-modal'
 
 // project components
-import withRegistration from '@salesforce/retail-react-app/app/components/with-registration'
 import {getPriceData} from '@salesforce/retail-react-app/app/utils/product-utils'
 import VariationGroupViewLayout from '@salesforce/retail-react-app/app/components/variation-group-view/partials/VariationGroupViewLayout'
 /**
@@ -48,14 +41,12 @@ const VariationGroupView = forwardRef(
         ref
     ) => {
         const {currency: activeCurrency} = useCurrency()
-        const intl = useIntl()
         const location = useLocation()
         const {
             isOpen: isAddToCartModalOpen,
             onOpen: onAddToCartModalOpen,
             onClose: onAddToCartModalClose
         } = useAddToCartModalContext()
-        const theme = useTheme()
         const [showOptionsMessage, toggleShowOptionsMessage] = useState(false)
         const {
             showLoading,
@@ -78,10 +69,6 @@ const VariationGroupView = forwardRef(
         const canAddToWishlist = !isProductLoading
         const errorContainerRef = useRef(null)
         const disableButton = showInventoryMessage
-        
-        // Variation groups are neither sets nor bundles
-        const isProductASet = false
-        const isProductABundle = false
 
         const validateAndShowError = (opts = {}) => {
             const {scrollErrorIntoView = true} = opts
@@ -144,7 +131,6 @@ const VariationGroupView = forwardRef(
                 showImageGallery={showImageGallery}
                 priceData={priceData}
                 activeCurrency={activeCurrency}
-                intl={intl}
                 showLoading={showLoading}
                 showInventoryMessage={showInventoryMessage}
                 inventoryMessage={inventoryMessage}
@@ -160,7 +146,7 @@ const VariationGroupView = forwardRef(
                 showOptionsMessage={showOptionsMessage}
                 errorContainerRef={errorContainerRef}
                 onAddToCartModalOpen={onAddToCartModalOpen}
-                theme={theme}
+                validateAndShowError={validateAndShowError}
             />
         )
     }

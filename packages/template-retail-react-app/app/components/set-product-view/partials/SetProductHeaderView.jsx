@@ -42,6 +42,7 @@ const SetProductHeaderView = forwardRef((props, ref) => {
         canAddToWishlist,
         customInventoryMessage,
         onAddToCartModalOpen,
+        validateAndShowError,
         theme
     } = props
     return (
@@ -169,40 +170,6 @@ const SetProductHeaderView = forwardRef((props, ref) => {
                                 )
                             })
                         )}
-                        <VStack align="stretch" maxWidth={'200px'}>
-                            <Box fontWeight="bold">
-                                <label htmlFor="quantity">
-                                    {intl.formatMessage({
-                                        defaultMessage: 'Quantity:',
-                                        id: 'product_view.label.quantity'
-                                    })}
-                                </label>
-                            </Box>
-
-                            <QuantityPicker
-                                id="quantity"
-                                step={stepQuantity}
-                                value={quantity}
-                                min={minOrderQuantity}
-                                onChange={(stringValue, numberValue) => {
-                                    if (numberValue >= 0) {
-                                        setQuantity(numberValue)
-                                    } else if (stringValue === '') {
-                                        setQuantity(stringValue)
-                                    }
-                                }}
-                                onBlur={(e) => {
-                                    const value = e.target.value
-                                    if (parseInt(value) < 0 || value === '') {
-                                        setQuantity(minOrderQuantity)
-                                    }
-                                }}
-                                onFocus={(e) => {
-                                    e.target.select()
-                                }}
-                                productName={product?.name}
-                            />
-                        </VStack>
                         <HideOnDesktop>
                             {showFullLink && product && (
                                 <Link
@@ -256,6 +223,7 @@ const SetProductHeaderView = forwardRef((props, ref) => {
                                 product={product}
                                 quantity={quantity}
                                 onAddToCartModalOpen={onAddToCartModalOpen}
+                                validateAndShowError={validateAndShowError}
                             />
                         </Box>
                     </Box>
@@ -293,6 +261,7 @@ const SetProductHeaderView = forwardRef((props, ref) => {
                     product={product}
                     quantity={quantity}
                     onAddToCartModalOpen={onAddToCartModalOpen}
+                    validateAndShowError={validateAndShowError}
                 />
             </Box>
         </Flex>

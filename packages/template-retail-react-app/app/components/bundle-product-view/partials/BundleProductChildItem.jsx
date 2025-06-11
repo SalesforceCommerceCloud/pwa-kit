@@ -73,7 +73,6 @@ const BundleProductChildItem = forwardRef(
             return getPriceData(product, {quantity})
         }, [product, quantity])
         const canAddToWishlist = !isProductLoading
-        console.log('product in bundleproductchilditem', product)
         const errorContainerRef = useRef(null)
 
         const validateAndShowError = (opts = {}) => {
@@ -171,6 +170,7 @@ const BundleProductChildItem = forwardRef(
                 showLoading={showLoading}
                 showInventoryMessage={showInventoryMessage}
                 inventoryMessage={inventoryMessage}
+                validateAndShowError={validateAndShowError}
                 quantity={quantity}
                 minOrderQuantity={minOrderQuantity}
                 setQuantity={setQuantity}

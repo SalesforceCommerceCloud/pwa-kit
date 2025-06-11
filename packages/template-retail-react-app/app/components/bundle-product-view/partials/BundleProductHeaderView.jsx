@@ -44,6 +44,7 @@ const BundleProductHeaderView = forwardRef((props, ref) => {
         canAddToWishlist,
         customInventoryMessage,
         onAddToCartModalOpen,
+        validateAndShowError,
         theme
     } = props
     return (
@@ -175,7 +176,7 @@ const BundleProductHeaderView = forwardRef((props, ref) => {
                             <Box fontWeight="bold">
                                 <label htmlFor="quantity">
                                     {intl.formatMessage({
-                                        defaultMessage: 'Quantity:',
+                                        defaultMessage: 'Quantity',
                                         id: 'product_view.label.quantity'
                                     })}
                                 </label>
@@ -259,6 +260,7 @@ const BundleProductHeaderView = forwardRef((props, ref) => {
                                 product={product}
                                 quantity={quantity}
                                 onAddToCartModalOpen={onAddToCartModalOpen}
+                                validateAndShowError={validateAndShowError}
                             />
                         </Box>
                     </Box>
@@ -296,6 +298,7 @@ const BundleProductHeaderView = forwardRef((props, ref) => {
                     product={product}
                     quantity={quantity}
                     onAddToCartModalOpen={onAddToCartModalOpen}
+                    validateAndShowError={validateAndShowError}
                 />
             </Box>
         </Flex>

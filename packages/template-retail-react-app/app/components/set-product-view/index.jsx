@@ -25,14 +25,23 @@ const SetProductView = ({
     const childProductRefs = useRef({})
 
     const comboProduct = normalizeSetBundleProduct(product)
-
-    const handleAddToCart = getAddToCartHandler({
-        product,
-        updateItemsInBasketMutation,
-        childProductSelection,
-        einstein,
-        showError
-    })
+    
+    const handleChildAddToCart = (childProduct) => {
+        const addToCartHandler = getAddToCartHandler({
+            product: childProduct,
+            updateItemsInBasketMutation,
+            childProductSelection,
+            einstein,
+            showError
+        })
+        
+        return ({variant, quantity}) => {
+            return addToCartHandler({
+                variant,
+                quantity
+            })
+        }
+    }
 
     const handleChildProductValidation = useCallback(() => {
         // Run validation for all child products. This will ensure the error
@@ -70,7 +79,13 @@ const SetProductView = ({
             <SetProductHeader
                 product={product}
                 category={primaryCategory?.parentCategoryTree || []}
-                addToCart={handleAddToCart}
+                addToCart={getAddToCartHandler({
+                    product,
+                    updateItemsInBasketMutation,
+                    childProductSelection,
+                    einstein,
+                    showError
+                })}
                 addToWishlist={handleAddToWishlist}
                 isProductLoading={isProductLoading}
                 isBasketLoading={isBasketLoading}
@@ -86,19 +101,21 @@ const SetProductView = ({
                 ({product: childProduct, quantity: childQuantity}) => (
                     <Box key={childProduct.id} data-testid="child-product">
                         <SetProductChildItem
-                            ref={function (ref) {
-                                childProductRefs.current[childProduct.id] = {
-                                    ref,
-                                    validateOrderability: this.validateOrderability
+                            ref={(componentRef) => {
+                                if (componentRef) {
+                                    childProductRefs.current[childProduct.id] = {
+                                        ref: componentRef,
+                                        validateOrderability: componentRef.validateOrderability || (() => {
+                                            return true
+                                        })
+                                    }
+                                } else {
+                                    // Clean up ref when component unmounts
+                                    delete childProductRefs.current[childProduct.id]
                                 }
                             }}
                             product={childProduct}
-                            addToCart={(variant, quantity) =>
-                                handleAddToCart({
-                                    variant,
-                                    quantity
-                                })
-                            }
+                            addToCart={handleChildAddToCart(childProduct)}
                             addToWishlist={handleAddToWishlist}
                             onVariantSelected={(product, variant, quantity) => {
                                 if (quantity) {

@@ -16,6 +16,7 @@ const ProductViewActionButtons = ({
     isProductASet,
     isProductABundle,
     isProductPartOfSet,
+    validateAndShowError,
     isProductPartOfBundle,
     disableButton,
     isBasketLoading,
@@ -67,12 +68,17 @@ const ProductViewActionButtons = ({
     }
 
     const handleCartItem = async () => {
+        const hasValidSelection = validateAndShowError()
+
+        if (!hasValidSelection) return null
+
         if (!addToCart && !updateCart) return null
         if (updateCart) {
             await updateCart(variant || product, quantity)
             return
         }
         try {
+            // (JEREMY) here the variant just the basic stuff.
             const itemsAdded = await addToCart({variant, quantity})
             if (itemsAdded && onAddToCartModalOpen) {
                 onAddToCartModalOpen({

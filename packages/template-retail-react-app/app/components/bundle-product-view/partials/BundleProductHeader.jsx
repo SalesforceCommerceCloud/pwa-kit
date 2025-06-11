@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, {forwardRef, useEffect, useMemo} from 'react'
+import React, {forwardRef, useEffect, useMemo, useState, useRef} from 'react'
 import PropTypes from 'prop-types'
 import {useLocation} from 'react-router-dom'
 import {useIntl} from 'react-intl'
@@ -66,7 +66,6 @@ const BundleProductHeader = forwardRef(
             variationAttributes,
             stepQuantity,
         } = useDerivedProduct(product, false, false)
-        
         const priceData = useMemo(() => {
             return getPriceData(product, {quantity})
         }, [product, quantity])
@@ -76,7 +75,6 @@ const BundleProductHeader = forwardRef(
         const {disableButton, customInventoryMessage} = useMemo(() => {
             let shouldDisableButton = showInventoryMessage
             let currentInventoryMsg = ''
-            
             if (!shouldDisableButton && childProductOrderability) {
                 // if any of the children are not orderable, it will disable the add to cart button
                 const unavailableChildProductKey = Object.keys(childProductOrderability).find(
@@ -132,6 +130,13 @@ const BundleProductHeader = forwardRef(
             }
         }, [variant?.productId, quantity])
 
+
+        const validateAndShowError = () => {
+            // Validate that all attributes are selected before proceeding.
+            const hasValidSelection = validateOrderability()
+            return hasValidSelection
+        }
+
         return (
             <BundleProductHeaderViewLayout
                 ref={ref}
@@ -165,6 +170,7 @@ const BundleProductHeader = forwardRef(
                 customInventoryMessage={customInventoryMessage}
                 onAddToCartModalOpen={onAddToCartModalOpen}
                 theme={theme}
+                validateAndShowError={validateAndShowError}
             />
         )
     }

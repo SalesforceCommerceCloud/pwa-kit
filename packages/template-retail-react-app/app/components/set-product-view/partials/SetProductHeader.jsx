@@ -131,6 +131,12 @@ const SetProductHeader = forwardRef(
             }
         }, [variant?.productId, quantity])
 
+        const validateAndShowError = () => {
+            // Validate that all attributes are selected before proceeding.
+            const hasValidSelection = validateOrderability()
+            return hasValidSelection
+        }
+
         return (
             <SetProductHeaderView
                 ref={ref}
@@ -162,6 +168,7 @@ const SetProductHeader = forwardRef(
                 canAddToWishlist={canAddToWishlist}
                 customInventoryMessage={customInventoryMessage}
                 onAddToCartModalOpen={onAddToCartModalOpen}
+                validateAndShowError={validateAndShowError}
                 theme={theme}
             />
         )
