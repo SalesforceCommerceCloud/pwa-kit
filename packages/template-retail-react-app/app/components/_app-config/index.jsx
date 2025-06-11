@@ -21,7 +21,7 @@ import {ChakraProvider} from '@salesforce/retail-react-app/app/components/shared
 import 'focus-visible/dist/focus-visible'
 
 import theme from '@salesforce/retail-react-app/app/theme'
-import {MultiSiteProvider} from '@salesforce/retail-react-app/app/contexts'
+import {MultiSiteProvider, StoreLocatorProvider} from '@salesforce/retail-react-app/app/contexts'
 import {useAppOrigin} from '@salesforce/retail-react-app/app/hooks/use-app-origin'
 import {
     resolveSiteFromUrl,
@@ -35,7 +35,17 @@ import {CommerceApiProvider} from '@salesforce/commerce-sdk-react'
 import {withReactQuery} from '@salesforce/pwa-kit-react-sdk/ssr/universal/components/with-react-query'
 import {useCorrelationId} from '@salesforce/pwa-kit-react-sdk/ssr/universal/hooks'
 import {ReactQueryDevtools} from '@tanstack/react-query-devtools'
-import {DEFAULT_DNT_STATE} from '@salesforce/retail-react-app/app/constants'
+import {
+    DEFAULT_DNT_STATE,
+    STORE_LOCATOR_RADIUS,
+    STORE_LOCATOR_RADIUS_UNIT,
+    STORE_LOCATOR_DEFAULT_COUNTRY,
+    STORE_LOCATOR_DEFAULT_COUNTRY_CODE,
+    STORE_LOCATOR_DEFAULT_POSTAL_CODE,
+    STORE_LOCATOR_DEFAULT_PAGE_SIZE,
+    STORE_LOCATOR_SUPPORTED_COUNTRIES
+} from '@salesforce/retail-react-app/app/constants'
+
 /**
  * Use the AppConfig component to inject extra arguments into the getProps
  * methods for all Route Components in the app – typically you'd want to do this
@@ -56,6 +66,16 @@ const AppConfig = ({children, locals = {}}) => {
 
     const passwordlessCallback = locals.appConfig.login?.passwordless?.callbackURI
 
+    const storeLocatorConfig = {
+        radius: STORE_LOCATOR_RADIUS,
+        radiusUnit: STORE_LOCATOR_RADIUS_UNIT,
+        defaultCountry: STORE_LOCATOR_DEFAULT_COUNTRY,
+        defaultCountryCode: STORE_LOCATOR_DEFAULT_COUNTRY_CODE,
+        defaultPostalCode: STORE_LOCATOR_DEFAULT_POSTAL_CODE,
+        defaultPageSize: STORE_LOCATOR_DEFAULT_PAGE_SIZE,
+        supportedCountries: STORE_LOCATOR_SUPPORTED_COUNTRIES
+    }
+
     return (
         <CommerceApiProvider
             shortCode={commerceApiConfig.parameters.shortCode}
@@ -75,7 +95,9 @@ const AppConfig = ({children, locals = {}}) => {
             logger={createLogger({packageName: 'commerce-sdk-react'})}
         >
             <MultiSiteProvider site={locals.site} locale={locals.locale} buildUrl={locals.buildUrl}>
-                <ChakraProvider theme={theme}>{children}</ChakraProvider>
+                <StoreLocatorProvider config={storeLocatorConfig}>
+                    <ChakraProvider theme={theme}>{children}</ChakraProvider>
+                </StoreLocatorProvider>
             </MultiSiteProvider>
             <ReactQueryDevtools />
         </CommerceApiProvider>

@@ -46,7 +46,7 @@ import {DrawerMenu} from '@salesforce/retail-react-app/app/components/drawer-men
 import {ListMenu, ListMenuContent} from '@salesforce/retail-react-app/app/components/list-menu'
 import {HideOnDesktop, HideOnMobile} from '@salesforce/retail-react-app/app/components/responsive'
 import AboveHeader from '@salesforce/retail-react-app/app/components/_app/partials/above-header'
-import StoreLocatorModal from '@salesforce/retail-react-app/app/components/store-locator-modal'
+import {StoreLocatorModal} from '@salesforce/retail-react-app/app/components/store-locator'
 // Hooks
 import {AuthModal, useAuthModal} from '@salesforce/retail-react-app/app/hooks/use-auth-modal'
 import {
