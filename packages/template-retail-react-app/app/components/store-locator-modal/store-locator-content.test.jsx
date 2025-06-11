@@ -396,6 +396,4 @@ describe('StoreLocatorContent', () => {
             expect(loadMore).not.toBeInTheDocument()
         })
     })
-
-
 })

@@ -152,7 +152,8 @@ const StoreLocatorContent = () => {
             return `${intl.formatMessage(
                 {
                     id: 'store_locator.description.viewing_near_postal_code',
-                    defaultMessage: 'Viewing stores within {distance}{distanceUnit} of {postalCode} in '
+                    defaultMessage:
+                        'Viewing stores within {distance}{distanceUnit} of {postalCode} in '
                 },
                 {
                     distance: STORE_LOCATOR_DISTANCE,
