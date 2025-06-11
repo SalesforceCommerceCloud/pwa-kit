@@ -1158,10 +1158,12 @@ const main = async (opts) => {
     console.log('plugins', pluginConfig?.plugins)
     // Prompt user for plugin selection
     if (pluginConfig?.plugins?.length > 0) {
+        console.log('1161 >> inside if')
         const pluginChoices = Object.entries(pluginConfig.plugins).map(([key, config]) => ({
             name: config.description,
             value: key
         }))
+        console.log('1166 >> pluginChoices', pluginChoices)
 
         const pluginAnswers = await inquirer.prompt([
             {
