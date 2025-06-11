@@ -26,11 +26,11 @@ function useCommerceApi(): ApiClients
  */
 function useCommerceApi<T extends keyof ApiClients>(clientName: T): NonNullable<ApiClients[T]>
 function useCommerceApi<T extends keyof ApiClients>(clientName?: T) {
-    const api = React.useContext(CommerceApiContext)
+    const apiClients = React.useContext(CommerceApiContext)
 
     // If no client name is provided, return the full API object (backwards compatibility)
     if (clientName === undefined) {
-        return api
+        return apiClients
     }
 
     // ApiClients can now be optional, so if query or mutation hooks are called we need to validate the client is initialized
