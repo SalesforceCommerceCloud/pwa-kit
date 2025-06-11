@@ -1201,6 +1201,7 @@ const main = async (opts) => {
         })
     }
 
+    console.log('plugins', pluginConfig?.plugins)
     // Prompt user for plugin selection
     if (pluginConfig?.plugins?.length > 0) {
         const pluginChoices = Object.entries(pluginConfig.plugins).map(([key, config]) => ({
