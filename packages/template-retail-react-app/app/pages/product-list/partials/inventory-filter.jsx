@@ -104,10 +104,10 @@ const StoreInventoryFilter = ({toggleFilter, selectedFilters}) => {
                     )}
                 >
                     <FormattedMessage
-                        defaultMessage="In Stock at {storeLink}"
+                        defaultMessage="In Stock at {storeName}"
                         id="store_inventory_filter.checkbox.label"
                         values={{
-                            storeLink: (
+                            storeName: (
                                 <Text
                                     as="span"
                                     textDecoration="underline"
