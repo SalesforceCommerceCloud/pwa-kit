@@ -47,6 +47,18 @@ const button = defineRecipe({
             //     minWidth: '1em',
             //     lineHeight: 4
             // }),
+            'link-red': {
+                color: 'red.500',
+                fontWeight: 'normal',
+                minWidth: '1em',
+                lineHeight: '1rem'
+            },
+            'link-blue': {
+                color: 'blue.600',
+                fontWeight: 'normal',
+                minWidth: '1em',
+                lineHeight: '1rem'
+            },
             'menu-link': {
                 color: 'black',
                 justifyContent: 'flex-start',
