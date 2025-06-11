@@ -8,7 +8,8 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 // Components
-import {Box, Heading, Flex, Text, Fade} from '@chakra-ui/react'
+import {Box, Heading, Flex, Text} from '@chakra-ui/react'
+import Fade from '../../../components/fade'
 
 // Project Components
 import Breadcrumb from '../../../components/breadcrumb'
