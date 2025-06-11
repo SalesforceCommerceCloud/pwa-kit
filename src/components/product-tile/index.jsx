@@ -296,7 +296,7 @@ const ProductTile = (props) => {
                                       {product: localizedProductName}
                                   )
                         }
-                        icon={isFavourite ? <HeartSolidIcon /> : <HeartIcon />}
+                        variant="unstyled"
                         css={styles.favIcon}
                         onClick={async () => {
                             if (!isFavouriteLoading.current) {
@@ -305,7 +305,9 @@ const ProductTile = (props) => {
                                 isFavouriteLoading.current = false
                             }
                         }}
-                    />
+                    >
+                        {isFavourite ? <HeartSolidIcon /> : <HeartIcon />}
+                    </IconButtonWithRegistration>
                 </Box>
             )}
             {filteredLabels.size > 0 && (
