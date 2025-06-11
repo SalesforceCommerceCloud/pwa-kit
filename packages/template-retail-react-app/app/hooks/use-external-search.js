@@ -5,25 +5,35 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import {useEffect} from 'react'
+import {useEffect, useMemo} from 'react'
 import {useHistory, useLocation} from 'react-router-dom'
 import {useSearchParams} from '@salesforce/retail-react-app/app/hooks/use-search-params'
 import {searchUrlBuilder} from '@salesforce/retail-react-app/app/utils/url'
 
 /**
- * routing external search queries to the appropriate search results page
+ * routing when external search parameters are present in the URL to the appropriate search results
  */
 const useExternalSearch = () => {
     const history = useHistory()
     const location = useLocation()
     const [searchParams] = useSearchParams()
 
+    const hasExternalSearchParams = useMemo(() => {
+        if (typeof window === 'undefined') return false
+        const urlParams = new URLSearchParams(location.search)
+        return urlParams.has('q') || urlParams.has('search') || urlParams.has('query')
+    }, [location.search])
+
     useEffect(() => {
+        if (!hasExternalSearchParams) {
+            return
+        }
+
         if (typeof window === 'undefined'){
             return
         }
 
-        // we need to pre-process out filler words like location hints etc
+        // we need to pre-process out filler words like location hints, and handle multi-word searches
         const rawQuery = searchParams?.q ?? searchParams?.search ?? searchParams?.query;
         const query = (typeof rawQuery === 'string' ? rawQuery : '').trim();
 
@@ -31,7 +41,6 @@ const useExternalSearch = () => {
             return;
         }
 
-        //avoid redirect when already on search page.
         if (location?.pathname?.startsWith('/search')) {
             return
         }
@@ -48,7 +57,7 @@ const useExternalSearch = () => {
             console.warn(error)
         }
 
-    }, [location?.pathname, searchParams?.q, searchParams?.search, searchParams?.query, history])
+    }, [hasExternalSearchParams, location?.pathname, searchParams?.q, searchParams?.search, searchParams?.query, history])
 }
 
 export default useExternalSearch
