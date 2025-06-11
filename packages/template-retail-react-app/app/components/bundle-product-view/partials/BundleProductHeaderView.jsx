@@ -1,6 +1,19 @@
+/*
+ * Copyright (c) 2025, Salesforce, Inc.
+ * All rights reserved.
+ * SPDX-License-Identifier: BSD-3-Clause
+ * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
+ */
 import React, {forwardRef} from 'react'
 import PropTypes from 'prop-types'
-import {Flex, Box, VStack, Text, Fade, Skeleton} from '@salesforce/retail-react-app/app/components/shared/ui'
+import {
+    Flex,
+    Box,
+    VStack,
+    Text,
+    Fade,
+    Skeleton
+} from '@salesforce/retail-react-app/app/components/shared/ui'
 import ImageGallery from '@salesforce/retail-react-app/app/components/image-gallery'
 import Breadcrumb from '@salesforce/retail-react-app/app/components/breadcrumb'
 import Link from '@salesforce/retail-react-app/app/components/link'
@@ -35,7 +48,7 @@ const BundleProductHeaderView = forwardRef((props, ref) => {
         inventoryMessage,
         quantity,
         minOrderQuantity,
-        setQuantity, 
+        setQuantity,
         variant,
         variationParams,
         variationAttributes,
@@ -136,8 +149,7 @@ const BundleProductHeaderView = forwardRef((props, ref) => {
                                         const hasSelection = Boolean(selectedValue?.value)
                                         const isSelected = selectedValue?.value === value
                                         const isFirst = index === 0
-                                        const isFocusable =
-                                            isSelected || (!hasSelection && isFirst)
+                                        const isFocusable = isSelected || (!hasSelection && isFirst)
                                         return (
                                             <Swatch
                                                 key={value}
@@ -210,10 +222,7 @@ const BundleProductHeaderView = forwardRef((props, ref) => {
                         </VStack>
                         <HideOnDesktop>
                             {showFullLink && product && (
-                                <Link
-                                    to={`/product/${product.master.masterId}`}
-                                    color="blue.600"
-                                >
+                                <Link to={`/product/${product.master.masterId}`} color="blue.600">
                                     <FormattedMessage
                                         id="product_view.link.full_details"
                                         defaultMessage="See full details"
@@ -238,11 +247,7 @@ const BundleProductHeaderView = forwardRef((props, ref) => {
                                 </Text>
                             </Fade>
                         )}
-                        <Box
-                            display={
-                                ['none', 'none', 'none', 'block']
-                            }
-                        >
+                        <Box display={['none', 'none', 'none', 'block']}>
                             <ProductViewActionButtons
                                 addToCart={addToCart}
                                 updateCart={updateCart}
@@ -272,9 +277,7 @@ const BundleProductHeaderView = forwardRef((props, ref) => {
                 position="fixed"
                 bg="white"
                 width="100%"
-                display={
-                    ['block', 'block', 'block', 'none']
-                }
+                display={['block', 'block', 'block', 'none']}
                 p={[4, 4, 6]}
                 left={0}
                 bottom={0}
@@ -311,4 +314,4 @@ BundleProductHeaderView.propTypes = {
     // Define all the prop types as needed for clarity and validation
 }
 
-export default BundleProductHeaderView 
+export default BundleProductHeaderView

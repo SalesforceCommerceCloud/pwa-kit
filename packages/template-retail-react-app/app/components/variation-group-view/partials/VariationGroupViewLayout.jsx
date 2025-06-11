@@ -1,6 +1,19 @@
+/*
+ * Copyright (c) 2025, Salesforce, Inc.
+ * All rights reserved.
+ * SPDX-License-Identifier: BSD-3-Clause
+ * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
+ */
 import React, {forwardRef} from 'react'
 import PropTypes from 'prop-types'
-import {Flex, Box, VStack, Text, Fade, Skeleton} from '@salesforce/retail-react-app/app/components/shared/ui'
+import {
+    Flex,
+    Box,
+    VStack,
+    Text,
+    Fade,
+    Skeleton
+} from '@salesforce/retail-react-app/app/components/shared/ui'
 import ImageGallery from '@salesforce/retail-react-app/app/components/image-gallery'
 import Link from '@salesforce/retail-react-app/app/components/link'
 import {FormattedMessage} from 'react-intl'
@@ -44,7 +57,7 @@ const VariationGroupViewLayout = forwardRef((props, ref) => {
         showOptionsMessage,
         errorContainerRef,
         onAddToCartModalOpen,
-        validateAndShowError,
+        validateAndShowError
     } = props
     const intl = useIntl()
     const theme = useTheme()
@@ -138,8 +151,7 @@ const VariationGroupViewLayout = forwardRef((props, ref) => {
                                         const hasSelection = Boolean(selectedValue?.value)
                                         const isSelected = selectedValue?.value === value
                                         const isFirst = index === 0
-                                        const isFocusable =
-                                            isSelected || (!hasSelection && isFirst)
+                                        const isFocusable = isSelected || (!hasSelection && isFirst)
                                         return (
                                             <Swatch
                                                 key={value}
@@ -209,26 +221,22 @@ const VariationGroupViewLayout = forwardRef((props, ref) => {
                                 productName={product?.name}
                             />
                         </VStack>
-                        
+
                         <Box ref={errorContainerRef}>
                             {!showLoading && showOptionsMessage && (
                                 <Fade in={true}>
                                     <Text color="orange.600" fontWeight={600} marginBottom={8}>
                                         {intl.formatMessage({
-                                            defaultMessage:
-                                                'Please select all your options above'
+                                            defaultMessage: 'Please select all your options above'
                                         })}
                                     </Text>
                                 </Fade>
                             )}
                         </Box>
-                        
+
                         <HideOnDesktop>
                             {showFullLink && product && (
-                                <Link
-                                    to={`/product/${product.master.masterId}`}
-                                    color="blue.600"
-                                >
+                                <Link to={`/product/${product.master.masterId}`} color="blue.600">
                                     <FormattedMessage
                                         id="product_view.link.full_details"
                                         defaultMessage="See full details"
@@ -246,7 +254,7 @@ const VariationGroupViewLayout = forwardRef((props, ref) => {
                                 </Text>
                             </Fade>
                         )}
-                        
+
                         <Box display={['none', 'none', 'none', 'block']}>
                             <ProductViewActionButtons
                                 addToCart={addToCart}
@@ -318,21 +326,21 @@ VariationGroupViewLayout.propTypes = {
     variant: PropTypes.object,
     variationParams: PropTypes.object,
     variationAttributes: PropTypes.array,
-    
+
     // Loading states
     isBasketLoading: PropTypes.bool,
     isWishlistLoading: PropTypes.bool,
     showLoading: PropTypes.bool,
-    
+
     // Quantity and inventory
     quantity: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
     minOrderQuantity: PropTypes.number,
     stepQuantity: PropTypes.number,
-    
+
     // Inventory messages
     showInventoryMessage: PropTypes.bool,
     inventoryMessage: PropTypes.string,
-    
+
     // UI state
     showFullLink: PropTypes.bool,
     showImageGallery: PropTypes.bool,
@@ -340,12 +348,12 @@ VariationGroupViewLayout.propTypes = {
     disableButton: PropTypes.bool,
     canAddToWishlist: PropTypes.bool,
     imageSize: PropTypes.oneOf(['sm', 'md']),
-    
+
     // Currency and locale
     activeCurrency: PropTypes.string,
     intl: PropTypes.object.isRequired,
     theme: PropTypes.object,
-    
+
     // Functions
     addToCart: PropTypes.func,
     updateCart: PropTypes.func,
@@ -353,9 +361,9 @@ VariationGroupViewLayout.propTypes = {
     updateWishlist: PropTypes.func,
     setQuantity: PropTypes.func,
     onAddToCartModalOpen: PropTypes.func,
-    
+
     // Refs
     errorContainerRef: PropTypes.object
 }
 
-export default VariationGroupViewLayout 
+export default VariationGroupViewLayout

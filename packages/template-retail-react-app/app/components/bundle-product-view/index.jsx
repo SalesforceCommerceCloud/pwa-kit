@@ -1,13 +1,15 @@
+/*
+ * Copyright (c) 2025, Salesforce, Inc.
+ * All rights reserved.
+ * SPDX-License-Identifier: BSD-3-Clause
+ * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
+ */
 import React, {useCallback, useState, useRef} from 'react'
 import PropTypes from 'prop-types'
 import {Box} from '@salesforce/retail-react-app/app/components/shared/ui'
 import InformationAccordion from '@salesforce/retail-react-app/app/pages/product-detail/partials/information-accordion'
-import {
-    normalizeSetBundleProduct,
-} from '@salesforce/retail-react-app/app/utils/product-utils'
-import {
-    useProducts,
-} from '@salesforce/commerce-sdk-react'
+import {normalizeSetBundleProduct} from '@salesforce/retail-react-app/app/utils/product-utils'
+import {useProducts} from '@salesforce/commerce-sdk-react'
 import {getAddToCartHandler} from '@salesforce/retail-react-app/app/utils/cart-handlers'
 import BundleProductHeader from '@salesforce/retail-react-app/app/components/bundle-product-view/partials/BundleProductHeader'
 import BundleProductChildItem from '@salesforce/retail-react-app/app/components/bundle-product-view/partials/BundleProductChildItem'
@@ -28,8 +30,8 @@ const BundleProductView = ({
     const childProductRefs = useRef({})
 
     let bundleChildVariantIds = Object.keys(childProductSelection)
-            ?.map((key) => childProductSelection[key].variant.productId)
-            .join(',')
+        ?.map((key) => childProductSelection[key].variant.productId)
+        .join(',')
 
     const {data: bundleChildrenData} = useProducts(
         {
@@ -84,7 +86,6 @@ const BundleProductView = ({
         const firstUnselectedProduct = comboProduct.childProducts.find(
             ({product: childProduct}) => !selectedProductIds.includes(childProduct.id)
         )?.product
- 
 
         if (firstUnselectedProduct) {
             // Get the reference to the product view and scroll to it.
@@ -120,52 +121,48 @@ const BundleProductView = ({
             <hr />
 
             {/* Render the child products */}
-            {comboProduct.childProducts?.map(
-                ({product: childProduct, quantity: childQuantity}) => (
-                    <Box key={childProduct.id} data-testid="child-product">
-                        <BundleProductChildItem
-                            ref={function (ref) {
-                                childProductRefs.current[childProduct.id] = {
-                                    ref,
-                                    validateOrderability: this.validateOrderability
-                                }
-                            }}
-                            product={childProduct}
-                            childOfBundleQuantity={childQuantity}
-                            selectedBundleParentQuantity={selectedBundleQuantity}
-                            addToCart={null}
-                            addToWishlist={null}
-                            onVariantSelected={(product, variant, quantity) => {
-                                if (quantity) {
-                                    setChildProductSelection((previousState) => ({
-                                        ...previousState,
-                                        [product.id]: {
-                                            product,
-                                            variant,
-                                            quantity: childQuantity
-                                        }
-                                    }))
-                                } else {
-                                    const selections = {...childProductSelection}
-                                    delete selections[product.id]
-                                    setChildProductSelection(selections)
-                                }
-                            }}
-                            isProductLoading={isProductLoading}
-                            isBasketLoading={isBasketLoading}
-                            isWishlistLoading={isWishlistLoading}
-                            setChildProductOrderability={
-                                setChildProductOrderability
+            {comboProduct.childProducts?.map(({product: childProduct, quantity: childQuantity}) => (
+                <Box key={childProduct.id} data-testid="child-product">
+                    <BundleProductChildItem
+                        ref={function (ref) {
+                            childProductRefs.current[childProduct.id] = {
+                                ref,
+                                validateOrderability: this.validateOrderability
                             }
-                        />
-                        <InformationAccordion product={childProduct} />
+                        }}
+                        product={childProduct}
+                        childOfBundleQuantity={childQuantity}
+                        selectedBundleParentQuantity={selectedBundleQuantity}
+                        addToCart={null}
+                        addToWishlist={null}
+                        onVariantSelected={(product, variant, quantity) => {
+                            if (quantity) {
+                                setChildProductSelection((previousState) => ({
+                                    ...previousState,
+                                    [product.id]: {
+                                        product,
+                                        variant,
+                                        quantity: childQuantity
+                                    }
+                                }))
+                            } else {
+                                const selections = {...childProductSelection}
+                                delete selections[product.id]
+                                setChildProductSelection(selections)
+                            }
+                        }}
+                        isProductLoading={isProductLoading}
+                        isBasketLoading={isBasketLoading}
+                        isWishlistLoading={isWishlistLoading}
+                        setChildProductOrderability={setChildProductOrderability}
+                    />
+                    <InformationAccordion product={childProduct} />
 
-                        <Box display={['none', 'none', 'none', 'block']}>
-                            <hr />
-                        </Box>
+                    <Box display={['none', 'none', 'none', 'block']}>
+                        <hr />
                     </Box>
-                )
-            )}
+                </Box>
+            ))}
         </>
     )
 }
@@ -190,4 +187,4 @@ BundleProductView.propTypes = {
     selectedBundleQuantity: PropTypes.number
 }
 
-export default BundleProductView 
+export default BundleProductView

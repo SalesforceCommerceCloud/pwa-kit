@@ -64,12 +64,12 @@ const BundleProductHeader = forwardRef(
             variant,
             variationParams,
             variationAttributes,
-            stepQuantity,
+            stepQuantity
         } = useDerivedProduct(product, false, false)
         const priceData = useMemo(() => {
             return getPriceData(product, {quantity})
         }, [product, quantity])
-        
+
         const canAddToWishlist = !isProductLoading
 
         const {disableButton, customInventoryMessage} = useMemo(() => {
@@ -129,7 +129,6 @@ const BundleProductHeader = forwardRef(
                 onVariantSelected(product, variant, quantity)
             }
         }, [variant?.productId, quantity])
-
 
         const validateAndShowError = () => {
             // Validate that all attributes are selected before proceeding.

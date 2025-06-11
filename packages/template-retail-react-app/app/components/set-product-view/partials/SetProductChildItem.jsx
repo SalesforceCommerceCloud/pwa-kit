@@ -81,7 +81,11 @@ const SetProductChildItem = forwardRef(
             const scrollToError = showError && scrollErrorIntoView
             toggleShowOptionsMessage(showError)
 
-            if (scrollToError && errorContainerRef.current && typeof errorContainerRef.current.scrollIntoView === 'function') {
+            if (
+                scrollToError &&
+                errorContainerRef.current &&
+                typeof errorContainerRef.current.scrollIntoView === 'function'
+            ) {
                 errorContainerRef.current.scrollIntoView({
                     behavior: 'smooth',
                     block: 'center'
@@ -92,14 +96,21 @@ const SetProductChildItem = forwardRef(
         }
 
         // Use useImperativeHandle to properly expose methods to parent components
-        useImperativeHandle(ref, () => ({
-            validateOrderability: validateAndShowError,
-            scrollIntoView: (options) => {
-                if (errorContainerRef.current && typeof errorContainerRef.current.scrollIntoView === 'function') {
-                    errorContainerRef.current.scrollIntoView(options)
+        useImperativeHandle(
+            ref,
+            () => ({
+                validateOrderability: validateAndShowError,
+                scrollIntoView: (options) => {
+                    if (
+                        errorContainerRef.current &&
+                        typeof errorContainerRef.current.scrollIntoView === 'function'
+                    ) {
+                        errorContainerRef.current.scrollIntoView(options)
+                    }
                 }
-            }
-        }), [validateAndShowError])
+            }),
+            [validateAndShowError]
+        )
 
         useEffect(() => {
             if (isAddToCartModalOpen) {
@@ -108,9 +119,7 @@ const SetProductChildItem = forwardRef(
         }, [location.pathname])
 
         useEffect(() => {
-            if (
-                validateOrderability(variant, quantity, stockLevel)
-            ) {
+            if (validateOrderability(variant, quantity, stockLevel)) {
                 toggleShowOptionsMessage(false)
             }
         }, [variationParams])

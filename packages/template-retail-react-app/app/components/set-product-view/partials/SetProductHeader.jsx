@@ -63,19 +63,19 @@ const SetProductHeader = forwardRef(
             variant,
             variationParams,
             variationAttributes,
-            stepQuantity,
+            stepQuantity
         } = useDerivedProduct(product, true, false)
-        
+
         const priceData = useMemo(() => {
             return getPriceData(product, {quantity})
         }, [product, quantity])
-        
+
         const canAddToWishlist = !isProductLoading
 
         const {disableButton, customInventoryMessage} = useMemo(() => {
             let shouldDisableButton = showInventoryMessage
             let currentInventoryMsg = ''
-            
+
             if (!shouldDisableButton && childProductOrderability) {
                 // if any of the children are not orderable, it will disable the add to cart button
                 const unavailableChildProductKey = Object.keys(childProductOrderability).find(
@@ -195,4 +195,4 @@ SetProductHeader.propTypes = {
     showImageGallery: PropTypes.bool
 }
 
-export default SetProductHeader 
+export default SetProductHeader

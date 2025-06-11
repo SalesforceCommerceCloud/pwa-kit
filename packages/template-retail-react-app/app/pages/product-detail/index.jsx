@@ -21,7 +21,7 @@ import {
     useCategory,
     useShopperCustomersMutation,
     useShopperBasketsMutation,
-    useCustomerId,
+    useCustomerId
 } from '@salesforce/commerce-sdk-react'
 
 // Hooks
@@ -290,46 +290,50 @@ const ProductDetail = () => {
         }
     }, [product])
 
-
     const renderProductView = () => {
         if (isProductASet) {
-            return <SetProductView product={product} 
-                einstein={einstein}
-                primaryCategory={primaryCategory}
-                handleAddToWishlist={handleAddToWishlist}
-                isProductLoading={isProductLoading}
-                isBasketLoading={isBasketLoading}
-                isWishlistLoading={isWishlistLoading}
-                updateItemsInBasketMutation={updateItemsInBasketMutation}
-                showError={showError}
-            /> 
-        }
-        else if (isProductABundle) {
-            return <BundleProductView
-                product={product}
-                einstein={einstein}
-                primaryCategory={primaryCategory}
-                handleAddToWishlist={handleAddToWishlist}
-                isProductLoading={isProductLoading}
-                isBasketLoading={isBasketLoading}
-                isWishlistLoading={isWishlistLoading}
-                updateItemsInBasketMutation={updateItemsInBasketMutation}
-                showError={showError}
-            />
-        }
-        else {
-            return <Fragment>
-                <VariationGroupView
+            return (
+                <SetProductView
                     product={product}
-                    category={primaryCategory?.parentCategoryTree || []}
-                    addToCart={handleAddToCart}
-                    addToWishlist={handleAddToWishlist}
+                    einstein={einstein}
+                    primaryCategory={primaryCategory}
+                    handleAddToWishlist={handleAddToWishlist}
                     isProductLoading={isProductLoading}
                     isBasketLoading={isBasketLoading}
                     isWishlistLoading={isWishlistLoading}
+                    updateItemsInBasketMutation={updateItemsInBasketMutation}
+                    showError={showError}
                 />
-                <InformationAccordion product={product} />
-            </Fragment>
+            )
+        } else if (isProductABundle) {
+            return (
+                <BundleProductView
+                    product={product}
+                    einstein={einstein}
+                    primaryCategory={primaryCategory}
+                    handleAddToWishlist={handleAddToWishlist}
+                    isProductLoading={isProductLoading}
+                    isBasketLoading={isBasketLoading}
+                    isWishlistLoading={isWishlistLoading}
+                    updateItemsInBasketMutation={updateItemsInBasketMutation}
+                    showError={showError}
+                />
+            )
+        } else {
+            return (
+                <Fragment>
+                    <VariationGroupView
+                        product={product}
+                        category={primaryCategory?.parentCategoryTree || []}
+                        addToCart={handleAddToCart}
+                        addToWishlist={handleAddToWishlist}
+                        isProductLoading={isProductLoading}
+                        isBasketLoading={isBasketLoading}
+                        isWishlistLoading={isWishlistLoading}
+                    />
+                    <InformationAccordion product={product} />
+                </Fragment>
+            )
         }
     }
 

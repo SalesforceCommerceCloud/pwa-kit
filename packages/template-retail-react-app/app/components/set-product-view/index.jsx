@@ -1,10 +1,14 @@
+/*
+ * Copyright (c) 2025, Salesforce, Inc.
+ * All rights reserved.
+ * SPDX-License-Identifier: BSD-3-Clause
+ * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
+ */
 import React, {useCallback, useState, useRef} from 'react'
 import PropTypes from 'prop-types'
 import {Box} from '@salesforce/retail-react-app/app/components/shared/ui'
 import InformationAccordion from '@salesforce/retail-react-app/app/pages/product-detail/partials/information-accordion'
-import {
-    normalizeSetBundleProduct,
-} from '@salesforce/retail-react-app/app/utils/product-utils'
+import {normalizeSetBundleProduct} from '@salesforce/retail-react-app/app/utils/product-utils'
 import {getAddToCartHandler} from '@salesforce/retail-react-app/app/utils/cart-handlers'
 import SetProductHeader from '@salesforce/retail-react-app/app/components/set-product-view/partials/SetProductHeader'
 import SetProductChildItem from '@salesforce/retail-react-app/app/components/set-product-view/partials/SetProductChildItem'
@@ -25,7 +29,7 @@ const SetProductView = ({
     const childProductRefs = useRef({})
 
     const comboProduct = normalizeSetBundleProduct(product)
-    
+
     const handleChildAddToCart = (childProduct) => {
         const addToCartHandler = getAddToCartHandler({
             product: childProduct,
@@ -34,7 +38,7 @@ const SetProductView = ({
             einstein,
             showError
         })
-        
+
         return ({variant, quantity}) => {
             return addToCartHandler({
                 variant,
@@ -99,50 +103,48 @@ const SetProductView = ({
             <hr />
 
             {/* Render the child products */}
-            {comboProduct.childProducts?.map(
-                ({product: childProduct, quantity: childQuantity}) => (
-                    <Box key={childProduct.id} data-testid="child-product">
-                        <SetProductChildItem
-                            ref={(componentRef) => {
-                                if (componentRef) {
-                                    childProductRefs.current[childProduct.id] = componentRef
-                                } else {
-                                    // Clean up ref when component unmounts
-                                    delete childProductRefs.current[childProduct.id]
-                                }
-                            }}
-                            product={childProduct}
-                            addToCart={handleChildAddToCart(childProduct)}
-                            addToWishlist={handleAddToWishlist}
-                            onVariantSelected={(product, variant, quantity) => {
-                                if (quantity) {
-                                    setChildProductSelection((previousState) => ({
-                                        ...previousState,
-                                        [product.id]: {
-                                            product,
-                                            variant,
-                                            quantity
-                                        }
-                                    }))
-                                } else {
-                                    const selections = {...childProductSelection}
-                                    delete selections[product.id]
-                                    setChildProductSelection(selections)
-                                }
-                            }}
-                            isProductLoading={isProductLoading}
-                            isBasketLoading={isBasketLoading}
-                            isWishlistLoading={isWishlistLoading}
-                            setChildProductOrderability={setChildProductOrderability}
-                        />
-                        <InformationAccordion product={childProduct} />
+            {comboProduct.childProducts?.map(({product: childProduct, quantity: childQuantity}) => (
+                <Box key={childProduct.id} data-testid="child-product">
+                    <SetProductChildItem
+                        ref={(componentRef) => {
+                            if (componentRef) {
+                                childProductRefs.current[childProduct.id] = componentRef
+                            } else {
+                                // Clean up ref when component unmounts
+                                delete childProductRefs.current[childProduct.id]
+                            }
+                        }}
+                        product={childProduct}
+                        addToCart={handleChildAddToCart(childProduct)}
+                        addToWishlist={handleAddToWishlist}
+                        onVariantSelected={(product, variant, quantity) => {
+                            if (quantity) {
+                                setChildProductSelection((previousState) => ({
+                                    ...previousState,
+                                    [product.id]: {
+                                        product,
+                                        variant,
+                                        quantity
+                                    }
+                                }))
+                            } else {
+                                const selections = {...childProductSelection}
+                                delete selections[product.id]
+                                setChildProductSelection(selections)
+                            }
+                        }}
+                        isProductLoading={isProductLoading}
+                        isBasketLoading={isBasketLoading}
+                        isWishlistLoading={isWishlistLoading}
+                        setChildProductOrderability={setChildProductOrderability}
+                    />
+                    <InformationAccordion product={childProduct} />
 
-                        <Box display={['none', 'none', 'none', 'block']}>
-                            <hr />
-                        </Box>
+                    <Box display={['none', 'none', 'none', 'block']}>
+                        <hr />
                     </Box>
-                )
-            )}
+                </Box>
+            ))}
         </>
     )
 }
@@ -159,4 +161,4 @@ SetProductView.propTypes = {
     showError: PropTypes.func
 }
 
-export default SetProductView 
+export default SetProductView

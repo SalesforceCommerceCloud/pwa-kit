@@ -99,9 +99,7 @@ const VariationGroupView = forwardRef(
         }, [location.pathname])
 
         useEffect(() => {
-            if (
-                validateOrderability(variant, quantity, stockLevel)
-            ) {
+            if (validateOrderability(variant, quantity, stockLevel)) {
                 toggleShowOptionsMessage(false)
             }
         }, [variationParams])

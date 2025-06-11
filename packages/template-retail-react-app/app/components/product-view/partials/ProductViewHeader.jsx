@@ -8,11 +8,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
-import {
-    Heading,
-    Skeleton,
-    VStack
-} from '@salesforce/retail-react-app/app/components/shared/ui'
+import {Heading, Skeleton, VStack} from '@salesforce/retail-react-app/app/components/shared/ui'
 
 // project components
 import Breadcrumb from '@salesforce/retail-react-app/app/components/breadcrumb'
