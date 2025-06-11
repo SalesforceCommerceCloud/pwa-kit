@@ -36,7 +36,7 @@ function useCommerceApi<T extends keyof ApiClients>(clientName?: T) {
     // ApiClients can now be optional, so if query or mutation hooks are called we need to validate the client is initialized
     // If a client name is provided, validate and return the specific client
     // If no client name is provided, return the full API object (backwards compatibility)
-    const client = api[clientName]
+    const client = apiClients[clientName]
     if (!client) {
         throw new Error(
             `Missing required client: ${String(clientName)}. ` +
