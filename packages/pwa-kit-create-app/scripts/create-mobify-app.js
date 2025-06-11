@@ -1157,7 +1157,7 @@ const isUsingCompatibleNode = semver.satisfies(foundNode, new semver.Range(requi
 const main = async (opts) => {
     console.log('plugins', pluginConfig?.plugins)
     // Prompt user for plugin selection
-    if (pluginConfig?.plugins?.length > 0) {
+    if (Object.keys(pluginConfig?.plugins).length > 0) {
         console.log('1161 >> inside if')
         const pluginChoices = Object.entries(pluginConfig.plugins).map(([key, config]) => ({
             name: config.description,
