@@ -13,7 +13,7 @@ const supportedLocales = ['en-GB', 'fr-FR', 'it-IT', 'zh-CN', 'ja-JP']
 
 test('Renders LocaleSelector', () => {
     renderWithProviders(<LocaleSelector selectedLocale="en-GB" locales={supportedLocales} />)
-    const accordion = document.querySelector('.chakra-accordion')
+    const accordion = document.querySelector('.chakra-accordion__root')
     const selectedLocale = document.querySelector('button[aria-expanded="false"]')
 
     expect(accordion).toBeInTheDocument()
@@ -28,7 +28,7 @@ test('Renders LocaleSelector with event handlers', () => {
     )
 
     const firstLocale = document.querySelector(
-        '.chakra-accordion .chakra-accordion button.chakra-accordion__button'
+        '.chakra-accordion__root .chakra-accordion__root button.chakra-accordion__itemTrigger'
     )
 
     fireEvent.click(firstLocale)

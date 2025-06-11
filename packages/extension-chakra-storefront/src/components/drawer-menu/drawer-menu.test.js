@@ -13,8 +13,8 @@ describe('DrawerMenu', () => {
     test('Renders DrawerMenu without errors', async () => {
         renderWithProviders(<DrawerMenu isOpen={true} root={mockCategories.root} />)
 
-        const drawer = document.querySelector('.chakra-portal')
-        const accordion = document.querySelector('.chakra-accordion')
+        const drawer = document.querySelector('.chakra-dialog__backdrop')
+        const accordion = document.querySelector('.chakra-accordion__root')
         const socialIcons = document.querySelector('.sf-social-icons')
 
         expect(drawer).toBeInTheDocument()
