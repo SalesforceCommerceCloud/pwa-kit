@@ -34,9 +34,9 @@ const SeInputHandler = ({onOpenStoreLocator, onSeParametersReady}) => {
 
             const urlParams = new URLSearchParams(location.search)
             const seParamKeys = ['lat', 'lng', 'zip', 'city', 'store', 'country']
-            const hasSEParams = seParamKeys.some((key) => urlParams.has(key))
+            const hasSeParams = seParamKeys.some((key) => urlParams.has(key))
 
-            if (hasSEParams) {
+            if (hasSeParams) {
                 const cleanParams = new URLSearchParams(location.search)
                 seParamKeys.forEach((key) => cleanParams.delete(key))
 

@@ -373,7 +373,7 @@ const useSeStoreSelection = () => {
                             id: selectedStore.id,
                             name: selectedStore.name || null,
                             inventoryId: selectedStore.inventoryId || null,
-                            isSESelection: true,
+                            isSeSelection: true,
                             timestamp: Date.now(),
                             seSearchParams
                         })
@@ -443,16 +443,16 @@ const useSeStoreSelection = () => {
 
     const processSeParameters = useCallback(
         (urlParams) => {
-            const hasSEParams = ['lat', 'lng', 'zip', 'city', 'store', 'country'].some((p) =>
+            const hasSeParams = ['lat', 'lng', 'zip', 'city', 'store', 'country'].some((p) =>
                 urlParams.has(p)
             )
 
-            if (!hasSEParams) {
+            if (!hasSeParams) {
                 if (typeof window !== 'undefined') {
                     const existingStore = localStorage.getItem(storeInfoKey)
                     if (existingStore) {
                         const storeData = JSON.parse(existingStore)
-                        if (storeData.isSESelection) {
+                        if (storeData.isSeSelection) {
                             return
                         }
                     }

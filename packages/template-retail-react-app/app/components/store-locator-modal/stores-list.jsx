@@ -75,7 +75,7 @@ const StoresList = ({storesInfo}) => {
             id: storeId,
             name: store.name || null,
             inventoryId: store.inventoryId || null,
-            isSESelection: false,
+            isSeSelection: false,
             timestamp: Date.now(),
             manualSearchParams: manualSearchParams
         }

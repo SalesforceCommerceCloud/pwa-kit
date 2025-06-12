@@ -32,7 +32,7 @@ export const useStoreLocator = (initialParams) => {
     const [automaticGeolocationHasFailed, setAutomaticGeolocationHasFailed] = useState(false)
     const [userWantsToShareLocation, setUserWantsToShareLocation] = useState(false)
 
-    const getSearchParamsForSESelection = () => {
+    const getSearchParamsForSeSelection = () => {
         if (initialParams) {
             return {
                 countryCode: initialParams.countryCode || DEFAULT_STORE_LOCATOR_COUNTRY.countryCode,
@@ -50,14 +50,14 @@ export const useStoreLocator = (initialParams) => {
                 if (existingStore) {
                     const storeData = JSON.parse(existingStore)
 
-                    if (storeData.isSESelection && storeData.seSearchParams) {
+                    if (storeData.isSeSelection && storeData.seSearchParams) {
                         return {
                             ...storeData.seSearchParams,
                             limit: STORE_LOCATOR_NUM_STORES_PER_LOAD
                         }
                     }
 
-                    if (!storeData.isSESelection && storeData.manualSearchParams) {
+                    if (!storeData.isSeSelection && storeData.manualSearchParams) {
                         return {
                             ...storeData.manualSearchParams,
                             limit: STORE_LOCATOR_NUM_STORES_PER_LOAD
@@ -77,7 +77,7 @@ export const useStoreLocator = (initialParams) => {
     }
 
     const [searchStoresParams, setSearchStoresParams] = useState(() =>
-        getSearchParamsForSESelection()
+        getSearchParamsForSeSelection()
     )
 
     useEffect(() => {
