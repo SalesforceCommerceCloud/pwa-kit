@@ -163,10 +163,10 @@ export const TestProviders = ({
                                 <Router>
                                     <ChakraProvider theme={theme}>
                                         <AddToCartModalProvider>
-                                        <BonusProductModalProvider>
-                                            {children}
-                                        </BonusProductModalProvider>
-                                    </AddToCartModalProvider>
+                                            <BonusProductModalProvider>
+                                                {children}
+                                            </BonusProductModalProvider>
+                                        </AddToCartModalProvider>
                                     </ChakraProvider>
                                 </Router>
                             </StoreLocatorProvider>
