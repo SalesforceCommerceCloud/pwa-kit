@@ -24,18 +24,18 @@ const renderWithIntl = (component) => {
 }
 
 describe('BonusProductQuantity', () => {
-    it('renders quantity for bonus product', () => {
+    test('renders quantity for bonus product', () => {
         renderWithIntl(<BonusProductQuantity product={mockProduct} />)
         expect(screen.getByText('Quantity: 2')).toBeInTheDocument()
     })
 
-    it('has correct aria label', () => {
+    test('has correct aria label', () => {
         renderWithIntl(<BonusProductQuantity product={mockProduct} />)
         const element = screen.getByText('Quantity: 2')
         expect(element).toHaveAttribute('aria-label', 'Quantity 2')
     })
 
-    it('handles undefined quantity gracefully', () => {
+    test('handles undefined quantity gracefully', () => {
         const productWithoutQuantity = {
             id: 'test-id',
             name: 'Test Product'

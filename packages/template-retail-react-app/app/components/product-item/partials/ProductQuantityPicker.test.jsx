@@ -50,7 +50,7 @@ describe('ProductQuantityPicker', () => {
         jest.clearAllMocks()
     })
 
-    it('renders quantity label and picker', () => {
+    test('renders quantity label and picker', () => {
         renderWithIntl(
             <ProductQuantityPicker
                 product={mockProduct}
@@ -64,7 +64,7 @@ describe('ProductQuantityPicker', () => {
         expect(screen.getByRole('spinbutton')).toBeInTheDocument()
     })
 
-    it('handles quantity change', async () => {
+    test('handles quantity change', async () => {
         mockOnItemQuantityChange.mockResolvedValue(true)
         renderWithIntl(
             <ProductQuantityPicker
@@ -83,7 +83,7 @@ describe('ProductQuantityPicker', () => {
         })
     })
 
-    it('has correct aria label', () => {
+    test('has correct aria label', () => {
         renderWithIntl(
             <ProductQuantityPicker
                 product={mockProduct}
@@ -100,7 +100,7 @@ describe('ProductQuantityPicker', () => {
         )
     })
 
-    it('handles empty input', () => {
+    test('handles empty input', () => {
         renderWithIntl(
             <ProductQuantityPicker
                 product={mockProduct}
@@ -115,7 +115,7 @@ describe('ProductQuantityPicker', () => {
         expect(mockSetQuantity).toHaveBeenCalledWith('')
     })
 
-    it('handles invalid input', () => {
+    test('handles invalid input', () => {
         renderWithIntl(
             <ProductQuantityPicker
                 product={mockProduct}
