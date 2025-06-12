@@ -297,8 +297,8 @@ const ProductDetail = () => {
     const handleAddToCart = async (productSelectionValues) => {
         try {
             const productItems = productSelectionValues.map(({variant, product, quantity}) => ({
-                productId: variant?.productId || product.id,
-                price: variant?.price || product.price,
+                productId: variant?.productId || product?.id,
+                price: variant?.price || product?.price,
                 quantity
             }))
 
