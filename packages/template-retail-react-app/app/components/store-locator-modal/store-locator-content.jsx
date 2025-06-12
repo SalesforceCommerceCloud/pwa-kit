@@ -5,10 +5,9 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, {useState, useContext, useMemo, useEffect} from 'react'
+import React, {useState, useContext, useMemo} from 'react'
 import {useIntl} from 'react-intl'
 
-// Components
 import {
     Heading,
     Accordion,
@@ -19,7 +18,6 @@ import {
 import StoresList from '@salesforce/retail-react-app/app/components/store-locator-modal/stores-list'
 import StoreLocatorInput from '@salesforce/retail-react-app/app/components/store-locator-modal/store-locator-input'
 
-// Others
 import {
     SUPPORTED_STORE_LOCATOR_COUNTRIES,
     DEFAULT_STORE_LOCATOR_COUNTRY,
@@ -28,10 +26,8 @@ import {
     STORE_LOCATOR_DISTANCE_UNIT
 } from '@salesforce/retail-react-app/app/constants'
 
-//This is an API limit and is therefore not configurable
 const NUM_STORES_PER_REQUEST_API_MAX = 200
 
-// Hooks
 import {useSearchStores} from '@salesforce/commerce-sdk-react'
 import {useForm} from 'react-hook-form'
 import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
@@ -58,7 +54,6 @@ const StoreLocatorContent = () => {
     })
 
     const [numStoresToShow, setNumStoresToShow] = useState(limit)
-    // Either the countryCode & postalCode or latitude & longitude are defined, never both
     const {
         data: searchStoresData,
         isLoading,
@@ -88,11 +83,13 @@ const StoreLocatorContent = () => {
             return searchStoresData.data
         }
 
-        return [...searchStoresData.data].sort((a, b) => {
-            if (a.id === selectedStoreId) return -1
-            if (b.id === selectedStoreId) return 1
-            return 0
-        })
+        const stores = [...searchStoresData.data]
+        const idx = stores.findIndex((store) => store.id === selectedStoreId)
+        if (idx > 0) {
+            const [selected] = stores.splice(idx, 1)
+            stores.unshift(selected)
+        }
+        return stores
     }, [searchStoresData?.data, site.id])
 
     const storesInfo =
@@ -120,10 +117,8 @@ const StoreLocatorContent = () => {
                 }
             }
         }
-        // Reset the number of stores in the UI
         setNumStoresToShow(STORE_LOCATOR_NUM_STORES_PER_LOAD)
 
-        // Ensures API call is made regardless of caching to provide UX feedback on click
         refetch()
     }
 
@@ -189,7 +184,6 @@ const StoreLocatorContent = () => {
             </Heading>
             <StoreLocatorInput form={form} submitForm={submitForm}></StoreLocatorInput>
             <Accordion allowMultiple flex={[1, 1, 1, 5]}>
-                {/* Details */}
                 <AccordionItem>
                     <Box
                         flex="1"
@@ -237,7 +231,5 @@ const StoreLocatorContent = () => {
         </>
     )
 }
-
-StoreLocatorContent.propTypes = {}
 
 export default StoreLocatorContent

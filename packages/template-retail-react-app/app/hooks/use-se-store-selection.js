@@ -111,16 +111,12 @@ const useSeStoreSelection = () => {
             (!allStoresData?.data?.length ||
                 (allStoresData?.data?.length > 0 &&
                     !allStoresData.data.some((store) => {
-                        const storeNameLower = (store.name || '').toLowerCase().trim()
-                        const searchNameLower = locationData.storeName.toLowerCase().trim()
+                        const sName = (store.name || '').toLowerCase().trim()
+                        const searchName = locationData.storeName.toLowerCase().trim()
                         const countryMatch =
                             (store.countryCode || DEFAULT_STORE_LOCATOR_COUNTRY.countryCode) ===
                             locationData.countryCode
-                        return (
-                            (storeNameLower === searchNameLower ||
-                                storeNameLower.includes(searchNameLower)) &&
-                            countryMatch
-                        )
+                        return (sName === searchName || sName.includes(searchName)) && countryMatch
                     })))
     )
 
@@ -261,6 +257,20 @@ const useSeStoreSelection = () => {
 
         if (storeName) {
             const searchNameLower = storeName.toLowerCase().trim()
+            const filters = [
+                [
+                    countryCode,
+                    (s) =>
+                        (s.countryCode || DEFAULT_STORE_LOCATOR_COUNTRY.countryCode) === countryCode
+                ],
+                [zipcode, (s) => (s.postalCode || s.address?.postalCode) === zipcode],
+                [
+                    city,
+                    (s) =>
+                        (s.city || s.address?.city || '').toLowerCase().includes(city.toLowerCase())
+                ]
+            ]
+
             let exactMatches = stores.filter((store) => {
                 const storeNameLower = (store.name || '').toLowerCase().trim()
                 return storeNameLower === searchNameLower
@@ -268,34 +278,10 @@ const useSeStoreSelection = () => {
 
             if (exactMatches.length > 0) {
                 let nameMatches = exactMatches
-                if (countryCode && nameMatches.length > 0) {
-                    const countryFilteredMatches = nameMatches.filter(
-                        (store) =>
-                            (store.countryCode || DEFAULT_STORE_LOCATOR_COUNTRY.countryCode) ===
-                            countryCode
-                    )
-                    if (countryFilteredMatches.length > 0) {
-                        nameMatches = countryFilteredMatches
-                    }
-                }
-
-                if (zipcode && nameMatches.length > 0) {
-                    const zipFilteredMatches = nameMatches.filter((store) => {
-                        const storeZip = store.postalCode || store.address?.postalCode
-                        return storeZip === zipcode
-                    })
-                    if (zipFilteredMatches.length > 0) {
-                        nameMatches = zipFilteredMatches
-                    }
-                }
-
-                if (city && nameMatches.length > 0) {
-                    const cityFilteredMatches = nameMatches.filter((store) => {
-                        const storeCity = (store.city || store.address?.city || '').toLowerCase()
-                        return storeCity.includes(city.toLowerCase())
-                    })
-                    if (cityFilteredMatches.length > 0) {
-                        nameMatches = cityFilteredMatches
+                for (const [condition, filterFn] of filters) {
+                    if (condition && nameMatches.length > 0) {
+                        const filtered = nameMatches.filter(filterFn)
+                        if (filtered.length > 0) nameMatches = filtered
                     }
                 }
 
@@ -310,34 +296,10 @@ const useSeStoreSelection = () => {
                 )
             })
 
-            if (countryCode && nameMatches.length > 0) {
-                const countryFilteredMatches = nameMatches.filter(
-                    (store) =>
-                        (store.countryCode || DEFAULT_STORE_LOCATOR_COUNTRY.countryCode) ===
-                        countryCode
-                )
-                if (countryFilteredMatches.length > 0) {
-                    nameMatches = countryFilteredMatches
-                }
-            }
-
-            if (zipcode && nameMatches.length > 0) {
-                const zipFilteredMatches = nameMatches.filter((store) => {
-                    const storeZip = store.postalCode || store.address?.postalCode
-                    return storeZip === zipcode
-                })
-                if (zipFilteredMatches.length > 0) {
-                    nameMatches = zipFilteredMatches
-                }
-            }
-
-            if (city && nameMatches.length > 0) {
-                const cityFilteredMatches = nameMatches.filter((store) => {
-                    const storeCity = (store.city || store.address?.city || '').toLowerCase()
-                    return storeCity.includes(city.toLowerCase())
-                })
-                if (cityFilteredMatches.length > 0) {
-                    nameMatches = cityFilteredMatches
+            for (const [condition, filterFn] of filters) {
+                if (condition && nameMatches.length > 0) {
+                    const filtered = nameMatches.filter(filterFn)
+                    if (filtered.length > 0) nameMatches = filtered
                 }
             }
 
@@ -404,7 +366,7 @@ const useSeStoreSelection = () => {
                     }
                 }
 
-                window.localStorage.setItem(
+                localStorage.setItem(
                     storeInfoKey,
                     JSON.stringify({
                         id: selectedStore.id,
@@ -412,7 +374,7 @@ const useSeStoreSelection = () => {
                         inventoryId: selectedStore.inventoryId || null,
                         isSESelection: true,
                         timestamp: Date.now(),
-                        seSearchParams: seSearchParams
+                        seSearchParams
                     })
                 )
 
@@ -477,25 +439,16 @@ const useSeStoreSelection = () => {
 
     const processSeParameters = useCallback(
         (urlParams) => {
-            const hasSEParams =
-                urlParams.has('lat') ||
-                urlParams.has('lng') ||
-                urlParams.has('zip') ||
-                urlParams.has('city') ||
-                urlParams.has('store') ||
-                urlParams.has('country')
+            const hasSEParams = ['lat', 'lng', 'zip', 'city', 'store', 'country'].some((p) =>
+                urlParams.has(p)
+            )
 
             if (!hasSEParams) {
-                const existingStore = window.localStorage.getItem(storeInfoKey)
+                const existingStore = localStorage.getItem(storeInfoKey)
                 if (existingStore) {
-                    try {
-                        const storeData = JSON.parse(existingStore)
-
-                        if (storeData.isSESelection) {
-                            return
-                        }
-                    } catch (e) {
-                        // Invalid localStorage data, ignore
+                    const storeData = JSON.parse(existingStore)
+                    if (storeData.isSESelection) {
+                        return
                     }
                 }
                 return
@@ -516,11 +469,8 @@ const useSeStoreSelection = () => {
                 parsedLng = parseFloat(lng)
             }
 
-            const hasLocationData = !!(parsedLat && parsedLng)
-            const hasIdentifierData = !!(storeName || zipcode || city)
-
-            if (hasLocationData || hasIdentifierData) {
-                const finalCountryCode = country || getCountryForPostalSearch(zipcode, null)
+            if ((parsedLat && parsedLng) || storeName || zipcode || city) {
+                const countryCode = country || getCountryForPostalSearch(zipcode, null)
 
                 setIsProcessing(true)
                 setLocationData({
@@ -528,8 +478,8 @@ const useSeStoreSelection = () => {
                     longitude: parsedLng,
                     storeName,
                     zipcode,
-                    city: city,
-                    countryCode: finalCountryCode
+                    city,
+                    countryCode
                 })
             }
         },

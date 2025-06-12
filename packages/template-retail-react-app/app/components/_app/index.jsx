@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, {useState, useEffect} from 'react'
+import React, {useState, useEffect, lazy, Suspense} from 'react'
 import PropTypes from 'prop-types'
 import {useHistory, useLocation} from 'react-router-dom'
 import {StorefrontPreview} from '@salesforce/commerce-sdk-react/components'
@@ -47,7 +47,6 @@ import {ListMenu, ListMenuContent} from '@salesforce/retail-react-app/app/compon
 import {HideOnDesktop, HideOnMobile} from '@salesforce/retail-react-app/app/components/responsive'
 import AboveHeader from '@salesforce/retail-react-app/app/components/_app/partials/above-header'
 import StoreLocatorModal from '@salesforce/retail-react-app/app/components/store-locator-modal'
-// Hooks
 import {AuthModal, useAuthModal} from '@salesforce/retail-react-app/app/hooks/use-auth-modal'
 import {
     DntNotification,
@@ -58,7 +57,6 @@ import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
 import {useUpdateShopperContext} from '@salesforce/retail-react-app/app/hooks/use-update-shopper-context'
-import SeInputHandler from '@salesforce/retail-react-app/app/components/se-input-handler'
 
 // HOCs
 import {withCommerceSdkReact} from '@salesforce/retail-react-app/app/components/with-commerce-sdk-react/with-commerce-sdk-react'
@@ -82,6 +80,10 @@ import {
 import Seo from '@salesforce/retail-react-app/app/components/seo'
 import {Helmet} from 'react-helmet'
 import {getPathWithLocale} from '@salesforce/retail-react-app/app/utils/url'
+
+const SeInputHandler = lazy(() =>
+    import('@salesforce/retail-react-app/app/components/se-input-handler')
+)
 
 const PlaceholderComponent = () => (
     <Center p="2">
@@ -325,10 +327,12 @@ const App = (props) => {
                     defaultLocale={DEFAULT_LOCALE}
                 >
                     <CurrencyProvider currency={currency}>
-                        <SeInputHandler
-                            onOpenStoreLocator={onOpenStoreLocator}
-                            onSeParametersReady={setSeStoreLocatorParams}
-                        />
+                        <Suspense fallback={null}>
+                            <SeInputHandler
+                                onOpenStoreLocator={onOpenStoreLocator}
+                                onSeParametersReady={setSeStoreLocatorParams}
+                            />
+                        </Suspense>
                         <Seo>
                             <meta name="theme-color" content={THEME_COLOR} />
                             <meta name="apple-mobile-web-app-title" content={DEFAULT_SITE_TITLE} />
