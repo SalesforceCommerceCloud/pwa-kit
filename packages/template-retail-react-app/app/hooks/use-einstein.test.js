@@ -35,6 +35,57 @@ afterAll(() => {
 })
 
 describe('EinsteinAPI', () => {
+    test('_constructEinsteinProduct handles variationGroup product type', () => {
+        const variationGroupProduct = {
+            id: 'test-variation-group-id',
+            price: 99.99,
+            type: {
+                variationGroup: true
+            },
+            master: {
+                variantId: 'master-variant-id'
+            }
+        }
+
+        const result = einsteinApi._constructEinsteinProduct(variationGroupProduct)
+
+        expect(result).toEqual({
+            altId: 'test-variation-group-id',
+            id: 'master-variant-id',
+            price: 99.99,
+            sku: 'test-variation-group-id',
+            type: 'vgroup'
+        })
+    })
+
+    test('_constructEinsteinItem handles variationGroup product type', () => {
+        const variationGroupItem = {
+            product: {
+                id: 'test-variation-group-id',
+                type: {
+                    variationGroup: true
+                },
+                master: {
+                    masterId: 'master-product-id'
+                }
+            },
+            productId: 'test-variation-group-id',
+            price: 99.99,
+            quantity: 2
+        }
+
+        const result = einsteinApi._constructEinsteinItem(variationGroupItem)
+
+        expect(result).toEqual({
+            id: 'master-product-id',
+            quantity: 2,
+            price: 99.99,
+            sku: 'test-variation-group-id',
+            type: 'vgroup',
+            altId: 'test-variation-group-id'
+        })
+    })
+
     test('viewProduct sends expected api request', async () => {
         await einsteinApi.sendViewProduct(mockProduct, {cookieId: 'test-usid'})
 
@@ -246,6 +297,33 @@ describe('EinsteinAPI', () => {
                     'Content-Type': 'application/json',
                     'x-cq-client-id': 'test-id'
                 }
+            }
+        )
+    })
+
+    test('sendViewProduct handles variationGroup product type', async () => {
+        const variationGroupProduct = {
+            id: 'test-variation-group-id',
+            price: 99.99,
+            type: {
+                variationGroup: true
+            },
+            master: {
+                variantId: 'master-variant-id'
+            }
+        }
+
+        await einsteinApi.sendViewProduct(variationGroupProduct, {cookieId: 'test-usid'})
+
+        expect(fetch).toHaveBeenCalledWith(
+            'http://localhost/test-path/v3/activities/test-site-id/viewProduct',
+            {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'x-cq-client-id': 'test-id'
+                },
+                body: '{"product":{"altId":"test-variation-group-id","id":"master-variant-id","price":99.99,"sku":"test-variation-group-id","type":"vgroup"},"cookieId":"test-usid","realm":"test","instanceType":"sbx"}'
             }
         )
     })
