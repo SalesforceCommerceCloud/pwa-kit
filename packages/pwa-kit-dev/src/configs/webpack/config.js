@@ -195,10 +195,8 @@ const baseConfig = (target) => {
                         DEBUG,
                         NODE_ENV: `'${process.env.NODE_ENV}'`,
                         WEBPACK_TARGET: `'${target}'`,
-                        ['global.GENTLY']: false,
+                        ['global.GENTLY']: false
                     }),
-                    process.env.RECORD_OVERRIDES === 'true' && new OverrideStatsPlugin(),
-                    // new SharedStatePlugin(),
                     mode === development && new webpack.NoEmitOnErrorsPlugin(),
 
                     sdkReplacementPlugin(),

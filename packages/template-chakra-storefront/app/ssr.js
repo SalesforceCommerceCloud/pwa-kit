@@ -5,15 +5,6 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-/*
- * Developer note! When updating this file, make sure to also update the
- * ssr.js template files in pwa-kit-create-app.
- *
- * In the pwa-kit-create-app, the templates are found under:
- * - assets/bootstrap/js/overrides/app/ssr.js.hbs
- * - assets/templates/@salesforce/retail-react-app/app/ssr.js.hbs
- */
-
 'use strict'
 
 import crypto from 'crypto'
@@ -181,8 +172,7 @@ export async function emailLink(emailId, templateId, magicLink) {
     return await sendMarketingCloudEmail(emailId, marketingCloudConfig)
 }
 
-const resetPasswordCallback =
-    config.login?.resetPassword?.callbackURI || '/reset-password-callback'
+const resetPasswordCallback = config.login?.resetPassword?.callbackURI || '/reset-password-callback'
 const passwordlessLoginCallback =
     config.login?.passwordless?.callbackURI || '/passwordless-login-callback'
 

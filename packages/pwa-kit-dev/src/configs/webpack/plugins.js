@@ -10,9 +10,6 @@ import glob from 'glob'
 import {makeRegExp} from './utils'
 
 const projectDir = process.cwd()
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const pkg = require(resolve(projectDir, 'package.json'))
-
 const OVERRIDES_EXTENSIONS = '.+(js|jsx|ts|tsx)'
 
 const getOverridePath = (relativePath) => {

@@ -5,14 +5,6 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-/*
- * Developer note! When updating this file, make sure to also update the
- * _app-config template files in pwa-kit-create-app.
- *
- * In the pwa-kit-create-app, the templates are found under:
- * - assets/bootstrap/js/overrides/app/components/_app-config
- * - assets/templates/../../../src/app/components/_app-config
- */
 import React, {createContext, useContext, useMemo} from 'react'
 import PropTypes from 'prop-types'
 import {ChakraProvider} from '@chakra-ui/react'
