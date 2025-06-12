@@ -1243,9 +1243,6 @@
   "product_view.error.no_store_selected_for_pickup": {
     "defaultMessage": "No valid store or inventory found for pickup"
   },
-  "product_view.error.not_available_for_pickup": {
-    "defaultMessage": "Out of Stock in {storeName}"
-  },
   "product_view.label.assistive_msg.quantity_decrement": {
     "defaultMessage": "Decrement Quantity for {productName}"
   },

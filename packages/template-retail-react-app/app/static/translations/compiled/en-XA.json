@@ -6191,24 +6191,6 @@
       "value": "]"
     }
   ],
-  "product_view.error.not_available_for_pickup": [
-    {
-      "type": 0,
-      "value": "["
-    },
-    {
-      "type": 0,
-      "value": "Ǿŭŭŧ ǿǿƒ Şŧǿǿƈķ īƞ "
-    },
-    {
-      "type": 1,
-      "value": "storeName"
-    },
-    {
-      "type": 0,
-      "value": "]"
-    }
-  ],
   "product_view.label.assistive_msg.quantity_decrement": [
     {
       "type": 0,

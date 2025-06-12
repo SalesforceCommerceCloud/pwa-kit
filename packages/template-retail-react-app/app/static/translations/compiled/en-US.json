@@ -2911,16 +2911,6 @@
       "value": "No valid store or inventory found for pickup"
     }
   ],
-  "product_view.error.not_available_for_pickup": [
-    {
-      "type": 0,
-      "value": "Out of Stock in "
-    },
-    {
-      "type": 1,
-      "value": "storeName"
-    }
-  ],
   "product_view.label.assistive_msg.quantity_decrement": [
     {
       "type": 0,

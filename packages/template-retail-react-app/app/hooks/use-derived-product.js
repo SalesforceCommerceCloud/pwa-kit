@@ -10,9 +10,17 @@ import {useVariant} from '@salesforce/retail-react-app/app/hooks/use-variant'
 import {useIntl} from 'react-intl'
 import {useVariationParams} from '@salesforce/retail-react-app/app/hooks/use-variation-params'
 import {useVariationAttributes} from '@salesforce/retail-react-app/app/hooks/use-variation-attributes'
+import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
 
 const OUT_OF_STOCK = 'OUT_OF_STOCK'
 const UNFULFILLABLE = 'UNFULFILLABLE'
+
+const getInventoryById = (product, inventoryId) => {
+    if (!inventoryId || !product?.inventories) {
+        return null
+    }
+    return product.inventories.find((inv) => inv.id === inventoryId)
+}
 
 // TODO: This needs to be refactored.
 export const useDerivedProduct = (
@@ -38,7 +46,28 @@ export const useDerivedProduct = (
         isProductPartOfBundle
     )
     const [quantity, setQuantity] = useState(initialQuantity)
+    const {site} = useMultiSite()
 
+    // TODO: This should be moved to a hook W-18751492
+    const selectedStore = (() => {
+        try {
+            if (typeof window !== 'undefined' && site?.id) {
+                return JSON.parse(window.localStorage.getItem(`store_${site.id}`))
+            }
+        } catch (e) {
+            // intentionally empty: ignore errors
+        }
+        return null
+    })()
+
+    const selectedStoreInventory = getInventoryById(product, selectedStore?.inventoryId)
+    const selectedStoreStockLevel = selectedStoreInventory?.stockLevel || 0
+    // selectedStoreStockLevel and selectedStoreInventory are already variant specific,
+    // so we don't need to check for variation attributes
+    const isSelectedStoreOutOfStock =
+        !selectedStoreStockLevel ||
+        selectedStoreStockLevel < quantity ||
+        !selectedStoreInventory?.orderable
     // A product is considered out of stock if the stock level is 0 or if we have all our
     // variation attributes selected, but don't have a variant. We do this because the API
     // will sometimes return all the variants even if they are out of stock, but for other
@@ -98,6 +127,8 @@ export const useDerivedProduct = (
         variant,
         stockLevel,
         isOutOfStock,
-        unfulfillable
+        unfulfillable,
+        isSelectedStoreOutOfStock,
+        selectedStore
     }
 }

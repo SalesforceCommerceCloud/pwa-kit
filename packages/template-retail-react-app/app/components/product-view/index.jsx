@@ -152,7 +152,9 @@ const ProductView = forwardRef(
             stockLevel,
             stepQuantity,
             isOutOfStock,
-            unfulfillable
+            unfulfillable,
+            isSelectedStoreOutOfStock,
+            selectedStore
         } = useDerivedProduct(product, isProductPartOfSet, isProductPartOfBundle)
         const priceData = useMemo(() => {
             return getPriceData(product, {quantity})
@@ -162,29 +164,9 @@ const ProductView = forwardRef(
         const isProductABundle = product?.type.bundle
         const errorContainerRef = useRef(null)
         const [pickupEnabled, setPickupEnabled] = useState(false)
-        const [pickupError, setPickupError] = useState('')
         const {site} = useMultiSite()
-
-        // Get store info from localStorage for stock status display (move to main render scope)
-        let storeName = null
-        let inventoryId = null
-        let storeStockStatus = null
-        if (typeof window !== 'undefined' && site?.id && product?.inventories) {
-            const storeInfoKey = `store_${site.id}`
-            try {
-                const storeInfo = JSON.parse(window.localStorage.getItem(storeInfoKey))
-                inventoryId = storeInfo?.inventoryId
-                storeName = storeInfo?.name
-                if (inventoryId) {
-                    const inventoryObj = product.inventories.find((inv) => inv.id === inventoryId)
-                    if (inventoryObj) {
-                        storeStockStatus = inventoryObj.orderable
-                    }
-                }
-            } catch (e) {
-                // intentionally empty: ignore errors
-            }
-        }
+        const storeName = selectedStore?.name
+        const inventoryId = selectedStore?.inventoryId
 
         const {disableButton, customInventoryMessage} = useMemo(() => {
             let shouldDisableButton = showInventoryMessage
@@ -453,41 +435,7 @@ const ProductView = forwardRef(
             })
         }
 
-        // Refactored handler for delivery option change
         const handleDeliveryOptionChange = (value) => {
-            setPickupError('')
-            if (value === 'pickup') {
-                if (pickupEnabled) {
-                    const storeInfoKey = `store_${site.id}`
-                    let inventoryId = null
-                    let storeName = null
-                    try {
-                        const storeInfo = JSON.parse(window.localStorage.getItem(storeInfoKey))
-                        inventoryId = storeInfo?.inventoryId
-                        storeName = storeInfo?.name
-                    } catch (e) {
-                        showError()
-                    }
-                    if (inventoryId && product?.inventories) {
-                        const inventoryObj = product.inventories.find(
-                            (inv) => inv.id === inventoryId
-                        )
-                        if (!inventoryObj?.orderable) {
-                            setPickupInStore(false)
-                            setPickupError(
-                                intl.formatMessage(
-                                    {
-                                        id: 'product_view.error.not_available_for_pickup',
-                                        defaultMessage: 'Out of Stock in {storeName}'
-                                    },
-                                    {storeName: storeName || ''}
-                                )
-                            )
-                            return
-                        }
-                    }
-                }
-            }
             setPickupInStore(value === 'pickup')
         }
 
@@ -759,7 +707,7 @@ const ProductView = forwardRef(
                                                     !pickupEnabled ||
                                                     (storeName &&
                                                         inventoryId &&
-                                                        storeStockStatus === false)
+                                                        isSelectedStoreOutOfStock)
                                                 }
                                             >
                                                 <FormattedMessage
@@ -777,7 +725,7 @@ const ProductView = forwardRef(
                                         mb={2}
                                         data-testid="store-stock-status-msg"
                                     >
-                                        {storeStockStatus
+                                        {!isSelectedStoreOutOfStock
                                             ? intl.formatMessage(
                                                   {
                                                       id: 'product_view.status.in_stock_at_store',
@@ -812,16 +760,6 @@ const ProductView = forwardRef(
                                                       )
                                                   }
                                               )}
-                                    </Text>
-                                )}
-                                {pickupError && (
-                                    <Text
-                                        color="orange.600"
-                                        fontWeight={600}
-                                        mb={3}
-                                        data-testid="pickup-error-msg"
-                                    >
-                                        {pickupError}
                                     </Text>
                                 )}
                                 <Box
