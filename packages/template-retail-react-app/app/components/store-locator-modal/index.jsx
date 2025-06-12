@@ -7,6 +7,7 @@
 
 import React, {useState, useEffect, createContext} from 'react'
 import PropTypes from 'prop-types'
+import {useStoreLocatorParams} from '@salesforce/retail-react-app/app/contexts/store-locator-params'
 
 // Components
 import {
@@ -102,7 +103,8 @@ export const useStoreLocator = (initialParams) => {
     }
 }
 
-const StoreLocatorModal = ({isOpen, onClose, initialParams}) => {
+const StoreLocatorModal = ({isOpen, onClose}) => {
+    const {params: initialParams} = useStoreLocatorParams()
     const storeLocator = useStoreLocator(initialParams)
     const isDesktopView = useBreakpointValue({base: false, lg: true})
 
@@ -149,8 +151,7 @@ const StoreLocatorModal = ({isOpen, onClose, initialParams}) => {
 
 StoreLocatorModal.propTypes = {
     isOpen: PropTypes.bool,
-    onClose: PropTypes.func,
-    initialParams: PropTypes.object
+    onClose: PropTypes.func
 }
 
 export default StoreLocatorModal

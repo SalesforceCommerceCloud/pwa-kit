@@ -9,12 +9,19 @@ import {useEffect} from 'react'
 import {useLocation, useHistory} from 'react-router-dom'
 import PropTypes from 'prop-types'
 import useSeStoreSelection from '@salesforce/retail-react-app/app/hooks/use-se-store-selection'
+import {useStoreLocatorParams} from '@salesforce/retail-react-app/app/contexts/store-locator-params'
+import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
 
-const SeInputHandler = ({onOpenStoreLocator, onSeParametersReady}) => {
+const SeInputHandler = ({onOpenStoreLocator}) => {
     const location = useLocation()
     const history = useHistory()
     const {shouldOpenModal, setShouldOpenModal, storeLocatorParams, processSeParameters} =
         useSeStoreSelection()
+
+    const {setParams} = useStoreLocatorParams()
+
+    const {site} = useMultiSite()
+    const storeInfoKey = `store_${site.id}`
 
     useEffect(() => {
         const urlParams = new URLSearchParams(location.search)
@@ -22,13 +29,18 @@ const SeInputHandler = ({onOpenStoreLocator, onSeParametersReady}) => {
     }, [location.search, processSeParameters])
 
     useEffect(() => {
-        if (storeLocatorParams && onSeParametersReady) {
-            onSeParametersReady(storeLocatorParams)
+        if (storeLocatorParams) {
+            setParams(storeLocatorParams)
         }
-    }, [storeLocatorParams, onSeParametersReady])
+    }, [storeLocatorParams, setParams])
 
     useEffect(() => {
-        if (shouldOpenModal) {
+        if (!shouldOpenModal || !storeLocatorParams) return
+
+        const hasSelectedStore =
+            typeof window !== 'undefined' && window.localStorage.getItem(storeInfoKey)
+
+        if (hasSelectedStore) {
             onOpenStoreLocator()
             setShouldOpenModal(false)
 
@@ -48,6 +60,8 @@ const SeInputHandler = ({onOpenStoreLocator, onSeParametersReady}) => {
         }
     }, [
         shouldOpenModal,
+        storeLocatorParams,
+        storeInfoKey,
         onOpenStoreLocator,
         setShouldOpenModal,
         location.search,
@@ -59,8 +73,7 @@ const SeInputHandler = ({onOpenStoreLocator, onSeParametersReady}) => {
 }
 
 SeInputHandler.propTypes = {
-    onOpenStoreLocator: PropTypes.func.isRequired,
-    onSeParametersReady: PropTypes.func
+    onOpenStoreLocator: PropTypes.func.isRequired
 }
 
 export default SeInputHandler

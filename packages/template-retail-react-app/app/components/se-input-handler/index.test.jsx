@@ -16,6 +16,10 @@ jest.doMock(
     () => mockUseSeStoreSelection
 )
 
+jest.doMock('@salesforce/retail-react-app/app/hooks/use-multi-site', () => () => ({
+    site: {id: 'test-site'}
+}))
+
 let SeInputHandler
 const mockOnOpenStoreLocator = jest.fn()
 
@@ -26,12 +30,16 @@ beforeEach(async () => {
     )
     SeInputHandler = SeInputHandlerModule.default
 
+    window.localStorage.clear()
+
     mockUseSeStoreSelection.mockReturnValue({
         shouldOpenModal: true,
         setShouldOpenModal: jest.fn(),
-        storeLocatorParams: null,
+        storeLocatorParams: {city: 'Boston'},
         processSeParameters: jest.fn()
     })
+
+    window.localStorage.setItem('store_test-site', JSON.stringify({dummy: true}))
 })
 
 test('clears lat and lng parameters from URL when modal opens', async () => {
