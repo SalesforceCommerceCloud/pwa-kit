@@ -36,16 +36,16 @@ describe('useSeStoreSelection Hook Tests', () => {
         jest.clearAllMocks()
     })
 
-    describe('SE Parameter Detection', () => {
-        test('identifies SE parameters correctly', () => {
+    describe('Search Engine provided location parameter Detection', () => {
+        test('identifies Search Engine provided location parameters correctly', () => {
             const seParams = new URLSearchParams('?lat=42.3601&lng=-71.0589')
             const nonSeParams = new URLSearchParams('?product=test&page=1')
 
-            const hasSEParams = (params) =>
+            const hasSeParams = (params) =>
                 ['lat', 'lng', 'zip', 'city', 'store', 'country'].some((param) => params.has(param))
 
-            expect(hasSEParams(seParams)).toBe(true)
-            expect(hasSEParams(nonSeParams)).toBe(false)
+            expect(hasSeParams(seParams)).toBe(true)
+            expect(hasSeParams(nonSeParams)).toBe(false)
         })
 
         test('validates coordinates', () => {
@@ -96,12 +96,12 @@ describe('useSeStoreSelection Hook Tests', () => {
     })
 
     describe('localStorage Handling', () => {
-        test('detects SE selection', () => {
-            const storeData = {id: '123', isSESelection: true}
+        test('detects Search Engine provided parameter selection', () => {
+            const storeData = {id: '123', isSeSelection: true}
             window.localStorage.setItem('store_RefArch', JSON.stringify(storeData))
 
             const stored = JSON.parse(window.localStorage.getItem('store_RefArch'))
-            expect(stored.isSESelection).toBe(true)
+            expect(stored.isSeSelection).toBe(true)
         })
 
         test('handles invalid data gracefully', () => {

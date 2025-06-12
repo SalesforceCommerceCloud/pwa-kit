@@ -196,7 +196,7 @@ describe('StoresList', () => {
             expect(parsedValue.id).toEqual(id)
             expect(parsedValue.name).toEqual(name)
             expect(parsedValue.inventoryId).toEqual(inventoryId)
-            expect(parsedValue.isSESelection).toBe(false)
+            expect(parsedValue.isSeSelection).toBe(false)
             expect(parsedValue).toHaveProperty('timestamp')
             expect(parsedValue).toHaveProperty('manualSearchParams')
         })

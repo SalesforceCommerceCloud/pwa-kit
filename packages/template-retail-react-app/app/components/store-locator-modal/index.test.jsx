@@ -223,7 +223,7 @@ describe('StoreLocatorModal', () => {
     })
 })
 
-describe('useStoreLocator - getSearchParamsForSESelection', () => {
+describe('useStoreLocator - getSearchParamsForSeSelection', () => {
     beforeEach(() => {
         window.localStorage.clear()
     })
@@ -247,9 +247,9 @@ describe('useStoreLocator - getSearchParamsForSESelection', () => {
         })
     })
 
-    test('returns SE selection from localStorage when available', () => {
+    test('returns Search Engine provided location parameter selection from localStorage when available', () => {
         const seStoreData = {
-            isSESelection: true,
+            isSeSelection: true,
             seSearchParams: {
                 countryCode: 'US',
                 postalCode: '90210',
@@ -271,9 +271,9 @@ describe('useStoreLocator - getSearchParamsForSESelection', () => {
         })
     })
 
-    test('returns manual search params from localStorage when no SE selection', () => {
+    test('returns manual search params from localStorage when no Search Engine provided location parameter selection', () => {
         const manualStoreData = {
-            isSESelection: false,
+            isSeSelection: false,
             manualSearchParams: {
                 countryCode: 'DE',
                 postalCode: '10178'
