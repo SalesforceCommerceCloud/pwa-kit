@@ -439,7 +439,6 @@ export const createBundle = async ({
             .then(async () => {
                 const {dependencies = {}, devDependencies = {}} = await getProjectPkg()
 
-                const cc_overrides: string[] = []
                 const dependencyTree = await getProjectDependencyTree()
                 // If we can't load the dependency tree, pretend that it's empty.
                 // TODO: Should we report an error?
@@ -450,8 +449,7 @@ export const createBundle = async ({
                         ...dependencies,
                         ...devDependencies,
                         ...(pwaKitDeps ?? {})
-                    },
-                    cc_overrides: cc_overrides
+                    }
                 }
             })
             .then(() => readFile(destination))
