@@ -11,22 +11,46 @@ import PropTypes from 'prop-types'
 import {Box, Button, Wrap, WrapItem} from '@salesforce/retail-react-app/app/components/shared/ui'
 import {CloseIcon} from '@salesforce/retail-react-app/app/components/icons'
 import {REMOVE_FILTER} from '@salesforce/retail-react-app/app/pages/product-list/partials/refinements-utils'
+import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
+import {getSelectedStoreData} from '@salesforce/retail-react-app/app/utils/store-locator-utils'
 
 const SelectedRefinements = ({toggleFilter, selectedFilterValues, filters, handleReset}) => {
     const {formatMessage} = useIntl()
+    const {site} = useMultiSite()
     const priceFilterValues = filters?.find((filter) => filter.attributeId === 'price')
-
     let selectedFilters = []
     for (const key in selectedFilterValues) {
         const filters = selectedFilterValues[key].split('|')
         filters?.forEach((filter) => {
+            let uiLabel = filter
+
+            if (key === 'price') {
+                uiLabel =
+                    priceFilterValues?.values?.find((priceFilter) => priceFilter.value === filter)
+                        ?.label || filter
+            } else if (key === 'ilids') {
+                // Fallback text for in stock selected filter
+                uiLabel = formatMessage({
+                    id: 'selected_refinements.filter.in_stock',
+                    defaultMessage: 'In Stock'
+                })
+
+                const storeInfo = getSelectedStoreData(site?.id)
+                if (storeInfo?.inventoryId === filter && storeInfo?.name) {
+                    uiLabel = formatMessage(
+                        {
+                            id: 'store_inventory_filter.checkbox.label',
+                            defaultMessage: 'In Stock at {storeName}'
+                        },
+                        {
+                            storeName: storeInfo.name
+                        }
+                    )
+                }
+            }
+
             const selected = {
-                uiLabel:
-                    key === 'price'
-                        ? priceFilterValues?.values?.find(
-                              (priceFilter) => priceFilter.value === filter
-                          )?.label
-                        : filter,
+                uiLabel,
                 value: key,
                 apiLabel: filter
             }

@@ -19,10 +19,14 @@ import {
     Text,
     VStack,
     Fade,
-    useTheme
+    useTheme,
+    Stack,
+    Radio,
+    RadioGroup
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 import {useCurrency, useDerivedProduct} from '@salesforce/retail-react-app/app/hooks'
 import {useAddToCartModalContext} from '@salesforce/retail-react-app/app/hooks/use-add-to-cart-modal'
+import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
 
 // project components
 import ImageGallery from '@salesforce/retail-react-app/app/components/image-gallery'
@@ -118,7 +122,9 @@ const ProductView = forwardRef(
                 !isProductLoading && variant?.orderable && quantity > 0 && quantity <= stockLevel,
             showImageGallery = true,
             setSelectedBundleQuantity = () => {},
-            selectedBundleParentQuantity = 1
+            selectedBundleParentQuantity = 1,
+            pickupInStore,
+            setPickupInStore
         },
         ref
     ) => {
@@ -155,6 +161,30 @@ const ProductView = forwardRef(
         const isProductASet = product?.type.set
         const isProductABundle = product?.type.bundle
         const errorContainerRef = useRef(null)
+        const [pickupEnabled, setPickupEnabled] = useState(false)
+        const [pickupError, setPickupError] = useState('')
+        const {site} = useMultiSite()
+
+        // Get store info from localStorage for stock status display (move to main render scope)
+        let storeName = null
+        let inventoryId = null
+        let storeStockStatus = null
+        if (typeof window !== 'undefined' && site?.id && product?.inventories) {
+            const storeInfoKey = `store_${site.id}`
+            try {
+                const storeInfo = JSON.parse(window.localStorage.getItem(storeInfoKey))
+                inventoryId = storeInfo?.inventoryId
+                storeName = storeInfo?.name
+                if (inventoryId) {
+                    const inventoryObj = product.inventories.find((inv) => inv.id === inventoryId)
+                    if (inventoryObj) {
+                        storeStockStatus = inventoryObj.orderable
+                    }
+                }
+            } catch (e) {
+                // intentionally empty: ignore errors
+            }
+        }
 
         const {disableButton, customInventoryMessage} = useMemo(() => {
             let shouldDisableButton = showInventoryMessage
@@ -272,14 +302,17 @@ const ProductView = forwardRef(
                     return
                 }
                 try {
-                    const itemsAdded = await addToCart(variant, quantity)
+                    const itemsAdded = await addToCart([{variant, quantity}])
                     // Open modal only when `addToCart` returns some data
                     // It's possible that the item has been added to cart, but we don't want to open the modal.
                     // See wishlist_primary_action for example.
                     if (itemsAdded) {
                         onAddToCartModalOpen({
                             product,
-                            itemsAdded,
+                            itemsAdded: itemsAdded.map((item) => ({
+                                ...item,
+                                product // attach the full product object
+                            })),
                             selectedQuantity: quantity
                         })
                     }
@@ -398,6 +431,65 @@ const ProductView = forwardRef(
                 }))
             }
         }, [showInventoryMessage, inventoryMessage])
+
+        useEffect(() => {
+            if (site?.id) {
+                const storeInfoKey = `store_${site.id}`
+                let inventoryId = null
+                try {
+                    const storeInfo = JSON.parse(window.localStorage.getItem(storeInfoKey))
+                    inventoryId = storeInfo?.inventoryId
+                } catch (e) {
+                    // intentionally empty: ignore errors
+                }
+                setPickupEnabled(!!inventoryId)
+            }
+        }, [site?.id])
+
+        const showError = (error) => {
+            showToast({
+                title: error?.message || 'An error occurred',
+                status: 'error'
+            })
+        }
+
+        // Refactored handler for delivery option change
+        const handleDeliveryOptionChange = (value) => {
+            setPickupError('')
+            if (value === 'pickup') {
+                if (pickupEnabled) {
+                    const storeInfoKey = `store_${site.id}`
+                    let inventoryId = null
+                    let storeName = null
+                    try {
+                        const storeInfo = JSON.parse(window.localStorage.getItem(storeInfoKey))
+                        inventoryId = storeInfo?.inventoryId
+                        storeName = storeInfo?.name
+                    } catch (e) {
+                        showError()
+                    }
+                    if (inventoryId && product?.inventories) {
+                        const inventoryObj = product.inventories.find(
+                            (inv) => inv.id === inventoryId
+                        )
+                        if (!inventoryObj?.orderable) {
+                            setPickupInStore(false)
+                            setPickupError(
+                                intl.formatMessage(
+                                    {
+                                        id: 'product_view.error.not_available_for_pickup',
+                                        defaultMessage: 'Out of Stock in {storeName}'
+                                    },
+                                    {storeName: storeName || ''}
+                                )
+                            )
+                            return
+                        }
+                    }
+                }
+            }
+            setPickupInStore(value === 'pickup')
+        }
 
         return (
             <Flex direction={'column'} data-testid="product-view" ref={ref}>
@@ -641,12 +733,130 @@ const ProductView = forwardRef(
                                     </Text>
                                 </Fade>
                             )}
-                            <Box
-                                display={
-                                    isProductPartOfSet ? 'block' : ['none', 'none', 'none', 'block']
-                                }
-                            >
-                                {renderActionButtons()}
+                            <Box>
+                                <Box mb={1}>
+                                    <Text as="label" fontWeight="bold" mb={1} display="block">
+                                        <FormattedMessage
+                                            defaultMessage="Delivery:"
+                                            id="product_view.label.delivery"
+                                        />
+                                    </Text>
+                                    <RadioGroup
+                                        value={pickupInStore ? 'pickup' : 'ship'}
+                                        onChange={handleDeliveryOptionChange}
+                                        mb={1}
+                                    >
+                                        <Stack direction="column" spacing={2}>
+                                            <Radio value="ship">
+                                                <FormattedMessage
+                                                    defaultMessage="Ship to Address"
+                                                    id="product_view.label.ship_to_address"
+                                                />
+                                            </Radio>
+                                            <Radio
+                                                value="pickup"
+                                                isDisabled={
+                                                    !pickupEnabled ||
+                                                    (storeName &&
+                                                        inventoryId &&
+                                                        storeStockStatus === false)
+                                                }
+                                            >
+                                                <FormattedMessage
+                                                    defaultMessage="Pickup in Store"
+                                                    id="product_view.label.pickup_in_store"
+                                                />
+                                            </Radio>
+                                        </Stack>
+                                    </RadioGroup>
+                                </Box>
+                                {storeName && inventoryId && (
+                                    <Text
+                                        color="black"
+                                        fontWeight={600}
+                                        mb={2}
+                                        data-testid="store-stock-status-msg"
+                                    >
+                                        {storeStockStatus
+                                            ? intl.formatMessage(
+                                                  {
+                                                      id: 'product_view.status.in_stock_at_store',
+                                                      defaultMessage: 'In Stock at {storeName}'
+                                                  },
+                                                  {
+                                                      storeName: (
+                                                          <Link
+                                                              to="/store-locator"
+                                                              color="blue.600"
+                                                              textDecoration="underline"
+                                                          >
+                                                              {storeName}
+                                                          </Link>
+                                                      )
+                                                  }
+                                              )
+                                            : intl.formatMessage(
+                                                  {
+                                                      id: 'product_view.status.out_of_stock_at_store',
+                                                      defaultMessage: 'Out of Stock at {storeName}'
+                                                  },
+                                                  {
+                                                      storeName: (
+                                                          <Link
+                                                              to="/store-locator"
+                                                              color="blue.600"
+                                                              textDecoration="underline"
+                                                          >
+                                                              {storeName}
+                                                          </Link>
+                                                      )
+                                                  }
+                                              )}
+                                    </Text>
+                                )}
+                                {pickupError && (
+                                    <Text
+                                        color="orange.600"
+                                        fontWeight={600}
+                                        mb={3}
+                                        data-testid="pickup-error-msg"
+                                    >
+                                        {pickupError}
+                                    </Text>
+                                )}
+                                <Box
+                                    display={
+                                        isProductPartOfSet
+                                            ? 'block'
+                                            : ['none', 'none', 'none', 'block']
+                                    }
+                                >
+                                    {/* Show label if pickup is disabled due to no store/inventoryId */}
+                                    {!pickupEnabled && (
+                                        <Text
+                                            color="black"
+                                            fontWeight={600}
+                                            mb={3}
+                                            data-testid="pickup-select-store-msg"
+                                        >
+                                            <FormattedMessage
+                                                defaultMessage="Pickup in "
+                                                id="product_view.label.pickup_in_select_store_prefix"
+                                            />{' '}
+                                            <Link
+                                                to="/store-locator"
+                                                color="blue.600"
+                                                textDecoration="underline"
+                                            >
+                                                <FormattedMessage
+                                                    defaultMessage="Select Store"
+                                                    id="product_view.label.select_store_link"
+                                                />
+                                            </Link>
+                                        </Text>
+                                    )}
+                                    {renderActionButtons()}
+                                </Box>
                             </Box>
                         </Box>
                     </VStack>
@@ -698,7 +908,9 @@ ProductView.propTypes = {
     validateOrderability: PropTypes.func,
     showImageGallery: PropTypes.bool,
     setSelectedBundleQuantity: PropTypes.func,
-    selectedBundleParentQuantity: PropTypes.number
+    selectedBundleParentQuantity: PropTypes.number,
+    pickupInStore: PropTypes.bool,
+    setPickupInStore: PropTypes.func
 }
 
 export default ProductView
