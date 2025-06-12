@@ -46,7 +46,7 @@ describe('EinsteinAPI', () => {
                     'Content-Type': 'application/json',
                     'x-cq-client-id': 'test-id'
                 },
-                body: '{"product":{"id":"56736828M","sku":"56736828M","altId":"","altIdType":""},"cookieId":"test-usid","realm":"test","instanceType":"sbx"}'
+                body: '{"product":{"id":"56736828M","price":155},"cookieId":"test-usid","realm":"test","instanceType":"sbx"}'
             }
         )
     })
@@ -158,12 +158,12 @@ describe('EinsteinAPI', () => {
                     'Content-Type': 'application/json',
                     'x-cq-client-id': 'test-id'
                 },
-                body: '{"products":[{"id":"682875719029M","sku":"","price":29.99,"quantity":1}],"amount":29.99,"cookieId":"test-usid","realm":"test","instanceType":"sbx"}'
+                body: '{"products":[{"id":"682875719029M","price":29.99,"quantity":1}],"amount":29.99,"cookieId":"test-usid","realm":"test","instanceType":"sbx"}'
             }
         )
     })
 
-    test('checkouStep sends expected api request', async () => {
+    test('checkoutStep sends expected api request', async () => {
         const checkoutStepName = 'CheckoutStep'
         const checkoutStep = 0
         await einsteinApi.sendCheckoutStep(checkoutStepName, checkoutStep, mockBasket, {
@@ -192,7 +192,7 @@ describe('EinsteinAPI', () => {
                     'Content-Type': 'application/json',
                     'x-cq-client-id': 'test-id'
                 },
-                body: '{"products":[{"id":"883360544021M","sku":"","price":155,"quantity":1}],"cookieId":"test-usid","realm":"test","instanceType":"sbx"}'
+                body: '{"products":[{"id":"883360544021M","price":155,"quantity":1}],"cookieId":"test-usid","realm":"test","instanceType":"sbx"}'
             }
         )
     })
@@ -209,7 +209,7 @@ describe('EinsteinAPI', () => {
                     'Content-Type': 'application/json',
                     'x-cq-client-id': 'test-id'
                 },
-                body: '{"recommenderName":"testRecommender","__recoUUID":"883360544021M","product":{"id":"56736828M","sku":"56736828M","altId":"","altIdType":""},"cookieId":"test-usid","realm":"test","instanceType":"sbx"}'
+                body: '{"recommenderName":"testRecommender","__recoUUID":"883360544021M","product":{"id":"56736828M","price":155},"cookieId":"test-usid","realm":"test","instanceType":"sbx"}'
             }
         )
     })
