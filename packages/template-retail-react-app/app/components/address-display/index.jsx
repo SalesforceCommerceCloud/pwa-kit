@@ -7,6 +7,8 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import {Box, Text} from '@salesforce/retail-react-app/app/components/shared/ui'
+import AbcComponent from '@salesforce/retail-react-app/app/components/abc-comp'
+import XyzComp from '@salesforce/retail-react-app/app/components/xyz-comp'
 
 const AddressDisplay = ({address}) => {
     return (
@@ -19,6 +21,8 @@ const AddressDisplay = ({address}) => {
                 {address.city}, {address.stateCode} {address.postalCode}
             </Text>
             <Text textStyle="md">{address.countryCode}</Text>
+            <AbcComponent />
+            <XyzComp />
         </Box>
     )
 }

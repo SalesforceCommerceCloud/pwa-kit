@@ -8,6 +8,9 @@
     import mockProduct from '../mocks/master-25517823M.js'
     import AddressDisplay from '@salesforce/retail-react-app/app/components/address-display'
     import {mockedRegisteredCustomer} from '../mocks/mock-data.js'
+    import {IconButton} from '@chakra-ui/react'
+    import {CopyIcon} from '@chakra-ui/icons'
+    import {useToast} from '@chakra-ui/react'
     const mockAddress = mockedRegisteredCustomer.addresses[0]
     
     const DEFAULT_CODE = `function Demo() {
@@ -35,6 +38,8 @@
         const [droppedComponents, setDroppedComponents] = useState([])
         const [draggedType, setDraggedType] = useState(null)
         const [hoveredId, setHoveredId] = useState(null)
+        const [copying, setCopying] = useState(false)
+        const toast = typeof window !== 'undefined' ? useToast() : null
         let idCounter = 0
         const getId = () => `comp_${idCounter++}_${Date.now()}`
 
@@ -129,13 +134,15 @@
                 }
                 if (node.type === 'Text') {
                     return (
-                        <Box key={node.id} mb={2}
+                        <Box key={node.id}
                             borderColor={hoveredId === node.id ? 'blue.500' : 'gray.200'}
                             borderWidth={1}
                             borderRadius="md"
                             onMouseEnter={() => setHoveredId(node.id)}
                             onMouseLeave={() => setHoveredId(null)}
                             position="relative"
+                            p={2}
+                            mb={2}
                         >
                             {hoveredId === node.id && (
                                 <CloseButton
@@ -161,13 +168,15 @@
                 }
                 if (node.type === 'ProductTile') {
                     return (
-                        <Box key={node.id} mb={2}
+                        <Box key={node.id}
                             borderColor={hoveredId === node.id ? 'blue.500' : 'gray.200'}
                             borderWidth={1}
                             borderRadius="md"
                             onMouseEnter={() => setHoveredId(node.id)}
                             onMouseLeave={() => setHoveredId(null)}
                             position="relative"
+                            p={2}
+                            mb={2}
                         >
                             {hoveredId === node.id && (
                                 <CloseButton
@@ -188,13 +197,15 @@
                 }
                 if (node.type === 'AddressDisplay') {
                     return (
-                        <Box key={node.id} mb={2}
+                        <Box key={node.id}
                             borderColor={hoveredId === node.id ? 'blue.500' : 'gray.200'}
                             borderWidth={1}
                             borderRadius="md"
                             onMouseEnter={() => setHoveredId(node.id)}
                             onMouseLeave={() => setHoveredId(null)}
                             position="relative"
+                            p={2}
+                            mb={2}
                         >
                             {hoveredId === node.id && (
                                 <CloseButton
@@ -218,24 +229,66 @@
         }
 
         // Recursively generate JSX code
-        function getJsxCode(nodes = droppedComponents, indent = 0) {
-            const pad = '  '.repeat(indent)
+        function getJsxCode(nodes = droppedComponents, indent = 2, used = {Box: false, Text: false, ProductTile: false, AddressDisplay: false, mockProduct: false, mockAddress: false}) {
+            const pad = ' '.repeat(indent)
             return nodes.map(node => {
                 if (node.type === 'Box') {
-                    const childrenJsx = node.children && node.children.length > 0 ? '\n' + getJsxCode(node.children, indent + 1) + pad : ''
+                    used.Box = true
+                    const childrenJsx = node.children && node.children.length > 0 ? '\n' + getJsxCode(node.children, indent + 2, used) + pad : ''
                     return `${pad}<Box>${childrenJsx}${childrenJsx ? '\n' + pad : ''}</Box>`
                 }
                 if (node.type === 'Text') {
+                    used.Text = true
                     return `${pad}<Text>${node.text ?? 'Text'}</Text>`
                 }
                 if (node.type === 'ProductTile') {
+                    used.ProductTile = true
+                    used.mockProduct = true
                     return `${pad}<ProductTile product={mockProduct} />`
                 }
                 if (node.type === 'AddressDisplay') {
+                    used.AddressDisplay = true
+                    used.mockAddress = true
                     return `${pad}<AddressDisplay address={mockAddress} />`
                 }
                 return ''
             }).join('\n')
+        }
+
+        // Generate a complete React component file as a string
+        function getFullComponentCode() {
+            // Track which imports are needed
+            const used = {Box: false, Text: false, ProductTile: false, AddressDisplay: false, mockProduct: false, mockAddress: false}
+            const jsx = getJsxCode(droppedComponents, 4, used)
+            const imports = []
+            if (used.Box || used.Text) {
+                imports.push(`import {Box${used.Text ? ', Text' : ''}} from '@salesforce/retail-react-app/app/components/shared/ui'`)
+            }
+            if (used.ProductTile) {
+                imports.push(`import ProductTile from '@salesforce/retail-react-app/app/components/product-tile'`)
+            }
+            if (used.AddressDisplay) {
+                imports.push(`import AddressDisplay from '@salesforce/retail-react-app/app/components/address-display'`)
+            }
+            if (used.mockProduct) {
+                imports.push(`import mockProduct from '../mocks/master-25517823M.js'`)
+            }
+            if (used.mockAddress) {
+                imports.push(`import {mockedRegisteredCustomer} from '../mocks/mock-data.js'`)
+            }
+            let mockAddressDef = ''
+            if (used.mockAddress) {
+                mockAddressDef = '\nconst mockAddress = mockedRegisteredCustomer.addresses[0]'
+            }
+            const name = componentName.trim() ? componentName.trim() : 'Component'
+            return `import React from 'react'
+${imports.join('\n')}
+${mockAddressDef}
+
+const ${name} = () => (\n  <>\n${jsx}\n  </>\n)
+
+export default ${name}
+`
         }
 
         return (
@@ -290,16 +343,44 @@
                             {droppedComponents.length === 0 && <Text color="gray.400">Drag Box or Text here</Text>}
                             {renderTree(droppedComponents)}
                         </Box>
+                        <Button
+                            mt={4}
+                            colorScheme="red"
+                            size="md"
+                            variant="outline"
+                            onClick={() => setDroppedComponents([])}
+                            w="full"
+                        >
+                            Clear
+                        </Button>
                     </Box>
                     {/* Right Pane: JSX Code */}
-                    <Box flexBasis="340px" flexShrink={0} minW="220px" maxW="400px" borderWidth={1} borderRadius="md" p={4} bg="gray.50" ml={{base: 0, md: 4}} mt={{base: 4, md: 0}}>
-                        <Heading as="h3" size="sm" mb={3}>JSX Code</Heading>
-                        <Textarea value={getJsxCode()} readOnly minH="300px" fontFamily="mono" fontSize="sm" bg="white" />
+                    <Box flexBasis="340px" flexShrink={0} minW="220px" maxW="400px" borderWidth={1} borderRadius="md" p={4} bg="gray.50" ml={{base: 0, md: 4}} mt={{base: 4, md: 0}} position="relative">
+                        <Heading as="h3" size="sm" mb={3} pr={10}>
+                            JSX Code
+                        </Heading>
+                        <IconButton
+                            aria-label="Copy code"
+                            icon={<CopyIcon />}
+                            size="sm"
+                            position="absolute"
+                            top={4}
+                            right={4}
+                            zIndex={2}
+                            onClick={async () => {
+                                setCopying(true);
+                                await navigator.clipboard.writeText(getFullComponentCode());
+                                setTimeout(() => setCopying(false), 1500);
+                            }}
+                            colorScheme={copying ? 'green' : 'gray'}
+                            title={copying ? 'Copied!' : 'Copy to clipboard'}
+                        />
+                        <Textarea value={getFullComponentCode()} readOnly minH="300px" fontFamily="mono" fontSize="sm" bg="white" />
                         <Button
                             mt={4}
                             colorScheme="green"
                             onClick={() => {
-                                const code = getJsxCode();
+                                const code = getFullComponentCode();
                                 const name = componentName.trim() ? componentName.trim() : 'Component';
                                 const blob = new Blob([code], {type: 'text/plain'});
                                 const a = document.createElement('a');
