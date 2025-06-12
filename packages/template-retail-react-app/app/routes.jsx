@@ -57,8 +57,14 @@ const Wishlist = loadable(() => import('./pages/account/wishlist'), {
 const ComponentShowcase = loadable(() => import('./pages/component-showcase'), {
     fallback
 })
+const HooksShowcase = loadable(() => import('./pages/hooks-showcase'), {
+    fallback
+})
 const PageShowcase = loadable(() => import('./pages/page-showcase'), {fallback})
 const PageNotFound = loadable(() => import('./pages/page-not-found'))
+const ComponentBuilder = loadable(() => import('./pages/component-builder'), {
+    fallback
+})
 
 export const routes = [
     {
@@ -145,8 +151,18 @@ export const routes = [
         exact: true
     },
     {
+        path: '/hooks-showcase',
+        component: HooksShowcase,
+        exact: true
+    },
+    {
         path: '/page-showcase',
         component: PageShowcase,
+        exact: true
+    },
+    {
+        path: '/component-builder',
+        component: ComponentBuilder,
         exact: true
     },
     {

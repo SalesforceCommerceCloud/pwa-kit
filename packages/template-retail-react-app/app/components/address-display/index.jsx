@@ -11,14 +11,14 @@ import {Box, Text} from '@salesforce/retail-react-app/app/components/shared/ui'
 const AddressDisplay = ({address}) => {
     return (
         <Box>
-            <Text>
+            <Text fontSize="lg" fontWeight="600">
                 {address.firstName} {address.lastName}
             </Text>
-            <Text>{address.address1}</Text>
+            <Text textStyle="md">{address.address1}</Text>
             <Text>
                 {address.city}, {address.stateCode} {address.postalCode}
             </Text>
-            <Text>{address.countryCode}</Text>
+            <Text textStyle="md">{address.countryCode}</Text>
         </Box>
     )
 }

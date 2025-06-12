@@ -1,5 +1,3 @@
-
-
 const PrimaryButton = ({ children, onClick, disabled = false, className = '', ...props }) => {
   return (
     <button

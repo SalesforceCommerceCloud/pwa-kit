@@ -2,12 +2,12 @@
   "name": "pwa-storefront-mcp",
   "version": "1.0.0",
   "description": "Simple MCP server that provides current time",
-  "main": "server.js",
+  "main": "src/server/server.js",
   "type": "module",
   "scripts": {
-    "start": "node server.js",
-    "test": "node test-mcp.js",
-    "demo": "node demo.js"
+    "start": "node src/server/server.js",
+    "test": "node src/tests/test-mcp.js",
+    "demo": "node src/scripts/demo.js"
   },
   "keywords": [
     "mcp",
@@ -17,6 +17,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@babel/runtime": "^7.27.6",
     "@modelcontextprotocol/sdk": "^1.0.0",
     "zod": "^3.25.56"
   }

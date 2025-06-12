@@ -78,4 +78,43 @@ To run the server in development mode:
 npm start
 ```
 
-The server will output debug information to stderr and handle MCP protocol messages via stdio. 
+The server will output debug information to stderr and handle MCP protocol messages via stdio.
+
+# Project Structure
+
+```
+/ (root)
+  - package.json
+  - package-lock.json
+  - README.md
+  - mcp.json
+  - claude_desktop_config.json
+  /src
+    /components
+      - index.js
+      - PrimaryButton.jsx
+      ... (other components)
+    /server
+      - server.js
+      - server-old-fashioned.js
+    /utils
+      - AddComponentTool.js
+    /scripts
+      - create-button.js
+      - demo.js
+    /tests
+      - test-mcp.js
+  /docs
+    - cursor-integration-guide.md
+  /node_modules
+  /.cursor
+```
+
+- All React components are in `src/components/`.
+- Server code is in `src/server/`.
+- Utilities/tools are in `src/utils/`.
+- Scripts are in `src/scripts/`.
+- Tests are in `src/tests/`.
+- Documentation is in `docs/`.
+
+Update your import paths accordingly. 

@@ -11,6 +11,10 @@ import {
     Flex
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 import Seo from '@salesforce/retail-react-app/app/components/seo'
+import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
+import {useShopperBasketsMutation} from '@salesforce/commerce-sdk-react'
+import {useLocation, useHistory} from 'react-router-dom'
+import ShowcaseTopBar from '@salesforce/retail-react-app/app/components/shared/ShowcaseTopBar'
 
 const pages = [
     {name: 'Home', path: '/'},
@@ -28,6 +32,23 @@ const pages = [
 const PageShowcase = () => {
     const [searchTerm, setSearchTerm] = useState('')
     const [selectedIndex, setSelectedIndex] = useState(0)
+    const location = useLocation()
+    const history = useHistory()
+
+    // Add to cart if empty
+    const {data: basket, derivedData: {totalItems} = {}} = useCurrentBasket()
+    const addItemToBasket = useShopperBasketsMutation('addItemToBasket')
+    React.useEffect(() => {
+        if (basket && (basket.productItems?.length === 0 || totalItems === 0)) {
+            addItemToBasket.mutate({
+                parameters: {basketId: basket.basketId},
+                body: {
+                    productId: '25752981M', // Example productId
+                    quantity: 1
+                }
+            })
+        }
+    }, [basket, totalItems])
 
     const filteredPages = searchTerm
         ? pages.filter(page =>
@@ -39,17 +60,16 @@ const PageShowcase = () => {
         selectedIndex >= filteredPages.length ? 0 : selectedIndex
     const selectedPage = filteredPages[safeSelectedIndex]
 
+    // Top bar navigation
+    const goToPageShowcase = () => history.push('/page-showcase')
+    const goToComponentShowcase = () => history.push('/component-showcase')
+    const goToHooksShowcase = () => history.push('/hooks-showcase')
+
+
     return (
         <Box data-testid="page-showcase-page" layerStyle="page">
-            <Seo
-                title="Page Showcase"
-                description="Explore all available pages"
-                keywords="Pages, UI Library, React, Chakra UI"
-            />
+            <ShowcaseTopBar />
             <Container maxW="container.xl" py={8}>
-                <Heading as="h1" size="2xl" color="blue.600" mb={8}>
-                    Page Showcase
-                </Heading>
                 <Flex direction={{base: 'column', md: 'row'}} gap={8} align="flex-start">
                     {/* Sidebar */}
                     <Box
@@ -105,11 +125,8 @@ const PageShowcase = () => {
                     >
                         {selectedPage ? (
                             <>
-                                <Heading size="lg" color="blue.600" mb={2}>
-                                    {selectedPage.name}
-                                </Heading>
-                                <Text color="gray.600" mb={4}>
-                                    Path: <code>{selectedPage.path}</code>
+                                <Text size="md" color="blue.600" mb={2}>
+                                    <b>{selectedPage.name} page</b> - <span style={{color: '#2D3748'}}>Path: <code>{selectedPage.path}</code></span>
                                 </Text>
                                 <Divider mb={6} />
                                 <Box border="2px solid #82e880" borderRadius="md" overflow="hidden" minH="900px" bg="gray.50">

@@ -7,7 +7,7 @@
 
 import React, {useState, useEffect} from 'react'
 import {useIntl, FormattedMessage} from 'react-intl'
-import {useLocation} from 'react-router-dom'
+import {useLocation, useHistory} from 'react-router-dom'
 
 // Components
 import {
@@ -34,7 +34,7 @@ import {
 // Project Components
 import Seo from '@salesforce/retail-react-app/app/components/seo'
 import ProductView from '@salesforce/retail-react-app/app/components/product-view'
-import mockProductDetail from '@salesforce/retail-react-app/app/mocks/variant-750518699578M'
+import mockProductDetail from '../../mocks/master-25517823M.js'
 import ProductTile from '@salesforce/retail-react-app/app/components/product-tile'
 import ProductScroller from '@salesforce/retail-react-app/app/components/product-scroller'
 import ActionCard from '@salesforce/retail-react-app/app/components/action-card'
@@ -68,6 +68,7 @@ import QuantityPicker from '@salesforce/retail-react-app/app/components/quantity
 import PageActionPlaceHolder from '@salesforce/retail-react-app/app/components/page-action-placeholder'
 import ProductViewModal from '@salesforce/retail-react-app/app/components/product-view-modal'
 import {PlusIcon} from '@salesforce/retail-react-app/app/components/icons'
+import ShowcaseTopBar from '@salesforce/retail-react-app/app/components/shared/ShowcaseTopBar'
 
 const mockProducts = [
     {
@@ -197,40 +198,6 @@ const componentCategories = [
                     <Button size="lg">Large</Button>
                 </HStack>
             </VStack>
-        )
-    },
-    {
-        name: 'Form Controls',
-        description: 'Input fields and form elements',
-        component: (
-            <VStack spacing={4} align="stretch" maxW="400px">
-                <Input placeholder="Basic input" />
-                <Select placeholder="Select option">
-                    <option value="option1">Option 1</option>
-                    <option value="option2">Option 2</option>
-                </Select>
-                <HStack>
-                    <Checkbox>Checkbox</Checkbox>
-                </HStack>
-                <RadioGroup defaultValue="1">
-                    <HStack>
-                        <Radio value="1">Option 1</Radio>
-                        <Radio value="2">Option 2</Radio>
-                    </HStack>
-                </RadioGroup>
-            </VStack>
-        )
-    },
-    {
-        name: 'Badges',
-        description: 'Status and label badges',
-        component: (
-            <HStack spacing={4}>
-                <Badge>Default</Badge>
-                <Badge colorScheme="green">Success</Badge>
-                <Badge colorScheme="red">Error</Badge>
-                <Badge colorScheme="blue">Info</Badge>
-            </HStack>
         )
     },
     {
@@ -587,6 +554,7 @@ function ProductViewModalDemo() {
 const ComponentShowcase = () => {
     const intl = useIntl()
     const location = useLocation()
+    const history = useHistory()
     const [searchTerm, setSearchTerm] = useState('')
     const [selectedIndex, setSelectedIndex] = useState(0)
 
@@ -615,13 +583,14 @@ const ComponentShowcase = () => {
         selectedIndex >= filteredComponents.length ? 0 : selectedIndex
     const selectedComponent = filteredComponents[safeSelectedIndex]
 
+    const goToPageShowcase = () => history.push('/page-showcase')
+    const goToComponentShowcase = () => history.push('/component-showcase')
+    const goToHooksShowcase = () => history.push('/hooks-showcase')
+
+
     return (
         <Box data-testid="component-showcase-page" layerStyle="page">
-            <Seo
-                title="Component Showcase"
-                description="Explore all available UI components"
-                keywords="Components, UI Library, React, Chakra UI"
-            />
+            <ShowcaseTopBar />
             <Container maxW="container.xl" py={8}>
                 <Heading as="h1" size="2xl" color="blue.600" mb={8}>
                     Component Showcase

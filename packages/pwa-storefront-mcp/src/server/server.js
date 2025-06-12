@@ -3,7 +3,9 @@
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import { z } from 'zod';
-import { AddComponentTool } from './AddComponentTool.js';
+import { AddComponentTool } from '../utils/AddComponentTool.js';
+import { InsertExistingComponentTool } from '../utils/InsertExistingComponentTool.js';
+import { CreateNewEmptyComponentTool } from '../utils/CreateNewEmptyComponentTool.js';  
 
 class PwaStorefrontMCPServerHighLevel {
   constructor() {
@@ -21,6 +23,8 @@ class PwaStorefrontMCPServerHighLevel {
     );
 
     this.addComponentTool = new AddComponentTool();
+    this.insertExistingComponentTool = new InsertExistingComponentTool();
+    this.CreateNewEmptyComponentTool = new CreateNewEmptyComponentTool();
     this.setupTools();
   }
 
@@ -69,7 +73,7 @@ class PwaStorefrontMCPServerHighLevel {
     );
 
     this.server.tool(
-      'insert_react_component',
+      'insert_new_react_component',
       'Insert a new React component into existing code',
       {
         code: z.string().describe('The existing JavaScript/React code'),
@@ -120,6 +124,50 @@ class PwaStorefrontMCPServerHighLevel {
         }
       }
     );
+
+    this.server.tool(
+        'insert_existing_component',
+        'Insert an existing React component into an existing page',
+        {
+          componentName: z.string().describe('Component name'),
+          targetPage: z.string().describe('Target page name or path')
+        //   options: z.object({
+        //     beforeComponentName: z.string().optional().describe('Insert before Component name'),
+        //     afterComponentName: z.string().optional().describe('Insert after Component name')
+        //   }).optional()
+        },
+        async (args) => {
+          try {
+            const modifiedCode = this.insertExistingComponentTool.insertComponentIntoPage(
+              args.targetPage,
+              args.componentName
+            );
+            return {
+              content: [
+                {
+                  type: 'text',
+                  text: JSON.stringify({
+                    success: true,
+                    modifiedCode,
+                    componentType: args.componentType,
+                    options: args.options
+                  }, null, 2),
+                },
+              ],
+            };
+          } catch (error) {
+            return {
+              content: [
+                {
+                  type: 'text',
+                  text: JSON.stringify({ error: error.message }, null, 2),
+                },
+              ],
+              isError: true,
+            };
+          }
+        }
+      );
 
     this.server.tool(
       'create_component_file',
@@ -173,7 +221,47 @@ class PwaStorefrontMCPServerHighLevel {
         }
       }
     );
+
+    this.server.tool(
+        'create_new_empty_component',
+        'Create a new empty React component file',
+        {
+          componentName: z.string().describe('Name of the component to create')
+        },
+        async (args) => {
+          try {
+            const componentCode = this.CreateNewEmptyComponentTool.createEmptyComponent
+                (
+              args.componentName
+            );
+            return {
+              content: [
+                {
+                  type: 'text',
+                  text: JSON.stringify({
+                    success: true,
+                    componentName: args.componentName,
+                    code: componentCode
+                  }, null, 2),
+                },
+              ],    
+            };
+          } catch (error) {
+            return {
+              content: [
+                {
+                  type: 'text',
+                  text: JSON.stringify({ error: error.message }, null, 2),
+                },
+              ],
+              isError: true,
+            };
+          }
+        }   
+      );
   }
+
+  
 
   async run() {
     const transport = new StdioServerTransport();
