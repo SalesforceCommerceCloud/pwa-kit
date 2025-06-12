@@ -299,6 +299,9 @@ const ProductView = forwardRef(
                                 )
                         ) || []
 
+                    // Open modal only when `addToCart` returns some data
+                    // It's possible that the item has been added to cart, but we don't want to open the modal.
+                    // See wishlist_primary_action for example.
                     if (isValidResponse) {
                         // Show bonus product modal first if there are bonus items
                         if (newBonusItems?.length > 0) {
@@ -402,9 +405,6 @@ const ProductView = forwardRef(
             if (isAddToCartModalOpen) {
                 onAddToCartModalClose()
             }
-        }, [location.pathname])
-
-        useEffect(() => {
             if (isBonusProductModalOpen) {
                 onBonusProductModalClose()
             }

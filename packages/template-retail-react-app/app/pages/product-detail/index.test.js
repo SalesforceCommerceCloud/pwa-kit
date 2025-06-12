@@ -55,8 +55,6 @@ jest.mock('@salesforce/retail-react-app/app/constants', () => {
     }
 })
 
-const mockBasket = {bonusDiscountLineItems: []}
-
 const MockedComponent = () => {
     return (
         <Switch>
@@ -108,7 +106,7 @@ test('should render product details page', async () => {
         })
     )
 
-    renderWithProviders(<MockedComponent />, {wrapperProps: {basket: mockBasket}})
+    renderWithProviders(<MockedComponent />)
 
     expect(await screen.findByTestId('product-details-page')).toBeInTheDocument()
     await waitFor(() => {
@@ -131,7 +129,7 @@ test('should add to wishlist', async () => {
         })
     )
 
-    renderWithProviders(<MockedComponent />, {wrapperProps: {basket: mockBasket}})
+    renderWithProviders(<MockedComponent />)
     expect(await screen.findByTestId('product-details-page')).toBeInTheDocument()
     // wait for data to fully loaded before taking any action
     await waitFor(() => {
@@ -158,7 +156,7 @@ test('should not add to wishlist if item is already in wishlist', async () => {
         })
     )
 
-    renderWithProviders(<MockedComponent />, {wrapperProps: {basket: mockBasket}})
+    renderWithProviders(<MockedComponent />)
     // wait for data to fully loaded before taking any action
     await waitFor(() => {
         expect(screen.getByRole('link', {name: /mens/i})).toBeInTheDocument()
@@ -184,7 +182,7 @@ describe('product set', () => {
     })
 
     test('render multi-product layout', async () => {
-        renderWithProviders(<MockedComponent />, {wrapperProps: {basket: mockBasket}})
+        renderWithProviders(<MockedComponent />)
 
         await waitFor(() => {
             expect(screen.getByRole('link', {name: /mens/i})).toBeInTheDocument()
@@ -204,9 +202,7 @@ describe('product set', () => {
 
         // Initial basket is necessary to add items to it
         const initialBasket = {basketId: 'valid_id'}
-        renderWithProviders(<MockedComponent />, {
-            wrapperProps: {basket: {...mockBasket, ...initialBasket}}
-        })
+        renderWithProviders(<MockedComponent />, {wrapperProps: {initialBasket}})
 
         await waitFor(
             () => {
@@ -240,7 +236,7 @@ describe('product set', () => {
     })
 
     test('add the set to cart with error messages', async () => {
-        renderWithProviders(<MockedComponent />, {wrapperProps: {basket: mockBasket}})
+        renderWithProviders(<MockedComponent />)
 
         await waitFor(
             () => {
@@ -262,7 +258,7 @@ describe('product set', () => {
     })
 
     test("child products' images are lazy loaded", async () => {
-        renderWithProviders(<MockedComponent />, {wrapperProps: {basket: mockBasket}})
+        renderWithProviders(<MockedComponent />)
         await waitFor(() => {
             expect(screen.getByRole('link', {name: /mens/i})).toBeInTheDocument()
         })
@@ -377,9 +373,7 @@ describe('product bundles', () => {
 
         // Initial basket is necessary to add items to it
         const initialBasket = {basketId: 'valid_id'}
-        renderWithProviders(<MockedComponent />, {
-            wrapperProps: {basket: {...mockBasket, ...initialBasket}}
-        })
+        renderWithProviders(<MockedComponent />, {wrapperProps: {initialBasket}})
 
         await waitFor(() => {
             expect(screen.getAllByText("Women's clothing test bundle")[0]).toBeInTheDocument()

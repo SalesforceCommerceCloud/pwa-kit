@@ -100,8 +100,7 @@ export const TestProviders = ({
     appConfig = mockConfig.app,
     siteAlias = DEFAULT_SITE,
     isGuest = false,
-    bypassAuth = true,
-    basket = {bonusDiscountLineItems: []}
+    bypassAuth = true
 }) => {
     const mounted = useRef()
     // We use this to track mounted state.
@@ -140,7 +139,7 @@ export const TestProviders = ({
                             <Router>
                                 <ChakraProvider theme={theme}>
                                     <AddToCartModalProvider>
-                                        <BonusProductModalProvider basket={basket}>
+                                        <BonusProductModalProvider>
                                             {children}
                                         </BonusProductModalProvider>
                                     </AddToCartModalProvider>
@@ -164,8 +163,7 @@ TestProviders.propTypes = {
     appConfig: PropTypes.object,
     siteAlias: PropTypes.string,
     bypassAuth: PropTypes.bool,
-    isGuest: PropTypes.bool,
-    basket: PropTypes.object
+    isGuest: PropTypes.bool
 }
 
 /**

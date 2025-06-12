@@ -414,7 +414,7 @@ const App = (props) => {
                             </Box>
                             {!isOnline && <OfflineBanner />}
                             <AddToCartModalProvider>
-                                <BonusProductModalProvider basket={basket}>
+                                <BonusProductModalProvider>
                                     <SkipNavContent
                                         style={{
                                             display: 'flex',
