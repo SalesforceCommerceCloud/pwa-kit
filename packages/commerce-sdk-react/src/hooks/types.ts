@@ -20,6 +20,7 @@ import {
     ShopperStores
 } from 'commerce-sdk-isomorphic'
 import {helpers} from 'commerce-sdk-isomorphic'
+import {CommerceApiProviderProps} from '../provider'
 
 // --- GENERAL UTILITIES --- //
 
@@ -226,3 +227,17 @@ export type TMutationVariables = {
     parameters?: {[key: string]: string | number | boolean | string[] | number[]}
     headers?: {[key: string]: string}
 } | void
+
+export type SDKClientTransformer<T> = (
+    params: T,
+    methodName: string,
+    options: any
+) => any | Promise<any>
+
+export type ErrorCallback<TParams> = (methodName: string, error: any, params: TParams) => void
+
+export interface SDKClientTransformConfig<TParams = Record<string, any>> {
+    props: Omit<CommerceApiProviderProps, 'children'>
+    transformer?: SDKClientTransformer<TParams>
+    onError?: ErrorCallback<TParams>
+}
