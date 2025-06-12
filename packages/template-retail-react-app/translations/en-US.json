@@ -1370,6 +1370,9 @@
   "selected_refinements.action.clear_all": {
     "defaultMessage": "Clear All"
   },
+  "selected_refinements.filter.in_stock": {
+    "defaultMessage": "In Stock"
+  },
   "shipping_address.button.continue_to_shipping": {
     "defaultMessage": "Continue to Shipping Method"
   },
@@ -1432,6 +1435,27 @@
   },
   "social_login_redirect.message.redirect_link": {
     "defaultMessage": "If you are not automatically redirected, click <link>this link</link> to proceed."
+  },
+  "store_inventory_filter.action.change_store": {
+    "defaultMessage": "Change Store"
+  },
+  "store_inventory_filter.action.select_store": {
+    "defaultMessage": "Select Store"
+  },
+  "store_inventory_filter.action.select_store_link": {
+    "defaultMessage": "Select a Store"
+  },
+  "store_inventory_filter.checkbox.assistive_msg": {
+    "defaultMessage": "Filter Products by Store Availability at {storeName}"
+  },
+  "store_inventory_filter.checkbox.label": {
+    "defaultMessage": "In Stock at {storeName}"
+  },
+  "store_inventory_filter.heading.shop_by_availability": {
+    "defaultMessage": "Shop by Availability"
+  },
+  "store_inventory_filter.link.assistive_msg": {
+    "defaultMessage": "Open Store Locator to {action}"
   },
   "store_locator.action.find": {
     "defaultMessage": "Find"
