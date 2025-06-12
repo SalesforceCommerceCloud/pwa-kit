@@ -201,10 +201,8 @@ describe('product set', () => {
         window.history.pushState({}, 'ProductDetail', urlPathAfterSelectingAllVariants)
 
         // Initial basket is necessary to add items to it
-        const initialBasket = {basketId: 'valid_id', bonusDiscountLineItems: []}
-        renderWithProviders(<MockedComponent />, {
-            wrapperProps: {basket: initialBasket}
-        })
+        const initialBasket = {basketId: 'valid_id'}
+        renderWithProviders(<MockedComponent />, {wrapperProps: {initialBasket}})
 
         await waitFor(
             () => {
@@ -374,10 +372,8 @@ describe('product bundles', () => {
         window.history.pushState({}, 'ProductDetail', urlPathAfterSelectingAllVariants)
 
         // Initial basket is necessary to add items to it
-        const initialBasket = {basketId: 'valid_id', bonusDiscountLineItems: []}
-        renderWithProviders(<MockedComponent />, {
-            wrapperProps: {basket: initialBasket}
-        })
+        const initialBasket = {basketId: 'valid_id'}
+        renderWithProviders(<MockedComponent />, {wrapperProps: {initialBasket}})
 
         await waitFor(() => {
             expect(screen.getAllByText("Women's clothing test bundle")[0]).toBeInTheDocument()

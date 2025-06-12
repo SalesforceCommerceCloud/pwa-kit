@@ -46,13 +46,9 @@ afterEach(() => {
     sessionStorage.clear()
 })
 
-const mockBasket = {bonusDiscountLineItems: []}
-
 test('ProductView Component renders properly', async () => {
     const addToCart = jest.fn()
-    renderWithProviders(<MockComponent product={mockProductDetail} addToCart={addToCart} />, {
-        wrapperProps: {basket: mockBasket}
-    })
+    renderWithProviders(<MockComponent product={mockProductDetail} addToCart={addToCart} />)
     expect(screen.getAllByText(/Black Single Pleat Athletic Fit Wool Suit/i)).toHaveLength(2)
     expect(screen.getAllByText(/299\.99/)).toHaveLength(4)
     expect(screen.getAllByText(/Add to cart/i)).toHaveLength(2)
@@ -62,9 +58,7 @@ test('ProductView Component renders properly', async () => {
 
 test('ProductView Component renders with addToCart event handler', async () => {
     const addToCart = jest.fn()
-    await renderWithProviders(<MockComponent product={mockProductDetail} addToCart={addToCart} />, {
-        wrapperProps: {basket: mockBasket}
-    })
+    await renderWithProviders(<MockComponent product={mockProductDetail} addToCart={addToCart} />)
 
     const addToCartButton = screen.getAllByText(/add to cart/i)[0]
     fireEvent.click(addToCartButton)
@@ -78,10 +72,7 @@ test('ProductView Component renders with addToWishList event handler', async () 
     const addToWishlist = jest.fn()
 
     await renderWithProviders(
-        <MockComponent product={mockProductDetail} addToWishlist={addToWishlist} />,
-        {
-            wrapperProps: {basket: mockBasket}
-        }
+        <MockComponent product={mockProductDetail} addToWishlist={addToWishlist} />
     )
 
     await waitFor(() => {
@@ -100,10 +91,7 @@ test('ProductView Component renders with updateWishlist event handler', async ()
     const updateWishlist = jest.fn()
 
     await renderWithProviders(
-        <MockComponent product={mockProductDetail} updateWishlist={updateWishlist} />,
-        {
-            wrapperProps: {basket: mockBasket}
-        }
+        <MockComponent product={mockProductDetail} updateWishlist={updateWishlist} />
     )
 
     await waitFor(() => {
@@ -121,9 +109,7 @@ test('ProductView Component renders with updateWishlist event handler', async ()
 test('Product View can update quantity', async () => {
     const user = userEvent.setup()
     const addToCart = jest.fn()
-    await renderWithProviders(<MockComponent product={mockProductDetail} addToCart={addToCart} />, {
-        wrapperProps: {basket: mockBasket}
-    })
+    await renderWithProviders(<MockComponent product={mockProductDetail} addToCart={addToCart} />)
 
     let quantityBox
     await waitFor(() => {
@@ -146,9 +132,7 @@ test('Product View handles invalid quantity inputs', async () => {
     const user = userEvent.setup()
 
     // Any invalid input should be reset to minOrderQuantity
-    await renderWithProviders(<MockComponent product={mockProductDetail} />, {
-        wrapperProps: {basket: mockBasket}
-    })
+    await renderWithProviders(<MockComponent product={mockProductDetail} />)
 
     const quantityInput = screen.getByRole('spinbutton', {name: /quantity/i})
     const minQuantity = mockProductDetail.minOrderQuantity.toString()
@@ -172,9 +156,7 @@ test('Product View handles invalid quantity inputs', async () => {
 describe('ProductView Component', () => {
     test('increases quantity when increment button is clicked', async () => {
         const user = userEvent.setup()
-        renderWithProviders(<ProductView product={mockProductDetail} />, {
-            wrapperProps: {basket: mockBasket}
-        })
+        renderWithProviders(<ProductView product={mockProductDetail} />)
 
         const quantityInput = await screen.findByRole('spinbutton')
         const incrementButton = screen.getByTestId('quantity-increment')
@@ -197,10 +179,7 @@ describe('ProductView Component', () => {
 test('renders a product set properly - parent item', () => {
     const parent = mockProductSet
     renderWithProviders(
-        <MockComponent product={parent} addToCart={() => {}} addToWishlist={() => {}} />,
-        {
-            wrapperProps: {basket: mockBasket}
-        }
+        <MockComponent product={parent} addToCart={() => {}} addToWishlist={() => {}} />
     )
 
     // NOTE: there can be duplicates of the same element, due to mobile and desktop views
@@ -225,10 +204,7 @@ test('renders a product set properly - parent item', () => {
 test('renders a product set properly - child item', () => {
     const child = mockProductSet.setProducts[0]
     renderWithProviders(
-        <MockComponent product={child} addToCart={() => {}} addToWishlist={() => {}} />,
-        {
-            wrapperProps: {basket: mockBasket}
-        }
+        <MockComponent product={child} addToCart={() => {}} addToWishlist={() => {}} />
     )
 
     // NOTE: there can be duplicates of the same element, due to mobile and desktop views
@@ -263,10 +239,7 @@ test('validateOrderability callback is called when adding a set to cart', async 
             validateOrderability={validateOrderability}
             addToCart={() => {}}
             addToWishlist={() => {}}
-        />,
-        {
-            wrapperProps: {basket: mockBasket}
-        }
+        />
     )
 
     const button = screen.getByRole('button', {name: /add set to cart/i})
@@ -289,10 +262,7 @@ test('onVariantSelected callback is called after successfully selected a variant
             onVariantSelected={onVariantSelected}
             addToCart={() => {}}
             addToWishlist={() => {}}
-        />,
-        {
-            wrapperProps: {basket: mockBasket}
-        }
+        />
     )
 
     const size = screen.getByRole('radio', {name: /xl/i})
@@ -310,10 +280,7 @@ describe('add to cart button loading tests', () => {
                 product={mockProductDetail}
                 addToCart={() => {}}
                 isBasketLoading={true}
-            />,
-            {
-                wrapperProps: {basket: mockBasket}
-            }
+            />
         )
         expect(screen.getByRole('button', {name: /add to cart/i})).toBeDisabled()
     })
@@ -324,10 +291,7 @@ describe('add to cart button loading tests', () => {
                 product={mockProductDetail}
                 addToCart={() => {}}
                 isBasketLoading={false}
-            />,
-            {
-                wrapperProps: {basket: mockBasket}
-            }
+            />
         )
         expect(screen.getByRole('button', {name: /add to cart/i})).toBeEnabled()
     })
@@ -336,10 +300,7 @@ describe('add to cart button loading tests', () => {
 test('renders a product bundle properly - parent item', () => {
     const parent = mockProductBundle
     renderWithProviders(
-        <MockComponent product={parent} addToCart={() => {}} addToWishlist={() => {}} />,
-        {
-            wrapperProps: {basket: mockBasket}
-        }
+        <MockComponent product={parent} addToCart={() => {}} addToWishlist={() => {}} />
     )
 
     // NOTE: there can be duplicates of the same element, due to mobile and desktop views
@@ -369,10 +330,7 @@ test('renders a product bundle properly - child item', () => {
             addToWishlist={() => {}}
             isProductPartOfBundle={true}
             setChildProductOrderability={() => {}}
-        />,
-        {
-            wrapperProps: {basket: mockBasket}
-        }
+        />
     )
 
     const addToCartButton = screen.queryByRole('button', {name: /add to cart/i})
