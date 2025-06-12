@@ -132,10 +132,11 @@ export const render = async (req, res, next) => {
     return tracePerformance(
         'ssr.render',
         async () => {
+            // Create a child span for route matching
+            const routeMatchingSpan = createChildSpan('Route Matching')
             res.__performanceTimer = new PerformanceTimer({enabled: shouldTrackPerformance})
             res.__performanceTimer.mark(PERFORMANCE_MARKS.total, 'start')
             const AppConfig = getAppConfig()
-            // Get the application config which should have been stored at this point.
             const config = getConfig()
 
             AppConfig.restore(res.locals)
@@ -153,7 +154,6 @@ export const render = async (req, res, next) => {
             }
 
             // Step 1 - Find the match.
-
             res.__performanceTimer.mark(PERFORMANCE_MARKS.routeMatching, 'start')
             let route
             let match
@@ -167,11 +167,14 @@ export const render = async (req, res, next) => {
                 return !!match
             })
             res.__performanceTimer.mark(PERFORMANCE_MARKS.routeMatching, 'end')
+            endSpan(routeMatchingSpan) // End the route matching span
 
             // Step 2 - Get the component
+            const componentLoadingSpan = createChildSpan('Component Loading')
             res.__performanceTimer.mark(PERFORMANCE_MARKS.loadComponent, 'start')
             const component = await route.component.getComponent()
             res.__performanceTimer.mark(PERFORMANCE_MARKS.loadComponent, 'end')
+            endSpan(componentLoadingSpan) // End the component loading span
 
             // Step 3 - Init the app state
             const props = {
