@@ -84,13 +84,20 @@ export const useBonusState = (basket) => {
         }
     }, [pathname])
 
-    // Update bonusProducts when basket changes
+    // Update bonusProducts when basket bonusDiscountLineItems changes
     useEffect(() => {
-        setState((prev) => ({
-            ...prev,
-            bonusProducts: basket?.bonusDiscountLineItems || []
-        }))
-    }, [basket])
+        const currentBonusItems = basket?.bonusDiscountLineItems || []
+        setState((prev) => {
+            // Only update if the bonus items have actually changed
+            if (JSON.stringify(prev.bonusProducts) !== JSON.stringify(currentBonusItems)) {
+                return {
+                    ...prev,
+                    bonusProducts: currentBonusItems
+                }
+            }
+            return prev
+        })
+    }, [basket?.bonusDiscountLineItems])
 
     const addBonusProducts = (newBonusItems) => {
         setState((prev) => {
