@@ -16,6 +16,15 @@ import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-u
 import userEvent from '@testing-library/user-event'
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
 
+// Ensure useMultiSite returns site.id = 'site-1' for all tests
+jest.mock('@salesforce/retail-react-app/app/hooks/use-multi-site', () => ({
+    __esModule: true,
+    default: () => ({
+        site: {id: 'site-1'},
+        buildUrl: (url) => url // identity function for tests
+    })
+}))
+
 const MockComponent = (props) => {
     const {data: customer} = useCurrentCustomer()
     return (
@@ -46,13 +55,19 @@ afterEach(() => {
     sessionStorage.clear()
 })
 
+// Update MockComponent default props for all tests
+MockComponent.defaultProps = {
+    pickupInStore: false,
+    setPickupInStore: jest.fn()
+}
+
 test('ProductView Component renders properly', async () => {
     const addToCart = jest.fn()
     renderWithProviders(<MockComponent product={mockProductDetail} addToCart={addToCart} />)
     expect(screen.getAllByText(/Black Single Pleat Athletic Fit Wool Suit/i)).toHaveLength(2)
     expect(screen.getAllByText(/299\.99/)).toHaveLength(4)
     expect(screen.getAllByText(/Add to cart/i)).toHaveLength(2)
-    expect(screen.getAllByRole('radiogroup')).toHaveLength(3)
+    expect(screen.getAllByRole('radiogroup')).toHaveLength(4)
     expect(screen.getAllByText(/add to cart/i)).toHaveLength(2)
 })
 
@@ -188,7 +203,13 @@ test('renders a product set properly - parent item', () => {
     const fromAtLabel = screen.getAllByText(/from/i)[0]
     const addSetToCartButton = screen.getAllByRole('button', {name: /add set to cart/i})[0]
     const addSetToWishlistButton = screen.getAllByRole('button', {name: /add set to wishlist/i})[0]
-    const variationAttributes = screen.queryAllByRole('radiogroup') // e.g. sizes, colors
+    const variationAttributes = screen
+        .getAllByRole('radiogroup')
+        .filter(
+            (rg) =>
+                !rg.textContent.includes('Ship to Address') &&
+                !rg.textContent.includes('Pickup in Store')
+        )
     const quantityPicker = screen.queryByRole('spinbutton', {name: /quantity/i})
 
     // What should exist:
@@ -212,7 +233,13 @@ test('renders a product set properly - child item', () => {
 
     const addToCartButton = screen.getAllByRole('button', {name: /add to cart/i})[0]
     const addToWishlistButton = screen.getAllByRole('button', {name: /add to wishlist/i})[0]
-    const variationAttributes = screen.getAllByRole('radiogroup') // e.g. sizes, colors
+    const variationAttributes = screen
+        .getAllByRole('radiogroup')
+        .filter(
+            (rg) =>
+                !rg.textContent.includes('Ship to Address') &&
+                !rg.textContent.includes('Pickup in Store')
+        )
     const quantityPicker = screen.getByRole('spinbutton', {name: /quantity/i})
     const fromLabels = screen.queryAllByText(/from/i)
 
@@ -310,7 +337,13 @@ test('renders a product bundle properly - parent item', () => {
         name: /add bundle to wishlist/i
     })[0]
     const quantityPicker = screen.getByRole('spinbutton', {name: /quantity/i})
-    const variationAttributes = screen.queryAllByRole('radiogroup') // e.g. sizes, colors
+    const variationAttributes = screen
+        .getAllByRole('radiogroup')
+        .filter(
+            (rg) =>
+                !rg.textContent.includes('Ship to Address') &&
+                !rg.textContent.includes('Pickup in Store')
+        )
 
     // What should exist:
     expect(addBundleToCartButton).toBeInTheDocument()
@@ -335,7 +368,13 @@ test('renders a product bundle properly - child item', () => {
 
     const addToCartButton = screen.queryByRole('button', {name: /add to cart/i})
     const addToWishlistButton = screen.queryByRole('button', {name: /add to wishlist/i})
-    const variationAttributes = screen.getAllByRole('radiogroup') // e.g. sizes, colors
+    const variationAttributes = screen
+        .getAllByRole('radiogroup')
+        .filter(
+            (rg) =>
+                !rg.textContent.includes('Ship to Address') &&
+                !rg.textContent.includes('Pickup in Store')
+        )
     const quantityPicker = screen.queryByRole('spinbutton', {name: /quantity:/i})
 
     // What should exist:
@@ -345,4 +384,130 @@ test('renders a product bundle properly - child item', () => {
     expect(addToCartButton).toBeNull()
     expect(addToWishlistButton).toBeNull()
     expect(quantityPicker).toBeNull()
+})
+
+test('Pickup in store radio is enabled when inventoryId is present in localStorage', async () => {
+    // Arrange: Set up localStorage with inventoryId for the current site
+    const siteId = 'site-1'
+    const storeInfoKey = `store_${siteId}`
+    const inventoryId = 'inventory_m_store_store1'
+    window.localStorage.setItem(storeInfoKey, JSON.stringify({inventoryId}))
+
+    renderWithProviders(<MockComponent product={mockProductDetail} />)
+
+    // Assert: Radio is enabled
+    const pickupRadio = await screen.findByRole('radio', {name: /pickup in store/i})
+    expect(pickupRadio).toBeEnabled()
+})
+
+test('Pickup in store radio is disabled when inventoryId is NOT present in localStorage', async () => {
+    // Arrange: Ensure localStorage does not have inventoryId for the current site
+    const siteId = 'site-1'
+    const storeInfoKey = `store_${siteId}`
+    window.localStorage.removeItem(storeInfoKey)
+
+    renderWithProviders(<MockComponent product={mockProductDetail} />)
+
+    // Assert: Radio is disabled
+    const pickupRadio = await screen.findByRole('radio', {name: /pickup in store/i})
+    expect(pickupRadio).toBeDisabled()
+})
+
+test('Pickup in store radio is disabled when inventoryId is NULL within localStorage', async () => {
+    // Arrange: Ensure localStorage does not have inventoryId for the current site
+    const siteId = 'site-1'
+    const storeInfoKey = `store_${siteId}`
+    const inventoryId = null
+    window.localStorage.removeItem(storeInfoKey)
+
+    renderWithProviders(<MockComponent product={mockProductDetail} />)
+
+    // Assert: Radio is disabled
+    const pickupRadio = await screen.findByRole('radio', {name: /pickup in store/i})
+    expect(pickupRadio).toBeDisabled()
+})
+
+test('Pickup in store radio is disabled when inventoryId is present but product is out of stock', async () => {
+    const user = userEvent.setup()
+    const siteId = 'site-1'
+    const storeInfoKey = `store_${siteId}`
+    const inventoryId = 'inventory_m_store_store1'
+    window.localStorage.setItem(storeInfoKey, JSON.stringify({inventoryId}))
+
+    // Product inventory is not orderable
+    const mockProduct = {
+        ...mockProductDetail,
+        inventories: [{id: inventoryId, orderable: false}]
+    }
+
+    renderWithProviders(<MockComponent product={mockProduct} />)
+
+    const pickupRadio = await screen.findByRole('radio', {name: /pickup in store/i})
+    // Chakra UI does not set a semantic disabled attribute, so we test for unclickability
+    expect(pickupRadio).not.toBeChecked()
+    await user.click(pickupRadio)
+    expect(pickupRadio).not.toBeChecked()
+})
+
+test('shows "Pickup in Select Store" label when pickup is disabled due to no store/inventoryId', async () => {
+    // Arrange: Ensure localStorage does not have inventoryId for the current site
+    const siteId = 'site-1'
+    const storeInfoKey = `store_${siteId}`
+    window.localStorage.removeItem(storeInfoKey)
+
+    renderWithProviders(<MockComponent product={mockProductDetail} />)
+
+    // Assert: The label is present and the link is correct
+    const label = await screen.findByTestId('pickup-select-store-msg')
+    expect(label).toBeInTheDocument()
+    expect(label).toHaveTextContent(/Pickup in/i)
+    const link = label.querySelector('a')
+    expect(link).toBeInTheDocument()
+    expect(link.getAttribute('href')).toMatch(/store-locator/)
+    expect(link).toHaveTextContent(/Select Store/i)
+})
+
+describe('ProductView stock status messages', () => {
+    const siteId = 'site-1'
+    const storeInfoKey = `store_${siteId}`
+    const storeName = 'Test Store'
+    const inventoryId = 'inventory_m_store_store1'
+
+    afterEach(() => {
+        window.localStorage.clear()
+    })
+
+    test('shows "In Stock at {storeName}" when store has inventory', async () => {
+        window.localStorage.setItem(storeInfoKey, JSON.stringify({inventoryId, name: storeName}))
+        const mockProduct = {
+            ...mockProductDetail,
+            inventories: [{id: inventoryId, orderable: true}],
+            name: 'Test Product'
+        }
+        renderWithProviders(<MockComponent product={mockProduct} />)
+        const msg = await screen.findByText(/In Stock at/i)
+        expect(msg).toBeInTheDocument()
+        expect(msg).toHaveTextContent(storeName)
+        // Store name should be a link
+        const link = msg.querySelector('a')
+        expect(link.getAttribute('href')).toMatch(/store-locator/)
+        expect(link).toHaveTextContent(storeName)
+    })
+
+    test('shows "Out of Stock at {storeName}" when store is out of inventory', async () => {
+        window.localStorage.setItem(storeInfoKey, JSON.stringify({inventoryId, name: storeName}))
+        const mockProduct = {
+            ...mockProductDetail,
+            inventories: [{id: inventoryId, orderable: false}],
+            name: 'Test Product'
+        }
+        renderWithProviders(<MockComponent product={mockProduct} />)
+        const msg = await screen.findByText(/Out of Stock at/i)
+        expect(msg).toBeInTheDocument()
+        expect(msg).toHaveTextContent(storeName)
+        // Store name should be a link
+        const link = msg.querySelector('a')
+        expect(link.getAttribute('href')).toMatch(/store-locator/)
+        expect(link).toHaveTextContent(storeName)
+    })
 })
