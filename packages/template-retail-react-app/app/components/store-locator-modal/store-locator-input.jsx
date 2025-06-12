@@ -50,7 +50,7 @@ const useGeolocation = () => {
     }
 
     const getUserGeolocation = () => {
-        if (navigator?.geolocation) {
+        if (typeof window !== 'undefined' && navigator?.geolocation) {
             navigator.geolocation.getCurrentPosition(getGeolocationSuccess, getGeolocationError)
             setUserHasSetManualGeolocation(false)
         } else {
@@ -59,7 +59,7 @@ const useGeolocation = () => {
     }
 
     useEffect(() => {
-        if (!userHasSetManualGeolocation) getUserGeolocation()
+        if (typeof window !== 'undefined' && !userHasSetManualGeolocation) getUserGeolocation()
     }, [])
 
     return getUserGeolocation

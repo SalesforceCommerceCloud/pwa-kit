@@ -45,21 +45,23 @@ export const useStoreLocator = (initialParams) => {
 
         try {
             const storeInfoKey = `store_${site.id}`
-            const existingStore = window.localStorage.getItem(storeInfoKey)
-            if (existingStore) {
-                const storeData = JSON.parse(existingStore)
+            if (typeof window !== 'undefined') {
+                const existingStore = window.localStorage.getItem(storeInfoKey)
+                if (existingStore) {
+                    const storeData = JSON.parse(existingStore)
 
-                if (storeData.isSESelection && storeData.seSearchParams) {
-                    return {
-                        ...storeData.seSearchParams,
-                        limit: STORE_LOCATOR_NUM_STORES_PER_LOAD
+                    if (storeData.isSESelection && storeData.seSearchParams) {
+                        return {
+                            ...storeData.seSearchParams,
+                            limit: STORE_LOCATOR_NUM_STORES_PER_LOAD
+                        }
                     }
-                }
 
-                if (!storeData.isSESelection && storeData.manualSearchParams) {
-                    return {
-                        ...storeData.manualSearchParams,
-                        limit: STORE_LOCATOR_NUM_STORES_PER_LOAD
+                    if (!storeData.isSESelection && storeData.manualSearchParams) {
+                        return {
+                            ...storeData.manualSearchParams,
+                            limit: STORE_LOCATOR_NUM_STORES_PER_LOAD
+                        }
                     }
                 }
             }

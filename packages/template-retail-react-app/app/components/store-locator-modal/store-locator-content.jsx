@@ -75,9 +75,12 @@ const StoreLocatorContent = () => {
     const sortedStoresData = useMemo(() => {
         if (!searchStoresData?.data) return []
 
-        const storeInfoKey = `store_${site.id}`
-        const selectedStoreInfo = JSON.parse(window.localStorage.getItem(storeInfoKey) || '{}')
-        const selectedStoreId = selectedStoreInfo.id
+        let selectedStoreId = null
+        if (typeof window !== 'undefined') {
+            const storeInfoKey = `store_${site.id}`
+            const selectedStoreInfo = JSON.parse(window.localStorage.getItem(storeInfoKey) || '{}')
+            selectedStoreId = selectedStoreInfo.id
+        }
 
         if (!selectedStoreId) {
             return searchStoresData.data

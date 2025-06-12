@@ -33,18 +33,11 @@ const SeInputHandler = ({onOpenStoreLocator, onSeParametersReady}) => {
             setShouldOpenModal(false)
 
             const urlParams = new URLSearchParams(location.search)
-            const hasSEParams =
-                urlParams.has('lat') ||
-                urlParams.has('lng') ||
-                urlParams.has('zip') ||
-                urlParams.has('city') ||
-                urlParams.has('store') ||
-                urlParams.has('country')
+            const seParamKeys = ['lat', 'lng', 'zip', 'city', 'store', 'country']
+            const hasSEParams = seParamKeys.some((key) => urlParams.has(key))
 
             if (hasSEParams) {
                 const cleanParams = new URLSearchParams(location.search)
-                const seParamKeys = ['lat', 'lng', 'zip', 'city', 'store', 'country']
-
                 seParamKeys.forEach((key) => cleanParams.delete(key))
 
                 const cleanSearch = cleanParams.toString()

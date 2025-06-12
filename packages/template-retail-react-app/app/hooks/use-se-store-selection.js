@@ -366,17 +366,19 @@ const useSeStoreSelection = () => {
                     }
                 }
 
-                localStorage.setItem(
-                    storeInfoKey,
-                    JSON.stringify({
-                        id: selectedStore.id,
-                        name: selectedStore.name || null,
-                        inventoryId: selectedStore.inventoryId || null,
-                        isSESelection: true,
-                        timestamp: Date.now(),
-                        seSearchParams
-                    })
-                )
+                if (typeof window !== 'undefined') {
+                    localStorage.setItem(
+                        storeInfoKey,
+                        JSON.stringify({
+                            id: selectedStore.id,
+                            name: selectedStore.name || null,
+                            inventoryId: selectedStore.inventoryId || null,
+                            isSESelection: true,
+                            timestamp: Date.now(),
+                            seSearchParams
+                        })
+                    )
+                }
 
                 if (locationData.latitude && locationData.longitude) {
                     setStoreLocatorParams({
@@ -410,19 +412,21 @@ const useSeStoreSelection = () => {
 
                 setShouldOpenModal(true)
 
-                window.dispatchEvent(
-                    new CustomEvent('seStoreSelected', {
-                        detail: {
-                            store: selectedStore,
-                            source: 'search_engine',
-                            hasStoreName: Boolean(locationData.storeName),
-                            selectionMethod: locationData.storeName
-                                ? 'name_match'
-                                : 'nearest_location',
-                            countryCode: countryCode
-                        }
-                    })
-                )
+                if (typeof window !== 'undefined') {
+                    window.dispatchEvent(
+                        new CustomEvent('seStoreSelected', {
+                            detail: {
+                                store: selectedStore,
+                                source: 'search_engine',
+                                hasStoreName: Boolean(locationData.storeName),
+                                selectionMethod: locationData.storeName
+                                    ? 'name_match'
+                                    : 'nearest_location',
+                                countryCode: countryCode
+                            }
+                        })
+                    )
+                }
             }
 
             setIsProcessing(false)
@@ -444,11 +448,13 @@ const useSeStoreSelection = () => {
             )
 
             if (!hasSEParams) {
-                const existingStore = localStorage.getItem(storeInfoKey)
-                if (existingStore) {
-                    const storeData = JSON.parse(existingStore)
-                    if (storeData.isSESelection) {
-                        return
+                if (typeof window !== 'undefined') {
+                    const existingStore = localStorage.getItem(storeInfoKey)
+                    if (existingStore) {
+                        const storeData = JSON.parse(existingStore)
+                        if (storeData.isSESelection) {
+                            return
+                        }
                     }
                 }
                 return

@@ -30,7 +30,15 @@ const StoresList = ({storesInfo}) => {
     const [selectedStore, setSelectedStore] = useState('')
 
     useEffect(() => {
-        const existingStore = window.localStorage.getItem(storeInfoKey)
+        let existingStore = null
+
+        try {
+            if (typeof window !== 'undefined') {
+                existingStore = window.localStorage.getItem(storeInfoKey)
+            }
+        } catch (e) {
+            console.warn('Error accessing localStorage:', e)
+        }
 
         if (existingStore) {
             try {
@@ -72,7 +80,13 @@ const StoresList = ({storesInfo}) => {
             manualSearchParams: manualSearchParams
         }
 
-        window.localStorage.setItem(storeInfoKey, JSON.stringify(newStoreData))
+        try {
+            if (typeof window !== 'undefined') {
+                window.localStorage.setItem(storeInfoKey, JSON.stringify(newStoreData))
+            }
+        } catch (e) {
+            console.warn('Error saving to localStorage:', e)
+        }
     }
 
     return (
