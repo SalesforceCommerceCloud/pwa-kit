@@ -11,7 +11,7 @@ import {ConfigContext, CommerceApiProviderProps} from '../provider'
 /**
  * @Internal
  */
-const useConfig = (): Omit<CommerceApiProviderProps, 'children'> => {
+const useConfig = (): Omit<CommerceApiProviderProps, 'children' | 'apiClients'> => {
     return React.useContext(ConfigContext)
 }
 

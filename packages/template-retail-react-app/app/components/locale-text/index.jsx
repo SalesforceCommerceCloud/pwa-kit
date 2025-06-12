@@ -40,7 +40,7 @@ LocaleText.propTypes = {
 export default LocaleText
 
 /**
- *  Translations for names of the commonly-used locales.
+ *  Translations for names of the commonly used locales.
  *  `locale` parameter format for OCAPI and Commerce API: <language code>-<country code>
  *  https://documentation.b2c.commercecloud.salesforce.com/DOC1/topic/com.demandware.dochelp/OCAPI/current/usage/Localization.html
  */

@@ -437,6 +437,16 @@
       "value": "買い物カゴから商品が削除されました"
     }
   ],
+  "cart.product_edit_modal.modal_label": [
+    {
+      "type": 1,
+      "value": "productName"
+    },
+    {
+      "type": 0,
+      "value": " のモーダルを編集"
+    }
+  ],
   "cart.recommended_products.title.may_also_like": [
     {
       "type": 0,
@@ -537,6 +547,12 @@
     {
       "type": 0,
       "value": ")"
+    }
+  ],
+  "category_links.button_text": [
+    {
+      "type": 0,
+      "value": "カテゴリ"
     }
   ],
   "cc_radio_group.action.remove": [
@@ -651,6 +667,24 @@
     {
       "type": 0,
       "value": "配送"
+    }
+  ],
+  "checkout_confirmation.label.shipping.strikethrough.price": [
+    {
+      "type": 0,
+      "value": "元の価格は "
+    },
+    {
+      "type": 1,
+      "value": "originalPrice"
+    },
+    {
+      "type": 0,
+      "value": " だが、現在は "
+    },
+    {
+      "type": 1,
+      "value": "newPrice"
     }
   ],
   "checkout_confirmation.label.subtotal": [
@@ -819,6 +853,12 @@
       "value": "クレジットカード"
     }
   ],
+  "checkout_payment.label.billing_address_form": [
+    {
+      "type": 0,
+      "value": "請求先住所フォーム"
+    }
+  ],
   "checkout_payment.label.same_as_shipping": [
     {
       "type": 0,
@@ -861,6 +901,18 @@
       "value": "はい"
     }
   ],
+  "confirmation_modal.default.assistive_msg.no": [
+    {
+      "type": 0,
+      "value": "いいえ、操作をキャンセルします"
+    }
+  ],
+  "confirmation_modal.default.assistive_msg.yes": [
+    {
+      "type": 0,
+      "value": "はい、操作を確認します"
+    }
+  ],
   "confirmation_modal.default.message.you_want_to_continue": [
     {
       "type": 0,
@@ -886,6 +938,24 @@
     }
   ],
   "confirmation_modal.remove_cart_item.action.yes": [
+    {
+      "type": 0,
+      "value": "はい、商品を削除します"
+    }
+  ],
+  "confirmation_modal.remove_cart_item.assistive_msg.no": [
+    {
+      "type": 0,
+      "value": "いいえ、商品をキープします"
+    }
+  ],
+  "confirmation_modal.remove_cart_item.assistive_msg.remove": [
+    {
+      "type": 0,
+      "value": "入手不可の商品を削除"
+    }
+  ],
+  "confirmation_modal.remove_cart_item.assistive_msg.yes": [
     {
       "type": 0,
       "value": "はい、商品を削除します"
@@ -999,6 +1069,64 @@
       "value": "セキュリティコード情報"
     }
   ],
+  "display_price.assistive_msg.current_price": [
+    {
+      "type": 0,
+      "value": "現在の価格 "
+    },
+    {
+      "type": 1,
+      "value": "currentPrice"
+    }
+  ],
+  "display_price.assistive_msg.current_price_with_range": [
+    {
+      "type": 0,
+      "value": "現在の価格 "
+    },
+    {
+      "type": 1,
+      "value": "currentPrice"
+    },
+    {
+      "type": 0,
+      "value": " から"
+    }
+  ],
+  "display_price.assistive_msg.strikethrough_price": [
+    {
+      "type": 0,
+      "value": "元の価格 "
+    },
+    {
+      "type": 1,
+      "value": "listPrice"
+    }
+  ],
+  "display_price.assistive_msg.strikethrough_price_with_range": [
+    {
+      "type": 0,
+      "value": "元の価格 "
+    },
+    {
+      "type": 1,
+      "value": "listPrice"
+    },
+    {
+      "type": 0,
+      "value": " から"
+    }
+  ],
+  "display_price.label.current_price_with_range": [
+    {
+      "type": 1,
+      "value": "currentPrice"
+    },
+    {
+      "type": 0,
+      "value": " から"
+    }
+  ],
   "drawer_menu.button.account_details": [
     {
       "type": 0,
@@ -1027,6 +1155,12 @@
     {
       "type": 0,
       "value": "注文履歴"
+    }
+  ],
+  "drawer_menu.header.assistive_msg.title": [
+    {
+      "type": 0,
+      "value": "ドロワーメニュー"
     }
   ],
   "drawer_menu.link.about_us": [
@@ -1413,6 +1547,12 @@
       "value": "メニュー"
     }
   ],
+  "header.button.assistive_msg.menu.open_dialog": [
+    {
+      "type": 0,
+      "value": "ダイアログを開く"
+    }
+  ],
   "header.button.assistive_msg.my_account": [
     {
       "type": 0,
@@ -1433,6 +1573,12 @@
     {
       "type": 1,
       "value": "numItems"
+    }
+  ],
+  "header.button.assistive_msg.store_locator": [
+    {
+      "type": 0,
+      "value": "店舗検索"
     }
   ],
   "header.button.assistive_msg.wishlist": [
@@ -1645,6 +1791,12 @@
       "value": "quantity"
     }
   ],
+  "item_attributes.label.selected_options": [
+    {
+      "type": 0,
+      "value": "選択したオプション"
+    }
+  ],
   "item_image.label.sale": [
     {
       "type": 0,
@@ -1657,10 +1809,32 @@
       "value": "入手不可"
     }
   ],
-  "item_price.label.starting_at": [
+  "item_variant.assistive_msg.quantity": [
     {
       "type": 0,
-      "value": "最低価格"
+      "value": "数量 "
+    },
+    {
+      "type": 1,
+      "value": "quantity"
+    }
+  ],
+  "item_variant.quantity.label": [
+    {
+      "type": 1,
+      "value": "productName"
+    },
+    {
+      "type": 0,
+      "value": "の数量セレクター。選択された数量は "
+    },
+    {
+      "type": 1,
+      "value": "quantity"
+    },
+    {
+      "type": 0,
+      "value": " です"
     }
   ],
   "lCPCxk": [
@@ -2473,14 +2647,28 @@
       "value": " をほしい物リストから削除"
     }
   ],
-  "product_tile.label.starting_at_price": [
+  "product_tile.badge.label.new": [
     {
       "type": 0,
-      "value": "最低価格: "
-    },
+      "value": "新規"
+    }
+  ],
+  "product_tile.badge.label.sale": [
     {
-      "type": 1,
-      "value": "price"
+      "type": 0,
+      "value": "セール"
+    }
+  ],
+  "product_view.button.add_bundle_to_cart": [
+    {
+      "type": 0,
+      "value": "バンドルを買い物カゴに追加"
+    }
+  ],
+  "product_view.button.add_bundle_to_wishlist": [
+    {
+      "type": 0,
+      "value": "バンドルをほしい物リストに追加"
     }
   ],
   "product_view.button.add_set_to_cart": [
@@ -2515,14 +2703,22 @@
   ],
   "product_view.label.assistive_msg.quantity_decrement": [
     {
+      "type": 1,
+      "value": "productName"
+    },
+    {
       "type": 0,
-      "value": "数量を減らす"
+      "value": " の数量を減らす"
     }
   ],
   "product_view.label.assistive_msg.quantity_increment": [
     {
+      "type": 1,
+      "value": "productName"
+    },
+    {
       "type": 0,
-      "value": "数量を増やす"
+      "value": " の数量を増やす"
     }
   ],
   "product_view.label.quantity": [
@@ -2541,12 +2737,6 @@
     {
       "type": 0,
       "value": "+"
-    }
-  ],
-  "product_view.label.starting_at_price": [
-    {
-      "type": 0,
-      "value": "最低価格"
     }
   ],
   "product_view.label.variant_type": [
@@ -2682,7 +2872,7 @@
     },
     {
       "type": 0,
-      "value": "にご同意いただいたものと見なされます"
+      "value": "にご同意いただいたものと見なされます。"
     }
   ],
   "register_form.message.already_have_account": [
@@ -2783,6 +2973,32 @@
       "value": "配送方法に進む"
     }
   ],
+  "shipping_address.label.edit_button": [
+    {
+      "type": 1,
+      "value": "address"
+    },
+    {
+      "type": 0,
+      "value": " の編集"
+    }
+  ],
+  "shipping_address.label.remove_button": [
+    {
+      "type": 1,
+      "value": "address"
+    },
+    {
+      "type": 0,
+      "value": " の削除"
+    }
+  ],
+  "shipping_address.label.shipping_address_form": [
+    {
+      "type": 0,
+      "value": "配送先住所フォーム"
+    }
+  ],
   "shipping_address.title.shipping_address": [
     {
       "type": 0,
@@ -2873,6 +3089,140 @@
       "value": "サインアウトしますか?現在のご注文を処理するには、再度サインインする必要があります。"
     }
   ],
+  "store_locator.action.find": [
+    {
+      "type": 0,
+      "value": "検索"
+    }
+  ],
+  "store_locator.action.select_a_country": [
+    {
+      "type": 0,
+      "value": "国を選択してください"
+    }
+  ],
+  "store_locator.action.use_my_location": [
+    {
+      "type": 0,
+      "value": "現在地を使用"
+    }
+  ],
+  "store_locator.action.viewMore": [
+    {
+      "type": 0,
+      "value": "もっと見る"
+    }
+  ],
+  "store_locator.description.away": [
+    {
+      "type": 0,
+      "value": "の距離"
+    }
+  ],
+  "store_locator.description.loading_locations": [
+    {
+      "type": 0,
+      "value": "位置情報を読み込んでいます..."
+    }
+  ],
+  "store_locator.description.no_locations": [
+    {
+      "type": 0,
+      "value": "申し訳ございませんが、このエリアには店舗がありません"
+    }
+  ],
+  "store_locator.description.or": [
+    {
+      "type": 0,
+      "value": "または"
+    }
+  ],
+  "store_locator.description.phone": [
+    {
+      "type": 0,
+      "value": "電話:"
+    }
+  ],
+  "store_locator.description.viewing_near_postal_code": [
+    {
+      "type": 0,
+      "value": "次の "
+    },
+    {
+      "type": 1,
+      "value": "postalCode"
+    },
+    {
+      "type": 0,
+      "value": " から "
+    },
+    {
+      "type": 1,
+      "value": "distance"
+    },
+    {
+      "type": 1,
+      "value": "distanceUnit"
+    },
+    {
+      "type": 0,
+      "value": " 以内の店舗を表示しています: "
+    }
+  ],
+  "store_locator.description.viewing_near_your_location": [
+    {
+      "type": 0,
+      "value": "現在地の近くの店舗を表示しています"
+    }
+  ],
+  "store_locator.dropdown.germany": [
+    {
+      "type": 0,
+      "value": "ドイツ"
+    }
+  ],
+  "store_locator.dropdown.united_states": [
+    {
+      "type": 0,
+      "value": "米国"
+    }
+  ],
+  "store_locator.error.agree_to_share_your_location": [
+    {
+      "type": 0,
+      "value": "現在地を共有することに同意してください"
+    }
+  ],
+  "store_locator.error.please_enter_a_postal_code": [
+    {
+      "type": 0,
+      "value": "郵便番号を入力してください。"
+    }
+  ],
+  "store_locator.error.please_select_a_country": [
+    {
+      "type": 0,
+      "value": "国を選択してください。"
+    }
+  ],
+  "store_locator.field.placeholder.enter_postal_code": [
+    {
+      "type": 0,
+      "value": "郵便番号を入力してください"
+    }
+  ],
+  "store_locator.pagination.load_more": [
+    {
+      "type": 0,
+      "value": "さらに読み込む"
+    }
+  ],
+  "store_locator.title": [
+    {
+      "type": 0,
+      "value": "店舗の検索"
+    }
+  ],
   "swatch_group.selected.label": [
     {
       "type": 1,
@@ -2887,6 +3237,30 @@
     {
       "type": 0,
       "value": "編集"
+    }
+  ],
+  "toggle_card.action.editContactInfo": [
+    {
+      "type": 0,
+      "value": "連絡先情報の編集"
+    }
+  ],
+  "toggle_card.action.editPaymentInfo": [
+    {
+      "type": 0,
+      "value": "支払情報の編集"
+    }
+  ],
+  "toggle_card.action.editShippingAddress": [
+    {
+      "type": 0,
+      "value": "配送先住所の編集"
+    }
+  ],
+  "toggle_card.action.editShippingOptions": [
+    {
+      "type": 0,
+      "value": "配送オプションの編集"
     }
   ],
   "update_password_fields.button.forgot_password": [
@@ -3146,13 +3520,41 @@
     },
     {
       "type": 0,
-      "value": " 点!"
+      "value": " 点のみ!"
+    }
+  ],
+  "use_product.message.inventory_remaining_for_product": [
+    {
+      "type": 1,
+      "value": "productName"
+    },
+    {
+      "type": 0,
+      "value": " は残り "
+    },
+    {
+      "type": 1,
+      "value": "stockLevel"
+    },
+    {
+      "type": 0,
+      "value": " 点のみ!"
     }
   ],
   "use_product.message.out_of_stock": [
     {
       "type": 0,
       "value": "在庫切れ"
+    }
+  ],
+  "use_product.message.out_of_stock_for_product": [
+    {
+      "type": 1,
+      "value": "productName"
+    },
+    {
+      "type": 0,
+      "value": " は在庫切れです"
     }
   ],
   "use_profile_fields.error.required_email": [
@@ -3383,6 +3785,26 @@
       "value": "新しいパスワード:"
     }
   ],
+  "wishlist_primary_action.button.addSetToCart.label": [
+    {
+      "type": 1,
+      "value": "productName"
+    },
+    {
+      "type": 0,
+      "value": " のセットを買い物カゴに追加"
+    }
+  ],
+  "wishlist_primary_action.button.addToCart.label": [
+    {
+      "type": 1,
+      "value": "productName"
+    },
+    {
+      "type": 0,
+      "value": " を買い物カゴに追加"
+    }
+  ],
   "wishlist_primary_action.button.add_set_to_cart": [
     {
       "type": 0,
@@ -3395,6 +3817,16 @@
       "value": "買い物カゴに追加"
     }
   ],
+  "wishlist_primary_action.button.viewFullDetails.label": [
+    {
+      "type": 1,
+      "value": "productName"
+    },
+    {
+      "type": 0,
+      "value": " の詳細を表示"
+    }
+  ],
   "wishlist_primary_action.button.view_full_details": [
     {
       "type": 0,
@@ -3405,6 +3837,16 @@
     {
       "type": 0,
       "value": "オプションを表示"
+    }
+  ],
+  "wishlist_primary_action.button.view_options.label": [
+    {
+      "type": 1,
+      "value": "productName"
+    },
+    {
+      "type": 0,
+      "value": " のオプションを表示"
     }
   ],
   "wishlist_primary_action.info.added_to_cart": [
@@ -3449,6 +3891,16 @@
     {
       "type": 0,
       "value": "削除"
+    }
+  ],
+  "wishlist_secondary_button_group.info.item.remove.label": [
+    {
+      "type": 1,
+      "value": "productName"
+    },
+    {
+      "type": 0,
+      "value": " の削除"
     }
   ],
   "wishlist_secondary_button_group.info.item_removed": [
