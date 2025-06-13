@@ -174,6 +174,9 @@
   "cart.info.removed_from_cart": {
     "defaultMessage": "从购物车中移除商品"
   },
+  "cart.product_edit_modal.modal_label": {
+    "defaultMessage": "编辑 {productName} 模态"
+  },
   "cart.recommended_products.title.may_also_like": {
     "defaultMessage": "您可能还喜欢"
   },
@@ -203,6 +206,9 @@
   },
   "cart_title.title.cart_num_of_items": {
     "defaultMessage": "购物车（{itemCount, plural, =0 {0 件商品} one {# 件商品} other {# 件商品}}）"
+  },
+  "category_links.button_text": {
+    "defaultMessage": "类别"
   },
   "cc_radio_group.action.remove": {
     "defaultMessage": "移除"
@@ -260,6 +266,9 @@
   },
   "checkout_confirmation.label.shipping": {
     "defaultMessage": "送货"
+  },
+  "checkout_confirmation.label.shipping.strikethrough.price": {
+    "defaultMessage": "原价 {originalPrice}，现价 {newPrice}"
   },
   "checkout_confirmation.label.subtotal": {
     "defaultMessage": "小计"
@@ -319,6 +328,9 @@
   "checkout_payment.heading.credit_card": {
     "defaultMessage": "信用卡"
   },
+  "checkout_payment.label.billing_address_form": {
+    "defaultMessage": "帐单地址表格"
+  },
   "checkout_payment.label.same_as_shipping": {
     "defaultMessage": "与送货地址相同"
   },
@@ -334,6 +346,12 @@
   "confirmation_modal.default.action.yes": {
     "defaultMessage": "是"
   },
+  "confirmation_modal.default.assistive_msg.no": {
+    "defaultMessage": "否，取消操作"
+  },
+  "confirmation_modal.default.assistive_msg.yes": {
+    "defaultMessage": "是，确认操作"
+  },
   "confirmation_modal.default.message.you_want_to_continue": {
     "defaultMessage": "是否确定要继续？"
   },
@@ -347,6 +365,15 @@
     "defaultMessage": "移除"
   },
   "confirmation_modal.remove_cart_item.action.yes": {
+    "defaultMessage": "是，移除商品"
+  },
+  "confirmation_modal.remove_cart_item.assistive_msg.no": {
+    "defaultMessage": "否，保留商品"
+  },
+  "confirmation_modal.remove_cart_item.assistive_msg.remove": {
+    "defaultMessage": "移除无货产品"
+  },
+  "confirmation_modal.remove_cart_item.assistive_msg.yes": {
     "defaultMessage": "是，移除商品"
   },
   "confirmation_modal.remove_cart_item.message.need_to_remove_due_to_unavailability": {
@@ -405,6 +432,21 @@
   "credit_card_fields.tool_tip.security_code_aria_label": {
     "defaultMessage": "安全码信息"
   },
+  "display_price.assistive_msg.current_price": {
+    "defaultMessage": "当前价格 {currentPrice}"
+  },
+  "display_price.assistive_msg.current_price_with_range": {
+    "defaultMessage": "从当前价格 {currentPrice}"
+  },
+  "display_price.assistive_msg.strikethrough_price": {
+    "defaultMessage": "原价 {listPrice}"
+  },
+  "display_price.assistive_msg.strikethrough_price_with_range": {
+    "defaultMessage": "从原价 {listPrice}"
+  },
+  "display_price.label.current_price_with_range": {
+    "defaultMessage": "从 {currentPrice} 起"
+  },
   "drawer_menu.button.account_details": {
     "defaultMessage": "账户详情"
   },
@@ -419,6 +461,9 @@
   },
   "drawer_menu.button.order_history": {
     "defaultMessage": "订单记录"
+  },
+  "drawer_menu.header.assistive_msg.title": {
+    "defaultMessage": "菜单抽屉"
   },
   "drawer_menu.link.about_us": {
     "defaultMessage": "关于我们"
@@ -582,6 +627,9 @@
   "header.button.assistive_msg.menu": {
     "defaultMessage": "菜单"
   },
+  "header.button.assistive_msg.menu.open_dialog": {
+    "defaultMessage": "打开对话框"
+  },
   "header.button.assistive_msg.my_account": {
     "defaultMessage": "我的账户"
   },
@@ -590,6 +638,9 @@
   },
   "header.button.assistive_msg.my_cart_with_num_items": {
     "defaultMessage": "我的购物车，商品数量：{numItems}"
+  },
+  "header.button.assistive_msg.store_locator": {
+    "defaultMessage": "实体店地址搜索"
   },
   "header.button.assistive_msg.wishlist": {
     "defaultMessage": "愿望清单"
@@ -691,6 +742,9 @@
   "item_attributes.label.quantity": {
     "defaultMessage": "数量：{quantity}"
   },
+  "item_attributes.label.selected_options": {
+    "defaultMessage": "已选选项"
+  },
   "item_image.label.sale": {
     "defaultMessage": "销售",
     "description": "A sale badge placed on top of a product image"
@@ -699,8 +753,11 @@
     "defaultMessage": "不可用",
     "description": "A unavailable badge placed on top of a product image"
   },
-  "item_price.label.starting_at": {
-    "defaultMessage": "起价："
+  "item_variant.assistive_msg.quantity": {
+    "defaultMessage": "数量 {quantity}"
+  },
+  "item_variant.quantity.label": {
+    "defaultMessage": "{productName} 的数量选择器。选择的数量是 {quantity}"
   },
   "lCPCxk": {
     "defaultMessage": "请在上方选择您的所有选项"
@@ -1063,8 +1120,17 @@
   "product_tile.assistive_msg.remove_from_wishlist": {
     "defaultMessage": "从愿望清单删除 {product}"
   },
-  "product_tile.label.starting_at_price": {
-    "defaultMessage": "起价：{price}"
+  "product_tile.badge.label.new": {
+    "defaultMessage": "新建"
+  },
+  "product_tile.badge.label.sale": {
+    "defaultMessage": "销售"
+  },
+  "product_view.button.add_bundle_to_cart": {
+    "defaultMessage": "将套装添加到购物车"
+  },
+  "product_view.button.add_bundle_to_wishlist": {
+    "defaultMessage": "将套装添加到心愿单"
   },
   "product_view.button.add_set_to_cart": {
     "defaultMessage": "将套装添加到购物车"
@@ -1082,10 +1148,10 @@
     "defaultMessage": "更新"
   },
   "product_view.label.assistive_msg.quantity_decrement": {
-    "defaultMessage": "递减数量"
+    "defaultMessage": "递减 {productName} 数量"
   },
   "product_view.label.assistive_msg.quantity_increment": {
-    "defaultMessage": "递增数量"
+    "defaultMessage": "递增 {productName} 数量"
   },
   "product_view.label.quantity": {
     "defaultMessage": "数量"
@@ -1095,9 +1161,6 @@
   },
   "product_view.label.quantity_increment": {
     "defaultMessage": "+"
-  },
-  "product_view.label.starting_at_price": {
-    "defaultMessage": "起价："
   },
   "product_view.label.variant_type": {
     "defaultMessage": "{variantType}"
@@ -1151,7 +1214,7 @@
     "defaultMessage": "开始使用！"
   },
   "register_form.message.agree_to_policy_terms": {
-    "defaultMessage": "创建账户即表明您同意 Salesforce <policy>隐私政策</policy>以及<terms>条款与条件</terms>"
+    "defaultMessage": "创建帐户即表示您同意 Salesforce <policy>隐私政策</policy>和<terms>条款与条件</terms>"
   },
   "register_form.message.already_have_account": {
     "defaultMessage": "已有账户？"
@@ -1195,6 +1258,15 @@
   },
   "shipping_address.button.continue_to_shipping": {
     "defaultMessage": "继续并选择送货方式"
+  },
+  "shipping_address.label.edit_button": {
+    "defaultMessage": "编辑 {address}"
+  },
+  "shipping_address.label.remove_button": {
+    "defaultMessage": "移除{address}"
+  },
+  "shipping_address.label.shipping_address_form": {
+    "defaultMessage": "送货地址表格"
   },
   "shipping_address.title.shipping_address": {
     "defaultMessage": "送货地址"
@@ -1241,11 +1313,80 @@
   "signout_confirmation_dialog.message.sure_to_sign_out": {
     "defaultMessage": "是否确定要注销？您需要重新登录才能继续处理当前订单。"
   },
+  "store_locator.action.find": {
+    "defaultMessage": "查找"
+  },
+  "store_locator.action.select_a_country": {
+    "defaultMessage": "选择国家/地区"
+  },
+  "store_locator.action.use_my_location": {
+    "defaultMessage": "使用我的位置"
+  },
+  "store_locator.action.viewMore": {
+    "defaultMessage": "查看更多"
+  },
+  "store_locator.description.away": {
+    "defaultMessage": "離開"
+  },
+  "store_locator.description.loading_locations": {
+    "defaultMessage": "正在加载位置..."
+  },
+  "store_locator.description.no_locations": {
+    "defaultMessage": "对不起，这个区域没有位置"
+  },
+  "store_locator.description.or": {
+    "defaultMessage": "或"
+  },
+  "store_locator.description.phone": {
+    "defaultMessage": "电话:"
+  },
+  "store_locator.description.viewing_near_postal_code": {
+    "defaultMessage": "查看查看距离 {postalCode} {distance}{distanceUnit} 内的实体店"
+  },
+  "store_locator.description.viewing_near_your_location": {
+    "defaultMessage": "查看您所在位置附近的实体店"
+  },
+  "store_locator.dropdown.germany": {
+    "defaultMessage": "德国"
+  },
+  "store_locator.dropdown.united_states": {
+    "defaultMessage": "美国"
+  },
+  "store_locator.error.agree_to_share_your_location": {
+    "defaultMessage": "请同意分享您的所在位置"
+  },
+  "store_locator.error.please_enter_a_postal_code": {
+    "defaultMessage": "请输入邮政编码。"
+  },
+  "store_locator.error.please_select_a_country": {
+    "defaultMessage": "请选择国家。"
+  },
+  "store_locator.field.placeholder.enter_postal_code": {
+    "defaultMessage": "输入邮政编码"
+  },
+  "store_locator.pagination.load_more": {
+    "defaultMessage": "加载更多"
+  },
+  "store_locator.title": {
+    "defaultMessage": "查找实体店"
+  },
   "swatch_group.selected.label": {
     "defaultMessage": "{label}："
   },
   "toggle_card.action.edit": {
     "defaultMessage": "编辑"
+  },
+  "toggle_card.action.editContactInfo": {
+    "defaultMessage": "编辑联系信息"
+  },
+  "toggle_card.action.editPaymentInfo": {
+    "defaultMessage": "编辑付款信息"
+  },
+  "toggle_card.action.editShippingAddress": {
+    "defaultMessage": "编辑送货地址"
+  },
+  "toggle_card.action.editShippingOptions": {
+    "defaultMessage": "编辑送货选项"
   },
   "update_password_fields.button.forgot_password": {
     "defaultMessage": "忘记密码？"
@@ -1260,7 +1401,8 @@
     "defaultMessage": "请输入您的电话号码。"
   },
   "use_address_fields.error.please_enter_your_postal_or_zip": {
-    "defaultMessage": "请输入您的邮政编码。"
+    "defaultMessage": "请输入您的邮政编码。",
+    "description": "Error message for a blank zip code (US-specific checkout)"
   },
   "use_address_fields.error.please_select_your_address": {
     "defaultMessage": "请输入您的地址。"
@@ -1272,7 +1414,8 @@
     "defaultMessage": "请输入您所在国家/地区。"
   },
   "use_address_fields.error.please_select_your_state_or_province": {
-    "defaultMessage": "请选择您所在的州／省。"
+    "defaultMessage": "请选择您所在的州。",
+    "description": "Error message for a blank state (US-specific checkout)"
   },
   "use_address_fields.error.required": {
     "defaultMessage": "必填"
@@ -1373,8 +1516,14 @@
   "use_product.message.inventory_remaining": {
     "defaultMessage": "仅剩 {stockLevel} 件！"
   },
+  "use_product.message.inventory_remaining_for_product": {
+    "defaultMessage": "{productName} 只剩下 {stockLevel}！"
+  },
   "use_product.message.out_of_stock": {
     "defaultMessage": "无库存"
+  },
+  "use_product.message.out_of_stock_for_product": {
+    "defaultMessage": "{productName} 无库存"
   },
   "use_profile_fields.error.required_email": {
     "defaultMessage": "请输入有效的电子邮件地址。"
@@ -1490,11 +1639,20 @@
   "use_update_password_fields.label.new_password": {
     "defaultMessage": "新密码"
   },
+  "wishlist_primary_action.button.addSetToCart.label": {
+    "defaultMessage": "将 {productName} 套装添加到购物车"
+  },
+  "wishlist_primary_action.button.addToCart.label": {
+    "defaultMessage": "将 {productName} 添加到购物车"
+  },
   "wishlist_primary_action.button.add_set_to_cart": {
     "defaultMessage": "将套装添加到购物车"
   },
   "wishlist_primary_action.button.add_to_cart": {
     "defaultMessage": "添加到购物车"
+  },
+  "wishlist_primary_action.button.viewFullDetails.label": {
+    "defaultMessage": "查看 {productName} 的完整详细信息"
   },
   "wishlist_primary_action.button.view_full_details": {
     "defaultMessage": "查看完整详情"
@@ -1502,11 +1660,17 @@
   "wishlist_primary_action.button.view_options": {
     "defaultMessage": "查看选项"
   },
+  "wishlist_primary_action.button.view_options.label": {
+    "defaultMessage": "查看 {productName} 的选项"
+  },
   "wishlist_primary_action.info.added_to_cart": {
     "defaultMessage": "{quantity} {quantity, plural, one { 件商品} other { 件商品}}已添加至购物车"
   },
   "wishlist_secondary_button_group.action.remove": {
     "defaultMessage": "移除"
+  },
+  "wishlist_secondary_button_group.info.item.remove.label": {
+    "defaultMessage": "移除{productName}"
   },
   "wishlist_secondary_button_group.info.item_removed": {
     "defaultMessage": "从愿望清单中移除商品"
