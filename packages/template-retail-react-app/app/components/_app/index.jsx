@@ -81,6 +81,7 @@ import {
 import Seo from '@salesforce/retail-react-app/app/components/seo'
 import {Helmet} from 'react-helmet'
 import {getPathWithLocale} from '@salesforce/retail-react-app/app/utils/url'
+import useExternalSearch from '@salesforce/retail-react-app/app/hooks/use-external-search'
 
 const SeInputHandler = lazy(() =>
     import('@salesforce/retail-react-app/app/components/se-input-handler')
@@ -132,6 +133,7 @@ const App = (props) => {
     const {data: categoriesTree} = useCategory({
         parameters: {id: CAT_MENU_DEFAULT_ROOT_CATEGORY, levels: CAT_MENU_DEFAULT_NAV_SSR_DEPTH}
     })
+    useExternalSearch()
     const categories = flatten(categoriesTree || {}, 'categories')
     const {getTokenWhenReady} = useAccessToken()
     const appOrigin = useAppOrigin()
