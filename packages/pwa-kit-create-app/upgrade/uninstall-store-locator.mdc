@@ -1,0 +1,24 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+These are the steps to remove the "Store Locator" extension from an existing store front application (currently opened project).
+
+# Step 1. First make sure the current project has all the right file structure:
+- It has a `components` directory under the project root
+- It has the file `index.jsx` under pages/home directory
+
+# Step 2. Delete folders containing store locator code
+- Run `rm -rf components/_fake-store-locator`
+
+# Step 3. Apply the following code changes to pages/home/index.jsx. Skip a step if the code change has already been applied.
+
+- Remove the following lines at the end of the const declaration block:
+`const StoreLocator = loadable(() => import('../components/_fake-store-locator'))`
+
+- Remove the following line ONLY WHEN `loadable` is no longer referenced
+`import loadable from '@loadable/component'`
+
+- Remove the following line in the JSX element return statement
+`<StoreLocator />`
