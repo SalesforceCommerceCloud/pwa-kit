@@ -33,7 +33,10 @@ import {Skeleton as ImageGallerySkeleton} from '@salesforce/retail-react-app/app
 import {HideOnDesktop, HideOnMobile} from '@salesforce/retail-react-app/app/components/responsive'
 import QuantityPicker from '@salesforce/retail-react-app/app/components/quantity-picker'
 import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
-import {API_ERROR_MESSAGE} from '@salesforce/retail-react-app/app/constants'
+import {
+    API_ERROR_MESSAGE,
+    STANDARD_PRODUCT_VARIATION_ATTRIBUTE
+} from '@salesforce/retail-react-app/app/constants'
 import DisplayPrice from '@salesforce/retail-react-app/app/components/display-price'
 import Swatch from '@salesforce/retail-react-app/app/components/swatch-group/swatch'
 import SwatchGroup from '@salesforce/retail-react-app/app/components/swatch-group'
@@ -486,6 +489,10 @@ const ProductView = forwardRef(
                                 </>
                             ) : (
                                 variationAttributes.map(({id, name, selectedValue, values}) => {
+                                    if (id === STANDARD_PRODUCT_VARIATION_ATTRIBUTE) {
+                                        // no need to render the standard product marker variation attribute
+                                        return
+                                    }
                                     const swatches = values.map(
                                         ({href, name, image, value, orderable}, index) => {
                                             const content = image ? (
