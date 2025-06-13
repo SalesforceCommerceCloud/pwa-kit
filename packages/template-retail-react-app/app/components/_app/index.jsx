@@ -36,6 +36,7 @@ import {CurrencyProvider} from '@salesforce/retail-react-app/app/contexts'
 
 // Local Project Components
 import Header from '@salesforce/retail-react-app/app/components/header'
+import DevCanvasHeader from '@salesforce/retail-react-app/app/components/dev-canvas-header'
 import OfflineBanner from '@salesforce/retail-react-app/app/components/offline-banner'
 import OfflineBoundary from '@salesforce/retail-react-app/app/components/offline-boundary'
 import ScrollToTop from '@salesforce/retail-react-app/app/components/scroll-to-top'
@@ -187,7 +188,7 @@ const App = (props) => {
 
     // Used to conditionally render header/footer for checkout page
     const isCheckout = /\/checkout$/.test(location?.pathname)
-    const isDevelop = location?.pathname.includes('/develop')
+    const isDevPath = location.pathname.includes('_dev')
 
     const {l10n} = site
     // Get the current currency to be used through out the app
@@ -374,39 +375,50 @@ const App = (props) => {
                                 {!isCheckout ? (
                                     <>
                                         <AboveHeader />
-                                        <Header
-                                            onMenuClick={onOpen}
-                                            onLogoClick={onLogoClick}
-                                            onMyCartClick={onCartClick}
-                                            onMyAccountClick={onAccountClick}
-                                            onWishlistClick={onWishlistClick}
-                                            onStoreLocatorClick={onOpenStoreLocator}
-                                        >
-                                            <HideOnDesktop>
-                                                <DrawerMenu
-                                                    isOpen={isOpen}
-                                                    onClose={onClose}
-                                                    onLogoClick={onLogoClick}
-                                                    root={
-                                                        categories?.[CAT_MENU_DEFAULT_ROOT_CATEGORY]
-                                                    }
-                                                    itemsKey="categories"
-                                                    itemsCountKey="onlineSubCategoriesCount"
-                                                    itemComponent={DrawerMenuItemWithData}
-                                                />
-                                            </HideOnDesktop>
+                                        {isDevPath ? (
+                                            <DevCanvasHeader
+                                                onMenuClick={onOpen}
+                                                onLogoClick={onLogoClick}
+                                                onMyCartClick={onCartClick}
+                                                onMyAccountClick={onAccountClick}
+                                                onWishlistClick={onWishlistClick}
+                                                onStoreLocatorClick={onOpenStoreLocator}
+                                            />
+                                        ) : (
+                                            <Header
+                                                onMenuClick={onOpen}
+                                                onLogoClick={onLogoClick}
+                                                onMyCartClick={onCartClick}
+                                                onMyAccountClick={onAccountClick}
+                                                onWishlistClick={onWishlistClick}
+                                                onStoreLocatorClick={onOpenStoreLocator}
+                                            >
+                                                <HideOnDesktop>
+                                                    <DrawerMenu
+                                                        isOpen={isOpen}
+                                                        onClose={onClose}
+                                                        onLogoClick={onLogoClick}
+                                                        root={
+                                                            categories?.[CAT_MENU_DEFAULT_ROOT_CATEGORY]
+                                                        }
+                                                        itemsKey="categories"
+                                                        itemsCountKey="onlineSubCategoriesCount"
+                                                        itemComponent={DrawerMenuItemWithData}
+                                                    />
+                                                </HideOnDesktop>
 
-                                            <HideOnMobile>
-                                                <ListMenu
-                                                    root={
-                                                        categories?.[CAT_MENU_DEFAULT_ROOT_CATEGORY]
-                                                    }
-                                                    itemsKey="categories"
-                                                    itemsCountKey="onlineSubCategoriesCount"
-                                                    contentComponent={ListMenuContentWithData}
-                                                />
-                                            </HideOnMobile>
-                                        </Header>
+                                                <HideOnMobile>
+                                                    <ListMenu
+                                                        root={
+                                                            categories?.[CAT_MENU_DEFAULT_ROOT_CATEGORY]
+                                                        }
+                                                        itemsKey="categories"
+                                                        itemsCountKey="onlineSubCategoriesCount"
+                                                        contentComponent={ListMenuContentWithData}
+                                                    />
+                                                </HideOnMobile>
+                                            </Header>
+                                        )}
                                     </>
                                 ) : (
                                     <CheckoutHeader />
@@ -436,7 +448,7 @@ const App = (props) => {
                                     </Box>
                                 </SkipNavContent>
 
-                                {!isCheckout && !isDevelop ? <Footer /> : !isDevelop ? <CheckoutFooter /> : null}
+                                {!isCheckout && !isDevPath ? <Footer /> : !isDevPath ? <CheckoutFooter /> : null}
 
                                 <AuthModal {...authModal} />
                                 <DntNotification {...dntNotification} />
