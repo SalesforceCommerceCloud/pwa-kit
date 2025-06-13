@@ -133,7 +133,10 @@ export const AddToCartModal = () => {
                                     <Flex gridGap="4">
                                         <Box w="24" flex="none">
                                             <AspectRatio ratio="1">
-                                                <img src={bundleImage.link} alt={bundleImage.alt} />
+                                                <img
+                                                    src={bundleImage?.link || ''}
+                                                    alt={bundleImage?.alt || ''}
+                                                />
                                             </AspectRatio>
                                         </Box>
 
@@ -230,7 +233,10 @@ export const AddToCartModal = () => {
                                             <Flex gridGap="4">
                                                 <Box w="24" flex="none">
                                                     <AspectRatio ratio="1">
-                                                        <img src={image.link} alt={image.alt} />
+                                                        <img
+                                                            src={image?.link || ''}
+                                                            alt={image?.alt || ''}
+                                                        />
                                                     </AspectRatio>
                                                 </Box>
 

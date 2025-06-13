@@ -2,6 +2,8 @@
 
 - Improved the layout of product tiles in product scroll and product list [#2446](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2446)
 - Updated 6 new languagues [#2495](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2495)
+- Show Bonus Product Label on OrderSummary component [#2524](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2524)
+- Support standard product on PDP [#2518](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2518)
 
 ## v6.1.0 (May 22, 2025)
 
