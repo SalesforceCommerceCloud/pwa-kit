@@ -257,3 +257,6 @@ export const PASSWORDLESS_ERROR_MESSAGES = [
 export const INVALID_TOKEN_ERROR = /invalid token/i
 
 export const USER_NOT_FOUND_ERROR = /user not found/i
+
+// This is a marker (not real) variation attribute ID to shim standard products as if they were a single variant.
+export const STANDARD_PRODUCT_VARIATION_ATTRIBUTE = '_single'

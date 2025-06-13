@@ -23,6 +23,11 @@ import {productUrlBuilder, rebuildPathWithParams} from '@salesforce/retail-react
  * // returns { "Colour": "royal" }
  */
 export const getDisplayVariationValues = (variationAttributes, values = {}) => {
+    // standard products do not have variation attributes
+    if (!variationAttributes || !values) {
+        return {}
+    }
+
     const returnVal = Object.entries(values).reduce((acc, [id, value]) => {
         const attribute = variationAttributes.find(({id: attributeId}) => attributeId === id)
         const attributeValue = attribute.values.find(

@@ -15,6 +15,9 @@ import {useVariationParams} from '@salesforce/retail-react-app/app/hooks/use-var
 import {updateSearchParams} from '@salesforce/retail-react-app/app/utils/url'
 import {usePDPSearchParams} from '@salesforce/retail-react-app/app/hooks/use-pdp-search-params'
 import {filterImageGroups} from '@salesforce/retail-react-app/app/utils/product-utils'
+
+import {STANDARD_PRODUCT_VARIATION_ATTRIBUTE} from '@salesforce/retail-react-app/app/constants'
+
 /**
  * Return the first image in the `swatch` type image group for a given
  * variation value of a product.
@@ -114,37 +117,65 @@ export const useVariationAttributes = (
         })
     }
 
-    return useMemo(
-        () =>
-            variationAttributes.map((variationAttribute) => ({
-                ...variationAttribute,
-                selectedValue: {
-                    name: variationAttribute.values.find(
-                        ({value}) => value === variationParams?.[variationAttribute.id]
-                    )?.name,
-                    value: variationParams?.[variationAttribute.id]
-                },
-                values: variationAttribute.values.map((value) => {
-                    const params = {
-                        ...variationParams,
-                        [variationAttribute.id]: value.value
+    return useMemo(() => {
+        // if product is a standard product we treat it as a product with a single variant
+        if (product.type?.item === true) {
+            return [
+                {
+                    id: STANDARD_PRODUCT_VARIATION_ATTRIBUTE,
+                    name: 'Single Variant',
+                    values: [
+                        {
+                            name: 'single',
+                            orderable: product?.inventory?.orderable,
+                            value: 'single',
+                            // no image for swatches
+                            href: buildVariantValueHref({
+                                pathname: location.pathname,
+                                existingParams,
+                                newParams: {},
+                                productId: product.id,
+                                isProductPartOfSet,
+                                isProductPartOfBundle
+                            })
+                        }
+                    ],
+                    selectedValue: {
+                        name: 'single',
+                        value: 'single'
                     }
+                }
+            ]
+        }
 
-                    return {
-                        ...value,
-                        image: getVariantValueSwatch(product, value),
-                        href: buildVariantValueHref({
-                            pathname: location.pathname,
-                            existingParams,
-                            newParams: params,
-                            productId: product.id,
-                            isProductPartOfSet,
-                            isProductPartOfBundle
-                        }),
-                        orderable: isVariantValueOrderable(product, params)
-                    }
-                })
-            })),
-        [location.search, product]
-    )
+        return variationAttributes.map((variationAttribute) => ({
+            ...variationAttribute,
+            selectedValue: {
+                name: variationAttribute.values.find(
+                    ({value}) => value === variationParams?.[variationAttribute.id]
+                )?.name,
+                value: variationParams?.[variationAttribute.id]
+            },
+            values: variationAttribute.values.map((value) => {
+                const params = {
+                    ...variationParams,
+                    [variationAttribute.id]: value.value
+                }
+
+                return {
+                    ...value,
+                    image: getVariantValueSwatch(product, value),
+                    href: buildVariantValueHref({
+                        pathname: location.pathname,
+                        existingParams,
+                        newParams: params,
+                        productId: product.id,
+                        isProductPartOfSet,
+                        isProductPartOfBundle
+                    }),
+                    orderable: isVariantValueOrderable(product, params)
+                }
+            })
+        }))
+    }, [location.search, product])
 }

@@ -791,6 +791,12 @@ describe('getDisplayVariationValues', function () {
             Width: 'M'
         })
     })
+
+    const standardVariationAttributes = undefined
+    test('returns empty object when standard products are used', () => {
+        const result = getDisplayVariationValues(standardVariationAttributes, {})
+        expect(result).toEqual({})
+    })
 })
 
 describe('getPriceData', function () {

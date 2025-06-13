@@ -209,7 +209,8 @@ const ProductDetail = () => {
 
     /**************** Product Variant ****************/
     useEffect(() => {
-        if (!variant) {
+        // if product is a standard product we don't need to update the url
+        if (!variant || product?.type?.item) {
             return
         }
         // update the variation attributes parameter on

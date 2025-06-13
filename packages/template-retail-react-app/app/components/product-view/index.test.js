@@ -11,6 +11,7 @@ import {fireEvent, screen, waitFor} from '@testing-library/react'
 import mockProductDetail from '@salesforce/retail-react-app/app/mocks/variant-750518699578M'
 import mockProductSet from '@salesforce/retail-react-app/app/mocks/product-set-winter-lookM'
 import {mockProductBundle} from '@salesforce/retail-react-app/app/mocks/product-bundle'
+import mockStandardProduct from '@salesforce/retail-react-app/app/mocks/standard-canon-eos-50d-bodyM'
 import ProductView from '@salesforce/retail-react-app/app/components/product-view'
 import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
 import userEvent from '@testing-library/user-event'
@@ -368,4 +369,49 @@ test('renders "Add to Cart" and "Add to Wishlist" buttons in French', async () =
     expect(
         screen.getByRole('button', {name: /ajouter à la liste de souhaits/i})
     ).toBeInTheDocument()
+})
+
+test('renders a standard product properly without variation attributes', () => {
+    const addToCart = jest.fn()
+    const addToWishlist = jest.fn()
+
+    renderWithProviders(
+        <MockComponent
+            product={mockStandardProduct}
+            addToCart={addToCart}
+            addToWishlist={addToWishlist}
+        />
+    )
+
+    // Should display product name
+    expect(screen.getAllByText(/Canon EOS 50D Digital SLR Camera/i)).toHaveLength(2)
+
+    // Should display price
+    expect(screen.getAllByText(/979\.99/)).toHaveLength(4)
+
+    // Should display add to cart buttons
+    expect(screen.getAllByText(/Add to cart/i)).toHaveLength(2)
+
+    // Should display add to wishlist buttons
+    expect(screen.getAllByText(/Add to wishlist/i)).toHaveLength(2)
+
+    // Should display quantity picker
+    expect(screen.getByRole('spinbutton', {name: /quantity/i})).toBeInTheDocument()
+
+    // Should NOT display any variation radiogroups (no colors/sizes for standard products)
+    const variationAttributes = screen.queryAllByRole('radiogroup')
+    expect(variationAttributes).toHaveLength(0)
+})
+
+test('standard product add to cart functionality works', async () => {
+    const addToCart = jest.fn()
+
+    renderWithProviders(<MockComponent product={mockStandardProduct} addToCart={addToCart} />)
+
+    const addToCartButton = screen.getAllByText(/add to cart/i)[0]
+    fireEvent.click(addToCartButton)
+
+    await waitFor(() => {
+        expect(addToCart).toHaveBeenCalledTimes(1)
+    })
 })
