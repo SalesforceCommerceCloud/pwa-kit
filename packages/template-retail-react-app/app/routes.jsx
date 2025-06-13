@@ -146,23 +146,28 @@ export const routes = [
         component: StoreLocator
     },
     {
-        path: '/component-showcase',
+        path: '/_dev/component-showcase',
         component: ComponentShowcase,
         exact: true
     },
     {
-        path: '/hooks-showcase',
+        path: '/_dev/hooks-showcase',
         component: HooksShowcase,
         exact: true
     },
     {
-        path: '/page-showcase',
+        path: '/_dev/page-showcase',
         component: PageShowcase,
         exact: true
     },
     {
-        path: '/component-builder',
+        path: '/_dev/component-builder',
         component: ComponentBuilder,
+        exact: true
+    },
+    {
+        path: '/_dev',
+        component: PageShowcase,
         exact: true
     },
     {

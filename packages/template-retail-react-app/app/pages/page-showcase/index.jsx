@@ -61,9 +61,9 @@ const PageShowcase = () => {
     const selectedPage = filteredPages[safeSelectedIndex]
 
     // Top bar navigation
-    const goToPageShowcase = () => history.push('/page-showcase')
-    const goToComponentShowcase = () => history.push('/component-showcase')
-    const goToHooksShowcase = () => history.push('/hooks-showcase')
+    const goToPageShowcase = () => history.push('/develop/page-showcase')
+    const goToComponentShowcase = () => history.push('/develop/component-showcase')
+    const goToHooksShowcase = () => history.push('/develop/hooks-showcase')
 
 
     return (

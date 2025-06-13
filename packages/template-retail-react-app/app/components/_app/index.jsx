@@ -187,6 +187,7 @@ const App = (props) => {
 
     // Used to conditionally render header/footer for checkout page
     const isCheckout = /\/checkout$/.test(location?.pathname)
+    const isDevelop = location?.pathname.includes('/develop')
 
     const {l10n} = site
     // Get the current currency to be used through out the app
@@ -435,7 +436,7 @@ const App = (props) => {
                                     </Box>
                                 </SkipNavContent>
 
-                                {!isCheckout ? <Footer /> : <CheckoutFooter />}
+                                {!isCheckout && !isDevelop ? <Footer /> : !isDevelop ? <CheckoutFooter /> : null}
 
                                 <AuthModal {...authModal} />
                                 <DntNotification {...dntNotification} />

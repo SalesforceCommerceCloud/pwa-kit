@@ -583,9 +583,9 @@ const ComponentShowcase = () => {
         selectedIndex >= filteredComponents.length ? 0 : selectedIndex
     const selectedComponent = filteredComponents[safeSelectedIndex]
 
-    const goToPageShowcase = () => history.push('/page-showcase')
-    const goToComponentShowcase = () => history.push('/component-showcase')
-    const goToHooksShowcase = () => history.push('/hooks-showcase')
+    const goToPageShowcase = () => history.push('/develop/page-showcase')
+    const goToComponentShowcase = () => history.push('/develop/component-showcase')
+    const goToHooksShowcase = () => history.push('/develop/hooks-showcase')
 
 
     return (
