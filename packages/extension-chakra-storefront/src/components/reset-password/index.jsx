@@ -68,7 +68,12 @@ const ResetPasswordForm = ({submitForm, clickSignIn = noop, form}) => {
                                             description="Precedes link to return to sign in"
                                         />
                                     </Text>
-                                    <Button variant="link" size="sm" onClick={clickSignIn}>
+                                    <Button
+                                        variant="link-blue"
+                                        size="sm"
+                                        lineHeight="1"
+                                        onClick={clickSignIn}
+                                    >
                                         <FormattedMessage
                                             defaultMessage="Sign in"
                                             id="reset_password_form.action.sign_in"

@@ -67,7 +67,12 @@ const RegisterForm = ({submitForm, clickSignIn = noop, form}) => {
                                     id="register_form.message.already_have_account"
                                 />
                             </Text>
-                            <Button variant="link-blue" size="sm" onClick={clickSignIn}>
+                            <Button
+                                variant="link-blue"
+                                size="sm"
+                                lineHeight="1"
+                                onClick={clickSignIn}
+                            >
                                 <FormattedMessage
                                     defaultMessage="Sign in"
                                     id="register_form.action.sign_in"
