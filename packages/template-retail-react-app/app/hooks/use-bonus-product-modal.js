@@ -12,13 +12,7 @@ import {BonusProductModal} from '@salesforce/retail-react-app/app/components/bon
 
 export const BonusProductModalContext = React.createContext()
 
-export const useBonusProductModalContext = () => {
-    const context = useContext(BonusProductModalContext)
-    if (!context) {
-        throw new Error('useBonusProductModalContext must be used within BonusProductModalProvider')
-    }
-    return context
-}
+export const useBonusProductModalContext = () => useContext(BonusProductModalContext)
 
 export const BonusProductModalProvider = ({children, basket}) => {
     const bonusProductState = useBonusState(basket)
