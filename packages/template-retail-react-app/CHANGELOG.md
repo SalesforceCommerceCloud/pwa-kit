@@ -5,6 +5,8 @@
 - Show Bonus Product Label on OrderSummary component [#2524](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2524)
 - Support standard product on PDP [#2518](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2518)
 - Fix Einstein event tracking for `addToCart` event [#2558](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2558)
+- Show Bonus Product Label on OrderSummary component [#2524](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2524)
+- Support standard product on PDP [#2518](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2518)
 
 ## v6.1.0 (May 22, 2025)
 
