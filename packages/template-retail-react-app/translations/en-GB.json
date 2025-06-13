@@ -796,7 +796,7 @@
   "icons.assistive_msg.lock": {
     "defaultMessage": "Secure"
   },
-  "item_attributes.label.is_bonus_product": {
+  "item_attributes.label.bonus_product": {
     "defaultMessage": "Bonus Product"
   },
   "item_attributes.label.promotions": {

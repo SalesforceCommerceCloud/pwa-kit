@@ -27,7 +27,7 @@ const ItemAttributes = ({includeQuantity, currency, excludeBonusLabel, ...props}
     const promotionIds = variant.priceAdjustments?.map((adj) => adj.promotionId) ?? []
     const intl = useIntl()
 
-    const displayBonusProduct = !excludeBonusLabel && variant?.bonusProductLineItem
+    const displayBonusProductLabel = !excludeBonusLabel && variant?.bonusProductLineItem
 
     // Fetch all the promotions given by price adjustments. We display this info in
     // the promotion info popover when applicable.
@@ -93,11 +93,11 @@ const ItemAttributes = ({includeQuantity, currency, excludeBonusLabel, ...props}
 
     return (
         <Stack spacing={1.5} flex={1} {...props}>
-            {displayBonusProduct && (
+            {displayBonusProductLabel && (
                 <Text lineHeight={1} color="black.600" fontSize="sm">
                     <FormattedMessage
                         defaultMessage="Bonus Product"
-                        id="item_attributes.label.is_bonus_product"
+                        id="item_attributes.label.bonus_product"
                     />
                 </Text>
             )}

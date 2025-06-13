@@ -83,7 +83,6 @@ const renderComponent = (variant, props = {}) => {
     )
 }
 
-// Test cases for Bonus Product functionality
 test('renders Bonus Product when bonusProductLineItem is true', async () => {
     const mockVariantWithBonusProduct = {
         ...mockBundledProductItemsVariant,
@@ -105,7 +104,6 @@ test('renders Bonus Product when bonusProductLineItem is true', async () => {
     })
 })
 
-// Test cases for Bonus Product functionality
 test('renders Bonus Product when excludeBonusLabel is not set', async () => {
     // Case 1: Variant has no bonus product
     const mockVariantWithOutBonusProduct = {
