@@ -5,77 +5,118 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
+import PropTypes from 'prop-types'
 import {renderHook, act} from '@testing-library/react'
-import {ChakraProvider} from '@chakra-ui/react'
-import {useLocation} from 'react-router-dom'
-import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
 import {
     useBonusState,
-    BonusProductModalProvider,
-    useBonusProductModalContext
+    useBonusProductModalContext,
+    BonusProductModalProvider
 } from '@salesforce/retail-react-app/app/hooks/use-bonus-product-modal'
+import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
+import {useLocation} from 'react-router-dom'
 
-// Mock react-router-dom
+// Mock react-router-dom with proper implementation
 jest.mock('react-router-dom', () => ({
-    useLocation: () => ({pathname: '/test-path'})
+    ...jest.requireActual('react-router-dom'),
+    useLocation: jest.fn()
 }))
 
-// Mock the commerce SDK
-jest.mock('@salesforce/commerce-sdk-react', () => ({
-    ...jest.requireActual('@salesforce/commerce-sdk-react'),
-    useProducts: jest.fn()
+// Mock the add to cart modal provider
+jest.mock('./use-add-to-cart-modal', () => ({
+    AddToCartModalProvider: ({children}) => <div>{children}</div>,
+    useAddToCartModalContext: jest.fn()
 }))
 
-// Mock useAddToCartModalContext
-const mockOnAddToCartModalOpen = jest.fn()
-jest.mock('@salesforce/retail-react-app/app/hooks/use-add-to-cart-modal', () => ({
-    useAddToCartModalContext: () => ({onOpen: mockOnAddToCartModalOpen})
-}))
+// Import the mocked functions after mocking
+import {useAddToCartModalContext} from './use-add-to-cart-modal'
 
-describe('BonusProductModal', () => {
+const mockUseLocation = useLocation
+const mockUseAddToCartModalContext = useAddToCartModalContext
+
+describe('useBonusState Hook', () => {
+    const mockOnAddToCartModalOpen = jest.fn()
+
     beforeEach(() => {
         jest.clearAllMocks()
-        useLocation.mockReturnValue({pathname: '/initial'})
+
+        // Setup location mock
+        mockUseLocation.mockReturnValue({
+            pathname: '/initial'
+        })
+
+        // Setup add to cart modal mock
+        mockUseAddToCartModalContext.mockReturnValue({
+            onOpen: mockOnAddToCartModalOpen
+        })
     })
 
-    test('initializes with correct state from basket', () => {
-        const basket = {bonusDiscountLineItems: [{id: 'b1'}]}
-        const {result} = renderHook(() => useBonusState(basket))
+    it('initializes with correct default state', () => {
+        const {result} = renderHook(() => useBonusState())
         expect(result.current.isOpen).toBe(false)
         expect(result.current.data).toEqual({})
-        expect(result.current.bonusProducts).toEqual([{id: 'b1'}])
+        expect(result.current.bonusProducts).toEqual([])
     })
 
-    test('updates bonusProducts when basket changes', () => {
+    it('initializes with basket bonusDiscountLineItems', () => {
+        const basket = {bonusDiscountLineItems: [{id: 'b1'}, {id: 'b2'}]}
+        const {result} = renderHook(() => useBonusState(basket))
+        expect(result.current.bonusProducts).toEqual([{id: 'b1'}, {id: 'b2'}])
+    })
+
+    it('updates bonusProducts when basket changes', () => {
         const {result, rerender} = renderHook(({basket}) => useBonusState(basket), {
             initialProps: {basket: {bonusDiscountLineItems: [{id: 'b1'}]}}
         })
-        rerender({basket: {bonusDiscountLineItems: [{id: 'b2'}]}})
-        expect(result.current.bonusProducts).toEqual([{id: 'b2'}])
+        expect(result.current.bonusProducts).toEqual([{id: 'b1'}])
+
+        rerender({basket: {bonusDiscountLineItems: [{id: 'b2'}, {id: 'b3'}]}})
+        expect(result.current.bonusProducts).toEqual([{id: 'b2'}, {id: 'b3'}])
     })
 
-    test('addBonusProducts adds items', () => {
+    it('addBonusProducts adds items to bonusProducts', () => {
         const {result} = renderHook(() => useBonusState())
+
         act(() => {
-            result.current.addBonusProducts([{id: 'b3'}])
+            result.current.addBonusProducts([{id: 'b1'}, {id: 'b2'}])
         })
-        expect(result.current.bonusProducts).toEqual([{id: 'b3'}])
+
+        expect(result.current.bonusProducts).toEqual([{id: 'b1'}, {id: 'b2'}])
     })
 
-    test('onOpen sets modal open and stores data', () => {
+    it('clearBonusProducts empties bonusProducts array', () => {
         const {result} = renderHook(() => useBonusState())
+
         act(() => {
-            result.current.onOpen({foo: 'bar'})
+            result.current.addBonusProducts([{id: 'b1'}, {id: 'b2'}])
+        })
+        expect(result.current.bonusProducts).toEqual([{id: 'b1'}, {id: 'b2'}])
+
+        act(() => {
+            result.current.clearBonusProducts()
+        })
+        expect(result.current.bonusProducts).toEqual([])
+    })
+
+    it('onOpen sets modal open and stores data', () => {
+        const {result} = renderHook(() => useBonusState())
+        const testData = {test: 'data', value: 123}
+
+        act(() => {
+            result.current.onOpen(testData)
+        })
+
+        expect(result.current.isOpen).toBe(true)
+        expect(result.current.data).toEqual(testData)
+    })
+
+    it('onClose closes modal and clears data', () => {
+        const {result} = renderHook(() => useBonusState())
+
+        act(() => {
+            result.current.onOpen({test: 'data'})
         })
         expect(result.current.isOpen).toBe(true)
-        expect(result.current.data).toEqual({foo: 'bar'})
-    })
 
-    test('onClose closes modal and clears data', () => {
-        const {result} = renderHook(() => useBonusState())
-        act(() => {
-            result.current.onOpen({foo: 'bar'})
-        })
         act(() => {
             result.current.onClose()
         })
@@ -83,41 +124,100 @@ describe('BonusProductModal', () => {
         expect(result.current.data).toEqual({})
     })
 
-    test('onClose calls onAddToCartModalOpen if needed', () => {
+    it('onClose calls onAddToCartModalOpen when openAddToCartModalIfNeeded is true', () => {
         const {result} = renderHook(() => useBonusState())
-        const data = {
+        const testData = {
             openAddToCartModalIfNeeded: true,
-            product: {id: 'p1'},
+            product: {id: 'p1', name: 'Test Product'},
             itemsAdded: 2,
             selectedQuantity: 1
         }
+
         act(() => {
-            result.current.onOpen(data)
+            result.current.onOpen(testData)
         })
+
         act(() => {
             result.current.onClose()
         })
+
         expect(mockOnAddToCartModalOpen).toHaveBeenCalledWith({
-            product: {id: 'p1'},
+            product: {id: 'p1', name: 'Test Product'},
             itemsAdded: 2,
             selectedQuantity: 1
         })
     })
 
-    test('closes modal on location change', () => {
-        // Initial location
-        useLocation.mockReturnValue({pathname: '/foo'})
+    it('does not call onAddToCartModalOpen when openAddToCartModalIfNeeded is false', () => {
+        const {result} = renderHook(() => useBonusState())
+        const testData = {
+            openAddToCartModalIfNeeded: false,
+            product: {id: 'p1'},
+            itemsAdded: 2
+        }
+
+        act(() => {
+            result.current.onOpen(testData)
+        })
+
+        act(() => {
+            result.current.onClose()
+        })
+
+        expect(mockOnAddToCartModalOpen).not.toHaveBeenCalled()
+    })
+
+    it('closes modal when location pathname changes', () => {
+        // Start with initial location
+        mockUseLocation.mockReturnValue({pathname: '/initial'})
+
         const {result, rerender} = renderHook(() => useBonusState())
 
         act(() => {
-            result.current.onOpen({foo: 'bar'})
+            result.current.onOpen({test: 'data'})
         })
         expect(result.current.isOpen).toBe(true)
 
-        // Change location
-        useLocation.mockReturnValue({pathname: '/bar'})
+        // Change location and trigger rerender
+        mockUseLocation.mockReturnValue({pathname: '/new-path'})
         rerender()
 
         expect(result.current.isOpen).toBe(false)
     })
 })
+
+describe('useBonusProductModalContext Hook', () => {
+    it('throws error when used outside of BonusProductModalProvider', () => {
+        // Suppress console.error for this test since we expect an error
+        const originalError = console.error
+        console.error = jest.fn()
+
+        expect(() => {
+            renderHook(() => useBonusProductModalContext())
+        }).toThrow('useBonusProductModalContext must be used within BonusProductModalProvider')
+
+        // Restore console.error
+        console.error = originalError
+    })
+})
+
+describe('BonusProductModalProvider', () => {
+    it('renders children and provides context', () => {
+        const TestChild = () => <div data-testid="test-child">Test Child</div>
+        const {getByTestId} = renderWithProviders(
+            <BonusProductModalProvider basket={{}}>
+                <TestChild />
+            </BonusProductModalProvider>
+        )
+        expect(getByTestId('test-child')).toBeInTheDocument()
+    })
+})
+
+// Mock component that provides the context
+const MockProvider = ({children}) => {
+    return <BonusProductModalProvider>{children}</BonusProductModalProvider>
+}
+
+MockProvider.propTypes = {
+    children: PropTypes.node.isRequired
+}
