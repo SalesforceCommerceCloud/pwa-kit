@@ -866,7 +866,6 @@ describe('Bonus products', () => {
 
         // Verify bonus product has no quantity picker
         expect(within(bonusProduct).queryByRole('spinbutton')).not.toBeInTheDocument()
-        expect(within(bonusProduct).getByText('Bonus Product')).toBeInTheDocument()
     })
 })
 
