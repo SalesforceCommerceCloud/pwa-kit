@@ -73,39 +73,3 @@ test('component renders product bundles without variant data', async () => {
         })
     })
 })
-
-test('renders Bonus Product when isBonusProduct is true', async () => {
-    const mockVariantWithBonusProduct = {
-        ...mockBundledProductItemsVariant,
-        bonusProductLineItem: true // Simulate the bonus product flag
-    }
-
-    renderWithProviders(<MockedComponent variant={mockVariantWithBonusProduct} />)
-
-    await waitFor(() => {
-        expect(screen.getByText(/Bonus Product/i)).toBeInTheDocument()
-    })
-})
-
-test('does not render Bonus Product when isBonusProduct is false', async () => {
-    const mockVariantWithoutBonusProduct = {
-        ...mockBundledProductItemsVariant,
-        bonusProductLineItem: false // Simulate the absence of the bonus product flag
-    }
-
-    renderWithProviders(<MockedComponent variant={mockVariantWithoutBonusProduct} />)
-
-    await waitFor(() => {
-        expect(screen.queryByText(/Bonus Product/i)).not.toBeInTheDocument()
-    })
-})
-
-test('does not render Bonus Product when bonusProductLineItem is undefined', async () => {
-    const mockVariantWithoutBonusProduct = {...mockBundledProductItemsVariant}
-    delete mockVariantWithoutBonusProduct.bonusProductLineItem
-
-    renderWithProviders(<MockedComponent variant={mockVariantWithoutBonusProduct} />)
-    await waitFor(() => {
-        expect(screen.queryByText(/Bonus Product/i)).not.toBeInTheDocument()
-    })
-})

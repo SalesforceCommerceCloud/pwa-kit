@@ -429,6 +429,16 @@
       "value": "항목이 카트에서 제거됨"
     }
   ],
+  "cart.product_edit_modal.modal_label": [
+    {
+      "type": 1,
+      "value": "productName"
+    },
+    {
+      "type": 0,
+      "value": "에 대한 모달 편집"
+    }
+  ],
   "cart.recommended_products.title.may_also_like": [
     {
       "type": 0,
@@ -529,6 +539,12 @@
     {
       "type": 0,
       "value": ")"
+    }
+  ],
+  "category_links.button_text": [
+    {
+      "type": 0,
+      "value": "카테고리"
     }
   ],
   "cc_radio_group.action.remove": [
@@ -643,6 +659,24 @@
     {
       "type": 0,
       "value": "배송"
+    }
+  ],
+  "checkout_confirmation.label.shipping.strikethrough.price": [
+    {
+      "type": 0,
+      "value": "원래 가격: "
+    },
+    {
+      "type": 1,
+      "value": "originalPrice"
+    },
+    {
+      "type": 0,
+      "value": " , 현재 가격: "
+    },
+    {
+      "type": 1,
+      "value": "newPrice"
     }
   ],
   "checkout_confirmation.label.subtotal": [
@@ -807,6 +841,12 @@
       "value": "신용카드"
     }
   ],
+  "checkout_payment.label.billing_address_form": [
+    {
+      "type": 0,
+      "value": "청구 주소 양식"
+    }
+  ],
   "checkout_payment.label.same_as_shipping": [
     {
       "type": 0,
@@ -849,6 +889,18 @@
       "value": "예"
     }
   ],
+  "confirmation_modal.default.assistive_msg.no": [
+    {
+      "type": 0,
+      "value": "아니요, 작업을 취소합니다."
+    }
+  ],
+  "confirmation_modal.default.assistive_msg.yes": [
+    {
+      "type": 0,
+      "value": "예, 작업을 확인합니다"
+    }
+  ],
   "confirmation_modal.default.message.you_want_to_continue": [
     {
       "type": 0,
@@ -874,6 +926,24 @@
     }
   ],
   "confirmation_modal.remove_cart_item.action.yes": [
+    {
+      "type": 0,
+      "value": "예. 항목을 제거합니다."
+    }
+  ],
+  "confirmation_modal.remove_cart_item.assistive_msg.no": [
+    {
+      "type": 0,
+      "value": "아니요. 항목을 그대로 둡니다."
+    }
+  ],
+  "confirmation_modal.remove_cart_item.assistive_msg.remove": [
+    {
+      "type": 0,
+      "value": "사용할 수 없는 제품 제거"
+    }
+  ],
+  "confirmation_modal.remove_cart_item.assistive_msg.yes": [
     {
       "type": 0,
       "value": "예. 항목을 제거합니다."
@@ -987,6 +1057,64 @@
       "value": "보안 코드 정보"
     }
   ],
+  "display_price.assistive_msg.current_price": [
+    {
+      "type": 0,
+      "value": "현재 가격 "
+    },
+    {
+      "type": 1,
+      "value": "currentPrice"
+    }
+  ],
+  "display_price.assistive_msg.current_price_with_range": [
+    {
+      "type": 0,
+      "value": "현재 가격 "
+    },
+    {
+      "type": 1,
+      "value": "currentPrice"
+    },
+    {
+      "type": 0,
+      "value": "에서"
+    }
+  ],
+  "display_price.assistive_msg.strikethrough_price": [
+    {
+      "type": 0,
+      "value": "원래 가격 "
+    },
+    {
+      "type": 1,
+      "value": "listPrice"
+    }
+  ],
+  "display_price.assistive_msg.strikethrough_price_with_range": [
+    {
+      "type": 0,
+      "value": "원래 가격 "
+    },
+    {
+      "type": 1,
+      "value": "listPrice"
+    },
+    {
+      "type": 0,
+      "value": "에서"
+    }
+  ],
+  "display_price.label.current_price_with_range": [
+    {
+      "type": 1,
+      "value": "currentPrice"
+    },
+    {
+      "type": 0,
+      "value": "부터 시작"
+    }
+  ],
   "drawer_menu.button.account_details": [
     {
       "type": 0,
@@ -1015,6 +1143,12 @@
     {
       "type": 0,
       "value": "주문 내역"
+    }
+  ],
+  "drawer_menu.header.assistive_msg.title": [
+    {
+      "type": 0,
+      "value": "메뉴 서랍"
     }
   ],
   "drawer_menu.link.about_us": [
@@ -1393,6 +1527,12 @@
       "value": "메뉴"
     }
   ],
+  "header.button.assistive_msg.menu.open_dialog": [
+    {
+      "type": 0,
+      "value": "대화창 열기"
+    }
+  ],
   "header.button.assistive_msg.my_account": [
     {
       "type": 0,
@@ -1413,6 +1553,12 @@
     {
       "type": 1,
       "value": "numItems"
+    }
+  ],
+  "header.button.assistive_msg.store_locator": [
+    {
+      "type": 0,
+      "value": "매장 찾기"
     }
   ],
   "header.button.assistive_msg.wishlist": [
@@ -1625,6 +1771,12 @@
       "value": "quantity"
     }
   ],
+  "item_attributes.label.selected_options": [
+    {
+      "type": 0,
+      "value": "선택한 옵션"
+    }
+  ],
   "item_image.label.sale": [
     {
       "type": 0,
@@ -1637,10 +1789,32 @@
       "value": "사용 불가"
     }
   ],
-  "item_price.label.starting_at": [
+  "item_variant.assistive_msg.quantity": [
     {
       "type": 0,
-      "value": "시작가"
+      "value": "수량 "
+    },
+    {
+      "type": 1,
+      "value": "quantity"
+    }
+  ],
+  "item_variant.quantity.label": [
+    {
+      "type": 1,
+      "value": "productName"
+    },
+    {
+      "type": 0,
+      "value": "에 대한 수량 선택기 선택한 수량은 "
+    },
+    {
+      "type": 1,
+      "value": "quantity"
+    },
+    {
+      "type": 0,
+      "value": "개입니다."
     }
   ],
   "lCPCxk": [
@@ -2465,14 +2639,28 @@
       "value": " 제거"
     }
   ],
-  "product_tile.label.starting_at_price": [
+  "product_tile.badge.label.new": [
     {
       "type": 0,
-      "value": "시작가: "
-    },
+      "value": "신규"
+    }
+  ],
+  "product_tile.badge.label.sale": [
     {
-      "type": 1,
-      "value": "price"
+      "type": 0,
+      "value": "판매"
+    }
+  ],
+  "product_view.button.add_bundle_to_cart": [
+    {
+      "type": 0,
+      "value": "카트에 번들 추가"
+    }
+  ],
+  "product_view.button.add_bundle_to_wishlist": [
+    {
+      "type": 0,
+      "value": "위시리스트에 번들 추가"
     }
   ],
   "product_view.button.add_set_to_cart": [
@@ -2507,14 +2695,22 @@
   ],
   "product_view.label.assistive_msg.quantity_decrement": [
     {
+      "type": 1,
+      "value": "productName"
+    },
+    {
       "type": 0,
-      "value": "수량 줄이기"
+      "value": "의 감소 수량"
     }
   ],
   "product_view.label.assistive_msg.quantity_increment": [
     {
+      "type": 1,
+      "value": "productName"
+    },
+    {
       "type": 0,
-      "value": "수량 늘리기"
+      "value": "에 대한 증분 수량"
     }
   ],
   "product_view.label.quantity": [
@@ -2533,12 +2729,6 @@
     {
       "type": 0,
       "value": "+"
-    }
-  ],
-  "product_view.label.starting_at_price": [
-    {
-      "type": 0,
-      "value": "시작가"
     }
   ],
   "product_view.label.variant_type": [
@@ -2652,7 +2842,7 @@
       "children": [
         {
           "type": 0,
-          "value": "개인정보보호 정책"
+          "value": "개인정보 보호정책"
         }
       ],
       "type": 8,
@@ -2660,13 +2850,13 @@
     },
     {
       "type": 0,
-      "value": "과 "
+      "value": " 및 "
     },
     {
       "children": [
         {
           "type": 0,
-          "value": "이용 약관"
+          "value": "약관"
         }
       ],
       "type": 8,
@@ -2674,7 +2864,7 @@
     },
     {
       "type": 0,
-      "value": "에 동의한 것으로 간주됩니다."
+      "value": "에 동의하는 것입니다."
     }
   ],
   "register_form.message.already_have_account": [
@@ -2771,6 +2961,32 @@
       "value": "배송 방법으로 계속 진행하기"
     }
   ],
+  "shipping_address.label.edit_button": [
+    {
+      "type": 1,
+      "value": "address"
+    },
+    {
+      "type": 0,
+      "value": " 편집"
+    }
+  ],
+  "shipping_address.label.remove_button": [
+    {
+      "type": 1,
+      "value": "address"
+    },
+    {
+      "type": 0,
+      "value": " 제거"
+    }
+  ],
+  "shipping_address.label.shipping_address_form": [
+    {
+      "type": 0,
+      "value": "배송 주소 양식"
+    }
+  ],
   "shipping_address.title.shipping_address": [
     {
       "type": 0,
@@ -2861,6 +3077,136 @@
       "value": "로그아웃하시겠습니까? 현재 주문을 처리하려면 다시 로그인해야 합니다."
     }
   ],
+  "store_locator.action.find": [
+    {
+      "type": 0,
+      "value": "찾기"
+    }
+  ],
+  "store_locator.action.select_a_country": [
+    {
+      "type": 0,
+      "value": "국가 선택"
+    }
+  ],
+  "store_locator.action.use_my_location": [
+    {
+      "type": 0,
+      "value": "내 위치 사용"
+    }
+  ],
+  "store_locator.action.viewMore": [
+    {
+      "type": 0,
+      "value": "자세히 보기"
+    }
+  ],
+  "store_locator.description.away": [
+    {
+      "type": 0,
+      "value": "떨어진 곳에 위치"
+    }
+  ],
+  "store_locator.description.loading_locations": [
+    {
+      "type": 0,
+      "value": "위치 로드 중..."
+    }
+  ],
+  "store_locator.description.no_locations": [
+    {
+      "type": 0,
+      "value": "죄송하지만 이 지역에는 위치가 없습니다."
+    }
+  ],
+  "store_locator.description.or": [
+    {
+      "type": 0,
+      "value": "Or"
+    }
+  ],
+  "store_locator.description.phone": [
+    {
+      "type": 0,
+      "value": "전화번호:"
+    }
+  ],
+  "store_locator.description.viewing_near_postal_code": [
+    {
+      "type": 1,
+      "value": "postalCode"
+    },
+    {
+      "type": 0,
+      "value": "에서 "
+    },
+    {
+      "type": 1,
+      "value": "distance"
+    },
+    {
+      "type": 1,
+      "value": "distanceUnit"
+    },
+    {
+      "type": 0,
+      "value": " 내에 위치한 매장 보기"
+    }
+  ],
+  "store_locator.description.viewing_near_your_location": [
+    {
+      "type": 0,
+      "value": "현재 위치에서 가까운 매장 보기"
+    }
+  ],
+  "store_locator.dropdown.germany": [
+    {
+      "type": 0,
+      "value": "독일"
+    }
+  ],
+  "store_locator.dropdown.united_states": [
+    {
+      "type": 0,
+      "value": "미국"
+    }
+  ],
+  "store_locator.error.agree_to_share_your_location": [
+    {
+      "type": 0,
+      "value": "위치 공유에 동의하십시오."
+    }
+  ],
+  "store_locator.error.please_enter_a_postal_code": [
+    {
+      "type": 0,
+      "value": "우편번호를 입력해 주세요."
+    }
+  ],
+  "store_locator.error.please_select_a_country": [
+    {
+      "type": 0,
+      "value": "국가를 선택하십시오."
+    }
+  ],
+  "store_locator.field.placeholder.enter_postal_code": [
+    {
+      "type": 0,
+      "value": "우편번호 입력"
+    }
+  ],
+  "store_locator.pagination.load_more": [
+    {
+      "type": 0,
+      "value": "추가 로드"
+    }
+  ],
+  "store_locator.title": [
+    {
+      "type": 0,
+      "value": "매장 찾기"
+    }
+  ],
   "swatch_group.selected.label": [
     {
       "type": 1,
@@ -2875,6 +3221,30 @@
     {
       "type": 0,
       "value": "편집"
+    }
+  ],
+  "toggle_card.action.editContactInfo": [
+    {
+      "type": 0,
+      "value": "연락처 정보 편집"
+    }
+  ],
+  "toggle_card.action.editPaymentInfo": [
+    {
+      "type": 0,
+      "value": "결제 정보 편집"
+    }
+  ],
+  "toggle_card.action.editShippingAddress": [
+    {
+      "type": 0,
+      "value": "배송 주소 편집"
+    }
+  ],
+  "toggle_card.action.editShippingOptions": [
+    {
+      "type": 0,
+      "value": "배송 옵션 편집"
     }
   ],
   "update_password_fields.button.forgot_password": [
@@ -2928,7 +3298,7 @@
   "use_address_fields.error.please_select_your_state_or_province": [
     {
       "type": 0,
-      "value": "시/도를 선택하십시오."
+      "value": "주를 선택하십시오."
     }
   ],
   "use_address_fields.error.required": [
@@ -3137,10 +3507,38 @@
       "value": "개 남음)"
     }
   ],
+  "use_product.message.inventory_remaining_for_product": [
+    {
+      "type": 1,
+      "value": "productName"
+    },
+    {
+      "type": 0,
+      "value": "이(가) "
+    },
+    {
+      "type": 1,
+      "value": "stockLevel"
+    },
+    {
+      "type": 0,
+      "value": "개 남았습니다!"
+    }
+  ],
   "use_product.message.out_of_stock": [
     {
       "type": 0,
       "value": "품절"
+    }
+  ],
+  "use_product.message.out_of_stock_for_product": [
+    {
+      "type": 1,
+      "value": "productName"
+    },
+    {
+      "type": 0,
+      "value": "이(가) 품절입니다."
     }
   ],
   "use_profile_fields.error.required_email": [
@@ -3371,6 +3769,34 @@
       "value": "새 암호"
     }
   ],
+  "wishlist_primary_action.button.addSetToCart.label": [
+    {
+      "type": 0,
+      "value": "카트에 "
+    },
+    {
+      "type": 1,
+      "value": "productName"
+    },
+    {
+      "type": 0,
+      "value": " 세트 추가"
+    }
+  ],
+  "wishlist_primary_action.button.addToCart.label": [
+    {
+      "type": 0,
+      "value": "카트에 "
+    },
+    {
+      "type": 1,
+      "value": "productName"
+    },
+    {
+      "type": 0,
+      "value": " 추가"
+    }
+  ],
   "wishlist_primary_action.button.add_set_to_cart": [
     {
       "type": 0,
@@ -3383,6 +3809,16 @@
       "value": "카트에 추가"
     }
   ],
+  "wishlist_primary_action.button.viewFullDetails.label": [
+    {
+      "type": 1,
+      "value": "productName"
+    },
+    {
+      "type": 0,
+      "value": "에 대한 전체 세부 정보 보기"
+    }
+  ],
   "wishlist_primary_action.button.view_full_details": [
     {
       "type": 0,
@@ -3393,6 +3829,16 @@
     {
       "type": 0,
       "value": "옵션 보기"
+    }
+  ],
+  "wishlist_primary_action.button.view_options.label": [
+    {
+      "type": 1,
+      "value": "productName"
+    },
+    {
+      "type": 0,
+      "value": "에 대한 보기 옵션"
     }
   ],
   "wishlist_primary_action.info.added_to_cart": [
@@ -3437,6 +3883,16 @@
     {
       "type": 0,
       "value": "제거"
+    }
+  ],
+  "wishlist_secondary_button_group.info.item.remove.label": [
+    {
+      "type": 1,
+      "value": "productName"
+    },
+    {
+      "type": 0,
+      "value": " 제거"
     }
   ],
   "wishlist_secondary_button_group.info.item_removed": [

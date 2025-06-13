@@ -185,35 +185,24 @@ export const REMOVE_UNAVAILABLE_CART_ITEM_DIALOG_CONFIG = {
     onPrimaryAction: noop
 }
 
-export const SUPPORTED_STORE_LOCATOR_COUNTRIES = [
+export const STORE_LOCATOR_IS_ENABLED = true
+export const STORE_LOCATOR_SUPPORTED_COUNTRIES = [
     {
         countryCode: 'US',
-        countryName: defineMessage({
-            defaultMessage: 'United States',
-            id: 'store_locator.dropdown.united_states'
-        })
+        countryName: 'United States'
     },
     {
         countryCode: 'DE',
-        countryName: defineMessage({
-            defaultMessage: 'Germany',
-            id: 'store_locator.dropdown.germany'
-        })
+        countryName: 'Germany'
     }
 ]
-
-export const DEFAULT_STORE_LOCATOR_COUNTRY = {
-    countryCode: 'DE',
-    countryName: defineMessage({
-        defaultMessage: 'Germany',
-        id: 'store_locator.dropdown.germany'
-    })
-}
-export const DEFAULT_STORE_LOCATOR_POSTAL_CODE = '10178'
-export const STORE_LOCATOR_DISTANCE = 100
-export const STORE_LOCATOR_NUM_STORES_PER_LOAD = 10
-export const STORE_LOCATOR_DISTANCE_UNIT = 'km'
-export const STORE_LOCATOR_IS_ENABLED = true
+export const STORE_LOCATOR_DEFAULT_POSTAL_CODE = '10178'
+export const STORE_LOCATOR_RADIUS = 100
+export const STORE_LOCATOR_RADIUS_UNIT = 'km'
+export const STORE_LOCATOR_DEFAULT_COUNTRY = 'DE'
+export const STORE_LOCATOR_DEFAULT_COUNTRY_CODE = 'DE'
+export const STORE_LOCATOR_DEFAULT_PAGE_SIZE = 10
+export const STORE_LOCATOR_NUM_STORES_PER_REQUEST_API_MAX = 200 // This is an API limit and is therefore not configurable
 
 export const DEFAULT_DNT_STATE = true
 // Constants for shopper context

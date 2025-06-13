@@ -174,6 +174,9 @@
   "cart.info.removed_from_cart": {
     "defaultMessage": "Item removido do carrinho"
   },
+  "cart.product_edit_modal.modal_label": {
+    "defaultMessage": "Editar modal para {productName}"
+  },
   "cart.recommended_products.title.may_also_like": {
     "defaultMessage": "Talvez você também queira"
   },
@@ -203,6 +206,9 @@
   },
   "cart_title.title.cart_num_of_items": {
     "defaultMessage": "Carrinho ({itemCount, plural, =0 {0 itens} one {# item} other {# itens}})"
+  },
+  "category_links.button_text": {
+    "defaultMessage": "Categorias"
   },
   "cc_radio_group.action.remove": {
     "defaultMessage": "Remover"
@@ -260,6 +266,9 @@
   },
   "checkout_confirmation.label.shipping": {
     "defaultMessage": "Frete"
+  },
+  "checkout_confirmation.label.shipping.strikethrough.price": {
+    "defaultMessage": "Originalmente {originalPrice}, agora {newPrice}"
   },
   "checkout_confirmation.label.subtotal": {
     "defaultMessage": "Subtotal"
@@ -319,6 +328,9 @@
   "checkout_payment.heading.credit_card": {
     "defaultMessage": "Cartão de crédito"
   },
+  "checkout_payment.label.billing_address_form": {
+    "defaultMessage": "Formulário de endereço para faturamento"
+  },
   "checkout_payment.label.same_as_shipping": {
     "defaultMessage": "Igual ao endereço de entrega"
   },
@@ -334,6 +346,12 @@
   "confirmation_modal.default.action.yes": {
     "defaultMessage": "Sim"
   },
+  "confirmation_modal.default.assistive_msg.no": {
+    "defaultMessage": "Não, cancelar ação"
+  },
+  "confirmation_modal.default.assistive_msg.yes": {
+    "defaultMessage": "Sim, confirmar ação"
+  },
   "confirmation_modal.default.message.you_want_to_continue": {
     "defaultMessage": "Tem certeza de que deseja continuar?"
   },
@@ -347,6 +365,15 @@
     "defaultMessage": "Remover"
   },
   "confirmation_modal.remove_cart_item.action.yes": {
+    "defaultMessage": "Sim, remover item"
+  },
+  "confirmation_modal.remove_cart_item.assistive_msg.no": {
+    "defaultMessage": "Não, manter item"
+  },
+  "confirmation_modal.remove_cart_item.assistive_msg.remove": {
+    "defaultMessage": "Remover produtos indisponíveis"
+  },
+  "confirmation_modal.remove_cart_item.assistive_msg.yes": {
     "defaultMessage": "Sim, remover item"
   },
   "confirmation_modal.remove_cart_item.message.need_to_remove_due_to_unavailability": {
@@ -405,6 +432,21 @@
   "credit_card_fields.tool_tip.security_code_aria_label": {
     "defaultMessage": "Informações do código de segurança"
   },
+  "display_price.assistive_msg.current_price": {
+    "defaultMessage": "preço atual {currentPrice}"
+  },
+  "display_price.assistive_msg.current_price_with_range": {
+    "defaultMessage": "A partir do preço atual {currentPrice}"
+  },
+  "display_price.assistive_msg.strikethrough_price": {
+    "defaultMessage": "preço original {listPrice}"
+  },
+  "display_price.assistive_msg.strikethrough_price_with_range": {
+    "defaultMessage": "A partir do preço original {listPrice}"
+  },
+  "display_price.label.current_price_with_range": {
+    "defaultMessage": "De {currentPrice}"
+  },
   "drawer_menu.button.account_details": {
     "defaultMessage": "Detalhes da conta"
   },
@@ -420,6 +462,9 @@
   "drawer_menu.button.order_history": {
     "defaultMessage": "Histórico de pedidos"
   },
+  "drawer_menu.header.assistive_msg.title": {
+    "defaultMessage": "Gaveta de menu"
+  },
   "drawer_menu.link.about_us": {
     "defaultMessage": "Sobre nós"
   },
@@ -427,7 +472,7 @@
     "defaultMessage": "Suporte ao cliente"
   },
   "drawer_menu.link.customer_support.contact_us": {
-    "defaultMessage": "Entrar em contato"
+    "defaultMessage": "Entre em contato"
   },
   "drawer_menu.link.customer_support.shipping_and_returns": {
     "defaultMessage": "Frete e devoluções"
@@ -582,6 +627,9 @@
   "header.button.assistive_msg.menu": {
     "defaultMessage": "Menu"
   },
+  "header.button.assistive_msg.menu.open_dialog": {
+    "defaultMessage": "Abre uma caixa de diálogo"
+  },
   "header.button.assistive_msg.my_account": {
     "defaultMessage": "Minha conta"
   },
@@ -590,6 +638,9 @@
   },
   "header.button.assistive_msg.my_cart_with_num_items": {
     "defaultMessage": "Meu carrinho, número de itens: {numItems}"
+  },
+  "header.button.assistive_msg.store_locator": {
+    "defaultMessage": "Localizador de lojas"
   },
   "header.button.assistive_msg.wishlist": {
     "defaultMessage": "Lista de desejos"
@@ -691,6 +742,9 @@
   "item_attributes.label.quantity": {
     "defaultMessage": "Quantidade: {quantity}"
   },
+  "item_attributes.label.selected_options": {
+    "defaultMessage": "Opções selecionadas"
+  },
   "item_image.label.sale": {
     "defaultMessage": "Promoção",
     "description": "A sale badge placed on top of a product image"
@@ -699,8 +753,11 @@
     "defaultMessage": "Indisponível",
     "description": "A unavailable badge placed on top of a product image"
   },
-  "item_price.label.starting_at": {
-    "defaultMessage": "A partir de"
+  "item_variant.assistive_msg.quantity": {
+    "defaultMessage": "Quantidade {quantity}"
+  },
+  "item_variant.quantity.label": {
+    "defaultMessage": "Seletor de quantidade para {productName}. A quantidade selecionada é {quantity}"
   },
   "lCPCxk": {
     "defaultMessage": "Selecione todas as opções acima"
@@ -1063,8 +1120,17 @@
   "product_tile.assistive_msg.remove_from_wishlist": {
     "defaultMessage": "Remover {product} da lista de desejos"
   },
-  "product_tile.label.starting_at_price": {
-    "defaultMessage": "A partir de {price}"
+  "product_tile.badge.label.new": {
+    "defaultMessage": "Criar"
+  },
+  "product_tile.badge.label.sale": {
+    "defaultMessage": "Promoção"
+  },
+  "product_view.button.add_bundle_to_cart": {
+    "defaultMessage": "Adicionar pacote ao carrinho"
+  },
+  "product_view.button.add_bundle_to_wishlist": {
+    "defaultMessage": "Adicionar pacote à lista de desejos"
   },
   "product_view.button.add_set_to_cart": {
     "defaultMessage": "Adicionar conjunto ao carrinho"
@@ -1082,10 +1148,10 @@
     "defaultMessage": "Atualizar"
   },
   "product_view.label.assistive_msg.quantity_decrement": {
-    "defaultMessage": "Quantidade de decremento"
+    "defaultMessage": "Quantidade em decremento para {productName}"
   },
   "product_view.label.assistive_msg.quantity_increment": {
-    "defaultMessage": "Quantidade de incremento"
+    "defaultMessage": "Quantidade em incremento para {productName}"
   },
   "product_view.label.quantity": {
     "defaultMessage": "Quantidade"
@@ -1095,9 +1161,6 @@
   },
   "product_view.label.quantity_increment": {
     "defaultMessage": "+"
-  },
-  "product_view.label.starting_at_price": {
-    "defaultMessage": "A partir de"
   },
   "product_view.label.variant_type": {
     "defaultMessage": "{variantType}"
@@ -1196,6 +1259,15 @@
   "shipping_address.button.continue_to_shipping": {
     "defaultMessage": "Ir ao método de entrega"
   },
+  "shipping_address.label.edit_button": {
+    "defaultMessage": "Editar {address}"
+  },
+  "shipping_address.label.remove_button": {
+    "defaultMessage": "Remover {address}"
+  },
+  "shipping_address.label.shipping_address_form": {
+    "defaultMessage": "Formulário de endereço de entrega"
+  },
   "shipping_address.title.shipping_address": {
     "defaultMessage": "Endereço de entrega"
   },
@@ -1241,11 +1313,80 @@
   "signout_confirmation_dialog.message.sure_to_sign_out": {
     "defaultMessage": "Tem certeza de que deseja fazer logout? Será preciso fazer logon novamente para dar continuidade ao seu pedido atual."
   },
+  "store_locator.action.find": {
+    "defaultMessage": "Localizar"
+  },
+  "store_locator.action.select_a_country": {
+    "defaultMessage": "Selecione um país"
+  },
+  "store_locator.action.use_my_location": {
+    "defaultMessage": "Utilizar a minha localização"
+  },
+  "store_locator.action.viewMore": {
+    "defaultMessage": "Ver mais"
+  },
+  "store_locator.description.away": {
+    "defaultMessage": "de distância"
+  },
+  "store_locator.description.loading_locations": {
+    "defaultMessage": "Carregando localizações..."
+  },
+  "store_locator.description.no_locations": {
+    "defaultMessage": "Desculpe, não há localizações nesta área"
+  },
+  "store_locator.description.or": {
+    "defaultMessage": "Ou"
+  },
+  "store_locator.description.phone": {
+    "defaultMessage": "Telefone:"
+  },
+  "store_locator.description.viewing_near_postal_code": {
+    "defaultMessage": "Visualizando lojas dentro de {distance}{distanceUnit} de {postalCode} em"
+  },
+  "store_locator.description.viewing_near_your_location": {
+    "defaultMessage": "Ver lojas perto da sua localização"
+  },
+  "store_locator.dropdown.germany": {
+    "defaultMessage": "Alemanha"
+  },
+  "store_locator.dropdown.united_states": {
+    "defaultMessage": "Estados Unidos"
+  },
+  "store_locator.error.agree_to_share_your_location": {
+    "defaultMessage": "Aceite compartilhar sua localização"
+  },
+  "store_locator.error.please_enter_a_postal_code": {
+    "defaultMessage": "Insira um código postal."
+  },
+  "store_locator.error.please_select_a_country": {
+    "defaultMessage": "Selecione um país."
+  },
+  "store_locator.field.placeholder.enter_postal_code": {
+    "defaultMessage": "Inserir código postal"
+  },
+  "store_locator.pagination.load_more": {
+    "defaultMessage": "Carregar mais"
+  },
+  "store_locator.title": {
+    "defaultMessage": "Encontre uma loja"
+  },
   "swatch_group.selected.label": {
     "defaultMessage": "{label}:"
   },
   "toggle_card.action.edit": {
     "defaultMessage": "Editar"
+  },
+  "toggle_card.action.editContactInfo": {
+    "defaultMessage": "Editar informações de contato"
+  },
+  "toggle_card.action.editPaymentInfo": {
+    "defaultMessage": "Editar informações de pagamento"
+  },
+  "toggle_card.action.editShippingAddress": {
+    "defaultMessage": "Editar endereço de entrega"
+  },
+  "toggle_card.action.editShippingOptions": {
+    "defaultMessage": "Editar opções de envio"
   },
   "update_password_fields.button.forgot_password": {
     "defaultMessage": "Esqueceu a senha?"
@@ -1260,7 +1401,8 @@
     "defaultMessage": "Insira seu telefone."
   },
   "use_address_fields.error.please_enter_your_postal_or_zip": {
-    "defaultMessage": "Insira seu código postal."
+    "defaultMessage": "Insira seu CEP.",
+    "description": "Error message for a blank zip code (US-specific checkout)"
   },
   "use_address_fields.error.please_select_your_address": {
     "defaultMessage": "Insira seu endereço."
@@ -1272,7 +1414,8 @@
     "defaultMessage": "Selecione o país."
   },
   "use_address_fields.error.please_select_your_state_or_province": {
-    "defaultMessage": "Selecione estado/província."
+    "defaultMessage": "Selecione seu estado.",
+    "description": "Error message for a blank state (US-specific checkout)"
   },
   "use_address_fields.error.required": {
     "defaultMessage": "Requerido"
@@ -1373,8 +1516,14 @@
   "use_product.message.inventory_remaining": {
     "defaultMessage": "Somente {stockLevel} restante(s)!"
   },
+  "use_product.message.inventory_remaining_for_product": {
+    "defaultMessage": "Sobraram somente {stockLevel} para {productName}!"
+  },
   "use_product.message.out_of_stock": {
     "defaultMessage": "Fora de estoque"
+  },
+  "use_product.message.out_of_stock_for_product": {
+    "defaultMessage": "{productName} esgotado(a)"
   },
   "use_profile_fields.error.required_email": {
     "defaultMessage": "Insira um endereço de e-mail válido."
@@ -1490,11 +1639,20 @@
   "use_update_password_fields.label.new_password": {
     "defaultMessage": "Nova senha"
   },
+  "wishlist_primary_action.button.addSetToCart.label": {
+    "defaultMessage": "Adicionar conjunto de {productName} ao carrinho"
+  },
+  "wishlist_primary_action.button.addToCart.label": {
+    "defaultMessage": "Adicionar {productName} ao carrinho"
+  },
   "wishlist_primary_action.button.add_set_to_cart": {
     "defaultMessage": "Adicionar conjunto ao carrinho"
   },
   "wishlist_primary_action.button.add_to_cart": {
     "defaultMessage": "Adicionar ao carrinho"
+  },
+  "wishlist_primary_action.button.viewFullDetails.label": {
+    "defaultMessage": "Ver todos os detalhes de {productName}"
   },
   "wishlist_primary_action.button.view_full_details": {
     "defaultMessage": "Ver detalhes completos"
@@ -1502,11 +1660,17 @@
   "wishlist_primary_action.button.view_options": {
     "defaultMessage": "Ver opções"
   },
+  "wishlist_primary_action.button.view_options.label": {
+    "defaultMessage": "Ver opções para {productName}"
+  },
   "wishlist_primary_action.info.added_to_cart": {
     "defaultMessage": "{quantity} {quantity, plural, one {item} other {itens}} adicionado(s) ao carrinho"
   },
   "wishlist_secondary_button_group.action.remove": {
     "defaultMessage": "Remover"
+  },
+  "wishlist_secondary_button_group.info.item.remove.label": {
+    "defaultMessage": "Remover {productName}"
   },
   "wishlist_secondary_button_group.info.item_removed": {
     "defaultMessage": "Item removido da lista de desejos"

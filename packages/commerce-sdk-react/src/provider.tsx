@@ -5,6 +5,15 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React, {ReactElement, useEffect, useMemo} from 'react'
+import Auth from './auth'
+import {ApiClientConfigParams, ApiClients, SDKClientTransformer} from './hooks/types'
+import {Logger} from './types'
+import {
+    DWSID_COOKIE_NAME,
+    MOBIFY_PATH,
+    SERVER_AFFINITY_HEADER_KEY,
+    SLAS_PRIVATE_PROXY_PATH
+} from './constant'
 import {
     ShopperBaskets,
     ShopperContexts,
@@ -20,15 +29,8 @@ import {
     ShopperBasketsTypes,
     ShopperStores
 } from 'commerce-sdk-isomorphic'
-import Auth from './auth'
-import {ApiClientConfigParams, ApiClients} from './hooks/types'
-import {Logger} from './types'
-import {
-    DWSID_COOKIE_NAME,
-    MOBIFY_PATH,
-    SERVER_AFFINITY_HEADER_KEY,
-    SLAS_PRIVATE_PROXY_PATH
-} from './constant'
+import {transformSDKClient} from './utils'
+
 export interface CommerceApiProviderProps extends ApiClientConfigParams {
     children: React.ReactNode
     proxy: string
@@ -46,6 +48,7 @@ export interface CommerceApiProviderProps extends ApiClientConfigParams {
     passwordlessLoginCallbackURI?: string
     refreshTokenRegisteredCookieTTL?: number
     refreshTokenGuestCookieTTL?: number
+    apiClients?: ApiClients
 }
 
 /**
@@ -56,7 +59,9 @@ export const CommerceApiContext = React.createContext({} as ApiClients)
 /**
  * @internal
  */
-export const ConfigContext = React.createContext({} as Omit<CommerceApiProviderProps, 'children'>)
+export const ConfigContext = React.createContext(
+    {} as Omit<CommerceApiProviderProps, 'children' | 'apiClients'>
+)
 
 /**
  * @internal
@@ -126,7 +131,8 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
         defaultDnt,
         passwordlessLoginCallbackURI,
         refreshTokenRegisteredCookieTTL,
-        refreshTokenGuestCookieTTL
+        refreshTokenGuestCookieTTL,
+        apiClients
     } = props
 
     // Set the logger based on provided configuration, or default to the console object if no logger is provided
@@ -167,7 +173,8 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
         defaultDnt,
         passwordlessLoginCallbackURI,
         refreshTokenRegisteredCookieTTL,
-        refreshTokenGuestCookieTTL
+        refreshTokenGuestCookieTTL,
+        apiClients
     ])
 
     const dwsid = auth.get(DWSID_COOKIE_NAME)
@@ -176,28 +183,62 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
         serverAffinityHeader[SERVER_AFFINITY_HEADER_KEY] = dwsid
     }
 
-    const config = {
-        proxy,
-        headers: {
-            ...headers,
-            ...serverAffinityHeader
-        },
-        parameters: {
-            clientId,
-            organizationId,
-            shortCode,
-            siteId,
-            locale,
-            currency
-        },
-        throwOnBadResponse: true,
-        fetchOptions
+    const _defaultTransformer: SDKClientTransformer<Record<string, any>> = (_, _$, options) => {
+        return {
+            ...options,
+            headers: {
+                ...options.headers,
+                ...serverAffinityHeader
+            },
+            throwOnBadResponse: true,
+            fetchOptions: {
+                ...options.fetchOptions,
+                ...fetchOptions
+            }
+        }
     }
 
-    const baseUrl = config.proxy.split(MOBIFY_PATH)[0]
-    const privateClientEndpoint = `${baseUrl}${SLAS_PRIVATE_PROXY_PATH}`
+    const updatedClients: ApiClients = useMemo(() => {
+        if (apiClients) {
+            const clients: Record<string, any> = {}
 
-    const apiClients = useMemo(() => {
+            // transformSDKClient is simply a utility function that wraps the SDK Client instance
+            // in a Proxy that allows us to transform the method arguments and modify headers, parameters, and other options.
+            // We don't really need to pass in the children prop to the transformer function, so we'll just pass in the rest of the props.
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+            const {children, ...restProps} = props
+
+            Object.entries(apiClients ?? {}).forEach(([key, apiClient]) => {
+                clients[key] = transformSDKClient(apiClient, {
+                    props: restProps,
+                    transformer: _defaultTransformer
+                })
+            })
+
+            return clients as ApiClients
+        }
+
+        const config = {
+            proxy,
+            headers: {
+                ...headers,
+                ...serverAffinityHeader
+            },
+            parameters: {
+                clientId,
+                organizationId,
+                shortCode,
+                siteId,
+                locale,
+                currency
+            },
+            throwOnBadResponse: true,
+            fetchOptions
+        }
+
+        const baseUrl = config.proxy.split(MOBIFY_PATH)[0]
+        const privateClientEndpoint = `${baseUrl}${SLAS_PRIVATE_PROXY_PATH}`
+
         return {
             shopperBaskets: new ShopperBaskets(config),
             shopperContexts: new ShopperContexts(config),
@@ -224,7 +265,8 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
         fetchOptions,
         locale,
         currency,
-        headers?.['correlation-id']
+        headers?.['correlation-id'],
+        apiClients
     ])
 
     // Initialize the session
@@ -251,7 +293,7 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
                 refreshTokenGuestCookieTTL
             }}
         >
-            <CommerceApiContext.Provider value={apiClients}>
+            <CommerceApiContext.Provider value={updatedClients}>
                 <AuthContext.Provider value={auth}>{children}</AuthContext.Provider>
             </CommerceApiContext.Provider>
         </ConfigContext.Provider>
