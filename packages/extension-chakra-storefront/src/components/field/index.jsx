@@ -4,15 +4,13 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {useState} from 'react'
+import React, {useState, Fragment} from 'react'
 import PropTypes from 'prop-types'
 import {Controller} from 'react-hook-form'
 import {
-    FormControl,
-    FormLabel,
-    FormErrorMessage,
-    IconButton,
+    Field,
     Input,
+    IconButton,
     InputGroup,
     InputRightElement,
     Select,
@@ -21,7 +19,7 @@ import {
 import {VisibilityIcon, VisibilityOffIcon, AlertIcon} from '../../components/icons'
 import {useIntl} from 'react-intl'
 
-const Field = ({
+const FieldComponent = ({
     name,
     label,
     formLabel,
@@ -50,6 +48,7 @@ const Field = ({
               id: 'field.password.assistive_msg.hide_password',
               defaultMessage: 'Hide password'
           })
+
     const inputType =
         type === 'password' && hidePassword ? 'password' : type === 'password' ? 'text' : type
 
@@ -64,95 +63,109 @@ const Field = ({
                     typeof inputProps === 'function' ? inputProps({value, onChange}) : inputProps
 
                 return (
-                    <FormControl id={name} isInvalid={error}>
-                        {!['checkbox', 'radio', 'hidden'].includes(type) &&
-                            (formLabel || <FormLabel>{label}</FormLabel>)}
-
-                        <InputGroup>
-                            {['text', 'password', 'email', 'phone', 'tel', 'number'].includes(
-                                type
-                            ) && (
-                                <Input
-                                    ref={(node) => {
-                                        ref(node)
-                                        if (inputRef) inputRef.current = node
-                                    }}
-                                    onChange={onChange}
-                                    value={value}
-                                    type={inputType}
-                                    placeholder={placeholder}
-                                    autoComplete={autoComplete}
-                                    {..._inputProps}
-                                />
-                            )}
-
-                            {type === 'hidden' && (
-                                <input
-                                    ref={ref}
-                                    onChange={onChange}
-                                    value={value}
-                                    type="hidden"
-                                    {..._inputProps}
-                                />
-                            )}
-
-                            {type === 'password' && (
-                                <InputRightElement>
-                                    <IconButton
-                                        variant="ghosted"
-                                        aria-label={passwordIconLabel}
-                                        icon={<PasswordIcon color="gray.500" boxSize={6} />}
-                                        onClick={() => setHidePassword(!hidePassword)}
-                                    />
-                                </InputRightElement>
-                            )}
-
-                            {type === 'select' && (
-                                <Select
-                                    ref={ref}
-                                    onChange={onChange}
-                                    value={value}
-                                    placeholder={placeholder}
-                                    {..._inputProps}
-                                >
-                                    {options.map((opt) => (
-                                        <option key={`${opt.label}-${opt.value}`} value={opt.value}>
-                                            {opt.label}
-                                        </option>
-                                    ))}
-                                </Select>
-                            )}
-
-                            {type === 'checkbox' && (
-                                <Checkbox
-                                    ref={ref}
-                                    onChange={(e) => onChange(e.target.checked)}
-                                    isChecked={value}
-                                    {..._inputProps}
-                                >
-                                    {formLabel || label}
-                                </Checkbox>
-                            )}
-
-                            {children}
-                        </InputGroup>
-
-                        {error && type !== 'hidden' && (
-                            <FormErrorMessage color="red.600">
-                                <AlertIcon aria-hidden="true" mr={2} />
-                                {error.message}
-                            </FormErrorMessage>
+                    <Field.Root name={name} isInvalid={!!error} isRequired={!!rules?.required}>
+                        {/* Label */}
+                        {!['checkbox', 'radio', 'hidden'].includes(type) && (
+                            <Field.Label>{formLabel || label}</Field.Label>
                         )}
 
-                        {helpText}
-                    </FormControl>
+                        <InputGroup>
+                            <Fragment>
+                                {['text', 'password', 'email', 'phone', 'tel', 'number'].includes(
+                                    type
+                                ) && (
+                                    <Input
+                                        ref={(node) => {
+                                            if (ref) ref(node)
+                                            if (inputRef) inputRef.current = node
+                                        }}
+                                        onChange={onChange}
+                                        value={value || ''}
+                                        type={inputType}
+                                        placeholder={placeholder}
+                                        autoComplete={autoComplete}
+                                        {..._inputProps}
+                                    />
+                                )}
+
+                                {type === 'hidden' && (
+                                    <input
+                                        ref={ref}
+                                        onChange={onChange}
+                                        value={value || ''}
+                                        type="hidden"
+                                        {..._inputProps}
+                                    />
+                                )}
+
+                                {type === 'password' && (
+                                    <InputRightElement>
+                                        <IconButton
+                                            variant="ghost"
+                                            aria-label={passwordIconLabel}
+                                            icon={
+                                                <PasswordIcon
+                                                    color="gray.500"
+                                                    width={6}
+                                                    height={6}
+                                                />
+                                            }
+                                            onClick={() => setHidePassword(!hidePassword)}
+                                        />
+                                    </InputRightElement>
+                                )}
+
+                                {type === 'select' && (
+                                    <Select
+                                        ref={ref}
+                                        onChange={onChange}
+                                        value={value || ''}
+                                        placeholder={placeholder}
+                                        {..._inputProps}
+                                    >
+                                        {options.map((opt) => (
+                                            <option
+                                                key={`${opt.label}-${opt.value}`}
+                                                value={opt.value}
+                                            >
+                                                {opt.label}
+                                            </option>
+                                        ))}
+                                    </Select>
+                                )}
+
+                                {type === 'checkbox' && (
+                                    <Checkbox
+                                        ref={ref}
+                                        onChange={(e) => onChange(e.target.checked)}
+                                        isChecked={value}
+                                        {..._inputProps}
+                                    >
+                                        {formLabel || label}
+                                    </Checkbox>
+                                )}
+
+                                {children}
+                            </Fragment>
+                        </InputGroup>
+
+                        {/* Error Message */}
+                        {error && type !== 'hidden' && (
+                            <Field.ErrorText>
+                                <AlertIcon aria-hidden="true" mr={2} />
+                                {error.message}
+                            </Field.ErrorText>
+                        )}
+
+                        {helpText && <Field.HelperText>{helpText}</Field.HelperText>}
+                    </Field.Root>
                 )
             }}
         />
     )
 }
 
-Field.propTypes = {
+FieldComponent.propTypes = {
     name: PropTypes.string,
     label: PropTypes.string,
     autoComplete: PropTypes.string,
@@ -180,4 +193,4 @@ Field.propTypes = {
     inputRef: PropTypes.object
 }
 
-export default Field
+export default FieldComponent

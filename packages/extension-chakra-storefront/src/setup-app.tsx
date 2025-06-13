@@ -6,7 +6,7 @@
  */
 
 // Third-Party
-import React, {Fragment, useState} from 'react'
+import React from 'react'
 
 // Platform Imports
 import {ApplicationExtension} from '@salesforce/pwa-kit-extension-sdk/react'
@@ -32,14 +32,26 @@ import extensionMeta from '../extension-meta.json'
 // Pages
 import * as Pages from './pages'
 
-
 // ALL CODE BETWEEN THESES COMMENTS IS FOR TESTING PURPOSES ONLY
 import LoginForm from './components/login'
 import {useForm} from 'react-hook-form'
+import {Box} from '@chakra-ui/react'
 
 const LoginPage = ({...props}) => {
     const form = useForm()
-    return <LoginForm form={form} {...props} />
+    return (
+        <Box style={{display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh'}}>
+            <Box style={{width: '407px', border: '1px solid lightgrey', marginTop: '100px', marginBottom: '100px'}}>
+                <LoginForm
+                    form={form}
+                    idps={['Apple', 'Google']}
+                    isPasswordlessEnabled={true}
+                    isSocialEnabled={true}
+                    {...props}
+                />
+            </Box>
+        </Box>
+    )
 }
 
 // END
