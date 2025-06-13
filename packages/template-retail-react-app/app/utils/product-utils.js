@@ -25,8 +25,7 @@ import {productUrlBuilder, rebuildPathWithParams} from '@salesforce/retail-react
 export const getDisplayVariationValues = (variationAttributes, values = {}) => {
     // standard products do not have variation attributes
     if (!variationAttributes || !values) {
-        return {
-        }
+        return {}
     }
 
     const returnVal = Object.entries(values).reduce((acc, [id, value]) => {
