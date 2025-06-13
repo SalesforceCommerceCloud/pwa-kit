@@ -10,8 +10,8 @@ import PropTypes from 'prop-types'
 import {FormattedMessage} from 'react-intl'
 import {Alert, Button, Stack, Text} from '@chakra-ui/react'
 import {AlertIcon, BrandLogo} from '../../components/icons'
-// import StandardLogin from '../../components/standard-login'
-// import PasswordlessLogin from '../../components/passwordless-login'
+import StandardLogin from '../../components/standard-login'
+import PasswordlessLogin from '../../components/passwordless-login'
 import {noop} from '../../utils/utils'
 
 const LoginForm = ({
@@ -27,8 +27,13 @@ const LoginForm = ({
 }) => {
     return (
         <Fragment>
-
-            <Stack justify="center" align="center" spacing={8} marginBottom={8}>
+            <Stack 
+                justifyContent="center" 
+                alignItems="center" 
+                gap={8} 
+                marginTop={8}
+                marginBottom={8}
+            >
                 <BrandLogo width="60px" height="auto" />
                 <Text align="center" fontSize="xl" fontWeight="semibold">
                     <FormattedMessage
@@ -51,7 +56,7 @@ const LoginForm = ({
                     </Alert>
                 )}
                 <Stack spacing={6}>
-                    {/* {isPasswordlessEnabled ? (
+                    {isPasswordlessEnabled ? (
                         <PasswordlessLogin
                             form={form}
                             handleForgotPasswordClick={handleForgotPasswordClick}
@@ -67,9 +72,9 @@ const LoginForm = ({
                             isSocialEnabled={isSocialEnabled}
                             idps={idps}
                         />
-                    )} */}
+                    )}
 
-                    <Stack direction="row" spacing={1} justify="center">
+                    <Stack direction="row" spacing={1} justifyContent="center">
                         <Text fontSize="sm">
                             <FormattedMessage
                                 defaultMessage="Don't have an account?"
