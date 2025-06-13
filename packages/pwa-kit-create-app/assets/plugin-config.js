@@ -13,7 +13,8 @@ module.exports = {
         SFDC_EXT_STORE_LOCATOR_ENABLED: {
             name: 'Store Locator',
             description: 'The Store Locator Extension',
-            instruction: 'store-locator.mdc'
+            installInstruction: 'install-store-locator.mdc',
+            uninstallInstruction: 'uninstall-store-locator.mdc'
         }
     }
 }
