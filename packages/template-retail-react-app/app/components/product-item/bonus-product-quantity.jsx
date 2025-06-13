@@ -17,20 +17,20 @@ const BonusProductQuantity = ({product}) => {
             color="gray.700"
             aria-label={intl.formatMessage(
                 {
-                    id: 'item_variant.assistive_msg.quantity',
-                    defaultMessage: 'Quantity {quantity}'
+                    id: 'item_variant.quantity.label',
+                    defaultMessage:
+                        'Quantity selector for {productName}. Selected quantity is {quantity}'
                 },
                 {
-                    quantity: product?.quantity
+                    quantity: product?.quantity,
+                    productName: product?.name
                 }
             )}
         >
             <FormattedMessage
                 defaultMessage="Quantity: {quantity}"
-                id="bonusproduct_item.label.quantity"
-                values={{
-                    quantity: product.quantity
-                }}
+                id="product_item.label.quantity"
+                values={{quantity: product?.quantity}}
             />
         </Text>
     )

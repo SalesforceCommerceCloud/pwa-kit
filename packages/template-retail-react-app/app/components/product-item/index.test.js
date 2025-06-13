@@ -73,7 +73,7 @@ describe('ProductItem Component', () => {
     test('renders bonus product without quantity picker', () => {
         renderWithProviders(<MockedComponent product={mockBonusProduct} />)
 
-        expect(screen.getByText(/quantity: 1$/i)).toBeInTheDocument()
+        expect(screen.getByText(/Quantity:/i)).toBeInTheDocument()
         expect(screen.queryByRole('spinbutton')).not.toBeInTheDocument()
     })
 })

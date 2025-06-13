@@ -18,10 +18,8 @@ import CartItemVariantName from '@salesforce/retail-react-app/app/components/ite
 import CartItemVariantAttributes from '@salesforce/retail-react-app/app/components/item-variant/item-attributes'
 import CartItemVariantPrice from '@salesforce/retail-react-app/app/components/item-variant/item-price'
 import LoadingSpinner from '@salesforce/retail-react-app/app/components/loading-spinner'
-
-// Partials
-import BonusProductQuantity from '@salesforce/retail-react-app/app/components/product-item/partials/BonusProductQuantity'
-import ProductQuantityPicker from '@salesforce/retail-react-app/app/components/product-item/partials/ProductQuantityPicker'
+import BonusProductQuantity from '@salesforce/retail-react-app/app/components/product-item/bonus-product-quantity'
+import ProductQuantityPicker from '@salesforce/retail-react-app/app/components/product-item/product-quantity-picker'
 
 // Utilities
 import {noop} from '@salesforce/retail-react-app/app/utils/utils'

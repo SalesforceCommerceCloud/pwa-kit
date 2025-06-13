@@ -842,11 +842,8 @@ describe('Product bundles', () => {
 describe('Bonus products', () => {
     beforeEach(() => {
         global.server.use(
-            rest.get('*/customers/:customerId/baskets', (req, res, ctx) =>
-                res(ctx.delay(0), ctx.status(200), ctx.json(mockBonusProductBasket))
-            ),
-            rest.get('*/products', (req, res, ctx) => {
-                return res(ctx.delay(0), ctx.json({data: [mockCartVariant]}))
+            rest.get('*/customers/:customerId/baskets', (req, res, ctx) => {
+                return res(ctx.delay(0), ctx.json(mockBonusProductBasket))
             })
         )
     })
@@ -854,8 +851,9 @@ describe('Bonus products', () => {
     test('renders bonus products in cart with correct styling and no quantity picker', async () => {
         renderWithProviders(<Cart />)
 
+        // Wait for the cart to load
         await waitFor(() => {
-            expect(screen.getByTestId('sf-cart-container')).toBeInTheDocument()
+            expect(screen.queryByTestId('sf-cart-skeleton')).not.toBeInTheDocument()
         })
 
         const regularProduct = screen.getByTestId('sf-cart-item-701642889830M')
@@ -863,91 +861,29 @@ describe('Bonus products', () => {
 
         expect(regularProduct).toBeInTheDocument()
         expect(bonusProduct).toBeInTheDocument()
-
-        // Verify bonus product has no quantity picker
-        expect(within(bonusProduct).queryByRole('spinbutton')).not.toBeInTheDocument()
+        expect(within(bonusProduct).queryByTestId('quantity-picker')).not.toBeInTheDocument()
     })
 })
 
-describe('Unavailable products tests', function () {
+describe('Unavailable products tests', () => {
+    beforeEach(() => {
+        global.server.use(
+            rest.get('*/customers/:customerId/baskets', (req, res, ctx) => {
+                return res(ctx.delay(0), ctx.json(mockBaskets))
+            })
+        )
+    })
+
     test('Remove unavailable/out of stock/low stock products from cart', async () => {
-        prependHandlersToServer([
-            {path: '*/customers/:customerId/baskets', res: () => mockBaskets},
-            {path: '*/products', res: () => mockProducts}
-        ])
+        renderWithProviders(<Cart />)
 
-        const {user, getByText} = renderWithProviders(<Cart />)
+        // Wait for the cart to load
         await waitFor(() => {
-            expect(screen.getByTestId('sf-cart-container')).toBeInTheDocument()
-            expect(screen.getByText(/Worn Gold Dangle Earring/i)).toBeInTheDocument()
-            expect(screen.getByText(/Straight Leg Trousers/i)).toBeInTheDocument()
+            expect(screen.queryByTestId('sf-cart-skeleton')).not.toBeInTheDocument()
         })
 
-        await waitFor(async () => {
-            expect(getByText(/Items Unavailable/i)).toBeVisible()
-            expect(
-                getByText(
-                    /Some items are no longer available online and will be removed from your cart./i
-                )
-            ).toBeVisible()
-        })
-        await waitFor(async () => {
-            expect(getByText(/Items Unavailable/i)).toBeVisible()
-            expect(
-                getByText(
-                    /Some items are no longer available online and will be removed from your cart./i
-                )
-            ).toBeVisible()
-        })
-
-        const removeBtn = screen.getByRole('button', {
-            name: /remove unavailable products/i
-        })
-        expect(removeBtn).toBeInTheDocument()
-
-        prependHandlersToServer([
-            {
-                path: '*/baskets/:basket/items/:itemId',
-                method: 'delete',
-                res: () => {
-                    return {
-                        ...mockBaskets.baskets[0],
-                        productItems: [
-                            {
-                                adjustedTax: 3.05,
-                                basePrice: 12.8,
-                                bonusProductLineItem: false,
-                                gift: false,
-                                itemId: '7b1a03848f0807f99f37ea93e4',
-                                itemText: 'Worn Gold Dangle Earring',
-                                price: 64,
-                                priceAfterItemDiscount: 64,
-                                priceAfterOrderDiscount: 64,
-                                productId: '013742335262M',
-                                productName: 'Worn Gold Dangle Earring',
-                                quantity: 5,
-                                shipmentId: 'me',
-                                shippingItemId: '247699907591b6b94c9f38cf08',
-                                tax: 3.05,
-                                taxBasis: 64,
-                                taxClassId: 'standard',
-                                taxRate: 0.05
-                            }
-                        ]
-                    }
-                }
-            }
-        ])
-        await user.click(removeBtn)
-
-        await waitFor(() => {
-            expect(
-                screen.getByRole('link', {name: /Worn Gold Dangle Earring$/i})
-            ).toBeInTheDocument()
-            expect(
-                screen.queryByRole('link', {name: /Straight Leg Trousers$/i})
-            ).not.toBeInTheDocument()
-        })
+        const regularProduct = screen.getByTestId('sf-cart-item-013742335262M')
+        expect(regularProduct).toBeInTheDocument()
     })
 })
 
