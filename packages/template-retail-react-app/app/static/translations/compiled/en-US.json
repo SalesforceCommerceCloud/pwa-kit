@@ -501,16 +501,6 @@
       "value": ")"
     }
   ],
-  "bonusproduct_item.label.quantity": [
-    {
-      "type": 0,
-      "value": "Quantity: "
-    },
-    {
-      "type": 1,
-      "value": "quantity"
-    }
-  ],
   "carousel.button.scroll_left.assistive_msg": [
     {
       "type": 0,
