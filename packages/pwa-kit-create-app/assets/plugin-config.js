@@ -11,6 +11,7 @@ module.exports = {
         //     description: 'The Hello World Extension'
         // },
         SFDC_EXT_STORE_LOCATOR_ENABLED: {
+            name: 'Store Locator',
             description: 'The Store Locator Extension',
             instruction: 'store-locator.mdc'
         }
