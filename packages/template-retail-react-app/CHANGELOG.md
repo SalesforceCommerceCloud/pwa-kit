@@ -7,7 +7,7 @@
 - Added support for PDP page to support Pickup in Store[#2537] (https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2537)
 - Compute store level inventory and refactor product view [#2553](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2553)
 - Show Bonus Product Label on OrderSummary component [#2524](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2524)
-
+- Updated store-locator component to work with Search Engines and location embedding [#2551](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2551)
 
 ## v6.1.0 (May 22, 2025)
 

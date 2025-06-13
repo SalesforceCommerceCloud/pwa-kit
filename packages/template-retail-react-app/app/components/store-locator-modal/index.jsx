@@ -5,8 +5,9 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, {useState, createContext} from 'react'
+import React, {useState, useEffect, createContext} from 'react'
 import PropTypes from 'prop-types'
+import {useStoreLocatorParams} from '@salesforce/retail-react-app/app/contexts/store-locator-params'
 
 // Components
 import {
@@ -18,24 +19,77 @@ import {
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 import StoreLocatorContent from '@salesforce/retail-react-app/app/components/store-locator-modal/store-locator-content'
 
-// Others
 import {
     DEFAULT_STORE_LOCATOR_COUNTRY,
     DEFAULT_STORE_LOCATOR_POSTAL_CODE,
     STORE_LOCATOR_NUM_STORES_PER_LOAD
 } from '@salesforce/retail-react-app/app/constants'
+import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
 
 export const StoreLocatorContext = createContext()
-export const useStoreLocator = () => {
+export const useStoreLocator = (initialParams) => {
+    const {site} = useMultiSite()
     const [userHasSetManualGeolocation, setUserHasSetManualGeolocation] = useState(false)
     const [automaticGeolocationHasFailed, setAutomaticGeolocationHasFailed] = useState(false)
     const [userWantsToShareLocation, setUserWantsToShareLocation] = useState(false)
 
-    const [searchStoresParams, setSearchStoresParams] = useState({
-        countryCode: DEFAULT_STORE_LOCATOR_COUNTRY.countryCode,
-        postalCode: DEFAULT_STORE_LOCATOR_POSTAL_CODE,
-        limit: STORE_LOCATOR_NUM_STORES_PER_LOAD
-    })
+    const getSearchParamsForSeSelection = () => {
+        if (initialParams) {
+            return {
+                countryCode: initialParams.countryCode || DEFAULT_STORE_LOCATOR_COUNTRY.countryCode,
+                postalCode: initialParams.postalCode || DEFAULT_STORE_LOCATOR_POSTAL_CODE,
+                latitude: initialParams.latitude,
+                longitude: initialParams.longitude,
+                limit: initialParams.limit || STORE_LOCATOR_NUM_STORES_PER_LOAD
+            }
+        }
+
+        try {
+            const storeInfoKey = `store_${site.id}`
+            if (typeof window !== 'undefined') {
+                const existingStore = window.localStorage.getItem(storeInfoKey)
+                if (existingStore) {
+                    const storeData = JSON.parse(existingStore)
+
+                    if (storeData.isSeSelection && storeData.seSearchParams) {
+                        return {
+                            ...storeData.seSearchParams,
+                            limit: STORE_LOCATOR_NUM_STORES_PER_LOAD
+                        }
+                    }
+
+                    if (!storeData.isSeSelection && storeData.manualSearchParams) {
+                        return {
+                            ...storeData.manualSearchParams,
+                            limit: STORE_LOCATOR_NUM_STORES_PER_LOAD
+                        }
+                    }
+                }
+            }
+        } catch (e) {
+            // Invalid localStorage data, ignore
+        }
+
+        return {
+            countryCode: DEFAULT_STORE_LOCATOR_COUNTRY.countryCode,
+            postalCode: DEFAULT_STORE_LOCATOR_POSTAL_CODE,
+            limit: STORE_LOCATOR_NUM_STORES_PER_LOAD
+        }
+    }
+
+    const [searchStoresParams, setSearchStoresParams] = useState(() =>
+        getSearchParamsForSeSelection()
+    )
+
+    useEffect(() => {
+        if (initialParams) {
+            setSearchStoresParams((prevParams) => ({
+                ...prevParams,
+                ...initialParams
+            }))
+            setUserHasSetManualGeolocation(true)
+        }
+    }, [initialParams])
 
     return {
         userHasSetManualGeolocation,
@@ -50,7 +104,8 @@ export const useStoreLocator = () => {
 }
 
 const StoreLocatorModal = ({isOpen, onClose}) => {
-    const storeLocator = useStoreLocator()
+    const {params: initialParams} = useStoreLocatorParams()
+    const storeLocator = useStoreLocator(initialParams)
     const isDesktopView = useBreakpointValue({base: false, lg: true})
 
     return (

@@ -21,7 +21,6 @@ import {
     RadioGroup
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 
-// Hooks
 import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
 
 const StoresList = ({storesInfo}) => {
@@ -31,20 +30,63 @@ const StoresList = ({storesInfo}) => {
     const [selectedStore, setSelectedStore] = useState('')
 
     useEffect(() => {
-        setSelectedStore(JSON.parse(window.localStorage.getItem(storeInfoKey))?.id || '')
-    }, [storeInfoKey])
+        let existingStore = null
+
+        try {
+            if (typeof window !== 'undefined') {
+                existingStore = window.localStorage.getItem(storeInfoKey)
+            }
+        } catch (e) {
+            console.warn('Error accessing localStorage:', e)
+        }
+
+        if (existingStore) {
+            try {
+                const storeData = JSON.parse(existingStore)
+
+                if (storeData.id) {
+                    setSelectedStore(storeData.id)
+                }
+            } catch (e) {
+                // Invalid localStorage data, ignore
+            }
+        } else {
+            setSelectedStore('')
+        }
+    }, [storeInfoKey, storesInfo])
 
     const handleChange = (storeId) => {
         setSelectedStore(storeId)
         const store = storesInfo.find((store) => store.id === storeId)
-        window.localStorage.setItem(
-            storeInfoKey,
-            JSON.stringify({
-                id: storeId,
-                name: store.name || null,
-                inventoryId: store.inventoryId || null
-            })
-        )
+
+        const manualSearchParams = {}
+        if (store.postalCode && store.countryCode) {
+            manualSearchParams.postalCode = store.postalCode
+            manualSearchParams.countryCode = store.countryCode
+        } else if (store.latitude && store.longitude) {
+            manualSearchParams.latitude = store.latitude
+            manualSearchParams.longitude = store.longitude
+            manualSearchParams.countryCode = store.countryCode
+        } else if (store.countryCode) {
+            manualSearchParams.countryCode = store.countryCode
+        }
+
+        const newStoreData = {
+            id: storeId,
+            name: store.name || null,
+            inventoryId: store.inventoryId || null,
+            isSeSelection: false,
+            timestamp: Date.now(),
+            manualSearchParams: manualSearchParams
+        }
+
+        try {
+            if (typeof window !== 'undefined') {
+                window.localStorage.setItem(storeInfoKey, JSON.stringify(newStoreData))
+            }
+        } catch (e) {
+            console.warn('Error saving to localStorage:', e)
+        }
     }
 
     return (

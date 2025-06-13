@@ -6,9 +6,21 @@
  */
 
 import React from 'react'
-import StoreLocatorModal from '@salesforce/retail-react-app/app/components/store-locator-modal/index'
+import StoreLocatorModal, {
+    useStoreLocator
+} from '@salesforce/retail-react-app/app/components/store-locator-modal/index'
 import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
 import {rest} from 'msw'
+import {renderHook} from '@testing-library/react'
+
+jest.mock('@salesforce/retail-react-app/app/hooks/use-multi-site', () => ({
+    __esModule: true,
+    default: () => ({
+        site: {
+            id: 'test-site'
+        }
+    })
+}))
 
 const mockStoresData = [
     {
@@ -208,5 +220,96 @@ describe('StoreLocatorModal', () => {
         expect(() => {
             renderWithProviders(<StoreLocatorModal />)
         }).not.toThrow()
+    })
+})
+
+describe('useStoreLocator - getSearchParamsForSeSelection', () => {
+    beforeEach(() => {
+        window.localStorage.clear()
+    })
+
+    test('returns initial params when provided', () => {
+        const initialParams = {
+            countryCode: 'US',
+            postalCode: '94301',
+            latitude: 37.4419,
+            longitude: -122.143
+        }
+
+        const {result} = renderHook(() => useStoreLocator(initialParams))
+
+        expect(result.current.searchStoresParams).toEqual({
+            countryCode: 'US',
+            postalCode: '94301',
+            latitude: 37.4419,
+            longitude: -122.143,
+            limit: 10
+        })
+    })
+
+    test('returns Search Engine provided location parameter selection from localStorage when available', () => {
+        const seStoreData = {
+            isSeSelection: true,
+            seSearchParams: {
+                countryCode: 'US',
+                postalCode: '90210',
+                latitude: 34.0522,
+                longitude: -118.2437
+            }
+        }
+
+        window.localStorage.setItem('store_test-site', JSON.stringify(seStoreData))
+
+        const {result} = renderHook(() => useStoreLocator())
+
+        expect(result.current.searchStoresParams).toEqual({
+            countryCode: 'US',
+            postalCode: '90210',
+            latitude: 34.0522,
+            longitude: -118.2437,
+            limit: 10
+        })
+    })
+
+    test('returns manual search params from localStorage when no Search Engine provided location parameter selection', () => {
+        const manualStoreData = {
+            isSeSelection: false,
+            manualSearchParams: {
+                countryCode: 'DE',
+                postalCode: '10178'
+            }
+        }
+
+        window.localStorage.setItem('store_test-site', JSON.stringify(manualStoreData))
+
+        const {result} = renderHook(() => useStoreLocator())
+
+        expect(result.current.searchStoresParams).toEqual({
+            countryCode: 'DE',
+            postalCode: '10178',
+            limit: 10
+        })
+    })
+
+    test('returns default values when localStorage is empty', () => {
+        const {result} = renderHook(() => useStoreLocator())
+
+        expect(result.current.searchStoresParams).toEqual({
+            countryCode: 'DE',
+            postalCode: '10178',
+            limit: 10
+        })
+    })
+
+    test('returns default values when localStorage data is invalid', () => {
+        window.localStorage.setItem('store_test-site', 'invalid-json')
+
+        const {result} = renderHook(() => useStoreLocator())
+
+        expect(result.current.searchStoresParams).toEqual({
+            countryCode: 'DE',
+            postalCode: '10178',
+            limit: 10
+        })
     })
 })
