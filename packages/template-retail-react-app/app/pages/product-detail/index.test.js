@@ -27,6 +27,7 @@ import {
     basketWithProductBundle,
     bundleProductItemsForPDP
 } from '@salesforce/retail-react-app/app/mocks/product-bundle'
+import mockStandardProduct from '@salesforce/retail-react-app/app/mocks/standard-canon-eos-50d-bodyM'
 
 jest.setTimeout(60000)
 
@@ -486,5 +487,78 @@ describe('product bundles', () => {
             expect(screen.getByText('Only 3 left!')).toBeInTheDocument()
             expect(addBundleToCartBtn).toBeDisabled()
         })
+    })
+})
+
+describe('standard products', () => {
+    test('should render standard product details page without variation attributes', async () => {
+        global.server.use(
+            // Use standard product mock
+            rest.get('*/products/:productId', (req, res, ctx) => {
+                return res(ctx.json(mockStandardProduct))
+            })
+        )
+
+        renderWithProviders(<MockedComponent />)
+
+        expect(await screen.findByTestId('product-details-page')).toBeInTheDocument()
+
+        await waitFor(() => {
+            expect(screen.getAllByText(/Canon EOS 50D Digital SLR Camera/i)).toHaveLength(2)
+            expect(screen.getAllByText(/979\.99/)).toHaveLength(4)
+            expect(screen.getAllByText(/Add to Cart/)).toHaveLength(2)
+            expect(screen.getAllByText(/Add to Wishlist/)).toHaveLength(2)
+            expect(screen.getByRole('spinbutton', {name: /quantity/i})).toBeInTheDocument()
+            expect(screen.getAllByTestId('product-view')).toHaveLength(1)
+            expect(screen.getByText(/You might also like/i)).toBeInTheDocument()
+
+            const productView = screen.getByTestId('product-view')
+            // Should NOT display any variation attributes
+            const variationAttributes = within(productView).queryAllByRole('radiogroup')
+            expect(variationAttributes).toHaveLength(0)
+        })
+    })
+
+    test('should add standard product to cart successfully', async () => {
+        global.server.use(
+            rest.get('*/products/:productId', (req, res, ctx) => {
+                return res(ctx.json(mockStandardProduct))
+            }),
+            rest.post('*/baskets/:basketId/items', (req, res, ctx) => {
+                return res(
+                    ctx.json({
+                        basketId: 'test-basket',
+                        productItems: [
+                            {
+                                productId: 'canon-eos-50d-bodyM',
+                                price: 979.99,
+                                quantity: 1
+                            }
+                        ]
+                    })
+                )
+            })
+        )
+
+        const initialBasket = {basketId: 'valid_id'}
+        renderWithProviders(<MockedComponent />, {wrapperProps: {initialBasket}})
+
+        expect(await screen.findByTestId('product-details-page')).toBeInTheDocument()
+
+        await waitFor(() => {
+            expect(screen.getAllByText(/Canon EOS 50D Digital SLR Camera/i)).toHaveLength(2)
+            expect(screen.getByText(/You might also like/i)).toBeInTheDocument()
+        })
+
+        const addToCartButton = await screen.findByRole('button', {name: /Add to Cart/})
+        fireEvent.click(addToCartButton)
+
+        await waitFor(
+            () => {
+                const modal = screen.getByTestId('add-to-cart-modal')
+                expect(within(modal).getByText(/1 item added to cart/i)).toBeInTheDocument()
+            },
+            {timeout: 10000}
+        )
     })
 })

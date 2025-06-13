@@ -128,7 +128,16 @@ export const useVariationAttributes = (
                         {
                             name: 'single',
                             orderable: product?.inventory?.orderable,
-                            value: 'single'
+                            value: 'single',
+                            // no image for swatches
+                            href: buildVariantValueHref({
+                                pathname: location.pathname,
+                                existingParams,
+                                newParams: {},
+                                productId: product.id,
+                                isProductPartOfSet,
+                                isProductPartOfBundle
+                            })
                         }
                     ],
                     selectedValue: {

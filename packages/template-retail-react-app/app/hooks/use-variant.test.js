@@ -11,6 +11,7 @@ import {Router} from 'react-router'
 import {render} from '@testing-library/react'
 import {createMemoryHistory} from 'history'
 import {useVariant} from '@salesforce/retail-react-app/app/hooks/use-variant'
+import {STANDARD_PRODUCT_VARIATION_ATTRIBUTE} from '@salesforce/retail-react-app/app/constants'
 
 // Below is a partial product used for mocking purposes. Note: only the properties
 // that are used in the hook at defined.
@@ -41,10 +42,31 @@ const MockProduct = {
     ]
 }
 
+// Mock standard product based on the new mock file
+const MockStandardProduct = {
+    id: 'canon-eos-50d-bodyM',
+    type: {
+        item: true
+    },
+    inventory: {
+        orderable: true
+    },
+    price: 979.99
+}
+
 const MockComponent = () => {
     const variant = useVariant(MockProduct)
     return (
         <script data-testid="variant" type="application/json">
+            {JSON.stringify(variant)}
+        </script>
+    )
+}
+
+const MockStandardComponent = () => {
+    const variant = useVariant(MockStandardProduct)
+    return (
+        <script data-testid="standardVariant" type="application/json">
             {JSON.stringify(variant)}
         </script>
     )
@@ -77,5 +99,21 @@ describe('The useVariant', () => {
         expect(wrapper.getByTestId('variant').text).toBe(
             '{"orderable":true,"price":195,"productId":"883360492148M","variationValues":{"color":"DKL","size":"34"}}'
         )
+    })
+
+    test('returns standard product as single variant for standard products', () => {
+        const history = createMemoryHistory()
+        history.push('/test/path')
+
+        const wrapper = render(
+            <Router history={history}>
+                <MockStandardComponent />
+            </Router>
+        )
+
+        const result = JSON.parse(wrapper.getByTestId('standardVariant').text)
+        expect(result).toEqual(expect.objectContaining({orderable: true, price: 979.99, productId: 'canon-eos-50d-bodyM'}))
+        expect(Object.keys(result.variationValues).length).toBe(1)
+        expect(result.variationValues[STANDARD_PRODUCT_VARIATION_ATTRIBUTE]).toEqual('single')
     })
 })
