@@ -32,6 +32,17 @@ import extensionMeta from '../extension-meta.json'
 // Pages
 import * as Pages from './pages'
 
+
+// ALL CODE BETWEEN THESES COMMENTS IS FOR TESTING PURPOSES ONLY
+import LoginForm from './components/login'
+import {useForm} from 'react-hook-form'
+
+const LoginPage = ({...props}) => {
+    const form = useForm()
+    return <LoginForm form={form} {...props} />
+}
+
+// END
 class ChakraStorefront extends ApplicationExtension<Config> {
     static readonly id = extensionMeta.id
 
@@ -59,6 +70,11 @@ class ChakraStorefront extends ApplicationExtension<Config> {
             {
                 path: config.pages.Home && config.pages.Home.path,
                 component: Pages.Home,
+                exact: true
+            },
+            {
+                path: '/login-form',
+                component: LoginPage,
                 exact: true
             },
             // {
