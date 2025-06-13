@@ -8,6 +8,7 @@ import { InsertExistingComponentTool } from '../utils/InsertExistingComponentToo
 import { CreateNewComponentTool } from '../utils/CreateNewComponentTool.js';
 import fs from 'fs/promises';
 import path from 'path';
+import { Developing_LWC_Guidelines } from './pwa-developing-guide.js';
 
 class PwaStorefrontMCPServerHighLevel {
   constructor() {
@@ -263,6 +264,14 @@ class PwaStorefrontMCPServerHighLevel {
           }
         }   
       );
+
+    // Register pwa-developing-guide tool
+    this.server.tool(
+      Developing_LWC_Guidelines.name,
+      Developing_LWC_Guidelines.description,
+      {},
+      Developing_LWC_Guidelines.fn
+    );
   }
 
   
