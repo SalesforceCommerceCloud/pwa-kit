@@ -112,8 +112,14 @@ describe('The useVariant', () => {
         )
 
         const result = JSON.parse(wrapper.getByTestId('standardVariant').text)
-        expect(result).toEqual(expect.objectContaining({orderable: true, price: 979.99, productId: 'canon-eos-50d-bodyM'}))
-        expect(Object.keys(result.variationValues).length).toBe(1)
-        expect(result.variationValues[STANDARD_PRODUCT_VARIATION_ATTRIBUTE]).toEqual('single')
+        expect(result).toEqual(
+            expect.objectContaining({
+                orderable: true,
+                price: 979.99,
+                productId: 'canon-eos-50d-bodyM'
+            })
+        )
+        expect(Object.keys(result.variationValues)).toHaveLength(1)
+        expect(result.variationValues[STANDARD_PRODUCT_VARIATION_ATTRIBUTE]).toBe('single')
     })
 })

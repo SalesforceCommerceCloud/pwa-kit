@@ -792,7 +792,7 @@ describe('getDisplayVariationValues', function () {
         })
     })
 
-    const standardVariationAttributes = undefined;
+    const standardVariationAttributes = undefined
     test('returns empty object when standard products are used', () => {
         const result = getDisplayVariationValues(standardVariationAttributes, {})
         expect(result).toEqual({})

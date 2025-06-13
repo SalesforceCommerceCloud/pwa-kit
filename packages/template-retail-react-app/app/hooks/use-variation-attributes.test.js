@@ -149,7 +149,7 @@ describe('The useVariationAttributes', () => {
             </Router>
         )
         const result = JSON.parse(wrapper.getByTestId('standardVariationAttributes').text)
-        expect(result.length).toBe(1)
+        expect(result).toHaveLength(1)
         expect(result[0].id).toBe(STANDARD_PRODUCT_VARIATION_ATTRIBUTE)
     })
 })
