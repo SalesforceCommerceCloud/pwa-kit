@@ -46,7 +46,7 @@ const LogoutButton = ({onClick}) => {
     const {formatMessage} = useIntl()
     return (
         <>
-            <Divider colorScheme={'gray'} marginTop={3} />
+            <Separator colorPalette={'gray'} marginTop={3} />
             <Button
                 fontWeight="500"
                 onClick={onClick}
@@ -74,7 +74,7 @@ const LogoutButton = ({onClick}) => {
 }
 
 LogoutButton.propTypes = {
-    onClick: PropTypes.func.isRequired
+    onClick: PropTypes.func.required
 }
 const Account = () => {
     const {path} = useRouteMatch()

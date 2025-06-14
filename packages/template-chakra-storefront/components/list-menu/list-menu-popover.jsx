@@ -26,7 +26,7 @@ import {
 
 const ListMenuPopover = ({contentComponent, item, name, itemsKey, maxColumns}) => {
     const initialFocusRef = useRef()
-    const {isOpen, onClose, onOpen} = useDisclosure()
+    const {open, onClose, onOpen} = useDisclosure()
     const ContentComponent = contentComponent || ListMenuContent
     const theme = useTheme()
     const {baseStyle} = theme.components.ListMenu
@@ -39,18 +39,18 @@ const ListMenuPopover = ({contentComponent, item, name, itemsKey, maxColumns}) =
                 initialFocusRef={initialFocusRef}
                 onOpen={onOpen}
                 onClose={onClose}
-                isOpen={isOpen}
+                open={open}
                 variant="fullWidth"
             >
                 <Fragment>
                     <ListMenuTrigger
                         item={item}
                         name={name}
-                        isOpen={isOpen}
+                        open={open}
                         onOpen={onOpen}
                         onClose={onClose}
                     />
-                    {isOpen && (
+                    {open && (
                         <PopoverContent data-testid="popover-menu" {...baseStyle.popoverContent}>
                             <PopoverBody {...baseStyle.popoverBody}>
                                 <ContentComponent

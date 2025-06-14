@@ -65,7 +65,7 @@ const ActionCard = ({
                         <Button
                             variant="link"
                             size="sm"
-                            colorScheme="red"
+                            colorPalette="red"
                             onClick={handleRemove}
                             color="red.600"
                             aria-label={removeBtnLabel}

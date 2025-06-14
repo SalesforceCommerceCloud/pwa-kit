@@ -28,7 +28,7 @@ const WishlistPrimaryAction = () => {
     const isProductABundle = variant?.type?.bundle
     const showToast = useToast()
     const [isLoading, setIsLoading] = useState(false)
-    const {isOpen, onOpen, onClose} = useDisclosure()
+    const {open, onOpen, onClose} = useDisclosure()
 
     const handleAddToCart = async (item, quantity) => {
         setIsLoading(true)
@@ -175,9 +175,9 @@ const WishlistPrimaryAction = () => {
                     >
                         {buttonText.viewOptions}
                     </Button>
-                    {isOpen && (
+                    {open && (
                         <ProductViewModal
-                            isOpen={isOpen}
+                            open={open}
                             onOpen={onOpen}
                             onClose={onClose}
                             product={variant}

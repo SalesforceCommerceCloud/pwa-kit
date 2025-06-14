@@ -7,7 +7,7 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import {Modal, ModalBody, ModalCloseButton, ModalContent, ModalOverlay} from '@chakra-ui/react'
+import {ModalBody, ModalCloseButton, ModalContent, ModalOverlay} from '@chakra-ui/react'
 import ProductView from '../product-view'
 import {useProductViewModal} from '../../hooks/use-product-view-modal'
 import {useIntl} from 'react-intl'
@@ -15,7 +15,7 @@ import {useIntl} from 'react-intl'
 /**
  * A Modal that contains Product View
  */
-const ProductViewModal = ({product, isOpen, onClose, ...props}) => {
+const ProductViewModal = ({product, open, onOpenChange, ...props}) => {
     const productViewModalData = useProductViewModal(product)
 
     const intl = useIntl()
@@ -28,7 +28,7 @@ const ProductViewModal = ({product, isOpen, onClose, ...props}) => {
     )
 
     return (
-        <Modal size="4xl" isOpen={isOpen} onClose={onClose}>
+        <Dialog size="4xl" open={open} onOpenChange={onOpenChange}>
             <ModalOverlay />
             <ModalContent containerProps={{'data-testid': 'product-view-modal'}} aria-label={label}>
                 <ModalCloseButton />
@@ -42,14 +42,14 @@ const ProductViewModal = ({product, isOpen, onClose, ...props}) => {
                     />
                 </ModalBody>
             </ModalContent>
-        </Modal>
+        </Dialog>
     )
 }
 
 ProductViewModal.propTypes = {
-    isOpen: PropTypes.bool.isRequired,
-    onOpen: PropTypes.func.isRequired,
-    onClose: PropTypes.func.isRequired,
+    open: PropTypes.bool.required,
+    onOpen: PropTypes.func.required,
+    onOpenChange: PropTypes.func.required,
     product: PropTypes.object,
     isLoading: PropTypes.bool
 }

@@ -129,7 +129,7 @@ const Footer = ({...otherProps}) => {
 
                     {showLocaleSelector && (
                         <Box {...styles.localeSelector}>
-                            <FormControl
+                            <ield.root
                                 data-testid="sf-footer-locale-selector"
                                 id="locale_selector"
                                 width="auto"
@@ -160,11 +160,11 @@ const Footer = ({...otherProps}) => {
                                         </option>
                                     ))}
                                 </Select>
-                            </FormControl>
+                            </Field.Root>
                         </Box>
                     )}
 
-                    <Divider {...styles.horizontalRule} />
+                    <Separator {...styles.horizontalRule} />
 
                     <Box {...styles.bottomHalf}>
                         <Text {...styles.copyright}>

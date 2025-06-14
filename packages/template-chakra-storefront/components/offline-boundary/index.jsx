@@ -95,7 +95,7 @@ class OfflineBoundary extends React.Component {
 }
 
 OfflineBoundary.propTypes = {
-    isOnline: PropTypes.bool.isRequired,
+    isOnline: PropTypes.bool.required,
     location: PropTypes.object,
     children: PropTypes.node
 }

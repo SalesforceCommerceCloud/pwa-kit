@@ -117,7 +117,7 @@ const ProductView = forwardRef(
         const intl = useIntl()
         const location = useLocation()
         const {
-            isOpen: isAddToCartModalOpen,
+            open: isAddToCartModalOpen,
             onOpen: onAddToCartModalOpen,
             onClose: onAddToCartModalClose
         } = useAddToCartModalContext()
@@ -293,7 +293,7 @@ const ProductView = forwardRef(
                     <Button
                         key="cart-button"
                         onClick={handleCartItem}
-                        isDisabled={disableButton}
+                        disabled={disableButton}
                         isLoading={isBasketLoading}
                         width="100%"
                         variant="solid"

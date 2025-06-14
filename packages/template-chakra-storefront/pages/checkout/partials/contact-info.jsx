@@ -256,7 +256,7 @@ const ContactInfo = ({isSocialEnabled = false, isPasswordlessEnabled = false, id
                 <Text>{basket?.customerInfo?.email || customer?.email}</Text>
 
                 <SignOutConfirmationDialog
-                    isOpen={signOutConfirmDialogIsOpen}
+                    open={signOutConfirmDialogIsOpen}
                     onClose={() => setSignOutConfirmDialogIsOpen(false)}
                     onConfirm={async () => {
                         await logout.mutateAsync()
@@ -275,11 +275,11 @@ ContactInfo.propTypes = {
     idps: PropTypes.arrayOf(PropTypes.string)
 }
 
-const SignOutConfirmationDialog = ({isOpen, onConfirm, onClose}) => {
+const SignOutConfirmationDialog = ({open, onConfirm, onClose}) => {
     const cancelRef = useRef()
 
     return (
-        <AlertDialog isOpen={isOpen} leastDestructiveRef={cancelRef} onClose={onClose}>
+        <Dialog role="alertdialog" initialFocusEl={cancelRef} open={open} onClose={onClose}>
             <AlertDialogOverlay>
                 <AlertDialogContent>
                     <AlertDialogHeader fontSize="lg" fontWeight="bold">
@@ -304,7 +304,7 @@ const SignOutConfirmationDialog = ({isOpen, onConfirm, onClose}) => {
                                 id="signout_confirmation_dialog.button.cancel"
                             />
                         </Button>
-                        <Button colorScheme="red" onClick={onConfirm} ml={3}>
+                        <Button colorPalette="red" onClick={onConfirm} ml={3}>
                             <FormattedMessage
                                 defaultMessage="Sign Out"
                                 id="signout_confirmation_dialog.button.sign_out"
@@ -313,12 +313,12 @@ const SignOutConfirmationDialog = ({isOpen, onConfirm, onClose}) => {
                     </AlertDialogFooter>
                 </AlertDialogContent>
             </AlertDialogOverlay>
-        </AlertDialog>
+        </Dialog>
     )
 }
 
 SignOutConfirmationDialog.propTypes = {
-    isOpen: PropTypes.bool,
+    open: PropTypes.bool,
     onClose: PropTypes.func,
     onConfirm: PropTypes.func
 }

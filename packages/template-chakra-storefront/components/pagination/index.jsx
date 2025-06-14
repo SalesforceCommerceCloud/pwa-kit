@@ -49,7 +49,7 @@ const Pagination = (props) => {
             <Button
                 {...styles.button}
                 as={RouteLink}
-                // Because we are using a button component as a link, the isDisabled flag isn't working
+                // Because we are using a button component as a link, the disabled flag isn't working
                 // as intended, the workaround is to use the current url when its disabled.
                 href={prev || currentURL}
                 to={prev || currentURL}
@@ -105,7 +105,7 @@ const Pagination = (props) => {
             <Button
                 {...styles.button}
                 as={RouteLink}
-                // Because we are using a button component as a link, the isDisabled flag isn't working
+                // Because we are using a button component as a link, the disabled flag isn't working
                 // as intended, the workaround is to use the current url when its disabled.
                 href={next || currentURL}
                 to={next || currentURL}
@@ -134,7 +134,7 @@ Pagination.propTypes = {
     /**
      * A list of URL's representing the pages that can be navigated to.
      */
-    urls: PropTypes.array.isRequired,
+    urls: PropTypes.array.required,
     /**
      * The URL representing the current page
      */

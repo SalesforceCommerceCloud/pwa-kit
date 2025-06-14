@@ -41,7 +41,7 @@ const LinksList = ({
                 (variant === 'horizontal' ? (
                     <List {...styles.list} data-testid="horizontal-list">
                         {links.map((link, i) => (
-                            <ListItem key={i} {...styles.listItem} sx={styles.listItemSx}>
+                            <ListItem key={i} {...styles.listItem} s={styles.listItemSx}>
                                 <Link
                                     to={link.href}
                                     onClick={onLinkClick}
@@ -77,7 +77,7 @@ LinksList.propTypes = {
             href: PropTypes.string,
             text: PropTypes.string
         })
-    ).isRequired,
+    ).required,
     heading: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
     variant: PropTypes.oneOf(['vertical', 'horizontal']),
     color: PropTypes.string,

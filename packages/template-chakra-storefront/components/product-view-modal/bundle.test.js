@@ -19,7 +19,7 @@ import {
 import {rest} from 'msw'
 
 const MockComponent = ({updateCart}) => {
-    const {isOpen, onOpen, onClose} = useDisclosure()
+    const {open, onOpen, onClose} = useDisclosure()
 
     return (
         <div>
@@ -28,7 +28,7 @@ const MockComponent = ({updateCart}) => {
                 updateCart={updateCart}
                 onOpen={onOpen}
                 onClose={onClose}
-                isOpen={isOpen}
+                open={open}
                 product={mockBundledProductItemsVariant}
             />
         </div>

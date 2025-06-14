@@ -34,7 +34,7 @@ LocaleText.propTypes = {
     /**
      * The locale shortcode that you would like the localized text for.
      */
-    shortCode: PropTypes.string.isRequired
+    shortCode: PropTypes.string.required
 }
 
 export default LocaleText

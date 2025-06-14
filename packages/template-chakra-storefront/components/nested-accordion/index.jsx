@@ -138,7 +138,7 @@ NestedAccordion.propTypes = {
      * A POJO consistening of an id, name, and items array of object with
      * similarly specified properties.
      */
-    item: PropTypes.object.isRequired,
+    item: PropTypes.object.required,
     /**
      * An array of `AccordionItem` components that will be displayed after all
      * of the child items. Alternatively you can pass a function that will recieve

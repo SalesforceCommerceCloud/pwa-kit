@@ -72,7 +72,7 @@ const formatSuggestions = (searchSuggestions, input) => {
  * @return  {React.ReactElement} - SearchInput component
  */
 const Search = (props) => {
-    const [isOpen, setIsOpen] = useState(false)
+    const [open, setIsOpen] = useState(false)
     const [searchQuery, setSearchQuery] = useState('')
     const navigate = useNavigation()
     const {search: searchConfig} = getConfig()
@@ -183,7 +183,7 @@ const Search = (props) => {
 
     return (
         <Box>
-            <Popover isOpen={isOpen} isLazy initialFocusRef={searchInputRef}>
+            <Popover open={open} isLazy initialFocusRef={searchInputRef}>
                 <PopoverTrigger>
                     <form onSubmit={onSubmitSearch}>
                         <HStack>
@@ -205,7 +205,7 @@ const Search = (props) => {
                             </InputGroup>
                             <HideOnDesktop>
                                 <Button
-                                    display={isOpen ? 'block' : 'none'}
+                                    display={open ? 'block' : 'none'}
                                     variant="link"
                                     size="sm"
                                     onMouseDown={() => closeAndNavigate(false)}
@@ -232,7 +232,7 @@ const Search = (props) => {
             </Popover>
             <HideOnDesktop>
                 <Flex
-                    display={isOpen || searchInputRef?.value?.length > 0 ? 'block' : 'none'}
+                    display={open || searchInputRef?.value?.length > 0 ? 'block' : 'none'}
                     postion="absolute"
                     background="white"
                     left={0}

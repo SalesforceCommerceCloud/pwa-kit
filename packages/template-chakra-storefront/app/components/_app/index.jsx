@@ -129,9 +129,9 @@ const App = (props) => {
     const {colors} = useTheme()
     const styles = useStyleConfig('App')
 
-    const {isOpen, onOpen, onClose} = useDisclosure()
+    const {open, onOpen, onClose} = useDisclosure()
     const {
-        isOpen: isOpenStoreLocator,
+        open: isOpenStoreLocator,
         onOpen: onOpenStoreLocator,
         onClose: onCloseStoreLocator
     } = useDisclosure()
@@ -358,7 +358,7 @@ const App = (props) => {
                         <Box id="app" display="flex" flexDirection="column" flex={1}>
                             <SkipNavLink zIndex="skipLink">Skip to Content</SkipNavLink>
                             <StoreLocatorModal
-                                isOpen={isOpenStoreLocator}
+                                open={isOpenStoreLocator}
                                 onClose={onCloseStoreLocator}
                             />
                             <Box {...styles.headerWrapper}>
@@ -374,7 +374,7 @@ const App = (props) => {
                                         >
                                             <HideOnDesktop>
                                                 <DrawerMenu
-                                                    isOpen={isOpen}
+                                                    open={open}
                                                     onClose={onClose}
                                                     onLogoClick={onLogoClick}
                                                     root={

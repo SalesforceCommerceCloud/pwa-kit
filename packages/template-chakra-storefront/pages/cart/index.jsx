@@ -162,7 +162,7 @@ const Cart = () => {
     const [localIsGiftItems, setLocalIsGiftItems] = useState({})
     const [isCartItemLoading, setCartItemLoading] = useState(false)
 
-    const {isOpen, onOpen, onClose} = useDisclosure()
+    const {open, onOpen, onClose} = useDisclosure()
     const {formatMessage} = useIntl()
     const toast = useToast()
     const navigate = useNavigation()
@@ -582,9 +582,9 @@ const Cart = () => {
                                     })}
                                 </Stack>
                                 <Box>
-                                    {isOpen && !selectedItem.bundledProductItems && (
+                                    {open && !selectedItem.bundledProductItems && (
                                         <ProductViewModal
-                                            isOpen={isOpen}
+                                            open={open}
                                             onOpen={onOpen}
                                             onClose={onClose}
                                             product={selectedItem}
@@ -593,9 +593,9 @@ const Cart = () => {
                                             }
                                         />
                                     )}
-                                    {isOpen && selectedItem.bundledProductItems && (
+                                    {open && selectedItem.bundledProductItems && (
                                         <BundleProductViewModal
-                                            isOpen={isOpen}
+                                            open={open}
                                             onOpen={onOpen}
                                             onClose={onClose}
                                             product={selectedItem}

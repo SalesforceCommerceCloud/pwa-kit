@@ -41,7 +41,7 @@ const UpdatePasswordFields = ({form, prefix = ''}) => {
 
 UpdatePasswordFields.propTypes = {
     /** Object returned from `useForm` */
-    form: PropTypes.object.isRequired,
+    form: PropTypes.object.required,
 
     /** Optional prefix for field names */
     prefix: PropTypes.string

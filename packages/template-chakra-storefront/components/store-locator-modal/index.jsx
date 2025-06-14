@@ -49,14 +49,14 @@ export const useStoreLocator = () => {
     }
 }
 
-const StoreLocatorModal = ({isOpen, onClose}) => {
+const StoreLocatorModal = ({open, onOpenChange}) => {
     const storeLocator = useStoreLocator()
     const isDesktopView = useBreakpointValue({base: false, lg: true})
 
     return (
         <StoreLocatorContext.Provider value={storeLocator}>
             {isDesktopView ? (
-                <Modal size="4xl" isOpen={isOpen} onClose={onClose}>
+                <Dialog size="4xl" open={open} onOpenChange={onOpenChange}>
                     <ModalContent
                         position="absolute"
                         top="0"
@@ -68,14 +68,14 @@ const StoreLocatorModal = ({isOpen, onClose}) => {
                         borderLeft="1px solid"
                         borderColor="gray.200"
                     >
-                        <ModalCloseButton onClick={onClose} />
+                        <ModalCloseButton onClick={onOpenChange} />
                         <ModalBody pb={8} bg="white" paddingBottom={6} paddingTop={6}>
                             <StoreLocatorContent />
                         </ModalBody>
                     </ModalContent>
-                </Modal>
+                </Dialog>
             ) : (
-                <Modal size="4xl" isOpen={isOpen} onClose={onClose}>
+                <Dialog size="4xl" open={open} onOpenChange={onOpenChange}>
                     <ModalContent
                         position="absolute"
                         top="0"
@@ -83,20 +83,20 @@ const StoreLocatorModal = ({isOpen, onClose}) => {
                         height="100vh"
                         marginTop="0px"
                     >
-                        <ModalCloseButton onClick={onClose} />
+                        <ModalCloseButton onClick={onOpenChange} />
                         <ModalBody pb={8} bg="white" paddingBottom={6} marginTop={6}>
                             <StoreLocatorContent />
                         </ModalBody>
                     </ModalContent>
-                </Modal>
+                </Dialog>
             )}
         </StoreLocatorContext.Provider>
     )
 }
 
 StoreLocatorModal.propTypes = {
-    isOpen: PropTypes.bool,
-    onClose: PropTypes.func
+    open: PropTypes.bool,
+    onOpenChange: PropTypes.func
 }
 
 export default StoreLocatorModal

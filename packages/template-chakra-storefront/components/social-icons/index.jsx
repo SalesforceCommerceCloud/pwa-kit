@@ -36,7 +36,7 @@ const SocialIcons = ({variant, pinterestInnerColor = 'white', ...otherProps}) =>
         <Flex
             className="sf-social-icons"
             {...styles.container}
-            sx={{'--pinterest-icon-inner': pinterestInnerColor}}
+            s={{'--pinterest-icon-inner': pinterestInnerColor}}
             {...otherProps}
         >
             {/* Social Links */}

@@ -101,7 +101,7 @@ export const usePromoCode = () => {
 }
 
 export const PromoCode = ({form, submitPromoCode, itemProps}) => {
-    const [isOpen, setOpen] = useState()
+    const [open, setOpen] = useState()
 
     useEffect(() => {
         if (form.formState.isSubmitSuccessful) {
@@ -110,7 +110,7 @@ export const PromoCode = ({form, submitPromoCode, itemProps}) => {
     }, [form.formState.isSubmitSuccessful])
 
     return (
-        <Accordion allowToggle index={isOpen ? 0 : -1} onChange={() => setOpen(!isOpen)}>
+        <Accordion allowToggle index={open ? 0 : -1} onChange={() => setOpen(!open)}>
             <AccordionItem {...itemProps}>
                 {({isExpanded}) => (
                     <>
@@ -152,10 +152,10 @@ export const PromoCode = ({form, submitPromoCode, itemProps}) => {
 
 PromoCode.propTypes = {
     /** The form object returned from `usePromoCode` hook */
-    form: PropTypes.object.isRequired,
+    form: PropTypes.object.required,
 
     /** The submit callback returned from `usePromoCode` hook */
-    submitPromoCode: PropTypes.func.isRequired,
+    submitPromoCode: PropTypes.func.required,
 
     /** Props applied to inner AccordionItem. Useful for style overrides. */
     itemProps: PropTypes.object

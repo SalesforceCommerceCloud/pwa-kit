@@ -64,7 +64,7 @@ const Field = ({
                     typeof inputProps === 'function' ? inputProps({value, onChange}) : inputProps
 
                 return (
-                    <FormControl id={name} isInvalid={error}>
+                    <ield.root id={name} invalid={error}>
                         {!['checkbox', 'radio', 'hidden'].includes(type) &&
                             (formLabel || <FormLabel>{label}</FormLabel>)}
 
@@ -138,14 +138,14 @@ const Field = ({
                         </InputGroup>
 
                         {error && type !== 'hidden' && (
-                            <FormErrorMessage color="red.600">
+                            <ield.errortext color="red.600">
                                 <AlertIcon aria-hidden="true" mr={2} />
                                 {error.message}
-                            </FormErrorMessage>
+                            </Field.ErrorText>
                         )}
 
                         {helpText}
-                    </FormControl>
+                    </Field.Root>
                 )
             }}
         />

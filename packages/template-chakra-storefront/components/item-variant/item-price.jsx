@@ -26,7 +26,7 @@ const PricePerItem = ({currency, basePrice}) => {
 }
 
 PricePerItem.propTypes = {
-    currency: PropTypes.string.isRequired,
+    currency: PropTypes.string.required,
     basePrice: PropTypes.number
 }
 
@@ -99,7 +99,7 @@ const ItemPrice = ({currency, align = 'right', baseDirection = 'column', ...prop
 }
 
 ItemPrice.propTypes = {
-    currency: PropTypes.string.isRequired,
+    currency: PropTypes.string.required,
     align: PropTypes.string,
     baseDirection: PropTypes.string
 }

@@ -11,7 +11,7 @@ import {mockCategories} from '../../mocks/mock-data'
 
 describe('DrawerMenu', () => {
     test('Renders DrawerMenu without errors', async () => {
-        renderWithProviders(<DrawerMenu isOpen={true} root={mockCategories.root} />)
+        renderWithProviders(<DrawerMenu open={true} root={mockCategories.root} />)
 
         const drawer = document.querySelector('.chakra-portal')
         const accordion = document.querySelector('.chakra-accordion')
@@ -22,7 +22,7 @@ describe('DrawerMenu', () => {
         expect(socialIcons).toBeInTheDocument()
     })
     test('Renders DrawerMenu Spinner without root', async () => {
-        renderWithProviders(<DrawerMenu isOpen={true} />, {
+        renderWithProviders(<DrawerMenu open={true} />, {
             wrapperProps: {initialCategories: {}}
         })
 

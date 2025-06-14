@@ -78,8 +78,8 @@ const DisplayPrice = ({
 
 DisplayPrice.propTypes = {
     priceData: PropTypes.shape({
-        currentPrice: PropTypes.number.isRequired,
-        isOnSale: PropTypes.bool.isRequired,
+        currentPrice: PropTypes.number.required,
+        isOnSale: PropTypes.bool.required,
         listPrice: PropTypes.number,
         pricePerUnit: PropTypes.number,
         isASet: PropTypes.bool,
@@ -88,7 +88,7 @@ DisplayPrice.propTypes = {
         maxPrice: PropTypes.number,
         tieredPrice: PropTypes.number
     }),
-    currency: PropTypes.string.isRequired,
+    currency: PropTypes.string.required,
     labelForA11y: PropTypes.string,
     currentPriceProps: PropTypes.object,
     listPriceProps: PropTypes.object,

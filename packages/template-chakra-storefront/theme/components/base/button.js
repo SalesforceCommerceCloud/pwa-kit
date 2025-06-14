@@ -10,7 +10,7 @@ export default {
     },
     variants: {
         solid: (props) =>
-            props.colorScheme === 'blue'
+            props.colorPalette === 'blue'
                 ? {
                       backgroundColor: 'blue.600',
                       color: 'white',
@@ -20,7 +20,7 @@ export default {
                   }
                 : {},
         outline: (props) =>
-            props.colorScheme === 'black'
+            props.colorPalette === 'black'
                 ? {color: 'gray.900', _hover: {bg: 'gray.50'}, borderColor: 'gray.200'}
                 : {color: 'blue.600', _hover: {bg: 'gray.50'}},
         footer: {
@@ -33,7 +33,7 @@ export default {
             paddingRight: 3
         },
         link: (props) => ({
-            color: props.colorScheme === 'red' ? 'red.500' : 'blue.600',
+            color: props.colorPalette === 'red' ? 'red.500' : 'blue.600',
             fontWeight: 'normal',
             minWidth: '1em',
             lineHeight: 4
@@ -43,7 +43,7 @@ export default {
             justifyContent: 'flex-start',
             fontSize: 'sm',
             _hover: {bg: 'gray.50', textDecoration: 'underline', textDecorationColor: 'gray.900'},
-            _activeLink: {
+            _currentPage: {
                 bg: 'gray.50',
                 borderLeft: 'solid',
                 borderLeftColor: 'gray.600',
@@ -55,7 +55,7 @@ export default {
             justifyContent: 'flex-start',
             fontSize: 'sm',
             _hover: {bg: 'gray.50', textDecoration: 'underline', textDecorationColor: 'gray.900'},
-            _activeLink: {
+            _currentPage: {
                 bg: 'gray.100',
                 border: 'solid',
                 borderColor: 'gray.600',
@@ -76,6 +76,6 @@ export default {
         }
     },
     defaultProps: {
-        colorScheme: 'blue'
+        colorPalette: 'blue'
     }
 }

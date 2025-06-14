@@ -95,7 +95,7 @@ const StoreLocatorInput = ({form, submitForm}) => {
                         }}
                         render={({field}) => {
                             return SUPPORTED_STORE_LOCATOR_COUNTRIES.length !== 0 ? (
-                                <FormControl isInvalid={form.formState.errors.countryCode}>
+                                <ield.root invalid={form.formState.errors.countryCode}>
                                     <Select
                                         {...field}
                                         marginBottom="10px"
@@ -116,15 +116,15 @@ const StoreLocatorInput = ({form, submitForm}) => {
                                         )}
                                     </Select>
                                     {form.formState.errors.countryCode && (
-                                        <FormErrorMessage
-                                            sx={{marginBottom: '10px'}}
+                                        <ield.errortext
+                                            s={{marginBottom: '10px'}}
                                             color="red.600"
                                         >
                                             <AlertIcon aria-hidden="true" mr={2} />
                                             {form.formState.errors.countryCode.message}
-                                        </FormErrorMessage>
+                                        </Field.ErrorText>
                                     )}
-                                </FormControl>
+                                </Field.Root>
                             ) : (
                                 <></>
                             )
@@ -145,7 +145,7 @@ const StoreLocatorInput = ({form, submitForm}) => {
                     defaultValue={userHasSetManualGeolocation ? searchStoresParams?.postalCode : ''}
                     render={({field}) => {
                         return (
-                            <FormControl isInvalid={form.formState.errors.postalCode}>
+                            <ield.root invalid={form.formState.errors.postalCode}>
                                 <Input
                                     {...field}
                                     placeholder={intl.formatMessage({
@@ -154,12 +154,12 @@ const StoreLocatorInput = ({form, submitForm}) => {
                                     })}
                                 />
                                 {form.formState.errors.postalCode && (
-                                    <FormErrorMessage sx={{top: '-20px'}} color="red.600">
+                                    <ield.errortext s={{top: '-20px'}} color="red.600">
                                         <AlertIcon aria-hidden="true" mr={2} />
                                         {form.formState.errors.postalCode.message}
-                                    </FormErrorMessage>
+                                    </Field.ErrorText>
                                 )}
-                            </FormControl>
+                            </Field.Root>
                         )
                     }}
                 ></Controller>
@@ -204,8 +204,8 @@ const StoreLocatorInput = ({form, submitForm}) => {
                     defaultMessage: 'Use My Location'
                 })}
             </Button>
-            <FormControl isInvalid={automaticGeolocationHasFailed && userWantsToShareLocation}>
-                <FormErrorMessage
+            <ield.root invalid={automaticGeolocationHasFailed && userWantsToShareLocation}>
+                <ield.errortext
                     color="red.600"
                     alignItems="center"
                     justifyContent="center"
@@ -216,8 +216,8 @@ const StoreLocatorInput = ({form, submitForm}) => {
                         id: 'store_locator.error.agree_to_share_your_location',
                         defaultMessage: 'Please agree to share your location'
                     })}
-                </FormErrorMessage>
-            </FormControl>
+                </Field.ErrorText>
+            </Field.Root>
         </form>
     )
 }

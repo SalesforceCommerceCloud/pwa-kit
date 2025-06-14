@@ -57,7 +57,7 @@ const OrderProductImages = ({productItems}) => {
                               borderRadius="base"
                               overflow="hidden"
                           >
-                              <Img
+                              <Image
                                   alt={image?.alt}
                                   src={image?.disBaseLink || image?.link}
                                   fallback={<Box background="gray.100" boxSize="full" />}
@@ -182,7 +182,7 @@ const AccountOrderHistory = () => {
                                                 values={{orderNumber: order.orderNo}}
                                             />
                                         </Text>
-                                        <Badge colorScheme="green">{order.status}</Badge>
+                                        <Badge colorPalette="green">{order.status}</Badge>
                                     </Stack>
                                 </Box>
                                 <Grid templateColumns={{base: 'repeat(auto-fit, 88px)'}} gap={4}>
@@ -194,7 +194,7 @@ const AccountOrderHistory = () => {
                                     alignItems={{base: 'flex-start', lg: 'center'}}
                                     spacing={{base: '2px', lg: 3}}
                                     divider={
-                                        <Divider
+                                        <Separator
                                             visibility={{base: 'hidden', lg: 'visible'}}
                                             orientation={'vertical'}
                                             h={{base: 0, lg: 4}}

@@ -41,7 +41,7 @@ const ItemImage = ({imageProps, ratio = 1, ...props}) => {
                             marginTop={2}
                             fontSize="10px"
                             variant="solid"
-                            colorScheme="blue"
+                            colorPalette="blue"
                         >
                             <FormattedMessage
                                 defaultMessage="Sale"
@@ -59,7 +59,7 @@ const ItemImage = ({imageProps, ratio = 1, ...props}) => {
                             marginTop={2}
                             fontSize="10px"
                             variant="solid"
-                            colorScheme="red"
+                            colorPalette="red"
                         >
                             <FormattedMessage
                                 defaultMessage="Unavailable"

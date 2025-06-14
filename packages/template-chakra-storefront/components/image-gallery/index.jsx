@@ -143,7 +143,7 @@ const ImageGallery = ({imageGroups = [], selectedVariationAttributes = {}, size,
                                     onClick={() => setSelectedIndex(index)}
                                     data-testid="image-gallery-thumbnails"
                                 >
-                                    <Img
+                                    <Image
                                         alt={image.alt}
                                         src={image.disBaseLink || image.link}
                                         loading={loadingStrategy}

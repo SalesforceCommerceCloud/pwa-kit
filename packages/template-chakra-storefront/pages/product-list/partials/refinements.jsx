@@ -107,7 +107,7 @@ const Refinements = ({
 
                         if (filter.values) {
                             return (
-                                <Stack key={filter.attributeId} divider={<Divider />}>
+                                <Stack key={filter.attributeId} divider={<Separator />}>
                                     <AccordionItem
                                         paddingTop={idx !== 0 || itemsBefore ? 6 : 0}
                                         borderBottom={

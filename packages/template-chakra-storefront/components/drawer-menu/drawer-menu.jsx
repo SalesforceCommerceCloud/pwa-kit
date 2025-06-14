@@ -64,7 +64,7 @@ const TABLET_DRAWER_SIZE = 'lg'
 
 const DrawerSeparator = () => (
     <Box paddingTop="6" paddingBottom="6">
-        <Divider />
+        <Separator />
     </Box>
 )
 
@@ -80,7 +80,7 @@ const DrawerMenu = ({
     root,
     itemsKey,
     itemsCountKey,
-    isOpen,
+    open,
     onClose = noop,
     onLogoClick = noop,
     itemComponent
@@ -111,7 +111,7 @@ const DrawerMenu = ({
     }, [])
 
     return (
-        <Drawer isOpen={isOpen} onClose={onClose} placement="left" size={drawerSize}>
+        <Drawer open={open} onClose={onClose} placement="left" size={drawerSize}>
             <DrawerOverlay>
                 <DrawerContent>
                     {/* Header Content */}
@@ -387,7 +387,7 @@ DrawerMenu.propTypes = {
     /**
      * The opened state of the drawer.
      */
-    isOpen: PropTypes.bool,
+    open: PropTypes.bool,
     /**
      * Function called when the drawer is dismissed.
      */

@@ -145,7 +145,7 @@ const CreditCardFields = ({form, prefix = ''}) => {
                                         placement="top"
                                         label={securityCodeTooltipLabel}
                                         shouldWrapChildren={true}
-                                        isOpen={isTooltipOpen}
+                                        open={isTooltipOpen}
                                     >
                                         <InfoIcon
                                             boxSize={5}
@@ -169,7 +169,7 @@ const CreditCardFields = ({form, prefix = ''}) => {
 
 CreditCardFields.propTypes = {
     /** Object returned from `useForm` */
-    form: PropTypes.object.isRequired,
+    form: PropTypes.object.required,
 
     /** Optional prefix for field names */
     prefix: PropTypes.string

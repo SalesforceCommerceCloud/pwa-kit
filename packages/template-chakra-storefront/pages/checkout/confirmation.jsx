@@ -290,7 +290,7 @@ const CheckoutConfirmation = () => {
                                             spacing={5}
                                             align="flex-start"
                                             width="full"
-                                            divider={<Divider />}
+                                            divider={<Separator />}
                                         >
                                             {order.productItems?.map((product, idx) => {
                                                 const productDetail =

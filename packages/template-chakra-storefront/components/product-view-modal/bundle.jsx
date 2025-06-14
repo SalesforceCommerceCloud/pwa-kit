@@ -28,7 +28,7 @@ import {useIntl} from 'react-intl'
 /**
  * A Modal that contains Product View for product bundle
  */
-const BundleProductViewModal = ({product: bundle, isOpen, onClose, updateCart, ...props}) => {
+const BundleProductViewModal = ({product: bundle, open, onOpenChange, updateCart, ...props}) => {
     const productViewModalData = useProductViewModal(bundle)
     const {variationParams} = useDerivedProduct(bundle)
     const childProductRefs = useRef({})
@@ -65,7 +65,7 @@ const BundleProductViewModal = ({product: bundle, isOpen, onClose, updateCart, .
     )
 
     return (
-        <Modal size="4xl" isOpen={isOpen} onClose={onClose}>
+        <Dialog size="4xl" open={open} onOpenChange={onOpenChange}>
             <ModalOverlay />
             <ModalContent containerProps={{'data-testid': 'product-view-modal'}} aria-label={label}>
                 <ModalCloseButton />
@@ -155,14 +155,14 @@ const BundleProductViewModal = ({product: bundle, isOpen, onClose, updateCart, .
                     </Flex>
                 </ModalBody>
             </ModalContent>
-        </Modal>
+        </Dialog>
     )
 }
 
 BundleProductViewModal.propTypes = {
-    isOpen: PropTypes.bool.isRequired,
-    onOpen: PropTypes.func.isRequired,
-    onClose: PropTypes.func.isRequired,
+    open: PropTypes.bool.required,
+    onOpen: PropTypes.func.required,
+    onOpenChange: PropTypes.func.required,
     product: PropTypes.object,
     isLoading: PropTypes.bool,
     updateCart: PropTypes.func

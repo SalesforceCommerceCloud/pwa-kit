@@ -110,11 +110,11 @@ LocaleSelector.propTypes = {
     /**
      * A complete list of all the locales supported. This array must have content.
      */
-    locales: PropTypes.arrayOf(PropTypes.string).isRequired,
+    locales: PropTypes.arrayOf(PropTypes.string).required,
     /**
      * The current locales shortcode.
      */
-    selectedLocale: PropTypes.string.isRequired,
+    selectedLocale: PropTypes.string.required,
     /**
      * Function called when a locale is selected.
      */

@@ -15,7 +15,7 @@ import mockProductDetail from '../../mocks/variant-750518699578M'
 import {prependHandlersToServer} from '../../jest-setup'
 
 const MockComponent = ({updateCart}) => {
-    const {isOpen, onOpen, onClose} = useDisclosure()
+    const {open, onOpen, onClose} = useDisclosure()
 
     return (
         <div>
@@ -24,7 +24,7 @@ const MockComponent = ({updateCart}) => {
                 updateCart={updateCart}
                 onOpen={onOpen}
                 onClose={onClose}
-                isOpen={isOpen}
+                open={open}
                 product={mockProductDetail}
             />
         </div>

@@ -54,7 +54,7 @@ const CheckoutFooter = ({...otherProps}) => {
                         <CreditCardIcons marginTop={4} marginBottom={4} />
                     </HideOnDesktop>
 
-                    <Divider {...styles.horizontalRule} />
+                    <Separator {...styles.horizontalRule} />
 
                     <Box {...styles.bottomHalf}>
                         <Text {...styles.copyright}>

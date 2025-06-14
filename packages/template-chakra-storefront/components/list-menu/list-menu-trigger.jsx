@@ -33,7 +33,7 @@ const ChevronIconTrigger = forwardRef(function ChevronIconTrigger(props, ref) {
     )
 })
 
-const ListMenuTrigger = ({item, name, isOpen, onOpen, onClose}) => {
+const ListMenuTrigger = ({item, name, open, onOpen, onClose}) => {
     const theme = useTheme()
     const {baseStyle} = theme.components.ListMenu
 
@@ -50,7 +50,7 @@ const ListMenuTrigger = ({item, name, isOpen, onOpen, onClose}) => {
                 onMouseOver={onOpen}
                 {...baseStyle.listMenuTriggerLink}
                 {...{name: name + ' __'}}
-                {...(isOpen ? baseStyle.listMenuTriggerLinkActive : {})}
+                {...(open ? baseStyle.listMenuTriggerLinkActive : {})}
             >
                 {name}
             </Link>
@@ -75,7 +75,7 @@ const ListMenuTrigger = ({item, name, isOpen, onOpen, onClose}) => {
 ListMenuTrigger.propTypes = {
     item: PropTypes.object,
     name: PropTypes.string,
-    isOpen: PropTypes.bool,
+    open: PropTypes.bool,
     onOpen: PropTypes.func,
     onClose: PropTypes.func
 }

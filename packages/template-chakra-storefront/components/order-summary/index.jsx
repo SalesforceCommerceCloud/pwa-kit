@@ -71,7 +71,7 @@ const CartItems = ({basket}) => {
                     <AccordionIcon />
                 </AccordionButton>
                 <AccordionPanel px={0} py={4}>
-                    <Stack spacing={5} align="flex-start" divider={<Divider />}>
+                    <Stack spacing={5} align="flex-start" divider={<Separator />}>
                         {basket.productItems?.map((product, idx) => {
                             const variant = {
                                 ...product,
@@ -264,7 +264,7 @@ const OrderSummary = ({
                         <PromoCode {...promoCodeProps} />
                     </Box>
                 ) : (
-                    <Divider />
+                    <Separator />
                 )}
 
                 <Stack spacing={4} w="full">
@@ -318,7 +318,7 @@ const OrderSummary = ({
                                             <Button
                                                 variant="link"
                                                 size="sm"
-                                                colorScheme="red"
+                                                colorPalette="red"
                                                 onClick={() => removePromoCode(item.couponItemId)}
                                             >
                                                 <FormattedMessage

@@ -8,7 +8,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import {FormattedMessage} from 'react-intl'
-import {Button, Divider, Stack, Text} from '@chakra-ui/react'
+import {Button, Stack, Text} from '@chakra-ui/react'
 import LoginFields from '../forms/login-fields'
 import SocialLogin from '../social-login'
 
@@ -42,7 +42,7 @@ const StandardLogin = ({
                 {isSocialEnabled && idps.length > 0 && (
                     <>
                         <Stack spacing={6} paddingTop={2} paddingBottom={2}>
-                            <Divider />
+                            <Separator />
                             <Text align="center" fontSize="sm">
                                 <FormattedMessage
                                     defaultMessage="Or Login With"

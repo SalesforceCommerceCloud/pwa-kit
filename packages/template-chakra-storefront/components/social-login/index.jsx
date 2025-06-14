@@ -105,7 +105,7 @@ const SocialLogin = ({form, idps = []}) => {
                                     color="blue.600"
                                     variant="outline"
                                 >
-                                    <Icon sx={{marginRight: 2}} />
+                                    <Icon s={{marginRight: 2}} />
                                     {message}
                                 </Button>
                             )

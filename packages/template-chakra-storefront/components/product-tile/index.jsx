@@ -307,8 +307,8 @@ const ProductTile = (props) => {
             )}
             {filteredLabels.size > 0 && (
                 <HStack {...styles.badgeGroup}>
-                    {Array.from(filteredLabels.entries()).map(([label, colorScheme]) => (
-                        <Badge key={label} data-testid="product-badge" colorScheme={colorScheme}>
+                    {Array.from(filteredLabels.entries()).map(([label, colorPalette]) => (
+                        <Badge key={label} data-testid="product-badge" colorPalette={colorPalette}>
                             {label}
                         </Badge>
                     ))}

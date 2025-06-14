@@ -64,8 +64,8 @@ const ListPrice = ({labelForA11y, price, isRange = false, as = 's', currency, ..
 }
 
 ListPrice.propTypes = {
-    price: PropTypes.number.isRequired,
-    currency: PropTypes.string.isRequired,
+    price: PropTypes.number.required,
+    currency: PropTypes.string.required,
     labelForA11y: PropTypes.string,
     as: PropTypes.string,
     isRange: PropTypes.bool,

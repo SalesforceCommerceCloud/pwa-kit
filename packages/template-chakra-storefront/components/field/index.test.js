@@ -17,8 +17,8 @@ const TestComponent = ({defaultValues, children}) => {
 }
 
 TestComponent.propTypes = {
-    defaultValues: PropTypes.object.isRequired,
-    children: PropTypes.func.isRequired
+    defaultValues: PropTypes.object.required,
+    children: PropTypes.func.required
 }
 
 test('renders Field component and forwards ref', () => {

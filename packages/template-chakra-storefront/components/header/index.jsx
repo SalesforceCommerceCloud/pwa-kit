@@ -118,7 +118,7 @@ const Header = ({
     const {
         getButtonProps: getAccountMenuButtonProps,
         getDisclosureProps: getAccountMenuDisclosureProps,
-        isOpen: isAccountMenuOpen,
+        open: isAccountMenuOpen,
         onClose: onAccountMenuClose,
         onOpen: onAccountMenuOpen
     } = useDisclosure()
@@ -212,7 +212,7 @@ const Header = ({
                         <Popover
                             isLazy
                             arrowSize={15}
-                            isOpen={isAccountMenuOpen}
+                            open={isAccountMenuOpen}
                             placement="bottom-end"
                             onClose={onAccountMenuClose}
                             onOpen={onAccountMenuOpen}
@@ -286,7 +286,7 @@ const Header = ({
                                     </Box>
                                 </PopoverBody>
                                 <PopoverFooter onClick={onSignoutClick} cursor="pointer">
-                                    <Divider colorScheme="gray" />
+                                    <Separator colorPalette="gray" />
                                     <Button variant="unstyled" {...styles.signout}>
                                         <Flex>
                                             <SignoutIcon

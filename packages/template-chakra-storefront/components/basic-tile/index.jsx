@@ -7,7 +7,7 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import {Box, Img, Text, AspectRatio, useTheme} from '@chakra-ui/react'
+import {Box, Image, Text, AspectRatio, useTheme} from '@chakra-ui/react'
 import {Link} from 'react-router-dom'
 
 import {ChevronRightIcon} from '../icons'
@@ -25,7 +25,7 @@ const BasicTile = ({img, href, title, ...props}) => {
             <Box paddingBottom="4">
                 <Link to={href}>
                     <AspectRatio ratio={3 / 4}>
-                        <Img
+                        <Image
                             alt={alt}
                             src={src}
                             borderRadius="base"
@@ -54,12 +54,12 @@ const BasicTile = ({img, href, title, ...props}) => {
 BasicTile.displayName = 'BasicTile'
 
 BasicTile.propTypes = {
-    href: PropTypes.string.isRequired,
+    href: PropTypes.string.required,
     img: PropTypes.shape({
         src: PropTypes.string,
         alt: PropTypes.string
-    }).isRequired,
-    title: PropTypes.string.isRequired
+    }).required,
+    title: PropTypes.string.required
 }
 
 export default BasicTile

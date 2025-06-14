@@ -101,7 +101,7 @@ const OrderProducts = ({productItems, currency}) => {
 }
 
 OrderProducts.propTypes = {
-    productItems: PropTypes.array.isRequired,
+    productItems: PropTypes.array.required,
     currency: PropTypes.string
 }
 
@@ -169,7 +169,7 @@ const AccountOrderDetail = () => {
                             alignItems={['flex-start', 'center']}
                             spacing={[0, 3]}
                             divider={
-                                <Divider
+                                <Separator
                                     visibility={{base: 'visible'}}
                                     orientation="vertical"
                                     h={[0, 4]}
@@ -197,7 +197,7 @@ const AccountOrderDetail = () => {
                                         values={{orderNumber: order.orderNo}}
                                     />
                                 </Text>
-                                <Badge colorScheme="green">{order.status}</Badge>
+                                <Badge colorPalette="green">{order.status}</Badge>
                             </Stack>
                         </Stack>
                     ) : (

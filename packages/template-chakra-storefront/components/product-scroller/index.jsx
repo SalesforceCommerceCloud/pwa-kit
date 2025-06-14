@@ -69,7 +69,7 @@ const ProductScroller = forwardRef(
                         px={{base: 4, md: 8, lg: 0}}
                         py={1}
                         {...scrollProps}
-                        sx={{
+                        s={{
                             scrollPadding: {base: 16, md: 32, lg: 0},
                             scrollSnapType: 'x mandatory',
                             WebkitOverflowScrolling: 'touch', // Safari touch scrolling needed for scroll snap
@@ -141,7 +141,7 @@ const ProductScroller = forwardRef(
                                 })}
                                 icon={<ChevronLeftIcon color="black" />}
                                 borderRadius="full"
-                                colorScheme="whiteAlpha"
+                                colorPalette="whiteAlpha"
                                 onClick={() => scroll(-1)}
                             />
                         </Box>
@@ -164,7 +164,7 @@ const ProductScroller = forwardRef(
                                 })}
                                 icon={<ChevronRightIcon color="black" />}
                                 borderRadius="full"
-                                colorScheme="whiteAlpha"
+                                colorPalette="whiteAlpha"
                                 onClick={() => scroll(1)}
                             />
                         </Box>

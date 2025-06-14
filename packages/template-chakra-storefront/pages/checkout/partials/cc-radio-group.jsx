@@ -7,7 +7,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import {FormattedMessage} from 'react-intl'
-import {Box, Button, Stack, Text, SimpleGrid, FormControl, FormErrorMessage} from '@chakra-ui/react'
+import {Box, Button, Stack, Text, SimpleGrid, } from '@chakra-ui/react'
 import {PlusIcon} from '../../components/icons'
 import {RadioCard, RadioCardGroup} from '../../components/radio-card'
 import {getCreditCardIcon} from '../../utils/cc-utils'
@@ -23,15 +23,15 @@ const CCRadioGroup = ({
     const {data: customer} = useCurrentCustomer()
 
     return (
-        <FormControl
+        <ield.root
             id="paymentInstrumentId"
-            isInvalid={form.formState.errors.paymentInstrumentId}
-            isRequired={!isEditingPayment}
+            invalid={form.formState.errors.paymentInstrumentId}
+            required={!isEditingPayment}
         >
             {form.formState.errors.paymentInstrumentId && (
-                <FormErrorMessage marginTop={0} marginBottom={4}>
+                <ield.errortext marginTop={0} marginBottom={4}>
                     {form.formState.errors.paymentInstrumentId.message}
-                </FormErrorMessage>
+                </Field.ErrorText>
             )}
 
             <RadioCardGroup value={value} onChange={onPaymentIdChange}>
@@ -63,7 +63,7 @@ const CCRadioGroup = ({
                                             </Stack>
 
                                             <Box>
-                                                <Button variant="link" size="sm" colorScheme="red">
+                                                <Button variant="link" size="sm" colorPalette="red">
                                                     <FormattedMessage
                                                         defaultMessage="Remove"
                                                         id="cc_radio_group.action.remove"
@@ -98,13 +98,13 @@ const CCRadioGroup = ({
                     </SimpleGrid>
                 </Stack>
             </RadioCardGroup>
-        </FormControl>
+        </Field.Root>
     )
 }
 
 CCRadioGroup.propTypes = {
     /** The form object returned from `useForm` */
-    form: PropTypes.object.isRequired,
+    form: PropTypes.object.required,
 
     /** The current payment ID value */
     value: PropTypes.string,

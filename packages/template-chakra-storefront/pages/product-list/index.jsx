@@ -99,7 +99,7 @@ const ProductList = (props) => {
     // `isLoading` later in this function.
     // eslint-disable-next-line react/prop-types, @typescript-eslint/no-unused-vars
     const {isLoading: _unusedIsLoading, staticContext, ...rest} = props
-    const {isOpen, onOpen, onClose} = useDisclosure()
+    const {open, onOpen, onOpenChange} = useDisclosure()
     const {formatMessage} = useIntl()
     const navigate = useNavigation()
     const history = useHistory()
@@ -483,7 +483,7 @@ const ProductList = (props) => {
                                 <Flex align="center">
                                     <Button
                                         fontSize="sm"
-                                        colorScheme="black"
+                                        colorPalette="black"
                                         variant="outline"
                                         marginRight={2}
                                         display="inline-flex"
@@ -501,7 +501,7 @@ const ProductList = (props) => {
                                         maxWidth="245px"
                                         fontSize="sm"
                                         marginRight={2}
-                                        colorScheme="black"
+                                        colorPalette="black"
                                         variant="outline"
                                         display="inline-flex"
                                         rightIcon={<ChevronDownIcon boxSize={5} />}
@@ -640,9 +640,9 @@ const ProductList = (props) => {
                 </>
             )}
             {/* Modal for filter options on mobile */}
-            <Modal
-                isOpen={isOpen}
-                onClose={onClose}
+            <Dialog
+                open={open}
+                onOpenChange={onOpenChange}
                 size="full"
                 motionPreset="slideInBottom"
                 scrollBehavior="inside"
@@ -670,7 +670,7 @@ const ProductList = (props) => {
                                           <CategoryLinks
                                               key="itemsBefore"
                                               category={category}
-                                              onSelect={onClose}
+                                              onSelect={onOpenChange}
                                           />
                                       ]
                                     : undefined
@@ -688,7 +688,7 @@ const ProductList = (props) => {
                         paddingBottom={10}
                     >
                         <Stack>
-                            <Button width="full" onClick={onClose}>
+                            <Button width="full" onClick={onOpenChange}>
                                 {formatMessage(
                                     {
                                         id: 'product_list.modal.button.view_items',
@@ -708,11 +708,11 @@ const ProductList = (props) => {
                         </Stack>
                     </ModalFooter>
                 </ModalContent>
-            </Modal>
+            </Dialog>
             <Drawer
                 placement="bottom"
-                isOpen={sortOpen}
-                onClose={() => setSortOpen(false)}
+                open={sortOpen}
+                onOpenChange={() => setSortOpen(false)}
                 size="sm"
                 motionPreset="slideInBottom"
                 scrollBehavior="inside"
@@ -775,7 +775,7 @@ const Sort = ({sortUrls, productSearchResult, basePath, ...otherProps}) => {
     const history = useHistory()
 
     return (
-        <FormControl
+        <ield.root
             aria-label={intl.formatMessage({
                 id: 'product_list.drawer.title.sort_by',
                 defaultMessage: 'Sort By'
@@ -812,7 +812,7 @@ const Sort = ({sortUrls, productSearchResult, basePath, ...otherProps}) => {
                     </option>
                 ))}
             </Select>
-        </FormControl>
+        </Field.Root>
     )
 }
 

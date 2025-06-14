@@ -45,8 +45,8 @@ const ConfirmationModal = ({
     }
 
     return (
-        <AlertDialog
-            isOpen={props.isOpen}
+        <Dialog role="alertdialog"
+            open={props.open}
             isCentered
             onClose={handleAlternateActionClick}
             {...props}
@@ -78,7 +78,7 @@ const ConfirmationModal = ({
                     </Button>
                 </AlertDialogFooter>
             </AlertDialogContent>
-        </AlertDialog>
+        </Dialog>
     )
 }
 
@@ -86,15 +86,15 @@ ConfirmationModal.propTypes = {
     /**
      * Prop to check if modal is open
      */
-    isOpen: PropTypes.bool.isRequired,
+    open: PropTypes.bool.required,
     /**
      * Callback invoked to open the modal
      */
-    onOpen: PropTypes.func.isRequired,
+    onOpen: PropTypes.func.required,
     /**
      * Callback invoked to close the modal
      */
-    onClose: PropTypes.func.isRequired,
+    onClose: PropTypes.func.required,
     /**
      * Text to be displayed as modal header
      */
