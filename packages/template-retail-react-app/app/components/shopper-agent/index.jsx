@@ -110,7 +110,7 @@ function ShopperAgentWindow({commerceAgentConfiguration, locale, domainUrl, bask
                 Locale: locale,
                 OrganizationId: commerceOrgId,
                 UsId: usid,
-                PwaKit: true
+                SfraSite: false
             })
         }
 
@@ -187,7 +187,7 @@ ShopperAgentWindow.propTypes = {
 
 /**
  * ShopperAgent component that initializes and manages the embedded messaging service
- * @param {Object} props - Component props 
+ * @param {Object} props - Component props
  * @param {Object} props.commerceAgentConfiguration - Commerce agent settings
  * @param {string} props.domainUrl - The domain URL for the embedded messaging script
  * @param {string} props.basketId - The basket ID for the embedded messaging script

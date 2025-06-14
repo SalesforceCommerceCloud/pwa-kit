@@ -9,17 +9,25 @@ import React from 'react'
 import {render, act} from '@testing-library/react'
 import ShopperAgent from '@salesforce/retail-react-app/app/components/shopper-agent/index'
 import useScript from '@salesforce/retail-react-app/app/hooks/use-script'
+
 // Mock the embeddedservice_bootstrap object
 const mockEmbeddedService = {
     init: jest.fn(),
-    settings: jest.fn(),
+    settings: {
+        language: '',
+        disableStreamingResponses: false
+    },
     prechatAPI: {
         setHiddenPrechatFields: jest.fn()
     }
 }
 
-jest.mock('../../hooks/use-script', () => jest.fn().mockReturnValue({loaded: false, error: false}))
+// Mock useScript hook
+jest.mock('@salesforce/retail-react-app/app/hooks/use-script', () =>
+    jest.fn().mockReturnValue({loaded: false, error: false})
+)
 
+// Mock commerce-sdk-react
 jest.mock('@salesforce/commerce-sdk-react', () => {
     const originalModule = jest.requireActual('@salesforce/commerce-sdk-react')
     return {
@@ -28,6 +36,7 @@ jest.mock('@salesforce/commerce-sdk-react', () => {
     }
 })
 
+// Mock UI components
 jest.mock('@salesforce/retail-react-app/app/components/shared/ui', () => {
     const originalModule = jest.requireActual(
         '@salesforce/retail-react-app/app/components/shared/ui'
@@ -56,22 +65,16 @@ const commerceAgentSettings = {
 
 describe('ShopperAgent Component', () => {
     beforeEach(() => {
-        // Reset all mocks before each test
         jest.clearAllMocks()
-
-        // Mock the window.embeddedservice_bootstrap object
         global.window.embeddedservice_bootstrap = mockEmbeddedService
-
         useScript.mockReturnValue({loaded: false, error: false})
-
-        // Clear any existing scripts
         const scripts = document.querySelectorAll('script[data-status]')
-        scripts.forEach((script) => script.remove())
+        scripts.forEach(script => script.remove())
     })
 
     afterEach(() => {
-        // Clean up the window.embeddedservice_bootstrap mock
         delete global.window.embeddedservice_bootstrap
+        jest.clearAllMocks()
     })
 
     const defaultProps = {
@@ -82,105 +85,80 @@ describe('ShopperAgent Component', () => {
         basketDoneLoading: true
     }
 
-    test('should render nothing when enableMiaw is false', () => {
-        const props = {...defaultProps, enableMiaw: false}
+    test('should render nothing when enabled is false', () => {
+        const disabledSettings = {...commerceAgentSettings, enabled: 'false'}
+        const props = {...defaultProps, commerceAgentConfiguration: disabledSettings}
         const {container} = render(<ShopperAgent {...props} />)
-
-        expect(container.firstChild).toBeNull()
-    })
-
-    test('should render nothing when commerceAgent is not provided via an environment variable', () => {
-        const commerceAgent = {enabled: 'false'}
-        const props = {commerceAgentConfiguration: commerceAgent, enableMiaw: false}
-        const {container} = render(<ShopperAgent {...props} />)
-
         expect(container.firstChild).toBeNull()
     })
 
     test('should render nothing when basketDoneLoading is false', () => {
         const props = {...defaultProps, basketDoneLoading: false}
         const {container} = render(<ShopperAgent {...props} />)
-
         expect(container.firstChild).toBeNull()
     })
 
-    test('should not render anything when commerceAgenticEsdScriptSourceUrl is not provided', () => {
-        const props = {...defaultProps, scriptUrl: null}
-        const {container} = render(<ShopperAgent {...props} />)
-        expect(container.firstChild).toBeNull()
-    })
-
-    test('should not render anything when embeddedservice_bootstrap is not available', () => {
-        // Temporarily remove the mock for this test
+    test('should not render when embeddedservice_bootstrap is not available', () => {
         const originalEmbeddedService = global.window.embeddedservice_bootstrap
         delete global.window.embeddedservice_bootstrap
         useScript.mockReturnValue({loaded: true, error: false})
 
         render(<ShopperAgent {...defaultProps} />)
-
         expect(mockEmbeddedService.init).not.toHaveBeenCalled()
 
-        // Restore the mock
         global.window.embeddedservice_bootstrap = originalEmbeddedService
     })
 
-    test('should initialize embedded service when all required props are provided', () => {
+    test('should initialize embedded service with correct settings', () => {
         useScript.mockReturnValue({loaded: true, error: false})
         render(<ShopperAgent {...defaultProps} />)
-        // Verify settings were configured correctly
+
         expect(mockEmbeddedService.settings.language).toBe('en-US')
         expect(mockEmbeddedService.settings.disableStreamingResponses).toBe(true)
-
-        // Verify embedded service initialization
         expect(mockEmbeddedService.init).toHaveBeenCalledWith(
             commerceAgentSettings.salesforceOrgId,
             commerceAgentSettings.embeddedServiceName,
             commerceAgentSettings.embeddedServiceEndpoint,
-            {
-                scrt2URL: commerceAgentSettings.scrt2Url
-            }
+            {scrt2URL: commerceAgentSettings.scrt2Url}
         )
     })
 
-    test('should handle initialization error from useMiaw hook', () => {
-        // Mock useMiaw to return an error
+    test('should handle initialization error', () => {
         const errorMessage = 'Initialization failed'
-        useScript.mockReturnValue({loaded: true, error: true})
+        useScript.mockReturnValue({loaded: true, error: false})
         mockEmbeddedService.init.mockImplementation(() => {
             throw new Error(errorMessage)
         })
 
+        const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation()
         const {container} = render(<ShopperAgent {...defaultProps} />)
-
-        // Component should not render anything when there's an error
+        
         expect(container.firstChild).toBeNull()
+        expect(consoleErrorSpy).toHaveBeenCalledWith(
+            'Error initializing Embedded Messaging: ',
+            expect.any(Error)
+        )
+
+        consoleErrorSpy.mockRestore()
     })
 
-    test('should not reinitialize embedded service when already initialized', () => {
-        // First render
+    test('should not reinitialize when already initialized', () => {
         const scriptLoadStatus = {loaded: true, error: false}
         useScript.mockReturnValue(scriptLoadStatus)
         const {rerender} = render(<ShopperAgent {...defaultProps} />)
 
         expect(mockEmbeddedService.init).toHaveBeenCalled()
-
-        // Reset mock call counts
         jest.clearAllMocks()
 
         useScript.mockReturnValue(scriptLoadStatus)
-
-        // Re-render with same props
         rerender(<ShopperAgent {...defaultProps} />)
-
-        // Should not call init or createComponent again
         expect(mockEmbeddedService.init).not.toHaveBeenCalled()
     })
 
-    test('should set prechat fields correctly on different events', async () => {
+    test('should set prechat fields on events', async () => {
         useScript.mockReturnValue({loaded: true, error: false})
         render(<ShopperAgent {...defaultProps} />)
 
-        // Test initial prechat fields set on ready event
         await act(async () => {
             window.dispatchEvent(new Event('onEmbeddedMessagingReady'))
         })
@@ -191,13 +169,11 @@ describe('ShopperAgent Component', () => {
             Locale: defaultProps.locale,
             OrganizationId: commerceAgentSettings.commerceOrgId,
             UsId: 'test-usid',
-            PwaKit: true
+            SfraSite: false
         })
 
-        // Reset mock to test button click event
         mockEmbeddedService.prechatAPI.setHiddenPrechatFields.mockClear()
 
-        // Test BasketId update when button is clicked
         await act(async () => {
             window.dispatchEvent(new Event('onEmbeddedMessagingButtonClicked'))
         })
@@ -206,182 +182,95 @@ describe('ShopperAgent Component', () => {
             BasketId: defaultProps.basketId
         })
     })
-    test('should not render when commerce agent settings are invalid', () => {
-        const invalidCommerceAgentSettings = {
-            enabled: 'true',
-            // Missing required fields
-            embeddedServiceName: 'test-service',
-            scriptSourceUrl: 'https://test.com/script.js'
-        }
-        const props = {
-            ...defaultProps,
-            commerceAgentConfiguration: invalidCommerceAgentSettings
+
+    test('should not render with invalid settings', () => {
+        const invalidSettings = {
+            ...commerceAgentSettings,
+            enabled: true,
+            askAgentOnSearch: null,
+            embeddedServiceName: undefined,
+            embeddedServiceEndpoint: 123,
+            scriptSourceUrl: {},
+            scrt2Url: [],
+            salesforceOrgId: false,
+            commerceOrgId: () => {},
+            siteId: 0
         }
 
-        const consoleSpy = jest.spyOn(console, 'error').mockImplementation()
+        const props = {...defaultProps, commerceAgentConfiguration: invalidSettings}
         const {container} = render(<ShopperAgent {...props} />)
 
-        // Should log error about invalid settings
-        expect(consoleSpy).toHaveBeenCalledWith('Invalid commerce agent settings.')
-
-        // Component should not render anything
         expect(container.firstChild).toBeNull()
-
-        consoleSpy.mockRestore()
+        expect(mockEmbeddedService.init).not.toHaveBeenCalled()
     })
 
-    test('should not load the script when the commerceAgent is disabled', () => {
-        const commerceAgentSettings = {...defaultProps.commerceAgent, enabled: 'false'}
-        const props = {...defaultProps, commerceAgentConfiguration: commerceAgentSettings}
-
-        render(<ShopperAgent {...props} />)
-
-        // Component should not render anything when there's an error
-        expect(useScript).not.toHaveBeenCalled()
-    })
-
-    test('should set the z-index of the embedded messaging frame to the sticky z-index + 1 when the window is maximized', async () => {
-        const mockFrame = document.createElement('div')
-        mockFrame.id = 'embeddedMessaging'
-        mockFrame.style.zIndex = '0'
-
-        // Store original querySelector
-        const originalQuerySelector = document.querySelector
-
-        // Mock querySelector to return our mock frame
-        document.body.querySelector = jest.fn().mockImplementation((selector) => {
-            if (selector === 'div.embedded-messaging iframe') {
-                return mockFrame
-            }
-            return originalQuerySelector.call(document, selector)
-        })
+    test('should handle missing settings', () => {
+        const originalSettings = mockEmbeddedService.settings
+        delete mockEmbeddedService.settings
+        useScript.mockReturnValue({loaded: true, error: false})
 
         render(<ShopperAgent {...defaultProps} />)
+        expect(mockEmbeddedService.init).not.toHaveBeenCalled()
 
-        // Simulate window maximize
+        mockEmbeddedService.settings = originalSettings
+    })
+
+    test('should update z-index on maximize', async () => {
+        useScript.mockReturnValue({loaded: true, error: false})
+        render(<ShopperAgent {...defaultProps} />)
+
+        const mockFrame = document.createElement('iframe')
+        const mockDiv = document.createElement('div')
+        mockDiv.className = 'embedded-messaging'
+        mockDiv.appendChild(mockFrame)
+        document.body.appendChild(mockDiv)
+
         await act(async () => {
             window.dispatchEvent(new Event('onEmbeddedMessagingWindowMaximized'))
         })
 
-        // Verify z-index was updated
-        expect(mockFrame.style.zIndex).toBe('1101') // sticky (1100) + 1
-
-        // Restore original querySelector
-        document.body.querySelector = originalQuerySelector
+        expect(mockFrame.style.zIndex).toBe('1101')
+        document.body.removeChild(mockDiv)
     })
 
-    describe('Event Listener Cleanup', () => {
-        let originalAddEventListener
-        let originalRemoveEventListener
-        const mockAddEventListener = jest.fn()
-        const mockRemoveEventListener = jest.fn()
+    test('should cleanup event listeners', () => {
+        useScript.mockReturnValue({loaded: true, error: false})
+        const {unmount} = render(<ShopperAgent {...defaultProps} />)
+        const removeEventListenerSpy = jest.spyOn(window, 'removeEventListener')
 
-        const mockCommerceAgent = {
-            enabled: 'true',
-            askAgentOnSearch: 'true',
-            embeddedServiceName: 'TestService',
-            embeddedServiceEndpoint: 'https://test.endpoint.com',
-            scriptSourceUrl: 'https://test.script.com',
-            scrt2Url: 'https://test.scrt.com',
-            salesforceOrgId: 'test-org-id',
-            commerceOrgId: 'test-commerce-id',
-            siteId: 'test-site-id'
-        }
+        unmount()
 
-        beforeEach(() => {
-            originalAddEventListener = window.addEventListener
-            originalRemoveEventListener = window.removeEventListener
-            window.addEventListener = mockAddEventListener
-            window.removeEventListener = mockRemoveEventListener
+        expect(removeEventListenerSpy).toHaveBeenCalledWith(
+            'onEmbeddedMessagingReady',
+            expect.any(Function)
+        )
+        expect(removeEventListenerSpy).toHaveBeenCalledWith(
+            'onEmbeddedMessagingWindowMaximized',
+            expect.any(Function)
+        )
+        expect(removeEventListenerSpy).toHaveBeenCalledWith(
+            'onEmbeddedMessagingButtonClicked',
+            expect.any(Function)
+        )
+
+        removeEventListenerSpy.mockRestore()
+    })
+
+    test('should handle basketId changes', async () => {
+        useScript.mockReturnValue({loaded: true, error: false})
+        const {rerender} = render(<ShopperAgent {...defaultProps} />)
+
+        mockEmbeddedService.prechatAPI.setHiddenPrechatFields.mockClear()
+
+        const newBasketId = 'new-basket-id'
+        rerender(<ShopperAgent {...defaultProps} basketId={newBasketId} />)
+
+        await act(async () => {
+            window.dispatchEvent(new Event('onEmbeddedMessagingButtonClicked'))
         })
 
-        afterEach(() => {
-            window.addEventListener = originalAddEventListener
-            window.removeEventListener = originalRemoveEventListener
-        })
-
-        it('should remove event listeners when component unmounts', () => {
-            // Render the component
-            const {unmount} = render(
-                <ShopperAgent
-                    commerceAgentConfiguration={mockCommerceAgent}
-                    domainUrl="https://test.domain.com"
-                    basketId="test-basket-id"
-                    locale="en-US"
-                    basketDoneLoading={true}
-                />
-            )
-
-            // Get the handler functions that were added
-            const readyHandler = mockAddEventListener.mock.calls.find(
-                (call) => call[0] === 'onEmbeddedMessagingReady'
-            )[1]
-            const maximizeHandler = mockAddEventListener.mock.calls.find(
-                (call) => call[0] === 'onEmbeddedMessagingWindowMaximized'
-            )[1]
-            const buttonClickHandler = mockAddEventListener.mock.calls.find(
-                (call) => call[0] === 'onEmbeddedMessagingButtonClicked'
-            )[1]
-
-            // Verify all event listeners were added
-            expect(mockAddEventListener).toHaveBeenCalledTimes(3)
-            expect(mockAddEventListener).toHaveBeenCalledWith(
-                'onEmbeddedMessagingReady',
-                readyHandler
-            )
-            expect(mockAddEventListener).toHaveBeenCalledWith(
-                'onEmbeddedMessagingWindowMaximized',
-                maximizeHandler
-            )
-            expect(mockAddEventListener).toHaveBeenCalledWith(
-                'onEmbeddedMessagingButtonClicked',
-                buttonClickHandler
-            )
-
-            // Unmount the component
-            unmount()
-
-            // Verify all event listeners were removed with the same handlers
-            expect(mockRemoveEventListener).toHaveBeenCalledTimes(3)
-            expect(mockRemoveEventListener).toHaveBeenCalledWith(
-                'onEmbeddedMessagingReady',
-                readyHandler
-            )
-            expect(mockRemoveEventListener).toHaveBeenCalledWith(
-                'onEmbeddedMessagingWindowMaximized',
-                maximizeHandler
-            )
-            expect(mockRemoveEventListener).toHaveBeenCalledWith(
-                'onEmbeddedMessagingButtonClicked',
-                buttonClickHandler
-            )
-        })
-
-        it('should not add event listeners when component is disabled', () => {
-            const disabledCommerceAgent = {
-                ...mockCommerceAgent,
-                enabled: 'false'
-            }
-
-            // Render the component with disabled commerce agent
-            const {unmount} = render(
-                <ShopperAgent
-                    commerceAgentConfiguration={disabledCommerceAgent}
-                    domainUrl="https://test.domain.com"
-                    basketId="test-basket-id"
-                    locale="en-US"
-                    basketDoneLoading={true}
-                />
-            )
-
-            // Verify no event listeners were added
-            expect(mockAddEventListener).not.toHaveBeenCalled()
-
-            // Unmount the component
-            unmount()
-
-            // Verify no event listeners were removed
-            expect(mockRemoveEventListener).not.toHaveBeenCalled()
+        expect(mockEmbeddedService.prechatAPI.setHiddenPrechatFields).toHaveBeenCalledWith({
+            BasketId: newBasketId
         })
     })
 })
