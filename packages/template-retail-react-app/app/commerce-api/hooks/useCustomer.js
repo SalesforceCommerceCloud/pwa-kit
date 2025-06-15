@@ -90,7 +90,9 @@ export default function useCustomer() {
              * @param {string} credentials.password
              */
             async login(credentials) {
-                await api.auth.ready()
+                if (api.auth.pendingToken) {
+                    await api.auth.pendingToken
+                }
                 let skeletonCustomer = getSkeletonCustomer()
                 if (credentials) {
                     await login.mutateAsync({
@@ -115,7 +117,7 @@ export default function useCustomer() {
              */
             async logout() {
                 await logout.mutateAsync()
-                await api.auth.ready()
+                await this.login()
                 const skeletonCustomer = getSkeletonCustomer()
                 setCustomer(skeletonCustomer)
             },

@@ -30,7 +30,7 @@ const useShopper = (opts = {}) => {
 
         // We have a customer but no basket, so we fetch a new or existing basket
         if (customer.isInitialized && !hasBasket) {
-            basket.getOrCreateBasket()
+            basket.getBasket()
             return
         }
 
@@ -41,7 +41,7 @@ const useShopper = (opts = {}) => {
             customer.isInitialized &&
             customer.customerId !== basket.customerInfo.customerId
         ) {
-            basket.getOrCreateBasket()
+            basket.getBasket()
             return
         }
 

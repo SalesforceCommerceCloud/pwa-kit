@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import jwtDecode from 'jwt-decode'
+import {jwtDecode} from 'jwt-decode'
 import {getAppOrigin} from 'pwa-kit-react-sdk/utils/url'
 import {HTTPError} from 'pwa-kit-react-sdk/ssr/universal/errors'
 import {refreshTokenGuestStorageKey, refreshTokenRegisteredStorageKey} from './constants'
@@ -178,8 +178,7 @@ export const checkRequiredParameters = (listOfPassedParameters, listOfRequiredPa
 export const createOcapiFetch =
     (commerceAPIConfig) => async (endpoint, method, args, methodName, body) => {
         const proxy = `/mobify/proxy/ocapi`
-
-        console.log("creating ocapi fetch", args[0])
+        
         // The api config will only have `ocapiHost` during testing to workaround localhost proxy
         const host = commerceAPIConfig.ocapiHost
             ? `https://${commerceAPIConfig.ocapiHost}`

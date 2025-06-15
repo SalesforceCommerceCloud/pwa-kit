@@ -71,9 +71,6 @@ class CommerceAPI {
 
         this.auth = new Auth(this._authConfig)
 
-        // Ensure auth is ready for synchronous access in transformer
-        this._authReady = this.auth.ready()
-
         if (this._config.einsteinConfig?.einsteinId) {
             this.einstein = new EinsteinAPI(this)
         }
@@ -157,7 +154,10 @@ class CommerceAPI {
                             ...fetchOptions?.parameters
                         }
 
-                        await self.auth.ready()
+                        if (self.auth.pendingToken) {
+                            await self.auth.pendingToken
+                            console.log('pendingToken resolved', self.auth.pendingToken)
+                        }
 
                         // Handle auth logic (replacing willSendRequest functionality)
                         let dwsidHeader = {}
@@ -185,8 +185,7 @@ class CommerceAPI {
                             }
                         }
 
-                        const token = self.auth.get('access_token')
-
+                        const {access_token: token} = await self.auth.ready()
                         return {
                             ...options,
                             headers: {

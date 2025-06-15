@@ -56,7 +56,7 @@ export default function useBasket(opts = {}) {
              * to interact with a customer basket. All other calls are done through the
              * ShopperBaskets API, which in our case, uses OCAPI rather than commerce sdk.
              */
-            async getOrCreateBasket() {
+            async getBasket() {
                 const customerBaskets = await api.shopperCustomers.getCustomerBaskets({
                     parameters: {customerId: customer?.customerId}
                 })
@@ -69,18 +69,8 @@ export default function useBasket(opts = {}) {
                 // We only support single baskets for now. Grab the first one.
                 let basket = Array.isArray(customerBaskets?.baskets) && customerBaskets.baskets[0]
 
-                if (!basket) {
-                    // Back to using ShopperBaskets for all basket interaction.
-                    basket = await api.shopperBaskets.createBasket({})
-
-                    // Throw if there was a problem creating the basket
-                    if (isError(basket)) {
-                        throw new Error(basket)
-                    }
-                }
-
                 // Update basket currency if it was created with the wrong one, this will also set the state.
-                if (currency && basket.currency !== currency) {
+                if (basket && currency && basket.currency !== currency) {
                     await this.updateBasketCurrency(currency, basket.basketId)
                 } else {
                     setBasket(basket)
@@ -115,9 +105,21 @@ export default function useBasket(opts = {}) {
              * @param {number} item.quantity - The quantity of the item.
              */
             async addItemToBasket(item) {
+                let newBasket = {}
+                console.log('basket', basket)
+                if (!basket || !basket.basketId) {
+                    // Back to using ShopperBaskets for all basket interaction.
+                    newBasket = await api.shopperBaskets.createBasket({})
+
+                    // Throw if there was a problem creating the basket
+                    if (isError(basket)) {
+                        throw new Error(basket)
+                    }
+                }
+
                 const response = await api.shopperBaskets.addItemToBasket({
                     body: item,
-                    parameters: {basketId: basket.basketId}
+                    parameters: {basketId: basket?.basketId || newBasket.basketId}
                 })
                 if (response.fault) {
                     throw new Error(response)
@@ -171,6 +173,10 @@ export default function useBasket(opts = {}) {
              */
             async getProductsInBasket(ids, options) {
                 if (!ids) {
+                    return
+                }
+
+                if (!basket) {
                     return
                 }
 
