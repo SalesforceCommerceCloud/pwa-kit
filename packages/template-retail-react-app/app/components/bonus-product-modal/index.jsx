@@ -105,9 +105,9 @@ const BonusProductItem = ({product, isSelected, onToggle, isLoading}) => {
                 >
                     {productName}
                 </Text>
-                <Checkbox 
-                    isChecked={isSelected} 
-                    onChange={() => onToggle(product)} 
+                <Checkbox
+                    isChecked={isSelected}
+                    onChange={() => onToggle(product)}
                     cursor="pointer"
                 />
             </VStack>
