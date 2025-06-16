@@ -9,7 +9,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import {useIntl} from 'react-intl'
 
-import {Container, SimpleGrid, Stack, useSlotRecipe} from '@chakra-ui/react'
+import {Container, SimpleGrid, useSlotRecipe} from '@chakra-ui/react'
 
 import LinksList from '../../components/links-list'
 
@@ -22,7 +22,7 @@ const ListMenuContent = ({maxColumns, item, itemsKey, onClose}) => {
     const items = item?.[itemsKey] || []
 
     return (
-        <Container as={Stack} css={styles.popoverContainer}>
+        <Container css={styles.popoverContainer}>
             <SimpleGrid
                 spacing={8}
                 justifyContent={'left'}

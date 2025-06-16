@@ -39,11 +39,11 @@ const ListMenu = ({
     maxColumns = MAXIMUM_NUMBER_COLUMNS
 }) => {
     const recipe = useSlotRecipe({key: 'listMenu'})
+    const styles = recipe()
     const [ariaBusy, setAriaBusy] = useState(true)
     const [activeLink, setActiveLink] = useState()
     const intl = useIntl()
 
-    const styles = recipe()
     const items = root?.[itemsKey]
 
     useEffect(() => {
@@ -63,7 +63,7 @@ const ListMenu = ({
         >
             <Flex css={styles.container}>
                 {items ? (
-                    <Stack direction={'row'} spacing={0} css={styles.stackContainer}>
+                    <Stack direction={'row'} gap={0} css={styles.stackContainer}>
                         {items?.map?.((item) => {
                             const {id, name} = item
                             const itemsCount = item[itemsCountKey] || item[itemsKey]?.length || 0
@@ -86,7 +86,7 @@ const ListMenu = ({
                                             to={categoryUrlBuilder(item)}
                                             onMouseOver={setActiveLink.bind(this, id)}
                                             onMouseOut={setActiveLink.bind(this)}
-                                            {...styles.listMenuTriggerLink}
+                                            css={styles.listMenuTriggerLink}
                                             {...{name: name + ' __'}}
                                             {...(activeLink === id
                                                 ? {css: styles.listMenuTriggerlessLinkActive}
