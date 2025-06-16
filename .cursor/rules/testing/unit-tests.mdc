@@ -3,9 +3,15 @@ description:
 globs: 
 alwaysApply: false
 ---
+---
+description: USE WHEN writing or modifying unit tests for React components in template-retail-react-app
+globs: ["packages/template-retail-react-app/**/*.test.js", "packages/template-retail-react-app/**/*.test.jsx", "packages/template-retail-react-app/**/*.test.ts", "packages/template-retail-react-app/**/*.test.tsx", "packages/template-retail-react-app/**/tests/**/*"]
+alwaysApply: false
+---
+
 # 🧪 Cursor Unit Test Rules for Components (.mdc)
 
-> These rules are enforced by Cursor IDE for all unit tests in `app/components`.
+> These rules are enforced by Cursor IDE for all unit tests in `packages/template-retail-react-app/app/components`.
 
 ---
 
