@@ -24,7 +24,7 @@ const ListMenuPopover = ({contentComponent, item, name, itemsKey, maxColumns}) =
         <Popover.Root
             open={open}
             onOpenChange={setOpen}
-            positioning={{placement: 'bottom-start', offset: { mainAxis: 12, crossAxis: 12 },}}
+            positioning={{placement: 'bottom-start'}}
             lazyMounted
             portalled
             unstyled
