@@ -17,7 +17,7 @@ jest.mock('@salesforce/commerce-sdk-react')
 
 // Mock provider component
 const MockProvider = ({children}) => {
-    return (<div data-testid="mock-provider">{children}</div>)
+    return <div data-testid="mock-provider">{children}</div>
 }
 
 MockProvider.propTypes = {
