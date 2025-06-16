@@ -22,37 +22,36 @@ const ListMenuPopover = ({contentComponent, item, name, itemsKey, maxColumns}) =
 
     return (
         <Box onMouseLeave={onClose}>
-        <Popover.Root
-            open={open}
-            positioning={{placement: 'bottom-start'}}
-            lazyMounted
-            unstyled
-        >
-            <Popover.Trigger asChild>
-                <Box onMouseEnter={onOpen}>
-                    <ListMenuTrigger
-                        item={item}
-                        name={name}
-                        isOpen={open}
-                        onOpen={onOpen}
-                        onClose={onClose}
-                    />
-                </Box>
-            </Popover.Trigger>
-
+            <Popover.Root
+                open={open}
+                positioning={{placement: 'bottom-start'}}
+                lazyMounted
+                unstyled
+            >
+                <Popover.Trigger asChild>
+                    <Box onMouseEnter={onOpen}>
+                        <ListMenuTrigger
+                            item={item}
+                            name={name}
+                            isOpen={open}
+                            onOpen={onOpen}
+                            onClose={onClose}
+                        />
+                    </Box>
+                </Popover.Trigger>
                 <Popover.Positioner>
                     <Popover.Content data-testid="popover-menu" css={styles.popoverContent}>
                         <Popover.Body css={styles.popoverBody}>
                             <ContentComponent
-                                    item={item}
-                                    itemsKey={itemsKey}
-                                    onClose={onClose}
-                                    maxColumns={maxColumns}
-                                />
+                                item={item}
+                                itemsKey={itemsKey}
+                                onClose={onClose}
+                                maxColumns={maxColumns}
+                            />
                         </Popover.Body>
                     </Popover.Content>
                 </Popover.Positioner>
-        </Popover.Root>
+            </Popover.Root>
         </Box>
     )
 }
