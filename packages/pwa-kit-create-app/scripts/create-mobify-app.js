@@ -170,21 +170,26 @@ const TYPESCRIPT_MINIMAL_QUESTIONS = [
     }
 ]
 
-const RETAIL_REACT_APP_QUESTIONS = [
+const createRetailReactAppQuestions = (defaults = {}) => [
     {
         name: 'project.name',
         validate: validProjectName,
-        message: 'What is the name of your Project?'
+        message: 'What is the name of your Project?',
+        default: defaults['project.name'] || 'retail-react-app'
     },
     {
         name: 'project.commerce.instanceUrl',
         message: 'What is the URL for your Commerce Cloud instance?',
-        validate: validUrl
+        validate: validUrl,
+        default:
+            defaults['project.commerce.instanceUrl'] ||
+            'https://zzrf-001.dx.commercecloud.salesforce.com'
     },
     {
         name: 'project.commerce.clientId',
         message: 'What is your SLAS Client ID?',
-        validate: validClientId
+        validate: validClientId,
+        default: defaults['project.commerce.clientId'] || 'c9c45bfd-0ed3-4aa2-9971-40f88962b836'
     },
     {
         name: 'project.commerce.isSlasPrivate',
@@ -199,22 +204,26 @@ const RETAIL_REACT_APP_QUESTIONS = [
                 name: 'No',
                 value: false
             }
-        ]
+        ],
+        default: defaults['project.commerce.isSlasPrivate'] || false
     },
     {
         name: 'project.commerce.siteId',
         message: 'What is your Site ID in Business Manager?',
-        validate: validSiteId
+        validate: validSiteId,
+        default: defaults['project.commerce.siteId'] || 'RefArch'
     },
     {
         name: 'project.commerce.organizationId',
         message: 'What is your Commerce API organization ID in Business Manager?',
-        validate: validOrganizationId
+        validate: validOrganizationId,
+        default: defaults['project.commerce.organizationId'] || 'f_ecom_zzrf_001'
     },
     {
         name: 'project.commerce.shortCode',
         message: 'What is your Commerce API short code in Business Manager?',
-        validate: validShortCode
+        validate: validShortCode,
+        default: defaults['project.commerce.shortCode'] || 'kv7kzm78'
     }
 ]
 
@@ -234,22 +243,23 @@ const PRESETS = [
             type: TEMPLATE_SOURCE_NPM,
             id: '@salesforce/chakra-storefront'
         },
-        questions: [...RETAIL_REACT_APP_QUESTIONS],
-        answers: {
-            ['project.hybrid']: false,
-            ['project.name']: 'retail-react-app',
-            ['project.commerce.instanceUrl']: 'https://zzrf-001.dx.commercecloud.salesforce.com',
-            ['project.commerce.clientId']: 'c9c45bfd-0ed3-4aa2-9971-40f88962b836',
-            ['project.commerce.siteId']: 'RefArch',
-            ['project.commerce.organizationId']: 'f_ecom_zzrf_001',
-            ['project.commerce.shortCode']: 'kv7kzm78',
-            ['project.commerce.isSlasPrivate']: false,
-            ['project.einstein.clientId']: '1ea06c6e-c936-4324-bcf0-fada93f83bb1',
-            ['project.einstein.siteId']: 'aaij-MobileFirst',
-            ['project.dataCloud.appSourceId']: 'fb81edab-24c6-4b40-8684-b67334dfdf32',
-            ['project.dataCloud.tenantId']: 'mmyw8zrxhfsg09lfmzrd1zjqmg',
-            ['project.demo.enableDemoSettings']: false
-        },
+        interactive: true,
+        getQuestions: () =>
+            createRetailReactAppQuestions({
+                'project.hybrid': false,
+                'project.name': 'retail-react-app',
+                'project.commerce.instanceUrl': 'https://zzrf-001.dx.commercecloud.salesforce.com',
+                'project.commerce.clientId': 'c9c45bfd-0ed3-4aa2-9971-40f88962b836',
+                'project.commerce.siteId': 'RefArch',
+                'project.commerce.organizationId': 'f_ecom_zzrf_001',
+                'project.commerce.shortCode': 'kv7kzm78',
+                'project.commerce.isSlasPrivate': false,
+                'project.einstein.clientId': '1ea06c6e-c936-4324-bcf0-fada93f83bb1',
+                'project.einstein.siteId': 'aaij-MobileFirst',
+                'project.dataCloud.appSourceId': 'fb81edab-24c6-4b40-8684-b67334dfdf32',
+                'project.dataCloud.tenantId': 'mmyw8zrxhfsg09lfmzrd1zjqmg',
+                'project.demo.enableDemoSettings': false
+            }),
         assets: ['translations'],
         private: false
     },
@@ -267,22 +277,22 @@ const PRESETS = [
             type: TEMPLATE_SOURCE_NPM,
             id: '@salesforce/retail-react-app'
         },
-        questions: [...RETAIL_REACT_APP_QUESTIONS],
-        answers: {
-            ['project.hybrid']: false,
-            ['project.name']: 'demo-storefront',
-            ['project.commerce.instanceUrl']: 'https://zzte-053.dx.commercecloud.salesforce.com',
-            ['project.commerce.clientId']: '1d763261-6522-4913-9d52-5d947d3b94c4',
-            ['project.commerce.siteId']: 'RefArch',
-            ['project.commerce.organizationId']: 'f_ecom_zzte_053',
-            ['project.commerce.shortCode']: 'kv7kzm78',
-            ['project.commerce.isSlasPrivate']: false,
-            ['project.einstein.clientId']: '1ea06c6e-c936-4324-bcf0-fada93f83bb1',
-            ['project.einstein.siteId']: 'aaij-MobileFirst',
-            ['project.dataCloud.appSourceId']: 'fb81edab-24c6-4b40-8684-b67334dfdf32',
-            ['project.dataCloud.tenantId']: 'mmyw8zrxhfsg09lfmzrd1zjqmg',
-            ['project.demo.enableDemoSettings']: false
-        },
+        getQuestions: () =>
+            createRetailReactAppQuestions({
+                'project.hybrid': false,
+                'project.name': 'demo-storefront',
+                'project.commerce.instanceUrl': 'https://zzte-053.dx.commercecloud.salesforce.com',
+                'project.commerce.clientId': '1d763261-6522-4913-9d52-5d947d3b94c4',
+                'project.commerce.siteId': 'RefArch',
+                'project.commerce.organizationId': 'f_ecom_zzte_053',
+                'project.commerce.shortCode': 'kv7kzm78',
+                'project.commerce.isSlasPrivate': false,
+                'project.einstein.clientId': '1ea06c6e-c936-4324-bcf0-fada93f83bb1',
+                'project.einstein.siteId': 'aaij-MobileFirst',
+                'project.dataCloud.appSourceId': 'fb81edab-24c6-4b40-8684-b67334dfdf32',
+                'project.dataCloud.tenantId': 'mmyw8zrxhfsg09lfmzrd1zjqmg',
+                'project.demo.enableDemoSettings': false
+            }),
         assets: ['translations'],
         private: false
     },
@@ -303,7 +313,7 @@ const PRESETS = [
             type: TEMPLATE_SOURCE_NPM,
             id: '@salesforce/retail-react-app'
         },
-        questions: [...RETAIL_REACT_APP_QUESTIONS],
+        interactive: false,
         answers: {
             ['project.hybrid']: false,
             ['project.name']: 'demo-storefront',
@@ -330,22 +340,22 @@ const PRESETS = [
             type: TEMPLATE_SOURCE_BUNDLE,
             id: 'typescript-minimal'
         },
-        questions: [...RETAIL_REACT_APP_QUESTIONS],
-        answers: {
-            ['project.hybrid']: false,
-            ['project.name']: 'retail-react-app',
-            ['project.commerce.instanceUrl']: 'https://zzrf-001.dx.commercecloud.salesforce.com',
-            ['project.commerce.clientId']: 'c9c45bfd-0ed3-4aa2-9971-40f88962b836',
-            ['project.commerce.siteId']: 'RefArch',
-            ['project.commerce.organizationId']: 'f_ecom_zzrf_001',
-            ['project.commerce.shortCode']: 'kv7kzm78',
-            ['project.commerce.isSlasPrivate']: false,
-            ['project.einstein.clientId']: '1ea06c6e-c936-4324-bcf0-fada93f83bb1',
-            ['project.einstein.siteId']: 'aaij-MobileFirst',
-            ['project.dataCloud.appSourceId']: 'fb81edab-24c6-4b40-8684-b67334dfdf32',
-            ['project.dataCloud.tenantId']: 'mmyw8zrxhfsg09lfmzrd1zjqmg',
-            ['project.demo.enableDemoSettings']: false
-        },
+        getQuestions: () =>
+            createRetailReactAppQuestions({
+                'project.hybrid': false,
+                'project.name': 'retail-react-app',
+                'project.commerce.instanceUrl': 'https://zzrf-001.dx.commercecloud.salesforce.com',
+                'project.commerce.clientId': 'c9c45bfd-0ed3-4aa2-9971-40f88962b836',
+                'project.commerce.siteId': 'RefArch',
+                'project.commerce.organizationId': 'f_ecom_zzrf_001',
+                'project.commerce.shortCode': 'kv7kzm78',
+                'project.commerce.isSlasPrivate': false,
+                'project.einstein.clientId': '1ea06c6e-c936-4324-bcf0-fada93f83bb1',
+                'project.einstein.siteId': 'aaij-MobileFirst',
+                'project.dataCloud.appSourceId': 'fb81edab-24c6-4b40-8684-b67334dfdf32',
+                'project.dataCloud.tenantId': 'mmyw8zrxhfsg09lfmzrd1zjqmg',
+                'project.demo.enableDemoSettings': false
+            }),
         assets: ['translations'],
         private: true
     },
@@ -357,22 +367,22 @@ const PRESETS = [
             type: TEMPLATE_SOURCE_NPM,
             id: '@salesforce/retail-react-app'
         },
-        questions: [...RETAIL_REACT_APP_QUESTIONS],
-        answers: {
-            ['project.hybrid']: false,
-            ['project.name']: 'retail-react-app',
-            ['project.commerce.instanceUrl']: 'https://zzrf-002.dx.commercecloud.salesforce.com',
-            ['project.commerce.clientId']: '89655706-9a0d-49ba-a1e5-18bb2d616374',
-            ['project.commerce.siteId']: 'RefArch',
-            ['project.commerce.organizationId']: 'f_ecom_zzrf_002',
-            ['project.commerce.shortCode']: 'kv7kzm78',
-            ['project.commerce.isSlasPrivate']: true,
-            ['project.einstein.clientId']: '1ea06c6e-c936-4324-bcf0-fada93f83bb1',
-            ['project.einstein.siteId']: 'aaij-MobileFirst',
-            ['project.dataCloud.appSourceId']: 'fb81edab-24c6-4b40-8684-b67334dfdf32',
-            ['project.dataCloud.tenantId']: 'mmyw8zrxhfsg09lfmzrd1zjqmg',
-            ['project.demo.enableDemoSettings']: false
-        },
+        getQuestions: () =>
+            createRetailReactAppQuestions({
+                'project.hybrid': false,
+                'project.name': 'retail-react-app',
+                'project.commerce.instanceUrl': 'https://zzrf-002.dx.commercecloud.salesforce.com',
+                'project.commerce.clientId': '89655706-9a0d-49ba-a1e5-18bb2d616374',
+                'project.commerce.siteId': 'RefArch',
+                'project.commerce.organizationId': 'f_ecom_zzrf_002',
+                'project.commerce.shortCode': 'kv7kzm78',
+                'project.commerce.isSlasPrivate': true,
+                'project.einstein.clientId': '1ea06c6e-c936-4324-bcf0-fada93f83bb1',
+                'project.einstein.siteId': 'aaij-MobileFirst',
+                'project.dataCloud.appSourceId': 'fb81edab-24c6-4b40-8684-b67334dfdf32',
+                'project.dataCloud.tenantId': 'mmyw8zrxhfsg09lfmzrd1zjqmg',
+                'project.demo.enableDemoSettings': false
+            }),
         assets: ['translations'],
         private: true
     },
@@ -384,22 +394,22 @@ const PRESETS = [
             type: TEMPLATE_SOURCE_NPM,
             id: '@salesforce/retail-react-app'
         },
-        questions: [...RETAIL_REACT_APP_QUESTIONS],
-        answers: {
-            ['project.hybrid']: false,
-            ['project.name']: 'retail-react-app',
-            ['project.commerce.instanceUrl']: 'https://zzec-006.dx.commercecloud.salesforce.com',
-            ['project.commerce.clientId']: 'b56e7ad3-2237-42c9-8f55-41e63ebca420',
-            ['project.commerce.siteId']: 'RefArch',
-            ['project.commerce.organizationId']: 'f_ecom_zzec_006',
-            ['project.commerce.shortCode']: 'staging-001',
-            ['project.einstein.clientId']: '1ea06c6e-c936-4324-bcf0-fada93f83bb1',
-            ['project.einstein.siteId']: 'aaij-MobileFirst',
-            ['project.dataCloud.appSourceId']: 'fb81edab-24c6-4b40-8684-b67334dfdf32',
-            ['project.dataCloud.tenantId']: 'mmyw8zrxhfsg09lfmzrd1zjqmg',
-            ['project.commerce.isSlasPrivate']: true,
-            ['project.demo.enableDemoSettings']: false
-        },
+        getQuestions: () =>
+            createRetailReactAppQuestions({
+                'project.hybrid': false,
+                'project.name': 'retail-react-app',
+                'project.commerce.instanceUrl': 'https://zzec-006.dx.commercecloud.salesforce.com',
+                'project.commerce.clientId': 'b56e7ad3-2237-42c9-8f55-41e63ebca420',
+                'project.commerce.siteId': 'RefArch',
+                'project.commerce.organizationId': 'f_ecom_zzec_006',
+                'project.commerce.shortCode': 'staging-001',
+                'project.einstein.clientId': '1ea06c6e-c936-4324-bcf0-fada93f83bb1',
+                'project.einstein.siteId': 'aaij-MobileFirst',
+                'project.dataCloud.appSourceId': 'fb81edab-24c6-4b40-8684-b67334dfdf32',
+                'project.dataCloud.tenantId': 'mmyw8zrxhfsg09lfmzrd1zjqmg',
+                'project.commerce.isSlasPrivate': true,
+                'project.demo.enableDemoSettings': false
+            }),
         assets: ['translations'],
         private: true
     },
@@ -411,22 +421,24 @@ const PRESETS = [
             type: TEMPLATE_SOURCE_NPM,
             id: '@salesforce/retail-react-app'
         },
-        questions: [...HYBRID_QUESTIONS, ...RETAIL_REACT_APP_QUESTIONS],
-        answers: {
-            ['project.hybrid']: true,
-            ['project.name']: 'retail-react-app',
-            ['project.commerce.instanceUrl']: 'https://test.phased-launch-testing.com/',
-            ['project.commerce.clientId']: '99b4e081-00cf-454a-95b0-26ac2b824931',
-            ['project.commerce.siteId']: 'RefArch',
-            ['project.commerce.organizationId']: 'f_ecom_bdpx_dev',
-            ['project.commerce.shortCode']: 'xitgmcd3',
-            ['project.einstein.clientId']: '1ea06c6e-c936-4324-bcf0-fada93f83bb1',
-            ['project.einstein.siteId']: 'aaij-MobileFirst',
-            ['project.commerce.isSlasPrivate']: true,
-            ['project.dataCloud.appSourceId']: 'fb81edab-24c6-4b40-8684-b67334dfdf32',
-            ['project.dataCloud.tenantId']: 'mmyw8zrxhfsg09lfmzrd1zjqmg',
-            ['project.demo.enableDemoSettings']: false
-        },
+        getQuestions: () => [
+            ...HYBRID_QUESTIONS,
+            ...createRetailReactAppQuestions({
+                'project.hybrid': true,
+                'project.name': 'retail-react-app',
+                'project.commerce.instanceUrl': 'https://test.phased-launch-testing.com/',
+                'project.commerce.clientId': '99b4e081-00cf-454a-95b0-26ac2b824931',
+                'project.commerce.siteId': 'RefArch',
+                'project.commerce.organizationId': 'f_ecom_bdpx_dev',
+                'project.commerce.shortCode': 'xitgmcd3',
+                'project.einstein.clientId': '1ea06c6e-c936-4324-bcf0-fada93f83bb1',
+                'project.einstein.siteId': 'aaij-MobileFirst',
+                'project.commerce.isSlasPrivate': true,
+                'project.dataCloud.appSourceId': 'fb81edab-24c6-4b40-8684-b67334dfdf32',
+                'project.dataCloud.tenantId': 'mmyw8zrxhfsg09lfmzrd1zjqmg',
+                'project.demo.enableDemoSettings': false
+            })
+        ],
         assets: ['translations'],
         private: true
     },
@@ -438,22 +450,24 @@ const PRESETS = [
             type: TEMPLATE_SOURCE_NPM,
             id: '@salesforce/retail-react-app'
         },
-        questions: [...HYBRID_QUESTIONS, ...RETAIL_REACT_APP_QUESTIONS],
-        answers: {
-            ['project.hybrid']: true,
-            ['project.name']: 'retail-react-app',
-            ['project.commerce.instanceUrl']: 'https://www.phased-launch-testing.com/',
-            ['project.commerce.clientId']: 'e7e22b7f-a904-4f3a-8022-49dbee696485',
-            ['project.commerce.siteId']: 'RefArch',
-            ['project.commerce.organizationId']: 'f_ecom_bjnl_prd',
-            ['project.commerce.shortCode']: 'performance-001',
-            ['project.einstein.clientId']: '1ea06c6e-c936-4324-bcf0-fada93f83bb1',
-            ['project.einstein.siteId']: 'aaij-MobileFirst',
-            ['project.commerce.isSlasPrivate']: false,
-            ['project.dataCloud.appSourceId']: 'fb81edab-24c6-4b40-8684-b67334dfdf32',
-            ['project.dataCloud.tenantId']: 'mmyw8zrxhfsg09lfmzrd1zjqmg',
-            ['project.demo.enableDemoSettings']: false
-        },
+        getQuestions: () => [
+            ...HYBRID_QUESTIONS,
+            ...createRetailReactAppQuestions({
+                'project.hybrid': true,
+                'project.name': 'retail-react-app',
+                'project.commerce.instanceUrl': 'https://www.phased-launch-testing.com/',
+                'project.commerce.clientId': 'e7e22b7f-a904-4f3a-8022-49dbee696485',
+                'project.commerce.siteId': 'RefArch',
+                'project.commerce.organizationId': 'f_ecom_bjnl_prd',
+                'project.commerce.shortCode': 'performance-001',
+                'project.einstein.clientId': '1ea06c6e-c936-4324-bcf0-fada93f83bb1',
+                'project.einstein.siteId': 'aaij-MobileFirst',
+                'project.commerce.isSlasPrivate': false,
+                'project.dataCloud.appSourceId': 'fb81edab-24c6-4b40-8684-b67334dfdf32',
+                'project.dataCloud.tenantId': 'mmyw8zrxhfsg09lfmzrd1zjqmg',
+                'project.demo.enableDemoSettings': false
+            })
+        ],
         assets: ['translations'],
         private: true
     },
@@ -480,7 +494,7 @@ const PRESETS = [
             type: TEMPLATE_SOURCE_BUNDLE,
             id: 'typescript-minimal'
         },
-        questions: TYPESCRIPT_MINIMAL_QUESTIONS,
+        getQuestions: () => TYPESCRIPT_MINIMAL_QUESTIONS,
         private: true
     },
     {
@@ -491,7 +505,7 @@ const PRESETS = [
             type: TEMPLATE_SOURCE_BUNDLE,
             id: 'express-minimal'
         },
-        questions: EXPRESS_MINIMAL_QUESTIONS,
+        getQuestions: () => EXPRESS_MINIMAL_QUESTIONS,
         answers: {
             ['project.name']: 'express-minimal'
         },
@@ -510,7 +524,7 @@ const PRESETS = [
             type: TEMPLATE_SOURCE_BUNDLE,
             id: 'express-minimal'
         },
-        questions: EXPRESS_MINIMAL_QUESTIONS,
+        getQuestions: () => EXPRESS_MINIMAL_QUESTIONS,
         private: true
     },
     {
@@ -521,7 +535,7 @@ const PRESETS = [
             type: TEMPLATE_SOURCE_BUNDLE,
             id: 'mrt-reference-app'
         },
-        questions: MRT_REFERENCE_QUESTIONS,
+        getQuestions: () => MRT_REFERENCE_QUESTIONS,
         answers: {
             ['project.name']: 'mrt-reference-app'
         },
@@ -906,16 +920,12 @@ const main = async (opts) => {
         console.log('')
     }
 
-    // The context object will have all the current information, like the selected preset, the answers
-    // to "general" and "project" questions. It'll also be populated with details of the selected project,
-    // like its `package.json` value.
     let context = INITIAL_CONTEXT
     let {outputDir, verbose, preset, templateVersion} = opts
     const {prompt} = inquirer
     const OUTPUT_DIR_FLAG_ACTIVE = !!outputDir
     const presetId = preset || process.env.GENERATOR_PRESET
 
-    // Exit if the preset provided is not valid.
     if (presetId && !validPreset(presetId)) {
         console.error(
             `The preset "${presetId}" is not valid. Valid presets are: ${
@@ -927,18 +937,20 @@ const main = async (opts) => {
         process.exit(1)
     }
 
-    // Set the preset based on presetId if provided
     if (presetId && !context.preset) {
         context.preset = PRESETS.find(({id}) => id === presetId)
     }
 
-    // Ask preset specific questions and merge into the current context.
-    const {questions = {}, answers = {}} = context.preset
-    if (questions) {
+    const {interactive = true, getQuestions, answers = {}} = context.preset
+    if (interactive) {
+        const questions = getQuestions ? getQuestions() : []
         const projectAnswers = await prompt(questions, answers)
-
         context = merge(context, {
             answers: expandObject(projectAnswers)
+        })
+    } else {
+        context = merge(context, {
+            answers: expandObject(answers)
         })
     }
 
