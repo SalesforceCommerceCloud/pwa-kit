@@ -289,7 +289,6 @@ const withLayout = <P extends object>(WrappedComponent: React.ComponentType<P>) 
                                     onMyAccountClick={onAccountClick}
                                     onWishlistClick={onWishlistClick}
                                 >
-                                    Header
                                     {/*    <HideOnDesktop>*/}
                                     {/*        <DrawerMenu*/}
                                     {/*            isOpen={isOpen}*/}
