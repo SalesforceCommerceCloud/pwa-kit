@@ -36,7 +36,7 @@ const ListMenuContent = ({maxColumns, item, itemsKey, onClose}) => {
                 }, minmax(0, 21%))`}
                 marginInlineStart={{lg: '68px', xl: '96px'}}
             >
-                {items.map((item, index) => {
+                {items.map((item) => {
                     const {id, name} = item
                     const items = item[itemsKey]
 
