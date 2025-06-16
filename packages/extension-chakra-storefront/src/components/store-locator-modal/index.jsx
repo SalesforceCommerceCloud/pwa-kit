@@ -9,14 +9,8 @@ import React, {useState, createContext} from 'react'
 import PropTypes from 'prop-types'
 
 // Components
-import {
-    Modal,
-    ModalBody,
-    ModalCloseButton,
-    ModalContent,
-    useBreakpointValue
-} from '@chakra-ui/react'
-import StoreLocatorContent from '../../components/store-locator-modal/store-locator-content'
+import {Dialog, DialogCloseButton, useBreakpointValue} from '@chakra-ui/react'
+import StoreLocatorContent from '../../components/store-locator-Dialog/store-locator-content'
 
 // Others
 import {
@@ -49,15 +43,15 @@ export const useStoreLocator = () => {
     }
 }
 
-const StoreLocatorModal = ({isOpen, onClose}) => {
+const StoreLocatorDialog = ({isOpen, onClose}) => {
     const storeLocator = useStoreLocator()
     const isDesktopView = useBreakpointValue({base: false, lg: true})
 
     return (
         <StoreLocatorContext.Provider value={storeLocator}>
             {isDesktopView ? (
-                <Modal size="4xl" isOpen={isOpen} onClose={onClose}>
-                    <ModalContent
+                <Dialog.Root role="dialog" size="4xl" isOpen={isOpen} onClose={onClose}>
+                    <Dialog.Content
                         position="absolute"
                         top="0"
                         right="0"
@@ -68,35 +62,41 @@ const StoreLocatorModal = ({isOpen, onClose}) => {
                         borderLeft="1px solid"
                         borderColor="gray.200"
                     >
-                        <ModalCloseButton onClick={onClose} />
-                        <ModalBody pb={8} bg="white" paddingBottom={6} paddingTop={6}>
+                        <Dialog.CloseTrigger asChild>
+                            <CloseButton size="sm" css={styles.closeButton} />
+                        </Dialog.CloseTrigger>
+
+                        <Dialog.Body pb={8} bg="white" paddingBottom={6} paddingTop={6}>
                             <StoreLocatorContent />
-                        </ModalBody>
-                    </ModalContent>
-                </Modal>
+                        </Dialog.Body>
+                    </Dialog.Content>
+                </Dialog.Root>
             ) : (
-                <Modal size="4xl" isOpen={isOpen} onClose={onClose}>
-                    <ModalContent
+                <Dialog.Root role="dialog" size="4xl" isOpen={isOpen} onClose={onClose}>
+                    <Dialog.Content
                         position="absolute"
                         top="0"
                         right="0"
                         height="100vh"
                         marginTop="0px"
                     >
-                        <ModalCloseButton onClick={onClose} />
-                        <ModalBody pb={8} bg="white" paddingBottom={6} marginTop={6}>
+                        <Dialog.CloseTrigger asChild>
+                            <CloseButton size="sm" css={styles.closeButton} />
+                        </Dialog.CloseTrigger>
+
+                        <Dialog.Body pb={8} bg="white" paddingBottom={6} marginTop={6}>
                             <StoreLocatorContent />
-                        </ModalBody>
-                    </ModalContent>
-                </Modal>
+                        </Dialog.Body>
+                    </Dialog.Content>
+                </Dialog.Root>
             )}
         </StoreLocatorContext.Provider>
     )
 }
 
-StoreLocatorModal.propTypes = {
+StoreLocatorDialog.propTypes = {
     isOpen: PropTypes.bool,
     onClose: PropTypes.func
 }
 
-export default StoreLocatorModal
+export default StoreLocatorDialog

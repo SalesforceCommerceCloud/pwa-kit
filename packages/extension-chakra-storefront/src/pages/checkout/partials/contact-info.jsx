@@ -8,12 +8,12 @@ import React, {useEffect, useRef, useState} from 'react'
 import PropTypes from 'prop-types'
 import {
     Alert,
-    AlertDialog,
-    AlertDialogBody,
-    AlertDialogContent,
-    AlertDialogFooter,
-    AlertDialogHeader,
-    AlertDialogOverlay,
+    Dialog,
+    DialogBody,
+    DialogContent,
+    DialogFooter,
+    DialogHeader,
+    DialogOverlay,
     AlertIcon,
     Box,
     Button,
@@ -279,41 +279,44 @@ const SignOutConfirmationDialog = ({isOpen, onConfirm, onClose}) => {
     const cancelRef = useRef()
 
     return (
-        <AlertDialog isOpen={isOpen} leastDestructiveRef={cancelRef} onClose={onClose}>
-            <AlertDialogOverlay>
-                <AlertDialogContent>
-                    <AlertDialogHeader fontSize="lg" fontWeight="bold">
+        <Dialog.Root
+            role="alertdialog"
+            isOpen={isOpen}
+            leastDestructiveRef={cancelRef}
+            onClose={onClose}
+        >
+            <Dialog.Content>
+                <Dialog.Header fontSize="lg" fontWeight="bold">
+                    <FormattedMessage
+                        defaultMessage="Sign Out"
+                        id="signout_confirmation_dialog.heading.sign_out"
+                    />
+                </Dialog.Header>
+
+                <Dialog.Body>
+                    <FormattedMessage
+                        defaultMessage="Are you sure you want to sign out? You will need to sign back in to proceed
+                        with your current order."
+                        id="signout_confirmation_dialog.message.sure_to_sign_out"
+                    />
+                </Dialog.Body>
+
+                <Dialog.Footer>
+                    <Button ref={cancelRef} variant="outline" onClick={onClose}>
+                        <FormattedMessage
+                            defaultMessage="Cancel"
+                            id="signout_confirmation_dialog.button.cancel"
+                        />
+                    </Button>
+                    <Button colorScheme="red" onClick={onConfirm} ml={3}>
                         <FormattedMessage
                             defaultMessage="Sign Out"
-                            id="signout_confirmation_dialog.heading.sign_out"
+                            id="signout_confirmation_dialog.button.sign_out"
                         />
-                    </AlertDialogHeader>
-
-                    <AlertDialogBody>
-                        <FormattedMessage
-                            defaultMessage="Are you sure you want to sign out? You will need to sign back in to proceed
-                        with your current order."
-                            id="signout_confirmation_dialog.message.sure_to_sign_out"
-                        />
-                    </AlertDialogBody>
-
-                    <AlertDialogFooter>
-                        <Button ref={cancelRef} variant="outline" onClick={onClose}>
-                            <FormattedMessage
-                                defaultMessage="Cancel"
-                                id="signout_confirmation_dialog.button.cancel"
-                            />
-                        </Button>
-                        <Button colorScheme="red" onClick={onConfirm} ml={3}>
-                            <FormattedMessage
-                                defaultMessage="Sign Out"
-                                id="signout_confirmation_dialog.button.sign_out"
-                            />
-                        </Button>
-                    </AlertDialogFooter>
-                </AlertDialogContent>
-            </AlertDialogOverlay>
-        </AlertDialog>
+                    </Button>
+                </Dialog.Footer>
+            </Dialog.Content>
+        </Dialog.Root>
     )
 }
 
