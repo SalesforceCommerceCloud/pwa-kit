@@ -20,7 +20,7 @@ import LinksList from '../../components/links-list'
 
 import {categoryUrlBuilder} from '../../utils/url'
 
-const ListMenuContent = ({maxColumns, item, itemsKey, onClose, initialFocusRef}) => {
+const ListMenuContent = ({maxColumns, item, itemsKey, onClose}) => {
     const recipe = useSlotRecipe({key: 'listMenu'})
     const styles = recipe()
     const {locale} = useIntl()
@@ -71,7 +71,6 @@ const ListMenuContent = ({maxColumns, item, itemsKey, onClose, initialFocusRef})
                             links={links}
                             color={'gray.900'}
                             onLinkClick={onClose}
-                            {...(index === 0 ? {headingLinkRef: initialFocusRef} : {})}
                         />
                     )
                 })}

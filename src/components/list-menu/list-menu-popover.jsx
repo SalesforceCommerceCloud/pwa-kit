@@ -48,11 +48,9 @@ const ListMenuPopover = ({contentComponent, item, name, itemsKey, maxColumns}) =
                             <ContentComponent
                                     item={item}
                                     itemsKey={itemsKey}
-                                    // initialFocusRef={initialFocusRef}
                                     onClose={onClose}
                                     maxColumns={maxColumns}
                                 />
-                            {/* <div>456</div> */}
                         </Popover.Body>
                     </Popover.Content>
                 </Popover.Positioner>
