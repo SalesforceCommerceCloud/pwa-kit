@@ -27,15 +27,15 @@ const LoginForm = ({
 }) => {
     return (
         <Fragment>
-            <Stack 
-                justifyContent="center" 
-                alignItems="center" 
-                gap={8} 
+            <Stack
+                justifyContent="center"
+                alignItems="center"
+                gap={8}
                 marginTop={8}
                 marginBottom={8}
             >
                 <BrandLogo width="60px" height="auto" />
-                <Text align="center" fontSize="xl" fontWeight="semibold">
+                <Text textAlign="center" fontSize="xl" fontWeight="semibold">
                     <FormattedMessage
                         defaultMessage="Welcome Back"
                         id="login_form.message.welcome_back"

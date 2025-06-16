@@ -6,6 +6,14 @@
  */
 import {defineRecipe} from '@chakra-ui/react'
 
+const baseLinkStyles = {
+    fontWeight: 'normal',
+    height: 'auto',
+    minWidth: '1em',
+    lineHeight: 4,
+    padding: 0
+}
+
 const button = defineRecipe({
     base: {
         borderRadius: 'sm'
@@ -41,12 +49,14 @@ const button = defineRecipe({
                 paddingLeft: 3,
                 paddingRight: 3
             },
-            // link: (props) => ({
-            //     color: props.colorPalette === 'red' ? 'red.500' : 'blue.600',
-            //     fontWeight: 'normal',
-            //     minWidth: '1em',
-            //     lineHeight: 4
-            // }),
+            link: {
+                ...baseLinkStyles,
+                color: 'blue.600'
+            },
+            'error-link': {
+                ...baseLinkStyles,
+                color: 'red.500'
+            },
             'menu-link': {
                 color: 'black',
                 justifyContent: 'flex-start',
