@@ -6,7 +6,7 @@
  */
 
 // Third-Party
-import React, {useState} from 'react'
+import React, {Fragment, useState} from 'react'
 
 // Platform Imports
 import {ApplicationExtension} from '@salesforce/pwa-kit-extension-sdk/react'
@@ -114,10 +114,10 @@ class ChakraStorefront extends ApplicationExtension<Config> {
                 path: config.pages.ProductDetail && config.pages.ProductDetail.path,
                 component: Pages.ProductDetail
             },
-            // {
-            //     path: config.pages.ProductList && config.pages.ProductList.path,
-            //     component: Pages.ProductList
-            // }
+            {
+                path: config.pages.ProductList && config.pages.ProductList.path,
+                component: Pages.ProductList
+            },
             {
                 path: config.pages.Checkout && config.pages.Checkout.path,
                 component: Pages.Checkout,

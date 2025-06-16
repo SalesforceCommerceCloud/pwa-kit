@@ -13,7 +13,7 @@ import {
     Text,
     Button,
     Center,
-    useMultiStyleConfig,
+    useSlotRecipe,
     useTheme
 } from '@chakra-ui/react'
 import PropTypes from 'prop-types'
@@ -25,10 +25,11 @@ import {
 
 const ColorRefinements = ({filter, toggleFilter, selectedFilters}) => {
     const intl = useIntl()
-    const styles = useMultiStyleConfig('SwatchGroup', {
-        variant: 'circle',
-        disabled: false
+    const recipe = useSlotRecipe({
+        key: 'swatchGroup',
+        variant: 'circle'
     })
+    const styles = recipe()
     const theme = useTheme()
     const cssColorGroups = theme.colors.cssColorGroups
 
@@ -49,9 +50,10 @@ const ColorRefinements = ({filter, toggleFilter, selectedFilters}) => {
                             cursor="pointer"
                         >
                             <Button
-                                {...styles.swatch}
+                                css={styles.swatch}
                                 color={isSelected ? 'black' : 'gray.200'}
                                 border={isSelected ? '1px' : '0'}
+                                data-state={isSelected ? 'selected' : 'unselected'}
                                 aria-checked={isSelected}
                                 role="checkbox"
                                 variant="outline"
@@ -63,7 +65,7 @@ const ColorRefinements = ({filter, toggleFilter, selectedFilters}) => {
                                 )}
                             >
                                 <Center
-                                    {...styles.swatchButton}
+                                    css={styles.swatchButton}
                                     marginRight={0}
                                     border="1px solid black"
                                 >
@@ -75,12 +77,12 @@ const ColorRefinements = ({filter, toggleFilter, selectedFilters}) => {
                                         backgroundRepeat="no-repeat"
                                         backgroundSize="cover"
                                         backgroundColor={
-                                            cssColorGroups[value.presentationId.toLowerCase()]
+                                            cssColorGroups[value.presentationId?.toLowerCase()]
                                         }
                                         background={
-                                            value.presentationId.toLowerCase() ===
+                                            value.presentationId?.toLowerCase() ===
                                                 'miscellaneous' &&
-                                            cssColorGroups[value.presentationId.toLowerCase()]
+                                            cssColorGroups[value.presentationId?.toLowerCase()]
                                         }
                                     />
                                 </Center>

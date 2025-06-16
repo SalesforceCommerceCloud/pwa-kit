@@ -25,35 +25,26 @@ import {
     Flex,
     SimpleGrid,
     Grid,
-    Select,
     Heading,
     Text,
-    FormControl,
     Stack,
     useDisclosure,
     Button,
-    Modal,
-    ModalHeader,
-    ModalBody,
-    ModalFooter,
-    ModalContent,
-    ModalCloseButton,
-    ModalOverlay,
+    Field,
+    Dialog,
+    Portal,
     Drawer,
-    DrawerBody,
-    DrawerHeader,
-    DrawerOverlay,
-    DrawerContent,
-    DrawerCloseButton
+    NativeSelect
 } from '@chakra-ui/react'
 
 // Project Components
 import Pagination from '../../components/pagination'
 import ProductTile, {Skeleton as ProductTileSkeleton} from '../../components/product-tile'
 import {HideOnDesktop} from '../../components/responsive'
-import Refinements from '../../pages/product-list/partials/refinements'
+// TODO: Refinements components will be migrated in separate PR
+// import Refinements from '../../pages/product-list/partials/refinements'
 import CategoryLinks from '../../pages/product-list/partials/category-links'
-import SelectedRefinements from '../../pages/product-list/partials/selected-refinements'
+// import SelectedRefinements from '../../pages/product-list/partials/selected-refinements'
 import EmptySearchResults from '../../pages/product-list/partials/empty-results'
 import PageHeader from '../../pages/product-list/partials/page-header'
 import AbovePageHeader from '../../pages/product-list/partials/above-page-header'
@@ -426,15 +417,15 @@ const ProductList = (props) => {
             ) : (
                 <>
                     <AbovePageHeader />
-                    <PageDesignerPromotionalBanner />
 
-                    {/* Header */}
+                    <PageDesignerPromotionalBanner />
+                    {/* Header for Desktop */}
                     <Stack
                         display={{base: 'none', lg: 'flex'}}
                         direction="row"
                         justify="flex-start"
                         align="flex-start"
-                        spacing={4}
+                        gap={4}
                         marginBottom={6}
                     >
                         <Flex align="left" width="287px">
@@ -447,12 +438,13 @@ const ProductList = (props) => {
                         </Flex>
 
                         <Box flex={1} paddingTop={'45px'}>
-                            <SelectedRefinements
+                            {/* TODO: SelectedRefinements component will be added in separate PR */}
+                            {/*<SelectedRefinements
                                 filters={productSearchResult?.refinements}
                                 toggleFilter={toggleFilter}
                                 handleReset={resetFilters}
                                 selectedFilterValues={productSearchResult?.selectedRefinements}
-                            />
+                            />*/}
                         </Box>
                         <Box paddingTop={'45px'}>
                             <Sort
@@ -465,7 +457,7 @@ const ProductList = (props) => {
 
                     {/* Filter Button for Mobile */}
                     <HideOnDesktop>
-                        <Stack spacing={6}>
+                        <Stack gap={6}>
                             <PageHeader
                                 searchQuery={searchQuery}
                                 category={category}
@@ -477,20 +469,20 @@ const ProductList = (props) => {
                                 direction="row"
                                 justify="flex-start"
                                 align="center"
-                                spacing={1}
+                                gap={1}
                                 height={12}
                                 borderColor="gray.100"
                             >
                                 <Flex align="center">
                                     <Button
                                         fontSize="sm"
-                                        colorScheme="black"
+                                        colorPalette="black"
                                         variant="outline"
                                         marginRight={2}
                                         display="inline-flex"
-                                        leftIcon={<FilterIcon boxSize={5} />}
                                         onClick={onOpen}
                                     >
+                                        <FilterIcon boxSize={5} />
                                         <FormattedMessage
                                             defaultMessage="Filter"
                                             id="product_list.button.filter"
@@ -502,10 +494,9 @@ const ProductList = (props) => {
                                         maxWidth="245px"
                                         fontSize="sm"
                                         marginRight={2}
-                                        colorScheme="black"
+                                        colorPalette="black"
                                         variant="outline"
                                         display="inline-flex"
-                                        rightIcon={<ChevronDownIcon boxSize={5} />}
                                         onClick={() => setSortOpen(true)}
                                     >
                                         {formatMessage(
@@ -517,24 +508,27 @@ const ProductList = (props) => {
                                                 sortOption: selectedSortingOptionLabel?.label
                                             }
                                         )}
+                                        <ChevronDownIcon boxSize={5} />
                                     </Button>
                                 </Flex>
                             </Stack>
                         </Stack>
                         <Box marginBottom={4}>
-                            <SelectedRefinements
+                            {/* TODO: SelectedRefinements component will be added in separate PR */}
+                            {/*<SelectedRefinements
                                 filters={productSearchResult?.refinements}
                                 toggleFilter={toggleFilter}
                                 handleReset={resetFilters}
                                 selectedFilterValues={productSearchResult?.selectedRefinements}
-                            />
+                            />*/}
                         </Box>
                     </HideOnDesktop>
 
                     {/* Body  */}
                     <Grid templateColumns={{base: '1fr', md: '280px 1fr'}} columnGap={6}>
                         <Stack display={{base: 'none', md: 'flex'}}>
-                            <Refinements
+                            {/* TODO:  Refinements component will be added in separate PR */}
+                            {/*<Refinements
                                 itemsBefore={
                                     category?.categories
                                         ? [<CategoryLinks key="itemsBefore" category={category} />]
@@ -545,13 +539,13 @@ const ProductList = (props) => {
                                 filters={productSearchResult?.refinements}
                                 excludedFilters={['cgid']}
                                 selectedFilters={searchParams.refine}
-                            />
+                            />*/}
                         </Stack>
                         <Box>
                             <SimpleGrid
                                 columns={[2, 2, 3, 3]}
-                                spacingX={4}
-                                spacingY={{base: 12, lg: 16}}
+                                columnGap={4}
+                                rowGap={{base: 12, lg: 16}}
                             >
                                 {isHydrated() &&
                                 ((isRefetching && !isFetched) || !productSearchResult)
@@ -617,146 +611,120 @@ const ProductList = (props) => {
                                 paddingTop={8}
                             >
                                 <Pagination currentURL={basePath} urls={pageUrls} />
-
-                                {/*
-                            Our design doesn't call for a page size select. Show this element if you want
-                            to add one to your design.
-                        */}
-                                <Select
-                                    display="none"
-                                    value={basePath}
-                                    onChange={({target}) => {
-                                        history.push(target.value)
-                                    }}
-                                >
-                                    {limitUrls.map((href, index) => (
-                                        <option key={href} value={href}>
-                                            {searchConfig.defaultLimitValues[index]}
-                                        </option>
-                                    ))}
-                                </Select>
                             </Flex>
                         </Box>
                     </Grid>
                 </>
             )}
             {/* Modal for filter options on mobile */}
-            <Modal
-                isOpen={isOpen}
-                onClose={onClose}
+            <Dialog.Root
+                open={isOpen}
+                onOpenChange={(e) => !e.open && onClose()}
                 size="full"
-                motionPreset="slideInBottom"
-                scrollBehavior="inside"
+                placement="center"
             >
-                <ModalOverlay />
-                <ModalContent top={0} marginTop={0}>
-                    <ModalHeader>
-                        <Heading as="h1" fontWeight="bold" fontSize="2xl">
-                            <FormattedMessage
-                                defaultMessage="Filter"
-                                id="product_list.modal.title.filter"
-                            />
-                        </Heading>
-                    </ModalHeader>
-                    <ModalCloseButton />
-                    <ModalBody py={4}>
-                        {filtersLoading && <LoadingSpinner />}
-                        <Refinements
-                            toggleFilter={toggleFilter}
-                            filters={productSearchResult?.refinements}
-                            selectedFilters={searchParams.refine}
-                            itemsBefore={
-                                category?.categories
-                                    ? [
-                                          <CategoryLinks
-                                              key="itemsBefore"
-                                              category={category}
-                                              onSelect={onClose}
-                                          />
-                                      ]
-                                    : undefined
-                            }
-                            excludedFilters={['cgid']}
-                        />
-                    </ModalBody>
+                <Portal>
+                    <Dialog.Backdrop />
+                    <Dialog.Positioner>
+                        <Dialog.Content>
+                            <Dialog.Header>
+                                <Dialog.Title>
+                                    <Heading as="h1" fontWeight="bold" fontSize="2xl">
+                                        <FormattedMessage
+                                            defaultMessage="Filter"
+                                            id="product_list.modal.title.filter"
+                                        />
+                                    </Heading>
+                                </Dialog.Title>
+                                <Dialog.CloseTrigger asChild>
+                                    <Button variant="ghost" size="sm">
+                                        ✕
+                                    </Button>
+                                </Dialog.CloseTrigger>
+                            </Dialog.Header>
+                            <Dialog.Body py={4}>
+                                {filtersLoading && <LoadingSpinner />}
+                                {/* TODO: Refinements component will be added in separate PR */}
+                                {/*<Refinements
+                                    toggleFilter={toggleFilter}
+                                    filters={productSearchResult?.refinements}
+                                    selectedFilters={searchParams.refine}
+                                    itemsBefore={
+                                        category?.categories
+                                            ? [
+                                                <CategoryLinks
+                                                    key="itemsBefore"
+                                                    category={category}
+                                                    onSelect={onClose}
+                                                />
+                                            ]
+                                            : undefined
+                                    }
+                                    excludedFilters={['cgid']}
+                                />*/}
+                            </Dialog.Body>
+                        </Dialog.Content>
+                    </Dialog.Positioner>
+                </Portal>
+            </Dialog.Root>
 
-                    <ModalFooter
-                        // justify="space-between"
-                        display="block"
-                        width="full"
-                        borderTop="1px solid"
-                        borderColor="gray.100"
-                        paddingBottom={10}
-                    >
-                        <Stack>
-                            <Button width="full" onClick={onClose}>
-                                {formatMessage(
-                                    {
-                                        id: 'product_list.modal.button.view_items',
-                                        defaultMessage: 'View {prroductCount} items'
-                                    },
-                                    {
-                                        prroductCount: productSearchResult?.total
-                                    }
-                                )}
-                            </Button>
-                            <Button width="full" variant="outline" onClick={resetFilters}>
-                                <FormattedMessage
-                                    defaultMessage="Clear Filters"
-                                    id="product_list.modal.button.clear_filters"
-                                />
-                            </Button>
-                        </Stack>
-                    </ModalFooter>
-                </ModalContent>
-            </Modal>
-            <Drawer
+            {/* Sort Drawer */}
+            <Drawer.Root
+                open={sortOpen}
+                onOpenChange={(e) => !e.open && setSortOpen(false)}
                 placement="bottom"
-                isOpen={sortOpen}
-                onClose={() => setSortOpen(false)}
                 size="sm"
-                motionPreset="slideInBottom"
-                scrollBehavior="inside"
-                isFullHeight={false}
-                height="50%"
             >
-                <DrawerOverlay />
-                <DrawerContent marginTop={0}>
-                    <DrawerHeader boxShadow="none">
-                        <Text fontWeight="bold" fontSize="2xl">
-                            <FormattedMessage
-                                defaultMessage="Sort By"
-                                id="product_list.drawer.title.sort_by"
-                            />
-                        </Text>
-                    </DrawerHeader>
-                    <DrawerCloseButton />
-                    <DrawerBody>
-                        {sortUrls.map((href, idx) => (
-                            <Button
-                                width="full"
-                                onClick={() => {
-                                    setSortOpen(false)
-                                    history.push(href)
-                                }}
-                                fontSize={'md'}
-                                key={idx}
-                                marginTop={0}
-                                variant="menu-link"
-                            >
-                                <Text
-                                    as={
-                                        selectedSortingOptionLabel?.label ===
-                                            productSearchResult?.sortingOptions[idx]?.label && 'u'
-                                    }
-                                >
-                                    {productSearchResult?.sortingOptions[idx]?.label}
-                                </Text>
-                            </Button>
-                        ))}
-                    </DrawerBody>
-                </DrawerContent>
-            </Drawer>
+                <Portal>
+                    <Drawer.Backdrop />
+                    <Drawer.Positioner>
+                        <Drawer.Content>
+                            <Drawer.Header>
+                                <Drawer.Title>
+                                    <Text fontWeight="bold" fontSize="2xl">
+                                        <FormattedMessage
+                                            defaultMessage="Sort By"
+                                            id="product_list.drawer.title.sort_by"
+                                        />
+                                    </Text>
+                                </Drawer.Title>
+                                <Drawer.CloseTrigger asChild>
+                                    <Button variant="ghost" size="sm">
+                                        ✕
+                                    </Button>
+                                </Drawer.CloseTrigger>
+                            </Drawer.Header>
+                            <Drawer.Body>
+                                {sortUrls.map((href, idx) => (
+                                    <Button
+                                        width="full"
+                                        onClick={() => {
+                                            setSortOpen(false)
+                                            history.push(href)
+                                        }}
+                                        fontSize={'md'}
+                                        key={idx}
+                                        marginTop={0}
+                                        variant="ghost"
+                                        justifyContent="flex-start"
+                                        mb={2}
+                                    >
+                                        <Text
+                                            as={
+                                                selectedSortingOptionLabel?.label ===
+                                                    productSearchResult?.sortingOptions[idx]
+                                                        ?.label && 'u'
+                                            }
+                                        >
+                                            {productSearchResult?.sortingOptions[idx]?.label}
+                                        </Text>
+                                    </Button>
+                                ))}
+                            </Drawer.Body>
+                        </Drawer.Content>
+                    </Drawer.Positioner>
+                </Portal>
+            </Drawer.Root>
         </Box>
     )
 }
@@ -776,7 +744,7 @@ const Sort = ({sortUrls, productSearchResult, basePath, ...otherProps}) => {
     const history = useHistory()
 
     return (
-        <FormControl
+        <Field.Root
             aria-label={intl.formatMessage({
                 id: 'product_list.drawer.title.sort_by',
                 defaultMessage: 'Sort By'
@@ -786,34 +754,55 @@ const Sort = ({sortUrls, productSearchResult, basePath, ...otherProps}) => {
             width="auto"
             {...otherProps}
         >
-            <Select
-                id="sf-product-list-sort-select"
-                aria-label={intl.formatMessage({
-                    id: 'product_list.sort_by.label.assistive_msg',
-                    defaultMessage: 'Sort products by'
-                })}
-                value={basePath.replace(/(offset)=(\d+)/i, '$1=0')}
-                onChange={({target}) => {
-                    history.push(target.value)
-                }}
-                height={11}
-                width="240px"
-            >
-                {sortUrls.map((href, index) => (
-                    <option key={href} value={href}>
-                        {intl.formatMessage(
-                            {
-                                id: 'product_list.select.sort_by',
-                                defaultMessage: 'Sort By: {sortOption}'
-                            },
-                            {
-                                sortOption: productSearchResult?.sortingOptions[index]?.label
-                            }
-                        )}
-                    </option>
-                ))}
-            </Select>
-        </FormControl>
+            <NativeSelect.Root>
+                <NativeSelect.Field
+                    id="sf-product-list-sort-select"
+                    aria-label={intl.formatMessage({
+                        id: 'product_list.sort_by.label.assistive_msg',
+                        defaultMessage: 'Sort products by'
+                    })}
+                    value={basePath.replace(/(offset)=(\d+)/i, '$1=0')}
+                    onChange={(e) => {
+                        history.push(e.target.value)
+                    }}
+                    height={11}
+                    width="240px"
+                    border="1px solid"
+                    borderColor="gray.200"
+                    borderRadius="md"
+                    px={3}
+                    py={2}
+                    fontSize="sm"
+                    bg="white"
+                    _focus={{
+                        borderColor: 'blue.500',
+                        boxShadow: '0 0 0 1px blue.500'
+                    }}
+                >
+                    {sortUrls.map((href, index) => (
+                        <option key={href} value={href}>
+                            {intl.formatMessage(
+                                {
+                                    id: 'product_list.select.sort_by',
+                                    defaultMessage: 'Sort By: {sortOption}'
+                                },
+                                {
+                                    sortOption: productSearchResult?.sortingOptions[index]?.label
+                                }
+                            )}
+                        </option>
+                    ))}
+                </NativeSelect.Field>
+                <NativeSelect.Indicator
+                    position="absolute"
+                    right={3}
+                    top="50%"
+                    transform="translateY(-50%)"
+                    pointerEvents="none"
+                    color="gray.600"
+                />
+            </NativeSelect.Root>
+        </Field.Root>
     )
 }
 

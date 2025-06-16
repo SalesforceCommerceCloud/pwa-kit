@@ -11,14 +11,11 @@ import PropTypes from 'prop-types'
 // Components
 import {
     Accordion,
-    AccordionButton,
-    AccordionItem,
-    AccordionPanel,
     Box,
     Text,
 
     // Hooks
-    useStyleConfig
+    useSlotRecipe
 } from '@chakra-ui/react'
 
 // Icons
@@ -51,55 +48,59 @@ const flags = {
  * user to change the current locale.
  */
 const LocaleSelector = ({selectedLocale = '', locales = [], onSelect = () => {}, ...props}) => {
-    const styles = useStyleConfig('LocaleSelector')
+    const recipe = useSlotRecipe({key: 'localeSelector'})
+    const styles = recipe()
+
     return (
         <Box className="sf-locale-selector">
-            <Accordion allowToggle={true} {...props}>
-                <AccordionItem border="none">
-                    {({isExpanded}) => (
-                        <>
-                            <AccordionButton {...styles.selectedButton}>
-                                {/* Replace default expanded/collapsed icons. */}
-                                {isExpanded ? (
-                                    <ChevronDownIcon {...styles.selectedButtonIcon} />
-                                ) : (
-                                    <ChevronRightIcon {...styles.selectedButtonIcon} />
-                                )}
-                                {/* Display flag icon if one exists */}
-                                {flags[selectedLocale]}
-                                <Text {...styles.selectedText}>
-                                    <LocaleText shortCode={selectedLocale} />
-                                </Text>
-                            </AccordionButton>
-                            <AccordionPanel>
-                                <Accordion allowToggle={true} {...styles.accordion}>
-                                    {locales.map((locale) => (
-                                        <AccordionItem border="none" key={locale}>
-                                            <AccordionButton
-                                                {...styles.optionButton}
-                                                onClick={() => onSelect(locale)}
-                                            >
-                                                {/* Display flag icon if one exists */}
-                                                {flags[locale]}
+            <Accordion.Root collapsible {...props}>
+                <Accordion.Item border="none">
+                    <Accordion.ItemContext>
+                        {({expanded}) => (
+                            <>
+                                <Accordion.ItemTrigger css={styles.selectedButton}>
+                                    {/* Replace default expanded/collapsed icons. */}
+                                    {expanded ? (
+                                        <ChevronDownIcon css={styles.selectedButtonIcon} />
+                                    ) : (
+                                        <ChevronRightIcon css={styles.selectedButtonIcon} />
+                                    )}
+                                    {/* Display flag icon if one exists */}
+                                    {flags[selectedLocale]}
+                                    <Text css={styles.selectedText}>
+                                        <LocaleText shortCode={selectedLocale} />
+                                    </Text>
+                                </Accordion.ItemTrigger>
+                                <Accordion.ItemContent>
+                                    <Accordion.Root multiple css={styles.accordion}>
+                                        {locales.map((locale) => (
+                                            <Accordion.Item border="none" key={locale}>
+                                                <Accordion.ItemTrigger
+                                                    css={styles.optionButton}
+                                                    onClick={() => onSelect(locale)}
+                                                >
+                                                    {/* Display flag icon if one exists */}
+                                                    {flags[locale]}
 
-                                                {/* Locale name */}
-                                                <Text {...styles.optionText}>
-                                                    <LocaleText shortCode={locale} />
-                                                </Text>
+                                                    {/* Locale name */}
+                                                    <Text css={styles.optionText}>
+                                                        <LocaleText shortCode={locale} />
+                                                    </Text>
 
-                                                {/* Selection indicator */}
-                                                {selectedLocale === locale && (
-                                                    <CheckIcon {...styles.selectedIcon} />
-                                                )}
-                                            </AccordionButton>
-                                        </AccordionItem>
-                                    ))}
-                                </Accordion>
-                            </AccordionPanel>
-                        </>
-                    )}
-                </AccordionItem>
-            </Accordion>
+                                                    {/* Selection indicator */}
+                                                    {selectedLocale === locale && (
+                                                        <CheckIcon css={styles.selectedIcon} />
+                                                    )}
+                                                </Accordion.ItemTrigger>
+                                            </Accordion.Item>
+                                        ))}
+                                    </Accordion.Root>
+                                </Accordion.ItemContent>
+                            </>
+                        )}
+                    </Accordion.ItemContext>
+                </Accordion.Item>
+            </Accordion.Root>
         </Box>
     )
 }
