@@ -48,7 +48,6 @@ const semver = require('semver')
 const slugify = require('slugify')
 const generatorPkg = require('../package.json')
 const Handlebars = require('handlebars')
-const validatePackageName = require('validate-npm-package-name')
 const treeShake = require('./tree-shake')
 const pluginConfig = require('../assets/plugin-config')
 const computeChecksum = require('./checksum')
@@ -74,15 +73,6 @@ const validProjectName = (s) => {
     }
     const regex = new RegExp(`^[a-zA-Z0-9-\\s]{1,${PROJECT_ID_MAX_LENGTH}}$`)
     return regex.test(s) || 'Value can only contain letters, numbers, space and hyphens.'
-}
-
-const validProjectAppExtensionName = (input) => {
-    const result = validatePackageName(input)
-    if (!result.validForNewPackages) {
-        const errors = result.errors || []
-        return `Invalid npm package name: ${errors.join(', ')}`
-    }
-    return true
 }
 
 const validUrl = (s) => {
@@ -123,8 +113,6 @@ const INITIAL_CONTEXT = {
 const TEMPLATE_SOURCE_NPM = 'npm'
 const TEMPLATE_SOURCE_BUNDLE = 'bundle'
 const DEFAULT_TEMPLATE_VERSION = 'latest'
-
-const LOCAL_DEV_PROJECT_DIR = 'dev'
 
 const selectedPlugins = {}
 
@@ -553,11 +541,6 @@ const ALL_PRESET_NAMES = PRIVATE_PRESET_NAMES.concat(PUBLIC_PRESET_NAMES)
 
 const PROJECT_ID_MAX_LENGTH = 20
 
-// Constant for the base application directory
-const APP_DIR = 'app'
-// Constant for the directory containing extracted application extensions
-const APP_EXTENSIONS_DIR = 'application-extensions'
-
 // Utilities
 const readJson = (path) => JSON.parse(sh.cat(path))
 
@@ -681,19 +664,6 @@ const expandKey = (key, value) =>
         )
 
 /**
- * Creates an .npmignore file at the root of the generated project.
- * Ensures the specified directories and files are excluded from being published to npm.
- *
- * @param {string} outputDir - The path to the root of the generated project.
- * @param {string[]} ignorePaths - An array of directory or file paths to ignore in the npm package.
- */
-const createNpmIgnoreFile = (outputDir, ignorePaths = []) => {
-    const npmIgnoreContent = ignorePaths.join('\n') + '\n'
-
-    fs.writeFileSync(p.join(outputDir, '.npmignore'), npmIgnoreContent)
-}
-
-/**
  * Provided an object there the keys use "dot notation", expand each individual key.
  * NOTE: This only expands keys at the root level, and not those nested.
  *
@@ -768,26 +738,6 @@ const processTemplate = (relFile, inputDir, outputDir, context) => {
 }
 
 /**
- * Fetches the latest version of a package using npm view.
- * @param {string} packageName - The name of the package (e.g., '@salesforce/template-chakra-storefront').
- * @returns {string} - The latest version number (e.g., '1.0.0') or 'latest' if fetching fails.
- */
-const getLatestVersion = (packageName) => {
-    try {
-        const result = child_proc.execSync(`npm view ${packageName} --json`, {encoding: 'utf8'})
-        const json = JSON.parse(result)
-        const latestVersion = json['dist-tags']?.latest
-        if (!latestVersion) {
-            throw new Error(`No 'dist-tags.latest' found for ${packageName}`)
-        }
-        return latestVersion
-    } catch (err) {
-        console.warn(`Failed to fetch version for ${packageName}: ${err.message}. Using 'latest'.`)
-        return 'latest'
-    }
-}
-
-/**
  * Copy all files, including subdirectories and hidden files
  */
 const copyAllFiles = (fromDirectory, targetDirectory) => {
@@ -813,7 +763,7 @@ const runGenerator = (
     context,
     {outputDir, templateVersion, verbose, installDependencies = true}
 ) => {
-    const {answers, preset} = context
+    const {preset} = context
     const {templateSource} = preset
 
     // Check if the output directory doesn't already exist.
@@ -826,7 +776,6 @@ const runGenerator = (
     // downloading from NPM or copying from the template bundle folder.
     const tmp = fs.mkdtempSync(p.resolve(os.tmpdir(), 'extract-template'))
     const packagePath = p.join(tmp, 'package')
-    const appExtensionsDir = p.join(outputDir, APP_DIR, APP_EXTENSIONS_DIR)
     const {id, type} = templateSource
     let tarPath
 
