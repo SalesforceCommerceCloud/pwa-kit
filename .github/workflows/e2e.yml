@@ -1,6 +1,12 @@
 name: SalesforceCommerceCloud/pwa-kit/e2e
 on:
   workflow_dispatch:
+  pull_request:
+    paths:
+      - 'e2e/**'
+      - 'playwright.config.js'
+      - '.github/workflows/e2e.yml'
+      - 'packages/template-retail-react-app/**'
   schedule:
     # Run every day at 12am (PST) - cron uses UTC times
     - cron: "0 8 * * *"
@@ -23,6 +29,8 @@ jobs:
       # (We also use this env var for making sure a step runs once for the current node version)
       # Note: For node 18, the default was npm 9 until v18.19.0, when it became npm 10
       IS_DEFAULT_NPM: ${{ (matrix.node == 18 && matrix.npm == 10) || (matrix.node == 20 && matrix.npm == 10) || (matrix.node == 22 && matrix.npm == 10) }}
+      # Set CI environment variable for enhanced timeouts
+      CI: true
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -60,6 +68,17 @@ jobs:
         uses: ./.github/actions/e2e_validate_generated_app
         with:
           PROJECT_KEY: "retail-app-demo"
+          
+      # Add step to capture test artifacts on failure
+      - name: Upload test artifacts on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-artifacts-demo-${{ matrix.node }}-${{ matrix.npm }}
+          path: |
+            test-results/
+            playwright-report/
+          retention-days: 7
   run-generator-retail-app-no-ext:
     strategy:
       fail-fast: false
@@ -79,6 +98,8 @@ jobs:
       # (We also use this env var for making sure a step runs once for the current node version)
       # Note: For node 18, the default was npm 9 until v18.19.0, when it became npm 10
       IS_DEFAULT_NPM: ${{ (matrix.node == 18 && matrix.npm == 10) || (matrix.node == 20 && matrix.npm == 10) || (matrix.node == 22 && matrix.npm == 10) }}
+      # Set CI environment variable for enhanced timeouts
+      CI: true
 
     steps:
       - name: Checkout
@@ -144,34 +165,17 @@ jobs:
       # this will not include a11y tests
       - name: Run Playwright tests
         run: npm run test:e2e
-  notify-slack-pwa-no-ext:
-    needs: [run-generator-retail-app-no-ext]
-    if: ${{ always() }}
-    runs-on: ubuntu-latest
-    steps:
-      - name: Send GitHub Action data to Slack workflow (Generated)
-        id: slack-success
-        if: ${{ github.event_name == 'schedule' && needs.run-generator-retail-app-no-ext.result == 'success' }}
-        uses: slackapi/slack-github-action@v1.23.0
+        
+      # Add step to capture test artifacts on failure
+      - name: Upload test artifacts on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
         with:
-          payload: |
-            {
-              "message": "✅ All PWA Kit no-ext E2E tests passed!"
-            }
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-
-      - name: Send GitHub Action data to Slack workflow (Generated)
-        id: slack-failure
-        if: ${{ github.event_name == 'schedule' && needs.run-generator-retail-app-no-ext.result != 'success'  }}
-        uses: slackapi/slack-github-action@v1.23.0
-        with:
-          payload: |
-            {
-              "message": "❌ One or more PWA Kit no-ext E2E tests failed! (${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})"
-            }
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          name: test-artifacts-no-ext-${{ matrix.node }}-${{ matrix.npm }}
+          path: |
+            test-results/
+            playwright-report/
+          retention-days: 7
   run-generator-retail-app-ext:
     # Run after the previous job completes irrespective of its result
     if: ${{ always() }}
@@ -197,6 +201,8 @@ jobs:
       # The current recommended version for Managed Runtime:
       # https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/upgrade-node-version.html
       IS_MRT_NODE: ${{ matrix.node == 22 && matrix.npm == 11 }}
+      # Set CI environment variable for enhanced timeouts
+      CI: true
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -266,6 +272,46 @@ jobs:
         if: env.IS_MRT_NODE == 'true'
         run: npm run test:e2e:a11y
 
+      # Add step to capture test artifacts on failure
+      - name: Upload test artifacts on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-artifacts-ext-${{ matrix.node }}-${{ matrix.npm }}
+          path: |
+            test-results/
+            playwright-report/
+          retention-days: 7
+
+  notify-slack-pwa-no-ext:
+    needs: [run-generator-retail-app-no-ext]
+    if: ${{ always() }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send GitHub Action data to Slack workflow (Generated)
+        id: slack-success
+        if: ${{ github.event_name == 'schedule' && needs.run-generator-retail-app-no-ext.result == 'success' }}
+        uses: slackapi/slack-github-action@v1.23.0
+        with:
+          payload: |
+            {
+              "message": "✅ All PWA Kit no-ext E2E tests passed!"
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+
+      - name: Send GitHub Action data to Slack workflow (Generated)
+        id: slack-failure
+        if: ${{ github.event_name == 'schedule' && needs.run-generator-retail-app-no-ext.result != 'success'  }}
+        uses: slackapi/slack-github-action@v1.23.0
+        with:
+          payload: |
+            {
+              "message": "❌ One or more PWA Kit no-ext E2E tests failed! (${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})"
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+
   notify-slack-pwa-ext:
     needs: [run-generator-retail-app-ext]
     if: ${{ always() }}
@@ -313,6 +359,8 @@ jobs:
       # (We also use this env var for making sure a step runs once for the current node version)
       # Note: For node 18, the default was npm 9 until v18.19.0, when it became npm 10
       IS_DEFAULT_NPM: ${{ (matrix.node == 18 && matrix.npm == 10) || (matrix.node == 20 && matrix.npm == 10) || (matrix.node == 22 && matrix.npm == 10) }}
+      # Set CI environment variable for enhanced timeouts
+      CI: true
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -382,6 +430,17 @@ jobs:
       # this will not include a11y tests
       - name: Run Playwright tests
         run: npm run test:e2e
+
+      # Add step to capture test artifacts on failure
+      - name: Upload test artifacts on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-artifacts-private-client-${{ matrix.node }}-${{ matrix.npm }}
+          path: |
+            test-results/
+            playwright-report/
+          retention-days: 7
 
   notify-slack-pwa-private-client:
     needs: [run-generator-private-client]

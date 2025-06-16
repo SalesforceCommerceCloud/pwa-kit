@@ -45,6 +45,8 @@ test('Registered shopper can checkout items', async ({page}) => {
             isMobile: true
         })
     }
+    
+    await answerConsentTrackingForm(page)
 
     await expect(page.getByRole('heading', {name: /Account Details/i})).toBeVisible()
 
@@ -143,7 +145,6 @@ test('Registered shopper can add item to wishlist', async ({page}) => {
             isMobile: true
         })
     }
-    // sometimes the consent tracking form appears again after login
     await answerConsentTrackingForm(page)
 
     await expect(page.getByRole('heading', {name: /Account Details/i})).toBeVisible()
