@@ -73,7 +73,7 @@ export class EinsteinAPI {
             if (product.type.variationGroup) {
                 return {
                     altId: product.id,
-                    id: product.master.variantId,
+                    id: product.master.masterId,
                     price: product.price,
                     sku: product.id,
                     type: 'vgroup'

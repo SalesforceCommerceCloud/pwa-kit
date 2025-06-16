@@ -43,7 +43,7 @@ describe('EinsteinAPI', () => {
                 variationGroup: true
             },
             master: {
-                variantId: 'master-variant-id'
+                masterId: 'master-product-id'
             }
         }
 
@@ -51,7 +51,7 @@ describe('EinsteinAPI', () => {
 
         expect(result).toEqual({
             altId: 'test-variation-group-id',
-            id: 'master-variant-id',
+            id: 'master-product-id',
             price: 99.99,
             sku: 'test-variation-group-id',
             type: 'vgroup'
@@ -330,7 +330,7 @@ describe('EinsteinAPI', () => {
                 variationGroup: true
             },
             master: {
-                variantId: 'master-variant-id'
+                masterId: 'master-product-id'
             }
         }
 
@@ -344,7 +344,7 @@ describe('EinsteinAPI', () => {
                     'Content-Type': 'application/json',
                     'x-cq-client-id': 'test-id'
                 },
-                body: '{"product":{"altId":"test-variation-group-id","id":"master-variant-id","price":99.99,"sku":"test-variation-group-id","type":"vgroup"},"cookieId":"test-usid","realm":"test","instanceType":"sbx"}'
+                body: '{"product":{"altId":"test-variation-group-id","id":"master-product-id","price":99.99,"sku":"test-variation-group-id","type":"vgroup"},"cookieId":"test-usid","realm":"test","instanceType":"sbx"}'
             }
         )
     })
