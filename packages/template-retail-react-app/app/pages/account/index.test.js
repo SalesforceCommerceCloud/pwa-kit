@@ -175,12 +175,12 @@ test('Allows customer to update password', async () => {
 
     const el = within(screen.getByTestId('sf-toggle-card-password'))
     user.click(el.getByText(/edit/i))
+    await screen.findByLabelText(/current password/i)
     user.type(el.getByLabelText(/current password/i), 'Password!12345')
     user.type(el.getByLabelText(/new password/i), 'Password!98765')
-    user.click(el.getByText(/Forgot password/i))
 
     expect(await screen.findByTestId('account-detail-page')).toBeInTheDocument()
 
     user.click(el.getByText(/save/i))
-    expect(await screen.findByText('••••••••')).toBeInTheDocument()
+    expect(await screen.findByText(/Profile Updated/i)).toBeInTheDocument()
 })
