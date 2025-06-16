@@ -14,7 +14,6 @@ export default defineSlotRecipe({
         },
         favIcon: {
             position: 'absolute',
-            variant: 'unstyled',
             top: 2,
             right: 2
         },

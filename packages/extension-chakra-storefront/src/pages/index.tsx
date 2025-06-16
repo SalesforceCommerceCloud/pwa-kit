@@ -32,9 +32,9 @@ const Home = loadable(() => import('overridable!./home'), {fallback})
 // const ResetPassword = loadable(() => import('overridable!./reset-password'), {fallback})
 // const LoginRedirect = loadable(() => import('overridable!./login-redirect'), {fallback})
 const ProductDetail = loadable(() => import('overridable!./product-detail'), {fallback})
-// const ProductList = loadable(() => import('overridable!./product-list'), {
-//     fallback
-// })
+const ProductList = loadable(() => import('overridable!./product-list'), {
+    fallback
+})
 // const SocialLoginRedirect = loadable(() => import('overridable!./social-login-redirect'), {
 //     fallback
 // })
@@ -55,7 +55,7 @@ Home.displayName = 'Home'
 // ResetPassword.displayName = 'ResetPassword'
 // LoginRedirect.displayName = 'LoginRedirect'
 ProductDetail.displayName = 'ProductDetail'
-// ProductList.displayName = 'ProductList'
+ProductList.displayName = 'ProductList'
 
 export {
     // Account,
@@ -67,7 +67,7 @@ export {
     // Registration,
     // ResetPassword,
     // LoginRedirect,
-    ProductDetail
-    // ProductList,
+    ProductDetail,
+    ProductList
     // SocialLoginRedirect
 }
