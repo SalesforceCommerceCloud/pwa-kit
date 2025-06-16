@@ -493,6 +493,7 @@ const PRESETS = [
             type: TEMPLATE_SOURCE_BUNDLE,
             id: 'typescript-minimal'
         },
+        interactive: true,
         getQuestions: () => TYPESCRIPT_MINIMAL_QUESTIONS,
         private: true
     },
