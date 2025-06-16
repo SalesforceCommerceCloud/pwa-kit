@@ -23,9 +23,12 @@ export default defineSlotRecipe({
         },
         popoverContent: {
             backgroundColor: 'white',
+            // The ArkUI component has a bug where the x-axis offset is always 8px
+            // attempted to fix it by setting the offset but didn't work
+            // Thus, we are manually setting the width and marginLeft for the offset
+            marginLeft: -8,
             minWidth: 'calc(100vw + 8px)',
             position: 'relative',
-            marginLeft: -8,
             left: 0,
             top: 0,
             zIndex: "sticky"
