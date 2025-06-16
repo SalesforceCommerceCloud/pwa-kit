@@ -35,6 +35,7 @@ import useDataCloud from '@salesforce/retail-react-app/app/hooks/use-datacloud'
 import useActiveData from '@salesforce/retail-react-app/app/hooks/use-active-data'
 import {useServerContext} from '@salesforce/pwa-kit-react-sdk/ssr/universal/hooks'
 import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
+import usePickupShipment from '@salesforce/retail-react-app/app/hooks/use-pickup-shipment'
 // Project Components
 import RecommendedProducts from '@salesforce/retail-react-app/app/components/recommended-products'
 import ProductView from '@salesforce/retail-react-app/app/components/product-view'
@@ -71,6 +72,11 @@ const ProductDetail = () => {
     const customerId = useCustomerId()
     const {site} = useMultiSite()
     const storeInfoKey = `store_${site.id}`
+    const {
+        configurePickupShipment,
+        hasPickupItems: checkHasPickupItems,
+        addInventoryIdsToPickupItems
+    } = usePickupShipment()
 
     // --- Add state for inventoryId ---
     const [selectedInventoryId, setSelectedInventoryId] = useState(() => {
@@ -338,33 +344,25 @@ const ProductDetail = () => {
 
     const handleAddToCart = async (productSelectionValues = []) => {
         try {
-            const productItems = productSelectionValues.map((item) => {
+            const hasPickupItems = checkHasPickupItems(
+                productSelectionValues,
+                pickupInStoreMap,
+                product
+            )
+
+            let productItems = productSelectionValues.map((item) => {
                 const {variant, quantity} = item
                 // Use variant if present, otherwise use the main product
                 const prod = variant || item.product || product
-                const prodKey = prod.productId || prod.id
-                let result = {
+                return {
                     productId: prod.productId || prod.id, // productId for variant, id for product
                     price: prod.price,
                     quantity
                 }
-                // Robustly fetch inventoryId from localStorage if pickupInStore is true
-                if (pickupInStoreMap[prodKey]) {
-                    const siteId = site?.id || (window.SFCC && window.SFCC.siteId)
-                    const storeInfoKey = `store_${siteId}`
-                    let inventoryId = undefined
-                    try {
-                        const storeInfo = JSON.parse(window.localStorage.getItem(storeInfoKey))
-                        inventoryId = storeInfo?.inventoryId
-                    } catch (e) {
-                        showError()
-                    }
-                    if (inventoryId) {
-                        result.inventoryId = inventoryId
-                    }
-                }
-                return result
             })
+
+            // Add inventory IDs for pickup items using the hook helper
+            productItems = addInventoryIdsToPickupItems(productItems, pickupInStoreMap)
             // Defensive check: This block ensures that if, for any reason, pickup is selected for a product but no store (inventoryId) is set,
             // we show an error. With the current UI logic, this should never be reached, but it guards against unexpected state.
             if (
@@ -382,7 +380,19 @@ const ProductDetail = () => {
                 )
                 return
             }
-            await addItemToNewOrExistingBasket(productItems)
+
+            const basketResponse = await addItemToNewOrExistingBasket(productItems)
+
+            // If any items are pickup items, and no shipments configured, ensure the shipment is configured for pickup
+            if (
+                hasPickupItems &&
+                basketResponse?.basketId &&
+                basketResponse.shipments.length > 0 &&
+                !basketResponse.shipments[0].shippingMethod
+            ) {
+                await configurePickupShipment(basketResponse.basketId, productItems)
+            }
+
             einstein.sendAddToCart(productItems)
             // Open modal with itemsAdded
             addToCartModal.onOpen({product, itemsAdded: productSelectionValues})
@@ -447,7 +457,13 @@ const ProductDetail = () => {
 
         try {
             const childProductSelections = Object.values(childProductSelection)
-            const productItems = [
+
+            // Check if any bundle items or the parent product are pickup items
+            const hasPickupItems =
+                pickupInStoreMap[product.id] ||
+                childProductSelections.some((child) => pickupInStoreMap[child.product.id])
+
+            let productItems = [
                 {
                     productId: product.id,
                     price: product.price,
@@ -460,6 +476,9 @@ const ProductDetail = () => {
                     })
                 }
             ]
+
+            // Add inventory IDs for pickup items using the hook helper
+            productItems = addInventoryIdsToPickupItems(productItems, pickupInStoreMap)
 
             const res = await addItemToNewOrExistingBasket(productItems)
             const bundleChildMasterIds = childProductSelections.map((child) => {
@@ -485,6 +504,17 @@ const ProductDetail = () => {
                     body: itemsToBeUpdated
                 })
             }
+
+            // If any items are pickup items, and no shipments configured, ensure the shipment is configured for pickup
+            if (
+                hasPickupItems &&
+                res.basketId &&
+                res.shipments.length > 0 &&
+                !res.shipments[0].shippingMethod
+            ) {
+                await configurePickupShipment(res.basketId, productItems)
+            }
+
             einstein.sendAddToCart(productItems)
             // Open modal with itemsAdded and selectedQuantity for bundles
             addToCartModal.onOpen({product, itemsAdded: childProductSelections, selectedQuantity})

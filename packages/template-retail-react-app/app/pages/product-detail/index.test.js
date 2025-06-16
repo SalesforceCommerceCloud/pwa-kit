@@ -563,3 +563,99 @@ test('Add to Cart (Pickup in Store) includes inventoryId for the selected varian
         // The assertion is inside the mock POST handler above
     })
 })
+
+test('Add to Cart with Pickup configures shipment when basket has no shipping method', async () => {
+    // Arrange: Set up localStorage with inventoryId for the current site
+    const siteId = 'site-1' // Use your actual site id here if different
+    const storeInfoKey = `store_${siteId}`
+    const inventoryId = 'inventory_m_store_store1'
+    const storeId = 'store-123'
+    window.localStorage.setItem(storeInfoKey, JSON.stringify({
+        inventoryId,
+        id: storeId
+    }))
+
+    // Create a product with a matching, orderable inventory
+    const masterProductWithInventory = {
+        ...masterProduct,
+        inventories: [
+            {
+                id: inventoryId,
+                orderable: true,
+                ats: 10,
+                stockLevel: 10
+            }
+        ]
+    }
+
+    // Track if configurePickupShipment was called
+    let configurePickupShipmentCalled = false
+    let shipmentUpdateRequest = null
+
+    // Mock the product to be a simple master product with inventory
+    global.server.use(
+        rest.get('*/products/:productId', (req, res, ctx) => {
+            return res(ctx.json(masterProductWithInventory))
+        }),
+        rest.post('*/baskets/:basketId/items', async (req, res, ctx) => {
+            const body = await req.json()
+            // Assert: inventoryId is included in the request body
+            expect(body[0].inventoryId).toBe(inventoryId)
+            return res(ctx.json({
+                basketId: 'test-basket-id',
+                shipments: [
+                    {
+                        shipmentId: 'me'
+                        // No shippingMethod property - this triggers configurePickupShipment
+                    }
+                ]
+            }))
+        }),
+        // Mock the shipment update call that configurePickupShipment makes
+        rest.patch('*/baskets/:basketId/shipments/:shipmentId', async (req, res, ctx) => {
+            configurePickupShipmentCalled = true
+            shipmentUpdateRequest = await req.json()
+            
+            // Verify the correct parameters are passed to configurePickupShipment
+            expect(req.params.basketId).toBe('test-basket-id')
+            expect(req.params.shipmentId).toBe('me')
+            expect(shipmentUpdateRequest.shippingMethod.id).toBe('GBP005')
+            expect(shipmentUpdateRequest.c_fromStoreId).toBe(storeId)
+            
+            return res(ctx.json({
+                basketId: 'test-basket-id',
+                shipments: [
+                    {
+                        shipmentId: 'me',
+                        shippingMethod: {
+                            id: 'GBP005'
+                        }
+                    }
+                ]
+            }))
+        })
+    )
+
+    renderWithProviders(<MockedComponent />)
+
+    // Wait for page to load
+    expect(await screen.findByTestId('product-details-page')).toBeInTheDocument()
+
+    // Wait for the page to fully load
+    await waitFor(() => {
+        expect(screen.getByRole('link', {name: /mens/i})).toBeInTheDocument()
+    })
+
+    // Select "Pickup in Store"
+    const pickupLabel = await screen.findByLabelText(/Pickup in Store/i)
+    fireEvent.click(pickupLabel)
+
+    // Click Add to Cart
+    const addToCartButton = await screen.findByRole('button', {name: /add to cart/i})
+    fireEvent.click(addToCartButton)
+
+    // Wait for the POST to be called and assertion to run
+    await waitFor(() => {
+        expect(configurePickupShipmentCalled).toBe(true)
+    })
+})
