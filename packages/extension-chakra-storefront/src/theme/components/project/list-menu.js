@@ -67,7 +67,21 @@ export default defineSlotRecipe({
             }
         },
         listMenuTriggerLinkActive: {
+            display: 'block',
+            whiteSpace: 'nowrap',
+            position: 'relative',
+            paddingTop: 3,
+            paddingRight: 1,
+            paddingBottom: 2,
+            paddingLeft: 1,
+            marginLeft: 3,
+            fontSize: 'md',
+            fontWeight: 700,
+            color: 'gray.900',
             textDecoration: 'none',
+            _hover: {
+                textDecoration: 'none'
+            },
             _before: {
                 position: 'absolute',
                 backgroundColor: 'black',
