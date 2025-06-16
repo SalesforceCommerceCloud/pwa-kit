@@ -235,6 +235,21 @@ const PRESETS = [
             id: '@salesforce/chakra-storefront'
         },
         questions: [...RETAIL_REACT_APP_QUESTIONS],
+        answers: {
+            ['project.hybrid']: false,
+            ['project.name']: 'retail-react-app',
+            ['project.commerce.instanceUrl']: 'https://zzrf-001.dx.commercecloud.salesforce.com',
+            ['project.commerce.clientId']: 'c9c45bfd-0ed3-4aa2-9971-40f88962b836',
+            ['project.commerce.siteId']: 'RefArch',
+            ['project.commerce.organizationId']: 'f_ecom_zzrf_001',
+            ['project.commerce.shortCode']: 'kv7kzm78',
+            ['project.commerce.isSlasPrivate']: false,
+            ['project.einstein.clientId']: '1ea06c6e-c936-4324-bcf0-fada93f83bb1',
+            ['project.einstein.siteId']: 'aaij-MobileFirst',
+            ['project.dataCloud.appSourceId']: 'fb81edab-24c6-4b40-8684-b67334dfdf32',
+            ['project.dataCloud.tenantId']: 'mmyw8zrxhfsg09lfmzrd1zjqmg',
+            ['project.demo.enableDemoSettings']: false
+        },
         assets: ['translations'],
         private: false
     },
@@ -786,7 +801,7 @@ const runGenerator = (
 ) => {
     const {answers, preset} = context
     const {templateSource} = preset
-    
+
     // Check if the output directory doesn't already exist.
     checkOutputDir(outputDir)
 
