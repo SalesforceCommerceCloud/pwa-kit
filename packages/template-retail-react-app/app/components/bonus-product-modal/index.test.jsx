@@ -45,8 +45,7 @@ describe('BonusProductModal', () => {
                             title: 'Product 2'
                         }
                     ],
-                    maxBonusItems: 2,
-                    promotionId: 'promo1'
+                    maxBonusItems: 2
                 }
             ]
         }

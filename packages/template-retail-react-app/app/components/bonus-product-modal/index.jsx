@@ -95,21 +95,24 @@ const BonusProductItem = ({product, isSelected, onToggle, isLoading}) => {
                     />
                 )}
             </AspectRatio>
-            <VStack spacing={2} align="center">
+            <VStack spacing={2} align="center" width="full">
                 <Text
                     fontSize="sm"
                     fontWeight="semibold"
                     lineHeight="1.2"
                     textAlign="center"
                     noOfLines={2}
+                    width="full"
                 >
                     {productName}
                 </Text>
-                <Checkbox
-                    isChecked={isSelected}
-                    onChange={() => onToggle(product)}
-                    cursor="pointer"
-                />
+                <Box width="full" display="flex" justifyContent="center">
+                    <Checkbox
+                        isChecked={isSelected}
+                        onChange={() => onToggle(product)}
+                        cursor="pointer"
+                    />
+                </Box>
             </VStack>
         </VStack>
     )
@@ -163,15 +166,14 @@ export const BonusProductModal = () => {
 
     const selectedCount = selectedProducts.size
 
-    // Calculate dynamic columns and modal size based on number of products
+    // Calculate columns based on number of products
     const productCount = bonusProducts.length
     const columns = Math.min(productCount, 3) // Max 3 columns, but fewer if less products
-    const modalSize = productCount === 1 ? 'lg' : productCount === 2 ? '3xl' : '5xl'
 
     if (!isOpen) return null
 
     return (
-        <Modal isOpen={isOpen} onClose={onClose} size={modalSize} scrollBehavior="inside">
+        <Modal isOpen={isOpen} onClose={onClose} size="3xl" scrollBehavior="inside">
             <ModalOverlay />
             <ModalContent>
                 <ModalHeader>
@@ -183,7 +185,7 @@ export const BonusProductModal = () => {
 
                 <ModalBody bgColor="white" padding="6">
                     {bonusProducts.length > 0 ? (
-                        <SimpleGrid columns={columns} spacing={8}>
+                        <SimpleGrid columns={columns} spacing={8} justifyItems="start">
                             {bonusProducts.map((product) => (
                                 <BonusProductItem
                                     key={product.productId || product.id}
