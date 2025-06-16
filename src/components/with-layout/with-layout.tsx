@@ -300,14 +300,14 @@ const withLayout = <P extends object>(WrappedComponent: React.ComponentType<P>) 
                                     {/*            itemComponent={DrawerMenuItemWithData}*/}
                                     {/*        />*/}
                                     {/*    </HideOnDesktop>*/}
-                                       <HideOnMobile>
-                                           <ListMenu
-                                                root={categories?.[CAT_MENU_DEFAULT_ROOT_CATEGORY]}
-                                                itemsKey="categories"
-                                                itemsCountKey="onlineSubCategoriesCount"
-                                                contentComponent={ListMenuContentWithData}
-                                            />
-                                        </HideOnMobile>
+                                    <HideOnMobile>
+                                        <ListMenu
+                                            root={categories?.[CAT_MENU_DEFAULT_ROOT_CATEGORY]}
+                                            itemsKey="categories"
+                                            itemsCountKey="onlineSubCategoriesCount"
+                                            contentComponent={ListMenuContentWithData}
+                                        />
+                                    </HideOnMobile>
                                 </Header>
                             </>
                         ) : (

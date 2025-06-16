@@ -9,12 +9,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import {useIntl} from 'react-intl'
 
-import {
-    Container,
-    SimpleGrid,
-    Stack,
-    useSlotRecipe
-} from '@chakra-ui/react'
+import {Container, SimpleGrid, Stack, useSlotRecipe} from '@chakra-ui/react'
 
 import LinksList from '../../components/links-list'
 
