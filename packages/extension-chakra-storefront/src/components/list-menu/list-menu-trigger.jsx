@@ -33,7 +33,7 @@ const ListMenuTrigger = ({item, name, isOpen, onOpen, onClose}) => {
                 onMouseOver={onOpen}
                 css={styles.listMenuTriggerLink}
                 {...{name: name + ' __'}}
-                // {...(isOpen ? {css: styles.listMenuTriggerLinkActive} : {})}
+                {...(isOpen ? {css: styles.listMenuTriggerLinkActive} : {})}
             >
                 {name}
             </Link>
