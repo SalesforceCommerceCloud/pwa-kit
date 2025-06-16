@@ -105,6 +105,14 @@ test('Renders account detail page by default for logged-in customer', async () =
 })
 
 test('Allows customer to sign out', async () => {
+    global.server.use(
+        rest.post('*/logout', (req, res, ctx) => {
+            return res(ctx.json({success: true}))
+        }),
+        rest.get('*/customers/:customerId', (req, res, ctx) => {
+            return res(ctx.json(mockedGuestCustomer))
+        })
+    )
     renderWithProviders(<MockedComponent />, {
         wrapperProps: {siteAlias: 'uk', appConfig: mockConfig.app}
     })
@@ -143,8 +151,12 @@ test('Allows customer to edit profile details', async () => {
 
     const el = within(screen.getByTestId('sf-toggle-card-my-profile'))
     user.click(el.getByText(/edit/i))
-    user.type(el.getByLabelText(/first name/i), 'Geordi')
-    user.type(el.getByLabelText(/Phone Number/i), '5671235585')
+    
+    // Wait for the form fields to be rendered
+    await screen.findByLabelText(/first name/i)
+    
+    user.type(screen.getByLabelText(/first name/i), 'Geordi')
+    user.type(screen.getByLabelText(/Phone Number/i), '5671235585')
     user.click(el.getByText(/save/i))
     expect(await screen.findByText('Geordi Tester')).toBeInTheDocument()
     expect(await screen.findByText('(567) 123-5585')).toBeInTheDocument()
