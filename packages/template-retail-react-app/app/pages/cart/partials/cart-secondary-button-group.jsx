@@ -62,6 +62,7 @@ const CartSecondaryButtonGroup = ({
     isAGift = false
 }) => {
     const variant = useItemVariant()
+    const isBonusProduct = variant?.bonusProductLineItem
 
     const {data: customer} = useCurrentCustomer()
     const modalProps = useDisclosure()
@@ -89,7 +90,7 @@ const CartSecondaryButtonGroup = ({
                             id="cart_secondary_button_group.action.remove"
                         />
                     </Button>
-                    {customer.isRegistered && (
+                    {customer.isRegistered && !isBonusProduct && (
                         <Button
                             variant="link"
                             size="sm"
@@ -108,31 +109,33 @@ const CartSecondaryButtonGroup = ({
                         />
                     </Button>
                 </ButtonGroup>
-                <Flex alignItems="center">
-                    <Checkbox
-                        name={`gift-checkbox-${variant.itemId}`}
-                        spacing={2}
-                        isChecked={isAGift}
-                        onChange={(e) => {
-                            const checked = e.target.checked
-                            onIsAGiftChange(variant, checked)
-                        }}
-                    >
-                        <FormattedMessage
-                            defaultMessage="This is a gift."
-                            id="cart_secondary_button_group.label.this_is_gift"
-                        />
-                    </Checkbox>
-                    {/* if you want to provide a link to your gift site, uncomment this section and re-build your translation*/}
-                    {/*<Box marginLeft={1}>*/}
-                    {/*    <Button marginLeft={1} variant="link" size="sm" href="#">*/}
-                    {/*        <FormattedMessage*/}
-                    {/*            defaultMessage="Learn More"*/}
-                    {/*            id="cart_secondary_button_group.link_learn_more"*/}
-                    {/*        />*/}
-                    {/*    </Button>*/}
-                    {/*</Box>*/}
-                </Flex>
+                {!isBonusProduct && (
+                    <Flex alignItems="center">
+                        <Checkbox
+                            name={`gift-checkbox-${variant.itemId}`}
+                            spacing={2}
+                            isChecked={isAGift}
+                            onChange={(e) => {
+                                const checked = e.target.checked
+                                onIsAGiftChange(variant, checked)
+                            }}
+                        >
+                            <FormattedMessage
+                                defaultMessage="This is a gift."
+                                id="cart_secondary_button_group.label.this_is_gift"
+                            />
+                        </Checkbox>
+                        {/* if you want to provide a link to your gift site, uncomment this section and re-build your translation*/}
+                        {/*<Box marginLeft={1}>*/}
+                        {/*    <Button marginLeft={1} variant="link" size="sm" href="#">*/}
+                        {/*        <FormattedMessage*/}
+                        {/*            defaultMessage="Learn More"*/}
+                        {/*            id="cart_secondary_button_group.link_learn_more"*/}
+                        {/*        />*/}
+                        {/*    </Button>*/}
+                        {/*</Box>*/}
+                    </Flex>
+                )}
             </Stack>
             <ConfirmationModal
                 {...REMOVE_CART_ITEM_CONFIRMATION_DIALOG_CONFIG}
