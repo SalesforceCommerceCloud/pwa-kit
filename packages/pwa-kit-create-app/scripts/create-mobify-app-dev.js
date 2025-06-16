@@ -87,6 +87,7 @@ const withLocalNPMRepo = (func) => {
                             OPEN_SOURCE_CONTRIBUTOR: 'true'
                         }
                     })
+                    console.log('verdaccioServerProcess')
 
                     verdaccioServerProcess.stdout.on('data', (data) => {
                         // we know verdaccio server is up when
@@ -95,7 +96,13 @@ const withLocalNPMRepo = (func) => {
                             console.log('local NPM repository is up')
                             process.env['npm_config_registry'] = 'http://localhost:4873/'
                             resolve()
+                        } else {
+                            console.log('verdaccioServerProcess stdout', data)
                         }
+                    })
+
+                    verdaccioServerProcess.stderr.on('error', (err) => {
+                        console.log('verdaccioServerProcess error', err)
                     })
                 })
         )
@@ -114,6 +121,7 @@ const withLocalNPMRepo = (func) => {
         .then(() => func())
         .then(() => cleanup())
         .catch((err) => {
+            console.log('Error!', err)
             cleanup()
             throw err
         })

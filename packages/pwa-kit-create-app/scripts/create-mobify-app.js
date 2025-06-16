@@ -50,8 +50,8 @@ const generatorPkg = require('../package.json')
 const Handlebars = require('handlebars')
 const validatePackageName = require('validate-npm-package-name')
 const treeShake = require('./tree-shake')
-const pluginConfig = require('../assets/plugin-config');
-const computeChecksum = require('./checksum');
+const pluginConfig = require('../assets/plugin-config')
+const computeChecksum = require('./checksum')
 
 const program = new Command()
 
@@ -125,22 +125,6 @@ const TEMPLATE_SOURCE_BUNDLE = 'bundle'
 const DEFAULT_TEMPLATE_VERSION = 'latest'
 
 const LOCAL_DEV_PROJECT_DIR = 'dev'
-
-const INITIAL_QUESTION = [
-    {
-        name: 'project.type',
-        message: 'What type of PWA Kit project would you like to create?',
-        type: 'list',
-        choices: [
-            {name: 'PWA Kit Application', value: 'PWAKitAppProject'},
-            {
-                name: 'PWA Kit Application Extension',
-                value: 'PWAKitAppExtensionProject'
-            }
-        ],
-        default: 'PWAKitAppProject'
-    }
-]
 
 const selectedPlugins = {}
 
@@ -345,13 +329,6 @@ const PRESETS = [
         questions: [...RETAIL_REACT_APP_QUESTIONS],
         answers: {
             ['project.hybrid']: false,
-            ['project.extractAppExtensions']: true,
-            ['project.type']: 'PWAKitAppProject',
-            ['project.useApplicationExtensibility']: true,
-            ['project.selectedAppExtensions']: [
-                '@salesforce/template-chakra-storefront',
-                '@salesforce/extension-chakra-store-locator'
-            ],
             ['project.name']: 'retail-react-app',
             ['project.commerce.instanceUrl']: 'https://zzrf-001.dx.commercecloud.salesforce.com',
             ['project.commerce.clientId']: 'c9c45bfd-0ed3-4aa2-9971-40f88962b836',
@@ -544,56 +521,6 @@ const PRESETS = [
         questions: MRT_REFERENCE_QUESTIONS,
         answers: {
             ['project.name']: 'mrt-reference-app'
-        },
-        private: true
-    },
-    {
-        id: 'extension-starter',
-        name: 'Starter Application Extension',
-        description: '',
-        templateSource: {
-            type: TEMPLATE_SOURCE_BUNDLE,
-            id: 'extension-starter'
-        },
-        questions: APPLICATION_EXTENSION_QUESTIONS,
-        answers: {
-            ['project.name']: '@salesforce/extension-starter',
-            ['project.type']: 'PWAKitAppExtensionProject',
-            ['project.extensionName']: '@salesforce/extension-starter'
-        },
-        private: true
-    },
-    {
-        id: 'app-extension-starter-extract',
-        name: 'Typescript Minimal With Extracted Extension',
-        description:
-            'Generate an typescript-minimal project with a starter extension. The extension code will be included in the project.',
-        templateSource: {
-            type: TEMPLATE_SOURCE_BUNDLE,
-            id: 'typescript-minimal'
-        },
-        questions: TYPESCRIPT_MINIMAL_QUESTIONS,
-        answers: {
-            ['project.name']: 'app-extension-starter-extract',
-            ['project.selectedAppExtensions']: ['extension-starter'],
-            ['project.extractAppExtensions']: true
-        },
-        private: true
-    },
-    {
-        id: 'app-extension-starter-no-extract',
-        name: 'Typescript Minimal With Extension',
-        description:
-            'Generate an typescript-minimal project with a starter extension. The extension code will not included in the project.',
-        templateSource: {
-            type: TEMPLATE_SOURCE_BUNDLE,
-            id: 'typescript-minimal'
-        },
-        questions: TYPESCRIPT_MINIMAL_QUESTIONS,
-        answers: {
-            ['project.name']: 'app-extension-starter-no-extract',
-            ['project.selectedAppExtensions']: ['extension-starter'],
-            ['project.extractAppExtensions']: false
         },
         private: true
     }
@@ -824,54 +751,6 @@ const processTemplate = (relFile, inputDir, outputDir, context) => {
 }
 
 /**
- * Process the Application Extensions into the extracted application extensions directory.
- *
- * @param {Array} appExtensions - An array of the Application Extension names.
- * @param {boolean} extractAppExtensions - A boolean indicating whether to extract the Application Extensions code from the npm package.
- * @param {string} appExtensionsDir - The path to the extracted application extensions directory.
- */
-const processAppExtensions = (
-    appExtensions = [],
-    extractAppExtensions = false,
-    appExtensionsDir
-) => {
-    if (appExtensions.length > 0 && extractAppExtensions) {
-        appExtensions.forEach((appExtensionName) => {
-            // Create the full path for the temporary directory, preserving the namespace
-            const appExtensionTmp = p.join(os.tmpdir(), `extract-${appExtensionName}`)
-            fs.mkdirSync(appExtensionTmp, {recursive: true})
-            const appExtensionTarFile = sh
-                .exec(
-                    `npm pack ${appExtensionName}@latest --pack-destination="${appExtensionTmp}"`,
-                    {
-                        silent: true
-                    }
-                )
-                .stdout.trim()
-
-            const appExtensionTarPath = p.join(appExtensionTmp, appExtensionTarFile)
-
-            // Extract the Application Extension
-            tar.x({
-                file: appExtensionTarPath,
-                cwd: appExtensionTmp,
-                sync: true
-            })
-
-            // Copy the extracted Application Extension into the appropriate folder
-            const appExtensionTmpPath = p.join(appExtensionTmp, 'package')
-            const appExtensionDestDir = p.join(appExtensionsDir, appExtensionName.replace('/', '_'))
-            sh.mkdir('-p', appExtensionDestDir)
-
-            copyAllFiles(appExtensionTmpPath, appExtensionDestDir)
-
-            // Clean up the temporary Application Extension directory
-            sh.rm('-rf', appExtensionTmp)
-        })
-    }
-}
-
-/**
  * Fetches the latest version of a package using npm view.
  * @param {string} packageName - The name of the package (e.g., '@salesforce/template-chakra-storefront').
  * @returns {string} - The latest version number (e.g., '1.0.0') or 'latest' if fetching fails.
@@ -888,28 +767,6 @@ const getLatestVersion = (packageName) => {
     } catch (err) {
         console.warn(`Failed to fetch version for ${packageName}: ${err.message}. Using 'latest'.`)
         return 'latest'
-    }
-}
-
-/**
- * Fetches available Application Extensions and their latest versions using npm view.
- * @returns {Array} - A list of objects containing name, value, and version of available extensions.
- */
-const fetchAvailableAppExtensions = () => {
-    const filePath = p.join(__dirname, '..', 'assets', 'available-app-extensions.json')
-    try {
-        const data = fs.readFileSync(filePath)
-        const staticResult = JSON.parse(data)
-        const extensionsWithVersions = staticResult.map((pkg) => {
-            const version = getLatestVersion(pkg.name)
-            // Prepend caret (^) to the version unless it's 'latest'
-            const caretVersion = version === 'latest' ? version : `^${version}`
-            return {name: pkg.name, value: pkg.name, version: caretVersion}
-        })
-        return extensionsWithVersions
-    } catch (error) {
-        console.error('Failed to fetch Application Extensions:', error.message)
-        return []
     }
 }
 
@@ -941,8 +798,7 @@ const runGenerator = (
 ) => {
     const {answers, preset} = context
     const {templateSource} = preset
-    const {selectedAppExtensions = [], extractAppExtensions = false} = answers.project
-
+    
     // Check if the output directory doesn't already exist.
     checkOutputDir(outputDir)
 
@@ -995,9 +851,12 @@ const runGenerator = (
     // Compute the checksum of the output directory
     const checksums = computeChecksum(outputDir)
     const checksumFilePath = p.join(outputDir, 'checksum.json')
-    const timestamp = new Date().toISOString();
-    fs.writeFileSync(checksumFilePath, JSON.stringify({checksums, timestamp, selectedPlugins}, null, 2))
-    
+    const timestamp = new Date().toISOString()
+    fs.writeFileSync(
+        checksumFilePath,
+        JSON.stringify({checksums, timestamp, selectedPlugins}, null, 2)
+    )
+
     // Copy template specific assets over.
     const assetsDir = p.join(ASSETS_TEMPLATES_DIR, id)
     if (sh.test('-e', assetsDir)) {
@@ -1011,96 +870,10 @@ const runGenerator = (
             })
     }
 
-    // Check project type and handle appropriately
-    if (answers.project.type === 'PWAKitAppExtensionProject') {
-        const devOutputDir = p.join(outputDir, LOCAL_DEV_PROJECT_DIR)
-
-        // Update the root package.json to add a start script
-        updatePackageJson(p.resolve(outputDir, 'package.json'), {
-            scripts: {
-                start: `npm --prefix ./${LOCAL_DEV_PROJECT_DIR} start`,
-                'start:inspect': `npm --prefix ./${LOCAL_DEV_PROJECT_DIR} run start:inspect`
-            }
-        })
-
-        // Recursively call runGenerator for the 'typescript-minimal' local dev project
-        const localDevProjectContext = {
-            ...context,
-            preset: {
-                id: 'typescript-minimal',
-                templateSource: {type: TEMPLATE_SOURCE_BUNDLE, id: 'typescript-minimal'},
-                private: true
-            },
-            answers: {project: {type: 'PWAKitAppProject', name: 'local-dev-project'}}
-        }
-
-        runGenerator(localDevProjectContext, {
-            outputDir: devOutputDir,
-            templateVersion,
-            verbose,
-            installDependencies: false
-        })
-
-        // Update the typescript-minimal dev package.json with dependencies
-        updatePackageJson(p.resolve(devOutputDir, 'package.json'), {
-            devDependencies: {[answers.project.name]: 'file:../'},
-            mobify: {app: {extensions: [answers.project.name]}}
-        })
-
-        // TODO: The generator is growing, we should refactor this to be more maintainable.
-        const processGeneratedExtension = () => {
-            // do a file content replacement for extension-meta.json in the outputDir
-            // find all instances of "@salesforce/extension-starter" and replace with answers.project.name
-            const extensionMetaJsonPath = p.join(outputDir, 'extension-meta.json')
-            if (fs.existsSync(extensionMetaJsonPath)) {
-                let extensionMetaJsonContent = fs.readFileSync(extensionMetaJsonPath, 'utf8')
-                extensionMetaJsonContent = extensionMetaJsonContent.replace(
-                    /@salesforce\/extension-starter/g,
-                    answers.project.name
-                )
-                fs.writeFileSync(extensionMetaJsonPath, extensionMetaJsonContent)
-            }
-        }
-
-        processGeneratedExtension()
-
-        // Create the .npmignore file, excluding the typescript-minimal local dev project folder
-        createNpmIgnoreFile(outputDir, [`${LOCAL_DEV_PROJECT_DIR}/`])
-
-        npmInstall(devOutputDir, {
-            verbose,
-            projectName: localDevProjectContext.answers.project.name
-        })
-    } else {
-        processAppExtensions(selectedAppExtensions, extractAppExtensions, appExtensionsDir)
-    }
-
     // Prepare updates for package.json
     const pkgUpdates = {
         name: getSlugifiedProjectName(context.answers.project.name || context.preset.id),
-        version: GENERATED_PROJECT_VERSION,
-        // Conditionally add workspaces for extractAppExtensions
-        ...(extractAppExtensions && {
-            workspaces: [`${p.join(APP_DIR, APP_EXTENSIONS_DIR)}/*`]
-        }),
-        // Add selected Application Extensions to devDependencies
-        devDependencies: selectedAppExtensions.reduce((acc, appExtensionName) => {
-            // Find the corresponding Application Extension details
-            const appExtensionDetails = context?.availableAppExtensions?.find(
-                (ext) => ext.value === appExtensionName
-            )
-            const version = appExtensionDetails ? appExtensionDetails.version : 'latest'
-
-            acc[appExtensionName] = extractAppExtensions
-                ? `file:${p.join(
-                      '.',
-                      APP_DIR,
-                      APP_EXTENSIONS_DIR,
-                      appExtensionName.replace('/', '_')
-                  )}`
-                : version
-            return acc
-        }, {})
+        version: GENERATED_PROJECT_VERSION
     }
 
     // Update the root package.json
@@ -1112,41 +885,6 @@ const runGenerator = (
     if (installDependencies) {
         // Install dependencies for the newly minted project.
         npmInstall(outputDir, {verbose, projectName: context.answers.project.name})
-    }
-
-    if (selectedAppExtensions.length > 0) {
-        const extensionsWithDefaultConfig = selectedAppExtensions.map((extension) => {
-            // Since we've just installed the dependencies, we can read the default config of each extension
-            const pathToDefaultConfig = p.join(
-                outputDir,
-                'node_modules',
-                extension,
-                'config',
-                'default.json'
-            )
-            if (!fs.existsSync(pathToDefaultConfig)) {
-                console.warn(
-                    `The extension ${extension} does not have a default config. Will generate a minimal default config for it.`
-                )
-                // Return a minimal default config. It should match what's defined in: https://github.com/SalesforceCommerceCloud/pwa-kit/blob/310e946bed12fd4cbb42a209ee6982e9b1bb9b99/packages/pwa-kit-extension-sdk/src/shared/utils/helpers.ts#L13-L15
-                return [extension, {enabled: true}]
-            }
-
-            const defaultConfig = readJson(pathToDefaultConfig)
-            return [extension, defaultConfig]
-        })
-
-        updatePackageJson(p.resolve(outputDir, 'package.json'), {
-            mobify: {
-                app: {
-                    extensions: extensionsWithDefaultConfig
-                }
-            }
-        })
-
-        console.log(
-            'After your project is generated, please review `mobify.app.extensions` in package.json to check the configuration of the extensions and fill out any placeholder values.'
-        )
     }
 }
 
@@ -1206,7 +944,7 @@ const main = async (opts) => {
         const pluginChoices = Object.entries(pluginConfig.plugins).map(([key, config]) => ({
             name: config.description,
             value: key
-        }));
+        }))
 
         const pluginAnswers = await inquirer.prompt([
             {
@@ -1215,30 +953,17 @@ const main = async (opts) => {
                 message: 'Which extensions would you like to enable?',
                 choices: pluginChoices
             }
-        ]);
+        ])
 
         // Convert selected plugins array to object with true values
         pluginAnswers.selectedPlugins.forEach((plugin) => {
-            selectedPlugins[plugin] = true;
-        });
+            selectedPlugins[plugin] = true
+        })
     }
 
     if (!OUTPUT_DIR_FLAG_ACTIVE) {
         // For extension projects, use the extension name as the output directory
-        if (
-            context.answers.project.type === 'PWAKitAppExtensionProject' &&
-            context.answers.project.extensionName
-        ) {
-            // Extract the package name part without the namespace for the directory name
-            const extensionName = context.answers.project.extensionName
-            const packageNamePart = extensionName.includes('/')
-                ? extensionName.split('/')[1]
-                : extensionName
-
-            outputDir = p.join(process.cwd(), packageNamePart)
-        } else {
-            outputDir = p.join(process.cwd(), context.answers.project.name || context.preset.id)
-        }
+        outputDir = p.join(process.cwd(), context.answers.project.name || context.preset.id)
     }
 
     if (context.answers.project.commerce?.instanceUrl) {
