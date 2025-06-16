@@ -46,7 +46,6 @@ export const OuterApp = ({routes, error, extensions, WrappedApp, locals, onHydra
     const AppConfig = getAppConfig()
     const isInitialPageRef = useRef(true)
 
-
     return (
         <ServerContext.Provider value={{}}>
             <Router ref={onHydrate}>

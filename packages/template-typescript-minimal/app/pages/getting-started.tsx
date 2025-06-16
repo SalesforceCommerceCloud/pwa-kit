@@ -52,7 +52,6 @@ const style = `
 `
 
 const GettingStarted = () => {
-
     return (
         <section className="content">
             <style dangerouslySetInnerHTML={{__html: style}} />
@@ -74,8 +73,6 @@ const GettingStarted = () => {
                                 Get started
                             </a>
                         </p>
-
-
                     </div>
                 </div>
             </div>
