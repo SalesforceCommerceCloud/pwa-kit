@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {useState, useEffect} from 'react'
+import React, {useState, useEffect, useMemo} from 'react'
 import {
     Modal,
     ModalCloseButton,
@@ -26,10 +26,12 @@ import {useProducts} from '@salesforce/commerce-sdk-react'
 import DynamicImage from '@salesforce/retail-react-app/app/components/dynamic-image'
 import PropTypes from 'prop-types'
 import {useBonusProductModalContext} from '@salesforce/retail-react-app/app/hooks/use-bonus-product-modal'
+import {findImageGroupBy} from '@salesforce/retail-react-app/app/utils/image-groups-utils'
+import {FormattedMessage} from 'react-intl'
 
 // Component to display individual bonus product with checkbox for selection
 const BonusProductItem = ({product, isSelected, onToggle, isLoading}) => {
-    const productName = product?.productName || product?.title || 'Unknown Product'
+    const productName = product?.productName || product?.title
     const productId = product?.productId || product?.id
 
     // Fetch product data to get image information
@@ -45,33 +47,16 @@ const BonusProductItem = ({product, isSelected, onToggle, isLoading}) => {
         }
     )
 
-    // Extract image URL from imageGroups
-    const getProductImage = () => {
-        if (!productData?.data?.[0]?.imageGroups) return null
+    // Get the appropriate image group
+    const imageGroup = useMemo(
+        () =>
+            findImageGroupBy(productData?.data?.[0]?.imageGroups || [], {
+                viewType: 'small'
+            }),
+        [productData]
+    )
 
-        const imageGroups = productData.data[0].imageGroups
-
-        // Try to find image in order of preference: medium, small, large
-        const preferredViewTypes = ['medium', 'small', 'large']
-
-        for (const viewType of preferredViewTypes) {
-            const imageGroup = imageGroups.find((group) => group.viewType === viewType)
-            if (imageGroup?.images?.[0]?.link) {
-                return imageGroup.images[0].link
-            }
-        }
-
-        // Fallback to first available image
-        for (const group of imageGroups) {
-            if (group.images?.[0]?.link) {
-                return group.images[0].link
-            }
-        }
-
-        return null
-    }
-
-    const imageUrl = getProductImage()
+    const image = imageGroup?.images?.[0]
     const showLoading = isLoading || isProductLoading
 
     if (showLoading) {
@@ -97,25 +82,18 @@ const BonusProductItem = ({product, isSelected, onToggle, isLoading}) => {
                 cursor="pointer"
                 onClick={() => onToggle(product)}
             >
-                {imageUrl ? (
+                {image && (
                     <DynamicImage
-                        src={imageUrl}
-                        alt={productName}
-                        borderRadius="md"
-                        objectFit="cover"
+                        src={`${image.disBaseLink || image.link}[?sw={width}&q=60]`}
+                        widths={{
+                            base: '150px'
+                        }}
+                        imageProps={{
+                            alt: productName,
+                            borderRadius: 'md',
+                            objectFit: 'cover'
+                        }}
                     />
-                ) : (
-                    <Box
-                        bg="gray.200"
-                        borderRadius="md"
-                        display="flex"
-                        alignItems="center"
-                        justifyContent="center"
-                    >
-                        <Text fontSize="xs" color="gray.500" textAlign="center">
-                            No Image
-                        </Text>
-                    </Box>
                 )}
             </AspectRatio>
             <VStack spacing={2} align="center">
@@ -178,7 +156,6 @@ export const BonusProductModal = () => {
     }
 
     const handleNext = () => {
-        console.log('Selected products:', Array.from(selectedProducts))
         onClose()
     }
 
@@ -205,9 +182,9 @@ export const BonusProductModal = () => {
                 <ModalBody bgColor="white" padding="6">
                     {bonusProducts.length > 0 ? (
                         <SimpleGrid columns={columns} spacing={8}>
-                            {bonusProducts.map((product, index) => (
+                            {bonusProducts.map((product) => (
                                 <BonusProductItem
-                                    key={product.productId || index}
+                                    key={product.productId || product.id}
                                     product={product}
                                     isSelected={selectedProducts.has(product.id || product.productId)}
                                     onToggle={handleToggle}

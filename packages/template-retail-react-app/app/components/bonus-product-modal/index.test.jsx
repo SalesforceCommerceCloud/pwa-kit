@@ -62,7 +62,7 @@ describe('BonusProductModal', () => {
             {
                 imageGroups: [
                     {
-                        viewType: 'medium',
+                        viewType: 'small',
                         images: [{link: 'test-image.jpg'}]
                     }
                 ]
@@ -173,6 +173,18 @@ describe('BonusProductModal', () => {
 
         const closeButton = screen.getByRole('button', {name: /close/i})
         fireEvent.click(closeButton)
+        expect(mockContextValue.onClose).toHaveBeenCalled()
+    })
+
+    it('closes modal when clicking next button', () => {
+        render(
+            <MockProvider contextValue={mockContextValue}>
+                <BonusProductModal />
+            </MockProvider>
+        )
+
+        const nextButton = screen.getByRole('button', {name: /next/i})
+        fireEvent.click(nextButton)
         expect(mockContextValue.onClose).toHaveBeenCalled()
     })
 })
