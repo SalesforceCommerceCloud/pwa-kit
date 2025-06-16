@@ -453,6 +453,16 @@
       "value": "Password Reset"
     }
   ],
+  "bonus_product_item.label.quantity": [
+    {
+      "type": 0,
+      "value": "Quantity: "
+    },
+    {
+      "type": 1,
+      "value": "quantity"
+    }
+  ],
   "bonus_products_title.title.num_of_items": [
     {
       "type": 0,

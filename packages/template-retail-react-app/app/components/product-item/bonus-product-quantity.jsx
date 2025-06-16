@@ -29,7 +29,7 @@ const BonusProductQuantity = ({product}) => {
         >
             <FormattedMessage
                 defaultMessage="Quantity: {quantity}"
-                id="product_item.label.quantity"
+                id="bonus_product_item.label.quantity"
                 values={{quantity: product?.quantity}}
             />
         </Text>
