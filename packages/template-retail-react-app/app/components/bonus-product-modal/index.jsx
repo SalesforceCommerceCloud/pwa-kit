@@ -27,7 +27,6 @@ import DynamicImage from '@salesforce/retail-react-app/app/components/dynamic-im
 import PropTypes from 'prop-types'
 import {useBonusProductModalContext} from '@salesforce/retail-react-app/app/hooks/use-bonus-product-modal'
 import {findImageGroupBy} from '@salesforce/retail-react-app/app/utils/image-groups-utils'
-import {FormattedMessage} from 'react-intl'
 
 // Component to display individual bonus product with checkbox for selection
 const BonusProductItem = ({product, isSelected, onToggle, isLoading}) => {
@@ -106,7 +105,9 @@ const BonusProductItem = ({product, isSelected, onToggle, isLoading}) => {
                 >
                     {productName}
                 </Text>
-                <Checkbox isChecked={isSelected} onChange={() => onToggle(product)} cursor="pointer" />
+                <Checkbox isChecked={isSelected} 
+                onChange={() => onToggle(product)} 
+                cursor="pointer" />
             </VStack>
         </VStack>
     )
@@ -128,7 +129,6 @@ export const BonusProductModal = () => {
     const firstBonusItem = bonusDiscountLineItems[0] || {}
     const bonusProducts = firstBonusItem.bonusProducts || []
     const maxBonusItems = firstBonusItem.maxBonusItems || 1
-    const promotionId = firstBonusItem.promotionId
 
     // Reset selections when modal opens
     useEffect(() => {
@@ -186,7 +186,9 @@ export const BonusProductModal = () => {
                                 <BonusProductItem
                                     key={product.productId || product.id}
                                     product={product}
-                                    isSelected={selectedProducts.has(product.id || product.productId)}
+                                    isSelected={selectedProducts.has(
+                                        product.id || product.productId
+                                    )}
                                     onToggle={handleToggle}
                                 />
                             ))}

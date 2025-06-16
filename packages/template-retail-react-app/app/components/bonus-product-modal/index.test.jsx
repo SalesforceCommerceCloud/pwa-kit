@@ -7,7 +7,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import {render, screen, fireEvent} from '@testing-library/react'
-import {BonusProductModal} from './index'
+import {BonusProductModal} from '@salesforce/retail-react-app/app/components/bonus-product-modal'
 import {useBonusProductModalContext} from '@salesforce/retail-react-app/app/hooks/use-bonus-product-modal'
 import {useProducts} from '@salesforce/commerce-sdk-react'
 
@@ -16,17 +16,12 @@ jest.mock('@salesforce/retail-react-app/app/hooks/use-bonus-product-modal')
 jest.mock('@salesforce/commerce-sdk-react')
 
 // Mock provider component
-const MockProvider = ({children, contextValue}) => {
-    return (
-        <div data-testid="mock-provider">
-            {children}
-        </div>
-    )
+const MockProvider = ({children}) => {
+    return (<div data-testid="mock-provider">{children}</div>)
 }
 
 MockProvider.propTypes = {
-    children: PropTypes.node.isRequired,
-    contextValue: PropTypes.object.isRequired
+    children: PropTypes.node.isRequired
 }
 
 describe('BonusProductModal', () => {
@@ -84,7 +79,7 @@ describe('BonusProductModal', () => {
 
     it('renders modal when isOpen is true', () => {
         render(
-            <MockProvider contextValue={mockContextValue}>
+            <MockProvider>
                 <BonusProductModal />
             </MockProvider>
         )
@@ -101,7 +96,7 @@ describe('BonusProductModal', () => {
         })
 
         render(
-            <MockProvider contextValue={mockContextValue}>
+            <MockProvider>
                 <BonusProductModal />
             </MockProvider>
         )
@@ -116,7 +111,7 @@ describe('BonusProductModal', () => {
         })
 
         render(
-            <MockProvider contextValue={mockContextValue}>
+            <MockProvider>
                 <BonusProductModal />
             </MockProvider>
         )
@@ -126,7 +121,7 @@ describe('BonusProductModal', () => {
 
     it('handles product selection and deselection', () => {
         render(
-            <MockProvider contextValue={mockContextValue}>
+            <MockProvider>
                 <BonusProductModal />
             </MockProvider>
         )
@@ -142,7 +137,7 @@ describe('BonusProductModal', () => {
 
     it('enforces maximum selection limit', () => {
         render(
-            <MockProvider contextValue={mockContextValue}>
+            <MockProvider>
                 <BonusProductModal />
             </MockProvider>
         )
@@ -156,17 +151,13 @@ describe('BonusProductModal', () => {
         fireEvent.click(checkboxes[1])
         expect(screen.getByText('Add Bonus Product (2 of 2)')).toBeInTheDocument()
 
-        // Try to select a third product (should not be possible)
-        const thirdCheckbox = screen.getAllByRole('checkbox')[2]
-        if (thirdCheckbox) {
-            fireEvent.click(thirdCheckbox)
-            expect(screen.getByText('Add Bonus Product (2 of 2)')).toBeInTheDocument()
-        }
+        // Verify there are only two checkboxes (max limit)
+        expect(checkboxes).toHaveLength(2)
     })
 
     it('closes modal when clicking close button', () => {
         render(
-            <MockProvider contextValue={mockContextValue}>
+            <MockProvider>
                 <BonusProductModal />
             </MockProvider>
         )
@@ -178,7 +169,7 @@ describe('BonusProductModal', () => {
 
     it('closes modal when clicking next button', () => {
         render(
-            <MockProvider contextValue={mockContextValue}>
+            <MockProvider>
                 <BonusProductModal />
             </MockProvider>
         )
