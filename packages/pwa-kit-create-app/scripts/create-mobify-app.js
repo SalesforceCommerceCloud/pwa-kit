@@ -313,7 +313,6 @@ const PRESETS = [
             type: TEMPLATE_SOURCE_NPM,
             id: '@salesforce/retail-react-app'
         },
-        interactive: false,
         answers: {
             ['project.hybrid']: false,
             ['project.name']: 'demo-storefront',
@@ -941,7 +940,7 @@ const main = async (opts) => {
         context.preset = PRESETS.find(({id}) => id === presetId)
     }
 
-    const {interactive = true, getQuestions, answers = {}} = context.preset
+    const {interactive = false, getQuestions, answers = {}} = context.preset
     if (interactive) {
         const questions = getQuestions ? getQuestions() : []
         const projectAnswers = await prompt(questions, answers)
