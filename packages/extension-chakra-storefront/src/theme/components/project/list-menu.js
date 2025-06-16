@@ -7,7 +7,17 @@
 import {defineSlotRecipe} from '@chakra-ui/react'
 
 export default defineSlotRecipe({
-    slots: ['container', 'stackContainer', 'popoverBody', 'popoverContent', 'popoverContainer', 'listMenuTriggerContainer', 'listMenuTriggerLink', 'listMenuTriggerLinkActive', 'listMenuTriggerLinkIcon'],
+    slots: [
+        'container',
+        'stackContainer',
+        'popoverBody',
+        'popoverContent',
+        'popoverContainer',
+        'listMenuTriggerContainer',
+        'listMenuTriggerLink',
+        'listMenuTriggerLinkActive',
+        'listMenuTriggerLinkIcon'
+    ],
     base: {
         container: {
             minWidth: 'xs',
@@ -31,7 +41,7 @@ export default defineSlotRecipe({
             position: 'relative',
             left: 0,
             top: 0,
-            zIndex: "sticky"
+            zIndex: 'sticky'
         },
         popoverBody: {
             boxShadow: 'xl',

@@ -10,14 +10,7 @@ import PropTypes from 'prop-types'
 import {useIntl} from 'react-intl'
 import {Link as RouteLink} from 'react-router-dom'
 
-import {
-    Box,
-    Center,
-    Flex,
-    Spinner,
-    Stack,
-    useSlotRecipe
-} from '@chakra-ui/react'
+import {Box, Center, Flex, Spinner, Stack, useSlotRecipe} from '@chakra-ui/react'
 
 // Project Components
 import {ListMenuPopover} from '../../components/list-menu/list-menu-popover'
