@@ -32,12 +32,13 @@ test('Renders confirmation modal with default config', async () => {
 
     // open the modal
     const trigger = screen.getByText(/open modal/i)
-    user.click(trigger)
+    await user.click(trigger)
 
-    expect(screen.getByText(/confirm action/i)).toBeInTheDocument()
-    expect(screen.getByText(/are you sure you want to continue/i)).toBeInTheDocument()
-    expect(screen.getByText(/yes/i)).toBeInTheDocument()
-    expect(screen.getByText(/no/i)).toBeInTheDocument()
+    // Wait for modal content to be rendered
+    await screen.findByText('Confirm Action')
+    expect(screen.getByText('Are you sure you want to continue?')).toBeInTheDocument()
+    expect(screen.getByText('Yes')).toBeInTheDocument()
+    expect(screen.getByText('No')).toBeInTheDocument()
 })
 
 test('Renders confirmation modal with the given config', async () => {
@@ -45,12 +46,13 @@ test('Renders confirmation modal with the given config', async () => {
 
     // open the modal
     const trigger = screen.getByText(/open modal/i)
-    user.click(trigger)
+    await user.click(trigger)
 
-    expect(screen.getByText(/confirm remove item/i)).toBeInTheDocument()
-    expect(screen.getByText(/are you sure you want to remove this item/i)).toBeInTheDocument()
-    expect(screen.getByText(/yes, remove item/i)).toBeInTheDocument()
-    expect(screen.getByText(/no, keep item/i)).toBeInTheDocument()
+    // Wait for modal content to be rendered
+    await screen.findByText('Confirm Remove Item')
+    expect(screen.getByText('Are you sure you want to remove this item from your cart?')).toBeInTheDocument()
+    expect(screen.getByText('Yes, remove item')).toBeInTheDocument()
+    expect(screen.getByText('No, keep item')).toBeInTheDocument()
 })
 
 test('Verify confirm action button click', async () => {
@@ -60,14 +62,14 @@ test('Verify confirm action button click', async () => {
 
     // open the modal
     const trigger = screen.getByText(/open modal/i)
-    user.click(trigger)
+    await user.click(trigger)
 
-    const onPrimaryActionTrigger = screen.getByText(/yes/i)
+    // Wait for modal content to be rendered
+    await screen.findByText('Confirm Action')
+    const confirmButton = screen.getByText('Yes')
+    expect(confirmButton).toBeInTheDocument()
 
-    expect(screen.getByText(/confirm action/i)).toBeInTheDocument()
-    expect(onPrimaryActionTrigger).toBeInTheDocument()
-
-    user.click(onPrimaryActionTrigger)
+    await user.click(confirmButton)
     expect(onPrimaryAction).toHaveBeenCalledTimes(1)
 })
 
@@ -78,13 +80,13 @@ test('Verify cancel action button click', async () => {
 
     // open the modal
     const trigger = screen.getByText(/open modal/i)
-    user.click(trigger)
+    await user.click(trigger)
 
-    const onAlternateActionTrigger = screen.getByText(/no/i)
+    // Wait for modal content to be rendered
+    await screen.findByText('Confirm Action')
+    const cancelButton = screen.getByText('No')
+    expect(cancelButton).toBeInTheDocument()
 
-    expect(screen.getByText(/confirm action/i)).toBeInTheDocument()
-    expect(onAlternateActionTrigger).toBeInTheDocument()
-
-    user.click(onAlternateActionTrigger)
+    await user.click(cancelButton)
     expect(onAlternateAction).toHaveBeenCalledTimes(1)
 })
