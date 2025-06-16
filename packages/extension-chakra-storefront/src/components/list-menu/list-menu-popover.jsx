@@ -7,7 +7,7 @@
 
 import React, {useState} from 'react'
 import PropTypes from 'prop-types'
-import {Box, Popover, Portal, useSlotRecipe} from '@chakra-ui/react'
+import {Box, Popover, useSlotRecipe} from '@chakra-ui/react'
 
 import {ListMenuContent} from '../../components/list-menu/list-menu-content'
 import {ListMenuTrigger} from '../../components/list-menu/list-menu-trigger'
