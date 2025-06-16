@@ -128,16 +128,6 @@ const LOCAL_DEV_PROJECT_DIR = 'dev'
 
 const selectedPlugins = {}
 
-const APPLICATION_EXTENSION_QUESTIONS = [
-    {
-        name: 'project.extensionName',
-        message:
-            'What is the name of your Application Extension? \n' +
-            'The name must follow standard npm package naming conventions (e.g., "@namespace/package-name" or "package-name").',
-        validate: validProjectAppExtensionName
-    }
-]
-
 const HYBRID_QUESTIONS = [
     {
         name: 'project.hybrid',
@@ -300,7 +290,6 @@ const PRESETS = [
         },
         questions: [...RETAIL_REACT_APP_QUESTIONS],
         answers: {
-            ['project.extend']: false, // Intentionally not an extensible project so that the correct logos appear on demo site
             ['project.hybrid']: false,
             ['project.name']: 'demo-storefront',
             ['project.commerce.instanceUrl']: 'https://zzrf-001.dx.commercecloud.salesforce.com',
@@ -382,7 +371,6 @@ const PRESETS = [
         },
         questions: [...RETAIL_REACT_APP_QUESTIONS],
         answers: {
-            ['project.extend']: true,
             ['project.hybrid']: false,
             ['project.name']: 'retail-react-app',
             ['project.commerce.instanceUrl']: 'https://zzec-006.dx.commercecloud.salesforce.com',
