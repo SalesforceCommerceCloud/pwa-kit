@@ -21,16 +21,15 @@ const ListMenuPopover = ({contentComponent, item, name, itemsKey, maxColumns}) =
     const styles = recipe()
 
     return (
+        <Box onMouseLeave={onClose}>
         <Popover.Root
             open={open}
-            onOpenChange={setOpen}
             positioning={{placement: 'bottom-start'}}
             lazyMounted
-            portalled
             unstyled
         >
             <Popover.Trigger asChild>
-                <Box onMouseEnter={onOpen} onMouseLeave={onClose}>
+                <Box onMouseEnter={onOpen}>
                     <ListMenuTrigger
                         item={item}
                         name={name}
@@ -41,7 +40,6 @@ const ListMenuPopover = ({contentComponent, item, name, itemsKey, maxColumns}) =
                 </Box>
             </Popover.Trigger>
 
-            <Portal>
                 <Popover.Positioner>
                     <Popover.Content data-testid="popover-menu" css={styles.popoverContent}>
                         <Popover.Body css={styles.popoverBody}>
@@ -54,8 +52,8 @@ const ListMenuPopover = ({contentComponent, item, name, itemsKey, maxColumns}) =
                         </Popover.Body>
                     </Popover.Content>
                 </Popover.Positioner>
-            </Portal>
         </Popover.Root>
+        </Box>
     )
 }
 
