@@ -22,6 +22,7 @@ import {
     useCheckout
 } from '@salesforce/retail-react-app/app/pages/checkout/util/checkout-context'
 import ContactInfo from '@salesforce/retail-react-app/app/pages/checkout/partials/contact-info'
+import PickupAddress from '@salesforce/retail-react-app/app/pages/checkout/partials/pickup-address'
 import ShippingAddress from '@salesforce/retail-react-app/app/pages/checkout/partials/shipping-address'
 import ShippingOptions from '@salesforce/retail-react-app/app/pages/checkout/partials/shipping-options'
 import Payment from '@salesforce/retail-react-app/app/pages/checkout/partials/payment'
@@ -51,6 +52,8 @@ const Checkout = () => {
     const idps = social?.idps
     const isSocialEnabled = !!social?.enabled
     const isPasswordlessEnabled = !!passwordless?.enabled
+
+    const isPickupInStore = basket?.pickupInStore
 
     useEffect(() => {
         if (error || step === 4) {
@@ -99,8 +102,8 @@ const Checkout = () => {
                                 isPasswordlessEnabled={isPasswordlessEnabled}
                                 idps={idps}
                             />
-                            <ShippingAddress />
-                            <ShippingOptions />
+                            {isPickupInStore ? <PickupAddress /> : <ShippingAddress />}
+                            {!isPickupInStore && <ShippingOptions />}
                             <Payment />
 
                             {step === 4 && (
