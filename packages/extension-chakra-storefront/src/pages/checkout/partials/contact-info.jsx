@@ -6,21 +6,8 @@
  */
 import React, {useEffect, useRef, useState} from 'react'
 import PropTypes from 'prop-types'
-import {
-    Alert,
-    Dialog,
-    DialogBody,
-    DialogContent,
-    DialogFooter,
-    DialogHeader,
-    DialogOverlay,
-    AlertIcon,
-    Box,
-    Button,
-    Container,
-    Stack,
-    Text
-} from '@chakra-ui/react'
+import {Alert, Dialog, Box, Button, Container, Stack, Text} from '@chakra-ui/react'
+import {AlertIcon} from '../../../components/icons'
 import {useForm} from 'react-hook-form'
 import {FormattedMessage, useIntl} from 'react-intl'
 import {useCheckout} from '../../../pages/checkout/util/checkout-context'

@@ -8,13 +8,10 @@ import React, {useState} from 'react'
 import PropTypes from 'prop-types'
 import {Controller} from 'react-hook-form'
 import {
-    FormControl,
-    FormLabel,
-    FormErrorMessage,
+    Field as ChakraField,
     IconButton,
     Input,
     InputGroup,
-    InputRightElement,
     Select,
     Checkbox
 } from '@chakra-ui/react'
@@ -64,11 +61,22 @@ const Field = ({
                     typeof inputProps === 'function' ? inputProps({value, onChange}) : inputProps
 
                 return (
-                    <FormControl id={name} isInvalid={error}>
+                    <ChakraField.Root id={name} isInvalid={error}>
                         {!['checkbox', 'radio', 'hidden'].includes(type) &&
-                            (formLabel || <FormLabel>{label}</FormLabel>)}
+                            (formLabel || <ChakraField.Label>{label}</ChakraField.Label>)}
 
-                        <InputGroup>
+                        <InputGroup
+                            endElement={
+                                type === 'password' ? (
+                                    <IconButton
+                                        variant="ghosted"
+                                        aria-label={passwordIconLabel}
+                                        icon={<PasswordIcon color="gray.500" boxSize={6} />}
+                                        onClick={() => setHidePassword(!hidePassword)}
+                                    />
+                                ) : undefined
+                            }
+                        >
                             {['text', 'password', 'email', 'phone', 'tel', 'number'].includes(
                                 type
                             ) && (
@@ -94,17 +102,6 @@ const Field = ({
                                     type="hidden"
                                     {..._inputProps}
                                 />
-                            )}
-
-                            {type === 'password' && (
-                                <InputRightElement>
-                                    <IconButton
-                                        variant="ghosted"
-                                        aria-label={passwordIconLabel}
-                                        icon={<PasswordIcon color="gray.500" boxSize={6} />}
-                                        onClick={() => setHidePassword(!hidePassword)}
-                                    />
-                                </InputRightElement>
                             )}
 
                             {type === 'select' && (
@@ -138,14 +135,14 @@ const Field = ({
                         </InputGroup>
 
                         {error && type !== 'hidden' && (
-                            <FormErrorMessage color="red.600">
+                            <ChakraField.ErrorText color="red.600">
                                 <AlertIcon aria-hidden="true" mr={2} />
                                 {error.message}
-                            </FormErrorMessage>
+                            </ChakraField.ErrorText>
                         )}
 
                         {helpText}
-                    </FormControl>
+                    </ChakraField.Root>
                 )
             }}
         />

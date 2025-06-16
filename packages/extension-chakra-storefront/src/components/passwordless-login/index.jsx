@@ -8,7 +8,7 @@
 import React, {useState} from 'react'
 import PropTypes from 'prop-types'
 import {FormattedMessage} from 'react-intl'
-import {Button, Divider, Stack, Text} from '@chakra-ui/react'
+import {Button, Separator, Stack, Text} from '@chakra-ui/react'
 import LoginFields from '../forms/login-fields'
 import StandardLogin from '../standard-login'
 import SocialLogin from '../social-login'
@@ -59,7 +59,7 @@ const PasswordlessLogin = ({
                             id="login_form.button.continue_securely"
                         />
                     </Button>
-                    <Divider />
+                    <Separator />
                     <Text align="center" fontSize="sm">
                         <FormattedMessage
                             defaultMessage="Or Login With"

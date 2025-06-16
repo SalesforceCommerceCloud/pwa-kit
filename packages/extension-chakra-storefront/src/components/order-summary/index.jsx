@@ -7,20 +7,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import {FormattedMessage, FormattedNumber} from 'react-intl'
-import {
-    Box,
-    Flex,
-    Button,
-    Stack,
-    Text,
-    Heading,
-    Divider,
-    Accordion,
-    AccordionIcon,
-    AccordionItem,
-    AccordionButton,
-    AccordionPanel
-} from '@chakra-ui/react'
+import {Box, Flex, Button, Stack, Text, Heading, Separator, Accordion} from '@chakra-ui/react'
 import Link from '../../components/link'
 import {PromoCode, usePromoCode} from '../../components/promo-code'
 import ItemVariantProvider from '../../components/item-variant'
@@ -56,22 +43,23 @@ const CartItems = ({basket}) => {
     )
 
     return (
-        <Accordion allowToggle={true} width="100%">
-            <AccordionItem style={{border: 0}}>
-                <AccordionButton color="blue.700">
-                    <BasketIcon aria-hidden={true} />
-                    <Box px={2}>
-                        <FormattedMessage
-                            id="order_summary.cart_items.action.num_of_items_in_cart"
-                            description="clicking it would expand/show the items in cart"
-                            defaultMessage="{itemCount, plural, =0 {0 items} one {# item} other {# items}} in cart"
-                            values={{itemCount: totalItems}}
-                        />
-                    </Box>
-                    <AccordionIcon />
-                </AccordionButton>
-                <AccordionPanel px={0} py={4}>
-                    <Stack spacing={5} align="flex-start" divider={<Divider />}>
+        <Accordion.Root allowToggle={true} width="100%">
+            <Accordion.Item style={{border: 0}}>
+                <Accordion.ItemTrigger>
+                    <Button variant="link" color="blue.700">
+                        <BasketIcon aria-hidden={true} />
+                        <Box px={2}>
+                            <FormattedMessage
+                                id="order_summary.cart_items.action.num_of_items_in_cart"
+                                description="clicking it would expand/show the items in cart"
+                                defaultMessage="{itemCount, plural, =0 {0 items} one {# item} other {# items}} in cart"
+                                values={{itemCount: totalItems}}
+                            />
+                        </Box>
+                    </Button>
+                </Accordion.ItemTrigger>
+                <Accordion.ItemContent px={0} py={4}>
+                    <Stack spacing={5} align="flex-start" divider={<Separator />}>
                         {basket.productItems?.map((product, idx) => {
                             const variant = {
                                 ...product,
@@ -106,9 +94,9 @@ const CartItems = ({basket}) => {
                             />
                         </Button>
                     </Stack>
-                </AccordionPanel>
-            </AccordionItem>
-        </Accordion>
+                </Accordion.ItemContent>
+            </Accordion.Item>
+        </Accordion.Root>
     )
 }
 
@@ -264,7 +252,7 @@ const OrderSummary = ({
                         <PromoCode {...promoCodeProps} />
                     </Box>
                 ) : (
-                    <Divider />
+                    <Separator />
                 )}
 
                 <Stack spacing={4} w="full">

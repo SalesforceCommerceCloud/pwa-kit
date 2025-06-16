@@ -6,32 +6,27 @@
  */
 import React from 'react'
 import PropTypes from 'prop-types'
-import {
-    Box,
-    IconButton,
-    Popover,
-    PopoverArrow,
-    PopoverBody,
-    PopoverCloseButton,
-    PopoverContent,
-    PopoverHeader,
-    PopoverTrigger,
-    Text
-} from '@chakra-ui/react'
+import {Box, IconButton, Popover, CloseButton, Text} from '@chakra-ui/react'
 import {InfoIcon} from '../../components/icons'
 import {FormattedMessage, useIntl} from 'react-intl'
 
 /**
- * This component renders a small info icon and displays a popover when hovered. It could be adapted
- * to handle any kind of popover if needed, but for now its been set up to be used/shared for displaying
+ * This component renders a small info icon and displays a popoverPopover. when hovered. It could be adapted
+ * to handle any kind of popoverPopover. if needed, but for now its been set up to be used/shared for displaying
  * promotions applied to products and/or orders on cart, checkout, order confirmation and order history.
  */
 const PromoPopover = ({header, children, ...props}) => {
     const intl = useIntl()
     return (
         <Box position="relative" {...props}>
-            <Popover isLazy placement="top" boundary="scrollParent" trigger="hover" variant="small">
-                <PopoverTrigger>
+            <Popover.Root
+                isLazy
+                placement="top"
+                boundary="scrollParent"
+                trigger="hover"
+                variant="small"
+            >
+                <Popover.Trigger>
                     <IconButton
                         icon={
                             <InfoIcon
@@ -50,29 +45,29 @@ const PromoPopover = ({header, children, ...props}) => {
                         position="relative"
                         variant="unstyled"
                         aria-label={intl.formatMessage({
-                            id: 'promo_popover.assistive_msg.info',
+                            id: 'promo_popoverPopover..assistive_msg.info',
                             defaultMessage: 'Info'
                         })}
                     />
-                </PopoverTrigger>
-                <PopoverContent border="none" borderRadius="base">
+                </Popover.Trigger>
+                <Popover.Content border="none" borderRadius="base">
                     <Box boxShadow="lg">
-                        <PopoverArrow />
-                        <PopoverCloseButton />
-                        <PopoverHeader borderBottom="none">
+                        <Popover.Arrow />
+                        <CloseButton />
+                        <Popover.Header borderBottom="none">
                             {header || (
                                 <Text fontWeight="bold" fontSize="md">
                                     <FormattedMessage
                                         defaultMessage="Promotions Applied"
-                                        id="promo_popover.heading.promo_applied"
+                                        id="promo_popoverPopover..heading.promo_applied"
                                     />
                                 </Text>
                             )}
-                        </PopoverHeader>
-                        <PopoverBody pt={0}>{children}</PopoverBody>
+                        </Popover.Header>
+                        <Popover.Body pt={0}>{children}</Popover.Body>
                     </Box>
-                </PopoverContent>
-            </Popover>
+                </Popover.Content>
+            </Popover.Root>
         </Box>
     )
 }

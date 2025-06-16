@@ -131,50 +131,58 @@ export default function ShippingOptions() {
                                 control={form.control}
                                 defaultValue=""
                                 render={({field: {value, onChange}}) => (
-                                    <RadioGroup
+                                    <RadioGroup.Root
                                         name="shipping-options-radiogroup"
                                         value={value}
-                                        onChange={onChange}
+                                        onValueChange={({value: newValue}) => onChange(newValue)}
                                     >
                                         <Stack spacing={5}>
                                             {shippingMethods.applicableShippingMethods.map(
                                                 (opt) => (
-                                                    <Radio value={opt.id} key={opt.id}>
-                                                        <Flex justify="space-between" w="full">
-                                                            <Box>
-                                                                <Text>{opt.name}</Text>
-                                                                <Text
-                                                                    fontSize="sm"
-                                                                    color="gray.600"
-                                                                >
-                                                                    {opt.description}
+                                                    <RadioGroup.Item value={opt.id} key={opt.id}>
+                                                        <RadioGroup.ItemHiddenInput />
+                                                        <RadioGroup.ItemControl>
+                                                            <RadioGroup.ItemIndicator />
+                                                        </RadioGroup.ItemControl>
+                                                        <RadioGroup.ItemText>
+                                                            <Flex justify="space-between" w="full">
+                                                                <Box>
+                                                                    <Text>{opt.name}</Text>
+                                                                    <Text
+                                                                        fontSize="sm"
+                                                                        color="gray.600"
+                                                                    >
+                                                                        {opt.description}
+                                                                    </Text>
+                                                                </Box>
+                                                                <Text fontWeight="bold">
+                                                                    <FormattedNumber
+                                                                        value={opt.price}
+                                                                        style="currency"
+                                                                        currency={currency}
+                                                                    />
                                                                 </Text>
-                                                            </Box>
-                                                            <Text fontWeight="bold">
-                                                                <FormattedNumber
-                                                                    value={opt.price}
-                                                                    style="currency"
-                                                                    currency={currency}
-                                                                />
-                                                            </Text>
-                                                        </Flex>
+                                                            </Flex>
 
-                                                        {opt.shippingPromotions?.map((promo) => {
-                                                            return (
-                                                                <Text
-                                                                    key={promo.promotionId}
-                                                                    fontSize="sm"
-                                                                    color="green.600"
-                                                                >
-                                                                    {promo.calloutMsg}
-                                                                </Text>
-                                                            )
-                                                        })}
-                                                    </Radio>
+                                                            {opt.shippingPromotions?.map(
+                                                                (promo) => {
+                                                                    return (
+                                                                        <Text
+                                                                            key={promo.promotionId}
+                                                                            fontSize="sm"
+                                                                            color="green.600"
+                                                                        >
+                                                                            {promo.calloutMsg}
+                                                                        </Text>
+                                                                    )
+                                                                }
+                                                            )}
+                                                        </RadioGroup.ItemText>
+                                                    </RadioGroup.Item>
                                                 )
                                             )}
                                         </Stack>
-                                    </RadioGroup>
+                                    </RadioGroup.Root>
                                 )}
                             />
                         )}

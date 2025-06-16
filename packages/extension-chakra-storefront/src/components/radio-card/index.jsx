@@ -6,70 +6,66 @@
  */
 import React from 'react'
 import PropTypes from 'prop-types'
-import {Box, useRadio, useRadioGroup} from '@chakra-ui/react'
+import {RadioCard as ChakraRadioCard, Box} from '@chakra-ui/react'
 import {CheckIcon} from '../../components/icons'
 
-const RadioCardGroupContext = React.createContext()
+// RadioCardGroup is now just a wrapper around ChakraRadioCard.Root
+export const RadioCardGroup = ({children, ...props}) => {
+    return <ChakraRadioCard.Root {...props}>{children}</ChakraRadioCard.Root>
+}
 
-export const RadioCard = (props) => {
-    const getRadioGroupProps = React.useContext(RadioCardGroupContext)
-    const {getInputProps, getRadioProps} = useRadio(getRadioGroupProps(props))
-
-    const input = getInputProps()
-    const checkbox = getRadioProps()
+// RadioCard is now a wrapper around ChakraRadioCard.Item with custom styling
+export const RadioCard = ({children, ...props}) => {
     return (
-        <Box as="label">
-            <input {...input} />
-            <Box
-                {...checkbox}
-                aria-hidden={false}
-                position="relative"
-                cursor="pointer"
-                border="1px solid"
-                borderColor="gray.200"
-                borderRadius="base"
-                height="full"
-                _checked={{
-                    borderColor: 'blue.600'
-                }}
-                _focus={{
-                    boxShadow: 'outline'
-                }}
-                px={4}
-                py={4}
-            >
-                {input.checked && (
-                    <Box
-                        position="absolute"
-                        top={0}
-                        right={0}
-                        w={0}
-                        h={0}
-                        borderStyle="solid"
-                        borderWidth="0 38px 38px 0"
-                        borderColor="transparent"
-                        borderRightColor="blue.600"
-                    >
-                        <CheckIcon color="white" position="absolute" right="-40px" top="1px" />
-                    </Box>
-                )}
-
-                {props.children}
-            </Box>
-        </Box>
+        <ChakraRadioCard.Item {...props}>
+            <ChakraRadioCard.ItemHiddenInput />
+            <ChakraRadioCard.ItemControl>
+                <Box
+                    position="relative"
+                    cursor="pointer"
+                    border="1px solid"
+                    borderColor="gray.200"
+                    borderRadius="base"
+                    height="full"
+                    _checked={{
+                        borderColor: 'blue.600'
+                    }}
+                    _focus={{
+                        boxShadow: 'outline'
+                    }}
+                    px={4}
+                    py={4}
+                >
+                    {props.value && (
+                        <Box
+                            position="absolute"
+                            top={0}
+                            right={0}
+                            w={0}
+                            h={0}
+                            borderStyle="solid"
+                            borderWidth="0 38px 38px 0"
+                            borderColor="transparent"
+                            borderRightColor="blue.600"
+                        >
+                            <CheckIcon color="white" position="absolute" right="-40px" top="1px" />
+                        </Box>
+                    )}
+                    <ChakraRadioCard.ItemText>{children}</ChakraRadioCard.ItemText>
+                </Box>
+            </ChakraRadioCard.ItemControl>
+        </ChakraRadioCard.Item>
     )
 }
 
-export const RadioCardGroup = (props) => {
-    const {getRootProps, getRadioProps} = useRadioGroup(props)
-    const group = getRootProps()
-
-    return (
-        <RadioCardGroupContext.Provider value={getRadioProps}>
-            <Box {...group}>{props.children}</Box>
-        </RadioCardGroupContext.Provider>
-    )
+RadioCard.propTypes = {
+    children: PropTypes.any,
+    value: PropTypes.string
 }
 
-RadioCard.propTypes = {children: PropTypes.any}
-RadioCardGroup.propTypes = {children: PropTypes.any}
+RadioCardGroup.propTypes = {
+    children: PropTypes.any,
+    defaultValue: PropTypes.string,
+    value: PropTypes.string,
+    onChange: PropTypes.func
+}

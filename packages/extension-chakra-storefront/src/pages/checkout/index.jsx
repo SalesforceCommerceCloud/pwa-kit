@@ -6,7 +6,8 @@
  */
 import React, {useEffect, useState} from 'react'
 import {FormattedMessage, useIntl} from 'react-intl'
-import {Alert, AlertIcon, Box, Button, Container, Grid, GridItem, Stack} from '@chakra-ui/react'
+import {Alert, Box, Button, Container, Grid, GridItem, Stack} from '@chakra-ui/react'
+import {AlertIcon} from '../../components/icons'
 import useNavigation from '../../hooks/use-navigation'
 import {CheckoutProvider, useCheckout} from '../../pages/checkout/util/checkout-context'
 import ContactInfo from '../../pages/checkout/partials/contact-info'
