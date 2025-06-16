@@ -101,6 +101,7 @@ export default function useCustomer() {
                     })
                     skeletonCustomer = getSkeletonCustomer()
                 }
+
                 if (skeletonCustomer.authType === 'guest') {
                     setCustomer(skeletonCustomer)
                 } else {

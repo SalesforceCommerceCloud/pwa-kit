@@ -106,6 +106,7 @@ beforeEach(() => {
     )
 })
 afterEach(() => {
+    jest.resetModules()
     localStorage.clear()
 })
 
@@ -133,11 +134,21 @@ test('Allows customer to sign in to their account', async () => {
     expect(await screen.findByText(/darek@test.com/i, {}, {timeout: 30000})).toBeInTheDocument()
 })
 
-test('Renders error when given incorrect log in credentials', async () => {
+test.only('Renders error when given incorrect log in credentials', async () => {
     // mock failed auth request
     global.server.use(
+        rest.get('*/customers', (req, res, ctx) => {
+            return res(ctx.delay(0), ctx.status(404), ctx.json({message: 'Not Found.'}))
+        }),
         rest.post('*/oauth2/login', (req, res, ctx) =>
-            res(ctx.delay(0), ctx.status(401), ctx.json({message: 'Invalid Credentials.'}))
+            res(
+                ctx.delay(0),
+                ctx.status(401),
+                ctx.json({
+                    status_code: '401 UNAUTHORIZED',
+                    message: 'Invalid Credentials.'
+                })
+            )
         )
     )
 

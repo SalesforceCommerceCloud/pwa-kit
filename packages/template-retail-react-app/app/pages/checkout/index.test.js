@@ -12,7 +12,7 @@ import user from '@testing-library/user-event'
 import {rest} from 'msw'
 import {renderWithProviders, createPathWithDefaults} from '../../utils/test-utils'
 import useShopper from '../../commerce-api/hooks/useShopper'
-import Auth from '../../commerce-api/auth'
+// import Auth from '../../commerce-api/auth'
 import {
     ocapiBasketWithItem,
     ocapiOrderResponse,
@@ -118,7 +118,7 @@ beforeEach(() => {
                 ctx.json({
                     authType: 'guest',
                     preferredLocale: 'en_US',
-                    ...mockedRegisteredCustomer,
+                    ...mockedGuestCustomer,
                     // Mocked customer ID should match the mocked basket's customer ID as
                     // it would with real usage, otherwise, the useShopper hook will detect
                     // the mismatch and attempt to refetch a new basket for the customer.
@@ -144,7 +144,7 @@ test('Can proceed through checkout steps as guest', async () => {
     // update this object, which essentially mimics a saved basket on the backend.
     let currentBasket = JSON.parse(JSON.stringify(ocapiBasketWithItem))
 
-    jest.spyOn(Auth.prototype, 'login').mockReturnValue(mockedGuestCustomer)
+    // jest.spyOn(Auth.prototype, 'login').mockReturnValue(mockedGuestCustomer)
 
     // Set up additional requests for intercepting/mocking for just this test.
     global.server.use(
@@ -340,15 +340,30 @@ test('Can proceed through checkout steps as guest', async () => {
     expect(await screen.findByText(/success/i)).toBeInTheDocument()
 })
 
-test('Can proceed through checkout as registered customer', async () => {
+test.only('Can proceed through checkout as registered customer', async () => {
     // Keep a *deep* of the initial mocked basket. Our mocked fetch responses will continuously
     // update this object, which essentially mimics a saved basket on the backend.
     let currentBasket = JSON.parse(JSON.stringify(ocapiBasketWithItem))
-
-    jest.spyOn(Auth.prototype, 'login').mockReturnValue(mockedRegisteredCustomer)
+    let currentCustomerAuthType = 'guest';
+    // jest.spyOn(Auth.prototype, 'login').mockReturnValue(mockedRegisteredCustomer)
 
     // Set up additional requests for intercepting/mocking for just this test.
     global.server.use(
+        rest.get('*/customers/:customerId', (req, res, ctx) => {
+            return res(
+                ctx.delay(0),
+                ctx.status(200),
+                ctx.json({
+                    authType: currentCustomerAuthType,
+                    preferredLocale: 'en_US',
+                    ...(currentCustomerAuthType === 'guest' ? mockedGuestCustomer : mockedRegisteredCustomer),
+                    // Mocked customer ID should match the mocked basket's customer ID as
+                    // it would with real usage, otherwise, the useShopper hook will detect
+                    // the mismatch and attempt to refetch a new basket for the customer.
+                    customerId: ocapiBasketWithItem.customer_info.customer_id
+                })
+            )
+        }),
         // mock adding guest email to basket
         rest.put('*/baskets/:basketId/customer', (req, res, ctx) => {
             currentBasket.customer_info.email = 'customer@test.com'
@@ -466,7 +481,9 @@ test('Can proceed through checkout as registered customer', async () => {
     user.type(pwInput, 'Password!1')
     user.click(loginBtn)
 
-    // Wait for next step to render
+    currentCustomerAuthType = 'registered'
+    
+
     await waitFor(() =>
         expect(screen.getByTestId('sf-toggle-card-step-1-content')).not.toBeEmptyDOMElement()
     )
@@ -541,7 +558,7 @@ test('Can edit address during checkout as a registered customer', async () => {
     // update this object, which essentially mimics a saved basket on the backend.
     let currentBasket = JSON.parse(JSON.stringify(ocapiBasketWithItem))
 
-    jest.spyOn(Auth.prototype, 'login').mockReturnValue(mockedRegisteredCustomer)
+    // jest.spyOn(Auth.prototype, 'login').mockReturnValue(mockedRegisteredCustomer)
 
     // Set up additional requests for intercepting/mocking for just this test.
     global.server.use(
@@ -635,7 +652,7 @@ test('Can add address during checkout as a registered customer', async () => {
     // update this object, which essentially mimics a saved basket on the backend.
     let currentBasket = JSON.parse(JSON.stringify(ocapiBasketWithItem))
 
-    jest.spyOn(Auth.prototype, 'login').mockReturnValue(mockedRegisteredCustomer)
+    // jest.spyOn(Auth.prototype, 'login').mockReturnValue(mockedRegisteredCustomer)
 
     // Set up additional requests for intercepting/mocking for just this test.
     global.server.use(

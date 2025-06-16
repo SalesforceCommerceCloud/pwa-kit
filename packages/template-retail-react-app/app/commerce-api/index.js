@@ -156,7 +156,6 @@ class CommerceAPI {
 
                         if (self.auth.pendingToken) {
                             await self.auth.pendingToken
-                            console.log('pendingToken resolved', self.auth.pendingToken)
                         }
 
                         // Handle auth logic (replacing willSendRequest functionality)

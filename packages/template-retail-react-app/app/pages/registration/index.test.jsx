@@ -28,44 +28,6 @@ const mockRegisteredCustomer = {
     login: 'darek@test.com'
 }
 
-const mockPasswordToken = {
-    email: 'foo@test.com',
-    expiresInMinutes: 10,
-    login: 'foo@test.com',
-    resetToken: 'testresettoken'
-}
-
-jest.mock('../../commerce-api/auth', () => {
-    return class AuthMock {
-        login() {
-            return mockRegisteredCustomer
-        }
-    }
-})
-
-jest.mock('../../commerce-api/utils', () => {
-    const originalModule = jest.requireActual('../../commerce-api/utils')
-    return {
-        ...originalModule,
-        isTokenExpired: jest.fn().mockReturnValue(false),
-        hasSFRAAuthStateChanged: jest.fn().mockReturnValue(false),
-        createGetTokenBody: jest.fn().mockReturnValue({
-            grantType: 'test',
-            code: 'test',
-            usid: 'test',
-            codeVerifier: 'test',
-            redirectUri: 'http://localhost/test'
-        })
-    }
-})
-
-jest.mock('../../commerce-api/pkce', () => {
-    return {
-        createCodeVerifier: jest.fn().mockReturnValue('codeverifier'),
-        generateCodeChallenge: jest.fn().mockReturnValue('codechallenge')
-    }
-})
-
 const MockedComponent = () => {
     const match = {
         params: {pageName: 'profile'}
@@ -89,9 +51,6 @@ beforeEach(() => {
         }),
         rest.get('*/customers/:customerId', (req, res, ctx) => {
             return res(ctx.delay(0), ctx.status(200), ctx.json(mockRegisteredCustomer))
-        }),
-        rest.post('*/customers/password/actions/create-reset-token', (req, res, ctx) => {
-            return res(ctx.delay(0), ctx.status(200), ctx.json(mockPasswordToken))
         })
     )
 })

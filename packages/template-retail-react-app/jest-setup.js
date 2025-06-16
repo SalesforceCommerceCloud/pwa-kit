@@ -45,8 +45,8 @@ export const setupMockServer = () => {
             )
         }),
         rest.post('*/sessions', (req, res, ctx) => res(ctx.delay(0), ctx.status(200))),
-        rest.post('*/oauth2/token', (req, res, ctx) =>
-            res(
+        rest.post('*/oauth2/token', (req, res, ctx) => {
+            return res(
                 ctx.delay(0),
                 ctx.json({
                     // FYI decoded token has this payload:
@@ -67,7 +67,7 @@ export const setupMockServer = () => {
                     id_token: 'testIdToken'
                 })
             )
-        ),
+        }),
         rest.get('*/categories/:categoryId', (req, res, ctx) =>
             res(ctx.delay(0), ctx.status(200), ctx.json(mockCategory))
         ),
@@ -159,4 +159,81 @@ Object.defineProperty(window, 'matchMedia', {
         removeEventListener: jest.fn(),
         dispatchEvent: jest.fn()
     }))
+})
+
+// Mock @tanstack/react-query
+jest.mock('@tanstack/react-query', () => {
+    const originalModule = jest.requireActual('@tanstack/react-query')
+    return {
+        ...originalModule,
+        QueryClient: jest.fn().mockImplementation(() => ({
+            mount: jest.fn(),
+            unmount: jest.fn(),
+            isFetching: jest.fn().mockReturnValue(false),
+            isMutating: jest.fn().mockReturnValue(false),
+            getQueryData: jest.fn(),
+            setQueryData: jest.fn(),
+            getQueryCache: jest.fn().mockReturnValue({
+                findAll: jest.fn().mockReturnValue([]),
+                subscribe: jest.fn()
+            }),
+            getMutationCache: jest.fn().mockReturnValue({
+                findAll: jest.fn().mockReturnValue([]),
+                subscribe: jest.fn()
+            }),
+            invalidateQueries: jest.fn(),
+            refetchQueries: jest.fn(),
+            clear: jest.fn()
+        })),
+        QueryClientProvider: ({children}) => children
+    }
+})
+
+jest.mock('@salesforce/commerce-sdk-react', () => {
+    return {
+        CommerceApiProvider: ({children}) => children,
+        AuthHelpers: {
+            LoginRegisteredUserB2C: 'LoginRegisteredUserB2C',
+            Logout: 'Logout'
+        },
+        useAuthHelper: jest.fn().mockReturnValue({
+            mutateAsync: jest.fn().mockResolvedValue({})
+        }),
+        useAccessToken: jest.fn().mockReturnValue('mock-access-token'),
+        useCustomerId: jest.fn().mockReturnValue('mock-customer-id'),
+        useEncUserId: jest.fn().mockReturnValue('mock-enc-user-id')
+    }
+})
+
+jest.mock('@salesforce/commerce-sdk-react/auth', () => {
+    return class MockAuth {
+        login() {
+            return {}
+        }
+        getAccessToken() {
+            return 'access_token'
+        }
+        handleTokenResponse() {
+            return Promise.resolve({})
+        }
+        clearStorage() {
+            return Promise.resolve()
+        }
+        ready() {
+            return Promise.resolve()
+        }
+        get(key) {
+            return key
+        }
+    }
+})
+
+jest.mock('@salesforce/commerce-sdk-react/utils', () => {
+    return {
+        getDefaultCookieAttributes: jest.fn().mockReturnValue({}),
+        getParentOrigin: jest.fn().mockReturnValue('http://localhost'),
+        isOriginTrusted: jest.fn().mockReturnValue(true),
+        onClient: jest.fn().mockReturnValue(true),
+        transformSDKClient: jest.fn().mockImplementation((sdkClient) => sdkClient)
+    }
 })
