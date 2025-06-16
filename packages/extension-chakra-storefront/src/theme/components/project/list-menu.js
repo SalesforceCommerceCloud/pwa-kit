@@ -7,7 +7,7 @@
 import {defineSlotRecipe} from '@chakra-ui/react'
 
 export default defineSlotRecipe({
-    slots: ['container', 'stackContainer', 'popoverContent', 'popoverContainer', 'listMenuTriggerContainer', 'listMenuTriggerLink', 'listMenuTriggerLinkActive', 'listMenuTriggerLinkIcon'],
+    slots: ['container', 'stackContainer', 'popoverBody', 'popoverContent', 'popoverContainer', 'listMenuTriggerContainer', 'listMenuTriggerLink', 'listMenuTriggerLinkActive', 'listMenuTriggerLinkIcon'],
     base: {
         container: {
             minWidth: 'xs',
@@ -15,7 +15,6 @@ export default defineSlotRecipe({
             flexDirection: 'row',
             justifyContent: 'flex-start',
             alignItems: 'flex-start',
-            paddingLeft: 4,
             display: {base: 'none', lg: 'flex'}
         },
         stackContainer: {
@@ -23,11 +22,13 @@ export default defineSlotRecipe({
             flexWrap: 'wrap'
         },
         popoverContent: {
-            marginLeft: 'auto',
-            marginRight: 'auto',
-            border: 0,
-            minWidth: '100%',
-            position: 'absolute'
+            backgroundColor: 'white',
+            minWidth: 'calc(100vw + 8px)',
+            position: 'relative',
+            marginLeft: -8,
+            left: 0,
+            top: 0,
+            zIndex: "sticky"
         },
         popoverBody: {
             boxShadow: 'xl',

@@ -5,13 +5,12 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, {useRef, useState} from 'react'
+import React, {useState} from 'react'
 import PropTypes from 'prop-types'
+import {Box, Popover, Portal, useSlotRecipe} from '@chakra-ui/react'
 
 import {ListMenuContent} from '../../components/list-menu/list-menu-content'
 import {ListMenuTrigger} from '../../components/list-menu/list-menu-trigger'
-
-import {Box, Popover, Portal, useSlotRecipe} from '@chakra-ui/react'
 
 const ListMenuPopover = ({contentComponent, item, name, itemsKey, maxColumns}) => {
     const [open, setOpen] = useState(false)
@@ -25,8 +24,10 @@ const ListMenuPopover = ({contentComponent, item, name, itemsKey, maxColumns}) =
         <Popover.Root
             open={open}
             onOpenChange={setOpen}
+            positioning={{placement: 'bottom-start', offset: { mainAxis: 12, crossAxis: 12 },}}
             lazyMounted
-            positioning={{placement: 'bottom-start'}}
+            portalled
+            unstyled
         >
             <Popover.Trigger asChild>
                 <Box onMouseEnter={onOpen} onMouseLeave={onClose}>
