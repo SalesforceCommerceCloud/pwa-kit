@@ -1,9 +1,4 @@
 ---
-description: 
-globs: 
-alwaysApply: false
----
----
 description: USE WHEN writing unit tests for components in template packages
 globs: ["packages/template-*/*/components/**/*.test.{js,jsx,ts,tsx}"]
 alwaysApply: false
