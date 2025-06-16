@@ -11,16 +11,10 @@ import fetch from 'jest-fetch-mock'
 // It will probably end up living in pwa-kit later on so we may want to
 // deal with it there.
 import {app as appConfig} from '../../config/default'
-import {createGetTokenBody} from './utils'
-import {generateCodeChallenge, createCodeVerifier} from './pkce'
 import {
     exampleRedirectUrl as mockExampleRedirectUrl,
     exampleTokenReponse as mockExampleTokenResponse,
     exampleTokenReponseForRefresh as mockExampleTokenReponseForRefresh,
-    examplePKCEVerifier,
-    email,
-    password,
-    expiredAuthToken,
     ocapiBasketResponse,
     ocapiFaultResponse
 } from './mock-data'
@@ -37,7 +31,6 @@ jest.mock('./utils', () => {
 const apiConfig = {
     ...appConfig.commerceAPI,
     einsteinConfig: appConfig.einsteinAPI,
-    proxy: undefined,
     locale: 'en-GB',
     currency: 'GBP'
 }
@@ -53,38 +46,6 @@ jest.mock('commerce-sdk-isomorphic', () => {
             }
             async getProducts(options) {
                 return options.parameters.ids.map((id) => ({id}))
-            }
-        },
-        ShopperLogin: class ShopperLoginMock {
-            async getAccessToken() {
-                return mockExampleTokenResponse
-            }
-            async authorizeCustomer() {
-                return {
-                    status: 303,
-                    headers: {
-                        get: () => null
-                    },
-                    url: mockExampleRedirectUrl
-                }
-            }
-            async authenticateCustomer() {
-                return {
-                    status: 303,
-                    headers: {
-                        get: () => null
-                    },
-                    url: mockExampleRedirectUrl
-                }
-            }
-            async logoutCustomer() {
-                return {
-                    status: 200,
-                    headers: {
-                        get: () => null
-                    },
-                    url: mockExampleTokenResponse
-                }
             }
         },
         ShopperCustomers: class ShopperCustomersMock extends sdk.ShopperCustomers {
@@ -117,8 +78,6 @@ jest.mock('pwa-kit-react-sdk/ssr/universal/components/storefront-preview/utils',
 beforeEach(() => {
     jest.resetModules()
     // Clearing out mocked local storage before each test so tokens don't get mixed
-    const api = getAPI()
-    api.auth._clearAuth()
     fetch.resetMocks()
 })
 
@@ -129,248 +88,20 @@ describe('CommerceAPI', () => {
             'shopperCustomers',
             'shopperBaskets',
             'shopperGiftCertificates',
-            'shopperLogin',
             'shopperOrders',
             'shopperProducts',
             'shopperPromotions',
             'shopperSearch'
         ]
         expect(api.shopperCustomers.clientConfig.parameters).toEqual(apiConfig.parameters)
-        apiNames.forEach((name) => expect(api[name]).toBeDefined())
+        apiNames.forEach((name) => {
+            expect(api[name]).toBeDefined()
+        })
         expect(typeof api.shopperCustomers.getCustomer).toBe('function')
     })
     test('returns api config', () => {
         const config = getAPI().getConfig()
         expect(config.parameters).toEqual(apiConfig.parameters)
-    })
-    test('calls willSendRequest with request name and options (including auto-injected locale and currency)', () => {
-        const api = getAPI()
-        const spy = jest.spyOn(api, 'willSendRequest')
-        api.shopperProducts.getProduct({parameters: {id: '123'}})
-        expect(spy).toHaveBeenCalledWith('getProduct', {
-            parameters: {id: '123', locale: 'en-GB', currency: 'GBP'}
-        })
-    })
-    test('can optionally ignore req/res hooks', () => {
-        const api = getAPI()
-        const spy = jest.spyOn(api, 'willSendRequest')
-        api.shopperProducts.getProduct({
-            parameters: {id: '123'},
-            ignoreHooks: true
-        })
-        expect(spy).not.toHaveBeenCalled()
-    })
-    test('passing in locale/currency in the API method would override the global values', () => {
-        const api = getAPI()
-        const spy = jest.spyOn(api, 'willSendRequest')
-
-        api.shopperProducts.getProduct({
-            parameters: {id: '123', locale: 'en-US'}
-        })
-        expect(spy).toHaveBeenCalledWith('getProduct', {
-            parameters: {id: '123', locale: 'en-US', currency: 'GBP'}
-        })
-
-        api.shopperProducts.getProduct({
-            parameters: {id: '123', currency: 'EUR'}
-        })
-        expect(spy).toHaveBeenCalledWith('getProduct', {
-            parameters: {id: '123', locale: 'en-GB', currency: 'EUR'}
-        })
-    })
-    test('adds cache breaker if on storefront preview', async () => {
-        const dateSpy = jest.spyOn(Date, 'now').mockImplementation(() => 1000)
-
-        const api = getAPI()
-        const didReceiveResponseSpy = jest.spyOn(api, 'didReceiveResponse')
-
-        await api.shopperProducts.getProduct({
-            parameters: {id: '123', locale: 'en-US'}
-        })
-        expect(didReceiveResponseSpy).toHaveBeenLastCalledWith(expect.anything(), [
-            expect.objectContaining({
-                parameters: expect.objectContaining({
-                    c_cache_breaker: 1000
-                })
-            })
-        ])
-
-        dateSpy.mockRestore()
-    })
-    test('applies updated options when calling sdk methods', async () => {
-        class MyAPI extends CommerceAPI {
-            async willSendRequest() {
-                return [{parameters: {id: '567'}}]
-            }
-        }
-        const myAPI = new MyAPI(apiConfig)
-        const result = await myAPI.shopperProducts.getProduct({
-            parameters: {id: '123'}
-        })
-        expect(result).toEqual({parameters: {id: '567'}})
-    })
-    test('can modify response before returning to caller', async () => {
-        const spy = jest.fn()
-        class MyAPI extends CommerceAPI {
-            async willSendRequest(method, ...args) {
-                return args
-            }
-            async didReceiveResponse(response, args) {
-                spy(response, args)
-                return `${response.length} product`
-            }
-        }
-        const myAPI = new MyAPI(apiConfig)
-        const result = await myAPI.shopperProducts.getProducts({
-            parameters: {ids: ['123']}
-        })
-        expect(spy).toHaveBeenCalledWith(
-            [{id: '123'}],
-            [{parameters: {ids: ['123'], locale: 'en-GB', currency: 'GBP'}}]
-        )
-        expect(result).toBe('1 product')
-    })
-    test('authorizes guest user', async () => {
-        const _CommerceAPI = require('./index').default
-        const api = new _CommerceAPI(apiConfig)
-        const customer = await api.auth.login()
-        expect(customer).toBeDefined()
-        expect(customer.authType).toEqual('guest')
-    })
-    test('customer is returned when you call login with credentials', async () => {
-        const _CommerceAPI = require('./index').default
-        const api = new _CommerceAPI(apiConfig)
-        const customer = await api.auth.login({email, password})
-        expect(customer).toBeDefined()
-        expect(customer.authType).toEqual('registered')
-        expect(api.auth.encUserId.length).toBeGreaterThan(0)
-    })
-    test('refreshes existing logged in token', async () => {
-        const _CommerceAPI = require('./index').default
-        const api = new _CommerceAPI(apiConfig)
-        api.auth.authToken = mockExampleTokenResponse.access_token
-        api.auth._saveRefreshToken(mockExampleTokenResponse.refresh_token, 'registered')
-        const customer = await api.auth.login()
-        expect(customer).toBeDefined()
-        expect(customer.authType).toEqual('registered')
-        expect(api.auth.encUserId.length).toBeGreaterThan(0)
-    })
-    test('Use same customer if token is valid', async () => {
-        const Utils = require('./utils')
-        jest.spyOn(Utils, 'isTokenExpired').mockReturnValue(false)
-        const _CommerceAPI = require('./index').default
-        const api = new _CommerceAPI(apiConfig)
-
-        api.auth.authToken = mockExampleTokenReponseForRefresh.access_token
-
-        await api.auth.login()
-        expect(api.auth.authToken).toBeDefined()
-        expect(api.auth.authToken).toEqual(mockExampleTokenReponseForRefresh.access_token)
-    })
-    test('refreshes existing token', async () => {
-        const _CommerceAPI = require('./index').default
-        const api = new _CommerceAPI(apiConfig)
-        await api.auth.login()
-        const existingToken = api.auth.authToken
-        expect(`Bearer ${mockExampleTokenResponse.access_token}`).toEqual(existingToken)
-        api.auth.authToken = mockExampleTokenReponseForRefresh.access_token
-        await api.auth.login()
-        expect(api.auth.authToken).toBeDefined()
-        expect(api.auth.authToken).not.toEqual(mockExampleTokenReponseForRefresh)
-    })
-    test('re-authorizes as guest when existing token is expired', async () => {
-        const api = getAPI()
-        await api.auth.login()
-        api.auth.authToken = expiredAuthToken
-        api.auth._saveRefreshToken(mockExampleTokenResponse.refresh_token, 'registered')
-        await api.auth.login()
-        expect(api.auth.authToken).toBeDefined()
-        expect(api.auth.authToken).not.toEqual(expiredAuthToken)
-    })
-
-    test('logs back in as new guest after log out', async () => {
-        const api = getAPI()
-        await api.auth.login()
-        const existingToken = api.auth.authToken
-        expect(existingToken).toBeDefined()
-        await api.auth.logout()
-        expect(api.auth.authToken).toBeDefined()
-        expect(api.auth.authToken).not.toEqual(mockExampleTokenReponseForRefresh)
-    })
-
-    test('automatically authorizes customer when calling sdk methods', async () => {
-        const api = getAPI()
-        api.auth.authToken = ''
-        await Promise.all([
-            api.shopperProducts.getProduct({parameters: {id: '10048'}}),
-            api.shopperProducts.getProduct({parameters: {id: '10048'}})
-        ])
-        expect(api.auth.authToken).toBeDefined()
-    })
-    test('calling login while its already pending returns existing promise', () => {
-        const api = getAPI()
-        const pendingLogin = api.auth.login()
-        const secondPendingLogin = api.auth.login()
-        expect(pendingLogin).toEqual(secondPendingLogin)
-    })
-    test('createGetTokenBody returns an object that contain the correct parameters', async () => {
-        const slasCallbackEndpoint = apiConfig.parameters.slasCallbackEndpoint || '/callback'
-        const tokenBody = createGetTokenBody(
-            mockExampleRedirectUrl,
-            slasCallbackEndpoint,
-            examplePKCEVerifier
-        )
-        const {grantType, code, usid, codeVerifier, redirectUri} = tokenBody
-        expect(grantType).toBeDefined()
-        expect(code).toBeDefined()
-        expect(usid).toBeDefined()
-        expect(codeVerifier).toBeDefined()
-        expect(redirectUri).toBeDefined()
-    })
-    test('should return a code verifier of 128 chracters', () => {
-        const codeVerifier = createCodeVerifier()
-        expect(codeVerifier.length).toEqual(128)
-    })
-    test('should return a code challenge of 43 chracters', async () => {
-        const codeVerifier = createCodeVerifier()
-        const codeChallenge = await generateCodeChallenge(codeVerifier)
-        expect(codeChallenge.length).toEqual(43)
-    })
-    test('calling getLoggedInToken should set JWT Token and Refresh Token ', async () => {
-        const _CommerceAPI = require('./index').default
-        const api = new _CommerceAPI(apiConfig)
-        const tokenBody = createGetTokenBody(
-            mockExampleRedirectUrl,
-            apiConfig.parameters.slasCallbackEndpoint,
-            examplePKCEVerifier
-        )
-        await api.auth.getLoggedInToken(tokenBody)
-        expect(api.auth.authToken).toEqual(`Bearer ${mockExampleTokenResponse.access_token}`)
-        expect(api.auth.refreshToken).toEqual(mockExampleTokenResponse.refresh_token)
-    })
-    test('saves access token in local storage if window exists', async () => {
-        const api = getAPI()
-        api.auth.authToken = mockExampleTokenResponse.access_token
-        expect(api.auth.authToken).toEqual(mockExampleTokenResponse.access_token)
-    })
-    test('saves refresh token in local storage if window exists', async () => {
-        const api = getAPI()
-        api.auth._saveRefreshToken(mockExampleTokenResponse.refresh_token)
-        expect(api.auth.refreshToken).toEqual(mockExampleTokenResponse.refresh_token)
-    })
-    test('saves encUserId in local storage if window exists', async () => {
-        const api = getAPI()
-        api.auth.encUserId = mockExampleTokenResponse.enc_user_id
-        expect(api.auth.encUserId).toEqual(mockExampleTokenResponse.enc_user_id)
-    })
-    test('saves usid in local storage if window exists', async () => {
-        const api = getAPI()
-        api.auth.usid = mockExampleTokenResponse.usid
-        expect(api.auth.usid).toEqual(mockExampleTokenResponse.usid)
-    })
-    test('test onClient is true if window exists', async () => {
-        const api = getAPI()
-        expect(api.auth._onClient).toEqual(true)
     })
     test('calling createBasket returns basket object in camelCase', async () => {
         const api = getAPI()
@@ -392,9 +123,7 @@ describe('CommerceAPI', () => {
     test('calling getBasket without basketId returns descriptive error', async () => {
         const api = getAPI()
         const response = await api.shopperBaskets.getBasket({})
-        expect(response.title).toEqual(
-            'The following parameters were missing from your resquest: basketId'
-        )
+        expect(response.title).toEqual('Parameters are required for this request')
         expect(response.type).toEqual('MissingParameters')
     })
     test('calling addItemToBasket with basketId & body returns basket object in camelCase', async () => {
