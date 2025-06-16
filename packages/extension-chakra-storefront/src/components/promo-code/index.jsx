@@ -7,20 +7,13 @@
 import React, {useEffect, useState} from 'react'
 import PropTypes from 'prop-types'
 import {FormattedMessage, useIntl} from 'react-intl'
-import {
-    Box,
-    Button,
-    Accordion,
-    AccordionButton,
-    AccordionItem,
-    AccordionPanel
-} from '@chakra-ui/react'
+import {Box, Button, Accordion} from '@chakra-ui/react'
 import {useForm} from 'react-hook-form'
-import {ChevronDownIcon, ChevronUpIcon} from '../../components/icons'
+import {ChevronDownIcon} from '../icons'
 import PromoCodeFields from '../../components/forms/promo-code-fields'
 import {API_ERROR_MESSAGE} from '../../constants'
 import {useShopperBasketsMutation} from '@salesforce/commerce-sdk-react'
-import {useCurrentBasket} from '../../hooks/use-current-basket'
+import {useCurrentBasket} from '../../hooks'
 import useToast from '../../hooks/use-toast'
 
 export const usePromoCode = () => {
@@ -104,43 +97,47 @@ export const PromoCode = ({form, submitPromoCode, itemProps}) => {
     }, [form.formState.isSubmitSuccessful])
 
     return (
-        <Accordion allowToggle index={isOpen ? 0 : -1} onChange={() => setOpen(!isOpen)}>
-            <AccordionItem {...itemProps}>
-                {({isExpanded}) => (
-                    <>
-                        <AccordionButton
-                            as={Button}
-                            justifyContent="flex-start"
-                            variant="link"
-                            fontSize="sm"
-                            color="blue.700"
-                            rightIcon={isExpanded ? <ChevronUpIcon /> : <ChevronDownIcon />}
-                            onClick={() => form.reset()}
+        <Accordion.Root
+            collapsible
+            // index={isOpen ? 0 : -1} onChange={() => setOpen(!isOpen)}
+        >
+            <Accordion.Item {...itemProps}>
+                <Accordion.ItemTrigger asChild>
+                    <Button
+                        justifyContent="flex-start"
+                        variant="link"
+                        fontSize="sm"
+                        color="blue.700"
+                        pl="0"
+                        onClick={() => form.reset()}
+                    >
+                        <FormattedMessage
+                            defaultMessage="Do you have a promo code?"
+                            id="promocode.accordion.button.have_promocode"
+                        />
+                        <Accordion.ItemIndicator asChild>
+                            <ChevronDownIcon />
+                        </Accordion.ItemIndicator>
+                    </Button>
+                </Accordion.ItemTrigger>
+                <Accordion.ItemContent px={0} mb={4}>
+                    <Accordion.ItemBody>
+                        <Box
+                            data-testid="promo-code-form"
+                            as="form"
+                            p={4}
+                            background="white"
+                            border="1px solid"
+                            borderColor="gray.100"
+                            borderRadius="base"
+                            onSubmit={form.handleSubmit(submitPromoCode)}
                         >
-                            <FormattedMessage
-                                defaultMessage="Do you have a promo code?"
-                                id="promocode.accordion.button.have_promocode"
-                            />
-                        </AccordionButton>
-
-                        <AccordionPanel px={0} mb={4}>
-                            <Box
-                                data-testid="promo-code-form"
-                                as="form"
-                                p={4}
-                                background="white"
-                                border="1px solid"
-                                borderColor="gray.100"
-                                borderRadius="base"
-                                onSubmit={form.handleSubmit(submitPromoCode)}
-                            >
-                                <PromoCodeFields form={form} maxWidth="350px" />
-                            </Box>
-                        </AccordionPanel>
-                    </>
-                )}
-            </AccordionItem>
-        </Accordion>
+                            <PromoCodeFields form={form} maxWidth="350px" />
+                        </Box>
+                    </Accordion.ItemBody>
+                </Accordion.ItemContent>
+            </Accordion.Item>
+        </Accordion.Root>
     )
 }
 

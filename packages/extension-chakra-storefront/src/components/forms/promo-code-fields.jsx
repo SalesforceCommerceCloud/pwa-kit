@@ -22,7 +22,7 @@ const PromoCodeFields = ({form, prefix = '', ...props}) => {
                 <Button
                     type="submit"
                     fontSize="sm"
-                    isLoading={form.formState.isSubmitting}
+                    loading={form.formState.isSubmitting}
                     disabled={code?.length < 3}
                 >
                     <FormattedMessage defaultMessage="Apply" id="promo_code_fields.button.apply" />

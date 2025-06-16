@@ -16,7 +16,7 @@ import CartCta from '../../pages/cart/partials/cart-cta'
 import CartSecondaryButtonGroup from '../../pages/cart/partials/cart-secondary-button-group'
 import CartSkeleton from '../../pages/cart/partials/cart-skeleton'
 import CartTitle from '../../pages/cart/partials/cart-title'
-import ConfirmationModal from '../../components/confirmation-modal'
+// import ConfirmationModal from '../../components/confirmation-modal'
 import EmptyCart from '../../pages/cart/partials/empty-cart'
 import OrderSummary from '../../components/order-summary'
 import ProductItem from '../../components/product-item'
@@ -50,7 +50,7 @@ import {
     useShopperCustomersMutation
 } from '@salesforce/commerce-sdk-react'
 import {useCurrentCustomer} from '../../hooks/use-current-customer'
-import UnavailableProductConfirmationModal from '../../components/unavailable-product-confirmation-modal'
+// import UnavailableProductConfirmationModal from '../../components/unavailable-product-confirmation-modal'
 import {getUpdateBundleChildArray} from '../../utils/product-utils'
 
 const DEBOUNCE_WAIT = 750
@@ -663,19 +663,19 @@ const Cart = () => {
             >
                 <CartCta />
             </Box>
-            <ConfirmationModal
-                {...REMOVE_CART_ITEM_CONFIRMATION_DIALOG_CONFIG}
-                onPrimaryAction={() => {
-                    handleRemoveItem(selectedItem)
-                }}
-                onAlternateAction={() => {}}
-                {...modalProps}
-            />
+            {/*<ConfirmationModal*/}
+            {/*    {...REMOVE_CART_ITEM_CONFIRMATION_DIALOG_CONFIG}*/}
+            {/*    onPrimaryAction={() => {*/}
+            {/*        handleRemoveItem(selectedItem)*/}
+            {/*    }}*/}
+            {/*    onAlternateAction={() => {}}*/}
+            {/*    {...modalProps}*/}
+            {/*/>*/}
 
-            <UnavailableProductConfirmationModal
-                productItems={basket?.productItems}
-                handleUnavailableProducts={handleUnavailableProducts}
-            />
+            {/*<UnavailableProductConfirmationModal*/}
+            {/*    productItems={basket?.productItems}*/}
+            {/*    handleUnavailableProducts={handleUnavailableProducts}*/}
+            {/*/>*/}
         </Box>
     )
 }

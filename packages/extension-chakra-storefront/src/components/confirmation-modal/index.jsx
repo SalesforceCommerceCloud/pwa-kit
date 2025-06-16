@@ -8,12 +8,7 @@ import React from 'react'
 import {noop} from '../../utils/utils'
 import {
     Button,
-    AlertDialog,
-    AlertDialogBody,
-    AlertDialogFooter,
-    AlertDialogHeader,
-    AlertDialogContent,
-    AlertDialogOverlay,
+    Dialog,
     Text
 } from '@chakra-ui/react'
 
@@ -45,40 +40,43 @@ const ConfirmationModal = ({
     }
 
     return (
-        <AlertDialog
-            isOpen={props.isOpen}
-            isCentered
-            onClose={handleAlternateActionClick}
+        <Dialog.Root
+            open={props.isOpen}
+            placement="center"
+            onOpenChange={({open}) => !open && handleAlternateActionClick()}
+            role="alertdialog"
             {...props}
         >
-            <AlertDialogOverlay />
-            <AlertDialogContent>
-                <AlertDialogHeader>{formatMessage(dialogTitle)}</AlertDialogHeader>
-                <AlertDialogBody>
-                    <Text>{formatMessage(confirmationMessage)}</Text>
-                </AlertDialogBody>
+            <Dialog.Backdrop />
+            <Dialog.Positioner>
+                <Dialog.Content>
+                    <Dialog.Header>{formatMessage(dialogTitle)}</Dialog.Header>
+                    <Dialog.Body>
+                        <Text>{formatMessage(confirmationMessage)}</Text>
+                    </Dialog.Body>
 
-                <AlertDialogFooter>
-                    {!hideAlternateAction ? (
+                    <Dialog.Footer>
+                        {!hideAlternateAction ? (
+                            <Button
+                                variant="ghost"
+                                mr={3}
+                                aria-label={formatMessage(alternateActionAriaLabel)}
+                                onClick={handleAlternateActionClick}
+                            >
+                                {formatMessage(alternateActionLabel)}
+                            </Button>
+                        ) : null}
                         <Button
-                            variant="ghost"
-                            mr={3}
-                            aria-label={formatMessage(alternateActionAriaLabel)}
-                            onClick={handleAlternateActionClick}
+                            variant="solid"
+                            onClick={handleConfirmClick}
+                            aria-label={formatMessage(primaryActionAriaLabel)}
                         >
-                            {formatMessage(alternateActionLabel)}
+                            {formatMessage(primaryActionLabel)}
                         </Button>
-                    ) : null}
-                    <Button
-                        variant="solid"
-                        onClick={handleConfirmClick}
-                        aria-label={formatMessage(primaryActionAriaLabel)}
-                    >
-                        {formatMessage(primaryActionLabel)}
-                    </Button>
-                </AlertDialogFooter>
-            </AlertDialogContent>
-        </AlertDialog>
+                    </Dialog.Footer>
+                </Dialog.Content>
+            </Dialog.Positioner>
+        </Dialog.Root>
     )
 }
 

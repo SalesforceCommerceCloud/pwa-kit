@@ -10,12 +10,6 @@ import {
     Box,
     IconButton,
     Popover,
-    PopoverArrow,
-    PopoverBody,
-    PopoverCloseButton,
-    PopoverContent,
-    PopoverHeader,
-    PopoverTrigger,
     Text
 } from '@chakra-ui/react'
 import {InfoIcon} from '../../components/icons'
@@ -30,8 +24,8 @@ const PromoPopover = ({header, children, ...props}) => {
     const intl = useIntl()
     return (
         <Box position="relative" {...props}>
-            <Popover isLazy placement="top" boundary="scrollParent" trigger="hover" variant="small">
-                <PopoverTrigger>
+            <Popover.Root lazy placement="top" boundary="scrollParent" trigger="hover" variant="small">
+                <Popover.Trigger>
                     <IconButton
                         icon={
                             <InfoIcon
@@ -54,25 +48,27 @@ const PromoPopover = ({header, children, ...props}) => {
                             defaultMessage: 'Info'
                         })}
                     />
-                </PopoverTrigger>
-                <PopoverContent border="none" borderRadius="base">
-                    <Box boxShadow="lg">
-                        <PopoverArrow />
-                        <PopoverCloseButton />
-                        <PopoverHeader borderBottom="none">
-                            {header || (
-                                <Text fontWeight="bold" fontSize="md">
-                                    <FormattedMessage
-                                        defaultMessage="Promotions Applied"
-                                        id="promo_popover.heading.promo_applied"
-                                    />
-                                </Text>
-                            )}
-                        </PopoverHeader>
-                        <PopoverBody pt={0}>{children}</PopoverBody>
-                    </Box>
-                </PopoverContent>
-            </Popover>
+                </Popover.Trigger>
+                <Popover.Positioner>
+                    <Popover.Content border="none" borderRadius="base">
+                        <Box boxShadow="lg">
+                            <Popover.Arrow />
+                            <Popover.CloseTrigger />
+                            <Popover.Header borderBottom="none">
+                                {header || (
+                                    <Text fontWeight="bold" fontSize="md">
+                                        <FormattedMessage
+                                            defaultMessage="Promotions Applied"
+                                            id="promo_popover.heading.promo_applied"
+                                        />
+                                    </Text>
+                                )}
+                            </Popover.Header>
+                            <Popover.Body pt={0}>{children}</Popover.Body>
+                        </Box>
+                    </Popover.Content>
+                </Popover.Positioner>
+            </Popover.Root>
         </Box>
     )
 }

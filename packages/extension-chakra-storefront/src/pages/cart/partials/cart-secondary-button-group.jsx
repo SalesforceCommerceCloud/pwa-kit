@@ -6,7 +6,16 @@
  */
 import React from 'react'
 import PropTypes from 'prop-types'
-import {Button, ButtonGroup, Checkbox, Divider, Flex, Stack, useDisclosure} from '@chakra-ui/react'
+import {
+    Button,
+    ButtonGroup,
+    Checkbox,
+    Separator,
+    Flex,
+    Stack,
+    useDisclosure,
+    Box
+} from '@chakra-ui/react'
 import {defineMessage, FormattedMessage} from 'react-intl'
 import {useItemVariant} from '../../../components/item-variant'
 import ConfirmationModal from '../../../components/confirmation-modal/index'
@@ -65,6 +74,7 @@ const CartSecondaryButtonGroup = ({
     const handleRemoveItem = async () => {
         onRemoveItemClick(variant)
     }
+    return <Box>Test</Box>
 
     return (
         <>
@@ -72,9 +82,9 @@ const CartSecondaryButtonGroup = ({
                 direction={{base: 'column', lg: 'row'}}
                 alignItems={{base: 'flex-start', lg: 'center'}}
                 justifyContent={{base: 'flex-start', lg: 'space-between'}}
-                divider={<Divider display={{base: 'block', lg: 'none'}} />}
+                divider={<Separator display={{base: 'block', lg: 'none'}} />}
             >
-                <ButtonGroup spacing="6">
+                <ButtonGroup gap="6">
                     <Button variant="link" size="sm" onClick={showRemoveItemConfirmation}>
                         <FormattedMessage
                             defaultMessage="Remove"
@@ -104,7 +114,7 @@ const CartSecondaryButtonGroup = ({
                     <Checkbox
                         name={`gift-checkbox-${variant.itemId}`}
                         spacing={2}
-                        isChecked={isAGift}
+                        checked={isAGift}
                         onChange={(e) => {
                             const checked = e.target.checked
                             onIsAGiftChange(variant, checked)

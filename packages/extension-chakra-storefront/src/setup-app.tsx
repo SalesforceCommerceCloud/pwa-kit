@@ -105,11 +105,11 @@ class ChakraStorefront extends ApplicationExtension<Config> {
             //     component: Pages.SocialLoginRedirect,
             //     exact: true
             // },
-            // {
-            //     path: config.pages.Cart && config.pages.Cart.path,
-            //     component: Pages.Cart,
-            //     exact: true
-            // },
+            {
+                path: config.pages.Cart && config.pages.Cart.path,
+                component: Pages.Cart,
+                exact: true
+            },
             {
                 path: config.pages.ProductDetail && config.pages.ProductDetail.path,
                 component: Pages.ProductDetail
