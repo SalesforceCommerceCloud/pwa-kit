@@ -63,7 +63,7 @@ export class EinsteinAPI {
             // In case of variant, send the "sku" attribute
             if (product.type.variant) {
                 return {
-                    id: product.master.variantId,
+                    id: product.master.masterId,
                     price: product.price,
                     sku: product.id
                 }

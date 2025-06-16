@@ -58,6 +58,27 @@ describe('EinsteinAPI', () => {
         })
     })
 
+    test('_constructEinsteinProduct handles variant product type', () => {
+        const variantProduct = {
+            id: 'test-variant-id',
+            price: 99.99,
+            type: {
+                variant: true
+            },
+            master: {
+                masterId: 'master-product-id'
+            }
+        }
+
+        const result = einsteinApi._constructEinsteinProduct(variantProduct)
+
+        expect(result).toEqual({
+            id: 'master-product-id',
+            price: 99.99,
+            sku: 'test-variant-id'
+        })
+    })
+
     test('_constructEinsteinItem handles variationGroup product type', () => {
         const variationGroupItem = {
             product: {
