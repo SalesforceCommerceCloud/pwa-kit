@@ -60,7 +60,7 @@ const PasswordlessLogin = ({
                         />
                     </Button>
                     <Separator />
-                    <Text align="center" fontSize="sm">
+                    <Text textAlign="center" fontSize="sm">
                         <FormattedMessage
                             defaultMessage="Or Login With"
                             id="login_form.message.or_login_with"

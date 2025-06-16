@@ -35,13 +35,23 @@ import * as Pages from './pages'
 // ALL CODE BETWEEN THESES COMMENTS IS FOR TESTING PURPOSES ONLY
 import LoginForm from './components/login'
 import {useForm} from 'react-hook-form'
-import {Box} from '@chakra-ui/react'
+import {Box, Container} from '@chakra-ui/react'
+import Seo from './components/seo'
 
 const LoginPage = ({...props}) => {
     const form = useForm()
     return (
-        <Box style={{display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh'}}>
-            <Box style={{width: '407px', border: '1px solid lightgrey', marginTop: '100px', marginBottom: '100px'}}>
+        <Box bg="gray.50" py={[8, 16]}>
+            <Seo title="Sign in" description="Customer sign in" />
+            <Container
+                paddingTop={16}
+                width={['100%', '407px']}
+                bg="white"
+                paddingBottom={14}
+                marginTop={8}
+                marginBottom={8}
+                borderRadius="base"
+            >
                 <LoginForm
                     form={form}
                     idps={['Apple', 'Google']}
@@ -49,7 +59,7 @@ const LoginPage = ({...props}) => {
                     isSocialEnabled={true}
                     {...props}
                 />
-            </Box>
+            </Container>
         </Box>
     )
 }
