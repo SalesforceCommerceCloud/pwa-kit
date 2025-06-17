@@ -348,24 +348,24 @@ test('should filter by inventory when inventory filter is clicked', async () => 
         id: 'store-123',
         name: 'Test Store',
         inventoryId: 'inventory_m_store_store12'
-    };
+    }
 
-    getSelectedStoreData.mockReturnValue(mockStoreData);
+    getSelectedStoreData.mockReturnValue(mockStoreData)
 
-    window.history.pushState({}, 'ProductList', '/uk/en-GB/category/mens-clothing-jackets');
+    window.history.pushState({}, 'ProductList', '/uk/en-GB/category/mens-clothing-jackets')
     const {user} = renderWithProviders(<MockedComponent />, {
         wrapperProps: {siteAlias: 'uk', locale: {id: 'en-GB'}}
-    });
+    })
 
-    expect(await screen.findByTestId('sf-product-list-page')).toBeInTheDocument();
+    expect(await screen.findByTestId('sf-product-list-page')).toBeInTheDocument()
 
     await waitFor(() => {
-        expect(screen.getByTestId('sf-store-inventory-filter')).toBeInTheDocument();
-    });
+        expect(screen.getByTestId('sf-store-inventory-filter')).toBeInTheDocument()
+    })
 
-    useProductSearch.mockClear();
-    const inventoryCheckbox = await screen.findByTestId('sf-store-inventory-filter-checkbox');
-    await user.click(inventoryCheckbox);
+    useProductSearch.mockClear()
+    const inventoryCheckbox = await screen.findByTestId('sf-store-inventory-filter-checkbox')
+    await user.click(inventoryCheckbox)
 
     // Verify that useProductSearch was called with the inventory filter
     await waitFor(() => {
@@ -375,7 +375,7 @@ test('should filter by inventory when inventory filter is clicked', async () => 
                     refine: expect.arrayContaining(['ilids=inventory_m_store_store12'])
                 })
             }),
-            { keepPreviousData: true }
-        );
+            {keepPreviousData: true}
+        )
     })
-});
+})

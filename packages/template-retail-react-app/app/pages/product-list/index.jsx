@@ -150,7 +150,7 @@ const ProductList = (props) => {
     /**************** Query Actions ****************/
     // _refine is an invalid param for useProductSearch, we don't want to pass it to API call
     const {_refine, ...restOfParams} = searchParams
-    
+
     const refine = searchByInventory ? [..._refine, `ilids=${searchByInventory}`] : _refine
 
     const {
@@ -332,7 +332,6 @@ const ProductList = (props) => {
             return
         }
 
-        // Rest of the existing toggleFilter logic for other filters
         const searchParamsCopy = {...searchParams}
 
         // Remove the `offset` search param if present.
@@ -560,14 +559,18 @@ const ProductList = (props) => {
                                           <StoreInventoryFilter
                                               key="storeInventoryFilter"
                                               toggleFilter={toggleFilter}
-                                              selectedFilters={productSearchResult?.selectedRefinements || {}}
+                                              selectedFilters={
+                                                  productSearchResult?.selectedRefinements || {}
+                                              }
                                           />
                                       ]
                                     : [
                                           <StoreInventoryFilter
                                               key="storeInventoryFilter"
                                               toggleFilter={toggleFilter}
-                                              selectedFilters={productSearchResult?.selectedRefinements || {}}
+                                              selectedFilters={
+                                                  productSearchResult?.selectedRefinements || {}
+                                              }
                                           />
                                       ]
                             }
@@ -712,14 +715,18 @@ const ProductList = (props) => {
                                           <StoreInventoryFilter
                                               key="storeInventoryFilter"
                                               toggleFilter={toggleFilter}
-                                              selectedFilters={productSearchResult?.selectedRefinements || {}}
+                                              selectedFilters={
+                                                  productSearchResult?.selectedRefinements || {}
+                                              }
                                           />
                                       ]
                                     : [
                                           <StoreInventoryFilter
                                               key="storeInventoryFilter"
                                               toggleFilter={toggleFilter}
-                                              selectedFilters={productSearchResult?.selectedRefinements || {}}
+                                              selectedFilters={
+                                                  productSearchResult?.selectedRefinements || {}
+                                              }
                                           />
                                       ]
                             }
