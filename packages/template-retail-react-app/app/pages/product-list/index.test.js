@@ -22,6 +22,7 @@ import {
 import ProductList from '.'
 import EmptySearchResults from '@salesforce/retail-react-app/app/pages/product-list/partials/empty-results'
 import {useProductSearch, useCategory} from '@salesforce/commerce-sdk-react'
+import {getSelectedStoreData} from '@salesforce/retail-react-app/app/utils/store-locator-utils'
 
 const MOCK_USE_QUERY_RESULT = {
     data: undefined,
@@ -56,6 +57,11 @@ jest.mock('@salesforce/commerce-sdk-react', () => {
         useCategory: jest.fn()
     }
 })
+
+jest.mock('@salesforce/retail-react-app/app/utils/store-locator-utils', () => ({
+    getSelectedStoreData: jest.fn()
+}))
+
 let mockProductListSearchResponse = mockProductSearch
 
 const MockedComponent = ({isLoading}) => {
@@ -336,3 +342,40 @@ test('should display Store Inventory Filter component', async () => {
     // Check that the Store Inventory Filter component is present
     expect(await screen.findByTestId('sf-store-inventory-filter')).toBeInTheDocument()
 })
+
+test('should call toggleFilter with inventoryId when store inventory filter is clicked', async () => {
+    const mockStoreData = {
+        id: 'store-123',
+        name: 'Test Store',
+        inventoryId: 'inventory_m_store_store12'
+    };
+
+    getSelectedStoreData.mockReturnValue(mockStoreData);
+
+    window.history.pushState({}, 'ProductList', '/uk/en-GB/category/mens-clothing-jackets');
+    const {user} = renderWithProviders(<MockedComponent />, {
+        wrapperProps: {siteAlias: 'uk', locale: {id: 'en-GB'}}
+    });
+
+    expect(await screen.findByTestId('sf-product-list-page')).toBeInTheDocument();
+
+    await waitFor(() => {
+        expect(screen.getByTestId('sf-store-inventory-filter')).toBeInTheDocument();
+    });
+
+    useProductSearch.mockClear();
+    const inventoryCheckbox = await screen.findByTestId('sf-store-inventory-filter-checkbox');
+    await user.click(inventoryCheckbox);
+
+    // Verify that useProductSearch was called with the inventory filter
+    await waitFor(() => {
+        expect(useProductSearch).toHaveBeenCalledWith(
+            expect.objectContaining({
+                parameters: expect.objectContaining({
+                    refine: expect.arrayContaining(['ilids=inventory_m_store_store12'])
+                })
+            }),
+            { keepPreviousData: true }
+        );
+    })
+});
