@@ -22,7 +22,7 @@
   "author": "Spark Team",
   "license": "ISC",
   "dependencies": {
-    "@babel/runtime": "^7.27.6",
+    "@babel/runtime": "^7.21.0",
     "@modelcontextprotocol/sdk": "^1.0.0",
     "zod": "^3.25.56"
   }
