@@ -8,7 +8,7 @@ import React, {useEffect, useState} from 'react'
 import PropTypes from 'prop-types'
 import {defineMessage, useIntl} from 'react-intl'
 import {useForm} from 'react-hook-form'
-import {Dialog, Portal, CloseButton} from '@chakra-ui/react'
+import {Dialog, Portal, CloseButton, useDisclosure} from '@chakra-ui/react'
 import {keepPreviousData} from '@tanstack/react-query'
 import {
     AuthHelpers,
@@ -56,8 +56,9 @@ export const AuthModal = ({
     initialEmail = '',
     onLoginSuccess = noop,
     onRegistrationSuccess = noop,
-    open,
-    onOpenChange,
+    isOpen,
+    onOpen,
+    onClose,
     isPasswordlessEnabled = false,
     isSocialEnabled = false,
     idps = [],
@@ -202,12 +203,12 @@ export const AuthModal = ({
 
     // Reset form and local state when opening the modal
     useEffect(() => {
-        if (open) {
+        if (isOpen) {
             setLoginType(LOGIN_TYPES.PASSWORD)
             setCurrentView(initialView)
             form.reset()
         }
-    }, [open])
+    }, [isOpen])
 
     // Auto-focus the first field in each form view
     useEffect(() => {
@@ -233,14 +234,14 @@ export const AuthModal = ({
         // Lets determine if the user has either logged in, or registed.
         const loggingIn = currentView === LOGIN_VIEW
         const registering = currentView === REGISTER_VIEW
-        const isNowRegistered = open && isRegistered && (loggingIn || registering)
+        const isNowRegistered = isOpen && isRegistered && (loggingIn || registering)
         // If the customer changed, but it's not because they logged in or registered. Do nothing.
         if (!isNowRegistered) {
             return
         }
 
         // We are done with the modal.
-        onOpenChange?.({open: false})
+        onClose()
 
         // Show a toast only for those registed users returning to the site.
         if (loggingIn) {
@@ -272,12 +273,14 @@ export const AuthModal = ({
     }, [isRegistered])
 
     const onBackToSignInClick = () =>
-        initialView === PASSWORD_VIEW ? onOpenChange?.({open: false}) : setCurrentView(LOGIN_VIEW)
+        initialView === PASSWORD_VIEW ? onClose() : setCurrentView(LOGIN_VIEW)
 
     return (
         <Dialog.Root
-            open={open}
-            onOpenChange={onOpenChange}
+            open={isOpen}
+            onOpenChange={({open}) => {
+                open ? onOpen() : onClose()
+            }}
             size="sm"
             closeOnInteractOutside={false}
             data-testid="sf-auth-modal"
@@ -347,8 +350,9 @@ export const AuthModal = ({
 AuthModal.propTypes = {
     initialView: PropTypes.oneOf([LOGIN_VIEW, REGISTER_VIEW, PASSWORD_VIEW, EMAIL_VIEW]),
     initialEmail: PropTypes.string,
-    open: PropTypes.bool.isRequired,
-    onOpenChange: PropTypes.func.isRequired,
+    isOpen: PropTypes.bool.isRequired,
+    onOpen: PropTypes.func.isRequired,
+    onClose: PropTypes.func.isRequired,
     onLoginSuccess: PropTypes.func,
     onRegistrationSuccess: PropTypes.func,
     isPasswordlessEnabled: PropTypes.bool,
@@ -362,16 +366,15 @@ AuthModal.propTypes = {
  * @returns {Object} - Object props to be spread on to the AuthModal component
  */
 export const useAuthModal = (initialView = LOGIN_VIEW) => {
-    const [open, setOpen] = useState(false)
+    const {open, onOpen, onClose} = useDisclosure()
     const {login} = useExtensionConfig()
     const {passwordless = {}, social = {}} = login
 
-    const onOpenChange = ({open}) => setOpen(open)
-
     return {
         initialView,
-        open,
-        onOpenChange,
+        isOpen: open,
+        onOpen,
+        onClose,
         isPasswordlessEnabled: !!passwordless?.enabled,
         isSocialEnabled: !!social?.enabled,
         idps: social?.idps
