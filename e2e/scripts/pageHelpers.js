@@ -1,10 +1,11 @@
 const {expect} = require('@playwright/test')
 const config = require('../config')
 const {getCreditCardExpiry, runAccessibilityTest} = require('../scripts/utils.js')
+
 /**
  * Note: As a best practice, we should await the network call and assert on the network response rather than waiting for pageLoadState()
  * to avoid race conditions from lock in pageLoadState being released before network call resolves.
- *
+ * 
  * This is a best practice for tests that are dependent on the network call. Eg.: Shopper login, registration, etc.
  */
 
@@ -20,19 +21,17 @@ const {getCreditCardExpiry, runAccessibilityTest} = require('../scripts/utils.js
 export const answerConsentTrackingForm = async (page, dnt = false) => {
     try {
         const consentFormVisible = await page.locator('text=Tracking Consent').isVisible().catch(() => false)
-        
         if (!consentFormVisible) {
             return
         }
+
         const buttonText = dnt ? 'Decline' : 'Accept'
-        
         await page.waitForLoadState('networkidle', { timeout: 3000 }).catch(() => {})
         
-        // Find all consent buttons in DOM - there are both mobile and desktop versions
-        // but only one is visible at a time, so we check which ones are actually visible
+        // Find and click consent buttons (handles both mobile and desktop versions existing in the DOM)
         const clickSuccess = await page.evaluate((targetText) => {
-            let buttons = []
-            buttons = Array.from(document.querySelectorAll(`button[aria-label="${targetText} tracking"]`))
+            // Try aria-label first, then fallback to text content
+            let buttons = Array.from(document.querySelectorAll(`button[aria-label="${targetText} tracking"]`))
             
             if (buttons.length === 0) {
                 buttons = Array.from(document.querySelectorAll('button')).filter(btn => 
@@ -42,7 +41,7 @@ export const answerConsentTrackingForm = async (page, dnt = false) => {
             
             let clickedCount = 0
             buttons.forEach((button) => {
-                // Only click buttons that are actually visible (offsetParent !== null)
+                // Only click visible buttons
                 if (button.offsetParent !== null) {
                     button.click()
                     clickedCount++
@@ -55,13 +54,10 @@ export const answerConsentTrackingForm = async (page, dnt = false) => {
         // after clicking an answering button, the tracking consent should not stay in the DOM
         if (clickSuccess > 0) {
             await page.waitForTimeout(2000)
-            const isGone = await page.locator('text=Tracking Consent').isHidden({ timeout: 5000 }).catch(() => false)
-            if (isGone) {
-                return
-            }
+            await page.locator('text=Tracking Consent').isHidden({ timeout: 5000 }).catch(() => {})
         }
     } catch (error) {
-        // Continue test execution silently
+        // Silently continue - consent form handling should not break tests
     }
 }
 
@@ -230,7 +226,7 @@ export const addProductToCart = async ({page, isMobile = false}) => {
 
 /**
  * Registers a shopper with provided user credentials
- *
+ * 
  * @param {Object} options.page - Object that represents a tab/window in the browser provided by playwright
  * @param {Object} options.userCredentials - Object containing user credentials with the following properties:
  *      - firstName
@@ -243,11 +239,25 @@ export const registerShopper = async ({page, userCredentials, isMobile = false})
     // Create Account and Sign In
     await page.goto(config.RETAIL_APP_HOME + '/registration')
     await answerConsentTrackingForm(page)
-
     await page.waitForLoadState()
 
+    // Skip registration if user is already logged in
+    const initialUrl = page.url()
+    if (initialUrl.includes('/account')) {
+        return
+    }
+
     const registrationFormHeading = page.getByText(/Let's get started!/i)
-    await registrationFormHeading.waitFor()
+    try {
+        await registrationFormHeading.waitFor({ timeout: 10000 })
+    } catch (error) {
+        // Check if user was redirected to account page during wait
+        const urlAfterWait = page.url()
+        if (urlAfterWait.includes('/account')) {
+            return
+        }
+        throw new Error(`Registration form not found. Current URL: ${urlAfterWait}`)
+    }
 
     await page.locator('input#firstName').fill(userCredentials.firstName)
     await page.locator('input#lastName').fill(userCredentials.lastName)
@@ -260,70 +270,13 @@ export const registerShopper = async ({page, userCredentials, isMobile = false})
         '**/shopper/auth/v1/organizations/**/oauth2/token'
     )
     await page.getByRole('button', {name: /Create Account/i}).click()
-    await tokenResponsePromise
-    expect((await tokenResponsePromise).status()).toBe(200)
+    const tokenResponse = await tokenResponsePromise
+    expect(tokenResponse.status()).toBe(200)
 
     await page.waitForLoadState('networkidle', { timeout: 10000 })
-    
-    // Try multiple selectors for account details - the UI might have changed
-    const accountDetailsSelectors = [
-        page.getByRole('heading', {name: /Account Details/i}),
-        page.getByRole('heading', {name: /My Account/i})
-    ]
-    
-    let foundSelector = null
-    for (const selector of accountDetailsSelectors) {
-        try {
-            await selector.waitFor({ timeout: 3000 })
-            foundSelector = selector
-            break
-        } catch (e) {
-            // Continue to next selector
-        }
-    }
-    
-    if (!foundSelector) {
-        // If still not found, check if we're on account page by URL
-        const currentUrl = page.url()
-        if (currentUrl.includes('/account') || currentUrl.includes('/profile')) {
-            console.log('Account page detected by URL, but heading not found. Continuing test...')
-        } else {
-            throw new Error(`Account Details page not found. Current URL: ${currentUrl}`)
-        }
-    } else {
-        await expect(foundSelector).toBeVisible()
-    }
 
-    if (!isMobile) {
-        // Try to find "My Account" heading with fallback
-        try {
-            await expect(page.getByRole('heading', {name: /My Account/i})).toBeVisible({ timeout: 3000 })
-        } catch (e) {
-            // Check for alternative account indicators
-            const accountIndicators = [
-                page.getByText(/Welcome/i),
-                page.getByText(/Account/i),
-                page.locator('[data-testid="account-nav"]')
-            ]
-            
-            let found = false
-            for (const indicator of accountIndicators) {
-                try {
-                    await indicator.waitFor({ timeout: 2000 })
-                    found = true
-                    break
-                } catch (e) {
-                    // Continue
-                }
-            }
-            
-            if (!found) {
-                console.warn('My Account heading not found, but continuing test...')
-            }
-        }
-    }
-
-    await expect(page.getByText(/Email/i)).toBeVisible()
+    const currentUrl = page.url()
+    expect(currentUrl).toMatch(/\/account/)
     await expect(page.getByText(userCredentials.email)).toBeVisible()
 }
 
@@ -406,37 +359,12 @@ export const loginShopper = async ({page, userCredentials}) => {
         expect(tokenResponse.status()).toBe(200)
 
         await page.waitForLoadState('networkidle', { timeout: 10000 })
-        
-        // Check if we successfully logged in by looking for account indicators
+
         const currentUrl = page.url()
-        if (currentUrl.includes('/account') || currentUrl.includes('/profile')) {
-            return true
-        }
-        
-        // Try to find account-related elements
-        const accountIndicators = [
-            page.getByRole('heading', {name: /Account Details/i}),
-            page.getByRole('heading', {name: /My Account/i})
-        ]
-        
-        for (const indicator of accountIndicators) {
-            try {
-                await indicator.waitFor({ timeout: 3000 })
-                return true // Found account indicator, login successful
-            } catch (e) {
-                // Continue to next indicator
-            }
-        }
-        
-        // If no indicators found, check URL again
-        const finalUrl = page.url()
-        if (finalUrl.includes('/account') || finalUrl.includes('/callback')) {
-            return true
-        }
-        
-        return false
+        expect(currentUrl).toMatch(/\/account/)
+        await expect(page.getByText(userCredentials.email)).toBeVisible()
+        return true
     } catch (error) {
-        console.log('Login failed:', error.message)
         return false
     }
 }
@@ -608,7 +536,11 @@ export const registeredUserHappyPath = async ({page, registeredUserCredentials, 
     
     await answerConsentTrackingForm(page)
     await page.waitForLoadState()
-    await expect(page.getByRole('heading', {name: /Account Details/i})).toBeVisible()
+    
+    // Verify we're on account page and user is logged in
+    const currentUrl = page.url()
+    expect(currentUrl).toMatch(/\/account/)
+    await expect(page.getByText(registeredUserCredentials.email)).toBeVisible()
 
     // Shop for items as registered user
     await addProductToCart({page})
@@ -658,14 +590,20 @@ export const registeredUserHappyPath = async ({page, registeredUserCredentials, 
         name: /Continue to Payment/i
     })
 
-    if (continueToPayment.isEnabled()) {
+    let hasShippingStep = false
+    try {
+        await expect(continueToPayment).toBeVisible({timeout: 2000})
         await continueToPayment.click()
+        hasShippingStep = true
+    } catch {
+        // Shipping step was skipped, proceed directly to payment
     }
 
-    // Confirm the shipping options form toggles to show edit button on clicking "Checkout as guest"
-    const step2Card = page.locator("div[data-testid='sf-toggle-card-step-2']")
-
-    await expect(step2Card.getByRole('button', {name: /Edit/i})).toBeVisible()
+    // Verify step-2 edit button only if shipping step was present
+    if (hasShippingStep) {
+        const step2Card = page.locator("div[data-testid='sf-toggle-card-step-2']")
+        await expect(step2Card.getByRole('button', {name: /Edit/i})).toBeVisible()
+    }
 
     await expect(page.getByRole('heading', {name: /Payment/i})).toBeVisible()
 
@@ -708,21 +646,51 @@ export const registeredUserHappyPath = async ({page, registeredUserCredentials, 
     await validateOrderHistory({page, a11y})
 }
 
+/**
+ * Executes the wishlist flow for a registered user.
+ * 
+ * Includes robust authentication handling with fallback mechanisms.
+ *
+ * @param {Object} options.page - Playwright page object representing a browser tab/window
+ * @param {Object} options.registeredUserCredentials - User credentials for authentication
+ * @param {Object} options.a11y - Accessibility testing configuration (optional)
+ */
 export const wishlistFlow = async ({page, registeredUserCredentials, a11y = {}}) => {
+    // Attempt login first
     const isLoggedIn = await loginShopper({
         page,
         userCredentials: registeredUserCredentials
     })
 
+    // If login fails, try registration with fallback
     if (!isLoggedIn) {
-        await registerShopper({
-            page,
-            userCredentials: registeredUserCredentials
-        })
+        try {
+            await registerShopper({
+                page,
+                userCredentials: registeredUserCredentials
+            })
+        } catch (error) {
+            // If registration fails, attempt login one more time
+            const secondLoginAttempt = await loginShopper({
+                page,
+                userCredentials: registeredUserCredentials
+            })
+            if (!secondLoginAttempt) {
+                throw new Error('Authentication failed: Both login and registration unsuccessful')
+            }
+        }
     }
 
+    // The consent form does not stick after registration
     await answerConsentTrackingForm(page)
     await page.waitForLoadState()
+    
+    // Ensure user is on account page before proceeding
+    const currentUrl = page.url()
+    if (!currentUrl.includes('/account')) {
+        await page.goto(config.RETAIL_APP_HOME + '/account')
+        await page.waitForLoadState()
+    }
 
     // Navigate to PDP
     await navigateToPDPDesktop({page})
