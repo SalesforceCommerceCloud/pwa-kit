@@ -97,7 +97,7 @@ const Cart = () => {
         }
     }, [basket.basketId])
 
-    if (!basket?.basketId) {
+    if (!basket.loaded) {
         return <CartSkeleton />
     }
 
