@@ -7,7 +7,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import {Helmet} from 'react-helmet'
-import {Box, Button, Flex, Heading, IconButton, Stack, Text} from '@chakra-ui/react'
+import {Box, Button, Flex, Heading, IconButton, HStack, Text} from '@chakra-ui/react'
 
 import {BrandLogo, FileIcon} from '../icons'
 import {useHistory} from 'react-router-dom'
@@ -42,11 +42,12 @@ const Error = (props) => {
                 >
                     <IconButton
                         aria-label="logo"
-                        icon={<BrandLogo width={[8, 8, 8, 12]} height={[6, 6, 6, 8]} />}
+                        variant="plain"
                         marginBottom={[1, 1, 2, 0]}
-                        variant="unstyled"
                         onClick={() => history.push('/')}
-                    />
+                    >
+                        <BrandLogo width={[8, 8, 8, 12]} height={[6, 6, 6, 8]} />
+                    </IconButton>
                 </Box>
             </Box>
             <Box
@@ -69,7 +70,7 @@ const Error = (props) => {
                             {title}
                         </Heading>
                         <Box maxWidth="440px" marginBottom={8}>
-                            <Text align="center">
+                            <Text textAlign="center">
                                 An error has occurred. Try refreshing the page or if you need
                                 immediate help please contact support.
                             </Text>
@@ -78,18 +79,22 @@ const Error = (props) => {
                                     as="pre"
                                     mt={4}
                                     fontSize="sm"
-                                    background="gray.50"
+                                    bg="gray.50"
                                     borderColor="gray.200"
-                                    borderStyle="solid"
                                     borderWidth="1px"
                                     overflow="auto"
                                     padding={4}
+                                    rounded="md"
                                 >
                                     {message}
                                 </Box>
                             )}
                         </Box>
-                        <Stack direction={['column', 'row']} spacing={4} width={['100%', 'auto']}>
+                        <HStack 
+                            flexDirection={['column', 'row']} 
+                            gap={4} 
+                            width={['100%', 'auto']}
+                        >
                             <Button
                                 variant="outline"
                                 bg="white"
@@ -103,7 +108,7 @@ const Error = (props) => {
                             <Button onClick={() => window.location.reload()}>
                                 Refresh the page
                             </Button>
-                        </Stack>
+                        </HStack>
                     </Flex>
                     {stack && (
                         <Box marginTop={20}>
@@ -114,12 +119,12 @@ const Error = (props) => {
                                 as="pre"
                                 mt={4}
                                 fontSize="sm"
-                                background="gray.50"
+                                bg="gray.50"
                                 borderColor="gray.200"
-                                borderStyle="solid"
                                 borderWidth="1px"
                                 overflow="auto"
                                 padding={4}
+                                rounded="md"
                             >
                                 {stack}
                             </Box>
