@@ -101,3 +101,41 @@ test('renders secondary with event handlers', async () => {
 
     expect(onRemoveItemClick).toHaveBeenCalledTimes(1)
 })
+
+// Helper to render with a custom variant
+const renderWithVariant = (variant, props = {}) => {
+    return renderWithProviders(
+        <ItemVariantProvider variant={variant}>
+            <CartSecondaryButtonGroup {...props} />
+        </ItemVariantProvider>
+    )
+}
+
+describe('CartSecondaryButtonGroup Edit button conditional rendering', () => {
+    test('shows Edit button for variant product (has variationAttributes)', () => {
+        const variantProduct = {
+            itemId: '123',
+            variationAttributes: [{id: 'color', values: [{value: 'red'}]}]
+        }
+        renderWithVariant(variantProduct)
+        expect(screen.getByRole('button', {name: /edit/i})).toBeInTheDocument()
+    })
+
+    test('does NOT show Edit button for standard product (no variationAttributes)', () => {
+        const standardProduct = {
+            itemId: '456'
+            // no variationAttributes
+        }
+        renderWithVariant(standardProduct)
+        expect(screen.queryByRole('button', {name: /edit/i})).not.toBeInTheDocument()
+    })
+
+    test('does NOT show Edit button for standard product (empty variationAttributes)', () => {
+        const standardProduct = {
+            itemId: '789',
+            variationAttributes: []
+        }
+        renderWithVariant(standardProduct)
+        expect(screen.queryByRole('button', {name: /edit/i})).not.toBeInTheDocument()
+    })
+})
