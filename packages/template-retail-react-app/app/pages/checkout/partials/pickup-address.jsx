@@ -16,14 +16,12 @@ import {
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 import {
     ToggleCard,
-    ToggleCardEdit,
     ToggleCardSummary
 } from '@salesforce/retail-react-app/app/components/toggle-card'
 import AddressDisplay from '@salesforce/retail-react-app/app/components/address-display'
 
 // Hooks
 import {useCheckout} from '@salesforce/retail-react-app/app/pages/checkout/util/checkout-context'
-import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
 import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
 import {useShopperBasketsMutation} from '@salesforce/commerce-sdk-react'
@@ -34,12 +32,14 @@ export default function PickupAddress() {
     const updateShippingAddressForShipment = useShopperBasketsMutation(
         'updateShippingAddressForShipment'
     )
-    const {step, STEPS, goToStep, goToNextStep} = useCheckout()
+    const {step, STEPS, goToStep} = useCheckout()
+    const {data: basket} = useCurrentBasket()
 
     const {site} = useMultiSite()
     const storeInfoKey = `store_${site.id}`
     const storeInfo = JSON.parse(window.localStorage.getItem(storeInfoKey))
     const pickupAddress = storeInfo?.shippingAddress
+    const selectedShippingAddress = basket?.shipments && basket?.shipments[0]?.shippingAddress
 
     const submitAndContinue = async (address) => {
         setIsLoading(true)
@@ -76,7 +76,7 @@ export default function PickupAddress() {
 
     return (
         <ToggleCard
-            id="step-2"
+            id="step-1"
             title={formatMessage({
                 defaultMessage: 'Pickup Address & Information',
                 id: 'pickup_address.title.pickup_address'
@@ -85,32 +85,38 @@ export default function PickupAddress() {
             disabled={step === STEPS.CONTACT_INFO}
             isLoading={isLoading}
         >
-            <ToggleCardEdit>
-                <Text fontWeight="bold" fontSize="md" mb={2}>
-                    <FormattedMessage
-                        defaultMessage="Store Information"
-                        id="pickup_address.title.store_information"
-                    />
-                </Text>
-                {pickupAddress && (
-                    <AddressDisplay address={pickupAddress} />
-                )}
-                <Box pt={3}>
-                    <Container variant="form">
-                        <Button w="full" onClick={() => submitAndContinue(pickupAddress)}>
-                            <FormattedMessage
-                                defaultMessage="Continue to Payment"
-                                id="pickup_address.button.continue_to_payment"
-                            />
-                        </Button>
-                    </Container>
-                </Box>
-            </ToggleCardEdit>
-            <ToggleCardSummary>
-                {pickupAddress && (
-                    <AddressDisplay address={pickupAddress} />
-                )}
-            </ToggleCardSummary>
+            {step === STEPS.PICKUP_ADDRESS && (
+                <>
+                    <Text fontWeight="bold" fontSize="md" mb={2}>
+                        <FormattedMessage
+                            defaultMessage="Store Information"
+                            id="pickup_address.title.store_information"
+                        />
+                    </Text>
+                    {pickupAddress && <AddressDisplay address={pickupAddress} />}
+                    <Box pt={3}>
+                        <Container variant="form">
+                            <Button w="full" onClick={() => submitAndContinue(pickupAddress)}>
+                                <FormattedMessage
+                                    defaultMessage="Continue to Payment"
+                                    id="pickup_address.button.continue_to_payment"
+                                />
+                            </Button>
+                        </Container>
+                    </Box>
+                </>
+            )}
+            {selectedShippingAddress && (
+                <ToggleCardSummary>
+                    <Text fontWeight="bold" fontSize="md" mb={2}>
+                        <FormattedMessage
+                            defaultMessage="Store Information"
+                            id="pickup_address.title.store_information"
+                        />
+                    </Text>
+                    <AddressDisplay address={selectedShippingAddress} />
+                </ToggleCardSummary>
+            )}
         </ToggleCard>
     )
 }

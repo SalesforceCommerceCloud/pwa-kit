@@ -27,6 +27,7 @@ export const CheckoutProvider = ({children}) => {
         'REVIEW_ORDER'
     ]
     const STEPS = CHECKOUT_STEPS_LIST.reduce((acc, step, idx) => ({...acc, [step]: idx}), {})
+    console.log('STEPS', STEPS)
 
     const getCheckoutStepName = (step) => CHECKOUT_STEPS_LIST[step]
 
@@ -84,11 +85,9 @@ export const CheckoutProvider = ({children}) => {
                 // Determine if it's a pickup order
                 const isPickupOrder = basket?.shipments[0]?.shippingMethod.c_storePickupEnabled === true
                 // Skip to appropriate next step
-                setStep(isPickupOrder ? STEPS.PICKUP_ADDRESS : STEPS.SHIPPING_ADDRESS)
-                console.log('AFTER goToNextStep', step)
+                setStep(1)
             } else {
                 setStep(step + 1)
-                console.log('AFTER goToNextStep', step)
             }
         },
         goToStep: (step) => setStep(step)
