@@ -39,7 +39,7 @@ This will:
 ```json
 {
   "mcpServers": {
-    "simple-time-server": {
+    "pwa-storefront-server": {
       "command": "node",
       "args": ["server.js"],
       "cwd": "{{$parent_dir_to_mcp}}/pwa-storefront-mcp"

@@ -37,15 +37,6 @@ class PwaStorefrontMCPServer {
       return {
         tools: [
           {
-            name: 'get_current_time',
-            description: 'Get the current server time in ISO format',
-            inputSchema: {
-              type: 'object',
-              properties: {},
-              required: [],
-            },
-          },
-          {
             name: 'analyze_code_structure',
             description: 'Analyze JavaScript/React code structure to identify components, imports, and insertion points',
             inputSchema: {
