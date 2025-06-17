@@ -100,7 +100,7 @@ type PageConfigs = {
 /**
  * This defines how your extension can be configured in the user's project. Please update it to your specific needs!
  */
-export interface UserConfig  {
+export interface UserConfig {
     activeDataEnabled?: boolean // default = false
     commerceAPI: CommerceAPIConfig
     categoryNav: {
