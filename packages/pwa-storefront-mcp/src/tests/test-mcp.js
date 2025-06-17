@@ -6,7 +6,7 @@ async function testMCPServer() {
   console.log('🚀 Testing MCP Server...\n');
 
   // Start the MCP server process
-  const serverProcess = spawn('node', ['server.js'], {
+  const serverProcess = spawn('node', ['src/server/server.js'], {
     stdio: ['pipe', 'pipe', 'pipe']
   });
 

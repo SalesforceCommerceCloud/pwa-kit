@@ -1,6 +1,6 @@
-# Simple Time MCP Server
+# PWA Storefront MCP Server
 
-A simple Model Context Protocol (MCP) server that provides the current time.
+An Model Context Protocol (MCP) server that helps PWA Storefront developers with development.
 
 ## What is MCP?
 
@@ -9,7 +9,7 @@ The Model Context Protocol (MCP) is an open protocol that enables secure connect
 ## Features
 
 This MCP server provides:
-- `xxx`: Returns the current server time in ISO format, timezone, and timestamp
+- `create_new_component`: Help developers to create a new PWA Storefront component
 
 ## Setup
 
@@ -42,7 +42,7 @@ This will:
     "simple-time-server": {
       "command": "node",
       "args": ["server.js"],
-      "cwd": "/Users/wei.liu/dev/git-repos/pwa-storefront-mcp"
+      "cwd": "{{$parent_dir_to_mcp}}/pwa-storefront-mcp"
     }
   }
 }

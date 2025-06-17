@@ -22,7 +22,7 @@ async function demonstrateMCPTools() {
   console.log('🚀 Demonstrating MCP Server Tools...\n');
 
   // Start the MCP server process
-  const serverProcess = spawn('node', ['server.js'], {
+  const serverProcess = spawn('node', ['src/server/server.js'], {
     stdio: ['pipe', 'pipe', 'pipe']
   });
 
