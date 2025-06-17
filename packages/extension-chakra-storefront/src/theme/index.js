@@ -37,12 +37,12 @@ import app from './components/project/_app'
 import breadcrumb from './components/project/breadcrumb'
 // import ListMenu from './components/project/list-menu'
 import checkoutFooter from './components/project/checkout-footer'
+import drawerMenu from './components/project/drawer-menu'
 import footer from './components/project/footer'
 import imageGallery from './components/project/image-gallery'
 import header from './components/project/header'
 import linkList from './components/project/links-list'
-// import DrawerMenu from './components/project/drawer-menu'
-// import LocaleSelector from './components/project/locale-selector'
+import localeSelector from './components/project/locale-selector'
 import nestedAccordion from './components/project/nested-accordion'
 import offlineBanner from './components/project/offline-banner'
 import pagination from './components/project/pagination'
@@ -110,10 +110,12 @@ export const overrides = defineConfig({
             app,
             breadcrumb,
             checkoutFooter,
+            drawerMenu,
             footer,
             header,
             imageGallery,
             linkList,
+            localeSelector,
             nestedAccordion,
             offlineBanner,
             pagination,
