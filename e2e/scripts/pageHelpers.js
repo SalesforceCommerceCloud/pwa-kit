@@ -25,7 +25,7 @@ export const answerConsentTrackingForm = async (page, dnt = false) => {
         }
 
         const buttonText = dnt ? 'Decline' : 'Accept'
-        await page.waitForLoadState('networkidle', { timeout: 3000 }).catch(() => {})
+        await page.getByRole('button', { name: new RegExp(buttonText, 'i') }).first().waitFor({ timeout: 3000 })
         
         // Find and click consent buttons (handles both mobile and desktop versions existing in the DOM)
         const clickSuccess = await page.evaluate((targetText) => {
@@ -273,10 +273,8 @@ export const registerShopper = async ({page, userCredentials, isMobile = false})
     const tokenResponse = await tokenResponsePromise
     expect(tokenResponse.status()).toBe(200)
 
-    await page.waitForLoadState('networkidle', { timeout: 10000 })
+    await page.waitForURL(/.*\/account.*/, { timeout: 10000 })
 
-    const currentUrl = page.url()
-    expect(currentUrl).toMatch(/\/account/)
     await expect(page.getByText(userCredentials.email)).toBeVisible()
 }
 
@@ -358,10 +356,8 @@ export const loginShopper = async ({page, userCredentials}) => {
         const tokenResponse = await tokenResponsePromise
         expect(tokenResponse.status()).toBe(200)
 
-        await page.waitForLoadState('networkidle', { timeout: 10000 })
+        await page.waitForURL(/.*\/account.*/, { timeout: 10000 })
 
-        const currentUrl = page.url()
-        expect(currentUrl).toMatch(/\/account/)
         await expect(page.getByText(userCredentials.email)).toBeVisible()
         return true
     } catch (error) {
