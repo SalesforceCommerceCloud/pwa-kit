@@ -67,8 +67,7 @@ jest.mock('../commerce-api/hooks/useCustomer', () => {
             ...originalModule.default(),
             isRegistered: false,
             getSkeletonCustomer: () => mockRegisteredCustomer,
-            registerCustomer: jest.fn(),
-            getResetPasswordToken: jest.fn()
+            registerCustomer: jest.fn()
         })
     }
 })
@@ -199,7 +198,6 @@ test('Allows customer to sign in to their account', async () => {
         {timeout: 5000}
     )
 
-
     // enter credentials and submit
     await user.type(screen.getByLabelText('Email'), 'customer@test.com')
     await user.type(screen.getByLabelText('Password'), 'Password!1')
@@ -266,16 +264,16 @@ test('Renders error when given incorrect log in credentials', async () => {
         {timeout: 5000}
     )
 
-
     // enter credentials and submit
     await user.type(screen.getByLabelText('Email'), 'customer@test.com')
     await user.type(screen.getByLabelText('Password'), 'Password!1')
 
     await user.click(screen.getByText(/sign in/i))
-    // wait for successful toast to appear
     await waitFor(
         () => {
-            expect(screen.getByText(/Something's not right with your email or password. Try again./i)).toBeInTheDocument()
+            expect(
+                screen.getByText(/Something's not right with your email or password. Try again./i)
+            ).toBeInTheDocument()
         },
         {timeout: 5000}
     )
@@ -287,29 +285,32 @@ test('Allows customer to generate password token', async () => {
 
     // open the modal
     const trigger = screen.getByText(/open modal/i)
-    user.click(trigger)
-    expect(authModal.isOpen).toBe(true)
+    await user.click(trigger)
+    await waitFor(() => {
+        expect(authModal.isOpen).toBe(true)
+    })
 
     // enter credentials and submit
     const withinForm = within(screen.getByTestId('sf-auth-modal-form'))
     user.type(withinForm.getByLabelText('Email'), 'foo@test.com')
     user.click(withinForm.getByText(/reset password/i))
 
-    // wait for success state
     await waitFor(() => {
         expect(screen.getByText(/password reset/i)).toBeInTheDocument()
         expect(screen.getByText(/foo@test.com/i)).toBeInTheDocument()
     })
 })
 
-test('Allows customer to open generate password token modal from everywhere', () => {
+test('Allows customer to open generate password token modal from everywhere', async () => {
     // render our test component
     renderWithProviders(<MockedComponent initialView="password" />)
 
     // open the modal
     const trigger = screen.getByText(/open modal/i)
-    user.click(trigger)
-    expect(authModal.isOpen).toBe(true)
+    await user.click(trigger)
+    await waitFor(() => {
+        expect(authModal.isOpen).toBe(true)
+    })
 
     const withinForm = within(screen.getByTestId('sf-auth-modal-form'))
 
@@ -317,7 +318,7 @@ test('Allows customer to open generate password token modal from everywhere', ()
 
     // close the modal
     const switchToSignIn = screen.getByText(/Sign in/i)
-    user.click(switchToSignIn)
+    await user.click(switchToSignIn)
 
     // check that the modal is closed
     expect(authModal.isOpen).toBe(false)
@@ -334,23 +335,24 @@ test('Allows customer to create an account', async () => {
     // open the modal
     const trigger = screen.getByText('Open Modal')
 
-    user.click(trigger)
+    await user.click(trigger)
 
     // switch to 'create account' view
-    user.click(screen.getByText(/create account/i))
+    await user.click(screen.getByText(/create account/i))
 
     // fill out form and submit
     const withinForm = within(screen.getByTestId('sf-auth-modal-form'))
 
-    user.paste(withinForm.getByLabelText('First Name'), 'Tester')
-    user.paste(withinForm.getByLabelText('Last Name'), 'Tester')
-    user.paste(withinForm.getByPlaceholderText(/you@email.com/i), 'customer@test.com')
-    user.paste(withinForm.getAllByLabelText(/password/i)[0], 'Password!1')
-    user.click(withinForm.getByText(/create account/i))
+    await user.type(withinForm.getByLabelText('First Name'), 'Tester')
+    await user.type(withinForm.getByLabelText('Last Name'), 'Tester')
+    await user.type(withinForm.getByPlaceholderText(/you@email.com/i), 'customer@test.com')
+    await user.type(withinForm.getAllByLabelText(/password/i)[0], 'Password!1')
+    await user.click(withinForm.getByText(/create account/i))
 
     await waitFor(
         () => {
-            expect(screen.getAllByText(/customer@test.com/i).length).toEqual(1)
+            expect(screen.getAllByText(/My Account/i).length).toEqual(2)
+            expect(screen.getAllByText(/Log Out/i).length).toEqual(2)
         },
         {timeout: 20000}
     )
