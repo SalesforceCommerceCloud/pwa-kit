@@ -41,7 +41,6 @@ const ListMenu = ({
     const recipe = useSlotRecipe({key: 'listMenu'})
     const styles = recipe()
     const [ariaBusy, setAriaBusy] = useState(true)
-    const [activeLink, setActiveLink] = useState()
     const intl = useIntl()
 
     const items = root?.[itemsKey]
@@ -84,13 +83,8 @@ const ListMenu = ({
                                         <Link
                                             as={RouteLink}
                                             to={categoryUrlBuilder(item)}
-                                            onMouseOver={setActiveLink.bind(this, id)}
-                                            onMouseOut={setActiveLink.bind(this)}
                                             css={styles.listMenuTriggerLink}
                                             {...{name: name + ' __'}}
-                                            {...(activeLink === id
-                                                ? {css: styles.listMenuTriggerlessLinkActive}
-                                                : {})}
                                         >
                                             {name}
                                         </Link>
