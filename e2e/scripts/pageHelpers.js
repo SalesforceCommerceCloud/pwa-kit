@@ -28,14 +28,11 @@ export const answerConsentTrackingForm = async (page, dnt = false) => {
         
         await page.waitForLoadState('networkidle', { timeout: 3000 }).catch(() => {})
         
+        // Find all consent buttons in DOM - there are both mobile and desktop versions
+        // but only one is visible at a time, so we check which ones are actually visible
         const clickSuccess = await page.evaluate((targetText) => {
             let buttons = []
-            
             buttons = Array.from(document.querySelectorAll(`button[aria-label="${targetText} tracking"]`))
-            
-            if (buttons.length === 0) {
-                buttons = Array.from(document.querySelectorAll(`button[aria-label*="${targetText.toLowerCase()} tracking"]`))
-            }
             
             if (buttons.length === 0) {
                 buttons = Array.from(document.querySelectorAll('button')).filter(btn => 
@@ -43,12 +40,9 @@ export const answerConsentTrackingForm = async (page, dnt = false) => {
                 )
             }
             
-            if (buttons.length === 0) {
-                buttons = Array.from(document.querySelectorAll('button[aria-label*="tracking"]'))
-            }
-            
             let clickedCount = 0
             buttons.forEach((button) => {
+                // Only click buttons that are actually visible (offsetParent !== null)
                 if (button.offsetParent !== null) {
                     button.click()
                     clickedCount++
@@ -57,7 +51,8 @@ export const answerConsentTrackingForm = async (page, dnt = false) => {
             
             return clickedCount
         }, buttonText)
-        
+
+        // after clicking an answering button, the tracking consent should not stay in the DOM
         if (clickSuccess > 0) {
             await page.waitForTimeout(2000)
             const isGone = await page.locator('text=Tracking Consent').isHidden({ timeout: 5000 }).catch(() => false)
@@ -65,26 +60,9 @@ export const answerConsentTrackingForm = async (page, dnt = false) => {
                 return
             }
         }
-        
-        try {
-            const allButtons = await page.locator(`button[aria-label*="${buttonText.toLowerCase()} tracking"]`).all()
-            
-            for (let i = 0; i < allButtons.length; i++) {
-                try {
-                    await allButtons[i].click({ force: true, timeout: 1000 })
-                } catch (clickError) {
-                    // Continue with next button
-                }
-            }
-            
-            await page.waitForTimeout(2000)
-        } catch (error) {
-            // Continue test execution
-        }
-        
-          } catch (error) {
-          // Continue test execution
-      }
+    } catch (error) {
+        // Continue test execution silently
+    }
 }
 
 /**
@@ -285,17 +263,12 @@ export const registerShopper = async ({page, userCredentials, isMobile = false})
     await tokenResponsePromise
     expect((await tokenResponsePromise).status()).toBe(200)
 
-    // Wait for navigation to account page with increased timeout and fallback selectors
     await page.waitForLoadState('networkidle', { timeout: 10000 })
     
     // Try multiple selectors for account details - the UI might have changed
     const accountDetailsSelectors = [
         page.getByRole('heading', {name: /Account Details/i}),
-        page.getByRole('heading', {name: /My Account/i}),
-        page.getByTestId('account-details'),
-        page.locator('h1:has-text("Account Details")'),
-        page.locator('h2:has-text("Account Details")'),
-        page.locator('[data-testid="account-page"]')
+        page.getByRole('heading', {name: /My Account/i})
     ]
     
     let foundSelector = null
@@ -426,14 +399,12 @@ export const loginShopper = async ({page, userCredentials}) => {
         )
         await page.getByRole('button', {name: /Sign In/i}).click()
         
-        // Wait for responses with increased timeout
         const loginResponse = await loginResponsePromise
         expect(loginResponse.status()).toBe(303) // Login returns a 303 redirect to /callback with authCode and usid
         
         const tokenResponse = await tokenResponsePromise
         expect(tokenResponse.status()).toBe(200)
-        
-        // Wait for navigation to complete and check if we're on account page
+
         await page.waitForLoadState('networkidle', { timeout: 10000 })
         
         // Check if we successfully logged in by looking for account indicators
@@ -445,10 +416,7 @@ export const loginShopper = async ({page, userCredentials}) => {
         // Try to find account-related elements
         const accountIndicators = [
             page.getByRole('heading', {name: /Account Details/i}),
-            page.getByRole('heading', {name: /My Account/i}),
-            page.getByText(/Welcome/i),
-            page.locator('[data-testid="account-nav"]'),
-            page.getByText(userCredentials.email)
+            page.getByRole('heading', {name: /My Account/i})
         ]
         
         for (const indicator of accountIndicators) {
