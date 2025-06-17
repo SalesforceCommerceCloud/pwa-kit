@@ -16,7 +16,7 @@ jest.mock('@salesforce/retail-react-app/app/utils/store-locator-utils', () => ({
     getSelectedStoreData: jest.fn()
 }))
 
-jest.mock('@salesforce/retail-react-app/app/components/store-locator-modal', () => {
+jest.mock('@salesforce/retail-react-app/app/components/store-locator', () => {
     // eslint-disable-next-line react/prop-types
     function MockStoreLocatorModal({isOpen, onClose}) {
         return isOpen ? (

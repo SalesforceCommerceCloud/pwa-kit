@@ -10,9 +10,9 @@ import {useSearchStores} from '@salesforce/commerce-sdk-react'
 import {useIntl} from 'react-intl'
 import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
 import {
-    STORE_LOCATOR_DISTANCE,
-    STORE_LOCATOR_DISTANCE_UNIT,
-    DEFAULT_STORE_LOCATOR_COUNTRY
+    STORE_LOCATOR_RADIUS,
+    STORE_LOCATOR_RADIUS_UNIT,
+    STORE_LOCATOR_DEFAULT_COUNTRY_CODE
 } from '@salesforce/retail-react-app/app/constants'
 
 const useSeStoreSelection = () => {
@@ -29,7 +29,7 @@ const useSeStoreSelection = () => {
     const getCountryForPostalSearch = useCallback((zipcode, explicitCountry) => {
         return explicitCountry && explicitCountry !== 'none'
             ? explicitCountry
-            : DEFAULT_STORE_LOCATOR_COUNTRY.countryCode
+            : STORE_LOCATOR_DEFAULT_COUNTRY_CODE
     }, [])
 
     const {data: coordinateStoreData, isLoading: isLoadingCoordinateStores} = useSearchStores({
@@ -37,9 +37,9 @@ const useSeStoreSelection = () => {
             latitude: locationData?.latitude,
             longitude: locationData?.longitude,
             locale: intl.locale,
-            maxDistance: STORE_LOCATOR_DISTANCE,
+            maxDistance: STORE_LOCATOR_RADIUS,
             limit: 200,
-            distanceUnit: STORE_LOCATOR_DISTANCE_UNIT
+            distanceUnit: STORE_LOCATOR_RADIUS_UNIT
         },
         enabled:
             enableCoordinateSearch && Boolean(locationData?.latitude && locationData?.longitude)
@@ -55,9 +55,9 @@ const useSeStoreSelection = () => {
             postalCode: locationData?.zipcode,
             countryCode: countryCodeToUse,
             locale: intl.locale,
-            maxDistance: STORE_LOCATOR_DISTANCE,
+            maxDistance: STORE_LOCATOR_RADIUS,
             limit: 200,
-            distanceUnit: STORE_LOCATOR_DISTANCE_UNIT
+            distanceUnit: STORE_LOCATOR_RADIUS_UNIT
         },
         enabled: Boolean(locationData?.zipcode && !locationData?.latitude)
     })
@@ -67,9 +67,9 @@ const useSeStoreSelection = () => {
             postalCode: locationData?.zipcode,
             countryCode: countryCodeToUse,
             locale: intl.locale,
-            maxDistance: STORE_LOCATOR_DISTANCE,
+            maxDistance: STORE_LOCATOR_RADIUS,
             limit: 200,
-            distanceUnit: STORE_LOCATOR_DISTANCE_UNIT
+            distanceUnit: STORE_LOCATOR_RADIUS_UNIT
         },
         enabled: Boolean(
             locationData?.storeName && locationData?.zipcode && !locationData?.latitude
@@ -77,17 +77,17 @@ const useSeStoreSelection = () => {
     })
 
     const getGlobalSearchParams = useCallback(() => {
-        const baseDistance = STORE_LOCATOR_DISTANCE * 200
+        const baseDistance = STORE_LOCATOR_RADIUS * 200
         const storeNameDistance =
             locationData?.storeName && locationData?.countryCode ? baseDistance * 2 : baseDistance
 
         return {
-            latitude: DEFAULT_STORE_LOCATOR_COUNTRY.latitude || 0,
-            longitude: DEFAULT_STORE_LOCATOR_COUNTRY.longitude || 0,
+            latitude: 0,
+            longitude: 0,
             locale: intl.locale,
             maxDistance: storeNameDistance,
             limit: 200,
-            distanceUnit: STORE_LOCATOR_DISTANCE_UNIT
+            distanceUnit: STORE_LOCATOR_RADIUS_UNIT
         }
     }, [locationData?.storeName, locationData?.countryCode, intl.locale])
 
@@ -121,15 +121,15 @@ const useSeStoreSelection = () => {
     )
 
     const getFallbackSearchParams = useCallback(() => {
-        const maxDistance = STORE_LOCATOR_DISTANCE * 500
+        const maxDistance = STORE_LOCATOR_RADIUS * 500
 
         return {
-            latitude: DEFAULT_STORE_LOCATOR_COUNTRY.latitude || 0,
-            longitude: DEFAULT_STORE_LOCATOR_COUNTRY.longitude || 0,
+            latitude: 0,
+            longitude: 0,
             locale: intl.locale,
             maxDistance,
             limit: 200,
-            distanceUnit: STORE_LOCATOR_DISTANCE_UNIT
+            distanceUnit: STORE_LOCATOR_RADIUS_UNIT
         }
     }, [intl.locale])
 
@@ -206,9 +206,9 @@ const useSeStoreSelection = () => {
             latitude: cityCoords?.lat,
             longitude: cityCoords?.lng,
             locale: intl.locale,
-            maxDistance: STORE_LOCATOR_DISTANCE * 5,
+            maxDistance: STORE_LOCATOR_RADIUS * 5,
             limit: 200,
-            distanceUnit: STORE_LOCATOR_DISTANCE_UNIT
+            distanceUnit: STORE_LOCATOR_RADIUS_UNIT
         },
         enabled: Boolean(
             cityCoords &&
