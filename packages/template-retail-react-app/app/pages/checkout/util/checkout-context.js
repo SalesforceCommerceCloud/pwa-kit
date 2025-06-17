@@ -20,6 +20,7 @@ export const CheckoutProvider = ({children}) => {
 
     const CHECKOUT_STEPS_LIST = [
         'CONTACT_INFO',
+        'PICKUP_ADDRESS',
         'SHIPPING_ADDRESS',
         'SHIPPING_OPTIONS',
         'PAYMENT',
@@ -39,7 +40,9 @@ export const CheckoutProvider = ({children}) => {
         if (customer.isGuest && !basket.customerInfo?.email) {
             step = STEPS.CONTACT_INFO
         } else if (!basket.shipments[0]?.shippingAddress) {
-            step = STEPS.SHIPPING_ADDRESS
+            // Check if it's a pickup order
+            const isPickupOrder = true
+            step = isPickupOrder ? STEPS.PICKUP_ADDRESS : STEPS.SHIPPING_ADDRESS
         } else if (!basket.shipments[0]?.shippingMethod) {
             step = STEPS.SHIPPING_OPTIONS
         } else if (!basket.paymentInstruments || !basket.billingAddress) {
@@ -74,7 +77,17 @@ export const CheckoutProvider = ({children}) => {
     const value = {
         step,
         STEPS,
-        goToNextStep: () => setStep(step + 1),
+        goToNextStep: () => {
+            // Check if current step is CONTACT_INFO
+            if (step === STEPS.CONTACT_INFO) {
+                // Determine if it's a pickup order
+                const isPickupOrder = basket?.shipments[0]?.shippingMethod?.c_storePickupEnabled === true
+                // Skip to appropriate next step
+                setStep(isPickupOrder ? STEPS.PICKUP_ADDRESS : STEPS.SHIPPING_ADDRESS)
+            } else {
+                setStep(step + 1)
+            }
+        },
         goToStep: (step) => setStep(step)
     }
 

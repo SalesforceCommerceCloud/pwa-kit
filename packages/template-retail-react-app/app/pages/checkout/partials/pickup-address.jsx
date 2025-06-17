@@ -5,132 +5,79 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React, {useState} from 'react'
-import {nanoid} from 'nanoid'
-import {defineMessage, useIntl} from 'react-intl'
-import {useCheckout} from '@salesforce/retail-react-app/app/pages/checkout/util/checkout-context'
+import {FormattedMessage, useIntl} from 'react-intl'
+
+// Components
+import {
+    Box,
+    Button,
+    Container,
+    Text
+} from '@salesforce/retail-react-app/app/components/shared/ui'
 import {
     ToggleCard,
     ToggleCardEdit,
     ToggleCardSummary
 } from '@salesforce/retail-react-app/app/components/toggle-card'
-import ShippingAddressSelection from '@salesforce/retail-react-app/app/pages/checkout/partials/shipping-address-selection'
 import AddressDisplay from '@salesforce/retail-react-app/app/components/address-display'
-import {
-    useShopperCustomersMutation,
-    useShopperBasketsMutation
-} from '@salesforce/commerce-sdk-react'
+
+// Hooks
+import {useCheckout} from '@salesforce/retail-react-app/app/pages/checkout/util/checkout-context'
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
-
-const submitButtonMessage = defineMessage({
-    defaultMessage: 'Continue to Shipping Method',
-    id: 'shipping_address.button.continue_to_shipping'
-})
-const shippingAddressAriaLabel = defineMessage({
-    defaultMessage: 'Shipping Address Form',
-    id: 'shipping_address.label.shipping_address_form'
-})
+import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
 
 export default function PickupAddress() {
     const {formatMessage} = useIntl()
     const [isLoading, setIsLoading] = useState()
-    const {data: customer} = useCurrentCustomer()
-    const {data: basket} = useCurrentBasket()
-    const pickupAddress = basket?.shipments && basket?.shipments[0]?.shippingAddress
     const {step, STEPS, goToStep, goToNextStep} = useCheckout()
 
-    const submitAndContinue = async (address) => {
-        setIsLoading(true)
-        const {
-            addressId,
-            address1,
-            city,
-            countryCode,
-            firstName,
-            lastName,
-            phone,
-            postalCode,
-            stateCode
-        } = address
-        await updateShippingAddressForShipment.mutateAsync({
-            parameters: {
-                basketId: basket.basketId,
-                shipmentId: 'me',
-                useAsBilling: false
-            },
-            body: {
-                address1,
-                city,
-                countryCode,
-                firstName,
-                lastName,
-                phone,
-                postalCode,
-                stateCode
-            }
-        })
+    const {site} = useMultiSite()
+    const storeInfoKey = `store_${site.id}`
+    const storeInfo = JSON.parse(window.localStorage.getItem(storeInfoKey))
+    const pickupAddress = storeInfo?.shippingAddress
 
-        if (customer.isRegistered && !addressId) {
-            const body = {
-                address1,
-                city,
-                countryCode,
-                firstName,
-                lastName,
-                phone,
-                postalCode,
-                stateCode,
-                addressId: nanoid()
-            }
-            await createCustomerAddress.mutateAsync({
-                body,
-                parameters: {customerId: customer.customerId}
-            })
-        }
-
-        if (customer.isRegistered && addressId) {
-            await updateCustomerAddress.mutateAsync({
-                body: address,
-                parameters: {
-                    customerId: customer.customerId,
-                    addressName: addressId
-                }
-            })
-        }
-
-        goToNextStep()
-        setIsLoading(false)
+    const onSubmit = () => {
+        goToStep(STEPS.PAYMENT)
     }
 
     return (
         <ToggleCard
-            id="step-1"
+            id="step-2"
             title={formatMessage({
                 defaultMessage: 'Pickup Address & Information',
                 id: 'pickup_address.title.pickup_address'
             })}
-            editing={step === STEPS.SHIPPING_ADDRESS}
+            editing={step === STEPS.PICKUP_ADDRESS}
+            disabled={step === STEPS.CONTACT_INFO}
             isLoading={isLoading}
-            disabled={step === STEPS.CONTACT_INFO && !selectedShippingAddress}
-            onEdit={() => goToStep(STEPS.SHIPPING_ADDRESS)}
-            editLabel={formatMessage({
-                defaultMessage: 'Edit Shipping Address',
-                id: 'toggle_card.action.editShippingAddress'
-            })}
         >
             <ToggleCardEdit>
-                <ShippingAddressSelection
-                    selectedAddress={selectedShippingAddress}
-                    submitButtonLabel={submitButtonMessage}
-                    onSubmit={submitAndContinue}
-                    formTitleAriaLabel={shippingAddressAriaLabel}
-                />
-            </ToggleCardEdit>
-            {pickupAddress && (
-                <ToggleCardSummary>
+                <Text fontWeight="bold" fontSize="md" mb={2}>
+                    <FormattedMessage
+                        defaultMessage="Store Information"
+                        id="pickup_address.title.store_information"
+                    />
+                </Text>
+                {pickupAddress && (
                     <AddressDisplay address={pickupAddress} />
-                </ToggleCardSummary>
-            )}
+                )}
+                <Box pt={3}>
+                    <Container variant="form">
+                        <Button w="full" onClick={onSubmit}>
+                            <FormattedMessage
+                                defaultMessage="Continue to Payment"
+                                id="pickup_address.button.continue_to_payment"
+                            />
+                        </Button>
+                    </Container>
+                </Box>
+            </ToggleCardEdit>
+            <ToggleCardSummary>
+                {pickupAddress && (
+                    <AddressDisplay address={pickupAddress} />
+                )}
+            </ToggleCardSummary>
         </ToggleCard>
     )
 }

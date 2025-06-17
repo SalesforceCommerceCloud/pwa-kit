@@ -53,7 +53,8 @@ const Checkout = () => {
     const isSocialEnabled = !!social?.enabled
     const isPasswordlessEnabled = !!passwordless?.enabled
 
-    const isPickupInStore = basket?.pickupInStore
+    const isPickupInStore = true
+    const temp = basket?.shipments && basket?.shipments[0]?.shippingMethod.c_storePickupEnabled === true
 
     useEffect(() => {
         if (error || step === 4) {
