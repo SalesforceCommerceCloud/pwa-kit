@@ -24,11 +24,14 @@ interface StoreLocatorState {
     formValues: FormValues
     deviceCoordinates: DeviceCoordinates
     config: StoreLocatorConfig
+    isModalOpen: boolean
 }
 
 interface StoreLocatorContextValue {
     state: StoreLocatorState
     setState: React.Dispatch<React.SetStateAction<StoreLocatorState>>
+    openModal: () => void
+    closeModal: () => void
 }
 
 interface StoreLocatorProviderProps {
@@ -49,12 +52,23 @@ export const StoreLocatorProvider: React.FC<StoreLocatorProviderProps> = ({confi
             latitude: null,
             longitude: null
         },
-        config
+        config,
+        isModalOpen: false
     })
+
+    const openModal = () => {
+        setState((prev) => ({...prev, isModalOpen: true}))
+    }
+
+    const closeModal = () => {
+        setState((prev) => ({...prev, isModalOpen: false}))
+    }
 
     const value: StoreLocatorContextValue = {
         state,
-        setState
+        setState,
+        openModal,
+        closeModal
     }
 
     return <StoreLocatorContext.Provider value={value}>{children}</StoreLocatorContext.Provider>
