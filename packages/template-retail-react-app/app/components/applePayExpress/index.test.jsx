@@ -1,6 +1,6 @@
 import React from 'react'
-import {render, screen, waitFor} from '@testing-library/react'
-import {ApplePayExpress} from './index'
+import {render, waitFor} from '@testing-library/react'
+import {ApplePayExpress} from '@salesforce/retail-react-app/app/components/applePayExpress/index'
 import AdyenCheckout from '@adyen/adyen-web'
 import {useAdyenExpressCheckout} from '@adyen/adyen-salesforce-pwa'
 
@@ -17,7 +17,6 @@ jest.mock('@adyen/adyen-salesforce-pwa', () => ({
 
 describe('ApplePayExpress', () => {
     const mockProps = {
-        showLoading: false,
         shippingMethods: []
     }
 
@@ -75,11 +74,6 @@ describe('ApplePayExpress', () => {
                 mount: mockMount
             })
         })
-    })
-
-    it('renders loading spinner when showLoading is true', () => {
-        render(<ApplePayExpress {...mockProps} showLoading={true} />)
-        expect(screen.getByRole('status')).toBeInTheDocument()
     })
 
     it('initializes AdyenCheckout with correct configuration', async () => {

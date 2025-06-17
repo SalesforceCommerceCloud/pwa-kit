@@ -7,13 +7,12 @@
 import React, {useEffect, useRef} from 'react'
 import AdyenCheckout from '@adyen/adyen-web'
 import '@adyen/adyen-web/dist/adyen.css'
-import {Spinner, Flex} from '@chakra-ui/react'
 import PropTypes from 'prop-types'
 import {useAdyenExpressCheckout} from '@adyen/adyen-salesforce-pwa'
-import {getCurrencyValueForApi} from './utils/parsers.mjs'
-import {AdyenShippingMethodsService} from './utils/shipping-methods'
-import {AdyenShippingAddressService} from './utils/shipping-address'
-import {AdyenPaymentsService} from './utils/payments'
+import {getCurrencyValueForApi} from '@salesforce/retail-react-app/app/components/applePayExpress/utils/parsers'
+import {AdyenShippingMethodsService} from '@salesforce/retail-react-app/app/components/applePayExpress/utils/shipping-methods'
+import {AdyenShippingAddressService} from '@salesforce/retail-react-app/app/components/applePayExpress/utils/shipping-address'
+import {AdyenPaymentsService} from '@salesforce/retail-react-app/app/components/applePayExpress/utils/payments'
 
 const PAYMENT_METHOD = 'applepay';
 const EXPRESS_PAYMENT_AVAILABLE = 'express.payment.available';
@@ -244,7 +243,7 @@ export const getAppleButtonConfig = (
     return buttonConfig
 }
 
-export const ApplePayExpress = (props) => {
+export const ApplePayExpress = () => {
     const {
         adyenEnvironment,
         adyenPaymentMethods,
@@ -347,17 +346,11 @@ export const ApplePayExpress = (props) => {
 
     return (
         <>
-            {props.showLoading && (
-                <Flex align={'center'} justify={'center'}>
-                    <Spinner size={'lg'} mt={4} />
-                </Flex>
-            )}
             <div ref={paymentContainer}></div>
         </>
     )
 }
 
 ApplePayExpress.propTypes = {
-    showLoading: PropTypes.bool,
     shippingMethods: PropTypes.array
 }

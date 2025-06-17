@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import currencyList from './currencyList.mjs'
+import currencyList from '@salesforce/retail-react-app/app/components/applePayExpress/utils/currencyList'
 const INVALID_CURRENCY_ERROR = 'invalid currency!'
 // converts the currency value for the Adyen Checkout API
 export function getCurrencyValueForApi(amount, currencyCode) {
