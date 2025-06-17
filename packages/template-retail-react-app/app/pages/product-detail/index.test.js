@@ -570,10 +570,13 @@ test('Add to Cart with Pickup configures shipment when basket has no shipping me
     const storeInfoKey = `store_${siteId}`
     const inventoryId = 'inventory_m_store_store1'
     const storeId = 'store-123'
-    window.localStorage.setItem(storeInfoKey, JSON.stringify({
-        inventoryId,
-        id: storeId
-    }))
+    window.localStorage.setItem(
+        storeInfoKey,
+        JSON.stringify({
+            inventoryId,
+            id: storeId
+        })
+    )
 
     // Create a product with a matching, orderable inventory
     const masterProductWithInventory = {
@@ -601,38 +604,42 @@ test('Add to Cart with Pickup configures shipment when basket has no shipping me
             const body = await req.json()
             // Assert: inventoryId is included in the request body
             expect(body[0].inventoryId).toBe(inventoryId)
-            return res(ctx.json({
-                basketId: 'test-basket-id',
-                shipments: [
-                    {
-                        shipmentId: 'me'
-                        // No shippingMethod property - this triggers configurePickupShipment
-                    }
-                ]
-            }))
+            return res(
+                ctx.json({
+                    basketId: 'test-basket-id',
+                    shipments: [
+                        {
+                            shipmentId: 'me'
+                            // No shippingMethod property - this triggers configurePickupShipment
+                        }
+                    ]
+                })
+            )
         }),
         // Mock the shipment update call that configurePickupShipment makes
         rest.patch('*/baskets/:basketId/shipments/:shipmentId', async (req, res, ctx) => {
             configurePickupShipmentCalled = true
             shipmentUpdateRequest = await req.json()
-            
+
             // Verify the correct parameters are passed to configurePickupShipment
             expect(req.params.basketId).toBe('test-basket-id')
             expect(req.params.shipmentId).toBe('me')
             expect(shipmentUpdateRequest.shippingMethod.id).toBe('GBP005')
             expect(shipmentUpdateRequest.c_fromStoreId).toBe(storeId)
-            
-            return res(ctx.json({
-                basketId: 'test-basket-id',
-                shipments: [
-                    {
-                        shipmentId: 'me',
-                        shippingMethod: {
-                            id: 'GBP005'
+
+            return res(
+                ctx.json({
+                    basketId: 'test-basket-id',
+                    shipments: [
+                        {
+                            shipmentId: 'me',
+                            shippingMethod: {
+                                id: 'GBP005'
+                            }
                         }
-                    }
-                ]
-            }))
+                    ]
+                })
+            )
         })
     )
 
