@@ -343,7 +343,7 @@ test('should display Store Inventory Filter component', async () => {
     expect(await screen.findByTestId('sf-store-inventory-filter')).toBeInTheDocument()
 })
 
-test('should call toggleFilter with inventoryId when store inventory filter is clicked', async () => {
+test('should filter by inventory when inventory filter is clicked', async () => {
     const mockStoreData = {
         id: 'store-123',
         name: 'Test Store',
