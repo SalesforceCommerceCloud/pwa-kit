@@ -51,14 +51,6 @@ const mockPromotions = {
     total: 1
 }
 
-jest.mock('../../commerce-api/auth', () => {
-    return class AuthMock {
-        login() {
-            return mockedGuestCustomer
-        }
-    }
-})
-
 jest.mock('../../commerce-api/einstein')
 
 jest.mock('../../commerce-api/ocapi-shopper-baskets', () => {
@@ -80,6 +72,9 @@ jest.mock('../../commerce-api/ocapi-shopper-baskets', () => {
         }
         async getShippingMethodsForShipment() {
             return mockedShippingMethodsResponse
+        }
+        async updateCustomerForBasket() {
+            return mockedBasketResponse
         }
     }
 })
@@ -174,20 +169,31 @@ test('Can update item quantity in the cart', async () => {
 })
 
 test('Can update item quantity from product view modal', async () => {
-    renderWithProviders(<WrappedCart />)
-    expect(await screen.findByTestId('sf-cart-container')).toBeInTheDocument()
-    expect(screen.getByText(/Black Single Pleat Athletic Fit Wool Suit/i)).toBeInTheDocument()
-
     mockedBasketResponse = {
         ...mockedBasketResponse,
         productItems: [
             {
                 ...mockedBasketResponse.productItems[0],
-                quantity: 3,
-                id: mockedBasketResponse.productItems[0].item_id
+                quantity: 2,
+                id: mockedBasketResponse.productItems[0].item_id,
+                stepQuantity: 1,
+                basePrice: '299.99',
+                productId: '750518699578M'
             }
-        ]
+        ],
+        _productItemsDetail: {
+            '750518699578M': {
+                ...mockVariant,
+                inventory: {
+                    stockLevel: 10
+                }
+            }
+        }
     }
+
+    renderWithProviders(<WrappedCart />)
+    expect(await screen.findByTestId('sf-cart-container')).toBeInTheDocument()
+    expect(screen.getByText(/Black Single Pleat Athletic Fit Wool Suit/i)).toBeInTheDocument()
 
     const cartItem = await screen.findByTestId(
         `sf-cart-item-${mockedBasketResponse.productItems[0].productId}`
@@ -195,8 +201,11 @@ test('Can update item quantity from product view modal', async () => {
 
     const editCartButton = within(cartItem).getByRole('button', {name: 'Edit'})
     userEvent.click(editCartButton)
-    const productView = screen.getByTestId('product-view')
+
+    // Wait for the modal to appear
+    const productView = await screen.findByTestId('product-view-modal')
     expect(productView).toBeInTheDocument()
+
     // update item quantity
     expect(await within(cartItem).getByDisplayValue('2'))
 
@@ -218,8 +227,11 @@ test('Can remove item from the cart', async () => {
     // remove item
     mockedBasketResponse = keysToCamel(mockEmptyBasket)
     const cartItem = await screen.findByTestId('sf-cart-item-750518699578M')
-    userEvent.click(within(cartItem).getByRole('button', {name: /remove/i}))
-    userEvent.click(screen.getByRole('button', {name: /yes, remove item/i}))
+    await userEvent.click(within(cartItem).getByRole('button', {name: /remove/i}))
+    await waitFor(() => {
+        expect(screen.getByRole('button', {name: /yes, remove/i})).toBeInTheDocument()
+    })
+    await userEvent.click(screen.getByRole('button', {name: /yes, remove/i}))
 
     expect(await screen.findByTestId('sf-cart-empty')).toBeInTheDocument()
 })
