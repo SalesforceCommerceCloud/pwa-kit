@@ -230,14 +230,16 @@ class PwaStorefrontMCPServerHighLevel {
         'Create a new React component file based on the provided code or a new component',
         {
           componentName: z.string().describe('Name of the component to create'),
-          componentCode: z.string().optional().describe('Code of the component to create')
+          componentCode: z.string().optional().describe('Code of the component to create'),
+          projectDir: z.string().optional().describe('Directory of Retail React App')
         },
         async (args) => {
           try {
             const componentCode = this.CreateNewComponentTool.createNewComponent
                 (
               args.componentName,
-              args.componentCode
+              args.componentCode,
+              args.projectDir
             );
             return {
               content: [

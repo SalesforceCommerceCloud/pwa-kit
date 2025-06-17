@@ -9,11 +9,11 @@ const hookGroups = [
         name: 'ShopperProducts',
         description: 'Hooks for accessing product and category data from the Shopper Products API. Use these to fetch product details, categories, and related information for building product detail pages, category listings, and navigation.',
         hooks: [
-            {
-                name: 'useProduct',
+    {
+        name: 'useProduct',
                 summary: 'Gets a product by ID from the Shopper Products API. Returns a TanStack Query hook with data from the getProduct endpoint.\nSee: https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-products?meta=getProduct',
-                options: [
-                    {name: 'parameters', description: 'Object with product id (e.g., { id: "123" })'},
+        options: [
+            {name: 'parameters', description: 'Object with product id (e.g., { id: "123" })'},
                     {name: 'queryOptions', description: 'TanStack Query options'}
                 ]
             },
@@ -90,7 +90,7 @@ const hookGroups = [
             {
                 name: 'useShopperBasketsMutation',
                 summary: 'Perform mutations on baskets (create, update, delete, etc). This hook provides access to all mutation endpoints for baskets, such as createBasket, addItemToBasket, updateBasket, etc.\nSee: https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-baskets',
-                options: [
+        options: [
                     {name: 'mutation', description: 'Mutation type (e.g., CreateBasket, AddItemToBasket, etc)'},
                     {name: 'parameters', description: 'Mutation parameters object'}
                 ]
@@ -211,7 +211,7 @@ const hookGroups = [
             {
                 name: 'useShopperCustomersMutation',
                 summary: 'Perform mutations on customers (register, update, address, payment, product lists, etc). This hook provides access to all mutation endpoints for customers, such as registerCustomer, updateCustomer, createCustomerAddress, etc.\nSee: https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-customers',
-                options: [
+        options: [
                     {name: 'mutation', description: 'Mutation type (e.g., RegisterCustomer, UpdateCustomer, etc)'},
                     {name: 'parameters', description: 'Mutation parameters object'}
                 ]
@@ -383,20 +383,20 @@ const HooksShowcase = () => {
                 <Box flex={1} p={8} minW={0} maxW="800px" mx="auto">
                     <Heading as="h2" size="md" mb={4}>
                      {group.name} Hooks
-                    </Heading>
+            </Heading>
                     <Box color="gray.600" mb={4}>{group.description}</Box>
-                    <VStack align="stretch" spacing={6}>
+            <VStack align="stretch" spacing={6}>
                         {group.hooks.map((hook) => (
                             <Box key={hook.name} borderWidth={1} borderRadius="md" p={5} bg="gray.25">
                                 <HStack justify="space-between" align="flex-start">
                                     <Box>
                                         <Heading as="h3" size="md" mb={1}>
                                             <Code fontSize="md">{hook.name}</Code>
-                                        </Heading>
+                            </Heading>
                                         <Text mb={2}>{renderSummaryWithLinks(hook.summary)}</Text>
-                                        <Text fontWeight="semibold" mb={1}>Options:</Text>
+                        <Text fontWeight="semibold" mb={1}>Options:</Text>
                                         <VStack align="stretch" spacing={1}>
-                                            {hook.options.map((opt) => (
+                            {hook.options.map((opt) => (
                                                 <Text key={opt.name} fontSize="sm">
                                                     <Code fontSize="sm" colorScheme="gray">{opt.name}</Code>: {opt.description}
                                                 </Text>
@@ -405,9 +405,9 @@ const HooksShowcase = () => {
                                     </Box>
                                 </HStack>
                             </Box>
-                        ))}
-                    </VStack>
-                </Box>
+                            ))}
+                        </VStack>
+                    </Box>
             </Flex>
         </Box>
     )

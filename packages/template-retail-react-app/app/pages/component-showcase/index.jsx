@@ -69,6 +69,7 @@ import PageActionPlaceHolder from '@salesforce/retail-react-app/app/components/p
 import ProductViewModal from '@salesforce/retail-react-app/app/components/product-view-modal'
 import {PlusIcon} from '@salesforce/retail-react-app/app/components/icons'
 import ShowcaseTopBar from '@salesforce/retail-react-app/app/components/shared/ShowcaseTopBar'
+import Hero from '@salesforce/retail-react-app/app/components/hero'
 
 const mockProducts = [
     {
@@ -460,6 +461,20 @@ const componentCategories = [
         name: 'Product View Modal',
         description: 'A modal dialog that displays product details.',
         component: <ProductViewModalDemo />
+    },
+    {
+        name: 'Hero',
+        description: 'A prominent hero section with image, title, and actions.',
+        component: (
+            <Hero
+                title="The React PWA Starter Store for Retail"
+                img={{
+                    src: 'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw2ad3abd7/images/medium/PG.10219685.JJ169XX.PZ.jpg',
+                    alt: 'PWA Kit Hero'
+                }}
+                actions={null}
+            />
+        )
     }
 ].sort((a, b) => a.name.localeCompare(b.name))
 

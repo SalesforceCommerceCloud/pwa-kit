@@ -27,10 +27,11 @@ export class InsertExistingComponentTool {
      * @param {string} [pagesDir='src/pages']
      * @param {string} [componentsDir='src/components']
      */
-    async insertComponentIntoPage(pageName, componentName, pagesDir = 'src/pages', componentsDir = 'src/components') {
+    async insertComponentIntoPage(pageName, componentName, projectDir = '/Users/wei.liu/dev/git-repos/pwa-kit/packages/template-retail-react-app', pagesDir = 'app/pages', componentsDir = 'app/components') {
       // Find the page file (support .js and .jsx)
-      let pageFile = `${pagesDir}/${pageName}.js`;
-      let pageFileAlt = `${pagesDir}/${pageName}.jsx`;
+      let pageFile = path.join(projectDir, pagesDir, `${pageName}.js`);
+      componentsDir = path.join(projectDir, componentsDir);
+      let pageFileAlt = path.join(projectDir, pagesDir, `${pageName}.jsx`);
       let pagePath = null;
       try {
         await fs.access(pageFile);
@@ -43,10 +44,11 @@ export class InsertExistingComponentTool {
           throw new Error(`Page file not found: ${pageFile} or ${pageFileAlt}`);
         }
       }
+      console.log('==== pagePath', pagePath);
 
       // Find the component file (support .js and .jsx)
-      let compFile = `${componentsDir}/${componentName}.js`;
-      let compFileAlt = `${componentsDir}/${componentName}.jsx`;
+      let compFile = `${componentsDir}/${componentName}/index.js`;
+      let compFileAlt = `${componentsDir}/${componentName}/index.jsx`;
       let compPath = null;
       try {
         await fs.access(compFile);

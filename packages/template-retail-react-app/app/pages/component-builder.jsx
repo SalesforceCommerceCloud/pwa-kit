@@ -7,9 +7,10 @@ import {Textarea} from '@chakra-ui/react'
 import {FormControl, FormLabel, Input} from '@chakra-ui/react'
 import {CloseButton} from '@chakra-ui/react'
 import ProductTile from '@salesforce/retail-react-app/app/components/product-tile'
-import mockProduct from '../mocks/master-25517823M.js'
+import mockProduct from '@salesforce/retail-react-app/app/mocks/master-25517823M.js'
+
 import AddressDisplay from '@salesforce/retail-react-app/app/components/address-display'
-import {mockedRegisteredCustomer} from '../mocks/mock-data.js'
+import {mockedRegisteredCustomer} from '@salesforce/retail-react-app/app/mocks/mock-data.js'
 import {IconButton} from '@chakra-ui/react'
 import {CopyIcon} from '@chakra-ui/icons'
 import {useToast} from '@chakra-ui/react'
@@ -20,6 +21,7 @@ import {
     StarIcon,
     PhotoIcon
 } from '@chakra-ui/icons'
+import Hero from '@salesforce/retail-react-app/app/components/hero'
 const mockAddress = mockedRegisteredCustomer.addresses[0]
 
 const DEFAULT_CODE = `function Demo() {
@@ -71,7 +73,7 @@ const ComponentBuilder = () => {
         e.preventDefault()
         const type = e.dataTransfer.getData('componentType')
         if (type === 'Box' || type === 'Text' || type === 'ProductTile' || type === 'AddressDisplay' || 
-            type === 'VStack' || type === 'HStack' || type === 'SimpleGrid' || type === 'Image') {
+            type === 'VStack' || type === 'HStack' || type === 'SimpleGrid' || type === 'Image' || type === 'Hero') {
             const newNode = { 
                 id: getId(), 
                 type, 
@@ -79,7 +81,12 @@ const ComponentBuilder = () => {
                     (type === 'SimpleGrid' ? Array(9).fill(null) : 
                      type === 'VStack' || type === 'HStack' ? Array(3).fill(null) : []) : undefined,
                 cellIndex,
-                src: type === 'Image' ? 'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw2ad3abd7/images/medium/PG.10219685.JJ169XX.PZ.jpg' : undefined
+                src: type === 'Image' ? 'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw2ad3abd7/images/medium/PG.10219685.JJ169XX.PZ.jpg' : undefined,
+                title: type === 'Hero' ? 'The React PWA Starter Store for Retail' : undefined,
+                img: type === 'Hero' ? {
+                    src: 'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw2ad3abd7/images/medium/PG.10219685.JJ169XX.PZ.jpg',
+                    alt: 'PWA Kit Hero'
+                } : undefined
             }
             if (!parentId) {
                 setDroppedComponents(prev => [...prev, newNode])
@@ -96,28 +103,24 @@ const ComponentBuilder = () => {
     // Recursively add child to tree
     function addChildToTree(tree, parentId, child) {
         return tree.map(node => {
+            if (!node) return node;
             if (node.id === parentId) {
                 if (node.type === 'SimpleGrid') {
-                    // For SimpleGrid, we need to find the specific cell
                     const cellIndex = parseInt(child.cellIndex)
-                    // Ensure we have a full array of 9 cells
                     const newChildren = Array(9).fill(null)
-                    // Copy existing children if they exist
                     if (node.children) {
                         node.children.forEach((existingChild, index) => {
-                            newChildren[index] = existingChild
+                            if (existingChild) newChildren[index] = existingChild
                         })
                     }
-                    // Add the new child to the specific cell
                     newChildren[cellIndex] = child
                     return { ...node, children: newChildren }
                 } else if (node.type === 'VStack' || node.type === 'HStack') {
-                    // For VStack and HStack, handle 3 cells
                     const cellIndex = parseInt(child.cellIndex)
                     const newChildren = Array(3).fill(null)
                     if (node.children) {
                         node.children.forEach((existingChild, index) => {
-                            newChildren[index] = existingChild
+                            if (existingChild) newChildren[index] = existingChild
                         })
                     }
                     newChildren[cellIndex] = child
@@ -238,6 +241,7 @@ const ComponentBuilder = () => {
                                 bg="white"
                                 minH="40px"
                                 position="relative"
+                                width={node.type === 'VStack' ? '100%' : undefined}
                                 onDrop={e => { e.stopPropagation(); handleDrop(e, node.id, index); }}
                                 onDragOver={handleDragOver}
                                 flex={node.type === 'HStack' ? 1 : undefined}
@@ -459,6 +463,16 @@ const ComponentBuilder = () => {
                     </Box>
                 )
             }
+            if (node.type === 'Hero') {
+                return (
+                    <Box key={node.id} borderColor={hoveredId === node.id ? 'blue.500' : 'gray.200'} borderWidth={1} borderRadius="md" onMouseEnter={() => setHoveredId(node.id)} onMouseLeave={() => setHoveredId(null)} position="relative" p={2} mb={2}>
+                        {hoveredId === node.id && (
+                            <CloseButton size="sm" position="absolute" top={1} right={1} zIndex={2} onClick={e => { e.stopPropagation(); setDroppedComponents(tree => removeNodeById(tree, node.id)) }} />
+                        )}
+                        <Hero title={node.title} img={node.img} />
+                    </Box>
+                )
+            }
             return null
         })
     }
@@ -474,7 +488,8 @@ const ComponentBuilder = () => {
         SimpleGrid: false,
         Image: false,
         mockProduct: false, 
-        mockAddress: false
+        mockAddress: false,
+        Hero: false
     }) {
         const pad = ' '.repeat(indent)
         return nodes.map(node => {
@@ -525,6 +540,10 @@ const ComponentBuilder = () => {
                 used.Image = true
                 return `${pad}<Box as="img" src="https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw2ad3abd7/images/medium/PG.10219685.JJ169XX.PZ.jpg" alt="Product Image" width="150px" height="150px" objectFit="cover" borderRadius="md" />`
             }
+            if (node.type === 'Hero') {
+                used.Hero = true
+                return `${pad}<Hero title=\"${node.title}\" img={{src: '${node.img.src}', alt: '${node.img.alt}'}} />`
+            }
             return ''
         }).join('\n')
     }
@@ -542,7 +561,8 @@ const ComponentBuilder = () => {
             SimpleGrid: false,
             Image: false,
             mockProduct: false, 
-            mockAddress: false
+            mockAddress: false,
+            Hero: false
         }
         const jsx = getJsxCode(droppedComponents, 4, used)
         const imports = []
@@ -557,13 +577,16 @@ const ComponentBuilder = () => {
             imports.push(`import AddressDisplay from '@salesforce/retail-react-app/app/components/address-display'`)
         }
         if (used.mockProduct) {
-            imports.push(`import mockProduct from '../mocks/master-25517823M.js'`)
+            imports.push(`import mockProduct from '@salesforce/retail-react-app/app/mocks/master-25517823M.js'`)
         }
         if (used.mockAddress) {
-            imports.push(`import {mockedRegisteredCustomer} from '../mocks/mock-data.js'`)
+            imports.push(`import {mockedRegisteredCustomer} from '@salesforce/retail-react-app/app/mocks/mock-data.js'`)
         }
         if (used.Image) {
             imports.push(`import {Image} from '@chakra-ui/react'`)
+        }
+        if (used.Hero) {
+            imports.push(`import Hero from '@salesforce/retail-react-app/app/components/hero'`)
         }
         let mockAddressDef = ''
         if (used.mockAddress) {
@@ -658,6 +681,12 @@ export default ${name}
                                 <Text>Image</Text>
                             </Flex>
                         </Box>
+                        <Box as="li" mb={2} draggable onDragStart={e => handleDragStart(e, 'Hero')} cursor="grab">
+                            <Flex align="center" gap={2}>
+                                <Box as="span" boxSize={4} borderWidth={1} borderRadius="sm" bg="yellow.100" />
+                                <Text>Hero</Text>
+                            </Flex>
+                        </Box>
                     </Box>
                 </Box>
                 {/* Middle Pane: Drop Target and Rendered Components */}
@@ -688,7 +717,7 @@ export default ${name}
                         borderWidth={1}
                         borderRadius="md"
                         p={4}
-                        minH="600px"
+                        minH="800px"
                         bg="white"
                         onDrop={handleDrop}
                         onDragOver={handleDragOver}
