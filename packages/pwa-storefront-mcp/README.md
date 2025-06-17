@@ -29,7 +29,7 @@ This will:
 - Start the MCP server
 - Connect to it as a client
 - List available tools
-- Call the `get_current_time` tool
+- Call the `create_new_component` tool
 - Display the results
 
 ### Method 2: Manual testing with MCP clients
@@ -61,7 +61,7 @@ node server.js
 
 # Then send JSON-RPC requests to stdin:
 {"jsonrpc": "2.0", "id": 1, "method": "tools/list", "params": {}}
-{"jsonrpc": "2.0", "id": 2, "method": "tools/call", "params": {"name": "get_current_time", "arguments": {}}}
+{"jsonrpc": "2.0", "id": 2, "method": "tools/call", "params": {"name": "create_new_component", "arguments": {}}}
 ```
 
 ## Files

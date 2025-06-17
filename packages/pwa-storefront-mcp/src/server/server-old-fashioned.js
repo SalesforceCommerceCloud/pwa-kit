@@ -138,20 +138,6 @@ class PwaStorefrontMCPServer {
       const { name, arguments: args } = request.params;
 
       switch (name) {
-        case 'get_current_time':
-          return {
-            content: [
-              {
-                type: 'text',
-                text: JSON.stringify({
-                  time: new Date().toISOString(),
-                  timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-                  timestamp: Date.now()
-                }, null, 2),
-              },
-            ],
-          };
-
         case 'analyze_code_structure':
           try {
             const analysis = this.addComponentTool.analyzeCodeStructure(args.code);

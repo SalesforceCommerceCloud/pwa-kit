@@ -60,15 +60,17 @@ async function testMCPServer() {
     // Wait for response
     await new Promise(resolve => setTimeout(resolve, 1000));
 
-    // Test 3: Call the get_current_time tool
-    console.log('\n🕐 Calling get_current_time tool...');
+    // Test 3: Call the create_new_component tool
+    console.log('\n🕐 Calling create_new_component tool...');
     const toolCallRequest = {
       jsonrpc: '2.0',
       id: 3,
       method: 'tools/call',
       params: {
-        name: 'get_current_time',
-        arguments: {}
+        name: 'create_new_component',
+        arguments: {
+          componentName: 'my-new-component'
+        }
       }
     };
     
