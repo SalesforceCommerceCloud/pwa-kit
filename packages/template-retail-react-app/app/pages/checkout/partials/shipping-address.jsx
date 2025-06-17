@@ -57,6 +57,7 @@ export default function ShippingAddress() {
             postalCode,
             stateCode
         } = address
+        console.log('address', address)
         await updateShippingAddressForShipment.mutateAsync({
             parameters: {
                 basketId: basket.basketId,

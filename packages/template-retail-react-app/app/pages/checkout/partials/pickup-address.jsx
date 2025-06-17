@@ -26,10 +26,14 @@ import {useCheckout} from '@salesforce/retail-react-app/app/pages/checkout/util/
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
 import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
+import {useShopperBasketsMutation} from '@salesforce/commerce-sdk-react'
 
 export default function PickupAddress() {
     const {formatMessage} = useIntl()
     const [isLoading, setIsLoading] = useState()
+    const updateShippingAddressForShipment = useShopperBasketsMutation(
+        'updateShippingAddressForShipment'
+    )
     const {step, STEPS, goToStep, goToNextStep} = useCheckout()
 
     const {site} = useMultiSite()
@@ -37,7 +41,36 @@ export default function PickupAddress() {
     const storeInfo = JSON.parse(window.localStorage.getItem(storeInfoKey))
     const pickupAddress = storeInfo?.shippingAddress
 
-    const onSubmit = () => {
+    const submitAndContinue = async (address) => {
+        setIsLoading(true)
+        const {
+            address1,
+            city,
+            countryCode,
+            firstName,
+            lastName,
+            phone,
+            postalCode,
+            stateCode
+        } = address
+        await updateShippingAddressForShipment.mutateAsync({
+            parameters: {
+                basketId: basket.basketId,
+                shipmentId: 'me',
+                useAsBilling: false
+            },
+            body: {
+                address1,
+                city,
+                countryCode,
+                firstName,
+                lastName,
+                phone,
+                postalCode,
+                stateCode
+            }
+        })
+        setIsLoading(false)
         goToStep(STEPS.PAYMENT)
     }
 
@@ -64,7 +97,7 @@ export default function PickupAddress() {
                 )}
                 <Box pt={3}>
                     <Container variant="form">
-                        <Button w="full" onClick={onSubmit}>
+                        <Button w="full" onClick={() => submitAndContinue(pickupAddress)}>
                             <FormattedMessage
                                 defaultMessage="Continue to Payment"
                                 id="pickup_address.button.continue_to_payment"

@@ -106,7 +106,7 @@ const Checkout = () => {
                             {!isPickupOrder && <ShippingOptions />}
                             <Payment />
 
-                            {step === 4 && (
+                            {step === 5 && (
                                 <Box pt={3} display={{base: 'none', lg: 'block'}}>
                                     <Container variant="form">
                                         <Button
@@ -133,7 +133,7 @@ const Checkout = () => {
                             showCartItems={true}
                         />
 
-                        {step === 4 && (
+                        {step === 5 && (
                             <Box display={{base: 'none', lg: 'block'}} pt={2}>
                                 <Button w="full" onClick={submitOrder} isLoading={isLoading}>
                                     <FormattedMessage
@@ -147,7 +147,7 @@ const Checkout = () => {
                 </Grid>
             </Container>
 
-            {step === 4 && (
+            {step === 5 && (
                 <Box
                     display={{lg: 'none'}}
                     position="sticky"

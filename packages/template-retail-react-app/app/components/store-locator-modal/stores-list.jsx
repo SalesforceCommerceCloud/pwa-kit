@@ -82,7 +82,8 @@ const StoresList = ({storesInfo}) => {
                 address1: store.address1 || null,
                 city: store.city || null,
                 stateCode: store.stateCode || null,
-                postalCode: store.postalCode || null
+                postalCode: store.postalCode || null,
+                countryCode: store.countryCode || null
             }
         }
 

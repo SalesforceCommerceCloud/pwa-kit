@@ -41,7 +41,7 @@ export const CheckoutProvider = ({children}) => {
             step = STEPS.CONTACT_INFO
         } else if (!basket.shipments[0]?.shippingAddress) {
             // Check if it's a pickup order
-            const isPickupOrder = basket?.shipments[0]?.shippingMethod?.c_storePickupEnabled === true
+            const isPickupOrder = basket?.shipments[0]?.shippingMethod.c_storePickupEnabled === true
             step = isPickupOrder ? STEPS.PICKUP_ADDRESS : STEPS.SHIPPING_ADDRESS
         } else if (!basket.shipments[0]?.shippingMethod) {
             step = STEPS.SHIPPING_OPTIONS
@@ -78,14 +78,17 @@ export const CheckoutProvider = ({children}) => {
         step,
         STEPS,
         goToNextStep: () => {
+            console.log('BEFORE goToNextStep', step)
             // Check if current step is CONTACT_INFO
             if (step === STEPS.CONTACT_INFO) {
                 // Determine if it's a pickup order
-                const isPickupOrder = basket?.shipments[0]?.shippingMethod?.c_storePickupEnabled === true
+                const isPickupOrder = basket?.shipments[0]?.shippingMethod.c_storePickupEnabled === true
                 // Skip to appropriate next step
                 setStep(isPickupOrder ? STEPS.PICKUP_ADDRESS : STEPS.SHIPPING_ADDRESS)
+                console.log('AFTER goToNextStep', step)
             } else {
                 setStep(step + 1)
+                console.log('AFTER goToNextStep', step)
             }
         },
         goToStep: (step) => setStep(step)
