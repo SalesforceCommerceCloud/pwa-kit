@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "simple-time-server": {
+      "command": "node",
+      "args": ["src/server/server.js"],
+      "cwd": "."
+    }
+  }
+} 

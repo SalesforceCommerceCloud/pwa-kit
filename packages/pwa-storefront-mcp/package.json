@@ -1,0 +1,29 @@
+{
+  "name": "pwa-storefront-mcp",
+  "version": "1.0.0",
+  "description": "MCP server that helps you build Salesforce Commerce Cloud PWA Kit Composable Storefront",
+  "main": "src/server/server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node src/server/server.js",
+    "test": "node src/tests/test-mcp.js",
+    "demo": "node src/scripts/demo.js"
+  },
+  "keywords": [
+    "mcp",
+    "server",
+    "pwa",
+    "salesforce",
+    "commerce",
+    "commerce cloud",
+    "pwa kit",
+    "composable storefront"
+  ],
+  "author": "Spark Team",
+  "license": "ISC",
+  "dependencies": {
+    "@babel/runtime": "^7.27.6",
+    "@modelcontextprotocol/sdk": "^1.0.0",
+    "zod": "^3.25.56"
+  }
+}
