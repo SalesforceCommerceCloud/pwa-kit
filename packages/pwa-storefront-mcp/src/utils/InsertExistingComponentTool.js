@@ -27,7 +27,7 @@ export class InsertExistingComponentTool {
      * @param {string} [pagesDir='src/pages']
      * @param {string} [componentsDir='src/components']
      */
-    async insertComponentIntoPage(pageName, componentName, projectDir = '/Users/wei.liu/dev/git-repos/pwa-kit/packages/template-retail-react-app', pagesDir = 'app/pages', componentsDir = 'app/components') {
+    async insertComponentIntoPage(pageName, componentName, projectDir = 'template-retail-react-app', pagesDir = 'app/pages', componentsDir = 'app/components') {
       // Find the page file (support .js and .jsx)
       let pageFile = path.join(projectDir, pagesDir, `${pageName}.js`);
       componentsDir = path.join(projectDir, componentsDir);

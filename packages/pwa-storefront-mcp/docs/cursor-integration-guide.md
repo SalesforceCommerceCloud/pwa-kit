@@ -12,7 +12,7 @@ This guide shows different methods to programmatically insert code blocks in fil
      "mcpServers": {
        "pwa-storefront-mcp": {
          "command": "node",
-         "args": ["/Users/wei.liu/dev/git-repos/pwa-storefront-mcp/server.js"]
+         "args": ["pwa-storefront-mcp/server.js"]
        }
      }
    }

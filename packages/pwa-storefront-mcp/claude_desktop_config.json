@@ -2,7 +2,7 @@
   "mcpServers": {
     "pwa-storefront-mcp": {
       "command": "node",
-      "args": ["/Users/wei.liu/dev/git-repos/pwa-kit/packages/pwa-storefront-mcp/src/server/server.js"]
+      "args": ["pwa-storefront-mcp/src/server/server.js"]
     }
   }
 } 
