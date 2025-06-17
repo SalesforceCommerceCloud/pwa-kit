@@ -1949,6 +1949,12 @@
       "value": "Secure"
     }
   ],
+  "item_attributes.label.bonus_product": [
+    {
+      "type": 0,
+      "value": "Bonus Product"
+    }
+  ],
   "item_attributes.label.promotions": [
     {
       "type": 0,

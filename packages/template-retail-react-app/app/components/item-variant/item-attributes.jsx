@@ -20,12 +20,14 @@ import {getDisplayVariationValues} from '@salesforce/retail-react-app/app/utils/
  * In the context of a cart product item variant, this component renders a styled
  * list of the selected variation values as well as any promos (w/ info popover).
  */
-const ItemAttributes = ({includeQuantity, currency, ...props}) => {
+const ItemAttributes = ({includeQuantity, currency, excludeBonusLabel, ...props}) => {
     const variant = useItemVariant()
     const {data: basket} = useCurrentBasket()
     const {currency: activeCurrency} = useCurrency()
     const promotionIds = variant.priceAdjustments?.map((adj) => adj.promotionId) ?? []
     const intl = useIntl()
+
+    const displayBonusProductLabel = !excludeBonusLabel && variant?.bonusProductLineItem
 
     // Fetch all the promotions given by price adjustments. We display this info in
     // the promotion info popover when applicable.
@@ -91,6 +93,15 @@ const ItemAttributes = ({includeQuantity, currency, ...props}) => {
 
     return (
         <Stack spacing={1.5} flex={1} {...props}>
+            {displayBonusProductLabel && (
+                <Text lineHeight={1} color="black.600" fontSize="sm">
+                    <FormattedMessage
+                        defaultMessage="Bonus Product"
+                        id="item_attributes.label.bonus_product"
+                    />
+                </Text>
+            )}
+
             {variationValues &&
                 Object.keys(variationValues).map((key) => (
                     <Text
@@ -210,7 +221,8 @@ const ItemAttributes = ({includeQuantity, currency, ...props}) => {
 
 ItemAttributes.propTypes = {
     includeQuantity: PropTypes.bool,
-    currency: PropTypes.string
+    currency: PropTypes.string,
+    excludeBonusLabel: PropTypes.bool
 }
 
 export default ItemAttributes
