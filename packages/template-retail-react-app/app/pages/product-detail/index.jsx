@@ -138,9 +138,7 @@ const ProductDetail = () => {
     let bundleChildVariantIds = ''
     if (isProductABundle)
         bundleChildVariantIds = Object.keys(childProductSelection)
-            // TODO: update bundle logic
-            // ?.map((key) => childProductSelection[key].variant.productId || childProductSelection[key].product.id)
-            ?.map((key) => childProductSelection[key].variant.productId)
+            ?.map((key) => childProductSelection[key].variant?.productId || childProductSelection[key].product?.id)
             .join(',')
 
     const {data: bundleChildrenData} = useProducts(
@@ -334,10 +332,16 @@ const ProductDetail = () => {
         })
 
         // Using ot state for which child products are selected, scroll to the first
-        // one that isn't selected.
+        // one that isn't selected and requires a variant selection.
         const selectedProductIds = Object.keys(childProductSelection)
         const firstUnselectedProduct = comboProduct.childProducts.find(
-            ({product: childProduct}) => !selectedProductIds.includes(childProduct.id)
+            ({product: childProduct}) => {
+                // Skip validation for standard products (no variations)
+                if (childProduct.type?.item) {
+                    return false
+                }
+                return !selectedProductIds.includes(childProduct.id)
+            }
         )?.product
 
         if (firstUnselectedProduct) {
