@@ -1,11 +1,10 @@
 const {expect} = require('@playwright/test')
 const config = require('../config')
 const {getCreditCardExpiry, runAccessibilityTest} = require('../scripts/utils.js')
-
 /**
  * Note: As a best practice, we should await the network call and assert on the network response rather than waiting for pageLoadState()
  * to avoid race conditions from lock in pageLoadState being released before network call resolves.
- * 
+ *
  * This is a best practice for tests that are dependent on the network call. Eg.: Shopper login, registration, etc.
  */
 
@@ -226,7 +225,7 @@ export const addProductToCart = async ({page, isMobile = false}) => {
 
 /**
  * Registers a shopper with provided user credentials
- * 
+ *
  * @param {Object} options.page - Object that represents a tab/window in the browser provided by playwright
  * @param {Object} options.userCredentials - Object containing user credentials with the following properties:
  *      - firstName
@@ -239,6 +238,7 @@ export const registerShopper = async ({page, userCredentials, isMobile = false})
     // Create Account and Sign In
     await page.goto(config.RETAIL_APP_HOME + '/registration')
     await answerConsentTrackingForm(page)
+
     await page.waitForLoadState()
 
     // Skip registration if user is already logged in
@@ -533,7 +533,6 @@ export const registeredUserHappyPath = async ({page, registeredUserCredentials, 
             userCredentials: registeredUserCredentials
         })
     }
-    
     await answerConsentTrackingForm(page)
     await page.waitForLoadState()
     
