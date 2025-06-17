@@ -26,7 +26,9 @@ jest.mock('./utils', () => {
     }
 })
 jest.mock('../../auth/index.ts')
-jest.mock('../../hooks/useConfig', () => jest.fn())
+jest.mock('../../hooks/useConfig', () => ({
+    useConfig: jest.fn()
+}))
 
 describe('Storefront Preview Component', function () {
     beforeEach(() => {
