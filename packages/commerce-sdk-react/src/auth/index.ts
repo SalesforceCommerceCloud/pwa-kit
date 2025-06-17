@@ -512,7 +512,7 @@ class Auth {
             this.set('customer_type', isGuest ? 'guest' : 'registered')
 
             accessToken = sfraAuthToken
-            // SFRA -> PWA access token cookie handoff is succesful so we clear the SFRA made cookies.
+            // SFRA -> PWA access token cookie handoff is successful so we clear the SFRA made cookies.
             // We don't want these cookies to persist and continue overriding what is in local store.
             this.clearSFRAAuthToken()
         }
