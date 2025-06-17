@@ -1,0 +1,32 @@
+---
+description: USE WHEN writing unit tests in template-retail-react-app components
+globs: ["packages/template-retail-react-app/app/components/**/*.test.{js,jsx,ts,tsx}"]
+alwaysApply: false
+---
+
+# 🛍️ Retail React App Test Rules
+
+## Package-Specific Requirements
+- **File naming**: `index.test.js` (colocated with component)
+- **Always use `renderWithProviders`** (provides Commerce SDK context)
+- **Get user events from return value**: `const {user} = renderWithProviders(...)`
+- **Do NOT import `userEvent` directly**
+
+## API Mocking
+- Use `prependHandlersToServer` or `msw` for API mocking
+
+```js
+import {screen} from '@testing-library/react'
+import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
+import MyComponent from '.'
+
+describe('MyComponent', () => {
+    beforeEach(() => jest.clearAllMocks())
+
+    test('handles user interaction', async () => {
+        const {user} = renderWithProviders(<MyComponent />)
+        await user.click(screen.getByText('Click Me'))
+        expect(screen.getByText('Expected')).toBeInTheDocument()
+    })
+})
+```
