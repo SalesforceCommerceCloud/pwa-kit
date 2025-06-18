@@ -17,7 +17,7 @@ const UpdatePasswordFields = ({form, prefix = ''}) => {
     const password = form.watch('password')
 
     return (
-        <Stack spacing={5} divider={<StackDivider borderColor="gray.100" />}>
+        <Stack gap={5} divider={<StackDivider borderColor="gray.100" />}>
             <Stack>
                 <Field {...fields.currentPassword} />
                 <Box>
@@ -30,7 +30,7 @@ const UpdatePasswordFields = ({form, prefix = ''}) => {
                 </Box>
             </Stack>
 
-            <Stack spacing={3} pb={2}>
+            <Stack gap={3} pb={2}>
                 <Field {...fields.password} />
                 <PasswordRequirements value={password} />
             </Stack>
