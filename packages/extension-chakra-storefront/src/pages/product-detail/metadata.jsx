@@ -21,17 +21,19 @@ import PropTypes from 'prop-types'
 export default function Metadata({product}) {
     const defaultTitle = 'Product Detail Page'
     const defaultDescription = 'View detailed information, specifications, and features for this product.'
+    const defaultKeywords = ''
     const title = product?.pageTitle ?? defaultTitle
     const metaTags = product?.pageMetaTags || []
-    const tags = metaTags.filter((tag) => tag.id !== 'description')
+    const keywords = metaTags.find((tag) => tag.id === 'keywords')?.value || product?.pageKeywords || defaultKeywords
     const description = metaTags.find((tag) => tag.id === 'description')?.value || product?.pageDescription || defaultDescription
-    
+
     return (
         <Helmet>
             <title>{title}</title>
             <meta name="description" content={description} />
+            {keywords && <meta name="keywords" content={keywords} />}
 
-            {tags.map(({id, value}) => (
+            {metaTags.map(({id, value}) => (
                 <meta name={id} content={value} key={id} />
             ))}
         </Helmet>
@@ -42,6 +44,7 @@ Metadata.propTypes = {
     product: PropTypes.shape({
         pageTitle: PropTypes.string,
         pageDescription: PropTypes.string,
+        pageKeywords: PropTypes.string,
         pageMetaTags: PropTypes.arrayOf(
             PropTypes.shape({
                 id: PropTypes.string.isRequired,
