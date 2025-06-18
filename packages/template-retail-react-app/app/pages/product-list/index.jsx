@@ -129,6 +129,7 @@ const ProductList = (props) => {
     const [filtersLoading, setFiltersLoading] = useState(false)
     const [wishlistLoading, setWishlistLoading] = useState([])
     const [sortOpen, setSortOpen] = useState(false)
+    const [searchByInventory, setSearchByInventory] = useState(null)
 
     const urlParams = new URLSearchParams(location.search)
     let searchQuery = urlParams.get('q')
@@ -150,6 +151,8 @@ const ProductList = (props) => {
     // _refine is an invalid param for useProductSearch, we don't want to pass it to API call
     const {_refine, ...restOfParams} = searchParams
 
+    const refine = searchByInventory ? [..._refine, `ilids=${searchByInventory}`] : _refine
+
     const {
         isLoading,
         isFetched,
@@ -170,7 +173,7 @@ const ProductList = (props) => {
                     'page_meta_tags',
                     'custom_properties'
                 ],
-                refine: _refine
+                refine
             }
         },
         {
@@ -319,6 +322,16 @@ const ProductList = (props) => {
 
     // Toggles filter on and off
     const toggleFilter = (value, attributeId, selected, allowMultiple = true) => {
+        // Special handling for inventory filter
+        if (attributeId === 'ilids') {
+            if (!selected) {
+                setSearchByInventory(value.value)
+            } else {
+                setSearchByInventory(null)
+            }
+            return
+        }
+
         const searchParamsCopy = {...searchParams}
 
         // Remove the `offset` search param if present.
@@ -375,6 +388,7 @@ const ProductList = (props) => {
             ...searchParams,
             refine: []
         }
+        setSearchByInventory(null)
         const newPath = isSearch
             ? `/search?${stringifySearchParams(newSearchParams)}`
             : `/category/${params.categoryId}?${stringifySearchParams(newSearchParams)}`
@@ -545,14 +559,18 @@ const ProductList = (props) => {
                                           <StoreInventoryFilter
                                               key="storeInventoryFilter"
                                               toggleFilter={toggleFilter}
-                                              selectedFilters={searchParams.refine}
+                                              selectedFilters={
+                                                  productSearchResult?.selectedRefinements || {}
+                                              }
                                           />
                                       ]
                                     : [
                                           <StoreInventoryFilter
                                               key="storeInventoryFilter"
                                               toggleFilter={toggleFilter}
-                                              selectedFilters={searchParams.refine}
+                                              selectedFilters={
+                                                  productSearchResult?.selectedRefinements || {}
+                                              }
                                           />
                                       ]
                             }
@@ -697,14 +715,18 @@ const ProductList = (props) => {
                                           <StoreInventoryFilter
                                               key="storeInventoryFilter"
                                               toggleFilter={toggleFilter}
-                                              selectedFilters={searchParams.refine}
+                                              selectedFilters={
+                                                  productSearchResult?.selectedRefinements || {}
+                                              }
                                           />
                                       ]
                                     : [
                                           <StoreInventoryFilter
                                               key="storeInventoryFilter"
                                               toggleFilter={toggleFilter}
-                                              selectedFilters={searchParams.refine}
+                                              selectedFilters={
+                                                  productSearchResult?.selectedRefinements || {}
+                                              }
                                           />
                                       ]
                             }
