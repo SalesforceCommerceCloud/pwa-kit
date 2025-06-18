@@ -16,13 +16,16 @@ import {mockCustomerBaskets} from '@salesforce/retail-react-app/app/mocks/mock-d
 import {
     mockProductBundle,
     mockBundleItemsAdded,
-    basketWithProductBundle,
-    mockStandardProduct,
     mockBundleWithStandardProducts,
     mockBundleItemsWithStandardProducts,
     mockBasketWithStandardProducts
 } from '@salesforce/retail-react-app/app/mocks/product-bundle'
 import {getDisplayVariationValues} from '@salesforce/retail-react-app/app/utils/product-utils'
+import {useCurrentBasket as mockUseCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
+
+jest.mock('@salesforce/retail-react-app/app/hooks/use-current-basket', () => ({
+    useCurrentBasket: jest.fn()
+}))
 
 const MOCK_PRODUCT = {
     currency: 'USD',
@@ -633,6 +636,11 @@ beforeEach(() => {
             return res(ctx.delay(0), ctx.status(200), ctx.json(mockCustomerBaskets))
         })
     )
+    mockUseCurrentBasket.mockReturnValue({
+        data: {},
+        derivedData: {},
+        currency: 'USD'
+    })
 })
 
 test('Renders AddToCartModal with multiple products', () => {
@@ -843,7 +851,7 @@ test('displays standard products in bundle without variation attributes', async 
         currency: 'USD' // Add currency at the top level
     }
 
-    jest.spyOn(require('@salesforce/retail-react-app/app/hooks/use-current-basket'), 'useCurrentBasket').mockReturnValue(mockBasket)
+    mockUseCurrentBasket.mockReturnValue(mockBasket)
 
     renderWithProviders(
         <AddToCartModalContext.Provider
