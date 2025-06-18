@@ -1,7 +1,8 @@
 ## v7.0.0-dev.0 (May 20, 2025)
 
 - Improved the layout of product tiles in product scroll and product list [#2446](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2446)
-- Updated 6 new languagues [#2495](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2495)
+- Updated 6 new languages [#2495](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2495)
+- Fix Einstein event tracking for `addToCart` event [#2558](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2558)
 
 ## v6.1.0 (May 22, 2025)
 
