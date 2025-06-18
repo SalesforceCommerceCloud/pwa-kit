@@ -28,7 +28,7 @@ export default function useBasket(opts = {}) {
 
             // Check if a this represents a valid basket
             get loaded() {
-                return basket && basket.basketId
+                return basket && basket.hasOwnProperty('_productItemsDetail')
             },
 
             get itemCount() {
@@ -106,7 +106,6 @@ export default function useBasket(opts = {}) {
              */
             async addItemToBasket(item) {
                 let newBasket = {}
-                console.log('basket', basket)
                 if (!basket || !basket.basketId) {
                     // Back to using ShopperBaskets for all basket interaction.
                     newBasket = await api.shopperBaskets.createBasket({})
