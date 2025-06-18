@@ -7,14 +7,7 @@
 import React, {useEffect, useState} from 'react'
 import PropTypes from 'prop-types'
 import {FormattedMessage, useIntl} from 'react-intl'
-import {
-    Box,
-    Button,
-    Accordion,
-    AccordionButton,
-    AccordionItem,
-    AccordionPanel
-} from '@chakra-ui/react'
+import {Box, Button, Accordion} from '@chakra-ui/react'
 import {useForm} from 'react-hook-form'
 import {ChevronDownIcon, ChevronUpIcon} from '../../components/icons'
 import PromoCodeFields from '../../components/forms/promo-code-fields'
@@ -104,11 +97,11 @@ export const PromoCode = ({form, submitPromoCode, itemProps}) => {
     }, [form.formState.isSubmitSuccessful])
 
     return (
-        <Accordion allowToggle index={isOpen ? 0 : -1} onChange={() => setOpen(!isOpen)}>
-            <AccordionItem {...itemProps}>
+        <Accordion.Root allowToggle index={isOpen ? 0 : -1} onChange={() => setOpen(!isOpen)}>
+            <Accordion.Item {...itemProps}>
                 {({isExpanded}) => (
                     <>
-                        <AccordionButton
+                        <Accordion.ItemTrigger
                             as={Button}
                             justifyContent="flex-start"
                             variant="link"
@@ -119,11 +112,11 @@ export const PromoCode = ({form, submitPromoCode, itemProps}) => {
                         >
                             <FormattedMessage
                                 defaultMessage="Do you have a promo code?"
-                                id="promocode.accordion.button.have_promocode"
+                                id="promocode.accordion..button.have_promocode"
                             />
-                        </AccordionButton>
+                        </Accordion.ItemTrigger>
 
-                        <AccordionPanel px={0} mb={4}>
+                        <Accordion.ItemContent px={0} mb={4}>
                             <Box
                                 data-testid="promo-code-form"
                                 as="form"
@@ -136,11 +129,11 @@ export const PromoCode = ({form, submitPromoCode, itemProps}) => {
                             >
                                 <PromoCodeFields form={form} maxWidth="350px" />
                             </Box>
-                        </AccordionPanel>
+                        </Accordion.ItemContent>
                     </>
                 )}
-            </AccordionItem>
-        </Accordion>
+            </Accordion.Item>
+        </Accordion.Root>
     )
 }
 
@@ -151,7 +144,7 @@ PromoCode.propTypes = {
     /** The submit callback returned from `usePromoCode` hook */
     submitPromoCode: PropTypes.func.isRequired,
 
-    /** Props applied to inner AccordionItem. Useful for style overrides. */
+    /** Props applied to inner Accordion.Item. Useful for style overrides. */
     itemProps: PropTypes.object
 }
 

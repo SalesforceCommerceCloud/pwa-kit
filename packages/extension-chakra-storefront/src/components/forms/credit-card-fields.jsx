@@ -8,7 +8,7 @@ import React, {useState} from 'react'
 import PropTypes from 'prop-types'
 import ccValidator from 'card-validator'
 import {useIntl} from 'react-intl'
-import {Box, Flex, FormLabel, InputRightElement, SimpleGrid, Stack, Tooltip} from '@chakra-ui/react'
+import {Box, Flex, Field as ChakraField, SimpleGrid, Stack, Tooltip} from '@chakra-ui/react'
 import {formatCreditCardNumber, getCreditCardIcon} from '../../utils/cc-utils'
 import useCreditCardFields from '../../components/forms/useCreditCardFields'
 import Field from '../../components/field'
@@ -65,7 +65,7 @@ const CreditCardFields = ({form, prefix = ''}) => {
                     {...fields.number}
                     formLabel={
                         <Flex justify="space-between">
-                            <FormLabel>{fields.number.label}</FormLabel>
+                            <ChakraField.Label>{fields.number.label}</ChakraField.Label>
                             <Stack direction="row" spacing={1}>
                                 <VisaIcon layerStyle="ccIcon" />
                                 <MastercardIcon layerStyle="ccIcon" />
@@ -84,15 +84,13 @@ const CreditCardFields = ({form, prefix = ''}) => {
                                 : number
                             form.setValue('cardType', card?.type || '')
                             return onChange(formattedNumber)
-                        }
+                        },
+                        endElement:
+                            CardIcon && form.getValues().number?.length > 2 ? (
+                                <CardIcon width="60px" layerStyle="ccIcon" />
+                            ) : undefined
                     })}
-                >
-                    {CardIcon && form.getValues().number?.length > 2 && (
-                        <InputRightElement width="60px">
-                            <CardIcon layerStyle="ccIcon" />
-                        </InputRightElement>
-                    )}
-                </Field>
+                ></Field>
 
                 <Field {...fields.holder} />
 

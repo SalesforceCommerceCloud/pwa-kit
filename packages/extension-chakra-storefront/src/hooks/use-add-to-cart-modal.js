@@ -91,7 +91,7 @@ export const AddToCartModal = () => {
                         margin="0"
                         borderRadius={{base: 'none', md: 'base'}}
                         bgColor="gray.50"
-                        containerProps={{'data-testid': 'add-to-cart-modal'}}
+                        data-testid="add-to-cart-modal"
                     >
                         <Dialog.Header paddingY="8" bgColor="white">
                             <Heading as="h1" fontSize="2xl">

@@ -7,7 +7,7 @@
 import React, {useState} from 'react'
 import PropTypes from 'prop-types'
 import {defineMessage, FormattedMessage, useIntl} from 'react-intl'
-import {Box, Button, Checkbox, Container, Heading, Stack, Text, Divider} from '@chakra-ui/react'
+import {Box, Button, Checkbox, Container, Heading, Stack, Text, Separator} from '@chakra-ui/react'
 import {useForm} from 'react-hook-form'
 import useToast from '../../../hooks/use-toast'
 import {useShopperBasketsMutation} from '@salesforce/commerce-sdk-react'
@@ -182,7 +182,7 @@ const Payment = () => {
                         </Stack>
                     )}
 
-                    <Divider borderColor="gray.100" />
+                    <Separator borderColor="gray.100" />
 
                     <Stack spacing={2}>
                         <Heading as="h3" fontSize="md">
@@ -249,7 +249,7 @@ const Payment = () => {
                         </Stack>
                     )}
 
-                    <Divider borderColor="gray.100" />
+                    <Separator borderColor="gray.100" />
 
                     {selectedBillingAddress && (
                         <Stack spacing={2}>
