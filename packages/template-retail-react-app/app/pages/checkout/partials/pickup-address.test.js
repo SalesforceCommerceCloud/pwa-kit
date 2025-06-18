@@ -22,6 +22,14 @@ jest.mock('@salesforce/commerce-sdk-react', () => {
     }
 })
 
+// Ensure useMultiSite returns site.id = 'site-1' for all tests
+jest.mock('@salesforce/retail-react-app/app/hooks/use-multi-site', () => ({
+    __esModule: true,
+    default: () => ({
+        site: {id: 'site-1'}
+    })
+}))
+
 jest.mock('@salesforce/retail-react-app/app/hooks/use-current-basket', () => ({
     useCurrentBasket: () => ({
         data: {
@@ -73,22 +81,16 @@ jest.mock('@salesforce/retail-react-app/app/pages/checkout/util/checkout-context
     })
 }))
 
-// Mock localStorage
-const mockLocalStorage = {
-    getItem: jest.fn(),
-    setItem: jest.fn(),
-    removeItem: jest.fn(),
-    clear: jest.fn()
-}
-Object.defineProperty(window, 'localStorage', {
-    value: mockLocalStorage
-})
-
 describe('PickupAddress', () => {
+    const siteId = 'site-1'
+    const storeInfoKey = `store_${siteId}`
+
     beforeEach(() => {
         jest.resetModules()
         jest.clearAllMocks()
-        mockLocalStorage.getItem.mockReturnValue(
+
+        window.localStorage.setItem(
+            storeInfoKey,
             JSON.stringify({
                 shippingAddress: {
                     address1: '123 Main Street',
@@ -102,6 +104,7 @@ describe('PickupAddress', () => {
     })
 
     afterEach(() => {
+        window.localStorage.removeItem(storeInfoKey)
         cleanup()
         jest.clearAllMocks()
     })

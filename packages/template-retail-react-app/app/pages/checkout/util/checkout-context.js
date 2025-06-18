@@ -79,7 +79,6 @@ export const CheckoutProvider = ({children}) => {
         step,
         STEPS,
         goToNextStep: () => {
-            console.log('BEFORE goToNextStep', step)
             // Check if current step is CONTACT_INFO
             if (step === STEPS.CONTACT_INFO) {
                 // Determine if it's a pickup order
