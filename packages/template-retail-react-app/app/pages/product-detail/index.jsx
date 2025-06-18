@@ -160,7 +160,7 @@ const ProductDetail = () => {
         // Loop through the bundle children and update the inventory for variant selection
         product.bundledProducts.forEach(({product: childProduct}, index) => {
             const matchingChildProduct = bundleChildrenData.data.find(
-                (bundleChild) => bundleChild.master.masterId === childProduct.id
+                (bundleChild) => bundleChild?.master?.masterId === childProduct.id
             )
             if (matchingChildProduct) {
                 product.bundledProducts[index].product = {
@@ -385,9 +385,7 @@ const ProductDetail = () => {
                     // with the chosen variant selections
                     bundledProductItems: childProductSelections.map((child) => {
                         return {
-                            // TODO: standard product in bundles/sets
-                            // productId: child.variant.productId || child.product.id,
-                            productId: child.variant.productId,
+                            productId: child.variant?.productId || child.product?.id,
                             quantity: child.quantity
                         }
                     })

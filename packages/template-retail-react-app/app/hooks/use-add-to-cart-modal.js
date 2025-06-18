@@ -158,13 +158,14 @@ export const AddToCartModal = () => {
                                                 gridGap={4}
                                             >
                                                 {itemsAdded.map(({product, variant, quantity}) => {
-                                                    const variationAttributeValues =
-                                                        getDisplayVariationValues(
+                                                    const variationAttributeValues = product.variationAttributes?.length && variant
+                                                        ? getDisplayVariationValues(
                                                             product.variationAttributes,
                                                             variant.variationValues
                                                         )
+                                                        : {}
                                                     return (
-                                                        <Box key={variant.productId}>
+                                                        <Box key={variant?.productId || product.id}>
                                                             <Text
                                                                 color="gray.700"
                                                                 fontWeight="700"
@@ -175,21 +176,23 @@ export const AddToCartModal = () => {
                                                                     ? `(${quantity})`
                                                                     : ''}
                                                             </Text>
-                                                            <Box
-                                                                color="gray.600"
-                                                                fontSize="sm"
-                                                                fontWeight="500"
-                                                            >
-                                                                {Object.entries(
-                                                                    variationAttributeValues
-                                                                ).map(([name, value]) => {
-                                                                    return (
-                                                                        <Text key={value}>
-                                                                            {name}: {value}
-                                                                        </Text>
-                                                                    )
-                                                                })}
-                                                            </Box>
+                                                            {Object.keys(variationAttributeValues).length > 0 && (
+                                                                <Box
+                                                                    color="gray.600"
+                                                                    fontSize="sm"
+                                                                    fontWeight="500"
+                                                                >
+                                                                    {Object.entries(
+                                                                        variationAttributeValues
+                                                                    ).map(([name, value]) => {
+                                                                        return (
+                                                                            <Text key={value}>
+                                                                                {name}: {value}
+                                                                            </Text>
+                                                                        )
+                                                                    })}
+                                                                </Box>
+                                                            )}
                                                         </Box>
                                                     )
                                                 })}
