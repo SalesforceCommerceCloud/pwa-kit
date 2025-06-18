@@ -15,10 +15,19 @@ interface SeoProps {
     description?: string
     noIndex?: boolean
     keywords?: string
+    metaTags?: Array<{id: string, value: string}>
     children?: React.ReactNode
 }
 
-const Seo: React.FC<SeoProps> = ({title, description, noIndex, keywords, children, ...props}) => {
+const Seo: React.FC<SeoProps> = ({
+    title, 
+    description, 
+    noIndex, 
+    keywords, 
+    metaTags = [], 
+    children, 
+    ...props
+}) => {
     const {defaultSiteTitle} = useExtensionConfig() as UserConfig
     const fullTitle = title ? `${title} | ${defaultSiteTitle}` : defaultSiteTitle
 
@@ -28,6 +37,11 @@ const Seo: React.FC<SeoProps> = ({title, description, noIndex, keywords, childre
             {description && <meta name="description" content={description} />}
             {noIndex && <meta name="robots" content="noindex" />}
             {keywords && <meta name="keywords" content={keywords} />}
+            
+            {metaTags.map(({id, value}) => (
+                <meta name={id} content={value} key={id} />
+            ))}
+            
             {children}
         </Helmet>
     )

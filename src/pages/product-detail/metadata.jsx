@@ -6,37 +6,36 @@
  */
 
 import React from 'react'
-import {Helmet} from 'react-helmet'
 import PropTypes from 'prop-types'
+import Seo from '../../components/seo'
 
 /**
  * Metadata component for the product detail page.
  * @param {Object} product - The product object
  * @param {string} product.pageTitle - The title of the product
  * @param {string} product.pageDescription - The description of the product
+ * @param {string} product.pageKeywords - The keywords of the product
  * @param {Array} product.pageMetaTags - The meta tags of the product
- * @param {Object} product.pageMetaTags.id - The id of the meta tag
+ * @param {string} product.pageMetaTags.id - The id of the meta tag
  * @param {string} product.pageMetaTags.value - The value of the meta tag
  */
 export default function Metadata({product}) {
     const defaultTitle = 'Product Detail Page'
     const defaultDescription = 'View detailed information, specifications, and features for this product.'
     const defaultKeywords = ''
-    const title = product?.pageTitle ?? defaultTitle
+    
     const metaTags = product?.pageMetaTags || []
+    const title = product?.pageTitle ?? defaultTitle
     const keywords = metaTags.find((tag) => tag.id === 'keywords')?.value || product?.pageKeywords || defaultKeywords
     const description = metaTags.find((tag) => tag.id === 'description')?.value || product?.pageDescription || defaultDescription
 
     return (
-        <Helmet>
-            <title>{title}</title>
-            <meta name="description" content={description} />
-            {keywords && <meta name="keywords" content={keywords} />}
-
-            {metaTags.map(({id, value}) => (
-                <meta name={id} content={value} key={id} />
-            ))}
-        </Helmet>
+        <Seo
+            title={title}
+            description={description}
+            keywords={keywords}
+            metaTags={metaTags}
+        />
     )
 }
 
