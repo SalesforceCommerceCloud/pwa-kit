@@ -378,4 +378,7 @@ test('should filter by inventory when inventory filter is clicked', async () => 
             {keepPreviousData: true}
         )
     })
+
+    // Verify URL hasn't changed
+    expect(window.location.pathname).toBe('/uk/en-GB/category/mens-clothing-jackets')
 })
