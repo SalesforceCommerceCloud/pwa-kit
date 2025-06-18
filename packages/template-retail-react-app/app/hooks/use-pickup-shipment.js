@@ -17,6 +17,23 @@ export const usePickupShipment = () => {
     const updateShipmentForBasketMutation = useShopperBasketsMutation('updateShipmentForBasket')
 
     /**
+     * Gets the shipping method ID for pickup in store
+     * @param {Object} shippingMethods - The shipping methods for the shipment
+     * @returns {string|null} The shipping method ID for pickup in store, or null if not found
+     */
+    const getPickupShippingMethodId = (shippingMethods) => {
+        if (!shippingMethods?.applicableShippingMethods) {
+            return null
+        }
+
+        const pickupMethod = shippingMethods.applicableShippingMethods.find(
+            (method) => method.c_storePickupEnabled === true
+        )
+
+        return pickupMethod?.id || null
+    }
+
+    /**
      * Ensures pickup shipment is properly configured for the basket
      * @param {string} basketId - The basket ID
      * @param {Array} productItems - Array of product items being added
@@ -25,14 +42,14 @@ export const usePickupShipment = () => {
      * @param {boolean} options.throwOnError - Whether to throw on error (default: false)
      */
     const configurePickupShipment = async (basketId, productItems, options = {}) => {
-        const {pickupShippingMethodId = 'GBP005', throwOnError = false} = options
+        const {pickupShippingMethodId = '005', throwOnError = false} = options
 
         try {
             const pickupItems = productItems.filter((item) => item.inventoryId)
             if (pickupItems.length === 0) return
 
             // Get store information for the pickup shipment
-            const siteId = site?.id || (window.SFCC && window.SFCC.siteId)
+            const siteId = site?.id
             const storeInfoKey = `store_${siteId}`
             let storeInfo = null
 
@@ -93,7 +110,7 @@ export const usePickupShipment = () => {
      */
     const getStoreInfo = () => {
         try {
-            const siteId = site?.id || (window.SFCC && window.SFCC.siteId)
+            const siteId = site?.id
             const storeInfoKey = `store_${siteId}`
             return JSON.parse(window.localStorage.getItem(storeInfoKey))
         } catch (e) {
@@ -128,6 +145,7 @@ export const usePickupShipment = () => {
         hasPickupItems,
         getStoreInfo,
         addInventoryIdsToPickupItems,
+        getPickupShippingMethodId,
         isLoading: updateShipmentForBasketMutation.isLoading
     }
 }

@@ -23,7 +23,8 @@ import {
     useShopperCustomersMutation,
     useShopperBasketsMutation,
     useCustomerId,
-    useShopperBasketsMutationHelper
+    useShopperBasketsMutationHelper,
+    useCommerceApi
 } from '@salesforce/commerce-sdk-react'
 
 // Hooks
@@ -59,6 +60,7 @@ import {useHistory, useLocation, useParams} from 'react-router-dom'
 import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
 import {useWishList} from '@salesforce/retail-react-app/app/hooks/use-wish-list'
 import {useAddToCartModalContext} from '@salesforce/retail-react-app/app/hooks/use-add-to-cart-modal'
+import {useQueryClient} from '@tanstack/react-query'
 
 const ProductDetail = () => {
     const {formatMessage} = useIntl()
@@ -72,10 +74,13 @@ const ProductDetail = () => {
     const customerId = useCustomerId()
     const {site} = useMultiSite()
     const storeInfoKey = `store_${site.id}`
+    const queryClient = useQueryClient()
+    const {shopperBaskets} = useCommerceApi()
     const {
         configurePickupShipment,
         hasPickupItems: checkHasPickupItems,
-        addInventoryIdsToPickupItems
+        addInventoryIdsToPickupItems,
+        getPickupShippingMethodId
     } = usePickupShipment()
 
     // --- Add state for inventoryId ---
@@ -390,7 +395,18 @@ const ProductDetail = () => {
                 basketResponse.shipments.length > 0 &&
                 !basketResponse.shipments[0].shippingMethod
             ) {
-                await configurePickupShipment(basketResponse.basketId, productItems)
+                // Fetch shipping methods and configure pickup shipment
+                const shippingMethods = await shopperBaskets.getShippingMethodsForShipment({
+                    parameters: {
+                        basketId: basketResponse.basketId,
+                        shipmentId: 'me'
+                    }
+                })
+
+                const pickupShippingMethodId = getPickupShippingMethodId(shippingMethods)
+                await configurePickupShipment(basketResponse.basketId, productItems, {
+                    pickupShippingMethodId
+                })
             }
 
             einstein.sendAddToCart(productItems)
@@ -512,7 +528,18 @@ const ProductDetail = () => {
                 res.shipments.length > 0 &&
                 !res.shipments[0].shippingMethod
             ) {
-                await configurePickupShipment(res.basketId, productItems)
+                // Fetch shipping methods and configure pickup shipment
+                const shippingMethods = await shopperBaskets.getShippingMethodsForShipment({
+                    parameters: {
+                        basketId: res.basketId,
+                        shipmentId: 'me'
+                    }
+                })
+
+                const pickupShippingMethodId = getPickupShippingMethodId(shippingMethods)
+                await configurePickupShipment(res.basketId, productItems, {
+                    pickupShippingMethodId
+                })
             }
 
             einstein.sendAddToCart(productItems)

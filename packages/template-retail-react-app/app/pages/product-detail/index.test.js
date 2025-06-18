@@ -640,6 +640,20 @@ test('Add to Cart with Pickup configures shipment when basket has no shipping me
                     ]
                 })
             )
+        }),
+        // Mock the shipping methods GET request
+        rest.get('*/baskets/:basketId/shipments/:shipmentId/shipping-methods', (req, res, ctx) => {
+            return res(
+                ctx.json({
+                    applicableShippingMethods: [
+                        {
+                            id: 'GBP005',
+                            name: 'Store Pickup',
+                            price: 0
+                        }
+                    ]
+                })
+            )
         })
     )
 
