@@ -17,14 +17,7 @@ import useBasket from '../../commerce-api/hooks/useBasket'
 import useShopper from '../../commerce-api/hooks/useShopper'
 import {ocapiOrderResponse} from '../../commerce-api/mock-data'
 import {mockedGuestCustomer, exampleTokenReponse} from '../../commerce-api/mock-data'
-
-jest.mock('../../commerce-api/auth', () => {
-    return class AuthMock {
-        login() {
-            return mockedGuestCustomer
-        }
-    }
-})
+import {AuthHelpers} from '@salesforce/commerce-sdk-react'
 
 const mockOrder = keysToCamel({
     basket_id: 'testorderbasket',
@@ -109,6 +102,33 @@ const mockProducts = {
         }
     ]
 }
+
+const mockAuthHelperFunctions = {
+    [AuthHelpers.Register]: {mutateAsync: jest.fn().mockResolvedValue(new Error({message: 'Login Already In Use'}))},
+    [AuthHelpers.LoginRegisteredUserB2C]: {mutateAsync: jest.fn()}
+}
+
+jest.mock('@salesforce/commerce-sdk-react', () => {
+    const originalModule = jest.requireActual('@salesforce/commerce-sdk-react')
+    return {
+        ...originalModule,
+        useAuthHelper: jest
+            .fn()
+            .mockImplementation((helperType) => mockAuthHelperFunctions[helperType])
+    }
+})
+
+jest.mock('../../commerce-api/hooks/useCustomer', () => {
+    const originalModule = jest.requireActual('../../commerce-api/hooks/useCustomer')
+    return {
+        __esModule: true,
+        default: () => ({
+            ...originalModule.default(),
+            isRegistered: false,
+            getSkeletonCustomer: () => mockedGuestCustomer,
+        })
+    }
+})
 
 const WrappedConfirmation = () => {
     useShopper()
@@ -206,8 +226,8 @@ test('Renders the Create Account form for guest customer', async () => {
     expect(button).toBeInTheDocument()
 
     // Email should already have been auto-filled
-    const email = screen.getByDisplayValue('jeff@lebowski.com')
-    expect(email).toBeInTheDocument()
+    const email = await screen.findByDisplayValue('jeff@lebowski.com')
+    await waitFor(() => expect(email).toBeInTheDocument())
 
     const password = screen.getByLabelText('Password')
     expect(password).toBeInTheDocument()
@@ -228,10 +248,10 @@ test('Create Account form - renders error message', async () => {
     renderWithProviders(<WrappedConfirmation />)
 
     const createAccountButton = await screen.findByRole('button', {name: /create account/i})
-    const password = screen.getByLabelText('Password')
+    const password = await screen.findByLabelText('Password')
 
-    user.type(password, 'P4ssword!')
-    user.click(createAccountButton)
+    await user.type(password, 'P4ssword!')
+    await user.click(createAccountButton)
 
     const alert = await screen.findByRole('alert', {}, {timeout: 2000})
     expect(alert).toBeInTheDocument()
