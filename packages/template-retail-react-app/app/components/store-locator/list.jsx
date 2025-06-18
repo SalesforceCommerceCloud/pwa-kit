@@ -6,16 +6,38 @@
  */
 
 import React, {useEffect, useState} from 'react'
-import {Accordion, AccordionItem, Box, Button} from '@chakra-ui/react'
+import {Accordion, AccordionItem, Box, Button, Radio, RadioGroup} from '@chakra-ui/react'
 import {StoreLocatorListItem} from '@salesforce/retail-react-app/app/components/store-locator/list-item'
 import {useStoreLocator} from '@salesforce/retail-react-app/app/hooks/use-store-locator'
+import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
 
 export const StoreLocatorList = () => {
     const {data, isLoading, config, formValues, mode} = useStoreLocator()
     const [page, setPage] = useState(1)
+    const {site} = useMultiSite()
+    const storeInfoKey = `store_${site.id}`
+    const [selectedStore, setSelectedStore] = useState('')
+
     useEffect(() => {
         setPage(1)
     }, [data])
+
+    useEffect(() => {
+        setSelectedStore(JSON.parse(window.localStorage.getItem(storeInfoKey))?.id || '')
+    }, [storeInfoKey])
+
+    const handleChange = (storeId) => {
+        setSelectedStore(storeId)
+        const store = data?.data?.find((store) => store.id === storeId)
+        window.localStorage.setItem(
+            storeInfoKey,
+            JSON.stringify({
+                id: storeId,
+                name: store?.name || null,
+                inventoryId: store?.inventoryId || null
+            })
+        )
+    }
 
     const displayStoreLocatorStatusMessage = () => {
         if (isLoading) return 'Loading locations...'
@@ -23,10 +45,10 @@ export const StoreLocatorList = () => {
 
         if (mode === 'input') {
             const countryName =
-                config.supportedCountries.length !== 0
+                Array.isArray(config.supportedCountries) && config.supportedCountries.length !== 0
                     ? config.supportedCountries.find(
-                          (o) => o.countryCode === formValues.countryCode
-                      )?.countryName || config.defaultCountry
+                        (o) => o.countryCode === formValues.countryCode
+                    )?.countryName || config.defaultCountry
                     : config.defaultCountry
 
             return `Viewing stores within ${String(config.radius)}${String(
@@ -59,9 +81,19 @@ export const StoreLocatorList = () => {
                         {displayStoreLocatorStatusMessage()}
                     </Box>
                 </AccordionItem>
-                {storesToShow?.map((store, index) => (
-                    <StoreLocatorListItem key={index} store={store} />
-                ))}
+                <RadioGroup onChange={handleChange} value={selectedStore} width="100%">
+                    {storesToShow?.map((store, index) => (
+                        <StoreLocatorListItem
+                            key={index}
+                            store={store}
+                            radioProps={{
+                                value: store.id,
+                                isChecked: selectedStore === store.id,
+                                'aria-describedby': `store-info-${store.id}`
+                            }}
+                        />
+                    ))}
+                </RadioGroup>
             </Accordion>
             {showLoadMoreButton && (
                 <Box paddingTop={3} marginTop={3}>
