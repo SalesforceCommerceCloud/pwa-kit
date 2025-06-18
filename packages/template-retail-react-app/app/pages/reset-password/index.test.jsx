@@ -96,7 +96,9 @@ test('Allows customer to generate password token', async () => {
 
     // enter credentials and submit
     await user.type(await screen.findByLabelText('Email'), 'foo@test.com')
-    await user.click(within(await screen.findByTestId('sf-auth-modal-form')).getByText(/reset password/i))
+    await user.click(
+        within(await screen.findByTestId('sf-auth-modal-form')).getByText(/reset password/i)
+    )
 
     expect(await screen.findByText(/password reset/i, {}, {timeout: 12000})).toBeInTheDocument()
 
@@ -130,7 +132,9 @@ test('Renders error message from server', async () => {
     renderWithProviders(<MockedComponent />)
 
     await user.type(await screen.findByLabelText('Email'), 'foo@test.com')
-    await user.click(within(await screen.findByTestId('sf-auth-modal-form')).getByText(/reset password/i))
+    await user.click(
+        within(await screen.findByTestId('sf-auth-modal-form')).getByText(/reset password/i)
+    )
 
     expect(await screen.findByText('Something went wrong')).toBeInTheDocument()
 })

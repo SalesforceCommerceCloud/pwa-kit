@@ -151,10 +151,10 @@ test('Allows customer to edit profile details', async () => {
 
     const el = within(screen.getByTestId('sf-toggle-card-my-profile'))
     user.click(el.getByText(/edit/i))
-    
+
     // Wait for the form fields to be rendered
     await screen.findByLabelText(/first name/i)
-    
+
     user.type(screen.getByLabelText(/first name/i), 'Geordi')
     user.type(screen.getByLabelText(/Phone Number/i), '5671235585')
     user.click(el.getByText(/save/i))

@@ -128,7 +128,7 @@ test.each(testBaskets)('does not render cart badge when basket not loaded', (ini
 })
 
 test('renders cart badge when basket is loaded', () => {
-    const initialBasket = {_productItemsDetail:{}, basketId: 'valid_id'}
+    const initialBasket = {_productItemsDetail: {}, basketId: 'valid_id'}
 
     renderWithProviders(<Header />, {wrapperProps: {initialBasket}})
 

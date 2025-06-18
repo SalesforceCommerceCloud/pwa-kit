@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
-import {screen, within, waitFor} from '@testing-library/react'
+import {screen} from '@testing-library/react'
 import user from '@testing-library/user-event'
 import {renderWithProviders} from '../../utils/test-utils'
 import Registration from '.'
@@ -30,7 +30,7 @@ const mockRegisteredCustomer = {
 }
 
 const mockAuthHelperFunctions = {
-    [AuthHelpers.LoginRegisteredUserB2C]: {mutateAsync: jest.fn()},
+    [AuthHelpers.LoginRegisteredUserB2C]: {mutateAsync: jest.fn()}
 }
 
 jest.mock('@salesforce/commerce-sdk-react', () => {

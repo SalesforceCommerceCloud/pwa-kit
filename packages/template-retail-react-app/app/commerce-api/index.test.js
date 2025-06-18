@@ -12,9 +12,7 @@ import fetch from 'jest-fetch-mock'
 // deal with it there.
 import {app as appConfig} from '../../config/default'
 import {
-    exampleRedirectUrl as mockExampleRedirectUrl,
     exampleTokenReponse as mockExampleTokenResponse,
-    exampleTokenReponseForRefresh as mockExampleTokenReponseForRefresh,
     ocapiBasketResponse,
     ocapiFaultResponse
 } from './mock-data'

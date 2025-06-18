@@ -28,7 +28,7 @@ export default function useBasket(opts = {}) {
 
             // Check if a this represents a valid basket
             get loaded() {
-                return basket && basket.hasOwnProperty('_productItemsDetail')
+                return basket && Object.prototype.hasOwnProperty.call(basket, '_productItemsDetail')
             },
 
             get itemCount() {

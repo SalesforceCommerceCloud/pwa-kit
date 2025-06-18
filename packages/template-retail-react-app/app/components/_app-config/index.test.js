@@ -4,6 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
+/* eslint-disable react/prop-types */
 import React from 'react'
 import {render} from '@testing-library/react'
 import AppConfig from './index.jsx'
@@ -14,7 +15,7 @@ jest.mock('../../theme', () => ({
     __esModule: true,
     default: {
         colors: {},
-        fonts: {},
+        fonts: {}
         // Add any other theme properties that might be used
     }
 }))
@@ -105,7 +106,7 @@ describe('AppConfig', () => {
 
     test('renders with all required providers', () => {
         const {getByTestId} = render(<AppConfig />)
-        
+
         expect(getByTestId('multi-site-provider')).toBeDefined()
         expect(getByTestId('commerce-api-provider')).toBeDefined()
         expect(getByTestId('customer-provider')).toBeDefined()
@@ -121,7 +122,7 @@ describe('AppConfig', () => {
             api: {},
             buildUrl: () => 'test-url'
         }
-        
+
         const {getByTestId} = render(<AppConfig locals={mockLocals} />)
         expect(getByTestId('multi-site-provider')).toBeDefined()
     })

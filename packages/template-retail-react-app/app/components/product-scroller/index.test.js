@@ -50,7 +50,7 @@ describe('Product Scroller', () => {
     })
     test('Renders left/right scroll buttons', async () => {
         renderWithProviders(<ProductScroller title="Scroller Title" products={testProducts} />)
-        
+
         // Ensure buttons are rendered
         const rightButton = screen.getByTestId('product-scroller-nav-right')
         const leftButton = screen.getByTestId('product-scroller-nav-left')
@@ -61,7 +61,7 @@ describe('Product Scroller', () => {
         await act(async () => {
             await user.click(rightButton)
         })
-        
+
         await waitFor(() => {
             expect(window.HTMLElement.prototype.scrollBy).toHaveBeenCalledWith({
                 top: 0,

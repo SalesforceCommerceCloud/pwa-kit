@@ -139,7 +139,7 @@ export const checkRequiredParameters = (listOfPassedParameters, listOfRequiredPa
 export const createOcapiFetch =
     (commerceAPIConfig) => async (endpoint, method, args, methodName, body) => {
         const proxy = `/mobify/proxy/ocapi`
-        
+
         // The api config will only have `ocapiHost` during testing to workaround localhost proxy
         const host = commerceAPIConfig.ocapiHost
             ? `https://${commerceAPIConfig.ocapiHost}`

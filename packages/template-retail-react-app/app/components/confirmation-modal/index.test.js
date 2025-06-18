@@ -50,7 +50,9 @@ test('Renders confirmation modal with the given config', async () => {
 
     // Wait for modal content to be rendered
     await screen.findByText('Confirm Remove Item')
-    expect(screen.getByText('Are you sure you want to remove this item from your cart?')).toBeInTheDocument()
+    expect(
+        screen.getByText('Are you sure you want to remove this item from your cart?')
+    ).toBeInTheDocument()
     expect(screen.getByText('Yes, remove item')).toBeInTheDocument()
     expect(screen.getByText('No, keep item')).toBeInTheDocument()
 })

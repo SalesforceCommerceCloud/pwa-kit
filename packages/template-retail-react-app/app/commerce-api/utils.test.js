@@ -4,19 +4,12 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import jwt from 'njwt'
 import {
     camelCaseKeysToUnderscore,
     keysToCamel,
     convertSnakeCaseToSentenceCase,
-    handleAsyncError,
+    handleAsyncError
 } from './utils'
-
-const createJwt = (secondsToExp) => {
-    const token = jwt.create({}, 'test')
-    token.setExpiration(new Date().getTime() + secondsToExp * 1000)
-    return token.compact()
-}
 
 jest.mock('./utils', () => {
     const originalModule = jest.requireActual('./utils')

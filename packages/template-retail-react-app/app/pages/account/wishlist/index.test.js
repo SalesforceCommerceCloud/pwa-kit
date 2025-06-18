@@ -360,7 +360,7 @@ test('Renders wishlist page', () => {
 })
 
 test('Can remove item from the wishlist', async () => {
-    const removeItemMock = jest.fn().mockResolvedValue(true)    
+    const removeItemMock = jest.fn().mockResolvedValue(true)
     useWishlist.mockReturnValue({
         isInitialized: true,
         isEmpty: false,
@@ -375,10 +375,10 @@ test('Can remove item from the wishlist', async () => {
         'sf-wishlist-remove-98ca9a3a9c8ee803543dc45cdc'
     )
     userEvent.click(wishlistRemoveButton)
-    
+
     const confirmButton = await screen.findByRole('button', {name: /yes, remove item/i})
     userEvent.click(confirmButton)
-    
+
     await waitFor(() => {
         expect(removeItemMock).toBeCalled()
     })

@@ -104,7 +104,9 @@ const mockProducts = {
 }
 
 const mockAuthHelperFunctions = {
-    [AuthHelpers.Register]: {mutateAsync: jest.fn().mockResolvedValue(new Error({message: 'Login Already In Use'}))},
+    [AuthHelpers.Register]: {
+        mutateAsync: jest.fn().mockResolvedValue(new Error({message: 'Login Already In Use'}))
+    },
     [AuthHelpers.LoginRegisteredUserB2C]: {mutateAsync: jest.fn()}
 }
 
@@ -125,7 +127,7 @@ jest.mock('../../commerce-api/hooks/useCustomer', () => {
         default: () => ({
             ...originalModule.default(),
             isRegistered: false,
-            getSkeletonCustomer: () => mockedGuestCustomer,
+            getSkeletonCustomer: () => mockedGuestCustomer
         })
     }
 })

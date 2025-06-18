@@ -17,10 +17,10 @@ jest.mock('pwa-kit-runtime/utils/ssr-config', () => {
     }
 })
 
-const mockHistoryPush = jest.fn().mockImplementation((...args) => {
+const mockHistoryPush = jest.fn().mockImplementation(() => {
     return jest.fn()
 })
-const mockHistoryReplace = jest.fn().mockImplementation((...args) => {
+const mockHistoryReplace = jest.fn().mockImplementation(() => {
     return jest.fn()
 })
 

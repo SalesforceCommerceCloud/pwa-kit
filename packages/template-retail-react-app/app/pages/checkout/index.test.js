@@ -58,7 +58,7 @@ jest.mock('../../commerce-api/hooks/useCustomer', () => {
         default: () => ({
             ...originalModule.default(),
             isRegistered: false,
-            getSkeletonCustomer: () => mockRegisteredCustomer,
+            getSkeletonCustomer: () => mockedRegisteredCustomer,
             registerCustomer: jest.fn()
         })
     }
