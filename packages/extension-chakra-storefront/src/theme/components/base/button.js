@@ -47,6 +47,32 @@ const button = defineRecipe({
             //     minWidth: '1em',
             //     lineHeight: 4
             // }),
+            'link-red': {
+                color: 'red.500',
+                fontWeight: 'normal',
+                minWidth: '1em',
+                height: 'auto',
+                padding: '0',
+                _hover: {
+                    // Copied from the original recipe of Chakra's Link
+                    textDecoration: 'underline',
+                    textUnderlineOffset: '3px',
+                    textDecorationColor: 'currentColor/20'
+                }
+            },
+            'link-blue': {
+                color: 'blue.600',
+                fontWeight: 'normal',
+                minWidth: '1em',
+                height: 'auto',
+                padding: '0',
+                _hover: {
+                    // Copied from the original recipe of Chakra's Link
+                    textDecoration: 'underline',
+                    textUnderlineOffset: '3px',
+                    textDecorationColor: 'currentColor/20'
+                }
+            },
             'menu-link': {
                 color: 'black',
                 justifyContent: 'flex-start',

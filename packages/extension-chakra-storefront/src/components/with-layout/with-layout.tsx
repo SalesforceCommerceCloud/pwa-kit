@@ -24,7 +24,6 @@ import {
     Center,
     Button,
     Flex,
-    // Fade,
     Heading,
     Spinner,
     useDisclosure,
@@ -49,7 +48,7 @@ import Seo from '../seo'
 import ScrollToTop from '../scroll-to-top'
 
 // Local Project Hooks
-// import {AuthModal, useAuthModal} from '../../hooks/use-auth-modal'
+import {AuthModal, useAuthModal} from '../../hooks/use-auth-modal'
 import {AddToCartModalProvider} from '../../hooks/use-add-to-cart-modal'
 import {useExtensionConfig, useCurrentCustomer, useCurrentBasket} from '../../hooks'
 import {watchOnlineStatus, flatten} from '../../utils/utils'
@@ -85,23 +84,19 @@ const PlaceholderComponent: React.FC = () => (
 //     }
 // )
 //
-// const ListMenuContentWithData = withCommerceSdkReactHookData(
-//     ({data, ...rest}: any) => (
-//         <Fade in={true}>
-//             <ListMenuContent {...rest} item={data} />
-//         </Fade>
-//     ),
-//     {
-//         hook: useCategory,
-//         queryOptions: ({item}: {item: {id: string}}) => ({
-//             parameters: {
-//                 id: item.id,
-//                 levels: 2
-//             }
-//         }),
-//         placeholder: PlaceholderComponent
-//     }
-// )
+const ListMenuContentWithData = withCommerceSdkReactHookData(
+    ({data, ...rest}: any) => <ListMenuContent {...rest} item={data} />,
+    {
+        hook: useCategory,
+        queryOptions: ({item}: {item: {id: string}}) => ({
+            parameters: {
+                id: item.id,
+                levels: 2
+            }
+        }),
+        placeholder: PlaceholderComponent
+    }
+)
 
 // Define the HOC function
 const withLayout = <P extends object>(WrappedComponent: React.ComponentType<P>) => {
@@ -121,7 +116,7 @@ const withLayout = <P extends object>(WrappedComponent: React.ComponentType<P>) 
         const activeData = useActiveData()
         const history = useHistory()
         const location = useLocation()
-        // const authModal = useAuthModal()
+        const authModal = useAuthModal()
         // const dntNotification = useDntNotification()
         const {site, locale, buildUrl} = useMultiSite()
         const [isOnline, setIsOnline] = useState<boolean>(true)
@@ -294,7 +289,6 @@ const withLayout = <P extends object>(WrappedComponent: React.ComponentType<P>) 
                                     onMyAccountClick={onAccountClick}
                                     onWishlistClick={onWishlistClick}
                                 >
-                                    Header
                                     {/*    <HideOnDesktop>*/}
                                     {/*        <DrawerMenu*/}
                                     {/*            isOpen={isOpen}*/}
@@ -306,14 +300,14 @@ const withLayout = <P extends object>(WrappedComponent: React.ComponentType<P>) 
                                     {/*            itemComponent={DrawerMenuItemWithData}*/}
                                     {/*        />*/}
                                     {/*    </HideOnDesktop>*/}
-                                    {/*    <HideOnMobile>*/}
-                                    {/*        <ListMenu*/}
-                                    {/*            root={categories?.[CAT_MENU_DEFAULT_ROOT_CATEGORY]}*/}
-                                    {/*            itemsKey="categories"*/}
-                                    {/*            itemsCountKey="onlineSubCategoriesCount"*/}
-                                    {/*            contentComponent={ListMenuContentWithData}*/}
-                                    {/*        />*/}
-                                    {/*    </HideOnMobile>*/}
+                                    <HideOnMobile>
+                                        <ListMenu
+                                            root={categories?.[CAT_MENU_DEFAULT_ROOT_CATEGORY]}
+                                            itemsKey="categories"
+                                            itemsCountKey="onlineSubCategoriesCount"
+                                            contentComponent={ListMenuContentWithData}
+                                        />
+                                    </HideOnMobile>
                                 </Header>
                             </>
                         ) : (
@@ -347,7 +341,7 @@ const withLayout = <P extends object>(WrappedComponent: React.ComponentType<P>) 
                         {/*</SkipNavContent>*/}
 
                         {!isCheckout ? <Footer /> : <CheckoutFooter />}
-                        {/*<AuthModal {...(authModal as any)} />*/}
+                        <AuthModal {...(authModal as any)} />
                         {/*<DntNotification {...dntNotification} />*/}
                     </AddToCartModalProvider>
                 </Box>

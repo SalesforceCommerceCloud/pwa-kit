@@ -7,7 +7,14 @@
 import {defineRecipe} from '@chakra-ui/react'
 
 export default defineRecipe({
-    base: {},
+    base: {
+        focusVisibleRing: 'inside',
+        _focusVisible: {
+            background: 'transparent',
+            borderColor: 'blue.500',
+            outlineWidth: 0
+        }
+    },
     variants: {
         variant: {
             outline: {
