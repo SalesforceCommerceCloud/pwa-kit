@@ -292,8 +292,8 @@ test('Allows customer to generate password token', async () => {
 
     // enter credentials and submit
     const withinForm = within(screen.getByTestId('sf-auth-modal-form'))
-    user.type(withinForm.getByLabelText('Email'), 'foo@test.com')
-    user.click(withinForm.getByText(/reset password/i))
+    await user.type(withinForm.getByLabelText('Email'), 'foo@test.com')
+    await user.click(withinForm.getByText(/reset password/i))
 
     await waitFor(() => {
         expect(screen.getByText(/password reset/i)).toBeInTheDocument()
