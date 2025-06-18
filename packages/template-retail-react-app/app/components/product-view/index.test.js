@@ -170,7 +170,7 @@ describe('ProductView Component', () => {
                 id: 'standard-product-1',
                 name: 'Standard Product',
                 type: {item: true},
-                variationAttributes: [], // No variation attributes = standard product
+                variationAttributes: [],
                 inventory: {
                     orderable: true,
                     stockLevel: 10

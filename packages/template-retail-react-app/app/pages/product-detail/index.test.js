@@ -581,11 +581,9 @@ describe('standard product', () => {
             rest.get('*/products/:productId', (req, res, ctx) => {
                 return res(ctx.json(mockProductBundle))
             }),
-            // Mock bundle children data with some items missing master property
             rest.get('*/products', (req, res, ctx) => {
                 const ids = req.url.searchParams.get('ids')
                 if (ids) {
-                    // Return products without master property (standard products)
                     const products = ids.split(',').map((id) => ({
                         id,
                         inventory: {

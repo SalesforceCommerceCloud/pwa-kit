@@ -848,7 +848,7 @@ test('displays standard products in bundle without variation attributes', async 
         derivedData: {
             totalItems: 2
         },
-        currency: 'USD' // Add currency at the top level
+        currency: 'USD'
     }
 
     mockUseCurrentBasket.mockReturnValue(mockBasket)
@@ -867,7 +867,6 @@ test('displays standard products in bundle without variation attributes', async 
 
     expect(screen.getByText('Standard Product (2)')).toBeInTheDocument()
 
-    // Should not display any variation attributes for standard products
     expect(screen.queryByText(/Color:/)).not.toBeInTheDocument()
     expect(screen.queryByText(/Size:/)).not.toBeInTheDocument()
 })
