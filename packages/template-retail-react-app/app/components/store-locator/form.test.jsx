@@ -147,4 +147,4 @@ describe('StoreLocatorForm', () => {
         const errorMessage = screen.queryByText('Please agree to share your location')
         expect(errorMessage).not.toBeNull()
     })
-}) 
+})
