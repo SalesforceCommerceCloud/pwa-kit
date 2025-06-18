@@ -7,11 +7,18 @@
 import React, {useState} from 'react'
 import PropTypes from 'prop-types'
 import {Controller} from 'react-hook-form'
-import {Field, IconButton, Input, InputGroup, NativeSelect, Checkbox} from '@chakra-ui/react'
+import {
+    Field as ChakraField,
+    IconButton,
+    Input,
+    InputGroup,
+    NativeSelect,
+    Checkbox
+} from '@chakra-ui/react'
 import {VisibilityIcon, VisibilityOffIcon, AlertIcon} from '../../components/icons'
 import {useIntl} from 'react-intl'
 
-const FieldComponent = ({
+const Field = ({
     name,
     label,
     formLabel,
@@ -54,9 +61,9 @@ const FieldComponent = ({
                     typeof inputProps === 'function' ? inputProps({value, onChange}) : inputProps
 
                 return (
-                    <Field.Root id={name} invalid={!!error}>
+                    <ChakraField.Root id={name} invalid={!!error}>
                         {!['checkbox', 'radio', 'hidden'].includes(type) &&
-                            (formLabel || <Field.Label>{label}</Field.Label>)}
+                            (formLabel || <ChakraField.Label>{label}</ChakraField.Label>)}
 
                         {['text', 'password', 'email', 'phone', 'tel', 'number'].includes(type) && (
                             <InputGroup
@@ -125,21 +132,21 @@ const FieldComponent = ({
                         {children}
 
                         {error && type !== 'hidden' && (
-                            <Field.ErrorText color="red.600">
+                            <ChakraField.ErrorText color="red.600">
                                 <AlertIcon aria-hidden="true" mr={2} />
                                 {error.message}
-                            </Field.ErrorText>
+                            </ChakraField.ErrorText>
                         )}
 
                         {helpText}
-                    </Field.Root>
+                    </ChakraField.Root>
                 )
             }}
         />
     )
 }
 
-FieldComponent.propTypes = {
+Field.propTypes = {
     name: PropTypes.string,
     label: PropTypes.string,
     autoComplete: PropTypes.string,
@@ -167,4 +174,4 @@ FieldComponent.propTypes = {
     inputRef: PropTypes.object
 }
 
-export default FieldComponent
+export default Field
