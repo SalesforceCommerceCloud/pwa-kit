@@ -130,7 +130,7 @@ const CheckoutContainer = () => {
     const customer = useCustomer()
     const basket = useBasket()
 
-    if (!customer || !customer.customerId || !basket || !basket.basketId) {
+    if (!customer || !customer.customerId || !basket || !basket.loaded) {
         return <CheckoutSkeleton />
     }
 
