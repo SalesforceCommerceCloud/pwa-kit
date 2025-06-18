@@ -6,7 +6,7 @@
  */
 
 import {renderHook} from '@testing-library/react'
-import usePickupShipment from './use-pickup-shipment'
+import usePickupShipment from '@salesforce/retail-react-app/app/hooks/use-pickup-shipment'
 import mockProductDetail from '@salesforce/retail-react-app/app/mocks/variant-750518699578M'
 
 // Mock the dependencies

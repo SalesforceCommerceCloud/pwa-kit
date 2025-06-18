@@ -6,7 +6,7 @@
  */
 
 import {useShopperBasketsMutation} from '@salesforce/commerce-sdk-react'
-import useMultiSite from './use-multi-site'
+import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
 
 /**
  * Custom hook to handle pickup in store shipment configuration
