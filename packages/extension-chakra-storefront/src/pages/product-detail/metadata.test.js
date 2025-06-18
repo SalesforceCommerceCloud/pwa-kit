@@ -7,77 +7,78 @@
 
 import React from 'react'
 import {render} from '@testing-library/react'
-import {Helmet} from 'react-helmet'
 import Metadata from './metadata'
 
+jest.mock('../../components/seo', () => {
+    return function MockSeo(props) {
+        return (
+            <div data-testid="mock-seo" data-props={JSON.stringify(props)}>
+                Mock SEO Component
+            </div>
+        )
+    }
+})
+
 describe('Metadata', () => {
-    afterEach(() => {
-        Helmet.canUseDOM = false
-    })
-
-    beforeEach(() => {
-        Helmet.canUseDOM = true
-    })
-
     it('renders with default values when product has no metadata', () => {
         const product = {}
-        render(<Metadata product={product} />)
-
-        const helmet = Helmet.peek()
-        expect(helmet.title).toBe('Product Detail Page')
-        expect(helmet.metaTags).toEqual([
-            {
-                name: 'description',
-                content: 'View detailed information, specifications, and features for this product.'
-            }
-        ])
+        const {getByTestId} = render(<Metadata product={product} />)
+        
+        const seoComponent = getByTestId('mock-seo')
+        const props = JSON.parse(seoComponent.getAttribute('data-props'))
+        
+        expect(props.title).toBe('Product Detail Page')
+        expect(props.description).toBe('View detailed information, specifications, and features for this product.')
+        expect(props.keywords).toBe('')
+        expect(props.metaTags).toEqual([])
     })
 
     it('renders with product pageTitle when provided', () => {
         const product = {
             pageTitle: 'Amazing Product - Best Quality'
         }
-        render(<Metadata product={product} />)
-
-        const helmet = Helmet.peek()
-        expect(helmet.title).toBe('Amazing Product - Best Quality')
+        const {getByTestId} = render(<Metadata product={product} />)
+        
+        const seoComponent = getByTestId('mock-seo')
+        const props = JSON.parse(seoComponent.getAttribute('data-props'))
+        
+        expect(props.title).toBe('Amazing Product - Best Quality')
     })
 
     it('renders with product pageDescription when provided', () => {
         const product = {
             pageDescription: 'This is an amazing product with great features.'
         }
-        render(<Metadata product={product} />)
-
-        const helmet = Helmet.peek()
-        expect(helmet.metaTags).toContainEqual({
-            name: 'description',
-            content: 'This is an amazing product with great features.'
-        })
+        const {getByTestId} = render(<Metadata product={product} />)
+        
+        const seoComponent = getByTestId('mock-seo')
+        const props = JSON.parse(seoComponent.getAttribute('data-props'))
+        
+        expect(props.description).toBe('This is an amazing product with great features.')
     })
 
     it('renders with product pageKeywords when provided', () => {
         const product = {
             pageKeywords: 'product, amazing, quality'
         }
-        render(<Metadata product={product} />)
-
-        const helmet = Helmet.peek()
-        expect(helmet.metaTags).toContainEqual({
-            name: 'keywords',
-            content: 'product, amazing, quality'
-        })
+        const {getByTestId} = render(<Metadata product={product} />)
+        
+        const seoComponent = getByTestId('mock-seo')
+        const props = JSON.parse(seoComponent.getAttribute('data-props'))
+        
+        expect(props.keywords).toBe('product, amazing, quality')
     })
 
-    it('does not render keywords meta tag when no keywords are provided', () => {
+    it('passes empty keywords when no keywords are provided', () => {
         const product = {
             pageTitle: 'Test Product'
         }
-        render(<Metadata product={product} />)
-
-        const helmet = Helmet.peek()
-        const keywordsTags = helmet.metaTags.filter(tag => tag.name === 'keywords')
-        expect(keywordsTags).toHaveLength(0)
+        const {getByTestId} = render(<Metadata product={product} />)
+        
+        const seoComponent = getByTestId('mock-seo')
+        const props = JSON.parse(seoComponent.getAttribute('data-props'))
+        
+        expect(props.keywords).toBe('')
     })
 
     it('prioritizes keywords from pageMetaTags over pageKeywords', () => {
@@ -87,13 +88,15 @@ describe('Metadata', () => {
                 {id: 'keywords', value: 'meta, tags, priority'}
             ]
         }
-        render(<Metadata product={product} />)
-
-        const helmet = Helmet.peek()
-        expect(helmet.metaTags).toContainEqual({
-            name: 'keywords',
-            content: 'meta, tags, priority'
-        })
+        const {getByTestId} = render(<Metadata product={product} />)
+        
+        const seoComponent = getByTestId('mock-seo')
+        const props = JSON.parse(seoComponent.getAttribute('data-props'))
+        
+        expect(props.keywords).toBe('meta, tags, priority')
+        expect(props.metaTags).toEqual([
+            {id: 'keywords', value: 'meta, tags, priority'}
+        ])
     })
 
     it('prioritizes description from pageMetaTags over pageDescription', () => {
@@ -104,20 +107,19 @@ describe('Metadata', () => {
                 {id: 'author', value: 'Test Author'}
             ]
         }
-        render(<Metadata product={product} />)
-
-        const helmet = Helmet.peek()
-        expect(helmet.metaTags).toContainEqual({
-            name: 'description',
-            content: 'This description should be used'
-        })
-        expect(helmet.metaTags).toContainEqual({
-            name: 'author',
-            content: 'Test Author'
-        })
+        const {getByTestId} = render(<Metadata product={product} />)
+        
+        const seoComponent = getByTestId('mock-seo')
+        const props = JSON.parse(seoComponent.getAttribute('data-props'))
+        
+        expect(props.description).toBe('This description should be used')
+        expect(props.metaTags).toEqual([
+            {id: 'description', value: 'This description should be used'},
+            {id: 'author', value: 'Test Author'}
+        ])
     })
 
-    it('renders all meta tags from pageMetaTags including duplicates', () => {
+    it('passes all meta tags from pageMetaTags to SEO component', () => {
         const product = {
             pageMetaTags: [
                 {id: 'keywords', value: 'product, test, quality'},
@@ -126,58 +128,22 @@ describe('Metadata', () => {
                 {id: 'robots', value: 'index, follow'}
             ]
         }
-        render(<Metadata product={product} />)
-
-        const helmet = Helmet.peek()
-        expect(helmet.metaTags).toContainEqual({
-            name: 'description',
-            content: 'Custom description'
-        })
-        expect(helmet.metaTags).toContainEqual({
-            name: 'keywords',
-            content: 'product, test, quality'
-        })
-        expect(helmet.metaTags).toContainEqual({
-            name: 'author',
-            content: 'Salesforce'
-        })
-        expect(helmet.metaTags).toContainEqual({
-            name: 'robots',
-            content: 'index, follow'
-        })
+        const {getByTestId} = render(<Metadata product={product} />)
+        
+        const seoComponent = getByTestId('mock-seo')
+        const props = JSON.parse(seoComponent.getAttribute('data-props'))
+        
+        expect(props.description).toBe('Custom description')
+        expect(props.keywords).toBe('product, test, quality')
+        expect(props.metaTags).toEqual([
+            {id: 'keywords', value: 'product, test, quality'},
+            {id: 'description', value: 'Custom description'},
+            {id: 'author', value: 'Salesforce'},
+            {id: 'robots', value: 'index, follow'}
+        ])
     })
 
-    it('handles duplicate meta tags when pageMetaTags contains description and keywords', () => {
-        const product = {
-            pageDescription: 'Fallback description',
-            pageKeywords: 'fallback, keywords',
-            pageMetaTags: [
-                {id: 'description', value: 'Priority description'},
-                {id: 'keywords', value: 'priority, keywords'}
-            ]
-        }
-        render(<Metadata product={product} />)
-
-        const helmet = Helmet.peek()
-        // Should have both the conditional keywords/description AND the ones from pageMetaTags
-        const descriptionTags = helmet.metaTags.filter(tag => tag.name === 'description')
-        const keywordsTags = helmet.metaTags.filter(tag => tag.name === 'keywords')
-        
-        expect(descriptionTags).toHaveLength(2)
-        expect(keywordsTags).toHaveLength(2)
-        
-        // The conditional ones should use the priority values from pageMetaTags
-        expect(helmet.metaTags).toContainEqual({
-            name: 'description',
-            content: 'Priority description'
-        })
-        expect(helmet.metaTags).toContainEqual({
-            name: 'keywords',
-            content: 'priority, keywords'
-        })
-    })
-
-    it('renders complete metadata with all product properties', () => {
+    it('handles complete metadata with all product properties', () => {
         const product = {
             pageTitle: 'Complete Product Title',
             pageDescription: 'Fallback description',
@@ -189,26 +155,20 @@ describe('Metadata', () => {
                 {id: 'viewport', value: 'width=device-width, initial-scale=1'}
             ]
         }
-        render(<Metadata product={product} />)
-
-        const helmet = Helmet.peek()
-        expect(helmet.title).toBe('Complete Product Title')
-        expect(helmet.metaTags).toContainEqual({
-            name: 'description',
-            content: 'Custom meta description'
-        })
-        expect(helmet.metaTags).toContainEqual({
-            name: 'keywords',
-            content: 'complete, product, test'
-        })
-        expect(helmet.metaTags).toContainEqual({
-            name: 'author',
-            content: 'Test Author'
-        })
-        expect(helmet.metaTags).toContainEqual({
-            name: 'viewport',
-            content: 'width=device-width, initial-scale=1'
-        })
+        const {getByTestId} = render(<Metadata product={product} />)
+        
+        const seoComponent = getByTestId('mock-seo')
+        const props = JSON.parse(seoComponent.getAttribute('data-props'))
+        
+        expect(props.title).toBe('Complete Product Title')
+        expect(props.description).toBe('Custom meta description')
+        expect(props.keywords).toBe('complete, product, test')
+        expect(props.metaTags).toEqual([
+            {id: 'description', value: 'Custom meta description'},
+            {id: 'keywords', value: 'complete, product, test'},
+            {id: 'author', value: 'Test Author'},
+            {id: 'viewport', value: 'width=device-width, initial-scale=1'}
+        ])
     })
 
     it('handles empty pageMetaTags array', () => {
@@ -217,19 +177,32 @@ describe('Metadata', () => {
             pageKeywords: 'test, product',
             pageMetaTags: []
         }
-        render(<Metadata product={product} />)
+        const {getByTestId} = render(<Metadata product={product} />)
+        
+        const seoComponent = getByTestId('mock-seo')
+        const props = JSON.parse(seoComponent.getAttribute('data-props'))
+        
+        expect(props.title).toBe('Test Product')
+        expect(props.description).toBe('View detailed information, specifications, and features for this product.')
+        expect(props.keywords).toBe('test, product')
+        expect(props.metaTags).toEqual([])
+    })
 
-        const helmet = Helmet.peek()
-        expect(helmet.title).toBe('Test Product')
-        expect(helmet.metaTags).toEqual([
-            {
-                name: 'description',
-                content: 'View detailed information, specifications, and features for this product.'
-            },
-            {
-                name: 'keywords',
-                content: 'test, product'
-            }
-        ])
+    it('handles null/undefined product properties gracefully', () => {
+        const product = {
+            pageTitle: null,
+            pageDescription: undefined,
+            pageKeywords: null,
+            pageMetaTags: undefined
+        }
+        const {getByTestId} = render(<Metadata product={product} />)
+        
+        const seoComponent = getByTestId('mock-seo')
+        const props = JSON.parse(seoComponent.getAttribute('data-props'))
+        
+        expect(props.title).toBe('Product Detail Page')
+        expect(props.description).toBe('View detailed information, specifications, and features for this product.')
+        expect(props.keywords).toBe('')
+        expect(props.metaTags).toEqual([])
     })
 })
