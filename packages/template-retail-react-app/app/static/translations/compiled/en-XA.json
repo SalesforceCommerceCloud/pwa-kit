@@ -925,6 +925,24 @@
       "value": "]"
     }
   ],
+  "bonus_product_item.label.quantity": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ɋŭŭȧȧƞŧīŧẏ: "
+    },
+    {
+      "type": 1,
+      "value": "quantity"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
   "bonus_products_title.title.num_of_items": [
     {
       "type": 0,
