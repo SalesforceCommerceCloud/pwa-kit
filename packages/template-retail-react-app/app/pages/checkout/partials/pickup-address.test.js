@@ -88,15 +88,17 @@ describe('PickupAddress', () => {
     beforeEach(() => {
         jest.resetModules()
         jest.clearAllMocks()
-        mockLocalStorage.getItem.mockReturnValue(JSON.stringify({
-            shippingAddress: {
-                address1: '123 Main Street',
-                city: 'San Francisco',
-                countryCode: 'US',
-                postalCode: '94105',
-                stateCode: 'CA'
-            }
-        }))
+        mockLocalStorage.getItem.mockReturnValue(
+            JSON.stringify({
+                shippingAddress: {
+                    address1: '123 Main Street',
+                    city: 'San Francisco',
+                    countryCode: 'US',
+                    postalCode: '94105',
+                    stateCode: 'CA'
+                }
+            })
+        )
     })
 
     afterEach(() => {
