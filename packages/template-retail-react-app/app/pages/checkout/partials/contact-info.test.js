@@ -27,7 +27,7 @@ jest.mock('../util/checkout-context', () => {
     }
 })
 
-test('renders component', () => {
+test('renders component', async () => {
     renderWithProviders(<ContactInfo />)
 
     // switch to login
@@ -36,8 +36,8 @@ test('renders component', () => {
 
     // open forgot password modal
     const withinCard = within(screen.getByTestId('sf-toggle-card-step-0'))
-    const openModal = withinCard.getByText(/Forgot password\?/i)
-    user.click(openModal)
+    const openModal = await withinCard.findByText(/Forgot password\?/i)
+    await user.click(openModal)
 
     // check that forgot password modal is open
     const withinForm = within(screen.getByTestId('sf-auth-modal-form'))
