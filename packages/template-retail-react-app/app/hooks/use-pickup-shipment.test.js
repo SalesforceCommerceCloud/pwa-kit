@@ -17,7 +17,7 @@ jest.mock('@salesforce/commerce-sdk-react', () => ({
     }))
 }))
 
-jest.mock('./use-multi-site', () => ({
+jest.mock('@salesforce/retail-react-app/app/hooks/use-multi-site', () => ({
     __esModule: true,
     default: () => ({
         site: {id: 'test-site'}
@@ -28,14 +28,37 @@ jest.mock('./use-multi-site', () => ({
 const localStorageMock = {
     getItem: jest.fn(),
     setItem: jest.fn(),
-    removeItem: jest.fn()
+    removeItem: jest.fn(),
+    clear: jest.fn()
 }
-Object.defineProperty(window, 'localStorage', {value: localStorageMock})
+
+// Store original localStorage to restore after tests
+const originalLocalStorage = Object.getOwnPropertyDescriptor(window, 'localStorage')
+
+// Set up localStorage mock
+Object.defineProperty(window, 'localStorage', {
+    value: localStorageMock,
+    writable: true,
+    configurable: true
+})
 
 describe('usePickupShipment', () => {
     beforeEach(() => {
         jest.clearAllMocks()
+        // Clear all mock functions
         localStorageMock.getItem.mockClear()
+        localStorageMock.setItem.mockClear()
+        localStorageMock.removeItem.mockClear()
+        localStorageMock.clear.mockClear()
+    })
+
+    afterAll(() => {
+        // Restore original localStorage after all tests
+        if (originalLocalStorage) {
+            Object.defineProperty(window, 'localStorage', originalLocalStorage)
+        } else {
+            delete window.localStorage
+        }
     })
 
     test('hasPickupItems returns true when pickup items exist', () => {
