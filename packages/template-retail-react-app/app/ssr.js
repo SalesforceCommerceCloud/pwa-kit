@@ -312,22 +312,18 @@ const {handler} = runtime.createHandler(options, (app) => {
                     'script-src': [
                         // Used by the service worker in /worker/main.js
                         'storage.googleapis.com',
-                        '*.test1.my.pc-rnd.site.com'
                     ],
                     'connect-src': [
                         // Connect to Einstein APIs
                         'api.cquotient.com',
                         // Connect to DataCloud APIs
                         '*.c360a.salesforce.com',
-                        '*.test1.my.pc-rnd.salesforce-scrt.com',
                         'https://api.lab.amplitude.com/sdk/vardata',
                         '*.adyen.com',
                         // Connect to SCRT2 URLs
                         '*.salesforce-scrt.com'
                     ],
                     'frame-src': [
-                        '*.test1.my.pc-rnd.salesforce-scrt.com',
-                        '*.test1.my.pc-rnd.site.com',
                         'checkoutshopper-test.adyen.com'
                     ],
                     'frame-ancestors': [
