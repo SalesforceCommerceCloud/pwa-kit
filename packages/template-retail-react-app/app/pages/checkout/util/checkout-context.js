@@ -85,7 +85,7 @@ export const CheckoutProvider = ({children}) => {
                 const isPickupOrder =
                     basket?.shipments[0]?.shippingMethod?.c_storePickupEnabled === true
                 // Skip to appropriate next step
-                setStep(isPickupOrder ? STEPS.PICKUP_ADDRESS : step + 1)
+                setStep(isPickupOrder ? STEPS.PICKUP_ADDRESS : STEPS.SHIPPING_ADDRESS)
             } else {
                 setStep(step + 1)
             }
