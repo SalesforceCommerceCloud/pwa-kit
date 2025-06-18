@@ -186,7 +186,8 @@ describe('StoresList', () => {
         )
 
         await waitFor(async () => {
-            const {id, name, inventoryId, address1, city, stateCode, postalCode, countryCode} = mockSearchStoresData[1]
+            const {id, name, inventoryId, address1, city, stateCode, postalCode, countryCode} =
+                mockSearchStoresData[1]
             const radioButton = screen.getByDisplayValue(id)
             fireEvent.click(radioButton)
 

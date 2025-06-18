@@ -8,12 +8,7 @@ import React, {useState} from 'react'
 import {FormattedMessage, useIntl} from 'react-intl'
 
 // Components
-import {
-    Box,
-    Button,
-    Container,
-    Text
-} from '@salesforce/retail-react-app/app/components/shared/ui'
+import {Box, Button, Container, Text} from '@salesforce/retail-react-app/app/components/shared/ui'
 import {
     ToggleCard,
     ToggleCardSummary
@@ -43,16 +38,8 @@ export default function PickupAddress() {
 
     const submitAndContinue = async (address) => {
         setIsLoading(true)
-        const {
-            address1,
-            city,
-            countryCode,
-            firstName,
-            lastName,
-            phone,
-            postalCode,
-            stateCode
-        } = address
+        const {address1, city, countryCode, firstName, lastName, phone, postalCode, stateCode} =
+            address
         await updateShippingAddressForShipment.mutateAsync({
             parameters: {
                 basketId: basket.basketId,

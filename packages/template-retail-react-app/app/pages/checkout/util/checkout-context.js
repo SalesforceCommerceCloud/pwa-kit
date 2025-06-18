@@ -82,7 +82,8 @@ export const CheckoutProvider = ({children}) => {
             // Check if current step is CONTACT_INFO
             if (step === STEPS.CONTACT_INFO) {
                 // Determine if it's a pickup order
-                const isPickupOrder = basket?.shipments[0]?.shippingMethod.c_storePickupEnabled === true
+                const isPickupOrder =
+                    basket?.shipments[0]?.shippingMethod.c_storePickupEnabled === true
                 // Skip to appropriate next step
                 setStep(isPickupOrder ? STEPS.PICKUP_ADDRESS : STEPS.SHIPPING_ADDRESS)
             } else {
