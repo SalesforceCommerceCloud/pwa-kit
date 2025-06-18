@@ -43,7 +43,7 @@ test('renders toast with action', async () => {
     renderWithProviders(<MockedComponent action={toastAction} />)
 
     const toastTrigger = await screen.findByRole('button', {name: /show toast/i})
-    user.click(toastTrigger)
+    await user.click(toastTrigger)
 
     await waitFor(() => {
         // Chakra UI renders multiple elements with toast title in DOM for accessibility.
@@ -52,6 +52,6 @@ test('renders toast with action', async () => {
     })
 
     const toastActionTrigger = await screen.findByRole('button', {name: /action/i})
-    user.click(toastActionTrigger)
+    await user.click(toastActionTrigger)
     expect(handleActionClick).toHaveBeenCalledTimes(1)
 })
