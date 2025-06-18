@@ -76,6 +76,7 @@ export const ocapiBasketResponse = {
 }
 
 export const ocapiBasketWithItem = {
+    _productItemsDetail: undefined,
     _v: '21.3',
     _type: 'basket',
     _resource_state: 'd4ad608574e06ab2d6bfa5ffc861402d653740dd437b625eced2bc2f5adf801e',
