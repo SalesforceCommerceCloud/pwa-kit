@@ -34,9 +34,9 @@ import {useCurrentBasket} from '../../hooks/use-current-basket'
 
 import Link from '../../components/link'
 import Search from '../../components/search'
-// import withRegistration from '../../components/with-registration'
+import withRegistration from '../../components/with-registration'
 import {
-    // AccountIcon,
+    AccountIcon,
     BrandLogo
     // BasketIcon,
     // HamburgerIcon,
@@ -52,7 +52,7 @@ import LoadingSpinner from '../../components/loading-spinner'
 import {HideOnDesktop, HideOnMobile} from '../responsive'
 import {noop} from '../../utils/utils'
 
-// const IconButtonWithRegistration = withRegistration(IconButton)
+const IconButtonWithRegistration = withRegistration(IconButton)
 
 /**
  * Search bar for the header.
@@ -197,18 +197,18 @@ const Header = ({
                         <SearchBar />
                     </HideOnMobile>
 
-                    {/*<IconButtonWithRegistration*/}
-                    {/*    aria-label={intl.formatMessage({*/}
-                    {/*        id: 'header.button.assistive_msg.my_account',*/}
-                    {/*        defaultMessage: 'My Account'*/}
-                    {/*    })}*/}
-                    {/*    variant="unstyled"*/}
-                    {/*    css={{...styles.icons, ...styles.accountIcon}}*/}
-                    {/*    onClick={onMyAccountClick}*/}
-                    {/*    onMouseOver={isDesktop ? onAccountMenuOpen : noop}*/}
-                    {/*>*/}
-                    {/*    <AccountIcon />*/}
-                    {/*</IconButton>*/}
+                    <IconButtonWithRegistration
+                        aria-label={intl.formatMessage({
+                            id: 'header.button.assistive_msg.my_account',
+                            defaultMessage: 'My Account'
+                        })}
+                        variant="unstyled"
+                        css={{...styles.icons, ...styles.accountIcon}}
+                        onClick={onMyAccountClick}
+                        onMouseOver={isDesktop ? onAccountMenuOpen : noop}
+                    >
+                        <AccountIcon />
+                    </IconButtonWithRegistration>
                     {/*{isRegistered && isHydrated() && (*/}
                     {/*    <Popover.Root*/}
                     {/*        lazyMount*/}

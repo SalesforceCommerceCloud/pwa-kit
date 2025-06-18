@@ -18,16 +18,16 @@ const ResetPasswordForm = ({submitForm, clickSignIn = noop, form}) => {
         <Fragment>
             {!form.formState.isSubmitSuccessful ? (
                 <>
-                    <Stack justify="center" align="center" spacing={8}>
+                    <Stack justify="center" align="center" gap={8}>
                         <BrandLogo width="60px" height="auto" />
-                        <Stack spacing={2}>
-                            <Text align="center" fontSize="xl" fontWeight="semibold">
+                        <Stack gap={2}>
+                            <Text textAlign="center" fontSize="xl" fontWeight="semibold">
                                 <FormattedMessage
                                     defaultMessage="Reset Password"
                                     id="reset_password_form.title.reset_password"
                                 />
                             </Text>
-                            <Text fontSize="sm" align="center" color="gray.700">
+                            <Text fontSize="sm" textAlign="center" color="gray.700">
                                 <FormattedMessage
                                     defaultMessage="Enter your email to receive instructions on how to reset your password"
                                     id="reset_password_form.message.enter_your_email"
@@ -36,21 +36,23 @@ const ResetPasswordForm = ({submitForm, clickSignIn = noop, form}) => {
                         </Stack>
                     </Stack>
                     <form onSubmit={form.handleSubmit(submitForm)} data-testid="sf-auth-modal-form">
-                        <Stack paddingTop={8} spacing={8} paddingLeft={4} paddingRight={4}>
+                        <Stack pt={8} gap={8} pl={4} pr={4}>
                             {form.formState.errors?.global && (
-                                <Alert status="error">
-                                    <AlertIcon color="red.500" boxSize={4} />
-                                    <Text fontSize="sm" ml={3}>
+                                <Alert.Root status="error">
+                                    <Alert.Indicator>
+                                        <AlertIcon color="red.500" boxSize={4} />
+                                    </Alert.Indicator>
+                                    <Alert.Title fontSize="sm" ml={3}>
                                         {form.formState.errors.global.message}
-                                    </Text>
-                                </Alert>
+                                    </Alert.Title>
+                                </Alert.Root>
                             )}
                             <ResetPasswordFields form={form} />
-                            <Stack spacing={6}>
+                            <Stack gap={6}>
                                 <Button
                                     type="submit"
                                     onClick={() => form.clearErrors('global')}
-                                    isLoading={form.formState.isSubmitting}
+                                    loading={form.formState.isSubmitting}
                                 >
                                     <FormattedMessage
                                         defaultMessage="Reset Password"
@@ -58,7 +60,7 @@ const ResetPasswordForm = ({submitForm, clickSignIn = noop, form}) => {
                                     />
                                 </Button>
 
-                                <Stack direction="row" spacing={1} justify="center">
+                                <Stack direction="row" gap={1} justify="center">
                                     <Text fontSize="sm">
                                         <FormattedMessage
                                             defaultMessage="Or return to"
@@ -66,7 +68,12 @@ const ResetPasswordForm = ({submitForm, clickSignIn = noop, form}) => {
                                             description="Precedes link to return to sign in"
                                         />
                                     </Text>
-                                    <Button variant="link" size="sm" onClick={clickSignIn}>
+                                    <Button
+                                        variant="link-blue"
+                                        size="sm"
+                                        lineHeight="1"
+                                        onClick={clickSignIn}
+                                    >
                                         <FormattedMessage
                                             defaultMessage="Sign in"
                                             id="reset_password_form.action.sign_in"
@@ -78,16 +85,16 @@ const ResetPasswordForm = ({submitForm, clickSignIn = noop, form}) => {
                     </form>
                 </>
             ) : (
-                <Stack justify="center" align="center" spacing={6}>
+                <Stack justify="center" align="center" gap={6}>
                     <BrandLogo width="60px" height="auto" />
-                    <Text align="center" fontSize="xl" fontWeight="semibold">
+                    <Text textAlign="center" fontSize="xl" fontWeight="semibold">
                         <FormattedMessage
                             defaultMessage={'Password Reset'}
                             id="auth_modal.password_reset_success.title.password_reset"
                         />
                     </Text>
-                    <Stack spacing={6} pt={4}>
-                        <Text align="center" fontSize="sm">
+                    <Stack gap={6} pt={4}>
+                        <Text textAlign="center" fontSize="sm">
                             <FormattedMessage
                                 defaultMessage="You will receive an email at <b>{email}</b> with a link to reset your password shortly."
                                 id="auth_modal.password_reset_success.info.will_email_shortly"
