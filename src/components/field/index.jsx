@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {useState, Fragment} from 'react'
+import React, {useState} from 'react'
 import PropTypes from 'prop-types'
 import {Controller} from 'react-hook-form'
 import {
@@ -18,7 +18,7 @@ import {
 import {VisibilityIcon, VisibilityOffIcon, AlertIcon} from '../../components/icons'
 import {useIntl} from 'react-intl'
 
-const FieldComponent = ({
+const Field = ({
     name,
     label,
     formLabel,
@@ -47,7 +47,6 @@ const FieldComponent = ({
               id: 'field.password.assistive_msg.hide_password',
               defaultMessage: 'Hide password'
           })
-
     const inputType =
         type === 'password' && hidePassword ? 'password' : type === 'password' ? 'text' : type
 
@@ -147,7 +146,7 @@ const FieldComponent = ({
     )
 }
 
-FieldComponent.propTypes = {
+Field.propTypes = {
     name: PropTypes.string,
     label: PropTypes.string,
     autoComplete: PropTypes.string,
@@ -175,4 +174,4 @@ FieldComponent.propTypes = {
     inputRef: PropTypes.object
 }
 
-export default FieldComponent
+export default Field
