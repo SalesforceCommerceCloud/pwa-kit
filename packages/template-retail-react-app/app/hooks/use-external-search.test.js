@@ -155,4 +155,65 @@ describe('useExternalSearch', () => {
             })
         })
     })
+
+    describe('URL normalization utility functions', () => {
+        const normalizeUrl = (url) => {
+            if (typeof url === 'string' && url.includes('?')) {
+                const questionMarks = (url.match(/\?/g) || []).length
+
+                if (questionMarks > 1) {
+                    const parts = url.split('?')
+                    return parts[0] + '?' + parts.slice(1).join('&')
+                }
+            }
+            return url
+        }
+
+        test('normalizes malformed URLs with multiple question marks', () => {
+            const malformedUrl = '/product/123?color=red?size=large?category=clothing'
+            const normalized = normalizeUrl(malformedUrl)
+            expect(normalized).toBe('/product/123?color=red&size=large&category=clothing')
+        })
+
+        test('handles URLs with mixed question marks and ampersands', () => {
+            const malformedUrl = '/search?q=test?city=Boston&country=US?store=downtown'
+            const normalized = normalizeUrl(malformedUrl)
+            expect(normalized).toBe('/search?q=test&city=Boston&country=US&store=downtown')
+        })
+
+        test('leaves properly formatted URLs unchanged', () => {
+            const properUrl = '/product/456?color=blue&size=medium&category=shoes'
+            const normalized = normalizeUrl(properUrl)
+            expect(normalized).toBe('/product/456?color=blue&size=medium&category=shoes')
+        })
+
+        test('handles URLs with no query parameters', () => {
+            const simpleUrl = '/product/789'
+            const normalized = normalizeUrl(simpleUrl)
+            expect(normalized).toBe('/product/789')
+        })
+
+        test('handles URLs with encoded parameters and multiple question marks', () => {
+            const malformedUrl = '/product/999?name=Modern%20Blazer?city=San%20Francisco?country=US'
+            const normalized = normalizeUrl(malformedUrl)
+            expect(normalized).toBe(
+                '/product/999?name=Modern%20Blazer&city=San%20Francisco&country=US'
+            )
+        })
+
+        test('handles complex URLs with many malformed parameters', () => {
+            const complexUrl =
+                '/store?city=Boston?state=MA?country=US?zip=02101?store=downtown?category=electronics'
+            const normalized = normalizeUrl(complexUrl)
+            expect(normalized).toBe(
+                '/store?city=Boston&state=MA&country=US&zip=02101&store=downtown&category=electronics'
+            )
+        })
+
+        test('returns non-string inputs unchanged', () => {
+            expect(normalizeUrl(null)).toBeNull()
+            expect(normalizeUrl(undefined)).toBeUndefined()
+            expect(normalizeUrl(123)).toBe(123)
+        })
+    })
 })

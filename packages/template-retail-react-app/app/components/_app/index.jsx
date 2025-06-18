@@ -154,6 +154,21 @@ const App = (props) => {
         onClose: onCloseStoreLocator
     } = useDisclosure()
 
+    useEffect(() => {
+        if (typeof window !== 'undefined' && window.location && window.location.href) {
+            const href = window.location.href
+            const questionMarks = (href.match(/\?/g) || []).length
+
+            if (questionMarks > 1) {
+                const parts = href.split('?')
+                const fixedUrl = parts[0] + '?' + parts.slice(1).join('&')
+                const url = new URL(fixedUrl)
+                const newPath = url.pathname + url.search
+                history.replace(newPath)
+            }
+        }
+    }, [location, history])
+
     const targetLocale = getTargetLocale({
         getUserPreferredLocales: () => {
             // CONFIG: This function should return an array of preferred locales. They can be
