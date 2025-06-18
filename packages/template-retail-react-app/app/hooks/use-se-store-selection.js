@@ -62,20 +62,6 @@ const useSeStoreSelection = () => {
         enabled: Boolean(locationData?.zipcode && !locationData?.latitude)
     })
 
-    const {data: storeNameLocationData, isLoading: isLoadingStoreNameLocation} = useSearchStores({
-        parameters: {
-            postalCode: locationData?.zipcode,
-            countryCode: countryCodeToUse,
-            locale: intl.locale,
-            maxDistance: STORE_LOCATOR_DISTANCE,
-            limit: 200,
-            distanceUnit: STORE_LOCATOR_DISTANCE_UNIT
-        },
-        enabled: Boolean(
-            locationData?.storeName && locationData?.zipcode && !locationData?.latitude
-        )
-    })
-
     const getGlobalSearchParams = useCallback(() => {
         const baseDistance = STORE_LOCATOR_DISTANCE * 200
         const storeNameDistance =
@@ -225,9 +211,11 @@ const useSeStoreSelection = () => {
 
     const getStoreSearchData = () => {
         if (coordinateStoreData) return coordinateStoreData
-        if (postalCodeStoreData) return postalCodeStoreData
-        if (storeNameLocationData) return storeNameLocationData
+
+        if (postalCodeStoreData && locationData?.zipcode) return postalCodeStoreData
+
         if (cityStoreData) return cityStoreData
+
         if (
             locationData?.storeName &&
             locationData?.countryCode &&
@@ -244,7 +232,6 @@ const useSeStoreSelection = () => {
     const isLoadingStores =
         isLoadingCoordinateStores ||
         isLoadingPostalStores ||
-        isLoadingStoreNameLocation ||
         isLoadingCityStores ||
         isLoadingAllStores ||
         isLoadingFallbackStores
@@ -461,7 +448,7 @@ const useSeStoreSelection = () => {
 
             const lat = urlParams.get('lat')
             const lng = urlParams.get('lng')
-            const storeName = urlParams.get('store')
+            const storeName = urlParams.get('store') || urlParams.get('Store')
             const zipcode = urlParams.get('zip')
             const city = urlParams.get('city')
             const country = urlParams.get('country')
