@@ -393,6 +393,32 @@ const foundNode = process.versions.node
 const requiredNode = generatorPkg.engines.node
 const isUsingCompatibleNode = semver.satisfies(foundNode, new semver.Range(requiredNode))
 
+// TODO: This function will likely be moved to a helpers folder/file.
+/**
+ * Reads all data from standard input (stdin) asynchronously and resolves with the complete input as a string.
+ * Useful for accepting piped or redirected input, such as JSON answers for non-interactive CLI usage.
+ *
+ * @returns {Promise<string>} A promise that resolves with the full stdin input as a string.
+ */
+const readStdin = async () => {
+    return new Promise((resolve, reject) => {
+        let input = ''
+        process.stdin.setEncoding('utf8')
+
+        process.stdin.on('data', (chunk) => {
+            input += chunk
+        })
+
+        process.stdin.on('end', () => {
+            resolve(input)
+        })
+
+        process.stdin.on('error', (err) => {
+            reject(err)
+        })
+    })
+}
+
 const main = async (opts) => {
     if (!isUsingCompatibleNode) {
         console.log('')
@@ -408,7 +434,7 @@ const main = async (opts) => {
     // to "general" and "project" questions. It'll also be populated with details of the selected project,
     // like its `package.json` value.
     let context = INITIAL_CONTEXT
-    let {outputDir, verbose, preset, templateVersion} = opts
+    let {outputDir, verbose, preset, templateVersion, stdio} = opts
     const {prompt} = inquirer
     const OUTPUT_DIR_FLAG_ACTIVE = !!outputDir
     const presetId = preset || process.env.GENERATOR_PRESET
@@ -425,14 +451,24 @@ const main = async (opts) => {
         process.exit(1)
     }
 
-    // If there is no preset provided via the CLI, prompt the user with a selection of presets.
-    // Otherwise, ask the questions.
+    // If there is no preset provided via the CLI, check for stdio input or prompt the user
     if (presetId) {
         context.answers = PRESETS.find(({id}) => id === presetId).answers || {}
+    } else if (stdio) {
+        try {
+            const input = await readStdin()
+            const jsonData = JSON.parse(input)
+            context.answers = jsonData
+            console.log('stdioData', jsonData)
+        } catch (err) {
+            console.error('Failed to read from stdin:', err.message)
+            process.exit(1)
+        }
     } else {
         context.answers = await prompt(QUESTIONS)
     }
 
+    console.log('context.answers', context.answers)
     // Add the selected preset to the context object.
     const selectedPreset = PRESETS.find(
         ({id}) => id === (presetId || context.answers.general.presetId)
@@ -440,7 +476,7 @@ const main = async (opts) => {
 
     // Add the preset to the context.
     context.preset = selectedPreset
- 
+
     // If using the preset, output the preset name
     if (presetId) {
         console.log(`Using preset "${selectedPreset.name}"`)
@@ -527,6 +563,7 @@ Examples:
             DEFAULT_TEMPLATE_VERSION
         )
         .option('--verbose', `Print additional logging information to the console.`, false)
+        .option('--stdio', `Accept project generation answers from stdin as JSON`, false)
 
     program.parse(process.argv)
 
