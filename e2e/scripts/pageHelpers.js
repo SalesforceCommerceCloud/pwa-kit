@@ -651,13 +651,11 @@ export const registeredUserHappyPath = async ({page, registeredUserCredentials, 
  * @param {Object} options.a11y - Accessibility testing configuration (optional)
  */
 export const wishlistFlow = async ({page, registeredUserCredentials, a11y = {}}) => {
-    // Attempt login first
     const isLoggedIn = await loginShopper({
         page,
         userCredentials: registeredUserCredentials
     })
 
-    // If login fails, try registration with fallback
     if (!isLoggedIn) {
         try {
             await registerShopper({
@@ -665,7 +663,7 @@ export const wishlistFlow = async ({page, registeredUserCredentials, a11y = {}})
                 userCredentials: registeredUserCredentials
             })
         } catch (error) {
-            // If registration fails, attempt login one more time
+            // If registration fails attempt to log in
             const secondLoginAttempt = await loginShopper({
                 page,
                 userCredentials: registeredUserCredentials
@@ -679,8 +677,7 @@ export const wishlistFlow = async ({page, registeredUserCredentials, a11y = {}})
     // The consent form does not stick after registration
     await answerConsentTrackingForm(page)
     await page.waitForLoadState()
-    
-    // Ensure user is on account page before proceeding
+
     const currentUrl = page.url()
     if (!currentUrl.includes('/account')) {
         await page.goto(config.RETAIL_APP_HOME + '/account')
