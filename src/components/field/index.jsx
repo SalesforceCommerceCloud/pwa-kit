@@ -8,12 +8,11 @@ import React, {useState, Fragment} from 'react'
 import PropTypes from 'prop-types'
 import {Controller} from 'react-hook-form'
 import {
-    Field,
-    Input,
+    Field as ChakraField,
     IconButton,
+    Input,
     InputGroup,
-    InputRightElement,
-    Select,
+    NativeSelect,
     Checkbox
 } from '@chakra-ui/react'
 import {VisibilityIcon, VisibilityOffIcon, AlertIcon} from '../../components/icons'
@@ -63,102 +62,85 @@ const FieldComponent = ({
                     typeof inputProps === 'function' ? inputProps({value, onChange}) : inputProps
 
                 return (
-                    <Field.Root name={name} isInvalid={!!error} isRequired={!!rules?.required}>
-                        {/* Label */}
-                        {!['checkbox', 'radio', 'hidden'].includes(type) && (
-                            <Field.Label>{formLabel || label}</Field.Label>
+                    <ChakraField.Root id={name} invalid={!!error}>
+                        {!['checkbox', 'radio', 'hidden'].includes(type) &&
+                            (formLabel || <ChakraField.Label>{label}</ChakraField.Label>)}
+
+                        {['text', 'password', 'email', 'phone', 'tel', 'number'].includes(type) && (
+                            <InputGroup
+                                endElement={
+                                    type === 'password' ? (
+                                        <IconButton
+                                            variant="ghosted"
+                                            aria-label={passwordIconLabel}
+                                            onClick={() => setHidePassword(!hidePassword)}
+                                        >
+                                            <PasswordIcon color="gray.500" boxSize={6} />
+                                        </IconButton>
+                                    ) : undefined
+                                }
+                            >
+                                <Input
+                                    ref={(node) => {
+                                        ref(node)
+                                        if (inputRef) inputRef.current = node
+                                    }}
+                                    onChange={onChange}
+                                    value={value}
+                                    type={inputType}
+                                    placeholder={placeholder}
+                                    autoComplete={autoComplete}
+                                    {..._inputProps}
+                                />
+                            </InputGroup>
                         )}
 
-                        <InputGroup>
-                            <Fragment>
-                                {['text', 'password', 'email', 'phone', 'tel', 'number'].includes(
-                                    type
-                                ) && (
-                                    <Input
-                                        ref={(node) => {
-                                            if (ref) ref(node)
-                                            if (inputRef) inputRef.current = node
-                                        }}
-                                        onChange={onChange}
-                                        value={value || ''}
-                                        type={inputType}
-                                        placeholder={placeholder}
-                                        autoComplete={autoComplete}
-                                        {..._inputProps}
-                                    />
-                                )}
+                        {type === 'hidden' && (
+                            <input
+                                ref={ref}
+                                onChange={onChange}
+                                value={value}
+                                type="hidden"
+                                {..._inputProps}
+                            />
+                        )}
 
-                                {type === 'hidden' && (
-                                    <input
-                                        ref={ref}
-                                        onChange={onChange}
-                                        value={value || ''}
-                                        type="hidden"
-                                        {..._inputProps}
-                                    />
-                                )}
+                        {type === 'select' && (
+                            <NativeSelect.Root ref={ref} value={value} {..._inputProps}>
+                                <NativeSelect.Field onChange={onChange} placeholder={placeholder}>
+                                    {options.map((opt) => (
+                                        <option key={`${opt.label}-${opt.value}`} value={opt.value}>
+                                            {opt.label}
+                                        </option>
+                                    ))}
+                                </NativeSelect.Field>
+                                <NativeSelect.Indicator />
+                            </NativeSelect.Root>
+                        )}
 
-                                {type === 'password' && (
-                                    <InputRightElement>
-                                        <IconButton
-                                            variant="ghost"
-                                            aria-label={passwordIconLabel}
-                                            icon={
-                                                <PasswordIcon
-                                                    color="gray.500"
-                                                    width={6}
-                                                    height={6}
-                                                />
-                                            }
-                                            onClick={() => setHidePassword(!hidePassword)}
-                                        />
-                                    </InputRightElement>
-                                )}
+                        {type === 'checkbox' && (
+                            <Checkbox.Root
+                                checked={value}
+                                onCheckedChange={(details) => onChange(details.checked)}
+                                {..._inputProps}
+                            >
+                                <Checkbox.HiddenInput ref={ref} />
+                                <Checkbox.Control />
+                                <Checkbox.Label>{formLabel || label}</Checkbox.Label>
+                            </Checkbox.Root>
+                        )}
 
-                                {type === 'select' && (
-                                    <Select
-                                        ref={ref}
-                                        onChange={onChange}
-                                        value={value || ''}
-                                        placeholder={placeholder}
-                                        {..._inputProps}
-                                    >
-                                        {options.map((opt) => (
-                                            <option
-                                                key={`${opt.label}-${opt.value}`}
-                                                value={opt.value}
-                                            >
-                                                {opt.label}
-                                            </option>
-                                        ))}
-                                    </Select>
-                                )}
+                        {children}
 
-                                {type === 'checkbox' && (
-                                    <Checkbox
-                                        ref={ref}
-                                        onChange={(e) => onChange(e.target.checked)}
-                                        isChecked={value}
-                                        {..._inputProps}
-                                    >
-                                        {formLabel || label}
-                                    </Checkbox>
-                                )}
-
-                                {children}
-                            </Fragment>
-                        </InputGroup>
-
-                        {/* Error Message */}
                         {error && type !== 'hidden' && (
-                            <Field.ErrorText>
+                            <ChakraField.ErrorText color="red.600">
                                 <AlertIcon aria-hidden="true" mr={2} />
                                 {error.message}
-                            </Field.ErrorText>
+                            </ChakraField.ErrorText>
                         )}
 
-                        {helpText && <Field.HelperText>{helpText}</Field.HelperText>}
-                    </Field.Root>
+                        {helpText}
+                    </ChakraField.Root>
                 )
             }}
         />

@@ -8,7 +8,7 @@ import React, {useEffect, useState} from 'react'
 import PropTypes from 'prop-types'
 import {defineMessage, useIntl} from 'react-intl'
 import {useForm} from 'react-hook-form'
-import {Dialog, useDisclosure} from '@chakra-ui/react'
+import {Dialog, Portal, CloseButton, useDisclosure} from '@chakra-ui/react'
 import {keepPreviousData} from '@tanstack/react-query'
 import {
     AuthHelpers,
@@ -278,61 +278,71 @@ export const AuthModal = ({
     return (
         <Dialog.Root
             open={isOpen}
-            onOpenChange={() => onClose()}
+            onOpenChange={({open}) => {
+                open ? onOpen() : onClose()
+            }}
             size="sm"
             closeOnInteractOutside={false}
             data-testid="sf-auth-modal"
             {...props}
         >
-            <Dialog.Backdrop />
-            <Dialog.Positioner>
-                <Dialog.Content>
-                    <Dialog.CloseTrigger
-                        aria-label={formatMessage({
-                            id: 'auth_modal.button.close.assistive_msg',
-                            defaultMessage: 'Close login form'
-                        })}
-                    />
-                    <Dialog.Body padding={8} bg="white" paddingBottom={14} marginTop={14}>
-                        {!form.formState.isSubmitSuccessful && currentView === LOGIN_VIEW && (
-                            <LoginForm
-                                form={form}
-                                submitForm={submitForm}
-                                clickCreateAccount={() => setCurrentView(REGISTER_VIEW)}
-                                handlePasswordlessLoginClick={() =>
-                                    setLoginType(LOGIN_TYPES.PASSWORDLESS)
-                                }
-                                handleForgotPasswordClick={() => setCurrentView(PASSWORD_VIEW)}
-                                isPasswordlessEnabled={isPasswordlessEnabled}
-                                isSocialEnabled={isSocialEnabled}
-                                idps={idps}
-                                setLoginType={setLoginType}
+            <Portal>
+                <Dialog.Backdrop />
+                <Dialog.Positioner>
+                    <Dialog.Content>
+                        <Dialog.CloseTrigger asChild>
+                            <CloseButton
+                                aria-label={formatMessage({
+                                    id: 'auth_modal.button.close.assistive_msg',
+                                    defaultMessage: 'Close login form'
+                                })}
                             />
-                        )}
-                        {!form.formState.isSubmitSuccessful && currentView === REGISTER_VIEW && (
-                            <RegisterForm
-                                form={form}
-                                submitForm={submitForm}
-                                clickSignIn={onBackToSignInClick}
-                            />
-                        )}
-                        {currentView === PASSWORD_VIEW && (
-                            <ResetPasswordForm
-                                form={form}
-                                submitForm={submitForm}
-                                clickSignIn={onBackToSignInClick}
-                            />
-                        )}
-                        {currentView === EMAIL_VIEW && (
-                            <PasswordlessEmailConfirmation
-                                form={form}
-                                submitForm={submitForm}
-                                email={passwordlessLoginEmail}
-                            />
-                        )}
-                    </Dialog.Body>
-                </Dialog.Content>
-            </Dialog.Positioner>
+                        </Dialog.CloseTrigger>
+                        <Dialog.Body padding={8} bg="white" paddingBottom={14} marginTop={14}>
+                            {!form.formState.isSubmitSuccessful && currentView === LOGIN_VIEW && (
+                                <LoginForm
+                                    form={form}
+                                    submitForm={submitForm}
+                                    clickCreateAccount={() => setCurrentView(REGISTER_VIEW)}
+                                    handlePasswordlessLoginClick={() =>
+                                        setLoginType(LOGIN_TYPES.PASSWORDLESS)
+                                    }
+                                    handleForgotPasswordClick={() => setCurrentView(PASSWORD_VIEW)}
+                                    isPasswordlessEnabled={isPasswordlessEnabled}
+                                    isSocialEnabled={isSocialEnabled}
+                                    idps={idps}
+                                    setLoginType={setLoginType}
+                                />
+                            )}
+
+                            {!form.formState.isSubmitSuccessful &&
+                                currentView === REGISTER_VIEW && (
+                                    <RegisterForm
+                                        form={form}
+                                        submitForm={submitForm}
+                                        clickSignIn={onBackToSignInClick}
+                                    />
+                                )}
+
+                            {currentView === PASSWORD_VIEW && (
+                                <ResetPasswordForm
+                                    form={form}
+                                    submitForm={submitForm}
+                                    clickSignIn={onBackToSignInClick}
+                                />
+                            )}
+
+                            {currentView === EMAIL_VIEW && (
+                                <PasswordlessEmailConfirmation
+                                    form={form}
+                                    submitForm={submitForm}
+                                    email={passwordlessLoginEmail}
+                                />
+                            )}
+                        </Dialog.Body>
+                    </Dialog.Content>
+                </Dialog.Positioner>
+            </Portal>
         </Dialog.Root>
     )
 }
@@ -356,13 +366,13 @@ AuthModal.propTypes = {
  * @returns {Object} - Object props to be spread on to the AuthModal component
  */
 export const useAuthModal = (initialView = LOGIN_VIEW) => {
-    const {isOpen, onOpen, onClose} = useDisclosure()
+    const {open, onOpen, onClose} = useDisclosure()
     const {login} = useExtensionConfig()
     const {passwordless = {}, social = {}} = login
 
     return {
         initialView,
-        isOpen,
+        isOpen: open,
         onOpen,
         onClose,
         isPasswordlessEnabled: !!passwordless?.enabled,

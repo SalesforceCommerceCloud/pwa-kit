@@ -8,10 +8,15 @@ import {defineRecipe} from '@chakra-ui/react'
 
 const baseLinkStyles = {
     fontWeight: 'normal',
-    height: 'auto',
     minWidth: '1em',
-    lineHeight: 4,
-    padding: 0
+    height: 'auto',
+    padding: '0',
+    _hover: {
+        // Copied from the original recipe of Chakra's Link
+        textDecoration: 'underline',
+        textUnderlineOffset: '3px',
+        textDecorationColor: 'currentColor/20'
+    }
 }
 
 const button = defineRecipe({
@@ -49,13 +54,19 @@ const button = defineRecipe({
                 paddingLeft: 3,
                 paddingRight: 3
             },
-            link: {
-                ...baseLinkStyles,
-                color: 'blue.600'
-            },
-            'error-link': {
+            // link: (props) => ({
+            //     color: props.colorPalette === 'red' ? 'red.500' : 'blue.600',
+            //     fontWeight: 'normal',
+            //     minWidth: '1em',
+            //     lineHeight: 4
+            // }),
+            'link-red': {
                 ...baseLinkStyles,
                 color: 'red.500'
+            },
+            'link-blue': {
+                ...baseLinkStyles,
+                color: 'blue.600'
             },
             'menu-link': {
                 color: 'black',
