@@ -253,7 +253,6 @@ const useSeStoreSelection = () => {
         if (!stores || stores.length === 0) return null
 
         const {storeName, zipcode, city, countryCode} = searchCriteria
-        const defaultCountry = countryCode || DEFAULT_STORE_LOCATOR_COUNTRY.countryCode
 
         if (storeName) {
             const searchNameLower = storeName.toLowerCase().trim()
