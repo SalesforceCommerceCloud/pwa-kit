@@ -9,30 +9,20 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import {useIntl} from 'react-intl'
 
-// Components
-import {
-    Container,
-    SimpleGrid,
-    Stack,
+import {Container, SimpleGrid, useSlotRecipe} from '@chakra-ui/react'
 
-    // Hooks
-    useTheme
-} from '@chakra-ui/react'
-
-// Project Components
 import LinksList from '../../components/links-list'
 
-// Others
 import {categoryUrlBuilder} from '../../utils/url'
 
-const ListMenuContent = ({maxColumns, item, itemsKey, onClose, initialFocusRef}) => {
-    const theme = useTheme()
-    const {baseStyle} = theme.components.ListMenu
+const ListMenuContent = ({maxColumns, item, itemsKey, onClose}) => {
+    const recipe = useSlotRecipe({key: 'listMenu'})
+    const styles = recipe()
     const {locale} = useIntl()
     const items = item?.[itemsKey] || []
 
     return (
-        <Container as={Stack} {...baseStyle.popoverContainer}>
+        <Container css={styles.popoverContainer}>
             <SimpleGrid
                 spacing={8}
                 justifyContent={'left'}
@@ -41,7 +31,7 @@ const ListMenuContent = ({maxColumns, item, itemsKey, onClose, initialFocusRef})
                 }, minmax(0, 21%))`}
                 marginInlineStart={{lg: '68px', xl: '96px'}}
             >
-                {items.map((item, index) => {
+                {items.map((item) => {
                     const {id, name} = item
                     const items = item[itemsKey]
 
@@ -76,7 +66,6 @@ const ListMenuContent = ({maxColumns, item, itemsKey, onClose, initialFocusRef})
                             links={links}
                             color={'gray.900'}
                             onLinkClick={onClose}
-                            {...(index === 0 ? {headingLinkRef: initialFocusRef} : {})}
                         />
                     )
                 })}

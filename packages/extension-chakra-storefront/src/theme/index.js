@@ -35,7 +35,7 @@ import popover from './components/base/popover'
 // // Project Component style overrides
 import app from './components/project/_app'
 import breadcrumb from './components/project/breadcrumb'
-// import ListMenu from './components/project/list-menu'
+import listMenu from './components/project/list-menu'
 import checkoutFooter from './components/project/checkout-footer'
 import drawerMenu from './components/project/drawer-menu'
 import footer from './components/project/footer'
@@ -115,6 +115,7 @@ export const overrides = defineConfig({
             header,
             imageGallery,
             linkList,
+            listMenu,
             localeSelector,
             nestedAccordion,
             offlineBanner,
