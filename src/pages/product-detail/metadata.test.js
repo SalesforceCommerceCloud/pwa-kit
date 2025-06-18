@@ -56,12 +56,52 @@ describe('Metadata', () => {
         })
     })
 
+    it('renders with product pageKeywords when provided', () => {
+        const product = {
+            pageKeywords: 'product, amazing, quality'
+        }
+        render(<Metadata product={product} />)
+
+        const helmet = Helmet.peek()
+        expect(helmet.metaTags).toContainEqual({
+            name: 'keywords',
+            content: 'product, amazing, quality'
+        })
+    })
+
+    it('does not render keywords meta tag when no keywords are provided', () => {
+        const product = {
+            pageTitle: 'Test Product'
+        }
+        render(<Metadata product={product} />)
+
+        const helmet = Helmet.peek()
+        const keywordsTags = helmet.metaTags.filter(tag => tag.name === 'keywords')
+        expect(keywordsTags).toHaveLength(0)
+    })
+
+    it('prioritizes keywords from pageMetaTags over pageKeywords', () => {
+        const product = {
+            pageKeywords: 'This should be ignored',
+            pageMetaTags: [
+                {id: 'keywords', value: 'meta, tags, priority'}
+            ]
+        }
+        render(<Metadata product={product} />)
+
+        const helmet = Helmet.peek()
+        expect(helmet.metaTags).toContainEqual({
+            name: 'keywords',
+            content: 'meta, tags, priority'
+        })
+    })
+
     it('prioritizes description from pageMetaTags over pageDescription', () => {
         const product = {
             pageDescription: 'This should be ignored',
             pageMetaTags: [
                 {id: 'description', value: 'This description should be used'},
-                {id: 'keywords', value: 'product, amazing, quality'}
+                {id: 'author', value: 'Test Author'}
             ]
         }
         render(<Metadata product={product} />)
@@ -72,15 +112,16 @@ describe('Metadata', () => {
             content: 'This description should be used'
         })
         expect(helmet.metaTags).toContainEqual({
-            name: 'keywords',
-            content: 'product, amazing, quality'
+            name: 'author',
+            content: 'Test Author'
         })
     })
 
-    it('renders additional meta tags from pageMetaTags', () => {
+    it('renders all meta tags from pageMetaTags including duplicates', () => {
         const product = {
             pageMetaTags: [
                 {id: 'keywords', value: 'product, test, quality'},
+                {id: 'description', value: 'Custom description'},
                 {id: 'author', value: 'Salesforce'},
                 {id: 'robots', value: 'index, follow'}
             ]
@@ -88,6 +129,10 @@ describe('Metadata', () => {
         render(<Metadata product={product} />)
 
         const helmet = Helmet.peek()
+        expect(helmet.metaTags).toContainEqual({
+            name: 'description',
+            content: 'Custom description'
+        })
         expect(helmet.metaTags).toContainEqual({
             name: 'keywords',
             content: 'product, test, quality'
@@ -102,25 +147,41 @@ describe('Metadata', () => {
         })
     })
 
-    it('filters out description tag from additional meta tags to avoid duplication', () => {
+    it('handles duplicate meta tags when pageMetaTags contains description and keywords', () => {
         const product = {
+            pageDescription: 'Fallback description',
+            pageKeywords: 'fallback, keywords',
             pageMetaTags: [
-                {id: 'description', value: 'Custom description'},
-                {id: 'keywords', value: 'product, test'}
+                {id: 'description', value: 'Priority description'},
+                {id: 'keywords', value: 'priority, keywords'}
             ]
         }
         render(<Metadata product={product} />)
 
         const helmet = Helmet.peek()
+        // Should have both the conditional keywords/description AND the ones from pageMetaTags
         const descriptionTags = helmet.metaTags.filter(tag => tag.name === 'description')
-        expect(descriptionTags).toHaveLength(1)
-        expect(descriptionTags[0].content).toBe('Custom description')
+        const keywordsTags = helmet.metaTags.filter(tag => tag.name === 'keywords')
+        
+        expect(descriptionTags).toHaveLength(2)
+        expect(keywordsTags).toHaveLength(2)
+        
+        // The conditional ones should use the priority values from pageMetaTags
+        expect(helmet.metaTags).toContainEqual({
+            name: 'description',
+            content: 'Priority description'
+        })
+        expect(helmet.metaTags).toContainEqual({
+            name: 'keywords',
+            content: 'priority, keywords'
+        })
     })
 
     it('renders complete metadata with all product properties', () => {
         const product = {
             pageTitle: 'Complete Product Title',
-            pageDescription: 'This should be overridden',
+            pageDescription: 'Fallback description',
+            pageKeywords: 'fallback, keywords',
             pageMetaTags: [
                 {id: 'description', value: 'Custom meta description'},
                 {id: 'keywords', value: 'complete, product, test'},
@@ -153,6 +214,7 @@ describe('Metadata', () => {
     it('handles empty pageMetaTags array', () => {
         const product = {
             pageTitle: 'Test Product',
+            pageKeywords: 'test, product',
             pageMetaTags: []
         }
         render(<Metadata product={product} />)
@@ -163,6 +225,10 @@ describe('Metadata', () => {
             {
                 name: 'description',
                 content: 'View detailed information, specifications, and features for this product.'
+            },
+            {
+                name: 'keywords',
+                content: 'test, product'
             }
         ])
     })
