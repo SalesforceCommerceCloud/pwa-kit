@@ -68,29 +68,6 @@ jest.mock('../../commerce-api/hooks/useCustomer', () => {
     }
 })
 
-jest.mock('../../commerce-api/utils', () => {
-    const originalModule = jest.requireActual('../../commerce-api/utils')
-    return {
-        ...originalModule,
-        isTokenExpired: jest.fn().mockReturnValue(false),
-        hasSFRAAuthStateChanged: jest.fn().mockReturnValue(false),
-        createGetTokenBody: jest.fn().mockReturnValue({
-            grantType: 'test',
-            code: 'test',
-            usid: 'test',
-            codeVerifier: 'test',
-            redirectUri: 'http://localhost/test'
-        })
-    }
-})
-
-jest.mock('../../commerce-api/pkce', () => {
-    return {
-        createCodeVerifier: jest.fn().mockReturnValue('codeverifier'),
-        generateCodeChallenge: jest.fn().mockReturnValue('codechallenge')
-    }
-})
-
 const MockedComponent = () => {
     const customer = useCustomer()
     const match = {

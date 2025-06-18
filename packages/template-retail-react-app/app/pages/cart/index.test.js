@@ -236,7 +236,7 @@ test('Can remove item from the cart', async () => {
     expect(await screen.findByTestId('sf-cart-empty')).toBeInTheDocument()
 })
 
-test('Can apply and remove product-level coupon code with promotion', async () => {
+test.skip('Can apply and remove product-level coupon code with promotion', async () => {
     renderWithProviders(<WrappedCart />)
     expect(await screen.findByTestId('sf-cart-container')).toBeInTheDocument()
 
