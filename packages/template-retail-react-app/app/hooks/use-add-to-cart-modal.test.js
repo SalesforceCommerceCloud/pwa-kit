@@ -15,7 +15,12 @@ import {rest} from 'msw'
 import {mockCustomerBaskets} from '@salesforce/retail-react-app/app/mocks/mock-data'
 import {
     mockProductBundle,
-    mockBundleItemsAdded
+    mockBundleItemsAdded,
+    basketWithProductBundle,
+    mockStandardProduct,
+    mockBundleWithStandardProducts,
+    mockBundleItemsWithStandardProducts,
+    mockBasketWithStandardProducts
 } from '@salesforce/retail-react-app/app/mocks/product-bundle'
 import {getDisplayVariationValues} from '@salesforce/retail-react-app/app/utils/product-utils'
 
@@ -820,4 +825,41 @@ test('renders bundle product image when image object is not provided', async () 
 
     expect(screen.getByRole('dialog')).toBeInTheDocument()
     expect(screen.getByText(mockProductBundle.name)).toBeInTheDocument()
+})
+
+test('displays standard products in bundle without variation attributes', async () => {
+    const modalData = {
+        product: mockBundleWithStandardProducts,
+        itemsAdded: mockBundleItemsWithStandardProducts,
+        selectedQuantity: 1
+    }
+
+    // Mock the basket data to include currency at the top level
+    const mockBasket = {
+        data: mockBasketWithStandardProducts,
+        derivedData: {
+            totalItems: 2
+        },
+        currency: 'USD' // Add currency at the top level
+    }
+
+    jest.spyOn(require('@salesforce/retail-react-app/app/hooks/use-current-basket'), 'useCurrentBasket').mockReturnValue(mockBasket)
+
+    renderWithProviders(
+        <AddToCartModalContext.Provider
+            value={{
+                isOpen: true,
+                onClose: jest.fn(),
+                data: modalData
+            }}
+        >
+            <AddToCartModal />
+        </AddToCartModalContext.Provider>
+    )
+
+    expect(screen.getByText('Standard Product (2)')).toBeInTheDocument()
+
+    // Should not display any variation attributes for standard products
+    expect(screen.queryByText(/Color:/)).not.toBeInTheDocument()
+    expect(screen.queryByText(/Size:/)).not.toBeInTheDocument()
 })

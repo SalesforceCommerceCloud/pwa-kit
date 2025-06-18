@@ -158,12 +158,14 @@ export const AddToCartModal = () => {
                                                 gridGap={4}
                                             >
                                                 {itemsAdded.map(({product, variant, quantity}) => {
-                                                    const variationAttributeValues = product.variationAttributes?.length && variant
-                                                        ? getDisplayVariationValues(
-                                                            product.variationAttributes,
-                                                            variant.variationValues
-                                                        )
-                                                        : {}
+                                                    const variationAttributeValues =
+                                                        product.variationAttributes?.length &&
+                                                        variant
+                                                            ? getDisplayVariationValues(
+                                                                  product.variationAttributes,
+                                                                  variant.variationValues
+                                                              )
+                                                            : {}
                                                     return (
                                                         <Box key={variant?.productId || product.id}>
                                                             <Text
@@ -176,7 +178,8 @@ export const AddToCartModal = () => {
                                                                     ? `(${quantity})`
                                                                     : ''}
                                                             </Text>
-                                                            {Object.keys(variationAttributeValues).length > 0 && (
+                                                            {Object.keys(variationAttributeValues)
+                                                                .length > 0 && (
                                                                 <Box
                                                                     color="gray.600"
                                                                     fontSize="sm"
