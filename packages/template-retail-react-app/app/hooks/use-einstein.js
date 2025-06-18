@@ -56,42 +56,57 @@ export class EinsteinAPI {
      * Given a product or item source, returns the product data that Einstein requires
      */
     _constructEinsteinProduct(product) {
-        if (product.type && (product.type.master || product.type.variant)) {
-            // handle variants for PDP / viewProduct
-            // Assumes product is a Product object from SCAPI Shopper-Products:
-            // https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-products?meta=type%3AProduct
-            return {
-                id: product.master.masterId,
-                sku: product.id,
-                altId: '',
-                altIdType: ''
+        // Handle variants for PDP / viewProduct
+        // Assumes product is a Product object from SCAPI Shopper-Products:
+        // https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-products?meta=type%3AProduct
+        if (product.type) {
+            // In case of variant, send the "sku" attribute
+            if (product.type.variant) {
+                return {
+                    id: product.master.masterId,
+                    price: product.price,
+                    sku: product.id
+                }
             }
-        } else if (
-            product.productType &&
-            (product.productType.master ||
-                product.productType.variant ||
-                product.productType.set ||
-                product.productType.bundle ||
-                product.productType.variationGroup ||
-                product.productType.item)
-        ) {
-            // handle variants & sets for PLP / viewCategory & viewSearch
-            // Assumes product is a ProductSearchHit from SCAPI Shopper-Search:
-            // https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-search?meta=type%3AProductSearchHit
+
+            // In case of variation group, send the "altId" and "type" attributes
+            if (product.type.variationGroup) {
+                return {
+                    altId: product.id,
+                    id: product.master.masterId,
+                    price: product.price,
+                    sku: product.id,
+                    type: 'vgroup'
+                }
+            }
+
+            // Handle non-variant products, like master, set, bundle, item.
+            // This code follows the implementation in the plugin_einstein_api.
+            // https://github.com/SalesforceCommerceCloud/plugin_einstein_api/blob/c8168d5b8e2e34bfb9413da73969d59b0f3adabd/plugin_einstein_api/cartridge/scripts/helpers/RecommendationsHelper.js#L315
+            return {
+                id: product.id,
+                price: product.price
+            }
+        }
+
+        // Handle variants & sets for PLP / viewCategory & viewSearch
+        // Assumes product is a ProductSearchHit from SCAPI Shopper-Search:
+        // https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-search?meta=type%3AProductSearchHit
+        if (product.hitType) {
             return {
                 id: product.productId,
                 sku: product.productId, //TODO: Should we switch this to product.representedProduct.id once we allow non-master products in search results?
                 altId: '',
                 altIdType: ''
             }
-        } else {
-            // handles non-variants
-            return {
-                id: product.id,
-                sku: '',
-                altId: '',
-                altIdType: ''
-            }
+        }
+
+        // handles non-variants
+        return {
+            id: product.id,
+            sku: '',
+            altId: '',
+            altIdType: ''
         }
     }
 
@@ -100,13 +115,40 @@ export class EinsteinAPI {
      *
      * Assumes item is a ProductItemfrom SCAPI Shopper-Baskets:
      * https://developer.salesforce.com/docs/commerce/commerce-api/references/shopper-baskets?meta=type%3AProductItem
+     *
+     * This code follows the implementation in the plugin_einstein_api.
+     * https://github.com/SalesforceCommerceCloud/plugin_einstein_api/blob/c8168d5b8e2e34bfb9413da73969d59b0f3adabd/plugin_einstein_api/cartridge/scripts/helpers/RecommendationsHelper.js#L315
      */
     _constructEinsteinItem(item) {
+        const {product, productId, price, quantity} = item
+
+        // In case of variant, send the "sku" attribute
+        if (product?.type?.variant) {
+            return {
+                id: product.master.masterId,
+                quantity: quantity,
+                price: price,
+                sku: product.id
+            }
+        }
+
+        // In case of variation group, send the "altId" and "type" attributes
+        if (product?.type?.variationGroup) {
+            return {
+                id: product.master.masterId,
+                quantity: quantity,
+                price: price,
+                sku: product.id,
+                type: 'vgroup',
+                altId: product.id
+            }
+        }
+
+        // Otherwise send default attributes.
         return {
-            id: item.productId,
-            sku: '',
-            price: item.price,
-            quantity: item.quantity
+            id: productId,
+            price: price,
+            quantity: quantity
         }
     }
 
