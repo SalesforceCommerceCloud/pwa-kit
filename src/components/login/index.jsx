@@ -74,14 +74,19 @@ const LoginForm = ({
                         />
                     )}
 
-                    <Stack direction="row" spacing={1} justifyContent="center">
+                    <Stack direction="row" gap={1} justifyContent="center">
                         <Text fontSize="sm">
                             <FormattedMessage
                                 defaultMessage="Don't have an account?"
                                 id="login_form.message.dont_have_account"
                             />
                         </Text>
-                        <Button variant="link" size="sm" onClick={clickCreateAccount}>
+                        <Button
+                            variant="link-blue"
+                            size="sm"
+                            lineHeight="1"
+                            onClick={clickCreateAccount}
+                        >
                             <FormattedMessage
                                 defaultMessage="Create account"
                                 id="login_form.action.create_account"
