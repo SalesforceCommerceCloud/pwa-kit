@@ -15,6 +15,8 @@ import Account from '../account'
 import Registration from '../registration'
 import ResetPassword from '../reset-password'
 import mockConfig from '../../../config/mocks/default'
+import {AuthHelpers} from '@salesforce/commerce-sdk-react'
+import useCustomer from '../../commerce-api/hooks/useCustomer'
 
 jest.setTimeout(60000)
 
@@ -38,6 +40,33 @@ const mockMergedBasket = {
         email: 'darek@test.com'
     }
 }
+const mockAuthHelperFunctions = {
+    [AuthHelpers.Register]: {mutateAsync: jest.fn()},
+    [AuthHelpers.LoginRegisteredUserB2C]: {mutateAsync: jest.fn()}
+}
+
+jest.mock('@salesforce/commerce-sdk-react', () => {
+    const originalModule = jest.requireActual('@salesforce/commerce-sdk-react')
+    return {
+        ...originalModule,
+        useAuthHelper: jest
+            .fn()
+            .mockImplementation((helperType) => mockAuthHelperFunctions[helperType])
+    }
+})
+
+jest.mock('../../commerce-api/hooks/useCustomer', () => {
+    const originalModule = jest.requireActual('../../commerce-api/hooks/useCustomer')
+    return {
+        __esModule: true,
+        default: () => ({
+            ...originalModule.default(),
+            isRegistered: false,
+            getSkeletonCustomer: () => mockRegisteredCustomer,
+            registerCustomer: jest.fn()
+        })
+    }
+})
 
 jest.mock('../../commerce-api/utils', () => {
     const originalModule = jest.requireActual('../../commerce-api/utils')
@@ -63,11 +92,13 @@ jest.mock('../../commerce-api/pkce', () => {
 })
 
 const MockedComponent = () => {
+    const customer = useCustomer()
     const match = {
         params: {pageName: 'profile'}
     }
     return (
         <Router>
+            <p>Auth Type: {customer.authType}</p>
             <Login />
             <Route path={createPathWithDefaults('/registration')}>
                 <Registration />
@@ -124,17 +155,20 @@ test('Allows customer to sign in to their account', async () => {
         wrapperProps: {siteAlias: 'uk', locale: {id: 'en-GB'}, appConfig: mockConfig.app}
     })
 
+    expect(await screen.findByText('Auth Type:', {}, {timeout: 30000})).toBeInTheDocument()
+
     // enter credentials and submit
-    user.type(screen.getByLabelText('Email'), 'darek@test.com')
-    user.type(screen.getByLabelText('Password'), 'Password!1')
-    user.click(screen.getByText(/sign in/i))
+    await user.type(screen.getByLabelText('Email'), 'darek@test.com')
+    await user.type(screen.getByLabelText('Password'), 'Password!1')
+    await user.click(screen.getByText(/sign in/i))
 
     // wait for success state to appear
-    expect(await screen.findByText(/Welcome Back/i, {}, {timeout: 30000})).toBeInTheDocument()
-    expect(await screen.findByText(/darek@test.com/i, {}, {timeout: 30000})).toBeInTheDocument()
+    expect(
+        await screen.findByText(/Auth Type: registered/i, {}, {timeout: 30000})
+    ).toBeInTheDocument()
 })
 
-test.only('Renders error when given incorrect log in credentials', async () => {
+test('Renders error when given incorrect log in credentials', async () => {
     // mock failed auth request
     global.server.use(
         rest.get('*/customers', (req, res, ctx) => {
@@ -152,17 +186,20 @@ test.only('Renders error when given incorrect log in credentials', async () => {
         )
     )
 
+    mockAuthHelperFunctions[AuthHelpers.LoginRegisteredUserB2C].mutateAsync.mockRejectedValueOnce(
+        new Error('Invalid credentials')
+    )
+
     // render our test component
     renderWithProviders(<MockedComponent />, {
         wrapperProps: {siteAlias: 'uk', locale: {id: 'en-GB'}, appConfig: mockConfig.app}
     })
 
     // enter credentials and submit
-    user.type(screen.getByLabelText('Email'), 'foo@test.com')
-    user.type(screen.getByLabelText('Password'), 'SomeFakePassword1!')
-    user.click(screen.getByText(/sign in/i))
+    await user.type(screen.getByLabelText('Email'), 'foo@test.com')
+    await user.type(screen.getByLabelText('Password'), 'SomeFakePassword1!')
+    await user.click(screen.getByText(/sign in/i))
 
-    // wait for login error alert to appear
     expect(
         await screen.findByText(
             /Incorrect username or password, please try again./i,
