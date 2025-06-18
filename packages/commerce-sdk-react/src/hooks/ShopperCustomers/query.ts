@@ -32,7 +32,7 @@ type Client = NonNullable<ApiClients[typeof CLIENT_KEY]>
 // ): UseQueryResult<DataType<Client['getExternalProfile']>> => {
 //     type Options = Argument<Client['getExternalProfile']>
 //     type Data = DataType<Client['getExternalProfile']>
-//     const {shopperCustomers: client} = useCommerceApi()
+//     const client = useCommerceApi('shopperCustomers')
 //     const methodName = 'getExternalProfile'
 //     const requiredParameters = ShopperCustomers.paramKeys[`${methodName}Required`]
 
