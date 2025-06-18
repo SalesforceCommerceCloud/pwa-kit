@@ -102,14 +102,15 @@ const CartSecondaryButtonGroup = ({
                         </Button>
                     )}
                     {/* Only show Edit if the product is a variant */}
-                    {Array.isArray(variant.variationAttributes) && variant.variationAttributes.length > 0 && (
-                        <Button variant="link" size="sm" onClick={() => onEditClick(variant)}>
-                            <FormattedMessage
-                                defaultMessage="Edit"
-                                id="cart_secondary_button_group.action.edit"
-                            />
-                        </Button>
-                    )}
+                    {Array.isArray(variant.variationAttributes) &&
+                        variant.variationAttributes.length > 0 && (
+                            <Button variant="link" size="sm" onClick={() => onEditClick(variant)}>
+                                <FormattedMessage
+                                    defaultMessage="Edit"
+                                    id="cart_secondary_button_group.action.edit"
+                                />
+                            </Button>
+                        )}
                 </ButtonGroup>
                 <Flex alignItems="center">
                     <Checkbox
