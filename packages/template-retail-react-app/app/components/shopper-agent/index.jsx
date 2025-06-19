@@ -61,7 +61,14 @@ function useMiaw(
                 locale
             )
         }
-    }, [scriptLoadStatus])
+    }, [
+        scriptLoadStatus,
+        salesforceOrgId,
+        embeddedServiceDeploymentName,
+        embeddedServiceDeploymentUrl,
+        scrt2Url,
+        locale
+    ])
 }
 
 function validateCommerceAgentSettings(commerceAgent) {
@@ -88,7 +95,7 @@ function isEnabled(enabled) {
     return enabled === 'true' && onClient
 }
 
-function ShopperAgentWindow({commerceAgentConfiguration, locale, domainUrl, basketId}) {
+function ShopperAgentWindow({commerceAgentConfiguration, locale, basketId}) {
     const theme = useTheme()
     const {
         embeddedServiceName,
@@ -105,12 +112,11 @@ function ShopperAgentWindow({commerceAgentConfiguration, locale, domainUrl, bask
     useEffect(() => {
         const handleEmbeddedMessagingReady = () => {
             window.embeddedservice_bootstrap.prechatAPI.setHiddenPrechatFields({
-                DomainUrl: domainUrl,
                 SiteId: siteId,
                 Locale: locale,
                 OrganizationId: commerceOrgId,
                 UsId: usid,
-                PwaKit: true
+                IsCartMgmtSupported: true
             })
         }
 
@@ -138,7 +144,7 @@ function ShopperAgentWindow({commerceAgentConfiguration, locale, domainUrl, bask
                 handleEmbeddedMessagingWindowMaximized
             )
         }
-    }, [commerceAgentConfiguration])
+    }, [commerceAgentConfiguration, usid, theme.zIndices.sticky])
 
     // whenever the basketId changes, update the hidden prechat fields
     useEffect(() => {
@@ -160,7 +166,7 @@ function ShopperAgentWindow({commerceAgentConfiguration, locale, domainUrl, bask
                 handleEmbeddedMessagingButtonClicked
             )
         }
-    }, [commerceAgentConfiguration, basketId])
+    }, [basketId])
 
     // Load the embedded messaging script
     const scriptLoadStatus = useScript(scriptSourceUrl)
@@ -180,7 +186,6 @@ function ShopperAgentWindow({commerceAgentConfiguration, locale, domainUrl, bask
 
 ShopperAgentWindow.propTypes = {
     commerceAgentConfiguration: PropTypes.object,
-    domainUrl: PropTypes.string,
     basketId: PropTypes.string,
     locale: PropTypes.string
 }
@@ -189,18 +194,11 @@ ShopperAgentWindow.propTypes = {
  * ShopperAgent component that initializes and manages the embedded messaging service
  * @param {Object} props - Component props
  * @param {Object} props.commerceAgentConfiguration - Commerce agent settings
- * @param {string} props.domainUrl - The domain URL for the embedded messaging script
  * @param {string} props.basketId - The basket ID for the embedded messaging script
  * @param {string} props.locale - The locale for the embedded messaging script
  * @returns {JSX.Element} The ShopperAgent component
  */
-function ShopperAgent({
-    commerceAgentConfiguration,
-    domainUrl,
-    basketId,
-    locale,
-    basketDoneLoading
-}) {
+function ShopperAgent({commerceAgentConfiguration, basketId, locale, basketDoneLoading}) {
     const {enabled} = commerceAgentConfiguration
     const isShopperAgentEnabled = isEnabled(enabled)
 
@@ -210,7 +208,6 @@ function ShopperAgent({
         <ShopperAgentWindow
             commerceAgentConfiguration={commerceAgentConfiguration}
             locale={locale}
-            domainUrl={domainUrl}
             basketId={basketId}
         />
     ) : null
@@ -218,7 +215,6 @@ function ShopperAgent({
 
 ShopperAgent.propTypes = {
     commerceAgentConfiguration: PropTypes.object,
-    domainUrl: PropTypes.string,
     basketId: PropTypes.string,
     locale: PropTypes.string,
     basketDoneLoading: PropTypes.bool

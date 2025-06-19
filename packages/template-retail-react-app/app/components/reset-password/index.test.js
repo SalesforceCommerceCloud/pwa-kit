@@ -49,7 +49,7 @@ const MockedErrorComponent = () => {
 }
 
 test('Allows customer to generate password token and see success message', async () => {
-    const mockSubmitForm = jest.fn(async (_data) => ({
+    const mockSubmitForm = jest.fn(async () => ({
         password: jest.fn(async (passwordData) => {
             // Mock behavior inside the password function
             console.log('Password function called with:', passwordData)
