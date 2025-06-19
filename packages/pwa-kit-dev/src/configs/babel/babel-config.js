@@ -6,6 +6,8 @@
  */
 const config = {
     sourceType: 'unambiguous',
+    compact: false,
+    minified: false,
     presets: [
         [
             require('@babel/preset-env'),

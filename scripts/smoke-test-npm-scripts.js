@@ -43,11 +43,13 @@ const main = () => {
         /^start.*$/,
         /^compile-translations.*$/,
         /^extract-default-translations.*$/,
-        /^bump-version.*$/
+        /^bump-version.*$/,
+        /^test:max-file-size$/,
+        /^test:lighthouse$/
     ]
 
     const scripts = Object.keys(pkg.scripts).filter(
-        (script) => !exclude.some((re) => script.match(re))
+        (script) => !exclude.some((re) => re.test(script))
     )
 
     scripts.forEach((script) => {
