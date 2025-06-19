@@ -54,6 +54,7 @@ const SelectedRefinements = ({toggleFilter, selectedFilterValues, filters, handl
                             color="black"
                             colorPalette="gray"
                             size="sm"
+                            variant="outline"
                             onClick={() =>
                                 toggleFilter({value: filter.apiLabel}, filter.value, true)
                             }
