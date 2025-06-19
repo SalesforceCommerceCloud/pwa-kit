@@ -20,7 +20,7 @@ const projectDir = path.join(__filename, '../..')
 const packagesDir = path.join(projectDir, 'packages')
 const dirs = fs
     .readdirSync(packagesDir, {withFileTypes: true})
-    .filter((dirent) => dirent.isDirectory())
+    .filter((dirent) => dirent.isDirectory() && dirent.name !== 'node_modules')
     .map((dirent) => path.join(packagesDir, dirent.name))
 let exitCode = 0
 
