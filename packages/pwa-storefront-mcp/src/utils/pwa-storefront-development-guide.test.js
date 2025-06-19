@@ -43,7 +43,7 @@ describe('PWA Development Guidelines', () => {
                 'Core Principles',
                 'Technical Stack',
                 'Best Practices',
-                'PWA Kit Storefront Project Structure',
+                'PWA Kit Extensibility',
                 'Quality Standards'
             ]
 
