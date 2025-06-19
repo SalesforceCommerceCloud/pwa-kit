@@ -31,8 +31,8 @@ jest.mock('@salesforce/pwa-kit-react-sdk/utils/url', () => {
         getAppOrigin: jest.fn(() => 'https://www.example.com')
     }
 })
-jest.mock('./utils', () => {
-    const original = jest.requireActual('./utils')
+jest.mock('@salesforce/pwa-kit-runtime/utils/ssr-config', () => {
+    const original = jest.requireActual('@salesforce/pwa-kit-runtime/utils/ssr-config')
     return {
         ...original,
         getConfig: jest.fn(() => mockConfig)
@@ -354,7 +354,7 @@ describe('createUrlTemplate tests', () => {
                 locale?.alias ? `, locale.alias:${locale.alias}` : ''
             } and urlConfig:${JSON.stringify(urlConfig)}`, () => {
                 const buildUrl = createUrlTemplate(
-                    {url: urlConfig, pages: {Home: {path: '/'}}},
+                    {url: urlConfig, pages: {home: {path: '/'}}},
                     site.id,
                     locale?.alias || locale?.id
                 )
