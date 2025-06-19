@@ -22,7 +22,7 @@ import {
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 import {useForm} from 'react-hook-form'
 import {useParams} from 'react-router-dom'
-import {useOrder, useProducts, useAuthHelper, AuthHelpers} from '@salesforce/commerce-sdk-react'
+import {useOrder, useProducts, useAuthHelper, AuthHelpers, useShopperCustomersMutation} from '@salesforce/commerce-sdk-react'
 import {getCreditCardIcon} from '@salesforce/retail-react-app/app/utils/cc-utils'
 import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
 import Link from '@salesforce/retail-react-app/app/components/link'
@@ -37,6 +37,7 @@ import CartItemVariantPrice from '@salesforce/retail-react-app/app/components/it
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
 import {API_ERROR_MESSAGE} from '@salesforce/retail-react-app/app/constants'
 import {useCurrency} from '@salesforce/retail-react-app/app/hooks'
+import {nanoid} from 'nanoid'
 
 const onClient = typeof window !== 'undefined'
 
@@ -56,6 +57,7 @@ const CheckoutConfirmation = () => {
     const {currency} = useCurrency()
     const itemIds = order?.productItems.map((item) => item.productId)
     const {data: products} = useProducts({parameters: {ids: itemIds?.join(',')}})
+    const createCustomerAddress = useShopperCustomersMutation('createCustomerAddress')
     const productItemsMap = products?.data.reduce((map, item) => ({...map, [item.id]: item}), {})
     const form = useForm()
 
@@ -81,11 +83,27 @@ const CheckoutConfirmation = () => {
                     firstName: data.firstName,
                     lastName: data.lastName,
                     email: data.email,
-                    login: data.email
+                    login: data.email,
+                    phoneHome: order.shipments[0].shippingAddress.phone
                 },
                 password: data.password
             }
-            await register.mutateAsync(body)
+            const registerData = await register.mutateAsync(body)
+
+            // Save the shipping address from this order to the customer's saved address list
+            const shippingAddress = order.shipments[0].shippingAddress
+            console.log('shippingAddress', shippingAddress)
+            let {id, ...shippingAddressWithoutId} = shippingAddress;
+            const bodyShippingAddress = {
+                addressId: nanoid(),
+                ...shippingAddressWithoutId
+            }
+            console.log('bodyShippingAddress', bodyShippingAddress)
+            console.log('customer.customerId', customer.customerId)
+            await createCustomerAddress.mutateAsync({
+                body: bodyShippingAddress,
+                parameters: {customerId: registerData.customerId}
+            })
 
             navigate(`/account`)
         } catch (error) {

@@ -239,7 +239,8 @@ export const SHOPPER_CONTEXT_SEARCH_PARAMS = {
 export const LOGIN_TYPES = {
     PASSWORD: 'password',
     PASSWORDLESS: 'passwordless',
-    SOCIAL: 'social'
+    SOCIAL: 'social',
+    OTP: 'otp'
 }
 
 // Constants for Password Reset

@@ -139,6 +139,8 @@ const Login = ({initialView = LOGIN_VIEW}) => {
                 } else if (loginType === LOGIN_TYPES.PASSWORDLESS) {
                     setPasswordlessLoginEmail(data.email)
                     await handlePasswordlessLogin(data.email)
+                } else if (loginType === LOGIN_TYPES.OTP) {
+                    // TODO something here
                 }
             },
             email: async () => {
