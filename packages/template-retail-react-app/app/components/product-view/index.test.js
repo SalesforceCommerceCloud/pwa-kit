@@ -443,14 +443,13 @@ test('shows "Pickup in Select Store" label when pickup is disabled due to no sto
 
     renderWithProviders(<MockComponent product={mockProductDetail} />)
 
-    // Assert: The label is present and the link is correct
+    // Assert: The label is present and the button is correct
     const label = await screen.findByTestId('pickup-select-store-msg')
     expect(label).toBeInTheDocument()
     expect(label).toHaveTextContent(/Pickup in/i)
-    const link = label.querySelector('a')
-    expect(link).toBeInTheDocument()
-    expect(link.getAttribute('href')).toMatch(/store-locator/)
-    expect(link).toHaveTextContent(/Select Store/i)
+    const button = label.querySelector('button')
+    expect(button).toBeInTheDocument()
+    expect(button).toHaveTextContent(/Select Store/i)
 })
 
 describe('ProductView stock status messages', () => {
@@ -474,10 +473,10 @@ describe('ProductView stock status messages', () => {
         const msg = await screen.findByText(/In Stock at/i)
         expect(msg).toBeInTheDocument()
         expect(msg).toHaveTextContent(storeName)
-        // Store name should be a link
-        const link = msg.querySelector('a')
-        expect(link.getAttribute('href')).toMatch(/store-locator/)
-        expect(link).toHaveTextContent(storeName)
+        // Store name should be a button
+        const button = msg.querySelector('button')
+        expect(button).toBeInTheDocument()
+        expect(button).toHaveTextContent(storeName)
     })
 
     test('shows "Out of Stock at {storeName}" when store is out of inventory', async () => {
@@ -491,9 +490,9 @@ describe('ProductView stock status messages', () => {
         const msg = await screen.findByText(/Out of Stock at/i)
         expect(msg).toBeInTheDocument()
         expect(msg).toHaveTextContent(storeName)
-        // Store name should be a link
-        const link = msg.querySelector('a')
-        expect(link.getAttribute('href')).toMatch(/store-locator/)
-        expect(link).toHaveTextContent(storeName)
+        // Store name should be a button
+        const button = msg.querySelector('button')
+        expect(button).toBeInTheDocument()
+        expect(button).toHaveTextContent(storeName)
     })
 })
