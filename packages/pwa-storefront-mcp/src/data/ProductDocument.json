@@ -1,0 +1,1458 @@
+{
+    "description": "Document representing a product",
+    "properties": {
+        "assigned_categories": {
+            "description": "The catalog categories that the product is assigned to",
+            "items": {
+                "$ref": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/catalog_category_id"
+            },
+            "type": "array"
+        },
+        "ats": {
+            "description": "The ATS(Available To Sell) inventory value of the product. This is a calculated value.",
+            "format": "double",
+            "type": "number"
+        },
+        "brand": {
+            "description": "The product's brand.",
+            "x-label": {
+                "default": "Brand"
+            },
+            "type": "string"
+        },
+        "bundled_products": {
+            "description": "The array of bundled products which the product includes.",
+            "items": {
+                "$ref": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/product"
+            },
+            "type": "array"
+        },
+        "c_availableForInStorePickup": {
+            "description": "Signals if there are inventory lists for brick-and-mortar stores associated with this product.",
+            "x-label": {
+                "default": "Available for In Store Pickup"
+            },
+            "type": "boolean"
+        },
+        "c_batteryLife": {
+            "x-label": {
+                "default": "Battery Life"
+            },
+            "type": "string"
+        },
+        "c_batteryType": {
+            "x-label": {
+                "default": "Battery Type"
+            },
+            "type": "string"
+        },
+        "c_bootType": {
+            "description": "Type of Boot for search refinement.",
+            "items": {
+                "enum": [
+                    "0010",
+                    "0020",
+                    "0030",
+                    "0040",
+                    "0050",
+                    "0060",
+                    "0070"
+                ],
+                "x-enum-labels": [
+                    {
+                        "default": "Winter"
+                    },
+                    {
+                        "default": "Waterproof"
+                    },
+                    {
+                        "default": "Classic"
+                    },
+                    {
+                        "default": "Ankle & Mid"
+                    },
+                    {
+                        "default": "Tall"
+                    },
+                    {
+                        "default": "6\""
+                    },
+                    {
+                        "default": "Casual"
+                    }
+                ],
+                "type": "string"
+            },
+            "x-label": {
+                "default": "Boot Type"
+            },
+            "type": "array"
+        },
+        "c_bottomType": {
+            "description": "Bottom type for search refinement",
+            "items": {
+                "enum": [
+                    "0010",
+                    "0020",
+                    "0030",
+                    "0040",
+                    "0050",
+                    "0060",
+                    "0070",
+                    "0080"
+                ],
+                "x-enum-labels": [
+                    {
+                        "default": "Khakis"
+                    },
+                    {
+                        "default": "Denim"
+                    },
+                    {
+                        "default": "Dress"
+                    },
+                    {
+                        "default": "Casual"
+                    },
+                    {
+                        "default": "Shorts"
+                    },
+                    {
+                        "default": "Work"
+                    },
+                    {
+                        "default": "Cargo"
+                    },
+                    {
+                        "default": "Fleece"
+                    }
+                ],
+                "type": "string"
+            },
+            "x-label": {
+                "default": "Bottom Type"
+            },
+            "type": "array"
+        },
+        "c_color": {
+            "description": "Product color used for variation attribute",
+            "x-label": {
+                "default": "Color"
+            },
+            "type": "string"
+        },
+        "c_consoleWarranty": {
+            "x-label": {
+                "default": "Extended Warranty"
+            },
+            "type": "string"
+        },
+        "c_customCSSFile": {
+            "$ref": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/media_file",
+            "description": "Use this attribute to apply custom styles for this product.",
+            "x-label": {
+                "default": "Custom CSS File"
+            }
+        },
+        "c_digitalCameraFeatures": {
+            "items": {
+                "enum": [
+                    "0010",
+                    "0020",
+                    "0030",
+                    "0040",
+                    "0050",
+                    "0060",
+                    "0070",
+                    "0080",
+                    "0090",
+                    "0100",
+                    "0110",
+                    "0120",
+                    "0130",
+                    "0140",
+                    "0150",
+                    "0160",
+                    "0170",
+                    "0180",
+                    "0190",
+                    "0200",
+                    "0210",
+                    "0220",
+                    "0230",
+                    "0240",
+                    "0250",
+                    "0260",
+                    "0270",
+                    "0280"
+                ],
+                "x-enum-labels": [
+                    {
+                        "default": "Built In Flash"
+                    },
+                    {
+                        "default": "HD Video"
+                    },
+                    {
+                        "default": "GPS Geo Tagging"
+                    },
+                    {
+                        "default": "Variable Self Timer"
+                    },
+                    {
+                        "default": "Image Optimizer"
+                    },
+                    {
+                        "default": "Stop Motion Video"
+                    },
+                    {
+                        "default": "Self Cleaning"
+                    },
+                    {
+                        "default": "Pro Performance"
+                    },
+                    {
+                        "default": "51 Area Autofocus"
+                    },
+                    {
+                        "default": "Super Fast Startup"
+                    },
+                    {
+                        "default": "Easy to Learn"
+                    },
+                    {
+                        "default": "Wide Angle Optical Zoom"
+                    },
+                    {
+                        "default": "Manual Controls"
+                    },
+                    {
+                        "default": "Wired LAN"
+                    },
+                    {
+                        "default": "GPS Enabled"
+                    },
+                    {
+                        "default": "In Camera Red Eye Reduction"
+                    },
+                    {
+                        "default": "Large LCD"
+                    },
+                    {
+                        "default": "Optical Zoom"
+                    },
+                    {
+                        "default": "Anti-Shake"
+                    },
+                    {
+                        "default": "Touch Screen"
+                    },
+                    {
+                        "default": "Image Stabilization"
+                    },
+                    {
+                        "default": "Fast Shutter"
+                    },
+                    {
+                        "default": "Slim"
+                    },
+                    {
+                        "default": "35mm Full Frame Sensor"
+                    },
+                    {
+                        "default": "Wide Angle|Continuous Shooting"
+                    },
+                    {
+                        "default": "Continuous Shooting"
+                    },
+                    {
+                        "default": "ISO 1600"
+                    },
+                    {
+                        "default": "Red Eye Reduction"
+                    }
+                ],
+                "type": "string"
+            },
+            "x-label": {
+                "default": "Digital Camera Features"
+            },
+            "type": "array"
+        },
+        "c_digitalCameraPixels": {
+            "x-label": {
+                "default": "Digital Camera Pixels"
+            },
+            "type": "string"
+        },
+        "c_digitalCameraType": {
+            "x-label": {
+                "default": "Digital Camera Type"
+            },
+            "type": "string"
+        },
+        "c_digitalCameraWarranty": {
+            "x-label": {
+                "default": "Extended Warranty"
+            },
+            "type": "string"
+        },
+        "c_dimDepth": {
+            "x-label": {
+                "default": "Depth"
+            },
+            "type": "string"
+        },
+        "c_dimHeight": {
+            "x-label": {
+                "default": "Height"
+            },
+            "type": "string"
+        },
+        "c_dimWeight": {
+            "x-label": {
+                "default": "Weight"
+            },
+            "type": "string"
+        },
+        "c_dimWidth": {
+            "x-label": {
+                "default": "Width"
+            },
+            "type": "string"
+        },
+        "c_displaySize": {
+            "x-label": {
+                "default": "Display Size"
+            },
+            "type": "string"
+        },
+        "c_gameGenre": {
+            "items": {
+                "enum": [
+                    "Action",
+                    "Educational",
+                    "Kids",
+                    "Racing",
+                    "Role-Playing",
+                    "Sports",
+                    "Strategy"
+                ],
+                "x-enum-labels": [
+                    {
+                        "default": "Action"
+                    },
+                    {
+                        "default": "Educational"
+                    },
+                    {
+                        "default": "Kids"
+                    },
+                    {
+                        "default": "Racing"
+                    },
+                    {
+                        "default": "Role-Playing"
+                    },
+                    {
+                        "default": "Sports"
+                    },
+                    {
+                        "default": "Strategy"
+                    }
+                ],
+                "type": "string"
+            },
+            "x-label": {
+                "default": "Genre"
+            },
+            "type": "array"
+        },
+        "c_gameRating": {
+            "x-label": {
+                "default": "Game Rating"
+            },
+            "type": "string"
+        },
+        "c_gameSystemType": {
+            "x-label": {
+                "default": "Gaming System"
+            },
+            "type": "string"
+        },
+        "c_gpsFeatures": {
+            "items": {
+                "enum": [
+                    "0010",
+                    "0020",
+                    "0030",
+                    "0040",
+                    "0050",
+                    "0060",
+                    "0070",
+                    "0080",
+                    "0090",
+                    "0100",
+                    "0110",
+                    "0120",
+                    "0130",
+                    "0140",
+                    "0150",
+                    "0160",
+                    "0170",
+                    "0180",
+                    "0190",
+                    "0200",
+                    "0210",
+                    "0230"
+                ],
+                "x-enum-labels": [
+                    {
+                        "default": "Preloaded"
+                    },
+                    {
+                        "default": "Voice Prompts"
+                    },
+                    {
+                        "default": "3D"
+                    },
+                    {
+                        "default": "Touch Screen"
+                    },
+                    {
+                        "default": "FM Traffic"
+                    },
+                    {
+                        "default": "MSN Direct"
+                    },
+                    {
+                        "default": "MP3 Player"
+                    },
+                    {
+                        "default": "Picture Viewer"
+                    },
+                    {
+                        "default": "Bluetooth®"
+                    },
+                    {
+                        "default": "Speech Recognition"
+                    },
+                    {
+                        "default": "XM Navtraffic"
+                    },
+                    {
+                        "default": "Waterproof"
+                    },
+                    {
+                        "default": "Motorcycle Ready"
+                    },
+                    {
+                        "default": "Lunar Tracking"
+                    },
+                    {
+                        "default": "Wrist Wear"
+                    },
+                    {
+                        "default": "Barometer"
+                    },
+                    {
+                        "default": "Compass"
+                    },
+                    {
+                        "default": "Geocaching"
+                    },
+                    {
+                        "default": "Jeppesen Enabled"
+                    },
+                    {
+                        "default": "Built-in HIS"
+                    },
+                    {
+                        "default": "Auto Logbook"
+                    },
+                    {
+                        "default": "Automotive Friendly"
+                    }
+                ],
+                "type": "string"
+            },
+            "x-label": {
+                "default": "GPS Features"
+            },
+            "type": "array"
+        },
+        "c_gpsType": {
+            "items": {
+                "enum": [
+                    "0010",
+                    "0020",
+                    "0030",
+                    "0040"
+                ],
+                "x-enum-labels": [
+                    {
+                        "default": "Automotive"
+                    },
+                    {
+                        "default": "Personal"
+                    },
+                    {
+                        "default": "Outdoor"
+                    },
+                    {
+                        "default": "Aviation"
+                    }
+                ],
+                "type": "string"
+            },
+            "x-label": {
+                "default": "GPS Type"
+            },
+            "type": "array"
+        },
+        "c_gpsWarranty": {
+            "x-label": {
+                "default": "Extended Warranty"
+            },
+            "type": "string"
+        },
+        "c_imageAspectRatio": {
+            "x-label": {
+                "default": "Image Aspect Ratio"
+            },
+            "type": "string"
+        },
+        "c_isCloseout": {
+            "x-label": {
+                "default": "Closeout?"
+            },
+            "type": "boolean"
+        },
+        "c_isNew": {
+            "x-label": {
+                "default": "New Arrival?"
+            },
+            "type": "boolean"
+        },
+        "c_isNewtest": {
+            "description": "This indiciates if the product is a new arrival.",
+            "x-label": {
+                "default": "New Arrival?"
+            },
+            "type": "boolean"
+        },
+        "c_isSale": {
+            "description": "This is the help text. It is used for sorting rules.",
+            "x-label": {
+                "default": "On sale?"
+            },
+            "type": "boolean"
+        },
+        "c_kidsAge": {
+            "description": "Kids Age used for search refinements",
+            "enum": [
+                "0010",
+                "0020",
+                "0030",
+                "0040",
+                "0050",
+                "0060",
+                "0070"
+            ],
+            "x-enum-labels": [
+                {
+                    "default": "Infant (0-1 yr)"
+                },
+                {
+                    "default": "Toddler (1-5 yrs)"
+                },
+                {
+                    "default": "Youth (5-9 yrs)"
+                },
+                {
+                    "default": "Junior (9-12 yrs)"
+                },
+                {
+                    "default": "Newborn (1-6 mths)"
+                },
+                {
+                    "default": "Infant (9 mnths - 3 yrs)"
+                },
+                {
+                    "default": "Junior (4-12 yrs)"
+                }
+            ],
+            "x-label": {
+                "default": "Age"
+            },
+            "type": "string"
+        },
+        "c_length": {
+            "description": "This attribute is used for mens and womens pants lengths.",
+            "x-label": {
+                "default": "Length"
+            },
+            "type": "string"
+        },
+        "c_lensAperture": {
+            "x-label": {
+                "default": "Lens Aperture"
+            },
+            "type": "string"
+        },
+        "c_materialTest": {
+            "items": {
+                "enum": [
+                    "cotton",
+                    "polyester",
+                    "wool"
+                ],
+                "x-enum-labels": [
+                    {
+                        "default": "Cotton"
+                    },
+                    {
+                        "default": "Polyester"
+                    },
+                    {
+                        "default": "Wool"
+                    }
+                ],
+                "type": "string"
+            },
+            "x-label": {
+                "default": "Material"
+            },
+            "type": "array"
+        },
+        "c_mediaFormat": {
+            "description": "Media Format",
+            "items": {
+                "enum": [
+                    "0010",
+                    "0020",
+                    "0030",
+                    "0040",
+                    "0050",
+                    "0060",
+                    "0070",
+                    "0080",
+                    "0090",
+                    "0100"
+                ],
+                "x-enum-labels": [
+                    {
+                        "default": "MP3"
+                    },
+                    {
+                        "default": "WMA"
+                    },
+                    {
+                        "default": "JPEG"
+                    },
+                    {
+                        "default": "WAV"
+                    },
+                    {
+                        "default": "FM Tuner"
+                    },
+                    {
+                        "default": "AAC"
+                    },
+                    {
+                        "default": "WMP"
+                    },
+                    {
+                        "default": "MPEG4"
+                    },
+                    {
+                        "default": "AVC"
+                    },
+                    {
+                        "default": "ASP"
+                    }
+                ],
+                "type": "string"
+            },
+            "x-label": {
+                "default": "Media Format"
+            },
+            "type": "array"
+        },
+        "c_memorySize": {
+            "description": "Memory Size",
+            "x-label": {
+                "default": "Memory Size"
+            },
+            "type": "string"
+        },
+        "c_memoryType": {
+            "items": {
+                "enum": [
+                    "0010",
+                    "0020",
+                    "0030",
+                    "0040",
+                    "0050",
+                    "0060",
+                    "0070",
+                    "0080",
+                    "0090"
+                ],
+                "x-enum-labels": [
+                    {
+                        "default": "SD"
+                    },
+                    {
+                        "default": "Memory Stick Pro DUO"
+                    },
+                    {
+                        "default": "Compact Flash"
+                    },
+                    {
+                        "default": "MMC"
+                    },
+                    {
+                        "default": "SDHC"
+                    },
+                    {
+                        "default": "CF Card"
+                    },
+                    {
+                        "default": "External Media"
+                    },
+                    {
+                        "default": "Micro SD"
+                    },
+                    {
+                        "default": "Garmin Data Card"
+                    }
+                ],
+                "type": "string"
+            },
+            "x-label": {
+                "default": "Memory Type"
+            },
+            "type": "array"
+        },
+        "c_musicStorage": {
+            "x-label": {
+                "default": "Music Storage"
+            },
+            "type": "string"
+        },
+        "c_opticalZoom": {
+            "x-label": {
+                "default": "Optical Zoom"
+            },
+            "type": "string"
+        },
+        "c_outerwearType": {
+            "description": "Type of Outerwear for search refinement",
+            "enum": [
+                "0010",
+                "0020",
+                "0030",
+                "0040",
+                "0050",
+                "0060",
+                "0070",
+                "0080"
+            ],
+            "x-enum-labels": [
+                {
+                    "default": "Waterproof"
+                },
+                {
+                    "default": "Jackets"
+                },
+                {
+                    "default": "Vest"
+                },
+                {
+                    "default": "Pants"
+                },
+                {
+                    "default": "Casual"
+                },
+                {
+                    "default": "Sweater"
+                },
+                {
+                    "default": "Outdoor"
+                },
+                {
+                    "default": "Fleece"
+                }
+            ],
+            "x-label": {
+                "default": "Outerwear Type"
+            },
+            "type": "string"
+        },
+        "c_portableAudioType": {
+            "items": {
+                "enum": [
+                    "0010",
+                    "0020",
+                    "0030"
+                ],
+                "x-enum-labels": [
+                    {
+                        "default": "Audio"
+                    },
+                    {
+                        "default": "Video"
+                    },
+                    {
+                        "default": "Internet"
+                    }
+                ],
+                "type": "string"
+            },
+            "x-label": {
+                "default": "Portable Audio Type"
+            },
+            "type": "array"
+        },
+        "c_refinementColor": {
+            "enum": [
+                "beige",
+                "black",
+                "blue",
+                "brown",
+                "green",
+                "grey",
+                "miscellaneous",
+                "navy",
+                "orange",
+                "pink",
+                "purple",
+                "red",
+                "white",
+                "yellow"
+            ],
+            "x-enum-labels": [
+                {
+                    "default": "Beige"
+                },
+                {
+                    "default": "Black"
+                },
+                {
+                    "default": "Blue"
+                },
+                {
+                    "default": "Brown"
+                },
+                {
+                    "default": "Green"
+                },
+                {
+                    "default": "Grey"
+                },
+                {
+                    "default": "Miscellaneous"
+                },
+                {
+                    "default": "Navy"
+                },
+                {
+                    "default": "Orange"
+                },
+                {
+                    "default": "Pink"
+                },
+                {
+                    "default": "Purple"
+                },
+                {
+                    "default": "Red"
+                },
+                {
+                    "default": "White"
+                },
+                {
+                    "default": "Yellow"
+                }
+            ],
+            "x-label": {
+                "default": "Refinement Color"
+            },
+            "type": "string"
+        },
+        "c_resolution": {
+            "x-label": {
+                "default": "Resolution"
+            },
+            "type": "string"
+        },
+        "c_sandalType": {
+            "description": "Type of Sandal for search refinement",
+            "enum": [
+                "0010",
+                "0020",
+                "0030"
+            ],
+            "x-enum-labels": [
+                {
+                    "default": "Sport"
+                },
+                {
+                    "default": "Casual"
+                },
+                {
+                    "default": "Thong"
+                }
+            ],
+            "x-label": {
+                "default": "Sandal Type"
+            },
+            "type": "string"
+        },
+        "c_sheets": {
+            "description": "test attribute",
+            "items": {
+                "enum": [
+                    "value1",
+                    "value2",
+                    "value3"
+                ],
+                "x-enum-labels": [
+                    {
+                        "default": "Value 1"
+                    },
+                    {
+                        "default": "Value 2"
+                    },
+                    {
+                        "default": "Value 3"
+                    }
+                ],
+                "type": "string"
+            },
+            "x-label": {
+                "default": "Sheets"
+            },
+            "type": "array"
+        },
+        "c_shoeType": {
+            "description": "Type of Shoe for search refinements",
+            "enum": [
+                "0010",
+                "0020",
+                "0030",
+                "0040",
+                "0050",
+                "0060",
+                "0070",
+                "0080",
+                "0090",
+                "0100",
+                "0110"
+            ],
+            "x-enum-labels": [
+                {
+                    "default": "Chukka"
+                },
+                {
+                    "default": "Lace Up"
+                },
+                {
+                    "default": "Slip On"
+                },
+                {
+                    "default": "Clog"
+                },
+                {
+                    "default": "Boat"
+                },
+                {
+                    "default": "Oxford"
+                },
+                {
+                    "default": "Loafer"
+                },
+                {
+                    "default": "Waterproof"
+                },
+                {
+                    "default": "Flats"
+                },
+                {
+                    "default": "Ballerina"
+                },
+                {
+                    "default": "Heeled"
+                }
+            ],
+            "x-label": {
+                "default": "Shoe Type"
+            },
+            "type": "string"
+        },
+        "c_size": {
+            "description": "This attribute is used for all footwear, apparel and accessory sizing for men, women and kids products.",
+            "x-label": {
+                "default": "Size"
+            },
+            "type": "string"
+        },
+        "c_skinConcern": {
+            "items": {
+                "enum": [
+                    "comprehensive",
+                    "dryTight",
+                    "liftingLossFirm"
+                ],
+                "x-enum-labels": [
+                    {
+                        "default": "Comprehensive Protection"
+                    },
+                    {
+                        "default": "Dry, Tight Skin"
+                    },
+                    {
+                        "default": "Lifting & Loss of Firmness"
+                    }
+                ],
+                "type": "string"
+            },
+            "x-label": {
+                "default": "Skin Concern"
+            },
+            "type": "array"
+        },
+        "c_styleNumber": {
+            "x-label": {
+                "default": "Style Number"
+            },
+            "type": "string"
+        },
+        "c_tabDescription": {
+            "$ref": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/markup_text",
+            "x-label": {
+                "default": "Description"
+            }
+        },
+        "c_tabDetails": {
+            "$ref": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/markup_text",
+            "x-label": {
+                "default": "Details"
+            }
+        },
+        "c_topType": {
+            "description": "Type of tops in clothing",
+            "x-label": {
+                "default": "Top Type"
+            },
+            "type": "string"
+        },
+        "c_tvSignalFormat": {
+            "x-label": {
+                "default": "TV Signal Format"
+            },
+            "type": "string"
+        },
+        "c_tvSize": {
+            "x-label": {
+                "default": "Size"
+            },
+            "type": "string"
+        },
+        "c_tvType": {
+            "enum": [
+                "0010",
+                "0020",
+                "0030",
+                "0040"
+            ],
+            "x-enum-labels": [
+                {
+                    "default": "Plasma"
+                },
+                {
+                    "default": "LCD"
+                },
+                {
+                    "default": "DLP"
+                },
+                {
+                    "default": "Projection"
+                }
+            ],
+            "x-label": {
+                "default": "TV Type"
+            },
+            "type": "string"
+        },
+        "c_tvWarranty": {
+            "x-label": {
+                "default": "Extended Warranty"
+            },
+            "type": "string"
+        },
+        "c_videoStorage": {
+            "x-label": {
+                "default": "Video Storage"
+            },
+            "type": "string"
+        },
+        "c_virtualTryOn": {
+            "description": "Whether the product is available for virtual try on.",
+            "x-label": {
+                "default": "Virtual Try On"
+            },
+            "type": "boolean"
+        },
+        "c_waist": {
+            "description": "Attribute used for apparel waist sizing.",
+            "x-label": {
+                "default": "Waist"
+            },
+            "type": "string"
+        },
+        "c_width": {
+            "description": "This attribute is used for shoe widths for mens, womens and kids.",
+            "x-label": {
+                "default": "Width"
+            },
+            "type": "string"
+        },
+        "classification_category": {
+            "$ref": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/catalog_category_id",
+            "description": "The classification category (default category) of the product"
+        },
+        "creation_date": {
+            "description": "Returns the value of attribute 'creationDate'.",
+            "format": "date-time",
+            "x-label": {
+                "default": "Creation Date"
+            },
+            "readOnly": true,
+            "type": "string"
+        },
+        "default_variant_id": {
+            "description": "The ID of the product's default variant.",
+            "type": "string"
+        },
+        "ean": {
+            "x-label": {
+                "default": "EAN"
+            },
+            "type": "string"
+        },
+        "id": {
+            "description": "The ID (SKU) of the product.",
+            "x-label": {
+                "default": "ID",
+                "en": "SKUAGE"
+            },
+            "maxLength": 100,
+            "minLength": 1,
+            "type": "string"
+        },
+        "image": {
+            "$ref": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/media_file",
+            "x-label": {
+                "default": "Standard Image"
+            }
+        },
+        "image_groups": {
+            "description": "The array of product image groups.",
+            "items": {
+                "$ref": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/image_group"
+            },
+            "type": "array"
+        },
+        "in_stock": {
+            "description": "The flag that indicates if the product is in stock, or not. This is a calculated value.",
+            "type": "boolean"
+        },
+        "last_modified": {
+            "description": "Returns the value of attribute 'lastModified'.",
+            "format": "date-time",
+            "x-label": {
+                "default": "Last Modified"
+            },
+            "readOnly": true,
+            "type": "string"
+        },
+        "link": {
+            "description": "A link to the product.",
+            "type": "string"
+        },
+        "localized_tax_class_id": {
+            "additionalProperties": {
+                "type": "string"
+            },
+            "format": "localized",
+            "x-label": {
+                "default": "Localized Tax Class"
+            },
+            "type": "object"
+        },
+        "long_description": {
+            "additionalProperties": {
+                "$ref": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/markup_text"
+            },
+            "format": "localized",
+            "x-label": {
+                "default": "Product Details"
+            },
+            "type": "object"
+        },
+        "manufacturer_name": {
+            "description": "The products manufacturer name.",
+            "x-label": {
+                "default": "Manufacturer"
+            },
+            "type": "string"
+        },
+        "manufacturer_sku": {
+            "x-label": {
+                "default": "Manufacturer Product ID"
+            },
+            "type": "string"
+        },
+        "master": {
+            "$ref": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/master",
+            "description": "The master product information. Only for types master, variation group and variant."
+        },
+        "name": {
+            "additionalProperties": {
+                "type": "string"
+            },
+            "description": "The localized product name.",
+            "format": "localized",
+            "x-label": {
+                "default": "Name"
+            },
+            "type": "object"
+        },
+        "online": {
+            "description": "The flag that indicates if the product is online, or not. This is a calculated value.",
+            "type": "boolean"
+        },
+        "online_flag": {
+            "additionalProperties": {
+                "type": "boolean"
+            },
+            "description": "The site specific online status of the product.",
+            "format": "site-specific",
+            "x-label": {
+                "default": "Online"
+            },
+            "type": "object"
+        },
+        "owning_catalog_id": {
+            "description": "The ID of the catalog that owns the product.",
+            "type": "string"
+        },
+        "owning_catalog_name": {
+            "additionalProperties": {
+                "type": "string"
+            },
+            "description": "The localized name of the catalog that owns the product.",
+            "format": "localized",
+            "type": "object"
+        },
+        "page_description": {
+            "additionalProperties": {
+                "type": "string"
+            },
+            "description": "The localized products page description.",
+            "format": "localized",
+            "x-label": {
+                "default": "Page Description"
+            },
+            "type": "object"
+        },
+        "page_keywords": {
+            "additionalProperties": {
+                "type": "string"
+            },
+            "description": "The localized products page description.",
+            "format": "localized",
+            "x-label": {
+                "default": "Page Keywords"
+            },
+            "type": "object"
+        },
+        "page_title": {
+            "additionalProperties": {
+                "type": "string"
+            },
+            "description": "The localized products page title.",
+            "format": "localized",
+            "x-label": {
+                "default": "Page Title"
+            },
+            "type": "object"
+        },
+        "price": {
+            "description": "The price of the product.",
+            "format": "double",
+            "type": "number"
+        },
+        "price_currency": {
+            "description": "The currency code for product's price.",
+            "type": "string"
+        },
+        "price_per_unit": {
+            "description": "The price per unit of the product",
+            "format": "double",
+            "type": "number"
+        },
+        "primary_categories": {
+            "description": "The catalog categories that are primary for the product",
+            "items": {
+                "$ref": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/catalog_category_id"
+            },
+            "type": "array"
+        },
+        "primary_category_id": {
+            "description": "The id of the products primary category.",
+            "type": "string"
+        },
+        "product_bundles": {
+            "description": "The array of product bundles which the product belongs to.",
+            "items": {
+                "$ref": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/product"
+            },
+            "type": "array"
+        },
+        "product_options": {
+            "description": "The array of product options. This is applicable for products of type \"option\".",
+            "items": {
+                "$ref": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/product_option"
+            },
+            "type": "array"
+        },
+        "product_sets": {
+            "description": "The array of product sets which the product belongs to.",
+            "items": {
+                "$ref": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/product"
+            },
+            "type": "array"
+        },
+        "searchable": {
+            "additionalProperties": {
+                "type": "boolean"
+            },
+            "description": "The site specific searchable status of the product.",
+            "format": "site-specific",
+            "x-label": {
+                "default": "Searchable"
+            },
+            "type": "object"
+        },
+        "set_products": {
+            "description": "The array of set products which the product includes.",
+            "items": {
+                "$ref": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/product"
+            },
+            "type": "array"
+        },
+        "short_description": {
+            "additionalProperties": {
+                "$ref": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/markup_text"
+            },
+            "format": "localized",
+            "x-label": {
+                "default": "Description"
+            },
+            "type": "object"
+        },
+        "tax_class_id": {
+            "x-label": {
+                "default": "Tax Class"
+            },
+            "type": "string"
+        },
+        "type": {
+            "$ref": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/product_type",
+            "description": "The product type information. Can be one or multiple of the following values: item,master,variation_group,variant,bundle,set."
+        },
+        "unit": {
+            "description": "The sales unit of the product.",
+            "x-label": {
+                "default": "Sales Unit"
+            },
+            "type": "string"
+        },
+        "unit_measure": {
+            "description": "The unitMeasure of the product.",
+            "x-label": {
+                "default": "Unit Measure"
+            },
+            "type": "string"
+        },
+        "unit_quantity": {
+            "description": "The unitQuantity of the product.",
+            "format": "double",
+            "x-label": {
+                "default": "Unit Quantity"
+            },
+            "type": "number"
+        },
+        "upc": {
+            "x-label": {
+                "default": "UPC"
+            },
+            "type": "string"
+        },
+        "valid_from": {
+            "additionalProperties": {
+                "format": "date-time",
+                "type": "string"
+            },
+            "description": "The time when product is valid from.",
+            "format": "site-specific",
+            "x-label": {
+                "default": "Online From"
+            },
+            "type": "object"
+        },
+        "valid_to": {
+            "additionalProperties": {
+                "format": "date-time",
+                "type": "string"
+            },
+            "description": "The time when product is valid to.",
+            "format": "site-specific",
+            "x-label": {
+                "default": "Online To"
+            },
+            "type": "object"
+        },
+        "variants": {
+            "description": "The array of actual variants. This array can be empty. Only for types master, variation group and variant.",
+            "items": {
+                "$ref": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/variant"
+            },
+            "type": "array"
+        },
+        "variation_attributes": {
+            "description": "Sorted array of variation attributes information. This array can be empty. Only for types master,\n variation group and variant.",
+            "items": {
+                "$ref": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/variation_attribute"
+            },
+            "type": "array"
+        },
+        "variation_groups": {
+            "description": "The array of actual variation groups. This array can be empty. Only for types master, variation group and variant.",
+            "items": {
+                "$ref": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/variation_group"
+            },
+            "type": "array"
+        },
+        "variation_values": {
+            "additionalProperties": {
+                "type": "string"
+            },
+            "description": "The actual variation attribute id - value pairs. Only for type variant and\n variation group.",
+            "type": "object"
+        }
+    }
+}

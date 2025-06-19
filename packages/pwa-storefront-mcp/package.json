@@ -1,0 +1,42 @@
+{
+  "name": "@salesforce/pwa-kit-storefront-mcp",
+  "version": "1.0.0",
+  "private": true,
+  "description": "MCP server that helps you build Salesforce Commerce Cloud PWA Kit Composable Storefront",
+  "main": "src/server/server.js",
+  "scripts": {
+    "build": "echo 'No build step required for MCP server'",
+    "format": "pwa-kit-dev format \"**/*.{js,jsx}\"",
+    "lint": "npm run lint:js",
+    "lint:fix": "npm run lint:js -- --fix",
+    "lint:js": "pwa-kit-dev lint \"**/*.{js,jsx}\"",
+    "prepare": "npm run build",
+    "test": "pwa-kit-dev test",
+    "test:inspect": "node --inspect-brk jest --runInBand",
+    "test:watch": "npm test -- --watch",
+    "start": "node src/server/server.js"
+  },
+  "keywords": [
+    "mcp",
+    "server",
+    "pwa",
+    "salesforce",
+    "commerce",
+    "commerce cloud",
+    "pwa kit",
+    "composable storefront"
+  ],
+  "author": "Spark Team",
+  "license": "ISC",
+  "dependencies": {
+    "@babel/runtime": "^7.21.0",
+    "@modelcontextprotocol/sdk": "^1.0.0",
+    "zod": "^3.25.56"
+  },
+  "devDependencies": {
+    "internal-lib-build": "3.11.0-dev.0",
+    "@salesforce/pwa-kit-dev": "3.11.0-dev.0",
+    "cross-env": "^5.2.1",
+    "nodemon": "^2.0.22"
+  }
+}
