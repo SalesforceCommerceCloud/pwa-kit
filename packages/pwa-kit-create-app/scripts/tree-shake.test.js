@@ -50,7 +50,6 @@ describe('tree-shake', () => {
             }
         })
         fs.unlinkSync.mockReturnValue(true)
-        fs.readFileSync.mockImplementation((filePath, encoding) => 'export default {}')
     })
 
     it('handles OR operator correctly', () => {
@@ -162,6 +161,8 @@ describe('tree-shake', () => {
                 return featureAComponentCode
             } else if (filePath.includes('src/components/featureBComponent/index.jsx')) {
                 return featureBComponentCode
+            } else {
+                return 'export default {}'
             }
         })
 
@@ -203,6 +204,8 @@ describe('tree-shake', () => {
                 return componentACode
             } else if (filePath.includes('src/components/featureBComponent/index.jsx')) {
                 return componentBCode
+            } else {
+                return 'export default {}'
             }
         })
 
@@ -256,6 +259,8 @@ describe('tree-shake', () => {
                 return componentACode
             } else if (filePath.includes('src/components/featureBComponent/index.jsx')) {
                 return componentBCode
+            } else {
+                return 'export default {}'
             }
         })
 
