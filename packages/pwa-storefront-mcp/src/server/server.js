@@ -6,8 +6,7 @@ import { z } from 'zod';
 import { AddComponentTool } from '../utils/AddComponentTool.js';
 import { InsertExistingComponentTool } from '../utils/InsertExistingComponentTool.js';
 import { CreateNewComponentTool } from '../utils/CreateNewComponentTool.js';
-import fs from 'fs/promises';
-import path from 'path';
+import { Developing_Composeable_Storefront_Guidelines } from './pwa-developing-guide';
 
 class PwaStorefrontMCPServerHighLevel {
   constructor() {
@@ -31,8 +30,16 @@ class PwaStorefrontMCPServerHighLevel {
   }
 
   setupTools() {
-    // Register tools using the high-level API
+    
+    // Register pwa-developing-guide tool
+    this.server.tool(
+      Developing_Composeable_Storefront_Guidelines.name,
+      Developing_Composeable_Storefront_Guidelines.description,
+      {},
+      Developing_Composeable_Storefront_Guidelines.fn
+    );
 
+    // Register tools using the high-level API
     this.server.tool(
       'analyze_code_structure',
       'Analyze JavaScript/React code structure to identify components, imports, and insertion points',
