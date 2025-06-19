@@ -52,6 +52,9 @@ This document offers guidelines for AI assistants in the development of Salesfor
 - Create simple, functional, modular, reusable components.
 - To support isomorphic rendering, configuration values are serialized to page. Don't place secrets in your configuration
 
+### PWA Kit Extensibility
+- Template extensibility is a feature introduced in PWA Kit v3. The goal of this feature is to empower customizing templates. Verify ccExtensibility.overridesDir in package.json and understand how to use it.
+
 ### Data Access
 - Use commerce-sdk-react hooks to fetch, cache, and mutate data from the Salesforce B2C Commerce API (SCAPI).
 
@@ -60,48 +63,6 @@ This document offers guidelines for AI assistants in the development of Salesfor
 - Cache data when appropriate.
 - Optimize queries with selective filters.
 - Use React Hooks (e.g., useState, useEffect, useContext, useMemo, useCallback) for state management and side effects. 
-
-## PWA Kit Storefront Project Structure
-### Extensibility Enabled
-\`\`\`
-your-project-root/
-├── config/                 # Configuration files
-│   ├── default.js         # Main config
-│   └── sites.js          # Multi-site config
-├── overrides/             # Your customizations
-│   └── app/
-│       ├── assets/       # Static assets
-│       ├── components/   # Custom components
-│       ├── pages/        # Custom pages
-│       ├── static/       # Static files
-│       ├── constants.js  # Constants
-│       ├── main.jsx     # Entry point
-│       ├── routes.jsx   # Routing
-│       └── ssr.js       # Server-side rendering
-├── translations/          # i18n files
-├── worker/               # Service worker
-├── package.json
-└── README.md
-\`\`\`
-
-### Extensibility Disabled
-\`\`\`
-your-project-root/
-├── app/                   # Main application code
-│   ├── assets/           # Static assets
-│   ├── components/       # All components
-│   ├── pages/            # Page components
-│   ├── static/           # Static files
-│   ├── constants.js
-│   ├── main.jsx
-│   ├── routes.jsx
-│   └── ssr.js
-├── config/               # Configuration
-├── translations/         # i18n files
-├── worker/              # Service worker
-├── package.json
-└── README.md
-\`\`\`
 
 ## Quality Standards
 - Maintain consistent code formatting using project standards.
