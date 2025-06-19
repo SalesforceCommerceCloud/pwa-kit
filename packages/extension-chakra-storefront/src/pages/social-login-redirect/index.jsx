@@ -8,7 +8,6 @@
 import React, {useEffect, useState} from 'react'
 import {FormattedMessage, useIntl} from 'react-intl'
 import {Alert, Box, Container, Stack, Text, Spinner} from '@chakra-ui/react'
-import {AlertIcon} from '../../components/icons'
 
 // Hooks
 import useNavigation from '../../hooks/use-navigation'
@@ -91,22 +90,22 @@ const SocialLoginRedirect = () => {
                 borderRadius="base"
             >
                 {error && (
-                    <Alert status="error" marginBottom={8}>
-                        <AlertIcon color="red.500" boxSize={4} />
+                    <Alert.Root status="error" marginBottom={8}>
+                        <Alert.Indicator color="red.500" boxSize={4} />
                         <Text fontSize="sm" ml={3}>
                             {error}
                         </Text>
-                    </Alert>
+                    </Alert.Root>
                 )}
-                <Stack justify="center" align="center" spacing={8} marginBottom={8}>
+                <Stack justify="center" align="center" gap={8} marginBottom={8}>
                     <Spinner opacity={0.85} color="blue.600" animationDuration="0.8s" size="lg" />
-                    <Text align="center" fontSize="xl" fontWeight="semibold">
+                    <Text textAlign="center" fontSize="xl" fontWeight="semibold">
                         <FormattedMessage
                             id="social_login_redirect.message.authenticating"
                             defaultMessage="Authenticating..."
                         />
                     </Text>
-                    <Text align="center" fontSize="m">
+                    <Text textAlign="center" fontSize="m">
                         <FormattedMessage
                             id="social_login_redirect.message.redirect_link"
                             defaultMessage="If you are not automatically redirected, click <link>this link</link> to proceed."
