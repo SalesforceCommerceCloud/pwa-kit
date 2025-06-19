@@ -6,5 +6,5 @@
  */
 
 module.exports = {
-    extends: [require.resolve('@salesforce/pwa-kit-dev/configs/eslint/no-react')]
+    extends: [require.resolve('internal-lib-build/configs/eslint/no-react')]
 }
