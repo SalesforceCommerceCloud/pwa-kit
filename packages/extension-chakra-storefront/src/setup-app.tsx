@@ -6,7 +6,7 @@
  */
 
 // Third-Party
-import React, {Fragment, useState} from 'react'
+import React from 'react'
 
 // Platform Imports
 import {ApplicationExtension} from '@salesforce/pwa-kit-extension-sdk/react'
