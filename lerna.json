@@ -9,8 +9,11 @@
     "--no-fund",
     "--prefer-offline",
     "--progress=false",
-    "--loglevel=warn"
+    "--loglevel=warn",
+    "--maxsockets=1",
+    "--fetch-retries=3",
+    "--fetch-timeout=300000"
   ],
-  "concurrency": 4,
+  "concurrency": 2,
   "stream": false
 }
