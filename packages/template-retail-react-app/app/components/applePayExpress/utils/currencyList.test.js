@@ -12,7 +12,6 @@ describe('currencyList', () => {
     })
 
     it('should not be empty', () => {
-        expect(currencyList).toHaveLength(expect.any(Number))
         expect(currencyList.length).toBeGreaterThan(0)
     })
 

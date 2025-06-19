@@ -2,5 +2,15 @@
   "version": "3.10.0-dev.1",
   "packages": [
     "packages/*"
-  ]
+  ],
+  "npmClient": "npm",
+  "npmClientArgs": [
+    "--no-audit",
+    "--no-fund",
+    "--prefer-offline",
+    "--progress=false",
+    "--loglevel=warn"
+  ],
+  "concurrency": 4,
+  "stream": false
 }
