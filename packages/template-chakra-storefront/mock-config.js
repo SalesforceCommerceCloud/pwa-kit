@@ -66,7 +66,7 @@ module.exports = {
     },
     maxCacheAge: 900,
     pages: {
-        Account: {
+        account: {
             path: '/account',
             orderSearchParam: {limit: 10, offset: 0, sort: 'best-matches', refine: []}
         },

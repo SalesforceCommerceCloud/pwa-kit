@@ -7,7 +7,13 @@
 import React from 'react'
 import {renderWithProviders, withPageProvider} from '../../../utils/test-utils'
 import MobileGrid1r1c from './index'
-
+jest.mock('@salesforce/pwa-kit-runtime/utils/ssr-config', () => {
+    const original = jest.requireActual('@salesforce/pwa-kit-runtime/utils/ssr-config')
+    return {
+        ...original,
+        getConfig: jest.fn(() => require('../../../mock-config'))
+    }
+})
 test('MobileGrid1r1c renders without errors', () => {
     const MobileGrid1r1cWithPageProvider = withPageProvider(MobileGrid1r1c)
     renderWithProviders(

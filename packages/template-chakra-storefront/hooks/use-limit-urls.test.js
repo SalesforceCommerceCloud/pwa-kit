@@ -11,7 +11,13 @@ import {Router} from 'react-router-dom'
 import {createMemoryHistory} from 'history'
 import {useLimitUrls} from './use-limit-urls'
 import {renderWithProviders} from '../utils/test-utils'
-
+jest.mock('@salesforce/pwa-kit-runtime/utils/ssr-config', () => {
+    const original = jest.requireActual('@salesforce/pwa-kit-runtime/utils/ssr-config')
+    return {
+        ...original,
+        getConfig: jest.fn(() => require('../mock-config'))
+    }
+})
 const MockComponent = () => {
     const urls = useLimitUrls()
 

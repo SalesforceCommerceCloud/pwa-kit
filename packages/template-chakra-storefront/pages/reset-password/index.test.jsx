@@ -10,7 +10,13 @@ import {rest} from 'msw'
 import {createPathWithDefaults, renderWithProviders} from '../../utils/test-utils'
 import ResetPassword from '.'
 import mockConfig from '../../mock-config'
-
+jest.mock('@salesforce/pwa-kit-runtime/utils/ssr-config', () => {
+    const original = jest.requireActual('@salesforce/pwa-kit-runtime/utils/ssr-config')
+    return {
+        ...original,
+        getConfig: jest.fn(() => require('../../mock-config'))
+    }
+})
 const MockedComponent = () => {
     return (
         <div>
