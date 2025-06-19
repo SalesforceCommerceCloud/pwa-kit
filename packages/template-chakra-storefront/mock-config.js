@@ -83,7 +83,7 @@ module.exports = {
         CheckoutConfirmation: {
             path: '/checkout/confirmation/:orderNo'
         },
-        Home: {
+        home: {
             path: '/',
             productLimit: 10,
             mainCategory: 'newarrivals'

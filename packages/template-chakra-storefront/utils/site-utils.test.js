@@ -59,16 +59,11 @@ describe('resolveSiteFromUrl', function () {
     })
 
     test('returns correct site when aliases are not declared in the config', () => {
-        getConfig.mockImplementation(() => {
-            return {
-                ...mockConfig,
-                app: {
-                    ...mockConfig.app,
-                    siteAliases: {},
-                    defaultSite: 'site-2'
-                }
-            }
-        })
+        getConfig.mockImplementation(() => ({
+            ...mockConfig,
+            defaultSite: 'site-2',
+            siteAliases: {}
+        }))
 
         const result = resolveSiteFromUrl('https://www.example-site.com/')
         expect(result.id).toBe('site-2')
@@ -99,10 +94,8 @@ describe('getDefaultSite', function () {
             }
         }
         getConfig.mockImplementation(() => ({
-            app: {
-                ...mockConfig.app,
-                sites: [siteMock]
-            }
+            ...mockConfig,
+            sites: [siteMock]
         }))
 
         const defaultSite = getDefaultSite()
@@ -111,10 +104,8 @@ describe('getDefaultSite', function () {
 
     test('returns site-2 as the default site according to the config', () => {
         getConfig.mockImplementation(() => ({
-            app: {
-                ...mockConfig.app,
-                defaultSite: 'site-2'
-            }
+            ...mockConfig,
+            defaultSite: 'site-2'
         }))
 
         const expectedRes = {
@@ -243,60 +234,50 @@ describe('getParamsFromPath', function () {
     ]
     cases.forEach(({path, expectedRes}) => {
         test(`return expected values when path is ${path}`, () => {
-            getConfig.mockImplementation(() => {
-                return {
-                    ...mockConfig,
-                    app: {
-                        ...mockConfig.app,
-                        sites: [
-                            {
-                                id: 'RefArch',
-                                alias: 'us',
-                                l10n: {
-                                    supportedCurrencies: ['USD'],
-                                    defaultCurrency: 'USD',
-                                    defaultLocale: 'en-US',
-                                    supportedLocales: [
-                                        {
-                                            id: 'en-US',
-                                            alias: 'en',
-                                            preferredCurrency: 'USD'
-                                        },
-                                        {
-                                            id: 'en-CA',
-                                            alias: 'ca',
-                                            preferredCurrency: 'USD'
-                                        }
-                                    ]
+            const modifiedMockConfig = {
+                ...mockConfig,
+                sites: [
+                    {
+                        id: 'RefArch',
+                        l10n: {
+                            defaultLocale: 'en-US',
+                            supportedLocales: [
+                                {
+                                    id: 'en-US',
+                                    alias: 'en',
+                                    preferredCurrency: 'USD'
                                 }
-                            },
-                            {
-                                id: 'RefArchGlobal',
-                                alias: 'global',
-                                l10n: {
-                                    supportedCurrencies: ['GBP', 'EUR', 'CNY', 'JPY'],
-                                    defaultCurrency: 'GBP',
-                                    supportedLocales: [
-                                        {
-                                            id: 'de-DE',
-                                            preferredCurrency: 'EUR'
-                                        },
-                                        {
-                                            id: 'en-GB',
-                                            alias: 'uk',
-                                            preferredCurrency: 'GBP'
-                                        }
-                                    ],
-                                    defaultLocale: 'en-GB'
+                            ]
+                        }
+                    },
+                    {
+                        ...mockConfig.sites[0]
+                    },
+                    {
+                        ...mockConfig.sites[1],
+                        l10n: {
+                            ...mockConfig.sites[1].l10n,
+                            supportedLocales: [
+                                {
+                                    id: 'en-US',
+                                    alias: 'en',
+                                    preferredCurrency: 'USD'
+                                },
+                                {
+                                    id: 'en-CA',
+                                    alias: 'ca',
+                                    preferredCurrency: 'USD'
                                 }
-                            }
-                        ]
+                            ]
+                        }
                     }
+                ],
+                siteAliases: {
+                    ...mockConfig.siteAliases,
+                    RefArch: 'us'
                 }
-            })
-            // getSites.mockImplementation(() => {
-            //     return
-            // })
+            }
+            getConfig.mockImplementation(() => modifiedMockConfig)
             expect(getParamsFromPath(path)).toEqual(expectedRes)
         })
     })

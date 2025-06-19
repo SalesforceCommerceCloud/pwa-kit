@@ -10,6 +10,14 @@ import {screen} from '@testing-library/react'
 import CheckoutHeader from './checkout-header'
 import {renderWithProviders} from '../../../utils/test-utils'
 
+// Mock getConfig to return our mockConfig
+jest.mock('@salesforce/pwa-kit-runtime/utils/ssr-config', () => {
+    const actualConfig = jest.requireActual('../../../mock-config')    
+    return {
+        getConfig: jest.fn().mockReturnValue(actualConfig)
+    }
+})
+
 test('renders component', () => {
     renderWithProviders(<CheckoutHeader />)
     expect(screen.getByTitle(/back to homepage/i)).toBeInTheDocument()
