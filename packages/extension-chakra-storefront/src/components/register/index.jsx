@@ -8,8 +8,8 @@
 import React, {Fragment} from 'react'
 import PropTypes from 'prop-types'
 import {FormattedMessage} from 'react-intl'
-import {Alert, Button, Stack, Text, Link as ChakraLink} from '@chakra-ui/react'
-import {BrandLogo} from '../../components/icons'
+import {Alert, Button, Stack, Text} from '@chakra-ui/react'
+import {AlertIcon, BrandLogo} from '../../components/icons'
 import {noop} from '../../utils/utils'
 import RegistrationFields from '../../components/forms/registration-fields'
 import Link from '../../components/link'
@@ -41,7 +41,9 @@ const RegisterForm = ({submitForm, clickSignIn = noop, form}) => {
                 <Stack paddingTop={8} gap={8} paddingLeft={4} paddingRight={4}>
                     {form.formState.errors?.global && (
                         <Alert.Root status="error">
-                            <Alert.Indicator />
+                            <Alert.Indicator>
+                                <AlertIcon color="red.500" boxSize={4} />
+                            </Alert.Indicator>
                             <Alert.Description>
                                 {form.formState.errors.global.message}
                             </Alert.Description>
