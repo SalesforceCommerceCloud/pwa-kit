@@ -206,6 +206,7 @@ describe('ShopperAgent Component', () => {
             BasketId: defaultProps.basketId
         })
     })
+
     test('should not render when commerce agent settings are invalid', () => {
         const invalidCommerceAgentSettings = {
             enabled: 'true',

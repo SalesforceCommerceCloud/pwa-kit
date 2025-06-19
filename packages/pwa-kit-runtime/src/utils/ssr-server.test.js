@@ -648,8 +648,8 @@ describe('processExpressResponse', () => {
 
     responseTypes.forEach((responseType) =>
         testCases.forEach((testCase) =>
-            // eslint-disable-next-line jest/expect-expect
             test(`${testCase.name} (${responseType.name})`, () => {
+                // eslint-disable-next-line jest/expect-expect
                 const headers = Object.assign({}, testCase.headers)
                 const response = responseType.create(headers)
                 processExpressResponse(response)
