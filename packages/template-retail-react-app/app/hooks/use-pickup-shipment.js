@@ -49,13 +49,8 @@ export const usePickupShipment = () => {
             if (pickupItems.length === 0) return
 
             // Get store information for the pickup shipment
-            const siteId = site?.id
-            const storeInfoKey = `store_${siteId}`
-            let storeInfo = null
-
-            try {
-                storeInfo = JSON.parse(window.localStorage.getItem(storeInfoKey))
-            } catch (e) {
+            const storeInfo = getStoreInfo()
+            if (!storeInfo) {
                 if (throwOnError) throw new Error('Failed to retrieve store information')
                 return
             }

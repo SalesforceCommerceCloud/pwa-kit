@@ -24,41 +24,18 @@ jest.mock('@salesforce/retail-react-app/app/hooks/use-multi-site', () => ({
     })
 }))
 
-// Mock localStorage
-const localStorageMock = {
-    getItem: jest.fn(),
-    setItem: jest.fn(),
-    removeItem: jest.fn(),
-    clear: jest.fn()
-}
-
-// Store original localStorage to restore after tests
-const originalLocalStorage = Object.getOwnPropertyDescriptor(window, 'localStorage')
-
-// Set up localStorage mock
-Object.defineProperty(window, 'localStorage', {
-    value: localStorageMock,
-    writable: true,
-    configurable: true
-})
+// Use real localStorage for tests
 
 describe('usePickupShipment', () => {
     beforeEach(() => {
         jest.clearAllMocks()
-        // Clear all mock functions
-        localStorageMock.getItem.mockClear()
-        localStorageMock.setItem.mockClear()
-        localStorageMock.removeItem.mockClear()
-        localStorageMock.clear.mockClear()
+        // Clear localStorage before each test
+        localStorage.clear()
     })
 
-    afterAll(() => {
-        // Restore original localStorage after all tests
-        if (originalLocalStorage) {
-            Object.defineProperty(window, 'localStorage', originalLocalStorage)
-        } else {
-            delete window.localStorage
-        }
+    afterEach(() => {
+        // Clean up localStorage after each test
+        localStorage.clear()
     })
 
     test('hasPickupItems returns true when pickup items exist', () => {
@@ -105,20 +82,18 @@ describe('usePickupShipment', () => {
 
     test('getStoreInfo returns parsed store data from localStorage', () => {
         const storeData = {inventoryId: 'store-123', name: 'Test Store'}
-        localStorageMock.getItem.mockReturnValue(JSON.stringify(storeData))
+        localStorage.setItem('store_test-site', JSON.stringify(storeData))
 
         const {result} = renderHook(() => usePickupShipment())
 
         const storeInfo = result.current.getStoreInfo()
 
-        expect(localStorageMock.getItem).toHaveBeenCalledWith('store_test-site')
         expect(storeInfo).toEqual(storeData)
     })
 
-    test('getStoreInfo returns null when localStorage throws error', () => {
-        localStorageMock.getItem.mockImplementation(() => {
-            throw new Error('localStorage error')
-        })
+    test('getStoreInfo returns null when localStorage contains invalid JSON', () => {
+        // Store invalid JSON to trigger error handling
+        localStorage.setItem('store_test-site', 'invalid-json{')
 
         const {result} = renderHook(() => usePickupShipment())
 
@@ -129,7 +104,7 @@ describe('usePickupShipment', () => {
 
     test('addInventoryIdsToPickupItems adds inventory ID to pickup items', () => {
         const storeData = {inventoryId: 'store-123'}
-        localStorageMock.getItem.mockReturnValue(JSON.stringify(storeData))
+        localStorage.setItem('store_test-site', JSON.stringify(storeData))
 
         const {result} = renderHook(() => usePickupShipment())
 
@@ -156,7 +131,7 @@ describe('usePickupShipment', () => {
     })
 
     test('addInventoryIdsToPickupItems returns original items when no store info', () => {
-        localStorageMock.getItem.mockReturnValue(null)
+        // Don't set any store data in localStorage (already cleared in beforeEach)
 
         const {result} = renderHook(() => usePickupShipment())
 
@@ -385,7 +360,7 @@ describe('usePickupShipment', () => {
 
     test('addInventoryIdsToPickupItems handles different productId combinations', () => {
         const storeData = {inventoryId: 'store-123'}
-        localStorageMock.getItem.mockReturnValue(JSON.stringify(storeData))
+        localStorage.setItem('store_test-site', JSON.stringify(storeData))
 
         const {result} = renderHook(() => usePickupShipment())
 
@@ -480,7 +455,7 @@ describe('usePickupShipment', () => {
 
         test('configures pickup shipment successfully with pickup items', async () => {
             const storeData = {inventoryId: 'store-123', id: 'store-id-456'}
-            localStorageMock.getItem.mockReturnValue(JSON.stringify(storeData))
+            localStorage.setItem('store_test-site', JSON.stringify(storeData))
 
             const {result} = renderHook(() => usePickupShipment())
 
@@ -508,7 +483,7 @@ describe('usePickupShipment', () => {
 
         test('uses custom pickupShippingMethodId when provided', async () => {
             const storeData = {inventoryId: 'store-123', id: 'store-id-456'}
-            localStorageMock.getItem.mockReturnValue(JSON.stringify(storeData))
+            localStorage.setItem('store_test-site', JSON.stringify(storeData))
 
             const {result} = renderHook(() => usePickupShipment())
 
@@ -544,13 +519,11 @@ describe('usePickupShipment', () => {
             await result.current.configurePickupShipment(basketId, productItems)
 
             expect(mockMutateAsync).not.toHaveBeenCalled()
-            expect(localStorageMock.getItem).not.toHaveBeenCalled()
         })
 
-        test('returns early when localStorage throws error and throwOnError is false', async () => {
-            localStorageMock.getItem.mockImplementation(() => {
-                throw new Error('localStorage error')
-            })
+        test('returns early when localStorage contains invalid JSON and throwOnError is false', async () => {
+            // Store invalid JSON to trigger error handling
+            localStorage.setItem('store_test-site', 'invalid-json{')
 
             const {result} = renderHook(() => usePickupShipment())
 
@@ -562,10 +535,9 @@ describe('usePickupShipment', () => {
             expect(mockMutateAsync).not.toHaveBeenCalled()
         })
 
-        test('throws error when localStorage throws error and throwOnError is true', async () => {
-            localStorageMock.getItem.mockImplementation(() => {
-                throw new Error('localStorage error')
-            })
+        test('throws error when localStorage contains invalid JSON and throwOnError is true', async () => {
+            // Store invalid JSON to trigger error handling
+            localStorage.setItem('store_test-site', 'invalid-json{')
 
             const {result} = renderHook(() => usePickupShipment())
 
@@ -579,7 +551,7 @@ describe('usePickupShipment', () => {
         })
 
         test('returns early when no store info exists and throwOnError is false', async () => {
-            localStorageMock.getItem.mockReturnValue(null)
+            // Don't set any store data in localStorage (already cleared in beforeEach)
 
             const {result} = renderHook(() => usePickupShipment())
 
@@ -592,7 +564,7 @@ describe('usePickupShipment', () => {
         })
 
         test('throws error when no store info exists and throwOnError is true', async () => {
-            localStorageMock.getItem.mockReturnValue(null)
+            // Don't set any store data in localStorage (already cleared in beforeEach)
 
             const {result} = renderHook(() => usePickupShipment())
 
@@ -602,12 +574,12 @@ describe('usePickupShipment', () => {
 
             await expect(
                 result.current.configurePickupShipment(basketId, productItems, options)
-            ).rejects.toThrow('No store inventory ID found')
+            ).rejects.toThrow('Failed to retrieve store information')
         })
 
         test('returns early when store info missing inventoryId and throwOnError is false', async () => {
             const storeData = {id: 'store-id-456'} // Missing inventoryId
-            localStorageMock.getItem.mockReturnValue(JSON.stringify(storeData))
+            localStorage.setItem('store_test-site', JSON.stringify(storeData))
 
             const {result} = renderHook(() => usePickupShipment())
 
@@ -621,7 +593,7 @@ describe('usePickupShipment', () => {
 
         test('throws error when store info missing inventoryId and throwOnError is true', async () => {
             const storeData = {id: 'store-id-456'} // Missing inventoryId
-            localStorageMock.getItem.mockReturnValue(JSON.stringify(storeData))
+            localStorage.setItem('store_test-site', JSON.stringify(storeData))
 
             const {result} = renderHook(() => usePickupShipment())
 
@@ -636,7 +608,7 @@ describe('usePickupShipment', () => {
 
         test('logs warning when mutation fails and throwOnError is false', async () => {
             const storeData = {inventoryId: 'store-123', id: 'store-id-456'}
-            localStorageMock.getItem.mockReturnValue(JSON.stringify(storeData))
+            localStorage.setItem('store_test-site', JSON.stringify(storeData))
 
             const mutationError = new Error('Mutation failed')
             mockMutateAsync.mockRejectedValue(mutationError)
@@ -660,7 +632,7 @@ describe('usePickupShipment', () => {
 
         test('throws error when mutation fails and throwOnError is true', async () => {
             const storeData = {inventoryId: 'store-123', id: 'store-id-456'}
-            localStorageMock.getItem.mockReturnValue(JSON.stringify(storeData))
+            localStorage.setItem('store_test-site', JSON.stringify(storeData))
 
             const mutationError = new Error('Mutation failed')
             mockMutateAsync.mockRejectedValue(mutationError)
