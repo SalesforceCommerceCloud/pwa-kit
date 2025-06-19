@@ -340,7 +340,7 @@ export const ApplePayExpress = () => {
         createCheckout()
 
         return () => {
-            isCanceled = true;
+            isCanceled = true
         };
     }, [adyenEnvironment, adyenPaymentMethods])
 
