@@ -22,7 +22,13 @@ import {
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 import {useForm} from 'react-hook-form'
 import {useParams} from 'react-router-dom'
-import {useOrder, useProducts, useAuthHelper, AuthHelpers} from '@salesforce/commerce-sdk-react'
+import {
+    useOrder,
+    useProducts,
+    useAuthHelper,
+    AuthHelpers,
+    useStores
+} from '@salesforce/commerce-sdk-react'
 import {getCreditCardIcon} from '@salesforce/retail-react-app/app/utils/cc-utils'
 import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
 import Link from '@salesforce/retail-react-app/app/components/link'
@@ -58,6 +64,21 @@ const CheckoutConfirmation = () => {
     const {data: products} = useProducts({parameters: {ids: itemIds?.join(',')}})
     const productItemsMap = products?.data.reduce((map, item) => ({...map, [item.id]: item}), {})
     const form = useForm()
+
+    // Check if this is a pickup order and get store details
+    const isPickupOrder = order?.shipments?.[0]?.shippingMethod?.c_storePickupEnabled === true
+    const storeId = order?.shipments?.[0]?.c_fromStoreId
+    const {data: storeData} = useStores(
+        {
+            parameters: {
+                ids: storeId
+            }
+        },
+        {
+            enabled: !!storeId && isPickupOrder && onClient
+        }
+    )
+    const store = storeData?.data?.[0]
 
     useEffect(() => {
         form.reset({
@@ -221,41 +242,124 @@ const CheckoutConfirmation = () => {
                     <Box layerStyle="card" rounded={[0, 0, 'base']} px={[4, 4, 6]} py={[6, 6, 8]}>
                         <Container variant="form">
                             <Stack spacing={6}>
-                                <Heading fontSize="lg">
-                                    <FormattedMessage
-                                        defaultMessage="Delivery Details"
-                                        id="checkout_confirmation.heading.delivery_details"
-                                    />
-                                </Heading>
-
-                                <SimpleGrid columns={[1, 1, 2]} spacing={6}>
-                                    <Stack spacing={1}>
-                                        <Heading as="h3" fontSize="sm">
+                                {isPickupOrder ? (
+                                    <>
+                                        <Heading fontSize="lg">
                                             <FormattedMessage
-                                                defaultMessage="Shipping Address"
-                                                id="checkout_confirmation.heading.shipping_address"
+                                                defaultMessage="Pickup Details"
+                                                id="checkout_confirmation.heading.pickup_details"
                                             />
                                         </Heading>
-                                        <AddressDisplay
-                                            address={order.shipments[0].shippingAddress}
-                                        />
-                                    </Stack>
 
-                                    <Stack spacing={1}>
-                                        <Heading as="h3" fontSize="sm">
+                                        <SimpleGrid columns={[1, 1, 2]} spacing={6}>
+                                            <Stack spacing={1}>
+                                                <Heading as="h3" fontSize="sm">
+                                                    <FormattedMessage
+                                                        defaultMessage="Pickup Address"
+                                                        id="checkout_confirmation.heading.pickup_address"
+                                                    />
+                                                </Heading>
+                                                {store ? (
+                                                    <Box>
+                                                        <Text fontWeight="bold">{store.name}</Text>
+                                                        <Box>
+                                                            <Text>{store.address1}</Text>
+                                                            <Text>
+                                                                {store.city}, {store.stateCode}{' '}
+                                                                {store.postalCode}
+                                                            </Text>
+                                                            <Text>{store.countryCode}</Text>
+                                                        </Box>
+                                                    </Box>
+                                                ) : (
+                                                    <Text>
+                                                        <FormattedMessage
+                                                            defaultMessage="Store information not available"
+                                                            id="checkout_confirmation.message.store_info_unavailable"
+                                                        />
+                                                    </Text>
+                                                )}
+                                            </Stack>
+
+                                            <Stack spacing={1}>
+                                                <Heading as="h3" fontSize="sm">
+                                                    <FormattedMessage
+                                                        defaultMessage="Pickup Information"
+                                                        id="checkout_confirmation.heading.pickup_information"
+                                                    />
+                                                </Heading>
+                                                <Box>
+                                                    {store?.c_customerServiceEmail && (
+                                                        <Text>{store.c_customerServiceEmail}</Text>
+                                                    )}
+                                                    {store?.phone && <Text>{store.phone}</Text>}
+                                                    {store?.storeHours && (
+                                                        <Box mt={2}>
+                                                            <Text
+                                                                fontSize="sm"
+                                                                fontWeight="semibold"
+                                                            >
+                                                                <FormattedMessage
+                                                                    defaultMessage="Store Hours"
+                                                                    id="checkout_confirmation.label.store_hours"
+                                                                />
+                                                            </Text>
+                                                            <Text
+                                                                fontSize="sm"
+                                                                whiteSpace="pre-line"
+                                                            >
+                                                                {store.storeHours}
+                                                            </Text>
+                                                        </Box>
+                                                    )}
+                                                </Box>
+                                            </Stack>
+                                        </SimpleGrid>
+                                    </>
+                                ) : (
+                                    <>
+                                        <Heading fontSize="lg">
                                             <FormattedMessage
-                                                defaultMessage="Shipping Method"
-                                                id="checkout_confirmation.heading.shipping_method"
+                                                defaultMessage="Delivery Details"
+                                                id="checkout_confirmation.heading.delivery_details"
                                             />
                                         </Heading>
-                                        <Box>
-                                            <Text>{order.shipments[0].shippingMethod.name}</Text>
-                                            <Text>
-                                                {order.shipments[0].shippingMethod.description}
-                                            </Text>
-                                        </Box>
-                                    </Stack>
-                                </SimpleGrid>
+
+                                        <SimpleGrid columns={[1, 1, 2]} spacing={6}>
+                                            <Stack spacing={1}>
+                                                <Heading as="h3" fontSize="sm">
+                                                    <FormattedMessage
+                                                        defaultMessage="Shipping Address"
+                                                        id="checkout_confirmation.heading.shipping_address"
+                                                    />
+                                                </Heading>
+                                                <AddressDisplay
+                                                    address={order.shipments[0].shippingAddress}
+                                                />
+                                            </Stack>
+
+                                            <Stack spacing={1}>
+                                                <Heading as="h3" fontSize="sm">
+                                                    <FormattedMessage
+                                                        defaultMessage="Shipping Method"
+                                                        id="checkout_confirmation.heading.shipping_method"
+                                                    />
+                                                </Heading>
+                                                <Box>
+                                                    <Text>
+                                                        {order.shipments[0].shippingMethod.name}
+                                                    </Text>
+                                                    <Text>
+                                                        {
+                                                            order.shipments[0].shippingMethod
+                                                                .description
+                                                        }
+                                                    </Text>
+                                                </Box>
+                                            </Stack>
+                                        </SimpleGrid>
+                                    </>
+                                )}
                             </Stack>
                         </Container>
                     </Box>
