@@ -5,9 +5,8 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
-import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
 import {useForm} from 'react-hook-form'
-import UpdatePasswordFields from '@salesforce/retail-react-app/app/components/forms/update-password-fields'
+import UpdatePasswordFields from './update-password-fields'
 import {screen} from '@testing-library/react'
 import PropTypes from 'prop-types'
 
