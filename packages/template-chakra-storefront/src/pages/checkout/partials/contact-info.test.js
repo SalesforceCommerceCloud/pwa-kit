@@ -6,7 +6,7 @@
  */
 import React from 'react'
 import {screen, waitFor, within} from '@testing-library/react'
-import ContactInfo from '../../../src/pages/checkout/partials/contact-info'
+import ContactInfo from './contact-info'
 import {renderWithProviders} from '../../../utils/test-utils'
 import {rest} from 'msw'
 import {scapiBasketWithItem} from '../../../mocks/mock-data'

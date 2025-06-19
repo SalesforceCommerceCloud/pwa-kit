@@ -17,8 +17,8 @@ import {IntlProvider} from 'react-intl'
 import {CommerceApiProvider} from '@salesforce/commerce-sdk-react'
 import {PageContext, Region} from '@salesforce/commerce-sdk-react/components'
 import {withReactQuery} from '@salesforce/pwa-kit-react-sdk/ssr/universal/components/with-react-query'
-import fallbackMessages from '../static/translations/compiled/en-GB.json'
-import mockConfig from '../mock-config'
+import fallbackMessages from '../../static/translations/compiled/en-GB.json'
+import mockConfig from '../../mock-config'
 // Contexts
 import {CurrencyProvider, MultiSiteProvider} from '../contexts'
 

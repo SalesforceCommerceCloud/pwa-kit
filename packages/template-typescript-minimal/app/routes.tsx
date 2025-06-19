@@ -11,7 +11,7 @@ const GettingStarted = loadable(() => import('./pages/getting-started'))
 const routes = [
     {
         // The path that the local dev server would open initially.
-        // You can configure the server in /app/ssr.js file.
+        // You can configure the server in /src/ssr.js file.
         path: '/__pwa-kit/getting-started',
         exact: true,
         component: GettingStarted

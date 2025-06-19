@@ -6,7 +6,7 @@
  */
 import React from 'react'
 import {configureRoutes} from './routes-utils'
-import mockConfig from '../mock-config'
+import mockConfig from '../../mock-config'
 
 describe('configureRoutes', function () {
     const cases = [

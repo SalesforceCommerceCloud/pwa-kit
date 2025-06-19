@@ -9,7 +9,7 @@
  * Returns the application's origin.
  *
  * NOTE: This utility can only be used server-side after your application has been
- * initialized using the `_createApp` method (This happens in your /app/ssr.js file).
+ * initialized using the `_createApp` method (This happens in your /src/ssr.js file).
  *
  * @function
  * @deprecated use `useOrigin()` instead.

@@ -17,7 +17,7 @@ import {
     useCategory,
     useShopperBasketsMutation
 } from '@salesforce/commerce-sdk-react'
-import logger from '../../../utils/logger-instance'
+import logger from '../../utils/logger-instance'
 import {useAppOrigin} from '../../../hooks/use-app-origin'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 
@@ -34,8 +34,8 @@ import OfflineBanner from '../../../components/offline-banner'
 import OfflineBoundary from '../../../components/offline-boundary'
 import ScrollToTop from '../../../components/scroll-to-top'
 import Footer from '../../../components/footer'
-import CheckoutHeader from '../../../pages/checkout/partials/checkout-header'
-import CheckoutFooter from '../../../pages/checkout/partials/checkout-footer'
+import CheckoutHeader from '../../pages/checkout/partials/checkout-header'
+import CheckoutFooter from '../../pages/checkout/partials/checkout-footer'
 import {DrawerMenu} from '../../../components/drawer-menu'
 import {ListMenu, ListMenuContent} from '../../../components/list-menu'
 import {HideOnDesktop, HideOnMobile} from '../../../components/responsive'
@@ -56,12 +56,12 @@ import {withCommerceSdkReact} from '../../../components/with-commerce-sdk-react'
 // Localization
 import {IntlProvider} from 'react-intl'
 // Others
-import {watchOnlineStatus, flatten, isServer} from '../../../utils/utils'
-import {getTargetLocale, fetchTranslations} from '../../../utils/locale'
+import {watchOnlineStatus, flatten, isServer} from '../../utils/utils'
+import {getTargetLocale, fetchTranslations} from '../../utils/locale'
 
 import Seo from '../../../components/seo'
 import {Helmet} from 'react-helmet'
-import {getPathWithLocale} from '../../../utils/url'
+import {getPathWithLocale} from '../../utils/url'
 
 const PlaceholderComponent = () => (
     <Center p="2">

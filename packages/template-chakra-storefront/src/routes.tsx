@@ -18,7 +18,7 @@ import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 
 // Components
 import {Skeleton} from '@chakra-ui/react'
-import {configureRoutes} from '../utils/routes-utils'
+import {configureRoutes} from './utils/routes-utils'
 
 const fallback = <Skeleton height="75vh" width="100%" />
 const socialRedirectURI = getConfig()?.login?.social?.redirectURI

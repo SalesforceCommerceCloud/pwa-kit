@@ -92,9 +92,9 @@ const entryPointExists = (segments) => {
     return false
 }
 
-const getAppEntryPoint = () => './app/main'
+const getAppEntryPoint = () => './src/main'
 
-const getServerEntryPoint = () => './app/ssr.js'
+const getServerEntryPoint = () => './src/ssr.js'
 
 const getPublicPathEntryPoint = () => {
     return resolve(
@@ -356,7 +356,7 @@ const enableReactRefresh = (config) => {
 }
 
 const client =
-    entryPointExists(['app', 'main']) &&
+    entryPointExists(['src', 'main']) &&
     baseConfig('web')
         .extend(withChunking)
         .extend((config) => {

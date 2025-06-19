@@ -553,7 +553,7 @@ describe('DevServer persistent caching support', () => {
                 res.status(status)
                 res.setHeader('content-type', 'application/javascript')
                 res.setHeader('content-encoding', 'gzip')
-                res.send(zlib.gzipSync(fse.readFileSync(path.join(testFixtures, 'app', 'main.js'))))
+                res.send(zlib.gzipSync(fse.readFileSync(path.join(testFixtures, 'src', 'main.js'))))
                 break
 
             case 'compressed-responses-test':

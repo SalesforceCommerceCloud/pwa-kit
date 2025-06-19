@@ -60,7 +60,7 @@
 - Revert mandatory enforcement of Content-Security-Policy headers. Provide middleware as an opt-in replacement. [#1528](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1528)
 
 ```js
-// your-project/app/ssr.js
+// your-project/src/ssr.js
 import {defaultPwaKitSecurityHeaders} from '@salesforce/pwa-kit-runtime/utils/middleware'
 const {handler} = runtime.createHandler(options, (app) => {
     app.use(defaultPwaKitSecurityHeaders)

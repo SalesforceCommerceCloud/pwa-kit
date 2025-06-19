@@ -9,7 +9,7 @@ import {nanoid} from 'nanoid'
 import {defineMessage, useIntl} from 'react-intl'
 import {useCheckout} from '../util/checkout-context'
 import {ToggleCard, ToggleCardEdit, ToggleCardSummary} from '../../../components/toggle-card'
-import ShippingAddressSelection from '../../../src/pages/checkout/partials/shipping-address-selection'
+import ShippingAddressSelection from './shipping-address-selection'
 import AddressDisplay from '../../../components/address-display'
 import {
     useShopperCustomersMutation,

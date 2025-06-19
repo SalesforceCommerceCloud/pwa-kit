@@ -13,7 +13,7 @@ import {Page} from '@salesforce/commerce-sdk-react/components'
 
 // Page Designer Components
 import {ImageWithText} from '../../../page-designer/assets'
-import {MobileGrid1r1c} from '../../..//page-designer/layouts'
+import {MobileGrid1r1c} from '../../../page-designer/layouts'
 
 // Hooks
 import {isServer} from '../../../utils/utils'

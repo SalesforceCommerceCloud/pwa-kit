@@ -26,7 +26,7 @@ tmp/
 node_modules
 
 # Generated files
-app/cache-hash-manifest.json
-app/loader-cache-hash-manifest.json
+src/cache-hash-manifest.json
+src/loader-cache-hash-manifest.json
 
 .vscode

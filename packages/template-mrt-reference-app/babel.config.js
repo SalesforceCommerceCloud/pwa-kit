@@ -9,5 +9,5 @@ const base = require('@salesforce/pwa-kit-dev/configs/babel/babel-config').defau
 
 module.exports = {
     ...base,
-    exclude: ['./app/ssr.js', './app/ssr.test.js']
+    exclude: ['./src/ssr.js', './src/ssr.test.js']
 }
