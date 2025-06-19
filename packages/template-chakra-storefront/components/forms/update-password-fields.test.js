@@ -9,6 +9,7 @@ import {useForm} from 'react-hook-form'
 import UpdatePasswordFields from './update-password-fields'
 import {screen} from '@testing-library/react'
 import PropTypes from 'prop-types'
+import {renderWithProviders} from '../../utils/test-utils'
 
 const WrapperComponent = ({onSubmit, ...props}) => {
     const form = useForm()
