@@ -171,7 +171,7 @@ export const RemoteServerFactory = {
         options.slasHostName = this._getSlasEndpoint(options)
         options.slasTarget = options.slasTarget || `https://${options.slasHostName}`
 
-        // Add extra conditions to regex to only allow SLAS endpoints
+        // Add extra condition to regex to only allow SLAS endpoints
         options.applySLASPrivateClientToEndpoints = new RegExp(
             `\/shopper\/auth\/.*(` + options.applySLASPrivateClientToEndpoints.source + ')'
         )
@@ -720,8 +720,6 @@ export const RemoteServerFactory = {
                         targetProtocol: 'https'
                     })
 
-                    console.log(options.applySLASPrivateClientToEndpoints.source)
-
                     // We pattern match and add client secrets only to endpoints that
                     // match the regex specified by options.applySLASPrivateClientToEndpoints
                     // (see option defaults at the top of this file).
@@ -729,7 +727,6 @@ export const RemoteServerFactory = {
                     // SLAS logout (/oauth2/logout), use the Authorization header for a different
                     // purpose so we don't want to overwrite the header for those calls.
                     if (incomingRequest.path?.match(options.applySLASPrivateClientToEndpoints)) {
-                        console.log(`adding auth header for ${incomingRequest.path}`)
                         proxyRequest.setHeader('Authorization', `Basic ${encodedSlasCredentials}`)
                     } else {
                         const message = `Request to ${incomingRequest.path} did not match allowed endpoints. Please make sure you have defined allowed endpoints via applySLASPrivateClientToEndpoints in ssr.js`
