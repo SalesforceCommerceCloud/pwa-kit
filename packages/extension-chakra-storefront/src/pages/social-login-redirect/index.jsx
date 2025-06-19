@@ -18,6 +18,7 @@ import {useAppOrigin} from '../../hooks/use-app-origin'
 import {useExtensionConfig} from '../../hooks/use-extension-config'
 import {getSessionJSONItem, clearSessionJSONItem, buildRedirectURI} from '../../utils/utils'
 import {API_ERROR_MESSAGE} from '../../constants'
+import {AlertIcon} from '../../components/icons'
 
 const SocialLoginRedirect = () => {
     const {formatMessage} = useIntl()
@@ -91,7 +92,9 @@ const SocialLoginRedirect = () => {
             >
                 {error && (
                     <Alert.Root status="error" marginBottom={8}>
-                        <Alert.Indicator color="red.500" boxSize={4} />
+                        <Alert.Indicator>
+                            <AlertIcon color="red.500" boxSize={4} />
+                        </Alert.Indicator>
                         <Text fontSize="sm" ml={3}>
                             {error}
                         </Text>
