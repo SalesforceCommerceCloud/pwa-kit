@@ -12,6 +12,14 @@ import {rest} from 'msw'
 import {renderWithProviders, createPathWithDefaults} from '../../utils/test-utils'
 import Confirmation from './confirmation'
 import {mockOrder, mockProducts} from './confirmation.mock'
+import mockConfig from '../../mock-config'
+import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
+
+jest.mock('@salesforce/pwa-kit-runtime/utils/ssr-config', () => {
+    return {
+        getConfig: jest.fn()
+    }
+})
 
 const MockedComponent = () => {
     return (
@@ -24,6 +32,8 @@ const MockedComponent = () => {
 }
 
 beforeEach(() => {
+    // Mock the config
+    getConfig.mockImplementation(() => mockConfig)
     global.server.use(
         rest.get('*/orders/:orderId', (req, res, ctx) => {
             return res(ctx.delay(0), ctx.json(mockOrder))
