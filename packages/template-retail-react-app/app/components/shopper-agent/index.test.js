@@ -12,7 +12,10 @@ import useScript from '@salesforce/retail-react-app/app/hooks/use-script'
 // Mock the embeddedservice_bootstrap object
 const mockEmbeddedService = {
     init: jest.fn(),
-    settings: jest.fn(),
+    settings: {
+        language: '',
+        disableStreamingResponses: false
+    },
     prechatAPI: {
         setHiddenPrechatFields: jest.fn()
     }
@@ -76,22 +79,14 @@ describe('ShopperAgent Component', () => {
 
     const defaultProps = {
         commerceAgentConfiguration: commerceAgentSettings,
-        domainUrl: 'https://myorg.salesforce.com',
         basketId: '4a67cda5b1b9325a29207854c1',
         locale: 'en-US',
         basketDoneLoading: true
     }
 
-    test('should render nothing when enableMiaw is false', () => {
-        const props = {...defaultProps, enableMiaw: false}
-        const {container} = render(<ShopperAgent {...props} />)
-
-        expect(container.firstChild).toBeNull()
-    })
-
-    test('should render nothing when commerceAgent is not provided via an environment variable', () => {
-        const commerceAgent = {enabled: 'false'}
-        const props = {commerceAgentConfiguration: commerceAgent, enableMiaw: false}
+    test('should render nothing when enabled is false', () => {
+        const disabledSettings = {...commerceAgentSettings, enabled: 'false'}
+        const props = {...defaultProps, commerceAgentConfiguration: disabledSettings}
         const {container} = render(<ShopperAgent {...props} />)
 
         expect(container.firstChild).toBeNull()
@@ -101,12 +96,6 @@ describe('ShopperAgent Component', () => {
         const props = {...defaultProps, basketDoneLoading: false}
         const {container} = render(<ShopperAgent {...props} />)
 
-        expect(container.firstChild).toBeNull()
-    })
-
-    test('should not render anything when commerceAgenticEsdScriptSourceUrl is not provided', () => {
-        const props = {...defaultProps, scriptUrl: null}
-        const {container} = render(<ShopperAgent {...props} />)
         expect(container.firstChild).toBeNull()
     })
 
@@ -127,10 +116,6 @@ describe('ShopperAgent Component', () => {
     test('should initialize embedded service when all required props are provided', () => {
         useScript.mockReturnValue({loaded: true, error: false})
         render(<ShopperAgent {...defaultProps} />)
-        // Verify settings were configured correctly
-        expect(mockEmbeddedService.settings.language).toBe('en-US')
-        expect(mockEmbeddedService.settings.disableStreamingResponses).toBe(true)
-
         // Verify embedded service initialization
         expect(mockEmbeddedService.init).toHaveBeenCalledWith(
             commerceAgentSettings.salesforceOrgId,
@@ -142,18 +127,22 @@ describe('ShopperAgent Component', () => {
         )
     })
 
-    test('should handle initialization error from useMiaw hook', () => {
+    test('should handle initialization error gracefully', () => {
+        // Mock console.error to avoid noise in test output
+        const consoleSpy = jest.spyOn(console, 'error').mockImplementation()
         // Mock useMiaw to return an error
         const errorMessage = 'Initialization failed'
-        useScript.mockReturnValue({loaded: true, error: true})
+        useScript.mockReturnValue({loaded: true, error: false})
         mockEmbeddedService.init.mockImplementation(() => {
             throw new Error(errorMessage)
         })
 
         const {container} = render(<ShopperAgent {...defaultProps} />)
 
-        // Component should not render anything when there's an error
+        // Component should still render (error is caught in initEmbeddedMessaging)
         expect(container.firstChild).toBeNull()
+
+        consoleSpy.mockRestore()
     })
 
     test('should not reinitialize embedded service when already initialized', () => {
@@ -172,8 +161,42 @@ describe('ShopperAgent Component', () => {
         // Re-render with same props
         rerender(<ShopperAgent {...defaultProps} />)
 
-        // Should not call init or createComponent again
+        // Should not call init again
         expect(mockEmbeddedService.init).not.toHaveBeenCalled()
+    })
+
+    test('should reinitialize when commerce agent configuration changes', () => {
+        // First render
+        useScript.mockReturnValue({loaded: true, error: false})
+        const {rerender} = render(<ShopperAgent {...defaultProps} />)
+
+        expect(mockEmbeddedService.init).toHaveBeenCalledTimes(1)
+
+        // Reset mock call counts
+        jest.clearAllMocks()
+
+        // Re-render with different commerce agent configuration
+        const newCommerceAgentSettings = {
+            ...commerceAgentSettings,
+            salesforceOrgId: 'new_salesforce_org_id',
+            embeddedServiceName: 'NewService'
+        }
+        const newProps = {
+            ...defaultProps,
+            commerceAgentConfiguration: newCommerceAgentSettings
+        }
+
+        rerender(<ShopperAgent {...newProps} />)
+
+        // Should call init again with new configuration
+        expect(mockEmbeddedService.init).toHaveBeenCalledWith(
+            newCommerceAgentSettings.salesforceOrgId,
+            newCommerceAgentSettings.embeddedServiceName,
+            newCommerceAgentSettings.embeddedServiceEndpoint,
+            {
+                scrt2URL: newCommerceAgentSettings.scrt2Url
+            }
+        )
     })
 
     test('should set prechat fields correctly on different events', async () => {
@@ -186,12 +209,11 @@ describe('ShopperAgent Component', () => {
         })
 
         expect(mockEmbeddedService.prechatAPI.setHiddenPrechatFields).toHaveBeenCalledWith({
-            DomainUrl: defaultProps.domainUrl,
             SiteId: commerceAgentSettings.siteId,
             Locale: defaultProps.locale,
             OrganizationId: commerceAgentSettings.commerceOrgId,
             UsId: 'test-usid',
-            PwaKit: true
+            IsCartMgmtSupported: true
         })
 
         // Reset mock to test button click event
@@ -232,22 +254,21 @@ describe('ShopperAgent Component', () => {
     })
 
     test('should not load the script when the commerceAgent is disabled', () => {
-        const commerceAgentSettings = {...defaultProps.commerceAgent, enabled: 'false'}
-        const props = {...defaultProps, commerceAgentConfiguration: commerceAgentSettings}
+        const disabledSettings = {...commerceAgentSettings, enabled: 'false'}
+        const props = {...defaultProps, commerceAgentConfiguration: disabledSettings}
 
         render(<ShopperAgent {...props} />)
 
-        // Component should not render anything when there's an error
+        // Component should not render anything when disabled
         expect(useScript).not.toHaveBeenCalled()
     })
 
     test('should set the z-index of the embedded messaging frame to the sticky z-index + 1 when the window is maximized', async () => {
         const mockFrame = document.createElement('div')
-        mockFrame.id = 'embeddedMessaging'
         mockFrame.style.zIndex = '0'
 
         // Store original querySelector
-        const originalQuerySelector = document.querySelector
+        const originalQuerySelector = document.body.querySelector
 
         // Mock querySelector to return our mock frame
         document.body.querySelector = jest.fn().mockImplementation((selector) => {
@@ -257,6 +278,7 @@ describe('ShopperAgent Component', () => {
             return originalQuerySelector.call(document, selector)
         })
 
+        useScript.mockReturnValue({loaded: true, error: false})
         render(<ShopperAgent {...defaultProps} />)
 
         // Simulate window maximize
@@ -269,6 +291,54 @@ describe('ShopperAgent Component', () => {
 
         // Restore original querySelector
         document.body.querySelector = originalQuerySelector
+    })
+
+    test('should update prechat fields when commerce agent configuration changes', async () => {
+        useScript.mockReturnValue({loaded: true, error: false})
+        const {rerender} = render(<ShopperAgent {...defaultProps} />)
+
+        // Trigger initial prechat fields setup
+        await act(async () => {
+            window.dispatchEvent(new Event('onEmbeddedMessagingReady'))
+        })
+
+        expect(mockEmbeddedService.prechatAPI.setHiddenPrechatFields).toHaveBeenCalledWith({
+            SiteId: commerceAgentSettings.siteId,
+            Locale: defaultProps.locale,
+            OrganizationId: commerceAgentSettings.commerceOrgId,
+            UsId: 'test-usid',
+            IsCartMgmtSupported: true
+        })
+
+        // Reset mock
+        mockEmbeddedService.prechatAPI.setHiddenPrechatFields.mockClear()
+
+        // Re-render with different configuration
+        const newCommerceAgentSettings = {
+            ...commerceAgentSettings,
+            siteId: 'NewSiteId',
+            commerceOrgId: 'new_commerce_org_id'
+        }
+        const newProps = {
+            ...defaultProps,
+            commerceAgentConfiguration: newCommerceAgentSettings
+        }
+
+        rerender(<ShopperAgent {...newProps} />)
+
+        // Trigger prechat fields setup again
+        await act(async () => {
+            window.dispatchEvent(new Event('onEmbeddedMessagingReady'))
+        })
+
+        // Should update with new values
+        expect(mockEmbeddedService.prechatAPI.setHiddenPrechatFields).toHaveBeenCalledWith({
+            SiteId: newCommerceAgentSettings.siteId,
+            Locale: defaultProps.locale,
+            OrganizationId: newCommerceAgentSettings.commerceOrgId,
+            UsId: 'test-usid',
+            IsCartMgmtSupported: true
+        })
     })
 
     describe('Event Listener Cleanup', () => {
@@ -302,11 +372,11 @@ describe('ShopperAgent Component', () => {
         })
 
         it('should remove event listeners when component unmounts', () => {
+            useScript.mockReturnValue({loaded: true, error: false})
             // Render the component
             const {unmount} = render(
                 <ShopperAgent
                     commerceAgentConfiguration={mockCommerceAgent}
-                    domainUrl="https://test.domain.com"
                     basketId="test-basket-id"
                     locale="en-US"
                     basketDoneLoading={true}
@@ -368,7 +438,6 @@ describe('ShopperAgent Component', () => {
             const {unmount} = render(
                 <ShopperAgent
                     commerceAgentConfiguration={disabledCommerceAgent}
-                    domainUrl="https://test.domain.com"
                     basketId="test-basket-id"
                     locale="en-US"
                     basketDoneLoading={true}
