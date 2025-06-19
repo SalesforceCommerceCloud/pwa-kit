@@ -214,7 +214,7 @@ describe('tree-shake', () => {
 
     it('reports error when delete permission is denied', () => {
         fs.unlinkSync.mockImplementation((filePath) => {
-            if (filePath.includes('src/components/featureBComponent')) {
+            if (filePath.includes('featureBComponent')) {
                 const error = new Error('Permission denied')
                 error.code = 'EPERM'
                 throw error
