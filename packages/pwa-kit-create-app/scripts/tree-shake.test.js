@@ -25,7 +25,7 @@ const treeShake = require('./tree-shake')
 describe('tree-shake', () => {
     beforeEach(() => {
         fs.readdirSync.mockReturnValue([
-            'src/components/featureComponent.jsx',
+            '/src/components/featureComponent.jsx',
             '/src/components/featureAComponent/index.jsx',
             '/src/components/featureBComponent/index.jsx'
         ])
@@ -162,7 +162,7 @@ describe('tree-shake', () => {
             } else if (filePath.includes('src/components/featureBComponent/index.jsx')) {
                 return featureBComponentCode
             } else {
-                return 'export default {}'
+                console.error('Unhandled file', filePath)
             }
         })
 
@@ -205,7 +205,7 @@ describe('tree-shake', () => {
             } else if (filePath.includes('src/components/featureBComponent/index.jsx')) {
                 return componentBCode
             } else {
-                return 'export default {}'
+                console.error('Unhandled file', filePath)
             }
         })
 
@@ -260,7 +260,7 @@ describe('tree-shake', () => {
             } else if (filePath.includes('src/components/featureBComponent/index.jsx')) {
                 return componentBCode
             } else {
-                return 'export default {}'
+                console.error('Unhandled file', filePath)
             }
         })
 
