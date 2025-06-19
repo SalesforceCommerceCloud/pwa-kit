@@ -9,7 +9,7 @@ import React, {useEffect} from 'react'
 import PropTypes from 'prop-types'
 import {useTheme} from '@chakra-ui/react'
 import useScript from '@salesforce/retail-react-app/app/hooks/use-script'
-import useUsid from '@salesforce/retail-react-app/app/hooks/use-usid'
+import {useUsid} from '@salesforce/commerce-sdk-react'
 import {onClient} from '@salesforce/retail-react-app/app/utils/ssr'
 
 /* global embeddedservice_bootstrap */
