@@ -49,6 +49,7 @@ jobs:
 
   pwa-kit:
     needs: changelog-check
+    timeout-minutes: 30
     strategy:
       fail-fast: false
       matrix:
@@ -75,6 +76,14 @@ jobs:
         with:
           node-version: ${{ matrix.node }}
           cache: npm
+
+      - name: Configure npm for CI
+        run: |
+          npm config set maxsockets 1
+          npm config set fetch-retries 3
+          npm config set fetch-timeout 300000
+          npm config set prefer-offline true
+          npm config set progress false
 
       - name: Update NPM version
         if: env.IS_DEFAULT_NPM == 'false'
@@ -139,6 +148,7 @@ jobs:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
   pwa-kit-windows:
     needs: changelog-check
+    timeout-minutes: 30
     strategy:
       fail-fast: false
       matrix:
@@ -166,6 +176,14 @@ jobs:
           with:
             node-version: ${{ matrix.node }}
             cache: npm
+
+        - name: Configure npm for CI
+          run: |
+            npm config set maxsockets 1
+            npm config set fetch-retries 3
+            npm config set fetch-timeout 300000
+            npm config set prefer-offline true
+            npm config set progress false
 
         - name: Update NPM version
           if: env.IS_DEFAULT_NPM == 'false'
