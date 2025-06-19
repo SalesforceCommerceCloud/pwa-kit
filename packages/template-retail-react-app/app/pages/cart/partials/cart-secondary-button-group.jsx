@@ -74,6 +74,20 @@ const CartSecondaryButtonGroup = ({
         onRemoveItemClick(variant)
     }
 
+    /**
+     * Determines if the Edit button should be shown.
+     * If the product is a variant with attributes or a bundle, the Edit button should be shown.
+     * @returns {boolean} True if Edit button should be shown
+     */
+    const shouldShowEditButton = () => {
+        const isVariationProduct =
+            Array.isArray(variant.variationAttributes) && variant.variationAttributes.length > 0
+        const isBundleProduct =
+            Array.isArray(variant.bundledProductItems) && variant.bundledProductItems.length > 0
+
+        return isVariationProduct || isBundleProduct
+    }
+
     return (
         <>
             <Stack
@@ -101,16 +115,14 @@ const CartSecondaryButtonGroup = ({
                             />
                         </Button>
                     )}
-                    {/* Only show Edit if the product is a variant */}
-                    {Array.isArray(variant.variationAttributes) &&
-                        variant.variationAttributes.length > 0 && (
-                            <Button variant="link" size="sm" onClick={() => onEditClick(variant)}>
-                                <FormattedMessage
-                                    defaultMessage="Edit"
-                                    id="cart_secondary_button_group.action.edit"
-                                />
-                            </Button>
-                        )}
+                    {shouldShowEditButton() && (
+                        <Button variant="link" size="sm" onClick={() => onEditClick(variant)}>
+                            <FormattedMessage
+                                defaultMessage="Edit"
+                                id="cart_secondary_button_group.action.edit"
+                            />
+                        </Button>
+                    )}
                 </ButtonGroup>
                 <Flex alignItems="center">
                     <Checkbox
