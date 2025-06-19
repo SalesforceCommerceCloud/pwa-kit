@@ -20,8 +20,8 @@ export class ApiClient {
             siteId: this.site.id,
             ...(options?.queryParams || {})
         }
-        this.url = `${this.url}?${new URLSearchParams(queryParams)}`
-        return fetch(this.url, {
+        const fullUrl = `${this.url}?${new URLSearchParams(queryParams)}`
+        return fetch(fullUrl, {
             method: method,
             body: options?.body || null,
             headers: {

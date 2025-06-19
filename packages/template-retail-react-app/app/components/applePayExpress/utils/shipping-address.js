@@ -24,9 +24,10 @@ export class AdyenShippingAddressService {
             }
         })
         if (res.status >= 300) {
-            throw new Error(res)
+            const errorBody = await res.text()
+            throw new Error(`Request failed with status ${res.status}: ${errorBody}`)
         } else {
-            return await res.json()
+            return res.json()
         }
     }
 }

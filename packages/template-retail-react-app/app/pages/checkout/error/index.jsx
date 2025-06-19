@@ -18,9 +18,9 @@ const AdyenCheckoutErrorComponent = () => {
                 data-testid="sf-checkout-confirmation-container"
             >
                 <Stack spacing={4}>
-                    <Box layerStyle="card" rounded={[0, 0, 'base']} px={[4, 4, 6]} py={[6, 6, 8]}>
+                    <Box role="alert" layerStyle="card" rounded={[0, 0, 'base']} px={[4, 4, 6]} py={[6, 6, 8]}>
                         <Stack spacing={6}>
-                            <Heading align="center" fontSize={['2xl']}>
+                            <Heading textAlign="center" fontSize={['2xl']}>
                                 <FormattedMessage
                                     defaultMessage="Something went wrong. Try again!"
                                     id="global.error.something_went_wrong"

@@ -32,7 +32,7 @@ function Express() {
     }, [])
 
     if (!authToken) {
-        return
+        return null
     }
 
     return (
@@ -45,7 +45,7 @@ function Express() {
                 basket={basket}
                 navigate={navigate}
             >
-                <ApplePayExpress></ApplePayExpress>
+                <ApplePayExpress/>
             </AdyenExpressCheckoutProvider>
         </div>
     )

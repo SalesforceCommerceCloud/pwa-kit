@@ -14,17 +14,21 @@ export class AdyenShippingMethodsService {
         this.apiClient = new ApiClient(this.baseUrl, token, site)
     }
 
+    async _handleResponse(res) {
+        if (res.status >= 300) {
+            const errorBody = await res.text()
+            throw new Error(`Request failed with status ${res.status}: ${errorBody}`)
+        }
+        return res.json()
+    }
+
     async getShippingMethods(basketId) {
         const res = await this.apiClient.get({
             headers: {
                 basketid: basketId
             }
         })
-        if (res.status >= 300) {
-            throw new Error(res)
-        } else {
-            return await res.json()
-        }
+        return this._handleResponse(res)
     }
 
     async updateShippingMethod(shippingMethodId, basketId) {
@@ -36,10 +40,6 @@ export class AdyenShippingMethodsService {
                 basketid: basketId
             }
         })
-        if (res.status >= 300) {
-            throw new Error(res)
-        } else {
-            return await res.json()
-        }
+        return this._handleResponse(res)
     }
 }
