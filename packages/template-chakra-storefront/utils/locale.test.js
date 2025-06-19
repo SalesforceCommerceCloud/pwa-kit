@@ -19,7 +19,7 @@ jest.mock('cross-fetch', () => {
         }
 
         const locale = matched[1]
-        const json = await import(`../../static/translations/compiled/${locale}.json`)
+        const json = await import(`../static/translations/compiled/${locale}.json`)
 
         return {
             ok: true,
@@ -73,15 +73,6 @@ describe('fetchTranslations', () => {
         const messages = await fetchTranslations(supportedLocale)
         expect(messages[testId2]).toBeDefined()
     })
-    // test('loading the pseudo locale', async () => {
-    //     const messages = await fetchTranslations('en-XA')
-    //     expect(messages[testId1][1].value).toMatch(/Ƥřīṽȧȧƈẏ Ƥǿǿŀīƈẏ/)
-    // })
-    // test('handling a not-found translation file', async () => {
-    //     const messages = await fetchTranslations('xx-XX')
-    //     const emptyMessages = {}
-    //     expect(messages).toEqual(emptyMessages)
-    // })
 })
 
 describe('getTargetLocale', () => {
