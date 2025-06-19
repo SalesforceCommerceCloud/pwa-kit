@@ -18,16 +18,30 @@ const PasswordlessEmailConfirmation = ({form, submitForm, email = ''}) => {
             data-testid="sf-form-resend-passwordless-email"
         >
             <Stack spacing={6}>
-                <Stack justify="center" align="center" spacing={6} role="alert">
+                <Stack
+                    justify="center"
+                    align="center"
+                    spacing={6}
+                    role="alert"
+                    aria-live="polite"
+                    aria-labelledby="email-confirmation-title"
+                    aria-describedby="email-confirmation-desc email-confirmation-spam"
+                    tabIndex="-1"
+                >
                     <BrandLogo width="60px" height="auto" aria-hidden={true} />
-                    <Text align="center" fontSize="xl" fontWeight="semibold">
+                    <Text
+                        align="center"
+                        fontSize="xl"
+                        fontWeight="semibold"
+                        id="email-confirmation-title"
+                    >
                         <FormattedMessage
                             defaultMessage="Check Your Email"
                             id="auth_modal.check_email.title.check_your_email"
                         />
                     </Text>
                     <Stack spacing={10}>
-                        <Text align="center" fontSize="md">
+                        <Text align="center" fontSize="md" id="email-confirmation-desc">
                             <FormattedMessage
                                 defaultMessage="We just sent a login link to <b>{email}</b>"
                                 id="auth_modal.check_email.description.just_sent"
@@ -37,7 +51,7 @@ const PasswordlessEmailConfirmation = ({form, submitForm, email = ''}) => {
                                 }}
                             />
                         </Text>
-                        <Text align="center" fontSize="sm">
+                        <Text align="center" fontSize="sm" id="email-confirmation-spam">
                             <FormattedMessage
                                 defaultMessage="The link may take a few minutes to arrive, check your spam folder if you're having trouble finding it"
                                 id="auth_modal.check_email.description.check_spam_folder"

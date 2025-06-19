@@ -1,6 +1,6 @@
 ## v3.4.0-dev.0 (May 23, 2025)
 - Now compatible with either React 17 and 18 [#2506](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2506)
-
+- Gracefully handle missing SDK Clients in CommerceApiProvider [#2539](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2539)
 - Refactor commerce-sdk-react to allow injecting ApiClients [#2519](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2519)
 
 ## v3.3.0 (May 22, 2025)
