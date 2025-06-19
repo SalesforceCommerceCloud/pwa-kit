@@ -13,7 +13,13 @@ import {fireEvent, screen} from '@testing-library/react'
 import {useDisclosure} from '@chakra-ui/react'
 import mockProductDetail from '../../mocks/variant-750518699578M'
 import {prependHandlersToServer} from '../../jest-setup'
-
+jest.mock('@salesforce/pwa-kit-runtime/utils/ssr-config', () => {
+    const original = jest.requireActual('@salesforce/pwa-kit-runtime/utils/ssr-config')
+    return {
+        ...original,
+        getConfig: jest.fn(() => require('../../mock-config'))
+    }
+})
 const MockComponent = ({updateCart}) => {
     const {isOpen, onOpen, onClose} = useDisclosure()
 

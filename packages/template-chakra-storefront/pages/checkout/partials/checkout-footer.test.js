@@ -9,7 +9,13 @@ import {screen} from '@testing-library/react'
 
 import CheckoutFooter from './checkout-footer'
 import {renderWithProviders} from '../../../utils/test-utils'
-
+jest.mock('@salesforce/pwa-kit-runtime/utils/ssr-config', () => {
+    const original = jest.requireActual('@salesforce/pwa-kit-runtime/utils/ssr-config')
+    return {
+        ...original,
+        getConfig: jest.fn(() => require('../../../mock-config'))
+    }
+})
 test('renders component', () => {
     renderWithProviders(<CheckoutFooter />)
     expect(screen.getByRole('link', {name: 'Shipping'})).toBeInTheDocument()

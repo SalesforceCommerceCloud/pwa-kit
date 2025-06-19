@@ -11,7 +11,13 @@ import {useCurrentBasket} from './use-current-basket'
 import {renderWithProviders} from '../utils/test-utils'
 import {useCustomerBaskets} from '@salesforce/commerce-sdk-react'
 import {mockCustomerBaskets} from '../mocks/mock-data'
-
+jest.mock('@salesforce/pwa-kit-runtime/utils/ssr-config', () => {
+    const original = jest.requireActual('@salesforce/pwa-kit-runtime/utils/ssr-config')
+    return {
+        ...original,
+        getConfig: jest.fn(() => require('../mock-config'))
+    }
+})
 const MOCK_USE_QUERY_RESULT = {
     data: undefined,
     dataUpdatedAt: 0,

@@ -7,7 +7,13 @@
 import React from 'react'
 import {renderWithProviders} from '../../utils/test-utils'
 import BasicTile from './index'
-
+jest.mock('@salesforce/pwa-kit-runtime/utils/ssr-config', () => {
+    const original = jest.requireActual('@salesforce/pwa-kit-runtime/utils/ssr-config')
+    return {
+        ...original,
+        getConfig: jest.fn(() => require('../../mock-config'))
+    }
+})
 test('BasicTile renders without errors', () => {
     const data = {
         title: 'title',
