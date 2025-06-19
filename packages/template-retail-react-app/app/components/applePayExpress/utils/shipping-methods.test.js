@@ -1,8 +1,14 @@
-import {AdyenShippingMethodsService} from './shipping-methods'
-import {ApiClient} from './api'
+/*
+ * Copyright (c) 2025, Salesforce, Inc.
+ * All rights reserved.
+ * SPDX-License-Identifier: BSD-3-Clause
+ * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
+ */
+import {AdyenShippingMethodsService} from '@salesforce/retail-react-app/app/components/applePayExpress/utils/shipping-methods'
+import {ApiClient} from '@salesforce/retail-react-app/app/components/applePayExpress/utils/api'
 
 // Mock the ApiClient
-jest.mock('./api')
+jest.mock('@salesforce/retail-react-app/app/components/applePayExpress/utils/api')
 
 describe('AdyenShippingMethodsService', () => {
     let shippingMethodsService
@@ -29,7 +35,11 @@ describe('AdyenShippingMethodsService', () => {
         })
 
         it('should create ApiClient with correct parameters', () => {
-            expect(ApiClient).toHaveBeenCalledWith('/api/adyen/shipping-methods', mockToken, mockSite)
+            expect(ApiClient).toHaveBeenCalledWith(
+                '/api/adyen/shipping-methods',
+                mockToken,
+                mockSite
+            )
         })
     })
 
@@ -69,7 +79,9 @@ describe('AdyenShippingMethodsService', () => {
 
             await expect(
                 shippingMethodsService.getShippingMethods(mockBasketId)
-            ).rejects.toThrow(`Request failed with status 400: ${errorMessage}`)
+            ).rejects.toThrow(
+                `Request failed with status 400: ${errorMessage}`
+            )
 
             expect(mockApiClient.get).toHaveBeenCalledWith({
                 headers: {
@@ -88,7 +100,9 @@ describe('AdyenShippingMethodsService', () => {
 
             await expect(
                 shippingMethodsService.getShippingMethods(mockBasketId)
-            ).rejects.toThrow(`Request failed with status 500: ${errorMessage}`)
+            ).rejects.toThrow(
+                `Request failed with status 500: ${errorMessage}`
+            )
         })
 
         it('should handle 404 error response', async () => {
@@ -101,7 +115,9 @@ describe('AdyenShippingMethodsService', () => {
 
             await expect(
                 shippingMethodsService.getShippingMethods(mockBasketId)
-            ).rejects.toThrow(`Request failed with status 404: ${errorMessage}`)
+            ).rejects.toThrow(
+                `Request failed with status 404: ${errorMessage}`
+            )
         })
     })
 
@@ -117,7 +133,10 @@ describe('AdyenShippingMethodsService', () => {
             }
             mockApiClient.post.mockResolvedValue(mockResponse)
 
-            const result = await shippingMethodsService.updateShippingMethod(mockShippingMethodId, mockBasketId)
+            const result = await shippingMethodsService.updateShippingMethod(
+                mockShippingMethodId,
+                mockBasketId
+            )
 
             expect(mockApiClient.post).toHaveBeenCalledWith({
                 body: JSON.stringify({
@@ -140,7 +159,9 @@ describe('AdyenShippingMethodsService', () => {
 
             await expect(
                 shippingMethodsService.updateShippingMethod(mockShippingMethodId, mockBasketId)
-            ).rejects.toThrow(`Request failed with status 400: ${errorMessage}`)
+            ).rejects.toThrow(
+                `Request failed with status 400: ${errorMessage}`
+            )
 
             expect(mockApiClient.post).toHaveBeenCalledWith({
                 body: JSON.stringify({
@@ -162,7 +183,9 @@ describe('AdyenShippingMethodsService', () => {
 
             await expect(
                 shippingMethodsService.updateShippingMethod(mockShippingMethodId, mockBasketId)
-            ).rejects.toThrow(`Request failed with status 500: ${errorMessage}`)
+            ).rejects.toThrow(
+                `Request failed with status 500: ${errorMessage}`
+            )
         })
 
         it('should handle 404 error response', async () => {
@@ -175,7 +198,9 @@ describe('AdyenShippingMethodsService', () => {
 
             await expect(
                 shippingMethodsService.updateShippingMethod(mockShippingMethodId, mockBasketId)
-            ).rejects.toThrow(`Request failed with status 404: ${errorMessage}`)
+            ).rejects.toThrow(
+                `Request failed with status 404: ${errorMessage}`
+            )
         })
     })
 }) 

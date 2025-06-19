@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) 2025, Salesforce, Inc.
+ * All rights reserved.
+ * SPDX-License-Identifier: BSD-3-Clause
+ * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
+ */
 import React from 'react'
 import {render, waitFor} from '@testing-library/react'
 import {ApplePayExpress} from '@salesforce/retail-react-app/app/components/applePayExpress/index'
@@ -22,19 +28,19 @@ jest.mock('@adyen/adyen-salesforce-pwa', () => ({
 }))
 
 // Mock the utility services
-jest.mock('./utils/payments', () => ({
+jest.mock('@salesforce/retail-react-app/app/components/applePayExpress/utils/payments', () => ({
     AdyenPaymentsService: jest.fn().mockImplementation(() => ({
         submitPayment: jest.fn()
     }))
 }))
 
-jest.mock('./utils/shipping-address', () => ({
+jest.mock('@salesforce/retail-react-app/app/components/applePayExpress/utils/shipping-address', () => ({
     AdyenShippingAddressService: jest.fn().mockImplementation(() => ({
         updateShippingAddress: jest.fn()
     }))
 }))
 
-jest.mock('./utils/shipping-methods', () => ({
+jest.mock('@salesforce/retail-react-app/app/components/applePayExpress/utils/shipping-methods', () => ({
     AdyenShippingMethodsService: jest.fn().mockImplementation(() => ({
         updateShippingMethod: jest.fn()
     }))
@@ -169,10 +175,12 @@ describe('Utility functions', () => {
         const paymentMethodsResponse = {
             paymentMethods: [
                 {type: 'applepay', configuration: {merchantName: 'Test Merchant'}},
-                {type: 'card', configuration: {}} 
+                {type: 'card', configuration: {}}
             ]
         }
-        expect(getApplePaymentMethodConfig(paymentMethodsResponse)).toEqual({merchantName: 'Test Merchant'})
+        expect(getApplePaymentMethodConfig(paymentMethodsResponse)).toEqual({
+            merchantName: 'Test Merchant'
+        })
     })
     it('getApplePaymentMethodConfig returns null if not found', () => {
         expect(getApplePaymentMethodConfig({paymentMethods: [{type: 'card'}]})).toBeNull()
@@ -262,7 +270,7 @@ describe('getAppleButtonConfig', () => {
         expect(config.isExpress).toBe(true)
         expect(config.configuration).toBe(mockApplePayConfig)
         expect(config.amount.currency).toBe('USD')
-        expect(config.shippingMethods.length).toBe(1)
+        expect(config.shippingMethods).toHaveLength(1)
     })
 
     it('onAuthorized resolves on successful payment', async () => {
@@ -276,15 +284,23 @@ describe('getAppleButtonConfig', () => {
             mockFetchShippingMethods
         )
         // Mock the service directly
-        const {AdyenPaymentsService} = require('./utils/payments')
-        const mockSubmitPayment = jest.fn().mockResolvedValue({isFinal: true, isSuccessful: true, merchantReference: 'order123'})
+        const {AdyenPaymentsService} = require('@salesforce/retail-react-app/app/components/applePayExpress/utils/payments')
+        const mockSubmitPayment = jest
+            .fn()
+            .mockResolvedValue({isFinal: true, isSuccessful: true, merchantReference: 'order123'})
         AdyenPaymentsService.mockImplementation(() => ({
             submitPayment: mockSubmitPayment
         }))
         
         const resolve = jest.fn()
         const reject = jest.fn()
-        const event = {payment: {shippingContact: {}, billingContact: {}, token: {paymentData: 'data'}}}
+        const event = {
+            payment: {
+                shippingContact: {},
+                billingContact: {},
+                token: {paymentData: 'data'}
+            }
+        }
         await config.onAuthorized(resolve, reject, event)
         expect(resolve).toHaveBeenCalled()
         expect(reject).not.toHaveBeenCalled()
@@ -300,7 +316,7 @@ describe('getAppleButtonConfig', () => {
             mockNavigate,
             mockFetchShippingMethods
         )
-        const {AdyenPaymentsService} = require('./utils/payments')
+        const {AdyenPaymentsService} = require('@salesforce/retail-react-app/app/components/applePayExpress/utils/payments')
         const mockSubmitPayment = jest.fn().mockResolvedValue({isFinal: false, isSuccessful: false})
         AdyenPaymentsService.mockImplementation(() => ({
             submitPayment: mockSubmitPayment
@@ -308,7 +324,13 @@ describe('getAppleButtonConfig', () => {
         
         const resolve = jest.fn()
         const reject = jest.fn()
-        const event = {payment: {shippingContact: {}, billingContact: {}, token: {paymentData: 'data'}}}
+        const event = {
+            payment: {
+                shippingContact: {},
+                billingContact: {},
+                token: {paymentData: 'data'}
+            }
+        }
         await config.onAuthorized(resolve, reject, event)
         expect(resolve).not.toHaveBeenCalled()
         expect(reject).toHaveBeenCalled()
@@ -324,7 +346,7 @@ describe('getAppleButtonConfig', () => {
             mockNavigate,
             mockFetchShippingMethods
         )
-        const {AdyenPaymentsService} = require('./utils/payments')
+        const {AdyenPaymentsService} = require('@salesforce/retail-react-app/app/components/applePayExpress/utils/payments')
         const mockSubmitPayment = jest.fn().mockRejectedValue(new Error('fail'))
         AdyenPaymentsService.mockImplementation(() => ({
             submitPayment: mockSubmitPayment
@@ -332,7 +354,13 @@ describe('getAppleButtonConfig', () => {
         
         const resolve = jest.fn()
         const reject = jest.fn()
-        const event = {payment: {shippingContact: {}, billingContact: {}, token: {paymentData: 'data'}}}
+        const event = {
+            payment: {
+                shippingContact: {},
+                billingContact: {},
+                token: {paymentData: 'data'}
+            }
+        }
         await config.onAuthorized(resolve, reject, event)
         expect(resolve).not.toHaveBeenCalled()
         expect(reject).toHaveBeenCalled()
@@ -377,8 +405,8 @@ describe('getAppleButtonConfig', () => {
 
     it('onShippingContactSelected resolves on successful address update', async () => {
         // Set up mocks before calling getAppleButtonConfig
-        const {AdyenShippingAddressService} = require('./utils/shipping-address')
-        const {AdyenShippingMethodsService} = require('./utils/shipping-methods')
+        const {AdyenShippingAddressService} = require('@salesforce/retail-react-app/app/components/applePayExpress/utils/shipping-address')
+        const {AdyenShippingMethodsService} = require('@salesforce/retail-react-app/app/components/applePayExpress/utils/shipping-methods')
         const mockUpdateShippingAddress = jest.fn().mockResolvedValue({success: true})
         const mockUpdateShippingMethod = jest.fn().mockResolvedValue({orderTotal: 110, currency: 'USD'})
         AdyenShippingAddressService.mockImplementation(() => ({
@@ -407,13 +435,15 @@ describe('getAppleButtonConfig', () => {
 
         const resolve = jest.fn()
         const reject = jest.fn()
-        const event = {shippingContact: {
-            locality: 'City',
-            countryCode: 'US',
-            addressLines: ['123 Main St'],
-            postalCode: '12345',
-            administrativeArea: 'CA'
-        }}
+        const event = {
+            shippingContact: {
+                locality: 'City',
+                countryCode: 'US',
+                addressLines: ['123 Main St'],
+                postalCode: '12345',
+                administrativeArea: 'CA'
+            }
+        }
         await config.onShippingContactSelected(resolve, reject, event)
         expect(resolve).toHaveBeenCalled()
         expect(reject).not.toHaveBeenCalled()
@@ -429,7 +459,7 @@ describe('getAppleButtonConfig', () => {
             mockNavigate,
             mockFetchShippingMethods
         )
-        const {AdyenShippingAddressService} = require('./utils/shipping-address')
+        const {AdyenShippingAddressService} = require('@salesforce/retail-react-app/app/components/applePayExpress/utils/shipping-address')
         const mockUpdateShippingAddress = jest.fn().mockRejectedValue(new Error('Address update failed'))
         AdyenShippingAddressService.mockImplementation(() => ({
             updateShippingAddress: mockUpdateShippingAddress
@@ -437,13 +467,15 @@ describe('getAppleButtonConfig', () => {
 
         const resolve = jest.fn()
         const reject = jest.fn()
-        const event = {shippingContact: {
-            locality: 'City',
-            countryCode: 'US',
-            addressLines: ['123 Main St'],
-            postalCode: '12345',
-            administrativeArea: 'CA'
-        }}
+        const event = {
+            shippingContact: {
+                locality: 'City',
+                countryCode: 'US',
+                addressLines: ['123 Main St'],
+                postalCode: '12345',
+                administrativeArea: 'CA'
+            }
+        }
         await config.onShippingContactSelected(resolve, reject, event)
         expect(resolve).not.toHaveBeenCalled()
         expect(reject).toHaveBeenCalled()
@@ -451,7 +483,7 @@ describe('getAppleButtonConfig', () => {
 
     it('onShippingMethodSelected resolves on successful method update', async () => {
         // Set up mocks before calling getAppleButtonConfig
-        const {AdyenShippingMethodsService} = require('./utils/shipping-methods')
+        const {AdyenShippingMethodsService} = require('@salesforce/retail-react-app/app/components/applePayExpress/utils/shipping-methods')
         const mockUpdateShippingMethod = jest.fn().mockResolvedValue({orderTotal: 110, currency: 'USD'})
         AdyenShippingMethodsService.mockImplementation(() => ({
             updateShippingMethod: mockUpdateShippingMethod
@@ -469,12 +501,14 @@ describe('getAppleButtonConfig', () => {
 
         const resolve = jest.fn()
         const reject = jest.fn()
-        const event = {shippingMethod: {
-            identifier: 'sm1',
-            label: 'Standard Shipping',
-            detail: '3-5 business days',
-            amount: '10.00'
-        }}
+        const event = {
+            shippingMethod: {
+                identifier: 'sm1',
+                label: 'Standard Shipping',
+                detail: '3-5 business days',
+                amount: '10.00'
+            }
+        }
         await config.onShippingMethodSelected(resolve, reject, event)
         expect(resolve).toHaveBeenCalled()
         expect(reject).not.toHaveBeenCalled()
@@ -490,7 +524,7 @@ describe('getAppleButtonConfig', () => {
             mockNavigate,
             mockFetchShippingMethods
         )
-        const {AdyenShippingMethodsService} = require('./utils/shipping-methods')
+        const {AdyenShippingMethodsService} = require('@salesforce/retail-react-app/app/components/applePayExpress/utils/shipping-methods')
         const mockUpdateShippingMethod = jest.fn().mockRejectedValue(new Error('Method update failed'))
         AdyenShippingMethodsService.mockImplementation(() => ({
             updateShippingMethod: mockUpdateShippingMethod
@@ -498,12 +532,14 @@ describe('getAppleButtonConfig', () => {
 
         const resolve = jest.fn()
         const reject = jest.fn()
-        const event = {shippingMethod: {
-            identifier: 'sm1',
-            label: 'Standard Shipping',
-            detail: '3-5 business days',
-            amount: '10.00'
-        }}
+        const event = {
+            shippingMethod: {
+                identifier: 'sm1',
+                label: 'Standard Shipping',
+                detail: '3-5 business days',
+                amount: '10.00'
+            }
+        }
         await config.onShippingMethodSelected(resolve, reject, event)
         expect(resolve).not.toHaveBeenCalled()
         expect(reject).toHaveBeenCalled()
@@ -513,8 +549,16 @@ describe('getAppleButtonConfig', () => {
 describe('ApplePayExpress error and edge cases', () => {
     const mockProps = {shippingMethods: []}
     const mockAdyenEnvironment = {ADYEN_ENVIRONMENT: 'test', ADYEN_CLIENT_KEY: 'test_key'}
-    const mockAdyenPaymentMethods = {paymentMethods: [{type: 'applepay', configuration: {merchantName: 'Test Merchant'}}], applicationInfo: {}}
-    const mockBasket = {basketId: 'test-basket', orderTotal: 100, currency: 'USD', customerInfo: {customerId: 'test-customer'}}
+    const mockAdyenPaymentMethods = {
+        paymentMethods: [{type: 'applepay', configuration: {merchantName: 'Test Merchant'}}],
+        applicationInfo: {}
+    }
+    const mockBasket = {
+        basketId: 'test-basket',
+        orderTotal: 100,
+        currency: 'USD',
+        customerInfo: {customerId: 'test-customer'}
+    }
     let originalPostMessage
     beforeEach(() => {
         jest.clearAllMocks()
@@ -536,7 +580,9 @@ describe('ApplePayExpress error and edge cases', () => {
         window.postMessage = originalPostMessage
     })
     it('handles AdyenCheckout throwing', async () => {
-        AdyenCheckout.mockImplementation(() => { throw new Error('fail') })
+        AdyenCheckout.mockImplementation(() => {
+            throw new Error('fail')
+        })
         render(<ApplePayExpress {...mockProps} />)
         await waitFor(() => {
             expect(window.postMessage).toHaveBeenCalledWith(
@@ -547,7 +593,9 @@ describe('ApplePayExpress error and edge cases', () => {
     })
     it('handles create throwing', async () => {
         AdyenCheckout.mockResolvedValue({
-            create: jest.fn().mockImplementation(() => { throw new Error('fail create') })
+            create: jest.fn().mockImplementation(() => {
+                throw new Error('fail create')
+            })
         })
         render(<ApplePayExpress {...mockProps} />)
         await waitFor(() => {
@@ -560,7 +608,9 @@ describe('ApplePayExpress error and edge cases', () => {
     it('handles isAvailable throwing', async () => {
         AdyenCheckout.mockResolvedValue({
             create: jest.fn().mockResolvedValue({
-                isAvailable: jest.fn().mockImplementation(() => { throw new Error('fail available') }),
+                isAvailable: jest.fn().mockImplementation(() => {
+                    throw new Error('fail available')
+                }),
                 mount: jest.fn()
             })
         })
@@ -591,7 +641,9 @@ describe('ApplePayExpress error and edge cases', () => {
         AdyenCheckout.mockResolvedValue({
             create: jest.fn().mockResolvedValue({
                 isAvailable: jest.fn().mockResolvedValue(true),
-                mount: jest.fn().mockImplementation(() => { throw new Error('fail mount') })
+                mount: jest.fn().mockImplementation(() => {
+                    throw new Error('fail mount')
+                })
             })
         })
         render(<ApplePayExpress {...mockProps} />)
