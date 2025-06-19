@@ -112,7 +112,7 @@ const renderWithVariant = (variant, props = {}) => {
 }
 
 describe('CartSecondaryButtonGroup Edit button conditional rendering', () => {
-    test('shows Edit button for variant product (has variationAttributes)', () => {
+    test('shows Edit button for a variation product (has variationAttributes)', () => {
         const variantProduct = {
             itemId: '123',
             variationAttributes: [{id: 'color', values: [{value: 'red'}]}]
@@ -121,21 +121,39 @@ describe('CartSecondaryButtonGroup Edit button conditional rendering', () => {
         expect(screen.getByRole('button', {name: /edit/i})).toBeInTheDocument()
     })
 
-    test('does NOT show Edit button for standard product (no variationAttributes)', () => {
+    test('shows Edit button for a bundle product (has bundledProductItems)', () => {
+        const bundleProduct = {
+            itemId: '456',
+            bundledProductItems: [{productId: 'bundle-item-1', quantity: 1}]
+        }
+        renderWithVariant(bundleProduct)
+        expect(screen.getByRole('button', {name: /edit/i})).toBeInTheDocument()
+    })
+
+    test('shows Edit button for a product with both variationAttributes and bundledProductItems', () => {
+        const bundleVariationProduct = {
+            itemId: '789',
+            variationAttributes: [{id: 'color', values: [{value: 'blue'}]}],
+            bundledProductItems: [{productId: 'bundle-item-2', quantity: 2}]
+        }
+        renderWithVariant(bundleVariationProduct)
+        expect(screen.getByRole('button', {name: /edit/i})).toBeInTheDocument()
+    })
+
+    test('does NOT show Edit button for a standard product (neither a variation nor a bundle)', () => {
         const standardProduct = {
-            itemId: '456'
-            // no variationAttributes
+            itemId: '101'
         }
         renderWithVariant(standardProduct)
         expect(screen.queryByRole('button', {name: /edit/i})).not.toBeInTheDocument()
     })
 
-    test('does NOT show Edit button for standard product (empty variationAttributes)', () => {
-        const standardProduct = {
-            itemId: '789',
-            variationAttributes: []
+    test('shows Edit button for an empty product bundle', () => {
+        const emptyBundleProduct = {
+            itemId: '103',
+            bundledProductItems: []
         }
-        renderWithVariant(standardProduct)
-        expect(screen.queryByRole('button', {name: /edit/i})).not.toBeInTheDocument()
+        renderWithVariant(emptyBundleProduct)
+        expect(screen.getByRole('button', {name: /edit/i})).toBeInTheDocument()
     })
 })

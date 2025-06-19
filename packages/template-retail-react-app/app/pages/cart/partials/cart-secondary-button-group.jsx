@@ -82,8 +82,7 @@ const CartSecondaryButtonGroup = ({
     const shouldShowEditButton = () => {
         const isVariationProduct =
             Array.isArray(variant.variationAttributes) && variant.variationAttributes.length > 0
-        const isBundleProduct =
-            Array.isArray(variant.bundledProductItems) && variant.bundledProductItems.length > 0
+        const isBundleProduct = Array.isArray(variant.bundledProductItems)
 
         return isVariationProduct || isBundleProduct
     }
