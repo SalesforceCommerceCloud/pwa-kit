@@ -13,7 +13,12 @@ const path = require('path')
 const pluginConfig = require('../assets/plugin-config')
 
 const removeComponentCandidates = [] // List of files that are candidates for removal, as a result of tree-shaking.
-const COMPONENT_SCAN_PATHS = ['/src/components/', '/src/pages/', '/src/hooks/']
+const SEPARATOR = path.sep // Use OS-specific path separator
+const COMPONENT_SCAN_PATHS = [
+    `${SEPARATOR}src${SEPARATOR}components${SEPARATOR}`,
+    `${SEPARATOR}src${SEPARATOR}pages${SEPARATOR}`,
+    `${SEPARATOR}src${SEPARATOR}hooks${SEPARATOR}`
+]
 
 /**
  * Tree-shake the directory to remove unused components and unused plugins.

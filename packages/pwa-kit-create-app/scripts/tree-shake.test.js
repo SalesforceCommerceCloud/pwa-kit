@@ -32,8 +32,8 @@ describe('tree-shake', () => {
         fs.statSync.mockReturnValue({isDirectory: () => false})
         fs.existsSync.mockImplementation((filePath) => {
             if (
-                filePath.includes('src/components/featureAComponent') ||
-                filePath.includes('src/components/featureBComponent')
+                filePath.includes('featureAComponent') ||
+                filePath.includes('featureBComponent')
             ) {
                 if (
                     filePath.endsWith('.jsx') ||
@@ -212,10 +212,10 @@ describe('tree-shake', () => {
         treeShake('/mock/dir', {SFDC_EXT_featureA: true, SFDC_EXT_featureB: false})
 
         expect(fs.unlinkSync).not.toHaveBeenCalledWith(
-            expect.stringContaining('src/components/featureAComponent')
+            expect.stringContaining('featureAComponent')
         )
         expect(fs.unlinkSync).toHaveBeenCalledWith(
-            expect.stringContaining('src/components/featureBComponent')
+            expect.stringContaining('featureBComponent')
         )
     })
 
@@ -267,7 +267,7 @@ describe('tree-shake', () => {
         treeShake('/mock/dir', {SFDC_EXT_featureA: true, SFDC_EXT_featureB: false})
 
         expect(fs.unlinkSync).toHaveBeenCalledWith(
-            expect.stringContaining('src/components/featureBComponent')
+            expect.stringContaining('featureBComponent')
         )
 
         expect(console.log).toHaveBeenCalledWith(
