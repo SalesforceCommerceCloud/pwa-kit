@@ -24,7 +24,8 @@ import {
     useShopperBasketsMutation,
     useCustomerId,
     useShopperBasketsMutationHelper,
-    useCommerceApi
+    useCommerceApi,
+    useShippingMethodsForShipment
 } from '@salesforce/commerce-sdk-react'
 
 // Hooks
@@ -74,14 +75,6 @@ const ProductDetail = () => {
     const customerId = useCustomerId()
     const {site} = useMultiSite()
     const storeInfoKey = `store_${site.id}`
-    const queryClient = useQueryClient()
-    const {shopperBaskets} = useCommerceApi()
-    const {
-        configurePickupShipment,
-        hasPickupItems: checkHasPickupItems,
-        addInventoryIdsToPickupItems,
-        getPickupShippingMethodId
-    } = usePickupShipment()
 
     // --- Add state for inventoryId ---
     const [selectedInventoryId, setSelectedInventoryId] = useState(() => {
@@ -110,7 +103,7 @@ const ProductDetail = () => {
     }, [storeInfoKey])
 
     /****************************** Basket *********************************/
-    const {isLoading: isBasketLoading} = useCurrentBasket()
+    const {data: basket, isLoading: isBasketLoading} = useCurrentBasket()
     const {addItemToNewOrExistingBasket} = useShopperBasketsMutationHelper()
     const updateItemsInBasketMutation = useShopperBasketsMutation('updateItemsInBasket')
     const {res} = useServerContext()
@@ -120,6 +113,27 @@ const ProductDetail = () => {
             `s-maxage=${MAX_CACHE_AGE}, stale-while-revalidate=${STALE_WHILE_REVALIDATE}`
         )
     }
+
+    /*************************** Pick up in Store ********************/
+    const {
+        configurePickupShipment,
+        hasPickupItems: checkHasPickupItems,
+        addInventoryIdsToPickupItems,
+        getPickupShippingMethodId
+    } = usePickupShipment()
+
+    // Hook for shipping methods - we'll use refetch when needed
+    const {data: shippingMethods, refetch: refetchShippingMethods} = useShippingMethodsForShipment(
+        {
+            parameters: {
+                basketId: basket?.basketId,
+                shipmentId: 'me'
+            }
+        },
+        {
+            enabled: false // Disable automatic fetching, we'll fetch manually when needed
+        }
+    )
 
     /*************************** Product Detail and Category ********************/
     const {productId} = useParams()
@@ -396,14 +410,8 @@ const ProductDetail = () => {
                 !basketResponse.shipments[0].shippingMethod
             ) {
                 // Fetch shipping methods and configure pickup shipment
-                const shippingMethods = await shopperBaskets.getShippingMethodsForShipment({
-                    parameters: {
-                        basketId: basketResponse.basketId,
-                        shipmentId: 'me'
-                    }
-                })
-
-                const pickupShippingMethodId = getPickupShippingMethodId(shippingMethods)
+                const {data: fetchedShippingMethods} = await refetchShippingMethods()
+                const pickupShippingMethodId = getPickupShippingMethodId(fetchedShippingMethods)
                 await configurePickupShipment(basketResponse.basketId, productItems, {
                     pickupShippingMethodId
                 })
@@ -529,14 +537,8 @@ const ProductDetail = () => {
                 !res.shipments[0].shippingMethod
             ) {
                 // Fetch shipping methods and configure pickup shipment
-                const shippingMethods = await shopperBaskets.getShippingMethodsForShipment({
-                    parameters: {
-                        basketId: res.basketId,
-                        shipmentId: 'me'
-                    }
-                })
-
-                const pickupShippingMethodId = getPickupShippingMethodId(shippingMethods)
+                const {data: fetchedShippingMethods} = await refetchShippingMethods()
+                const pickupShippingMethodId = getPickupShippingMethodId(fetchedShippingMethods)
                 await configurePickupShipment(res.basketId, productItems, {
                     pickupShippingMethodId
                 })
