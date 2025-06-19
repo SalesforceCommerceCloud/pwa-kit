@@ -9,6 +9,13 @@ import React from 'react'
 import StoreLocatorModal from './index'
 import {renderWithProviders} from '../../utils/test-utils'
 import {rest} from 'msw'
+jest.mock('@salesforce/pwa-kit-runtime/utils/ssr-config', () => {
+    const original = jest.requireActual('@salesforce/pwa-kit-runtime/utils/ssr-config')
+    return {
+        ...original,
+        getConfig: jest.fn(() => require('../../mock-config'))
+    }
+})
 
 const mockStoresData = [
     {
