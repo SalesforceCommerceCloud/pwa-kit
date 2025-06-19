@@ -311,7 +311,7 @@ const {handler} = runtime.createHandler(options, (app) => {
                     ],
                     'script-src': [
                         // Used by the service worker in /worker/main.js
-                        'storage.googleapis.com',
+                        'storage.googleapis.com'
                     ],
                     'connect-src': [
                         // Connect to Einstein APIs

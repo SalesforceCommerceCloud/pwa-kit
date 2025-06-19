@@ -45,7 +45,7 @@ function Express() {
                 basket={basket}
                 navigate={navigate}
             >
-                <ApplePayExpress/>
+                <ApplePayExpress />
             </AdyenExpressCheckoutProvider>
         </div>
     )

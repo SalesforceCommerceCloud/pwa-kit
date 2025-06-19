@@ -14,12 +14,12 @@ import {AdyenShippingMethodsService} from '@salesforce/retail-react-app/app/comp
 import {AdyenShippingAddressService} from '@salesforce/retail-react-app/app/components/applePayExpress/utils/shipping-address'
 import {AdyenPaymentsService} from '@salesforce/retail-react-app/app/components/applePayExpress/utils/payments'
 
-const PAYMENT_METHOD = 'applepay';
-const EXPRESS_PAYMENT_AVAILABLE = 'express.payment.available';
-const EXPRESS_PAYMENT_UNAVAILABLE = 'express.payment.unavailable';
-const EXPRESS_PAYMENT_SUCCESS = 'express.payment.success';
-const EXPRESS_PAYMENT_FAILURE = 'express.payment.failure';
-const EXPRESS_PAYMENT_CANCEL = 'express.payment.cancel';
+const PAYMENT_METHOD = 'applepay'
+const EXPRESS_PAYMENT_AVAILABLE = 'express.payment.available'
+const EXPRESS_PAYMENT_UNAVAILABLE = 'express.payment.unavailable'
+const EXPRESS_PAYMENT_SUCCESS = 'express.payment.success'
+const EXPRESS_PAYMENT_FAILURE = 'express.payment.failure'
+const EXPRESS_PAYMENT_CANCEL = 'express.payment.cancel'
 
 const sendExpressMessage = (type, payload = {}) => {
     window.parent.postMessage(
@@ -28,8 +28,8 @@ const sendExpressMessage = (type, payload = {}) => {
             payload
         },
         '*'
-    );
-};
+    )
+}
 
 export const getApplePaymentMethodConfig = (paymentMethodsResponse) => {
     const applePayPaymentMethod = paymentMethodsResponse?.paymentMethods?.find(
@@ -131,23 +131,23 @@ export const getAppleButtonConfig = (
                     }
                     resolve(finalPriceUpdate)
 
-                    var orderId = paymentsResponse?.merchantReference;
+                    var orderId = paymentsResponse?.merchantReference
 
                     sendExpressMessage(EXPRESS_PAYMENT_SUCCESS, {
                         orderId,
                         PAYMENT_METHOD
-                    });
+                    })
                 } else {
                     reject()
                     sendExpressMessage(EXPRESS_PAYMENT_FAILURE, {
                         PAYMENT_METHOD
-                    });
+                    })
                 }
             } catch (err) {
                 reject()
                 sendExpressMessage(EXPRESS_PAYMENT_FAILURE, {
                     PAYMENT_METHOD
-                });
+                })
             }
         },
         onSubmit: () => {},
@@ -228,15 +228,15 @@ export const getAppleButtonConfig = (
                 reject()
             }
         },
-        onError: (error, component) => {
+        onError: (error) => {
             if (error.name === 'CANCEL') {
                 sendExpressMessage(EXPRESS_PAYMENT_CANCEL, {
                     PAYMENT_METHOD
-                });
+                })
             } else {
                 sendExpressMessage(EXPRESS_PAYMENT_FAILURE, {
                     PAYMENT_METHOD
-                });
+                })
             }
         }
     }
@@ -258,21 +258,21 @@ export const ApplePayExpress = () => {
     const paymentContainer = useRef(null)
 
     useEffect(() => {
-        let isCanceled = false;
+        let isCanceled = false
 
         const createCheckout = async () => {
             if (isCanceled) {
-                return;
+                return
             }
 
             const handleApplePayUnavailable = () => {
                 sendExpressMessage(EXPRESS_PAYMENT_UNAVAILABLE, {
                     PAYMENT_METHOD
-                });
-            };
+                })
+            }
 
             try {
-                let checkout;
+                let checkout
                 try {
                     checkout = await AdyenCheckout({
                         environment: adyenEnvironment?.ADYEN_ENVIRONMENT,
@@ -283,10 +283,10 @@ export const ApplePayExpress = () => {
                                 applicationInfo: adyenPaymentMethods?.applicationInfo
                             }
                         }
-                    });
+                    })
                 } catch (ex) {
-                    handleApplePayUnavailable();
-                    return;
+                    handleApplePayUnavailable()
+                    return
                 }
 
                 const applePaymentMethodConfig = getApplePaymentMethodConfig(adyenPaymentMethods)
@@ -300,39 +300,41 @@ export const ApplePayExpress = () => {
                     fetchShippingMethods
                 )
 
-                let applePayButton;
+                let applePayButton
                 try {
-                    applePayButton = await checkout.create('applepay', appleButtonConfig);
+                    applePayButton = await checkout.create('applepay', appleButtonConfig)
                 } catch (ex) {
-                    handleApplePayUnavailable();
-                    return;
+                    handleApplePayUnavailable()
+                    return
                 }
 
-                let isApplePayButtonAvailable = false;
+                let isApplePayButtonAvailable = false
                 try {
-                    isApplePayButtonAvailable = await applePayButton.isAvailable();
+                    isApplePayButtonAvailable = await applePayButton.isAvailable()
                 } catch (ex) {
-                    isApplePayButtonAvailable = false;
+                    isApplePayButtonAvailable = false
                 }
 
                 if (!isApplePayButtonAvailable) {
-                    handleApplePayUnavailable();
-                    return;
+                    handleApplePayUnavailable()
+                    return
                 }
 
                 try {
-                    await applePayButton.mount(paymentContainer.current);
+                    await applePayButton.mount(paymentContainer.current)
                     sendExpressMessage(EXPRESS_PAYMENT_AVAILABLE, {
                         PAYMENT_METHOD
-                    });
+                    })
                 } catch (error) {
-                    handleApplePayUnavailable();
+                    handleApplePayUnavailable()
                 }
             } catch (err) {
-                console.error('Full error details:', err);
-                const isMissingOrderTotalError = err instanceof TypeError && err.message == "undefined is not an object (evaluating 'a.orderTotal')";
+                console.error('Full error details:', err)
+                const isMissingOrderTotalError =
+                    err instanceof TypeError &&
+                    err.message == "undefined is not an object (evaluating 'a.orderTotal')"
                 if (!isMissingOrderTotalError) {
-                    handleApplePayUnavailable();
+                    handleApplePayUnavailable()
                 }
             }
         }
@@ -340,8 +342,8 @@ export const ApplePayExpress = () => {
         createCheckout()
 
         return () => {
-            isCanceled = true;
-        };
+            isCanceled = true
+        }
     }, [adyenEnvironment, adyenPaymentMethods])
 
     return (
