@@ -10,15 +10,7 @@ import PropTypes from 'prop-types'
 import {FormattedMessage} from 'react-intl'
 
 // Project Components
-import {
-    AccordionItem,
-    AccordionButton,
-    AccordionPanel,
-    AccordionIcon,
-    Heading,
-    Stack,
-    Text
-} from '@chakra-ui/react'
+import {Accordion, Heading, Stack, Text} from '@chakra-ui/react'
 import Link from '../../../components/link'
 
 // Others
@@ -28,15 +20,15 @@ const CategoryLinks = ({category = {}, onSelect = noop}) => {
     const {categories = []} = category
 
     return (
-        <AccordionItem paddingBottom={6} borderTop="none" key="show-all">
-            <AccordionButton>
+        <Accordion.Item value="categories" paddingBottom={6} borderTop="none" key="show-all">
+            <Accordion.ItemTrigger>
                 <Heading as="h2" flex="1" textAlign="left" fontSize="md" fontWeight={600}>
                     <FormattedMessage defaultMessage="Categories" id="category_links.button_text" />
                 </Heading>
-                <AccordionIcon />
-            </AccordionButton>
-            <AccordionPanel>
-                <Stack spacing={1}>
+                <Accordion.ItemIndicator />
+            </Accordion.ItemTrigger>
+            <Accordion.ItemContent>
+                <Stack gap={1}>
                     {categories.map(({id, name}) => {
                         return (
                             <Link
@@ -53,8 +45,8 @@ const CategoryLinks = ({category = {}, onSelect = noop}) => {
                         )
                     })}
                 </Stack>
-            </AccordionPanel>
-        </AccordionItem>
+            </Accordion.ItemContent>
+        </Accordion.Item>
     )
 }
 

@@ -41,10 +41,9 @@ import {
 import Pagination from '../../components/pagination'
 import ProductTile, {Skeleton as ProductTileSkeleton} from '../../components/product-tile'
 import {HideOnDesktop} from '../../components/responsive'
-// TODO: Refinements components will be migrated in separate PR
-// import Refinements from '../../pages/product-list/partials/refinements'
+import Refinements from '../../pages/product-list/partials/refinements'
 import CategoryLinks from '../../pages/product-list/partials/category-links'
-// import SelectedRefinements from '../../pages/product-list/partials/selected-refinements'
+import SelectedRefinements from '../../pages/product-list/partials/selected-refinements'
 import EmptySearchResults from '../../pages/product-list/partials/empty-results'
 import PageHeader from '../../pages/product-list/partials/page-header'
 import AbovePageHeader from '../../pages/product-list/partials/above-page-header'
@@ -438,13 +437,12 @@ const ProductList = (props) => {
                         </Flex>
 
                         <Box flex={1} paddingTop={'45px'}>
-                            {/* TODO: SelectedRefinements component will be added in separate PR */}
-                            {/*<SelectedRefinements
+                            <SelectedRefinements
                                 filters={productSearchResult?.refinements}
                                 toggleFilter={toggleFilter}
                                 handleReset={resetFilters}
                                 selectedFilterValues={productSearchResult?.selectedRefinements}
-                            />*/}
+                            />
                         </Box>
                         <Box paddingTop={'45px'}>
                             <Sort
@@ -514,21 +512,19 @@ const ProductList = (props) => {
                             </Stack>
                         </Stack>
                         <Box marginBottom={4}>
-                            {/* TODO: SelectedRefinements component will be added in separate PR */}
-                            {/*<SelectedRefinements
+                            <SelectedRefinements
                                 filters={productSearchResult?.refinements}
                                 toggleFilter={toggleFilter}
                                 handleReset={resetFilters}
                                 selectedFilterValues={productSearchResult?.selectedRefinements}
-                            />*/}
+                            />
                         </Box>
                     </HideOnDesktop>
 
                     {/* Body  */}
                     <Grid templateColumns={{base: '1fr', md: '280px 1fr'}} columnGap={6}>
                         <Stack display={{base: 'none', md: 'flex'}}>
-                            {/* TODO:  Refinements component will be added in separate PR */}
-                            {/*<Refinements
+                            <Refinements
                                 itemsBefore={
                                     category?.categories
                                         ? [<CategoryLinks key="itemsBefore" category={category} />]
@@ -539,7 +535,7 @@ const ProductList = (props) => {
                                 filters={productSearchResult?.refinements}
                                 excludedFilters={['cgid']}
                                 selectedFilters={searchParams.refine}
-                            />*/}
+                            />
                         </Stack>
                         <Box>
                             <SimpleGrid
@@ -644,24 +640,23 @@ const ProductList = (props) => {
                             </Dialog.Header>
                             <Dialog.Body py={4}>
                                 {filtersLoading && <LoadingSpinner />}
-                                {/* TODO: Refinements component will be added in separate PR */}
-                                {/*<Refinements
+                                <Refinements
                                     toggleFilter={toggleFilter}
                                     filters={productSearchResult?.refinements}
                                     selectedFilters={searchParams.refine}
                                     itemsBefore={
                                         category?.categories
                                             ? [
-                                                <CategoryLinks
-                                                    key="itemsBefore"
-                                                    category={category}
-                                                    onSelect={onClose}
-                                                />
-                                            ]
+                                                  <CategoryLinks
+                                                      key="itemsBefore"
+                                                      category={category}
+                                                      onSelect={onClose}
+                                                  />
+                                              ]
                                             : undefined
                                     }
                                     excludedFilters={['cgid']}
-                                />*/}
+                                />
                             </Dialog.Body>
                         </Dialog.Content>
                     </Dialog.Positioner>
