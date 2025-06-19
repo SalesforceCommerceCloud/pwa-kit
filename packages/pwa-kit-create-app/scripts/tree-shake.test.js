@@ -31,10 +31,7 @@ describe('tree-shake', () => {
         ])
         fs.statSync.mockReturnValue({isDirectory: () => false})
         fs.existsSync.mockImplementation((filePath) => {
-            if (
-                filePath.includes('featureAComponent') ||
-                filePath.includes('featureBComponent')
-            ) {
+            if (filePath.includes('featureAComponent') || filePath.includes('featureBComponent')) {
                 if (
                     filePath.endsWith('.jsx') ||
                     filePath.endsWith('.tsx') ||
@@ -211,12 +208,8 @@ describe('tree-shake', () => {
 
         treeShake('/mock/dir', {SFDC_EXT_featureA: true, SFDC_EXT_featureB: false})
 
-        expect(fs.unlinkSync).not.toHaveBeenCalledWith(
-            expect.stringContaining('featureAComponent')
-        )
-        expect(fs.unlinkSync).toHaveBeenCalledWith(
-            expect.stringContaining('featureBComponent')
-        )
+        expect(fs.unlinkSync).not.toHaveBeenCalledWith(expect.stringContaining('featureAComponent'))
+        expect(fs.unlinkSync).toHaveBeenCalledWith(expect.stringContaining('featureBComponent'))
     })
 
     it('reports error when delete permission is denied', () => {
@@ -266,9 +259,7 @@ describe('tree-shake', () => {
 
         treeShake('/mock/dir', {SFDC_EXT_featureA: true, SFDC_EXT_featureB: false})
 
-        expect(fs.unlinkSync).toHaveBeenCalledWith(
-            expect.stringContaining('featureBComponent')
-        )
+        expect(fs.unlinkSync).toHaveBeenCalledWith(expect.stringContaining('featureBComponent'))
 
         expect(console.log).toHaveBeenCalledWith(
             expect.stringContaining(
