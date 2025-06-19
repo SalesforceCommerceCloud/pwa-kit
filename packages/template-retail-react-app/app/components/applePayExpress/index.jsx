@@ -35,6 +35,7 @@ export const getApplePaymentMethodConfig = (paymentMethodsResponse) => {
     const applePayPaymentMethod = paymentMethodsResponse?.paymentMethods?.find(
         (pm) => pm.type === PAYMENT_METHOD
     )
+
     return applePayPaymentMethod?.configuration || null
 }
 
