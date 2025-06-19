@@ -6,7 +6,6 @@
  */
 import {once, RemoteServerFactory} from './build-remote-server'
 import {X_ENCODED_HEADERS} from './constants'
-import awsServerlessExpress from 'aws-serverless-express'
 
 jest.mock('aws-serverless-express', () => {
     return {

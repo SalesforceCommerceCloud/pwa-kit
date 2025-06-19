@@ -28,8 +28,7 @@ import {
     CUSTOM_HOME_TITLE,
     HOME_SHOP_PRODUCTS_CATEGORY_ID,
     HOME_SHOP_PRODUCTS_LIMIT,
-    MAX_CACHE_AGE,
-    STALE_WHILE_REVALIDATE
+    MAX_CACHE_AGE
 } from '../../constants'
 
 import {useServerContext} from '@salesforce/pwa-kit-react-sdk/ssr/universal/hooks'
@@ -52,10 +51,7 @@ const Home = () => {
     // and these objects are undefined on the client side.
     const {res} = useServerContext()
     if (res) {
-        res.set(
-            'Cache-Control',
-            `s-maxage=${MAX_CACHE_AGE}, stale-while-revalidate={STALE_WHILE_REVALIDATE}`
-        )
+        res.set('Cache-Control', `s-maxage=${MAX_CACHE_AGE}`)
     }
 
     const {data: productSearchResult, isLoading} = useProductSearch({
