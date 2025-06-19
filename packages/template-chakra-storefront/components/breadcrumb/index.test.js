@@ -22,6 +22,13 @@ const mockCategories = [
         name: 'Category 3'
     }
 ]
+jest.mock('@salesforce/pwa-kit-runtime/utils/ssr-config', () => {
+    const original = jest.requireActual('@salesforce/pwa-kit-runtime/utils/ssr-config')
+    return {
+        ...original,
+        getConfig: jest.fn(() => require('../../mock-config'))
+    }
+})
 
 test('Renders Breadcrum', () => {
     const {getAllByTestId} = renderWithProviders(<Breadcrumb categories={mockCategories} />)
