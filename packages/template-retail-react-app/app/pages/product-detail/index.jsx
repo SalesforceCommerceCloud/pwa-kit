@@ -42,6 +42,7 @@ import usePickupShipment from '@salesforce/retail-react-app/app/hooks/use-pickup
 import RecommendedProducts from '@salesforce/retail-react-app/app/components/recommended-products'
 import ProductView from '@salesforce/retail-react-app/app/components/product-view'
 import InformationAccordion from '@salesforce/retail-react-app/app/pages/product-detail/partials/information-accordion'
+import StoreLocatorModal from '@salesforce/retail-react-app/app/components/store-locator-modal'
 
 import {HTTPNotFound, HTTPError} from '@salesforce/pwa-kit-react-sdk/ssr/universal/errors'
 import logger from '@salesforce/retail-react-app/app/utils/logger-instance'
@@ -61,7 +62,7 @@ import {useHistory, useLocation, useParams} from 'react-router-dom'
 import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
 import {useWishList} from '@salesforce/retail-react-app/app/hooks/use-wish-list'
 import {useAddToCartModalContext} from '@salesforce/retail-react-app/app/hooks/use-add-to-cart-modal'
-import {useQueryClient} from '@tanstack/react-query'
+import {useDisclosure} from '@salesforce/retail-react-app/app/components/shared/ui'
 
 const ProductDetail = () => {
     const {formatMessage} = useIntl()
@@ -75,6 +76,11 @@ const ProductDetail = () => {
     const customerId = useCustomerId()
     const {site} = useMultiSite()
     const storeInfoKey = `store_${site.id}`
+    const {
+        isOpen: isStoreLocatorOpen,
+        onOpen: onOpenStoreLocator,
+        onClose: onCloseStoreLocator
+    } = useDisclosure()
 
     // --- Add state for inventoryId ---
     const [selectedInventoryId, setSelectedInventoryId] = useState(() => {
@@ -627,6 +633,7 @@ const ProductDetail = () => {
                             setPickupInStore={(checked) =>
                                 product && handlePickupInStoreChange(product.id, checked)
                             }
+                            onOpenStoreLocator={onOpenStoreLocator}
                         />
 
                         <hr />
@@ -696,6 +703,7 @@ const ProductDetail = () => {
                                                 childProduct &&
                                                 handlePickupInStoreChange(childProduct.id, checked)
                                             }
+                                            onOpenStoreLocator={onOpenStoreLocator}
                                         />
                                         <InformationAccordion product={childProduct} />
 
@@ -726,6 +734,7 @@ const ProductDetail = () => {
                             setPickupInStore={(checked) =>
                                 product && handlePickupInStoreChange(product.id, checked)
                             }
+                            onOpenStoreLocator={onOpenStoreLocator}
                         />
                         <InformationAccordion product={product} />
                     </Fragment>
@@ -775,6 +784,7 @@ const ProductDetail = () => {
                     />
                 </Stack>
             </Stack>
+            <StoreLocatorModal isOpen={isStoreLocatorOpen} onClose={onCloseStoreLocator} />
         </Box>
     )
 }
