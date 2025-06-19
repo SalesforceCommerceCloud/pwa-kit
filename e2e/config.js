@@ -12,7 +12,7 @@ module.exports = {
   GENERATED_PROJECTS_DIR: "../generated-projects",
   GENERATE_PROJECTS: ["retail-app-demo", "retail-app-ext", "retail-app-no-ext"],
   GENERATOR_CMD:
-    "node packages/pwa-kit-create-app/scripts/create-mobify-app-dev.js --outputDir",
+    "node ../packages/pwa-kit-create-app/scripts/create-mobify-app-dev.js --outputDir",
   CLI_RESPONSES: {
     "retail-app-demo": [
       {
