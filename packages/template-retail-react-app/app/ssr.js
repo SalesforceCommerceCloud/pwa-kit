@@ -311,7 +311,7 @@ const {handler} = runtime.createHandler(options, (app) => {
                     ],
                     'script-src': [
                         // Used by the service worker in /worker/main.js
-                        'storage.googleapis.com',
+                        'storage.googleapis.com'
                     ],
                     'connect-src': [
                         // Connect to Einstein APIs
@@ -323,12 +323,8 @@ const {handler} = runtime.createHandler(options, (app) => {
                         // Connect to SCRT2 URLs
                         '*.salesforce-scrt.com'
                     ],
-                    'frame-src': [
-                        'checkoutshopper-test.adyen.com'
-                    ],
-                    'frame-ancestors': [
-                        "'self'"
-                    ]
+                    'frame-src': ['checkoutshopper-test.adyen.com'],
+                    'frame-ancestors': ["'self'"]
                 }
             },
             referrerPolicy: {

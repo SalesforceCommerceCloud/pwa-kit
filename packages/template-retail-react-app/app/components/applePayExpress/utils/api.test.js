@@ -1,4 +1,10 @@
-import {ApiClient} from './api'
+/*
+ * Copyright (c) 2025, Salesforce, Inc.
+ * All rights reserved.
+ * SPDX-License-Identifier: BSD-3-Clause
+ * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
+ */
+import {ApiClient} from '@salesforce/retail-react-app/app/components/applePayExpress/utils/api'
 
 // Mock fetch properly
 const mockFetch = jest.fn()
@@ -79,13 +85,13 @@ describe('ApiClient', () => {
             const request = mockFetch.mock.calls[0][0]
             expect(request.url).toBe(`${mockUrl}?siteId=${mockSite.id}`)
             expect(request.method).toBe('POST')
-            if (typeof request.text === 'function') {
-                const requestBody = await request.text()
-                expect(requestBody).toBe(body)
-            }
             expect(request.headers.get('Content-Type')).toBe('application/json')
             expect(request.headers.get('authorization')).toBe(`Bearer ${mockToken}`)
             expect(request.headers.get('custom')).toBe('header')
+
+            // Check body separately to avoid conditional expect
+            const requestBody = await request.text()
+            expect(requestBody).toBe(body)
         })
 
         it('should handle request without optional parameters', async () => {
@@ -144,4 +150,4 @@ describe('ApiClient', () => {
             expect(spy).toHaveBeenCalledWith('post', {param: 'value'})
         })
     })
-}) 
+})

@@ -1,8 +1,14 @@
-import {AdyenPaymentsService} from './payments'
-import {ApiClient} from './api'
+/*
+ * Copyright (c) 2025, Salesforce, Inc.
+ * All rights reserved.
+ * SPDX-License-Identifier: BSD-3-Clause
+ * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
+ */
+import {AdyenPaymentsService} from '@salesforce/retail-react-app/app/components/applePayExpress/utils/payments'
+import {ApiClient} from '@salesforce/retail-react-app/app/components/applePayExpress/utils/api'
 
 // Mock the ApiClient
-jest.mock('./api')
+jest.mock('@salesforce/retail-react-app/app/components/applePayExpress/utils/api')
 
 describe('AdyenPaymentsService', () => {
     let paymentsService
@@ -45,7 +51,11 @@ describe('AdyenPaymentsService', () => {
             }
             mockApiClient.post.mockResolvedValue(mockResponse)
 
-            const result = await paymentsService.submitPayment(mockAdyenStateData, mockBasketId, mockCustomerId)
+            const result = await paymentsService.submitPayment(
+                mockAdyenStateData,
+                mockBasketId,
+                mockCustomerId
+            )
 
             expect(mockApiClient.post).toHaveBeenCalledWith({
                 body: JSON.stringify({
@@ -108,4 +118,4 @@ describe('AdyenPaymentsService', () => {
             ).rejects.toThrow(`Request failed with status 404: ${errorMessage}`)
         })
     })
-}) 
+})

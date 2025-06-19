@@ -1,19 +1,18 @@
 /*
- * Copyright (c) 2024, salesforce.com, inc.
+ * Copyright (c) 2025, Salesforce, Inc.
  * All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
 import React, {useEffect} from 'react'
-import useScript from '@salesforce/retail-react-app/app/hooks/use-script'
-import {useUsid} from '@salesforce/commerce-sdk-react'
 import PropTypes from 'prop-types'
-import {useTheme} from '@salesforce/retail-react-app/app/components/shared/ui'
+import {useTheme} from '@chakra-ui/react'
+import useScript from '@salesforce/retail-react-app/app/hooks/use-script'
+import {useUsid, onClient} from '@salesforce/commerce-sdk-react'
 
-const onClient = typeof window !== 'undefined'
+/* global embeddedservice_bootstrap */
 
-// Function to initialize embedded messaging
 const initEmbeddedMessaging = (
     salesforceOrgId,
     embeddedServiceDeploymentName,
@@ -29,7 +28,7 @@ const initEmbeddedMessaging = (
         ) {
             window.embeddedservice_bootstrap.settings.language = locale
             window.embeddedservice_bootstrap.settings.disableStreamingResponses = true
-            embeddedservice_bootstrap.settings.iframeAllow = 'payment *';
+            embeddedservice_bootstrap.settings.iframeAllow = 'payment *'
             window.embeddedservice_bootstrap.init(
                 salesforceOrgId,
                 embeddedServiceDeploymentName,

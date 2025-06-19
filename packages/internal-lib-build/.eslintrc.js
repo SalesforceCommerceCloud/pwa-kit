@@ -6,5 +6,31 @@
  */
 
 module.exports = {
-    extends: [require.resolve('@salesforce/pwa-kit-dev/configs/eslint/no-react')]
+    extends: ['eslint:recommended'],
+    env: {
+        node: true,
+        es6: true
+    },
+    parserOptions: {
+        ecmaVersion: 2020,
+        sourceType: 'module'
+    },
+    overrides: [
+        {
+            files: ['**/*.js'],
+            parserOptions: {
+                sourceType: 'script'
+            }
+        },
+        {
+            files: ['configs/jest/setup-jest.js'],
+            parserOptions: {
+                sourceType: 'module'
+            }
+        }
+    ],
+    rules: {
+        // Disable TypeScript-specific rules since this package doesn't use TypeScript ESLint
+        '@typescript-eslint/no-var-requires': 'off'
+    }
 }

@@ -1,8 +1,14 @@
-import {AdyenShippingAddressService} from './shipping-address'
-import {ApiClient} from './api'
+/*
+ * Copyright (c) 2025, Salesforce, Inc.
+ * All rights reserved.
+ * SPDX-License-Identifier: BSD-3-Clause
+ * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
+ */
+import {AdyenShippingAddressService} from '@salesforce/retail-react-app/app/components/applePayExpress/utils/shipping-address'
+import {ApiClient} from '@salesforce/retail-react-app/app/components/applePayExpress/utils/api'
 
 // Mock the ApiClient
-jest.mock('./api')
+jest.mock('@salesforce/retail-react-app/app/components/applePayExpress/utils/api')
 
 describe('AdyenShippingAddressService', () => {
     let shippingAddressService
@@ -28,7 +34,11 @@ describe('AdyenShippingAddressService', () => {
         })
 
         it('should create ApiClient with correct parameters', () => {
-            expect(ApiClient).toHaveBeenCalledWith('/api/adyen/shipping-address', mockToken, mockSite)
+            expect(ApiClient).toHaveBeenCalledWith(
+                '/api/adyen/shipping-address',
+                mockToken,
+                mockSite
+            )
         })
     })
 
@@ -50,7 +60,10 @@ describe('AdyenShippingAddressService', () => {
             }
             mockApiClient.post.mockResolvedValue(mockResponse)
 
-            const result = await shippingAddressService.updateShippingAddress(mockBasketId, mockAddressData)
+            const result = await shippingAddressService.updateShippingAddress(
+                mockBasketId,
+                mockAddressData
+            )
 
             expect(mockApiClient.post).toHaveBeenCalledWith({
                 body: JSON.stringify({
@@ -131,4 +144,4 @@ describe('AdyenShippingAddressService', () => {
             expect(result).toEqual(mockResponseData)
         })
     })
-}) 
+})
