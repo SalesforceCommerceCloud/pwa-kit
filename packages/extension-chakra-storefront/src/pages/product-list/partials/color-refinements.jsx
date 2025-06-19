@@ -46,6 +46,8 @@ const ColorRefinements = ({filter, toggleFilter, selectedFilters}) => {
                                 variant="outline"
                                 role="checkbox"
                                 tabIndex={0}
+                                marginRight={0}
+                                marginBottom={0}
                                 onClick={(e) => {
                                     e.preventDefault()
                                     toggleFilter(value, filter.attributeId, isSelected)

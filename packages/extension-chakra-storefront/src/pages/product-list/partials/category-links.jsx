@@ -20,7 +20,13 @@ const CategoryLinks = ({category = {}, onSelect = noop}) => {
     const {categories = []} = category
 
     return (
-        <Accordion.Item value="categories" paddingBottom={6} borderTop="none" key="show-all">
+        <Accordion.Item
+            value="categories"
+            paddingBottom={6}
+            borderTop="none"
+            borderBottom="none"
+            key="show-all"
+        >
             <Accordion.ItemTrigger>
                 <Heading as="h2" flex="1" textAlign="left" fontSize="md" fontWeight={600}>
                     <FormattedMessage defaultMessage="Categories" id="category_links.button_text" />
@@ -28,7 +34,7 @@ const CategoryLinks = ({category = {}, onSelect = noop}) => {
                 <Accordion.ItemIndicator />
             </Accordion.ItemTrigger>
             <Accordion.ItemContent>
-                <Stack gap={1}>
+                <Stack gap={1} paddingLeft={4}>
                     {categories.map(({id, name}) => {
                         return (
                             <Link
