@@ -773,7 +773,7 @@ const ProductView = forwardRef(
                                     }
                                 >
                                     {/* Show label if pickup is disabled due to no store/inventoryId */}
-                                    {!pickupEnabled && (
+                                    {!pickupEnabled && !storeName && !inventoryId && (
                                         <Text
                                             color="black"
                                             fontWeight={600}
