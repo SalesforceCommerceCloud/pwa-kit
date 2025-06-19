@@ -127,13 +127,6 @@ jest.mock('@salesforce/pwa-kit-runtime/utils/ssr-config', () => {
         getConfig: () => mockAppConfig
     }
 })
-jest.mock('./src/utils/get-config', () => {
-    const origin = jest.requireActual('./src/utils/get-config')
-    return {
-        ...origin,
-        getConfig: jest.fn().mockReturnValue(mockConfig)
-    }
-})
 
 jest.mock('@salesforce/cc-datacloud-typescript', () => ({
     initDataCloudSdk: jest.fn()
