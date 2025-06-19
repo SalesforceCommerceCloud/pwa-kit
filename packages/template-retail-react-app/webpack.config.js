@@ -4,11 +4,11 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-var config = require('@salesforce/pwa-kit-dev/configs/webpack/config')
-var configNames = require('@salesforce/pwa-kit-dev/configs/webpack/config-names')
-const {isRemote} = require('@salesforce/pwa-kit-runtime/utils/ssr-server')
+import config from '@salesforce/pwa-kit-dev/configs/webpack/config'
+import configNames from '@salesforce/pwa-kit-dev/configs/webpack/config-names'
+import {isRemote} from '@salesforce/pwa-kit-runtime/utils/ssr-server'
 
-module.exports = config.map((configItem) => {
+export default config.map((configItem) => {
     if (configItem.name === configNames.CLIENT || configItem.name === configNames.SERVER) {
         return {
             ...configItem,

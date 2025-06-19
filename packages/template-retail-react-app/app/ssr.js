@@ -323,12 +323,8 @@ const {handler} = runtime.createHandler(options, (app) => {
                         // Connect to SCRT2 URLs
                         '*.salesforce-scrt.com'
                     ],
-                    'frame-src': [
-                        'checkoutshopper-test.adyen.com'
-                    ],
-                    'frame-ancestors': [
-                        "'self'"
-                    ]
+                    'frame-src': ['checkoutshopper-test.adyen.com'],
+                    'frame-ancestors': ["'self'"]
                 }
             },
             referrerPolicy: {

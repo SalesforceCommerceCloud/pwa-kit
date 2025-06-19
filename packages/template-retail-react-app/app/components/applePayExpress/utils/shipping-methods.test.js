@@ -77,9 +77,7 @@ describe('AdyenShippingMethodsService', () => {
             }
             mockApiClient.get.mockResolvedValue(mockResponse)
 
-            await expect(
-                shippingMethodsService.getShippingMethods(mockBasketId)
-            ).rejects.toThrow(
+            await expect(shippingMethodsService.getShippingMethods(mockBasketId)).rejects.toThrow(
                 `Request failed with status 400: ${errorMessage}`
             )
 
@@ -98,9 +96,7 @@ describe('AdyenShippingMethodsService', () => {
             }
             mockApiClient.get.mockResolvedValue(mockResponse)
 
-            await expect(
-                shippingMethodsService.getShippingMethods(mockBasketId)
-            ).rejects.toThrow(
+            await expect(shippingMethodsService.getShippingMethods(mockBasketId)).rejects.toThrow(
                 `Request failed with status 500: ${errorMessage}`
             )
         })
@@ -113,9 +109,7 @@ describe('AdyenShippingMethodsService', () => {
             }
             mockApiClient.get.mockResolvedValue(mockResponse)
 
-            await expect(
-                shippingMethodsService.getShippingMethods(mockBasketId)
-            ).rejects.toThrow(
+            await expect(shippingMethodsService.getShippingMethods(mockBasketId)).rejects.toThrow(
                 `Request failed with status 404: ${errorMessage}`
             )
         })
@@ -159,9 +153,7 @@ describe('AdyenShippingMethodsService', () => {
 
             await expect(
                 shippingMethodsService.updateShippingMethod(mockShippingMethodId, mockBasketId)
-            ).rejects.toThrow(
-                `Request failed with status 400: ${errorMessage}`
-            )
+            ).rejects.toThrow(`Request failed with status 400: ${errorMessage}`)
 
             expect(mockApiClient.post).toHaveBeenCalledWith({
                 body: JSON.stringify({
@@ -183,9 +175,7 @@ describe('AdyenShippingMethodsService', () => {
 
             await expect(
                 shippingMethodsService.updateShippingMethod(mockShippingMethodId, mockBasketId)
-            ).rejects.toThrow(
-                `Request failed with status 500: ${errorMessage}`
-            )
+            ).rejects.toThrow(`Request failed with status 500: ${errorMessage}`)
         })
 
         it('should handle 404 error response', async () => {
@@ -198,9 +188,7 @@ describe('AdyenShippingMethodsService', () => {
 
             await expect(
                 shippingMethodsService.updateShippingMethod(mockShippingMethodId, mockBasketId)
-            ).rejects.toThrow(
-                `Request failed with status 404: ${errorMessage}`
-            )
+            ).rejects.toThrow(`Request failed with status 404: ${errorMessage}`)
         })
     })
-}) 
+})

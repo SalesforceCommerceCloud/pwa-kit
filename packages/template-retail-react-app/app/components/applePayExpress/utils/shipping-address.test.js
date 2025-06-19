@@ -144,4 +144,4 @@ describe('AdyenShippingAddressService', () => {
             expect(result).toEqual(mockResponseData)
         })
     })
-}) 
+})

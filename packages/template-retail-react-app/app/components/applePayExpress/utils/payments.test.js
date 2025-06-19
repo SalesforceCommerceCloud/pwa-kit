@@ -118,4 +118,4 @@ describe('AdyenPaymentsService', () => {
             ).rejects.toThrow(`Request failed with status 404: ${errorMessage}`)
         })
     })
-}) 
+})

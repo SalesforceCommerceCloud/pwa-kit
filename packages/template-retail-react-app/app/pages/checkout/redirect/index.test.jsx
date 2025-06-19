@@ -82,4 +82,4 @@ describe('AdyenCheckoutRedirectContainer', () => {
             expect.anything()
         )
     })
-}) 
+})

@@ -78,4 +78,4 @@ describe('currencyList', () => {
         expect(bhd).toBeDefined()
         expect(bhd.Decimals).toBe('3')
     })
-}) 
+})
