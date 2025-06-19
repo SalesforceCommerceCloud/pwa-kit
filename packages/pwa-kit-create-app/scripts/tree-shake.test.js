@@ -155,11 +155,11 @@ describe('tree-shake', () => {
             export const FeatureB = 'FeatureB'
         `
         fs.readFileSync.mockImplementation((filePath) => {
-            if (filePath.includes('src/components/featureComponent.jsx')) {
+            if (filePath.includes('featureComponent.jsx')) {
                 return code
-            } else if (filePath.includes('src/components/featureAComponent/index.jsx')) {
+            } else if (filePath.includes('featureAComponent')) {
                 return featureAComponentCode
-            } else if (filePath.includes('src/components/featureBComponent/index.jsx')) {
+            } else if (filePath.includes('featureBComponent')) {
                 return featureBComponentCode
             } else {
                 console.error('Unhandled file', filePath)
@@ -193,16 +193,16 @@ describe('tree-shake', () => {
 
         let treeShakeCalled = false
         fs.readFileSync.mockImplementation((filePath) => {
-            if (filePath.includes('src/components/featureComponent.jsx')) {
+            if (filePath.includes('featureComponent.jsx')) {
                 if (!treeShakeCalled) {
                     treeShakeCalled = true
                     return code
                 } else {
                     return shookCode
                 }
-            } else if (filePath.includes('src/components/featureAComponent/index.jsx')) {
+            } else if (filePath.includes('featureAComponent')) {
                 return componentACode
-            } else if (filePath.includes('src/components/featureBComponent/index.jsx')) {
+            } else if (filePath.includes('featureBComponent')) {
                 return componentBCode
             } else {
                 console.error('Unhandled file', filePath)
@@ -248,16 +248,16 @@ describe('tree-shake', () => {
 
         let treeShakeCalled = false
         fs.readFileSync.mockImplementation((filePath) => {
-            if (filePath.includes('src/components/featureComponent.jsx')) {
+            if (filePath.includes('featureComponent.jsx')) {
                 if (!treeShakeCalled) {
                     treeShakeCalled = true
                     return code
                 } else {
                     return shookCode
                 }
-            } else if (filePath.includes('src/components/featureAComponent/index.jsx')) {
+            } else if (filePath.includes('featureAComponent')) {
                 return componentACode
-            } else if (filePath.includes('src/components/featureBComponent/index.jsx')) {
+            } else if (filePath.includes('featureBComponent')) {
                 return componentBCode
             } else {
                 console.error('Unhandled file', filePath)
