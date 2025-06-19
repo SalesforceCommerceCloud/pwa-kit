@@ -23,8 +23,6 @@ const renderQueryHook = (name: string, arg: any, {data, isLoading, error}: any, 
         return <h1 style={{color: 'red'}}>Something is wrong</h1>
     }
 
-    const pages = name === 'usePage' ? [data] : data.data
-
     return (
         <div key={`${name}_${index}`}>
             <h2 id={name}>{name}</h2>

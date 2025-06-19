@@ -13,26 +13,28 @@ module.exports = {
         // This property is set to a serialized JSON string that contains the configuration for the commerce agent.
         // The JSON string is set to the value of the COMMERCE_AGENT_SETTINGS environment variable.
         // If the COMMERCE_AGENT_SETTINGS environment variable is not set, the feature is disabled.
-        commerceAgent: process.env.COMMERCE_AGENT_SETTINGS || JSON.stringify({
-            // Enables or disables the commerce agent chat functionality. Defaults to: 'false'
-            enabled: 'false',
-            // Determines whether to prompt for agent assistance during search. Defaults to: 'false'
-            askAgentOnSearch: 'false',
-            // The name of the embedded service deployment for the chat widget
-            embeddedServiceName: '',
-            // The endpoint URL for the embedded service deployment
-            embeddedServiceEndpoint: '',
-            // The URL for the embedded messaging script that powers the chat widget
-            scriptSourceUrl: '',
-            // The URL for the SCRT2 script required by the embedded messaging service
-            scrt2Url: '',
-            // Your Salesforce organization ID where the embedded messaging is configured
-            salesforceOrgId: '',
-            // Your Commerce Cloud organization ID
-            commerceOrgId: '',
-            // The site ID where the commerce agent will be active
-            siteId: ''
-        }),
+        commerceAgent:
+            process.env.COMMERCE_AGENT_SETTINGS ||
+            JSON.stringify({
+                // Enables or disables the commerce agent chat functionality. Defaults to: 'false'
+                enabled: 'false',
+                // Determines whether to prompt for agent assistance during search. Defaults to: 'false'
+                askAgentOnSearch: 'false',
+                // The name of the embedded service deployment for the chat widget
+                embeddedServiceName: '',
+                // The endpoint URL for the embedded service deployment
+                embeddedServiceEndpoint: '',
+                // The URL for the embedded messaging script that powers the chat widget
+                scriptSourceUrl: '',
+                // The URL for the SCRT2 script required by the embedded messaging service
+                scrt2Url: '',
+                // Your Salesforce organization ID where the embedded messaging is configured
+                salesforceOrgId: '',
+                // Your Commerce Cloud organization ID
+                commerceOrgId: '',
+                // The site ID where the commerce agent will be active
+                siteId: ''
+            }),
         // Customize how your 'site' and 'locale' are displayed in the url.
         url: {
             {{#if answers.project.demo.enableDemoSettings}}
