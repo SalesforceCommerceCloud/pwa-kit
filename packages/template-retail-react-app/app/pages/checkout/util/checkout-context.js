@@ -27,7 +27,7 @@ export const CheckoutProvider = ({children}) => {
     ]
     const STEPS = CHECKOUT_STEPS_LIST.reduce((acc, step, idx) => ({...acc, [step]: idx}), {})
 
-    const getCheckoutStepName = (step) => CHECKOUT_STEPS_LIST[step]
+    const getCheckoutStepName = (step) => CHECKOUT_STEPS_LIST[step] 
 
     useEffect(() => {
         if (!customer || !basket) {
