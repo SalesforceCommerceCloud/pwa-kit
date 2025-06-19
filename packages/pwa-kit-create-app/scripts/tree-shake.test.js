@@ -50,6 +50,7 @@ describe('tree-shake', () => {
             }
         })
         fs.unlinkSync.mockReturnValue(true)
+        fs.readFileSync.mockImplementation((filePath, encoding) => 'export default {}')
     })
 
     it('handles OR operator correctly', () => {
