@@ -6,5 +6,12 @@
  */
 
 module.exports = {
-    extends: [require.resolve('@salesforce/pwa-kit-dev/configs/eslint/no-react')]
+    extends: ['eslint:recommended'],
+    env: {
+        node: true,
+        es6: true
+    },
+    parserOptions: {
+        ecmaVersion: 2020
+    }
 }
