@@ -10,7 +10,13 @@ import {Button} from '@chakra-ui/react'
 import {renderWithProviders} from '../utils/test-utils'
 import {screen, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-
+jest.mock('@salesforce/pwa-kit-runtime/utils/ssr-config', () => {
+    const original = jest.requireActual('@salesforce/pwa-kit-runtime/utils/ssr-config')
+    return {
+        ...original,
+        getConfig: jest.fn(() => require('../mock-config'))
+    }
+})
 jest.setTimeout(60000)
 const MockedComponent = (props) => {
     const showToast = useToast()
