@@ -412,8 +412,7 @@ const ProductDetail = () => {
             if (
                 hasPickupItems &&
                 basketResponse?.basketId &&
-                basketResponse.shipments.length > 0 &&
-                !basketResponse.shipments[0].shippingMethod
+                basketResponse.shipments.length > 0
             ) {
                 // Fetch shipping methods and configure pickup shipment
                 const {data: fetchedShippingMethods} = await refetchShippingMethods()
