@@ -601,7 +601,9 @@ test('Can add address during checkout as a registered customer', async () => {
     await user.click(screen.getByText(/add new address/i))
 
     // Shipping Address Form must be present
-    expect(screen.getByLabelText('Shipping Address Form')).toBeInTheDocument()
+    await waitFor(() => {
+        expect(screen.getByLabelText('Shipping Address Form')).toBeInTheDocument()
+    })
 
     const firstName = await screen.findByLabelText(/first name/i)
     await user.type(firstName, 'Test2')

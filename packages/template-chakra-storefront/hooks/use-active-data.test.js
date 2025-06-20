@@ -15,7 +15,13 @@ import useActiveData from './use-active-data'
 import {mockCategory, mockProduct, mockSearchResults} from './einstein-mock-data'
 import mockConfig from '../mock-config'
 const DEFAULT_SEARCH_PARAMS = mockConfig.search.defaultSearchParams
-jest.mock('../mock-config')
+jest.mock('@salesforce/pwa-kit-runtime/utils/ssr-config', () => {
+    const original = jest.requireActual('@salesforce/pwa-kit-runtime/utils/ssr-config')
+    return {
+        ...original,
+        getConfig: jest.fn(() => require('../mock-config'))
+    }
+})
 
 const MockComponent = ({action, args}) => {
     const [loading, setLoading] = useState(true)

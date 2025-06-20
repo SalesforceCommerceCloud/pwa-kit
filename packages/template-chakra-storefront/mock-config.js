@@ -73,7 +73,7 @@ module.exports = {
         Cart: {
             path: '/cart'
         },
-        Checkout: {
+        checkout: {
             path: '/checkout',
             shippingCountryCode: [
                 {value: 'CA', label: 'Canada'},
@@ -103,11 +103,11 @@ module.exports = {
         ProductDetail: {
             path: '/product/:productId'
         },
-        ProductList: {
+        productList: {
             path: ['/search', '/category/:categoryId'],
             imageViewType: 'large',
             selectableAttributeId: 'color',
-            filterAccordionSate: 'filters-expanded-index'
+            filterAccordionState: 'filters-expanded-index'
         }
     },
     search: {
