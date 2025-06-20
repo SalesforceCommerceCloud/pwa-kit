@@ -754,7 +754,7 @@ const runGenerator = (context, {outputDir, templateVersion, verbose}) => {
         }
         case TEMPLATE_SOURCE_BUNDLE:
             // Use require.resolve to find the package root directory, then navigate to templates
-            const packageRoot = p.dirname(require.resolve('../package.json'))
+            const packageRoot = p.dirname(require.resolve('@salesforce/pwa-kit-create-app/package.json'))
             tarPath = p.join(packageRoot, 'templates', `${id}.tar.gz`)
             break
         default: {
