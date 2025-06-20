@@ -721,9 +721,6 @@ export const RemoteServerFactory = {
                         targetProtocol: 'https'
                     })
 
-                    console.log(options.slasApiPath)
-                    console.log(options.applySLASPrivateClientToEndpoints)
-
                     // We pattern match and add client secrets only to endpoints that
                     // match the regex specified by options.applySLASPrivateClientToEndpoints
                     // (see option defaults at the top of this file).
