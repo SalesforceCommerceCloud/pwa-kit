@@ -15,4 +15,4 @@ export const onClient = typeof window !== 'undefined'
  * Check if the code is running on the server side
  * @returns {boolean} True if running on server, false if on client
  */
-export const onServer = typeof window === 'undefined' 
+export const onServer = typeof window === 'undefined'
