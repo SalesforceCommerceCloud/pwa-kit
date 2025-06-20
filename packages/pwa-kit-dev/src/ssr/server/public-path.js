@@ -17,5 +17,4 @@
 import {bundleBasePath} from '../../utils/ssr-namespace-paths'
 
 /* global __webpack_public_path__: writable */
-// eslint-disable-next-line no-undef
 __webpack_public_path__ = bundleBasePath + '/'

@@ -60,13 +60,18 @@ export const sendCachedResponse = (cached) => {
  * @param [shouldCacheResponse] {Function} function to determine if response should be cached
  * @private
  */
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export const cacheResponseWhenDone = ({
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     req,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     res,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     expiration,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     key,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     namespace,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     shouldCacheResponse
 }) => {
     // Stub implementation for testing

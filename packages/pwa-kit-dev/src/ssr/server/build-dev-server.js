@@ -357,15 +357,12 @@ export const DevServerMixin = {
         server.listen({hostname, port}, () => {
             /* istanbul ignore next */
             if (process.env.NODE_ENV !== 'test') {
-                open(
-                    `${this._getDevServerURL(
-                        options
-                    )}/__mrt/loading-screen/index.html?loading=1`
-                )
+                open(`${this._getDevServerURL(options)}/__mrt/loading-screen/index.html?loading=1`)
             }
         })
 
         // Always return a stub handler so destructuring never fails
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const handler = (event, context, callback) => {
             throw new Error('Lambda handler is not available in dev mode')
         }
