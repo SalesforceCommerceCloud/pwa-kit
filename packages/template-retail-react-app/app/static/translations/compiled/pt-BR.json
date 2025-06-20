@@ -361,10 +361,44 @@
       "value": "Fechar formulário de logon"
     }
   ],
+  "auth_modal.check_email.button.resend_link": [
+    {
+      "type": 0,
+      "value": "Reenviar link"
+    }
+  ],
+  "auth_modal.check_email.description.check_spam_folder": [
+    {
+      "type": 0,
+      "value": "O link pode levar alguns minutos para chegar, verifique sua pasta de spam se você estiver tendo problemas para encontrá-lo"
+    }
+  ],
+  "auth_modal.check_email.description.just_sent": [
+    {
+      "type": 0,
+      "value": "Acabamos de enviar um link de logon para "
+    },
+    {
+      "children": [
+        {
+          "type": 1,
+          "value": "email"
+        }
+      ],
+      "type": 8,
+      "value": "b"
+    }
+  ],
+  "auth_modal.check_email.title.check_your_email": [
+    {
+      "type": 0,
+      "value": "Verifique seu e-mail"
+    }
+  ],
   "auth_modal.description.now_signed_in": [
     {
       "type": 0,
-      "value": "Agora você fez login na sua conta."
+      "value": "Agora você fez logon na sua conta."
     }
   ],
   "auth_modal.error.incorrect_email_or_password": [
@@ -390,7 +424,7 @@
   "auth_modal.password_reset_success.button.back_to_sign_in": [
     {
       "type": 0,
-      "value": "Fazer login novamente"
+      "value": "Fazer logon novamente"
     }
   ],
   "auth_modal.password_reset_success.info.will_email_shortly": [
@@ -1025,6 +1059,12 @@
       "value": "Já tem uma conta? Fazer logon"
     }
   ],
+  "contact_info.button.back_to_sign_in_options": [
+    {
+      "type": 0,
+      "value": "Voltar para opções de logon"
+    }
+  ],
   "contact_info.button.checkout_as_guest": [
     {
       "type": 0,
@@ -1037,6 +1077,18 @@
       "value": "Fazer logon"
     }
   ],
+  "contact_info.button.password": [
+    {
+      "type": 0,
+      "value": "Senha"
+    }
+  ],
+  "contact_info.button.secure_link": [
+    {
+      "type": 0,
+      "value": "Link seguro"
+    }
+  ],
   "contact_info.error.incorrect_username_or_password": [
     {
       "type": 0,
@@ -1047,6 +1099,12 @@
     {
       "type": 0,
       "value": "Esqueceu a senha?"
+    }
+  ],
+  "contact_info.message.or_login_with": [
+    {
+      "type": 0,
+      "value": "Ou faça logon com"
     }
   ],
   "contact_info.title.contact_info": [
@@ -1121,6 +1179,48 @@
     {
       "type": 1,
       "value": "currentPrice"
+    }
+  ],
+  "dnt_notification.button.accept": [
+    {
+      "type": 0,
+      "value": "Aceitar"
+    }
+  ],
+  "dnt_notification.button.assistive_msg.accept": [
+    {
+      "type": 0,
+      "value": "Aceitar rastreamento"
+    }
+  ],
+  "dnt_notification.button.assistive_msg.close": [
+    {
+      "type": 0,
+      "value": "Fechar formulário de consentimento de rastreamento"
+    }
+  ],
+  "dnt_notification.button.assistive_msg.decline": [
+    {
+      "type": 0,
+      "value": "Recusar rastreamento"
+    }
+  ],
+  "dnt_notification.button.decline": [
+    {
+      "type": 0,
+      "value": "Recusar"
+    }
+  ],
+  "dnt_notification.description": [
+    {
+      "type": 0,
+      "value": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex e a commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur."
+    }
+  ],
+  "dnt_notification.title": [
+    {
+      "type": 0,
+      "value": "Consentimento de rastreamento"
     }
   ],
   "drawer_menu.button.account_details": [
@@ -1413,6 +1513,12 @@
       "value": "Termos e condições"
     }
   ],
+  "footer.locale_selector.assistive_msg": [
+    {
+      "type": 0,
+      "value": "Selecionar idioma"
+    }
+  ],
   "footer.message.copyright": [
     {
       "type": 0,
@@ -1429,6 +1535,12 @@
     {
       "type": 0,
       "value": "Registre-se para ficar por dentro de todas as ofertas"
+    }
+  ],
+  "footer.subscribe.email.assistive_msg": [
+    {
+      "type": 0,
+      "value": "Endereço de e-mail para newsletter"
     }
   ],
   "footer.subscribe.heading.first_to_know": [
@@ -1471,6 +1583,24 @@
     {
       "type": 0,
       "value": "Lista de desejos"
+    }
+  ],
+  "global.error.create_account": [
+    {
+      "type": 0,
+      "value": "Esse recurso não está disponível no momento. Você deve criar uma conta para acessar esse recurso."
+    }
+  ],
+  "global.error.feature_unavailable": [
+    {
+      "type": 0,
+      "value": "Esse recurso não está disponível no momento."
+    }
+  ],
+  "global.error.invalid_token": [
+    {
+      "type": 0,
+      "value": "Token inválido, tente novamente."
     }
   ],
   "global.error.something_went_wrong": [
@@ -2173,6 +2303,36 @@
       "value": "Criar conta"
     }
   ],
+  "login_form.button.apple": [
+    {
+      "type": 0,
+      "value": "Apple"
+    }
+  ],
+  "login_form.button.back": [
+    {
+      "type": 0,
+      "value": "Voltar para opções de logon"
+    }
+  ],
+  "login_form.button.continue_securely": [
+    {
+      "type": 0,
+      "value": "Continuar com segurança"
+    }
+  ],
+  "login_form.button.google": [
+    {
+      "type": 0,
+      "value": "Google"
+    }
+  ],
+  "login_form.button.password": [
+    {
+      "type": 0,
+      "value": "Senha"
+    }
+  ],
   "login_form.button.sign_in": [
     {
       "type": 0,
@@ -2189,6 +2349,12 @@
     {
       "type": 0,
       "value": "Não tem uma conta?"
+    }
+  ],
+  "login_form.message.or_login_with": [
+    {
+      "type": 0,
+      "value": "Ou faça logon com"
     }
   ],
   "login_form.message.welcome_back": [
@@ -2353,6 +2519,12 @@
       "value": "numOfPages"
     }
   ],
+  "pagination.field.page_number_select": [
+    {
+      "type": 0,
+      "value": "Selecionar número de página"
+    }
+  ],
   "pagination.link.next": [
     {
       "type": 0,
@@ -2425,10 +2597,22 @@
       "value": "1 letra maiúscula"
     }
   ],
+  "password_reset_success.toast": [
+    {
+      "type": 0,
+      "value": "Sucesso na redefinição de senha"
+    }
+  ],
   "payment_selection.heading.credit_card": [
     {
       "type": 0,
       "value": "Cartão de crédito"
+    }
+  ],
+  "payment_selection.radio_group.assistive_msg": [
+    {
+      "type": 0,
+      "value": "Pagamento"
     }
   ],
   "payment_selection.tooltip.secure_payment": [
@@ -2619,6 +2803,12 @@
       "value": "sortOption"
     }
   ],
+  "product_list.sort_by.label.assistive_msg": [
+    {
+      "type": 0,
+      "value": "Ordenar produtos por"
+    }
+  ],
   "product_scroller.assistive_msg.scroll_left": [
     {
       "type": 0,
@@ -2799,6 +2989,12 @@
       "value": "Meu perfil"
     }
   ],
+  "profile_fields.label.profile_form": [
+    {
+      "type": 0,
+      "value": "Formulário de perfil"
+    }
+  ],
   "promo_code_fields.button.apply": [
     {
       "type": 0,
@@ -2897,38 +3093,6 @@
     {
       "type": 0,
       "value": "Crie uma conta e tenha acesso aos melhores produtos, ideias e comunidade."
-    }
-  ],
-  "reset_password.button.back_to_sign_in": [
-    {
-      "type": 0,
-      "value": "Fazer login novamente"
-    }
-  ],
-  "reset_password.info.receive_email_shortly": [
-    {
-      "type": 0,
-      "value": "Em breve, você receberá um e-mail em "
-    },
-    {
-      "children": [
-        {
-          "type": 1,
-          "value": "email"
-        }
-      ],
-      "type": 8,
-      "value": "b"
-    },
-    {
-      "type": 0,
-      "value": " com um link para redefinir a senha."
-    }
-  ],
-  "reset_password.title.password_reset": [
-    {
-      "type": 0,
-      "value": "Redefinição de senha"
     }
   ],
   "reset_password_form.action.sign_in": [
@@ -3099,6 +3263,32 @@
     {
       "type": 0,
       "value": "Tem certeza de que deseja fazer logout? Será preciso fazer logon novamente para dar continuidade ao seu pedido atual."
+    }
+  ],
+  "social_login_redirect.message.authenticating": [
+    {
+      "type": 0,
+      "value": "Autenticando..."
+    }
+  ],
+  "social_login_redirect.message.redirect_link": [
+    {
+      "type": 0,
+      "value": "Se você não for redirecionado automaticamente, clique "
+    },
+    {
+      "children": [
+        {
+          "type": 0,
+          "value": "neste link"
+        }
+      ],
+      "type": 8,
+      "value": "link"
+    },
+    {
+      "type": 0,
+      "value": " para continuar."
     }
   ],
   "store_locator.action.find": [
@@ -3765,6 +3955,18 @@
       "value": "A senha deve conter pelo menos 8 caracteres."
     }
   ],
+  "use_update_password_fields.error.password_mismatch": [
+    {
+      "type": 0,
+      "value": "As senhas não são iguais."
+    }
+  ],
+  "use_update_password_fields.error.required_confirm_password": [
+    {
+      "type": 0,
+      "value": "Confirme sua senha."
+    }
+  ],
   "use_update_password_fields.error.required_new_password": [
     {
       "type": 0,
@@ -3787,6 +3989,12 @@
     {
       "type": 0,
       "value": "A senha deve conter pelo menos 1 letra maiúscula."
+    }
+  ],
+  "use_update_password_fields.label.confirm_new_password": [
+    {
+      "type": 0,
+      "value": "Confirmar nova senha"
     }
   ],
   "use_update_password_fields.label.current_password": [

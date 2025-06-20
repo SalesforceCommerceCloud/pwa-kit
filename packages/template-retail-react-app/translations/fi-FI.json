@@ -133,7 +133,7 @@
     "defaultMessage": "Ostoskorin välisumma ({itemAccumulatedCount} tuote)"
   },
   "add_to_cart_modal.label.quantity": {
-    "defaultMessage": "Määrä"
+    "defaultMessage": "Lkm"
   },
   "add_to_cart_modal.link.checkout": {
     "defaultMessage": "Siirry kassalle"
@@ -146,6 +146,18 @@
   },
   "auth_modal.button.close.assistive_msg": {
     "defaultMessage": "Sulje kirjautumislomake"
+  },
+  "auth_modal.check_email.button.resend_link": {
+    "defaultMessage": "Lähetä linkki uudelleen"
+  },
+  "auth_modal.check_email.description.check_spam_folder": {
+    "defaultMessage": "Linkin saapuminen voi kestää muutaman minuutin. Tarkista roskapostikansiosi, jos et löydä sitä"
+  },
+  "auth_modal.check_email.description.just_sent": {
+    "defaultMessage": "Lähetimme juuri kirjautumislinkin osoitteeseen <b>{email}</b>"
+  },
+  "auth_modal.check_email.title.check_your_email": {
+    "defaultMessage": "Tarkista sähköpostisi"
   },
   "auth_modal.description.now_signed_in": {
     "defaultMessage": "Olet nyt kirjautunut sisään."
@@ -181,7 +193,7 @@
     "defaultMessage": "Saatat myös pitää näistä"
   },
   "cart.recommended_products.title.recently_viewed": {
-    "defaultMessage": "Viimeksi tarkasteltu"
+    "defaultMessage": "Viimeksi katsottu"
   },
   "cart_cta.link.checkout": {
     "defaultMessage": "Siirry kassalle"
@@ -229,7 +241,7 @@
     "defaultMessage": "Laskutusosoite"
   },
   "checkout_confirmation.heading.create_account": {
-    "defaultMessage": "Luo tili voidaksesi tehdä tilauksia nopeammin"
+    "defaultMessage": "Luo tili, niin voit tehdä tilauksia nopeammin"
   },
   "checkout_confirmation.heading.credit_card": {
     "defaultMessage": "Luottokortti"
@@ -253,7 +265,7 @@
     "defaultMessage": "Kiitos tilauksestasi!"
   },
   "checkout_confirmation.label.free": {
-    "defaultMessage": "Ilmainen"
+    "defaultMessage": "Veloituksetta"
   },
   "checkout_confirmation.label.order_number": {
     "defaultMessage": "Tilausnumero"
@@ -308,7 +320,7 @@
     "defaultMessage": "Ehdot"
   },
   "checkout_footer.message.copyright": {
-    "defaultMessage": "Salesforce tai sen tytäryhtiöt. Kaikki oikeudet pidätetään. Tämä on vain demomyymälä. Tehtyjä tilauksia EI käsitellä."
+    "defaultMessage": "Salesforce tai sen tytäryhtiöt. Kaikki oikeudet pidätetään. Tämä on vain demomyymälä. Tilauksia EI käsitellä."
   },
   "checkout_header.link.assistive_msg.cart": {
     "defaultMessage": "Takaisin ostoskoriin, tuotteiden määrä: {numItems}"
@@ -406,17 +418,29 @@
   "contact_info.button.already_have_account": {
     "defaultMessage": "Onko sinulla jo tili? Kirjaudu sisään"
   },
+  "contact_info.button.back_to_sign_in_options": {
+    "defaultMessage": "Takaisin kirjautumisvaihtoehtoihin"
+  },
   "contact_info.button.checkout_as_guest": {
     "defaultMessage": "Tee tilaus vieraana"
   },
   "contact_info.button.login": {
     "defaultMessage": "Kirjaudu sisään"
   },
+  "contact_info.button.password": {
+    "defaultMessage": "Salasana"
+  },
+  "contact_info.button.secure_link": {
+    "defaultMessage": "Turvallinen linkki"
+  },
   "contact_info.error.incorrect_username_or_password": {
     "defaultMessage": "Väärä käyttäjätunnus tai salasana, yritä uudelleen."
   },
   "contact_info.link.forgot_password": {
     "defaultMessage": "Unohditko salasanan?"
+  },
+  "contact_info.message.or_login_with": {
+    "defaultMessage": "Tai kirjaudu sisään jollakin seuraavista"
   },
   "contact_info.title.contact_info": {
     "defaultMessage": "Yhteystiedot"
@@ -445,7 +469,28 @@
     "defaultMessage": "Alkuperäisestä hinnasta {listPrice}"
   },
   "display_price.label.current_price_with_range": {
-    "defaultMessage": "Hinnasta {currentPrice}"
+    "defaultMessage": "Alkaen {currentPrice}"
+  },
+  "dnt_notification.button.accept": {
+    "defaultMessage": "Hyväksy"
+  },
+  "dnt_notification.button.assistive_msg.accept": {
+    "defaultMessage": "Hyväksy seuranta"
+  },
+  "dnt_notification.button.assistive_msg.close": {
+    "defaultMessage": "Sulje suostumuksen seurantalomake"
+  },
+  "dnt_notification.button.assistive_msg.decline": {
+    "defaultMessage": "Kiellä seuranta"
+  },
+  "dnt_notification.button.decline": {
+    "defaultMessage": "Kiellä"
+  },
+  "dnt_notification.description": {
+    "defaultMessage": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur."
+  },
+  "dnt_notification.title": {
+    "defaultMessage": "Suostumuksen seuranta"
   },
   "drawer_menu.button.account_details": {
     "defaultMessage": "Tilin tiedot"
@@ -576,6 +621,9 @@
   "footer.link.terms_conditions": {
     "defaultMessage": "Ehdot"
   },
+  "footer.locale_selector.assistive_msg": {
+    "defaultMessage": "Valitse kieli"
+  },
   "footer.message.copyright": {
     "defaultMessage": "Salesforce tai sen tytäryhtiöt. Kaikki oikeudet pidätetään. Tämä on vain demomyymälä. Tilauksia EI käsitellä."
   },
@@ -583,10 +631,13 @@
     "defaultMessage": "Rekisteröidy"
   },
   "footer.subscribe.description.sign_up": {
-    "defaultMessage": "Rekisteröidy pysyäksesi ajan tasalla kuumimmista tarjouksista"
+    "defaultMessage": "Rekisteröidy, niin pysyt ajan tasalla kuumimmista tarjouksista"
+  },
+  "footer.subscribe.email.assistive_msg": {
+    "defaultMessage": "Sähköpostiosoite uutiskirjettä varten"
   },
   "footer.subscribe.heading.first_to_know": {
-    "defaultMessage": "Saa tieto ensimmäisten joukossa"
+    "defaultMessage": "Saat tietää ensimmäisten joukossa"
   },
   "form_action_buttons.button.cancel": {
     "defaultMessage": "Peruuta"
@@ -605,6 +656,15 @@
   },
   "global.account.link.wishlist": {
     "defaultMessage": "Toivelista"
+  },
+  "global.error.create_account": {
+    "defaultMessage": "Tämä ominaisuus ei ole tällä hetkellä saatavilla. Luo tili, jotta voit käyttää tätä ominaisuutta."
+  },
+  "global.error.feature_unavailable": {
+    "defaultMessage": "Tämä ominaisuus ei ole tällä hetkellä saatavilla."
+  },
+  "global.error.invalid_token": {
+    "defaultMessage": "Merkki on virheellinen, yritä uudelleen."
   },
   "global.error.something_went_wrong": {
     "defaultMessage": "Jokin meni vikaan. Yritä uudelleen!"
@@ -664,7 +724,7 @@
     "defaultMessage": "He opastavat sinut oikeaan paikkaan."
   },
   "home.description.shop_products": {
-    "defaultMessage": "Tämä osio sisältää katalogin sisältöä. {docLink} miten se korvataan.",
+    "defaultMessage": "Tässä osiossa on sisältöä luettelosta. Katso tietoja {docLink}, miten se korvataan.",
     "description": "{docLink} is a html button that links the user to https://sfdc.co/business-manager-manage-catalogs"
   },
   "home.features.description.cart_checkout": {
@@ -728,10 +788,10 @@
     "defaultMessage": "Aloita"
   },
   "home.link.read_docs": {
-    "defaultMessage": "Lue asiakirjat"
+    "defaultMessage": "Lue asiakirjoista"
   },
   "home.title.react_starter_store": {
-    "defaultMessage": "React PWA Starter Store vähittäiskauppaan"
+    "defaultMessage": "React PWA Starter Store vähittäiskaupalle"
   },
   "icons.assistive_msg.lock": {
     "defaultMessage": "Turvallinen"
@@ -880,7 +940,7 @@
     "defaultMessage": "Hollanti (Alankomaat)"
   },
   "locale_text.message.no-NO": {
-    "defaultMessage": "Norjala (Norja)"
+    "defaultMessage": "Norja (Norja)"
   },
   "locale_text.message.pl-PL": {
     "defaultMessage": "Puola (Puola)"
@@ -927,6 +987,21 @@
   "login_form.action.create_account": {
     "defaultMessage": "Luo tili"
   },
+  "login_form.button.apple": {
+    "defaultMessage": "Apple"
+  },
+  "login_form.button.back": {
+    "defaultMessage": "Takaisin kirjautumisvaihtoehtoihin"
+  },
+  "login_form.button.continue_securely": {
+    "defaultMessage": "Jatka turvallisesti"
+  },
+  "login_form.button.google": {
+    "defaultMessage": "Google"
+  },
+  "login_form.button.password": {
+    "defaultMessage": "Salasana"
+  },
   "login_form.button.sign_in": {
     "defaultMessage": "Kirjaudu sisään"
   },
@@ -935,6 +1010,9 @@
   },
   "login_form.message.dont_have_account": {
     "defaultMessage": "Eikö sinulla ole tiliä?"
+  },
+  "login_form.message.or_login_with": {
+    "defaultMessage": "Tai kirjaudu sisään jollakin seuraavista"
   },
   "login_form.message.welcome_back": {
     "defaultMessage": "Tervetuloa takaisin"
@@ -962,7 +1040,7 @@
     "defaultMessage": "Arvioitu kokonaismäärä"
   },
   "order_summary.label.free": {
-    "defaultMessage": "Ilmainen"
+    "defaultMessage": "Veloituksetta"
   },
   "order_summary.label.order_total": {
     "defaultMessage": "Tilauksen loppusumma"
@@ -996,6 +1074,9 @@
   },
   "pagination.field.num_of_pages": {
     "defaultMessage": "/ {numOfPages}"
+  },
+  "pagination.field.page_number_select": {
+    "defaultMessage": "Valitse sivunumero"
   },
   "pagination.link.next": {
     "defaultMessage": "Seuraava"
@@ -1038,14 +1119,20 @@
     "defaultMessage": "1 iso kirjain",
     "description": "Password requirement"
   },
+  "password_reset_success.toast": {
+    "defaultMessage": "Salasanan nollaus onnistui"
+  },
   "payment_selection.heading.credit_card": {
     "defaultMessage": "Luottokortti"
+  },
+  "payment_selection.radio_group.assistive_msg": {
+    "defaultMessage": "Maksu"
   },
   "payment_selection.tooltip.secure_payment": {
     "defaultMessage": "Tämä on turvallinen SSL-salattu maksu."
   },
   "price_per_item.label.each": {
-    "defaultMessage": "kukin",
+    "defaultMessage": "kpl",
     "description": "Abbreviated 'each', follows price per item, like $10/ea"
   },
   "product_detail.accordion.button.product_detail": {
@@ -1108,6 +1195,9 @@
   "product_list.select.sort_by": {
     "defaultMessage": "Lajitteluperuste: {sortOption}"
   },
+  "product_list.sort_by.label.assistive_msg": {
+    "defaultMessage": "Tuotteiden lajitteluperuste"
+  },
   "product_scroller.assistive_msg.scroll_left": {
     "defaultMessage": "Selaa tuotteita vasemmalle"
   },
@@ -1148,10 +1238,10 @@
     "defaultMessage": "Päivitys"
   },
   "product_view.label.assistive_msg.quantity_decrement": {
-    "defaultMessage": "Vähennysmäärä tuotteelle {productName}"
+    "defaultMessage": "Vähennä tuotteen {productName} määrää"
   },
   "product_view.label.assistive_msg.quantity_increment": {
-    "defaultMessage": "Lisäysmäärä tuotteelle {productName}"
+    "defaultMessage": "Lisää tuotteen {productName} määrää"
   },
   "product_view.label.quantity": {
     "defaultMessage": "Määrä"
@@ -1185,6 +1275,9 @@
   },
   "profile_card.title.my_profile": {
     "defaultMessage": "Oma profiili"
+  },
+  "profile_fields.label.profile_form": {
+    "defaultMessage": "Profiililomake"
   },
   "promo_code_fields.button.apply": {
     "defaultMessage": "Käytä"
@@ -1222,15 +1315,6 @@
   "register_form.message.create_an_account": {
     "defaultMessage": "Luo tili ja voit hyödyntää ensimmäisten joukossa parhaat tuotteet, inspiraation ja yhteisön."
   },
-  "reset_password.button.back_to_sign_in": {
-    "defaultMessage": "Takaisin kirjautumiseen"
-  },
-  "reset_password.info.receive_email_shortly": {
-    "defaultMessage": "Saat pian osoitteeseen <b>{email}</b> sähköpostin, jossa on linkki salasanasi nollaamiseen."
-  },
-  "reset_password.title.password_reset": {
-    "defaultMessage": "Salasanan nollaus"
-  },
   "reset_password_form.action.sign_in": {
     "defaultMessage": "Kirjaudu sisään"
   },
@@ -1238,7 +1322,7 @@
     "defaultMessage": "Nollaa salasana"
   },
   "reset_password_form.message.enter_your_email": {
-    "defaultMessage": "Anna sähköpostiosoitteesi saadaksesi ohjeet salasanasi nollaamiseen"
+    "defaultMessage": "Anna sähköpostiosoitteesi, niin saat ohjeet salasanasi nollaamiseen"
   },
   "reset_password_form.message.return_to_sign_in": {
     "defaultMessage": "Tai palaa kohteeseen",
@@ -1311,7 +1395,13 @@
     "defaultMessage": "Kirjaudu ulos"
   },
   "signout_confirmation_dialog.message.sure_to_sign_out": {
-    "defaultMessage": "Oletko varma, että haluat kirjautua ulos? Sinun on kirjauduttava takaisin sisään jatkaaksesi nykyistä tilaustasi."
+    "defaultMessage": "Haluatko varmasti kirjautua ulos? Sinun täytyy kirjautua takaisin sisään jatkaaksesi nykyistä tilaustasi."
+  },
+  "social_login_redirect.message.authenticating": {
+    "defaultMessage": "Todennetaan..."
+  },
+  "social_login_redirect.message.redirect_link": {
+    "defaultMessage": "Jos sinua ei ohjata eteenpäin automaattisesti, jatka valitsemalla <linkki>tämä linkki</linkki>."
   },
   "store_locator.action.find": {
     "defaultMessage": "Etsi"
@@ -1326,7 +1416,7 @@
     "defaultMessage": "Näytä lisää"
   },
   "store_locator.description.away": {
-    "defaultMessage": "poissa"
+    "defaultMessage": "päässä"
   },
   "store_locator.description.loading_locations": {
     "defaultMessage": "Kohteita ladataan..."
@@ -1469,7 +1559,7 @@
     "defaultMessage": "Anna viimeinen voimassaolopäivämäärä."
   },
   "use_credit_card_fields.error.required_name": {
-    "defaultMessage": "Anna nimesi kuten se näkyy kortissasi."
+    "defaultMessage": "Anna nimesi niin kuin se näkyy kortissasi."
   },
   "use_credit_card_fields.error.required_security_code": {
     "defaultMessage": "Anna turvakoodisi."
@@ -1565,13 +1655,13 @@
     "defaultMessage": "Alennus poistettu"
   },
   "use_registration_fields.error.contain_number": {
-    "defaultMessage": "Salasanan on sisällettävä vähintään yksi numero."
+    "defaultMessage": "Salasanassa täytyy olla vähintään yksi numero."
   },
   "use_registration_fields.error.lowercase_letter": {
-    "defaultMessage": "Salasanan on sisällettävä vähintään yksi pieni kirjain."
+    "defaultMessage": "Salasanassa täytyy olla vähintään yksi pieni kirjain."
   },
   "use_registration_fields.error.minimum_characters": {
-    "defaultMessage": "Salasanan on sisällettävä vähintään 8 merkkiä."
+    "defaultMessage": "Salasanassa täytyy olla vähintään 8 merkkiä."
   },
   "use_registration_fields.error.required_email": {
     "defaultMessage": "Anna kelvollinen sähköpostiosoite."
@@ -1586,10 +1676,10 @@
     "defaultMessage": "Luo salasana."
   },
   "use_registration_fields.error.special_character": {
-    "defaultMessage": "Salasanan on sisällettävä vähintään yksi erikoismerkki."
+    "defaultMessage": "Salasanassa täytyy olla vähintään yksi erikoismerkki."
   },
   "use_registration_fields.error.uppercase_letter": {
-    "defaultMessage": "Salasanan on sisällettävä vähintään yksi iso kirjain."
+    "defaultMessage": "Salasanassa täytyy olla vähintään yksi iso kirjain."
   },
   "use_registration_fields.label.email": {
     "defaultMessage": "Sähköposti"
@@ -1613,13 +1703,19 @@
     "defaultMessage": "Sähköposti"
   },
   "use_update_password_fields.error.contain_number": {
-    "defaultMessage": "Salasanan on sisällettävä vähintään yksi numero."
+    "defaultMessage": "Salasanassa täytyy olla vähintään yksi numero."
   },
   "use_update_password_fields.error.lowercase_letter": {
-    "defaultMessage": "Salasanan on sisällettävä vähintään yksi pieni kirjain."
+    "defaultMessage": "Salasanassa täytyy olla vähintään yksi pieni kirjain."
   },
   "use_update_password_fields.error.minimum_characters": {
-    "defaultMessage": "Salasanan on sisällettävä vähintään 8 merkkiä."
+    "defaultMessage": "Salasanassa täytyy olla vähintään 8 merkkiä."
+  },
+  "use_update_password_fields.error.password_mismatch": {
+    "defaultMessage": "Salasanat eivät täsmää."
+  },
+  "use_update_password_fields.error.required_confirm_password": {
+    "defaultMessage": "Vahvista salasanasi."
   },
   "use_update_password_fields.error.required_new_password": {
     "defaultMessage": "Anna uusi salasana."
@@ -1628,10 +1724,13 @@
     "defaultMessage": "Anna salasanasi."
   },
   "use_update_password_fields.error.special_character": {
-    "defaultMessage": "Salasanan on sisällettävä vähintään yksi erikoismerkki."
+    "defaultMessage": "Salasanassa täytyy olla vähintään yksi erikoismerkki."
   },
   "use_update_password_fields.error.uppercase_letter": {
-    "defaultMessage": "Salasanan on sisällettävä vähintään yksi iso kirjain."
+    "defaultMessage": "Salasanassa täytyy olla vähintään yksi iso kirjain."
+  },
+  "use_update_password_fields.label.confirm_new_password": {
+    "defaultMessage": "Vahvista uusi salasana"
   },
   "use_update_password_fields.label.current_password": {
     "defaultMessage": "Nykyinen salasana"

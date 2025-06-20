@@ -62,7 +62,7 @@
   "account_addresses.page_action_placeholder.message.add_new_address": [
     {
       "type": 0,
-      "value": "Voeg een nieuwe adresmethode toe voor sneller afrekenen."
+      "value": "Voeg een nieuwe adresmethode toe om sneller af te rekenen."
     }
   ],
   "account_addresses.title.addresses": [
@@ -359,6 +359,40 @@
     {
       "type": 0,
       "value": "Aanmeldformulier sluiten"
+    }
+  ],
+  "auth_modal.check_email.button.resend_link": [
+    {
+      "type": 0,
+      "value": "Link opnieuw versturen"
+    }
+  ],
+  "auth_modal.check_email.description.check_spam_folder": [
+    {
+      "type": 0,
+      "value": "Het kan een paar minuten duren voordat de link aankomt. Controleer je map met spam als je de link niet kunt vinden"
+    }
+  ],
+  "auth_modal.check_email.description.just_sent": [
+    {
+      "type": 0,
+      "value": "We hebben zojuist een aanmeldlink gestuurd naar "
+    },
+    {
+      "children": [
+        {
+          "type": 1,
+          "value": "email"
+        }
+      ],
+      "type": 8,
+      "value": "b"
+    }
+  ],
+  "auth_modal.check_email.title.check_your_email": [
+    {
+      "type": 0,
+      "value": "Controleer je e-mail"
     }
   ],
   "auth_modal.description.now_signed_in": [
@@ -1025,6 +1059,12 @@
       "value": "Heb je al een account? Aanmelden"
     }
   ],
+  "contact_info.button.back_to_sign_in_options": [
+    {
+      "type": 0,
+      "value": "Terug naar Opties voor aanmelden"
+    }
+  ],
   "contact_info.button.checkout_as_guest": [
     {
       "type": 0,
@@ -1037,6 +1077,18 @@
       "value": "Aanmelden"
     }
   ],
+  "contact_info.button.password": [
+    {
+      "type": 0,
+      "value": "Wachtwoord"
+    }
+  ],
+  "contact_info.button.secure_link": [
+    {
+      "type": 0,
+      "value": "Beveiligde link"
+    }
+  ],
   "contact_info.error.incorrect_username_or_password": [
     {
       "type": 0,
@@ -1047,6 +1099,12 @@
     {
       "type": 0,
       "value": "Wachtwoord vergeten?"
+    }
+  ],
+  "contact_info.message.or_login_with": [
+    {
+      "type": 0,
+      "value": "Of meld je aan met"
     }
   ],
   "contact_info.title.contact_info": [
@@ -1121,6 +1179,48 @@
     {
       "type": 1,
       "value": "currentPrice"
+    }
+  ],
+  "dnt_notification.button.accept": [
+    {
+      "type": 0,
+      "value": "Accepteren"
+    }
+  ],
+  "dnt_notification.button.assistive_msg.accept": [
+    {
+      "type": 0,
+      "value": "Tracking accepteren"
+    }
+  ],
+  "dnt_notification.button.assistive_msg.close": [
+    {
+      "type": 0,
+      "value": "Toestemmingsformulier voor tracking sluiten"
+    }
+  ],
+  "dnt_notification.button.assistive_msg.decline": [
+    {
+      "type": 0,
+      "value": "Tracking weigeren"
+    }
+  ],
+  "dnt_notification.button.decline": [
+    {
+      "type": 0,
+      "value": "Weigeren"
+    }
+  ],
+  "dnt_notification.description": [
+    {
+      "type": 0,
+      "value": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur."
+    }
+  ],
+  "dnt_notification.title": [
+    {
+      "type": 0,
+      "value": "Toestemming voor tracking"
     }
   ],
   "drawer_menu.button.account_details": [
@@ -1413,6 +1513,12 @@
       "value": "Algemene voorwaarden"
     }
   ],
+  "footer.locale_selector.assistive_msg": [
+    {
+      "type": 0,
+      "value": "Taal selecteren"
+    }
+  ],
   "footer.message.copyright": [
     {
       "type": 0,
@@ -1429,6 +1535,12 @@
     {
       "type": 0,
       "value": "Registreer je om op de hoogte te blijven van de beste aanbiedingen"
+    }
+  ],
+  "footer.subscribe.email.assistive_msg": [
+    {
+      "type": 0,
+      "value": "E-mailadres voor nieuwsbrief"
     }
   ],
   "footer.subscribe.heading.first_to_know": [
@@ -1473,6 +1585,24 @@
       "value": "Verlanglijst"
     }
   ],
+  "global.error.create_account": [
+    {
+      "type": 0,
+      "value": "Deze functie is momenteel niet beschikbaar. Als je toegang wilt tot deze functie, moet je een account aanmaken."
+    }
+  ],
+  "global.error.feature_unavailable": [
+    {
+      "type": 0,
+      "value": "Deze functie is momenteel niet beschikbaar."
+    }
+  ],
+  "global.error.invalid_token": [
+    {
+      "type": 0,
+      "value": "Ongeldig token. Probeer het opnieuw."
+    }
+  ],
   "global.error.something_went_wrong": [
     {
       "type": 0,
@@ -1514,7 +1644,7 @@
     },
     {
       "type": 0,
-      "value": " toegevoegd aan verlanglijst"
+      "value": " aan verlanglijst toegevoegd"
     }
   ],
   "global.info.already_in_wishlist": [
@@ -1608,7 +1738,7 @@
   "home.description.features": [
     {
       "type": 0,
-      "value": "Kant en klare functies, zodat jij je alleen hoeft te focussen op het toevoegen van verbeteringen."
+      "value": "Gebruiksklare functies, zodat jij je kunt richten op het toevoegen van verbeteringen."
     }
   ],
   "home.description.here_to_help": [
@@ -1626,7 +1756,7 @@
   "home.description.shop_products": [
     {
       "type": 0,
-      "value": "Deze sectie bevat content uit de catalogus. Lees "
+      "value": "Dit gedeelte bevat content uit de catalogus. Je kunt deze "
     },
     {
       "type": 1,
@@ -1634,7 +1764,7 @@
     },
     {
       "type": 0,
-      "value": " over hoe je deze vervangt."
+      "value": " over hoe je de content vervangt."
     }
   ],
   "home.features.description.cart_checkout": [
@@ -1658,13 +1788,13 @@
   "home.features.description.my_account": [
     {
       "type": 0,
-      "value": "Shoppers kunnen de informatie in hun account beheren, zoals hun profiel, adressen, betalingen en orders."
+      "value": "Shoppers kunnen hun accountgegevens beheren, zoals hun profiel, adressen, betalingen en orders."
     }
   ],
   "home.features.description.shopper_login": [
     {
       "type": 0,
-      "value": "Stel shoppers in staat zicht eenvoudig aan te melden met een meer gepersonaliseerde winkelbeleving."
+      "value": "Stel shoppers in staat zich eenvoudig aan te melden met een meer gepersonaliseerde winkelbeleving."
     }
   ],
   "home.features.description.wishlist": [
@@ -1700,7 +1830,7 @@
   "home.features.heading.shopper_login": [
     {
       "type": 0,
-      "value": "Aanmeldgegevens van shoppers en API-toegangsservice"
+      "value": "Shopper Login and API Access Service (SLAS)"
     }
   ],
   "home.features.heading.wishlist": [
@@ -1742,7 +1872,7 @@
   "home.hero_features.link.on_managed_runtime": [
     {
       "type": 0,
-      "value": "Implementeren op beheerde runtime"
+      "value": "Implementeren op Managed Runtime"
     }
   ],
   "home.link.contact_us": [
@@ -2173,6 +2303,36 @@
       "value": "Account maken"
     }
   ],
+  "login_form.button.apple": [
+    {
+      "type": 0,
+      "value": "Apple"
+    }
+  ],
+  "login_form.button.back": [
+    {
+      "type": 0,
+      "value": "Terug naar Opties voor aanmelden"
+    }
+  ],
+  "login_form.button.continue_securely": [
+    {
+      "type": 0,
+      "value": "Veilig doorgaan"
+    }
+  ],
+  "login_form.button.google": [
+    {
+      "type": 0,
+      "value": "Google"
+    }
+  ],
+  "login_form.button.password": [
+    {
+      "type": 0,
+      "value": "Wachtwoord"
+    }
+  ],
   "login_form.button.sign_in": [
     {
       "type": 0,
@@ -2189,6 +2349,12 @@
     {
       "type": 0,
       "value": "Heb je geen account?"
+    }
+  ],
+  "login_form.message.or_login_with": [
+    {
+      "type": 0,
+      "value": "Of meld je aan met"
     }
   ],
   "login_form.message.welcome_back": [
@@ -2353,6 +2519,12 @@
       "value": "numOfPages"
     }
   ],
+  "pagination.field.page_number_select": [
+    {
+      "type": 0,
+      "value": "Paginanummer selecteren"
+    }
+  ],
   "pagination.link.next": [
     {
       "type": 0,
@@ -2425,10 +2597,22 @@
       "value": "1 hoofdletter"
     }
   ],
+  "password_reset_success.toast": [
+    {
+      "type": 0,
+      "value": "Het wachtwoord is opnieuw ingesteld"
+    }
+  ],
   "payment_selection.heading.credit_card": [
     {
       "type": 0,
       "value": "Creditcard"
+    }
+  ],
+  "payment_selection.radio_group.assistive_msg": [
+    {
+      "type": 0,
+      "value": "Betaling"
     }
   ],
   "payment_selection.tooltip.secure_payment": [
@@ -2615,6 +2799,12 @@
       "value": "sortOption"
     }
   ],
+  "product_list.sort_by.label.assistive_msg": [
+    {
+      "type": 0,
+      "value": "Producten sorteren op"
+    }
+  ],
   "product_scroller.assistive_msg.scroll_left": [
     {
       "type": 0,
@@ -2795,6 +2985,12 @@
       "value": "Mijn profiel"
     }
   ],
+  "profile_fields.label.profile_form": [
+    {
+      "type": 0,
+      "value": "Profielformulier"
+    }
+  ],
   "promo_code_fields.button.apply": [
     {
       "type": 0,
@@ -2893,38 +3089,6 @@
     {
       "type": 0,
       "value": "Maak een account en krijg als eerste toegang tot de allerbeste producten, inspiratie en de community."
-    }
-  ],
-  "reset_password.button.back_to_sign_in": [
-    {
-      "type": 0,
-      "value": "Terug naar Aanmelden"
-    }
-  ],
-  "reset_password.info.receive_email_shortly": [
-    {
-      "type": 0,
-      "value": "Je ontvangt binnenkort een e-mail op "
-    },
-    {
-      "children": [
-        {
-          "type": 1,
-          "value": "email"
-        }
-      ],
-      "type": 8,
-      "value": "b"
-    },
-    {
-      "type": 0,
-      "value": " met een link om je wachtwoord opnieuw in te stellen."
-    }
-  ],
-  "reset_password.title.password_reset": [
-    {
-      "type": 0,
-      "value": "Wachtwoord opnieuw instellen"
     }
   ],
   "reset_password_form.action.sign_in": [
@@ -3095,6 +3259,32 @@
     {
       "type": 0,
       "value": "Weet je zeker dat je je wilt afmelden? Je moet je opnieuw aanmelden om verder te gaan met je huidige order."
+    }
+  ],
+  "social_login_redirect.message.authenticating": [
+    {
+      "type": 0,
+      "value": "Authenticeren..."
+    }
+  ],
+  "social_login_redirect.message.redirect_link": [
+    {
+      "type": 0,
+      "value": "Als je niet automatisch wordt omgeleid, klik dan op "
+    },
+    {
+      "children": [
+        {
+          "type": 0,
+          "value": "deze link"
+        }
+      ],
+      "type": 8,
+      "value": "link"
+    },
+    {
+      "type": 0,
+      "value": " om verder te gaan."
     }
   ],
   "store_locator.action.find": [
@@ -3761,6 +3951,18 @@
       "value": "Het wachtwoord moet minstens 8 tekens bevatten."
     }
   ],
+  "use_update_password_fields.error.password_mismatch": [
+    {
+      "type": 0,
+      "value": "Wachtwoorden komen niet overeen."
+    }
+  ],
+  "use_update_password_fields.error.required_confirm_password": [
+    {
+      "type": 0,
+      "value": "Bevestig je wachtwoord."
+    }
+  ],
   "use_update_password_fields.error.required_new_password": [
     {
       "type": 0,
@@ -3783,6 +3985,12 @@
     {
       "type": 0,
       "value": "Het wachtwoord moet minstens één hoofdletter bevatten."
+    }
+  ],
+  "use_update_password_fields.label.confirm_new_password": [
+    {
+      "type": 0,
+      "value": "Bevestig het nieuwe wachtwoord:"
     }
   ],
   "use_update_password_fields.label.current_password": [

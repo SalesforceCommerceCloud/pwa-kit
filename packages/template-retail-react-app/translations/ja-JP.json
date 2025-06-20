@@ -147,6 +147,18 @@
   "auth_modal.button.close.assistive_msg": {
     "defaultMessage": "ログインフォームを閉じる"
   },
+  "auth_modal.check_email.button.resend_link": {
+    "defaultMessage": "リンクの再送信"
+  },
+  "auth_modal.check_email.description.check_spam_folder": {
+    "defaultMessage": "リンクが届くまで数分かかる場合があります。見つからない場合は迷惑メールフォルダーを確認してください。"
+  },
+  "auth_modal.check_email.description.just_sent": {
+    "defaultMessage": "ログインリンクを <b>{email}</b> に送信しました"
+  },
+  "auth_modal.check_email.title.check_your_email": {
+    "defaultMessage": "Eメールを確認してください"
+  },
   "auth_modal.description.now_signed_in": {
     "defaultMessage": "サインインしました。"
   },
@@ -290,7 +302,7 @@
     "description": "# item(s) in order"
   },
   "checkout_confirmation.message.will_email_shortly": {
-    "defaultMessage": "確認番号と領収書が含まれる Eメールをまもなく <b>{email}</b> 宛にお送りします。"
+    "defaultMessage": "確認番号と領収書を記載した Eメールをまもなく <b>{email}</b> 宛にお送りします。"
   },
   "checkout_footer.link.privacy_policy": {
     "defaultMessage": "プライバシーポリシー"
@@ -406,17 +418,29 @@
   "contact_info.button.already_have_account": {
     "defaultMessage": "すでにアカウントをお持ちですか?ログイン"
   },
+  "contact_info.button.back_to_sign_in_options": {
+    "defaultMessage": "サインインオプションに戻る"
+  },
   "contact_info.button.checkout_as_guest": {
     "defaultMessage": "ゲストとして注文手続きへ進む"
   },
   "contact_info.button.login": {
     "defaultMessage": "ログイン"
   },
+  "contact_info.button.password": {
+    "defaultMessage": "パスワード"
+  },
+  "contact_info.button.secure_link": {
+    "defaultMessage": "セキュアリンク"
+  },
   "contact_info.error.incorrect_username_or_password": {
     "defaultMessage": "ユーザー名またはパスワードが間違っています。もう一度お試しください。"
   },
   "contact_info.link.forgot_password": {
     "defaultMessage": "パスワードを忘れましたか?"
+  },
+  "contact_info.message.or_login_with": {
+    "defaultMessage": "または次でログイン"
   },
   "contact_info.title.contact_info": {
     "defaultMessage": "連絡先情報"
@@ -446,6 +470,27 @@
   },
   "display_price.label.current_price_with_range": {
     "defaultMessage": "{currentPrice} から"
+  },
+  "dnt_notification.button.accept": {
+    "defaultMessage": "許可"
+  },
+  "dnt_notification.button.assistive_msg.accept": {
+    "defaultMessage": "追跡を許可する"
+  },
+  "dnt_notification.button.assistive_msg.close": {
+    "defaultMessage": "追跡同意フォームを閉じる"
+  },
+  "dnt_notification.button.assistive_msg.decline": {
+    "defaultMessage": "追跡を拒否する"
+  },
+  "dnt_notification.button.decline": {
+    "defaultMessage": "拒否"
+  },
+  "dnt_notification.description": {
+    "defaultMessage": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur."
+  },
+  "dnt_notification.title": {
+    "defaultMessage": "追跡に関する同意"
   },
   "drawer_menu.button.account_details": {
     "defaultMessage": "アカウントの詳細"
@@ -565,7 +610,7 @@
     "defaultMessage": "配送"
   },
   "footer.link.signin_create_account": {
-    "defaultMessage": "サインインするかアカウントを作成してください"
+    "defaultMessage": "サインインまたはアカウントを作成"
   },
   "footer.link.site_map": {
     "defaultMessage": "サイトマップ"
@@ -576,6 +621,9 @@
   "footer.link.terms_conditions": {
     "defaultMessage": "使用条件"
   },
+  "footer.locale_selector.assistive_msg": {
+    "defaultMessage": "言語の選択"
+  },
   "footer.message.copyright": {
     "defaultMessage": "Salesforce またはその系列会社。All Rights Reserved. これはデモのみを目的とするストアです。注文を確定しても処理されません。"
   },
@@ -584,6 +632,9 @@
   },
   "footer.subscribe.description.sign_up": {
     "defaultMessage": "サインアップすると人気のお買い得商品について最新情報を入手できます"
+  },
+  "footer.subscribe.email.assistive_msg": {
+    "defaultMessage": "ニュースレターの Eメールアドレス"
   },
   "footer.subscribe.heading.first_to_know": {
     "defaultMessage": "最新情報を誰よりも早く入手"
@@ -605,6 +656,15 @@
   },
   "global.account.link.wishlist": {
     "defaultMessage": "ほしい物リスト"
+  },
+  "global.error.create_account": {
+    "defaultMessage": "この機能は現在ご利用いただけません。この機能にアクセスするには、アカウントを作成する必要があります。"
+  },
+  "global.error.feature_unavailable": {
+    "defaultMessage": "この機能は現在ご利用いただけません。"
+  },
+  "global.error.invalid_token": {
+    "defaultMessage": "無効なトークンです。もう一度やり直してください。"
   },
   "global.error.something_went_wrong": {
     "defaultMessage": "問題が発生しました。もう一度お試しください!"
@@ -731,7 +791,7 @@
     "defaultMessage": "ドキュメントを読む"
   },
   "home.title.react_starter_store": {
-    "defaultMessage": "リテール用 React PWA Starter Store"
+    "defaultMessage": "リテール用 React PWA スターターストア"
   },
   "icons.assistive_msg.lock": {
     "defaultMessage": "セキュア"
@@ -927,6 +987,21 @@
   "login_form.action.create_account": {
     "defaultMessage": "アカウントの作成"
   },
+  "login_form.button.apple": {
+    "defaultMessage": "Apple"
+  },
+  "login_form.button.back": {
+    "defaultMessage": "サインインオプションに戻る"
+  },
+  "login_form.button.continue_securely": {
+    "defaultMessage": "安全に続行"
+  },
+  "login_form.button.google": {
+    "defaultMessage": "Google"
+  },
+  "login_form.button.password": {
+    "defaultMessage": "パスワード"
+  },
   "login_form.button.sign_in": {
     "defaultMessage": "サインイン"
   },
@@ -936,8 +1011,11 @@
   "login_form.message.dont_have_account": {
     "defaultMessage": "アカウントをお持ちではありませんか?"
   },
+  "login_form.message.or_login_with": {
+    "defaultMessage": "または次でログイン"
+  },
   "login_form.message.welcome_back": {
-    "defaultMessage": "お帰りなさい"
+    "defaultMessage": "おかえりなさい"
   },
   "login_page.error.incorrect_username_or_password": {
     "defaultMessage": "ユーザー名またはパスワードが間違っています。もう一度お試しください。"
@@ -997,6 +1075,9 @@
   "pagination.field.num_of_pages": {
     "defaultMessage": "/{numOfPages}"
   },
+  "pagination.field.page_number_select": {
+    "defaultMessage": "ページ番号を選択"
+  },
   "pagination.link.next": {
     "defaultMessage": "次へ"
   },
@@ -1038,8 +1119,14 @@
     "defaultMessage": "大文字 1 個",
     "description": "Password requirement"
   },
+  "password_reset_success.toast": {
+    "defaultMessage": "パスワードリセットの成功"
+  },
   "payment_selection.heading.credit_card": {
     "defaultMessage": "クレジットカード"
+  },
+  "payment_selection.radio_group.assistive_msg": {
+    "defaultMessage": "支払"
   },
   "payment_selection.tooltip.secure_payment": {
     "defaultMessage": "これは SSL 暗号化によるセキュアな支払方法です。"
@@ -1107,6 +1194,9 @@
   },
   "product_list.select.sort_by": {
     "defaultMessage": "並べ替え順: {sortOption}"
+  },
+  "product_list.sort_by.label.assistive_msg": {
+    "defaultMessage": "商品の並べ替え条件"
   },
   "product_scroller.assistive_msg.scroll_left": {
     "defaultMessage": "商品を左へスクロール"
@@ -1186,6 +1276,9 @@
   "profile_card.title.my_profile": {
     "defaultMessage": "マイプロフィール"
   },
+  "profile_fields.label.profile_form": {
+    "defaultMessage": "プロフィールフォーム"
+  },
   "promo_code_fields.button.apply": {
     "defaultMessage": "適用"
   },
@@ -1222,15 +1315,6 @@
   "register_form.message.create_an_account": {
     "defaultMessage": "アカウントを作成すると、売れ筋商品、インスピレーション、コミュニティに最初にアクセスできます。"
   },
-  "reset_password.button.back_to_sign_in": {
-    "defaultMessage": "サインインに戻る"
-  },
-  "reset_password.info.receive_email_shortly": {
-    "defaultMessage": "パスワードリセットのリンクが記載された Eメールがまもなく <b>{email}</b> に届きます。"
-  },
-  "reset_password.title.password_reset": {
-    "defaultMessage": "パスワードのリセット"
-  },
   "reset_password_form.action.sign_in": {
     "defaultMessage": "サインイン"
   },
@@ -1241,7 +1325,7 @@
     "defaultMessage": "パスワードのリセット方法を受け取るには Eメールを入力してください"
   },
   "reset_password_form.message.return_to_sign_in": {
-    "defaultMessage": "または次のリンクをクリックしてください: ",
+    "defaultMessage": "または次に戻る: ",
     "description": "Precedes link to return to sign in"
   },
   "reset_password_form.title.reset_password": {
@@ -1312,6 +1396,12 @@
   },
   "signout_confirmation_dialog.message.sure_to_sign_out": {
     "defaultMessage": "サインアウトしますか?現在のご注文を処理するには、再度サインインする必要があります。"
+  },
+  "social_login_redirect.message.authenticating": {
+    "defaultMessage": "認証中..."
+  },
+  "social_login_redirect.message.redirect_link": {
+    "defaultMessage": "自動的にリダイレクトされない場合は、<link>このリンク</link>をクリックして続行してください。"
   },
   "store_locator.action.find": {
     "defaultMessage": "検索"
@@ -1621,6 +1711,12 @@
   "use_update_password_fields.error.minimum_characters": {
     "defaultMessage": "パスワードには、少なくとも 8 文字を含める必要があります。"
   },
+  "use_update_password_fields.error.password_mismatch": {
+    "defaultMessage": "パスワードが一致しません。"
+  },
+  "use_update_password_fields.error.required_confirm_password": {
+    "defaultMessage": "パスワードを確認してください。"
+  },
   "use_update_password_fields.error.required_new_password": {
     "defaultMessage": "新しいパスワードを入力してください。"
   },
@@ -1632,6 +1728,9 @@
   },
   "use_update_password_fields.error.uppercase_letter": {
     "defaultMessage": "パスワードには、少なくとも 1 個の大文字を含める必要があります。"
+  },
+  "use_update_password_fields.label.confirm_new_password": {
+    "defaultMessage": "新しいパスワードの確認入力"
   },
   "use_update_password_fields.label.current_password": {
     "defaultMessage": "現在のパスワード"
