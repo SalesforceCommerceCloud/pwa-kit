@@ -33,6 +33,7 @@ import {getCreditCardIcon} from '@salesforce/retail-react-app/app/utils/cc-utils
 import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
 import Link from '@salesforce/retail-react-app/app/components/link'
 import AddressDisplay from '@salesforce/retail-react-app/app/components/address-display'
+import StoreDisplay from '@salesforce/retail-react-app/app/components/store-display'
 import PostCheckoutRegistrationFields from '@salesforce/retail-react-app/app/components/forms/post-checkout-registration-fields'
 import PromoPopover from '@salesforce/retail-react-app/app/components/promo-popover'
 import ItemVariantProvider from '@salesforce/retail-react-app/app/components/item-variant'
@@ -251,70 +252,30 @@ const CheckoutConfirmation = () => {
                                             />
                                         </Heading>
 
-                                        <SimpleGrid columns={[1, 1, 2]} spacing={6}>
-                                            <Stack spacing={1}>
-                                                <Heading as="h3" fontSize="sm">
+                                        <Stack spacing={1}>
+                                            <Heading as="h3" fontSize="sm">
+                                                <FormattedMessage
+                                                    defaultMessage="Pickup Address"
+                                                    id="checkout_confirmation.heading.pickup_address"
+                                                />
+                                            </Heading>
+                                            {store ? (
+                                                <StoreDisplay
+                                                    store={store}
+                                                    showDistance={false}
+                                                    showEmail={true}
+                                                    showPhone={true}
+                                                    showStoreHours={true}
+                                                />
+                                            ) : (
+                                                <Text>
                                                     <FormattedMessage
-                                                        defaultMessage="Pickup Address"
-                                                        id="checkout_confirmation.heading.pickup_address"
+                                                        defaultMessage="Store information not available"
+                                                        id="checkout_confirmation.message.store_info_unavailable"
                                                     />
-                                                </Heading>
-                                                {store ? (
-                                                    <Box>
-                                                        <Text fontWeight="bold">{store.name}</Text>
-                                                        <Box>
-                                                            <Text>{store.address1}</Text>
-                                                            <Text>
-                                                                {store.city}, {store.stateCode}{' '}
-                                                                {store.postalCode}
-                                                            </Text>
-                                                            <Text>{store.countryCode}</Text>
-                                                        </Box>
-                                                    </Box>
-                                                ) : (
-                                                    <Text>
-                                                        <FormattedMessage
-                                                            defaultMessage="Store information not available"
-                                                            id="checkout_confirmation.message.store_info_unavailable"
-                                                        />
-                                                    </Text>
-                                                )}
-                                            </Stack>
-
-                                            <Stack spacing={1}>
-                                                <Heading as="h3" fontSize="sm">
-                                                    <FormattedMessage
-                                                        defaultMessage="Pickup Information"
-                                                        id="checkout_confirmation.heading.pickup_information"
-                                                    />
-                                                </Heading>
-                                                <Box>
-                                                    {store?.c_customerServiceEmail && (
-                                                        <Text>{store.c_customerServiceEmail}</Text>
-                                                    )}
-                                                    {store?.phone && <Text>{store.phone}</Text>}
-                                                    {store?.storeHours && (
-                                                        <Box mt={2}>
-                                                            <Text
-                                                                fontSize="sm"
-                                                                fontWeight="semibold"
-                                                            >
-                                                                <FormattedMessage
-                                                                    defaultMessage="Store Hours"
-                                                                    id="checkout_confirmation.label.store_hours"
-                                                                />
-                                                            </Text>
-                                                            <Text
-                                                                fontSize="sm"
-                                                                whiteSpace="pre-line"
-                                                            >
-                                                                {store.storeHours}
-                                                            </Text>
-                                                        </Box>
-                                                    )}
-                                                </Box>
-                                            </Stack>
-                                        </SimpleGrid>
+                                                </Text>
+                                            )}
+                                        </Stack>
                                     </>
                                 ) : (
                                     <>
