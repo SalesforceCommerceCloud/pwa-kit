@@ -36,7 +36,12 @@ describe('StoreLocatorListItem', () => {
         const addressElements = screen.getAllByText((content, element) =>
             element.textContent.includes('San Francisco')
         )
-        expect(addressElements.some(el => el.textContent.includes('San Francisco') && el.textContent.includes('CA') && el.textContent.includes('94105'))).toBe(true)
+        expect(
+            addressElements.some(
+                (el) =>
+                    el.textContent.includes('San Francisco') &&
+                    el.textContent.includes('CA') &&
+                    el.textContent.includes('94105'))).toBe(true)
         expect(screen.getByText('0.5 mi away')).toBeTruthy()
         expect(screen.getByText('Phone: 555-1234')).toBeTruthy()
         expect(screen.getByText('View More')).toBeTruthy()
