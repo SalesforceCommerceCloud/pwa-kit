@@ -7,7 +7,7 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import {Dialog, Portal} from '@chakra-ui/react'
+import {Dialog, Portal, CloseButton} from '@chakra-ui/react'
 import ProductView from '../../components/product-view'
 import {useProductViewModal} from '../../hooks/use-product-view-modal'
 import {useIntl} from 'react-intl'
@@ -26,12 +26,12 @@ const ProductViewModal = ({product, isOpen, onClose, ...props}) => {
         },
         {productName: productViewModalData?.product?.name}
     )
-
     return (
         <Dialog.Root
+            lazyMount
             open={isOpen}
             onOpenChange={() => onClose()}
-            size="4xl"
+            size="xl"
             closeOnInteractOutside={false}
         >
             <Portal>
@@ -48,6 +48,9 @@ const ProductViewModal = ({product, isOpen, onClose, ...props}) => {
                                 {...props}
                             />
                         </Dialog.Body>
+                        <Dialog.CloseTrigger asChild>
+                            <CloseButton size="sm" />
+                        </Dialog.CloseTrigger>
                     </Dialog.Content>
                 </Dialog.Positioner>
             </Portal>

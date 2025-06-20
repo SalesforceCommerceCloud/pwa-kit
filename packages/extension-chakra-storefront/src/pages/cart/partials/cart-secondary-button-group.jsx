@@ -66,7 +66,6 @@ const CartSecondaryButtonGroup = ({
 
     const {data: customer} = useCurrentCustomer()
     const modalProps = useDisclosure()
-    console.log('modalProps', modalProps)
 
     const showRemoveItemConfirmation = () => {
         modalProps.onOpen()

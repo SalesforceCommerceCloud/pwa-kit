@@ -24,7 +24,6 @@ const ConfirmationModal = ({
     onAlternateAction = noop,
     ...props
 }) => {
-    console.log('prop', props)
     const {formatMessage} = useIntl()
     const handleConfirmClick = () => {
         onPrimaryAction()

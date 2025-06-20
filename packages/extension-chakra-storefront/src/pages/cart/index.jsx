@@ -16,7 +16,7 @@ import CartCta from '../../pages/cart/partials/cart-cta'
 import CartSecondaryButtonGroup from '../../pages/cart/partials/cart-secondary-button-group'
 import CartSkeleton from '../../pages/cart/partials/cart-skeleton'
 import CartTitle from '../../pages/cart/partials/cart-title'
-// import ConfirmationModal from '../../components/confirmation-modal'
+import ConfirmationModal from '../../components/confirmation-modal'
 import EmptyCart from '../../pages/cart/partials/empty-cart'
 import OrderSummary from '../../components/order-summary'
 import ProductItem from '../../components/product-item'
@@ -49,14 +49,14 @@ import {
     useProducts,
     useShopperCustomersMutation
 } from '@salesforce/commerce-sdk-react'
-// import UnavailableProductConfirmationModal from '../../components/unavailable-product-confirmation-modal'
+import UnavailableProductConfirmationModal from '../../components/unavailable-product-confirmation-modal'
 import {getUpdateBundleChildArray} from '../../utils/product-utils'
 
 const DEBOUNCE_WAIT = 750
 const Cart = () => {
-    const {data: basket, isLoading} = useCurrentBasket()
+    const {data: basket, isPending} = useCurrentBasket()
     const productIds = basket?.productItems?.map(({productId}) => productId).join(',') ?? ''
-    const {data: products, isLoading: isProductsLoading} = useProducts(
+    const {data: products, isPending: isProductsPending} = useProducts(
         {
             parameters: {
                 ids: productIds,
@@ -162,7 +162,7 @@ const Cart = () => {
     const [localIsGiftItems, setLocalIsGiftItems] = useState({})
     const [isCartItemLoading, setCartItemLoading] = useState(false)
 
-    const {isOpen, onOpen, onClose} = useDisclosure()
+    const {open: isOpen, onOpen, onClose} = useDisclosure()
     const {formatMessage} = useIntl()
     const toast = useToast()
     const navigate = useNavigation()
@@ -482,7 +482,6 @@ const Cart = () => {
 
     /***************************** Remove Item from basket **************************/
     const handleRemoveItem = async (product) => {
-        console.log('tttttt')
         setSelectedItem(product)
         setCartItemLoading(true)
         await removeItemFromBasketMutation.mutateAsync(
@@ -507,13 +506,12 @@ const Cart = () => {
             }
         )
     }
-
     /********* Rendering  UI **********/
-    if (isLoading) {
+    if (isPending) {
         return <CartSkeleton />
     }
 
-    if (!isLoading && !basket?.productItems?.length) {
+    if (!isPending && !basket?.productItems?.length) {
         return <EmptyCart isRegistered={isRegistered} />
     }
     return (
@@ -551,6 +549,7 @@ const Cart = () => {
                                                         onIsAGiftChange={handleIsAGiftChange}
                                                         onAddToWishlistClick={handleAddToWishlist}
                                                         onEditClick={(product) => {
+                                                            console.log('product', product)
                                                             setSelectedItem(product)
                                                             onOpen()
                                                         }}
@@ -561,7 +560,7 @@ const Cart = () => {
                                                     ...productItem,
                                                     ...(productsByItemId &&
                                                         productsByItemId[productItem.itemId]),
-                                                    isProductUnavailable: !isProductsLoading
+                                                    isProductUnavailable: !isProductsPending
                                                         ? !productsByItemId?.[productItem.itemId]
                                                         : undefined,
                                                     price: productItem.price,
@@ -665,19 +664,19 @@ const Cart = () => {
             >
                 <CartCta />
             </Box>
-            {/*<ConfirmationModal*/}
-            {/*    {...REMOVE_CART_ITEM_CONFIRMATION_DIALOG_CONFIG}*/}
-            {/*    onPrimaryAction={() => {*/}
-            {/*        handleRemoveItem(selectedItem)*/}
-            {/*    }}*/}
-            {/*    onAlternateAction={() => {}}*/}
-            {/*    {...modalProps}*/}
-            {/*/>*/}
+            <ConfirmationModal
+                {...REMOVE_CART_ITEM_CONFIRMATION_DIALOG_CONFIG}
+                onPrimaryAction={() => {
+                    handleRemoveItem(selectedItem)
+                }}
+                onAlternateAction={() => {}}
+                {...modalProps}
+            />
 
-            {/*<UnavailableProductConfirmationModal*/}
-            {/*    productItems={basket?.productItems}*/}
-            {/*    handleUnavailableProducts={handleUnavailableProducts}*/}
-            {/*/>*/}
+            <UnavailableProductConfirmationModal
+                productItems={basket?.productItems}
+                handleUnavailableProducts={handleUnavailableProducts}
+            />
         </Box>
     )
 }
