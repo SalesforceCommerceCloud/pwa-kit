@@ -8,10 +8,12 @@ import {spawn} from 'child_process'
 import path from 'path'
 
 export function generatePwaKitProject(config) {
-    console.log('generatePwaKitProject', config)
+    console.error('generatePwaKitProject', config)
     return new Promise((resolve, reject) => {
-        const cliPath = path.resolve('node_modules', '.bin', 'pwa-kit-create-app')
-        console.log('cliPath', cliPath)
+        const cliPath = path.resolve(process.cwd(), 'node_modules', '.bin', 'pwa-kit-create-app')
+
+        console.error('cliPath', cliPath)
+
         const child = spawn('node', [cliPath], {stdio: ['pipe', 'pipe', 'pipe']})
 
         let output = ''

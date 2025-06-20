@@ -1,0 +1,47 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "Presets Schema",
+    "type": "object",
+    "properties": {
+        "presets": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "required": ["id", "name", "description", "answers", "private"],
+                "properties": {
+                    "id": {"type": "string"},
+                    "name": {"type": "string"},
+                    "description": {"type": "string"},
+                    "shortDescription": {"type": "string"},
+                    "templateSource": {
+                        "type": "object",
+                        "required": ["type", "id"],
+                        "properties": {
+                            "type": {"type": "string"},
+                            "id": {"type": "string"}
+                        },
+                        "additionalProperties": false
+                    },
+                    "answers": {
+                        "type": "object",
+                        "additionalProperties": {}
+                    },
+                    "assets": {
+                        "type": "array",
+                        "items": {"type": "string"}
+                    },
+                    "private": {
+                        "type": "boolean",
+                        "_ai": {
+                            "instruction": "This property is used to filter what presets are shown to the user.",
+                            "expectedUse": "Hiding presets from the user."
+                        }
+                    }
+                },
+                "additionalProperties": false
+            }
+        }
+    },
+    "required": ["presets"],
+    "additionalProperties": true
+}

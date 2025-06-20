@@ -12,10 +12,24 @@ import {AddComponentTool} from '../utils/AddComponentTool.js'
 import {InsertExistingComponentTool} from '../utils/InsertExistingComponentTool.js'
 import {CreateNewComponentTool} from '../utils/CreateNewComponentTool.js'
 import {generatePwaKitProject} from '../utils/GenerateProject.js'
-import pwaKitQuestions from '@salesforce/pwa-kit-create-app/assets/questions/test-questions.json' assert {type: 'json'}
+
+// TODO: It might be better to use and index file.
+
+// Preset and Template data
+import createAppPresets from '@salesforce/pwa-kit-create-app/data/presets.json' assert {type: 'json'}
+import createAppTemplates from '@salesforce/pwa-kit-create-app/data/templates.json' assert {type: 'json'}
+
+// Preset and Template schemas
+import createAppPresetsSchema from '@salesforce/pwa-kit-create-app/schemas/presets.json' assert {type: 'json'}
+import createAppTemplatesSchema from '@salesforce/pwa-kit-create-app/schemas/templates.json' assert {type: 'json'}
+
+
 import fs from 'fs/promises'
 import path from 'path'
 import {fileURLToPath} from 'url'
+import {createRequire} from 'module'
+
+const require = createRequire(import.meta.url)
 
 class PwaStorefrontMCPServerHighLevel {
     constructor() {
@@ -33,6 +47,19 @@ class PwaStorefrontMCPServerHighLevel {
     }
 
     setupTools() {
+        const getCreateAppPresetsDescription =
+            'Get the PWA Kit project creation presets and conversational guidelines. Ensure you read the linked schema ' +
+            'for details on the data structure and `_ai` properties. ' +
+            'Ask users what preset they want to use for project creation. After selecting the preset, ' +
+            'display the "answers" and confirm before passing the "answers" object from the selected ' +
+            'preset to the submit_pwa_kit_project_answers tool to generate the project ' +
+            '(triggers: create pwa using preset, build storefront prest, generate pwa-kit preset).'
+
+        const getCreateAppTemplatesDescription =
+            'Get the PWA Kit project templates and conversational guidelines. ' +
+            'Ask user to fulfill the templates questions conversationally if required then pass the answers ' +
+            'to the submit_pwa_kit_project_answers tool to generate the project. Do not trigger is prompt ' +
+            'contains the word "preset" (triggers: create pwa, build storefront, generate pwa-kit).'
         // Register tools using the high-level API
 
         this.server.tool(
@@ -217,10 +244,12 @@ class PwaStorefrontMCPServerHighLevel {
             'submit_pwa_kit_project_answers',
             'Submit completed PWA Kit project answers to generate the PWA Kit project. This should be called after the get_project_questions tool is called and the answers are collected.',
             {
-                answers: z.object({}).describe('The collected answers for project generation')
+                answers: z.record(z.any()).describe('The collected answers for project generation')
             },
             async ({answers}) => {
                 try {
+                    console.error('answers: ', answers)
+
                     const result = await generatePwaKitProject(answers)
                     console.error('result: ', result)
                     return {
@@ -246,11 +275,50 @@ class PwaStorefrontMCPServerHighLevel {
         )
 
         this.server.tool(
-            'get_project_questions',
-            'Get the PWA Kit project creation questions and conversational guidelines and start the project creation process (triggers: create pwa, build storefront, generate pwa-kit). Once the answers are collected, use the submit_pwa_kit_project_answers tool to generate the project.',
+            'get_create_app_presets',
+            getCreateAppPresetsDescription,
             {},
             async () => {
-                console.error('pwaKitQuestions: ', pwaKitQuestions)
+                console.error('PWA Kit presets: ', createAppPresets)
+                // You can customize this to dynamically load the schema if desired
+                // TODO: These guidelines should be imported from the create app package.
+                const guidelines = {
+                    tone: 'professional, friendly, concise',
+                    languageRestrictions: 'no foul or offensive language',
+                    questionScope: 'only ask questions provided in the schema',
+                    conversationalStyle:
+                        'keep questions direct and clear, avoid unnecessary elaboration',
+                    examples: {
+                        good: 'What is your project name?',
+                        bad: 'Hey there buddy, would you mind terribly if I asked you to please provide me with a project name? No rush!'
+                    }
+                }
+
+                return {
+                    content: [
+                        {
+                            type: 'text',
+                            text: JSON.stringify(
+                                {
+                                    presets: createAppPresets,
+                                    schema: createAppPresetsSchema,
+                                    guidelines
+                                },
+                                null,
+                                2
+                            )
+                        }
+                    ]
+                }
+            }
+        )
+
+        this.server.tool(
+            'get_create_app_templates',
+            getCreateAppTemplatesDescription,
+            {},
+            async () => {
+                console.error('PWA Kit template: ', createAppTemplates)
                 // You can customize this to dynamically load the schema if desired
                 const guidelines = {
                     tone: 'professional, friendly, concise',
@@ -270,7 +338,8 @@ class PwaStorefrontMCPServerHighLevel {
                             type: 'text',
                             text: JSON.stringify(
                                 {
-                                    questions: pwaKitQuestions,
+                                    templates: createAppTemplates,
+                                    schema: createAppTemplatesSchema,
                                     guidelines
                                 },
                                 null,

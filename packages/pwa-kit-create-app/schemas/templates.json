@@ -1,0 +1,72 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "Templates Schema",
+    "type": "object",
+    "properties": {
+        "$schema": { "type": "string" },
+        "templates": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "required": [
+                    "id",
+                    "name",
+                    "description",
+                    "source",
+                    "questions",
+                    "private"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "string"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "description": {
+                        "type": "string"
+                    },
+                    "shortDescription": {
+                        "type": "string"
+                    },
+                    "source": {
+                        "type": "string",
+                        "enum": [
+                            "npm",
+                            "bundle"
+                        ]
+                    },
+                    "questions": {
+                        "$ref": "questions.json",
+                        "_ai": {
+                            "instruction": "This property references the Inquirer Question interface defined here https://github.com/DefinitelyTyped/DefinitelyTyped/blob/master/types/inquirer/index.d.ts",
+                            "expectedUse": "Hiding presets from the user."
+                        }
+                    },
+                    "assets": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "answers": {
+                        "type": "object",
+                        "additionalProperties": {}
+                    },
+                    "private": {
+                        "type": "boolean"
+                    }
+                },
+                "additionalProperties": false
+            },
+            "_ai": {
+                "instruction": "Do not display templates that are private. Answer is a key/value pair where the key is `project.template` and the value is the template id.",
+                "expectedUse": "Asking the user which template they want to use."
+            }
+        }
+    },
+    "required": [
+        "templates"
+    ],
+    "additionalProperties": true
+}

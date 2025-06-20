@@ -1,0 +1,92 @@
+{
+    "$schema": "../schemas/templates.json",
+    "templates": [
+      {
+        "id": "@salesforce/retail-react-app",
+        "name": "Retail React App",
+        "description": "Generate a project using custom settings by answering questions about a B2C Commerce instance. Use this preset to connect to an existing instance, such as a sandbox.",
+        "shortDescription": "The Retail app using your own Commerce Cloud instance",
+        "source": "npm",
+        "questions": [
+          {
+            "name": "project.name",
+            "message": "What is the name of your Project?"
+          },
+          {
+            "name": "project.commerce.instanceUrl",
+            "message": "What is the URL for your Commerce Cloud instance?"
+          },
+          {
+            "name": "project.commerce.clientId",
+            "message": "What is your SLAS Client ID?"
+          },
+          {
+            "name": "project.commerce.isSlasPrivate",
+            "message": "Is your SLAS client private?",
+            "type": "list",
+            "choices": [
+              { "name": "Yes", "value": true },
+              { "name": "No", "value": false }
+            ]
+          },
+          {
+            "name": "project.commerce.siteId",
+            "message": "What is your Site ID in Business Manager?"
+          },
+          {
+            "name": "project.commerce.organizationId",
+            "message": "What is your Commerce API organization ID in Business Manager?"
+          },
+          {
+            "name": "project.commerce.shortCode",
+            "message": "What is your Commerce API short code in Business Manager?"
+          }
+        ],
+        "assets": ["translations"],
+        "private": false
+      },
+      {
+        "id": "@salesforce/typescript-minimal",
+        "name": "Template Minimal Project",
+        "description": "Generate a project using a bare-bones TypeScript app template. Use this as a TypeScript starting point or as a base on top of which to build new TypeScript project templates for Managed Runtime.",
+        "source": "bundle",
+        "questions": [
+          {
+            "name": "project.name",
+            "message": "What is the name of your Project?"
+          }
+        ],
+        "private": false
+      },
+      {
+        "id": "express-minimal",
+        "name": "Express Minimal Project",
+        "description": "Generate a project using a bare-bones express app template. Use this as a starting point for APIs or as a base on top of which to build new project templates for Managed Runtime.",
+        "source": "bundle",
+        "questions": [
+          {
+            "name": "project.name",
+            "message": "What is the name of your Project?"
+          }
+        ],
+        "private": true
+      },
+      {
+        "id": "mrt-reference-app",
+        "name": "Managed Runtime Reference App",
+        "description": "",
+        "source": "bundle",
+        "questions": [
+          {
+            "name": "project.name",
+            "message": "What is the name of your Project?"
+          }
+        ],
+        "answers": {
+          "project.name": "mrt-reference-app"
+        },
+        "private": true
+      }
+    ]
+  }
+  
