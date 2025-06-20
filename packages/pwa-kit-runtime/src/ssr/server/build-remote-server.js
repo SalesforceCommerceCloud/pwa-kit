@@ -174,7 +174,10 @@ export const RemoteServerFactory = {
         // Add extra condition to regex to only allow SLAS endpoints
         options.slasApiPath = /\/shopper\/auth\/.*/
         options.applySLASPrivateClientToEndpoints = new RegExp(
-            options.slasApiPath.source + `(` + options.applySLASPrivateClientToEndpoints.source + ')'
+            options.slasApiPath.source +
+                `(` +
+                options.applySLASPrivateClientToEndpoints.source +
+                ')'
         )
 
         return options
