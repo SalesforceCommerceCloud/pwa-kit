@@ -225,7 +225,7 @@ function processFile(filePath, plugins) {
 }
 
 /**
-* Remove unused components from the directory, as a result of trimming.
+ * Remove unused components from the directory, as a result of trimming.
  * @param {*} directory - The directory to remove unused components from.
  * @returns {void}
  */
