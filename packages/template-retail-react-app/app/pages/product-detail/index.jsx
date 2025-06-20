@@ -409,11 +409,7 @@ const ProductDetail = () => {
             const basketResponse = await addItemToNewOrExistingBasket(productItems)
 
             // If any items are pickup items, and no shipments configured, ensure the shipment is configured for pickup
-            if (
-                hasPickupItems &&
-                basketResponse?.basketId &&
-                basketResponse.shipments.length > 0
-            ) {
+            if (hasPickupItems && basketResponse?.basketId && basketResponse.shipments.length > 0) {
                 // Fetch shipping methods and configure pickup shipment
                 const {data: fetchedShippingMethods} = await refetchShippingMethods()
                 const pickupShippingMethodId = getPickupShippingMethodId(fetchedShippingMethods)
