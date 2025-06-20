@@ -29,7 +29,7 @@ export const StoreLocatorListItem = ({store, radioProps}) => {
                             {store.address1}
                         </Box>
                         <Box fontSize="md" color="gray.600">
-                            {store.city}, {store.stateCode ? store.stateCode : ''} 
+                            {store.city}, {store.stateCode ? store.stateCode : ''}
                             {store.postalCode}
                         </Box>
                         {store.distance !== undefined && (
