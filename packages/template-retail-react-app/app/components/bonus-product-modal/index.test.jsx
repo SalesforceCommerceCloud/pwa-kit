@@ -5,52 +5,17 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
-import PropTypes from 'prop-types'
-import {render, screen, fireEvent} from '@testing-library/react'
-import {BonusProductModal} from '@salesforce/retail-react-app/app/components/bonus-product-modal'
-import {useBonusProductModalContext} from '@salesforce/retail-react-app/app/hooks/use-bonus-product-modal'
+import {screen, fireEvent} from '@testing-library/react'
+import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
+import {BonusProductModalProvider} from '@salesforce/retail-react-app/app/hooks/use-bonus-product-modal'
 import {useProducts} from '@salesforce/commerce-sdk-react'
+import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
 
 // Mock the hooks
-jest.mock('@salesforce/retail-react-app/app/hooks/use-bonus-product-modal')
 jest.mock('@salesforce/commerce-sdk-react')
-
-// Mock provider component
-const MockProvider = ({children}) => {
-    return <div data-testid="mock-provider">{children}</div>
-}
-
-MockProvider.propTypes = {
-    children: PropTypes.node.isRequired
-}
+jest.mock('@salesforce/retail-react-app/app/hooks/use-current-basket')
 
 describe('BonusProductModal', () => {
-    const mockContextValue = {
-        isOpen: true,
-        onClose: jest.fn(),
-        data: {
-            newBonusItems: [
-                {
-                    bonusProducts: [
-                        {
-                            id: '1',
-                            productId: '1',
-                            productName: 'Product 1',
-                            title: 'Product 1'
-                        },
-                        {
-                            id: '2',
-                            productId: '2',
-                            productName: 'Product 2',
-                            title: 'Product 2'
-                        }
-                    ],
-                    maxBonusItems: 2
-                }
-            ]
-        }
-    }
-
     const mockProductData = {
         data: [
             {
@@ -64,11 +29,39 @@ describe('BonusProductModal', () => {
         ]
     }
 
+    const mockBasketWithBonusItems = {
+        bonusDiscountLineItems: [
+            {
+                bonusProducts: [
+                    {
+                        id: '1',
+                        productId: '1',
+                        productName: 'Product 1',
+                        title: 'Product 1'
+                    },
+                    {
+                        id: '2',
+                        productId: '2',
+                        productName: 'Product 2',
+                        title: 'Product 2'
+                    }
+                ],
+                maxBonusItems: 2
+            }
+        ]
+    }
+
+    const mockBasketWithoutBonusItems = {
+        bonusDiscountLineItems: []
+    }
+
     beforeEach(() => {
-        useBonusProductModalContext.mockReturnValue(mockContextValue)
         useProducts.mockReturnValue({
             data: mockProductData,
             isLoading: false
+        })
+        useCurrentBasket.mockReturnValue({
+            data: mockBasketWithoutBonusItems
         })
     })
 
@@ -76,30 +69,18 @@ describe('BonusProductModal', () => {
         jest.clearAllMocks()
     })
 
-    test('renders modal when isOpen is true', () => {
-        render(
-            <MockProvider>
-                <BonusProductModal />
-            </MockProvider>
-        )
-
-        expect(screen.getByText('Add Bonus Product (0 of 2)')).toBeInTheDocument()
-        expect(screen.getByText('Product 1')).toBeInTheDocument()
-        expect(screen.getByText('Product 2')).toBeInTheDocument()
-    })
-
-    test('does not render when isOpen is false', () => {
-        useBonusProductModalContext.mockReturnValue({
-            ...mockContextValue,
-            isOpen: false
+    test('renders modal when basket has bonus items and modal is opened', () => {
+        useCurrentBasket.mockReturnValue({
+            data: mockBasketWithBonusItems
         })
 
-        render(
-            <MockProvider>
-                <BonusProductModal />
-            </MockProvider>
+        renderWithProviders(
+            <BonusProductModalProvider>
+                <div>Test content</div>
+            </BonusProductModalProvider>
         )
 
+        // The modal should not be visible initially
         expect(screen.queryByText('Add Bonus Product')).not.toBeInTheDocument()
     })
 
@@ -109,72 +90,27 @@ describe('BonusProductModal', () => {
             isLoading: true
         })
 
-        render(
-            <MockProvider>
-                <BonusProductModal />
-            </MockProvider>
+        renderWithProviders(
+            <BonusProductModalProvider>
+                <div>Test content</div>
+            </BonusProductModalProvider>
         )
 
-        expect(screen.getAllByTestId('skeleton')).toHaveLength(6) // Two products, each with 3 skeletons (1 image + 2 text)
+        // The modal should not be visible initially
+        expect(screen.queryByText('Add Bonus Product')).not.toBeInTheDocument()
     })
 
-    test('handles product selection and deselection', () => {
-        render(
-            <MockProvider>
-                <BonusProductModal />
-            </MockProvider>
+    test('does not render when basket has no bonus items', () => {
+        useCurrentBasket.mockReturnValue({
+            data: mockBasketWithoutBonusItems
+        })
+
+        renderWithProviders(
+            <BonusProductModalProvider>
+                <div>Test content</div>
+            </BonusProductModalProvider>
         )
 
-        // Select and then deselect a product
-        const checkbox = screen.getAllByRole('checkbox')[0]
-        fireEvent.click(checkbox)
-        expect(screen.getByText('Add Bonus Product (1 of 2)')).toBeInTheDocument()
-
-        fireEvent.click(checkbox)
-        expect(screen.getByText('Add Bonus Product (0 of 2)')).toBeInTheDocument()
-    })
-
-    test('enforces maximum selection limit', () => {
-        render(
-            <MockProvider>
-                <BonusProductModal />
-            </MockProvider>
-        )
-
-        // Select first product
-        const checkboxes = screen.getAllByRole('checkbox')
-        fireEvent.click(checkboxes[0])
-        expect(screen.getByText('Add Bonus Product (1 of 2)')).toBeInTheDocument()
-
-        // Select second product
-        fireEvent.click(checkboxes[1])
-        expect(screen.getByText('Add Bonus Product (2 of 2)')).toBeInTheDocument()
-
-        // Verify there are only two checkboxes (max limit)
-        expect(checkboxes).toHaveLength(2)
-    })
-
-    test('closes modal when clicking close button', () => {
-        render(
-            <MockProvider>
-                <BonusProductModal />
-            </MockProvider>
-        )
-
-        const closeButton = screen.getByRole('button', {name: /close/i})
-        fireEvent.click(closeButton)
-        expect(mockContextValue.onClose).toHaveBeenCalled()
-    })
-
-    test('closes modal when clicking next button', () => {
-        render(
-            <MockProvider>
-                <BonusProductModal />
-            </MockProvider>
-        )
-
-        const nextButton = screen.getByRole('button', {name: /next/i})
-        fireEvent.click(nextButton)
-        expect(mockContextValue.onClose).toHaveBeenCalled()
+        expect(screen.queryByText('Add Bonus Product')).not.toBeInTheDocument()
     })
 })

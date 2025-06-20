@@ -30,34 +30,20 @@ import {findImageGroupBy} from '@salesforce/retail-react-app/app/utils/image-gro
 import {FormattedMessage} from 'react-intl'
 
 // Component to display individual bonus product with checkbox for selection
-const BonusProductItem = ({product, isSelected, onToggle, isLoading}) => {
+const BonusProductItem = ({product, productData, isSelected, onToggle, isLoading}) => {
     const productName = product?.productName || product?.title
-    const productId = product?.productId || product?.id
 
-    // Fetch product data to get image information
-    const {data: productData, isLoading: isProductLoading} = useProducts(
-        {
-            parameters: {
-                ids: productId,
-                allImages: true
-            }
-        },
-        {
-            enabled: !!productId
-        }
-    )
-
-    // Get the appropriate image group
+    // Get the appropriate image group from the passed product data
     const imageGroup = useMemo(
         () =>
-            findImageGroupBy(productData?.data?.[0]?.imageGroups || [], {
+            findImageGroupBy(productData?.imageGroups || [], {
                 viewType: 'small'
             }),
         [productData]
     )
 
     const image = imageGroup?.images?.[0]
-    const showLoading = isLoading || isProductLoading
+    const showLoading = isLoading
 
     if (showLoading) {
         return (
@@ -121,6 +107,7 @@ const BonusProductItem = ({product, isSelected, onToggle, isLoading}) => {
 
 BonusProductItem.propTypes = {
     product: PropTypes.object.isRequired,
+    productData: PropTypes.object,
     isSelected: PropTypes.bool.isRequired,
     onToggle: PropTypes.func.isRequired,
     isLoading: PropTypes.bool
@@ -135,6 +122,36 @@ export const BonusProductModal = () => {
     const currentPromotion = bonusDiscountLineItems[0] || {}
     const bonusProducts = currentPromotion.bonusProducts || []
     const maxBonusItems = currentPromotion.maxBonusItems || 1
+
+    // Get all product IDs for batch fetching
+    const productIds = useMemo(() => {
+        return bonusProducts
+            .map(product => product.productId || product.id)
+            .filter(Boolean)
+    }, [bonusProducts])
+
+    // Fetch all products data at once
+    const {data: productsData, isLoading: isProductsLoading} = useProducts(
+        {
+            parameters: {
+                ids: productIds.join(','),
+                allImages: true
+            }
+        },
+        {
+            enabled: productIds.length > 0
+        }
+    )
+
+    // Create a map of product data by ID for easy lookup
+    const productsDataMap = useMemo(() => {
+        if (!productsData?.data) return {}
+        
+        return productsData.data.reduce((acc, product) => {
+            acc[product.id] = product
+            return acc
+        }, {})
+    }, [productsData])
 
     // Reset selections when modal opens
     useEffect(() => {
@@ -187,16 +204,21 @@ export const BonusProductModal = () => {
                 <ModalBody bgColor="white" padding="6">
                     {bonusProducts.length > 0 ? (
                         <SimpleGrid columns={columns} spacing={8} justifyItems="start">
-                            {bonusProducts.map((product) => (
-                                <BonusProductItem
-                                    key={product.productId || product.id}
-                                    product={product}
-                                    isSelected={selectedProducts.has(
-                                        product.id || product.productId
-                                    )}
-                                    onToggle={handleToggle}
-                                />
-                            ))}
+                            {bonusProducts.map((product) => {
+                                const productId = product.productId || product.id
+                                const productData = productsDataMap[productId]
+                                
+                                return (
+                                    <BonusProductItem
+                                        key={productId}
+                                        product={product}
+                                        productData={productData}
+                                        isSelected={selectedProducts.has(productId)}
+                                        onToggle={handleToggle}
+                                        isLoading={isProductsLoading}
+                                    />
+                                )
+                            })}
                         </SimpleGrid>
                     ) : (
                         <Box textAlign="center" py={8}>
