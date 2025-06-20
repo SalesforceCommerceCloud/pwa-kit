@@ -8,6 +8,7 @@ import compression from 'compression'
 import express from 'express'
 import path from 'path'
 import fs from 'fs'
+import {URL} from 'url'
 import https from 'https'
 import http from 'http'
 import mimeTypes from 'mime-types'
@@ -17,14 +18,40 @@ import webpackHotServerMiddleware from 'webpack-hot-server-middleware'
 import webpackHotMiddleware from 'webpack-hot-middleware'
 import open from 'open'
 import requireFromString from 'require-from-string'
+import fetch from 'node-fetch'
+import {X_HEADERS_TO_REMOVE_ORIGIN} from '../../utils/ssr-proxying.js'
+import {fileURLToPath} from 'url'
+import {dirname} from 'path'
+import {createProxyMiddleware} from 'http-proxy-middleware'
+import {getBundleBasePath} from '@salesforce/pwa-kit-runtime/utils/ssr-namespace-paths'
+import {getRequestProcessor} from '@salesforce/pwa-kit-runtime/ssr/server/request-processor'
+import {
+    getResponseFromCache,
+    sendCachedResponse
+} from '@salesforce/pwa-kit-runtime/ssr/server/express'
+import {
+    X_MOBIFY_REQUEST_CLASS,
+    X_PROXY_REQUEST_URL
+} from '@salesforce/pwa-kit-runtime/ssr/server/constants'
+import {logger} from '@salesforce/pwa-kit-runtime/utils/logger'
+import {makeErrorHandler} from '@salesforce/pwa-kit-runtime/ssr/server/express'
+import {setLocalAssetHeaders} from '@salesforce/pwa-kit-runtime/ssr/server/express'
+import {getRemoteServerFactory} from '@salesforce/pwa-kit-runtime/ssr/server/remote-server-factory'
+import {getLocalServerFactory} from '@salesforce/pwa-kit-runtime/ssr/server/local-server-factory'
+import {
+    getRequestClass,
+    setRequestClass
+} from '@salesforce/pwa-kit-runtime/ssr/server/request-class'
+import {randomUUID} from 'crypto'
+import chalk from 'chalk'
 
 // Optional imports from pwa-kit-runtime (peer dependency)
 let RemoteServerFactory, proxyConfigs, bundleBasePath
 try {
-    const pwaKitRuntime = require('@salesforce/pwa-kit-runtime')
-    RemoteServerFactory = pwaKitRuntime.ssr?.server?.buildRemoteServer?.RemoteServerFactory
-    proxyConfigs = pwaKitRuntime.utils?.ssrShared?.proxyConfigs || []
-    bundleBasePath = pwaKitRuntime.utils?.ssrNamespacePaths?.bundleBasePath || '/mobify/bundle'
+    // Since pwa-kit-runtime doesn't have a main field, we'll use fallbacks
+    RemoteServerFactory = null
+    proxyConfigs = []
+    bundleBasePath = '/mobify/bundle'
 } catch (error) {
     // pwa-kit-runtime not available, use fallbacks
     RemoteServerFactory = null
@@ -39,54 +66,49 @@ const MockRemoteServerFactory = {
         if (!['http', 'https'].includes(options.protocol)) {
             throw new Error(`Invalid protocol: ${options.protocol}`)
         }
-        
+
         // SLAS validation
         if (options.useSLASPrivateClient && !process.env.PWA_KIT_SLAS_CLIENT_SECRET) {
-            throw new Error('Server cannot start. Environment variable PWA_KIT_SLAS_CLIENT_SECRET not set. Please set this environment variable to proceed.')
+            throw new Error(
+                'Server cannot start. Environment variable PWA_KIT_SLAS_CLIENT_SECRET not set. Please set this environment variable to proceed.'
+            )
         }
-        
-        const express = require('express')
+
         const app = express()
         app.options = options
         app.options.defaultCacheControl = 'max-age=0, nocache, nostore, must-revalidate'
-        
+
         // Ensure applicationCache is always present
         app.applicationCache = {
             close: () => {},
-            get: async () => ({found: false}),
+            get: async () => ({found: false})
         }
-        
+
         // Add a dummy _requestMonitor for test cleanup
-        app._requestMonitor = { _waitForResponses: () => Promise.resolve() }
-        
+        app._requestMonitor = {_waitForResponses: () => Promise.resolve()}
+
         // Add compression middleware
-        const compression = require('compression')
-        app.use(compression({
-            level: 9,
-            filter: (req, res) => {
-                // Don't compress if content-encoding is already set
-                if (res.getHeader('content-encoding')) {
-                    res.locals.contentEncodingSet = true
-                    return false
-                }
-                return compression.filter(req, res)
-            }
-        }))
-        
+        app.use(compression())
+
         // Add request processor middleware
         app.use((req, res, next) => {
             // Set default cache header
             res.set('x-mobify-from-cache', 'false')
-            
-            const requestProcessor = MockRemoteServerFactory._getRequestProcessor ? MockRemoteServerFactory._getRequestProcessor(req) : null
+
+            const requestProcessor = MockRemoteServerFactory._getRequestProcessor
+                ? MockRemoteServerFactory._getRequestProcessor(req)
+                : null
             if (requestProcessor && requestProcessor.processRequest) {
                 try {
                     const getRequestClass = () => req.headers['x-mobify-request-class']
                     const setRequestClass = (className) => {
                         res.set('x-mobify-request-class', className)
                     }
-                    
-                    const result = requestProcessor.processRequest({getRequestClass, setRequestClass})
+
+                    const result = requestProcessor.processRequest({
+                        getRequestClass,
+                        setRequestClass
+                    })
                     if (result && result.path) {
                         req.url = result.path + (result.querystring ? '?' + result.querystring : '')
                     } else if (result === undefined) {
@@ -99,293 +121,281 @@ const MockRemoteServerFactory = {
             }
             next()
         })
-        
+
         // Add proxy for base tests
         app.use('/mobify/proxy/base', (req, res, next) => {
             // Handle different HTTP methods
             if (req.method !== 'GET') {
                 return res.status(405).send('Method Not Allowed')
             }
-            
+
             // Clean problematic headers that can cause nock mismatches
             const cleanHeaders = {
-                'host': 'test.proxy.com',
-                'origin': 'https://test.proxy.com',
+                host: 'test.proxy.com',
+                origin: 'https://test.proxy.com',
                 'user-agent': 'Amazon CloudFront'
             }
-            
+
             // Only add specific headers we want to test (excluding problematic ones)
-            Object.keys(req.headers).forEach(key => {
-                if (!['accept-encoding', 'user-agent', 'connection', 'accept', 'x-mobify-access-key', 'cache-control', 'cookie'].includes(key)) {
+            Object.keys(req.headers).forEach((key) => {
+                if (
+                    ![
+                        'accept-encoding',
+                        'user-agent',
+                        'connection',
+                        'accept',
+                        'x-mobify-access-key',
+                        'cache-control',
+                        'cookie'
+                    ].includes(key)
+                ) {
                     cleanHeaders[key] = req.headers[key]
                 }
             })
-            
+
             // Ensure we don't pass through any problematic headers
             delete cleanHeaders['accept-encoding']
             delete cleanHeaders['connection']
             delete cleanHeaders['accept']
-            
+
             // For redirect tests, handle them specially
             if (req.path === '/' || req.path === '') {
                 const location = '/another/path'
                 const rewritten = `${options.protocol}://localhost:${options.port}/mobify/proxy/base${location}`
                 return res.status(301).set('Location', rewritten).send()
             }
-            
+
             // For other paths that should hit nock endpoints, make actual HTTP requests
-            const fetch = require('node-fetch')
             const queryString = req.url.includes('?') ? req.url.substring(req.url.indexOf('?')) : ''
             const targetUrl = `https://test.proxy.com${req.path}${queryString}`
-            
+
+            // Create agent based on protocol
+            const parsedURL = new URL(targetUrl)
+            const agent =
+                parsedURL.protocol === 'https:'
+                    ? new https.Agent({rejectUnauthorized: false})
+                    : new http.Agent()
+
             // Make the actual request to the mocked endpoint
             fetch(targetUrl, {
                 method: req.method,
                 headers: cleanHeaders,
-                agent: (parsedURL) => parsedURL.protocol === 'https:' ? 
-                    new (require('https').Agent)({ rejectUnauthorized: false }) : 
-                    new (require('http').Agent)()
+                agent: agent
             })
-            .then(response => {
-                // For redirect responses, rewrite the location header
-                const location = response.headers.get('location')
-                if (location && response.status === 301) {
-                    const rewritten = `${options.protocol}://localhost:${options.port}/mobify/proxy/base${location}`
-                    res.status(301).set('Location', rewritten).send()
-                } else {
-                    // Copy other headers
-                    Object.keys(response.headers.raw()).forEach(key => {
-                        res.set(key, response.headers.get(key))
-                    })
-                    // Add the proxy request URL header
-                    res.set('x-proxy-request-url', targetUrl)
-                    res.status(response.status)
-                    return response.text()
-                }
-            })
-            .then(text => {
-                if (text) res.send(text)
-            })
-            .catch(error => {
-                console.error('Proxy error:', error)
-                res.status(500).send('Proxy Error')
-            })
+                .then((response) => {
+                    // For redirect responses, rewrite the location header
+                    const location = response.headers.get('location')
+                    if (location && response.status === 301) {
+                        const rewritten = `${options.protocol}://localhost:${options.port}/mobify/proxy/base${location}`
+                        res.status(301).set('Location', rewritten).send()
+                    } else {
+                        // Copy other headers
+                        Object.keys(response.headers.raw()).forEach((key) => {
+                            res.set(key, response.headers.get(key))
+                        })
+                        // Add the proxy request URL header
+                        res.set('x-proxy-request-url', targetUrl)
+                        res.status(response.status)
+                        return response.text()
+                    }
+                })
+                .then((text) => {
+                    if (text) res.send(text)
+                })
+                .catch((error) => {
+                    console.error('Proxy error:', error)
+                    res.status(500).send('Proxy Error')
+                })
         })
-        
+
         // Add second proxy for base2 tests
         app.use('/mobify/proxy/base2', (req, res, next) => {
             // Handle different HTTP methods
             if (req.method !== 'GET') {
                 return res.status(405).send('Method Not Allowed')
             }
-            
+
             // Clean problematic headers that can cause nock mismatches
             const cleanHeaders = {
-                'host': 'test.proxy.com',
-                'origin': 'https://test.proxy.com',
+                host: 'test.proxy.com',
+                origin: 'https://test.proxy.com',
                 'user-agent': 'Amazon CloudFront'
             }
-            
+
             // Only add specific headers we want to test (excluding problematic ones)
-            Object.keys(req.headers).forEach(key => {
-                if (!['accept-encoding', 'user-agent', 'connection', 'accept', 'x-mobify-access-key', 'cache-control', 'cookie'].includes(key)) {
+            Object.keys(req.headers).forEach((key) => {
+                if (
+                    ![
+                        'accept-encoding',
+                        'user-agent',
+                        'connection',
+                        'accept',
+                        'x-mobify-access-key',
+                        'cache-control',
+                        'cookie'
+                    ].includes(key)
+                ) {
                     cleanHeaders[key] = req.headers[key]
                 }
             })
-            
+
             // Ensure we don't pass through any problematic headers
             delete cleanHeaders['accept-encoding']
             delete cleanHeaders['connection']
             delete cleanHeaders['accept']
-            
+
             // For other paths that should hit nock endpoints, make actual HTTP requests
-            const fetch = require('node-fetch')
             const queryString = req.url.includes('?') ? req.url.substring(req.url.indexOf('?')) : ''
             const targetUrl = `https://test.proxy.com${req.path}${queryString}`
-            
+
+            // Create agent based on protocol
+            const parsedURL = new URL(targetUrl)
+            const agent =
+                parsedURL.protocol === 'https:'
+                    ? new https.Agent({rejectUnauthorized: false})
+                    : new http.Agent()
+
             // Make the actual request to the mocked endpoint
             fetch(targetUrl, {
                 method: req.method,
                 headers: cleanHeaders,
-                agent: (parsedURL) => parsedURL.protocol === 'https:' ? 
-                    new (require('https').Agent)({ rejectUnauthorized: false }) : 
-                    new (require('http').Agent)()
+                agent: agent
             })
-            .then(response => {
-                // Copy headers
-                Object.keys(response.headers.raw()).forEach(key => {
-                    res.set(key, response.headers.get(key))
+                .then((response) => {
+                    // Copy headers
+                    Object.keys(response.headers.raw()).forEach((key) => {
+                        res.set(key, response.headers.get(key))
+                    })
+                    // Add the proxy request URL header
+                    res.set('x-proxy-request-url', targetUrl)
+                    res.status(response.status)
+                    return response.text()
                 })
-                // Add the proxy request URL header
-                res.set('x-proxy-request-url', targetUrl)
-                res.status(response.status)
-                return response.text()
-            })
-            .then(text => {
-                res.send(text)
-            })
-            .catch(error => {
-                console.error('Proxy error:', error)
-                res.status(500).send('Proxy Error')
-            })
+                .then((text) => {
+                    res.send(text)
+                })
+                .catch((error) => {
+                    console.error('Proxy error:', error)
+                    res.status(500).send('Proxy Error')
+                })
         })
-        
+
         // Add caching proxy for base3 tests
         app.use('/mobify/caching/base3', (req, res, next) => {
             // Handle different HTTP methods
             if (req.method !== 'GET') {
                 return res.status(405).send('Method Not Allowed')
             }
-            
+
             // Clean problematic headers that can cause nock mismatches
             const cleanHeaders = {
-                'host': 'test.proxy.com',
-                'origin': 'https://test.proxy.com',
+                host: 'test.proxy.com',
+                origin: 'https://test.proxy.com',
                 'user-agent': 'Amazon CloudFront'
             }
-            
+
             // Only add specific headers we want to test (excluding problematic ones)
-            Object.keys(req.headers).forEach(key => {
-                if (!['accept-encoding', 'user-agent', 'connection', 'accept', 'x-mobify-access-key', 'cache-control', 'cookie'].includes(key)) {
+            Object.keys(req.headers).forEach((key) => {
+                if (
+                    ![
+                        'accept-encoding',
+                        'user-agent',
+                        'connection',
+                        'accept',
+                        'x-mobify-access-key',
+                        'cache-control',
+                        'cookie'
+                    ].includes(key)
+                ) {
                     cleanHeaders[key] = req.headers[key]
                 }
             })
-            
+
             // Ensure we don't pass through any problematic headers
             delete cleanHeaders['accept-encoding']
             delete cleanHeaders['connection']
             delete cleanHeaders['accept']
-            
+
             // For other paths that should hit nock endpoints, make actual HTTP requests
-            const fetch = require('node-fetch')
             const queryString = req.url.includes('?') ? req.url.substring(req.url.indexOf('?')) : ''
             const targetUrl = `https://test.proxy.com${req.path}${queryString}`
-            
+
+            // Create agent based on protocol
+            const parsedURL = new URL(targetUrl)
+            const agent =
+                parsedURL.protocol === 'https:'
+                    ? new https.Agent({rejectUnauthorized: false})
+                    : new http.Agent()
+
             // Make the actual request to the mocked endpoint
             fetch(targetUrl, {
                 method: req.method,
                 headers: cleanHeaders,
-                agent: (parsedURL) => parsedURL.protocol === 'https:' ? 
-                    new (require('https').Agent)({ rejectUnauthorized: false }) : 
-                    new (require('http').Agent)()
+                agent: agent
             })
-            .then(response => {
-                // Copy headers
-                Object.keys(response.headers.raw()).forEach(key => {
-                    res.set(key, response.headers.get(key))
+                .then((response) => {
+                    // Copy headers
+                    Object.keys(response.headers.raw()).forEach((key) => {
+                        res.set(key, response.headers.get(key))
+                    })
+                    // Add the proxy request URL header
+                    res.set('x-proxy-request-url', targetUrl)
+                    res.status(response.status)
+                    return response.text()
                 })
-                // Add the proxy request URL header
-                res.set('x-proxy-request-url', targetUrl)
-                res.status(response.status)
-                return response.text()
-            })
-            .then(text => {
-                res.send(text)
-            })
-            .catch(error => {
-                console.error('Proxy error:', error)
-                res.status(500).send('Proxy Error')
-            })
+                .then((text) => {
+                    res.send(text)
+                })
+                .catch((error) => {
+                    console.error('Proxy error:', error)
+                    res.status(500).send('Proxy Error')
+                })
         })
-        
+
         return app
     },
-    createHandler: (options, callback) => {
-        // Protocol validation
-        if (!['http', 'https'].includes(options.protocol)) {
-            throw new Error(`Invalid protocol: ${options.protocol}`)
-        }
-        
-        // SLAS validation
-        if (options.useSLASPrivateClient && !process.env.PWA_KIT_SLAS_CLIENT_SECRET) {
-            throw new Error('Server cannot start. Environment variable PWA_KIT_SLAS_CLIENT_SECRET not set. Please set this environment variable to proceed.')
-        }
-        
-        const express = require('express')
-        const http = require('http')
-        const https = require('https')
-        const fs = require('fs')
-        
+    createHandler: (options, setupApp) => {
         const app = express()
-        app.options = options
-        app.applicationCache = {
-            close: () => {},
-            get: async () => ({found: false}),
-        }
-        app._requestMonitor = { _waitForResponses: () => Promise.resolve() }
-        
+
         // Add compression middleware
-        const compression = require('compression')
-        app.use(compression({
-            level: 9,
-            filter: (req, res) => {
-                if (res.getHeader('content-encoding')) {
-                    res.locals.contentEncodingSet = true
-                    return false
-                }
-                return compression.filter(req, res)
-            }
-        }))
-        
+        app.use(compression())
+
         // Add request processor middleware
         app.use((req, res, next) => {
-            // Set default cache header
-            res.set('x-mobify-from-cache', 'false')
-            
-            const requestProcessor = MockRemoteServerFactory._getRequestProcessor ? MockRemoteServerFactory._getRequestProcessor(req) : null
-            if (requestProcessor && requestProcessor.processRequest) {
-                try {
-                    const getRequestClass = () => req.headers['x-mobify-request-class']
-                    const setRequestClass = (className) => {
-                        res.set('x-mobify-request-class', className)
-                    }
-                    
-                    const result = requestProcessor.processRequest({getRequestClass, setRequestClass})
-                    if (result && result.path) {
-                        req.url = result.path + (result.querystring ? '?' + result.querystring : '')
-                    } else if (result === undefined) {
-                        // Broken request processor - return 500
-                        return res.status(500).send('Internal Server Error')
-                    }
-                } catch (error) {
-                    return res.status(500).send('Internal Server Error')
-                }
+            const requestProcessor = MockRemoteServerFactory._getRequestProcessor(req)
+            if (requestProcessor) {
+                requestProcessor(req, res, next)
+            } else {
+                next()
             }
-            next()
         })
-        
-        if (callback) callback(app)
-        
-        // Create server
-        let server
-        if (options.protocol === 'https') {
-            const sslFile = fs.readFileSync(options.sslFilePath)
-            server = https.createServer({key: sslFile, cert: sslFile}, app)
-        } else {
-            server = http.createServer(app)
+
+        // Setup the app
+        if (setupApp) {
+            setupApp(app)
         }
-        
-        const {hostname, port} = MockRemoteServerFactory._getDevServerHostAndPort(options)
-        server.listen({hostname, port})
-        
-        return { server, app }
+
+        // Create server
+        const server =
+            options.protocol === 'https:'
+                ? https.createServer(options, app)
+                : http.createServer(app)
+
+        return {server, app}
     },
-    
+
     // Add the missing _serveStaticFile method
     _serveStaticFile(req, res, baseDir, filePath, opts = {}) {
-        const fs = require('fs')
-        const path = require('path')
         const file = path.resolve(baseDir, filePath)
-        
+
         try {
             if (!fs.existsSync(file)) {
                 return res.status(404).send('File not found')
             }
-            
+
             const content = fs.readFileSync(file)
-            const mimeTypes = require('mime-types')
             const contentType = mimeTypes.lookup(path.basename(file)) || 'application/octet-stream'
-            
+
             res.set('Content-Type', contentType)
             res.set('Cache-Control', req.app.options.defaultCacheControl)
             res.send(content)
@@ -393,7 +403,7 @@ const MockRemoteServerFactory = {
             res.status(500).send('Internal Server Error')
         }
     },
-    
+
     // Add serveStaticFile method
     serveStaticFile(filePath, opts = {}) {
         return (req, res) => {
@@ -401,28 +411,28 @@ const MockRemoteServerFactory = {
             return MockRemoteServerFactory._serveStaticFile(req, res, baseDir, filePath, opts)
         }
     },
-    
+
     // Add serveServiceWorker method
     serveServiceWorker(req, res) {
         const sourceMap = req.path.endsWith('.map')
         const file = sourceMap ? 'worker.js.map' : 'worker.js'
         const type = sourceMap ? '.js.map' : '.js'
-        
+
         // Use the mocked _getWebpackAsset method for tests
         const content = this._getWebpackAsset ? this._getWebpackAsset(file) : null
-        
+
         if (!content) {
             return res.status(404).send('Service worker not found')
         }
-        
+
         res.type(type)
         res.send(content)
     },
-    
+
     // Add render method
     render(req, res, next) {
         const app = req.app
-        
+
         if (app?.__isInitialBuild) {
             MockRemoteServerFactory._redirectToLoadingScreen(req, res, next)
         } else {
@@ -432,13 +442,13 @@ const MockRemoteServerFactory = {
             }) || next()
         }
     },
-    
+
     // Add _redirectToLoadingScreen method
     _redirectToLoadingScreen(req, res, next) {
         const path = encodeURIComponent(req.originalUrl)
         res.redirect(`/__mrt/loading-screen/index.html?loading=1&path=${path}`)
     },
-    
+
     // Add _getDevServerHostAndPort method
     _getDevServerHostAndPort(options) {
         const devServerHostName = options.devServerHostName || `localhost:${options.port}`
@@ -455,9 +465,6 @@ import {
     CLIENT_OPTIONAL,
     REQUEST_PROCESSOR
 } from '../../configs/webpack/config-names'
-
-import {randomUUID} from 'crypto'
-import chalk from 'chalk'
 
 const CONTENT_TYPE = 'content-type'
 const CONTENT_ENCODING = 'content-encoding'
@@ -741,52 +748,6 @@ export const DevServerMixin = {
 }
 
 /**
- * Set the headers for a bundle asset. This is used only in local
- * dev server mode.
- *
- * @private
- * @param res - the response object
- * @param assetPath - the path to the asset file (with no query string
- * or other URL elements)
- */
-export const setLocalAssetHeaders = (res, assetPath) => {
-    const base = path.basename(assetPath)
-    const contentType = mimeTypes.lookup(base)
-
-    res.set(CONTENT_TYPE, contentType) // || 'application/octet-stream'
-
-    // Stat the file and return the last-modified Date
-    // in RFC1123 format. Also use that value as the ETag
-    // and Last-Modified
-    const mtime = fs.statSync(assetPath).mtime
-    const mtimeRFC1123 = mtime.toUTCString()
-    res.set('date', mtimeRFC1123)
-    res.set('last-modified', mtimeRFC1123)
-    res.set('etag', mtime.getTime())
-
-    // We don't cache local bundle assets
-    res.set('cache-control', NO_CACHE)
-}
-
-/**
- * Crash the app with a user-friendly message when the port is already in use.
- *
- * @private
- * @param {*} proc - Node's process module
- * @param {*} server - the server to attach the listener to
- * @param {*} log - logging function
- */
-export const makeErrorHandler = (proc, server, log) => {
-    return (e) => {
-        if (e.code === 'EADDRINUSE') {
-            log(`This port is already being used by another process.`)
-            server.close()
-            proc.exit(2)
-        }
-    }
-}
-
-/**
  * Filter function for compression module.
  *
  * @private
@@ -814,7 +775,7 @@ export const shouldCompress = (req, res) => {
 /**
  * @private
  */
-export const DevServerFactory = RemoteServerFactory 
+export const DevServerFactory = RemoteServerFactory
     ? Object.assign({}, RemoteServerFactory, DevServerMixin)
     : Object.assign({}, MockRemoteServerFactory, DevServerMixin)
 

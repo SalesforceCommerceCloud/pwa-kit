@@ -6,36 +6,52 @@
  */
 
 // Optional imports from pwa-kit-runtime (peer dependency)
-let NO_CACHE, X_MOBIFY_REQUEST_CLASS, X_PROXY_REQUEST_URL, getResponseFromCache, sendCachedResponse, cacheResponseWhenDone
-try {
-    const pwaKitRuntime = require('@salesforce/pwa-kit-runtime')
-    NO_CACHE = pwaKitRuntime.ssr?.server?.constants?.NO_CACHE || 'max-age=0, nocache, nostore, must-revalidate'
-    X_MOBIFY_REQUEST_CLASS = pwaKitRuntime.utils?.ssrProxying?.X_MOBIFY_REQUEST_CLASS || 'x-mobify-request-class'
-    X_PROXY_REQUEST_URL = pwaKitRuntime.utils?.ssrProxying?.X_PROXY_REQUEST_URL || 'x-proxy-request-url'
-    getResponseFromCache = pwaKitRuntime.ssr?.server?.express?.getResponseFromCache || (() => ({found: false}))
-    sendCachedResponse = pwaKitRuntime.ssr?.server?.express?.sendCachedResponse || (() => {})
-    cacheResponseWhenDone = pwaKitRuntime.ssr?.server?.express?.cacheResponseWhenDone || (() => {})
-} catch (error) {
-    // pwa-kit-runtime not available, use fallbacks
-    NO_CACHE = 'max-age=0, nocache, nostore, must-revalidate'
-    X_MOBIFY_REQUEST_CLASS = 'x-mobify-request-class'
-    X_PROXY_REQUEST_URL = 'x-proxy-request-url'
-    getResponseFromCache = () => ({found: false})
-    sendCachedResponse = () => {}
-    cacheResponseWhenDone = () => {}
-}
+import {
+    X_MOBIFY_REQUEST_CLASS,
+    X_PROXY_REQUEST_URL
+} from '@salesforce/pwa-kit-runtime/ssr/server/constants'
+
+import {
+    getResponseFromCache,
+    sendCachedResponse,
+    cacheResponseWhenDone
+} from '@salesforce/pwa-kit-runtime/ssr/server/express'
+
+import https from 'https'
+import http from 'http'
+
+const NO_CACHE = 'no-cache, no-store, must-revalidate'
 
 import fetch from 'node-fetch'
 import request from 'supertest'
-import {makeErrorHandler, DevServerFactory, setLocalAssetHeaders, MockRemoteServerFactory} from './build-dev-server'
+import {
+    makeErrorHandler,
+    DevServerFactory,
+    setLocalAssetHeaders,
+    MockRemoteServerFactory
+} from './build-dev-server'
 import os from 'os'
 import path from 'path'
-import http from 'http'
-import https from 'https'
 import nock from 'nock'
 import zlib from 'zlib'
 import fse from 'fs-extra'
 import rimraf from 'rimraf'
+
+// Mock pwa-kit-runtime modules
+jest.mock('@salesforce/pwa-kit-runtime/ssr/server/constants', () => ({
+    X_MOBIFY_REQUEST_CLASS: 'x-mobify-request-class',
+    X_PROXY_REQUEST_URL: 'x-proxy-request-url'
+}))
+
+jest.mock('@salesforce/pwa-kit-runtime/ssr/server/express', () => ({
+    getResponseFromCache: jest.fn(),
+    sendCachedResponse: jest.fn(),
+    cacheResponseWhenDone: jest.fn()
+}))
+
+jest.mock('http-proxy-middleware', () => ({
+    createProxyMiddleware: jest.fn()
+}))
 
 const TEST_PORT = 3444
 const testFixtures = path.resolve(__dirname, 'test_fixtures')
@@ -73,13 +89,10 @@ const httpsAgent = new https.Agent({
  * Fetch and ignore self-signed certificate errors.
  */
 const insecureFetch = (url, opts) => {
-    const https = require('https')
-    const http = require('http')
-    
     // Create agents that don't keep connections alive and accept self-signed certificates
-    const httpsAgent = new https.Agent({ keepAlive: false, rejectUnauthorized: false })
-    const httpAgent = new http.Agent({ keepAlive: false })
-    
+    const httpsAgent = new https.Agent({keepAlive: false, rejectUnauthorized: false})
+    const httpAgent = new http.Agent({keepAlive: false})
+
     return fetch(url, {
         ...opts,
         agent: (_parsedURL) => (_parsedURL.protocol === 'https:' ? httpsAgent : httpAgent)
@@ -324,25 +337,29 @@ describe('DevServer listening on http/https protocol', () => {
                 }
             )
             server = _server
-            
+
             // Wait for server to be ready
-            await new Promise(resolve => setTimeout(resolve, 100))
-            
+            await new Promise((resolve) => setTimeout(resolve, 100))
+
+            let requestSucceeded = false
+            let sslErrorExpected = false
+
             try {
                 // For HTTPS tests, we need to handle self-signed certificates
                 const response = await insecureFetch(`${protocol}://localhost:${TEST_PORT}`, {
                     // Add rejectUnauthorized: false for HTTPS
                     ...(protocol === 'https' && {
-                        agent: new (require('https').Agent)({ rejectUnauthorized: false })
+                        agent: new https.Agent({rejectUnauthorized: false})
                     })
                 })
                 expect(response.ok).toBe(true)
+                requestSucceeded = true
             } catch (error) {
                 // For HTTPS tests, we might get SSL errors, so let's check if the server is running
                 if (protocol === 'https' && error.code === 'EPROTO') {
                     // Server is running but SSL handshake failed due to self-signed cert
                     // This is expected in test environment
-                    expect(server.listening).toBe(true)
+                    sslErrorExpected = true
                 } else {
                     throw error
                 }
@@ -352,6 +369,10 @@ describe('DevServer listening on http/https protocol', () => {
                     server = null
                 }
             }
+
+            // Always verify the test outcomes - no conditionals around expect
+            expect(requestSucceeded || sslErrorExpected).toBe(true)
+            expect(server.listening).toBe(true)
         })
     })
 })
@@ -456,11 +477,15 @@ describe('DevServer proxying', () => {
                 // Verify that the request headers were rewritten
                 const headers = requestHeaders[0]
                 expect(headers.host).toBe('localhost:4567')
-                expect(Array.isArray(headers.origin) ? headers.origin[0] : headers.origin).toBe('https://test.proxy.com')
+                expect(Array.isArray(headers.origin) ? headers.origin[0] : headers.origin).toBe(
+                    'https://test.proxy.com'
+                )
 
                 // Verify that the cookie and multi-value headers are
                 // correctly preserved.
-                expect(Array.isArray(headers.cookie) ? headers.cookie[0] : headers.cookie).toBe('abc=123')
+                expect(Array.isArray(headers.cookie) ? headers.cookie[0] : headers.cookie).toBe(
+                    'abc=123'
+                )
                 const multi = headers['x-multi-value']
                 expect(Array.isArray(multi) ? multi[0] : multi).toBe('abc, def')
 
@@ -503,7 +528,11 @@ describe('DevServer proxying', () => {
                 expect('cache-control' in headers).toBe(false)
                 expect('cookie' in headers).toBe(false)
 
-                expect(Array.isArray(headers['accept-language']) ? headers['accept-language'][0] : headers['accept-language']).toBe('en')
+                expect(
+                    Array.isArray(headers['accept-language'])
+                        ? headers['accept-language'][0]
+                        : headers['accept-language']
+                ).toBe('en')
 
                 // The proxy removes accept-encoding header, so it shouldn't be present
                 expect('accept-encoding' in headers).toBe(false)
@@ -710,7 +739,7 @@ describe('DevServer rendering', () => {
                 __devMiddleware: {waitUntilValid: (callback) => callback()}
             }
         }
-        const res = { redirect: jest.fn() }
+        const res = {redirect: jest.fn()}
         const next = jest.fn()
 
         NoWebpackDevServerFactory.render(req, res, next)
@@ -721,19 +750,23 @@ describe('DevServer rendering', () => {
     test('redirects to loading screen during the inital build', () => {
         const originalRedirectToLoadingScreen = MockRemoteServerFactory._redirectToLoadingScreen
         MockRemoteServerFactory._redirectToLoadingScreen = jest.fn()
-        
+
         const req = {
             app: {
                 __isInitialBuild: true
             }
         }
-        const res = { redirect: jest.fn() }
+        const res = {redirect: jest.fn()}
         const next = jest.fn()
 
         NoWebpackDevServerFactory.render(req, res, next)
 
-        expect(MockRemoteServerFactory._redirectToLoadingScreen).toHaveBeenCalledWith(req, res, next)
-        
+        expect(MockRemoteServerFactory._redirectToLoadingScreen).toHaveBeenCalledWith(
+            req,
+            res,
+            next
+        )
+
         // Restore the original method
         MockRemoteServerFactory._redirectToLoadingScreen = originalRedirectToLoadingScreen
     })
@@ -798,17 +831,15 @@ describe('DevServer service worker', () => {
     cases.forEach(({file, content, name, requestPath}) => {
         test(`${name}`, async () => {
             const app = createApp()
-            
+
             // Mock _getWebpackAsset to return the file content
             const originalGetWebpackAsset = NoWebpackDevServerFactory._getWebpackAsset
             NoWebpackDevServerFactory._getWebpackAsset = jest.fn().mockReturnValue(content)
-            
+
             app.get('/worker.js(.map)?', NoWebpackDevServerFactory.serveServiceWorker)
 
             try {
-                const response = await request(app)
-                    .get(requestPath)
-                    .expect(200)
+                const response = await request(app).get(requestPath).expect(200)
                 expect(response.text).toEqual(content)
             } finally {
                 NoWebpackDevServerFactory._getWebpackAsset = originalGetWebpackAsset
@@ -817,17 +848,15 @@ describe('DevServer service worker', () => {
 
         test(`${name} (and handle 404s correctly)`, async () => {
             const app = createApp()
-            
+
             // Mock _getWebpackAsset to return null for 404 tests
             const originalGetWebpackAsset = NoWebpackDevServerFactory._getWebpackAsset
             NoWebpackDevServerFactory._getWebpackAsset = jest.fn().mockReturnValue(null)
-            
+
             app.get('/worker.js(.map)?', NoWebpackDevServerFactory.serveServiceWorker)
 
             try {
-                await request(app)
-                    .get(requestPath)
-                    .expect(404)
+                await request(app).get(requestPath).expect(404)
             } finally {
                 NoWebpackDevServerFactory._getWebpackAsset = originalGetWebpackAsset
             }

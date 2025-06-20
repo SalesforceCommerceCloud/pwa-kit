@@ -5,24 +5,28 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-const crypto = require('crypto')
-const zlib = require('zlib')
-const path = require('path')
-const fse = require('fs-extra')
-const nock = require('nock')
-const https = require('https')
-const AWSMockContext = require('aws-lambda-mock-context')
-const createEvent = require('@serverless/event-mocks').default
-const {RemoteServerFactory} = require('./build-remote-server')
+import {jest} from '@jest/globals'
+import path from 'path'
+import zlib from 'zlib'
+import https from 'https'
+import {randomBytes} from 'crypto'
+import nock from 'nock'
+import {RemoteServerFactory} from './build-remote-server.js'
+import AWSMockContext from 'aws-lambda-mock-context'
+import createEvent from '@serverless/event-mocks'
+import {X_HEADERS_TO_REMOVE_ORIGIN} from '../../utils/ssr-proxying.js'
 
 // Mock crypto.randomBytes to prevent RANDOMBYTESREQUEST open handles
-const originalRandomBytes = crypto.randomBytes
-crypto.randomBytes = jest.fn((size) => {
+const mockRandomBytes = jest.fn((size) => {
     // Return a predictable buffer for testing
     return Buffer.alloc(size, 0x01)
 })
 
-const {X_HEADERS_TO_REMOVE_ORIGIN} = require('../../utils/ssr-proxying')
+// Mock the randomBytes function
+jest.mock('crypto', () => ({
+    ...jest.requireActual('crypto'),
+    randomBytes: mockRandomBytes
+}))
 
 const TEST_PORT = 3446
 
@@ -108,14 +112,12 @@ describe('SSRServer Lambda integration', () => {
     afterAll(() => {
         process.env = savedEnvironment
         // Clean up any remaining servers
-        servers.forEach(server => {
+        servers.forEach((server) => {
             if (server && typeof server.close === 'function') {
                 server.close()
             }
         })
         servers = []
-        // Restore original crypto.randomBytes
-        crypto.randomBytes = originalRandomBytes
     })
 
     beforeEach(() => {
@@ -132,8 +134,8 @@ describe('SSRServer Lambda integration', () => {
 
     afterEach(() => {
         nock.cleanAll()
-        // Close all created servers
-        servers.forEach(server => {
+        // Clean up any remaining servers
+        servers.forEach((server) => {
             if (server && typeof server.close === 'function') {
                 server.close()
             }
@@ -141,7 +143,7 @@ describe('SSRServer Lambda integration', () => {
         servers = []
     })
 
-    const fakeBinaryPayload = crypto.randomBytes(16)
+    const fakeBinaryPayload = randomBytes(16)
     const jsPayload = '// This is JavaScript'
     const redirectTarget =
         '/webapp/wcs/stores/servlet/prod_55555_10001_048010312563_-1002?shipToCntry=AU'
@@ -392,9 +394,7 @@ describe('SSRServer Lambda integration', () => {
         const {handler, server: srv} = RemoteServerFactory.createHandler(options, (app) => {
             const route = (req, res) => {
                 // Return the request headers as JSON
-                res.status(200)
-                    .set('Content-Type', 'application/json')
-                    .send(JSON.stringify(req.headers))
+                res.json(req.headers)
             }
             app.get('/*', route)
         })

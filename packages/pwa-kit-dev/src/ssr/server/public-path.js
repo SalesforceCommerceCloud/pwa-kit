@@ -1,30 +1,27 @@
 /*
- * Copyright (c) 2024, salesforce.com, inc.
+ * Copyright (c) 2025, Salesforce, Inc.
  * All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-/**
- * This file is used to dynamically set the webpack public path used by HMR via the global webpack variable
- * __webpack_public_path__
- * See https://webpack.js.org/guides/public-path/
- *
- * Previously, we hard coded the public path in our webpack config to '/mobify/bundle/development/'
- * but we need something more dynamic to support namespaced /mobify paths.
- */
+import path from 'path'
 
-// Optional import from pwa-kit-runtime (peer dependency)
-let bundleBasePath
-try {
-    bundleBasePath = require('@salesforce/pwa-kit-runtime/utils/ssr-namespace-paths').bundleBasePath
-} catch (error) {
-    // pwa-kit-runtime not available, use fallback
-    bundleBasePath = '/mobify/bundle'
+/**
+ * Set the webpack public path for the current page
+ * @param {string} publicPath - The public path to set
+ */
+export function setPublicPath(publicPath) {
+    // Set the webpack public path
+    // eslint-disable-next-line no-undef
+    __webpack_public_path__ = publicPath
 }
 
-/* global __webpack_public_path__: writable */
-// eslint-disable-next-line no-undef
-const webpackPublicPath = `${bundleBasePath}/development/`
-// eslint-disable-next-line no-undef
-__webpack_public_path__ = webpackPublicPath
+/**
+ * Get the public path for a given file
+ * @param {string} filePath - The file path
+ * @returns {string} The public path
+ */
+export function getPublicPath(filePath) {
+    return path.join(process.env.PUBLIC_URL || '', filePath)
+}
