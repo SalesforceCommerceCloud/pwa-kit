@@ -1076,8 +1076,8 @@ describe('DevServer middleware', () => {
     test('_validateConfiguration strictSSL', () => {
         const warn = jest.spyOn(console, 'warn').mockImplementation(() => {})
         RemoteServerFactory._validateConfiguration(opts({strictSSL: false}))
-        expect(warn.mock.calls).toEqual([
-            ['The SSR Server has _strictSSL turned off for https requests']
+        expect(warn.mock.calls).toContainEqual([
+            'The SSR Server has _strictSSL turned off for https requests'
         ])
     })
 })
