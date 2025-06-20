@@ -10,8 +10,8 @@ runs:
     - name: Install Dependencies
       working-directory: ${{ inputs.cwd }}
       run: |-
-        # Install node dependencies with optimized settings
-        node ./scripts/gtime.js monorepo_install npm ci --maxsockets=1 --prefer-offline --progress=false
+        # Install node dependencies
+        node ./scripts/gtime.js monorepo_install npm ci
 
         # Build the PWA
         npm run lerna -- run analyze-build --scope "@salesforce/retail-react-app"
