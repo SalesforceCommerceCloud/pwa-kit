@@ -34,6 +34,15 @@ export const usePickupShipment = () => {
     }
 
     /**
+     * Checks if the current shipping method is already a pickup method
+     * @param {Object} currentShippingMethod - The current shipping method on the basket
+     * @returns {boolean} True if the current shipping method is a pickup method
+     */
+    const isCurrentShippingMethodPickup = (currentShippingMethod) => {
+        return currentShippingMethod?.c_storePickupEnabled === true
+    }
+
+    /**
      * Ensures pickup shipment is properly configured for the basket
      * @param {string} basketId - The basket ID
      * @param {Array} productItems - Array of product items being added
@@ -141,6 +150,7 @@ export const usePickupShipment = () => {
         getStoreInfo,
         addInventoryIdsToPickupItems,
         getPickupShippingMethodId,
+        isCurrentShippingMethodPickup,
         isLoading: updateShipmentForBasketMutation.isLoading
     }
 }

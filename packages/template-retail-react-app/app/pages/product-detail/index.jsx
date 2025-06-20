@@ -125,7 +125,8 @@ const ProductDetail = () => {
         configurePickupShipment,
         hasPickupItems: checkHasPickupItems,
         addInventoryIdsToPickupItems,
-        getPickupShippingMethodId
+        getPickupShippingMethodId,
+        isCurrentShippingMethodPickup
     } = usePickupShipment()
 
     // Hook for shipping methods - we'll use refetch when needed
@@ -408,14 +409,19 @@ const ProductDetail = () => {
 
             const basketResponse = await addItemToNewOrExistingBasket(productItems)
 
-            // If any items are pickup items, and no shipments configured, ensure the shipment is configured for pickup
+            // If any items are pickup items, ensure the shipment is configured for pickup
             if (hasPickupItems && basketResponse?.basketId && basketResponse.shipments.length > 0) {
-                // Fetch shipping methods and configure pickup shipment
-                const {data: fetchedShippingMethods} = await refetchShippingMethods()
-                const pickupShippingMethodId = getPickupShippingMethodId(fetchedShippingMethods)
-                await configurePickupShipment(basketResponse.basketId, productItems, {
-                    pickupShippingMethodId
-                })
+                const currentShippingMethod = basketResponse.shipments[0].shippingMethod
+
+                // Only configure pickup shipment if current shipping method is not already pickup
+                if (!isCurrentShippingMethodPickup(currentShippingMethod)) {
+                    // Fetch shipping methods and configure pickup shipment
+                    const {data: fetchedShippingMethods} = await refetchShippingMethods()
+                    const pickupShippingMethodId = getPickupShippingMethodId(fetchedShippingMethods)
+                    await configurePickupShipment(basketResponse.basketId, productItems, {
+                        pickupShippingMethodId
+                    })
+                }
             }
 
             einstein.sendAddToCart(productItems)
@@ -530,19 +536,19 @@ const ProductDetail = () => {
                 })
             }
 
-            // If any items are pickup items, and no shipments configured, ensure the shipment is configured for pickup
-            if (
-                hasPickupItems &&
-                res.basketId &&
-                res.shipments.length > 0 &&
-                !res.shipments[0].shippingMethod
-            ) {
-                // Fetch shipping methods and configure pickup shipment
-                const {data: fetchedShippingMethods} = await refetchShippingMethods()
-                const pickupShippingMethodId = getPickupShippingMethodId(fetchedShippingMethods)
-                await configurePickupShipment(res.basketId, productItems, {
-                    pickupShippingMethodId
-                })
+            // If any items are pickup items, ensure the shipment is configured for pickup
+            if (hasPickupItems && res.basketId && res.shipments.length > 0) {
+                const currentShippingMethod = res.shipments[0].shippingMethod
+
+                // Only configure pickup shipment if current shipping method is not already pickup
+                if (!isCurrentShippingMethodPickup(currentShippingMethod)) {
+                    // Fetch shipping methods and configure pickup shipment
+                    const {data: fetchedShippingMethods} = await refetchShippingMethods()
+                    const pickupShippingMethodId = getPickupShippingMethodId(fetchedShippingMethods)
+                    await configurePickupShipment(res.basketId, productItems, {
+                        pickupShippingMethodId
+                    })
+                }
             }
 
             einstein.sendAddToCart(productItems)
