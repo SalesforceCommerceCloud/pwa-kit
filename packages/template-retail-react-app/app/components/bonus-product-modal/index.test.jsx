@@ -76,7 +76,7 @@ describe('BonusProductModal', () => {
         jest.clearAllMocks()
     })
 
-    it('renders modal when isOpen is true', () => {
+    test('renders modal when isOpen is true', () => {
         render(
             <MockProvider>
                 <BonusProductModal />
@@ -88,7 +88,7 @@ describe('BonusProductModal', () => {
         expect(screen.getByText('Product 2')).toBeInTheDocument()
     })
 
-    it('does not render when isOpen is false', () => {
+    test('does not render when isOpen is false', () => {
         useBonusProductModalContext.mockReturnValue({
             ...mockContextValue,
             isOpen: false
@@ -103,7 +103,7 @@ describe('BonusProductModal', () => {
         expect(screen.queryByText('Add Bonus Product')).not.toBeInTheDocument()
     })
 
-    it('shows loading state when fetching product data', () => {
+    test('shows loading state when fetching product data', () => {
         useProducts.mockReturnValue({
             data: null,
             isLoading: true
@@ -118,7 +118,7 @@ describe('BonusProductModal', () => {
         expect(screen.getAllByTestId('skeleton')).toHaveLength(6) // Two products, each with 3 skeletons (1 image + 2 text)
     })
 
-    it('handles product selection and deselection', () => {
+    test('handles product selection and deselection', () => {
         render(
             <MockProvider>
                 <BonusProductModal />
@@ -134,7 +134,7 @@ describe('BonusProductModal', () => {
         expect(screen.getByText('Add Bonus Product (0 of 2)')).toBeInTheDocument()
     })
 
-    it('enforces maximum selection limit', () => {
+    test('enforces maximum selection limit', () => {
         render(
             <MockProvider>
                 <BonusProductModal />
@@ -154,7 +154,7 @@ describe('BonusProductModal', () => {
         expect(checkboxes).toHaveLength(2)
     })
 
-    it('closes modal when clicking close button', () => {
+    test('closes modal when clicking close button', () => {
         render(
             <MockProvider>
                 <BonusProductModal />
@@ -166,7 +166,7 @@ describe('BonusProductModal', () => {
         expect(mockContextValue.onClose).toHaveBeenCalled()
     })
 
-    it('closes modal when clicking next button', () => {
+    test('closes modal when clicking next button', () => {
         render(
             <MockProvider>
                 <BonusProductModal />
