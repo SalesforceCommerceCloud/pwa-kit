@@ -365,7 +365,11 @@ export const DevServerMixin = {
             }
         })
 
-        return {handler: undefined, server, app}
+        // Always return a stub handler so destructuring never fails
+        const handler = (event, context, callback) => {
+            throw new Error('Lambda handler is not available in dev mode')
+        }
+        return {handler, server, app}
     },
 
     /**
