@@ -753,7 +753,9 @@ const runGenerator = (context, {outputDir, templateVersion, verbose}) => {
             break
         }
         case TEMPLATE_SOURCE_BUNDLE:
-            tarPath = p.join(__dirname, '..', 'templates', `${id}.tar.gz`)
+            // Use require.resolve to find the package root directory, then navigate to templates
+            const packageRoot = p.dirname(require.resolve('../package.json'))
+            tarPath = p.join(packageRoot, 'templates', `${id}.tar.gz`)
             break
         default: {
             const msg = `Error: Cannot handle template source type ${type}.`
