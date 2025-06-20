@@ -114,7 +114,7 @@ const useSeStoreSelection = () => {
                         const sName = (store.name || '').toLowerCase().trim()
                         const searchName = locationData.storeName.toLowerCase().trim()
                         const countryMatch =
-                            (store.countryCode || DEFAULT_STORE_LOCATOR_COUNTRY.countryCode) ===
+                            (store.countryCode || STORE_LOCATOR_DEFAULT_COUNTRY_CODE) ===
                             locationData.countryCode
                         return (sName === searchName || sName.includes(searchName)) && countryMatch
                     })))
@@ -145,11 +145,11 @@ const useSeStoreSelection = () => {
             if (stores.length === 0) return null
 
             const cityKey = cityName.toLowerCase().trim()
-            const defaultCountry = countryCode || DEFAULT_STORE_LOCATOR_COUNTRY.countryCode
+            const defaultCountry = countryCode || STORE_LOCATOR_DEFAULT_COUNTRY_CODE
 
             let cityStores = stores.filter((store) => {
                 const storeCity = (store.city || '').toLowerCase().trim()
-                const storeCountry = store.countryCode || DEFAULT_STORE_LOCATOR_COUNTRY.countryCode
+                const storeCountry = store.countryCode || STORE_LOCATOR_DEFAULT_COUNTRY_CODE
                 const cityMatch =
                     storeCity === cityKey ||
                     storeCity.includes(cityKey) ||
@@ -253,7 +253,7 @@ const useSeStoreSelection = () => {
         if (!stores || stores.length === 0) return null
 
         const {storeName, zipcode, city, countryCode} = searchCriteria
-        const defaultCountry = countryCode || DEFAULT_STORE_LOCATOR_COUNTRY.countryCode
+        const defaultCountry = countryCode || STORE_LOCATOR_DEFAULT_COUNTRY_CODE
 
         if (storeName) {
             const searchNameLower = storeName.toLowerCase().trim()
@@ -261,7 +261,7 @@ const useSeStoreSelection = () => {
                 [
                     countryCode,
                     (s) =>
-                        (s.countryCode || DEFAULT_STORE_LOCATOR_COUNTRY.countryCode) === countryCode
+                        (s.countryCode || STORE_LOCATOR_DEFAULT_COUNTRY_CODE) === countryCode
                 ],
                 [zipcode, (s) => (s.postalCode || s.address?.postalCode) === zipcode],
                 [
