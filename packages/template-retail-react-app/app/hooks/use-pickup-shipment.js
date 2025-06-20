@@ -107,7 +107,11 @@ export const usePickupShipment = () => {
      * @param {string} shippingMethodId - The shipping method ID to set
      * @param {boolean} throwOnError - Whether to throw on error (default: false)
      */
-    const configureRegularShippingMethod = async (basketId, shippingMethodId, throwOnError = false) => {
+    const configureRegularShippingMethod = async (
+        basketId,
+        shippingMethodId,
+        throwOnError = false
+    ) => {
         try {
             await updateShipmentForBasketMutation.mutateAsync({
                 parameters: {
