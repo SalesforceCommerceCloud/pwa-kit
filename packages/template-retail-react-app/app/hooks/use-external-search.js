@@ -17,6 +17,10 @@ const useExternalSearch = () => {
     const history = useHistory()
     const location = useLocation()
     const [searchParams] = useSearchParams()
+    const hasStoreLocatorParams = useMemo(() => {
+        const keys = ['lat', 'lng', 'zip', 'city', 'store', 'country']
+        return keys.some((key) => Boolean(searchParams?.[key]))
+    }, [searchParams])
 
     const hasExternalSearchParams = useMemo(() => {
         if (typeof window === 'undefined') return false
@@ -33,7 +37,12 @@ const useExternalSearch = () => {
             return
         }
 
+        if (hasStoreLocatorParams) {
+            return
+        }
+
         // need to pre-process out filler words like location hints, and handle multi-word searches
+        // Handle multi-word searches and any extraneous hints.
         const rawQuery = searchParams?.q ?? searchParams?.search ?? searchParams?.query
         const query = (typeof rawQuery === 'string' ? rawQuery : '').trim()
 
@@ -62,7 +71,8 @@ const useExternalSearch = () => {
         searchParams?.q,
         searchParams?.search,
         searchParams?.query,
-        history
+        history,
+        hasStoreLocatorParams
     ])
 }
 
