@@ -16,5 +16,5 @@ afterAll(() => {
     server.unref()
     
     // Wait a bit for any pending operations to complete
-    return new Promise(resolve => setTimeout(resolve, 100))
+    return new Promise(resolve => setTimeout(resolve, 200))
 }) 

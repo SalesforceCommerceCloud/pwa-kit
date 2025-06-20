@@ -1,29 +1,34 @@
 /*
- * Copyright (c) 2021, salesforce.com, inc.
+ * Copyright (c) 2022, Salesforce, Inc.
  * All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-/* eslint-disable @typescript-eslint/no-var-requires */
 
-// Mock static assets (require path is relative to the 'ssr' directory)
-const mockStaticAssets = {}
-jest.mock('../static/assets.json', () => mockStaticAssets, {virtual: true})
-
-// We use require() for the ssr-server since we have to mock a module
-// that it needs.
-const {RemoteServerFactory} = require('./build-remote-server')
-const AWSMockContext = require('aws-lambda-mock-context')
-const createEvent = require('@serverless/event-mocks').default
 const crypto = require('crypto')
+const zlib = require('zlib')
+const path = require('path')
+const fse = require('fs-extra')
 const nock = require('nock')
 const https = require('https')
-const path = require('path')
-const zlib = require('zlib')
+const AWSMockContext = require('aws-lambda-mock-context')
+const createEvent = require('@serverless/event-mocks').default
+const {RemoteServerFactory} = require('./build-remote-server')
+
+// Mock crypto.randomBytes to prevent RANDOMBYTESREQUEST open handles
+const originalRandomBytes = crypto.randomBytes
+crypto.randomBytes = jest.fn((size) => {
+    // Return a predictable buffer for testing
+    return Buffer.alloc(size, 0x01)
+})
 
 const {X_HEADERS_TO_REMOVE_ORIGIN} = require('../../utils/ssr-proxying')
 
 const TEST_PORT = 3446
+
+// Mock static assets (require path is relative to the 'ssr' directory)
+const mockStaticAssets = {}
+jest.mock('../static/assets.json', () => mockStaticAssets, {virtual: true})
 
 const testPackageMobify = {
     ssrEnabled: true,
@@ -109,6 +114,8 @@ describe('SSRServer Lambda integration', () => {
             }
         })
         servers = []
+        // Restore original crypto.randomBytes
+        crypto.randomBytes = originalRandomBytes
     })
 
     beforeEach(() => {

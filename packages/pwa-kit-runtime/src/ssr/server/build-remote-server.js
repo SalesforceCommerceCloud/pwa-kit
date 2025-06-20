@@ -27,7 +27,8 @@ import {
     setQuiet,
     localDevLog
 } from '../../utils/ssr-server'
-import dns from 'dns'
+// Only import DNS in non-test environments to prevent open handles
+const dns = process.env.NODE_ENV !== 'test' ? require('dns') : null
 import express from 'express'
 import {PersistentCache} from '../../utils/ssr-cache'
 import merge from 'merge-descriptors'
@@ -342,7 +343,10 @@ export const RemoteServerFactory = {
         // we kick off a DNS lookup for the appHostname. We don't
         // wait for it to complete, or care if it fails, so the
         // callback is a no-op.
-        dns.lookup(options.appHostname, () => null)
+        // Skip DNS lookup in test environments to avoid open handles
+        if (process.env.NODE_ENV !== 'test' && dns) {
+            dns.lookup(options.appHostname, () => null)
+        }
 
         this._validateConfiguration(options)
         this._updatePackageMobify(options)

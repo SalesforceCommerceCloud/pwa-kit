@@ -25,5 +25,6 @@ module.exports = {
         '!scripts/version.js',
         '!src/ssr/server/test_fixtures/**',
         '!src/schemas/**'
-    ]
+    ],
+    setupFilesAfterEnv: ['./jest.setup.js']
 }

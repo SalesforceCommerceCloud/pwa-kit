@@ -1086,7 +1086,8 @@ describe('SLAS private client proxy', () => {
     const savedEnvironment = Object.assign({}, process.env)
 
     let proxyApp
-    const proxyPort = 12345
+    let proxyServer
+    const proxyPort = 12346
     const proxyPath = '/responseHeaders'
     const slasTarget = `http://localhost:${proxyPort}${proxyPath}`
 
@@ -1097,7 +1098,7 @@ describe('SLAS private client proxy', () => {
         proxyApp.use(proxyPath, (req, res) => {
             res.send(req.headers)
         })
-        proxyApp.listen(proxyPort)
+        proxyServer = proxyApp.listen(proxyPort)
     })
 
     afterEach(() => {
@@ -1105,7 +1106,9 @@ describe('SLAS private client proxy', () => {
     })
 
     afterAll(() => {
-        proxyApp.close()
+        if (proxyServer) {
+            proxyServer.close()
+        }
     })
 
     test('should not create proxy by default', () => {
