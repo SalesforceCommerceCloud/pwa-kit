@@ -18,7 +18,7 @@
   "files": [
     "assets",
     "templates",
-    "scripts/tree-shake.js",
+    "scripts/trim-extensions.js",
     "scripts/checksum.js"
   ],
   "scripts": {
