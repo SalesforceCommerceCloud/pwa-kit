@@ -7,7 +7,15 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import {AccordionItem, AccordionButton, AccordionIcon, AccordionPanel, Box, Radio, HStack} from '@chakra-ui/react'
+import {
+    AccordionItem,
+    AccordionButton,
+    AccordionIcon,
+    AccordionPanel,
+    Box,
+    Radio,
+    HStack
+} from '@chakra-ui/react'
 
 export const StoreLocatorListItem = ({store, radioProps}) => {
     return (

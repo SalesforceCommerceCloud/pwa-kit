@@ -235,7 +235,6 @@ const useSeStoreSelection = () => {
         isLoadingCityStores ||
         isLoadingAllStores ||
         isLoadingFallbackStores
-
     const findMatchingStore = useCallback((stores, searchCriteria) => {
         if (!stores || stores.length === 0) return null
 

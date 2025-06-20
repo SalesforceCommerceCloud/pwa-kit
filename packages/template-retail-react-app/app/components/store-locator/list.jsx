@@ -6,7 +6,7 @@
  */
 
 import React, {useEffect, useState} from 'react'
-import {Accordion, AccordionItem, Box, Button, Radio, RadioGroup} from '@chakra-ui/react'
+import {Accordion, AccordionItem, Box, Button, RadioGroup} from '@chakra-ui/react'
 import {StoreLocatorListItem} from '@salesforce/retail-react-app/app/components/store-locator/list-item'
 import {useStoreLocator} from '@salesforce/retail-react-app/app/hooks/use-store-locator'
 import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
@@ -46,7 +46,7 @@ export const StoreLocatorList = () => {
         if (mode === 'input') {
             const countryName =
                 Array.isArray(config.supportedCountries) && config.supportedCountries.length !== 0
-                    ? config.supportedCountries.find(
+                ? config.supportedCountries.find(
                         (o) => o.countryCode === formValues.countryCode
                     )?.countryName || config.defaultCountry
                     : config.defaultCountry

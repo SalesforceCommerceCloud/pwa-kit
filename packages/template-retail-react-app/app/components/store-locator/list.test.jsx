@@ -139,4 +139,3 @@ describe('StoreLocatorList', () => {
         expect(screen.getByText('Viewing stores near your location')).toBeTruthy()
     })
 })
-

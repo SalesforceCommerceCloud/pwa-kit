@@ -188,4 +188,3 @@ describe('useStoreLocator', () => {
         expect(result.current.data).toEqual(mockStoreData)
     })
 })
- 
