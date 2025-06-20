@@ -1334,6 +1334,9 @@
   "store_locator.description.no_locations": {
     "defaultMessage": "Er zijn geen locaties in dit gebied"
   },
+  "store_locator.description.non_empty_basket": {
+    "defaultMessage": "Sorry, je hebt items in je winkelmandje. Verwijder ze om door te gaan."
+  },
   "store_locator.description.or": {
     "defaultMessage": "Of"
   },

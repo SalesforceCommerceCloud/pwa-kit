@@ -14,6 +14,16 @@ import {STORE_LOCATOR_NUM_STORES_PER_LOAD} from '@salesforce/retail-react-app/ap
 import {rest} from 'msw'
 import {StoreLocatorContext} from '@salesforce/retail-react-app/app/components/store-locator-modal/index'
 import {useStoreLocator} from '@salesforce/retail-react-app/app/components/store-locator-modal/index'
+
+jest.mock('@salesforce/retail-react-app/app/hooks/use-current-basket', () => ({
+    useCurrentBasket: jest.fn(() => ({
+        derivedData: {totalItems: 0}
+    }))
+}))
+
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const {useCurrentBasket} = require('@salesforce/retail-react-app/app/hooks/use-current-basket')
+
 const mockStoresData = [
     {
         address1: '162 University Ave',
@@ -233,6 +243,16 @@ WrapperComponent.propTypes = {
 }
 
 describe('StoreLocatorContent', () => {
+    beforeEach(() => {
+        useCurrentBasket.mockReturnValue({
+            derivedData: {totalItems: 0}
+        })
+    })
+
+    afterEach(() => {
+        jest.clearAllMocks()
+    })
+
     test('renders without crashing', () => {
         global.server.use(
             rest.get('*/shopper-stores/v1/organizations/*', (req, res, ctx) => {
@@ -394,6 +414,43 @@ describe('StoreLocatorContent', () => {
         await waitFor(() => {
             const loadMore = screen.queryByText(/Load More/i)
             expect(loadMore).not.toBeInTheDocument()
+        })
+    })
+
+    test('Shows cart warning when cart has items', async () => {
+        useCurrentBasket.mockReturnValue({
+            derivedData: {totalItems: 2}
+        })
+
+        global.server.use(
+            rest.get('*/shopper-stores/v1/organizations/*', (req, res, ctx) => {
+                return res(
+                    ctx.delay(0),
+                    ctx.status(200),
+                    ctx.json(mockStoresTotalIsHigherThanLimit)
+                )
+            })
+        )
+
+        renderWithProviders(
+            <WrapperComponent
+                searchStoresParams={{
+                    postalCode: '10178',
+                    countryCode: 'DE',
+                    limit: STORE_LOCATOR_NUM_STORES_PER_LOAD
+                }}
+                userHasSetManualGeolocation={true}
+            />
+        )
+
+        await waitFor(async () => {
+            const cartWarning = screen.getByText(
+                /Sorry, you have items in your basket. Please remove them to continue./i
+            )
+            expect(cartWarning).toBeInTheDocument()
+
+            const viewing = screen.queryByText(/Viewing stores within 100km of 10178 in Germany/i)
+            expect(viewing).not.toBeInTheDocument()
         })
     })
 })

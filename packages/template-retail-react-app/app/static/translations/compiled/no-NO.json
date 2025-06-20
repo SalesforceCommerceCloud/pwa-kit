@@ -3135,6 +3135,12 @@
       "value": "Beklager, det finnes ingen steder i dette området"
     }
   ],
+  "store_locator.description.non_empty_basket": [
+    {
+      "type": 0,
+      "value": "Beklager, du har varer i handlekurven. Fjern dem for å fortsette."
+    }
+  ],
   "store_locator.description.or": [
     {
       "type": 0,

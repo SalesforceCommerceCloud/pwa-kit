@@ -7343,6 +7343,20 @@
       "value": "]"
     }
   ],
+  "store_locator.description.non_empty_basket": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Şǿǿřřẏ, ẏǿǿŭŭ ħȧȧṽḗḗ īŧḗḗḿş īƞ ẏǿǿŭŭř ƀȧȧşķḗḗŧ. Ƥŀḗḗȧȧşḗḗ řḗḗḿǿǿṽḗḗ ŧħḗḗḿ ŧǿǿ ƈǿǿƞŧīƞŭŭḗḗ."
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
   "store_locator.description.or": [
     {
       "type": 0,

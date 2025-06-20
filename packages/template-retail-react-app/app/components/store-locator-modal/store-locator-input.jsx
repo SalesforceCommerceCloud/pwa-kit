@@ -65,7 +65,7 @@ const useGeolocation = () => {
     return getUserGeolocation
 }
 
-const StoreLocatorInput = ({form, submitForm}) => {
+const StoreLocatorInput = ({form, submitForm, totalItemCount}) => {
     const {
         searchStoresParams,
         userHasSetManualGeolocation,
@@ -73,158 +73,165 @@ const StoreLocatorInput = ({form, submitForm}) => {
         setUserWantsToShareLocation,
         userWantsToShareLocation
     } = useContext(StoreLocatorContext)
-
     const getUserGeolocation = useGeolocation()
     const {control} = form
     const intl = useIntl()
     return (
         <form id="store-locator-form" onSubmit={form.handleSubmit(submitForm)}>
-            <InputGroup>
-                {SUPPORTED_STORE_LOCATOR_COUNTRIES.length > 0 && (
+            <fieldset disabled={totalItemCount > 0}>
+                <InputGroup>
+                    {SUPPORTED_STORE_LOCATOR_COUNTRIES.length > 0 && (
+                        <Controller
+                            name="countryCode"
+                            control={control}
+                            defaultValue={
+                                userHasSetManualGeolocation ? searchStoresParams?.countryCode : ''
+                            }
+                            rules={{
+                                required: intl.formatMessage({
+                                    id: 'store_locator.error.please_select_a_country',
+                                    defaultMessage: 'Please select a country.'
+                                })
+                            }}
+                            render={({field}) => {
+                                return SUPPORTED_STORE_LOCATOR_COUNTRIES.length !== 0 ? (
+                                    <FormControl isInvalid={form.formState.errors.countryCode}>
+                                        <Select
+                                            {...field}
+                                            marginBottom="10px"
+                                            placeholder={intl.formatMessage({
+                                                id: 'store_locator.action.select_a_country',
+                                                defaultMessage: 'Select a country'
+                                            })}
+                                            borderColor="gray.500"
+                                        >
+                                            {SUPPORTED_STORE_LOCATOR_COUNTRIES.map(
+                                                ({countryCode, countryName}) => {
+                                                    return (
+                                                        <option
+                                                            value={countryCode}
+                                                            key={countryCode}
+                                                        >
+                                                            {intl.formatMessage(countryName)}
+                                                        </option>
+                                                    )
+                                                }
+                                            )}
+                                        </Select>
+                                        {form.formState.errors.countryCode && (
+                                            <FormErrorMessage
+                                                sx={{marginBottom: '10px'}}
+                                                color="red.600"
+                                            >
+                                                <AlertIcon aria-hidden="true" mr={2} />
+                                                {form.formState.errors.countryCode.message}
+                                            </FormErrorMessage>
+                                        )}
+                                    </FormControl>
+                                ) : (
+                                    <></>
+                                )
+                            }}
+                        ></Controller>
+                    )}
+                </InputGroup>
+                <InputGroup>
                     <Controller
-                        name="countryCode"
+                        name="postalCode"
                         control={control}
-                        defaultValue={
-                            userHasSetManualGeolocation ? searchStoresParams?.countryCode : ''
-                        }
                         rules={{
                             required: intl.formatMessage({
-                                id: 'store_locator.error.please_select_a_country',
-                                defaultMessage: 'Please select a country.'
+                                id: 'store_locator.error.please_enter_a_postal_code',
+                                defaultMessage: 'Please enter a postal code.'
                             })
                         }}
+                        defaultValue={
+                            userHasSetManualGeolocation ? searchStoresParams?.postalCode : ''
+                        }
                         render={({field}) => {
-                            return SUPPORTED_STORE_LOCATOR_COUNTRIES.length !== 0 ? (
-                                <FormControl isInvalid={form.formState.errors.countryCode}>
-                                    <Select
+                            return (
+                                <FormControl isInvalid={form.formState.errors.postalCode}>
+                                    <Input
                                         {...field}
-                                        marginBottom="10px"
                                         placeholder={intl.formatMessage({
-                                            id: 'store_locator.action.select_a_country',
-                                            defaultMessage: 'Select a country'
+                                            id: 'store_locator.field.placeholder.enter_postal_code',
+                                            defaultMessage: 'Enter postal code'
                                         })}
-                                        borderColor="gray.500"
-                                    >
-                                        {SUPPORTED_STORE_LOCATOR_COUNTRIES.map(
-                                            ({countryCode, countryName}) => {
-                                                return (
-                                                    <option value={countryCode} key={countryCode}>
-                                                        {intl.formatMessage(countryName)}
-                                                    </option>
-                                                )
-                                            }
-                                        )}
-                                    </Select>
-                                    {form.formState.errors.countryCode && (
-                                        <FormErrorMessage
-                                            sx={{marginBottom: '10px'}}
-                                            color="red.600"
-                                        >
+                                    />
+                                    {form.formState.errors.postalCode && (
+                                        <FormErrorMessage sx={{top: '-20px'}} color="red.600">
                                             <AlertIcon aria-hidden="true" mr={2} />
-                                            {form.formState.errors.countryCode.message}
+                                            {form.formState.errors.postalCode.message}
                                         </FormErrorMessage>
                                     )}
                                 </FormControl>
-                            ) : (
-                                <></>
                             )
                         }}
                     ></Controller>
-                )}
-            </InputGroup>
-            <InputGroup>
-                <Controller
-                    name="postalCode"
-                    control={control}
-                    rules={{
-                        required: intl.formatMessage({
-                            id: 'store_locator.error.please_enter_a_postal_code',
-                            defaultMessage: 'Please enter a postal code.'
-                        })
-                    }}
-                    defaultValue={userHasSetManualGeolocation ? searchStoresParams?.postalCode : ''}
-                    render={({field}) => {
-                        return (
-                            <FormControl isInvalid={form.formState.errors.postalCode}>
-                                <Input
-                                    {...field}
-                                    placeholder={intl.formatMessage({
-                                        id: 'store_locator.field.placeholder.enter_postal_code',
-                                        defaultMessage: 'Enter postal code'
-                                    })}
-                                />
-                                {form.formState.errors.postalCode && (
-                                    <FormErrorMessage sx={{top: '-20px'}} color="red.600">
-                                        <AlertIcon aria-hidden="true" mr={2} />
-                                        {form.formState.errors.postalCode.message}
-                                    </FormErrorMessage>
-                                )}
-                            </FormControl>
-                        )
-                    }}
-                ></Controller>
-                <Button
-                    key="find-button"
-                    type="submit"
-                    onClick={() => {
-                        setUserWantsToShareLocation(false)
-                    }}
-                    width="15%"
-                    marginLeft={2}
-                    variant="solid"
+                    <Button
+                        key="find-button"
+                        type="submit"
+                        onClick={() => {
+                            setUserWantsToShareLocation(false)
+                        }}
+                        width="15%"
+                        marginLeft={2}
+                        variant="solid"
+                    >
+                        {intl.formatMessage({
+                            id: 'store_locator.action.find',
+                            defaultMessage: 'Find'
+                        })}
+                    </Button>
+                </InputGroup>
+                <Box
+                    style={{display: 'flex', justifyContent: 'center', alignItems: 'center'}}
+                    margin="10px"
                 >
                     {intl.formatMessage({
-                        id: 'store_locator.action.find',
-                        defaultMessage: 'Find'
+                        id: 'store_locator.description.or',
+                        defaultMessage: 'Or'
                     })}
-                </Button>
-            </InputGroup>
-            <Box
-                style={{display: 'flex', justifyContent: 'center', alignItems: 'center'}}
-                margin="10px"
-            >
-                {intl.formatMessage({
-                    id: 'store_locator.description.or',
-                    defaultMessage: 'Or'
-                })}
-            </Box>
-            <Button
-                key="use-my-location-button"
-                onClick={() => {
-                    setUserWantsToShareLocation(true)
-                    getUserGeolocation()
-                }}
-                width="100%"
-                variant="solid"
-                fontWeight="bold"
-                marginBottom={4}
-            >
-                {intl.formatMessage({
-                    id: 'store_locator.action.use_my_location',
-                    defaultMessage: 'Use My Location'
-                })}
-            </Button>
-            <FormControl isInvalid={automaticGeolocationHasFailed && userWantsToShareLocation}>
-                <FormErrorMessage
-                    color="red.600"
-                    alignItems="center"
-                    justifyContent="center"
+                </Box>
+                <Button
+                    key="use-my-location-button"
+                    onClick={() => {
+                        setUserWantsToShareLocation(true)
+                        getUserGeolocation()
+                    }}
+                    width="100%"
+                    variant="solid"
+                    fontWeight="bold"
                     marginBottom={4}
                 >
-                    <AlertIcon aria-hidden="true" mr={2} />
                     {intl.formatMessage({
-                        id: 'store_locator.error.agree_to_share_your_location',
-                        defaultMessage: 'Please agree to share your location'
+                        id: 'store_locator.action.use_my_location',
+                        defaultMessage: 'Use My Location'
                     })}
-                </FormErrorMessage>
-            </FormControl>
+                </Button>
+                <FormControl isInvalid={automaticGeolocationHasFailed && userWantsToShareLocation}>
+                    <FormErrorMessage
+                        color="red.600"
+                        alignItems="center"
+                        justifyContent="center"
+                        marginBottom={4}
+                    >
+                        <AlertIcon aria-hidden="true" mr={2} />
+                        {intl.formatMessage({
+                            id: 'store_locator.error.agree_to_share_your_location',
+                            defaultMessage: 'Please agree to share your location'
+                        })}
+                    </FormErrorMessage>
+                </FormControl>
+            </fieldset>
         </form>
     )
 }
 
 StoreLocatorInput.propTypes = {
     form: PropTypes.object,
-    submitForm: PropTypes.func
+    submitForm: PropTypes.func,
+    totalItemCount: PropTypes.number
 }
 
 export default StoreLocatorInput

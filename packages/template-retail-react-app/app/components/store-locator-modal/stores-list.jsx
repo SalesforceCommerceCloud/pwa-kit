@@ -8,8 +8,6 @@
 import React, {useEffect, useState} from 'react'
 import {useIntl} from 'react-intl'
 import PropTypes from 'prop-types'
-
-// Components
 import {
     AccordionItem,
     AccordionButton,
@@ -23,12 +21,11 @@ import {
 
 import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
 
-const StoresList = ({storesInfo}) => {
+const StoresList = ({storesInfo, totalItemCount}) => {
     const intl = useIntl()
     const {site} = useMultiSite()
     const storeInfoKey = `store_${site.id}`
     const [selectedStore, setSelectedStore] = useState('')
-
     useEffect(() => {
         let existingStore = null
 
@@ -90,7 +87,7 @@ const StoresList = ({storesInfo}) => {
     }
 
     return (
-        <RadioGroup onChange={handleChange} value={selectedStore}>
+        <RadioGroup isDisabled={totalItemCount > 0} onChange={handleChange} value={selectedStore}>
             {storesInfo?.map((store, index) => {
                 return (
                     <AccordionItem key={index}>
@@ -167,7 +164,8 @@ const StoresList = ({storesInfo}) => {
 }
 
 StoresList.propTypes = {
-    storesInfo: PropTypes.array
+    storesInfo: PropTypes.array,
+    totalItemCount: PropTypes.number
 }
 
 export default StoresList

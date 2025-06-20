@@ -1334,6 +1334,9 @@
   "store_locator.description.no_locations": {
     "defaultMessage": "Niestety, w tym obszarze nie ma lokalizacji"
   },
+  "store_locator.description.non_empty_basket": {
+    "defaultMessage": "Przepraszamy, masz przedmioty w koszyku. Usuń je, aby kontynuować."
+  },
   "store_locator.description.or": {
     "defaultMessage": "Lub"
   },

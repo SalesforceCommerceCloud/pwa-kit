@@ -3139,6 +3139,12 @@
       "value": "Tyvärr finns det inga platser i detta område"
     }
   ],
+  "store_locator.description.non_empty_basket": [
+    {
+      "type": 0,
+      "value": "Tyvärr, du har varor i din kundvagn. Ta bort dem för att fortsätta."
+    }
+  ],
   "store_locator.description.or": [
     {
       "type": 0,

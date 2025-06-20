@@ -3447,6 +3447,12 @@
       "value": "Sorry, there are no locations in this area"
     }
   ],
+  "store_locator.description.non_empty_basket": [
+    {
+      "type": 0,
+      "value": "Sorry, you have items in your basket. Please remove them to continue."
+    }
+  ],
   "store_locator.description.or": [
     {
       "type": 0,

@@ -1334,6 +1334,9 @@
   "store_locator.description.no_locations": {
     "defaultMessage": "Valitettavasti tällä alueella ei ole kohteita"
   },
+  "store_locator.description.non_empty_basket": {
+    "defaultMessage": "Anteeksi, ostoskorissasi on tuotteita. Poista ne jatkaaksesi."
+  },
   "store_locator.description.or": {
     "defaultMessage": "Tai"
   },

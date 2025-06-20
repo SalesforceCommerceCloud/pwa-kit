@@ -31,6 +31,7 @@ const NUM_STORES_PER_REQUEST_API_MAX = 200
 import {useSearchStores} from '@salesforce/commerce-sdk-react'
 import {useForm} from 'react-hook-form'
 import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
+import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
 
 import {StoreLocatorContext} from '@salesforce/retail-react-app/app/components/store-locator-modal/index'
 
@@ -53,6 +54,9 @@ const StoreLocatorContent = () => {
         }
     })
 
+    const {
+        derivedData: {totalItems: totalItemCount}
+    } = useCurrentBasket()
     const [numStoresToShow, setNumStoresToShow] = useState(limit)
     const {
         data: searchStoresData,
@@ -136,6 +140,13 @@ const StoreLocatorContent = () => {
                 id: 'store_locator.description.no_locations',
                 defaultMessage: 'Sorry, there are no locations in this area'
             })
+        if (totalItemCount > 0) {
+            return intl.formatMessage({
+                id: 'store_locator.description.non_empty_basket',
+                defaultMessage:
+                    'Sorry, you have items in your basket. Please remove them to continue.'
+            })
+        }
 
         if (searchStoresParams.postalCode !== undefined) {
             const countryName =
@@ -185,7 +196,11 @@ const StoreLocatorContent = () => {
                     defaultMessage: 'Find a Store'
                 })}
             </Heading>
-            <StoreLocatorInput form={form} submitForm={submitForm}></StoreLocatorInput>
+            <StoreLocatorInput
+                form={form}
+                submitForm={submitForm}
+                totalItemCount={totalItemCount}
+            ></StoreLocatorInput>
             <Accordion allowMultiple flex={[1, 1, 1, 5]}>
                 <AccordionItem>
                     <Box
@@ -202,7 +217,7 @@ const StoreLocatorContent = () => {
                         {displayStoreLocatorStatusMessage()}
                     </Box>
                 </AccordionItem>
-                <StoresList storesInfo={storesInfo} />
+                <StoresList storesInfo={storesInfo} totalItemCount={totalItemCount} />
             </Accordion>
             {!isFetching &&
             numStoresToShow < numStores &&

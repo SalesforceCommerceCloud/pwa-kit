@@ -1334,6 +1334,9 @@
   "store_locator.description.no_locations": {
     "defaultMessage": "Beklager, der er ingen steder i dette område"
   },
+  "store_locator.description.non_empty_basket": {
+    "defaultMessage": "Beklager, du har varer i din kurv. Fjern dem for at fortsætte."
+  },
   "store_locator.description.or": {
     "defaultMessage": "Eller"
   },

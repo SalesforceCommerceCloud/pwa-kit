@@ -1475,6 +1475,9 @@
   "store_locator.description.no_locations": {
     "defaultMessage": "Sorry, there are no locations in this area"
   },
+  "store_locator.description.non_empty_basket": {
+    "defaultMessage": "Sorry, you have items in your basket. Please remove them to continue."
+  },
   "store_locator.description.or": {
     "defaultMessage": "Or"
   },

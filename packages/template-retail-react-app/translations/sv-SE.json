@@ -1334,6 +1334,9 @@
   "store_locator.description.no_locations": {
     "defaultMessage": "Tyvärr finns det inga platser i detta område"
   },
+  "store_locator.description.non_empty_basket": {
+    "defaultMessage": "Tyvärr, du har varor i din kundvagn. Ta bort dem för att fortsätta."
+  },
   "store_locator.description.or": {
     "defaultMessage": "Eller"
   },

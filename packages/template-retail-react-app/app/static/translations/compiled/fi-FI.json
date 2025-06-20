@@ -3139,6 +3139,12 @@
       "value": "Valitettavasti tällä alueella ei ole kohteita"
     }
   ],
+  "store_locator.description.non_empty_basket": [
+    {
+      "type": 0,
+      "value": "Anteeksi, ostoskorissasi on tuotteita. Poista ne jatkaaksesi."
+    }
+  ],
   "store_locator.description.or": [
     {
       "type": 0,

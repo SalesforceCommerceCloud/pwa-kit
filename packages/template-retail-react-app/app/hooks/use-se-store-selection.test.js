@@ -5,27 +5,63 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
+import React from 'react'
+import PropTypes from 'prop-types'
+import {renderHook, act} from '@testing-library/react'
+import {IntlProvider} from 'react-intl'
 import {DEFAULT_STORE_LOCATOR_COUNTRY} from '@salesforce/retail-react-app/app/constants'
+import {cleanURLParams} from '@salesforce/retail-react-app/app/components/se-input-handler'
+import useSeStoreSelection from '@salesforce/retail-react-app/app/hooks/use-se-store-selection'
 
-jest.mock('@salesforce/retail-react-app/app/hooks/use-se-store-selection', () => {
-    const mockHook = jest.fn(() => ({
-        isProcessing: false,
-        shouldOpenModal: false,
-        setShouldOpenModal: jest.fn(),
-        storeLocatorParams: null,
-        processSeParameters: jest.fn()
+jest.mock('@salesforce/retail-react-app/app/hooks/use-current-basket')
+jest.mock('react-router-dom', () => ({
+    useLocation: jest.fn(),
+    useHistory: jest.fn()
+}))
+jest.mock('@salesforce/retail-react-app/app/components/se-input-handler', () => ({
+    cleanURLParams: jest.fn()
+}))
+jest.mock('react-intl', () => ({
+    ...jest.requireActual('react-intl'),
+    useIntl: jest.fn(() => ({
+        formatMessage: jest.fn((message) => message.defaultMessage || message.id),
+        locale: 'en-US'
     }))
+}))
+jest.mock('@salesforce/retail-react-app/app/hooks/use-multi-site', () => ({
+    __esModule: true,
+    default: jest.fn(() => ({
+        site: {id: 'RefArch', alias: 'uk'},
+        buildUrl: jest.fn((href) => href)
+    }))
+}))
+jest.mock('@salesforce/commerce-sdk-react', () => ({
+    useSearchStores: jest.fn(() => ({
+        data: {
+            stores: [
+                {id: '001', name: 'Downtown Store', city: 'San Francisco'},
+                {id: '002', name: 'Union Square Store', city: 'Boston'}
+            ]
+        },
+        isLoading: false,
+        error: null
+    }))
+}))
 
-    const originalModule = jest.requireActual(
-        '@salesforce/retail-react-app/app/hooks/use-se-store-selection'
-    )
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const mockUseCurrentBasket = require('@salesforce/retail-react-app/app/hooks/use-current-basket')
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const mockReactRouterDom = require('react-router-dom')
 
-    return {
-        __esModule: true,
-        default: mockHook,
-        ...originalModule
-    }
-})
+const TestWrapper = ({children}) => (
+    <IntlProvider locale="en-US" messages={{}}>
+        {children}
+    </IntlProvider>
+)
+
+TestWrapper.propTypes = {
+    children: PropTypes.node
+}
 
 describe('useSeStoreSelection Hook Tests', () => {
     beforeEach(() => {
@@ -132,6 +168,230 @@ describe('useSeStoreSelection Hook Tests', () => {
             expect(isValid(data1)).toBe(true)
             expect(isValid(data2)).toBe(true)
             expect(isValid(data3)).toBe(false)
+        })
+    })
+
+    describe('Cart State Integration Tests', () => {
+        let mockLocation, mockHistory
+
+        beforeEach(() => {
+            mockLocation = {
+                search: '',
+                pathname: '/test'
+            }
+            mockHistory = {
+                replace: jest.fn()
+            }
+            mockReactRouterDom.useLocation = jest.fn(() => mockLocation)
+            mockReactRouterDom.useHistory = jest.fn(() => mockHistory)
+
+            global.fetch = jest.fn(() =>
+                Promise.resolve({
+                    json: () =>
+                        Promise.resolve({
+                            stores: [
+                                {id: '001', name: 'Downtown Store', city: 'San Francisco'},
+                                {id: '002', name: 'Union Square Store', city: 'Boston'}
+                            ]
+                        })
+                })
+            )
+        })
+
+        afterEach(() => {
+            jest.clearAllMocks()
+            localStorage.clear()
+        })
+
+        test('1. blocks store selection after adding items to cart', async () => {
+            mockUseCurrentBasket.useCurrentBasket = jest.fn(() => ({
+                derivedData: {totalItems: 0}
+            }))
+
+            const {result, rerender} = renderHook(
+                ({totalItems}) => useSeStoreSelection(totalItems),
+                {
+                    wrapper: TestWrapper,
+                    initialProps: {totalItems: 0}
+                }
+            )
+
+            expect(result.current.isProcessing).toBeDefined()
+            act(() => {
+                mockLocation.search = '?store=Downtown Store&city=San Francisco'
+                const params = new URLSearchParams(mockLocation.search)
+                result.current.processSeParameters?.(params)
+            })
+            mockUseCurrentBasket.useCurrentBasket = jest.fn(() => ({
+                derivedData: {totalItems: 1}
+            }))
+
+            rerender({totalItems: 1})
+            const originalStoreData = localStorage.getItem('store_RefArch')
+
+            act(() => {
+                mockLocation.search = '?store=Union Square Store&city=Boston'
+                const params = new URLSearchParams(mockLocation.search)
+                result.current.processSeParameters?.(params)
+            })
+            expect(localStorage.getItem('store_RefArch')).toBe(originalStoreData)
+        })
+
+        test('2. allows store selection when cart becomes empty', async () => {
+            const {result} = renderHook(({totalItems}) => useSeStoreSelection(totalItems), {
+                wrapper: TestWrapper,
+                initialProps: {totalItems: 0}
+            })
+            localStorage.removeItem('store_RefArch')
+            act(() => {
+                mockLocation.search = '?store=Downtown Store&city=San Francisco'
+                const params = new URLSearchParams(mockLocation.search)
+                result.current.processSeParameters?.(params)
+            })
+            expect(result.current.isProcessing).toBeDefined()
+        })
+
+        test('3. keeps store selection blocked when cart still has items after partial removal', async () => {
+            mockUseCurrentBasket.useCurrentBasket = jest.fn(() => ({
+                derivedData: {totalItems: 0}
+            }))
+            const {result, rerender} = renderHook(
+                ({totalItems}) => useSeStoreSelection(totalItems),
+                {
+                    wrapper: TestWrapper,
+                    initialProps: {totalItems: 0}
+                }
+            )
+            act(() => {
+                mockLocation.search = '?store=Downtown Store&city=San Francisco'
+                const params = new URLSearchParams(mockLocation.search)
+                result.current.processSeParameters?.(params)
+            })
+            mockUseCurrentBasket.useCurrentBasket = jest.fn(() => ({
+                derivedData: {totalItems: 2}
+            }))
+
+            rerender({totalItems: 2})
+            mockUseCurrentBasket.useCurrentBasket = jest.fn(() => ({
+                derivedData: {totalItems: 1}
+            }))
+
+            rerender({totalItems: 1})
+            const originalStore = localStorage.getItem('store_RefArch')
+
+            act(() => {
+                mockLocation.search = '?store=Union Square Store&city=Boston'
+                const params = new URLSearchParams(mockLocation.search)
+                result.current.processSeParameters?.(params)
+            })
+            expect(localStorage.getItem('store_RefArch')).toBe(originalStore)
+        })
+
+        test('4. cleans URL params when cart has items without changing store selection', async () => {
+            mockUseCurrentBasket.useCurrentBasket = jest.fn(() => ({
+                derivedData: {totalItems: 1}
+            }))
+            localStorage.setItem(
+                'store_RefArch',
+                JSON.stringify({
+                    id: '001',
+                    name: 'Downtown Store',
+                    city: 'San Francisco'
+                })
+            )
+            mockLocation.search = '?city=Boston&country=US'
+            const {result} = renderHook(({totalItems}) => useSeStoreSelection(totalItems), {
+                wrapper: TestWrapper,
+                initialProps: {totalItems: 1}
+            })
+
+            act(() => {
+                const params = new URLSearchParams(mockLocation.search)
+                result.current.processSeParameters?.(params)
+            })
+
+            expect(cleanURLParams).toHaveBeenCalledWith(mockLocation, mockHistory, [
+                'lat',
+                'lng',
+                'zip',
+                'city',
+                'store',
+                'country'
+            ])
+            const storedData = JSON.parse(localStorage.getItem('store_RefArch'))
+            expect(storedData.name).toBe('Downtown Store')
+            expect(storedData.city).toBe('San Francisco')
+        })
+
+        test('5. cleans URL params and preserves store when cart has items', async () => {
+            mockUseCurrentBasket.useCurrentBasket = jest.fn(() => ({
+                derivedData: {totalItems: 1}
+            }))
+            localStorage.setItem(
+                'store_RefArch',
+                JSON.stringify({
+                    id: '001',
+                    name: 'Original Store',
+                    city: 'Original City'
+                })
+            )
+
+            mockLocation.search = '?city=Boston&country=US'
+            const {result} = renderHook(({totalItems}) => useSeStoreSelection(totalItems), {
+                wrapper: TestWrapper,
+                initialProps: {totalItems: 1}
+            })
+
+            act(() => {
+                const params = new URLSearchParams(mockLocation.search)
+                result.current.processSeParameters?.(params)
+            })
+
+            expect(cleanURLParams).toHaveBeenCalled()
+            const storedData = JSON.parse(localStorage.getItem('store_RefArch'))
+            expect(storedData.name).toBe('Original Store')
+        })
+
+        test('6. cleans location params but preserves search params for PLP redirect', async () => {
+            const mockUseExternalSearch = jest.fn(() => ({
+                searchRedirect: jest.fn()
+            }))
+
+            mockUseCurrentBasket.useCurrentBasket = jest.fn(() => ({
+                derivedData: {totalItems: 1}
+            }))
+
+            localStorage.setItem(
+                'store_RefArch',
+                JSON.stringify({
+                    id: '001',
+                    name: 'Original Store'
+                })
+            )
+            mockLocation.search = '?city=Boston&country=US&q=shoes'
+
+            const {result} = renderHook(({totalItems}) => useSeStoreSelection(totalItems), {
+                wrapper: TestWrapper,
+                initialProps: {totalItems: 1}
+            })
+
+            act(() => {
+                const params = new URLSearchParams(mockLocation.search)
+                result.current.processSeParameters?.(params)
+            })
+
+            expect(cleanURLParams).toHaveBeenCalledWith(mockLocation, mockHistory, [
+                'lat',
+                'lng',
+                'zip',
+                'city',
+                'store',
+                'country'
+            ])
+
+            const storedData = JSON.parse(localStorage.getItem('store_RefArch'))
+            expect(storedData.name).toBe('Original Store')
+            expect(mockLocation.search).toContain('q=shoes')
         })
     })
 })
