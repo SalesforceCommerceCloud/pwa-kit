@@ -61,6 +61,18 @@ const red = (s) => `\x1b[31m${s}\u001b[0m`
 const blue = (s) => `\x1b[36m${s}\u001b[0m`
 
 if (warnings.length) {
+    // Check if we're in a CI environment
+    const isCI = Boolean(process.env.CI)
+
+    if (isCI) {
+        console.log(red('Warning: Some software installed locally does not meet the version requirements:'))
+        warnings.forEach((warning) => console.log(warning))
+        console.log('')
+        console.log('To fix this warning, see: http://sfdc.co/pwa-kit-required-software')
+        console.log('Continuing installation in CI environment...')
+        process.exit(0)
+    }
+
     const rl = readline.createInterface({
         input: process.stdin,
         output: process.stdout
