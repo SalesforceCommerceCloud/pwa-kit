@@ -18,8 +18,7 @@ import AddressDisplay from '@salesforce/retail-react-app/app/components/address-
 // Hooks
 import {useCheckout} from '@salesforce/retail-react-app/app/pages/checkout/util/checkout-context'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
-import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
-import {useShopperBasketsMutation} from '@salesforce/commerce-sdk-react'
+import {useShopperBasketsMutation, useStores} from '@salesforce/commerce-sdk-react'
 
 export default function PickupAddress() {
     const {formatMessage} = useIntl()
@@ -30,11 +29,27 @@ export default function PickupAddress() {
     const {step, STEPS, goToStep} = useCheckout()
     const {data: basket} = useCurrentBasket()
 
-    const {site} = useMultiSite()
-    const storeInfoKey = `store_${site.id}`
-    const storeInfo = JSON.parse(window.localStorage.getItem(storeInfoKey))
-    const pickupAddress = storeInfo?.shippingAddress
     const selectedShippingAddress = basket?.shipments && basket?.shipments[0]?.shippingAddress
+
+    const storeId = basket?.shipments?.[0]?.c_fromStoreId
+    const {data: storeData} = useStores(
+        {
+            parameters: {
+                ids: storeId
+            }
+        },
+        {
+            enabled: !!storeId
+        }
+    )
+    const store = storeData?.data?.[0]
+    const pickupAddress = {
+        address1: store?.address1,
+        city: store?.city,
+        countryCode: store?.countryCode,
+        postalCode: store?.postalCode,
+        stateCode: store?.stateCode
+    }
 
     const submitAndContinue = async (address) => {
         setIsLoading(true)

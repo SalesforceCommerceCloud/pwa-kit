@@ -77,14 +77,7 @@ const StoresList = ({storesInfo}) => {
             inventoryId: store.inventoryId || null,
             isSeSelection: false,
             timestamp: Date.now(),
-            manualSearchParams: manualSearchParams,
-            shippingAddress: {
-                address1: store.address1 || null,
-                city: store.city || null,
-                stateCode: store.stateCode || null,
-                postalCode: store.postalCode || null,
-                countryCode: store.countryCode || null
-            }
+            manualSearchParams: manualSearchParams
         }
 
         try {

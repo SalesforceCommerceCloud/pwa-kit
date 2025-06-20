@@ -18,6 +18,26 @@ jest.mock('@salesforce/commerce-sdk-react', () => {
         ...originalModule,
         useShopperBasketsMutation: () => ({
             mutateAsync: mockMutateAsync
+        }),
+        useStores: () => ({
+            data: {
+                data: [
+                    {
+                        id: 'store-123',
+                        name: 'Test Store',
+                        address1: '123 Main Street',
+                        city: 'San Francisco',
+                        stateCode: 'CA',
+                        postalCode: '94105',
+                        countryCode: 'US',
+                        phone: '555-123-4567',
+                        storeHours: 'Mon-Fri: 9AM-6PM',
+                        storeType: 'retail'
+                    }
+                ]
+            },
+            isLoading: false,
+            error: null
         })
     }
 })
@@ -57,7 +77,8 @@ jest.mock('@salesforce/retail-react-app/app/hooks/use-current-basket', () => ({
                     shippingStatus: 'not_shipped',
                     shippingTotal: 5.99
                 }
-            ]
+            ],
+            c_fromStoreId: 'store-123'
         },
         derivedData: {
             hasBasket: true,
@@ -88,23 +109,9 @@ describe('PickupAddress', () => {
     beforeEach(() => {
         jest.resetModules()
         jest.clearAllMocks()
-
-        window.localStorage.setItem(
-            storeInfoKey,
-            JSON.stringify({
-                shippingAddress: {
-                    address1: '123 Main Street',
-                    city: 'San Francisco',
-                    countryCode: 'US',
-                    postalCode: '94105',
-                    stateCode: 'CA'
-                }
-            })
-        )
     })
 
     afterEach(() => {
-        window.localStorage.removeItem(storeInfoKey)
         cleanup()
         jest.clearAllMocks()
     })
