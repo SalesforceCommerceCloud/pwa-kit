@@ -15,15 +15,15 @@ const EmptyCart = ({isRegistered}) => {
     return (
         <Box data-testid="sf-cart-empty" flex="1" minWidth="100%" width="full" background="gray.50">
             <Center>
-                <Stack spacing={6} width={['343px', '444px']} marginTop="20%" marginBottom="20%">
-                    <Box align="center">
+                <Stack gap={6} width={['343px', '444px']} marginTop="20%" marginBottom="20%">
+                    <Box css={{ "& > *": { textAlign: "center" } }}>
                         <BasketIcon boxSize={[8, 10]} />
                     </Box>
-                    <Stack spacing={8}>
-                        <Stack spacing={2}>
+                    <Stack gap={8}>
+                        <Stack gap={2}>
                             <Text
                                 lineHeight={1}
-                                align="center"
+                                css={{ "& > *": { textAlign: "center" } }}
                                 fontSize={['18px', '2xl']}
                                 fontWeight="bold"
                             >
@@ -33,7 +33,7 @@ const EmptyCart = ({isRegistered}) => {
                                 />
                             </Text>
 
-                            <Text align="center" fontSize="md" color="gray.700">
+                            <Text css={{ "& > *": { textAlign: "center" } }} fontSize="md" color="gray.700">
                                 {isRegistered ? (
                                     <FormattedMessage
                                         defaultMessage="Continue shopping to add items to your cart."
@@ -47,7 +47,7 @@ const EmptyCart = ({isRegistered}) => {
                                 )}
                             </Text>
                         </Stack>
-                        <Stack justify="center" direction={['column', 'row']} spacing={4}>
+                        <Stack justify="center" direction={['column', 'row']} gap={4}>
                             <Button
                                 as={Link}
                                 href={'/'}

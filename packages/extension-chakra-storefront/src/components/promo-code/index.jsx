@@ -88,28 +88,19 @@ export const usePromoCode = () => {
 }
 
 export const PromoCode = ({form, submitPromoCode, itemProps}) => {
-    const [isOpen, setOpen] = useState()
-
-    useEffect(() => {
-        if (form.formState.isSubmitSuccessful) {
-            setOpen(false)
-        }
-    }, [form.formState.isSubmitSuccessful])
-
     return (
-        <Accordion.Root
-            collapsible
-            // index={isOpen ? 0 : -1} onChange={() => setOpen(!isOpen)}
-        >
+        <Accordion.Root collapsible>
             <Accordion.Item {...itemProps}>
                 <Accordion.ItemTrigger asChild>
                     <Button
                         justifyContent="flex-start"
-                        variant="link"
                         fontSize="sm"
-                        color="blue.700"
-                        pl="0"
+                        lineHeight="4"
                         onClick={() => form.reset()}
+                        variant="link"
+                        color="blue.700"
+                        fw="400"
+                        pl="0"
                     >
                         <FormattedMessage
                             defaultMessage="Do you have a promo code?"

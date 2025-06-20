@@ -6,11 +6,7 @@
  */
 import React from 'react'
 import {noop} from '../../utils/utils'
-import {
-    Button,
-    Dialog,
-    Text
-} from '@chakra-ui/react'
+import {Button, Dialog, Text, useDisclosure} from '@chakra-ui/react'
 
 import PropTypes from 'prop-types'
 import {CONFIRMATION_DIALOG_DEFAULT_CONFIG} from '../../pages/account/constant'
@@ -28,6 +24,7 @@ const ConfirmationModal = ({
     onAlternateAction = noop,
     ...props
 }) => {
+    console.log('prop', props)
     const {formatMessage} = useIntl()
     const handleConfirmClick = () => {
         onPrimaryAction()
@@ -41,7 +38,7 @@ const ConfirmationModal = ({
 
     return (
         <Dialog.Root
-            open={props.isOpen}
+            open={props.open}
             placement="center"
             onOpenChange={({open}) => !open && handleAlternateActionClick()}
             role="alertdialog"
@@ -84,7 +81,7 @@ ConfirmationModal.propTypes = {
     /**
      * Prop to check if modal is open
      */
-    isOpen: PropTypes.bool.isRequired,
+    open: PropTypes.bool.isRequired,
     /**
      * Callback invoked to open the modal
      */

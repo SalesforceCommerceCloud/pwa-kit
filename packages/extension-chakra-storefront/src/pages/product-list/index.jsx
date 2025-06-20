@@ -43,7 +43,7 @@ import ProductTile, {Skeleton as ProductTileSkeleton} from '../../components/pro
 import {HideOnDesktop} from '../../components/responsive'
 // TODO: Refinements components will be migrated in separate PR
 // import Refinements from '../../pages/product-list/partials/refinements'
-import CategoryLinks from '../../pages/product-list/partials/category-links'
+// import CategoryLinks from '../../pages/product-list/partials/category-links'
 // import SelectedRefinements from '../../pages/product-list/partials/selected-refinements'
 import EmptySearchResults from '../../pages/product-list/partials/empty-results'
 import PageHeader from '../../pages/product-list/partials/page-header'

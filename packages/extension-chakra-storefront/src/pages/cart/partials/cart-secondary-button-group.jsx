@@ -66,6 +66,7 @@ const CartSecondaryButtonGroup = ({
 
     const {data: customer} = useCurrentCustomer()
     const modalProps = useDisclosure()
+    console.log('modalProps', modalProps)
 
     const showRemoveItemConfirmation = () => {
         modalProps.onOpen()
@@ -74,7 +75,6 @@ const CartSecondaryButtonGroup = ({
     const handleRemoveItem = async () => {
         onRemoveItemClick(variant)
     }
-    return <Box>Test</Box>
 
     return (
         <>
@@ -82,10 +82,10 @@ const CartSecondaryButtonGroup = ({
                 direction={{base: 'column', lg: 'row'}}
                 alignItems={{base: 'flex-start', lg: 'center'}}
                 justifyContent={{base: 'flex-start', lg: 'space-between'}}
-                divider={<Separator display={{base: 'block', lg: 'none'}} />}
+                separator={<Separator display={{base: 'block', lg: 'none'}} />}
             >
                 <ButtonGroup gap="6">
-                    <Button variant="link" size="sm" onClick={showRemoveItemConfirmation}>
+                    <Button variant="link-blue" size="sm" onClick={showRemoveItemConfirmation}>
                         <FormattedMessage
                             defaultMessage="Remove"
                             id="cart_secondary_button_group.action.remove"
@@ -93,7 +93,7 @@ const CartSecondaryButtonGroup = ({
                     </Button>
                     {customer.isRegistered && (
                         <Button
-                            variant="link"
+                            variant="link-blue"
                             size="sm"
                             onClick={() => onAddToWishlistClick(variant)}
                         >
@@ -103,7 +103,7 @@ const CartSecondaryButtonGroup = ({
                             />
                         </Button>
                     )}
-                    <Button variant="link" size="sm" onClick={() => onEditClick(variant)}>
+                    <Button variant="link-blue" size="sm" onClick={() => onEditClick(variant)}>
                         <FormattedMessage
                             defaultMessage="Edit"
                             id="cart_secondary_button_group.action.edit"
@@ -111,23 +111,27 @@ const CartSecondaryButtonGroup = ({
                     </Button>
                 </ButtonGroup>
                 <Flex alignItems="center">
-                    <Checkbox
+                    <Checkbox.Root
                         name={`gift-checkbox-${variant.itemId}`}
-                        spacing={2}
-                        checked={isAGift}
+                        gap={2}
+                        defaultChecked={isAGift}
                         onChange={(e) => {
                             const checked = e.target.checked
                             onIsAGiftChange(variant, checked)
                         }}
                     >
-                        <FormattedMessage
-                            defaultMessage="This is a gift."
-                            id="cart_secondary_button_group.label.this_is_gift"
-                        />
-                    </Checkbox>
+                        <Checkbox.HiddenInput />
+                        <Checkbox.Control />
+                        <Checkbox.Label>
+                            <FormattedMessage
+                                defaultMessage="This is a gift."
+                                id="cart_secondary_button_group.label.this_is_gift"
+                            />
+                        </Checkbox.Label>
+                    </Checkbox.Root>
                     {/* if you want to provide a link to your gift site, uncomment this section and re-build your translation*/}
                     {/*<Box marginLeft={1}>*/}
-                    {/*    <Button marginLeft={1} variant="link" size="sm" href="#">*/}
+                    {/*    <Button marginLeft={1} variant="ghost" size="sm" href="#">*/}
                     {/*        <FormattedMessage*/}
                     {/*            defaultMessage="Learn More"*/}
                     {/*            id="cart_secondary_button_group.link_learn_more"*/}

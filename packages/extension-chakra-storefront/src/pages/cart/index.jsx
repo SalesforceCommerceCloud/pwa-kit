@@ -42,14 +42,13 @@ import {REMOVE_CART_ITEM_CONFIRMATION_DIALOG_CONFIG} from '../../pages/cart/part
 
 // Utilities
 import debounce from 'lodash/debounce'
-import {useCurrentBasket} from '../../hooks/use-current-basket'
+import {useCurrentBasket, useCurrentCustomer} from '../../hooks/'
 import {
     useShopperBasketsMutation,
     useShippingMethodsForShipment,
     useProducts,
     useShopperCustomersMutation
 } from '@salesforce/commerce-sdk-react'
-import {useCurrentCustomer} from '../../hooks/use-current-customer'
 // import UnavailableProductConfirmationModal from '../../components/unavailable-product-confirmation-modal'
 import {getUpdateBundleChildArray} from '../../utils/product-utils'
 
@@ -483,6 +482,7 @@ const Cart = () => {
 
     /***************************** Remove Item from basket **************************/
     const handleRemoveItem = async (product) => {
+        console.log('tttttt')
         setSelectedItem(product)
         setCartItemLoading(true)
         await removeItemFromBasketMutation.mutateAsync(
@@ -524,8 +524,8 @@ const Cart = () => {
                 paddingTop={{base: 8, lg: 8}}
                 paddingBottom={{base: 8, lg: 14}}
             >
-                <Stack spacing={24}>
-                    <Stack spacing={4}>
+                <Stack gap={24}>
+                    <Stack gap={4}>
                         <CartTitle />
 
                         <Grid
@@ -533,7 +533,7 @@ const Cart = () => {
                             gap={{base: 10, xl: 20}}
                         >
                             <GridItem>
-                                <Stack spacing={4}>
+                                <Stack gap={4}>
                                     {basket.productItems?.map((productItem, idx) => {
                                         return (
                                             <ProductItem
@@ -608,7 +608,7 @@ const Cart = () => {
                                 </Box>
                             </GridItem>
                             <GridItem>
-                                <Stack spacing={4}>
+                                <Stack gap={4}>
                                     <OrderSummary
                                         showPromoCodeForm={true}
                                         isEstimate={true}
@@ -622,7 +622,7 @@ const Cart = () => {
                         </Grid>
 
                         {/* Product Recommendations */}
-                        <Stack spacing={16}>
+                        <Stack gap={16}>
                             <RecommendedProducts
                                 title={
                                     <FormattedMessage
@@ -659,7 +659,9 @@ const Cart = () => {
                 bottom={0}
                 bg="white"
                 display={{base: 'block', lg: 'none'}}
-                align="center"
+                css={{
+                    '& > *': {alignItems: 'center'}
+                }}
             >
                 <CartCta />
             </Box>

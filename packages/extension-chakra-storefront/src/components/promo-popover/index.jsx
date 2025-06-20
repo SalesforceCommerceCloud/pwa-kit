@@ -6,13 +6,8 @@
  */
 import React from 'react'
 import PropTypes from 'prop-types'
-import {
-    Box,
-    IconButton,
-    Popover,
-    Text
-} from '@chakra-ui/react'
-import {InfoIcon} from '../../components/icons'
+import {Box, IconButton, Popover, Text} from '@chakra-ui/react'
+import {InfoIcon} from '../icons'
 import {FormattedMessage, useIntl} from 'react-intl'
 
 /**
@@ -24,8 +19,14 @@ const PromoPopover = ({header, children, ...props}) => {
     const intl = useIntl()
     return (
         <Box position="relative" {...props}>
-            <Popover.Root lazy placement="top" boundary="scrollParent" trigger="hover" variant="small">
-                <Popover.Trigger>
+            <Popover.Root
+                lazy
+                placement="top"
+                boundary="scrollParent"
+                trigger="hover"
+                variant="small"
+            >
+                <Popover.Trigger asChild>
                     <IconButton
                         icon={
                             <InfoIcon

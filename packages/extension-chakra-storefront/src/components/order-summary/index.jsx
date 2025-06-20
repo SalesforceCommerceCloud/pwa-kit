@@ -7,22 +7,9 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import {FormattedMessage, FormattedNumber} from 'react-intl'
-import {
-    Box,
-    Flex,
-    Button,
-    Stack,
-    Text,
-    Heading,
-    Divider,
-    Accordion,
-    AccordionIcon,
-    AccordionItem,
-    AccordionButton,
-    AccordionPanel
-} from '@chakra-ui/react'
+import {Box, Flex, Button, Stack, Text, Heading, Separator, Accordion} from '@chakra-ui/react'
 import Link from '../../components/link'
-import {PromoCode, usePromoCode} from '../../components/promo-code'
+import {PromoCode, usePromoCode} from '../promo-code'
 import ItemVariantProvider from '../../components/item-variant'
 import CartItemVariantImage from '../../components/item-variant/item-image'
 import CartItemVariantName from '../../components/item-variant/item-name'
@@ -30,7 +17,7 @@ import CartItemVariantAttributes from '../../components/item-variant/item-attrib
 import CartItemVariantPrice from '../../components/item-variant/item-price'
 import PromoPopover from '../../components/promo-popover'
 import {useProducts} from '@salesforce/commerce-sdk-react'
-import {BasketIcon} from '../../components/icons'
+import {BasketIcon} from '../icons'
 
 const CartItems = ({basket}) => {
     const totalItems = basket?.productItems?.reduce((acc, item) => acc + item.quantity, 0) || 0
@@ -56,11 +43,11 @@ const CartItems = ({basket}) => {
     )
 
     return (
-        <Accordion allowToggle={true} width="100%">
-            <AccordionItem style={{border: 0}}>
-                <AccordionButton color="blue.700">
-                    <BasketIcon aria-hidden={true} />
-                    <Box px={2}>
+        <Accordion.Root w="full" collapsible>
+            <Accordion.Item>
+                <Accordion.ItemTrigger px={0} py={4}>
+                    <Box as="span" flex="1" textAlign="left" fontSize="md" fontWeight="bold">
+                        <BasketIcon display="inline" mr={2} />
                         <FormattedMessage
                             id="order_summary.cart_items.action.num_of_items_in_cart"
                             description="clicking it would expand/show the items in cart"
@@ -68,10 +55,10 @@ const CartItems = ({basket}) => {
                             values={{itemCount: totalItems}}
                         />
                     </Box>
-                    <AccordionIcon />
-                </AccordionButton>
-                <AccordionPanel px={0} py={4}>
-                    <Stack spacing={5} align="flex-start" divider={<Divider />}>
+                    <Accordion.ItemIndicator />
+                </Accordion.ItemTrigger>
+                <Accordion.ItemContent px={0} py={4}>
+                    <Stack gap={5} align="flex-start" separator={<Divider />}>
                         {basket.productItems?.map((product, idx) => {
                             const variant = {
                                 ...product,
@@ -86,7 +73,7 @@ const CartItems = ({basket}) => {
                                 >
                                     <Flex width="full" alignItems="flex-start">
                                         <CartItemVariantImage width="80px" mr={2} />
-                                        <Stack width="full" spacing={1} marginTop="-3px">
+                                        <Stack width="full" gap={1} marginTop="-3px">
                                             <CartItemVariantName />
                                             <CartItemVariantAttributes includeQuantity />
                                             <CartItemVariantPrice
@@ -99,16 +86,16 @@ const CartItems = ({basket}) => {
                             )
                         })}
 
-                        <Button as={Link} to="/cart" variant="link" width="full" color="blue.700">
+                        <Button as={Link} to="/cart" variant="link-blue" width="full">
                             <FormattedMessage
                                 defaultMessage="Edit cart"
                                 id="order_summary.cart_items.link.edit_cart"
                             />
                         </Button>
                     </Stack>
-                </AccordionPanel>
-            </AccordionItem>
-        </Accordion>
+                </Accordion.ItemContent>
+            </Accordion.Item>
+        </Accordion.Root>
     )
 }
 
@@ -132,7 +119,7 @@ const OrderSummary = ({
     const hasShippingPromos = shippingItem?.priceAdjustments?.length > 0
 
     return (
-        <Stack data-testid="sf-order-summary" spacing={5}>
+        <Stack data-testid="sf-order-summary" gap={5}>
             <Heading fontSize={fontSize} pt={1} id="order-summary-heading">
                 <FormattedMessage
                     defaultMessage="Order Summary"
@@ -140,16 +127,11 @@ const OrderSummary = ({
                 />
             </Heading>
 
-            <Stack
-                spacing={4}
-                align="flex-start"
-                role="region"
-                aria-labelledby="order-summary-heading"
-            >
+            <Stack gap={4} align="flex-start" role="region" aria-labelledby="order-summary-heading">
                 {showCartItems && <CartItems basket={basket} />}
 
                 <Stack w="full">
-                    <Flex justify="space-between" aria-live="polite" aria-atomic="true">
+                    <Flex justifyContent="space-between" aria-live="polite" aria-atomic="true">
                         <Text fontWeight="bold" fontSize={fontSize}>
                             <FormattedMessage
                                 defaultMessage="Subtotal"
@@ -167,7 +149,7 @@ const OrderSummary = ({
 
                     {basket.orderPriceAdjustments?.map((adjustment) => (
                         <Flex
-                            justify="space-between"
+                            justifyContent="space-between"
                             key={adjustment.priceAdjustmentId}
                             aria-live="polite"
                             aria-atomic="true"
@@ -183,7 +165,7 @@ const OrderSummary = ({
                         </Flex>
                     ))}
 
-                    <Flex justify="space-between" aria-live="polite" aria-atomic="true">
+                    <Flex justifyContent="space-between" aria-live="polite" aria-atomic="true">
                         <Flex alignItems="center">
                             <Text lineHeight={1} fontSize={fontSize}>
                                 <FormattedMessage
@@ -239,7 +221,7 @@ const OrderSummary = ({
                         )}
                     </Flex>
 
-                    <Flex justify="space-between" aria-live="polite" aria-atomic="true">
+                    <Flex justifyContent="space-between" aria-live="polite" aria-atomic="true">
                         <Text fontSize={fontSize}>
                             <FormattedMessage defaultMessage="Tax" id="order_summary.label.tax" />
                         </Text>
@@ -264,11 +246,16 @@ const OrderSummary = ({
                         <PromoCode {...promoCodeProps} />
                     </Box>
                 ) : (
-                    <Divider />
+                    <Separator />
                 )}
 
-                <Stack spacing={4} w="full">
-                    <Flex w="full" justify="space-between" aria-live="polite" aria-atomic="true">
+                <Stack gap={4} w="full">
+                    <Flex
+                        w="full"
+                        justifyContent="space-between"
+                        aria-live="polite"
+                        aria-atomic="true"
+                    >
                         {isEstimate ? (
                             <Text fontWeight="bold" fontSize={fontSize}>
                                 <FormattedMessage
@@ -316,7 +303,7 @@ const OrderSummary = ({
                                         </Text>
                                         {!basket.orderNo && (
                                             <Button
-                                                variant="link"
+                                                variant="ghost"
                                                 size="sm"
                                                 colorScheme="red"
                                                 onClick={() => removePromoCode(item.couponItemId)}

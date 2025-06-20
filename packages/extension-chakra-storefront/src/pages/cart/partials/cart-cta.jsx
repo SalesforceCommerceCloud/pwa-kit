@@ -27,7 +27,7 @@ const CartCta = () => {
                     id="cart_cta.link.checkout"
                 />
             </Button>
-            <Flex justify={'center'}>
+            <Flex justifyContent={'center'}>
                 <VisaIcon height={8} width={10} mr={2} />
                 <MastercardIcon height={8} width={10} mr={2} />
                 <AmexIcon height={8} width={10} mr={2} />

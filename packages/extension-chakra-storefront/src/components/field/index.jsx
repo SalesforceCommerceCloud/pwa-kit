@@ -11,6 +11,7 @@ import {
     Field as ChakraField,
     IconButton,
     Input,
+    Group,
     InputGroup,
     NativeSelect,
     Checkbox
@@ -79,18 +80,21 @@ const Field = ({
                                     ) : undefined
                                 }
                             >
-                                <Input
-                                    ref={(node) => {
-                                        ref(node)
-                                        if (inputRef) inputRef.current = node
-                                    }}
-                                    onChange={onChange}
-                                    value={value}
-                                    type={inputType}
-                                    placeholder={placeholder}
-                                    autoComplete={autoComplete}
-                                    {..._inputProps}
-                                />
+                                <>
+                                    <Input
+                                        ref={(node) => {
+                                            ref(node)
+                                            if (inputRef) inputRef.current = node
+                                        }}
+                                        onChange={onChange}
+                                        value={value}
+                                        type={inputType}
+                                        placeholder={placeholder}
+                                        autoComplete={autoComplete}
+                                        {..._inputProps}
+                                    />
+                                    {children}
+                                </>
                             </InputGroup>
                         )}
 
@@ -105,31 +109,41 @@ const Field = ({
                         )}
 
                         {type === 'select' && (
-                            <NativeSelect.Root ref={ref} value={value} {..._inputProps}>
-                                <NativeSelect.Field onChange={onChange} placeholder={placeholder}>
-                                    {options.map((opt) => (
-                                        <option key={`${opt.label}-${opt.value}`} value={opt.value}>
-                                            {opt.label}
-                                        </option>
-                                    ))}
-                                </NativeSelect.Field>
-                                <NativeSelect.Indicator />
-                            </NativeSelect.Root>
+                            <>
+                                <NativeSelect.Root ref={ref} value={value} {..._inputProps}>
+                                    <NativeSelect.Field
+                                        onChange={onChange}
+                                        placeholder={placeholder}
+                                    >
+                                        {options.map((opt) => (
+                                            <option
+                                                key={`${opt.label}-${opt.value}`}
+                                                value={opt.value}
+                                            >
+                                                {opt.label}
+                                            </option>
+                                        ))}
+                                    </NativeSelect.Field>
+                                    <NativeSelect.Indicator />
+                                </NativeSelect.Root>
+                                {children}
+                            </>
                         )}
 
                         {type === 'checkbox' && (
-                            <Checkbox.Root
-                                checked={value}
-                                onCheckedChange={(details) => onChange(details.checked)}
-                                {..._inputProps}
-                            >
-                                <Checkbox.HiddenInput ref={ref} />
-                                <Checkbox.Control />
-                                <Checkbox.Label>{formLabel || label}</Checkbox.Label>
-                            </Checkbox.Root>
+                            <>
+                                <Checkbox.Root
+                                    checked={value}
+                                    onCheckedChange={(details) => onChange(details.checked)}
+                                    {..._inputProps}
+                                >
+                                    <Checkbox.HiddenInput ref={ref} />
+                                    <Checkbox.Control />
+                                    <Checkbox.Label>{formLabel || label}</Checkbox.Label>
+                                </Checkbox.Root>
+                                {children}
+                            </>
                         )}
-
-                        {children}
 
                         {error && type !== 'hidden' && (
                             <ChakraField.ErrorText color="red.600">
