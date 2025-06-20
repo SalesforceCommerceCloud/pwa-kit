@@ -124,7 +124,8 @@ const ProductView = forwardRef(
             setSelectedBundleQuantity = () => {},
             selectedBundleParentQuantity = 1,
             pickupInStore,
-            setPickupInStore
+            setPickupInStore,
+            onOpenStoreLocator
         },
         ref
     ) => {
@@ -695,7 +696,7 @@ const ProductView = forwardRef(
                                         mb={1}
                                     >
                                         <Stack direction="column" spacing={2}>
-                                            <Radio value="ship">
+                                            <Radio value="ship" isDisabled={disableButton}>
                                                 <FormattedMessage
                                                     defaultMessage="Ship to Address"
                                                     id="product_view.label.ship_to_address"
@@ -734,9 +735,10 @@ const ProductView = forwardRef(
                                                   {
                                                       storeName: (
                                                           <Link
-                                                              to="/store-locator"
+                                                              as="button"
                                                               color="blue.600"
                                                               textDecoration="underline"
+                                                              onClick={onOpenStoreLocator}
                                                           >
                                                               {storeName}
                                                           </Link>
@@ -751,9 +753,10 @@ const ProductView = forwardRef(
                                                   {
                                                       storeName: (
                                                           <Link
-                                                              to="/store-locator"
+                                                              as="button"
                                                               color="blue.600"
                                                               textDecoration="underline"
+                                                              onClick={onOpenStoreLocator}
                                                           >
                                                               {storeName}
                                                           </Link>
@@ -770,7 +773,7 @@ const ProductView = forwardRef(
                                     }
                                 >
                                     {/* Show label if pickup is disabled due to no store/inventoryId */}
-                                    {!pickupEnabled && (
+                                    {!pickupEnabled && !storeName && !inventoryId && (
                                         <Text
                                             color="black"
                                             fontWeight={600}
@@ -782,9 +785,10 @@ const ProductView = forwardRef(
                                                 id="product_view.label.pickup_in_select_store_prefix"
                                             />{' '}
                                             <Link
-                                                to="/store-locator"
+                                                as="button"
                                                 color="blue.600"
                                                 textDecoration="underline"
+                                                onClick={onOpenStoreLocator}
                                             >
                                                 <FormattedMessage
                                                     defaultMessage="Select Store"
@@ -848,7 +852,8 @@ ProductView.propTypes = {
     setSelectedBundleQuantity: PropTypes.func,
     selectedBundleParentQuantity: PropTypes.number,
     pickupInStore: PropTypes.bool,
-    setPickupInStore: PropTypes.func
+    setPickupInStore: PropTypes.func,
+    onOpenStoreLocator: PropTypes.func
 }
 
 export default ProductView

@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, {useState, useEffect, lazy, Suspense} from 'react'
+import React, {useState, useEffect} from 'react'
 import PropTypes from 'prop-types'
 import {useHistory, useLocation} from 'react-router-dom'
 import {StorefrontPreview} from '@salesforce/commerce-sdk-react/components'
@@ -19,6 +19,7 @@ import {
 } from '@salesforce/commerce-sdk-react'
 import logger from '@salesforce/retail-react-app/app/utils/logger-instance'
 import {useAppOrigin} from '@salesforce/retail-react-app/app/hooks/use-app-origin'
+import loadable from '@loadable/component'
 
 // Chakra
 import {
@@ -83,7 +84,7 @@ import {Helmet} from 'react-helmet'
 import {getPathWithLocale} from '@salesforce/retail-react-app/app/utils/url'
 import useExternalSearch from '@salesforce/retail-react-app/app/hooks/use-external-search'
 
-const SeInputHandler = lazy(() =>
+const SeInputHandler = loadable(() =>
     import('@salesforce/retail-react-app/app/components/se-input-handler')
 )
 
@@ -152,6 +153,21 @@ const App = (props) => {
         onOpen: onOpenStoreLocator,
         onClose: onCloseStoreLocator
     } = useDisclosure()
+
+    useEffect(() => {
+        if (typeof window !== 'undefined' && window.location && window.location.href) {
+            const href = window.location.href
+            const questionMarks = (href.match(/\?/g) || []).length
+
+            if (questionMarks > 1) {
+                const parts = href.split('?')
+                const fixedUrl = parts[0] + '?' + parts.slice(1).join('&')
+                const url = new URL(fixedUrl)
+                const newPath = url.pathname + url.search
+                history.replace(newPath)
+            }
+        }
+    }, [location, history])
 
     const targetLocale = getTargetLocale({
         getUserPreferredLocales: () => {
@@ -329,9 +345,7 @@ const App = (props) => {
                 >
                     <CurrencyProvider currency={currency}>
                         <StoreLocatorParamsProvider>
-                            <Suspense fallback={null}>
-                                <SeInputHandler onOpenStoreLocator={onOpenStoreLocator} />
-                            </Suspense>
+                            <SeInputHandler onOpenStoreLocator={onOpenStoreLocator} />
                             <Seo>
                                 <meta name="theme-color" content={THEME_COLOR} />
                                 <meta

@@ -91,6 +91,7 @@ const StoreInventoryFilter = ({toggleFilter, selectedFilters}) => {
                     />
                 </Heading>
                 <Checkbox
+                    data-testid="sf-store-inventory-filter-checkbox"
                     isChecked={isChecked}
                     onChange={handleCheckboxChange}
                     aria-label={formatMessage(
