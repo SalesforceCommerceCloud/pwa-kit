@@ -22,19 +22,14 @@ module.exports = {
     },
     setupFilesAfterEnv: [path.join(__dirname, 'jest-setup.js')],
     collectCoverageFrom: [
-        'app/**/*.{js,jsx}',
-        'non-pwa/**/*.{js,jsx}',
-        'worker/**/*.{js,jsx}',
-        'scripts/generator/*.{js,jsx}',
-        '!app/pages/test-container/**/*.{js,jsx}',
-        '!app/utils/test-utils.js',
-        '!app/mocks/*.js',
-        '!app/main.jsx',
-        '!app/loader.js',
-        '!app/ssr.js',
-        '!app/static/**',
-        '!app/theme/**',
-        '!node_modules/**'
+        'pages/**/*.{js,jsx}',
+        'components/**/*.{js,jsx}',
+        'hooks/**/*.{js,jsx}',
+        'utils/**/*.{js,jsx}',
+        'contexts/**/*.{js,jsx}',
+        'page-designer/**/*.{js,jsx}',
+        '!**/node_modules/**',
+        '!**/dist/**'
     ],
     //@TODO: Revert this threshold back to original numbers stattements: 80, branches: 72, functions: 78, lines: 83
     coverageThreshold: {
