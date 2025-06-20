@@ -12,7 +12,7 @@ const generate = require('@babel/generator').default
 const path = require('path')
 const pluginConfig = require('../assets/plugin-config')
 
-const removeComponentCandidates = [] // List of files that are candidates for removal, as a result of tree-shaking.
+const removeComponentCandidates = [] // List of files that are candidates for removal, as a result of trimming.
 const SEPARATOR = path.sep // Use OS-specific path separator
 const COMPONENT_SCAN_PATHS = [
     `${SEPARATOR}src${SEPARATOR}components${SEPARATOR}`,
@@ -21,12 +21,12 @@ const COMPONENT_SCAN_PATHS = [
 ]
 
 /**
- * Tree-shake the directory to remove unused components and unused plugins.
- * @param {*} directory - The directory to tree-shake.
+ * Trim the directory to remove unused components and unused plugins.
+ * @param {*} directory - The directory to trim.
  * @param {*} generatedPlugins - The plugins that were seleted/unselected by the user.
  * @returns {void}
  */
-function treeShake(directory, generatedPlugins) {
+function trimExtensions(directory, generatedPlugins) {
     // read plugins from config file
     const configPlugins = pluginConfig.plugins || {}
     const plugins = {}
@@ -35,7 +35,7 @@ function treeShake(directory, generatedPlugins) {
     })
 
     if (Object.keys(plugins).length === 0) {
-        console.log('No plugins found, skipping tree-shake')
+        console.log('No plugins found, skipping trim')
         return
     }
 
@@ -218,14 +218,14 @@ function processFile(filePath, plugins) {
 
         // console.log(JSON.stringify(output.split('\n').slice(0, 100), null, 2));
 
-        // Replace the original file with the tree-shaked version
+        // Replace the original file with the trimmed version
         fs.writeFileSync(filePath, output)
         console.log(`Updated file ${filePath}`)
     }
 }
 
 /**
- * Remove unused components from the directory, as a result of tree-shaking.
+* Remove unused components from the directory, as a result of trimming.
  * @param {*} directory - The directory to remove unused components from.
  * @returns {void}
  */
@@ -388,7 +388,7 @@ function removeUnusedComponents(directory) {
 //         console.error('Please provide a directory path');
 //         process.exit(1);
 //     }
-//     treeShake(directory, {});
+//     trimExtensions(directory, {});
 // }
 
-module.exports = treeShake
+module.exports = trimExtensions

@@ -20,9 +20,9 @@ jest.mock('../assets/plugin-config', () => ({
 
 jest.mock('fs')
 
-const treeShake = require('./tree-shake')
+const trimExtensions = require('./trim-extensions')
 
-describe('tree-shake', () => {
+describe('trim-extensions', () => {
     beforeEach(() => {
         fs.readdirSync.mockReturnValue([
             '/src/components/featureComponent.jsx',
@@ -50,31 +50,39 @@ describe('tree-shake', () => {
     })
 
     it('handles OR operator correctly', () => {
-        const code = `
-            const feature = (SFDC_EXT_featureA || SFDC_EXT_featureB) && 'Feature Enabled';
-        `
-        fs.readFileSync.mockReturnValue(code)
+        const code = `const feature = (SFDC_EXT_featureA || SFDC_EXT_featureB) && 'Feature Enabled';`
+        fs.readFileSync.mockImplementation((filePath) => {
+            if (filePath.includes('featureComponent.jsx')) {
+                return code
+            } else {
+                return ''
+            }
+        })
 
-        treeShake('/mock/dir', {SFDC_EXT_featureA: true, SFDC_EXT_featureB: false})
-
+        trimExtensions('/mock/dir', {SFDC_EXT_featureA: true, SFDC_EXT_featureB: false})
         expect(fs.writeFileSync).toHaveBeenCalledWith(
             expect.any(String),
-            expect.stringContaining("const feature = 'Feature Enabled';")
+            "const feature = 'Feature Enabled';"
         )
     })
 
     it('handles variable declarations correctly', () => {
-        const code = `
-            const featureAFunc = SFDC_EXT_featureA && (() => 'Feature A');
+        const code = `const featureAFunc = SFDC_EXT_featureA && (() => 'Feature A');
             const featureBFunc = SFDC_EXT_featureB && (() => 'Feature B');
         `
-        fs.readFileSync.mockReturnValue(code)
+        fs.readFileSync.mockImplementation((filePath) => {
+            if (filePath.includes('featureComponent.jsx')) {
+                return code
+            } else {
+                return ''
+            }
+        })
 
-        treeShake('/mock/dir', {SFDC_EXT_featureA: true, SFDC_EXT_featureB: false})
+        trimExtensions('/mock/dir', {SFDC_EXT_featureA: true, SFDC_EXT_featureB: false})
 
         expect(fs.writeFileSync).toHaveBeenCalledWith(
             expect.any(String),
-            expect.stringContaining("const featureAFunc = () => 'Feature A';")
+            "const featureAFunc = () => 'Feature A';"
         )
         expect(fs.writeFileSync).toHaveBeenCalledWith(
             expect.any(String),
@@ -83,16 +91,20 @@ describe('tree-shake', () => {
     })
 
     it('handles variable with ternary expressions correctly', () => {
-        const code = `
-            const showFeature = SFDC_EXT_featureA ? Feature_A : Feature_B;
-        `
-        fs.readFileSync.mockReturnValue(code)
+        const code = `const showFeature = SFDC_EXT_featureA ? Feature_A : Feature_B;`
+        fs.readFileSync.mockImplementation((filePath) => {
+            if (filePath.includes('featureComponent.jsx')) {
+                return code
+            } else {
+                return ''
+            }
+        })
 
-        treeShake('/mock/dir', {SFDC_EXT_featureA: true})
+        trimExtensions('/mock/dir', {SFDC_EXT_featureA: true})
 
         expect(fs.writeFileSync).toHaveBeenCalledWith(
             expect.any(String),
-            expect.stringContaining('const showFeature = Feature_A')
+            'const showFeature = Feature_A;'
         )
         expect(fs.writeFileSync).toHaveBeenCalledWith(
             expect.any(String),
@@ -108,7 +120,7 @@ describe('tree-shake', () => {
         `
         fs.readFileSync.mockReturnValue(code)
 
-        treeShake('/mock/dir', {SFDC_EXT_featureA: true})
+        trimExtensions('/mock/dir', {SFDC_EXT_featureA: true})
 
         expect(fs.writeFileSync).toHaveBeenCalledWith(
             expect.any(String),
@@ -129,7 +141,7 @@ describe('tree-shake', () => {
         `
         fs.readFileSync.mockReturnValue(code)
 
-        treeShake('/mock/dir', {SFDC_EXT_featureA: true, SFDC_EXT_featureB: false})
+        trimExtensions('/mock/dir', {SFDC_EXT_featureA: true, SFDC_EXT_featureB: false})
 
         expect(fs.writeFileSync).toHaveBeenCalledWith(
             expect.any(String),
@@ -163,7 +175,7 @@ describe('tree-shake', () => {
             }
         })
 
-        treeShake('/mock/dir', {SFDC_EXT_featureA: true})
+        trimExtensions('/mock/dir', {SFDC_EXT_featureA: true})
 
         expect(fs.unlinkSync).not.toHaveBeenCalledWith(
             expect.stringContaining('src/components/featureAComponent')
@@ -177,7 +189,7 @@ describe('tree-shake', () => {
             const ComponentB = SFDC_EXT_featureB && loadable(() => import('./featureBComponent'))
         `
 
-        const shookCode = `
+        const trimmedCode = `
             import loadable from '@loadable/component'
             const ComponentA = loadable(() => import('./featureAComponent'))
         `
@@ -188,14 +200,14 @@ describe('tree-shake', () => {
             export default ComponentB
         `
 
-        let treeShakeCalled = false
+        let trimExtensionsCalled = false
         fs.readFileSync.mockImplementation((filePath) => {
             if (filePath.includes('featureComponent.jsx')) {
-                if (!treeShakeCalled) {
-                    treeShakeCalled = true
+                if (!trimExtensionsCalled) {
+                    trimExtensionsCalled = true
                     return code
                 } else {
-                    return shookCode
+                    return trimmedCode
                 }
             } else if (filePath.includes('featureAComponent')) {
                 return componentACode
@@ -206,7 +218,7 @@ describe('tree-shake', () => {
             }
         })
 
-        treeShake('/mock/dir', {SFDC_EXT_featureA: true, SFDC_EXT_featureB: false})
+        trimExtensions('/mock/dir', {SFDC_EXT_featureA: true, SFDC_EXT_featureB: false})
 
         expect(fs.unlinkSync).not.toHaveBeenCalledWith(expect.stringContaining('featureAComponent'))
         expect(fs.unlinkSync).toHaveBeenCalledWith(expect.stringContaining('featureBComponent'))
@@ -228,7 +240,7 @@ describe('tree-shake', () => {
             const ComponentB = SFDC_EXT_featureB && loadable(() => import('./featureBComponent'))
         `
 
-        const shookCode = `
+        const trimmedCode = `
             import loadable from '@loadable/component'
             const ComponentA = loadable(() => import('./featureAComponent'))
         `
@@ -239,14 +251,14 @@ describe('tree-shake', () => {
             export default ComponentB
         `
 
-        let treeShakeCalled = false
+        let trimExtensionsCalled = false
         fs.readFileSync.mockImplementation((filePath) => {
             if (filePath.includes('featureComponent.jsx')) {
-                if (!treeShakeCalled) {
-                    treeShakeCalled = true
+                if (!trimExtensionsCalled) {
+                    trimExtensionsCalled = true
                     return code
                 } else {
-                    return shookCode
+                    return trimmedCode
                 }
             } else if (filePath.includes('featureAComponent')) {
                 return componentACode
@@ -257,7 +269,7 @@ describe('tree-shake', () => {
             }
         })
 
-        treeShake('/mock/dir', {SFDC_EXT_featureA: true, SFDC_EXT_featureB: false})
+        trimExtensions('/mock/dir', {SFDC_EXT_featureA: true, SFDC_EXT_featureB: false})
 
         expect(fs.unlinkSync).toHaveBeenCalledWith(expect.stringContaining('featureBComponent'))
 

@@ -48,7 +48,7 @@ const semver = require('semver')
 const slugify = require('slugify')
 const generatorPkg = require('../package.json')
 const Handlebars = require('handlebars')
-const treeShake = require('./tree-shake')
+const trimExtensions = require('./trim-extensions')
 const pluginConfig = require('../assets/plugin-config')
 const computeChecksum = require('./checksum')
 
@@ -811,7 +811,7 @@ const runGenerator = (
 
     // Convert selected plugins array to object with true values
     if (Object.keys(pluginConfig?.plugins || {}).length > 0 && selectedPlugins) {
-        treeShake(outputDir, selectedPlugins)
+        trimExtensions(outputDir, selectedPlugins)
     }
 
     // Compute the checksum of the output directory
