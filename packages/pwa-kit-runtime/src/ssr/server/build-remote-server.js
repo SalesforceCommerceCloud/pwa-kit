@@ -172,8 +172,9 @@ export const RemoteServerFactory = {
         options.slasTarget = options.slasTarget || `https://${options.slasHostName}`
 
         // Add extra condition to regex to only allow SLAS endpoints
+        options.slasApiPath = /\/shopper\/auth\/.*/
         options.applySLASPrivateClientToEndpoints = new RegExp(
-            `\/shopper\/auth\/.*(` + options.applySLASPrivateClientToEndpoints.source + ')'
+            options.slasApiPath.source + `(` + options.applySLASPrivateClientToEndpoints.source + ')'
         )
 
         return options
@@ -720,6 +721,9 @@ export const RemoteServerFactory = {
                         targetProtocol: 'https'
                     })
 
+                    console.log(options.slasApiPath)
+                    console.log(options.applySLASPrivateClientToEndpoints)
+
                     // We pattern match and add client secrets only to endpoints that
                     // match the regex specified by options.applySLASPrivateClientToEndpoints
                     // (see option defaults at the top of this file).
@@ -728,8 +732,8 @@ export const RemoteServerFactory = {
                     // purpose so we don't want to overwrite the header for those calls.
                     if (incomingRequest.path?.match(options.applySLASPrivateClientToEndpoints)) {
                         proxyRequest.setHeader('Authorization', `Basic ${encodedSlasCredentials}`)
-                    } else {
-                        const message = `Request to ${incomingRequest.path} did not match allowed endpoints. Please make sure you have defined allowed endpoints via applySLASPrivateClientToEndpoints in ssr.js`
+                    } else if (!incomingRequest.path?.match(options.slasApiPath)) {
+                        const message = `Request to ${incomingRequest.path} is not allowed through the SLAS Private Client Proxy`
                         logger.error(message)
                         return res.status(403).json({
                             message: message
