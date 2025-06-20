@@ -27,6 +27,7 @@ import DynamicImage from '@salesforce/retail-react-app/app/components/dynamic-im
 import PropTypes from 'prop-types'
 import {useBonusProductModalContext} from '@salesforce/retail-react-app/app/hooks/use-bonus-product-modal'
 import {findImageGroupBy} from '@salesforce/retail-react-app/app/utils/image-groups-utils'
+import {FormattedMessage} from 'react-intl'
 
 // Component to display individual bonus product with checkbox for selection
 const BonusProductItem = ({product, isSelected, onToggle, isLoading}) => {
@@ -131,9 +132,9 @@ export const BonusProductModal = () => {
 
     // Extract bonus items from the response structure
     const bonusDiscountLineItems = data?.newBonusItems || data?.allBonusItems || []
-    const firstBonusItem = bonusDiscountLineItems[0] || {}
-    const bonusProducts = firstBonusItem.bonusProducts || []
-    const maxBonusItems = firstBonusItem.maxBonusItems || 1
+    const currentPromotion = bonusDiscountLineItems[0] || {}
+    const bonusProducts = currentPromotion.bonusProducts || []
+    const maxBonusItems = currentPromotion.maxBonusItems || 1
 
     // Reset selections when modal opens
     useEffect(() => {
@@ -199,7 +200,12 @@ export const BonusProductModal = () => {
                         </SimpleGrid>
                     ) : (
                         <Box textAlign="center" py={8}>
-                            <Text color="gray.500">No bonus products available</Text>
+                            <Text color="gray.500">
+                                <FormattedMessage
+                                    defaultMessage="No bonus products available"
+                                    id="bonus_product_modal.no_products_available"
+                                />
+                            </Text>
                         </Box>
                     )}
                 </ModalBody>

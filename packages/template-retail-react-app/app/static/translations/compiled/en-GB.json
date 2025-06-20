@@ -453,6 +453,12 @@
       "value": "Password Reset"
     }
   ],
+  "bonus_product_modal.no_products_available": [
+    {
+      "type": 0,
+      "value": "No bonus products available"
+    }
+  ],
   "carousel.button.scroll_left.assistive_msg": [
     {
       "type": 0,

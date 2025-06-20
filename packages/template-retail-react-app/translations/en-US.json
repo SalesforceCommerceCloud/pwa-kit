@@ -177,6 +177,9 @@
   "auth_modal.password_reset_success.title.password_reset": {
     "defaultMessage": "Password Reset"
   },
+  "bonus_product_modal.no_products_available": {
+    "defaultMessage": "No bonus products available"
+  },
   "carousel.button.scroll_left.assistive_msg": {
     "defaultMessage": "Scroll carousel left"
   },

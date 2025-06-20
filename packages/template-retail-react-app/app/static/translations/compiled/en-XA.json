@@ -925,6 +925,20 @@
       "value": "]"
     }
   ],
+  "bonus_product_modal.no_products_available": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ƞǿǿ ƀǿǿƞŭŭş ƥřǿǿḓŭŭƈŧş ȧȧṽȧȧīŀȧȧƀŀḗḗ"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
   "carousel.button.scroll_left.assistive_msg": [
     {
       "type": 0,
