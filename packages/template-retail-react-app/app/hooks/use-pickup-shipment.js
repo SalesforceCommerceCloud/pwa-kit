@@ -34,6 +34,15 @@ export const usePickupShipment = () => {
     }
 
     /**
+     * Gets the default shipping method ID (non-pickup)
+     * @param {Object} shippingMethods - The shipping methods for the shipment
+     * @returns {string|null} The default shipping method ID, or null if not found
+     */
+    const getDefaultShippingMethodId = (shippingMethods) => {
+        return shippingMethods?.defaultShippingMethodId || null
+    }
+
+    /**
      * Checks if the current shipping method is already a pickup method
      * @param {Object} currentShippingMethod - The current shipping method on the basket
      * @returns {boolean} True if the current shipping method is a pickup method
@@ -93,6 +102,35 @@ export const usePickupShipment = () => {
     }
 
     /**
+     * Configures regular shipping method for the basket
+     * @param {string} basketId - The basket ID
+     * @param {string} shippingMethodId - The shipping method ID to set
+     * @param {boolean} throwOnError - Whether to throw on error (default: false)
+     */
+    const configureRegularShippingMethod = async (basketId, shippingMethodId, throwOnError = false) => {
+        try {
+            await updateShipmentForBasketMutation.mutateAsync({
+                parameters: {
+                    basketId,
+                    shipmentId: 'me'
+                },
+                body: {
+                    shippingMethod: {
+                        id: shippingMethodId
+                    }
+                }
+            })
+        } catch (error) {
+            if (throwOnError) {
+                throw error
+            } else {
+                // Log error but don't block the add to cart flow
+                console.warn('Failed to configure regular shipping method:', error)
+            }
+        }
+    }
+
+    /**
      * Checks if any items in the selection require pickup configuration
      * @param {Array} productSelectionValues - Array of product selection values
      * @param {Object} pickupInStoreMap - Map of product IDs to pickup flags
@@ -146,10 +184,12 @@ export const usePickupShipment = () => {
 
     return {
         configurePickupShipment,
+        configureRegularShippingMethod,
         hasPickupItems,
         getStoreInfo,
         addInventoryIdsToPickupItems,
         getPickupShippingMethodId,
+        getDefaultShippingMethodId,
         isCurrentShippingMethodPickup,
         isLoading: updateShipmentForBasketMutation.isLoading
     }

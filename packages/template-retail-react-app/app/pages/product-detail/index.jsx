@@ -123,9 +123,11 @@ const ProductDetail = () => {
     /*************************** Pick up in Store ********************/
     const {
         configurePickupShipment,
+        configureRegularShippingMethod,
         hasPickupItems: checkHasPickupItems,
         addInventoryIdsToPickupItems,
         getPickupShippingMethodId,
+        getDefaultShippingMethodId,
         isCurrentShippingMethodPickup
     } = usePickupShipment()
 
@@ -409,18 +411,31 @@ const ProductDetail = () => {
 
             const basketResponse = await addItemToNewOrExistingBasket(productItems)
 
-            // If any items are pickup items, ensure the shipment is configured for pickup
-            if (hasPickupItems && basketResponse?.basketId && basketResponse.shipments.length > 0) {
+            // Configure shipping method based on pickup selection
+            if (basketResponse?.basketId && basketResponse.shipments.length > 0) {
                 const currentShippingMethod = basketResponse.shipments[0].shippingMethod
-
-                // Only configure pickup shipment if current shipping method is not already pickup
-                if (!isCurrentShippingMethodPickup(currentShippingMethod)) {
-                    // Fetch shipping methods and configure pickup shipment
-                    const {data: fetchedShippingMethods} = await refetchShippingMethods()
+                const isCurrentlyPickup = isCurrentShippingMethodPickup(currentShippingMethod)
+                
+                // Check if any products have pickup selected
+                const hasAnyPickupSelected = productSelectionValues.some((item) => {
+                    const prodKey = (item.variant || item.product || product).productId || 
+                                   (item.variant || item.product || product).id
+                    return pickupInStoreMap[prodKey]
+                })
+                
+                // Fetch shipping methods to get available options
+                const {data: fetchedShippingMethods} = await refetchShippingMethods()
+                
+                if (hasAnyPickupSelected && !isCurrentlyPickup) {
+                    // Configure pickup shipment if pickup is selected but current method is not pickup
                     const pickupShippingMethodId = getPickupShippingMethodId(fetchedShippingMethods)
                     await configurePickupShipment(basketResponse.basketId, productItems, {
                         pickupShippingMethodId
                     })
+                } else if (!hasAnyPickupSelected && isCurrentlyPickup) {
+                    // Configure regular shipping if pickup is not selected but current method is pickup
+                    const defaultShippingMethodId = getDefaultShippingMethodId(fetchedShippingMethods)
+                    await configureRegularShippingMethod(basketResponse.basketId, defaultShippingMethodId)
                 }
             }
 
@@ -536,18 +551,29 @@ const ProductDetail = () => {
                 })
             }
 
-            // If any items are pickup items, ensure the shipment is configured for pickup
-            if (hasPickupItems && res.basketId && res.shipments.length > 0) {
+            // Configure shipping method based on pickup selection
+            if (res.basketId && res.shipments.length > 0) {
                 const currentShippingMethod = res.shipments[0].shippingMethod
-
-                // Only configure pickup shipment if current shipping method is not already pickup
-                if (!isCurrentShippingMethodPickup(currentShippingMethod)) {
-                    // Fetch shipping methods and configure pickup shipment
-                    const {data: fetchedShippingMethods} = await refetchShippingMethods()
+                const isCurrentlyPickup = isCurrentShippingMethodPickup(currentShippingMethod)
+                
+                // Check if any products have pickup selected (including bundle items)
+                const hasAnyPickupSelected = 
+                    pickupInStoreMap[product.id] || 
+                    childProductSelections.some((child) => pickupInStoreMap[child.product.id])
+                
+                // Fetch shipping methods to get available options
+                const {data: fetchedShippingMethods} = await refetchShippingMethods()
+                
+                if (hasAnyPickupSelected && !isCurrentlyPickup) {
+                    // Configure pickup shipment if pickup is selected but current method is not pickup
                     const pickupShippingMethodId = getPickupShippingMethodId(fetchedShippingMethods)
                     await configurePickupShipment(res.basketId, productItems, {
                         pickupShippingMethodId
                     })
+                } else if (!hasAnyPickupSelected && isCurrentlyPickup) {
+                    // Configure regular shipping if pickup is not selected but current method is pickup
+                    const defaultShippingMethodId = getDefaultShippingMethodId(fetchedShippingMethods)
+                    await configureRegularShippingMethod(res.basketId, defaultShippingMethodId)
                 }
             }
 
