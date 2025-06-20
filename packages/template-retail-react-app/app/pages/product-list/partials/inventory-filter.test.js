@@ -26,7 +26,9 @@ jest.mock('@salesforce/retail-react-app/app/components/store-locator', () => {
         ) : null
     }
 
-    return MockStoreLocatorModal
+    return {
+        StoreLocatorModal: MockStoreLocatorModal
+    }
 })
 
 const mockToggleFilter = jest.fn()
