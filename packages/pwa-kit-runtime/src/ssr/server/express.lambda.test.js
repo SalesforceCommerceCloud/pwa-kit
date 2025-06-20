@@ -16,16 +16,24 @@ import AWSMockContext from 'aws-lambda-mock-context'
 import createEvent from '@serverless/event-mocks'
 import {X_HEADERS_TO_REMOVE_ORIGIN} from '../../utils/ssr-proxying.js'
 
-// Mock crypto.randomBytes to prevent RANDOMBYTESREQUEST open handles
 const mockRandomBytes = jest.fn((size) => {
     // Return a predictable buffer for testing
     return Buffer.alloc(size, 0x01)
 })
 
-// Mock the randomBytes function
+// Mock the crypto module to provide randomBytes and other needed functions
 jest.mock('crypto', () => ({
-    ...jest.requireActual('crypto'),
-    randomBytes: mockRandomBytes
+    randomBytes: (size) => Buffer.alloc(size, 0x01),
+    createHash: () => ({
+        update: () => ({
+            digest: () => 'mock-hash'
+        })
+    }),
+    createHmac: () => ({
+        update: () => ({
+            digest: () => 'mock-hmac'
+        })
+    })
 }))
 
 const TEST_PORT = 3446

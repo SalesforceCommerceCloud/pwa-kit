@@ -34,13 +34,3 @@ jest.mock('../pwa-kit-dev/dist/bin/pwa-kit-dev.js', () => {
         default: jest.fn()
     }
 })
-
-// Mock the pwa-kit-runtime package
-jest.mock('./src/ssr/server/build-remote-server.js', () => {
-    return new Promise((resolve) => {
-        resolve({
-            __esModule: true,
-            default: jest.fn()
-        })
-    })
-})
