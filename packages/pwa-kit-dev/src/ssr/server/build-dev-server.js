@@ -337,9 +337,9 @@ export const DevServerMixin = {
     /**
      * @private
      */
-    _createHandler(app) {
-        const {protocol, sslFilePath} = app.options
-        const {hostname, port} = this._getDevServerHostAndPort(app.options)
+    _createHandler(app, options) {
+        const {protocol, sslFilePath} = options
+        const {hostname, port} = this._getDevServerHostAndPort(options)
 
         let server
 
@@ -359,7 +359,7 @@ export const DevServerMixin = {
             if (process.env.NODE_ENV !== 'test') {
                 open(
                     `${this._getDevServerURL(
-                        app.options
+                        options
                     )}/__mrt/loading-screen/index.html?loading=1`
                 )
             }
@@ -411,7 +411,6 @@ export const DevServerMixin = {
                 preset: 'none',
                 outputPath: true
             })
-
             try {
                 const rp = jsonWebpackStats.children.find((child) => child.name === compilerName)
                 const assetPath = path.join(rp.outputPath, fileName)
@@ -424,6 +423,40 @@ export const DevServerMixin = {
             // The file isn't compiled yet
             return null
         }
+    },
+
+    /**
+     * Create an SSR (Server-Side Rendering) Server.
+     *
+     * @constructor
+     * @param {Object} options
+     * @param {String} [options.buildDir] - The build directory path, either as an
+     * absolute path, or relative to the current working directory. Defaults
+     * to 'build'.
+     * @param {Number} [options.defaultCacheTimeSeconds=600] - The cache time
+     * for rendered pages and assets (not used in local development mode).
+     * @param {Object} options.mobify - The 'mobify' object from the project's
+     * package.json file, containing the SSR parameters.
+     * @param {Number} [options.port=3443] - the localhost port on which the local
+     * development Express app listens.
+     * @param {String} [options.protocol='https'] - the protocol on which the development
+     * Express app listens.
+     * @param {Boolean} [options.proxyKeepAliveAgent] - This boolean value indicates
+     * whether or not we are using a keep alive agent for proxy connections. Defaults
+     * to 'true'. NOTE: This keep alive agent will only be used on remote.
+     * @param {String} options.sslFilePath - the absolute path to a PEM format
+     * certificate file to be used by the local development server. This should
+     * contain both the certificate and the private key.
+     * @param {function} customizeApp - a callback that takes an express app
+     * as an argument. Use this to customize the server.
+     * @param {Boolean} [options.allowCookies] - This boolean value indicates
+     * whether or not we strip cookies from requests and block setting of cookies. Defaults
+     * to 'false'.
+     */
+    createHandler(options, customizeApp) {
+        const app = this._createApp(options)
+        customizeApp(app, options)
+        return this._createHandler(app, options)
     }
 }
 
