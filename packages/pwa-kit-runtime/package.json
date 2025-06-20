@@ -56,14 +56,6 @@
     "superagent": "^6.1.0",
     "supertest": "^4.0.2"
   },
-  "peerDependencies": {
-    "@salesforce/pwa-kit-dev": "3.10.0-dev.1"
-  },
-  "peerDependenciesMeta": {
-    "@salesforce/pwa-kit-dev": {
-      "optional": true
-    }
-  },
   "engines": {
     "node": "^16.11.0 || ^18.0.0 || ^20.0.0 || ^22.0.0",
     "npm": "^8.0.0 || ^9.0.0 || ^10.0.0 || ^11.0.0"

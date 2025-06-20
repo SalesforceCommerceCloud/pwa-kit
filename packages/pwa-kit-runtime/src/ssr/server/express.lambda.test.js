@@ -72,7 +72,7 @@ function createServerWithGCSpy() {
 
     const collectGarbage = jest.spyOn(app, '_collectGarbage')
     const sendMetric = jest.spyOn(app, 'sendMetric')
-    return {route, handler, collectGarbage, sendMetric, server}
+    return {route, handler, collectGarbage, sendMetric, new_server: server}
 }
 
 function createApiGatewayEvent() {
@@ -94,7 +94,7 @@ function createApiGatewayEvent() {
 
 describe('SSRServer Lambda integration', () => {
     let savedEnvironment
-    let server
+    let servers = []
 
     beforeAll(() => {
         savedEnvironment = Object.assign({}, process.env)
@@ -102,6 +102,13 @@ describe('SSRServer Lambda integration', () => {
 
     afterAll(() => {
         process.env = savedEnvironment
+        // Clean up any remaining servers
+        servers.forEach(server => {
+            if (server && typeof server.close === 'function') {
+                server.close()
+            }
+        })
+        servers = []
     })
 
     beforeEach(() => {
@@ -118,9 +125,13 @@ describe('SSRServer Lambda integration', () => {
 
     afterEach(() => {
         nock.cleanAll()
-        if (server) {
-            server.close()
-        }
+        // Close all created servers
+        servers.forEach(server => {
+            if (server && typeof server.close === 'function') {
+                server.close()
+            }
+        })
+        servers = []
     })
 
     const fakeBinaryPayload = crypto.randomBytes(16)
@@ -291,7 +302,7 @@ describe('SSRServer Lambda integration', () => {
                 app.get('/*', testCase.route)
             })
 
-            server = srv
+            servers.push(srv)
 
             // Set up the mock proxy
             nock('http://test.proxy.com')
@@ -380,7 +391,7 @@ describe('SSRServer Lambda integration', () => {
             }
             app.get('/*', route)
         })
-        server = srv
+        servers.push(srv)
 
         // Set up a fake event and a fake context for the Lambda call
         const event = createEvent('aws:apiGateway', {
@@ -416,7 +427,7 @@ describe('SSRServer Lambda integration', () => {
     test('Lambda reuse -- Default Behavior', () => {
         const {route, handler, collectGarbage, sendMetric, new_server} = createServerWithGCSpy()
         const {event, context} = createApiGatewayEvent()
-        server = new_server
+        servers.push(new_server)
 
         const call = (event) =>
             new Promise((resolve) => handler(event, context, (err, response) => resolve(response)))
@@ -446,7 +457,7 @@ describe('SSRServer Lambda integration', () => {
         process.env.FORCE_GC = 'true'
         const {event, context} = createApiGatewayEvent()
         const {route, handler, collectGarbage, sendMetric, new_server} = createServerWithGCSpy()
-        server = new_server
+        servers.push(new_server)
 
         const call = (event) =>
             new Promise((resolve) => handler(event, context, (err, response) => resolve(response)))

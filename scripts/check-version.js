@@ -57,7 +57,7 @@ if (!semver.satisfies(foundNpm, new semver.Range(requiredNpm))) {
     warnings.push(`- NPM: ${foundNpm} is installed, but we require ${requiredNpm}`)
 }
 
-const red = (s) => `\x1b[31m${s}\u001b[0m`
+const red = (s) => `\x1b[31m${s}\x1b[0m`
 const blue = (s) => `\x1b[36m${s}\u001b[0m`
 
 if (warnings.length) {

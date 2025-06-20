@@ -4,16 +4,27 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import {NO_CACHE} from '@salesforce/pwa-kit-runtime/ssr/server/constants'
-import {
-    X_MOBIFY_REQUEST_CLASS,
-    X_PROXY_REQUEST_URL
-} from '@salesforce/pwa-kit-runtime/utils/ssr-proxying'
-import {
-    getResponseFromCache,
-    sendCachedResponse,
-    cacheResponseWhenDone
-} from '@salesforce/pwa-kit-runtime/ssr/server/express'
+
+// Optional imports from pwa-kit-runtime (peer dependency)
+let NO_CACHE, X_MOBIFY_REQUEST_CLASS, X_PROXY_REQUEST_URL, getResponseFromCache, sendCachedResponse, cacheResponseWhenDone
+try {
+    const pwaKitRuntime = require('@salesforce/pwa-kit-runtime')
+    NO_CACHE = pwaKitRuntime.ssr?.server?.constants?.NO_CACHE || 'max-age=0, nocache, nostore, must-revalidate'
+    X_MOBIFY_REQUEST_CLASS = pwaKitRuntime.utils?.ssrProxying?.X_MOBIFY_REQUEST_CLASS || 'x-mobify-request-class'
+    X_PROXY_REQUEST_URL = pwaKitRuntime.utils?.ssrProxying?.X_PROXY_REQUEST_URL || 'x-proxy-request-url'
+    getResponseFromCache = pwaKitRuntime.ssr?.server?.express?.getResponseFromCache || (() => null)
+    sendCachedResponse = pwaKitRuntime.ssr?.server?.express?.sendCachedResponse || (() => {})
+    cacheResponseWhenDone = pwaKitRuntime.ssr?.server?.express?.cacheResponseWhenDone || (() => {})
+} catch (error) {
+    // pwa-kit-runtime not available, use fallbacks
+    NO_CACHE = 'max-age=0, nocache, nostore, must-revalidate'
+    X_MOBIFY_REQUEST_CLASS = 'x-mobify-request-class'
+    X_PROXY_REQUEST_URL = 'x-proxy-request-url'
+    getResponseFromCache = () => null
+    sendCachedResponse = () => {}
+    cacheResponseWhenDone = () => {}
+}
+
 import fetch from 'node-fetch'
 import request from 'supertest'
 import {makeErrorHandler, DevServerFactory, setLocalAssetHeaders} from './build-dev-server'

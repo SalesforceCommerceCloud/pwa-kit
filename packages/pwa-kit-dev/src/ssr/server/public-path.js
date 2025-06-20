@@ -14,7 +14,14 @@
  * but we need something more dynamic to support namespaced /mobify paths.
  */
 
-import {bundleBasePath} from '@salesforce/pwa-kit-runtime/utils/ssr-namespace-paths'
+// Optional import from pwa-kit-runtime (peer dependency)
+let bundleBasePath
+try {
+    bundleBasePath = require('@salesforce/pwa-kit-runtime/utils/ssr-namespace-paths').bundleBasePath
+} catch (error) {
+    // pwa-kit-runtime not available, use fallback
+    bundleBasePath = '/mobify/bundle'
+}
 
 /* global __webpack_public_path__: writable */
 // eslint-disable-next-line no-undef

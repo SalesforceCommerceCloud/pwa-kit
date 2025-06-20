@@ -17,9 +17,39 @@ import webpackHotServerMiddleware from 'webpack-hot-server-middleware'
 import webpackHotMiddleware from 'webpack-hot-middleware'
 import open from 'open'
 import requireFromString from 'require-from-string'
-import {RemoteServerFactory} from '@salesforce/pwa-kit-runtime/ssr/server/build-remote-server'
-import {proxyConfigs} from '@salesforce/pwa-kit-runtime/utils/ssr-shared'
-import {bundleBasePath} from '@salesforce/pwa-kit-runtime/utils/ssr-namespace-paths'
+
+// Optional imports from pwa-kit-runtime (peer dependency)
+let RemoteServerFactory, proxyConfigs, bundleBasePath
+try {
+    const pwaKitRuntime = require('@salesforce/pwa-kit-runtime')
+    RemoteServerFactory = pwaKitRuntime.ssr?.server?.buildRemoteServer?.RemoteServerFactory
+    proxyConfigs = pwaKitRuntime.utils?.ssrShared?.proxyConfigs || []
+    bundleBasePath = pwaKitRuntime.utils?.ssrNamespacePaths?.bundleBasePath || '/mobify/bundle'
+} catch (error) {
+    // pwa-kit-runtime not available, use fallbacks
+    RemoteServerFactory = null
+    proxyConfigs = []
+    bundleBasePath = '/mobify/bundle'
+}
+
+// Create a mock RemoteServerFactory if the real one is not available
+const MockRemoteServerFactory = {
+    _createApp: (options) => {
+        const express = require('express')
+        const app = express()
+        app.options = options
+        app.options.defaultCacheControl = 'max-age=0, nocache, nostore, must-revalidate'
+        return app
+    },
+    createHandler: (options, callback) => {
+        const express = require('express')
+        const app = express()
+        app.options = options
+        if (callback) callback(app)
+        return { server: null, app }
+    }
+}
+
 import {
     SERVER,
     CLIENT,
@@ -497,4 +527,6 @@ export const shouldCompress = (req, res) => {
 /**
  * @private
  */
-export const DevServerFactory = Object.assign({}, RemoteServerFactory, DevServerMixin)
+export const DevServerFactory = RemoteServerFactory 
+    ? Object.assign({}, RemoteServerFactory, DevServerMixin)
+    : Object.assign({}, MockRemoteServerFactory, DevServerMixin)

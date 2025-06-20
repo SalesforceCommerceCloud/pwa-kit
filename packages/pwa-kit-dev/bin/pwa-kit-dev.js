@@ -13,7 +13,15 @@ const WebSocket = require('ws')
 const program = require('commander')
 const validator = require('validator')
 const {execSync: _execSync} = require('child_process')
-const {getConfig} = require('@salesforce/pwa-kit-runtime/utils/ssr-config')
+
+// Optional import from pwa-kit-runtime (peer dependency)
+let getConfig
+try {
+    getConfig = require('@salesforce/pwa-kit-runtime/utils/ssr-config').getConfig
+} catch (error) {
+    // pwa-kit-runtime not available, use fallback
+    getConfig = () => ({})
+}
 
 // Scripts in ./bin have never gone through babel, so we
 // don't have a good pattern for mixing compiled/un-compiled
