@@ -22,4 +22,4 @@ module.exports = {
         // This doesn't reliably report errors :(
         'jest/no-standalone-expect': ['off']
     }
-} 
+}

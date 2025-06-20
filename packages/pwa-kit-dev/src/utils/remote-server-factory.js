@@ -39,6 +39,7 @@ export const RemoteServerFactory = {
     /**
      * @private
      */
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     _logStartupMessage(options) {
         // Hook for the DevServer
     },
@@ -46,6 +47,7 @@ export const RemoteServerFactory = {
     /**
      * @private
      */
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     _getAllowCookies(options) {
         return 'MRT_ALLOW_COOKIES' in process.env ? process.env.MRT_ALLOW_COOKIES == 'true' : false
     },
@@ -53,6 +55,7 @@ export const RemoteServerFactory = {
     /**
      * @private
      */
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     _getProtocol(options) {
         return 'https'
     },
@@ -60,6 +63,7 @@ export const RemoteServerFactory = {
     /**
      * @private
      */
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     _getDefaultCacheControl(options) {
         return 'max-age=0, nocache, nostore, must-revalidate'
     },
@@ -67,6 +71,7 @@ export const RemoteServerFactory = {
     /**
      * @private
      */
+
     _strictSSL(options) {
         return options.strictSSL
     },
@@ -81,6 +86,7 @@ export const RemoteServerFactory = {
     /**
      * @private
      */
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     _getSlasEndpoint(options) {
         return process.env.SLAS_HOSTNAME || 'account.demandware.com'
     },
@@ -88,6 +94,7 @@ export const RemoteServerFactory = {
     /**
      * @private
      */
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     _setCompression(app) {
         // Compression setup would go here
     },
@@ -95,6 +102,7 @@ export const RemoteServerFactory = {
     /**
      * @private
      */
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     _setupLogging(app) {
         // Logging setup would go here
     },
@@ -102,6 +110,7 @@ export const RemoteServerFactory = {
     /**
      * @private
      */
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     _setRequestId(app) {
         // Request ID setup would go here
     },
@@ -109,6 +118,7 @@ export const RemoteServerFactory = {
     /**
      * @private
      */
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     _setupMetricsFlushing(app) {
         // Metrics flushing setup would go here
     },
@@ -116,6 +126,7 @@ export const RemoteServerFactory = {
     /**
      * @private
      */
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     _updatePackageMobify(options) {
         // Package mobify update would go here
     },
@@ -123,6 +134,7 @@ export const RemoteServerFactory = {
     /**
      * @private
      */
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     _configureProxyConfigs(options) {
         // Proxy config setup would go here
     },
@@ -130,22 +142,25 @@ export const RemoteServerFactory = {
     /**
      * @private
      */
+
     _createApp(options) {
         // App creation would go here
-        return { options }
+        return {options}
     },
 
     /**
      * @private
      */
+
     _createExpressApp(options) {
         // Express app creation would go here
-        return { options }
+        return {options}
     },
 
     /**
      * @private
      */
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     _addSDKInternalHandlers(app) {
         // SDK internal handlers would go here
     },
@@ -153,6 +168,7 @@ export const RemoteServerFactory = {
     /**
      * @private
      */
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     _setForwardedHeaders(app, options) {
         // Forwarded headers setup would go here
     },
@@ -160,6 +176,7 @@ export const RemoteServerFactory = {
     /**
      * @private
      */
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     _setupSSRRequestProcessorMiddleware(app) {
         // SSR request processor setup would go here
     },
@@ -167,6 +184,7 @@ export const RemoteServerFactory = {
     /**
      * @private
      */
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     _setupProxying(app, options) {
         // Proxying setup would go here
     },
@@ -174,6 +192,7 @@ export const RemoteServerFactory = {
     /**
      * @private
      */
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     _handleMissingSlasPrivateEnvVar(app) {
         // SLAS private env var handling would go here
     },
@@ -181,6 +200,7 @@ export const RemoteServerFactory = {
     /**
      * @private
      */
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     _setupSlasPrivateClientProxy(app, options) {
         // SLAS private client proxy setup would go here
     },
@@ -188,6 +208,7 @@ export const RemoteServerFactory = {
     /**
      * @private
      */
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     _setupHealthcheck(app) {
         // Healthcheck setup would go here
     },
@@ -195,6 +216,7 @@ export const RemoteServerFactory = {
     /**
      * @private
      */
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     _setupCommonMiddleware(app, options) {
         // Common middleware setup would go here
     },
@@ -202,6 +224,7 @@ export const RemoteServerFactory = {
     /**
      * @private
      */
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     _validateConfiguration(options) {
         // Configuration validation would go here
     },
@@ -223,6 +246,7 @@ export const RemoteServerFactory = {
     /**
      * @private
      */
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     serveServiceWorker(req, res) {
         // Service worker serving would go here
     },
@@ -230,6 +254,7 @@ export const RemoteServerFactory = {
     /**
      * @private
      */
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     serveStaticFile(filePath, opts = {}) {
         // Static file serving would go here
     },
@@ -237,6 +262,7 @@ export const RemoteServerFactory = {
     /**
      * @private
      */
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     render(req, res, next) {
         // Rendering would go here
     },
@@ -244,6 +270,7 @@ export const RemoteServerFactory = {
     /**
      * @private
      */
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     _createHandler(app, options) {
         // Handler creation would go here
     },
@@ -251,6 +278,7 @@ export const RemoteServerFactory = {
     /**
      * @private
      */
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     createHandler(options, customizeApp) {
         // Handler creation would go here
     },
@@ -258,7 +286,8 @@ export const RemoteServerFactory = {
     /**
      * @private
      */
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     _getRequestProcessor(req) {
         // Request processor would go here
     }
-} 
+}

@@ -5,9 +5,8 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-/** Override configuration for TypeScript files. */
+/** Base configuration used by all PWA Kit packages. */
 module.exports = {
-    files: ['**/*.ts', '**/*.tsx'],
     parser: '@typescript-eslint/parser',
     parserOptions: {
         ecmaVersion: 2017,
@@ -16,11 +15,18 @@ module.exports = {
             jsx: true
         }
     },
-    plugins: ['@typescript-eslint'],
+    env: {
+        es6: true,
+        node: true,
+        browser: true
+    },
     extends: [
+        'eslint:recommended',
         'plugin:@typescript-eslint/recommended',
-        'plugin:@typescript-eslint/recommended-requiring-type-checking'
+        'plugin:prettier/recommended'
     ],
+    plugins: ['@typescript-eslint', 'prettier'],
+    reportUnusedDisableDirectives: true,
     rules: {
         // The goal of the no-empty-function rule is to minimize the contextual knowledge required
         // by the reader. The suggested fix for empty functions is to add comments indicating that

@@ -5,9 +5,10 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import 'raf/polyfill' // fix requestAnimationFrame issue with polyfill
-import fetch from 'jest-fetch-mock'
-import 'regenerator-runtime/runtime'
+/* eslint-disable @typescript-eslint/no-var-requires */
+require('raf/polyfill') // fix requestAnimationFrame issue with polyfill
+const fetch = require('jest-fetch-mock')
+require('regenerator-runtime/runtime')
 
 // Mock Fetch
 global.fetch = fetch

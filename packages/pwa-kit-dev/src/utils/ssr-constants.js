@@ -25,4 +25,4 @@ export const CONTENT_SECURITY_POLICY = 'content-security-policy'
 export const STRICT_TRANSPORT_SECURITY = 'strict-transport-security'
 
 /**  * @deprecated Use ssr-namespace-paths.slasPrivateProxyPath instead  */
-export const SLAS_CUSTOM_PROXY_PATH = '/mobify/slas/private' 
+export const SLAS_CUSTOM_PROXY_PATH = '/mobify/slas/private'

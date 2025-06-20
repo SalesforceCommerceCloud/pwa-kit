@@ -19,4 +19,4 @@
 export const getConfig = () => {
     // Stub implementation - returns empty config
     return {}
-} 
+}

@@ -40,4 +40,4 @@ export const proxyBasePath = `${ssrNamespace}${PROXY_PATH_BASE}`
 export const bundleBasePath = `${ssrNamespace}${BUNDLE_PATH_BASE}`
 export const cachingBasePath = `${ssrNamespace}${CACHING_PATH_BASE}`
 export const healthCheckPath = `${ssrNamespace}${HEALTHCHECK_PATH}`
-export const slasPrivateProxyPath = `${ssrNamespace}${SLAS_PRIVATE_CLIENT_PROXY_PATH}` 
+export const slasPrivateProxyPath = `${ssrNamespace}${SLAS_PRIVATE_CLIENT_PROXY_PATH}`

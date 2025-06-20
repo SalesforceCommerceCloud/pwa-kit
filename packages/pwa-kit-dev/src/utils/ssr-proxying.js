@@ -40,7 +40,4 @@ export class Headers {
     }
 }
 
-export const X_HEADERS_TO_REMOVE_ORIGIN = [
-    'x-mobify-request-class',
-    'x-proxy-request-url'
-] 
+export const X_HEADERS_TO_REMOVE_ORIGIN = ['x-mobify-request-class', 'x-proxy-request-url']

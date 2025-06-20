@@ -6,12 +6,5 @@
  */
 
 module.exports = {
-    extends: ['eslint:recommended'],
-    env: {
-        node: true,
-        es6: true
-    },
-    parserOptions: {
-        ecmaVersion: 2020
-    }
+    extends: [require.resolve('./configs/eslint/no-react')]
 }

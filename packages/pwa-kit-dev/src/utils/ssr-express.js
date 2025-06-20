@@ -23,6 +23,7 @@
  * that represents the result of the cache lookup.
  * @private
  */
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export const getResponseFromCache = ({req, res, namespace, key}) => {
     // Stub implementation for testing
     return Promise.resolve({
@@ -59,6 +60,7 @@ export const sendCachedResponse = (cached) => {
  * @param [shouldCacheResponse] {Function} function to determine if response should be cached
  * @private
  */
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export const cacheResponseWhenDone = ({
     req,
     res,
@@ -69,4 +71,4 @@ export const cacheResponseWhenDone = ({
 }) => {
     // Stub implementation for testing
     return Promise.resolve()
-} 
+}

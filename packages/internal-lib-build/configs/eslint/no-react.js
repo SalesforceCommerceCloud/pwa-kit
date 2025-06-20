@@ -13,4 +13,4 @@ module.exports = {
     extends: [require.resolve('./base')],
     // TypeScript and Jest rules only apply to specific file paths, so they are overrides.
     overrides: [require('./typescript-permit-any'), require('./jest')]
-} 
+}

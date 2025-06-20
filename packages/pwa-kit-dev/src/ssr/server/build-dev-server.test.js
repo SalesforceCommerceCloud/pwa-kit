@@ -5,10 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import {NO_CACHE} from '../../utils/ssr-constants'
-import {
-    X_MOBIFY_REQUEST_CLASS,
-    X_PROXY_REQUEST_URL
-} from '../../utils/ssr-proxying'
+import {X_MOBIFY_REQUEST_CLASS, X_PROXY_REQUEST_URL} from '../../utils/ssr-proxying'
 import {
     getResponseFromCache,
     sendCachedResponse,
