@@ -4,6 +4,7 @@
   "private": true,
   "description": "MCP server that helps you build Salesforce Commerce Cloud PWA Kit Composable Storefront",
   "main": "src/server/server.js",
+  "type": "module",
   "scripts": {
     "build": "echo 'No build step required for MCP server'",
     "format": "pwa-kit-dev format \"**/*.{js,jsx}\"",
@@ -31,6 +32,7 @@
   "dependencies": {
     "@babel/runtime": "^7.21.0",
     "@modelcontextprotocol/sdk": "^1.0.0",
+    "@salesforce/pwa-kit-create-app": "3.11.0-dev.0",
     "zod": "^3.25.56"
   },
   "devDependencies": {

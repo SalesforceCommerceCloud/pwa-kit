@@ -11,24 +11,20 @@ import {z} from 'zod'
 import {AddComponentTool} from '../utils/AddComponentTool.js'
 import {InsertExistingComponentTool} from '../utils/InsertExistingComponentTool.js'
 import {CreateNewComponentTool} from '../utils/CreateNewComponentTool.js'
+import {generatePwaKitProject} from '../utils/GenerateProject.js'
+import pwaKitQuestions from '@salesforce/pwa-kit-create-app/assets/questions/test-questions.json' assert {type: 'json'}
 import fs from 'fs/promises'
 import path from 'path'
 import {fileURLToPath} from 'url'
 
 class PwaStorefrontMCPServerHighLevel {
     constructor() {
+        console.error('PwaStorefrontMCPServerHighLevel constructor')
         // Using McpServer instead of Server
-        this.server = new McpServer(
-            {
-                name: 'pwa-storefront-mcp-server',
-                version: '0.1.0'
-            },
-            {
-                capabilities: {
-                    tools: {}
-                }
-            }
-        )
+        this.server = new McpServer({
+            name: 'pwa-storefront-mcp-server',
+            version: '0.1.0'
+        })
 
         this.addComponentTool = new AddComponentTool()
         this.insertExistingComponentTool = new InsertExistingComponentTool()
@@ -213,6 +209,75 @@ class PwaStorefrontMCPServerHighLevel {
                         type: 'text',
                         text: item.text
                     }))
+                }
+            }
+        )
+
+        this.server.tool(
+            'submit_pwa_kit_project_answers',
+            'Submit completed PWA Kit project answers to generate the PWA Kit project. This should be called after the get_project_questions tool is called and the answers are collected.',
+            {
+                answers: z.object({}).describe('The collected answers for project generation')
+            },
+            async ({answers}) => {
+                try {
+                    const result = await generatePwaKitProject(answers)
+                    console.error('result: ', result)
+                    return {
+                        content: [
+                            {
+                                type: 'text',
+                                text: `Project generation completed successfully:\n${result}`
+                            }
+                        ]
+                    }
+                } catch (error) {
+                    return {
+                        content: [
+                            {
+                                type: 'text',
+                                text: `Project generation failed: ${error.message}`
+                            }
+                        ],
+                        isError: true
+                    }
+                }
+            }
+        )
+
+        this.server.tool(
+            'get_project_questions',
+            'Get the PWA Kit project creation questions and conversational guidelines and start the project creation process (triggers: create pwa, build storefront, generate pwa-kit). Once the answers are collected, use the submit_pwa_kit_project_answers tool to generate the project.',
+            {},
+            async () => {
+                console.error('pwaKitQuestions: ', pwaKitQuestions)
+                // You can customize this to dynamically load the schema if desired
+                const guidelines = {
+                    tone: 'professional, friendly, concise',
+                    languageRestrictions: 'no foul or offensive language',
+                    questionScope: 'only ask questions provided in the schema',
+                    conversationalStyle:
+                        'keep questions direct and clear, avoid unnecessary elaboration',
+                    examples: {
+                        good: 'What is your project name?',
+                        bad: 'Hey there buddy, would you mind terribly if I asked you to please provide me with a project name? No rush!'
+                    }
+                }
+
+                return {
+                    content: [
+                        {
+                            type: 'text',
+                            text: JSON.stringify(
+                                {
+                                    questions: pwaKitQuestions,
+                                    guidelines
+                                },
+                                null,
+                                2
+                            )
+                        }
+                    ]
                 }
             }
         )
