@@ -17,9 +17,9 @@ import webpackHotServerMiddleware from 'webpack-hot-server-middleware'
 import webpackHotMiddleware from 'webpack-hot-middleware'
 import open from 'open'
 import requireFromString from 'require-from-string'
-import {RemoteServerFactory} from '@salesforce/pwa-kit-runtime/ssr/server/build-remote-server'
-import {proxyConfigs} from '@salesforce/pwa-kit-runtime/utils/ssr-shared'
-import {bundleBasePath} from '@salesforce/pwa-kit-runtime/utils/ssr-namespace-paths'
+import {RemoteServerFactory} from '../../utils/remote-server-factory'
+import {proxyConfigs} from '../../utils/ssr-shared'
+import {bundleBasePath} from '../../utils/ssr-namespace-paths'
 import {
     SERVER,
     CLIENT,

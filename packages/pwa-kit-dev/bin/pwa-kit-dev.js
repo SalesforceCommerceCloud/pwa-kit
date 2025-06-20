@@ -13,7 +13,7 @@ const WebSocket = require('ws')
 const program = require('commander')
 const validator = require('validator')
 const {execSync: _execSync} = require('child_process')
-const {getConfig} = require('@salesforce/pwa-kit-runtime/utils/ssr-config')
+const {getConfig} = require('../utils/ssr-config')
 
 // Scripts in ./bin have never gone through babel, so we
 // don't have a good pattern for mixing compiled/un-compiled

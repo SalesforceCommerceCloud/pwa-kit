@@ -14,7 +14,7 @@
  * but we need something more dynamic to support namespaced /mobify paths.
  */
 
-import {bundleBasePath} from '@salesforce/pwa-kit-runtime/utils/ssr-namespace-paths'
+import {bundleBasePath} from '../../utils/ssr-namespace-paths'
 
 /* global __webpack_public_path__: writable */
 // eslint-disable-next-line no-undef
