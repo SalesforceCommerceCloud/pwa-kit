@@ -245,8 +245,7 @@ const useSeStoreSelection = () => {
             const filters = [
                 [
                     countryCode,
-                    (s) =>
-                        (s.countryCode || STORE_LOCATOR_DEFAULT_COUNTRY_CODE) === countryCode
+                    (s) => (s.countryCode || STORE_LOCATOR_DEFAULT_COUNTRY_CODE) === countryCode
                 ],
                 [zipcode, (s) => (s.postalCode || s.address?.postalCode) === zipcode],
                 [

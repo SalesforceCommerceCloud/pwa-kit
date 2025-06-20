@@ -46,9 +46,9 @@ export const StoreLocatorList = () => {
         if (mode === 'input') {
             const countryName =
                 Array.isArray(config.supportedCountries) && config.supportedCountries.length !== 0
-                ? config.supportedCountries.find(
-                        (o) => o.countryCode === formValues.countryCode
-                    )?.countryName || config.defaultCountry
+                    ? config.supportedCountries.find(
+                          (o) => o.countryCode === formValues.countryCode
+                      )?.countryName || config.defaultCountry
                     : config.defaultCountry
 
             return `Viewing stores within ${String(config.radius)}${String(

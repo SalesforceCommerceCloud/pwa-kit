@@ -24,7 +24,6 @@ import {
     useShopperBasketsMutation,
     useCustomerId,
     useShopperBasketsMutationHelper,
-    useCommerceApi,
     useShippingMethodsForShipment
 } from '@salesforce/commerce-sdk-react'
 
