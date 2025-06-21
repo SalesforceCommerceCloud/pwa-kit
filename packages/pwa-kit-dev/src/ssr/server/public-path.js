@@ -17,4 +17,7 @@
 import {bundleBasePath} from '@salesforce/pwa-kit-runtime/utils/ssr-namespace-paths'
 
 /* global __webpack_public_path__: writable */
-__webpack_public_path__ = `${bundleBasePath}/development/`
+
+const webpackPublicPath = `${bundleBasePath}/development/`
+
+__webpack_public_path__ = webpackPublicPath
