@@ -32,9 +32,20 @@ module.exports = {
         '<rootDir>/src/components/swatch-group/**/*.test.js',
         '<rootDir>/src/components/toaster/**/*.test.jsx',
         '<rootDir>/src/components/list-menu/**/*.test.js',
+        '<rootDir>/src/components/login/**/*.test.js',
+        '<rootDir>/src/components/register/**/*.test.js',
+        '<rootDir>/src/components/email-confirmation/**/*.test.js',
+        '<rootDir>/src/components/field/**/*.test.js',
+        '<rootDir>/src/components/reset-password/**/*.test.js',
+        '<rootDir>/src/components/with-registration/**/*.test.js',
         '<rootDir>/src/pages/home/**/*.test.js',
+        // '<rootDir>/src/pages/login/**/*.test.js',  // TODO: enable after Account page has been migrated
+        '<rootDir>/src/pages/login-redirect/**/*.test.js',
+        '<rootDir>/src/pages/social-login-redirect/**/*.test.js',
+        '<rootDir>/src/pages/registration/**/*.test.js',
         '<rootDir>/src/utils/responsive-image.test.js',
         '<rootDir>/src/hooks/use-toast.test.js'
+        // '<rootDir>/src/hooks/use-auth-modal.test.js' // TODO: enable after Account page has been migrated
     ],
     moduleNameMapper: {
         ...base.moduleNameMapper,
