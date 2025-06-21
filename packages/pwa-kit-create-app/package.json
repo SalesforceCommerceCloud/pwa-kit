@@ -29,6 +29,7 @@
     "test": "internal-lib-build test"
   },
   "dependencies": {
+    "@adyen/adyen-salesforce-pwa": "^2.0.1",
     "commander": "^9.5.0",
     "deepmerge": "2.2.1",
     "handlebars": "^4.7.7",
