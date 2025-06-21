@@ -125,9 +125,7 @@ export const BonusProductModal = () => {
 
     // Get all product IDs for batch fetching
     const productIds = useMemo(() => {
-        return bonusProducts
-            .map(product => product.productId || product.id)
-            .filter(Boolean)
+        return bonusProducts.map((product) => product.productId || product.id).filter(Boolean)
     }, [bonusProducts])
 
     // Fetch all products data at once
@@ -146,7 +144,7 @@ export const BonusProductModal = () => {
     // Create a map of product data by ID for easy lookup
     const productsDataMap = useMemo(() => {
         if (!productsData?.data) return {}
-        
+
         return productsData.data.reduce((acc, product) => {
             acc[product.id] = product
             return acc
@@ -207,7 +205,7 @@ export const BonusProductModal = () => {
                             {bonusProducts.map((product) => {
                                 const productId = product.productId || product.id
                                 const productData = productsDataMap[productId]
-                                
+
                                 return (
                                     <BonusProductItem
                                         key={productId}
