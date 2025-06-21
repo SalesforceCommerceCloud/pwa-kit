@@ -255,6 +255,12 @@
   "checkout_confirmation.heading.payment_details": {
     "defaultMessage": "Payment Details"
   },
+  "checkout_confirmation.heading.pickup_address": {
+    "defaultMessage": "Pickup Address"
+  },
+  "checkout_confirmation.heading.pickup_details": {
+    "defaultMessage": "Pickup Details"
+  },
   "checkout_confirmation.heading.shipping_address": {
     "defaultMessage": "Shipping Address"
   },
@@ -300,6 +306,9 @@
   "checkout_confirmation.message.num_of_items_in_order": {
     "defaultMessage": "{itemCount, plural, =0 {0 items} one {# item} other {# items}}",
     "description": "# item(s) in order"
+  },
+  "checkout_confirmation.message.store_info_unavailable": {
+    "defaultMessage": "Store information not available"
   },
   "checkout_confirmation.message.will_email_shortly": {
     "defaultMessage": "We will send an email to <b>{email}</b> with your confirmation number and receipt shortly."
@@ -1433,6 +1442,9 @@
   "social_login_redirect.message.redirect_link": {
     "defaultMessage": "If you are not automatically redirected, click <link>this link</link> to proceed."
   },
+  "store_display.label.store_hours": {
+    "defaultMessage": "Store Hours"
+  },
   "store_inventory_filter.action.change_store": {
     "defaultMessage": "Change Store"
   },
@@ -1468,6 +1480,9 @@
   },
   "store_locator.description.away": {
     "defaultMessage": "away"
+  },
+  "store_locator.description.email": {
+    "defaultMessage": "Email:"
   },
   "store_locator.description.loading_locations": {
     "defaultMessage": "Loading locations..."
