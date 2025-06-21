@@ -549,7 +549,6 @@ const Cart = () => {
                                                         onIsAGiftChange={handleIsAGiftChange}
                                                         onAddToWishlistClick={handleAddToWishlist}
                                                         onEditClick={(product) => {
-                                                            console.log('product', product)
                                                             setSelectedItem(product)
                                                             onOpen()
                                                         }}
