@@ -25,19 +25,19 @@ const Checkout = loadable(() => import('overridable!./checkout'), {
 //     fallback
 // })
 const Home = loadable(() => import('overridable!./home'), {fallback})
-// const Login = loadable(() => import('overridable!./login'), {fallback})
-// const Registration = loadable(() => import('overridable!./registration'), {
-//     fallback
-// })
+const Login = loadable(() => import('overridable!./login'), {fallback})
+const Registration = loadable(() => import('overridable!./registration'), {
+    fallback
+})
 // const ResetPassword = loadable(() => import('overridable!./reset-password'), {fallback})
-// const LoginRedirect = loadable(() => import('overridable!./login-redirect'), {fallback})
+const LoginRedirect = loadable(() => import('overridable!./login-redirect'), {fallback})
 const ProductDetail = loadable(() => import('overridable!./product-detail'), {fallback})
 const ProductList = loadable(() => import('overridable!./product-list'), {
     fallback
 })
-// const SocialLoginRedirect = loadable(() => import('overridable!./social-login-redirect'), {
-//     fallback
-// })
+const SocialLoginRedirect = loadable(() => import('overridable!./social-login-redirect'), {
+    fallback
+})
 // const Wishlist = loadable(() => import('overridable!./account/wishlist'), {
 //     fallback
 // })
@@ -50,12 +50,13 @@ const ProductList = loadable(() => import('overridable!./product-list'), {
 // Checkout.displayName = 'Checkout'
 // CheckoutConfirmation.displayName = 'CheckoutConfirmation'
 Home.displayName = 'Home'
-// Login.displayName = 'Login'
-// Registration.displayName = 'Registration'
+Login.displayName = 'Login'
+Registration.displayName = 'Registration'
 // ResetPassword.displayName = 'ResetPassword'
-// LoginRedirect.displayName = 'LoginRedirect'
+LoginRedirect.displayName = 'LoginRedirect'
 ProductDetail.displayName = 'ProductDetail'
 ProductList.displayName = 'ProductList'
+SocialLoginRedirect.displayName = 'SocialLoginRedirect'
 
 export {
     // Account,
@@ -63,11 +64,11 @@ export {
     Checkout,
     // CheckoutConfirmation,
     Home,
-    // Login,
-    // Registration,
+    Login,
+    Registration,
     // ResetPassword,
-    // LoginRedirect,
+    LoginRedirect,
     ProductDetail,
-    ProductList
-    // SocialLoginRedirect
+    ProductList,
+    SocialLoginRedirect
 }
