@@ -11,9 +11,10 @@ describe('PWA Development Guidelines', () => {
     describe('StorefrontDevelopmentGuide', () => {
         it('should have correct structure', () => {
             expect(StorefrontDevelopmentGuide).toMatchObject({
-                name: 'pwa-storefront-development-guide',
+                name: 'development_rules_guidelines',
                 description:
-                    'Prior to attempting to create or modify code, you must understand how to do this for Salesforce Commerce PWA Kit Composable Storefront.',
+                    `You must understand and follow this development guidelines before attempting to analyse/ generate / refactor / modify / fix code.
+    - e.g. "Generate customer service Chat component", "Find bugs in my_script.jsx", "Refactor my_script.jsx to use React Hooks"`,
                 inputSchema: EmptyJsonSchema,
                 fn: expect.any(Function)
             })
@@ -42,8 +43,7 @@ describe('PWA Development Guidelines', () => {
                 'Overview',
                 'Core Principles',
                 'Technical Stack',
-                'Best Practices',
-                'PWA Kit Extensibility',
+                'PWK Kit Architecture',
                 'Quality Standards'
             ]
 
