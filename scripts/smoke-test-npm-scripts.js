@@ -54,7 +54,19 @@ const main = () => {
         const cmd = `npm run ${script}`
         console.log(`Testing "${cmd}"`)
         try {
-            sh.exec(cmd, {cwd, silent: true})
+            const result = sh.exec(cmd, {cwd, silent: true})
+            // Check if the command failed (exit code !== 0)
+            if (result.code !== 0) {
+                console.error(`Command failed with exit code ${result.code}`)
+                console.error(result.stdout)
+                console.error(result.stderr)
+                sh.exit(1)
+            }
+            // If command succeeded but had warnings (like Babel warnings), log them but don't fail
+            if (result.stderr && result.stderr.includes('[BABEL] Note:')) {
+                console.log('Command completed with Babel warnings (non-fatal):')
+                console.log(result.stderr)
+            }
         } catch (e) {
             console.error(e)
             sh.exit(1)
