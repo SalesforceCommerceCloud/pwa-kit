@@ -79,9 +79,6 @@ describe('AdyenCheckoutRedirectContainer', () => {
             }),
             expect.anything()
         )
-        expect(AdyenCheckout).toHaveBeenCalledWith(
-            expect.objectContaining({showLoading: true}),
-            expect.anything()
-        )
+        expect(AdyenCheckout).toHaveBeenCalledWith({}, expect.anything())
     })
 })
