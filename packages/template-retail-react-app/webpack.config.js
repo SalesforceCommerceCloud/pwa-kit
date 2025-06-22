@@ -32,7 +32,6 @@ module.exports = config.map((configItem) => {
                             {
                                 loader: 'css-loader',
                                 options: {
-                                    importLoaders: 1,
                                     modules: false,
                                     sourceMap: true,
                                     esModule: false
