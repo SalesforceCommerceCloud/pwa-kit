@@ -4,11 +4,12 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import config from '@salesforce/pwa-kit-dev/configs/webpack/config.js'
-import configNames from '@salesforce/pwa-kit-dev/configs/webpack/config-names.js'
-import {isRemote} from '@salesforce/pwa-kit-runtime/utils/ssr-server.js'
+/* eslint-disable @typescript-eslint/no-var-requires */
+const config = require('@salesforce/pwa-kit-dev/configs/webpack/config.js')
+const configNames = require('@salesforce/pwa-kit-dev/configs/webpack/config-names.js')
+const {isRemote} = require('@salesforce/pwa-kit-runtime/utils/ssr-server.js')
 
-export default config.map((configItem) => {
+module.exports = config.map((configItem) => {
     if (configItem.name === configNames.CLIENT || configItem.name === configNames.SERVER) {
         return {
             ...configItem,
