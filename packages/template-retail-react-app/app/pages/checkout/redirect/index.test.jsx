@@ -1,11 +1,19 @@
+/*
+ * Copyright (c) 2025, Salesforce, Inc.
+ * All rights reserved.
+ * SPDX-License-Identifier: BSD-3-Clause
+ * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
+ */
 import React from 'react'
 import {render, waitFor} from '@testing-library/react'
-import AdyenCheckoutRedirectContainer from './index'
+import AdyenCheckoutRedirectContainer from '@salesforce/retail-react-app/../../app/pages/checkout/redirect/index'
 
 // Mock Adyen components
 jest.mock('@adyen/adyen-salesforce-pwa', () => ({
     AdyenCheckout: jest.fn(() => <div data-testid="adyen-checkout" />),
-    AdyenCheckoutProvider: jest.fn(({children}) => <div data-testid="adyen-provider">{children}</div>)
+    AdyenCheckoutProvider: jest.fn(({children}) => (
+        <div data-testid="adyen-provider">{children}</div>
+    ))
 }))
 
 // Mock hooks
@@ -74,4 +82,4 @@ describe('AdyenCheckoutRedirectContainer', () => {
             expect.anything()
         )
     })
-}) 
+})

@@ -13,6 +13,21 @@ module.exports = config.map((configItem) => {
         return {
             ...configItem,
             devtool: isRemote() ? false : 'source-map',
+            optimization: {
+                ...configItem.optimization,
+                splitChunks: {
+                    ...configItem.optimization?.splitChunks,
+                    cacheGroups: {
+                        ...configItem.optimization?.splitChunks?.cacheGroups,
+                        adyen: {
+                            test: /[\\/]node_modules[\\/](@adyen)[\\/]/,
+                            name: 'adyen',
+                            chunks: 'all',
+                            priority: 20
+                        }
+                    }
+                }
+            },
             module: {
                 ...configItem.module,
                 rules: [

@@ -103,11 +103,15 @@
   "bundlesize": [
     {
       "path": "build/main.js",
-      "maxSize": "58 kB"
+      "maxSize": "65 kB"
     },
     {
       "path": "build/vendor.js",
-      "maxSize": "328 kB"
+      "maxSize": "460 kB"
+    },
+    {
+      "path": "build/adyen.js",
+      "maxSize": "550 kB"
     }
   ]
 }

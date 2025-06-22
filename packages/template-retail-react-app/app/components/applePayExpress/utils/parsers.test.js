@@ -1,9 +1,15 @@
-import {getCurrencyValueForApi} from './parsers'
+/*
+ * Copyright (c) 2025, Salesforce, Inc.
+ * All rights reserved.
+ * SPDX-License-Identifier: BSD-3-Clause
+ * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
+ */
+import {getCurrencyValueForApi} from '@salesforce/retail-react-app/../../app/components/applePayExpress/utils/parsers'
 
 describe('parsers', () => {
     describe('getCurrencyValueForApi', () => {
         it('should convert USD amount correctly', () => {
-            const result = getCurrencyValueForApi(100.50, 'USD')
+            const result = getCurrencyValueForApi(100.5, 'USD')
             expect(result).toBe(10050) // 100.50 * 10^2 = 10050 cents
         })
 
@@ -18,7 +24,7 @@ describe('parsers', () => {
         })
 
         it('should handle BHD correctly (3 decimals)', () => {
-            const result = getCurrencyValueForApi(10.500, 'BHD')
+            const result = getCurrencyValueForApi(10.5, 'BHD')
             expect(result).toBe(10500) // 10.500 * 10^3 = 10500
         })
 
@@ -33,7 +39,9 @@ describe('parsers', () => {
         })
 
         it('should throw error for invalid amount', () => {
-            expect(() => getCurrencyValueForApi('invalid', 'USD')).toThrow('Invalid amount: invalid')
+            expect(() => getCurrencyValueForApi('invalid', 'USD')).toThrow(
+                'Invalid amount: invalid'
+            )
         })
 
         it('should throw error for NaN amount', () => {
@@ -41,7 +49,9 @@ describe('parsers', () => {
         })
 
         it('should throw error for unsupported currency', () => {
-            expect(() => getCurrencyValueForApi(100, 'INVALID')).toThrow('Unsupported or unknown currency code: INVALID')
+            expect(() => getCurrencyValueForApi(100, 'INVALID')).toThrow(
+                'Unsupported or unknown currency code: INVALID'
+            )
         })
 
         it('should throw error for null amount', () => {
@@ -49,7 +59,9 @@ describe('parsers', () => {
         })
 
         it('should throw error for undefined amount', () => {
-            expect(() => getCurrencyValueForApi(undefined, 'USD')).toThrow('Invalid amount: undefined')
+            expect(() => getCurrencyValueForApi(undefined, 'USD')).toThrow(
+                'Invalid amount: undefined'
+            )
         })
     })
-}) 
+})

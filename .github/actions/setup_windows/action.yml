@@ -2,13 +2,14 @@ name: setup_windows
 inputs:
   cwd:
     required: false
-    default: "${PWD}"
+    default: ${{ github.workspace }}
 description: "Setup Windows Machine"
 runs:
   using: composite
   steps:
     - name: Install Dependencies
+      working-directory: ${{ inputs.cwd }}
       run: |-
         # Install node dependencies
         npm ci
-      shell: bash
+      shell: pwsh

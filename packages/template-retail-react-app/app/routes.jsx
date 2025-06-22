@@ -19,8 +19,6 @@ import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 // Components
 import {Skeleton} from '@salesforce/retail-react-app/app/components/shared/ui'
 import {configureRoutes} from '@salesforce/retail-react-app/app/utils/routes-utils'
-import '@adyen/adyen-salesforce-pwa/dist/app/adyen.css'
-import '@salesforce/retail-react-app/app/styles/adyen-overrides.css'
 
 // Constants
 import {

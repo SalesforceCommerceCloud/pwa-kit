@@ -11,7 +11,7 @@ runs:
       working-directory: ${{ inputs.cwd }}
       run: |-
         # Install node dependencies
-        node ./scripts/gtime.js monorepo_install npm ci
+        npm ci
 
         # Build the PWA
         npm run lerna -- run analyze-build --scope "@salesforce/retail-react-app"
