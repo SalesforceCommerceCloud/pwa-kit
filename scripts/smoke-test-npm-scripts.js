@@ -10,7 +10,8 @@ const sh = require('shelljs')
 const program = require('commander')
 const path = require('path')
 
-sh.set('-e')
+// Removed sh.set('-e') to allow custom error handling
+// sh.set('-e')
 
 const defaultDir = process.cwd()
 
