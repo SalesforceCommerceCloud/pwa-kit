@@ -261,20 +261,6 @@ const baseConfig = (target) => {
 
                 module: {
                     rules: [
-                        {
-                            test: /\.css$/,
-                            use: [
-                                'style-loader',
-                                {
-                                    loader: 'css-loader',
-                                    options: {
-                                        modules: false,
-                                        sourceMap: true,
-                                        esModule: false
-                                    }
-                                }
-                            ]
-                        },
                         ruleForBabelLoader(),
                         target === 'node' && {
                             test: /\.svg$/,
