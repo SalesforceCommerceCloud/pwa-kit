@@ -417,7 +417,11 @@ const enableReactRefresh = (config) => {
     }
 
     const newRule = ruleForBabelLoader([require.resolve('react-refresh/babel')])
-    const rules = findAndReplace(config.module.rules, (rule) => rule.test && rule.test.toString() === '/(\\.js(x?)|\.ts(x?))$/', newRule)
+    const rules = findAndReplace(
+        config.module.rules,
+        (rule) => rule.test && rule.test.toString() === '/(\\.js(x?)|.ts(x?))$/',
+        newRule
+    )
 
     return {
         ...config,
