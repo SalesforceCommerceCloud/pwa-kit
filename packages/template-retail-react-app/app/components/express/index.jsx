@@ -4,14 +4,16 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {useEffect, useState} from 'react'
+import React, {useEffect, useState, Suspense} from 'react'
 
 import {useAccessToken, useCustomerId} from '@salesforce/commerce-sdk-react'
-import {AdyenExpressCheckoutProvider} from '@adyen/adyen-salesforce-pwa'
-import {ApplePayExpress} from '@salesforce/retail-react-app/app/components/apple-pay-express/index'
+import {ApplePayExpressWithSuspense} from '@salesforce/retail-react-app/app/components/apple-pay-express/index'
 import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
 import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
+
+// Dynamic import for AdyenExpressCheckoutProvider
+const AdyenExpressCheckoutProvider = React.lazy(() => import('@adyen/adyen-salesforce-pwa').then(module => ({default: module.AdyenExpressCheckoutProvider})))
 
 function Express() {
     const {getTokenWhenReady} = useAccessToken()
@@ -37,16 +39,18 @@ function Express() {
 
     return (
         <div>
-            <AdyenExpressCheckoutProvider
-                authToken={authToken}
-                customerId={customerId}
-                locale={locale}
-                site={site}
-                basket={basket}
-                navigate={navigate}
-            >
-                <ApplePayExpress />
-            </AdyenExpressCheckoutProvider>
+            <Suspense fallback={<div>Loading AdyenExpressCheckoutProvider...</div>}>
+                <AdyenExpressCheckoutProvider
+                    authToken={authToken}
+                    customerId={customerId}
+                    locale={locale}
+                    site={site}
+                    basket={basket}
+                    navigate={navigate}
+                >
+                    <ApplePayExpressWithSuspense />
+                </AdyenExpressCheckoutProvider>
+            </Suspense>
         </div>
     )
 }

@@ -4,12 +4,15 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {useEffect, useState} from 'react'
-import {AdyenCheckout, AdyenCheckoutProvider} from '@adyen/adyen-salesforce-pwa'
+import React, {useEffect, useState, Suspense} from 'react'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
 import {useAccessToken, useCustomerId} from '@salesforce/commerce-sdk-react'
 import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
 import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
+
+// Dynamic imports for Adyen components
+const AdyenCheckout = React.lazy(() => import('@adyen/adyen-salesforce-pwa').then(module => ({default: module.AdyenCheckout})))
+const AdyenCheckoutProvider = React.lazy(() => import('@adyen/adyen-salesforce-pwa').then(module => ({default: module.AdyenCheckoutProvider})))
 
 // Embedded CSS to avoid webpack loader conflicts
 const adyenCSS = `
@@ -62,16 +65,18 @@ const AdyenCheckoutRedirectContainer = () => {
     }
 
     return (
-        <AdyenCheckoutProvider
-            authToken={authToken}
-            customerId={customerId}
-            locale={getOrigin()}
-            site={getOrigin()}
-            basket={basket}
-            navigate={goBack}
-        >
-            <AdyenCheckout showLoading />
-        </AdyenCheckoutProvider>
+        <Suspense fallback={<div>Loading payment form...</div>}>
+            <AdyenCheckoutProvider
+                authToken={authToken}
+                customerId={customerId}
+                locale={getOrigin()}
+                site={getOrigin()}
+                basket={basket}
+                navigate={goBack}
+            >
+                <AdyenCheckout />
+            </AdyenCheckoutProvider>
+        </Suspense>
     )
 }
 

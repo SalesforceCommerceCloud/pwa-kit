@@ -4,14 +4,16 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {useEffect, useRef} from 'react'
-import AdyenCheckout from '@adyen/adyen-web'
+import React, {useEffect, useRef, Suspense} from 'react'
 import PropTypes from 'prop-types'
 import {useAdyenExpressCheckout} from '@adyen/adyen-salesforce-pwa'
 import {getCurrencyValueForApi} from '@salesforce/retail-react-app/app/components/apple-pay-express/utils/parsers'
 import {AdyenShippingMethodsService} from '@salesforce/retail-react-app/app/components/apple-pay-express/utils/shipping-methods'
 import {AdyenShippingAddressService} from '@salesforce/retail-react-app/app/components/apple-pay-express/utils/shipping-address'
 import {AdyenPaymentsService} from '@salesforce/retail-react-app/app/components/apple-pay-express/utils/payments'
+
+// Dynamic import for AdyenCheckout
+const AdyenCheckout = React.lazy(() => import('@adyen/adyen-web').then(module => ({default: module.default})))
 
 const PAYMENT_METHOD = 'applepay'
 const EXPRESS_PAYMENT_AVAILABLE = 'express.payment.available'
@@ -273,7 +275,9 @@ export const ApplePayExpress = () => {
             try {
                 let checkout
                 try {
-                    checkout = await AdyenCheckout({
+                    // Use the dynamically imported AdyenCheckout
+                    const AdyenCheckoutModule = await import('@adyen/adyen-web')
+                    checkout = await AdyenCheckoutModule.default({
                         environment: adyenEnvironment?.ADYEN_ENVIRONMENT,
                         clientKey: adyenEnvironment?.ADYEN_CLIENT_KEY,
                         locale: locale.id,
@@ -351,6 +355,13 @@ export const ApplePayExpress = () => {
         </>
     )
 }
+
+// Wrapper component with Suspense
+export const ApplePayExpressWithSuspense = () => (
+    <Suspense fallback={<div>Loading Apple Pay...</div>}>
+        <ApplePayExpress />
+    </Suspense>
+)
 
 ApplePayExpress.propTypes = {
     shippingMethods: PropTypes.array
