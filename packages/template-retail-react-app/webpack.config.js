@@ -27,14 +27,16 @@ module.exports = config.map((configItem) => {
                 rules: [
                     ...configItem.module.rules,
                     {
-                        test: /\.css$/i,
+                        test: /\.css$/,
                         use: [
                             'style-loader',
                             {
                                 loader: 'css-loader',
                                 options: {
                                     importLoaders: 1,
-                                    modules: false
+                                    modules: false,
+                                    sourceMap: true,
+                                    esModule: false
                                 }
                             }
                         ]
