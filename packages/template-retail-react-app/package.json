@@ -87,7 +87,9 @@
     "react-router-dom": "^5.3.4"
   },
   "devDependencies": {
-    "cross-env": "^5.2.1"
+    "cross-env": "^5.2.1",
+    "css-loader": "^7.1.2",
+    "style-loader": "^4.0.0"
   },
   "overrides": {
     "react-router": {
