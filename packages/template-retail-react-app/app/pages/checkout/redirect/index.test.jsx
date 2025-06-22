@@ -40,7 +40,11 @@ describe('AdyenCheckoutRedirectContainer', () => {
         useAccessToken.mockReturnValue({
             getTokenWhenReady: jest.fn().mockResolvedValue('token123')
         })
-        useMultiSite.mockReturnValue({locale: 'en-US', site: 'site123'})
+        useMultiSite.mockReturnValue({
+            locale: 'en-US',
+            site: 'site123',
+            getOrigin: () => 'site123'
+        })
         useNavigation.mockReturnValue(jest.fn())
     })
 
@@ -69,10 +73,9 @@ describe('AdyenCheckoutRedirectContainer', () => {
             expect.objectContaining({
                 authToken: 'token123',
                 customerId: 'customer123',
-                locale: 'en-US',
+                locale: 'site123',
                 site: 'site123',
-                basket: {id: 'basket123'},
-                navigate: mockNavigate
+                basket: {data: {id: 'basket123'}}
             }),
             expect.anything()
         )
