@@ -6,7 +6,6 @@
  */
 import React, {useEffect, useRef} from 'react'
 import AdyenCheckout from '@adyen/adyen-web'
-import '@adyen/adyen-web/dist/adyen.css'
 import PropTypes from 'prop-types'
 import {useAdyenExpressCheckout} from '@adyen/adyen-salesforce-pwa'
 import {getCurrencyValueForApi} from '@salesforce/retail-react-app/app/components/apple-pay-express/utils/parsers'

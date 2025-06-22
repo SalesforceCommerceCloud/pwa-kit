@@ -21,30 +21,6 @@ module.exports = config.map((configItem) => {
                     ...configItem.resolve?.alias,
                     '@salesforce/retail-react-app/app': path.resolve(__dirname, 'app')
                 }
-            },
-            module: {
-                ...configItem.module,
-                rules: [
-                    {
-                        oneOf: [
-                            {
-                                test: /\.css$/,
-                                use: [
-                                    'style-loader',
-                                    {
-                                        loader: 'css-loader',
-                                        options: {
-                                            modules: false,
-                                            sourceMap: true,
-                                            esModule: false
-                                        }
-                                    }
-                                ]
-                            }
-                        ]
-                    },
-                    ...configItem.module.rules
-                ]
             }
         }
     } else {
