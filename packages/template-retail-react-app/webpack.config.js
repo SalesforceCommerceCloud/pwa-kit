@@ -13,9 +13,12 @@ const path = require('path')
 module.exports = config.map((configItem) => {
     if (configItem.name === configNames.CLIENT || configItem.name === configNames.SERVER) {
         // Check if a CSS loader rule already exists
-        const hasCssRule = configItem.module && configItem.module.rules && configItem.module.rules.some(
-            (rule) => rule.test && rule.test.toString() === '/\\.css$/'
-        )
+        const hasCssRule =
+            configItem.module &&
+            configItem.module.rules &&
+            configItem.module.rules.some(
+                (rule) => rule.test && rule.test.toString() === '/\\.css$/'
+            )
 
         return {
             ...configItem,
@@ -32,22 +35,22 @@ module.exports = config.map((configItem) => {
                 rules: hasCssRule
                     ? [...configItem.module.rules]
                     : [
-                        {
-                            test: /\.css$/,
-                            use: [
-                                'style-loader',
-                                {
-                                    loader: 'css-loader',
-                                    options: {
-                                        modules: false,
-                                        sourceMap: true,
-                                        esModule: false
-                                    }
-                                }
-                            ]
-                        },
-                        ...configItem.module.rules
-                    ]
+                          {
+                              test: /\.css$/,
+                              use: [
+                                  'style-loader',
+                                  {
+                                      loader: 'css-loader',
+                                      options: {
+                                          modules: false,
+                                          sourceMap: true,
+                                          esModule: false
+                                      }
+                                  }
+                              ]
+                          },
+                          ...configItem.module.rules
+                      ]
             }
         }
     } else {
