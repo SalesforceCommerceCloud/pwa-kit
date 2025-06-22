@@ -271,6 +271,21 @@ const baseConfig = (target) => {
                             loader: findDepInStack('ignore-loader')
                         },
                         {
+                            test: /\.css$/,
+                            use: [
+                                'style-loader',
+                                {
+                                    loader: 'css-loader',
+                                    options: {
+                                        importLoaders: 1,
+                                        modules: false,
+                                        sourceMap: true,
+                                        esModule: false
+                                    }
+                                }
+                            ]
+                        },
+                        {
                             test: /\.html$/,
                             exclude: /node_modules/,
                             use: {
