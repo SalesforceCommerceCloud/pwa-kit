@@ -13,7 +13,9 @@ import {AdyenShippingAddressService} from '@salesforce/retail-react-app/app/comp
 import {AdyenPaymentsService} from '@salesforce/retail-react-app/app/components/apple-pay-express/utils/payments'
 
 // Dynamic import for AdyenCheckout
-const AdyenCheckout = React.lazy(() => import('@adyen/adyen-web').then(module => ({default: module.default})))
+const AdyenCheckout = React.lazy(() =>
+    import('@adyen/adyen-web').then((module) => ({default: module.default}))
+)
 
 const PAYMENT_METHOD = 'applepay'
 const EXPRESS_PAYMENT_AVAILABLE = 'express.payment.available'

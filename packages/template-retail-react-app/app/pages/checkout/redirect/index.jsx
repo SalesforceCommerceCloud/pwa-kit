@@ -11,8 +11,14 @@ import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
 import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
 
 // Dynamic imports for Adyen components
-const AdyenCheckout = React.lazy(() => import('@adyen/adyen-salesforce-pwa').then(module => ({default: module.AdyenCheckout})))
-const AdyenCheckoutProvider = React.lazy(() => import('@adyen/adyen-salesforce-pwa').then(module => ({default: module.AdyenCheckoutProvider})))
+const AdyenCheckout = React.lazy(() =>
+    import('@adyen/adyen-salesforce-pwa').then((module) => ({default: module.AdyenCheckout}))
+)
+const AdyenCheckoutProvider = React.lazy(() =>
+    import('@adyen/adyen-salesforce-pwa').then((module) => ({
+        default: module.AdyenCheckoutProvider
+    }))
+)
 
 // Embedded CSS to avoid webpack loader conflicts
 const adyenCSS = `

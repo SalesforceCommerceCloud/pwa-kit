@@ -13,7 +13,11 @@ import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
 
 // Dynamic import for AdyenExpressCheckoutProvider
-const AdyenExpressCheckoutProvider = React.lazy(() => import('@adyen/adyen-salesforce-pwa').then(module => ({default: module.AdyenExpressCheckoutProvider})))
+const AdyenExpressCheckoutProvider = React.lazy(() =>
+    import('@adyen/adyen-salesforce-pwa').then((module) => ({
+        default: module.AdyenExpressCheckoutProvider
+    }))
+)
 
 function Express() {
     const {getTokenWhenReady} = useAccessToken()
