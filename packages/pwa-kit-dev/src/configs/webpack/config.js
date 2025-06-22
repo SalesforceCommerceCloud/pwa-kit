@@ -261,6 +261,20 @@ const baseConfig = (target) => {
 
                 module: {
                     rules: [
+                        {
+                            test: /\.css$/,
+                            use: [
+                                'style-loader',
+                                {
+                                    loader: 'css-loader',
+                                    options: {
+                                        modules: false,
+                                        sourceMap: true,
+                                        esModule: false
+                                    }
+                                }
+                            ]
+                        },
                         ruleForBabelLoader(),
                         target === 'node' && {
                             test: /\.svg$/,
@@ -269,21 +283,6 @@ const baseConfig = (target) => {
                         target === 'web' && {
                             test: /\.svg$/,
                             loader: findDepInStack('ignore-loader')
-                        },
-                        {
-                            test: /\.css$/,
-                            use: [
-                                'style-loader',
-                                {
-                                    loader: 'css-loader',
-                                    options: {
-                                        importLoaders: 1,
-                                        modules: false,
-                                        sourceMap: true,
-                                        esModule: false
-                                    }
-                                }
-                            ]
                         },
                         {
                             test: /\.html$/,

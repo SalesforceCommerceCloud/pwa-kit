@@ -25,7 +25,6 @@ module.exports = config.map((configItem) => {
             module: {
                 ...configItem.module,
                 rules: [
-                    ...configItem.module.rules,
                     {
                         test: /\.css$/,
                         use: [
@@ -40,7 +39,8 @@ module.exports = config.map((configItem) => {
                                 }
                             }
                         ]
-                    }
+                    },
+                    ...configItem.module.rules
                 ]
             }
         }
