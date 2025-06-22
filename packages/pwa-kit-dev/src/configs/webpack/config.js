@@ -313,8 +313,6 @@ const baseConfig = (target) => {
         }
 
         build() {
-            // Clean up temporary properties, to be compatible with the config schema
-            this.config.module.rules.filter((rule) => rule.id).forEach((rule) => delete rule.id)
             return this.config
         }
     }
@@ -378,7 +376,6 @@ const staticFolderCopyPlugin = new CopyPlugin({
 
 const ruleForBabelLoader = (babelPlugins) => {
     return {
-        id: 'babel-loader',
         test: /(\.js(x?)|\.ts(x?))$/,
         ...(EXT_OVERRIDES_DIR && EXT_EXTENDS
             ? // TODO: handle for array here when that's supported
@@ -420,7 +417,7 @@ const enableReactRefresh = (config) => {
     }
 
     const newRule = ruleForBabelLoader([require.resolve('react-refresh/babel')])
-    const rules = findAndReplace(config.module.rules, (rule) => rule.id === 'babel-loader', newRule)
+    const rules = findAndReplace(config.module.rules, (rule) => rule.test && rule.test.toString() === '/(\\.js(x?)|\.ts(x?))$/', newRule)
 
     return {
         ...config,
