@@ -183,15 +183,16 @@ const CSSInjector = () => {
 
 CSSInjector.displayName = 'CSSInjector'
 
-const Routes = () => {
-    return (
-        <>
-            <CSSInjector />
-            {configureRoutes(routes)}
-        </>
-    )
+// Export routes as a function that returns the configured routes
+export default () => {
+    const config = getConfig()
+    const configuredRoutes = configureRoutes(routes, config, {ignoredRoutes: []})
+
+    // Ensure we always return an array
+    if (!Array.isArray(configuredRoutes)) {
+        console.error('configureRoutes did not return an array:', configuredRoutes)
+        return routes // fallback to original routes
+    }
+
+    return configuredRoutes
 }
-
-Routes.displayName = 'Routes'
-
-export default Routes
