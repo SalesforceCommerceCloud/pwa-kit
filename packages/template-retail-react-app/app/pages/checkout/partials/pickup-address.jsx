@@ -48,7 +48,10 @@ export default function PickupAddress() {
         city: store?.city,
         countryCode: store?.countryCode,
         postalCode: store?.postalCode,
-        stateCode: store?.stateCode
+        stateCode: store?.stateCode,
+        firstName: store?.name,
+        lastName: '',
+        phone: store?.phone
     }
 
     const submitAndContinue = async (address) => {
