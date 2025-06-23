@@ -108,24 +108,24 @@ const Checkout = () => {
                         </Stack>
                     </GridItem>
 
-                    <GridItem py={6} px={[4, 4, 4, 0]}>
-                        <OrderSummary
-                            basket={basket}
-                            showTaxEstimationForm={false}
-                            showCartItems={true}
-                        />
+                    {/* <GridItem py={6} px={[4, 4, 4, 0]}> */}
+                    {/*     <OrderSummary */}
+                    {/*         basket={basket} */}
+                    {/*         showTaxEstimationForm={false} */}
+                    {/*         showCartItems={true} */}
+                    {/*     /> */}
 
-                        {step === 4 && (
-                            <Box display={{base: 'none', lg: 'block'}} pt={2}>
-                                <Button w="full" onClick={submitOrder} isLoading={isLoading}>
-                                    <FormattedMessage
-                                        defaultMessage="Place Order"
-                                        id="checkout.button.place_order"
-                                    />
-                                </Button>
-                            </Box>
-                        )}
-                    </GridItem>
+                    {/*     {step === 4 && ( */}
+                    {/*         <Box display={{base: 'none', lg: 'block'}} pt={2}> */}
+                    {/*             <Button w="full" onClick={submitOrder} isLoading={isLoading}> */}
+                    {/*                 <FormattedMessage */}
+                    {/*                     defaultMessage="Place Order" */}
+                    {/*                     id="checkout.button.place_order" */}
+                    {/*                 /> */}
+                    {/*             </Button> */}
+                    {/*         </Box> */}
+                    {/*     )} */}
+                    {/* </GridItem> */}
                 </Grid>
             </Container>
 
@@ -204,10 +204,10 @@ const CheckoutContainer = () => {
             {isDeletingUnavailableItem && <LoadingSpinner wrapperStyles={{height: '100vh'}} />}
 
             <Checkout />
-            <UnavailableProductConfirmationModal
-                productItems={basket?.productItems}
-                handleUnavailableProducts={handleUnavailableProducts}
-            />
+            {/* <UnavailableProductConfirmationModal */}
+            {/*     productItems={basket?.productItems} */}
+            {/*     handleUnavailableProducts={handleUnavailableProducts} */}
+            {/* /> */}
         </CheckoutProvider>
     )
 }

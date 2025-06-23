@@ -255,15 +255,15 @@ const ContactInfo = ({isSocialEnabled = false, isPasswordlessEnabled = false, id
             <ToggleCardSummary>
                 <Text>{basket?.customerInfo?.email || customer?.email}</Text>
 
-                <SignOutConfirmationDialog
-                    isOpen={signOutConfirmDialogIsOpen}
-                    onClose={() => setSignOutConfirmDialogIsOpen(false)}
-                    onConfirm={async () => {
-                        await logout.mutateAsync()
-                        navigate('/login')
-                        setSignOutConfirmDialogIsOpen(false)
-                    }}
-                />
+                {/* <SignOutConfirmationDialog */}
+                {/*     isOpen={signOutConfirmDialogIsOpen} */}
+                {/*     onClose={() => setSignOutConfirmDialogIsOpen(false)} */}
+                {/*     onConfirm={async () => { */}
+                {/*         await logout.mutateAsync() */}
+                {/*         navigate('/login') */}
+                {/*         setSignOutConfirmDialogIsOpen(false) */}
+                {/*     }} */}
+                {/* /> */}
             </ToggleCardSummary>
         </ToggleCard>
     )
