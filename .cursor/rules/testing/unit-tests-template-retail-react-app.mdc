@@ -4,6 +4,11 @@ globs: ["packages/template-retail-react-app/app/components/**/*.test.{js,jsx,ts,
 alwaysApply: false
 ---
 
+---
+description: USE WHEN writing unit tests in template-retail-react-app components
+globs: ["packages/template-retail-react-app/app/components/**/*.test.{js,jsx,ts,tsx}"]
+alwaysApply: false
+---
 # 🛍️ Retail React App Test Rules
 
 ## Package-Specific Requirements
