@@ -1,0 +1,46 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "PWA Kit Create App Validators",
+    "description": "A list of validators for the PWA Kit Create App tool.",
+    "type": "object",
+    "properties": {
+        "validators": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "description": "The unique identifier for the validator."
+                    },
+                    "name": {
+                        "type": "string",
+                        "description": "The name of the validator."
+                    },
+                    "description": {
+                        "type": "string",
+                        "description": "A brief description of what the validator does."
+                    },
+                    "message": {
+                        "type": "string",
+                        "description": "The error message to display if validation fails."
+                    },
+                    "regex": {
+                        "type": "string",
+                        "description": "The validation logic, often a regular expression or a reference to a function."
+                    }
+                },
+                "required": [
+                    "id",
+                    "name",
+                    "description",
+                    "message",
+                    "regex"
+                ]
+            }
+        }
+    },
+    "required": [
+        "validators"
+    ]
+}

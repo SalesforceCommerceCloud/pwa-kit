@@ -10,15 +10,27 @@
         "questions": [
           {
             "name": "project.name",
-            "message": "What is the name of your Project?"
+            "message": "What is the name of your Project?",
+            "_ai": {
+                "instruction": "Should validate the user input using the 'validateProjectName' validator.",
+                "expectedUse": "Instruct agent on how to validate user input."
+            }
           },
           {
             "name": "project.commerce.instanceUrl",
-            "message": "What is the URL for your Commerce Cloud instance?"
+            "message": "What is the URL for your Commerce Cloud instance?",
+            "_ai": {
+                "instruction": "Should validate the user input using the 'validUrl' validator.",
+                "expectedUse": "Instruct agent on how to validate user input."
+            }
           },
           {
             "name": "project.commerce.clientId",
-            "message": "What is your SLAS Client ID?"
+            "message": "What is your SLAS Client ID?",
+            "_ai": {
+                "instruction": "Should validate the user input using the 'validClientId' validator.",
+                "expectedUse": "Instruct agent on how to validate user input."
+            }
           },
           {
             "name": "project.commerce.isSlasPrivate",

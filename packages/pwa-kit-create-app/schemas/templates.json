@@ -40,7 +40,7 @@
                         "$ref": "questions.json",
                         "_ai": {
                             "instruction": "This property references the Inquirer Question interface defined here https://github.com/DefinitelyTyped/DefinitelyTyped/blob/master/types/inquirer/index.d.ts",
-                            "expectedUse": "Hiding presets from the user."
+                            "expectedUse": "Instruct agent on how to ask the user questions."
                         }
                     },
                     "assets": {
@@ -54,7 +54,11 @@
                         "additionalProperties": {}
                     },
                     "private": {
-                        "type": "boolean"
+                        "type": "boolean",
+                        "_ai": {
+                            "instruction": "This property is used to filter what templates are shown to the user.",
+                            "expectedUse": "Hiding templates from the user."
+                        }
                     }
                 },
                 "additionalProperties": false

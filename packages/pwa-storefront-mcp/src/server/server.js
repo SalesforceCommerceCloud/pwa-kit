@@ -18,10 +18,13 @@ import {generatePwaKitProject} from '../utils/GenerateProject.js'
 // Preset and Template data
 import createAppPresets from '@salesforce/pwa-kit-create-app/data/presets.json' assert {type: 'json'}
 import createAppTemplates from '@salesforce/pwa-kit-create-app/data/templates.json' assert {type: 'json'}
+import createAppValidators from '@salesforce/pwa-kit-create-app/data/validators.json' assert {type: 'json'}
+
 
 // Preset and Template schemas
 import createAppPresetsSchema from '@salesforce/pwa-kit-create-app/schemas/presets.json' assert {type: 'json'}
 import createAppTemplatesSchema from '@salesforce/pwa-kit-create-app/schemas/templates.json' assert {type: 'json'}
+import createAppValidatorsSchema from '@salesforce/pwa-kit-create-app/schemas/validators.json' assert {type: 'json'}
 
 
 import fs from 'fs/promises'
@@ -57,9 +60,18 @@ class PwaStorefrontMCPServerHighLevel {
 
         const getCreateAppTemplatesDescription =
             'Get the PWA Kit project templates and conversational guidelines. ' +
-            'Ask user to fulfill the templates questions conversationally if required then pass the answers ' +
-            'to the submit_pwa_kit_project_answers tool to generate the project. Do not trigger is prompt ' +
+            'Ask user to fulfill the templates questions conversationally, if required, then pass the answers ' +
+            'to the submit_pwa_kit_project_answers tool to generate the project. When asking the questions ensure you ' + 
+            'use the validators from get_create_app_validators. Do not trigger if the prompt ' +
             'contains the word "preset" (triggers: create pwa, build storefront, generate pwa-kit).'
+        
+        const getCreateAppValidators =
+            'Get the PWA Kit project creation question validators. Ensure you read the linked schema ' +
+            'for details on the data structure and `_ai` properties. ' +
+            'When asking the user to fulfill the templates questions use there validators to text the user input. ' +
+            'The validators will be defined in the templates questions `_ai` properties. Do not validate input that ' +
+            'is not defined in the templates questions `_ai` properties.'
+
         // Register tools using the high-level API
 
         this.server.tool(
@@ -270,6 +282,44 @@ class PwaStorefrontMCPServerHighLevel {
                         ],
                         isError: true
                     }
+                }
+            }
+        )
+
+        this.server.tool(
+            'get_create_app_validators',
+            getCreateAppValidators,
+            {},
+            async () => {
+                // You can customize this to dynamically load the schema if desired
+                // TODO: These guidelines should be imported from the create app package.
+                const guidelines = {
+                    tone: 'professional, friendly, concise',
+                    languageRestrictions: 'no foul or offensive language',
+                    questionScope: 'only ask questions provided in the schema',
+                    conversationalStyle:
+                        'keep questions direct and clear, avoid unnecessary elaboration',
+                    examples: {
+                        good: 'What is your project name?',
+                        bad: 'Hey there buddy, would you mind terribly if I asked you to please provide me with a project name? No rush!'
+                    }
+                }
+
+                return {
+                    content: [
+                        {
+                            type: 'text',
+                            text: JSON.stringify(
+                                {
+                                    validators: createAppValidators,
+                                    schema: createAppValidatorsSchema,
+                                    guidelines
+                                },
+                                null,
+                                2
+                            )
+                        }
+                    ]
                 }
             }
         )
