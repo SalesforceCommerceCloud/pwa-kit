@@ -22,6 +22,7 @@ import {
     useCheckout
 } from '@salesforce/retail-react-app/app/pages/checkout/util/checkout-context'
 import ContactInfo from '@salesforce/retail-react-app/app/pages/checkout/partials/contact-info'
+import PickupAddress from '@salesforce/retail-react-app/app/pages/checkout/partials/pickup-address'
 import ShippingAddress from '@salesforce/retail-react-app/app/pages/checkout/partials/shipping-address'
 import ShippingOptions from '@salesforce/retail-react-app/app/pages/checkout/partials/shipping-options'
 import Payment from '@salesforce/retail-react-app/app/pages/checkout/partials/payment'
@@ -51,6 +52,8 @@ const Checkout = () => {
     const idps = social?.idps
     const isSocialEnabled = !!social?.enabled
     const isPasswordlessEnabled = !!passwordless?.enabled
+
+    const isPickupOrder = basket?.shipments[0]?.shippingMethod?.c_storePickupEnabled === true
 
     useEffect(() => {
         if (error || step === 4) {
@@ -99,11 +102,11 @@ const Checkout = () => {
                                 isPasswordlessEnabled={isPasswordlessEnabled}
                                 idps={idps}
                             />
-                            <ShippingAddress />
-                            <ShippingOptions />
+                            {isPickupOrder ? <PickupAddress /> : <ShippingAddress />}
+                            {!isPickupOrder && <ShippingOptions />}
                             <Payment />
 
-                            {step === 4 && (
+                            {step === 5 && (
                                 <Box pt={3} display={{base: 'none', lg: 'block'}}>
                                     <Container variant="form">
                                         <Button
@@ -130,7 +133,7 @@ const Checkout = () => {
                             showCartItems={true}
                         />
 
-                        {step === 4 && (
+                        {step === 5 && (
                             <Box display={{base: 'none', lg: 'block'}} pt={2}>
                                 <Button w="full" onClick={submitOrder} isLoading={isLoading}>
                                     <FormattedMessage
@@ -144,7 +147,7 @@ const Checkout = () => {
                 </Grid>
             </Container>
 
-            {step === 4 && (
+            {step === 5 && (
                 <Box
                     display={{lg: 'none'}}
                     position="sticky"
