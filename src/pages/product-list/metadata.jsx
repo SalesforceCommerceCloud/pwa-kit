@@ -22,22 +22,34 @@ import Seo from '../../components/seo'
  * @param {string} productSearchResult.pageMetaTags.value - The value of the meta tag
  */
 export default function Metadata({category, searchQuery, productSearchResult}) {
-    const defaultTitle = 'Product List'
-    const defaultDescription = 'Browse our collection of products'
-    const defaultKeywords = ''
-    const metaTags = productSearchResult?.pageMetaTags || []
-    const title = category?.pageTitle ?? searchQuery ?? defaultTitle
-    const description = category?.pageDescription ?? searchQuery ?? defaultDescription
-    const keywords = metaTags.find((tag) => tag.id === 'keywords')?.value || category?.pageKeywords || defaultKeywords
+    if (category) {
+        return (
+            <Seo
+                title={category.pageTitle}
+                description={category.pageDescription}
+                keywords={category.pageKeywords}
+            />
+        )
+    }
 
-    return (
-        <Seo
-            title={title}
-            description={description}
-            keywords={keywords}
-            metaTags={metaTags}
-        />
-    )
+    if (searchQuery) {
+        const metaTags = productSearchResult?.pageMetaTags || []
+        const searchTitle = searchQuery
+        const searchDescription = searchQuery
+        const searchKeywords = metaTags.find((tag) => tag.id === 'keywords')?.value
+        
+        return (
+            <Seo
+                title={searchTitle}
+                description={searchDescription}
+                keywords={searchKeywords}
+                metaTags={metaTags}
+            />
+        )
+    }
+    
+
+    return null
 }
 
 Metadata.propTypes = {

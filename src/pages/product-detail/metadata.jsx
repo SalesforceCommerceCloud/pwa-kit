@@ -20,14 +20,14 @@ import Seo from '../../components/seo'
  * @param {string} product.pageMetaTags.value - The value of the meta tag
  */
 export default function Metadata({product}) {
-    const defaultTitle = 'Product Detail Page'
-    const defaultDescription = 'View detailed information, specifications, and features for this product.'
-    const defaultKeywords = ''
-    
-    const metaTags = product?.pageMetaTags || []
-    const title = product?.pageTitle ?? defaultTitle
-    const keywords = metaTags.find((tag) => tag.id === 'keywords')?.value || product?.pageKeywords || defaultKeywords
-    const description = metaTags.find((tag) => tag.id === 'description')?.value || product?.pageDescription || defaultDescription
+    if (!product) {
+        return null
+    }
+
+    const metaTags = product.pageMetaTags || []
+    const title = product.pageTitle
+    const keywords = metaTags.find((tag) => tag.id === 'keywords')?.value || product.pageKeywords
+    const description = metaTags.find((tag) => tag.id === 'description')?.value || product.pageDescription
 
     return (
         <Seo
