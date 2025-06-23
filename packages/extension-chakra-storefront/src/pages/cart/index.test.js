@@ -430,16 +430,21 @@ describe('Coupons tests', function () {
             })
         )
     })
-    test.only('Can apply and remove product-level coupon code with promotion', async () => {
+    test('Can apply and remove product-level coupon code with promotion', async () => {
         const {user} = renderWithProviders(<Cart />)
-        
+
         // Wait for cart to fully load
         expect(await screen.findByTestId('sf-cart-container')).toBeInTheDocument()
 
-        // add coupon
-        await user.click(screen.getByText('Do you have a promo code?'))
-        await user.type(screen.getByLabelText('Promo Code'), 'menssuits')
-        await user.click(screen.getByText('Apply'))
+        // add coupon - wrap the accordion opening in act() since that's when the form initializes
+        await act(async () => {
+            await user.click(screen.getByText('Do you have a promo code?'))
+        })
+
+        await act(async () => {
+            await user.type(screen.getByLabelText('Promo Code'), 'menssuits')
+            await user.click(screen.getByText('Apply'))
+        })
 
         // Wait for the async form submission and state updates to complete
         await waitFor(async () => {
