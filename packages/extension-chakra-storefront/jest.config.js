@@ -33,6 +33,7 @@ module.exports = {
         '<rootDir>/src/components/toaster/**/*.test.jsx',
         '<rootDir>/src/components/list-menu/**/*.test.js',
         '<rootDir>/src/pages/home/**/*.test.js',
+        '<rootDir>/src/pages/product-list/**/*.test.js',
         '<rootDir>/src/utils/responsive-image.test.js',
         '<rootDir>/src/hooks/use-toast.test.js'
     ],
