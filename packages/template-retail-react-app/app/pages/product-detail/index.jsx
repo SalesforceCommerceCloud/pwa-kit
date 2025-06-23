@@ -372,12 +372,6 @@ const ProductDetail = () => {
 
     const handleAddToCart = async (productSelectionValues = []) => {
         try {
-            const hasPickupItems = checkHasPickupItems(
-                productSelectionValues,
-                pickupInStoreMap,
-                product
-            )
-
             let productItems = productSelectionValues.map((item) => {
                 const {variant, quantity} = item
                 // Use variant if present, otherwise use the main product
@@ -424,16 +418,19 @@ const ProductDetail = () => {
                     return pickupInStoreMap[prodKey]
                 })
 
-                // Fetch shipping methods to get available options
-                const {data: fetchedShippingMethods} = await refetchShippingMethods()
-
                 if (hasAnyPickupSelected && !isCurrentlyPickup) {
+                    // Fetch shipping methods to get available options
+                    const {data: fetchedShippingMethods} = await refetchShippingMethods()
+
                     // Configure pickup shipment if pickup is selected but current method is not pickup
                     const pickupShippingMethodId = getPickupShippingMethodId(fetchedShippingMethods)
                     await configurePickupShipment(basketResponse.basketId, productItems, {
                         pickupShippingMethodId
                     })
                 } else if (!hasAnyPickupSelected && isCurrentlyPickup) {
+                    // Fetch shipping methods to get available options
+                    const {data: fetchedShippingMethods} = await refetchShippingMethods()
+
                     // Configure regular shipping if pickup is not selected but current method is pickup
                     const defaultShippingMethodId =
                         getDefaultShippingMethodId(fetchedShippingMethods)
@@ -508,11 +505,6 @@ const ProductDetail = () => {
 
         try {
             const childProductSelections = Object.values(childProductSelection)
-
-            // Check if any bundle items or the parent product are pickup items
-            const hasPickupItems =
-                pickupInStoreMap[product.id] ||
-                childProductSelections.some((child) => pickupInStoreMap[child.product.id])
 
             let productItems = [
                 {
