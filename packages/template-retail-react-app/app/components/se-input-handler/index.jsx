@@ -21,7 +21,8 @@ const SeInputHandler = ({onOpenStoreLocator}) => {
     const {
         derivedData: {totalItems: totalItemCount}
     } = useCurrentBasket()
-    const {shouldOpenModal, setShouldOpenModal, storeLocatorParams, processSeParameters} = useSeStoreSelection(totalItemCount)
+    const {shouldOpenModal, setShouldOpenModal, storeLocatorParams, processSeParameters} =
+        useSeStoreSelection(totalItemCount)
 
     const {setParams} = useStoreLocatorParams()
 
@@ -31,18 +32,18 @@ const SeInputHandler = ({onOpenStoreLocator}) => {
 
     useEffect(() => {
         let urlParams
-        
+
         try {
             urlParams = new URLSearchParams(location.search)
             let needsRepair = false
             const repairedParams = new URLSearchParams()
-            
+
             for (const [key, value] of urlParams.entries()) {
                 if (value.includes('?')) {
                     needsRepair = true
                     const [actualValue, extraParams] = value.split('?', 2)
                     repairedParams.set(key, actualValue)
-                    
+
                     if (extraParams) {
                         const extraParamsObj = new URLSearchParams(extraParams)
                         for (const [extraKey, extraValue] of extraParamsObj.entries()) {
@@ -53,11 +54,10 @@ const SeInputHandler = ({onOpenStoreLocator}) => {
                     repairedParams.set(key, value)
                 }
             }
-            
+
             if (needsRepair) {
                 urlParams = repairedParams
             }
-            
         } catch (error) {
             console.warn('Error parsing URL parameters:', error)
             let sanitizedSearch = location.search
@@ -71,7 +71,7 @@ const SeInputHandler = ({onOpenStoreLocator}) => {
             }
             urlParams = new URLSearchParams(sanitizedSearch)
         }
-        
+
         processSeParameters(urlParams)
     }, [location.search, processSeParameters])
 

@@ -14,10 +14,10 @@ import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
 const useStores = (state) => {
     //This is an API limit and is therefore not configurable
     const NUM_STORES_PER_REQUEST_API_MAX = 200
-    
+
     let apiParameters
     let shouldFetchStores
-    
+
     if (state.mode === 'se' && state.seParams) {
         apiParameters = {
             ...state.seParams,
@@ -43,7 +43,9 @@ const useStores = (state) => {
                   }
         shouldFetchStores =
             Boolean(
-                state.mode === 'input' && state.formValues.countryCode && state.formValues.postalCode
+                state.mode === 'input' &&
+                    state.formValues.countryCode &&
+                    state.formValues.postalCode
             ) ||
             Boolean(
                 state.mode === 'device' &&
@@ -51,7 +53,7 @@ const useStores = (state) => {
                     state.deviceCoordinates.longitude
             )
     }
-    
+
     return useSearchStores(
         {
             parameters: apiParameters
@@ -89,16 +91,20 @@ export const useStoreLocator = () => {
         return null
     }
     const storedSeParams = getStoredSeParams()
-    const effectiveState = seParams ? {
-        ...state,
-        mode: 'se',
-        seParams
-    } : storedSeParams ? {
-        ...state,
-        mode: 'se',
-        seParams: storedSeParams
-    } : state
-    
+    const effectiveState = seParams
+        ? {
+              ...state,
+              mode: 'se',
+              seParams
+          }
+        : storedSeParams
+        ? {
+              ...state,
+              mode: 'se',
+              seParams: storedSeParams
+          }
+        : state
+
     const {data, isLoading} = useStores(effectiveState)
 
     // There are three modes: input, device, and se.
@@ -121,9 +127,9 @@ export const useStoreLocator = () => {
     }
 
     const getFormValuesFromStoredData = useCallback((parsed, data) => {
-        if (!parsed?.seSearchParams) return { formCountry: null, formPostalCode: null }
-        
-        const { seSearchParams } = parsed
+        if (!parsed?.seSearchParams) return {formCountry: null, formPostalCode: null}
+
+        const {seSearchParams} = parsed
         if (seSearchParams.postalCode && seSearchParams.countryCode) {
             return {
                 formCountry: seSearchParams.countryCode,
@@ -131,14 +137,14 @@ export const useStoreLocator = () => {
             }
         }
         if (seSearchParams.latitude && seSearchParams.countryCode && data?.data?.length > 0) {
-            const selectedStore = data.data.find(store => store.id === parsed.id)
+            const selectedStore = data.data.find((store) => store.id === parsed.id)
             return {
                 formCountry: seSearchParams.countryCode,
                 formPostalCode: selectedStore?.postalCode || null
             }
         }
-        
-        return { formCountry: null, formPostalCode: null }
+
+        return {formCountry: null, formPostalCode: null}
     }, [])
 
     useEffect(() => {
@@ -151,13 +157,14 @@ export const useStoreLocator = () => {
                 const parsed = JSON.parse(storedInfo)
                 if (!parsed.isSeSelection) return
 
-                const { formCountry, formPostalCode } = getFormValuesFromStoredData(parsed, data)
+                const {formCountry, formPostalCode} = getFormValuesFromStoredData(parsed, data)
 
-                const needsUpdate = (formCountry && formCountry !== state.formValues.countryCode) ||
-                                  (formPostalCode && formPostalCode !== state.formValues.postalCode)
-                
+                const needsUpdate =
+                    (formCountry && formCountry !== state.formValues.countryCode) ||
+                    (formPostalCode && formPostalCode !== state.formValues.postalCode)
+
                 if (needsUpdate) {
-                    setState(prev => ({
+                    setState((prev) => ({
                         ...prev,
                         formValues: {
                             countryCode: formCountry || prev.formValues.countryCode,
@@ -170,7 +177,13 @@ export const useStoreLocator = () => {
                 console.warn('Failed to parse stored info for form population:', e)
             }
         }
-    }, [site.id, data, getFormValuesFromStoredData, state.formValues.countryCode, state.formValues.postalCode])
+    }, [
+        site.id,
+        data,
+        getFormValuesFromStoredData,
+        state.formValues.countryCode,
+        state.formValues.postalCode
+    ])
 
     return {
         ...state,

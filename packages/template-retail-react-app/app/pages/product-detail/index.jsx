@@ -163,7 +163,7 @@ const ProductDetail = () => {
             return new URLSearchParams()
         }
     }
-    
+
     const urlParams = getSanitizedUrlParams()
     const {
         data: product,

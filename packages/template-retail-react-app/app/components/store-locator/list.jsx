@@ -6,6 +6,7 @@
  */
 
 import React, {useEffect, useState, useMemo} from 'react'
+import PropTypes from 'prop-types'
 import {Accordion, AccordionItem, Box, Button, RadioGroup} from '@chakra-ui/react'
 import {StoreLocatorListItem} from '@salesforce/retail-react-app/app/components/store-locator/list-item'
 import {useStoreLocator} from '@salesforce/retail-react-app/app/hooks/use-store-locator'
@@ -31,7 +32,8 @@ export const StoreLocatorList = ({totalItemCount}) => {
     }, [currentData])
 
     useEffect(() => {
-        const storeId = selectedStoreId || JSON.parse(window.localStorage.getItem(storeInfoKey))?.id || ''
+        const storeId =
+            selectedStoreId || JSON.parse(window.localStorage.getItem(storeInfoKey))?.id || ''
         setSelectedStore(storeId)
     }, [storeInfoKey, selectedStoreId])
 
@@ -85,7 +87,7 @@ export const StoreLocatorList = ({totalItemCount}) => {
         }
 
         if (useSeData) {
-            const selectedStoreInfo = modalStores.find(store => store.isSelected)
+            const selectedStoreInfo = modalStores.find((store) => store.isSelected)
             if (selectedStoreInfo) {
                 return `Showing stores near your selected location`
             }
@@ -108,7 +110,10 @@ export const StoreLocatorList = ({totalItemCount}) => {
                         if (parsed.isSeSelection && parsed.seSearchParams) {
                             if (parsed.seSearchParams.postalCode) {
                                 locationDescription = parsed.seSearchParams.postalCode
-                            } else if (parsed.seSearchParams.latitude && parsed.seSearchParams.longitude) {
+                            } else if (
+                                parsed.seSearchParams.latitude &&
+                                parsed.seSearchParams.longitude
+                            ) {
                                 locationDescription = 'your coordinates'
                             }
                         }
@@ -117,7 +122,7 @@ export const StoreLocatorList = ({totalItemCount}) => {
                     // Fallback to form values
                 }
             }
-            
+
             const postalCode = formValues.postalCode || locationDescription
 
             return `Viewing stores within ${String(config.radius)}${String(
@@ -130,21 +135,21 @@ export const StoreLocatorList = ({totalItemCount}) => {
 
     const sortedStores = useMemo(() => {
         if (!currentData?.data) return []
-        
+
         const stores = [...currentData.data]
         return stores.sort((a, b) => {
             if (a.id === selectedStore && b.id !== selectedStore) return -1
             if (b.id === selectedStore && a.id !== selectedStore) return 1
-            
+
             if (useSeData) {
                 if (a.isSelected && !b.isSelected) return -1
                 if (b.isSelected && !a.isSelected) return 1
             }
-            
+
             if (a.distance !== null && b.distance !== null) {
                 return a.distance - b.distance
             }
-            
+
             return 0
         })
     }, [currentData?.data, selectedStore, useSeData])
@@ -173,8 +178,9 @@ export const StoreLocatorList = ({totalItemCount}) => {
                 </AccordionItem>
                 <RadioGroup onChange={handleChange} value={selectedStore} width="100%">
                     {storesToShow?.map((store, index) => {
-                        const showSeIndicator = store.isSelected && store.id === selectedStore && useSeData
-                        
+                        const showSeIndicator =
+                            store.isSelected && store.id === selectedStore && useSeData
+
                         return (
                             <StoreLocatorListItem
                                 key={store.id}
@@ -207,4 +213,8 @@ export const StoreLocatorList = ({totalItemCount}) => {
             )}
         </>
     )
+}
+
+StoreLocatorList.propTypes = {
+    totalItemCount: PropTypes.number
 }

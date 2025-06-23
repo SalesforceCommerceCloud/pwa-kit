@@ -86,7 +86,7 @@ const StoreInventoryFilter = ({toggleFilter, selectedFilters}) => {
 
     const handleStoreLocatorClose = () => {
         const storeInfo = getSelectedStoreData(site?.id)
-        
+
         if (storeInfo?.name && storeInfo?.inventoryId) {
             // Apply the filter when a store is selected from the locator
             toggleFilter({value: storeInfo.inventoryId}, 'ilids', false, false)

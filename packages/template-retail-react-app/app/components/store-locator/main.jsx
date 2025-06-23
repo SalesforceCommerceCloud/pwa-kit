@@ -11,7 +11,6 @@ import {StoreLocatorForm} from '@salesforce/retail-react-app/app/components/stor
 import {StoreLocatorHeading} from '@salesforce/retail-react-app/app/components/store-locator/heading'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
 
-
 export const StoreLocator = () => {
     const {
         derivedData: {totalItems: totalItemCount}

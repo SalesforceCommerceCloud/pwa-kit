@@ -21,7 +21,13 @@ import {
 export const StoreLocatorListItem = ({store, radioProps, isSeSelected = false, totalItemCount}) => {
     return (
         <AccordionItem>
-            <Box margin="10px" borderWidth={isSeSelected ? "2px" : "0"} borderColor={isSeSelected ? "blue.500" : "transparent"} borderRadius="md" padding={isSeSelected ? "8px" : "0"}>
+            <Box
+                margin="10px"
+                borderWidth={isSeSelected ? '2px' : '0'}
+                borderColor={isSeSelected ? 'blue.500' : 'transparent'}
+                borderRadius="md"
+                padding={isSeSelected ? '8px' : '0'}
+            >
                 <HStack align="flex-start" spacing={3}>
                     <Radio isDisabled={totalItemCount > 0} {...radioProps} mt="1px" />
                     <Box flex="1">
