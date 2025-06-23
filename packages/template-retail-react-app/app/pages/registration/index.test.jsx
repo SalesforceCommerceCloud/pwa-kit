@@ -94,7 +94,6 @@ test.skip('Allows customer to create an account', async () => {
     renderWithProviders(<MockedComponent />, {
         wrapperProps: {siteAlias: 'uk', appConfig: mockConfig.app}
     })
-    screen.debug()
     // fill out form and submit
     await user.type(screen.getByLabelText('First Name'), 'Tester')
     await user.type(screen.getByLabelText('Last Name'), 'Tester')

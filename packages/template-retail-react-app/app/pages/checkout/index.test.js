@@ -635,8 +635,6 @@ test.skip('Can edit address during checkout as a registered customer', async () 
     await user.type(pwInput, 'Password!1')
     await user.click(loginBtn)
 
-    screen.debug()
-
     // Wait for next step to render
     await waitFor(() =>
         expect(screen.getByTestId('sf-toggle-card-step-1-content')).not.toBeEmptyDOMElement()
