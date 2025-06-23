@@ -100,44 +100,40 @@ const Refinements = ({
 
                         if (filter.values) {
                             return (
-                                <Stack key={filter.attributeId}>
-                                    <Accordion.Item
-                                        value={String(idx)}
-                                        paddingTop={idx !== 0 || itemsBefore ? 6 : 0}
-                                        borderBottom={
-                                            idx === filters.length - 1 ? '1px solid' : 'none'
-                                        }
-                                        borderBottomColor="gray.200"
-                                        paddingBottom={6}
-                                        borderTop={idx === 0 && !itemsBefore ? 'none' : '1px solid'}
-                                        borderTopColor="gray.200"
+                                <Accordion.Item
+                                    key={filter.attributeId}
+                                    value={String(idx)}
+                                    paddingTop={idx !== 0 || itemsBefore ? 6 : 0}
+                                    borderBottom={idx === filters.length - 1 ? '1px solid' : 'none'}
+                                    borderBottomColor="gray.200"
+                                    paddingBottom={6}
+                                    borderTop={idx === 0 && !itemsBefore ? 'none' : '1px solid'}
+                                    borderTopColor="gray.200"
+                                >
+                                    <Accordion.ItemTrigger
+                                        paddingTop={0}
+                                        paddingBottom={2}
+                                        cursor="pointer"
                                     >
-                                        <Accordion.ItemTrigger
-                                            paddingTop={0}
-                                            paddingBottom={2}
-                                            cursor="pointer"
+                                        <Heading
+                                            as="h2"
+                                            flex="1"
+                                            textAlign="left"
+                                            fontSize="md"
+                                            fontWeight={600}
                                         >
-                                            <Heading
-                                                as="h2"
-                                                flex="1"
-                                                textAlign="left"
-                                                fontSize="md"
-                                                fontWeight={600}
-                                            >
-                                                {filter.label}
-                                            </Heading>
-                                            <Accordion.ItemIndicator />
-                                        </Accordion.ItemTrigger>
-                                        <Accordion.ItemContent paddingLeft={0}>
-                                            <Values
-                                                selectedFilters={selectedFiltersArray}
-                                                filter={filter}
-                                                toggleFilter={toggleFilter}
-                                            />
-                                        </Accordion.ItemContent>
-                                    </Accordion.Item>
-                                    {idx < filters.length - 1 && <Separator />}
-                                </Stack>
+                                            {filter.label}
+                                        </Heading>
+                                        <Accordion.ItemIndicator />
+                                    </Accordion.ItemTrigger>
+                                    <Accordion.ItemContent paddingLeft={0}>
+                                        <Values
+                                            selectedFilters={selectedFiltersArray}
+                                            filter={filter}
+                                            toggleFilter={toggleFilter}
+                                        />
+                                    </Accordion.ItemContent>
+                                </Accordion.Item>
                             )
                         } else {
                             return null

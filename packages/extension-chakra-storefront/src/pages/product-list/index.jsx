@@ -470,6 +470,7 @@ const ProductList = (props) => {
                                 borderColor="gray.100"
                             >
                                 <Flex align="center">
+                                    {/* Modal for filter options on mobile */}
                                     <Dialog.Root size="full" placement="center">
                                         <Dialog.Trigger asChild>
                                             <Button
@@ -489,8 +490,18 @@ const ProductList = (props) => {
                                         <Portal>
                                             <Dialog.Backdrop />
                                             <Dialog.Positioner>
-                                                <Dialog.Content>
-                                                    <Dialog.Header>
+                                                <Dialog.Content
+                                                    display="flex"
+                                                    flexDirection="column"
+                                                    height="100vh"
+                                                >
+                                                    <Dialog.Header
+                                                        flexShrink={0}
+                                                        bg="white"
+                                                        borderBottom="1px solid"
+                                                        borderBottomColor="gray.100"
+                                                        p={4}
+                                                    >
                                                         <Dialog.Title>
                                                             <Heading
                                                                 as="h1"
@@ -509,7 +520,12 @@ const ProductList = (props) => {
                                                             </Button>
                                                         </Dialog.CloseTrigger>
                                                     </Dialog.Header>
-                                                    <Dialog.Body py={4}>
+                                                    <Dialog.Body
+                                                        flex={1}
+                                                        overflowY="auto"
+                                                        px={4}
+                                                        py={4}
+                                                    >
                                                         {filtersLoading && <LoadingSpinner />}
                                                         <Refinements
                                                             toggleFilter={toggleFilter}
@@ -530,6 +546,52 @@ const ProductList = (props) => {
                                                             excludedFilters={['cgid']}
                                                         />
                                                     </Dialog.Body>
+                                                    <Dialog.Footer
+                                                        flexShrink={0}
+                                                        bg="white"
+                                                        borderTop="1px solid"
+                                                        borderTopColor="gray.100"
+                                                        p={4}
+                                                    >
+                                                        <Stack
+                                                            direction="column"
+                                                            gap={3}
+                                                            width="full"
+                                                        >
+                                                            <Dialog.CloseTrigger asChild>
+                                                                <Button
+                                                                    width="full"
+                                                                    colorPalette="blue"
+                                                                    size="lg"
+                                                                    position="static"
+                                                                >
+                                                                    <FormattedMessage
+                                                                        defaultMessage="View {count} Items"
+                                                                        id="product_list.modal.btn.view_items"
+                                                                        values={{
+                                                                            count:
+                                                                                productSearchResult?.total ||
+                                                                                0
+                                                                        }}
+                                                                    />
+                                                                </Button>
+                                                            </Dialog.CloseTrigger>
+                                                            <Dialog.CloseTrigger asChild>
+                                                                <Button
+                                                                    width="full"
+                                                                    variant="outline"
+                                                                    size="lg"
+                                                                    position="static"
+                                                                    onClick={resetFilters}
+                                                                >
+                                                                    <FormattedMessage
+                                                                        defaultMessage="Clear Filters"
+                                                                        id="product_list.modal.btn.clear_filters"
+                                                                    />
+                                                                </Button>
+                                                            </Dialog.CloseTrigger>
+                                                        </Stack>
+                                                    </Dialog.Footer>
                                                 </Dialog.Content>
                                             </Dialog.Positioner>
                                         </Portal>
