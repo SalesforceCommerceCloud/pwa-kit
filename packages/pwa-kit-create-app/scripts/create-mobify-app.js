@@ -163,7 +163,7 @@ const createRetailReactAppQuestions = (defaults = {}) => [
         name: 'project.name',
         validate: validProjectName,
         message: 'What is the name of your Project?',
-        default: defaults['project.name'] || 'chakra-storefront'
+        default: defaults['project.name'] || 'retail-react-app'
     },
     {
         name: 'project.commerce.instanceUrl',
