@@ -405,7 +405,7 @@ const ProductList = (props) => {
             paddingTop={{base: 6, lg: 8}}
             {...rest}
         >
-            <Metadata 
+            <Metadata
                 category={category}
                 searchQuery={searchQuery}
                 productSearchResult={productSearchResult}

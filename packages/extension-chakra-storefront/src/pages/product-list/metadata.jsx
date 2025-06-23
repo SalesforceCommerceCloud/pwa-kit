@@ -37,7 +37,7 @@ export default function Metadata({category, searchQuery, productSearchResult}) {
         const searchTitle = searchQuery
         const searchDescription = searchQuery
         const searchKeywords = metaTags.find((tag) => tag.id === 'keywords')?.value
-        
+
         return (
             <Seo
                 title={searchTitle}
@@ -47,7 +47,6 @@ export default function Metadata({category, searchQuery, productSearchResult}) {
             />
         )
     }
-    
 
     return null
 }

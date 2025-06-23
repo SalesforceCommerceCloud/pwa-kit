@@ -27,16 +27,10 @@ export default function Metadata({product}) {
     const metaTags = product.pageMetaTags || []
     const title = product.pageTitle
     const keywords = metaTags.find((tag) => tag.id === 'keywords')?.value || product.pageKeywords
-    const description = metaTags.find((tag) => tag.id === 'description')?.value || product.pageDescription
+    const description =
+        metaTags.find((tag) => tag.id === 'description')?.value || product.pageDescription
 
-    return (
-        <Seo
-            title={title}
-            description={description}
-            keywords={keywords}
-            metaTags={metaTags}
-        />
-    )
+    return <Seo title={title} description={description} keywords={keywords} metaTags={metaTags} />
 }
 
 Metadata.propTypes = {
