@@ -70,9 +70,7 @@ describe('Metadata', () => {
             pageTitle: 'Test Product',
             pageDescription: 'Fallback Description',
             pageKeywords: 'fallback, keywords',
-            pageMetaTags: [
-                {id: 'custom', value: 'custom value'}
-            ]
+            pageMetaTags: [{id: 'custom', value: 'custom value'}]
         }
 
         const {getByTestId} = render(<Metadata product={product} />)

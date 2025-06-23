@@ -25,7 +25,7 @@ describe('Metadata', () => {
             }
 
             const {getByTestId} = render(<Metadata category={category} />)
-            
+
             const seoElement = getByTestId('seo')
             expect(seoElement).toHaveAttribute('title', 'Category Title')
             expect(seoElement).toHaveAttribute('description', 'Category Description')
@@ -39,7 +39,7 @@ describe('Metadata', () => {
             }
 
             const {getByTestId} = render(<Metadata category={category} />)
-            
+
             const seoElement = getByTestId('seo')
             expect(seoElement).toHaveAttribute('title', 'Category Title')
             expect(seoElement).toHaveAttribute('description', '')
@@ -52,7 +52,7 @@ describe('Metadata', () => {
             const searchQuery = 'search term'
 
             const {getByTestId} = render(<Metadata searchQuery={searchQuery} />)
-            
+
             const seoElement = getByTestId('seo')
             expect(seoElement).toHaveAttribute('title', 'search term')
             expect(seoElement).toHaveAttribute('description', 'search term')
@@ -69,12 +69,9 @@ describe('Metadata', () => {
             }
 
             const {getByTestId} = render(
-                <Metadata 
-                    searchQuery={searchQuery} 
-                    productSearchResult={productSearchResult} 
-                />
+                <Metadata searchQuery={searchQuery} productSearchResult={productSearchResult} />
             )
-            
+
             const seoElement = getByTestId('seo')
             expect(seoElement).toHaveAttribute('title', 'search term')
             expect(seoElement).toHaveAttribute('description', 'search term')
@@ -88,12 +85,9 @@ describe('Metadata', () => {
             }
 
             const {getByTestId} = render(
-                <Metadata 
-                    searchQuery={searchQuery} 
-                    productSearchResult={productSearchResult} 
-                />
+                <Metadata searchQuery={searchQuery} productSearchResult={productSearchResult} />
             )
-            
+
             const seoElement = getByTestId('seo')
             expect(seoElement).toHaveAttribute('title', 'search term')
             expect(seoElement).toHaveAttribute('description', 'search term')
@@ -103,10 +97,8 @@ describe('Metadata', () => {
         it('renders Seo with search query when productSearchResult is undefined', () => {
             const searchQuery = 'search term'
 
-            const {getByTestId} = render(
-                <Metadata searchQuery={searchQuery} />
-            )
-            
+            const {getByTestId} = render(<Metadata searchQuery={searchQuery} />)
+
             const seoElement = getByTestId('seo')
             expect(seoElement).toHaveAttribute('title', 'search term')
             expect(seoElement).toHaveAttribute('description', 'search term')
@@ -123,10 +115,8 @@ describe('Metadata', () => {
             }
             const searchQuery = 'search term'
 
-            const {getByTestId} = render(
-                <Metadata category={category} searchQuery={searchQuery} />
-            )
-            
+            const {getByTestId} = render(<Metadata category={category} searchQuery={searchQuery} />)
+
             const seoElement = getByTestId('seo')
             expect(seoElement).toHaveAttribute('title', 'Category Title')
             expect(seoElement).toHaveAttribute('description', 'Category Description')
@@ -142,11 +132,7 @@ describe('Metadata', () => {
 
         it('returns null when props are empty', () => {
             const {container} = render(
-                <Metadata 
-                    category={null} 
-                    searchQuery="" 
-                    productSearchResult={null} 
-                />
+                <Metadata category={null} searchQuery="" productSearchResult={null} />
             )
             expect(container.firstChild).toBeNull()
         })
