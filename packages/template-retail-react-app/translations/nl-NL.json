@@ -30,7 +30,7 @@
     "defaultMessage": "Geen opgeslagen adressen"
   },
   "account_addresses.page_action_placeholder.message.add_new_address": {
-    "defaultMessage": "Voeg een nieuwe adresmethode toe voor sneller afrekenen."
+    "defaultMessage": "Voeg een nieuwe adresmethode toe om sneller af te rekenen."
   },
   "account_addresses.title.addresses": {
     "defaultMessage": "Adressen"
@@ -146,6 +146,18 @@
   },
   "auth_modal.button.close.assistive_msg": {
     "defaultMessage": "Aanmeldformulier sluiten"
+  },
+  "auth_modal.check_email.button.resend_link": {
+    "defaultMessage": "Link opnieuw versturen"
+  },
+  "auth_modal.check_email.description.check_spam_folder": {
+    "defaultMessage": "Het kan een paar minuten duren voordat de link aankomt. Controleer je map met spam als je de link niet kunt vinden"
+  },
+  "auth_modal.check_email.description.just_sent": {
+    "defaultMessage": "We hebben zojuist een aanmeldlink gestuurd naar <b>{email}</b>"
+  },
+  "auth_modal.check_email.title.check_your_email": {
+    "defaultMessage": "Controleer je e-mail"
   },
   "auth_modal.description.now_signed_in": {
     "defaultMessage": "Je bent nu aangemeld."
@@ -406,17 +418,29 @@
   "contact_info.button.already_have_account": {
     "defaultMessage": "Heb je al een account? Aanmelden"
   },
+  "contact_info.button.back_to_sign_in_options": {
+    "defaultMessage": "Terug naar Opties voor aanmelden"
+  },
   "contact_info.button.checkout_as_guest": {
     "defaultMessage": "Afrekenen als gast"
   },
   "contact_info.button.login": {
     "defaultMessage": "Aanmelden"
   },
+  "contact_info.button.password": {
+    "defaultMessage": "Wachtwoord"
+  },
+  "contact_info.button.secure_link": {
+    "defaultMessage": "Beveiligde link"
+  },
   "contact_info.error.incorrect_username_or_password": {
     "defaultMessage": "Onjuiste gebruikersnaam of onjuist wachtwoord. Probeer het opnieuw."
   },
   "contact_info.link.forgot_password": {
     "defaultMessage": "Wachtwoord vergeten?"
+  },
+  "contact_info.message.or_login_with": {
+    "defaultMessage": "Of meld je aan met"
   },
   "contact_info.title.contact_info": {
     "defaultMessage": "Contactgegevens"
@@ -446,6 +470,27 @@
   },
   "display_price.label.current_price_with_range": {
     "defaultMessage": "Van {currentPrice}"
+  },
+  "dnt_notification.button.accept": {
+    "defaultMessage": "Accepteren"
+  },
+  "dnt_notification.button.assistive_msg.accept": {
+    "defaultMessage": "Tracking accepteren"
+  },
+  "dnt_notification.button.assistive_msg.close": {
+    "defaultMessage": "Toestemmingsformulier voor tracking sluiten"
+  },
+  "dnt_notification.button.assistive_msg.decline": {
+    "defaultMessage": "Tracking weigeren"
+  },
+  "dnt_notification.button.decline": {
+    "defaultMessage": "Weigeren"
+  },
+  "dnt_notification.description": {
+    "defaultMessage": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur."
+  },
+  "dnt_notification.title": {
+    "defaultMessage": "Toestemming voor tracking"
   },
   "drawer_menu.button.account_details": {
     "defaultMessage": "Accountgegevens"
@@ -576,6 +621,9 @@
   "footer.link.terms_conditions": {
     "defaultMessage": "Algemene voorwaarden"
   },
+  "footer.locale_selector.assistive_msg": {
+    "defaultMessage": "Taal selecteren"
+  },
   "footer.message.copyright": {
     "defaultMessage": "Salesforce of aan Salesforce gelieerde bedrijven. Alle rechten voorbehouden. Dit is een demowinkel. Geplaatste orders WORDEN NIET verwerkt."
   },
@@ -584,6 +632,9 @@
   },
   "footer.subscribe.description.sign_up": {
     "defaultMessage": "Registreer je om op de hoogte te blijven van de beste aanbiedingen"
+  },
+  "footer.subscribe.email.assistive_msg": {
+    "defaultMessage": "E-mailadres voor nieuwsbrief"
   },
   "footer.subscribe.heading.first_to_know": {
     "defaultMessage": "Zorg dat je als eerste op de hoogte bent"
@@ -606,11 +657,20 @@
   "global.account.link.wishlist": {
     "defaultMessage": "Verlanglijst"
   },
+  "global.error.create_account": {
+    "defaultMessage": "Deze functie is momenteel niet beschikbaar. Als je toegang wilt tot deze functie, moet je een account aanmaken."
+  },
+  "global.error.feature_unavailable": {
+    "defaultMessage": "Deze functie is momenteel niet beschikbaar."
+  },
+  "global.error.invalid_token": {
+    "defaultMessage": "Ongeldig token. Probeer het opnieuw."
+  },
   "global.error.something_went_wrong": {
     "defaultMessage": "Er is iets mis gegaan. Probeer het opnieuw."
   },
   "global.info.added_to_wishlist": {
-    "defaultMessage": "{quantity} {quantity, plural, one {artikel} other {artikelen}} toegevoegd aan verlanglijst"
+    "defaultMessage": "{quantity} {quantity, plural, one {artikel} other {artikelen}} aan verlanglijst toegevoegd"
   },
   "global.info.already_in_wishlist": {
     "defaultMessage": "Artikel staat al op verlanglijst"
@@ -655,7 +715,7 @@
     "defaultMessage": "Mijn account"
   },
   "home.description.features": {
-    "defaultMessage": "Kant en klare functies, zodat jij je alleen hoeft te focussen op het toevoegen van verbeteringen."
+    "defaultMessage": "Gebruiksklare functies, zodat jij je kunt richten op het toevoegen van verbeteringen."
   },
   "home.description.here_to_help": {
     "defaultMessage": "Neem contact op met onze klantenservice."
@@ -664,7 +724,7 @@
     "defaultMessage": "Zij vertellen je waar je moet zijn."
   },
   "home.description.shop_products": {
-    "defaultMessage": "Deze sectie bevat content uit de catalogus. Lees {docLink} over hoe je deze vervangt.",
+    "defaultMessage": "Dit gedeelte bevat content uit de catalogus. Je kunt deze {docLink} over hoe je de content vervangt.",
     "description": "{docLink} is a html button that links the user to https://sfdc.co/business-manager-manage-catalogs"
   },
   "home.features.description.cart_checkout": {
@@ -677,10 +737,10 @@
     "defaultMessage": "Bied elke shopper het op een na beste product of de op een na beste aanbieding via productaanbevelingen."
   },
   "home.features.description.my_account": {
-    "defaultMessage": "Shoppers kunnen de informatie in hun account beheren, zoals hun profiel, adressen, betalingen en orders."
+    "defaultMessage": "Shoppers kunnen hun accountgegevens beheren, zoals hun profiel, adressen, betalingen en orders."
   },
   "home.features.description.shopper_login": {
-    "defaultMessage": "Stel shoppers in staat zicht eenvoudig aan te melden met een meer gepersonaliseerde winkelbeleving."
+    "defaultMessage": "Stel shoppers in staat zich eenvoudig aan te melden met een meer gepersonaliseerde winkelbeleving."
   },
   "home.features.description.wishlist": {
     "defaultMessage": "Geregistreerde shoppers kunnen producten toevoegen aan hun verlanglijst om deze later te kopen."
@@ -698,7 +758,7 @@
     "defaultMessage": "Mijn account"
   },
   "home.features.heading.shopper_login": {
-    "defaultMessage": "Aanmeldgegevens van shoppers en API-toegangsservice"
+    "defaultMessage": "Shopper Login and API Access Service (SLAS)"
   },
   "home.features.heading.wishlist": {
     "defaultMessage": "Verlanglijst"
@@ -719,7 +779,7 @@
     "defaultMessage": "Downloaden op Github"
   },
   "home.hero_features.link.on_managed_runtime": {
-    "defaultMessage": "Implementeren op beheerde runtime"
+    "defaultMessage": "Implementeren op Managed Runtime"
   },
   "home.link.contact_us": {
     "defaultMessage": "Contact opnemen"
@@ -927,6 +987,21 @@
   "login_form.action.create_account": {
     "defaultMessage": "Account maken"
   },
+  "login_form.button.apple": {
+    "defaultMessage": "Apple"
+  },
+  "login_form.button.back": {
+    "defaultMessage": "Terug naar Opties voor aanmelden"
+  },
+  "login_form.button.continue_securely": {
+    "defaultMessage": "Veilig doorgaan"
+  },
+  "login_form.button.google": {
+    "defaultMessage": "Google"
+  },
+  "login_form.button.password": {
+    "defaultMessage": "Wachtwoord"
+  },
   "login_form.button.sign_in": {
     "defaultMessage": "Aanmelden"
   },
@@ -935,6 +1010,9 @@
   },
   "login_form.message.dont_have_account": {
     "defaultMessage": "Heb je geen account?"
+  },
+  "login_form.message.or_login_with": {
+    "defaultMessage": "Of meld je aan met"
   },
   "login_form.message.welcome_back": {
     "defaultMessage": "Welkom terug"
@@ -997,6 +1075,9 @@
   "pagination.field.num_of_pages": {
     "defaultMessage": "van {numOfPages}"
   },
+  "pagination.field.page_number_select": {
+    "defaultMessage": "Paginanummer selecteren"
+  },
   "pagination.link.next": {
     "defaultMessage": "Volgende"
   },
@@ -1038,8 +1119,14 @@
     "defaultMessage": "1 hoofdletter",
     "description": "Password requirement"
   },
+  "password_reset_success.toast": {
+    "defaultMessage": "Het wachtwoord is opnieuw ingesteld"
+  },
   "payment_selection.heading.credit_card": {
     "defaultMessage": "Creditcard"
+  },
+  "payment_selection.radio_group.assistive_msg": {
+    "defaultMessage": "Betaling"
   },
   "payment_selection.tooltip.secure_payment": {
     "defaultMessage": "Dit is een beveiligde betaling met SSL-versleuteling."
@@ -1107,6 +1194,9 @@
   },
   "product_list.select.sort_by": {
     "defaultMessage": "Sorteren op: {sortOption}"
+  },
+  "product_list.sort_by.label.assistive_msg": {
+    "defaultMessage": "Producten sorteren op"
   },
   "product_scroller.assistive_msg.scroll_left": {
     "defaultMessage": "Scrollen door producten links"
@@ -1186,6 +1276,9 @@
   "profile_card.title.my_profile": {
     "defaultMessage": "Mijn profiel"
   },
+  "profile_fields.label.profile_form": {
+    "defaultMessage": "Profielformulier"
+  },
   "promo_code_fields.button.apply": {
     "defaultMessage": "Toepassen"
   },
@@ -1221,15 +1314,6 @@
   },
   "register_form.message.create_an_account": {
     "defaultMessage": "Maak een account en krijg als eerste toegang tot de allerbeste producten, inspiratie en de community."
-  },
-  "reset_password.button.back_to_sign_in": {
-    "defaultMessage": "Terug naar Aanmelden"
-  },
-  "reset_password.info.receive_email_shortly": {
-    "defaultMessage": "Je ontvangt binnenkort een e-mail op <b>{email}</b> met een link om je wachtwoord opnieuw in te stellen."
-  },
-  "reset_password.title.password_reset": {
-    "defaultMessage": "Wachtwoord opnieuw instellen"
   },
   "reset_password_form.action.sign_in": {
     "defaultMessage": "Aanmelden"
@@ -1312,6 +1396,12 @@
   },
   "signout_confirmation_dialog.message.sure_to_sign_out": {
     "defaultMessage": "Weet je zeker dat je je wilt afmelden? Je moet je opnieuw aanmelden om verder te gaan met je huidige order."
+  },
+  "social_login_redirect.message.authenticating": {
+    "defaultMessage": "Authenticeren..."
+  },
+  "social_login_redirect.message.redirect_link": {
+    "defaultMessage": "Als je niet automatisch wordt omgeleid, klik dan op <link>deze link</link> om verder te gaan."
   },
   "store_locator.action.find": {
     "defaultMessage": "Zoeken"
@@ -1621,6 +1711,12 @@
   "use_update_password_fields.error.minimum_characters": {
     "defaultMessage": "Het wachtwoord moet minstens 8 tekens bevatten."
   },
+  "use_update_password_fields.error.password_mismatch": {
+    "defaultMessage": "Wachtwoorden komen niet overeen."
+  },
+  "use_update_password_fields.error.required_confirm_password": {
+    "defaultMessage": "Bevestig je wachtwoord."
+  },
   "use_update_password_fields.error.required_new_password": {
     "defaultMessage": "Geef een nieuw wachtwoord op."
   },
@@ -1632,6 +1728,9 @@
   },
   "use_update_password_fields.error.uppercase_letter": {
     "defaultMessage": "Het wachtwoord moet minstens één hoofdletter bevatten."
+  },
+  "use_update_password_fields.label.confirm_new_password": {
+    "defaultMessage": "Bevestig het nieuwe wachtwoord:"
   },
   "use_update_password_fields.label.current_password": {
     "defaultMessage": "Huidig wachtwoord:"
