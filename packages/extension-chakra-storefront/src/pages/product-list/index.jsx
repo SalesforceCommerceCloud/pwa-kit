@@ -479,6 +479,7 @@ const ProductList = (props) => {
                                                 variant="outline"
                                                 marginRight={2}
                                                 display="inline-flex"
+                                                color="black"
                                             >
                                                 <FilterIcon boxSize={5} />
                                                 <FormattedMessage
@@ -605,6 +606,7 @@ const ProductList = (props) => {
                                         colorPalette="black"
                                         variant="outline"
                                         display="inline-flex"
+                                        color="black"
                                         onClick={() => setSortOpen(true)}
                                     >
                                         {formatMessage(
