@@ -463,6 +463,12 @@
       "value": "quantity"
     }
   ],
+  "bonus_product_modal.no_products_available": [
+    {
+      "type": 0,
+      "value": "No bonus products available"
+    }
+  ],
   "bonus_products_title.title.num_of_items": [
     {
       "type": 0,

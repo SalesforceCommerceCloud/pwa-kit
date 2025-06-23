@@ -4,16 +4,9 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React from 'react'
 import {renderHook, act} from '@testing-library/react'
-import {ChakraProvider} from '@chakra-ui/react'
 import {useLocation} from 'react-router-dom'
-import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
-import {
-    useBonusState,
-    BonusProductModalProvider,
-    useBonusProductModalContext
-} from '@salesforce/retail-react-app/app/hooks/use-bonus-product-modal'
+import {useBonusState} from '@salesforce/retail-react-app/app/hooks/use-bonus-product-modal'
 
 // Mock react-router-dom's useLocation
 jest.mock('react-router-dom', () => ({
