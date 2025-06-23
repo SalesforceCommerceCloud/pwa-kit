@@ -55,7 +55,7 @@ describe('Metadata', () => {
 
             const seoElement = getByTestId('seo')
             expect(seoElement).toHaveAttribute('title', 'search term')
-            expect(seoElement).toHaveAttribute('description', 'search term')
+            expect(seoElement).toHaveAttribute('description', '')
             expect(seoElement).toHaveAttribute('keywords', '')
         })
 
@@ -63,6 +63,7 @@ describe('Metadata', () => {
             const searchQuery = 'search term'
             const productSearchResult = {
                 pageMetaTags: [
+                    {id: 'description', value: 'search description from meta'},
                     {id: 'keywords', value: 'search, keywords'},
                     {id: 'author', value: 'Salesforce'}
                 ]
@@ -74,7 +75,7 @@ describe('Metadata', () => {
 
             const seoElement = getByTestId('seo')
             expect(seoElement).toHaveAttribute('title', 'search term')
-            expect(seoElement).toHaveAttribute('description', 'search term')
+            expect(seoElement).toHaveAttribute('description', 'search description from meta')
             expect(seoElement).toHaveAttribute('keywords', 'search, keywords')
         })
 
@@ -90,7 +91,7 @@ describe('Metadata', () => {
 
             const seoElement = getByTestId('seo')
             expect(seoElement).toHaveAttribute('title', 'search term')
-            expect(seoElement).toHaveAttribute('description', 'search term')
+            expect(seoElement).toHaveAttribute('description', '')
             expect(seoElement).toHaveAttribute('keywords', '')
         })
 
@@ -101,8 +102,27 @@ describe('Metadata', () => {
 
             const seoElement = getByTestId('seo')
             expect(seoElement).toHaveAttribute('title', 'search term')
-            expect(seoElement).toHaveAttribute('description', 'search term')
+            expect(seoElement).toHaveAttribute('description', '')
             expect(seoElement).toHaveAttribute('keywords', '')
+        })
+
+        it('renders Seo with search query and meta tags without description', () => {
+            const searchQuery = 'search term'
+            const productSearchResult = {
+                pageMetaTags: [
+                    {id: 'keywords', value: 'search, keywords'},
+                    {id: 'author', value: 'Salesforce'}
+                ]
+            }
+
+            const {getByTestId} = render(
+                <Metadata searchQuery={searchQuery} productSearchResult={productSearchResult} />
+            )
+
+            const seoElement = getByTestId('seo')
+            expect(seoElement).toHaveAttribute('title', 'search term')
+            expect(seoElement).toHaveAttribute('description', '')
+            expect(seoElement).toHaveAttribute('keywords', 'search, keywords')
         })
     })
 

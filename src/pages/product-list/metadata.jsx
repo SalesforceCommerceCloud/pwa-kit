@@ -35,7 +35,7 @@ export default function Metadata({category, searchQuery, productSearchResult}) {
     if (searchQuery) {
         const metaTags = productSearchResult?.pageMetaTags || []
         const searchTitle = searchQuery
-        const searchDescription = searchQuery
+        const searchDescription = metaTags.find((tag) => tag.id === 'description')?.value
         const searchKeywords = metaTags.find((tag) => tag.id === 'keywords')?.value
 
         return (
