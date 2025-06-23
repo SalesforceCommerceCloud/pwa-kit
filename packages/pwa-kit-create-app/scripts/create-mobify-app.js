@@ -218,7 +218,7 @@ const createRetailReactAppQuestions = (defaults = {}) => [
 // Project dictionary describing details and how the generator should ask questions etc.
 const PRESETS = [
     {
-        id: 'chakra-storefront',
+        id: 'retail-react-app',
         name: 'Retail React App',
         description: `
             Generate a project using custom settings by answering questions about a
@@ -252,7 +252,7 @@ const PRESETS = [
         private: false
     },
     {
-        id: 'chakra-storefront-demo',
+        id: 'retail-react-app-demo',
         name: 'Chakra Storefront Demo',
         description: `
             Generate a project using the settings for a special B2C Commerce
@@ -285,7 +285,7 @@ const PRESETS = [
         private: false
     },
     {
-        id: 'chakra-storefront-demo-site-internal',
+        id: 'retail-react-app-demo-site-internal',
         name: 'Chakra Storefront Demo Store',
         description: `
             Generates a project using the settings for a special B2C Commerce instance that is used
@@ -320,7 +320,7 @@ const PRESETS = [
         private: true
     },
     {
-        id: 'chakra-storefront-test-project',
+        id: 'retail-react-app-test-project',
         name: 'Chakra Storefront Test Project',
         description: '',
         templateSource: {
@@ -347,7 +347,7 @@ const PRESETS = [
         private: true
     },
     {
-        id: 'chakra-storefront-private-slas-client',
+        id: 'retail-react-app-private-slas-client',
         name: 'Chakra Storefront Private SLAS client project',
         description: '',
         templateSource: {
@@ -374,7 +374,7 @@ const PRESETS = [
         private: true
     },
     {
-        id: 'chakra-storefront-bug-bounty',
+        id: 'retail-react-app-bug-bounty',
         name: 'Chakra Storefront Bug Bounty Project',
         description: '',
         templateSource: {
@@ -401,7 +401,7 @@ const PRESETS = [
         private: true
     },
     {
-        id: 'chakra-storefront-hybrid-test-project',
+        id: 'retail-react-app-hybrid-test-project',
         name: 'Chakra Storefront Hybrid Test Private SLAS Project',
         description: '',
         templateSource: {
@@ -430,7 +430,7 @@ const PRESETS = [
         private: true
     },
     {
-        id: 'chakra-storefront-hybrid-public-client-test-project',
+        id: 'retail-react-app-hybrid-public-client-test-project',
         name: 'Chakra Storefront Hybrid Test Public SLAS client project',
         description: '',
         templateSource: {
