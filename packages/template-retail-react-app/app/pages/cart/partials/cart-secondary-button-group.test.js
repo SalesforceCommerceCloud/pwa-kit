@@ -142,7 +142,8 @@ describe('CartSecondaryButtonGroup Edit button conditional rendering', () => {
 
     test('does NOT show Edit button for a standard product (neither a variation nor a bundle)', () => {
         const standardProduct = {
-            itemId: '101'
+            itemId: '101',
+            type: {item: true}
         }
         renderWithVariant(standardProduct)
         expect(screen.queryByRole('button', {name: /edit/i})).not.toBeInTheDocument()

@@ -74,19 +74,6 @@ const CartSecondaryButtonGroup = ({
         onRemoveItemClick(variant)
     }
 
-    /**
-     * Determines if the Edit button should be shown.
-     * If the product is a variant with attributes or a bundle, the Edit button should be shown.
-     * @returns {boolean} True if Edit button should be shown
-     */
-    const shouldShowEditButton = () => {
-        const isVariationProduct =
-            Array.isArray(variant.variationAttributes) && variant.variationAttributes.length > 0
-        const isBundleProduct = Array.isArray(variant.bundledProductItems)
-
-        return isVariationProduct || isBundleProduct
-    }
-
     return (
         <>
             <Stack
@@ -114,7 +101,7 @@ const CartSecondaryButtonGroup = ({
                             />
                         </Button>
                     )}
-                    {shouldShowEditButton() && (
+                    {!variant.type?.item && (
                         <Button variant="link" size="sm" onClick={() => onEditClick(variant)}>
                             <FormattedMessage
                                 defaultMessage="Edit"
