@@ -13,8 +13,7 @@ import {
     Separator,
     Flex,
     Stack,
-    useDisclosure,
-    Box
+    useDisclosure
 } from '@chakra-ui/react'
 import {defineMessage, FormattedMessage} from 'react-intl'
 import {useItemVariant} from '../../../components/item-variant'

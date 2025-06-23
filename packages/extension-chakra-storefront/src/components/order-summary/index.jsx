@@ -58,7 +58,7 @@ const CartItems = ({basket}) => {
                     <Accordion.ItemIndicator />
                 </Accordion.ItemTrigger>
                 <Accordion.ItemContent px={0} py={4}>
-                    <Stack gap={5} align="flex-start" separator={<Divider />}>
+                    <Stack gap={5} align="flex-start" separator={<Separator />}>
                         {basket.productItems?.map((product, idx) => {
                             const variant = {
                                 ...product,

@@ -16,14 +16,14 @@ const EmptyCart = ({isRegistered}) => {
         <Box data-testid="sf-cart-empty" flex="1" minWidth="100%" width="full" background="gray.50">
             <Center>
                 <Stack gap={6} width={['343px', '444px']} marginTop="20%" marginBottom="20%">
-                    <Box css={{ "& > *": { textAlign: "center" } }}>
+                    <Box css={{'& > *': {textAlign: 'center'}}}>
                         <BasketIcon boxSize={[8, 10]} />
                     </Box>
                     <Stack gap={8}>
                         <Stack gap={2}>
                             <Text
                                 lineHeight={1}
-                                css={{ "& > *": { textAlign: "center" } }}
+                                css={{'& > *': {textAlign: 'center'}}}
                                 fontSize={['18px', '2xl']}
                                 fontWeight="bold"
                             >
@@ -33,7 +33,11 @@ const EmptyCart = ({isRegistered}) => {
                                 />
                             </Text>
 
-                            <Text css={{ "& > *": { textAlign: "center" } }} fontSize="md" color="gray.700">
+                            <Text
+                                css={{'& > *': {textAlign: 'center'}}}
+                                fontSize="md"
+                                color="gray.700"
+                            >
                                 {isRegistered ? (
                                     <FormattedMessage
                                         defaultMessage="Continue shopping to add items to your cart."

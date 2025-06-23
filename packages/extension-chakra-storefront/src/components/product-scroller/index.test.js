@@ -6,7 +6,6 @@
  */
 import React from 'react'
 import {act, screen} from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
 import ProductScroller from '../../components/product-scroller/index'
 import {renderWithProviders} from '../../utils/test-utils'
 

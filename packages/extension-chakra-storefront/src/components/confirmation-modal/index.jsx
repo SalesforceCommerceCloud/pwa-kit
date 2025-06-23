@@ -6,7 +6,7 @@
  */
 import React from 'react'
 import {noop} from '../../utils/utils'
-import {Button, Dialog, Text, useDisclosure} from '@chakra-ui/react'
+import {Button, Dialog, Text} from '@chakra-ui/react'
 
 import PropTypes from 'prop-types'
 import {CONFIRMATION_DIALOG_DEFAULT_CONFIG} from '../../pages/account/constant'

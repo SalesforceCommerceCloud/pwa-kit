@@ -11,7 +11,6 @@ import {
     Field as ChakraField,
     IconButton,
     Input,
-    Group,
     InputGroup,
     NativeSelect,
     Checkbox
