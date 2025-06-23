@@ -3,14 +3,6 @@ description: USE WHEN writing unit tests for components in template packages
 globs: ["packages/template-*/*/components/**/*.test.{js,jsx,ts,tsx}"]
 alwaysApply: false
 ---
-
-# 🧪 Generic Component Test Rules
-
----
-description: USE WHEN writing unit tests for components in template packages
-globs: ["packages/template-*/*/components/**/*.test.{js,jsx,ts,tsx}"]
-alwaysApply: false
----
 USE WHEN writing unit tests for components in template packages
 
 # 🧪 Generic Component Test Rules
