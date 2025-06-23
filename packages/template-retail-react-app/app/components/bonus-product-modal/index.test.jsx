@@ -7,7 +7,6 @@
 import React from 'react'
 import {screen, fireEvent} from '@testing-library/react'
 import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
-import {BonusProductModalProvider} from '@salesforce/retail-react-app/app/hooks/use-bonus-product-modal'
 import {useProducts} from '@salesforce/commerce-sdk-react'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
 
@@ -74,11 +73,7 @@ describe('BonusProductModal', () => {
             data: mockBasketWithBonusItems
         })
 
-        renderWithProviders(
-            <BonusProductModalProvider>
-                <div>Test content</div>
-            </BonusProductModalProvider>
-        )
+        renderWithProviders(<div>Test content</div>)
 
         // The modal should not be visible initially
         expect(screen.queryByText('Add Bonus Product')).not.toBeInTheDocument()
@@ -90,11 +85,7 @@ describe('BonusProductModal', () => {
             isLoading: true
         })
 
-        renderWithProviders(
-            <BonusProductModalProvider>
-                <div>Test content</div>
-            </BonusProductModalProvider>
-        )
+        renderWithProviders(<div>Test content</div>)
 
         // The modal should not be visible initially
         expect(screen.queryByText('Add Bonus Product')).not.toBeInTheDocument()
@@ -105,11 +96,7 @@ describe('BonusProductModal', () => {
             data: mockBasketWithoutBonusItems
         })
 
-        renderWithProviders(
-            <BonusProductModalProvider>
-                <div>Test content</div>
-            </BonusProductModalProvider>
-        )
+        renderWithProviders(<div>Test content</div>)
 
         expect(screen.queryByText('Add Bonus Product')).not.toBeInTheDocument()
     })
