@@ -163,7 +163,7 @@ const createRetailReactAppQuestions = (defaults = {}) => [
         name: 'project.name',
         validate: validProjectName,
         message: 'What is the name of your Project?',
-        default: defaults['project.name'] || 'retail-react-app'
+        default: defaults['project.name'] || 'chakra-storefront'
     },
     {
         name: 'project.commerce.instanceUrl',
@@ -235,7 +235,7 @@ const PRESETS = [
         getQuestions: () =>
             createRetailReactAppQuestions({
                 'project.hybrid': false,
-                'project.name': 'retail-react-app',
+                'project.name': 'chakra-storefront',
                 'project.commerce.instanceUrl': 'https://zzrf-001.dx.commercecloud.salesforce.com',
                 'project.commerce.clientId': 'c9c45bfd-0ed3-4aa2-9971-40f88962b836',
                 'project.commerce.siteId': 'RefArch',
@@ -252,8 +252,8 @@ const PRESETS = [
         private: false
     },
     {
-        id: 'retail-react-app-demo',
-        name: 'Retail React App Demo',
+        id: 'chakra-storefront-demo',
+        name: 'Chakra Storefront Demo',
         description: `
             Generate a project using the settings for a special B2C Commerce
             instance that is used for demo purposes. No questions are asked.
@@ -263,7 +263,7 @@ const PRESETS = [
         shortDescription: 'The Retail app with demo Commerce Cloud instance',
         templateSource: {
             type: TEMPLATE_SOURCE_NPM,
-            id: '@salesforce/retail-react-app'
+            id: '@salesforce/chakra-storefront'
         },
         getQuestions: () =>
             createRetailReactAppQuestions({
@@ -285,8 +285,8 @@ const PRESETS = [
         private: false
     },
     {
-        id: 'retail-react-app-demo-site-internal',
-        name: 'Retail React App Demo Store',
+        id: 'chakra-storefront-demo-site-internal',
+        name: 'Chakra Storefront Demo Store',
         description: `
             Generates a project using the settings for a special B2C Commerce instance that is used
             for demo purposes. The demo site is accessible at https://pwa-kit.mobify-storefront.com/
@@ -299,7 +299,7 @@ const PRESETS = [
             'The Retail app with demo Commerce Cloud instance and a private SLAS client',
         templateSource: {
             type: TEMPLATE_SOURCE_NPM,
-            id: '@salesforce/retail-react-app'
+            id: '@salesforce/chakra-storefront'
         },
         answers: {
             ['project.hybrid']: false,
@@ -320,8 +320,8 @@ const PRESETS = [
         private: true
     },
     {
-        id: 'retail-react-app-test-project',
-        name: 'Retail React App Test Project',
+        id: 'chakra-storefront-test-project',
+        name: 'Chakra Storefront Test Project',
         description: '',
         templateSource: {
             type: TEMPLATE_SOURCE_BUNDLE,
@@ -330,7 +330,7 @@ const PRESETS = [
         getQuestions: () =>
             createRetailReactAppQuestions({
                 'project.hybrid': false,
-                'project.name': 'retail-react-app',
+                'project.name': 'chakra-storefront',
                 'project.commerce.instanceUrl': 'https://zzrf-001.dx.commercecloud.salesforce.com',
                 'project.commerce.clientId': 'c9c45bfd-0ed3-4aa2-9971-40f88962b836',
                 'project.commerce.siteId': 'RefArch',
@@ -347,17 +347,17 @@ const PRESETS = [
         private: true
     },
     {
-        id: 'retail-react-app-private-slas-client',
-        name: 'Retail React App Private SLAS client project',
+        id: 'chakra-storefront-private-slas-client',
+        name: 'Chakra Storefront Private SLAS client project',
         description: '',
         templateSource: {
             type: TEMPLATE_SOURCE_NPM,
-            id: '@salesforce/retail-react-app'
+            id: '@salesforce/chakra-storefront'
         },
         getQuestions: () =>
             createRetailReactAppQuestions({
                 'project.hybrid': false,
-                'project.name': 'retail-react-app',
+                'project.name': 'chakra-storefront',
                 'project.commerce.instanceUrl': 'https://zzrf-002.dx.commercecloud.salesforce.com',
                 'project.commerce.clientId': '89655706-9a0d-49ba-a1e5-18bb2d616374',
                 'project.commerce.siteId': 'RefArch',
@@ -374,17 +374,17 @@ const PRESETS = [
         private: true
     },
     {
-        id: 'retail-react-app-bug-bounty',
-        name: 'Retail React App Bug Bounty Project',
+        id: 'chakra-storefront-bug-bounty',
+        name: 'Chakra Storefront Bug Bounty Project',
         description: '',
         templateSource: {
             type: TEMPLATE_SOURCE_NPM,
-            id: '@salesforce/retail-react-app'
+            id: '@salesforce/chakra-storefront'
         },
         getQuestions: () =>
             createRetailReactAppQuestions({
                 'project.hybrid': false,
-                'project.name': 'retail-react-app',
+                'project.name': 'chakra-storefront',
                 'project.commerce.instanceUrl': 'https://zzec-006.dx.commercecloud.salesforce.com',
                 'project.commerce.clientId': 'b56e7ad3-2237-42c9-8f55-41e63ebca420',
                 'project.commerce.siteId': 'RefArch',
@@ -401,18 +401,18 @@ const PRESETS = [
         private: true
     },
     {
-        id: 'retail-react-app-hybrid-test-project',
-        name: 'Retail React App Hybrid Test Private SLAS Project',
+        id: 'chakra-storefront-hybrid-test-project',
+        name: 'Chakra Storefront Hybrid Test Private SLAS Project',
         description: '',
         templateSource: {
             type: TEMPLATE_SOURCE_NPM,
-            id: '@salesforce/retail-react-app'
+            id: '@salesforce/chakra-storefront'
         },
         getQuestions: () => [
             ...HYBRID_QUESTIONS,
             ...createRetailReactAppQuestions({
                 'project.hybrid': true,
-                'project.name': 'retail-react-app',
+                'project.name': 'chakra-storefront',
                 'project.commerce.instanceUrl': 'https://test.phased-launch-testing.com/',
                 'project.commerce.clientId': '99b4e081-00cf-454a-95b0-26ac2b824931',
                 'project.commerce.siteId': 'RefArch',
@@ -430,18 +430,18 @@ const PRESETS = [
         private: true
     },
     {
-        id: 'retail-react-app-hybrid-public-client-test-project',
-        name: 'Retail React App Hybrid Test Public SLAS client project',
+        id: 'chakra-storefront-hybrid-public-client-test-project',
+        name: 'Chakra Storefront Hybrid Test Public SLAS client project',
         description: '',
         templateSource: {
             type: TEMPLATE_SOURCE_NPM,
-            id: '@salesforce/retail-react-app'
+            id: '@salesforce/chakra-storefront'
         },
         getQuestions: () => [
             ...HYBRID_QUESTIONS,
             ...createRetailReactAppQuestions({
                 'project.hybrid': true,
-                'project.name': 'retail-react-app',
+                'project.name': 'chakra-storefront',
                 'project.commerce.instanceUrl': 'https://www.phased-launch-testing.com/',
                 'project.commerce.clientId': 'e7e22b7f-a904-4f3a-8022-49dbee696485',
                 'project.commerce.siteId': 'RefArch',
