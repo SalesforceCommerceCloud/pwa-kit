@@ -120,7 +120,7 @@ export const PromoCode = ({form, submitPromoCode, itemProps}) => {
                             background="white"
                             border="1px solid"
                             borderColor="gray.100"
-                            borderRadius="base"
+                            borderRadius="sm"
                             onSubmit={form.handleSubmit(submitPromoCode)}
                         >
                             <PromoCodeFields form={form} maxWidth="350px" />

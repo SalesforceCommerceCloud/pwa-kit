@@ -6,7 +6,7 @@
  */
 import React from 'react'
 import PropTypes from 'prop-types'
-import {Box, IconButton, Popover, Text} from '@chakra-ui/react'
+import {Box, CloseButton, Flex, IconButton, Popover, Text} from '@chakra-ui/react'
 import {InfoIcon} from '../icons'
 import {FormattedMessage, useIntl} from 'react-intl'
 
@@ -19,24 +19,9 @@ const PromoPopover = ({header, children, ...props}) => {
     const intl = useIntl()
     return (
         <Box position="relative" {...props}>
-            <Popover.Root
-                lazy
-                placement="top"
-                boundary="scrollParent"
-                trigger="hover"
-                variant="small"
-            >
+            <Popover.Root size="xs" lazyMount trigger="hover" positioning={{placement: 'top'}}>
                 <Popover.Trigger asChild>
                     <IconButton
-                        icon={
-                            <InfoIcon
-                                display="block"
-                                boxSize="18px"
-                                mt="-2px"
-                                ml="-1px"
-                                color="gray.600"
-                            />
-                        }
                         display="block"
                         size="xs"
                         height="14px"
@@ -48,14 +33,22 @@ const PromoPopover = ({header, children, ...props}) => {
                             id: 'promo_popover.assistive_msg.info',
                             defaultMessage: 'Info'
                         })}
-                    />
+                    >
+                        <InfoIcon
+                            display="block"
+                            boxSize="18px"
+                            mt="-2px"
+                            ml="-1px"
+                            color="gray.600"
+                        />
+                    </IconButton>
                 </Popover.Trigger>
                 <Popover.Positioner>
-                    <Popover.Content border="none" borderRadius="base">
-                        <Box boxShadow="lg">
-                            <Popover.Arrow />
-                            <Popover.CloseTrigger />
-                            <Popover.Header borderBottom="none">
+                    <Popover.Content border="none" borderRadius="sm" boxShadow="lg">
+                        <Popover.Arrow />
+
+                        <Popover.Header borderBottom="none" pb={3}>
+                            <Flex justifyContent="space-between" alignItems="baseline">
                                 {header || (
                                     <Text fontWeight="bold" fontSize="md">
                                         <FormattedMessage
@@ -64,9 +57,12 @@ const PromoPopover = ({header, children, ...props}) => {
                                         />
                                     </Text>
                                 )}
-                            </Popover.Header>
-                            <Popover.Body pt={0}>{children}</Popover.Body>
-                        </Box>
+                                <Popover.CloseTrigger asChild>
+                                    <CloseButton size="2xs" />
+                                </Popover.CloseTrigger>
+                            </Flex>
+                        </Popover.Header>
+                        <Popover.Body pt={0}>{children}</Popover.Body>
                     </Popover.Content>
                 </Popover.Positioner>
             </Popover.Root>

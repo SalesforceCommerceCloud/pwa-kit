@@ -103,7 +103,8 @@ export const TestProviders = ({
     site,
     siteAlias = DEFAULT_SITE,
     isGuest = false,
-    bypassAuth = true
+    bypassAuth = true,
+    includeAddToCartModal = false
 }) => {
     const mounted = useRef()
     // We use this to track mounted state.
@@ -119,6 +120,20 @@ export const TestProviders = ({
 
     const commerceApiConfig = config.commerceAPI
     const buildUrl = createUrlTemplate(config, site?.alias || site?.id, locale.alias || locale.id)
+
+    const content = (
+        <CurrencyProvider currency={DEFAULT_CURRENCY}>
+            <Router>
+                <ChakraProvider value={theme}>
+                    {includeAddToCartModal ? (
+                        <AddToCartModalProvider>{children}</AddToCartModalProvider>
+                    ) : (
+                        children
+                    )}
+                </ChakraProvider>
+            </Router>
+        </CurrencyProvider>
+    )
 
     return (
         <ServerContext.Provider value={{}}>
@@ -137,13 +152,7 @@ export const TestProviders = ({
                                 bypassAuth ? (isGuest ? guestToken : registerUserToken) : ''
                             }
                         >
-                            <CurrencyProvider currency={DEFAULT_CURRENCY}>
-                                <Router>
-                                    <ChakraProvider value={theme}>
-                                        <AddToCartModalProvider>{children}</AddToCartModalProvider>
-                                    </ChakraProvider>
-                                </Router>
-                            </CurrencyProvider>
+                            {content}
                         </CommerceApiProvider>
                     </MultiSiteProvider>
                 </IntlProvider>
@@ -163,7 +172,8 @@ TestProviders.propTypes = {
     site: PropTypes.object,
     siteAlias: PropTypes.string,
     bypassAuth: PropTypes.bool,
-    isGuest: PropTypes.bool
+    isGuest: PropTypes.bool,
+    includeAddToCartModal: PropTypes.bool
 }
 
 /**
