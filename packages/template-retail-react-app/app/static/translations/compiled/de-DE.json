@@ -361,6 +361,44 @@
       "value": "Anmeldeformular schließen"
     }
   ],
+  "auth_modal.check_email.button.resend_link": [
+    {
+      "type": 0,
+      "value": "Link erneut senden"
+    }
+  ],
+  "auth_modal.check_email.description.check_spam_folder": [
+    {
+      "type": 0,
+      "value": "Es kann einige Minuten dauern, bis der Link ankommt. Überprüfen Sie Ihren Spam-Ordner, wenn Sie Probleme haben, ihn zu finden"
+    }
+  ],
+  "auth_modal.check_email.description.just_sent": [
+    {
+      "type": 0,
+      "value": "Wir haben gerade einen Anmeldungslink an "
+    },
+    {
+      "children": [
+        {
+          "type": 1,
+          "value": "email"
+        }
+      ],
+      "type": 8,
+      "value": "b"
+    },
+    {
+      "type": 0,
+      "value": " gesendet."
+    }
+  ],
+  "auth_modal.check_email.title.check_your_email": [
+    {
+      "type": 0,
+      "value": "Überprüfen Sie Ihr E-Mail-Postfach"
+    }
+  ],
   "auth_modal.description.now_signed_in": [
     {
       "type": 0,
@@ -1021,6 +1059,12 @@
       "value": "Sie haben bereits ein Konto? Einloggen"
     }
   ],
+  "contact_info.button.back_to_sign_in_options": [
+    {
+      "type": 0,
+      "value": "Zurück zu den Anmeldeoptionen"
+    }
+  ],
   "contact_info.button.checkout_as_guest": [
     {
       "type": 0,
@@ -1033,6 +1077,18 @@
       "value": "Einloggen"
     }
   ],
+  "contact_info.button.password": [
+    {
+      "type": 0,
+      "value": "Passwort"
+    }
+  ],
+  "contact_info.button.secure_link": [
+    {
+      "type": 0,
+      "value": "Sicherer Link"
+    }
+  ],
   "contact_info.error.incorrect_username_or_password": [
     {
       "type": 0,
@@ -1043,6 +1099,12 @@
     {
       "type": 0,
       "value": "Passwort vergessen?"
+    }
+  ],
+  "contact_info.message.or_login_with": [
+    {
+      "type": 0,
+      "value": "Oder melden Sie sich an mit"
     }
   ],
   "contact_info.title.contact_info": [
@@ -1117,6 +1179,48 @@
     {
       "type": 1,
       "value": "currentPrice"
+    }
+  ],
+  "dnt_notification.button.accept": [
+    {
+      "type": 0,
+      "value": "Akzeptieren"
+    }
+  ],
+  "dnt_notification.button.assistive_msg.accept": [
+    {
+      "type": 0,
+      "value": "Tracking akzeptieren"
+    }
+  ],
+  "dnt_notification.button.assistive_msg.close": [
+    {
+      "type": 0,
+      "value": "Formular zum Tracking von Einwilligungen schließen"
+    }
+  ],
+  "dnt_notification.button.assistive_msg.decline": [
+    {
+      "type": 0,
+      "value": "Tracking ablehnen"
+    }
+  ],
+  "dnt_notification.button.decline": [
+    {
+      "type": 0,
+      "value": "Ablehnen"
+    }
+  ],
+  "dnt_notification.description": [
+    {
+      "type": 0,
+      "value": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur."
+    }
+  ],
+  "dnt_notification.title": [
+    {
+      "type": 0,
+      "value": "Tracking-Einwilligung"
     }
   ],
   "drawer_menu.button.account_details": [
@@ -1268,7 +1372,7 @@
     },
     {
       "type": 0,
-      "value": "\" nichts finden. Suchen Sie nach einem Produkt oder setzen Sie sich mit unserem "
+      "value": "\" nichts finden. Suchen Sie nach einem Produkt oder nehmen Sie mit uns "
     },
     {
       "type": 1,
@@ -1276,7 +1380,7 @@
     },
     {
       "type": 0,
-      "value": " in Verbindung."
+      "value": " auf."
     }
   ],
   "empty_search_results.info.cant_find_anything_for_query": [
@@ -1296,7 +1400,7 @@
   "empty_search_results.info.double_check_spelling": [
     {
       "type": 0,
-      "value": "Überprüfen Sie Ihre Schreibweise und versuchen Sie es erneut oder "
+      "value": "Überprüfen Sie Ihre Schreibweise und versuchen Sie es erneut oder nehmen Sie mit uns "
     },
     {
       "type": 1,
@@ -1304,7 +1408,7 @@
     },
     {
       "type": 0,
-      "value": "."
+      "value": " auf."
     }
   ],
   "empty_search_results.link.contact_us": [
@@ -1409,6 +1513,12 @@
       "value": "Allgemeine Geschäftsbedingungen"
     }
   ],
+  "footer.locale_selector.assistive_msg": [
+    {
+      "type": 0,
+      "value": "Sprache auswählen"
+    }
+  ],
   "footer.message.copyright": [
     {
       "type": 0,
@@ -1425,6 +1535,12 @@
     {
       "type": 0,
       "value": "Melden Sie sich an, um stets die neuesten Angebote zu erhalten"
+    }
+  ],
+  "footer.subscribe.email.assistive_msg": [
+    {
+      "type": 0,
+      "value": "E-Mail-Adresse für den Newsletter"
     }
   ],
   "footer.subscribe.heading.first_to_know": [
@@ -1467,6 +1583,24 @@
     {
       "type": 0,
       "value": "Wunschliste"
+    }
+  ],
+  "global.error.create_account": [
+    {
+      "type": 0,
+      "value": "Diese Funktion ist derzeit nicht verfügbar. Sie müssen ein Konto erstellen, um auf diese Funktion zugreifen zu können."
+    }
+  ],
+  "global.error.feature_unavailable": [
+    {
+      "type": 0,
+      "value": "Diese Funktion ist derzeit nicht verfügbar."
+    }
+  ],
+  "global.error.invalid_token": [
+    {
+      "type": 0,
+      "value": "Ungültiges Token, bitte versuchen Sie es erneut."
     }
   ],
   "global.error.something_went_wrong": [
@@ -1642,7 +1776,7 @@
   "home.features.description.components": [
     {
       "type": 0,
-      "value": "Eine unter Verwendung der Chakra UI entwickelte, einfache, modulare und zugängliche React Komponentenbibliothek."
+      "value": "Eine mit Chakra UI entwickelte, einfache, modulare und zugängliche React Komponentenbibliothek."
     }
   ],
   "home.features.description.einstein_recommendations": [
@@ -1732,13 +1866,13 @@
   "home.hero_features.link.on_github": [
     {
       "type": 0,
-      "value": "Auf Github herunterladen"
+      "value": "In Github herunterladen"
     }
   ],
   "home.hero_features.link.on_managed_runtime": [
     {
       "type": 0,
-      "value": "Auf Managed Runtime bereitstellen"
+      "value": "Mit Managed Runtime bereitstellen"
     }
   ],
   "home.link.contact_us": [
@@ -1756,7 +1890,7 @@
   "home.link.read_docs": [
     {
       "type": 0,
-      "value": "Dokumente lesen"
+      "value": "Dokumentation lesen"
     }
   ],
   "home.title.react_starter_store": [
@@ -2169,6 +2303,36 @@
       "value": "Konto erstellen"
     }
   ],
+  "login_form.button.apple": [
+    {
+      "type": 0,
+      "value": "Apple"
+    }
+  ],
+  "login_form.button.back": [
+    {
+      "type": 0,
+      "value": "Zurück zu den Anmeldeoptionen"
+    }
+  ],
+  "login_form.button.continue_securely": [
+    {
+      "type": 0,
+      "value": "Sicher weitermachen"
+    }
+  ],
+  "login_form.button.google": [
+    {
+      "type": 0,
+      "value": "Google"
+    }
+  ],
+  "login_form.button.password": [
+    {
+      "type": 0,
+      "value": "Passwort"
+    }
+  ],
   "login_form.button.sign_in": [
     {
       "type": 0,
@@ -2185,6 +2349,12 @@
     {
       "type": 0,
       "value": "Sie haben noch kein Konto?"
+    }
+  ],
+  "login_form.message.or_login_with": [
+    {
+      "type": 0,
+      "value": "Oder melden Sie sich an mit"
     }
   ],
   "login_form.message.welcome_back": [
@@ -2349,6 +2519,12 @@
       "value": "numOfPages"
     }
   ],
+  "pagination.field.page_number_select": [
+    {
+      "type": 0,
+      "value": "Seitenzahl auswählen"
+    }
+  ],
   "pagination.link.next": [
     {
       "type": 0,
@@ -2421,10 +2597,22 @@
       "value": "1 Großbuchstabe"
     }
   ],
+  "password_reset_success.toast": [
+    {
+      "type": 0,
+      "value": "Erfolgreiches Zurücksetzen des Passworts"
+    }
+  ],
   "payment_selection.heading.credit_card": [
     {
       "type": 0,
       "value": "Kreditkarte"
+    }
+  ],
+  "payment_selection.radio_group.assistive_msg": [
+    {
+      "type": 0,
+      "value": "Zahlung"
     }
   ],
   "payment_selection.tooltip.secure_payment": [
@@ -2611,6 +2799,12 @@
       "value": "sortOption"
     }
   ],
+  "product_list.sort_by.label.assistive_msg": [
+    {
+      "type": 0,
+      "value": "Produkte sortieren nach"
+    }
+  ],
   "product_scroller.assistive_msg.scroll_left": [
     {
       "type": 0,
@@ -2783,6 +2977,12 @@
       "value": "Mein Profil"
     }
   ],
+  "profile_fields.label.profile_form": [
+    {
+      "type": 0,
+      "value": "Profil-Formular"
+    }
+  ],
   "promo_code_fields.button.apply": [
     {
       "type": 0,
@@ -2881,38 +3081,6 @@
     {
       "type": 0,
       "value": "Erstellen Sie ein Konto und Sie erhalten als Erstes Zugang zu den besten Produkten und Inspirationen sowie zur Community."
-    }
-  ],
-  "reset_password.button.back_to_sign_in": [
-    {
-      "type": 0,
-      "value": "Zurück zur Anmeldung"
-    }
-  ],
-  "reset_password.info.receive_email_shortly": [
-    {
-      "type": 0,
-      "value": "Sie erhalten in Kürze eine E-Mail an "
-    },
-    {
-      "children": [
-        {
-          "type": 1,
-          "value": "email"
-        }
-      ],
-      "type": 8,
-      "value": "b"
-    },
-    {
-      "type": 0,
-      "value": " mit einem Link zum Zurücksetzen Ihres Passworts."
-    }
-  ],
-  "reset_password.title.password_reset": [
-    {
-      "type": 0,
-      "value": "Zurücksetzen des Passworts"
     }
   ],
   "reset_password_form.action.sign_in": [
@@ -3083,6 +3251,32 @@
     {
       "type": 0,
       "value": "Möchten Sie sich wirklich abmelden? Sie müssen sich wieder anmelden, um mit Ihrer aktuellen Bestellung fortzufahren."
+    }
+  ],
+  "social_login_redirect.message.authenticating": [
+    {
+      "type": 0,
+      "value": "Authentifizierung läuft …"
+    }
+  ],
+  "social_login_redirect.message.redirect_link": [
+    {
+      "type": 0,
+      "value": "Wenn Sie nicht automatisch weitergeleitet werden, klicken Sie auf "
+    },
+    {
+      "children": [
+        {
+          "type": 0,
+          "value": "diesen Link"
+        }
+      ],
+      "type": 8,
+      "value": "link"
+    },
+    {
+      "type": 0,
+      "value": ", um fortzufahren."
     }
   ],
   "store_locator.action.find": [
@@ -3753,6 +3947,18 @@
       "value": "Das Passwort muss mindestens 8 Zeichen enthalten."
     }
   ],
+  "use_update_password_fields.error.password_mismatch": [
+    {
+      "type": 0,
+      "value": "Passwörter stimmen nicht überein."
+    }
+  ],
+  "use_update_password_fields.error.required_confirm_password": [
+    {
+      "type": 0,
+      "value": "Bitte bestätigen Sie Ihr Passwort."
+    }
+  ],
   "use_update_password_fields.error.required_new_password": [
     {
       "type": 0,
@@ -3775,6 +3981,12 @@
     {
       "type": 0,
       "value": "Das Passwort muss mindestens einen Großbuchstaben enthalten."
+    }
+  ],
+  "use_update_password_fields.label.confirm_new_password": [
+    {
+      "type": 0,
+      "value": "Neues Passwort bestätigen:"
     }
   ],
   "use_update_password_fields.label.current_password": [

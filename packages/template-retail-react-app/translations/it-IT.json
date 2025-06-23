@@ -147,6 +147,18 @@
   "auth_modal.button.close.assistive_msg": {
     "defaultMessage": "Chiudi modulo di accesso"
   },
+  "auth_modal.check_email.button.resend_link": {
+    "defaultMessage": "Reinvia link"
+  },
+  "auth_modal.check_email.description.check_spam_folder": {
+    "defaultMessage": "Il link potrebbe richiedere alcuni minuti per arrivare, controlla la cartella spam se non riesci a trovarlo"
+  },
+  "auth_modal.check_email.description.just_sent": {
+    "defaultMessage": "Abbiamo appena inviato un link di accesso a <b>{email}</b>"
+  },
+  "auth_modal.check_email.title.check_your_email": {
+    "defaultMessage": "Controlla la tua e-mail"
+  },
   "auth_modal.description.now_signed_in": {
     "defaultMessage": "hai eseguito l'accesso."
   },
@@ -406,17 +418,29 @@
   "contact_info.button.already_have_account": {
     "defaultMessage": "Hai già un account? Accedi"
   },
+  "contact_info.button.back_to_sign_in_options": {
+    "defaultMessage": "Torna alle opzioni di accesso"
+  },
   "contact_info.button.checkout_as_guest": {
     "defaultMessage": "Checkout come ospite"
   },
   "contact_info.button.login": {
     "defaultMessage": "Accedi"
   },
+  "contact_info.button.password": {
+    "defaultMessage": "Password"
+  },
+  "contact_info.button.secure_link": {
+    "defaultMessage": "Link sicuro"
+  },
   "contact_info.error.incorrect_username_or_password": {
     "defaultMessage": "Nome utente o password errati. Riprova."
   },
   "contact_info.link.forgot_password": {
     "defaultMessage": "Password dimenticata?"
+  },
+  "contact_info.message.or_login_with": {
+    "defaultMessage": "Oppure accedi con"
   },
   "contact_info.title.contact_info": {
     "defaultMessage": "Informazioni di contatto"
@@ -446,6 +470,27 @@
   },
   "display_price.label.current_price_with_range": {
     "defaultMessage": "Da {currentPrice}"
+  },
+  "dnt_notification.button.accept": {
+    "defaultMessage": "Accetta"
+  },
+  "dnt_notification.button.assistive_msg.accept": {
+    "defaultMessage": "Accetta tracciamento"
+  },
+  "dnt_notification.button.assistive_msg.close": {
+    "defaultMessage": "Chiudi modulo di consenso tracciamento"
+  },
+  "dnt_notification.button.assistive_msg.decline": {
+    "defaultMessage": "Rifiuta tracciamento"
+  },
+  "dnt_notification.button.decline": {
+    "defaultMessage": "Rifiuta"
+  },
+  "dnt_notification.description": {
+    "defaultMessage": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur."
+  },
+  "dnt_notification.title": {
+    "defaultMessage": "Consenso tracciamento"
   },
   "drawer_menu.button.account_details": {
     "defaultMessage": "Dettagli account"
@@ -538,7 +583,7 @@
     "defaultMessage": "Nascondi password"
   },
   "field.password.assistive_msg.show_password": {
-    "defaultMessage": "Mosra password"
+    "defaultMessage": "Mostra password"
   },
   "footer.column.account": {
     "defaultMessage": "Account"
@@ -576,6 +621,9 @@
   "footer.link.terms_conditions": {
     "defaultMessage": "Termini e condizioni"
   },
+  "footer.locale_selector.assistive_msg": {
+    "defaultMessage": "Seleziona lingua"
+  },
   "footer.message.copyright": {
     "defaultMessage": "Salesforce o società affiliate. Tutti i diritti riservati. Questo è un negozio fittizio a scopo dimostrativo. Gli ordini effettuati NON VERRANNO evasi."
   },
@@ -584,6 +632,9 @@
   },
   "footer.subscribe.description.sign_up": {
     "defaultMessage": "Registrati per gli ultimi aggiornamenti sulle migliori offerte"
+  },
+  "footer.subscribe.email.assistive_msg": {
+    "defaultMessage": "Indirizzo e-mail per la newsletter"
   },
   "footer.subscribe.heading.first_to_know": {
     "defaultMessage": "Ricevi le novità in anteprima"
@@ -605,6 +656,15 @@
   },
   "global.account.link.wishlist": {
     "defaultMessage": "Lista desideri"
+  },
+  "global.error.create_account": {
+    "defaultMessage": "Questa funzione non è attualmente disponibile. Per accedere a questa funzione è necessario creare un account."
+  },
+  "global.error.feature_unavailable": {
+    "defaultMessage": "Questa funzione non è attualmente disponibile."
+  },
+  "global.error.invalid_token": {
+    "defaultMessage": "Token non valido, riprova."
   },
   "global.error.something_went_wrong": {
     "defaultMessage": "Si è verificato un problema. Riprova!"
@@ -927,6 +987,21 @@
   "login_form.action.create_account": {
     "defaultMessage": "Crea account"
   },
+  "login_form.button.apple": {
+    "defaultMessage": "Apple"
+  },
+  "login_form.button.back": {
+    "defaultMessage": "Torna alle opzioni di accesso"
+  },
+  "login_form.button.continue_securely": {
+    "defaultMessage": "Continua in modo sicuro"
+  },
+  "login_form.button.google": {
+    "defaultMessage": "Google"
+  },
+  "login_form.button.password": {
+    "defaultMessage": "Password"
+  },
   "login_form.button.sign_in": {
     "defaultMessage": "Accedi"
   },
@@ -935,6 +1010,9 @@
   },
   "login_form.message.dont_have_account": {
     "defaultMessage": "Non hai un account?"
+  },
+  "login_form.message.or_login_with": {
+    "defaultMessage": "Oppure accedi con"
   },
   "login_form.message.welcome_back": {
     "defaultMessage": "Piacere di rivederti"
@@ -997,6 +1075,9 @@
   "pagination.field.num_of_pages": {
     "defaultMessage": "di {numOfPages}"
   },
+  "pagination.field.page_number_select": {
+    "defaultMessage": "Seleziona numero di pagina"
+  },
   "pagination.link.next": {
     "defaultMessage": "Avanti"
   },
@@ -1038,8 +1119,14 @@
     "defaultMessage": "1 lettera maiuscola",
     "description": "Password requirement"
   },
+  "password_reset_success.toast": {
+    "defaultMessage": "Reimpostazione password riuscita"
+  },
   "payment_selection.heading.credit_card": {
     "defaultMessage": "Carta di credito"
+  },
+  "payment_selection.radio_group.assistive_msg": {
+    "defaultMessage": "Pagamento"
   },
   "payment_selection.tooltip.secure_payment": {
     "defaultMessage": "Questo è un pagamento crittografato con SSL sicuro."
@@ -1107,6 +1194,9 @@
   },
   "product_list.select.sort_by": {
     "defaultMessage": "Ordina per: {sortOption}"
+  },
+  "product_list.sort_by.label.assistive_msg": {
+    "defaultMessage": "Ordina prodotti per"
   },
   "product_scroller.assistive_msg.scroll_left": {
     "defaultMessage": "Scorri prodotti a sinistra"
@@ -1186,6 +1276,9 @@
   "profile_card.title.my_profile": {
     "defaultMessage": "Il mio profilo"
   },
+  "profile_fields.label.profile_form": {
+    "defaultMessage": "Modulo profilo"
+  },
   "promo_code_fields.button.apply": {
     "defaultMessage": "Applica"
   },
@@ -1222,15 +1315,6 @@
   "register_form.message.create_an_account": {
     "defaultMessage": "Crea un account e accedi in esclusiva ai prodotti, alle idee e alle community migliori."
   },
-  "reset_password.button.back_to_sign_in": {
-    "defaultMessage": "Torna all'accesso"
-  },
-  "reset_password.info.receive_email_shortly": {
-    "defaultMessage": "A breve riceverai un'email all'indirizzo <b>{email}</b> con un link per la reimpostazione della password."
-  },
-  "reset_password.title.password_reset": {
-    "defaultMessage": "Reimpostazione password"
-  },
   "reset_password_form.action.sign_in": {
     "defaultMessage": "Accedi"
   },
@@ -1241,7 +1325,7 @@
     "defaultMessage": "Inserisci il tuo indirizzo email per ricevere istruzioni su come reimpostare la password"
   },
   "reset_password_form.message.return_to_sign_in": {
-    "defaultMessage": "Oppure torna a",
+    "defaultMessage": "Oppure torna a:",
     "description": "Precedes link to return to sign in"
   },
   "reset_password_form.title.reset_password": {
@@ -1312,6 +1396,12 @@
   },
   "signout_confirmation_dialog.message.sure_to_sign_out": {
     "defaultMessage": "Uscire? Per procedere con l'ordine corrente devi eseguire di nuovo l'accesso."
+  },
+  "social_login_redirect.message.authenticating": {
+    "defaultMessage": "Autenticazione in corso..."
+  },
+  "social_login_redirect.message.redirect_link": {
+    "defaultMessage": "Se non si viene reindirizzati automaticamente, fare clic su <link>questo link</link> per procedere."
   },
   "store_locator.action.find": {
     "defaultMessage": "Trova"
@@ -1621,6 +1711,12 @@
   "use_update_password_fields.error.minimum_characters": {
     "defaultMessage": "La password deve contenere almeno 8 caratteri."
   },
+  "use_update_password_fields.error.password_mismatch": {
+    "defaultMessage": "Le password non corrispondono."
+  },
+  "use_update_password_fields.error.required_confirm_password": {
+    "defaultMessage": "Conferma la password."
+  },
   "use_update_password_fields.error.required_new_password": {
     "defaultMessage": "Specifica una nuova password."
   },
@@ -1632,6 +1728,9 @@
   },
   "use_update_password_fields.error.uppercase_letter": {
     "defaultMessage": "La password deve contenere almeno una lettera maiuscola."
+  },
+  "use_update_password_fields.label.confirm_new_password": {
+    "defaultMessage": "Conferma nuova password"
   },
   "use_update_password_fields.label.current_password": {
     "defaultMessage": "Password corrente"
