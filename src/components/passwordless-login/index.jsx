@@ -8,7 +8,7 @@
 import React, {useState} from 'react'
 import PropTypes from 'prop-types'
 import {FormattedMessage} from 'react-intl'
-import {Button, Divider, Stack, Text} from '@chakra-ui/react'
+import {Button, Separator, Stack, Text} from '@chakra-ui/react'
 import LoginFields from '../forms/login-fields'
 import StandardLogin from '../standard-login'
 import SocialLogin from '../social-login'
@@ -40,7 +40,7 @@ const PasswordlessLogin = ({
         <>
             {((!form.formState.isSubmitSuccessful && !showPasswordView) ||
                 form.formState.errors.email) && (
-                <Stack spacing={6} paddingLeft={4} paddingRight={4}>
+                <Stack gap={6} paddingLeft={4} paddingRight={4}>
                     <LoginFields
                         form={form}
                         hidePassword={true}
@@ -59,14 +59,14 @@ const PasswordlessLogin = ({
                             id="login_form.button.continue_securely"
                         />
                     </Button>
-                    <Divider />
-                    <Text align="center" fontSize="sm">
+                    <Separator />
+                    <Text textAlign="center" fontSize="sm">
                         <FormattedMessage
                             defaultMessage="Or Login With"
                             id="login_form.message.or_login_with"
                         />
                     </Text>
-                    <Stack spacing={4}>
+                    <Stack gap={4}>
                         <Button
                             onClick={handlePasswordButton}
                             borderColor="gray.500"

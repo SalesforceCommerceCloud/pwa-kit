@@ -27,9 +27,15 @@ const LoginForm = ({
 }) => {
     return (
         <Fragment>
-            <Stack justify="center" align="center" spacing={8} marginBottom={8}>
+            <Stack
+                justifyContent="center"
+                alignItems="center"
+                gap={8}
+                marginTop={8}
+                marginBottom={8}
+            >
                 <BrandLogo width="60px" height="auto" />
-                <Text align="center" fontSize="xl" fontWeight="semibold">
+                <Text textAlign="center" fontSize="xl" fontWeight="semibold">
                     <FormattedMessage
                         defaultMessage="Welcome Back"
                         id="login_form.message.welcome_back"
@@ -42,14 +48,16 @@ const LoginForm = ({
                 data-testid="sf-auth-modal-form"
             >
                 {form.formState.errors?.global && (
-                    <Alert status="error" marginBottom={8}>
-                        <AlertIcon color="red.500" boxSize={4} />
-                        <Text fontSize="sm" ml={3}>
+                    <Alert.Root status="error" marginBottom={8}>
+                        <Alert.Indicator>
+                            <AlertIcon color="red.500" boxSize={4} />
+                        </Alert.Indicator>
+                        <Alert.Description fontSize="sm">
                             {form.formState.errors.global.message}
-                        </Text>
-                    </Alert>
+                        </Alert.Description>
+                    </Alert.Root>
                 )}
-                <Stack spacing={6}>
+                <Stack gap={6}>
                     {isPasswordlessEnabled ? (
                         <PasswordlessLogin
                             form={form}
@@ -68,14 +76,19 @@ const LoginForm = ({
                         />
                     )}
 
-                    <Stack direction="row" spacing={1} justify="center">
+                    <Stack direction="row" gap={1} justifyContent="center">
                         <Text fontSize="sm">
                             <FormattedMessage
                                 defaultMessage="Don't have an account?"
                                 id="login_form.message.dont_have_account"
                             />
                         </Text>
-                        <Button variant="link" size="sm" onClick={clickCreateAccount}>
+                        <Button
+                            variant="link-blue"
+                            size="sm"
+                            lineHeight="1"
+                            onClick={clickCreateAccount}
+                        >
                             <FormattedMessage
                                 defaultMessage="Create account"
                                 id="login_form.action.create_account"
