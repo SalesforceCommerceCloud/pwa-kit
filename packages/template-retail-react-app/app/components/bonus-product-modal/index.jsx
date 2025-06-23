@@ -28,19 +28,31 @@ import PropTypes from 'prop-types'
 import {useBonusProductModalContext} from '@salesforce/retail-react-app/app/hooks/use-bonus-product-modal'
 import {findImageGroupBy} from '@salesforce/retail-react-app/app/utils/image-groups-utils'
 import {FormattedMessage} from 'react-intl'
+import {filterImageGroups} from '@salesforce/retail-react-app/app/utils/product-utils'
 
 // Component to display individual bonus product with checkbox for selection
 const BonusProductItem = ({product, productData, isSelected, onToggle, isLoading}) => {
     const productName = product?.productName || product?.title
 
     // Get the appropriate image group from the passed product data
-    const imageGroup = useMemo(
-        () =>
-            findImageGroupBy(productData?.imageGroups || [], {
-                viewType: 'small'
-            }),
-        [productData]
-    )
+    // Use filterImageGroups to get variant-specific images when available
+    const imageGroup = useMemo(() => {
+        if (!productData?.imageGroups) return null
+
+        // If the product has variationValues, use filterImageGroups to get variant-specific images
+        if (productData.variationValues && Object.keys(productData.variationValues).length > 0) {
+            const filteredGroups = filterImageGroups(productData.imageGroups, {
+                viewType: 'small',
+                variationValues: productData.variationValues
+            })
+            return filteredGroups?.[0] || null
+        }
+
+        // Fallback to the original logic for non-variant products
+        return findImageGroupBy(productData.imageGroups, {
+            viewType: 'small'
+        })
+    }, [productData])
 
     const image = imageGroup?.images?.[0]
     const showLoading = isLoading
