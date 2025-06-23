@@ -49,6 +49,7 @@ import EmptySearchResults from '../../pages/product-list/partials/empty-results'
 import PageHeader from '../../pages/product-list/partials/page-header'
 import AbovePageHeader from '../../pages/product-list/partials/above-page-header'
 import PageDesignerPromotionalBanner from '../../pages/product-list/partials/page-designer-promotional-banner'
+import Metadata from './metadata'
 
 // Icons
 import {FilterIcon, ChevronDownIcon} from '../../components/icons'
@@ -404,14 +405,11 @@ const ProductList = (props) => {
             paddingTop={{base: 6, lg: 8}}
             {...rest}
         >
-            <Helmet>
-                <title>{category?.pageTitle ?? searchQuery}</title>
-                <meta name="description" content={category?.pageDescription ?? searchQuery} />
-                <meta name="keywords" content={category?.pageKeywords} />
-                {productSearchResult?.pageMetaTags?.map(({id, value}) => {
-                    return <meta name={id} content={value} key={id} />
-                })}
-            </Helmet>
+            <Metadata 
+                category={category}
+                searchQuery={searchQuery}
+                productSearchResult={productSearchResult}
+            />
             {showNoResults ? (
                 <EmptySearchResults searchQuery={searchQuery} category={category} />
             ) : (
