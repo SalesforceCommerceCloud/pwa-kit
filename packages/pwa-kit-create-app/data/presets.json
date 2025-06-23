@@ -6,6 +6,7 @@
             "name": "Retail React App Demo",
             "description": "Generate a project using the settings for a special B2C Commerce instance that is used for demo purposes. No questions are asked. Use this preset to try out PWA Kit.",
             "shortDescription": "The Retail app with demo Commerce Cloud instance",
+            "templateId": "@salesforce/retail-react-app",
             "answers": {
                 "project.extend": true,
                 "project.hybrid": false,
@@ -31,6 +32,7 @@
             "name": "Retail React App Demo Store",
             "description": "Generates a project using the settings for a special B2C Commerce instance that is used for demo purposes. The demo site is accessible at https://pwa-kit.mobify-storefront.com/ This environment uses a SLAS private client and has social and passwordless login enabled. This environment is set up to use multiple locales. Future features that are enabled for the demo environment may be added to this preset.",
             "shortDescription": "The Retail app with demo Commerce Cloud instance and a private SLAS client",
+            "templateId": "@salesforce/retail-react-app",
             "answers": {
                 "project.extend": false,
                 "project.hybrid": false,
@@ -55,6 +57,7 @@
             "id": "retail-react-app-test-project",
             "name": "Retail React App Test Project",
             "description": "",
+            "templateId": "@salesforce/retail-react-app",
             "answers": {
                 "project.extend": true,
                 "project.hybrid": false,
@@ -79,6 +82,7 @@
             "id": "retail-react-app-private-slas-client",
             "name": "Retail React App Private SLAS client project",
             "description": "",
+            "templateId": "@salesforce/retail-react-app",
             "answers": {
                 "project.extend": true,
                 "project.hybrid": false,
@@ -103,6 +107,7 @@
             "id": "retail-react-app-bug-bounty",
             "name": "Retail React App Bug Bounty Project",
             "description": "",
+            "templateId": "@salesforce/retail-react-app",
             "answers": {
                 "project.extend": true,
                 "project.hybrid": false,
@@ -127,10 +132,7 @@
             "id": "retail-react-app-hybrid-test-project",
             "name": "Retail React App Hybrid Test Private SLAS Project",
             "description": "",
-            "templateSource": {
-                "type": "npm",
-                "id": "@salesforce/retail-react-app"
-            },
+            "templateId": "@salesforce/retail-react-app",
             "answers": {
                 "project.extend": true,
                 "project.hybrid": true,
@@ -154,6 +156,7 @@
             "id": "retail-react-app-hybrid-public-client-test-project",
             "name": "Retail React App Hybrid Test Public SLAS client project",
             "description": "",
+            "templateId": "@salesforce/retail-react-app",
             "answers": {
                 "project.extend": true,
                 "project.hybrid": true,
@@ -178,6 +181,7 @@
             "id": "typescript-minimal-test-project",
             "name": "Template Minimal Test Project",
             "description": "",
+            "templateId": "@salesforce/typescript-minimal",
             "answers": {
                 "project.name": "typescript-minimal",
                 "project.template": "@salesforce/typescript-minimal"
@@ -188,6 +192,7 @@
             "id": "express-minimal-test-project",
             "name": "Express Minimal Test Project",
             "description": "",
+            "templateId": "@salesforce/typescript-minimal",
             "answers": {
                 "project.name": "express-minimal",
                 "project.template": "@salesforce/express-minimal"

@@ -54,8 +54,8 @@ class PwaStorefrontMCPServerHighLevel {
             'Get the PWA Kit project creation presets and conversational guidelines. Ensure you read the linked schema ' +
             'for details on the data structure and `_ai` properties. ' +
             'Ask users what preset they want to use for project creation. After selecting the preset, ' +
-            'display the "answers" and confirm before passing the "answers" object from the selected ' +
-            'preset to the submit_pwa_kit_project_answers tool to generate the project ' +
+            'display the selected preset answers and pass the selected preset object ' +
+            'to the submit_pwa_kit_project_answers tool to generate the project ' +
             '(triggers: create pwa using preset, build storefront prest, generate pwa-kit preset).'
 
         const getCreateAppTemplatesDescription =
@@ -72,6 +72,19 @@ class PwaStorefrontMCPServerHighLevel {
             'The validators will be defined in the templates questions `_ai` properties. Do not validate input that ' +
             'is not defined in the templates questions `_ai` properties.'
 
+        // You can customize this to dynamically load the schema if desired
+        // TODO: These guidelines should be imported from the create app package.
+        const createAppGuidelines = {
+            tone: 'professional, friendly, concise',
+            languageRestrictions: 'no foul or offensive language',
+            questionScope: 'only ask questions provided in the schema',
+            conversationalStyle:
+                'keep questions direct and clear, avoid unnecessary elaboration',
+            examples: {
+                good: 'What is your project name?',
+                bad: 'Hey there buddy, would you mind terribly if I asked you to please provide me with a project name? No rush!'
+            }
+        }
         // Register tools using the high-level API
 
         this.server.tool(
@@ -252,6 +265,7 @@ class PwaStorefrontMCPServerHighLevel {
             }
         )
 
+        // submit_pwa_kit_project_answers
         this.server.tool(
             'submit_pwa_kit_project_answers',
             'Submit completed PWA Kit project answers to generate the PWA Kit project. This should be called after the get_project_questions tool is called and the answers are collected.',
@@ -286,24 +300,12 @@ class PwaStorefrontMCPServerHighLevel {
             }
         )
 
+        // get_create_app_validators
         this.server.tool(
             'get_create_app_validators',
             getCreateAppValidators,
             {},
             async () => {
-                // You can customize this to dynamically load the schema if desired
-                // TODO: These guidelines should be imported from the create app package.
-                const guidelines = {
-                    tone: 'professional, friendly, concise',
-                    languageRestrictions: 'no foul or offensive language',
-                    questionScope: 'only ask questions provided in the schema',
-                    conversationalStyle:
-                        'keep questions direct and clear, avoid unnecessary elaboration',
-                    examples: {
-                        good: 'What is your project name?',
-                        bad: 'Hey there buddy, would you mind terribly if I asked you to please provide me with a project name? No rush!'
-                    }
-                }
 
                 return {
                     content: [
@@ -313,7 +315,7 @@ class PwaStorefrontMCPServerHighLevel {
                                 {
                                     validators: createAppValidators,
                                     schema: createAppValidatorsSchema,
-                                    guidelines
+                                    guidelines: createAppGuidelines
                                 },
                                 null,
                                 2
@@ -324,25 +326,12 @@ class PwaStorefrontMCPServerHighLevel {
             }
         )
 
+        // get_create_app_presets
         this.server.tool(
             'get_create_app_presets',
             getCreateAppPresetsDescription,
             {},
             async () => {
-                console.error('PWA Kit presets: ', createAppPresets)
-                // You can customize this to dynamically load the schema if desired
-                // TODO: These guidelines should be imported from the create app package.
-                const guidelines = {
-                    tone: 'professional, friendly, concise',
-                    languageRestrictions: 'no foul or offensive language',
-                    questionScope: 'only ask questions provided in the schema',
-                    conversationalStyle:
-                        'keep questions direct and clear, avoid unnecessary elaboration',
-                    examples: {
-                        good: 'What is your project name?',
-                        bad: 'Hey there buddy, would you mind terribly if I asked you to please provide me with a project name? No rush!'
-                    }
-                }
 
                 return {
                     content: [
@@ -352,7 +341,7 @@ class PwaStorefrontMCPServerHighLevel {
                                 {
                                     presets: createAppPresets,
                                     schema: createAppPresetsSchema,
-                                    guidelines
+                                    guidelines: createAppGuidelines
                                 },
                                 null,
                                 2
@@ -363,24 +352,12 @@ class PwaStorefrontMCPServerHighLevel {
             }
         )
 
+        // get_create_app_templates
         this.server.tool(
             'get_create_app_templates',
             getCreateAppTemplatesDescription,
             {},
             async () => {
-                console.error('PWA Kit template: ', createAppTemplates)
-                // You can customize this to dynamically load the schema if desired
-                const guidelines = {
-                    tone: 'professional, friendly, concise',
-                    languageRestrictions: 'no foul or offensive language',
-                    questionScope: 'only ask questions provided in the schema',
-                    conversationalStyle:
-                        'keep questions direct and clear, avoid unnecessary elaboration',
-                    examples: {
-                        good: 'What is your project name?',
-                        bad: 'Hey there buddy, would you mind terribly if I asked you to please provide me with a project name? No rush!'
-                    }
-                }
 
                 return {
                     content: [
@@ -390,7 +367,7 @@ class PwaStorefrontMCPServerHighLevel {
                                 {
                                     templates: createAppTemplates,
                                     schema: createAppTemplatesSchema,
-                                    guidelines
+                                    guidelines: createAppGuidelines
                                 },
                                 null,
                                 2

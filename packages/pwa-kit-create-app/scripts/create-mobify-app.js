@@ -48,8 +48,32 @@ const semver = require('semver')
 const slugify = require('slugify')
 const generatorPkg = require('../package.json')
 const Handlebars = require('handlebars')
-const {PRESETS} = require('../assets/questions/presets')
-const QUESTIONS = require('../assets/questions')
+
+// Presets, Templates and Validators
+const PRESETS = require('../data/presets.json').presets
+const TEMPLATES = require('../data/templates.json').templates
+const VALIDATORS = require('../data/validators.json').validators
+
+// Questions composed of public presets and public templates.
+// NOTE: We have to do some weird stuff to determine if the thing we are selecting is a preset or a template.
+// There might be a better way to do this.
+const INITIAL_QUESTIONS = [
+    {
+        name: 'general.presetOrTemplateId',
+        message: 'Choose a project preset to get started:',
+        type: 'list',
+        choices: [
+            ...PRESETS.filter(({private}) => !private).map(({shortDescription, id}) => ({
+                name: shortDescription,
+                value: `preset-${id}`
+            })),
+            ...TEMPLATES.filter(({private}) => !private).map(({shortDescription, id}) => ({
+                name: shortDescription,
+                value: `template-${id}`
+            }))
+        ].sort((a, b) => (a.name || '').localeCompare(b.name))
+    }
+]
 
 const program = new Command()
 
@@ -65,39 +89,6 @@ Handlebars.registerHelper('script', (object) => object.replaceAll('"', '\\"'))
 const validPreset = (preset) => {
     return ALL_PRESET_NAMES.includes(preset)
 }
-
-const validProjectName = (s) => {
-    if (s.length > PROJECT_ID_MAX_LENGTH) {
-        return `Maximum length is ${PROJECT_ID_MAX_LENGTH} characters.`
-    }
-    const regex = new RegExp(`^[a-zA-Z0-9-\\s]{1,${PROJECT_ID_MAX_LENGTH}}$`)
-    return regex.test(s) || 'Value can only contain letters, numbers, space and hyphens.'
-}
-
-const validUrl = (s) => {
-    try {
-        new URL(s)
-        return true
-    } catch (err) {
-        return 'Value must be an absolute URL'
-    }
-}
-
-const validSiteId = (s) =>
-    /^[a-z0-9_-]+$/i.test(s) || 'Valid characters are alphanumeric, hyphen, or underscore'
-
-// To see definitions for Commerce API configuration values, go to
-// https://developer.salesforce.com/docs/commerce/commerce-api/guide/commerce-api-configuration-values.
-const defaultCommerceAPIError =
-    'Invalid format. Use docs to find more information about valid configurations: https://developer.salesforce.com/docs/commerce/commerce-api/guide/commerce-api-configuration-values'
-const validShortCode = (s) => /(^[0-9A-Z]{8}$)/i.test(s) || defaultCommerceAPIError
-
-const validClientId = (s) =>
-    /(^[0-9A-Z]{8}-[0-9A-Z]{4}-[0-9A-Z]{4}-[0-9A-Z]{4}-[0-9A-Z]{12}$)/i.test(s) ||
-    s === 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa' ||
-    defaultCommerceAPIError
-const validOrganizationId = (s) =>
-    /^(f_ecom)_([A-Z]{4})_(prd|stg|dev|[0-9]{3}|s[0-9]{2})$/i.test(s) || defaultCommerceAPIError
 
 // Globals
 const GENERATED_PROJECT_VERSION = '0.0.1'
@@ -302,8 +293,8 @@ const processTemplate = (relFile, inputDir, outputDir, context) => {
  * @param {*} param2
  */
 const runGenerator = (context, {outputDir, templateVersion, verbose}) => {
-    const {answers, preset} = context
-    const {templateSource} = preset
+    const {answers, template} = context
+    const {id, source} = template
     const {extend = false} = answers.project
 
     // Check if the output directory doesn't already exist.
@@ -313,10 +304,9 @@ const runGenerator = (context, {outputDir, templateVersion, verbose}) => {
     // downloading from NPM or copying from the template bundle folder.
     const tmp = fs.mkdtempSync(p.resolve(os.tmpdir(), 'extract-template'))
     const packagePath = p.join(tmp, 'package')
-    const {id, type} = templateSource
     let tarPath
 
-    switch (type) {
+    switch (source) {
         case TEMPLATE_SOURCE_NPM: {
             const tarFile = sh
                 .exec(`npm pack ${id}@${templateVersion} --pack-destination="${tmp}"`, {
@@ -351,8 +341,8 @@ const runGenerator = (context, {outputDir, templateVersion, verbose}) => {
                 processTemplate(relFilePath, BOOTSTRAP_DIR, outputDir, context)
             )
 
-        // Copy required assets defind on the preset level.
-        const {assets = []} = preset
+        // Copy required assets defined on the preset level.
+        const {assets = []} = template
         assets.forEach((asset) => {
             sh.cp('-rf', p.join(packagePath, asset), outputDir)
         })
@@ -376,7 +366,7 @@ const runGenerator = (context, {outputDir, templateVersion, verbose}) => {
         const pkgJsonPath = p.resolve(outputDir, 'package.json')
         const pkgJSON = readJson(pkgJsonPath)
         const finalPkgData = merge(pkgJSON, {
-            name: slugifyName(context.answers.project.name || context.preset.id),
+            name: slugifyName(context.answers.project.name || context.template.id),
             version: GENERATED_PROJECT_VERSION
         })
         writeJson(pkgJsonPath, finalPkgData)
@@ -459,31 +449,66 @@ const main = async (opts) => {
             const input = await readStdin()
             const jsonData = JSON.parse(input)
             context.answers = jsonData
-            console.log('stdioData', jsonData)
         } catch (err) {
             console.error('Failed to read from stdin:', err.message)
             process.exit(1)
         }
     } else {
-        context.answers = await prompt(QUESTIONS)
+        context.answers = await prompt(INITIAL_QUESTIONS)
+
+        // Determine if the selected preset or template is a preset or template.
+        context.answers.general.isPreset =
+            context.answers.general.presetOrTemplateId.startsWith('preset-')
+
+        // Update the answers with the preset or template id.
+        context.answers.general.presetOrTemplateId = context.answers.general.presetOrTemplateId
+            .replace('preset-', '')
+            .replace('template-', '')
     }
 
-    console.log('context.answers', context.answers)
     // Add the selected preset to the context object.
-    const selectedPreset = PRESETS.find(
-        ({id}) => id === (presetId || context.answers.general.presetId)
-    )
+    const selectedPresetOrTemplate = [
+        ...(context.answers.general.isPreset ? PRESETS : TEMPLATES)
+    ].find(({id}) => id === (presetId || context.answers.general.presetOrTemplateId))
 
     // Add the preset to the context.
-    context.preset = selectedPreset
+    context.presetOrTemplate = selectedPresetOrTemplate
 
     // If using the preset, output the preset name
-    if (presetId) {
-        console.log(`Using preset "${selectedPreset.name}"`)
-    }
+    console.log(`Using ${context.answers.general.isPreset ? 'preset' : 'template'} "${selectedPresetOrTemplate.name}"`)
 
     if (!OUTPUT_DIR_FLAG_ACTIVE) {
-        outputDir = p.join(process.cwd(), selectedPreset.id)
+        outputDir = p.join(process.cwd(), selectedPresetOrTemplate.id)
+    }
+
+    // Ask template specific questions and merge into the current context.
+    
+    if (context.answers.general.isPreset) {
+        context = merge(context, {
+            answers: expandObject(selectedPresetOrTemplate.answers)
+        })
+        console.log('Using preset', context)
+
+    } else {
+        let {questions} = selectedPresetOrTemplate
+
+        // We want to enhance these questions with the VALIDATORS.
+        const enhancedQuestions = questions.map((question) => {
+            const validator = VALIDATORS.find(({id}) => id === question.validator)
+            return {
+                ...question,
+                validate: validator?.regex
+                    ? (input) => new RegExp(validator.regex, 'i').test(input) || validator.message
+                    : undefined
+            }
+        })
+
+        // Ask the questions and merge the answers into the current context.
+        const projectAnswers = await prompt(enhancedQuestions, answers)
+
+        context = merge(context, {
+            answers: expandObject(projectAnswers)
+        })
     }
 
     if (context.answers.project.commerce?.instanceUrl) {
@@ -492,10 +517,14 @@ const main = async (opts) => {
         context.answers.project.commerce.instanceUrl = url.hostname
     }
 
+    const templateId = context.answers.general.isPreset
+        ? selectedPresetOrTemplate.templateId
+        : selectedPresetOrTemplate.id
+
     // Inject the packageJSON into the context for extensible projects.
     if (context.answers.project.extend) {
         const pkgJSON = JSON.parse(
-            sh.exec(`npm view ${selectedPreset.templateSource.id}@${templateVersion} --json`, {
+            sh.exec(`npm view ${templateId}@${templateVersion} --json`, {
                 silent: true
             }).stdout
         )
@@ -508,17 +537,17 @@ const main = async (opts) => {
         if (pkgJSON?.scripts['extract-default-translations']) {
             pkgJSON.scripts['extract-default-translations'] = pkgJSON.scripts[
                 'extract-default-translations'
-            ].replace('./', `./node_modules/${selectedPreset.templateSource.id}/`)
+            ].replace('./', `./node_modules/${templateId}/`)
         }
         if (pkgJSON?.scripts['compile-translations']) {
             pkgJSON.scripts['compile-translations'] = pkgJSON.scripts[
                 'compile-translations'
-            ].replace('./', `./node_modules/${selectedPreset.templateSource.id}/`)
+            ].replace('./', `./node_modules/${templateId}/`)
         }
         if (pkgJSON?.scripts['compile-translations:pseudo']) {
             pkgJSON.scripts['compile-translations:pseudo'] = pkgJSON.scripts[
                 'compile-translations:pseudo'
-            ].replace('./', `./node_modules/${selectedPreset.templateSource.id}/`)
+            ].replace('./', `./node_modules/${templateId}/`)
         }
 
         context = merge(
@@ -529,6 +558,14 @@ const main = async (opts) => {
         )
     }
 
+    
+    if (context.answers.general.isPreset) {
+        context.template = TEMPLATES.find(({id}) => id === selectedPresetOrTemplate.templateId) 
+
+    } else {
+        context.template = selectedPresetOrTemplate
+    }
+    console.log('context', context)
     // Generate the project.
     runGenerator(context, {outputDir, templateVersion, verbose})
 

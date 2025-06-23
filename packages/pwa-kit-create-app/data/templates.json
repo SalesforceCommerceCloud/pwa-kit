@@ -11,6 +11,7 @@
           {
             "name": "project.name",
             "message": "What is the name of your Project?",
+            "validator": "validProjectName",
             "_ai": {
                 "instruction": "Should validate the user input using the 'validateProjectName' validator.",
                 "expectedUse": "Instruct agent on how to validate user input."
@@ -19,6 +20,7 @@
           {
             "name": "project.commerce.instanceUrl",
             "message": "What is the URL for your Commerce Cloud instance?",
+            "validator": "validUrl",
             "_ai": {
                 "instruction": "Should validate the user input using the 'validUrl' validator.",
                 "expectedUse": "Instruct agent on how to validate user input."
@@ -27,6 +29,7 @@
           {
             "name": "project.commerce.clientId",
             "message": "What is your SLAS Client ID?",
+            "validator": "validClientId",
             "_ai": {
                 "instruction": "Should validate the user input using the 'validClientId' validator.",
                 "expectedUse": "Instruct agent on how to validate user input."
@@ -43,15 +46,30 @@
           },
           {
             "name": "project.commerce.siteId",
-            "message": "What is your Site ID in Business Manager?"
+            "message": "What is your Site ID in Business Manager?",
+            "validator": "validSiteId",
+            "_ai": {
+                "instruction": "Should validate the user input using the 'validSiteId' validator.",
+                "expectedUse": "Instruct agent on how to validate user input."
+            }
           },
           {
             "name": "project.commerce.organizationId",
-            "message": "What is your Commerce API organization ID in Business Manager?"
+            "message": "What is your Commerce API organization ID in Business Manager?",
+            "validator": "validOrganizationId",
+            "_ai": {
+                "instruction": "Should validate the user input using the 'validOrganizationId' validator.",
+                "expectedUse": "Instruct agent on how to validate user input."
+            }
           },
           {
             "name": "project.commerce.shortCode",
-            "message": "What is your Commerce API short code in Business Manager?"
+            "message": "What is your Commerce API short code in Business Manager?",
+            "validator": "validShortCode",
+            "_ai": {
+                "instruction": "Should validate the user input using the 'validShortCode' validator.",
+                "expectedUse": "Instruct agent on how to validate user input."
+            }
           }
         ],
         "assets": ["translations"],
@@ -65,7 +83,12 @@
         "questions": [
           {
             "name": "project.name",
-            "message": "What is the name of your Project?"
+            "message": "What is the name of your Project?",
+            "validator": "validateProjectName",
+            "_ai": {
+                "instruction": "Should validate the user input using the 'validateProjectName' validator.",
+                "expectedUse": "Instruct agent on how to validate user input."
+            }
           }
         ],
         "private": false
@@ -78,7 +101,12 @@
         "questions": [
           {
             "name": "project.name",
-            "message": "What is the name of your Project?"
+            "message": "What is the name of your Project?",
+            "validator": "validateProjectName",
+            "_ai": {
+                "instruction": "Should validate the user input using the 'validateProjectName' validator.",
+                "expectedUse": "Instruct agent on how to validate user input."
+            }
           }
         ],
         "private": true
@@ -91,7 +119,12 @@
         "questions": [
           {
             "name": "project.name",
-            "message": "What is the name of your Project?"
+            "message": "What is the name of your Project?",
+            "validator": "validateProjectName",
+            "_ai": {
+                "instruction": "Should validate the user input using the 'validateProjectName' validator.",
+                "expectedUse": "Instruct agent on how to validate user input."
+            }
           }
         ],
         "answers": {

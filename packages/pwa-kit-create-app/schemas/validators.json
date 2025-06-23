@@ -23,11 +23,19 @@
                     },
                     "message": {
                         "type": "string",
-                        "description": "The error message to display if validation fails."
+                        "description": "The error message to display if validation fails.",
+                        "_ai": {
+                            "instruction": "When validation fails, use this message to inform the user what went wrong.",
+                            "expectedUse": "For validation error feedback."
+                        }
                     },
                     "regex": {
                         "type": "string",
-                        "description": "The validation logic, often a regular expression or a reference to a function."
+                        "description": "The validation logic, often a regular expression or a reference to a function.",
+                        "_ai": {
+                            "instruction": "Use this regex to validate the user input.",
+                            "expectedUse": "For validation of user input."
+                        }
                     }
                 },
                 "required": [

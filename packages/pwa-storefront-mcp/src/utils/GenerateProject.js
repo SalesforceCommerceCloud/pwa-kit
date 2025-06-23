@@ -10,11 +10,8 @@ import path from 'path'
 export function generatePwaKitProject(config) {
     console.error('generatePwaKitProject', config)
     return new Promise((resolve, reject) => {
-        const cliPath = path.resolve(process.cwd(), 'node_modules', '.bin', 'pwa-kit-create-app')
-
-        console.error('cliPath', cliPath)
-
-        const child = spawn('node', [cliPath], {stdio: ['pipe', 'pipe', 'pipe']})
+        // const cliPath = path.resolve(process.cwd(), 'node_modules', '.bin', 'pwa-kit-create-app')
+        const child = spawn('node', ['/Users/bchypak/Projects/pwa-kit/packages/pwa-kit-create-app/scripts/create-mobify-app.js'], {stdio: ['pipe', 'pipe', 'pipe']})
 
         let output = ''
         let errorOutput = ''

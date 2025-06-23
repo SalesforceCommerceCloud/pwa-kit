@@ -7,20 +7,14 @@
             "type": "array",
             "items": {
                 "type": "object",
-                "required": ["id", "name", "description", "answers", "private"],
+                "required": ["id", "name", "description", "answers", "private", "templateId"],
                 "properties": {
                     "id": {"type": "string"},
                     "name": {"type": "string"},
                     "description": {"type": "string"},
                     "shortDescription": {"type": "string"},
-                    "templateSource": {
-                        "type": "object",
-                        "required": ["type", "id"],
-                        "properties": {
-                            "type": {"type": "string"},
-                            "id": {"type": "string"}
-                        },
-                        "additionalProperties": false
+                    "templateId": {
+                        "type": "string"
                     },
                     "answers": {
                         "type": "object",
@@ -33,7 +27,7 @@
                     "private": {
                         "type": "boolean",
                         "_ai": {
-                            "instruction": "This property is used to filter what presets are shown to the user.",
+                            "instruction": "This property is used to filter what presets are shown to the user. If the preset is private, should NOT be shown to the user in a list of selectable presets. This equates to the 'when' property Inquirer question schema.",
                             "expectedUse": "Hiding presets from the user."
                         }
                     }
