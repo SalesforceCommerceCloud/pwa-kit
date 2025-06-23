@@ -60,7 +60,7 @@ export const ToggleCard = ({
                         </Heading>
                         {!editing && !disabled && onEdit && !disableEdit && (
                             <Button
-                                variant="link"
+                                variant="link-blue"
                                 size="sm"
                                 onClick={onEdit}
                                 aria-label={editLabel}
