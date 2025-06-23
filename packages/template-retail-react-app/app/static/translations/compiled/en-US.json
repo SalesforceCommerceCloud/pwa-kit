@@ -655,6 +655,18 @@
       "value": "Payment Details"
     }
   ],
+  "checkout_confirmation.heading.pickup_address": [
+    {
+      "type": 0,
+      "value": "Pickup Address"
+    }
+  ],
+  "checkout_confirmation.heading.pickup_details": [
+    {
+      "type": 0,
+      "value": "Pickup Details"
+    }
+  ],
   "checkout_confirmation.heading.shipping_address": [
     {
       "type": 0,
@@ -789,6 +801,12 @@
       "pluralType": "cardinal",
       "type": 6,
       "value": "itemCount"
+    }
+  ],
+  "checkout_confirmation.message.store_info_unavailable": [
+    {
+      "type": 0,
+      "value": "Store information not available"
     }
   ],
   "checkout_confirmation.message.will_email_shortly": [
@@ -3369,6 +3387,12 @@
       "value": " to proceed."
     }
   ],
+  "store_display.label.store_hours": [
+    {
+      "type": 0,
+      "value": "Store Hours"
+    }
+  ],
   "store_inventory_filter.action.change_store": [
     {
       "type": 0,
@@ -3451,6 +3475,12 @@
     {
       "type": 0,
       "value": "away"
+    }
+  ],
+  "store_locator.description.email": [
+    {
+      "type": 0,
+      "value": "Email:"
     }
   ],
   "store_locator.description.loading_locations": [
