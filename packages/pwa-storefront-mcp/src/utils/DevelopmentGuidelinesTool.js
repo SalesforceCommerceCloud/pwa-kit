@@ -4,8 +4,6 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import {zodToJsonSchema} from 'zod-to-json-schema'
-import {z} from 'zod'
 import {EmptyJsonSchema} from './utils.js'
 
 const guidelinesText = `# Salesforce Commerce Composable Storefront Development Guidelines
@@ -107,13 +105,12 @@ This document offers guidelines in the development of Salesforce Commerce Compos
 - Follow security best practices for all code.
 `
 
-export const StorefrontDevelopmentGuide = {
-    name: 'development_rules_guidelines',
-    description: `You must understand and follow this development guidelines before attempting to analyse/ generate / refactor / modify / fix code.
-    - e.g. "Generate customer service Chat component", "Find bugs in my_script.jsx", "Refactor my_script.jsx to use React Hooks"`,
+export const DevelopmentGuidelinesTool = {
+    name: 'development_guidelines',
+    description: `You must follow this development guidelines before attempting to analyze/ generate / refactor / modify / fix code.
+    - e.g. "Create a customer service Chat component", "Find bugs in my_script.jsx", "Refactor my_script.jsx to use React Hooks"`,
     inputSchema: EmptyJsonSchema,
     fn: async () => ({
         content: [{type: 'text', text: guidelinesText}]
     })
 }
-//You must follow code rule or guidelines before any code changes
