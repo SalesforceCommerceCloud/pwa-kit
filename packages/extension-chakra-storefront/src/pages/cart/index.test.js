@@ -436,7 +436,9 @@ describe('Coupons tests', function () {
         // Wait for cart to fully load
         expect(await screen.findByTestId('sf-cart-container')).toBeInTheDocument()
 
-        // add coupon - wrap the accordion opening in act() since that's when the form initializes
+        // There are a lot of warnings about using act regarding to form.reset()
+        // This comes from the setState coming within react-hook-form.
+        // using act here to ensure these set state are cleaned up properly
         await act(async () => {
             await user.click(screen.getByText('Do you have a promo code?'))
         })
