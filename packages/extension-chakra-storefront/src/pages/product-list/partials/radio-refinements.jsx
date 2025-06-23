@@ -22,9 +22,10 @@ const RadioRefinement = ({filter, value, toggleFilter, isSelected}) => {
             display="inline-flex"
             height={{base: '44px', lg: '24px'}}
             alignItems="center"
+            cursor="pointer"
         >
             <RadioGroup.ItemHiddenInput />
-            <RadioGroup.ItemIndicator />
+            <RadioGroup.ItemIndicator cursor="pointer" />
             <RadioGroup.ItemText
                 fontSize="sm"
                 aria-label={formatMessage(isSelected ? REMOVE_FILTER : ADD_FILTER, value)}
