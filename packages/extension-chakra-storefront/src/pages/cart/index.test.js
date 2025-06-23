@@ -272,9 +272,7 @@ describe('Remove item from cart', function () {
         )
     })
 
-    // TODO: Fix flaky/broken test
-    // eslint-disable-next-line jest/no-disabled-tests
-    test.skip('Can remove item from the cart', async () => {
+    test('Can remove item from the cart', async () => {
         const {user} = renderWithProviders(<Cart />)
 
         let cartItem
@@ -286,10 +284,15 @@ describe('Remove item from cart', function () {
             expect(cartItem).toBeInTheDocument()
         })
 
-        await user.click(within(cartItem).getByText(/remove/i))
+        await act(async () => {
+            await user.click(within(cartItem).getByText(/remove/i))
+        })
 
         try {
-            await user.click(screen.getByText(/yes, remove item/i))
+            // act will wait for modal to disappear before asserting to avoid react warning
+            await act(async () => {
+                await user.click(screen.getByText(/yes, remove item/i))
+            })
         } catch {
             // On CI this remove-item button sometimes does not exist yet.
             // But if we then call `await screen.findByText(/yes, remove item/i)` at this point,
@@ -441,14 +444,10 @@ describe('Coupons tests', function () {
         // using act here to ensure these set state are cleaned up properly
         await act(async () => {
             await user.click(screen.getByText('Do you have a promo code?'))
-        })
-
-        await act(async () => {
             await user.type(screen.getByLabelText('Promo Code'), 'menssuits')
             await user.click(screen.getByText('Apply'))
         })
 
-        // Wait for the async form submission and state updates to complete
         await waitFor(async () => {
             expect(screen.getByText(/Promotion applied/)).toBeInTheDocument()
         })
@@ -460,18 +459,19 @@ describe('Coupons tests', function () {
         expect(within(cartItem).queryByText(/^-([A-Z]{2})?\$19\.20$/)).toBeInTheDocument()
 
         const orderSummary = screen.getByTestId('sf-order-summary')
-        await user.click(within(orderSummary).getByText('Remove'))
 
+        await waitFor(() => {
+            expect(within(orderSummary).getByText('Remove')).toBeInTheDocument()
+        })
+
+        await act(async () => {
+            await user.click(within(orderSummary).getByText('Remove'))
+        })
         await waitFor(async () => {
             const menSuit = screen.queryByText(/menssuits/i)
             const promotionDiscount = within(cartItem).queryByText(/^-([A-Z]{2})?\$19\.20$/)
             expect(promotionDiscount).not.toBeInTheDocument()
             expect(menSuit).not.toBeInTheDocument()
-        })
-
-        // Additional wait to ensure all React Query mutations have settled
-        await waitFor(() => {
-            expect(screen.getByText('Do you have a promo code?')).toBeInTheDocument()
         })
     })
 })
@@ -520,7 +520,9 @@ describe('Update this is a gift option', function () {
 
         const giftCheckbox = screen.getByRole('checkbox')
         expect(giftCheckbox).not.toBeChecked()
-        await user.click(giftCheckbox)
+        await act(async () => {
+            await user.click(giftCheckbox)
+        })
         global.server.use(
             rest.get('*/customers/:customerId/baskets', (req, res, ctx) => {
                 return res.once(
@@ -689,8 +691,9 @@ describe.skip('Product bundles', () => {
             name: /edit/i,
             hidden: true
         })
-        await user.click(editCartButton)
-
+        await act(async () => {
+            await user.click(editCartButton)
+        })
         let productViewModal
         await waitFor(
             async () => {
@@ -714,7 +717,9 @@ describe.skip('Product bundles', () => {
         })
 
         const updateCartButtons = within(productViewModal).getAllByRole('button', {name: 'Update'})
-        await user.click(updateCartButtons[0])
+        await act(async () => {
+            await user.click(updateCartButtons[0])
+        })
 
         await waitFor(() => {
             expect(productViewModal).not.toBeInTheDocument()
@@ -799,8 +804,9 @@ describe('Unavailable products tests', function () {
                 }
             }
         ])
-        await user.click(removeBtn)
-
+        await act(async () => {
+            await user.click(removeBtn)
+        })
         await waitFor(() => {
             expect(
                 screen.getByRole('link', {name: /Worn Gold Dangle Earring$/i})
