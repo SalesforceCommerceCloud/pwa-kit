@@ -352,9 +352,9 @@ const ProductDetail = () => {
 
     /**************** Add To Cart ****************/
     const showToast = useToast()
-    const showError = () => {
+    const showError = (errorMessage) => {
         showToast({
-            title: formatMessage(API_ERROR_MESSAGE),
+            title: errorMessage || formatMessage(API_ERROR_MESSAGE),
             status: 'error'
         })
     }
@@ -403,20 +403,31 @@ const ProductDetail = () => {
                 return
             }
 
+            // Check if any products have pickup selected
+            const hasAnyPickupSelected = productSelectionValues.some((item) => {
+                const prodKey =
+                    (item.variant || item.product || product).productId ||
+                    (item.variant || item.product || product).id
+                return pickupInStoreMap[prodKey]
+            })
+
+            const currentShippingMethodIsPickup = isCurrentShippingMethodPickup(basket?.shipments?.[0]?.shippingMethod)
+            // Only perform the check if the basket exists and has at least one item and the shipping method is not null
+            if (basket && basket.productItems?.length > 0 && basket?.shipments?.[0]?.shippingMethod) {
+                if (hasAnyPickupSelected && !currentShippingMethodIsPickup) {
+                    throw new Error('Select Pickup in Store to match your existing shipping method.')
+                }
+                if (!hasAnyPickupSelected && currentShippingMethodIsPickup) {
+                    throw new Error('Select Ship to Address to match your existing shipping method.')
+                }
+            }
+
             const basketResponse = await addItemToNewOrExistingBasket(productItems)
 
             // Configure shipping method based on pickup selection
             if (basketResponse?.basketId && basketResponse.shipments.length > 0) {
                 const currentShippingMethod = basketResponse.shipments[0].shippingMethod
                 const isCurrentlyPickup = isCurrentShippingMethodPickup(currentShippingMethod)
-
-                // Check if any products have pickup selected
-                const hasAnyPickupSelected = productSelectionValues.some((item) => {
-                    const prodKey =
-                        (item.variant || item.product || product).productId ||
-                        (item.variant || item.product || product).id
-                    return pickupInStoreMap[prodKey]
-                })
 
                 if (hasAnyPickupSelected && !isCurrentlyPickup) {
                     // Fetch shipping methods to get available options
@@ -446,7 +457,7 @@ const ProductDetail = () => {
             addToCartModal.onOpen({product, itemsAdded: productSelectionValues})
             return productSelectionValues
         } catch (error) {
-            showError(error)
+            showError(error.message)
         }
     }
 
