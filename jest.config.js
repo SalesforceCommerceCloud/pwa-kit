@@ -35,7 +35,8 @@ module.exports = {
         '<rootDir>/src/pages/home/**/*.test.js',
         '<rootDir>/src/utils/responsive-image.test.js',
         '<rootDir>/src/hooks/use-toast.test.js',
-        '<rootDir>/src/pages/product-detail/metadata.test.js'
+        '<rootDir>/src/pages/product-detail/metadata.test.js',
+        '<rootDir>/src/pages/product-list/metadata.test.js'
     ],
     moduleNameMapper: {
         ...base.moduleNameMapper,
