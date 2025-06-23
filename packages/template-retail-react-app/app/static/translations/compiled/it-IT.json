@@ -361,6 +361,40 @@
       "value": "Chiudi modulo di accesso"
     }
   ],
+  "auth_modal.check_email.button.resend_link": [
+    {
+      "type": 0,
+      "value": "Reinvia link"
+    }
+  ],
+  "auth_modal.check_email.description.check_spam_folder": [
+    {
+      "type": 0,
+      "value": "Il link potrebbe richiedere alcuni minuti per arrivare, controlla la cartella spam se non riesci a trovarlo"
+    }
+  ],
+  "auth_modal.check_email.description.just_sent": [
+    {
+      "type": 0,
+      "value": "Abbiamo appena inviato un link di accesso a "
+    },
+    {
+      "children": [
+        {
+          "type": 1,
+          "value": "email"
+        }
+      ],
+      "type": 8,
+      "value": "b"
+    }
+  ],
+  "auth_modal.check_email.title.check_your_email": [
+    {
+      "type": 0,
+      "value": "Controlla la tua e-mail"
+    }
+  ],
   "auth_modal.description.now_signed_in": [
     {
       "type": 0,
@@ -1021,6 +1055,12 @@
       "value": "Hai già un account? Accedi"
     }
   ],
+  "contact_info.button.back_to_sign_in_options": [
+    {
+      "type": 0,
+      "value": "Torna alle opzioni di accesso"
+    }
+  ],
   "contact_info.button.checkout_as_guest": [
     {
       "type": 0,
@@ -1033,6 +1073,18 @@
       "value": "Accedi"
     }
   ],
+  "contact_info.button.password": [
+    {
+      "type": 0,
+      "value": "Password"
+    }
+  ],
+  "contact_info.button.secure_link": [
+    {
+      "type": 0,
+      "value": "Link sicuro"
+    }
+  ],
   "contact_info.error.incorrect_username_or_password": [
     {
       "type": 0,
@@ -1043,6 +1095,12 @@
     {
       "type": 0,
       "value": "Password dimenticata?"
+    }
+  ],
+  "contact_info.message.or_login_with": [
+    {
+      "type": 0,
+      "value": "Oppure accedi con"
     }
   ],
   "contact_info.title.contact_info": [
@@ -1117,6 +1175,48 @@
     {
       "type": 1,
       "value": "currentPrice"
+    }
+  ],
+  "dnt_notification.button.accept": [
+    {
+      "type": 0,
+      "value": "Accetta"
+    }
+  ],
+  "dnt_notification.button.assistive_msg.accept": [
+    {
+      "type": 0,
+      "value": "Accetta tracciamento"
+    }
+  ],
+  "dnt_notification.button.assistive_msg.close": [
+    {
+      "type": 0,
+      "value": "Chiudi modulo di consenso tracciamento"
+    }
+  ],
+  "dnt_notification.button.assistive_msg.decline": [
+    {
+      "type": 0,
+      "value": "Rifiuta tracciamento"
+    }
+  ],
+  "dnt_notification.button.decline": [
+    {
+      "type": 0,
+      "value": "Rifiuta"
+    }
+  ],
+  "dnt_notification.description": [
+    {
+      "type": 0,
+      "value": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur."
+    }
+  ],
+  "dnt_notification.title": [
+    {
+      "type": 0,
+      "value": "Consenso tracciamento"
     }
   ],
   "drawer_menu.button.account_details": [
@@ -1334,7 +1434,7 @@
   "field.password.assistive_msg.show_password": [
     {
       "type": 0,
-      "value": "Mosra password"
+      "value": "Mostra password"
     }
   ],
   "footer.column.account": [
@@ -1409,6 +1509,12 @@
       "value": "Termini e condizioni"
     }
   ],
+  "footer.locale_selector.assistive_msg": [
+    {
+      "type": 0,
+      "value": "Seleziona lingua"
+    }
+  ],
   "footer.message.copyright": [
     {
       "type": 0,
@@ -1425,6 +1531,12 @@
     {
       "type": 0,
       "value": "Registrati per gli ultimi aggiornamenti sulle migliori offerte"
+    }
+  ],
+  "footer.subscribe.email.assistive_msg": [
+    {
+      "type": 0,
+      "value": "Indirizzo e-mail per la newsletter"
     }
   ],
   "footer.subscribe.heading.first_to_know": [
@@ -1467,6 +1579,24 @@
     {
       "type": 0,
       "value": "Lista desideri"
+    }
+  ],
+  "global.error.create_account": [
+    {
+      "type": 0,
+      "value": "Questa funzione non è attualmente disponibile. Per accedere a questa funzione è necessario creare un account."
+    }
+  ],
+  "global.error.feature_unavailable": [
+    {
+      "type": 0,
+      "value": "Questa funzione non è attualmente disponibile."
+    }
+  ],
+  "global.error.invalid_token": [
+    {
+      "type": 0,
+      "value": "Token non valido, riprova."
     }
   ],
   "global.error.something_went_wrong": [
@@ -2169,6 +2299,36 @@
       "value": "Crea account"
     }
   ],
+  "login_form.button.apple": [
+    {
+      "type": 0,
+      "value": "Apple"
+    }
+  ],
+  "login_form.button.back": [
+    {
+      "type": 0,
+      "value": "Torna alle opzioni di accesso"
+    }
+  ],
+  "login_form.button.continue_securely": [
+    {
+      "type": 0,
+      "value": "Continua in modo sicuro"
+    }
+  ],
+  "login_form.button.google": [
+    {
+      "type": 0,
+      "value": "Google"
+    }
+  ],
+  "login_form.button.password": [
+    {
+      "type": 0,
+      "value": "Password"
+    }
+  ],
   "login_form.button.sign_in": [
     {
       "type": 0,
@@ -2185,6 +2345,12 @@
     {
       "type": 0,
       "value": "Non hai un account?"
+    }
+  ],
+  "login_form.message.or_login_with": [
+    {
+      "type": 0,
+      "value": "Oppure accedi con"
     }
   ],
   "login_form.message.welcome_back": [
@@ -2349,6 +2515,12 @@
       "value": "numOfPages"
     }
   ],
+  "pagination.field.page_number_select": [
+    {
+      "type": 0,
+      "value": "Seleziona numero di pagina"
+    }
+  ],
   "pagination.link.next": [
     {
       "type": 0,
@@ -2421,10 +2593,22 @@
       "value": "1 lettera maiuscola"
     }
   ],
+  "password_reset_success.toast": [
+    {
+      "type": 0,
+      "value": "Reimpostazione password riuscita"
+    }
+  ],
   "payment_selection.heading.credit_card": [
     {
       "type": 0,
       "value": "Carta di credito"
+    }
+  ],
+  "payment_selection.radio_group.assistive_msg": [
+    {
+      "type": 0,
+      "value": "Pagamento"
     }
   ],
   "payment_selection.tooltip.secure_payment": [
@@ -2615,6 +2799,12 @@
       "value": "sortOption"
     }
   ],
+  "product_list.sort_by.label.assistive_msg": [
+    {
+      "type": 0,
+      "value": "Ordina prodotti per"
+    }
+  ],
   "product_scroller.assistive_msg.scroll_left": [
     {
       "type": 0,
@@ -2795,6 +2985,12 @@
       "value": "Il mio profilo"
     }
   ],
+  "profile_fields.label.profile_form": [
+    {
+      "type": 0,
+      "value": "Modulo profilo"
+    }
+  ],
   "promo_code_fields.button.apply": [
     {
       "type": 0,
@@ -2867,38 +3063,6 @@
       "value": "Crea un account e accedi in esclusiva ai prodotti, alle idee e alle community migliori."
     }
   ],
-  "reset_password.button.back_to_sign_in": [
-    {
-      "type": 0,
-      "value": "Torna all'accesso"
-    }
-  ],
-  "reset_password.info.receive_email_shortly": [
-    {
-      "type": 0,
-      "value": "A breve riceverai un'email all'indirizzo "
-    },
-    {
-      "children": [
-        {
-          "type": 1,
-          "value": "email"
-        }
-      ],
-      "type": 8,
-      "value": "b"
-    },
-    {
-      "type": 0,
-      "value": " con un link per la reimpostazione della password."
-    }
-  ],
-  "reset_password.title.password_reset": [
-    {
-      "type": 0,
-      "value": "Reimpostazione password"
-    }
-  ],
   "reset_password_form.action.sign_in": [
     {
       "type": 0,
@@ -2920,7 +3084,7 @@
   "reset_password_form.message.return_to_sign_in": [
     {
       "type": 0,
-      "value": "Oppure torna a"
+      "value": "Oppure torna a:"
     }
   ],
   "reset_password_form.title.reset_password": [
@@ -3067,6 +3231,32 @@
     {
       "type": 0,
       "value": "Uscire? Per procedere con l'ordine corrente devi eseguire di nuovo l'accesso."
+    }
+  ],
+  "social_login_redirect.message.authenticating": [
+    {
+      "type": 0,
+      "value": "Autenticazione in corso..."
+    }
+  ],
+  "social_login_redirect.message.redirect_link": [
+    {
+      "type": 0,
+      "value": "Se non si viene reindirizzati automaticamente, fare clic su "
+    },
+    {
+      "children": [
+        {
+          "type": 0,
+          "value": "questo link"
+        }
+      ],
+      "type": 8,
+      "value": "link"
+    },
+    {
+      "type": 0,
+      "value": " per procedere."
     }
   ],
   "store_locator.action.find": [
@@ -3737,6 +3927,18 @@
       "value": "La password deve contenere almeno 8 caratteri."
     }
   ],
+  "use_update_password_fields.error.password_mismatch": [
+    {
+      "type": 0,
+      "value": "Le password non corrispondono."
+    }
+  ],
+  "use_update_password_fields.error.required_confirm_password": [
+    {
+      "type": 0,
+      "value": "Conferma la password."
+    }
+  ],
   "use_update_password_fields.error.required_new_password": [
     {
       "type": 0,
@@ -3759,6 +3961,12 @@
     {
       "type": 0,
       "value": "La password deve contenere almeno una lettera maiuscola."
+    }
+  ],
+  "use_update_password_fields.label.confirm_new_password": [
+    {
+      "type": 0,
+      "value": "Conferma nuova password"
     }
   ],
   "use_update_password_fields.label.current_password": [

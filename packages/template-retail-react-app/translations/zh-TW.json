@@ -136,7 +136,7 @@
     "defaultMessage": "數量"
   },
   "add_to_cart_modal.link.checkout": {
-    "defaultMessage": "繼續以結帳"
+    "defaultMessage": "前往結帳"
   },
   "add_to_cart_modal.link.view_cart": {
     "defaultMessage": "檢視購物車"
@@ -147,6 +147,18 @@
   "auth_modal.button.close.assistive_msg": {
     "defaultMessage": "關閉登入表單"
   },
+  "auth_modal.check_email.button.resend_link": {
+    "defaultMessage": "重新傳送連結"
+  },
+  "auth_modal.check_email.description.check_spam_folder": {
+    "defaultMessage": "連結可能需要幾分鐘才會送達，若您未收到，請檢查垃圾郵件資料夾"
+  },
+  "auth_modal.check_email.description.just_sent": {
+    "defaultMessage": "我們剛剛已傳送登入連結至 <b>{email}</b>"
+  },
+  "auth_modal.check_email.title.check_your_email": {
+    "defaultMessage": "檢查您的電子郵件"
+  },
   "auth_modal.description.now_signed_in": {
     "defaultMessage": "您現在已登入。"
   },
@@ -154,7 +166,7 @@
     "defaultMessage": "您的電子郵件或密碼不正確。請再試一次。"
   },
   "auth_modal.info.welcome_user": {
-    "defaultMessage": "{name}，歡迎："
+    "defaultMessage": "歡迎 {name}，"
   },
   "auth_modal.password_reset_success.button.back_to_sign_in": {
     "defaultMessage": "返回登入"
@@ -184,7 +196,7 @@
     "defaultMessage": "最近檢視"
   },
   "cart_cta.link.checkout": {
-    "defaultMessage": "繼續以結帳"
+    "defaultMessage": "前往結帳"
   },
   "cart_secondary_button_group.action.added_to_wishlist": {
     "defaultMessage": "新增至願望清單"
@@ -406,17 +418,29 @@
   "contact_info.button.already_have_account": {
     "defaultMessage": "已經有帳戶了？登入"
   },
+  "contact_info.button.back_to_sign_in_options": {
+    "defaultMessage": "返回登入選項"
+  },
   "contact_info.button.checkout_as_guest": {
     "defaultMessage": "以訪客身份結帳"
   },
   "contact_info.button.login": {
     "defaultMessage": "登入"
   },
+  "contact_info.button.password": {
+    "defaultMessage": "密碼"
+  },
+  "contact_info.button.secure_link": {
+    "defaultMessage": "安全連結"
+  },
   "contact_info.error.incorrect_username_or_password": {
     "defaultMessage": "使用者名稱或密碼不正確，請再試一次。"
   },
   "contact_info.link.forgot_password": {
     "defaultMessage": "忘記密碼了嗎？"
+  },
+  "contact_info.message.or_login_with": {
+    "defaultMessage": "或使用下列方式登入"
   },
   "contact_info.title.contact_info": {
     "defaultMessage": "聯絡資訊"
@@ -446,6 +470,27 @@
   },
   "display_price.label.current_price_with_range": {
     "defaultMessage": "從 {currentPrice}"
+  },
+  "dnt_notification.button.accept": {
+    "defaultMessage": "接受"
+  },
+  "dnt_notification.button.assistive_msg.accept": {
+    "defaultMessage": "接受追蹤"
+  },
+  "dnt_notification.button.assistive_msg.close": {
+    "defaultMessage": "關閉同意追蹤表"
+  },
+  "dnt_notification.button.assistive_msg.decline": {
+    "defaultMessage": "拒絕追蹤"
+  },
+  "dnt_notification.button.decline": {
+    "defaultMessage": "拒絕"
+  },
+  "dnt_notification.description": {
+    "defaultMessage": "Lorem ipsum dolor sit amet， consectetur adipiscing elit， sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.Ut enim ad minim veniam， quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur."
+  },
+  "dnt_notification.title": {
+    "defaultMessage": "同意追蹤"
   },
   "drawer_menu.button.account_details": {
     "defaultMessage": "帳戶詳細資料"
@@ -576,6 +621,9 @@
   "footer.link.terms_conditions": {
     "defaultMessage": "條款與條件"
   },
+  "footer.locale_selector.assistive_msg": {
+    "defaultMessage": "選擇語言"
+  },
   "footer.message.copyright": {
     "defaultMessage": "Salesforce 或相關企業。保留一切權利。這只是一個示範商店。在此下單將「不會」進行處理。"
   },
@@ -584,6 +632,9 @@
   },
   "footer.subscribe.description.sign_up": {
     "defaultMessage": "註冊來獲得最熱門的優惠消息"
+  },
+  "footer.subscribe.email.assistive_msg": {
+    "defaultMessage": "電子報的電子郵件地址"
   },
   "footer.subscribe.heading.first_to_know": {
     "defaultMessage": "搶先獲得消息"
@@ -605,6 +656,15 @@
   },
   "global.account.link.wishlist": {
     "defaultMessage": "願望清單"
+  },
+  "global.error.create_account": {
+    "defaultMessage": "目前不支援此功能。您必須建立帳戶才能存取此功能。"
+  },
+  "global.error.feature_unavailable": {
+    "defaultMessage": "目前不支援此功能。"
+  },
+  "global.error.invalid_token": {
+    "defaultMessage": "權杖無效，請再試一次。"
   },
   "global.error.something_went_wrong": {
     "defaultMessage": "發生錯誤。請再試一次。"
@@ -664,7 +724,7 @@
     "defaultMessage": "讓他們為您指點迷津。"
   },
   "home.description.shop_products": {
-    "defaultMessage": "此區塊包含來自目錄的內容。{docLink}來了解如何取代。",
+    "defaultMessage": "此區塊包含來自目錄的內容。請{docLink}來瞭解如何替換。",
     "description": "{docLink} is a html button that links the user to https://sfdc.co/business-manager-manage-catalogs"
   },
   "home.features.description.cart_checkout": {
@@ -731,7 +791,7 @@
     "defaultMessage": "閱讀文件"
   },
   "home.title.react_starter_store": {
-    "defaultMessage": "零售型 React PWA Starter Store"
+    "defaultMessage": "適用於零售的 React PWA 入門商店"
   },
   "icons.assistive_msg.lock": {
     "defaultMessage": "安全"
@@ -927,6 +987,21 @@
   "login_form.action.create_account": {
     "defaultMessage": "建立帳戶"
   },
+  "login_form.button.apple": {
+    "defaultMessage": "Apple"
+  },
+  "login_form.button.back": {
+    "defaultMessage": "返回登入選項"
+  },
+  "login_form.button.continue_securely": {
+    "defaultMessage": "安全地繼續"
+  },
+  "login_form.button.google": {
+    "defaultMessage": "Google"
+  },
+  "login_form.button.password": {
+    "defaultMessage": "密碼"
+  },
   "login_form.button.sign_in": {
     "defaultMessage": "登入"
   },
@@ -935,6 +1010,9 @@
   },
   "login_form.message.dont_have_account": {
     "defaultMessage": "沒有帳戶嗎？"
+  },
+  "login_form.message.or_login_with": {
+    "defaultMessage": "或使用下列方式登入"
   },
   "login_form.message.welcome_back": {
     "defaultMessage": "歡迎回來"
@@ -997,6 +1075,9 @@
   "pagination.field.num_of_pages": {
     "defaultMessage": "{numOfPages} 頁"
   },
+  "pagination.field.page_number_select": {
+    "defaultMessage": "選擇頁碼"
+  },
   "pagination.link.next": {
     "defaultMessage": "下一頁"
   },
@@ -1038,8 +1119,14 @@
     "defaultMessage": "1 個大寫字母",
     "description": "Password requirement"
   },
+  "password_reset_success.toast": {
+    "defaultMessage": "成功重設密碼"
+  },
   "payment_selection.heading.credit_card": {
     "defaultMessage": "信用卡"
+  },
+  "payment_selection.radio_group.assistive_msg": {
+    "defaultMessage": "付款"
   },
   "payment_selection.tooltip.secure_payment": {
     "defaultMessage": "此為安全 SSL 加密付款。"
@@ -1107,6 +1194,9 @@
   },
   "product_list.select.sort_by": {
     "defaultMessage": "排序方式：{sortOption}"
+  },
+  "product_list.sort_by.label.assistive_msg": {
+    "defaultMessage": "產品排序方式依"
   },
   "product_scroller.assistive_msg.scroll_left": {
     "defaultMessage": "向左捲動產品"
@@ -1186,6 +1276,9 @@
   "profile_card.title.my_profile": {
     "defaultMessage": "我的個人資料"
   },
+  "profile_fields.label.profile_form": {
+    "defaultMessage": "設定檔表單"
+  },
   "promo_code_fields.button.apply": {
     "defaultMessage": "套用"
   },
@@ -1221,15 +1314,6 @@
   },
   "register_form.message.create_an_account": {
     "defaultMessage": "建立帳戶，就能搶先獲得最棒產品、靈感來源和社群最新消息。"
-  },
-  "reset_password.button.back_to_sign_in": {
-    "defaultMessage": "返回登入"
-  },
-  "reset_password.info.receive_email_shortly": {
-    "defaultMessage": "您很快就會在 <b>{email}</b> 收到一封電子郵件，內含重設密碼的連結。"
-  },
-  "reset_password.title.password_reset": {
-    "defaultMessage": "重設密碼"
   },
   "reset_password_form.action.sign_in": {
     "defaultMessage": "登入"
@@ -1312,6 +1396,12 @@
   },
   "signout_confirmation_dialog.message.sure_to_sign_out": {
     "defaultMessage": "確定要登出嗎？您必須重新登入，才能繼續目前的訂單流程。"
+  },
+  "social_login_redirect.message.authenticating": {
+    "defaultMessage": "進行驗證..."
+  },
+  "social_login_redirect.message.redirect_link": {
+    "defaultMessage": "若未被重新導向，請按一下 <link>此連結</link> 以繼續。"
   },
   "store_locator.action.find": {
     "defaultMessage": "尋找"
@@ -1621,6 +1711,12 @@
   "use_update_password_fields.error.minimum_characters": {
     "defaultMessage": "密碼必須包含至少 8 個字元。"
   },
+  "use_update_password_fields.error.password_mismatch": {
+    "defaultMessage": "密碼不相符。"
+  },
+  "use_update_password_fields.error.required_confirm_password": {
+    "defaultMessage": "請確認您的密碼。"
+  },
   "use_update_password_fields.error.required_new_password": {
     "defaultMessage": "請提供新密碼。"
   },
@@ -1632,6 +1728,9 @@
   },
   "use_update_password_fields.error.uppercase_letter": {
     "defaultMessage": "密碼必須包含至少 1 個大寫字母。"
+  },
+  "use_update_password_fields.label.confirm_new_password": {
+    "defaultMessage": "確認新密碼"
   },
   "use_update_password_fields.label.current_password": {
     "defaultMessage": "目前密碼"
