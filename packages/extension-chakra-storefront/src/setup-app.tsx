@@ -61,19 +61,19 @@ class ChakraStorefront extends ApplicationExtension<Config> {
                 component: Pages.Home,
                 exact: true
             },
-            // {
-            //     path: [
-            //         config.pages.Login && config.pages.Login.path,
-            //         config.login.passwordless.enabled && config.login.passwordless.landingPath
-            //     ].filter(Boolean),
-            //     component: Pages.Login,
-            //     exact: true
-            // },
-            // {
-            //     path: config.pages.Registration && config.pages.Registration.path,
-            //     component: Pages.Registration,
-            //     exact: true
-            // },
+            {
+                path: [
+                    config.pages.Login && config.pages.Login.path,
+                    config.login.passwordless.enabled && config.login.passwordless.landingPath
+                ].filter(Boolean),
+                component: Pages.Login,
+                exact: true
+            },
+            {
+                path: config.pages.Registration && config.pages.Registration.path,
+                component: Pages.Registration,
+                exact: true
+            },
             // {
             //     path: [
             //         config.pages.ResetPassword && config.pages.ResetPassword.path,
@@ -95,21 +95,21 @@ class ChakraStorefront extends ApplicationExtension<Config> {
             //     path: config.pages.CheckoutConfirmation && config.pages.CheckoutConfirmation.path,
             //     component: Pages.CheckoutConfirmation
             // },
-            // {
-            //     path: config.pages.LoginRedirect && config.pages.LoginRedirect.path,
-            //     component: Pages.LoginRedirect,
-            //     exact: true
-            // },
-            // {
-            //     path: config.login.social.enabled && config.login.social.redirectURI,
-            //     component: Pages.SocialLoginRedirect,
-            //     exact: true
-            // },
             {
-                path: config.pages.Cart && config.pages.Cart.path,
-                component: Pages.Cart,
+                path: config.pages.LoginRedirect && config.pages.LoginRedirect.path,
+                component: Pages.LoginRedirect,
                 exact: true
             },
+            {
+                path: config.login.social.enabled && config.login.social.redirectURI,
+                component: Pages.SocialLoginRedirect,
+                exact: true
+            },
+            // {
+            //     path: config.pages.Cart && config.pages.Cart.path,
+            //     component: Pages.Cart,
+            //     exact: true
+            // },
             {
                 path: config.pages.ProductDetail && config.pages.ProductDetail.path,
                 component: Pages.ProductDetail
