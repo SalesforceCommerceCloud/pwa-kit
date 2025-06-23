@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
-import {screen} from '@testing-library/react'
+import {act, screen} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import ProductScroller from '../../components/product-scroller/index'
 import {renderWithProviders} from '../../utils/test-utils'
@@ -50,13 +50,17 @@ describe('Product Scroller', () => {
     test('Renders left/right scroll buttons', async () => {
         const user = userEvent.setup()
         renderWithProviders(<ProductScroller title="Scroller Title" products={testProducts} />)
-        await user.click(screen.getByTestId('product-scroller-nav-right'))
+        await act(async () => {
+            await user.click(screen.getByTestId('product-scroller-nav-right'))
+        })
         expect(window.HTMLElement.prototype.scrollBy).toHaveBeenCalledWith({
             top: 0,
             left: 0,
             behavior: 'smooth'
         })
-        await user.click(screen.getByTestId('product-scroller-nav-left'))
+        await act(async () => {
+            await user.click(screen.getByTestId('product-scroller-nav-left'))
+        })
         expect(window.HTMLElement.prototype.scrollBy).toHaveBeenCalledWith({
             top: 0,
             left: -0,
@@ -79,7 +83,9 @@ describe('Product Scroller', () => {
         renderWithProviders(
             <ProductScroller products={testProducts} productTileProps={{onClick: onClickMock}} />
         )
-        await user.click(screen.getByText(testProducts[0].productName))
+        await act(async () => {
+            await user.click(screen.getByText(testProducts[0].productName))
+        })
         expect(onClickMock).toHaveBeenCalled()
     })
     test('productTileProps as function', async () => {
@@ -92,7 +98,9 @@ describe('Product Scroller', () => {
                 productTileProps={() => ({onClick: onClickMock})}
             />
         )
-        await user.click(screen.getByText(testProducts[0].productName))
+        await act(async () => {
+            await user.click(screen.getByText(testProducts[0].productName))
+        })
         expect(onClickMock).toHaveBeenCalled()
     })
 })

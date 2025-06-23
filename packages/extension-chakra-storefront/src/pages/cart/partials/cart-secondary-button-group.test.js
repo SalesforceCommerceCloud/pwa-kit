@@ -57,14 +57,18 @@ beforeEach(() => {
     jest.resetModules()
 })
 
+afterEach(() => {
+    jest.restoreAllMocks()
+})
+
 test('renders secondary action component', async () => {
     const {user} = renderWithProviders(<MockedComponent />)
     const removeButton = screen.getByRole('button', {
         name: /remove/i
     })
     expect(removeButton).toBeInTheDocument()
-    
-    // Wrap the modal-opening click in act() 
+
+    // Wrap the modal-opening click in act()
     // to handle DialogRoot state updates in the ConfirmationModal
     await act(async () => {
         await user.click(removeButton)
@@ -94,7 +98,9 @@ test('renders secondary with event handlers', async () => {
     })
 
     expect(editButton).toBeInTheDocument()
-    await user.click(editButton)
+    await act(async () => {
+        await user.click(editButton)
+    })
     expect(onEditClick).toHaveBeenCalledTimes(1)
 
     const addToWishlistButton = screen.getByRole('button', {
@@ -116,7 +122,7 @@ test('renders secondary with event handlers', async () => {
     const confirmButton = await screen.findByRole('button', {name: /yes, remove item/i})
     expect(confirmButton).toBeInTheDocument()
 
-    // Wrap the modal-opening click in act() 
+    // Wrap the modal-opening click in act()
     // to handle DialogRoot state updates in the ConfirmationModal
     await act(async () => {
         await user.click(confirmButton)
@@ -131,17 +137,14 @@ test('handles gift checkbox change', async () => {
     const onIsAGiftChange = jest.fn()
 
     const {user} = renderWithProviders(
-        <MockedComponent
-            onIsAGiftChange={onIsAGiftChange}
-            isAGift={false}
-        />
+        <MockedComponent onIsAGiftChange={onIsAGiftChange} isAGift={false} />
     )
 
     const giftCheckbox = screen.getByRole('checkbox', {name: /this is a gift/i})
     expect(giftCheckbox).toBeInTheDocument()
     expect(giftCheckbox).not.toBeChecked()
 
-    // Wrap the modal-opening click in act() 
+    // Wrap the modal-opening click in act()
     // to handle DialogRoot state updates in the ConfirmationModal
     await act(async () => {
         await user.click(giftCheckbox)
