@@ -3459,6 +3459,12 @@
       "value": "Email:"
     }
   ],
+  "store_locator.description.non_empty_basket": [
+    {
+      "type": 0,
+      "value": "Sorry, you have items in your basket. Please remove them to continue."
+    }
+  ],
   "store_locator.description.phone": [
     {
       "type": 0,

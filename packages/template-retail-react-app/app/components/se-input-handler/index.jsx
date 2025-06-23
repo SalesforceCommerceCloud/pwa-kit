@@ -12,18 +12,22 @@ import useSeStoreSelection from '@salesforce/retail-react-app/app/hooks/use-se-s
 import {useStoreLocatorParams} from '@salesforce/retail-react-app/app/contexts/store-locator-params'
 import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
 import useExternalSearch from '@salesforce/retail-react-app/app/hooks/use-external-search'
+import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
 
 const SeInputHandler = ({onOpenStoreLocator}) => {
     useExternalSearch()
     const location = useLocation()
     const history = useHistory()
-    const {shouldOpenModal, setShouldOpenModal, storeLocatorParams, processSeParameters} =
-        useSeStoreSelection()
+    const {
+        derivedData: {totalItems: totalItemCount}
+    } = useCurrentBasket()
+    const {shouldOpenModal, setShouldOpenModal, storeLocatorParams, processSeParameters} = useSeStoreSelection(totalItemCount)
 
     const {setParams} = useStoreLocatorParams()
 
     const {site} = useMultiSite()
     const storeInfoKey = `store_${site.id}`
+    const hasSeParamKeys = ['lat', 'lng', 'zip', 'city', 'store', 'country']
 
     useEffect(() => {
         let urlParams
@@ -85,7 +89,6 @@ const SeInputHandler = ({onOpenStoreLocator}) => {
 
         if (hasSelectedStore) {
             const urlParams = new URLSearchParams(location.search)
-            const hasSeParamKeys = ['lat', 'lng', 'zip', 'city', 'store', 'country']
             const hasExternalQuery =
                 urlParams.has('q') || urlParams.has('search') || urlParams.has('query')
 
@@ -104,13 +107,7 @@ const SeInputHandler = ({onOpenStoreLocator}) => {
             const hasSeParams = hasSeParamKeys.some((key) => urlParams.has(key))
 
             if (hasSeParams) {
-                const cleanParams = new URLSearchParams(location.search)
-                hasSeParamKeys.forEach((key) => cleanParams.delete(key))
-
-                const cleanSearch = cleanParams.toString()
-                const newUrl = location.pathname + (cleanSearch ? `?${cleanSearch}` : '')
-
-                history.replace(newUrl)
+                cleanURLParams(location, history, hasSeParamKeys)
             }
         }
     }, [
@@ -125,6 +122,16 @@ const SeInputHandler = ({onOpenStoreLocator}) => {
     ])
 
     return null
+}
+
+export const cleanURLParams = (location, history, hasSeParamKeys) => {
+    const cleanParams = new URLSearchParams(location.search)
+    hasSeParamKeys.forEach((key) => cleanParams.delete(key))
+
+    const cleanSearch = cleanParams.toString()
+    const newUrl = location.pathname + (cleanSearch ? `?${cleanSearch}` : '')
+
+    history.replace(newUrl)
 }
 
 SeInputHandler.propTypes = {

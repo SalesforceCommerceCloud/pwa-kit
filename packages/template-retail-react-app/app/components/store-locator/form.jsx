@@ -19,7 +19,7 @@ import {useForm, Controller} from 'react-hook-form'
 import {useStoreLocator} from '@salesforce/retail-react-app/app/hooks/use-store-locator'
 import {useGeolocation} from '@salesforce/retail-react-app/app/hooks/use-geo-location'
 
-export const StoreLocatorForm = () => {
+export const StoreLocatorForm = ({totalItemCount}) => {
     const {config, formValues, setFormValues, setDeviceCoordinates} = useStoreLocator()
     const {coordinates, error, refresh} = useGeolocation()
     const form = useForm({
@@ -64,6 +64,7 @@ export const StoreLocatorForm = () => {
                 void form.handleSubmit(submitForm)(e)
             }}
         >
+            <fieldset disabled={totalItemCount > 0}>
             <InputGroup>
                 {showCountrySelector && (
                     <Controller
@@ -157,6 +158,7 @@ export const StoreLocatorForm = () => {
                     Please agree to share your location
                 </FormErrorMessage>
             </FormControl>
+            </fieldset>
         </form>
     )
 }

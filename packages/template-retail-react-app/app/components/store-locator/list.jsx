@@ -11,10 +11,12 @@ import {StoreLocatorListItem} from '@salesforce/retail-react-app/app/components/
 import {useStoreLocator} from '@salesforce/retail-react-app/app/hooks/use-store-locator'
 import useSeStoreSelection from '@salesforce/retail-react-app/app/hooks/use-se-store-selection'
 import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
+import {useIntl} from 'react-intl'
 
-export const StoreLocatorList = () => {
+export const StoreLocatorList = ({totalItemCount}) => {
+    const intl = useIntl()
     const {data, isLoading, config, formValues, mode} = useStoreLocator()
-    const {modalStores, isLoadingModalStores, selectedStoreId} = useSeStoreSelection()
+    const {modalStores, isLoadingModalStores, selectedStoreId} = useSeStoreSelection(totalItemCount)
     const [page, setPage] = useState(1)
     const {site} = useMultiSite()
     const storeInfoKey = `store_${site.id}`
@@ -74,6 +76,13 @@ export const StoreLocatorList = () => {
     const displayStoreLocatorStatusMessage = () => {
         if (currentIsLoading) return 'Loading locations...'
         if (currentData?.total === 0) return 'Sorry, there are no locations in this area'
+        if (totalItemCount > 0) {
+            return intl.formatMessage({
+                id: 'store_locator.description.non_empty_basket',
+                defaultMessage:
+                    'Sorry, you have items in your basket. Please remove them to continue.'
+            })
+        }
 
         if (useSeData) {
             const selectedStoreInfo = modalStores.find(store => store.isSelected)
@@ -175,6 +184,7 @@ export const StoreLocatorList = () => {
                                     'aria-describedby': `store-info-${store.id}`
                                 }}
                                 isSeSelected={showSeIndicator}
+                                totalItemCount={totalItemCount}
                             />
                         )
                     })}

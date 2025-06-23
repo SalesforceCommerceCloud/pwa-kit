@@ -1481,6 +1481,9 @@
   "store_locator.description.email": {
     "defaultMessage": "Email:"
   },
+  "store_locator.description.non_empty_basket": {
+    "defaultMessage": "Sorry, you have items in your basket. Please remove them to continue."
+  },
   "store_locator.description.phone": {
     "defaultMessage": "Phone:"
   },

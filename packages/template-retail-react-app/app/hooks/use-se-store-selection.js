@@ -9,15 +9,19 @@ import {useState, useEffect, useCallback, useMemo} from 'react'
 import {useSearchStores} from '@salesforce/commerce-sdk-react'
 import {useIntl} from 'react-intl'
 import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
+import {cleanURLParams} from '@salesforce/retail-react-app/app/components/se-input-handler'
 import {
     STORE_LOCATOR_RADIUS,
     STORE_LOCATOR_RADIUS_UNIT,
     STORE_LOCATOR_DEFAULT_COUNTRY_CODE
 } from '@salesforce/retail-react-app/app/constants'
+import {useLocation, useHistory} from 'react-router-dom'
 
-const useSeStoreSelection = () => {
+const useSeStoreSelection = (totalItemCount) => {
     const intl = useIntl()
     const {site} = useMultiSite()
+    const location = useLocation()
+    const history = useHistory()
     const [locationData, setLocationData] = useState(null)
     const [isProcessing, setIsProcessing] = useState(false)
     const [shouldOpenModal, setShouldOpenModal] = useState(false)
@@ -330,6 +334,16 @@ const useSeStoreSelection = () => {
     }, [])
 
     useEffect(() => {
+        if (totalItemCount > 0) {
+            const urlParams = new URLSearchParams(location.search)
+            const hasSeParamsList = ['lat', 'lng', 'zip', 'city', 'store', 'country']
+            const hasSeParams = hasSeParamsList.some((key) => urlParams.has(key))
+            if (hasSeParams) {
+                cleanURLParams(location, history, hasSeParamsList)
+                setLocationData(null)
+            }
+            return
+        }
         if (storeSearchData?.data && locationData && isProcessing) {
             const countryCode = locationData.countryCode ? getCountryForPostalSearch(locationData.countryCode) : null
             const searchCriteria = {
@@ -430,7 +444,8 @@ const useSeStoreSelection = () => {
         findMatchingStore,
         storeInfoKey,
         getCountryForPostalSearch,
-        cityCoords
+        cityCoords,
+        totalItemCount
     ])
 
     const processSeParameters = useCallback(

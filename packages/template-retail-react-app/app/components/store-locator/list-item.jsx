@@ -18,12 +18,12 @@ import {
     Badge
 } from '@chakra-ui/react'
 
-export const StoreLocatorListItem = ({store, radioProps, isSeSelected = false}) => {
+export const StoreLocatorListItem = ({store, radioProps, isSeSelected = false, totalItemCount}) => {
     return (
         <AccordionItem>
             <Box margin="10px" borderWidth={isSeSelected ? "2px" : "0"} borderColor={isSeSelected ? "blue.500" : "transparent"} borderRadius="md" padding={isSeSelected ? "8px" : "0"}>
                 <HStack align="flex-start" spacing={3}>
-                    <Radio {...radioProps} mt="1px" />
+                    <Radio isDisabled={totalItemCount > 0} {...radioProps} mt="1px" />
                     <Box flex="1">
                         <HStack justify="space-between" align="flex-start">
                             <Box>
@@ -95,5 +95,6 @@ StoreLocatorListItem.propTypes = {
         storeHours: PropTypes.string
     }).isRequired,
     radioProps: PropTypes.object,
-    isSeSelected: PropTypes.bool
+    isSeSelected: PropTypes.bool,
+    totalItemCount: PropTypes.number
 }
