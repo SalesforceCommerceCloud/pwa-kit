@@ -48,8 +48,9 @@ describe('Product Scroller', () => {
         expect(screen.getByTestId('custom-header')).toBeInTheDocument()
     })
     test('Renders left/right scroll buttons', async () => {
-        const user = userEvent.setup()
-        renderWithProviders(<ProductScroller title="Scroller Title" products={testProducts} />)
+        const {user} = renderWithProviders(
+            <ProductScroller title="Scroller Title" products={testProducts} />
+        )
         await act(async () => {
             await user.click(screen.getByTestId('product-scroller-nav-right'))
         })
@@ -77,10 +78,8 @@ describe('Product Scroller', () => {
         expect(screen.queryByTestId('product-scroller-nav-right')).not.toBeInTheDocument()
     })
     test('productTileProps as object', async () => {
-        const user = userEvent.setup()
-
         const onClickMock = jest.fn()
-        renderWithProviders(
+        const {user} = renderWithProviders(
             <ProductScroller products={testProducts} productTileProps={{onClick: onClickMock}} />
         )
         await act(async () => {
@@ -89,10 +88,8 @@ describe('Product Scroller', () => {
         expect(onClickMock).toHaveBeenCalled()
     })
     test('productTileProps as function', async () => {
-        const user = userEvent.setup()
-
         const onClickMock = jest.fn()
-        renderWithProviders(
+        const {user} = renderWithProviders(
             <ProductScroller
                 products={testProducts}
                 productTileProps={() => ({onClick: onClickMock})}
