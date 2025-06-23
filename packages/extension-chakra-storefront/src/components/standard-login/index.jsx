@@ -21,7 +21,7 @@ const StandardLogin = ({
     idps = []
 }) => {
     return (
-        <Stack spacing={8} paddingLeft={4} paddingRight={4}>
+        <Stack gap={8} paddingLeft={4} paddingRight={4}>
             <Stack>
                 <LoginFields
                     form={form}
@@ -29,7 +29,7 @@ const StandardLogin = ({
                     handleForgotPasswordClick={handleForgotPasswordClick}
                 />
             </Stack>
-            <Stack spacing={4}>
+            <Stack gap={4}>
                 <Button
                     type="submit"
                     onClick={() => {
@@ -41,7 +41,7 @@ const StandardLogin = ({
                 </Button>
                 {isSocialEnabled && idps.length > 0 && (
                     <>
-                        <Stack spacing={6} paddingTop={2} paddingBottom={2}>
+                        <Stack gap={6} paddingTop={2} paddingBottom={2}>
                             <Divider />
                             <Text align="center" fontSize="sm">
                                 <FormattedMessage

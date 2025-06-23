@@ -6,6 +6,19 @@
  */
 import {defineRecipe} from '@chakra-ui/react'
 
+const baseLinkStyles = {
+    fontWeight: 'normal',
+    minWidth: '1em',
+    height: 'auto',
+    padding: '0',
+    _hover: {
+        // Copied from the original recipe of Chakra's Link
+        textDecoration: 'underline',
+        textUnderlineOffset: '3px',
+        textDecorationColor: 'currentColor/20'
+    }
+}
+
 const button = defineRecipe({
     base: {
         borderRadius: 'sm'
@@ -48,30 +61,12 @@ const button = defineRecipe({
             //     lineHeight: 4
             // }),
             'link-red': {
-                color: 'red.500',
-                fontWeight: 'normal',
-                minWidth: '1em',
-                height: 'auto',
-                padding: '0',
-                _hover: {
-                    // Copied from the original recipe of Chakra's Link
-                    textDecoration: 'underline',
-                    textUnderlineOffset: '3px',
-                    textDecorationColor: 'currentColor/20'
-                }
+                ...baseLinkStyles,
+                color: 'red.500'
             },
             'link-blue': {
-                color: 'blue.600',
-                fontWeight: 'normal',
-                minWidth: '1em',
-                height: 'auto',
-                padding: '0',
-                _hover: {
-                    // Copied from the original recipe of Chakra's Link
-                    textDecoration: 'underline',
-                    textUnderlineOffset: '3px',
-                    textDecorationColor: 'currentColor/20'
-                }
+                ...baseLinkStyles,
+                color: 'blue.600'
             },
             'menu-link': {
                 color: 'black',
