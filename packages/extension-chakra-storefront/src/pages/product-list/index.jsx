@@ -28,7 +28,6 @@ import {
     Heading,
     Text,
     Stack,
-    useDisclosure,
     Button,
     Field,
     Dialog,
@@ -95,7 +94,6 @@ const ProductList = (props) => {
     // `isLoading` later in this function.
     // eslint-disable-next-line react/prop-types, @typescript-eslint/no-unused-vars
     const {isLoading: _unusedIsLoading, staticContext, ...rest} = props
-    const {isOpen, onOpen, onClose} = useDisclosure()
     const {formatMessage} = useIntl()
     const navigate = useNavigation()
     const history = useHistory()
@@ -472,20 +470,70 @@ const ProductList = (props) => {
                                 borderColor="gray.100"
                             >
                                 <Flex align="center">
-                                    <Button
-                                        fontSize="sm"
-                                        colorPalette="black"
-                                        variant="outline"
-                                        marginRight={2}
-                                        display="inline-flex"
-                                        onClick={onOpen}
-                                    >
-                                        <FilterIcon boxSize={5} />
-                                        <FormattedMessage
-                                            defaultMessage="Filter"
-                                            id="product_list.button.filter"
-                                        />
-                                    </Button>
+                                    <Dialog.Root size="full" placement="center">
+                                        <Dialog.Trigger asChild>
+                                            <Button
+                                                fontSize="sm"
+                                                colorPalette="black"
+                                                variant="outline"
+                                                marginRight={2}
+                                                display="inline-flex"
+                                            >
+                                                <FilterIcon boxSize={5} />
+                                                <FormattedMessage
+                                                    defaultMessage="Filter"
+                                                    id="product_list.button.filter"
+                                                />
+                                            </Button>
+                                        </Dialog.Trigger>
+                                        <Portal>
+                                            <Dialog.Backdrop />
+                                            <Dialog.Positioner>
+                                                <Dialog.Content>
+                                                    <Dialog.Header>
+                                                        <Dialog.Title>
+                                                            <Heading
+                                                                as="h1"
+                                                                fontWeight="bold"
+                                                                fontSize="2xl"
+                                                            >
+                                                                <FormattedMessage
+                                                                    defaultMessage="Filter"
+                                                                    id="product_list.modal.title.filter"
+                                                                />
+                                                            </Heading>
+                                                        </Dialog.Title>
+                                                        <Dialog.CloseTrigger asChild>
+                                                            <Button variant="ghost" size="sm">
+                                                                ✕
+                                                            </Button>
+                                                        </Dialog.CloseTrigger>
+                                                    </Dialog.Header>
+                                                    <Dialog.Body py={4}>
+                                                        {filtersLoading && <LoadingSpinner />}
+                                                        <Refinements
+                                                            toggleFilter={toggleFilter}
+                                                            filters={
+                                                                productSearchResult?.refinements
+                                                            }
+                                                            selectedFilters={searchParams.refine}
+                                                            itemsBefore={
+                                                                category?.categories
+                                                                    ? [
+                                                                          <CategoryLinks
+                                                                              key="itemsBefore"
+                                                                              category={category}
+                                                                          />
+                                                                      ]
+                                                                    : undefined
+                                                            }
+                                                            excludedFilters={['cgid']}
+                                                        />
+                                                    </Dialog.Body>
+                                                </Dialog.Content>
+                                            </Dialog.Positioner>
+                                        </Portal>
+                                    </Dialog.Root>
                                 </Flex>
                                 <Flex align="center">
                                     <Button
@@ -612,56 +660,6 @@ const ProductList = (props) => {
                     </Grid>
                 </>
             )}
-            {/* Modal for filter options on mobile */}
-            <Dialog.Root
-                open={isOpen}
-                onOpenChange={(e) => !e.open && onClose()}
-                size="full"
-                placement="center"
-            >
-                <Portal>
-                    <Dialog.Backdrop />
-                    <Dialog.Positioner>
-                        <Dialog.Content>
-                            <Dialog.Header>
-                                <Dialog.Title>
-                                    <Heading as="h1" fontWeight="bold" fontSize="2xl">
-                                        <FormattedMessage
-                                            defaultMessage="Filter"
-                                            id="product_list.modal.title.filter"
-                                        />
-                                    </Heading>
-                                </Dialog.Title>
-                                <Dialog.CloseTrigger asChild>
-                                    <Button variant="ghost" size="sm">
-                                        ✕
-                                    </Button>
-                                </Dialog.CloseTrigger>
-                            </Dialog.Header>
-                            <Dialog.Body py={4}>
-                                {filtersLoading && <LoadingSpinner />}
-                                <Refinements
-                                    toggleFilter={toggleFilter}
-                                    filters={productSearchResult?.refinements}
-                                    selectedFilters={searchParams.refine}
-                                    itemsBefore={
-                                        category?.categories
-                                            ? [
-                                                  <CategoryLinks
-                                                      key="itemsBefore"
-                                                      category={category}
-                                                      onSelect={onClose}
-                                                  />
-                                              ]
-                                            : undefined
-                                    }
-                                    excludedFilters={['cgid']}
-                                />
-                            </Dialog.Body>
-                        </Dialog.Content>
-                    </Dialog.Positioner>
-                </Portal>
-            </Dialog.Root>
 
             {/* Sort Drawer */}
             <Drawer.Root

@@ -112,7 +112,7 @@ const Refinements = ({
                                         borderTop={idx === 0 && !itemsBefore ? 'none' : '1px solid'}
                                         borderTopColor="gray.200"
                                     >
-                                        <Accordion.ItemTrigger paddingTop={0} paddingBottom={2}>
+                                        <Accordion.ItemTrigger paddingTop={0} paddingBottom={2} cursor="pointer">
                                             <Heading
                                                 as="h2"
                                                 flex="1"

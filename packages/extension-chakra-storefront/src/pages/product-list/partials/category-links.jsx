@@ -27,7 +27,7 @@ const CategoryLinks = ({category = {}, onSelect = noop}) => {
             borderBottom="none"
             key="show-all"
         >
-            <Accordion.ItemTrigger>
+            <Accordion.ItemTrigger cursor="pointer">
                 <Heading as="h2" flex="1" textAlign="left" fontSize="md" fontWeight={600}>
                     <FormattedMessage defaultMessage="Categories" id="category_links.button_text" />
                 </Heading>
