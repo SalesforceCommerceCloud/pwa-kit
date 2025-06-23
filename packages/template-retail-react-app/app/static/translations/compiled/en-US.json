@@ -655,18 +655,6 @@
       "value": "Payment Details"
     }
   ],
-  "checkout_confirmation.heading.pickup_address": [
-    {
-      "type": 0,
-      "value": "Pickup Address"
-    }
-  ],
-  "checkout_confirmation.heading.pickup_details": [
-    {
-      "type": 0,
-      "value": "Pickup Details"
-    }
-  ],
   "checkout_confirmation.heading.shipping_address": [
     {
       "type": 0,
@@ -801,12 +789,6 @@
       "pluralType": "cardinal",
       "type": 6,
       "value": "itemCount"
-    }
-  ],
-  "checkout_confirmation.message.store_info_unavailable": [
-    {
-      "type": 0,
-      "value": "Store information not available"
     }
   ],
   "checkout_confirmation.message.will_email_shortly": [
@@ -2923,12 +2905,6 @@
       "value": "Update"
     }
   ],
-  "product_view.error.no_store_selected_for_pickup": [
-    {
-      "type": 0,
-      "value": "No valid store or inventory found for pickup"
-    }
-  ],
   "product_view.label.assistive_msg.quantity_decrement": [
     {
       "type": 0,
@@ -2949,24 +2925,6 @@
       "value": "productName"
     }
   ],
-  "product_view.label.delivery": [
-    {
-      "type": 0,
-      "value": "Delivery:"
-    }
-  ],
-  "product_view.label.pickup_in_select_store_prefix": [
-    {
-      "type": 0,
-      "value": "Pickup in"
-    }
-  ],
-  "product_view.label.pickup_in_store": [
-    {
-      "type": 0,
-      "value": "Pickup in Store"
-    }
-  ],
   "product_view.label.quantity": [
     {
       "type": 0,
@@ -2985,18 +2943,6 @@
       "value": "+"
     }
   ],
-  "product_view.label.select_store_link": [
-    {
-      "type": 0,
-      "value": "Select Store"
-    }
-  ],
-  "product_view.label.ship_to_address": [
-    {
-      "type": 0,
-      "value": "Ship to Address"
-    }
-  ],
   "product_view.label.variant_type": [
     {
       "type": 1,
@@ -3007,26 +2953,6 @@
     {
       "type": 0,
       "value": "See full details"
-    }
-  ],
-  "product_view.status.in_stock_at_store": [
-    {
-      "type": 0,
-      "value": "In Stock at "
-    },
-    {
-      "type": 1,
-      "value": "storeName"
-    }
-  ],
-  "product_view.status.out_of_stock_at_store": [
-    {
-      "type": 0,
-      "value": "Out of Stock at "
-    },
-    {
-      "type": 1,
-      "value": "storeName"
     }
   ],
   "profile_card.info.profile_updated": [
@@ -3215,12 +3141,6 @@
       "value": "Clear All"
     }
   ],
-  "selected_refinements.filter.in_stock": [
-    {
-      "type": 0,
-      "value": "In Stock"
-    }
-  ],
   "shipping_address.button.continue_to_shipping": [
     {
       "type": 0,
@@ -3367,206 +3287,6 @@
     {
       "type": 0,
       "value": " to proceed."
-    }
-  ],
-  "store_display.label.store_hours": [
-    {
-      "type": 0,
-      "value": "Store Hours"
-    }
-  ],
-  "store_inventory_filter.action.change_store": [
-    {
-      "type": 0,
-      "value": "Change Store"
-    }
-  ],
-  "store_inventory_filter.action.select_store": [
-    {
-      "type": 0,
-      "value": "Select Store"
-    }
-  ],
-  "store_inventory_filter.action.select_store_link": [
-    {
-      "type": 0,
-      "value": "Select a Store"
-    }
-  ],
-  "store_inventory_filter.checkbox.assistive_msg": [
-    {
-      "type": 0,
-      "value": "Filter Products by Store Availability at "
-    },
-    {
-      "type": 1,
-      "value": "storeName"
-    }
-  ],
-  "store_inventory_filter.checkbox.label": [
-    {
-      "type": 0,
-      "value": "In Stock at "
-    },
-    {
-      "type": 1,
-      "value": "storeName"
-    }
-  ],
-  "store_inventory_filter.heading.shop_by_availability": [
-    {
-      "type": 0,
-      "value": "Shop by Availability"
-    }
-  ],
-  "store_inventory_filter.link.assistive_msg": [
-    {
-      "type": 0,
-      "value": "Open Store Locator to "
-    },
-    {
-      "type": 1,
-      "value": "action"
-    }
-  ],
-  "store_locator.action.find": [
-    {
-      "type": 0,
-      "value": "Find"
-    }
-  ],
-  "store_locator.action.select_a_country": [
-    {
-      "type": 0,
-      "value": "Select a country"
-    }
-  ],
-  "store_locator.action.use_my_location": [
-    {
-      "type": 0,
-      "value": "Use My Location"
-    }
-  ],
-  "store_locator.action.viewMore": [
-    {
-      "type": 0,
-      "value": "View More"
-    }
-  ],
-  "store_locator.description.away": [
-    {
-      "type": 0,
-      "value": "away"
-    }
-  ],
-  "store_locator.description.email": [
-    {
-      "type": 0,
-      "value": "Email:"
-    }
-  ],
-  "store_locator.description.loading_locations": [
-    {
-      "type": 0,
-      "value": "Loading locations..."
-    }
-  ],
-  "store_locator.description.no_locations": [
-    {
-      "type": 0,
-      "value": "Sorry, there are no locations in this area"
-    }
-  ],
-  "store_locator.description.or": [
-    {
-      "type": 0,
-      "value": "Or"
-    }
-  ],
-  "store_locator.description.phone": [
-    {
-      "type": 0,
-      "value": "Phone:"
-    }
-  ],
-  "store_locator.description.viewing_near_postal_code": [
-    {
-      "type": 0,
-      "value": "Viewing stores within "
-    },
-    {
-      "type": 1,
-      "value": "distance"
-    },
-    {
-      "type": 1,
-      "value": "distanceUnit"
-    },
-    {
-      "type": 0,
-      "value": " of "
-    },
-    {
-      "type": 1,
-      "value": "postalCode"
-    },
-    {
-      "type": 0,
-      "value": " in"
-    }
-  ],
-  "store_locator.description.viewing_near_your_location": [
-    {
-      "type": 0,
-      "value": "Viewing stores near your location"
-    }
-  ],
-  "store_locator.dropdown.germany": [
-    {
-      "type": 0,
-      "value": "Germany"
-    }
-  ],
-  "store_locator.dropdown.united_states": [
-    {
-      "type": 0,
-      "value": "United States"
-    }
-  ],
-  "store_locator.error.agree_to_share_your_location": [
-    {
-      "type": 0,
-      "value": "Please agree to share your location"
-    }
-  ],
-  "store_locator.error.please_enter_a_postal_code": [
-    {
-      "type": 0,
-      "value": "Please enter a postal code."
-    }
-  ],
-  "store_locator.error.please_select_a_country": [
-    {
-      "type": 0,
-      "value": "Please select a country."
-    }
-  ],
-  "store_locator.field.placeholder.enter_postal_code": [
-    {
-      "type": 0,
-      "value": "Enter postal code"
-    }
-  ],
-  "store_locator.pagination.load_more": [
-    {
-      "type": 0,
-      "value": "Load More"
-    }
-  ],
-  "store_locator.title": [
-    {
-      "type": 0,
-      "value": "Find a Store"
     }
   ],
   "swatch_group.selected.label": [
