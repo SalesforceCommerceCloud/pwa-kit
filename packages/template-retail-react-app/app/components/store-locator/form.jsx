@@ -32,6 +32,11 @@ export const StoreLocatorForm = () => {
     })
     const {control} = form
     useEffect(() => {
+        form.setValue('countryCode', formValues.countryCode)
+        form.setValue('postalCode', formValues.postalCode)
+    }, [formValues.countryCode, formValues.postalCode, form])
+    
+    useEffect(() => {
         if (coordinates.latitude && coordinates.longitude) {
             setDeviceCoordinates(coordinates)
         }

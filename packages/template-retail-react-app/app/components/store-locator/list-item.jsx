@@ -14,42 +14,52 @@ import {
     AccordionPanel,
     Box,
     Radio,
-    HStack
+    HStack,
+    Badge
 } from '@chakra-ui/react'
 
-export const StoreLocatorListItem = ({store, radioProps}) => {
+export const StoreLocatorListItem = ({store, radioProps, isSeSelected = false}) => {
     return (
         <AccordionItem>
-            <Box margin="10px">
+            <Box margin="10px" borderWidth={isSeSelected ? "2px" : "0"} borderColor={isSeSelected ? "blue.500" : "transparent"} borderRadius="md" padding={isSeSelected ? "8px" : "0"}>
                 <HStack align="flex-start" spacing={3}>
                     <Radio {...radioProps} mt="1px" />
-                    <Box>
-                        {store.name && <Box fontSize="lg">{store.name}</Box>}
-                        <Box fontSize="md" color="gray.600">
-                            {store.address1}
-                        </Box>
-                        <Box fontSize="md" color="gray.600">
-                            {store.city}, {store.stateCode ? store.stateCode : ''}
-                            {store.postalCode}
-                        </Box>
-                        {store.distance !== undefined && (
-                            <>
-                                <br />
+                    <Box flex="1">
+                        <HStack justify="space-between" align="flex-start">
+                            <Box>
+                                {store.name && <Box fontSize="lg">{store.name}</Box>}
                                 <Box fontSize="md" color="gray.600">
-                                    {store.distance} {store.distanceUnit}
-                                    {' away'}
+                                    {store.address1}
                                 </Box>
-                            </>
-                        )}
-                        {store.phone && (
-                            <>
-                                <br />
                                 <Box fontSize="md" color="gray.600">
-                                    {'Phone: '}
-                                    {store.phone}
+                                    {store.city}, {store.stateCode ? store.stateCode : ''}
+                                    {store.postalCode}
                                 </Box>
-                            </>
-                        )}
+                                {store.distance !== undefined && (
+                                    <>
+                                        <br />
+                                        <Box fontSize="md" color="gray.600">
+                                            {store.distance} {store.distanceUnit}
+                                            {' away'}
+                                        </Box>
+                                    </>
+                                )}
+                                {store.phone && (
+                                    <>
+                                        <br />
+                                        <Box fontSize="md" color="gray.600">
+                                            {'Phone: '}
+                                            {store.phone}
+                                        </Box>
+                                    </>
+                                )}
+                            </Box>
+                            {isSeSelected && (
+                                <Badge colorScheme="blue" variant="solid" fontSize="xs">
+                                    Auto-Selected
+                                </Badge>
+                            )}
+                        </HStack>
                         {store.storeHours && (
                             <>
                                 <AccordionButton color="blue.700" style={{marginTop: '10px'}}>
@@ -84,5 +94,6 @@ StoreLocatorListItem.propTypes = {
         phone: PropTypes.string,
         storeHours: PropTypes.string
     }).isRequired,
-    radioProps: PropTypes.object
+    radioProps: PropTypes.object,
+    isSeSelected: PropTypes.bool
 }

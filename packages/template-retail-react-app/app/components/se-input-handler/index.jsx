@@ -26,7 +26,48 @@ const SeInputHandler = ({onOpenStoreLocator}) => {
     const storeInfoKey = `store_${site.id}`
 
     useEffect(() => {
-        const urlParams = new URLSearchParams(location.search)
+        let urlParams
+        
+        try {
+            urlParams = new URLSearchParams(location.search)
+            let needsRepair = false
+            const repairedParams = new URLSearchParams()
+            
+            for (const [key, value] of urlParams.entries()) {
+                if (value.includes('?')) {
+                    needsRepair = true
+                    const [actualValue, extraParams] = value.split('?', 2)
+                    repairedParams.set(key, actualValue)
+                    
+                    if (extraParams) {
+                        const extraParamsObj = new URLSearchParams(extraParams)
+                        for (const [extraKey, extraValue] of extraParamsObj.entries()) {
+                            repairedParams.set(extraKey, extraValue)
+                        }
+                    }
+                } else {
+                    repairedParams.set(key, value)
+                }
+            }
+            
+            if (needsRepair) {
+                urlParams = repairedParams
+            }
+            
+        } catch (error) {
+            console.warn('Error parsing URL parameters:', error)
+            let sanitizedSearch = location.search
+            if (sanitizedSearch) {
+                const firstQuestionIndex = sanitizedSearch.indexOf('?')
+                if (firstQuestionIndex !== -1) {
+                    const queryPart = sanitizedSearch.substring(firstQuestionIndex + 1)
+                    const sanitizedQuery = queryPart.replace(/\?/g, '&')
+                    sanitizedSearch = '?' + sanitizedQuery
+                }
+            }
+            urlParams = new URLSearchParams(sanitizedSearch)
+        }
+        
         processSeParameters(urlParams)
     }, [location.search, processSeParameters])
 

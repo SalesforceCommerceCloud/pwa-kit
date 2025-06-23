@@ -145,7 +145,26 @@ const ProductDetail = () => {
 
     /*************************** Product Detail and Category ********************/
     const {productId} = useParams()
-    const urlParams = new URLSearchParams(location.search)
+    const getSanitizedUrlParams = () => {
+        try {
+            const urlParams = new URLSearchParams(location.search)
+            const sanitizedParams = new URLSearchParams()
+            for (const [key, value] of urlParams.entries()) {
+                if (value.includes('?')) {
+                    const cleanValue = value.split('?')[0]
+                    sanitizedParams.set(key, cleanValue)
+                } else {
+                    sanitizedParams.set(key, value)
+                }
+            }
+            return sanitizedParams
+        } catch (error) {
+            console.warn('Error parsing URL parameters:', error)
+            return new URLSearchParams()
+        }
+    }
+    
+    const urlParams = getSanitizedUrlParams()
     const {
         data: product,
         isLoading: isProductLoading,

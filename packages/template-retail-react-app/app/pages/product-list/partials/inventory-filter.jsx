@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, {useEffect, useState} from 'react'
+import React, {useEffect, useState, useCallback} from 'react'
 import {useIntl, FormattedMessage} from 'react-intl'
 import PropTypes from 'prop-types'
 import {
@@ -27,13 +27,42 @@ const StoreInventoryFilter = ({toggleFilter, selectedFilters}) => {
 
     const isChecked = selectedFilters?.ilids !== undefined
 
-    useEffect(() => {
+    const updateStoreInfo = useCallback(() => {
         const storeInfo = getSelectedStoreData(site?.id)
 
         if (storeInfo?.name && storeInfo?.inventoryId) {
             setSelectedStore(storeInfo)
+        } else {
+            setSelectedStore(null)
         }
     }, [site?.id])
+
+    useEffect(() => {
+        updateStoreInfo()
+    }, [updateStoreInfo])
+    useEffect(() => {
+        const storeKey = `store_${site?.id}`
+        let lastValue = localStorage.getItem(storeKey)
+        const handleStorageChange = (e) => {
+            if (e.key === storeKey) updateStoreInfo()
+        }
+        const handleStoreSelected = () => updateStoreInfo()
+        const checkForChanges = () => {
+            const currentValue = localStorage.getItem(storeKey)
+            if (currentValue !== lastValue) {
+                lastValue = currentValue
+                updateStoreInfo()
+            }
+        }
+        window.addEventListener('storage', handleStorageChange)
+        window.addEventListener('seStoreSelected', handleStoreSelected)
+        const interval = setInterval(checkForChanges, 500)
+        return () => {
+            window.removeEventListener('storage', handleStorageChange)
+            window.removeEventListener('seStoreSelected', handleStoreSelected)
+            clearInterval(interval)
+        }
+    }, [site?.id, updateStoreInfo])
 
     const handleCheckboxChange = (e) => {
         // If no store is selected or no inventoryId, open store locator
@@ -57,10 +86,8 @@ const StoreInventoryFilter = ({toggleFilter, selectedFilters}) => {
 
     const handleStoreLocatorClose = () => {
         const storeInfo = getSelectedStoreData(site?.id)
-
+        
         if (storeInfo?.name && storeInfo?.inventoryId) {
-            setSelectedStore(storeInfo)
-
             // Apply the filter when a store is selected from the locator
             toggleFilter({value: storeInfo.inventoryId}, 'ilids', false, false)
         }

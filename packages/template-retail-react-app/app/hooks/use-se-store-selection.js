@@ -26,27 +26,38 @@ const useSeStoreSelection = () => {
 
     const storeInfoKey = `store_${site.id}`
 
-    const getCountryForPostalSearch = useCallback((zipcode, explicitCountry) => {
+    const getCountryForPostalSearch = useCallback((explicitCountry) => {
         return explicitCountry && explicitCountry !== 'none'
             ? explicitCountry
             : STORE_LOCATOR_DEFAULT_COUNTRY_CODE
     }, [])
 
+    const addCountryCode = useCallback((params, countryCode) => ({
+        ...params,
+        ...(countryCode ? { countryCode } : {})
+    }), [])
+
+    const createBaseStoreParams = useCallback((countryCode) => ({
+        ...(countryCode ? { countryCode } : {}),
+        maxDistance: STORE_LOCATOR_RADIUS,
+        distanceUnit: STORE_LOCATOR_RADIUS_UNIT,
+        limit: 50
+    }), [])
+
     const {data: coordinateStoreData, isLoading: isLoadingCoordinateStores} = useSearchStores({
-        parameters: {
+        parameters: addCountryCode({
             latitude: locationData?.latitude,
             longitude: locationData?.longitude,
             locale: intl.locale,
             maxDistance: STORE_LOCATOR_RADIUS,
             limit: 200,
             distanceUnit: STORE_LOCATOR_RADIUS_UNIT
-        },
+        }, locationData?.countryCode ? getCountryForPostalSearch(locationData?.countryCode) : null),
         enabled:
             enableCoordinateSearch && Boolean(locationData?.latitude && locationData?.longitude)
     })
 
     const countryCodeToUse = getCountryForPostalSearch(
-        locationData?.zipcode,
         locationData?.countryCode
     )
 
@@ -188,14 +199,14 @@ const useSeStoreSelection = () => {
     ])
 
     const {data: cityStoreData, isLoading: isLoadingCityStores} = useSearchStores({
-        parameters: {
+        parameters: addCountryCode({
             latitude: cityCoords?.lat,
             longitude: cityCoords?.lng,
             locale: intl.locale,
-            maxDistance: STORE_LOCATOR_RADIUS * 5,
+            maxDistance: STORE_LOCATOR_RADIUS,
             limit: 200,
             distanceUnit: STORE_LOCATOR_RADIUS_UNIT
-        },
+        }, locationData?.countryCode ? getCountryForPostalSearch(locationData?.countryCode) : null),
         enabled: Boolean(
             cityCoords &&
                 locationData?.city &&
@@ -209,23 +220,44 @@ const useSeStoreSelection = () => {
         setEnableCoordinateSearch(Boolean(locationData?.latitude && locationData?.longitude))
     }, [locationData?.latitude, locationData?.longitude])
 
+
+    const filterStoresByCountryAndDistance = useCallback((storeData) => {
+        if (!storeData?.data) return storeData
+        
+        const filteredStores = storeData.data.filter(store => {
+
+            let countryMatch = true
+            if (locationData?.countryCode) {
+                const targetCountry = getCountryForPostalSearch(locationData.countryCode)
+                const storeCountry = store.countryCode || STORE_LOCATOR_DEFAULT_COUNTRY_CODE
+                countryMatch = storeCountry === targetCountry
+            }
+            const distanceMatch = !store.distance || store.distance <= STORE_LOCATOR_RADIUS
+            
+            return countryMatch && distanceMatch
+        })
+        
+        return {
+            ...storeData,
+            data: filteredStores,
+            total: filteredStores.length
+        }
+    }, [locationData?.countryCode, getCountryForPostalSearch])
+
     const getStoreSearchData = () => {
-        if (coordinateStoreData) return coordinateStoreData
-
-        if (postalCodeStoreData && locationData?.zipcode) return postalCodeStoreData
-
-        if (cityStoreData) return cityStoreData
-
-        if (
+        let rawData = null
+        
+        if (coordinateStoreData) rawData = coordinateStoreData
+        else if (postalCodeStoreData && locationData?.zipcode) rawData = postalCodeStoreData
+        else if (cityStoreData) rawData = cityStoreData
+        else if (
             locationData?.storeName &&
             locationData?.countryCode &&
             !locationData?.zipcode &&
             !locationData?.city &&
             combinedStoresData
-        ) {
-            return combinedStoresData
-        }
-        return null
+        ) rawData = combinedStoresData
+        return rawData ? filterStoresByCountryAndDistance(rawData) : null
     }
 
     const storeSearchData = getStoreSearchData()
@@ -240,84 +272,69 @@ const useSeStoreSelection = () => {
 
         const {storeName, zipcode, city, countryCode} = searchCriteria
 
-        if (storeName) {
-            const searchNameLower = storeName.toLowerCase().trim()
+        const applyFilters = (matches) => {
             const filters = [
-                [
-                    countryCode,
-                    (s) => (s.countryCode || STORE_LOCATOR_DEFAULT_COUNTRY_CODE) === countryCode
-                ],
+                [countryCode, (s) => (s.countryCode || STORE_LOCATOR_DEFAULT_COUNTRY_CODE) === countryCode],
                 [zipcode, (s) => (s.postalCode || s.address?.postalCode) === zipcode],
-                [
-                    city,
-                    (s) =>
-                        (s.city || s.address?.city || '').toLowerCase().includes(city.toLowerCase())
-                ]
+                [city, (s) => (s.city || s.address?.city || '').toLowerCase().includes(city.toLowerCase())]
             ]
 
-            let exactMatches = stores.filter((store) => {
+            let result = matches
+            for (const [condition, filterFn] of filters) {
+                if (condition && result.length > 0) {
+                    const filtered = result.filter(filterFn)
+                    if (filtered.length > 0) result = filtered
+                }
+            }
+            return result
+        }
+        if (storeName) {
+            const searchNameLower = storeName.toLowerCase().trim()
+            const exactMatches = stores.filter(store => {
                 const storeNameLower = (store.name || '').toLowerCase().trim()
                 return storeNameLower === searchNameLower
             })
 
             if (exactMatches.length > 0) {
-                let nameMatches = exactMatches
-                for (const [condition, filterFn] of filters) {
-                    if (condition && nameMatches.length > 0) {
-                        const filtered = nameMatches.filter(filterFn)
-                        if (filtered.length > 0) nameMatches = filtered
-                    }
-                }
-
-                if (nameMatches.length > 0) return nameMatches[0]
+                const filtered = applyFilters(exactMatches)
+                if (filtered.length > 0) return filtered[0]
             }
 
-            let nameMatches = stores.filter((store) => {
+
+            const partialMatches = stores.filter(store => {
                 const storeNameLower = (store.name || '').toLowerCase().trim()
-                return (
-                    storeNameLower.includes(searchNameLower) ||
-                    searchNameLower.includes(storeNameLower)
-                )
+                return storeNameLower.includes(searchNameLower) || searchNameLower.includes(storeNameLower)
             })
 
-            for (const [condition, filterFn] of filters) {
-                if (condition && nameMatches.length > 0) {
-                    const filtered = nameMatches.filter(filterFn)
-                    if (filtered.length > 0) nameMatches = filtered
-                }
+            if (partialMatches.length > 0) {
+                const filtered = applyFilters(partialMatches)
+                if (filtered.length > 0) return filtered[0]
             }
-
-            if (nameMatches.length > 0) return nameMatches[0]
         }
-
         if (zipcode) {
-            const zipMatches = stores.filter((store) => {
+            const zipMatches = stores.filter(store => {
                 const storeZip = store.postalCode || store.address?.postalCode
                 return storeZip === zipcode
             })
             if (zipMatches.length > 0) return zipMatches[0]
         }
-
         if (city) {
-            const cityMatches = stores.filter((store) => {
+            const cityMatches = stores.filter(store => {
                 const storeCity = (store.city || store.address?.city || '').toLowerCase()
                 return storeCity.includes(city.toLowerCase())
             })
             if (cityMatches.length > 0) return cityMatches[0]
         }
 
-        return stores.length > 0 ? stores[0] : null
+        return stores[0]
     }, [])
 
     useEffect(() => {
         if (storeSearchData?.data && locationData && isProcessing) {
-            const countryCode = getCountryForPostalSearch(
-                locationData.zipcode,
-                locationData.countryCode
-            )
+            const countryCode = locationData.countryCode ? getCountryForPostalSearch(locationData.countryCode) : null
             const searchCriteria = {
                 ...locationData,
-                countryCode: locationData.countryCode || countryCode
+                countryCode
             }
             const selectedStore =
                 findMatchingStore(storeSearchData.data, searchCriteria) || storeSearchData.data[0]
@@ -325,28 +342,24 @@ const useSeStoreSelection = () => {
             if (selectedStore) {
                 let seSearchParams = {}
                 if (locationData.latitude && locationData.longitude) {
-                    seSearchParams = {
+                    seSearchParams = addCountryCode({
                         latitude: locationData.latitude,
-                        longitude: locationData.longitude,
-                        countryCode: selectedStore?.countryCode
-                    }
+                        longitude: locationData.longitude
+                    }, selectedStore?.countryCode)
                 } else if (locationData.zipcode) {
-                    seSearchParams = {
-                        postalCode: locationData.zipcode,
-                        countryCode: countryCode
-                    }
+                    seSearchParams = addCountryCode({
+                        postalCode: locationData.zipcode
+                    }, countryCode)
                 } else if (locationData.city && cityCoords) {
                     if (cityCoords.postalCode) {
-                        seSearchParams = {
-                            postalCode: cityCoords.postalCode,
-                            countryCode: cityCoords.country
-                        }
+                        seSearchParams = addCountryCode({
+                            postalCode: cityCoords.postalCode
+                        }, cityCoords.country)
                     } else {
-                        seSearchParams = {
+                        seSearchParams = addCountryCode({
                             latitude: cityCoords.lat,
-                            longitude: cityCoords.lng,
-                            countryCode: cityCoords.country
-                        }
+                            longitude: cityCoords.lng
+                        }, cityCoords.country)
                     }
                 }
 
@@ -366,30 +379,26 @@ const useSeStoreSelection = () => {
 
                 if (locationData.latitude && locationData.longitude) {
                     setStoreLocatorParams({
+                        ...createBaseStoreParams(countryCode),
                         latitude: locationData.latitude,
-                        longitude: locationData.longitude,
-                        postalCode: selectedStore?.postalCode,
-                        countryCode: selectedStore?.countryCode,
-                        limit: 50
+                        longitude: locationData.longitude
                     })
                 } else if (locationData.zipcode) {
                     setStoreLocatorParams({
-                        postalCode: locationData.zipcode,
-                        countryCode: countryCode,
-                        limit: 50
+                        ...createBaseStoreParams(countryCode),
+                        postalCode: locationData.zipcode
                     })
                 } else if (locationData.city && cityCoords) {
                     if (cityCoords.postalCode) {
                         setStoreLocatorParams({
-                            postalCode: cityCoords.postalCode,
-                            countryCode: cityCoords.country,
-                            limit: 50
+                            ...createBaseStoreParams(cityCoords.country),
+                            postalCode: cityCoords.postalCode
                         })
                     } else {
                         setStoreLocatorParams({
+                            ...createBaseStoreParams(cityCoords.country),
                             latitude: cityCoords.lat,
-                            longitude: cityCoords.lng,
-                            limit: 50
+                            longitude: cityCoords.lng
                         })
                     }
                 }
@@ -399,15 +408,14 @@ const useSeStoreSelection = () => {
                 if (typeof window !== 'undefined') {
                     window.dispatchEvent(
                         new CustomEvent('seStoreSelected', {
-                            detail: {
+                            detail: addCountryCode({
                                 store: selectedStore,
                                 source: 'search_engine',
                                 hasStoreName: Boolean(locationData.storeName),
                                 selectionMethod: locationData.storeName
                                     ? 'name_match'
-                                    : 'nearest_location',
-                                countryCode: countryCode
-                            }
+                                    : 'nearest_location'
+                            }, countryCode)
                         })
                     )
                 }
@@ -460,7 +468,7 @@ const useSeStoreSelection = () => {
             }
 
             if ((parsedLat && parsedLng) || storeName || zipcode || city) {
-                const countryCode = country || getCountryForPostalSearch(zipcode, null)
+                const countryCode = country ? getCountryForPostalSearch(country) : null
 
                 setIsProcessing(true)
                 setLocationData({
