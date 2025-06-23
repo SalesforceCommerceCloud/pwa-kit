@@ -62,7 +62,7 @@ const HooksShowcase = loadable(() => import('./pages/hooks-showcase'), {
 })
 const PageShowcase = loadable(() => import('./pages/page-showcase'), {fallback})
 const PageNotFound = loadable(() => import('./pages/page-not-found'))
-const ComponentBuilder = loadable(() => import('./pages/component-builder'), {
+const ComponentBuilder = loadable(() => import('./pages/component-builder/index'), {
     fallback
 })
 
