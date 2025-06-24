@@ -11,15 +11,15 @@ import {ChakraProvider} from '@chakra-ui/react'
 // Removes focus for non-keyboard interactions for the whole application
 import 'focus-visible/dist/focus-visible'
 
-import theme from '../../../theme'
-import {MultiSiteProvider} from '../../../contexts'
+import theme from '../../../src/theme'
+import {MultiSiteProvider} from '../../../src/contexts'
 import {
     resolveSiteFromUrl,
     resolveLocaleFromUrl
-} from '../../../utils/site-utils'
+} from '../../../src/utils/site-utils'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {proxyBasePath} from '@salesforce/pwa-kit-runtime/utils/ssr-namespace-paths'
-import {createUrlTemplate} from '../../../utils/url'
+import {createUrlTemplate} from '../../../src/utils/url'
 import createLogger from '@salesforce/pwa-kit-runtime/utils/logger-factory'
 
 import {CommerceApiProvider} from '@salesforce/commerce-sdk-react'

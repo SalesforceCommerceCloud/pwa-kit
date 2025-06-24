@@ -10,15 +10,15 @@ import PropTypes from 'prop-types'
 import {useHistory, useLocation} from 'react-router-dom'
 import {StorefrontPreview} from '@salesforce/commerce-sdk-react/components'
 import {getAssetUrl} from '@salesforce/pwa-kit-react-sdk/ssr/universal/utils'
-import useActiveData from '../../../hooks/use-active-data'
+import useActiveData from '../../../src/hooks/use-active-data'
 import {useQuery} from '@tanstack/react-query'
 import {
     useAccessToken,
     useCategory,
     useShopperBasketsMutation
 } from '@salesforce/commerce-sdk-react'
-import logger from '../../../utils/logger-instance'
-import {useAppOrigin} from '../../../hooks/use-app-origin'
+import logger from '../../../src/utils/logger-instance'
+import {useAppOrigin} from '../../../src/hooks/use-app-origin'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 
 // Chakra
@@ -26,42 +26,42 @@ import {Box, Center, Fade, Spinner, useDisclosure, useStyleConfig} from '@chakra
 import {SkipNavLink, SkipNavContent} from '@chakra-ui/skip-nav'
 
 // Contexts
-import {CurrencyProvider} from '../../../contexts'
+import {CurrencyProvider} from '../../../src/contexts'
 
 // Local Project Components
-import Header from '../../../components/header'
-import OfflineBanner from '../../../components/offline-banner'
-import OfflineBoundary from '../../../components/offline-boundary'
-import ScrollToTop from '../../../components/scroll-to-top'
-import Footer from '../../../components/footer'
-import CheckoutHeader from '../../../pages/checkout/partials/checkout-header'
-import CheckoutFooter from '../../../pages/checkout/partials/checkout-footer'
-import {DrawerMenu} from '../../../components/drawer-menu'
-import {ListMenu, ListMenuContent} from '../../../components/list-menu'
-import {HideOnDesktop, HideOnMobile} from '../../../components/responsive'
-import StoreLocatorModal from '../../../components/store-locator-modal'
+import Header from '../../../src/components/header'
+import OfflineBanner from '../../../src/components/offline-banner'
+import OfflineBoundary from '../../../src/components/offline-boundary'
+import ScrollToTop from '../../../src/components/scroll-to-top'
+import Footer from '../../../src/components/footer'
+import CheckoutHeader from '../../../src/pages/checkout/partials/checkout-header'
+import CheckoutFooter from '../../../src/pages/checkout/partials/checkout-footer'
+import {DrawerMenu} from '../../../src/components/drawer-menu'
+import {ListMenu, ListMenuContent} from '../../../src/components/list-menu'
+import {HideOnDesktop, HideOnMobile} from '../../../src/components/responsive'
+import StoreLocatorModal from '../../../src/components/store-locator-modal'
 // Hooks
-import {AuthModal, useAuthModal} from '../../../hooks/use-auth-modal'
-import {DntNotification, useDntNotification} from '../../../hooks/use-dnt-notification'
+import {AuthModal, useAuthModal} from '../../../src/hooks/use-auth-modal'
+import {DntNotification, useDntNotification} from '../../../src/hooks/use-dnt-notification'
 import {useTheme} from '@chakra-ui/react'
-import {AddToCartModalProvider} from '../../../hooks/use-add-to-cart-modal'
-import useMultiSite from '../../../hooks/use-multi-site'
-import {useCurrentCustomer} from '../../../hooks/use-current-customer'
-import {useCurrentBasket} from '../../../hooks/use-current-basket'
-import {useUpdateShopperContext} from '../../../hooks/use-update-shopper-context'
+import {AddToCartModalProvider} from '../../../src/hooks/use-add-to-cart-modal'
+import useMultiSite from '../../../src/hooks/use-multi-site'
+import {useCurrentCustomer} from '../../../src/hooks/use-current-customer'
+import {useCurrentBasket} from '../../../src/hooks/use-current-basket'
+import {useUpdateShopperContext} from '../../../src/hooks/use-update-shopper-context'
 
 // HOCs
-import {withCommerceSdkReact} from '../../../components/with-commerce-sdk-react'
+import {withCommerceSdkReact} from '../../../src/components/with-commerce-sdk-react'
 
 // Localization
 import {IntlProvider} from 'react-intl'
 // Others
-import {watchOnlineStatus, flatten, isServer} from '../../../utils/utils'
-import {getTargetLocale, fetchTranslations} from '../../../utils/locale'
+import {watchOnlineStatus, flatten, isServer} from '../../../src/utils/utils'
+import {getTargetLocale, fetchTranslations} from '../../../src/utils/locale'
 
-import Seo from '../../../components/seo'
+import Seo from '../../../src/components/seo'
 import {Helmet} from 'react-helmet'
-import {getPathWithLocale} from '../../../utils/url'
+import {getPathWithLocale} from '../../../src/utils/url'
 
 const PlaceholderComponent = () => (
     <Center p="2">

@@ -18,7 +18,7 @@ import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 
 // Components
 import {Skeleton} from '@chakra-ui/react'
-import {configureRoutes} from '../utils/routes-utils'
+import {configureRoutes} from '../src/utils/routes-utils'
 
 const fallback = <Skeleton height="75vh" width="100%" />
 const socialRedirectURI = getConfig()?.login?.social?.redirectURI
@@ -26,31 +26,33 @@ const resetPasswordLandingPath = getConfig()?.login?.resetPassword?.landingPath
 const passwordlessLoginLandingPath = getConfig()?.login?.passwordless?.landingPath
 
 // Pages
-const Home = loadable(() => import('../pages/home'), {fallback})
-const Login = loadable(() => import('../pages/login'), {fallback})
-const Registration = loadable(() => import('../pages/registration'), {
+const Home = loadable(() => import('../src/pages/home'), {fallback})
+const Login = loadable(() => import('../src/pages/login'), {fallback})
+const Registration = loadable(() => import('../src/pages/registration'), {
     fallback
 })
-const ResetPassword = loadable(() => import('../pages/reset-password'), {fallback})
-const Account = loadable(() => import('../pages/account'), {fallback})
-const Cart = loadable(() => import('../pages/cart'), {fallback})
-const Checkout = loadable(() => import('../pages/checkout'), {
+const ResetPassword = loadable(() => import('../src/pages/reset-password'), {fallback})
+const Account = loadable(() => import('../src/pages/account'), {fallback})
+const Cart = loadable(() => import('../src/pages/cart'), {fallback})
+const Checkout = loadable(() => import('../src/pages/checkout'), {
     fallback
 })
-const CheckoutConfirmation = loadable(() => import('../pages/checkout/confirmation'), {fallback})
-const SocialLoginRedirect = loadable(() => import('../pages/social-login-redirect'), {fallback})
-const LoginRedirect = loadable(() => import('../pages/login-redirect'), {fallback})
-const ProductDetail = loadable(() => import('../pages/product-detail'), {fallback})
-const ProductList = loadable(() => import('../pages/product-list'), {
+const CheckoutConfirmation = loadable(() => import('../src/pages/checkout/confirmation'), {
     fallback
 })
-const StoreLocator = loadable(() => import('../pages/store-locator'), {
+const SocialLoginRedirect = loadable(() => import('../src/pages/social-login-redirect'), {fallback})
+const LoginRedirect = loadable(() => import('../src/pages/login-redirect'), {fallback})
+const ProductDetail = loadable(() => import('../src/pages/product-detail'), {fallback})
+const ProductList = loadable(() => import('../src/pages/product-list'), {
     fallback
 })
-const Wishlist = loadable(() => import('../pages/account/wishlist'), {
+const StoreLocator = loadable(() => import('../src/pages/store-locator'), {
     fallback
 })
-const PageNotFound = loadable(() => import('../pages/page-not-found'))
+const Wishlist = loadable(() => import('../src/pages/account/wishlist'), {
+    fallback
+})
+const PageNotFound = loadable(() => import('../src/pages/page-not-found'))
 
 export const routes = [
     {
