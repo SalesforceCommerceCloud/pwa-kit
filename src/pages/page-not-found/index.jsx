@@ -27,8 +27,8 @@ const PageNotFound = () => {
         <Box
             layerStyle="page"
             className="page-not-found"
-            height={'100%'}
-            padding={{lg: 8, md: 6, sm: 0, base: 0}}
+            height="100%"
+            padding={{base: 0, sm: 0, md: 6, lg: 8}}
         >
             <Helmet>
                 <title>
@@ -47,8 +47,8 @@ const PageNotFound = () => {
                 px={{base: 5, md: 12}}
                 py={{base: 48, md: 60}}
             >
-                <SearchIcon boxSize={['30px', '32px']} mb={8} />
-                <Heading as="h2" fontSize={['xl', '2xl', '2xl', '3xl']} mb={2} align="center">
+                <SearchIcon boxSize={{base: '30px', md: '32px'}} mb={8} />
+                <Heading as="h2" fontSize={{base: 'xl', md: '2xl', lg: '3xl'}} mb={2} textAlign="center">
                     {intl.formatMessage({
                         defaultMessage: "The page you're looking for can't be found.",
                         id: 'page_not_found.title.page_cant_be_found'
@@ -63,19 +63,19 @@ const PageNotFound = () => {
                         })}
                     </Text>
                 </Box>
-                <Stack direction={['column', 'row']} width={['100%', 'auto']}>
+                <Stack direction={{base: 'column', md: 'row'}} width={{base: '100%', md: 'auto'}}>
                     <Button
                         variant="outline"
                         bg="white"
                         onClick={() => history.goBack()}
-                        borderColor={'gray.200'}
+                        borderColor="gray.200"
                     >
                         {intl.formatMessage({
                             defaultMessage: 'Back to previous page',
                             id: 'page_not_found.action.go_back'
                         })}
                     </Button>
-                    <Button as={Link} to={'/'}>
+                    <Button as={Link} to="/">
                         {intl.formatMessage({
                             defaultMessage: 'Go to home page',
                             id: 'page_not_found.link.homepage'
