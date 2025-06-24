@@ -503,7 +503,7 @@ const ProductList = (props) => {
                                                         borderBottomColor="gray.100"
                                                         p={4}
                                                     >
-                                                        <Dialog.Title>
+                                                        <Dialog.Title asChild>
                                                             <Heading
                                                                 as="h1"
                                                                 fontWeight="bold"
