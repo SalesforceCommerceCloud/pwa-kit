@@ -189,7 +189,6 @@ const App = (props) => {
 
     // Used to conditionally render header/footer for checkout page
     const isCheckout = /\/checkout$/.test(location?.pathname)
-    const isExpress = /\/express$/.test(location?.pathname)
 
     const {l10n} = site
     // Get the current currency to be used through out the app
@@ -290,11 +289,7 @@ const App = (props) => {
         trackPage()
     }, [location])
 
-    return isExpress ? (
-        <OfflineBoundary isOnline={false}>
-            <div style={{width: '100%', height: '32px', overflowY: 'hidden'}}>{children}</div>
-        </OfflineBoundary>
-    ) : (
+    return (
         <Box className="sf-app" {...styles.container}>
             <StorefrontPreview getToken={getTokenWhenReady}>
                 <IntlProvider
