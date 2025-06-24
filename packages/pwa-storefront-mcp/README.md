@@ -20,12 +20,34 @@ This MCP server provides:
 npm install
 ```
 
-## Testing the MCP Server
+## Run the MCP Server
 
-### Method 1: Run the automated test script
-```bash
-npm test
-```
+### Method 1: Run MCP Server From Cursor
+Open Cursor Application
+Go to Cursor Menu on top menu bar, then *Settings* > *Cursor Settings...* > Tools & Integrations > MCP Tools > New MCP Server
+
+![Cursor Settings Screenshot](./docs/images/cursor-settings.png)
+![Cursor MCP Tools Screenshot](./docs/images/cursor-mcp-tools.png)
+
+Add this to your mcp.json:
+``` json
+{
+  "mcpServers": {
+
+    "pwa-storefront-mcp": {
+      "command": "node /Users/wei.liu/dev/git-repos/pwa-kit-2/pwa-kit/packages/pwa-storefront-mcp/src/server/server.js",
+      "transport": "stdio",
+      "args": []
+    }
+  }
+}
+
+This will:
+- Start the MCP server
+- Connect to it as a client
+- List available tools
+- Call the `create_new_component` tool
+- Display the results
 
 This will:
 - Start the MCP server
