@@ -277,7 +277,12 @@ const SignOutConfirmationDialog = ({isOpen, onConfirm, onClose}) => {
     const cancelRef = useRef()
 
     return (
-        <Dialog.Root role="alertdialog" initialFocusEl={cancelRef} open={isOpen} onOpenChange={(details) => !details.open && onClose()}>
+        <Dialog.Root
+            role="alertdialog"
+            initialFocusEl={cancelRef}
+            open={isOpen}
+            onOpenChange={(details) => !details.open && onClose()}
+        >
             <Portal>
                 <Dialog.Backdrop />
                 <Dialog.Positioner>
