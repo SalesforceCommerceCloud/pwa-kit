@@ -190,7 +190,7 @@
     "defaultMessage": "Delivery"
   },
   "cart.order_type.pickup_in_store": {
-    "defaultMessage": "Pickup in Store"
+    "defaultMessage": "Pickup in Store ({storeName})"
   },
   "cart.product_edit_modal.modal_label": {
     "defaultMessage": "Edit modal for {productName}"

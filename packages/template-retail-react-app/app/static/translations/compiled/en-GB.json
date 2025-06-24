@@ -480,7 +480,15 @@
   "cart.order_type.pickup_in_store": [
     {
       "type": 0,
-      "value": "Pickup in Store"
+      "value": "Pickup in Store ("
+    },
+    {
+      "type": 1,
+      "value": "storeName"
+    },
+    {
+      "type": 0,
+      "value": ")"
     }
   ],
   "cart.product_edit_modal.modal_label": [
