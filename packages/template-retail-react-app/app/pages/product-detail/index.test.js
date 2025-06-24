@@ -16,8 +16,6 @@ import mockedProductSet from '../../commerce-api/mocks/product-set-winter-lookM'
 
 jest.setTimeout(60000)
 
-jest.useFakeTimers()
-
 jest.mock('../../commerce-api/einstein')
 
 const MockedComponent = () => {
