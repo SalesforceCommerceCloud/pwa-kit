@@ -98,7 +98,6 @@ const ProductDetail = () => {
     const {
         configurePickupShipment,
         configureRegularShippingMethod,
-        hasPickupItems: checkHasPickupItems,
         addInventoryIdsToPickupItems,
         getPickupShippingMethodId,
         getDefaultShippingMethodId,
@@ -106,7 +105,7 @@ const ProductDetail = () => {
     } = usePickupShipment()
 
     // Hook for shipping methods - we'll use refetch when needed
-    const {data: shippingMethods, refetch: refetchShippingMethods} = useShippingMethodsForShipment(
+    const {refetch: refetchShippingMethods} = useShippingMethodsForShipment(
         {
             parameters: {
                 basketId: basket?.basketId,

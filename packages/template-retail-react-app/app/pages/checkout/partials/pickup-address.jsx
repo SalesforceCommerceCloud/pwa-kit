@@ -31,6 +31,8 @@ export default function PickupAddress() {
 
     const selectedShippingAddress = basket?.shipments && basket?.shipments[0]?.shippingAddress
 
+    // Check if basket is a pickup order
+    const isPickupOrder = basket?.shipments?.[0]?.shippingMethod?.c_storePickupEnabled === true
     const storeId = basket?.shipments?.[0]?.c_fromStoreId
     const {data: storeData} = useStores(
         {
@@ -39,7 +41,7 @@ export default function PickupAddress() {
             }
         },
         {
-            enabled: !!storeId
+            enabled: !!storeId && isPickupOrder
         }
     )
     const store = storeData?.data?.[0]
@@ -48,7 +50,10 @@ export default function PickupAddress() {
         city: store?.city,
         countryCode: store?.countryCode,
         postalCode: store?.postalCode,
-        stateCode: store?.stateCode
+        stateCode: store?.stateCode,
+        firstName: store?.name,
+        lastName: 'Pickup',
+        phone: store?.phone
     }
 
     const submitAndContinue = async (address) => {

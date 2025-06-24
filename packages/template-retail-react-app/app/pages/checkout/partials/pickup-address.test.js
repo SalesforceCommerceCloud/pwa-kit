@@ -6,7 +6,6 @@
  */
 import React from 'react'
 import {screen, waitFor, cleanup} from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
 import PickupAddress from '@salesforce/retail-react-app/app/pages/checkout/partials/pickup-address'
 import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
 
@@ -103,9 +102,6 @@ jest.mock('@salesforce/retail-react-app/app/pages/checkout/util/checkout-context
 }))
 
 describe('PickupAddress', () => {
-    const siteId = 'site-1'
-    const storeInfoKey = `store_${siteId}`
-
     beforeEach(() => {
         jest.resetModules()
         jest.clearAllMocks()
@@ -151,7 +147,10 @@ describe('PickupAddress', () => {
                     city: 'San Francisco',
                     countryCode: 'US',
                     postalCode: '94105',
-                    stateCode: 'CA'
+                    stateCode: 'CA',
+                    firstName: 'Test Store',
+                    lastName: 'Pickup',
+                    phone: '555-123-4567'
                 }
             })
         })
