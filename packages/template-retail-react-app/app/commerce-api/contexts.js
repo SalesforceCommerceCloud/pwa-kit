@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React, {createContext, useReducer, useContext} from 'react'
-import {CommerceApiProvider} from '@salesforce/commerce-sdk-react'
+import {CommerceApiProvider as CommerceSDKReactProvider} from '@salesforce/commerce-sdk-react'
 import {getAppOrigin} from 'pwa-kit-react-sdk/utils/url'
 import {isServer} from '../utils/utils'
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
@@ -61,7 +61,7 @@ export const CommerceAPIProvider = ({value, children}) => {
     return (
         <CommerceAPIContext.Provider value={api}>
             <QueryClientProvider client={queryClient}>
-                <CommerceApiProvider
+                <CommerceSDKReactProvider
                     shortCode={shortCode}
                     clientId={clientId}
                     organizationId={organizationId}
@@ -73,7 +73,7 @@ export const CommerceAPIProvider = ({value, children}) => {
                     apiClients={apiClients}
                 >
                     {children}
-                </CommerceApiProvider>
+                </CommerceSDKReactProvider>
             </QueryClientProvider>
         </CommerceAPIContext.Provider>
     )
