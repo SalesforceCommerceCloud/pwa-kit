@@ -138,7 +138,11 @@ const ProductDetail = () => {
     let bundleChildVariantIds = ''
     if (isProductABundle)
         bundleChildVariantIds = Object.keys(childProductSelection)
-            ?.map((key) => childProductSelection[key].variant.productId)
+            ?.map(
+                (key) =>
+                    childProductSelection[key].variant?.productId ||
+                    childProductSelection[key].product?.id
+            )
             .join(',')
 
     const {data: bundleChildrenData} = useProducts(
@@ -160,7 +164,7 @@ const ProductDetail = () => {
         // Loop through the bundle children and update the inventory for variant selection
         product.bundledProducts.forEach(({product: childProduct}, index) => {
             const matchingChildProduct = bundleChildrenData.data.find(
-                (bundleChild) => bundleChild.master.masterId === childProduct.id
+                (bundleChild) => bundleChild?.master?.masterId === childProduct.id
             )
             if (matchingChildProduct) {
                 product.bundledProducts[index].product = {
@@ -332,10 +336,16 @@ const ProductDetail = () => {
         })
 
         // Using ot state for which child products are selected, scroll to the first
-        // one that isn't selected.
+        // one that isn't selected and requires a variant selection.
         const selectedProductIds = Object.keys(childProductSelection)
         const firstUnselectedProduct = comboProduct.childProducts.find(
-            ({product: childProduct}) => !selectedProductIds.includes(childProduct.id)
+            ({product: childProduct}) => {
+                // Skip validation for standard products (no variations)
+                if (childProduct.type?.item) {
+                    return false
+                }
+                return !selectedProductIds.includes(childProduct.id)
+            }
         )?.product
 
         if (firstUnselectedProduct) {
@@ -379,7 +389,7 @@ const ProductDetail = () => {
                     // with the chosen variant selections
                     bundledProductItems: childProductSelections.map((child) => {
                         return {
-                            productId: child.variant.productId,
+                            productId: child.variant?.productId || child.product?.id,
                             quantity: child.quantity
                         }
                     })

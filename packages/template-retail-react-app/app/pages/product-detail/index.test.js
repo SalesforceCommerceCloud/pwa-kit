@@ -574,4 +574,45 @@ describe('standard product', () => {
             ])
         })
     })
+
+    test('renders bundle containing standard products without errors when master property is not provided', async () => {
+        global.server.use(
+            // Mock bundle with standard products
+            rest.get('*/products/:productId', (req, res, ctx) => {
+                return res(ctx.json(mockProductBundle))
+            }),
+            rest.get('*/products', (req, res, ctx) => {
+                const ids = req.url.searchParams.get('ids')
+                if (ids) {
+                    const products = ids.split(',').map((id) => ({
+                        id,
+                        inventory: {
+                            stockLevel: 5,
+                            orderable: true
+                        }
+                    }))
+                    return res(ctx.json({data: products}))
+                }
+                return res(ctx.json({data: []}))
+            }),
+            // Add items to basket
+            rest.post('*/baskets/:basketId/items', (req, res, ctx) => {
+                return res(ctx.json(basketWithProductBundle))
+            }),
+            // Update basket items
+            rest.patch('*/baskets/:basketId/items', (req, res, ctx) => {
+                return res(ctx.json(basketWithProductBundle))
+            })
+        )
+
+        renderWithProviders(<MockedComponent />)
+
+        await waitFor(() => {
+            expect(screen.getByTestId('product-details-page')).toBeInTheDocument()
+        })
+
+        await waitFor(() => {
+            expect(screen.getAllByTestId('product-view')).toHaveLength(4) // 1 parent + 3 children
+        })
+    })
 })
