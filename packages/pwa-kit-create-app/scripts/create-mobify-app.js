@@ -57,6 +57,7 @@ const VALIDATORS = require('../data/validators.json').validators
 // Questions composed of public presets and public templates.
 // NOTE: We have to do some weird stuff to determine if the thing we are selecting is a preset or a template.
 // There might be a better way to do this.
+// NOTE: Id's between presets and templates are unique. We should not break this contract.
 const INITIAL_QUESTIONS = [
     {
         name: 'general.presetOrTemplateId',
@@ -65,11 +66,11 @@ const INITIAL_QUESTIONS = [
         choices: [
             ...PRESETS.filter(({private}) => !private).map(({shortDescription, id}) => ({
                 name: shortDescription,
-                value: `preset-${id}`
+                value: id
             })),
             ...TEMPLATES.filter(({private}) => !private).map(({shortDescription, id}) => ({
                 name: shortDescription,
-                value: `template-${id}`
+                value: id
             }))
         ].sort((a, b) => (a.name || '').localeCompare(b.name))
     }
@@ -94,7 +95,7 @@ const validPreset = (preset) => {
 const GENERATED_PROJECT_VERSION = '0.0.1'
 
 const INITIAL_CONTEXT = {
-    preset: undefined,
+    template: undefined,
     answers: {
         general: {},
         project: {}
@@ -270,7 +271,7 @@ const processTemplate = (relFile, inputDir, outputDir, context) => {
     const inputFile = p.join(inputDir, relFile)
     const outputFile = p.join(outputDir, relFile)
     const destDir = p.join(outputFile, '..')
-
+    console.error('cwd: ', process.cwd())
     // Create folder if we are doing a deep copy
     if (destDir) {
         fs.mkdirSync(destDir, {recursive: true})
@@ -320,7 +321,7 @@ const runGenerator = (context, {outputDir, templateVersion, verbose}) => {
             tarPath = p.join(__dirname, '..', 'templates', `${id}.tar.gz`)
             break
         default: {
-            const msg = `Error: Cannot handle template source type ${type}.`
+            const msg = `Error: Cannot handle template source type ${source}.`
             console.error(msg)
             process.exit(1)
         }
@@ -424,6 +425,9 @@ const main = async (opts) => {
     // to "general" and "project" questions. It'll also be populated with details of the selected project,
     // like its `package.json` value.
     let context = INITIAL_CONTEXT
+    let isPreset = false
+    let answers = {}
+    let selectedTemplate
     let {outputDir, verbose, preset, templateVersion, stdio} = opts
     const {prompt} = inquirer
     const OUTPUT_DIR_FLAG_ACTIVE = !!outputDir
@@ -442,74 +446,75 @@ const main = async (opts) => {
     }
 
     // If there is no preset provided via the CLI, check for stdio input or prompt the user
-    if (presetId) {
-        context.answers = PRESETS.find(({id}) => id === presetId).answers || {}
-    } else if (stdio) {
+    if (stdio) {
         try {
             const input = await readStdin()
-            const jsonData = JSON.parse(input)
-            context.answers = jsonData
+            answers = merge(answers, expandObject(JSON.parse(input)))
         } catch (err) {
             console.error('Failed to read from stdin:', err.message)
             process.exit(1)
         }
     } else {
-        context.answers = await prompt(INITIAL_QUESTIONS)
-
-        // Determine if the selected preset or template is a preset or template.
-        context.answers.general.isPreset =
-            context.answers.general.presetOrTemplateId.startsWith('preset-')
-
-        // Update the answers with the preset or template id.
-        context.answers.general.presetOrTemplateId = context.answers.general.presetOrTemplateId
-            .replace('preset-', '')
-            .replace('template-', '')
+        answers = await prompt(
+            INITIAL_QUESTIONS,
+            presetId ? {general: {presetOrTemplateId: presetId}} : {}
+        )
     }
 
-    // Add the selected preset to the context object.
-    const selectedPresetOrTemplate = [
-        ...(context.answers.general.isPreset ? PRESETS : TEMPLATES)
-    ].find(({id}) => id === (presetId || context.answers.general.presetOrTemplateId))
+    // Determine if the selection is a preset or template.
+    isPreset = PRESETS.some(({id}) => id === answers?.general?.presetOrTemplateId)
 
-    // Add the preset to the context.
-    context.presetOrTemplate = selectedPresetOrTemplate
+    // Update the answer with the actual template id.
+    if (isPreset) {
+        const selectedPreset = PRESETS.find(({id}) => id === answers.general.presetOrTemplateId)
 
-    // If using the preset, output the preset name
-    console.log(`Using ${context.answers.general.isPreset ? 'preset' : 'template'} "${selectedPresetOrTemplate.name}"`)
+        // NOTE: This is a little weird, but we'll set this value to the template id and treat is as such from this point forward..
+        answers.general.presetOrTemplateId = selectedPreset.templateId
+
+        // Expand the preset answers into the answers object.
+        answers = merge(answers, expandObject(selectedPreset.answers))
+    }
+
+    // Since we know we have the template id, we can find the template.
+    selectedTemplate = TEMPLATES.find(({id}) => id === answers.general.presetOrTemplateId)
+
+    // Give some feedback to the user.
+    console.log(`Using template "${selectedTemplate.name}"`)
+
+    // Assign the  preset to the context.
+    context.template = selectedTemplate
+    context.answers = answers
 
     if (!OUTPUT_DIR_FLAG_ACTIVE) {
-        outputDir = p.join(process.cwd(), selectedPresetOrTemplate.id)
+        outputDir = p.join(process.cwd(), selectedTemplate.id)
     }
 
     // Ask template specific questions and merge into the current context.
-    
-    if (context.answers.general.isPreset) {
-        context = merge(context, {
-            answers: expandObject(selectedPresetOrTemplate.answers)
-        })
-        console.log('Using preset', context)
+    // NOTE: Only questions that don't have supplied answers will be asked. This is how we get away with simplifying the code.
+    let {questions} = selectedTemplate
 
-    } else {
-        let {questions} = selectedPresetOrTemplate
+    // Inquirer doesn't support Regex values for the "validate" property. So lets make a function for it.
+    questions = questions.map((question) => {
+        const validator = VALIDATORS.find(({id}) => id === question.validator)
 
-        // We want to enhance these questions with the VALIDATORS.
-        const enhancedQuestions = questions.map((question) => {
-            const validator = VALIDATORS.find(({id}) => id === question.validator)
-            return {
-                ...question,
-                validate: validator?.regex
-                    ? (input) => new RegExp(validator.regex, 'i').test(input) || validator.message
-                    : undefined
-            }
-        })
+        return {
+            ...question,
+            validate: validator?.regex
+                ? (input) => new RegExp(validator.regex, 'i').test(input) || validator.message
+                : undefined
+        }
+    })
 
-        // Ask the questions and merge the answers into the current context.
-        const projectAnswers = await prompt(enhancedQuestions, answers)
+    // As the template specific questions. If we already have answers from the preset, then no questions
+    // will be asked.
+    console.log('questions', questions)
+    console.log('answers', answers)
+    const projectAnswers = await prompt(questions, answers)
 
-        context = merge(context, {
-            answers: expandObject(projectAnswers)
-        })
-    }
+    // Update the context.
+    context = merge(context, {
+        answers: expandObject(projectAnswers)
+    })
 
     if (context.answers.project.commerce?.instanceUrl) {
         // Remove protocol since we only use this to setup the OCAPI proxy
@@ -517,14 +522,10 @@ const main = async (opts) => {
         context.answers.project.commerce.instanceUrl = url.hostname
     }
 
-    const templateId = context.answers.general.isPreset
-        ? selectedPresetOrTemplate.templateId
-        : selectedPresetOrTemplate.id
-
     // Inject the packageJSON into the context for extensible projects.
     if (context.answers.project.extend) {
         const pkgJSON = JSON.parse(
-            sh.exec(`npm view ${templateId}@${templateVersion} --json`, {
+            sh.exec(`npm view ${selectedTemplate.id}@${templateVersion} --json`, {
                 silent: true
             }).stdout
         )
@@ -537,17 +538,17 @@ const main = async (opts) => {
         if (pkgJSON?.scripts['extract-default-translations']) {
             pkgJSON.scripts['extract-default-translations'] = pkgJSON.scripts[
                 'extract-default-translations'
-            ].replace('./', `./node_modules/${templateId}/`)
+            ].replace('./', `./node_modules/${selectedTemplate.id}/`)
         }
         if (pkgJSON?.scripts['compile-translations']) {
             pkgJSON.scripts['compile-translations'] = pkgJSON.scripts[
                 'compile-translations'
-            ].replace('./', `./node_modules/${templateId}/`)
+            ].replace('./', `./node_modules/${selectedTemplate.id}/`)
         }
         if (pkgJSON?.scripts['compile-translations:pseudo']) {
             pkgJSON.scripts['compile-translations:pseudo'] = pkgJSON.scripts[
                 'compile-translations:pseudo'
-            ].replace('./', `./node_modules/${templateId}/`)
+            ].replace('./', `./node_modules/${selectedTemplate.id}/`)
         }
 
         context = merge(
@@ -558,13 +559,6 @@ const main = async (opts) => {
         )
     }
 
-    
-    if (context.answers.general.isPreset) {
-        context.template = TEMPLATES.find(({id}) => id === selectedPresetOrTemplate.templateId) 
-
-    } else {
-        context.template = selectedPresetOrTemplate
-    }
     console.log('context', context)
     // Generate the project.
     runGenerator(context, {outputDir, templateVersion, verbose})

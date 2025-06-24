@@ -11,7 +11,6 @@
                 "project.extend": true,
                 "project.hybrid": false,
                 "project.name": "demo-storefront",
-                "project.template": "@salesforce/retail-react-app",
                 "project.commerce.instanceUrl": "https://zzte-053.dx.commercecloud.salesforce.com",
                 "project.commerce.clientId": "1d763261-6522-4913-9d52-5d947d3b94c4",
                 "project.commerce.siteId": "RefArch",
@@ -24,7 +23,6 @@
                 "project.dataCloud.tenantId": "mmydmztgh04dczjzmnsw0zd0g8.pc-rnd",
                 "project.demo.enableDemoSettings": false
             },
-            "assets": ["translations"],
             "private": false
         },
         {
@@ -37,7 +35,6 @@
                 "project.extend": false,
                 "project.hybrid": false,
                 "project.name": "demo-storefront",
-                "project.template": "@salesforce/retail-react-app",
                 "project.commerce.instanceUrl": "https://zzrf-001.dx.commercecloud.salesforce.com",
                 "project.commerce.clientId": "083859f2-5d93-4209-b999-a112266d63a0",
                 "project.commerce.siteId": "RefArchGlobal",
@@ -50,7 +47,6 @@
                 "project.dataCloud.tenantId": "mmydmztgh04dczjzmnsw0zd0g8.pc-rnd",
                 "project.demo.enableDemoSettings": true
             },
-            "assets": ["translations"],
             "private": true
         },
         {
@@ -62,7 +58,6 @@
                 "project.extend": true,
                 "project.hybrid": false,
                 "project.name": "retail-react-app",
-                "project.template": "@salesforce/retail-react-app",
                 "project.commerce.instanceUrl": "https://zzrf-001.dx.commercecloud.salesforce.com",
                 "project.commerce.clientId": "c9c45bfd-0ed3-4aa2-9971-40f88962b836",
                 "project.commerce.siteId": "RefArch",
@@ -75,7 +70,6 @@
                 "project.dataCloud.tenantId": "mmydmztgh04dczjzmnsw0zd0g8.pc-rnd",
                 "project.demo.enableDemoSettings": false
             },
-            "assets": ["translations"],
             "private": true
         },
         {
@@ -87,7 +81,6 @@
                 "project.extend": true,
                 "project.hybrid": false,
                 "project.name": "retail-react-app",
-                "project.template": "@salesforce/retail-react-app",
                 "project.commerce.instanceUrl": "https://zzrf-002.dx.commercecloud.salesforce.com",
                 "project.commerce.clientId": "89655706-9a0d-49ba-a1e5-18bb2d616374",
                 "project.commerce.siteId": "RefArch",
@@ -100,7 +93,6 @@
                 "project.dataCloud.tenantId": "mmydmztgh04dczjzmnsw0zd0g8.pc-rnd",
                 "project.demo.enableDemoSettings": false
             },
-            "assets": ["translations"],
             "private": true
         },
         {
@@ -112,7 +104,6 @@
                 "project.extend": true,
                 "project.hybrid": false,
                 "project.name": "retail-react-app",
-                "project.template": "@salesforce/retail-react-app",
                 "project.commerce.instanceUrl": "https://zzec-006.dx.commercecloud.salesforce.com",
                 "project.commerce.clientId": "b56e7ad3-2237-42c9-8f55-41e63ebca420",
                 "project.commerce.siteId": "RefArch",
@@ -125,7 +116,6 @@
                 "project.dataCloud.tenantId": "mmydmztgh04dczjzmnsw0zd0g8.pc-rnd",
                 "project.demo.enableDemoSettings": false
             },
-            "assets": ["translations"],
             "private": true
         },
         {
@@ -149,7 +139,6 @@
                 "project.dataCloud.tenantId": "mmydmztgh04dczjzmnsw0zd0g8.pc-rnd",
                 "project.demo.enableDemoSettings": false
             },
-            "assets": ["translations"],
             "private": true
         },
         {
@@ -161,7 +150,6 @@
                 "project.extend": true,
                 "project.hybrid": true,
                 "project.name": "retail-react-app",
-                "project.template": "@salesforce/retail-react-app",
                 "project.commerce.instanceUrl": "https://www.phased-launch-testing.com/",
                 "project.commerce.clientId": "e7e22b7f-a904-4f3a-8022-49dbee696485",
                 "project.commerce.siteId": "RefArch",
@@ -174,7 +162,6 @@
                 "project.dataCloud.tenantId": "mmydmztgh04dczjzmnsw0zd0g8.pc-rnd",
                 "project.demo.enableDemoSettings": false
             },
-            "assets": ["translations"],
             "private": true
         },
         {
@@ -183,8 +170,7 @@
             "description": "",
             "templateId": "@salesforce/typescript-minimal",
             "answers": {
-                "project.name": "typescript-minimal",
-                "project.template": "@salesforce/typescript-minimal"
+                "project.name": "typescript-minimal"
             },
             "private": true
         },
@@ -194,8 +180,7 @@
             "description": "",
             "templateId": "@salesforce/typescript-minimal",
             "answers": {
-                "project.name": "express-minimal",
-                "project.template": "@salesforce/express-minimal"
+                "project.name": "express-minimal"
             },
             "private": true
         }

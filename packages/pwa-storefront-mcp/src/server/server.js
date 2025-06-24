@@ -43,6 +43,8 @@ class PwaStorefrontMCPServerHighLevel {
             version: '0.1.0'
         })
 
+        console.error = console.error.bind(console)
+        
         this.addComponentTool = new AddComponentTool()
         this.insertExistingComponentTool = new InsertExistingComponentTool()
         this.CreateNewComponentTool = new CreateNewComponentTool()
@@ -55,7 +57,8 @@ class PwaStorefrontMCPServerHighLevel {
             'for details on the data structure and `_ai` properties. ' +
             'Ask users what preset they want to use for project creation. After selecting the preset, ' +
             'display the selected preset answers and pass the selected preset object ' +
-            'to the submit_pwa_kit_project_answers tool to generate the project ' +
+            'to the submit_pwa_kit_project_answers tool, keyed as "selectedPreset", to generate the project without confirming the answers. ' +
+            'IMPORTANT: Only call the submit_pwa_kit_project_answers tool after the user has selected a preset. ' +
             '(triggers: create pwa using preset, build storefront prest, generate pwa-kit preset).'
 
         const getCreateAppTemplatesDescription =
@@ -65,7 +68,7 @@ class PwaStorefrontMCPServerHighLevel {
             'use the validators from get_create_app_validators. Do not trigger if the prompt ' +
             'contains the word "preset" (triggers: create pwa, build storefront, generate pwa-kit).'
         
-        const getCreateAppValidators =
+        const getCreateAppValidatorsDescription =
             'Get the PWA Kit project creation question validators. Ensure you read the linked schema ' +
             'for details on the data structure and `_ai` properties. ' +
             'When asking the user to fulfill the templates questions use there validators to text the user input. ' +
@@ -270,14 +273,17 @@ class PwaStorefrontMCPServerHighLevel {
             'submit_pwa_kit_project_answers',
             'Submit completed PWA Kit project answers to generate the PWA Kit project. This should be called after the get_project_questions tool is called and the answers are collected.',
             {
-                answers: z.record(z.any()).describe('The collected answers for project generation')
+                selectedPreset: z.record(z.any()).describe('The selected preset for project generation')
             },
-            async ({answers}) => {
+            async (thing) => {
                 try {
-                    console.error('answers: ', answers)
-
-                    const result = await generatePwaKitProject(answers)
-                    console.error('result: ', result)
+                    const jsonData = {
+                        ...thing.selectedPreset.answers,
+                        'general.presetOrTemplateId': thing.selectedPreset.templateId
+                    }
+                    
+                    const result = await generatePwaKitProject(jsonData)
+                    
                     return {
                         content: [
                             {
@@ -303,7 +309,7 @@ class PwaStorefrontMCPServerHighLevel {
         // get_create_app_validators
         this.server.tool(
             'get_create_app_validators',
-            getCreateAppValidators,
+            getCreateAppValidatorsDescription,
             {},
             async () => {
 
