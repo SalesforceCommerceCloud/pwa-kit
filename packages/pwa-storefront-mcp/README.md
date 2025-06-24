@@ -12,7 +12,7 @@ The Model Context Protocol (MCP) is an open protocol that enables secure connect
 
 This MCP server provides:
 - `development_guidelines`: Help developers to understand and follow PWA Storefront developer guidelines and best practices
-- `create_new_component`: Help developers to create a new PWA Storefront component
+- `create_new_component`: Help developers to create a new PWA Storefront component. It will guide developers through a few simple questions and then generate code for the component based on the commerce data model used, layouts, etc.
 - `submit_pwa_kit_project_answers`: Help developers to generate a new PWA Storefront project
 
 ## Setup
@@ -135,13 +135,18 @@ The server will output debug information to stderr and handle MCP protocol messa
       ... (other components)
     /server
       - server.js
-      - server-old-fashioned.js
     /utils
       - AddComponentTool.js
+      - pwa-developer-guideline-tool.js
     /scripts
       - create-button.js
       - demo.js
     /tests
+      /images
+        - claude-config.png
+        - claude-list-tools.png
+        - cursor-list-tools.png
+        - cursor-settings.pnb
       - test-mcp.js
   /docs
     - cursor-integration-guide.md
