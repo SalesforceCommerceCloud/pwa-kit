@@ -121,7 +121,7 @@ describe('StoreLocatorList', () => {
             isLoading: false,
             data: mockStores,
             config: defaultConfig,
-            formValues: {countryCode: 'US'},
+            formValues: {countryCode: 'US', postalCode: '02108'},
             mode: 'input'
         })
 

@@ -425,6 +425,28 @@ const ProductList = (props) => {
         }
     }, [productSearchResult])
 
+    useEffect(() => {
+        // Check if products are loaded and visible to the user
+        if (!isLoading && productSearchResult?.hits && productSearchResult.hits.length > 0) {
+            const timer = setTimeout(() => {
+                if (typeof window !== 'undefined') {
+                    window.dispatchEvent(
+                        new CustomEvent('plpProductsLoaded', {
+                            detail: {
+                                searchQuery,
+                                totalProducts: productSearchResult.total,
+                                visibleProducts: productSearchResult.hits.length,
+                                isSearch
+                            }
+                        })
+                    )
+                }
+            }, 100)
+
+            return () => clearTimeout(timer)
+        }
+    }, [isLoading, productSearchResult?.hits, searchQuery, isSearch])
+
     return (
         <Box
             className="sf-product-list-page"

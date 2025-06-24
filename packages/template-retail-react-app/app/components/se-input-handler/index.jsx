@@ -34,46 +34,40 @@ const SeInputHandler = ({onOpenStoreLocator}) => {
         let urlParams
 
         try {
-            urlParams = new URLSearchParams(location.search)
-            let needsRepair = false
-            const repairedParams = new URLSearchParams()
-
-            for (const [key, value] of urlParams.entries()) {
-                if (value.includes('?')) {
-                    needsRepair = true
-                    const [actualValue, extraParams] = value.split('?', 2)
-                    repairedParams.set(key, actualValue)
-
-                    if (extraParams) {
-                        const extraParamsObj = new URLSearchParams(extraParams)
-                        for (const [extraKey, extraValue] of extraParamsObj.entries()) {
-                            repairedParams.set(extraKey, extraValue)
-                        }
-                    }
-                } else {
-                    repairedParams.set(key, value)
+            // First, normalize the search string by replacing any ? after the first one with &
+            let normalizedSearch = location.search
+            if (normalizedSearch) {
+                const [firstPart, ...rest] = normalizedSearch.split('?')
+                if (rest.length > 0) {
+                    normalizedSearch = firstPart + '?' + rest.join('&')
                 }
             }
 
-            if (needsRepair) {
-                urlParams = repairedParams
+            urlParams = new URLSearchParams(normalizedSearch)
+
+            // Check if we need to redirect to a clean URL
+            if (location.search !== normalizedSearch) {
+                history.replace({
+                    pathname: location.pathname,
+                    search: normalizedSearch
+                })
+                return
+            }
+
+            // Process the parameters
+            processSeParameters(urlParams)
+
+            // Clean up location parameters if they exist
+            const hasSeParams = hasSeParamKeys.some((key) => urlParams.has(key))
+            if (hasSeParams) {
+                cleanURLParams(location, history, hasSeParamKeys)
             }
         } catch (error) {
             console.warn('Error parsing URL parameters:', error)
-            let sanitizedSearch = location.search
-            if (sanitizedSearch) {
-                const firstQuestionIndex = sanitizedSearch.indexOf('?')
-                if (firstQuestionIndex !== -1) {
-                    const queryPart = sanitizedSearch.substring(firstQuestionIndex + 1)
-                    const sanitizedQuery = queryPart.replace(/\?/g, '&')
-                    sanitizedSearch = '?' + sanitizedQuery
-                }
-            }
-            urlParams = new URLSearchParams(sanitizedSearch)
+            urlParams = new URLSearchParams()
+            processSeParameters(urlParams)
         }
-
-        processSeParameters(urlParams)
-    }, [location.search, processSeParameters])
+    }, [location.search, processSeParameters, history, location.pathname, hasSeParamKeys])
 
     useEffect(() => {
         if (storeLocatorParams) {
@@ -94,20 +88,37 @@ const SeInputHandler = ({onOpenStoreLocator}) => {
 
             const openModal = () => {
                 onOpenStoreLocator()
+                setShouldOpenModal(false)
             }
 
             if (hasExternalQuery) {
-                setTimeout(openModal, 1500)
+                // Wait for PLP products to load before opening modal
+                const handlePlpLoaded = (event) => {
+                    if (event.detail?.isSearch) {
+                        openModal()
+                        window.removeEventListener('plpProductsLoaded', handlePlpLoaded)
+                    }
+                }
+
+                window.addEventListener('plpProductsLoaded', handlePlpLoaded)
+                if (
+                    document.readyState === 'complete' &&
+                    (window.location.pathname.startsWith('/search') ||
+                        window.location.pathname.includes('/product-list'))
+                ) {
+                    const productGrid = document.querySelector('.product-grid')
+                    if (productGrid && productGrid.children.length > 0) {
+                        openModal()
+                        window.removeEventListener('plpProductsLoaded', handlePlpLoaded)
+                        return
+                    }
+                }
+
+                return () => {
+                    window.removeEventListener('plpProductsLoaded', handlePlpLoaded)
+                }
             } else {
                 openModal()
-            }
-
-            setShouldOpenModal(false)
-
-            const hasSeParams = hasSeParamKeys.some((key) => urlParams.has(key))
-
-            if (hasSeParams) {
-                cleanURLParams(location, history, hasSeParamKeys)
             }
         }
     }, [

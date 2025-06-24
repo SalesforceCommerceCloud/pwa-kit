@@ -95,9 +95,7 @@ test('clears store, zip and country parameters from URL when modal opens', async
 })
 
 test('preserves other parameters when SE parameters are cleared', async () => {
-    window.history.pushState({}, '', '/test?lat=42.3601&lng=-71.0589&q=Shoes&size=10')
-
-    jest.clearAllMocks()
+    window.history.pushState({}, '', '/test?lat=42.3601&lng=-71.0589&color=blue&size=10')
 
     mockUseSeStoreSelection.mockReturnValue({
         shouldOpenModal: true,
@@ -108,12 +106,13 @@ test('preserves other parameters when SE parameters are cleared', async () => {
     window.localStorage.setItem('store_test-site', JSON.stringify({dummy: true}))
 
     renderWithProviders(<SeInputHandler onOpenStoreLocator={mockOnOpenStoreLocator} />)
-    jest.advanceTimersByTime(1500)
-
-    await waitFor(() => {
-        expect(window.location.search).toBe('?q=Shoes&size=10')
-        expect(mockOnOpenStoreLocator).toHaveBeenCalled()
-    })
+    await waitFor(
+        () => {
+            expect(mockOnOpenStoreLocator).toHaveBeenCalled()
+            expect(window.location.search).toBe('?color=blue&size=10')
+        },
+        {timeout: 3000}
+    )
 })
 
 test('does not open modal when only country parameter is provided', async () => {
@@ -129,7 +128,7 @@ test('does not open modal when only country parameter is provided', async () => 
     renderWithProviders(<SeInputHandler onOpenStoreLocator={mockOnOpenStoreLocator} />)
 
     await waitFor(() => {
-        expect(window.location.search).toBe('?country=US')
+        expect(window.location.search).toBe('')
         expect(mockOnOpenStoreLocator).not.toHaveBeenCalled()
     })
 })
@@ -139,7 +138,10 @@ test('delays modal opening when external search query is present', async () => {
 
     renderWithProviders(<SeInputHandler onOpenStoreLocator={mockOnOpenStoreLocator} />)
     expect(mockOnOpenStoreLocator).not.toHaveBeenCalled()
-    jest.advanceTimersByTime(1500)
+    const plpEvent = new CustomEvent('plpProductsLoaded', {
+        detail: {isSearch: true}
+    })
+    window.dispatchEvent(plpEvent)
 
     await waitFor(() => {
         expect(mockOnOpenStoreLocator).toHaveBeenCalled()

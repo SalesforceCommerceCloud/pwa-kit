@@ -488,6 +488,10 @@ const useSeStoreSelection = (totalItemCount) => {
 
     const processSeParameters = useCallback(
         (urlParams) => {
+            if (totalItemCount > 0) {
+                return
+            }
+
             const hasSeParams = ['lat', 'lng', 'zip', 'city', 'store', 'country'].some((p) =>
                 urlParams.has(p)
             )
@@ -534,7 +538,7 @@ const useSeStoreSelection = (totalItemCount) => {
                 })
             }
         },
-        [getCountryForPostalSearch, storeInfoKey]
+        [getCountryForPostalSearch, storeInfoKey, totalItemCount]
     )
 
     return {

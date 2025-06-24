@@ -14,6 +14,11 @@ import {useSearchStores} from '@salesforce/commerce-sdk-react'
 jest.mock('@salesforce/commerce-sdk-react', () => ({
     useSearchStores: jest.fn()
 }))
+jest.mock('@salesforce/retail-react-app/app/hooks/use-multi-site', () => () => ({
+    site: {id: 'test-site'},
+    buildUrl: (url) => url,
+    locale: 'en-US'
+}))
 
 const config = {
     radius: 100,
@@ -186,5 +191,149 @@ describe('useStoreLocator', () => {
         const {result} = renderHook(() => useStoreLocator(), {wrapper})
 
         expect(result.current.data).toEqual(mockStoreData)
+    })
+})
+
+describe('useStoreLocator - getSearchParams For Store Selection', () => {
+    const wrapper = ({children}) => (
+        <StoreLocatorProvider
+            config={{
+                radius: 100,
+                radiusUnit: 'mi',
+                defaultCountryCode: 'US',
+                defaultPostalCode: '10178'
+            }}
+        >
+            {children}
+        </StoreLocatorProvider>
+    )
+
+    beforeEach(() => {
+        window.localStorage.clear()
+        useSearchStores.mockClear()
+        useSearchStores.mockReturnValue({data: undefined, isLoading: false})
+    })
+
+    test('returns initial params when provided', () => {
+        const initialParams = {
+            countryCode: 'US',
+            postalCode: '94301',
+            latitude: 37.4419,
+            longitude: -122.143
+        }
+        const customWrapper = ({children}) => (
+            <StoreLocatorProvider
+                config={{
+                    radius: 100,
+                    radiusUnit: 'mi',
+                    defaultCountryCode: 'US',
+                    defaultPostalCode: '10178'
+                }}
+            >
+                {children}
+            </StoreLocatorProvider>
+        )
+        const {result} = renderHook(() => useStoreLocator(), {wrapper: customWrapper})
+        act(() => {
+            result.current.setFormValues({
+                countryCode: initialParams.countryCode,
+                postalCode: initialParams.postalCode
+            })
+        })
+        expect(useSearchStores).toHaveBeenCalledWith(
+            expect.objectContaining({
+                parameters: expect.objectContaining({
+                    countryCode: 'US',
+                    postalCode: '94301',
+                    maxDistance: 100,
+                    limit: 200,
+                    distanceUnit: 'mi'
+                })
+            }),
+            expect.any(Object)
+        )
+    })
+
+    test('returns Search Engine provided location parameter selection from localStorage when available', () => {
+        const seStoreData = {
+            isSeSelection: true,
+            seSearchParams: {
+                countryCode: 'US',
+                postalCode: '90210',
+                latitude: 34.0522,
+                longitude: -118.2437
+            }
+        }
+        window.localStorage.setItem('store_test-site', JSON.stringify(seStoreData))
+        renderHook(() => useStoreLocator(), {wrapper})
+        expect(useSearchStores).toHaveBeenCalledWith(
+            expect.objectContaining({
+                parameters: expect.objectContaining({
+                    countryCode: 'US',
+                    postalCode: '90210',
+                    latitude: 34.0522,
+                    longitude: -118.2437,
+                    limit: 200
+                })
+            }),
+            expect.any(Object)
+        )
+    })
+
+    test('returns manual search params from localStorage when no Search Engine provided location parameter selection', () => {
+        const manualStoreData = {
+            isSeSelection: false,
+            manualSearchParams: {
+                countryCode: 'DE',
+                postalCode: '10178'
+            }
+        }
+        window.localStorage.setItem('store_test-site', JSON.stringify(manualStoreData))
+        renderHook(() => useStoreLocator(), {wrapper})
+        expect(useSearchStores).toHaveBeenCalledWith(
+            expect.objectContaining({
+                parameters: expect.objectContaining({
+                    countryCode: 'US',
+                    postalCode: '10178',
+                    maxDistance: 100,
+                    limit: 200,
+                    distanceUnit: 'mi'
+                })
+            }),
+            expect.any(Object)
+        )
+    })
+
+    test('returns default values when localStorage is empty', () => {
+        renderHook(() => useStoreLocator(), {wrapper})
+        expect(useSearchStores).toHaveBeenCalledWith(
+            expect.objectContaining({
+                parameters: expect.objectContaining({
+                    countryCode: 'US',
+                    postalCode: '10178',
+                    maxDistance: 100,
+                    limit: 200,
+                    distanceUnit: 'mi'
+                })
+            }),
+            expect.any(Object)
+        )
+    })
+
+    test('returns default values when localStorage data is invalid', () => {
+        window.localStorage.setItem('store_test-site', 'invalid-json')
+        renderHook(() => useStoreLocator(), {wrapper})
+        expect(useSearchStores).toHaveBeenCalledWith(
+            expect.objectContaining({
+                parameters: expect.objectContaining({
+                    countryCode: 'US',
+                    postalCode: '10178',
+                    maxDistance: 100,
+                    limit: 200,
+                    distanceUnit: 'mi'
+                })
+            }),
+            expect.any(Object)
+        )
     })
 })

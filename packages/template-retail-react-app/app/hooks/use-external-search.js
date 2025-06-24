@@ -37,10 +37,6 @@ const useExternalSearch = () => {
             return
         }
 
-        if (hasStoreLocatorParams) {
-            return
-        }
-
         // need to pre-process out filler words like location hints, and handle multi-word searches
         // Handle multi-word searches and any extraneous hints.
         const rawQuery = searchParams?.q ?? searchParams?.search ?? searchParams?.query
