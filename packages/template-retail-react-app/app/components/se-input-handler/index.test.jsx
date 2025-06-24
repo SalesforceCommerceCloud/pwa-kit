@@ -110,8 +110,7 @@ test('preserves other parameters when SE parameters are cleared', async () => {
         () => {
             expect(mockOnOpenStoreLocator).toHaveBeenCalled()
             expect(window.location.search).toBe('?color=blue&size=10')
-        },
-        {timeout: 3000}
+        }
     )
 })
 
