@@ -12,21 +12,38 @@ import withRegistration from './index'
 import {renderWithProviders} from '../../utils/test-utils'
 import user from '@testing-library/user-event'
 import {rest} from 'msw'
-import {mockedGuestCustomer} from '../../commerce-api/mock-data'
+import {mockedGuestCustomer, mockedRegisteredCustomer} from '../../commerce-api/mock-data'
 import useCustomer from '../../commerce-api/hooks/useCustomer'
+import {AuthHelpers} from '@salesforce/commerce-sdk-react'
 
 jest.setTimeout(60000)
-jest.useFakeTimers()
 
 const ButtonWithRegistration = withRegistration(Button)
+
+const mockAuthHelperFunctions = {
+    [AuthHelpers.LoginRegisteredUserB2C]: {mutateAsync: jest.fn()}
+}
+
+jest.mock('@salesforce/commerce-sdk-react', () => {
+    const originalModule = jest.requireActual('@salesforce/commerce-sdk-react')
+    return {
+        ...originalModule,
+        useAuthHelper: jest
+            .fn()
+            .mockImplementation((helperType) => mockAuthHelperFunctions[helperType])
+    }
+})
 
 const MockedComponent = (props) => {
     const customer = useCustomer()
 
     useEffect(() => {
-        if (!customer.isRegistered) {
-            customer.login('customer@test.com', 'password1')
+        const doLogin = async () => {
+            if (!customer.isRegistered) {
+                await customer.login({email: 'customer@test.com', password: 'password1'})
+            }
         }
+        doLogin()
     }, [])
 
     return (
@@ -45,25 +62,29 @@ beforeAll(() => {
 })
 
 beforeEach(() => {
-    jest.resetModules()
+    jest.clearAllMocks()
 })
 
 afterEach(() => {
-    jest.resetModules()
     sessionStorage.clear()
 })
 
 test('should execute onClick for registered users', async () => {
+    global.server.use(
+        rest.get('*/customers/:customerId', (req, res, ctx) => {
+            return res(ctx.delay(0), ctx.status(200), ctx.json(mockedRegisteredCustomer))
+        })
+    )
     const onClick = jest.fn()
-    await renderWithProviders(<MockedComponent onClick={onClick} />)
+    renderWithProviders(<MockedComponent onClick={onClick} />)
 
     await waitFor(() => {
         // we wait for login to complete and user's firstName to show up on screen.
         expect(screen.getByText(/Testing/)).toBeInTheDocument()
     })
 
-    const trigger = screen.getByText(/button/i)
-    user.click(trigger)
+    const trigger = await screen.findByText(/button/i)
+    await user.click(trigger)
 
     await waitFor(() => {
         expect(onClick).toHaveBeenCalledTimes(1)
@@ -77,7 +98,7 @@ test('should show login modal if user not registered', async () => {
         })
     )
     const onClick = jest.fn()
-    await renderWithProviders(<MockedComponent onClick={onClick} />)
+    renderWithProviders(<MockedComponent onClick={onClick} />)
 
     const trigger = await screen.findByText(/button/i)
     await waitFor(() => {
