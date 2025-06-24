@@ -193,6 +193,36 @@ describe('ProductView Component', () => {
                 expect(onVariantSelected).toHaveBeenCalledWith(standardProduct, null, 2)
             })
         })
+
+        test('calls onVariantSelected for standard products in sets', async () => {
+            const onVariantSelected = jest.fn()
+            const setChildProductOrderability = jest.fn()
+            const standardProduct = {
+                id: 'standard-product-1',
+                name: 'Standard Product',
+                type: {item: true},
+                variationAttributes: [],
+                inventory: {
+                    orderable: true,
+                    stockLevel: 10
+                }
+            }
+
+            renderWithProviders(
+                <MockComponent
+                    product={standardProduct}
+                    onVariantSelected={onVariantSelected}
+                    setChildProductOrderability={setChildProductOrderability}
+                    isProductPartOfSet={true}
+                    addToCart={() => {}}
+                    addToWishlist={() => {}}
+                />
+            )
+
+            await waitFor(() => {
+                expect(onVariantSelected).toHaveBeenCalledWith(standardProduct, null, 1)
+            })
+        })
     })
 
     describe('Quantity Management', () => {
