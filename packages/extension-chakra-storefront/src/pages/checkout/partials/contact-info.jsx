@@ -308,7 +308,7 @@ const SignOutConfirmationDialog = ({isOpen, onConfirm, onClose}) => {
                                     />
                                 </Button>
                             </Dialog.ActionTrigger>
-                            <Button colorScheme="red" onClick={onConfirm} ml={3}>
+                            <Button colorPalette="red" onClick={onConfirm} ml={3}>
                                 <FormattedMessage
                                     defaultMessage="Sign Out"
                                     id="signout_confirmation_dialog.button.sign_out"
