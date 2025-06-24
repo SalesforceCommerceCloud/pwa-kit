@@ -44,9 +44,9 @@ const BundleProductViewModal = ({product: bundle, isOpen, onClose, updateCart, .
     let childProductIds = productViewModalData.product?.bundledProductItems
         ?.map(({productId}) => productId)
         .join(',')
-    const productIds = selectedChildProducts.map(({variant, product}) =>
-        variant?.productId || product?.id
-    ).join(',')
+    const productIds = selectedChildProducts
+        .map(({variant, product}) => variant?.productId || product?.id)
+        .join(',')
     if (productIds?.length > 0 && productIds !== childProductIds) {
         childProductIds = productIds
     }
