@@ -19,7 +19,7 @@ const PromoPopover = ({header, children, ...props}) => {
     const intl = useIntl()
     return (
         <Box position="relative" {...props}>
-            <Popover.Root size="xs" lazyMount trigger="hover" positioning={{placement: 'top'}}>
+            <Popover.Root size="xs" lazyMount unmountOnExit positioning={{placement: 'top'}}>
                 <Popover.Trigger asChild>
                     <IconButton
                         display="block"

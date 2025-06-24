@@ -31,6 +31,7 @@ module.exports = {
         createTestGlob('components/product-scroller'),
         createTestGlob('components/product-tile'),
         createTestGlob('components/product-view'),
+        createTestGlob('components/promo-popover'),
         createTestGlob('components/quantity-picker'),
         createTestGlob('components/search'),
         createTestGlob('components/social-icons'),
