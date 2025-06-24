@@ -8,6 +8,7 @@ import React from 'react'
 import {renderHook, act} from '@testing-library/react'
 import {useStoreLocator} from '@salesforce/retail-react-app/app/hooks/use-store-locator'
 import {StoreLocatorProvider} from '@salesforce/retail-react-app/app/contexts/store-locator-provider'
+import {MultiSiteProvider} from '@salesforce/retail-react-app/app/contexts'
 import {useSearchStores} from '@salesforce/commerce-sdk-react'
 
 // Mock the commerce-sdk-react hook
@@ -22,8 +23,17 @@ const config = {
     defaultPostalCode: '10178'
 }
 
+const mockSite = {
+    id: 'RefArch',
+    alias: 'us'
+}
+
 const wrapper = ({children}) => {
-    return <StoreLocatorProvider config={config}>{children}</StoreLocatorProvider>
+    return (
+        <MultiSiteProvider site={mockSite}>
+            <StoreLocatorProvider config={config}>{children}</StoreLocatorProvider>
+        </MultiSiteProvider>
+    )
 }
 
 describe('useStoreLocator', () => {

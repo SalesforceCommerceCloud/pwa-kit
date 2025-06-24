@@ -69,6 +69,19 @@ jest.mock('@salesforce/retail-react-app/app/components/store-locator', () => {
     }
 })
 
+jest.mock('@salesforce/retail-react-app/app/hooks/use-selected-store', () => ({
+    useSelectedStore: jest.fn(() => ({
+        store: {
+            id: 'store-123',
+            name: 'Test Store',
+            inventoryId: 'inventory_m_store_store1'
+        },
+        isLoading: false,
+        error: null,
+        hasSelectedStore: true
+    }))
+}))
+
 const MockedComponent = () => {
     return (
         <Switch>

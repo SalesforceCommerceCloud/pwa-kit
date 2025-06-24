@@ -5,13 +5,13 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import {useEffect} from 'react'
+import {useEffect, useContext} from 'react'
 import {useLocation, useHistory} from 'react-router-dom'
 import PropTypes from 'prop-types'
 import useSeStoreSelection from '@salesforce/retail-react-app/app/hooks/use-se-store-selection'
 import {useStoreLocatorParams} from '@salesforce/retail-react-app/app/contexts/store-locator-params'
-import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
 import useExternalSearch from '@salesforce/retail-react-app/app/hooks/use-external-search'
+import {StoreLocatorContext} from '@salesforce/retail-react-app/app/contexts/store-locator-provider'
 
 const SeInputHandler = ({onOpenStoreLocator}) => {
     useExternalSearch()
@@ -22,8 +22,8 @@ const SeInputHandler = ({onOpenStoreLocator}) => {
 
     const {setParams} = useStoreLocatorParams()
 
-    const {site} = useMultiSite()
-    const storeInfoKey = `store_${site.id}`
+    const storeLocatorContext = useContext(StoreLocatorContext)
+    const selectedStoreId = storeLocatorContext?.state?.selectedStoreId
 
     useEffect(() => {
         const urlParams = new URLSearchParams(location.search)
@@ -39,8 +39,7 @@ const SeInputHandler = ({onOpenStoreLocator}) => {
     useEffect(() => {
         if (!shouldOpenModal || !storeLocatorParams) return
 
-        const hasSelectedStore =
-            typeof window !== 'undefined' && window.localStorage.getItem(storeInfoKey)
+        const hasSelectedStore = !!selectedStoreId
 
         if (hasSelectedStore) {
             const urlParams = new URLSearchParams(location.search)
@@ -75,7 +74,7 @@ const SeInputHandler = ({onOpenStoreLocator}) => {
     }, [
         shouldOpenModal,
         storeLocatorParams,
-        storeInfoKey,
+        selectedStoreId,
         onOpenStoreLocator,
         setShouldOpenModal,
         location.search,

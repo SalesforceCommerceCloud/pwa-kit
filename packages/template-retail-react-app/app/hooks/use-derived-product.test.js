@@ -13,10 +13,16 @@ import {useDerivedProduct} from '@salesforce/retail-react-app/app/hooks/use-deri
 import mockProductDetail from '@salesforce/retail-react-app/app/mocks/variant-750518699578M'
 import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
 import {useVariant} from '@salesforce/retail-react-app/app/hooks/use-variant'
+import {useSelectedStore} from '@salesforce/retail-react-app/app/hooks/use-selected-store'
 
 // Mock the useVariant hook
 jest.mock('@salesforce/retail-react-app/app/hooks/use-variant', () => ({
     useVariant: jest.fn()
+}))
+
+// Mock the useSelectedStore hook
+jest.mock('@salesforce/retail-react-app/app/hooks/use-selected-store', () => ({
+    useSelectedStore: jest.fn()
 }))
 
 // Ensure useMultiSite returns site.id = 'site-1' for all tests
@@ -58,6 +64,14 @@ describe('useDerivedProduct hook', () => {
     beforeEach(() => {
         // Reset mock before each test
         jest.clearAllMocks()
+
+        // Default mock for useSelectedStore - no store selected
+        useSelectedStore.mockReturnValue({
+            store: null,
+            isLoading: false,
+            error: null,
+            hasSelectedStore: false
+        })
     })
 
     test('should not show out of stock message when stockLevel is greater then 0 and greater then asked quantity', () => {
@@ -196,6 +210,14 @@ describe('useDerivedProduct hook', () => {
         })
 
         test('when store is selected, should return product is in stock when storestockLevel is greater then 0 and greater then asked quantity', () => {
+            // Mock useSelectedStore to return a store with inventoryId
+            useSelectedStore.mockReturnValue({
+                store: {inventoryId},
+                isLoading: false,
+                error: null,
+                hasSelectedStore: true
+            })
+
             // Mock useVariant to return a valid variant
             useVariant.mockReturnValue({
                 orderable: true,
@@ -225,6 +247,14 @@ describe('useDerivedProduct hook', () => {
         })
 
         test('when store is selected, should return product is out of stock message when storestockLevel is 0 or less then asked quantity', () => {
+            // Mock useSelectedStore to return a store with inventoryId
+            useSelectedStore.mockReturnValue({
+                store: {inventoryId},
+                isLoading: false,
+                error: null,
+                hasSelectedStore: true
+            })
+
             // Mock useVariant to return a valid variant
             useVariant.mockReturnValue({
                 orderable: true,
@@ -254,6 +284,14 @@ describe('useDerivedProduct hook', () => {
         })
 
         test('when store is selected, should show selected store info', () => {
+            // Mock useSelectedStore to return a store with inventoryId
+            useSelectedStore.mockReturnValue({
+                store: {inventoryId},
+                isLoading: false,
+                error: null,
+                hasSelectedStore: true
+            })
+
             // Mock useVariant to return a valid variant
             useVariant.mockReturnValue({
                 orderable: true,

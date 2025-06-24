@@ -5,10 +5,11 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import {useState, useEffect, useCallback, useMemo} from 'react'
+import {useState, useEffect, useCallback, useMemo, useContext} from 'react'
 import {useSearchStores} from '@salesforce/commerce-sdk-react'
 import {useIntl} from 'react-intl'
 import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
+import {StoreLocatorContext} from '@salesforce/retail-react-app/app/contexts/store-locator-provider'
 import {
     STORE_LOCATOR_RADIUS,
     STORE_LOCATOR_RADIUS_UNIT,
@@ -18,6 +19,7 @@ import {
 const useSeStoreSelection = () => {
     const intl = useIntl()
     const {site} = useMultiSite()
+    const storeLocatorContext = useContext(StoreLocatorContext)
     const [locationData, setLocationData] = useState(null)
     const [isProcessing, setIsProcessing] = useState(false)
     const [shouldOpenModal, setShouldOpenModal] = useState(false)
@@ -350,18 +352,13 @@ const useSeStoreSelection = () => {
                     }
                 }
 
-                if (typeof window !== 'undefined') {
-                    localStorage.setItem(
-                        storeInfoKey,
-                        JSON.stringify({
-                            id: selectedStore.id,
-                            name: selectedStore.name || null,
-                            inventoryId: selectedStore.inventoryId || null,
-                            isSeSelection: true,
-                            timestamp: Date.now(),
-                            seSearchParams
-                        })
-                    )
+                if (storeLocatorContext?.setState) {
+                    storeLocatorContext.setState((prevState) => ({
+                        ...prevState,
+                        selectedStore: selectedStore.id,
+                        isSeSelection: true
+                        // TODO: is there any value to saving seSearchParams here?
+                    }))
                 }
 
                 if (locationData.latitude && locationData.longitude) {
@@ -432,14 +429,8 @@ const useSeStoreSelection = () => {
             )
 
             if (!hasSeParams) {
-                if (typeof window !== 'undefined') {
-                    const existingStore = localStorage.getItem(storeInfoKey)
-                    if (existingStore) {
-                        const storeData = JSON.parse(existingStore)
-                        if (storeData.isSeSelection) {
-                            return
-                        }
-                    }
+                if (storeLocatorContext?.state?.isSeSelection) {
+                    return
                 }
                 return
             }

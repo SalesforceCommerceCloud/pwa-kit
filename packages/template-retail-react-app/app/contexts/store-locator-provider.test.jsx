@@ -5,16 +5,33 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
+import PropTypes from 'prop-types'
 import {render, act} from '@testing-library/react'
 import {
     StoreLocatorProvider,
     StoreLocatorContext
 } from '@salesforce/retail-react-app/app/contexts/store-locator-provider'
+import {MultiSiteProvider} from '@salesforce/retail-react-app/app/contexts'
 
 describe('StoreLocatorProvider', () => {
     const mockConfig = {
         defaultCountryCode: 'US',
         defaultPostalCode: '10178'
+    }
+
+    const mockSite = {
+        id: 'RefArch',
+        alias: 'us'
+    }
+
+    const TestWrapper = ({children}) => (
+        <MultiSiteProvider site={mockSite}>
+            <StoreLocatorProvider config={mockConfig}>{children}</StoreLocatorProvider>
+        </MultiSiteProvider>
+    )
+
+    TestWrapper.propTypes = {
+        children: PropTypes.node
     }
 
     it('provides the expected context value', () => {
@@ -25,9 +42,9 @@ describe('StoreLocatorProvider', () => {
         }
 
         render(
-            <StoreLocatorProvider config={mockConfig}>
+            <TestWrapper>
                 <TestComponent />
-            </StoreLocatorProvider>
+            </TestWrapper>
         )
 
         expect(contextValue).toBeTruthy()
@@ -41,6 +58,8 @@ describe('StoreLocatorProvider', () => {
                 latitude: null,
                 longitude: null
             },
+            selectedStoreId: null,
+            isSeSelection: false,
             config: mockConfig
         })
         expect(typeof contextValue?.setState).toBe('function')
@@ -54,9 +73,9 @@ describe('StoreLocatorProvider', () => {
         }
 
         render(
-            <StoreLocatorProvider config={mockConfig}>
+            <TestWrapper>
                 <TestComponent />
-            </StoreLocatorProvider>
+            </TestWrapper>
         )
 
         act(() => {
@@ -81,9 +100,9 @@ describe('StoreLocatorProvider', () => {
         const TestChild = () => <div data-testid="test-child">Test Child</div>
 
         const {getByText} = render(
-            <StoreLocatorProvider config={mockConfig}>
+            <TestWrapper>
                 <TestChild />
-            </StoreLocatorProvider>
+            </TestWrapper>
         )
 
         expect(getByText('Test Child')).toBeTruthy()

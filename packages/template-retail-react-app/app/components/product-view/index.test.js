@@ -25,6 +25,11 @@ jest.mock('@salesforce/retail-react-app/app/hooks/use-multi-site', () => ({
     })
 }))
 
+// Mock useSelectedStore hook
+jest.mock('@salesforce/retail-react-app/app/hooks/use-selected-store', () => ({
+    useSelectedStore: jest.fn()
+}))
+
 const MockComponent = (props) => {
     const {data: customer} = useCurrentCustomer()
     return (
@@ -48,6 +53,28 @@ beforeEach(() => {
     // Since we're testing some navigation logic, we are using a simple Router
     // around our component. We need to initialize the default route/path here.
     window.history.pushState({}, 'Account', '/en/account')
+
+    // Mock useSelectedStore to read from localStorage
+    const {useSelectedStore} =
+        // eslint-disable-next-line @typescript-eslint/no-var-requires
+        require('@salesforce/retail-react-app/app/hooks/use-selected-store')
+    useSelectedStore.mockImplementation(() => {
+        const siteId = 'site-1'
+        const storeInfoKey = `store_${siteId}`
+        const storeInfo = JSON.parse(window.localStorage.getItem(storeInfoKey) || '{}')
+
+        return {
+            store: storeInfo.inventoryId
+                ? {
+                      inventoryId: storeInfo.inventoryId,
+                      name: storeInfo.name
+                  }
+                : null,
+            isLoading: false,
+            error: null,
+            hasSelectedStore: !!storeInfo.inventoryId
+        }
+    })
 })
 afterEach(() => {
     jest.resetModules()
