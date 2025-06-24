@@ -411,14 +411,32 @@ const ProductDetail = () => {
                 return pickupInStoreMap[prodKey]
             })
 
-            const currentShippingMethodIsPickup = isCurrentShippingMethodPickup(basket?.shipments?.[0]?.shippingMethod)
+            const currentShippingMethodIsPickup = isCurrentShippingMethodPickup(
+                basket?.shipments?.[0]?.shippingMethod
+            )
             // Only perform the check if the basket exists and has at least one item and the shipping method is not null
-            if (basket && basket.productItems?.length > 0 && basket?.shipments?.[0]?.shippingMethod) {
+            if (
+                basket &&
+                basket.productItems?.length > 0 &&
+                basket?.shipments?.[0]?.shippingMethod
+            ) {
                 if (hasAnyPickupSelected && !currentShippingMethodIsPickup) {
-                    throw new Error('Select Pickup in Store to match your existing shipping method.')
+                    throw new Error(
+                        formatMessage({
+                            id: 'product_view.error.select_ship_to_address',
+                            defaultMessage:
+                                'Select Ship to Address to match your existing shipping method.'
+                        })
+                    )
                 }
                 if (!hasAnyPickupSelected && currentShippingMethodIsPickup) {
-                    throw new Error('Select Ship to Address to match your existing shipping method.')
+                    throw new Error(
+                        formatMessage({
+                            id: 'product_view.error.select_pickup_in_store',
+                            defaultMessage:
+                                'Select Pickup in Store to match your existing shipping method.'
+                        })
+                    )
                 }
             }
 

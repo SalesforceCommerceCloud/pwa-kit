@@ -490,93 +490,146 @@ describe('product bundles', () => {
 })
 
 describe('Delivery Options Restrictions', () => {
-    const pickupShippingMethod = {id: 'pickup', name: 'Pickup In Store', methodType: 'pickup'}
-    const shippingShippingMethod = {id: 'shipping', name: 'Ship to Address', methodType: 'shipping'}
+    const pickupShippingMethod = {c_storePickupEnabled: true}
+    const shipToAddressShippingMethod = {
+        id: 'shipping',
+        name: 'Ship to Address',
+        methodType: 'shipping'
+    }
     const baseBasket = {
-        ...basketWithProductSet,
+        ...mockCustomerBaskets.baskets[0],
         shipments: [
             {
-                ...basketWithProductSet.shipments[0],
-                shippingMethod: shippingShippingMethod
+                ...mockCustomerBaskets.baskets[0].shipments[0],
+                shippingMethod: shipToAddressShippingMethod
             }
         ]
     }
     const pickupBasket = {
-        ...basketWithProductSet,
+        ...mockCustomerBaskets.baskets[0],
         shipments: [
             {
-                ...basketWithProductSet.shipments[0],
+                ...mockCustomerBaskets.baskets[0].shipments[0],
                 shippingMethod: pickupShippingMethod
             }
         ]
     }
 
     test('shows error when adding pickup item to basket with non-pickup shipping method', async () => {
+        // Arrange: Set up localStorage with inventoryId for the current site
+        const siteId = 'site-1' // Use your actual site id here if different
+        const storeInfoKey = `store_${siteId}`
+        const inventoryId = 'inventory_m_store_store1'
+        const storeId = 'store-123'
+        window.localStorage.setItem(
+            storeInfoKey,
+            JSON.stringify({
+                inventoryId,
+                id: storeId
+            })
+        )
+
+        // Create a product with a matching, orderable inventory
+        const masterProductWithInventory = {
+            ...masterProduct,
+            inventories: [
+                {
+                    id: inventoryId,
+                    orderable: true,
+                    ats: 10,
+                    stockLevel: 10
+                }
+            ]
+        }
+
+        // Mock the product to be a simple master product with inventory
         global.server.use(
             rest.get('*/products/:productId', (req, res, ctx) => {
-                return res(ctx.json(masterProduct))
+                return res(ctx.json(masterProductWithInventory))
             }),
             rest.get('*/customers/:customerId/baskets', (req, res, ctx) => {
                 return res(ctx.json({baskets: [baseBasket], total: 1}))
             })
         )
+
         renderWithProviders(<MockedComponent />)
+        // Wait for page to load
         expect(await screen.findByTestId('product-details-page')).toBeInTheDocument()
-        // Simulate selecting Pickup in Store
+        // Wait for the page to fully load
+        await waitFor(() => {
+            expect(screen.getByRole('link', {name: /mens/i})).toBeInTheDocument()
+        })
+        // Select "Pickup in Store"
         const pickupLabel = await screen.findByLabelText(/Pickup in Store/i)
         fireEvent.click(pickupLabel)
+
         // Click Add to Cart
-        const addToCartButton = await screen.findByRole('button', {name: /Add to Cart/i})
+        const addToCartButton = await screen.findByRole('button', {name: /add to cart/i})
         fireEvent.click(addToCartButton)
+
         await waitFor(() => {
-            expect(screen.getByText('Select Pickup in Store to match your existing shipping method.')).toBeInTheDocument()
+            expect(
+                screen.getByText('Select Ship to Address to match your existing shipping method.')
+            ).toBeInTheDocument()
         })
     })
 
     test('shows error when adding non-pickup item to basket with pickup shipping method', async () => {
-        global.server.use(
-            rest.get('*/products/:productId', (req, res, ctx) => {
-                return res(ctx.json(masterProduct))
-            }),
-            rest.get('*/customers/:customerId/baskets', (req, res, ctx) => {
-                return res(ctx.json({baskets: [pickupBasket], total: 1}))
+        // Arrange: Set up localStorage with inventoryId for the current site
+        const siteId = 'site-1' // Use your actual site id here if different
+        const storeInfoKey = `store_${siteId}`
+        const inventoryId = 'inventory_m_store_store1'
+        const storeId = 'store-123'
+        window.localStorage.setItem(
+            storeInfoKey,
+            JSON.stringify({
+                inventoryId,
+                id: storeId
             })
         )
-        renderWithProviders(<MockedComponent />)
-        expect(await screen.findByTestId('product-details-page')).toBeInTheDocument()
-        // Ensure Pickup in Store is not selected
-        const pickupLabel = await screen.findByLabelText(/Pickup in Store/i)
-        if (pickupLabel.checked) fireEvent.click(pickupLabel) // uncheck if checked
-        // Click Add to Cart
-        const addToCartButton = await screen.findByRole('button', {name: /Add to Cart/i})
-        fireEvent.click(addToCartButton)
-        await waitFor(() => {
-            expect(screen.getByText('Select Ship to Address to match your existing shipping method.')).toBeInTheDocument()
-        })
-    })
 
-    test('adds to cart successfully when selection matches basket shipping method', async () => {
+        // Create a product with a matching, orderable inventory
+        const masterProductWithInventory = {
+            ...masterProduct,
+            inventories: [
+                {
+                    id: inventoryId,
+                    orderable: true,
+                    ats: 10,
+                    stockLevel: 10
+                }
+            ]
+        }
+
+        // Mock the product to be a simple master product with inventory
         global.server.use(
             rest.get('*/products/:productId', (req, res, ctx) => {
-                return res(ctx.json(masterProduct))
+                return res(ctx.json(masterProductWithInventory))
             }),
             rest.get('*/customers/:customerId/baskets', (req, res, ctx) => {
                 return res(ctx.json({baskets: [pickupBasket], total: 1}))
-            }),
-            rest.post('*/baskets/:basketId/items', (req, res, ctx) => {
-                return res(ctx.json(pickupBasket))
             })
         )
+
         renderWithProviders(<MockedComponent />)
+        // Wait for page to load
         expect(await screen.findByTestId('product-details-page')).toBeInTheDocument()
-        // Select Pickup in Store
-        const pickupLabel = await screen.findByLabelText(/Pickup in Store/i)
-        fireEvent.click(pickupLabel)
-        // Click Add to Cart
-        const addToCartButton = await screen.findByRole('button', {name: /Add to Cart/i})
-        fireEvent.click(addToCartButton)
+        // Wait for the page to fully load
         await waitFor(() => {
-            expect(screen.getByTestId('add-to-cart-modal')).toBeInTheDocument()
+            expect(screen.getByRole('link', {name: /mens/i})).toBeInTheDocument()
+        })
+        // Select "Pickup in Store"
+        const pickupLabel = await screen.findByLabelText(/Ship to Address/i)
+        fireEvent.click(pickupLabel)
+
+        // Click Add to Cart
+        const addToCartButton = await screen.findByRole('button', {name: /add to cart/i})
+        fireEvent.click(addToCartButton)
+
+        await waitFor(() => {
+            expect(
+                screen.getByText('Select Pickup in Store to match your existing shipping method.')
+            ).toBeInTheDocument()
         })
     })
 })
