@@ -166,6 +166,20 @@ test('bundle product view modal disables update button when quantity exceeds chi
         expect(swingTankProductView).toBeInTheDocument()
         expect(sizeSelectBtn).toBeInTheDocument()
         expect(quantityInput).toBeInTheDocument()
+    })
+
+    // Wait for all child products to be rendered
+    await waitFor(() => {
+        expect(screen.getAllByText('Sleeveless Pleated Floral Front Blouse')).toHaveLength(2)
+        expect(screen.getAllByText('Swing Tank')).toHaveLength(2)
+        expect(screen.getAllByText('Pull On Neutral Pant')).toHaveLength(2)
+    })
+
+    // Select a valid variant
+    fireEvent.click(sizeSelectBtn)
+
+    // Wait for the initial state to be fully loaded and the button to be enabled
+    await waitFor(() => {
         expect(updateBtn).toBeEnabled()
     })
 
