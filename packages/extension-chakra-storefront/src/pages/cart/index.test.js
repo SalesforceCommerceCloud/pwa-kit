@@ -235,7 +235,9 @@ describe.skip('Update quantity in product view', function () {
         )
 
         const editCartButton = within(cartItem).getByRole('button', {name: 'Edit'})
-        await user.click(editCartButton)
+        await act(async () => {
+            await user.click(editCartButton)
+        })
 
         const productView = screen.queryByTestId('product-view')
 
@@ -247,7 +249,9 @@ describe.skip('Update quantity in product view', function () {
         expect(within(productView).getByDisplayValue('3'))
 
         const updateCartButtons = within(productView).getAllByRole('button', {name: 'Update'})
-        await user.click(updateCartButtons[0])
+        await act(async () => {
+            await user.click(updateCartButtons[0])
+        })
         await waitFor(() => {
             expect(productView).not.toBeInTheDocument()
         })
@@ -566,7 +570,7 @@ describe('Update this is a gift option', function () {
     })
 })
 
-describe.skip('Product bundles', () => {
+describe('Product bundles', () => {
     beforeEach(() => {
         global.server.use(
             rest.get('*/customers/:customerId/baskets', (req, res, ctx) =>
@@ -605,7 +609,7 @@ describe.skip('Product bundles', () => {
     })
 
     test('displays inventory message when incrementing quantity above available stock', async () => {
-        renderWithProviders(<Cart />)
+        const {user} = renderWithProviders(<Cart />)
 
         await waitFor(
             async () => {
@@ -625,13 +629,15 @@ describe.skip('Product bundles', () => {
         const quantityElement = screen.getByRole('spinbutton', {id: 'quantity'})
         expect(quantityElement).toBeInTheDocument()
         expect(quantityElement).toHaveValue('1')
-        quantityElement.focus()
-        fireEvent.change(quantityElement, {target: {value: '4'}})
 
+        await act(async () => {
+            // Clear the input and type the new value
+            await user.clear(quantityElement)
+            await user.type(quantityElement, '4')
+        })
         await waitFor(
             () => {
                 expect(quantityElement).toHaveValue('4')
-                screen.logTestingPlaygroundURL()
                 expect(screen.getByText(/only 3 left for swing tank!/i)).toBeInTheDocument()
             },
             {timeout: 10000}
@@ -707,11 +713,10 @@ describe.skip('Product bundles', () => {
         expect(quantityElement).toHaveValue('1')
         const incrementButton = await within(productViewModal).findByTestId('quantity-increment')
 
-        // For some reason clicking - fireEvent.click(incrementButton) - doesn't work,
-        // so we'll use the keyboard to increment
-        incrementButton.focus()
-        fireEvent.keyDown(incrementButton, {key: 'Enter', code: 'Enter', charCode: 13})
-
+        await act(async () => {
+            // Use user event to click the increment button
+            await user.click(incrementButton)
+        })
         await waitFor(async () => {
             expect(quantityElement).toHaveValue('2')
         })
