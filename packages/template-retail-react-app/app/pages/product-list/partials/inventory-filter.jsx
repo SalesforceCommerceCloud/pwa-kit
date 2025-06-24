@@ -15,7 +15,7 @@ import {
     Text,
     useDisclosure
 } from '@salesforce/retail-react-app/app/components/shared/ui'
-import StoreLocatorModal from '@salesforce/retail-react-app/app/components/store-locator-modal'
+import {StoreLocatorModal} from '@salesforce/retail-react-app/app/components/store-locator'
 import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
 import {getSelectedStoreData} from '@salesforce/retail-react-app/app/utils/store-locator-utils'
 

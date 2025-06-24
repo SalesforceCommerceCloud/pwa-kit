@@ -7,6 +7,10 @@
 
 import React, {useState} from 'react'
 import PropTypes from 'prop-types'
+export {
+    StoreLocatorContext,
+    StoreLocatorProvider
+} from '@salesforce/retail-react-app/app/contexts/store-locator-provider'
 
 /**
  * This is the global state for the multiples sites and locales supported in the App.

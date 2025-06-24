@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import {DEFAULT_STORE_LOCATOR_COUNTRY} from '@salesforce/retail-react-app/app/constants'
+import {STORE_LOCATOR_DEFAULT_COUNTRY_CODE} from '@salesforce/retail-react-app/app/constants'
 
 jest.mock('@salesforce/retail-react-app/app/hooks/use-se-store-selection', () => {
     const mockHook = jest.fn(() => ({
@@ -65,11 +65,11 @@ describe('useSeStoreSelection Hook Tests', () => {
     describe('Country Detection', () => {
         test('uses explicit country when provided', () => {
             const getCountry = (country) =>
-                country && country !== 'none' ? country : DEFAULT_STORE_LOCATOR_COUNTRY.countryCode
+                country && country !== 'none' ? country : STORE_LOCATOR_DEFAULT_COUNTRY_CODE
 
             expect(getCountry('US')).toBe('US')
-            expect(getCountry(null)).toBe(DEFAULT_STORE_LOCATOR_COUNTRY.countryCode)
-            expect(getCountry('none')).toBe(DEFAULT_STORE_LOCATOR_COUNTRY.countryCode)
+            expect(getCountry(null)).toBe(STORE_LOCATOR_DEFAULT_COUNTRY_CODE)
+            expect(getCountry('none')).toBe(STORE_LOCATOR_DEFAULT_COUNTRY_CODE)
         })
     })
 
