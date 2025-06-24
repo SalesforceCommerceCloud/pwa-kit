@@ -340,7 +340,8 @@ describe('usePickupShipment', () => {
 
         const updatedItems1 = result.current.addInventoryIdsToPickupItems(
             productItems1,
-            pickupInStoreMap1
+            pickupInStoreMap1,
+            storeData
         )
 
         expect(updatedItems1[0]).toEqual({
@@ -355,7 +356,8 @@ describe('usePickupShipment', () => {
 
         const updatedItems2 = result.current.addInventoryIdsToPickupItems(
             productItems2,
-            pickupInStoreMap2
+            pickupInStoreMap2,
+            storeData
         )
 
         expect(updatedItems2[0]).toEqual({
@@ -373,7 +375,8 @@ describe('usePickupShipment', () => {
 
         const updatedItems3 = result.current.addInventoryIdsToPickupItems(
             productItems3,
-            pickupInStoreMap3
+            pickupInStoreMap3,
+            storeData
         )
 
         expect(updatedItems3[0]).toEqual({
@@ -600,7 +603,7 @@ describe('usePickupShipment', () => {
             const options = {throwOnError: true}
 
             await expect(
-                result.current.configurePickupShipment(basketId, productItems, options)
+                result.current.configurePickupShipment(basketId, productItems, storeData, options)
             ).rejects.toThrow('Mutation failed')
         })
     })

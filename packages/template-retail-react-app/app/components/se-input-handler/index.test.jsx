@@ -31,6 +31,17 @@ jest.doMock('@salesforce/retail-react-app/app/contexts/store-locator-params', ()
 
 jest.doMock('@salesforce/retail-react-app/app/hooks/use-external-search', () => () => {})
 
+// Mock the StoreLocatorContext with a variable that can be changed in tests
+const mockStoreLocatorContext = {
+    state: {
+        selectedStoreId: 'test-store-123'
+    }
+}
+
+jest.doMock('@salesforce/retail-react-app/app/contexts/store-locator-provider', () => ({
+    StoreLocatorContext: React.createContext(mockStoreLocatorContext)
+}))
+
 let SeInputHandler
 const mockOnOpenStoreLocator = jest.fn()
 
@@ -44,6 +55,9 @@ beforeEach(async () => {
     SeInputHandler = SeInputHandlerModule.default
 
     window.localStorage.clear()
+
+    // Reset the mock context to default value
+    mockStoreLocatorContext.state.selectedStoreId = 'test-store-123'
 
     mockUseSeStoreSelection.mockReturnValue({
         shouldOpenModal: true,
@@ -162,6 +176,9 @@ test('opens modal immediately when no external search query is present', async (
 })
 
 test('does not open modal when localStorage is empty', async () => {
+    // Update the mock context to return null selectedStoreId
+    mockStoreLocatorContext.state.selectedStoreId = null
+
     window.localStorage.clear()
     window.history.pushState({}, '', '/test?lat=42.3601&lng=-71.0589')
 
