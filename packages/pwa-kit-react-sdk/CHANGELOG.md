@@ -1,6 +1,6 @@
 ## v3.11.0-dev.0 (May 23, 2025)
 - Fix the performance logging so that it'll capture all SSR queries, even those that result in errors [#2486](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2486)
-- Created an opentelemetry server for SSR tracer intialization [#2617](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2617)
+- Created an opentelemetry server for SSR tracer intialization [#2637](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2637)
 
 ## v3.10.0 (May 22, 2025)
 - Fix the performance logging util to use the correct delimiter for the server-timing header. [#2225](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2295)
