@@ -50,7 +50,7 @@ export default function PickupAddress() {
         postalCode: store?.postalCode,
         stateCode: store?.stateCode,
         firstName: store?.name,
-        lastName: '',
+        lastName: 'Pickup',
         phone: store?.phone
     }
 

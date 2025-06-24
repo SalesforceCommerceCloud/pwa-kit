@@ -147,7 +147,10 @@ describe('PickupAddress', () => {
                     city: 'San Francisco',
                     countryCode: 'US',
                     postalCode: '94105',
-                    stateCode: 'CA'
+                    stateCode: 'CA',
+                    firstName: 'Test Store',
+                    lastName: 'Pickup',
+                    phone: '555-123-4567'
                 }
             })
         })
