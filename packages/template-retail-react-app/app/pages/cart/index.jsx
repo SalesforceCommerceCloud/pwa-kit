@@ -65,7 +65,6 @@ const DEBOUNCE_WAIT = 750
 const Cart = () => {
     const {
         data: basket,
-        derivedData: {totalItems},
         isLoading
     } = useCurrentBasket()
     const isPickupOrder = basket?.shipments[0]?.shippingMethod?.c_storePickupEnabled === true
@@ -550,21 +549,15 @@ const Cart = () => {
                                         {isPickupOrder ? (
                                             <Text fontWeight="bold">
                                                 <FormattedMessage
-                                                    defaultMessage="Pickup in Store - {itemCount, plural, =0 {0 items} one {# item} other {# items}}"
+                                                    defaultMessage="Pickup in Store"
                                                     id="cart.order_type.pickup_in_store"
-                                                    values={{
-                                                        itemCount: totalItems
-                                                    }}
                                                 />
                                             </Text>
                                         ) : (
                                             <Text fontWeight="bold">
                                                 <FormattedMessage
-                                                    defaultMessage="Delivery - {itemCount, plural, =0 {0 items} one {# item} other {# items}}"
+                                                    defaultMessage="Delivery"
                                                     id="cart.order_type.delivery"
-                                                    values={{
-                                                        itemCount: totalItems
-                                                    }}
                                                 />
                                             </Text>
                                         )}
