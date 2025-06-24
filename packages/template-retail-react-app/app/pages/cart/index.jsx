@@ -55,7 +55,8 @@ import {
     useShopperBasketsMutation,
     useShippingMethodsForShipment,
     useProducts,
-    useShopperCustomersMutation
+    useShopperCustomersMutation,
+    useStores
 } from '@salesforce/commerce-sdk-react'
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
 import UnavailableProductConfirmationModal from '@salesforce/retail-react-app/app/components/unavailable-product-confirmation-modal'
@@ -64,7 +65,22 @@ import {getUpdateBundleChildArray} from '@salesforce/retail-react-app/app/utils/
 const DEBOUNCE_WAIT = 750
 const Cart = () => {
     const {data: basket, isLoading} = useCurrentBasket()
+
+    // Pickup in Store
     const isPickupOrder = basket?.shipments[0]?.shippingMethod?.c_storePickupEnabled === true
+    const storeId = basket?.shipments?.[0]?.c_fromStoreId
+    const {data: storeData} = useStores(
+        {
+            parameters: {
+                ids: storeId
+            }
+        },
+        {
+            enabled: !!storeId
+        }
+    )
+    const storeName = storeData?.data?.[0]?.name
+
     const productIds = basket?.productItems?.map(({productId}) => productId).join(',') ?? ''
     const {data: products, isLoading: isProductsLoading} = useProducts(
         {
@@ -546,8 +562,11 @@ const Cart = () => {
                                         {isPickupOrder ? (
                                             <Text fontWeight="bold">
                                                 <FormattedMessage
-                                                    defaultMessage="Pickup in Store"
+                                                    defaultMessage="Pickup in Store ({storeName})"
                                                     id="cart.order_type.pickup_in_store"
+                                                    values={{
+                                                        storeName
+                                                    }}
                                                 />
                                             </Text>
                                         ) : (
