@@ -63,10 +63,7 @@ import {getUpdateBundleChildArray} from '@salesforce/retail-react-app/app/utils/
 
 const DEBOUNCE_WAIT = 750
 const Cart = () => {
-    const {
-        data: basket,
-        isLoading
-    } = useCurrentBasket()
+    const {data: basket, isLoading} = useCurrentBasket()
     const isPickupOrder = basket?.shipments[0]?.shippingMethod?.c_storePickupEnabled === true
     const productIds = basket?.productItems?.map(({productId}) => productId).join(',') ?? ''
     const {data: products, isLoading: isProductsLoading} = useProducts(
