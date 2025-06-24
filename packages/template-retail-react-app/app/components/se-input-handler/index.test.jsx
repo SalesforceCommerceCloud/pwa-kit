@@ -106,12 +106,10 @@ test('preserves other parameters when SE parameters are cleared', async () => {
     window.localStorage.setItem('store_test-site', JSON.stringify({dummy: true}))
 
     renderWithProviders(<SeInputHandler onOpenStoreLocator={mockOnOpenStoreLocator} />)
-    await waitFor(
-        () => {
-            expect(mockOnOpenStoreLocator).toHaveBeenCalled()
-            expect(window.location.search).toBe('?color=blue&size=10')
-        }
-    )
+    await waitFor(() => {
+        expect(mockOnOpenStoreLocator).toHaveBeenCalled()
+        expect(window.location.search).toBe('?color=blue&size=10')
+    })
 })
 
 test('does not open modal when only country parameter is provided', async () => {
