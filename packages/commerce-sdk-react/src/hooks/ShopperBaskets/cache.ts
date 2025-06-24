@@ -21,8 +21,10 @@ import {
     getTaxesFromBasket
 } from './queryKeyHelpers'
 import {getCustomerBaskets} from '../ShopperCustomers/queryKeyHelpers'
+import {CLIENT_KEYS} from '../../constant'
 
-type Client = ApiClients['shopperBaskets']
+const CLIENT_KEY = CLIENT_KEYS.SHOPPER_BASKETS
+type Client = NonNullable<ApiClients[typeof CLIENT_KEY]>
 /** Data returned by every Shopper Baskets endpoint (except `deleteBasket`) */
 type Basket = ShopperBasketsTypes.Basket
 /** Data returned by `getCustomerBaskets` */
