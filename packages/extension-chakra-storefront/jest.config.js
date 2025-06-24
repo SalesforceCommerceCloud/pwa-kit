@@ -45,6 +45,7 @@ module.exports = {
         createTestGlob('components/with-registration'),
         createTestGlob('pages/home'),
         createTestGlob('pages/cart'),
+        createTestGlob('pages/product-list'),
         // createTestGlob('pages/login'),  // TODO: enable after Account page has been migrated
         createTestGlob('pages/login-redirect'),
         createTestGlob('pages/social-login-redirect'),

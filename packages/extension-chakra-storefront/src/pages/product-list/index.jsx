@@ -28,7 +28,6 @@ import {
     Heading,
     Text,
     Stack,
-    useDisclosure,
     Button,
     Field,
     Dialog,
@@ -41,10 +40,9 @@ import {
 import Pagination from '../../components/pagination'
 import ProductTile, {Skeleton as ProductTileSkeleton} from '../../components/product-tile'
 import {HideOnDesktop} from '../../components/responsive'
-// TODO: Refinements components will be migrated in separate PR
-// import Refinements from '../../pages/product-list/partials/refinements'
-// import CategoryLinks from '../../pages/product-list/partials/category-links'
-// import SelectedRefinements from '../../pages/product-list/partials/selected-refinements'
+import Refinements from '../../pages/product-list/partials/refinements'
+import CategoryLinks from '../../pages/product-list/partials/category-links'
+import SelectedRefinements from '../../pages/product-list/partials/selected-refinements'
 import EmptySearchResults from '../../pages/product-list/partials/empty-results'
 import PageHeader from '../../pages/product-list/partials/page-header'
 import AbovePageHeader from '../../pages/product-list/partials/above-page-header'
@@ -96,7 +94,6 @@ const ProductList = (props) => {
     // `isLoading` later in this function.
     // eslint-disable-next-line react/prop-types, @typescript-eslint/no-unused-vars
     const {isLoading: _unusedIsLoading, staticContext, ...rest} = props
-    const {isOpen, onOpen, onClose} = useDisclosure()
     const {formatMessage} = useIntl()
     const navigate = useNavigation()
     const history = useHistory()
@@ -438,13 +435,12 @@ const ProductList = (props) => {
                         </Flex>
 
                         <Box flex={1} paddingTop={'45px'}>
-                            {/* TODO: SelectedRefinements component will be added in separate PR */}
-                            {/*<SelectedRefinements
+                            <SelectedRefinements
                                 filters={productSearchResult?.refinements}
                                 toggleFilter={toggleFilter}
                                 handleReset={resetFilters}
                                 selectedFilterValues={productSearchResult?.selectedRefinements}
-                            />*/}
+                            />
                         </Box>
                         <Box paddingTop={'45px'}>
                             <Sort
@@ -474,20 +470,133 @@ const ProductList = (props) => {
                                 borderColor="gray.100"
                             >
                                 <Flex align="center">
-                                    <Button
-                                        fontSize="sm"
-                                        colorPalette="black"
-                                        variant="outline"
-                                        marginRight={2}
-                                        display="inline-flex"
-                                        onClick={onOpen}
-                                    >
-                                        <FilterIcon boxSize={5} />
-                                        <FormattedMessage
-                                            defaultMessage="Filter"
-                                            id="product_list.button.filter"
-                                        />
-                                    </Button>
+                                    {/* Modal for filter options on mobile */}
+                                    <Dialog.Root size="full" placement="center">
+                                        <Dialog.Trigger asChild>
+                                            <Button
+                                                fontSize="sm"
+                                                colorPalette="black"
+                                                variant="outline"
+                                                marginRight={2}
+                                                display="inline-flex"
+                                                color="black"
+                                            >
+                                                <FilterIcon boxSize={5} />
+                                                <FormattedMessage
+                                                    defaultMessage="Filter"
+                                                    id="product_list.button.filter"
+                                                />
+                                            </Button>
+                                        </Dialog.Trigger>
+                                        <Portal>
+                                            <Dialog.Backdrop />
+                                            <Dialog.Positioner>
+                                                <Dialog.Content
+                                                    display="flex"
+                                                    flexDirection="column"
+                                                    height="100vh"
+                                                >
+                                                    <Dialog.Header
+                                                        flexShrink={0}
+                                                        bg="white"
+                                                        borderBottom="1px solid"
+                                                        borderBottomColor="gray.100"
+                                                        p={4}
+                                                    >
+                                                        <Dialog.Title>
+                                                            <Heading
+                                                                as="h1"
+                                                                fontWeight="bold"
+                                                                fontSize="2xl"
+                                                            >
+                                                                <FormattedMessage
+                                                                    defaultMessage="Filter"
+                                                                    id="product_list.modal.title.filter"
+                                                                />
+                                                            </Heading>
+                                                        </Dialog.Title>
+                                                        <Dialog.CloseTrigger asChild>
+                                                            <Button variant="ghost" size="sm">
+                                                                ✕
+                                                            </Button>
+                                                        </Dialog.CloseTrigger>
+                                                    </Dialog.Header>
+                                                    <Dialog.Body
+                                                        flex={1}
+                                                        overflowY="auto"
+                                                        px={4}
+                                                        py={4}
+                                                    >
+                                                        {filtersLoading && <LoadingSpinner />}
+                                                        <Refinements
+                                                            toggleFilter={toggleFilter}
+                                                            filters={
+                                                                productSearchResult?.refinements
+                                                            }
+                                                            selectedFilters={searchParams.refine}
+                                                            itemsBefore={
+                                                                category?.categories
+                                                                    ? [
+                                                                          <CategoryLinks
+                                                                              key="itemsBefore"
+                                                                              category={category}
+                                                                          />
+                                                                      ]
+                                                                    : undefined
+                                                            }
+                                                            excludedFilters={['cgid']}
+                                                        />
+                                                    </Dialog.Body>
+                                                    <Dialog.Footer
+                                                        flexShrink={0}
+                                                        bg="white"
+                                                        borderTop="1px solid"
+                                                        borderTopColor="gray.100"
+                                                        p={4}
+                                                    >
+                                                        <Stack
+                                                            direction="column"
+                                                            gap={3}
+                                                            width="full"
+                                                        >
+                                                            <Dialog.CloseTrigger asChild>
+                                                                <Button
+                                                                    width="full"
+                                                                    colorPalette="blue"
+                                                                    size="lg"
+                                                                    position="static"
+                                                                >
+                                                                    <FormattedMessage
+                                                                        defaultMessage="View {count} Items"
+                                                                        id="product_list.modal.btn.view_items"
+                                                                        values={{
+                                                                            count:
+                                                                                productSearchResult?.total ||
+                                                                                0
+                                                                        }}
+                                                                    />
+                                                                </Button>
+                                                            </Dialog.CloseTrigger>
+                                                            <Dialog.CloseTrigger asChild>
+                                                                <Button
+                                                                    width="full"
+                                                                    variant="outline"
+                                                                    size="lg"
+                                                                    position="static"
+                                                                    onClick={resetFilters}
+                                                                >
+                                                                    <FormattedMessage
+                                                                        defaultMessage="Clear Filters"
+                                                                        id="product_list.modal.btn.clear_filters"
+                                                                    />
+                                                                </Button>
+                                                            </Dialog.CloseTrigger>
+                                                        </Stack>
+                                                    </Dialog.Footer>
+                                                </Dialog.Content>
+                                            </Dialog.Positioner>
+                                        </Portal>
+                                    </Dialog.Root>
                                 </Flex>
                                 <Flex align="center">
                                     <Button
@@ -497,6 +606,7 @@ const ProductList = (props) => {
                                         colorPalette="black"
                                         variant="outline"
                                         display="inline-flex"
+                                        color="black"
                                         onClick={() => setSortOpen(true)}
                                     >
                                         {formatMessage(
@@ -514,21 +624,19 @@ const ProductList = (props) => {
                             </Stack>
                         </Stack>
                         <Box marginBottom={4}>
-                            {/* TODO: SelectedRefinements component will be added in separate PR */}
-                            {/*<SelectedRefinements
+                            <SelectedRefinements
                                 filters={productSearchResult?.refinements}
                                 toggleFilter={toggleFilter}
                                 handleReset={resetFilters}
                                 selectedFilterValues={productSearchResult?.selectedRefinements}
-                            />*/}
+                            />
                         </Box>
                     </HideOnDesktop>
 
                     {/* Body  */}
                     <Grid templateColumns={{base: '1fr', md: '280px 1fr'}} columnGap={6}>
                         <Stack display={{base: 'none', md: 'flex'}}>
-                            {/* TODO:  Refinements component will be added in separate PR */}
-                            {/*<Refinements
+                            <Refinements
                                 itemsBefore={
                                     category?.categories
                                         ? [<CategoryLinks key="itemsBefore" category={category} />]
@@ -539,7 +647,7 @@ const ProductList = (props) => {
                                 filters={productSearchResult?.refinements}
                                 excludedFilters={['cgid']}
                                 selectedFilters={searchParams.refine}
-                            />*/}
+                            />
                         </Stack>
                         <Box>
                             <SimpleGrid
@@ -616,57 +724,6 @@ const ProductList = (props) => {
                     </Grid>
                 </>
             )}
-            {/* Modal for filter options on mobile */}
-            <Dialog.Root
-                open={isOpen}
-                onOpenChange={(e) => !e.open && onClose()}
-                size="full"
-                placement="center"
-            >
-                <Portal>
-                    <Dialog.Backdrop />
-                    <Dialog.Positioner>
-                        <Dialog.Content>
-                            <Dialog.Header>
-                                <Dialog.Title>
-                                    <Heading as="h1" fontWeight="bold" fontSize="2xl">
-                                        <FormattedMessage
-                                            defaultMessage="Filter"
-                                            id="product_list.modal.title.filter"
-                                        />
-                                    </Heading>
-                                </Dialog.Title>
-                                <Dialog.CloseTrigger asChild>
-                                    <Button variant="ghost" size="sm">
-                                        ✕
-                                    </Button>
-                                </Dialog.CloseTrigger>
-                            </Dialog.Header>
-                            <Dialog.Body py={4}>
-                                {filtersLoading && <LoadingSpinner />}
-                                {/* TODO: Refinements component will be added in separate PR */}
-                                {/*<Refinements
-                                    toggleFilter={toggleFilter}
-                                    filters={productSearchResult?.refinements}
-                                    selectedFilters={searchParams.refine}
-                                    itemsBefore={
-                                        category?.categories
-                                            ? [
-                                                <CategoryLinks
-                                                    key="itemsBefore"
-                                                    category={category}
-                                                    onSelect={onClose}
-                                                />
-                                            ]
-                                            : undefined
-                                    }
-                                    excludedFilters={['cgid']}
-                                />*/}
-                            </Dialog.Body>
-                        </Dialog.Content>
-                    </Dialog.Positioner>
-                </Portal>
-            </Dialog.Root>
 
             {/* Sort Drawer */}
             <Drawer.Root
