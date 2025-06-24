@@ -101,12 +101,14 @@ const CartSecondaryButtonGroup = ({
                             />
                         </Button>
                     )}
-                    <Button variant="link" size="sm" onClick={() => onEditClick(variant)}>
-                        <FormattedMessage
-                            defaultMessage="Edit"
-                            id="cart_secondary_button_group.action.edit"
-                        />
-                    </Button>
+                    {!variant.type?.item && (
+                        <Button variant="link" size="sm" onClick={() => onEditClick(variant)}>
+                            <FormattedMessage
+                                defaultMessage="Edit"
+                                id="cart_secondary_button_group.action.edit"
+                            />
+                        </Button>
+                    )}
                 </ButtonGroup>
                 <Flex alignItems="center">
                     <Checkbox
