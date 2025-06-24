@@ -1,8 +1,9 @@
 {
   "mcpServers": {
     "pwa-storefront-mcp": {
-      "command": "node",
-      "args": ["pwa-storefront-mcp/src/server/server.js"]
+      "command": "{{path-to-node}}/node",
+      "transport": "stdio",
+      "args": ["{{parent-dir-to-mcp}}}/pwa-storefront-mcp/src/server/server.js"]
     }
   }
-} 
+}
