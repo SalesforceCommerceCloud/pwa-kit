@@ -9,34 +9,18 @@ import React, {useEffect, useState} from 'react'
 import {Accordion, AccordionItem, Box, Button, RadioGroup} from '@chakra-ui/react'
 import {StoreLocatorListItem} from '@salesforce/retail-react-app/app/components/store-locator/list-item'
 import {useStoreLocator} from '@salesforce/retail-react-app/app/hooks/use-store-locator'
-import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
 
 export const StoreLocatorList = () => {
-    const {data, isLoading, config, formValues, mode} = useStoreLocator()
+    const {data, isLoading, config, formValues, mode, selectedStore, setSelectedStore} =
+        useStoreLocator()
     const [page, setPage] = useState(1)
-    const {site} = useMultiSite()
-    const storeInfoKey = `store_${site.id}`
-    const [selectedStore, setSelectedStore] = useState('')
 
     useEffect(() => {
         setPage(1)
     }, [data])
 
-    useEffect(() => {
-        setSelectedStore(JSON.parse(window.localStorage.getItem(storeInfoKey))?.id || '')
-    }, [storeInfoKey])
-
-    const handleChange = (storeId) => {
-        setSelectedStore(storeId)
-        const store = data?.data?.find((store) => store.id === storeId)
-        window.localStorage.setItem(
-            storeInfoKey,
-            JSON.stringify({
-                id: storeId,
-                name: store?.name || null,
-                inventoryId: store?.inventoryId || null
-            })
-        )
+    const handleChange = (selectedStore) => {
+        setSelectedStore(selectedStore)
     }
 
     const displayStoreLocatorStatusMessage = () => {

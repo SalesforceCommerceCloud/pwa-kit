@@ -26,7 +26,6 @@ import {
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 import {useCurrency, useDerivedProduct} from '@salesforce/retail-react-app/app/hooks'
 import {useAddToCartModalContext} from '@salesforce/retail-react-app/app/hooks/use-add-to-cart-modal'
-import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
 
 // project components
 import ImageGallery from '@salesforce/retail-react-app/app/components/image-gallery'
@@ -165,7 +164,6 @@ const ProductView = forwardRef(
         const isProductABundle = product?.type.bundle
         const errorContainerRef = useRef(null)
         const [pickupEnabled, setPickupEnabled] = useState(false)
-        const {site} = useMultiSite()
         const storeName = selectedStore?.name
         const inventoryId = selectedStore?.inventoryId
 
@@ -416,18 +414,8 @@ const ProductView = forwardRef(
         }, [showInventoryMessage, inventoryMessage])
 
         useEffect(() => {
-            if (site?.id) {
-                const storeInfoKey = `store_${site.id}`
-                let inventoryId = null
-                try {
-                    const storeInfo = JSON.parse(window.localStorage.getItem(storeInfoKey))
-                    inventoryId = storeInfo?.inventoryId
-                } catch (e) {
-                    // intentionally empty: ignore errors
-                }
-                setPickupEnabled(!!inventoryId)
-            }
-        }, [site?.id])
+            setPickupEnabled(!!selectedStore?.inventoryId)
+        }, [selectedStore?.inventoryId])
 
         const showError = (error) => {
             showToast({

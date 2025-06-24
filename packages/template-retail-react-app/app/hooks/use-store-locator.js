@@ -74,12 +74,17 @@ export const useStoreLocator = () => {
         }))
     }
 
+    const setSelectedStore = (selectedStore) => {
+        setState((prev) => ({...prev, selectedStore}))
+    }
+
     return {
         ...state,
         data,
         isLoading,
         // Actions
         setFormValues,
-        setDeviceCoordinates
+        setDeviceCoordinates,
+        setSelectedStore
     }
 }
