@@ -1,6 +1,7 @@
 # PWA Storefront MCP Server
 
 An Model Context Protocol (MCP) server that helps PWA Storefront developers with development.
+It should be run as a local MCP server installed by developers or run locally via npx (when it's available on npm in feature).
 
 ## What is MCP?
 
@@ -79,18 +80,22 @@ Claude will:
 - Start the MCP server
 - Connect to it as a client
 - List available tools
-<img src="./docs/images/claude-list-tools.png" alt="Claude MCP Tools Screenshot" width="50%" />
+
+<img src="./docs/images/claude-list-tools.png" alt="Claude MCP Tools Screenshot" width="40%" />
+
+You can also enable/disable any available tools from here.
 
 #### Using other MCP clients
 The server runs on stdio, so you can test it with any MCP-compatible client.
 
-### Method 3: Direct stdio testing
+### Method 3: Manually start MCP Server
 
-You can also test directly by running the server and sending JSON-RPC messages:
+You can also manually the server from command line and sending JSON-RPC messages:
 
 ```bash
+cd {{dir-to-mcp}}
 # Start the server
-node server.js
+node src/server/server.js
 
 # Then send JSON-RPC requests to stdin:
 {"jsonrpc": "2.0", "id": 1, "method": "tools/list", "params": {}}
