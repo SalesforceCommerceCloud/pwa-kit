@@ -55,6 +55,20 @@ jest.mock('@salesforce/retail-react-app/app/constants', () => {
     }
 })
 
+jest.mock('@salesforce/retail-react-app/app/components/store-locator', () => {
+    // eslint-disable-next-line react/prop-types
+    function MockStoreLocatorModal({isOpen, onClose}) {
+        return isOpen ? (
+            <div data-testid="store-locator-modal">
+                <button onClick={onClose}>Close Modal</button>
+            </div>
+        ) : null
+    }
+    return {
+        StoreLocatorModal: MockStoreLocatorModal
+    }
+})
+
 const MockedComponent = () => {
     return (
         <Switch>
