@@ -11,12 +11,11 @@ import PropTypes from 'prop-types'
 import {Box, Button, Wrap, WrapItem} from '@salesforce/retail-react-app/app/components/shared/ui'
 import {CloseIcon} from '@salesforce/retail-react-app/app/components/icons'
 import {REMOVE_FILTER} from '@salesforce/retail-react-app/app/pages/product-list/partials/refinements-utils'
-import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
-import {getSelectedStoreData} from '@salesforce/retail-react-app/app/utils/store-locator-utils'
+import {useSelectedStore} from '@salesforce/retail-react-app/app/hooks/use-selected-store'
 
 const SelectedRefinements = ({toggleFilter, selectedFilterValues, filters, handleReset}) => {
     const {formatMessage} = useIntl()
-    const {site} = useMultiSite()
+    const {store: selectedStore} = useSelectedStore()
     const priceFilterValues = filters?.find((filter) => filter.attributeId === 'price')
     let selectedFilters = []
     for (const key in selectedFilterValues) {
@@ -35,15 +34,14 @@ const SelectedRefinements = ({toggleFilter, selectedFilterValues, filters, handl
                     defaultMessage: 'In Stock'
                 })
 
-                const storeInfo = getSelectedStoreData(site?.id)
-                if (storeInfo?.inventoryId === filter && storeInfo?.name) {
+                if (selectedStore?.inventoryId === filter && selectedStore?.name) {
                     uiLabel = formatMessage(
                         {
                             id: 'store_inventory_filter.checkbox.label',
                             defaultMessage: 'In Stock at {storeName}'
                         },
                         {
-                            storeName: storeInfo.name
+                            storeName: selectedStore.name
                         }
                     )
                 }

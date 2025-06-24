@@ -11,7 +11,7 @@ import {StoreLocatorListItem} from '@salesforce/retail-react-app/app/components/
 import {useStoreLocator} from '@salesforce/retail-react-app/app/hooks/use-store-locator'
 
 export const StoreLocatorList = () => {
-    const {data, isLoading, config, formValues, mode, selectedStore, setSelectedStore} =
+    const {data, isLoading, config, formValues, mode, selectedStoreId, setSelectedStoreId} =
         useStoreLocator()
     const [page, setPage] = useState(1)
 
@@ -19,8 +19,8 @@ export const StoreLocatorList = () => {
         setPage(1)
     }, [data])
 
-    const handleChange = (selectedStore) => {
-        setSelectedStore(selectedStore)
+    const handleChange = (selectedStoreId) => {
+        setSelectedStoreId(selectedStoreId)
     }
 
     const displayStoreLocatorStatusMessage = () => {
@@ -65,14 +65,14 @@ export const StoreLocatorList = () => {
                         {displayStoreLocatorStatusMessage()}
                     </Box>
                 </AccordionItem>
-                <RadioGroup onChange={handleChange} value={selectedStore} width="100%">
+                <RadioGroup onChange={handleChange} value={selectedStoreId} width="100%">
                     {storesToShow?.map((store, index) => (
                         <StoreLocatorListItem
                             key={index}
                             store={store}
                             radioProps={{
                                 value: store.id,
-                                isChecked: selectedStore === store.id,
+                                isChecked: selectedStoreId === store.id,
                                 'aria-describedby': `store-info-${store.id}`
                             }}
                         />

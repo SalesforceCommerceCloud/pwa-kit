@@ -21,7 +21,7 @@ export const useSelectedStore = () => {
     }
 
     const {state} = context
-    const selectedStoreId = state.selectedStore
+    const selectedStoreId = state.selectedStoreId
 
     // Use the useStores hook to fetch store details by ID
     const {
