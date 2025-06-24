@@ -42,8 +42,8 @@ describe('Metadata', () => {
 
             const seoElement = getByTestId('seo')
             expect(seoElement).toHaveAttribute('title', 'Category Title')
-            expect(seoElement).toHaveAttribute('description', '')
-            expect(seoElement).toHaveAttribute('keywords', '')
+            expect(seoElement).not.toHaveAttribute('description')
+            expect(seoElement).not.toHaveAttribute('keywords')
         })
     })
 
@@ -55,8 +55,8 @@ describe('Metadata', () => {
 
             const seoElement = getByTestId('seo')
             expect(seoElement).toHaveAttribute('title', 'search term')
-            expect(seoElement).toHaveAttribute('description', '')
-            expect(seoElement).toHaveAttribute('keywords', '')
+            expect(seoElement).not.toHaveAttribute('description')
+            expect(seoElement).not.toHaveAttribute('keywords')
         })
 
         it('renders Seo with search query and product search result meta tags', () => {
@@ -91,8 +91,8 @@ describe('Metadata', () => {
 
             const seoElement = getByTestId('seo')
             expect(seoElement).toHaveAttribute('title', 'search term')
-            expect(seoElement).toHaveAttribute('description', '')
-            expect(seoElement).toHaveAttribute('keywords', '')
+            expect(seoElement).not.toHaveAttribute('description')
+            expect(seoElement).not.toHaveAttribute('keywords')
         })
 
         it('renders Seo with search query when productSearchResult is undefined', () => {
@@ -102,8 +102,8 @@ describe('Metadata', () => {
 
             const seoElement = getByTestId('seo')
             expect(seoElement).toHaveAttribute('title', 'search term')
-            expect(seoElement).toHaveAttribute('description', '')
-            expect(seoElement).toHaveAttribute('keywords', '')
+            expect(seoElement).not.toHaveAttribute('description')
+            expect(seoElement).not.toHaveAttribute('keywords')
         })
 
         it('renders Seo with search query and meta tags without description', () => {
@@ -121,7 +121,7 @@ describe('Metadata', () => {
 
             const seoElement = getByTestId('seo')
             expect(seoElement).toHaveAttribute('title', 'search term')
-            expect(seoElement).toHaveAttribute('description', '')
+            expect(seoElement).not.toHaveAttribute('description')
             expect(seoElement).toHaveAttribute('keywords', 'search, keywords')
         })
     })
