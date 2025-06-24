@@ -24,53 +24,62 @@ npm install
 
 ### Method 1: Run MCP Server From Cursor
 Open Cursor Application
-Go to Cursor Menu on top menu bar, then *Settings* > *Cursor Settings...* > Tools & Integrations > MCP Tools > New MCP Server
 
-![Cursor Settings Screenshot](./docs/images/cursor-settings.png)
-![Cursor MCP Tools Screenshot](./docs/images/cursor-mcp-tools.png)
+Go to Cursor Menu on top menu bar, then *Settings* > *Cursor Settings...* 
 
-Add this to your mcp.json:
+<img src="./docs/images/cursor-settings.png" alt="Cursor Settings Screenshot" width="50%" />
+
+Select Tools & Integrations > MCP Tools > New MCP Server
+
+<img src="./docs/images/cursor-mcp-tools.png" alt="Cursor MCP Tools Screenshot" width="50%" />
+
+You will be led to mcp.json file. Add this to your mcp.json:
 ``` json
 {
   "mcpServers": {
 
     "pwa-storefront-mcp": {
-      "command": "node /Users/wei.liu/dev/git-repos/pwa-kit-2/pwa-kit/packages/pwa-storefront-mcp/src/server/server.js",
+      "command": "node {{parent-dir-to-mcp}}/pwa-storefront-mcp/src/server/server.js",
       "transport": "stdio",
       "args": []
     }
   }
-}
+} 
+```
 
-This will:
+Cursor will:
 - Start the MCP server
 - Connect to it as a client
 - List available tools
-- Call the `create_new_component` tool
-- Display the results
 
-This will:
-- Start the MCP server
-- Connect to it as a client
-- List available tools
-- Call the `create_new_component` tool
-- Display the results
+You can go back to MCP Tools choose to enable/disable any MCP Server or tools.
 
-### Method 2: Manual testing with MCP clients
+### Method 2: Run MCP Server from Claude
 
 #### Using Claude Desktop
-1. Add this server to your Claude Desktop configuration:
+1. Go to Claude menu on top menu bar then "Developer" > "Edit Config"
+This will lead you to "claude_desktop_config.json" file.
+
+<img src="./docs/images/claude-config.png" alt="Claude MCP Config Screenshot" width="50%" />
+
+2. Add this server to your claude_desktop_config.json:
 ```json
 {
   "mcpServers": {
-    "pwa-storefront-server": {
-      "command": "node",
-      "args": ["server.js"],
-      "cwd": "{{$parent_dir_to_mcp}}/pwa-storefront-mcp"
+    "pwa-storefront-mcp": {
+      "command": "{{path-to-node}}/node",
+      "transport": "stdio",
+      "args": ["{{parent-dir-to-mcp}}}/pwa-storefront-mcp/src/server/server.js"]
     }
   }
 }
 ```
+
+Claude will:
+- Start the MCP server
+- Connect to it as a client
+- List available tools
+<img src="./docs/images/claude-list-tools.png" alt="Claude MCP Tools Screenshot" width="50%" />
 
 #### Using other MCP clients
 The server runs on stdio, so you can test it with any MCP-compatible client.
