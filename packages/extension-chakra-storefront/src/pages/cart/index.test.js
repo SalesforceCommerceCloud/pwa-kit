@@ -630,11 +630,9 @@ describe('Product bundles', () => {
         expect(quantityElement).toBeInTheDocument()
         expect(quantityElement).toHaveValue('1')
 
-        await act(async () => {
-            // Clear the input and type the new value
-            await user.clear(quantityElement)
-            await user.type(quantityElement, '4')
-        })
+        // Clear the input and type the new value
+        await user.clear(quantityElement)
+        await user.type(quantityElement, '4')
         await waitFor(
             () => {
                 expect(quantityElement).toHaveValue('4')
@@ -713,10 +711,8 @@ describe('Product bundles', () => {
         expect(quantityElement).toHaveValue('1')
         const incrementButton = await within(productViewModal).findByTestId('quantity-increment')
 
-        await act(async () => {
-            // Use user event to click the increment button
-            await user.click(incrementButton)
-        })
+        // Use user event to click the increment button
+        await user.click(incrementButton)
         await waitFor(async () => {
             expect(quantityElement).toHaveValue('2')
         })
