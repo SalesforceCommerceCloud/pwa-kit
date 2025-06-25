@@ -5,7 +5,6 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
-import {useApplicationExtensions} from '@salesforce/pwa-kit-extension-sdk/react'
 
 const style = `
 .content {
@@ -53,8 +52,6 @@ const style = `
 `
 
 const GettingStarted = () => {
-    const applicationExtensions = useApplicationExtensions()
-
     return (
         <section className="content">
             <style dangerouslySetInnerHTML={{__html: style}} />
@@ -76,19 +73,6 @@ const GettingStarted = () => {
                                 Get started
                             </a>
                         </p>
-
-                        {applicationExtensions.length > 0 ? (
-                            <>
-                                <p>You have {applicationExtensions.length} extensions installed:</p>
-                                <ul>
-                                    {applicationExtensions?.map((extension, index) => (
-                                        <li key={index}>{extension.getName()} Extension</li>
-                                    ))}
-                                </ul>
-                            </>
-                        ) : (
-                            <p>You currently do not have any extensions installed.</p>
-                        )}
                     </div>
                 </div>
             </div>

@@ -48,7 +48,9 @@ const semver = require('semver')
 const slugify = require('slugify')
 const generatorPkg = require('../package.json')
 const Handlebars = require('handlebars')
-const validatePackageName = require('validate-npm-package-name')
+const trimExtensions = require('./trim-extensions')
+const pluginConfig = require('../assets/plugin-config')
+const computeChecksum = require('./checksum')
 
 const program = new Command()
 
@@ -71,15 +73,6 @@ const validProjectName = (s) => {
     }
     const regex = new RegExp(`^[a-zA-Z0-9-\\s]{1,${PROJECT_ID_MAX_LENGTH}}$`)
     return regex.test(s) || 'Value can only contain letters, numbers, space and hyphens.'
-}
-
-const validProjectAppExtensionName = (input) => {
-    const result = validatePackageName(input)
-    if (!result.validForNewPackages) {
-        const errors = result.errors || []
-        return `Invalid npm package name: ${errors.join(', ')}`
-    }
-    return true
 }
 
 const validUrl = (s) => {
@@ -121,55 +114,7 @@ const TEMPLATE_SOURCE_NPM = 'npm'
 const TEMPLATE_SOURCE_BUNDLE = 'bundle'
 const DEFAULT_TEMPLATE_VERSION = 'latest'
 
-const LOCAL_DEV_PROJECT_DIR = 'dev'
-
-const INITIAL_QUESTION = [
-    {
-        name: 'project.type',
-        message: 'What type of PWA Kit project would you like to create?',
-        type: 'list',
-        choices: [
-            {name: 'PWA Kit Application', value: 'PWAKitAppProject'},
-            {
-                name: 'PWA Kit Application Extension',
-                value: 'PWAKitAppExtensionProject'
-            }
-        ],
-        default: 'PWAKitAppProject'
-    }
-]
-
-const askApplicationExtensibilityQuestions = (availableAppExtensions) => {
-    return [
-        {
-            name: 'project.selectedAppExtensions',
-            message: 'Which Application Extensions do you want to install?',
-            type: 'checkbox',
-            choices: availableAppExtensions
-        },
-        {
-            name: 'project.extractAppExtensions',
-            message:
-                '⚠️ WARNING: If you choose to extract the Application Extension code,\n' +
-                'you will NO LONGER be able to consume upgrades from NPM. All changes\n' +
-                'made to the extracted code will be YOUR RESPONSIBILITY.\n' +
-                '\n' +
-                'Do you want to proceed with extracting the Application Extensions code?',
-            type: 'confirm',
-            default: false
-        }
-    ]
-}
-
-const APPLICATION_EXTENSION_QUESTIONS = [
-    {
-        name: 'project.extensionName',
-        message:
-            'What is the name of your Application Extension? \n' +
-            'The name must follow standard npm package naming conventions (e.g., "@namespace/package-name" or "package-name").',
-        validate: validProjectAppExtensionName
-    }
-]
+const selectedPlugins = {}
 
 const HYBRID_QUESTIONS = [
     {
@@ -213,21 +158,26 @@ const TYPESCRIPT_MINIMAL_QUESTIONS = [
     }
 ]
 
-const RETAIL_REACT_APP_QUESTIONS = [
+const createRetailReactAppQuestions = (defaults = {}) => [
     {
         name: 'project.name',
         validate: validProjectName,
-        message: 'What is the name of your Project?'
+        message: 'What is the name of your Project?',
+        default: defaults['project.name'] || 'retail-react-app'
     },
     {
         name: 'project.commerce.instanceUrl',
         message: 'What is the URL for your Commerce Cloud instance?',
-        validate: validUrl
+        validate: validUrl,
+        default:
+            defaults['project.commerce.instanceUrl'] ||
+            'https://zzrf-001.dx.commercecloud.salesforce.com'
     },
     {
         name: 'project.commerce.clientId',
         message: 'What is your SLAS Client ID?',
-        validate: validClientId
+        validate: validClientId,
+        default: defaults['project.commerce.clientId'] || 'c9c45bfd-0ed3-4aa2-9971-40f88962b836'
     },
     {
         name: 'project.commerce.isSlasPrivate',
@@ -242,22 +192,26 @@ const RETAIL_REACT_APP_QUESTIONS = [
                 name: 'No',
                 value: false
             }
-        ]
+        ],
+        default: defaults['project.commerce.isSlasPrivate'] || false
     },
     {
         name: 'project.commerce.siteId',
         message: 'What is your Site ID in Business Manager?',
-        validate: validSiteId
+        validate: validSiteId,
+        default: defaults['project.commerce.siteId'] || 'RefArch'
     },
     {
         name: 'project.commerce.organizationId',
         message: 'What is your Commerce API organization ID in Business Manager?',
-        validate: validOrganizationId
+        validate: validOrganizationId,
+        default: defaults['project.commerce.organizationId'] || 'f_ecom_zzrf_001'
     },
     {
         name: 'project.commerce.shortCode',
         message: 'What is your Commerce API short code in Business Manager?',
-        validate: validShortCode
+        validate: validShortCode,
+        default: defaults['project.commerce.shortCode'] || 'kv7kzm78'
     }
 ]
 
@@ -275,15 +229,31 @@ const PRESETS = [
         shortDescription: 'The Retail app using your own Commerce Cloud instance',
         templateSource: {
             type: TEMPLATE_SOURCE_NPM,
-            id: '@salesforce/retail-react-app'
+            id: '@salesforce/chakra-storefront'
         },
-        questions: [...RETAIL_REACT_APP_QUESTIONS],
+        interactive: true,
+        getQuestions: () =>
+            createRetailReactAppQuestions({
+                'project.hybrid': false,
+                'project.name': 'chakra-storefront',
+                'project.commerce.instanceUrl': 'https://zzrf-001.dx.commercecloud.salesforce.com',
+                'project.commerce.clientId': 'c9c45bfd-0ed3-4aa2-9971-40f88962b836',
+                'project.commerce.siteId': 'RefArch',
+                'project.commerce.organizationId': 'f_ecom_zzrf_001',
+                'project.commerce.shortCode': 'kv7kzm78',
+                'project.commerce.isSlasPrivate': false,
+                'project.einstein.clientId': '1ea06c6e-c936-4324-bcf0-fada93f83bb1',
+                'project.einstein.siteId': 'aaij-MobileFirst',
+                'project.dataCloud.appSourceId': 'fb81edab-24c6-4b40-8684-b67334dfdf32',
+                'project.dataCloud.tenantId': 'mmyw8zrxhfsg09lfmzrd1zjqmg',
+                'project.demo.enableDemoSettings': false
+            }),
         assets: ['translations'],
         private: false
     },
     {
         id: 'retail-react-app-demo',
-        name: 'Retail React App Demo',
+        name: 'Chakra Storefront Demo',
         description: `
             Generate a project using the settings for a special B2C Commerce
             instance that is used for demo purposes. No questions are asked.
@@ -293,30 +263,30 @@ const PRESETS = [
         shortDescription: 'The Retail app with demo Commerce Cloud instance',
         templateSource: {
             type: TEMPLATE_SOURCE_NPM,
-            id: '@salesforce/retail-react-app'
+            id: '@salesforce/chakra-storefront'
         },
-        questions: [...RETAIL_REACT_APP_QUESTIONS],
-        answers: {
-            ['project.hybrid']: false,
-            ['project.name']: 'demo-storefront',
-            ['project.commerce.instanceUrl']: 'https://zzte-053.dx.commercecloud.salesforce.com',
-            ['project.commerce.clientId']: '1d763261-6522-4913-9d52-5d947d3b94c4',
-            ['project.commerce.siteId']: 'RefArch',
-            ['project.commerce.organizationId']: 'f_ecom_zzte_053',
-            ['project.commerce.shortCode']: 'kv7kzm78',
-            ['project.commerce.isSlasPrivate']: false,
-            ['project.einstein.clientId']: '1ea06c6e-c936-4324-bcf0-fada93f83bb1',
-            ['project.einstein.siteId']: 'aaij-MobileFirst',
-            ['project.dataCloud.appSourceId']: 'fb81edab-24c6-4b40-8684-b67334dfdf32',
-            ['project.dataCloud.tenantId']: 'mmyw8zrxhfsg09lfmzrd1zjqmg',
-            ['project.demo.enableDemoSettings']: false
-        },
+        getQuestions: () =>
+            createRetailReactAppQuestions({
+                'project.hybrid': false,
+                'project.name': 'demo-storefront',
+                'project.commerce.instanceUrl': 'https://zzte-053.dx.commercecloud.salesforce.com',
+                'project.commerce.clientId': '1d763261-6522-4913-9d52-5d947d3b94c4',
+                'project.commerce.siteId': 'RefArch',
+                'project.commerce.organizationId': 'f_ecom_zzte_053',
+                'project.commerce.shortCode': 'kv7kzm78',
+                'project.commerce.isSlasPrivate': false,
+                'project.einstein.clientId': '1ea06c6e-c936-4324-bcf0-fada93f83bb1',
+                'project.einstein.siteId': 'aaij-MobileFirst',
+                'project.dataCloud.appSourceId': 'fb81edab-24c6-4b40-8684-b67334dfdf32',
+                'project.dataCloud.tenantId': 'mmyw8zrxhfsg09lfmzrd1zjqmg',
+                'project.demo.enableDemoSettings': false
+            }),
         assets: ['translations'],
         private: false
     },
     {
         id: 'retail-react-app-demo-site-internal',
-        name: 'Retail React App Demo Store',
+        name: 'Chakra Storefront Demo Store',
         description: `
             Generates a project using the settings for a special B2C Commerce instance that is used
             for demo purposes. The demo site is accessible at https://pwa-kit.mobify-storefront.com/
@@ -329,11 +299,9 @@ const PRESETS = [
             'The Retail app with demo Commerce Cloud instance and a private SLAS client',
         templateSource: {
             type: TEMPLATE_SOURCE_NPM,
-            id: '@salesforce/retail-react-app'
+            id: '@salesforce/chakra-storefront'
         },
-        questions: [...RETAIL_REACT_APP_QUESTIONS],
         answers: {
-            ['project.extend']: false, // Intentionally not an extensible project so that the correct logos appear on demo site
             ['project.hybrid']: false,
             ['project.name']: 'demo-storefront',
             ['project.commerce.instanceUrl']: 'https://zzrf-001.dx.commercecloud.salesforce.com',
@@ -353,144 +321,140 @@ const PRESETS = [
     },
     {
         id: 'retail-react-app-test-project',
-        name: 'Retail React App Test Project',
+        name: 'Chakra Storefront Test Project',
         description: '',
         templateSource: {
             type: TEMPLATE_SOURCE_BUNDLE,
             id: 'typescript-minimal'
         },
-        questions: [...RETAIL_REACT_APP_QUESTIONS],
-        answers: {
-            ['project.hybrid']: false,
-            ['project.extractAppExtensions']: true,
-            ['project.type']: 'PWAKitAppProject',
-            ['project.useApplicationExtensibility']: true,
-            ['project.selectedAppExtensions']: [
-                '@salesforce/extension-chakra-storefront',
-                '@salesforce/extension-chakra-store-locator'
-            ],
-            ['project.name']: 'retail-react-app',
-            ['project.commerce.instanceUrl']: 'https://zzrf-001.dx.commercecloud.salesforce.com',
-            ['project.commerce.clientId']: 'c9c45bfd-0ed3-4aa2-9971-40f88962b836',
-            ['project.commerce.siteId']: 'RefArch',
-            ['project.commerce.organizationId']: 'f_ecom_zzrf_001',
-            ['project.commerce.shortCode']: 'kv7kzm78',
-            ['project.commerce.isSlasPrivate']: false,
-            ['project.einstein.clientId']: '1ea06c6e-c936-4324-bcf0-fada93f83bb1',
-            ['project.einstein.siteId']: 'aaij-MobileFirst',
-            ['project.dataCloud.appSourceId']: 'fb81edab-24c6-4b40-8684-b67334dfdf32',
-            ['project.dataCloud.tenantId']: 'mmyw8zrxhfsg09lfmzrd1zjqmg',
-            ['project.demo.enableDemoSettings']: false
-        },
+        getQuestions: () =>
+            createRetailReactAppQuestions({
+                'project.hybrid': false,
+                'project.name': 'chakra-storefront',
+                'project.commerce.instanceUrl': 'https://zzrf-001.dx.commercecloud.salesforce.com',
+                'project.commerce.clientId': 'c9c45bfd-0ed3-4aa2-9971-40f88962b836',
+                'project.commerce.siteId': 'RefArch',
+                'project.commerce.organizationId': 'f_ecom_zzrf_001',
+                'project.commerce.shortCode': 'kv7kzm78',
+                'project.commerce.isSlasPrivate': false,
+                'project.einstein.clientId': '1ea06c6e-c936-4324-bcf0-fada93f83bb1',
+                'project.einstein.siteId': 'aaij-MobileFirst',
+                'project.dataCloud.appSourceId': 'fb81edab-24c6-4b40-8684-b67334dfdf32',
+                'project.dataCloud.tenantId': 'mmyw8zrxhfsg09lfmzrd1zjqmg',
+                'project.demo.enableDemoSettings': false
+            }),
         assets: ['translations'],
         private: true
     },
     {
         id: 'retail-react-app-private-slas-client',
-        name: 'Retail React App Private SLAS client project',
+        name: 'Chakra Storefront Private SLAS client project',
         description: '',
         templateSource: {
             type: TEMPLATE_SOURCE_NPM,
-            id: '@salesforce/retail-react-app'
+            id: '@salesforce/chakra-storefront'
         },
-        questions: [...RETAIL_REACT_APP_QUESTIONS],
-        answers: {
-            ['project.hybrid']: false,
-            ['project.name']: 'retail-react-app',
-            ['project.commerce.instanceUrl']: 'https://zzrf-002.dx.commercecloud.salesforce.com',
-            ['project.commerce.clientId']: '89655706-9a0d-49ba-a1e5-18bb2d616374',
-            ['project.commerce.siteId']: 'RefArch',
-            ['project.commerce.organizationId']: 'f_ecom_zzrf_002',
-            ['project.commerce.shortCode']: 'kv7kzm78',
-            ['project.commerce.isSlasPrivate']: true,
-            ['project.einstein.clientId']: '1ea06c6e-c936-4324-bcf0-fada93f83bb1',
-            ['project.einstein.siteId']: 'aaij-MobileFirst',
-            ['project.dataCloud.appSourceId']: 'fb81edab-24c6-4b40-8684-b67334dfdf32',
-            ['project.dataCloud.tenantId']: 'mmyw8zrxhfsg09lfmzrd1zjqmg',
-            ['project.demo.enableDemoSettings']: false
-        },
+        getQuestions: () =>
+            createRetailReactAppQuestions({
+                'project.hybrid': false,
+                'project.name': 'chakra-storefront',
+                'project.commerce.instanceUrl': 'https://zzrf-002.dx.commercecloud.salesforce.com',
+                'project.commerce.clientId': '89655706-9a0d-49ba-a1e5-18bb2d616374',
+                'project.commerce.siteId': 'RefArch',
+                'project.commerce.organizationId': 'f_ecom_zzrf_002',
+                'project.commerce.shortCode': 'kv7kzm78',
+                'project.commerce.isSlasPrivate': true,
+                'project.einstein.clientId': '1ea06c6e-c936-4324-bcf0-fada93f83bb1',
+                'project.einstein.siteId': 'aaij-MobileFirst',
+                'project.dataCloud.appSourceId': 'fb81edab-24c6-4b40-8684-b67334dfdf32',
+                'project.dataCloud.tenantId': 'mmyw8zrxhfsg09lfmzrd1zjqmg',
+                'project.demo.enableDemoSettings': false
+            }),
         assets: ['translations'],
         private: true
     },
     {
         id: 'retail-react-app-bug-bounty',
-        name: 'Retail React App Bug Bounty Project',
+        name: 'Chakra Storefront Bug Bounty Project',
         description: '',
         templateSource: {
             type: TEMPLATE_SOURCE_NPM,
-            id: '@salesforce/retail-react-app'
+            id: '@salesforce/chakra-storefront'
         },
-        questions: [...RETAIL_REACT_APP_QUESTIONS],
-        answers: {
-            ['project.extend']: true,
-            ['project.hybrid']: false,
-            ['project.name']: 'retail-react-app',
-            ['project.commerce.instanceUrl']: 'https://zzec-006.dx.commercecloud.salesforce.com',
-            ['project.commerce.clientId']: 'b56e7ad3-2237-42c9-8f55-41e63ebca420',
-            ['project.commerce.siteId']: 'RefArch',
-            ['project.commerce.organizationId']: 'f_ecom_zzec_006',
-            ['project.commerce.shortCode']: 'staging-001',
-            ['project.einstein.clientId']: '1ea06c6e-c936-4324-bcf0-fada93f83bb1',
-            ['project.einstein.siteId']: 'aaij-MobileFirst',
-            ['project.dataCloud.appSourceId']: 'fb81edab-24c6-4b40-8684-b67334dfdf32',
-            ['project.dataCloud.tenantId']: 'mmyw8zrxhfsg09lfmzrd1zjqmg',
-            ['project.commerce.isSlasPrivate']: true,
-            ['project.demo.enableDemoSettings']: false
-        },
+        getQuestions: () =>
+            createRetailReactAppQuestions({
+                'project.hybrid': false,
+                'project.name': 'chakra-storefront',
+                'project.commerce.instanceUrl': 'https://zzec-006.dx.commercecloud.salesforce.com',
+                'project.commerce.clientId': 'b56e7ad3-2237-42c9-8f55-41e63ebca420',
+                'project.commerce.siteId': 'RefArch',
+                'project.commerce.organizationId': 'f_ecom_zzec_006',
+                'project.commerce.shortCode': 'staging-001',
+                'project.einstein.clientId': '1ea06c6e-c936-4324-bcf0-fada93f83bb1',
+                'project.einstein.siteId': 'aaij-MobileFirst',
+                'project.dataCloud.appSourceId': 'fb81edab-24c6-4b40-8684-b67334dfdf32',
+                'project.dataCloud.tenantId': 'mmyw8zrxhfsg09lfmzrd1zjqmg',
+                'project.commerce.isSlasPrivate': true,
+                'project.demo.enableDemoSettings': false
+            }),
         assets: ['translations'],
         private: true
     },
     {
         id: 'retail-react-app-hybrid-test-project',
-        name: 'Retail React App Hybrid Test Private SLAS Project',
+        name: 'Chakra Storefront Hybrid Test Private SLAS Project',
         description: '',
         templateSource: {
             type: TEMPLATE_SOURCE_NPM,
-            id: '@salesforce/retail-react-app'
+            id: '@salesforce/chakra-storefront'
         },
-        questions: [...HYBRID_QUESTIONS, ...RETAIL_REACT_APP_QUESTIONS],
-        answers: {
-            ['project.hybrid']: true,
-            ['project.name']: 'retail-react-app',
-            ['project.commerce.instanceUrl']: 'https://test.phased-launch-testing.com/',
-            ['project.commerce.clientId']: '99b4e081-00cf-454a-95b0-26ac2b824931',
-            ['project.commerce.siteId']: 'RefArch',
-            ['project.commerce.organizationId']: 'f_ecom_bdpx_dev',
-            ['project.commerce.shortCode']: 'xitgmcd3',
-            ['project.einstein.clientId']: '1ea06c6e-c936-4324-bcf0-fada93f83bb1',
-            ['project.einstein.siteId']: 'aaij-MobileFirst',
-            ['project.commerce.isSlasPrivate']: true,
-            ['project.dataCloud.appSourceId']: 'fb81edab-24c6-4b40-8684-b67334dfdf32',
-            ['project.dataCloud.tenantId']: 'mmyw8zrxhfsg09lfmzrd1zjqmg',
-            ['project.demo.enableDemoSettings']: false
-        },
+        getQuestions: () => [
+            ...HYBRID_QUESTIONS,
+            ...createRetailReactAppQuestions({
+                'project.hybrid': true,
+                'project.name': 'chakra-storefront',
+                'project.commerce.instanceUrl': 'https://test.phased-launch-testing.com/',
+                'project.commerce.clientId': '99b4e081-00cf-454a-95b0-26ac2b824931',
+                'project.commerce.siteId': 'RefArch',
+                'project.commerce.organizationId': 'f_ecom_bdpx_dev',
+                'project.commerce.shortCode': 'xitgmcd3',
+                'project.einstein.clientId': '1ea06c6e-c936-4324-bcf0-fada93f83bb1',
+                'project.einstein.siteId': 'aaij-MobileFirst',
+                'project.commerce.isSlasPrivate': true,
+                'project.dataCloud.appSourceId': 'fb81edab-24c6-4b40-8684-b67334dfdf32',
+                'project.dataCloud.tenantId': 'mmyw8zrxhfsg09lfmzrd1zjqmg',
+                'project.demo.enableDemoSettings': false
+            })
+        ],
         assets: ['translations'],
         private: true
     },
     {
         id: 'retail-react-app-hybrid-public-client-test-project',
-        name: 'Retail React App Hybrid Test Public SLAS client project',
+        name: 'Chakra Storefront Hybrid Test Public SLAS client project',
         description: '',
         templateSource: {
             type: TEMPLATE_SOURCE_NPM,
-            id: '@salesforce/retail-react-app'
+            id: '@salesforce/chakra-storefront'
         },
-        questions: [...HYBRID_QUESTIONS, ...RETAIL_REACT_APP_QUESTIONS],
-        answers: {
-            ['project.hybrid']: true,
-            ['project.name']: 'retail-react-app',
-            ['project.commerce.instanceUrl']: 'https://www.phased-launch-testing.com/',
-            ['project.commerce.clientId']: 'e7e22b7f-a904-4f3a-8022-49dbee696485',
-            ['project.commerce.siteId']: 'RefArch',
-            ['project.commerce.organizationId']: 'f_ecom_bjnl_prd',
-            ['project.commerce.shortCode']: 'performance-001',
-            ['project.einstein.clientId']: '1ea06c6e-c936-4324-bcf0-fada93f83bb1',
-            ['project.einstein.siteId']: 'aaij-MobileFirst',
-            ['project.commerce.isSlasPrivate']: false,
-            ['project.dataCloud.appSourceId']: 'fb81edab-24c6-4b40-8684-b67334dfdf32',
-            ['project.dataCloud.tenantId']: 'mmyw8zrxhfsg09lfmzrd1zjqmg',
-            ['project.demo.enableDemoSettings']: false
-        },
+        getQuestions: () => [
+            ...HYBRID_QUESTIONS,
+            ...createRetailReactAppQuestions({
+                'project.hybrid': true,
+                'project.name': 'chakra-storefront',
+                'project.commerce.instanceUrl': 'https://www.phased-launch-testing.com/',
+                'project.commerce.clientId': 'e7e22b7f-a904-4f3a-8022-49dbee696485',
+                'project.commerce.siteId': 'RefArch',
+                'project.commerce.organizationId': 'f_ecom_bjnl_prd',
+                'project.commerce.shortCode': 'performance-001',
+                'project.einstein.clientId': '1ea06c6e-c936-4324-bcf0-fada93f83bb1',
+                'project.einstein.siteId': 'aaij-MobileFirst',
+                'project.commerce.isSlasPrivate': false,
+                'project.dataCloud.appSourceId': 'fb81edab-24c6-4b40-8684-b67334dfdf32',
+                'project.dataCloud.tenantId': 'mmyw8zrxhfsg09lfmzrd1zjqmg',
+                'project.demo.enableDemoSettings': false
+            })
+        ],
         assets: ['translations'],
         private: true
     },
@@ -517,7 +481,8 @@ const PRESETS = [
             type: TEMPLATE_SOURCE_BUNDLE,
             id: 'typescript-minimal'
         },
-        questions: TYPESCRIPT_MINIMAL_QUESTIONS,
+        interactive: true,
+        getQuestions: () => TYPESCRIPT_MINIMAL_QUESTIONS,
         private: true
     },
     {
@@ -528,7 +493,7 @@ const PRESETS = [
             type: TEMPLATE_SOURCE_BUNDLE,
             id: 'express-minimal'
         },
-        questions: EXPRESS_MINIMAL_QUESTIONS,
+        getQuestions: () => EXPRESS_MINIMAL_QUESTIONS,
         answers: {
             ['project.name']: 'express-minimal'
         },
@@ -547,7 +512,7 @@ const PRESETS = [
             type: TEMPLATE_SOURCE_BUNDLE,
             id: 'express-minimal'
         },
-        questions: EXPRESS_MINIMAL_QUESTIONS,
+        getQuestions: () => EXPRESS_MINIMAL_QUESTIONS,
         private: true
     },
     {
@@ -558,59 +523,9 @@ const PRESETS = [
             type: TEMPLATE_SOURCE_BUNDLE,
             id: 'mrt-reference-app'
         },
-        questions: MRT_REFERENCE_QUESTIONS,
+        getQuestions: () => MRT_REFERENCE_QUESTIONS,
         answers: {
             ['project.name']: 'mrt-reference-app'
-        },
-        private: true
-    },
-    {
-        id: 'extension-starter',
-        name: 'Starter Application Extension',
-        description: '',
-        templateSource: {
-            type: TEMPLATE_SOURCE_BUNDLE,
-            id: 'extension-starter'
-        },
-        questions: APPLICATION_EXTENSION_QUESTIONS,
-        answers: {
-            ['project.name']: '@salesforce/extension-starter',
-            ['project.type']: 'PWAKitAppExtensionProject',
-            ['project.extensionName']: '@salesforce/extension-starter'
-        },
-        private: true
-    },
-    {
-        id: 'app-extension-starter-extract',
-        name: 'Typescript Minimal With Extracted Extension',
-        description:
-            'Generate an typescript-minimal project with a starter extension. The extension code will be included in the project.',
-        templateSource: {
-            type: TEMPLATE_SOURCE_BUNDLE,
-            id: 'typescript-minimal'
-        },
-        questions: TYPESCRIPT_MINIMAL_QUESTIONS,
-        answers: {
-            ['project.name']: 'app-extension-starter-extract',
-            ['project.selectedAppExtensions']: ['extension-starter'],
-            ['project.extractAppExtensions']: true
-        },
-        private: true
-    },
-    {
-        id: 'app-extension-starter-no-extract',
-        name: 'Typescript Minimal With Extension',
-        description:
-            'Generate an typescript-minimal project with a starter extension. The extension code will not included in the project.',
-        templateSource: {
-            type: TEMPLATE_SOURCE_BUNDLE,
-            id: 'typescript-minimal'
-        },
-        questions: TYPESCRIPT_MINIMAL_QUESTIONS,
-        answers: {
-            ['project.name']: 'app-extension-starter-no-extract',
-            ['project.selectedAppExtensions']: ['extension-starter'],
-            ['project.extractAppExtensions']: false
         },
         private: true
     }
@@ -625,11 +540,6 @@ const PUBLIC_PRESET_NAMES = PRESETS.filter(({private}) => !private).map(({id}) =
 const ALL_PRESET_NAMES = PRIVATE_PRESET_NAMES.concat(PUBLIC_PRESET_NAMES)
 
 const PROJECT_ID_MAX_LENGTH = 20
-
-// Constant for the base application directory
-const APP_DIR = 'app'
-// Constant for the directory containing extracted application extensions
-const APP_EXTENSIONS_DIR = 'application-extensions'
 
 // Utilities
 const readJson = (path) => JSON.parse(sh.cat(path))
@@ -754,19 +664,6 @@ const expandKey = (key, value) =>
         )
 
 /**
- * Creates an .npmignore file at the root of the generated project.
- * Ensures the specified directories and files are excluded from being published to npm.
- *
- * @param {string} outputDir - The path to the root of the generated project.
- * @param {string[]} ignorePaths - An array of directory or file paths to ignore in the npm package.
- */
-const createNpmIgnoreFile = (outputDir, ignorePaths = []) => {
-    const npmIgnoreContent = ignorePaths.join('\n') + '\n'
-
-    fs.writeFileSync(p.join(outputDir, '.npmignore'), npmIgnoreContent)
-}
-
-/**
  * Provided an object there the keys use "dot notation", expand each individual key.
  * NOTE: This only expands keys at the root level, and not those nested.
  *
@@ -841,96 +738,6 @@ const processTemplate = (relFile, inputDir, outputDir, context) => {
 }
 
 /**
- * Process the Application Extensions into the extracted application extensions directory.
- *
- * @param {Array} appExtensions - An array of the Application Extension names.
- * @param {boolean} extractAppExtensions - A boolean indicating whether to extract the Application Extensions code from the npm package.
- * @param {string} appExtensionsDir - The path to the extracted application extensions directory.
- */
-const processAppExtensions = (
-    appExtensions = [],
-    extractAppExtensions = false,
-    appExtensionsDir
-) => {
-    if (appExtensions.length > 0 && extractAppExtensions) {
-        appExtensions.forEach((appExtensionName) => {
-            // Create the full path for the temporary directory, preserving the namespace
-            const appExtensionTmp = p.join(os.tmpdir(), `extract-${appExtensionName}`)
-            fs.mkdirSync(appExtensionTmp, {recursive: true})
-            const appExtensionTarFile = sh
-                .exec(
-                    `npm pack ${appExtensionName}@latest --pack-destination="${appExtensionTmp}"`,
-                    {
-                        silent: true
-                    }
-                )
-                .stdout.trim()
-
-            const appExtensionTarPath = p.join(appExtensionTmp, appExtensionTarFile)
-
-            // Extract the Application Extension
-            tar.x({
-                file: appExtensionTarPath,
-                cwd: appExtensionTmp,
-                sync: true
-            })
-
-            // Copy the extracted Application Extension into the appropriate folder
-            const appExtensionTmpPath = p.join(appExtensionTmp, 'package')
-            const appExtensionDestDir = p.join(appExtensionsDir, appExtensionName.replace('/', '_'))
-            sh.mkdir('-p', appExtensionDestDir)
-
-            copyAllFiles(appExtensionTmpPath, appExtensionDestDir)
-
-            // Clean up the temporary Application Extension directory
-            sh.rm('-rf', appExtensionTmp)
-        })
-    }
-}
-
-/**
- * Fetches the latest version of a package using npm view.
- * @param {string} packageName - The name of the package (e.g., '@salesforce/extension-chakra-storefront').
- * @returns {string} - The latest version number (e.g., '1.0.0') or 'latest' if fetching fails.
- */
-const getLatestVersion = (packageName) => {
-    try {
-        const result = child_proc.execSync(`npm view ${packageName} --json`, {encoding: 'utf8'})
-        const json = JSON.parse(result)
-        const latestVersion = json['dist-tags']?.latest
-        if (!latestVersion) {
-            throw new Error(`No 'dist-tags.latest' found for ${packageName}`)
-        }
-        return latestVersion
-    } catch (err) {
-        console.warn(`Failed to fetch version for ${packageName}: ${err.message}. Using 'latest'.`)
-        return 'latest'
-    }
-}
-
-/**
- * Fetches available Application Extensions and their latest versions using npm view.
- * @returns {Array} - A list of objects containing name, value, and version of available extensions.
- */
-const fetchAvailableAppExtensions = () => {
-    const filePath = p.join(__dirname, '..', 'assets', 'available-app-extensions.json')
-    try {
-        const data = fs.readFileSync(filePath)
-        const staticResult = JSON.parse(data)
-        const extensionsWithVersions = staticResult.map((pkg) => {
-            const version = getLatestVersion(pkg.name)
-            // Prepend caret (^) to the version unless it's 'latest'
-            const caretVersion = version === 'latest' ? version : `^${version}`
-            return {name: pkg.name, value: pkg.name, version: caretVersion}
-        })
-        return extensionsWithVersions
-    } catch (error) {
-        console.error('Failed to fetch Application Extensions:', error.message)
-        return []
-    }
-}
-
-/**
  * Copy all files, including subdirectories and hidden files
  */
 const copyAllFiles = (fromDirectory, targetDirectory) => {
@@ -956,9 +763,8 @@ const runGenerator = (
     context,
     {outputDir, templateVersion, verbose, installDependencies = true}
 ) => {
-    const {answers, preset} = context
+    const {preset} = context
     const {templateSource} = preset
-    const {selectedAppExtensions = [], extractAppExtensions = false} = answers.project
 
     // Check if the output directory doesn't already exist.
     checkOutputDir(outputDir)
@@ -970,7 +776,6 @@ const runGenerator = (
     // downloading from NPM or copying from the template bundle folder.
     const tmp = fs.mkdtempSync(p.resolve(os.tmpdir(), 'extract-template'))
     const packagePath = p.join(tmp, 'package')
-    const appExtensionsDir = p.join(outputDir, APP_DIR, APP_EXTENSIONS_DIR)
     const {id, type} = templateSource
     let tarPath
 
@@ -1004,6 +809,20 @@ const runGenerator = (
     // Copy the base template either from the package or npm.
     copyAllFiles(packagePath, outputDir)
 
+    // Convert selected plugins array to object with true values
+    if (Object.keys(pluginConfig?.plugins || {}).length > 0 && selectedPlugins) {
+        trimExtensions(outputDir, selectedPlugins)
+    }
+
+    // Compute the checksum of the output directory
+    const checksums = computeChecksum(outputDir)
+    const checksumFilePath = p.join(outputDir, 'checksum.json')
+    const timestamp = new Date().toISOString()
+    fs.writeFileSync(
+        checksumFilePath,
+        JSON.stringify({checksums, timestamp, selectedPlugins}, null, 2)
+    )
+
     // Copy template specific assets over.
     const assetsDir = p.join(ASSETS_TEMPLATES_DIR, id)
     if (sh.test('-e', assetsDir)) {
@@ -1017,96 +836,10 @@ const runGenerator = (
             })
     }
 
-    // Check project type and handle appropriately
-    if (answers.project.type === 'PWAKitAppExtensionProject') {
-        const devOutputDir = p.join(outputDir, LOCAL_DEV_PROJECT_DIR)
-
-        // Update the root package.json to add a start script
-        updatePackageJson(p.resolve(outputDir, 'package.json'), {
-            scripts: {
-                start: `npm --prefix ./${LOCAL_DEV_PROJECT_DIR} start`,
-                'start:inspect': `npm --prefix ./${LOCAL_DEV_PROJECT_DIR} run start:inspect`
-            }
-        })
-
-        // Recursively call runGenerator for the 'typescript-minimal' local dev project
-        const localDevProjectContext = {
-            ...context,
-            preset: {
-                id: 'typescript-minimal',
-                templateSource: {type: TEMPLATE_SOURCE_BUNDLE, id: 'typescript-minimal'},
-                private: true
-            },
-            answers: {project: {type: 'PWAKitAppProject', name: 'local-dev-project'}}
-        }
-
-        runGenerator(localDevProjectContext, {
-            outputDir: devOutputDir,
-            templateVersion,
-            verbose,
-            installDependencies: false
-        })
-
-        // Update the typescript-minimal dev package.json with dependencies
-        updatePackageJson(p.resolve(devOutputDir, 'package.json'), {
-            devDependencies: {[answers.project.name]: 'file:../'},
-            mobify: {app: {extensions: [answers.project.name]}}
-        })
-
-        // TODO: The generator is growing, we should refactor this to be more maintainable.
-        const processGeneratedExtension = () => {
-            // do a file content replacement for extension-meta.json in the outputDir
-            // find all instances of "@salesforce/extension-starter" and replace with answers.project.name
-            const extensionMetaJsonPath = p.join(outputDir, 'extension-meta.json')
-            if (fs.existsSync(extensionMetaJsonPath)) {
-                let extensionMetaJsonContent = fs.readFileSync(extensionMetaJsonPath, 'utf8')
-                extensionMetaJsonContent = extensionMetaJsonContent.replace(
-                    /@salesforce\/extension-starter/g,
-                    answers.project.name
-                )
-                fs.writeFileSync(extensionMetaJsonPath, extensionMetaJsonContent)
-            }
-        }
-
-        processGeneratedExtension()
-
-        // Create the .npmignore file, excluding the typescript-minimal local dev project folder
-        createNpmIgnoreFile(outputDir, [`${LOCAL_DEV_PROJECT_DIR}/`])
-
-        npmInstall(devOutputDir, {
-            verbose,
-            projectName: localDevProjectContext.answers.project.name
-        })
-    } else {
-        processAppExtensions(selectedAppExtensions, extractAppExtensions, appExtensionsDir)
-    }
-
     // Prepare updates for package.json
     const pkgUpdates = {
         name: getSlugifiedProjectName(context.answers.project.name || context.preset.id),
-        version: GENERATED_PROJECT_VERSION,
-        // Conditionally add workspaces for extractAppExtensions
-        ...(extractAppExtensions && {
-            workspaces: [`${p.join(APP_DIR, APP_EXTENSIONS_DIR)}/*`]
-        }),
-        // Add selected Application Extensions to devDependencies
-        devDependencies: selectedAppExtensions.reduce((acc, appExtensionName) => {
-            // Find the corresponding Application Extension details
-            const appExtensionDetails = context?.availableAppExtensions?.find(
-                (ext) => ext.value === appExtensionName
-            )
-            const version = appExtensionDetails ? appExtensionDetails.version : 'latest'
-
-            acc[appExtensionName] = extractAppExtensions
-                ? `file:${p.join(
-                      '.',
-                      APP_DIR,
-                      APP_EXTENSIONS_DIR,
-                      appExtensionName.replace('/', '_')
-                  )}`
-                : version
-            return acc
-        }, {})
+        version: GENERATED_PROJECT_VERSION
     }
 
     // Update the root package.json
@@ -1118,41 +851,6 @@ const runGenerator = (
     if (installDependencies) {
         // Install dependencies for the newly minted project.
         npmInstall(outputDir, {verbose, projectName: context.answers.project.name})
-    }
-
-    if (selectedAppExtensions.length > 0) {
-        const extensionsWithDefaultConfig = selectedAppExtensions.map((extension) => {
-            // Since we've just installed the dependencies, we can read the default config of each extension
-            const pathToDefaultConfig = p.join(
-                outputDir,
-                'node_modules',
-                extension,
-                'config',
-                'default.json'
-            )
-            if (!fs.existsSync(pathToDefaultConfig)) {
-                console.warn(
-                    `The extension ${extension} does not have a default config. Will generate a minimal default config for it.`
-                )
-                // Return a minimal default config. It should match what's defined in: https://github.com/SalesforceCommerceCloud/pwa-kit/blob/310e946bed12fd4cbb42a209ee6982e9b1bb9b99/packages/pwa-kit-extension-sdk/src/shared/utils/helpers.ts#L13-L15
-                return [extension, {enabled: true}]
-            }
-
-            const defaultConfig = readJson(pathToDefaultConfig)
-            return [extension, defaultConfig]
-        })
-
-        updatePackageJson(p.resolve(outputDir, 'package.json'), {
-            mobify: {
-                app: {
-                    extensions: extensionsWithDefaultConfig
-                }
-            }
-        })
-
-        console.log(
-            'After your project is generated, please review `mobify.app.extensions` in package.json to check the configuration of the extensions and fill out any placeholder values.'
-        )
     }
 }
 
@@ -1171,16 +869,12 @@ const main = async (opts) => {
         console.log('')
     }
 
-    // The context object will have all the current information, like the selected preset, the answers
-    // to "general" and "project" questions. It'll also be populated with details of the selected project,
-    // like its `package.json` value.
     let context = INITIAL_CONTEXT
     let {outputDir, verbose, preset, templateVersion} = opts
     const {prompt} = inquirer
     const OUTPUT_DIR_FLAG_ACTIVE = !!outputDir
     const presetId = preset || process.env.GENERATOR_PRESET
 
-    // Exit if the preset provided is not valid.
     if (presetId && !validPreset(presetId)) {
         console.error(
             `The preset "${presetId}" is not valid. Valid presets are: ${
@@ -1192,73 +886,48 @@ const main = async (opts) => {
         process.exit(1)
     }
 
-    // If no preset argument is provided, ask Application Extensibility questions
-    if (!presetId) {
-        // Ask initial question
-        const initialAnswers = await inquirer.prompt(INITIAL_QUESTION)
-        context = {...context, answers: {project: initialAnswers.project}}
-
-        if (initialAnswers.project.type === 'PWAKitAppExtensionProject') {
-            // Ask for extension name if Application Extension is selected
-            const extensionNameAnswers = await inquirer.prompt(APPLICATION_EXTENSION_QUESTIONS)
-            const extensionName = extensionNameAnswers.project.extensionName
-
-            // Get the preset and set extension name in all required places
-            context.preset = {
-                ...PRESETS.find(({id}) => id === 'extension-starter'),
-                answers: {
-                    'project.type': 'PWAKitAppExtensionProject',
-                    'project.name': extensionName,
-                    'project.extensionName': extensionName
-                }
-            }
-        } else {
-            const availableAppExtensions = fetchAvailableAppExtensions()
-
-            // Include version info in context
-            context.availableAppExtensions = availableAppExtensions
-
-            const generationAnswers = await prompt(
-                askApplicationExtensibilityQuestions(availableAppExtensions)
-            )
-            context = merge(context, {answers: expandObject(generationAnswers)})
-
-            // Default to 'typescript-minimal' preset when no preset is specified
-            context.preset = PRESETS.find(({id}) => id === 'typescript-minimal')
-        }
-    }
-
-    // Set the preset based on presetId if provided
     if (presetId && !context.preset) {
         context.preset = PRESETS.find(({id}) => id === presetId)
     }
 
-    // Ask preset specific questions and merge into the current context.
-    const {questions = {}, answers = {}} = context.preset
-    if (questions) {
+    const {interactive = false, getQuestions, answers = {}} = context.preset
+    if (interactive) {
+        const questions = getQuestions ? getQuestions() : []
         const projectAnswers = await prompt(questions, answers)
-
         context = merge(context, {
             answers: expandObject(projectAnswers)
+        })
+    } else {
+        context = merge(context, {
+            answers: expandObject(answers)
+        })
+    }
+
+    // Prompt user for plugin selection
+    if (Object.keys(pluginConfig?.plugins || {}).length > 0) {
+        const pluginChoices = Object.entries(pluginConfig.plugins).map(([key, config]) => ({
+            name: config.description,
+            value: key
+        }))
+
+        const pluginAnswers = await inquirer.prompt([
+            {
+                type: 'checkbox',
+                name: 'selectedPlugins',
+                message: 'Which extensions would you like to enable?',
+                choices: pluginChoices
+            }
+        ])
+
+        // Convert selected plugins array to object with true values
+        pluginAnswers.selectedPlugins.forEach((plugin) => {
+            selectedPlugins[plugin] = true
         })
     }
 
     if (!OUTPUT_DIR_FLAG_ACTIVE) {
         // For extension projects, use the extension name as the output directory
-        if (
-            context.answers.project.type === 'PWAKitAppExtensionProject' &&
-            context.answers.project.extensionName
-        ) {
-            // Extract the package name part without the namespace for the directory name
-            const extensionName = context.answers.project.extensionName
-            const packageNamePart = extensionName.includes('/')
-                ? extensionName.split('/')[1]
-                : extensionName
-
-            outputDir = p.join(process.cwd(), packageNamePart)
-        } else {
-            outputDir = p.join(process.cwd(), context.answers.project.name || context.preset.id)
-        }
+        outputDir = p.join(process.cwd(), context.answers.project.name || context.preset.id)
     }
 
     if (context.answers.project.commerce?.instanceUrl) {

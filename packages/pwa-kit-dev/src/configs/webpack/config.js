@@ -9,7 +9,7 @@
 
 // For more information on these settings, see https://webpack.js.org/configuration
 import {BundleAnalyzerPlugin} from 'webpack-bundle-analyzer'
-import path, {resolve} from 'path'
+import {resolve} from 'path'
 import fse from 'fs-extra'
 import webpack from 'webpack'
 
@@ -20,34 +20,17 @@ import ReactRefreshWebpackPlugin from '@pmmmwh/react-refresh-webpack-plugin'
 import SpeedMeasurePlugin from 'speed-measure-webpack-plugin'
 import WebpackNotifierPlugin from 'webpack-notifier'
 
-// PWA-Kit Plugins
-import ApplicationExtensionConfigPlugin from '@salesforce/pwa-kit-extension-sdk/configs/webpack/application-extensions-config-plugin'
-import OverrideStatsPlugin from '@salesforce/pwa-kit-extension-sdk/configs/webpack/override-stats-plugin'
-
 // Local Plugins
 import {sdkReplacementPlugin} from './plugins'
 
 // Constants
 import {CLIENT, SERVER, CLIENT_OPTIONAL, SSR, REQUEST_PROCESSOR} from './config-names'
 
-// Utilities
-import {
-    ruleForApplicationExtensibility,
-    ruleForOverrideResolver
-} from '@salesforce/pwa-kit-extension-sdk/configs/webpack'
-import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
-import {
-    buildAliases,
-    getConfiguredExtensions,
-    isExtensionPackage
-} from '@salesforce/pwa-kit-extension-sdk/shared/utils'
-
 const projectDir = process.cwd()
 const pkg = fse.readJsonSync(resolve(projectDir, 'package.json'))
 const buildDir = process.env.PWA_KIT_BUILD_DIR
     ? resolve(process.env.PWA_KIT_BUILD_DIR)
     : resolve(projectDir, 'build')
-const isMonoRepo = fse.existsSync(resolve(projectDir, '..', '..', 'lerna.json'))
 const production = 'production'
 const development = 'development'
 const analyzeBundle = process.env.MOBIFY_ANALYZE === 'true'
@@ -56,8 +39,6 @@ const INSPECT = process.execArgv.some((arg) => /^--inspect(?:-brk)?(?:$|=)/.test
 const DEBUG = mode !== production && process.env.DEBUG === 'true'
 const CI = process.env.CI
 const disableHMR = process.env.HMR === 'false'
-
-export const EXTENIONS_NAMESPACE = '__extensions'
 
 if ([production, development].indexOf(mode) < 0) {
     throw new Error(`Invalid mode "${mode}"`)
@@ -145,37 +126,11 @@ const findDepInStack = (pkg) => {
     return candidate
 }
 
-// Helper function to detect extensions
-const detectExtensions = ({dependencies, projectDir} = {}) => {
-    const extensions = []
-
-    // Use provided dependencies or get them from package.json
-    const allDependencies = dependencies || [
-        ...Object.keys(pkg.dependencies || {}),
-        ...Object.keys(pkg.devDependencies || {})
-    ]
-
-    for (const dependency of allDependencies) {
-        const packagePath = path.join(projectDir || process.cwd(), 'node_modules', dependency)
-
-        if (isExtensionPackage(packagePath)) {
-            extensions.push(dependency)
-        }
-    }
-
-    return extensions
-}
-
-const detectedExtensions = detectExtensions({
-    projectDir
-})
-
 const baseConfig = (target) => {
     if (!['web', 'node'].includes(target)) {
         throw Error(`The value "${target}" is not a supported webpack target`)
     }
 
-    const extensions = getConfiguredExtensions(getConfig())
     class Builder {
         constructor() {
             this.config = {
@@ -223,33 +178,25 @@ const baseConfig = (target) => {
                             ...DEPS_TO_DEDUPE.map((dep) => ({
                                 [dep]: findDepInStack(dep)
                             }))
-                        ),
-                        // Create alias's for "all" detected extensions, enabled or disabled, as they are being imported from the SDK package
-                        // and cannot be resolved from that location. We create alias's for all because we do not know which extensions
-                        // are configured at build time.
-                        ...buildAliases(detectedExtensions)
+                        )
                     },
                     ...(target === 'web' ? {fallback: {crypto: false}} : {})
                 },
-                resolveLoader: {
-                    alias: {
-                        overridable: findDepInStack(
-                            '@salesforce/pwa-kit-extension-sdk/configs/webpack/overrides-resolver-loader.js'
-                        )
-                    }
-                },
+                // To add a new config for an extension, you can add a new element to the plugins array with the key and value as follows:
+                // The key should be the name of the plugin, and the value should be a boolean.
+                // The value should be true if the plugin is enabled, and false if it is disabled.
+                // The key should start with SFDC_EXT_, so that it's clear that it is an extension and not part of the core PWA Kit.
+                // For example, to add a new config for the Hello World extension, you can add the following:
+                // new webpack.DefinePlugin({
+                //     SFDC_EXT_HELLO_WORLD_ENABLED: true
+                // })
                 plugins: [
-                    new ApplicationExtensionConfigPlugin({
-                        extensions
-                    }),
                     new webpack.DefinePlugin({
                         DEBUG,
                         NODE_ENV: `'${process.env.NODE_ENV}'`,
                         WEBPACK_TARGET: `'${target}'`,
                         ['global.GENTLY']: false
                     }),
-                    process.env.RECORD_OVERRIDES === 'true' && new OverrideStatsPlugin(),
-                    // new SharedStatePlugin(),
                     mode === development && new webpack.NoEmitOnErrorsPlugin(),
 
                     sdkReplacementPlugin(),
@@ -282,26 +229,7 @@ const baseConfig = (target) => {
                             use: {
                                 loader: findDepInStack('source-map-loader')
                             }
-                        },
-                        ruleForApplicationExtensibility({
-                            loaderOptions: {
-                                configured: extensions,
-                                target: 'web'
-                            }
-                        }),
-                        ruleForApplicationExtensibility({
-                            loaderOptions: {
-                                configured: extensions,
-                                target: 'node'
-                            }
-                        }),
-                        ruleForOverrideResolver({
-                            extensions,
-                            resolveExtensions: SUPPORTED_FILE_EXTENSIONS,
-                            isMonoRepo,
-                            projectDir,
-                            target
-                        })
+                        }
                     ].filter(Boolean)
                 }
             }
@@ -347,68 +275,18 @@ const withChunking = (config) => {
 const staticFolderCopyPlugin = new CopyPlugin({
     patterns: [
         {
-            from: 'app/static/',
-            to: 'static/'
-        },
-        ...detectedExtensions.map((extension) => {
-            return {
-                from: `${projectDir}/node_modules/${extension}/static`,
-                to: `static/${EXTENIONS_NAMESPACE}/${extension}`,
-                // Add exclude for readme file.
-                noErrorOnMissing: true
-            }
-        })
+            from: 'static',
+            to: 'static/',
+            noErrorOnMissing: true
+        }
     ]
 })
 
 const ruleForBabelLoader = (babelPlugins) => {
-    // Handle the case when no extensions are detected
-    if (!detectedExtensions.length) {
-        return {
-            id: 'babel-loader',
-            test: /(\.js(x?)|\.ts(x?))$/,
-            exclude: /node_modules/,
-            use: [
-                {
-                    loader: findDepInStack('thread-loader'),
-                    options: {
-                        // eslint-disable-next-line @typescript-eslint/no-var-requires
-                        workers: Math.min(4, require('os').cpus().length),
-                        workerParallelJobs: 100
-                    }
-                },
-                {
-                    loader: findDepInStack('babel-loader'),
-                    options: {
-                        rootMode: 'upward',
-                        cacheDirectory: true,
-                        ...(babelPlugins ? {plugins: babelPlugins} : {})
-                    }
-                }
-            ]
-        }
-    }
-
-    // Pre-compute the paths to extensions for performance
-    const extensionPaths = detectedExtensions.map((ext) =>
-        path.normalize(`node_modules${path.sep}${ext}${path.sep}`)
-    )
-
     return {
         id: 'babel-loader',
         test: /(\.js(x?)|\.ts(x?))$/,
-        exclude: (modulePath) => {
-            // Not in node_modules. Include it (don't exclude)
-            if (!modulePath.includes('node_modules')) {
-                return false
-            }
-
-            // Normalize path for consistent comparison
-            const normalizedPath = path.normalize(modulePath)
-
-            // Check if the path includes any of our extension paths
-            return !extensionPaths.some((extPath) => normalizedPath.includes(extPath))
-        },
+        exclude: /node_modules/,
         use: [
             {
                 loader: findDepInStack('thread-loader'),

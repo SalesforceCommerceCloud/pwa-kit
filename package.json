@@ -5,7 +5,7 @@
     "bump-version": "node ./scripts/bump-version/index.js",
     "bump-version:retail-react-app": "node ./scripts/bump-version/index.js --package=@salesforce/retail-react-app",
     "bump-version:commerce-sdk-react": "node ./scripts/bump-version/index.js --package=@salesforce/commerce-sdk-react",
-    "bump-version:extension-chakra-storefront": "node ./scripts/bump-version/index.js --package=@salesforce/extension-chakra-storefront",
+    "bump-version:template-chakra-storefront": "node ./scripts/bump-version/index.js --package=@salesforce/template-chakra-storefront",
     "bump-version:extension-chakra-store-locator": "node ./scripts/bump-version/index.js --package=@salesforce/extension-chakra-store-locator",
     "bump-version:extension-starter": "node ./scripts/bump-version/index.js --package=@salesforce/extension-starter",
     "publish-to-npm": "node ./scripts/publish-to-npm.js",
@@ -15,7 +15,7 @@
     "lerna": "lerna",
     "lint": "lerna run --stream lint",
     "lint:fix": "lerna run lint:fix",
-    "start": "npm start --prefix packages/template-retail-react-app",
+    "start": "npm start --prefix packages/template-chakra-storefront",
     "pretest": "npm run lint",
     "test:e2e": "npx playwright test",
     "test:e2e:ui": "npx playwright test --ui",
@@ -39,6 +39,8 @@
     "npm": "^8.0.0 || ^9.0.0 || ^10.0.0 || ^11.0.0"
   },
   "dependencies": {
+    "@babel/parser": "^7.27.5",
+    "@babel/traverse": "^7.27.4",
     "node-fetch": "^2.6.9"
   }
 }

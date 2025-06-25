@@ -15,8 +15,7 @@ sh.set('-e')
 sh.config.silent = false
 
 const TEMPLATE_PREFIX = 'template-'
-const EXTENSION_STARTER_NAME = 'extension-starter'
-const EXTENSION_CHAKRA_STOREFRONT_NAME = 'extension-chakra-storefront'
+const EXTENSION_CHAKRA_STOREFRONT_NAME = 'template-chakra-storefront'
 
 const monorepoRoot = p.resolve(__dirname, '..', '..', '..')
 const templatesDir = p.resolve(__dirname, '..', 'templates')
@@ -26,9 +25,14 @@ const mkdtempSync = () => fs.mkdtempSync(p.resolve(os.tmpdir(), 'pwa-template-tm
 const tarPathForPkg = (pkg) => p.resolve(templatesDir, `${pkg}.tar.gz`)
 
 const main = () => {
-    const templatePkgNames = ['express-minimal', 'typescript-minimal', 'mrt-reference-app']
+    const templatePkgNames = [
+        'chakra-storefront',
+        'express-minimal',
+        'typescript-minimal',
+        'mrt-reference-app'
+    ]
 
-    const extensionPkgName = [EXTENSION_STARTER_NAME, EXTENSION_CHAKRA_STOREFRONT_NAME]
+    const extensionPkgName = [EXTENSION_CHAKRA_STOREFRONT_NAME]
 
     if (!sh.test('-d', templatesDir)) {
         sh.mkdir('-p', templatesDir)
@@ -46,7 +50,7 @@ const main = () => {
     )
 
     return Promise.all(
-        [...templatePkgNames, ...extensionPkgName].map((pkgName) => {
+        [...templatePkgNames].map((pkgName) => {
             const finalPkgName = extensionPkgName.includes(pkgName)
                 ? pkgName
                 : `${TEMPLATE_PREFIX}${pkgName}`

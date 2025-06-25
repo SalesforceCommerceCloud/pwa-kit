@@ -10,10 +10,6 @@ import {hydrateRoot} from 'react-dom/client'
 import PropTypes from 'prop-types'
 import {BrowserRouter as Router} from 'react-router-dom'
 import {loadableReady} from '@loadable/component'
-import {
-    getApplicationExtensions,
-    withApplicationExtensions
-} from '@salesforce/pwa-kit-extension-sdk/react'
 
 import {ServerContext, CorrelationIdProvider} from '../universal/contexts'
 import App from '../universal/components/_app'
@@ -46,15 +42,9 @@ export const registerServiceWorker = (url) => {
     })
 }
 
-export const OuterApp = ({routes, error, extensions, WrappedApp, locals, onHydrate}) => {
+export const OuterApp = ({routes, error, WrappedApp, locals, onHydrate}) => {
     const AppConfig = getAppConfig()
     const isInitialPageRef = useRef(true)
-
-    // Invoke the Application Extensions 'beforeRouteMatch' hook. This hook accepts ALL the routes for the current
-    // application including all routes added from the configured extensions.
-    extensions.forEach((applicationExtension) => {
-        routes = applicationExtension.beforeRouteMatch({allRoutes: routes, locals})
-    })
 
     return (
         <ServerContext.Provider value={{}}>
@@ -86,7 +76,6 @@ export const OuterApp = ({routes, error, extensions, WrappedApp, locals, onHydra
 OuterApp.propTypes = {
     routes: PropTypes.array.isRequired,
     error: PropTypes.object,
-    extensions: PropTypes.array,
     WrappedApp: PropTypes.func.isRequired,
     locals: PropTypes.object,
     onHydrate: PropTypes.func
@@ -125,20 +114,13 @@ export const start = async () => {
     // been warned.
     window.__HYDRATING__ = true
 
-    // Load all the configured Application Extensions and provide them to the
-    const applicationExtensions = await getApplicationExtensions()
-    const WrappedApp = withApplicationExtensions(routeComponent(App, false, locals), {
-        applicationExtensions,
-        locals
-    })
-
     const routes = await getAllRoutes(locals)
+
     const props = {
         error: window.__ERROR__,
         locals: locals,
-        routes,
-        extensions: applicationExtensions,
-        WrappedApp
+        routes: routes,
+        WrappedApp: routeComponent(App, false, locals)
     }
 
     return Promise.resolve()

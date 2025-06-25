@@ -21,10 +21,6 @@ import sprite from 'svg-sprite-loader/runtime/sprite.build'
 import {isRemote} from '@salesforce/pwa-kit-runtime/utils/ssr-server'
 import {proxyConfigs} from '@salesforce/pwa-kit-runtime/utils/ssr-shared'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
-import {
-    getApplicationExtensions,
-    withApplicationExtensions
-} from '@salesforce/pwa-kit-extension-sdk/react'
 
 import {getAssetUrl} from '../universal/utils'
 import {ServerContext, CorrelationIdProvider} from '../universal/contexts'
@@ -131,15 +127,8 @@ export const render = async (req, res, next) => {
 
     AppConfig.restore(res.locals)
 
-    // Use locals to thread the application extensions through the rendering pipeline.
-    const applicationExtensions = await getApplicationExtensions()
-
-    const WrappedApp = withApplicationExtensions(routeComponent(App, false, res.locals), {
-        applicationExtensions,
-        locals: res.locals
-    })
-
-    let routes = await getAllRoutes(res.locals)
+    const routes = await getAllRoutes(res.locals)
+    const WrappedApp = routeComponent(App, false, res.locals)
 
     const [pathname] = req.originalUrl.split('?')
 
@@ -150,24 +139,7 @@ export const render = async (req, res, next) => {
         })
     }
 
-    // Some application extensions need to be serialized because they have asynchronous state
-    const serializedExtensions = Object.fromEntries(
-        applicationExtensions.flatMap((extension) => {
-            if (typeof extension.getRoutesAsync !== 'function') return []
-            const routes = extension.serializeAsyncRoutes()
-            // TODO W-18257236: Use a unique key for each extension like the extension ID from
-            // extension-meta.json
-            return [[extension.getName(), {routes}]]
-        })
-    )
-
     // Step 1 - Find the match.
-
-    // Call `beforeRouteMatch` application extension hook.
-    applicationExtensions.forEach((applicationExtension) => {
-        routes = applicationExtension.beforeRouteMatch({allRoutes: routes, locals: res.locals})
-    })
-
     res.__performanceTimer.mark(PERFORMANCE_MARKS.routeMatching, 'start')
     let route
     let match
@@ -239,8 +211,7 @@ export const render = async (req, res, next) => {
             res,
             location,
             config,
-            appJSX,
-            serializedExtensions
+            appJSX
         })
     } catch (e) {
         // This is an unrecoverable error.
@@ -305,7 +276,7 @@ const renderToString = (jsx, extractor) =>
     ReactDOMServer.renderToString(extractor.collectChunks(jsx))
 
 const renderApp = (args) => {
-    const {req, res, appStateError, appJSX, appState, config, serializedExtensions} = args
+    const {req, res, appStateError, appJSX, appState, config} = args
     const extractor = new ChunkExtractor({statsFile: BUNDLES_PATH, publicPath: getAssetUrl()})
 
     const ssrOnly = 'mobify_server_only' in req.query || '__server_only' in req.query
@@ -369,7 +340,6 @@ const renderApp = (args) => {
         __CONFIG__: config,
         __PRELOADED_STATE__: appState,
         __ERROR__: error,
-        __EXTENSIONS__: serializedExtensions,
         // `window.Progressive` has a long history at Mobify and some
         // client-side code depends on it. Maintain its name out of tradition.
         Progressive: getWindowProgressive(req, res)

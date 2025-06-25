@@ -46,7 +46,6 @@ export interface CommerceApiProviderProps extends ApiClientConfigParams {
     passwordlessLoginCallbackURI?: string
     refreshTokenRegisteredCookieTTL?: number
     refreshTokenGuestCookieTTL?: number
-    OCAPISessionsURL?: string
 }
 
 /**

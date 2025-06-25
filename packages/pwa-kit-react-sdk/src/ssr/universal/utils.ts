@@ -18,12 +18,7 @@ import {bundleBasePath} from '@salesforce/pwa-kit-runtime/utils/ssr-namespace-pa
 
 const onClient = typeof window !== 'undefined'
 
-const EXTENSIONS_NAMESPACE = '__extensions'
 const STATIC_FOLDER = 'static'
-
-type GetAssetUrlOptions = {
-    appExtensionPackageName?: string
-}
 
 /**
  * Get the URL that should be used to load an asset from the bundle.
@@ -48,14 +43,10 @@ export const getAssetUrl = (path: string) => {
  * Get the URL that should be used to load a static asset from the bundle.
  *
  * @param {string} path - Relative path from the build directory to the asset.
- * @param {Object} opts - Options for generating the asset URL.
- * @param {string} [opts.appExtensionPackageName] - Optional package name for an application extension.
  * @function
  * @returns {string} The full URL to the static asset.
  */
-export const getStaticAssetUrl = (path = '', opts: GetAssetUrlOptions = {}) => {
-    const {appExtensionPackageName = ''} = opts || {}
-
+export const getStaticAssetUrl = (path = '') => {
     /* istanbul ignore next */
     let publicPath = getAssetUrl('')
 
@@ -68,9 +59,7 @@ export const getStaticAssetUrl = (path = '', opts: GetAssetUrlOptions = {}) => {
         publicPath = `${publicPath}/`
     }
 
-    return `${publicPath}${STATIC_FOLDER}${
-        appExtensionPackageName ? `/${EXTENSIONS_NAMESPACE}/${appExtensionPackageName}` : ''
-    }${path ? path : ''}`
+    return `${publicPath}${STATIC_FOLDER}${path ? path : ''}`
 }
 
 /**

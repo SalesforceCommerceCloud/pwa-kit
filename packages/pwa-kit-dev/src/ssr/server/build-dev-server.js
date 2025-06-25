@@ -269,9 +269,6 @@ export const DevServerMixin = {
         //
         // https://salesforce-internal.slack.com/archives/C8YDDMKFZ/p1677793769255659?thread_ts=1677791840.174309&cid=C8YDDMKFZ
 
-        // eslint-disable-next-line @typescript-eslint/no-var-requires
-        const pkg = require(path.resolve(process.cwd(), 'package.json'))
-
         return (req, res) => {
             const baseDir = path.resolve(req.app.options.projectDir, 'app')
             return this._serveStaticFile(req, res, baseDir, filePath, opts)

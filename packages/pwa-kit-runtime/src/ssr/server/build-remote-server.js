@@ -52,7 +52,6 @@ import awsServerlessExpress from 'aws-serverless-express'
 import expressLogging from 'morgan'
 import logger from '../../utils/logger-instance'
 import {createProxyMiddleware} from 'http-proxy-middleware'
-import {applyApplicationExtensions} from '@salesforce/pwa-kit-extension-sdk/express'
 
 /**
  * An Array of mime-types (Content-Type values) that are considered
@@ -781,10 +780,6 @@ export const RemoteServerFactory = {
         // to add in their projects, like in any regular Express app.
         app.use(ssrMiddleware)
         app.use(errorHandlerMiddleware)
-
-        // NOTE: Think about changing the name of this function to `applyApplicationExtensions`. First look into
-        // what a common pattern is for application enhancement.
-        applyApplicationExtensions(app)
 
         if (options?.encodeNonAsciiHttpHeaders) {
             app.use(encodeNonAsciiMiddleware)

@@ -14,13 +14,6 @@ const program = require('commander')
 const validator = require('validator')
 const {execSync: _execSync} = require('child_process')
 const {getConfig} = require('@salesforce/pwa-kit-runtime/utils/ssr-config')
-const {
-    buildBabelExtensibilityArgs
-} = require('@salesforce/pwa-kit-extension-sdk/configs/babel/utils')
-const {
-    getConfiguredExtensions,
-    validateExtensionDependencies
-} = require('@salesforce/pwa-kit-extension-sdk/shared/utils')
 
 // Scripts in ./bin have never gone through babel, so we
 // don't have a good pattern for mixing compiled/un-compiled
@@ -68,22 +61,6 @@ const getProjectName = async () => {
 
 const getAppEntrypoint = () => {
     return p.join(process.cwd(), 'app', 'ssr.js')
-}
-
-/**
- * For some commands, we like to validate the configuration first before proceeding with the rest of the command.
- * Currently, we're only validating the app extensions, but we plan to validate other parts of the config in the future.
- */
-const validateAppConfiguration = () => {
-    const extensions = getConfiguredExtensions(getConfig())
-    if (extensions.length > 0) {
-        info('Validating app extensions...')
-        const {success, errors} = validateExtensionDependencies(extensions)
-        if (!success) {
-            errors.forEach((e) => error(e.message))
-            throw new Error('Please double-check your configuration.')
-        }
-    }
 }
 
 const main = async () => {
@@ -252,8 +229,6 @@ const main = async () => {
             ).default('--extensions ".js,.jsx,.ts,.tsx"')
         )
         .action(async ({inspect, noHMR, babelArgs}) => {
-            validateAppConfiguration()
-
             info('Starting server...')
             // We use @babel/node instead of node because we want to support ES6 import syntax
             const babelNode = p.join(
@@ -266,9 +241,7 @@ const main = async () => {
             )
 
             execSync(
-                `"${babelNode}" ${inspect ? '--inspect' : ''} ${buildBabelExtensibilityArgs(
-                    getConfig()
-                )} ${babelArgs} "${getAppEntrypoint()}"`,
+                `"${babelNode}" ${inspect ? '--inspect' : ''} ${babelArgs} "${getAppEntrypoint()}"`,
                 {
                     env: {
                         ...process.env,
@@ -290,8 +263,6 @@ const main = async () => {
         )
         .description(`build your app for production`)
         .action(async ({buildDirectory}) => {
-            validateAppConfiguration()
-
             info('Building...')
             const webpack = p.join(require.resolve('webpack'), '..', '..', '..', '.bin', 'webpack')
             const projectWebpack = p.join(process.cwd(), 'webpack.config.js')
@@ -471,13 +442,6 @@ const main = async () => {
                     args.length ? ' ' + args.join(' ') : ''
                 }`
             )
-        })
-
-    program
-        .command('list-overrides')
-        .description('List all overridable files in the project')
-        .action(() => {
-            execSync(p.join('node_modules', '.bin', 'pwa-kit-extension-sdk'))
         })
 
     managedRuntimeCommand('tail-logs')

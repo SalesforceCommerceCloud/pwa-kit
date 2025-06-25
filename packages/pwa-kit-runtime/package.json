@@ -47,7 +47,6 @@
   "devDependencies": {
     "@loadable/component": "^5.15.3",
     "@salesforce/pwa-kit-dev": "4.0.0-extensibility-preview.5",
-    "@salesforce/pwa-kit-extension-sdk": "4.0.0-extensibility-preview.5",
     "@serverless/event-mocks": "^1.1.1",
     "@types/express": "^4.17.21",
     "aws-lambda-mock-context": "^3.2.1",
