@@ -30,9 +30,7 @@ import createAppValidatorsSchema from '@salesforce/pwa-kit-create-app/schemas/va
 import fs from 'fs/promises'
 import path from 'path'
 import {fileURLToPath} from 'url'
-import {createRequire} from 'module'
-
-const require = createRequire(import.meta.url)
+import {DeveloperGuidelinesTool} from '../utils/pwa-developer-guideline-tool.js'
 
 class PwaStorefrontMCPServerHighLevel {
     constructor() {
@@ -52,43 +50,13 @@ class PwaStorefrontMCPServerHighLevel {
     }
 
     setupTools() {
-        const getCreateAppPresetsDescription =
-            'Get the PWA Kit project creation presets and conversational guidelines. Ensure you read the linked schema ' +
-            'for details on the data structure and `_ai` properties. ' +
-            'Ask users what preset they want to use for project creation. After selecting the preset, ' +
-            'display the selected preset answers and pass the selected preset object ' +
-            'to the submit_pwa_kit_project_answers tool, keyed as "selectedPreset", to generate the project without confirming the answers. ' +
-            'IMPORTANT: Only call the submit_pwa_kit_project_answers tool after the user has selected a preset. ' +
-            '(triggers: create pwa using preset, build storefront prest, generate pwa-kit preset).'
-
-        const getCreateAppTemplatesDescription =
-            'Get the PWA Kit project templates and conversational guidelines. ' +
-            'Ask user to fulfill the templates questions conversationally, if required, then pass the answers ' +
-            'to the submit_pwa_kit_project_answers tool to generate the project. When asking the questions ensure you ' + 
-            'use the validators from get_create_app_validators. Do not trigger if the prompt ' +
-            'contains the word "preset" (triggers: create pwa, build storefront, generate pwa-kit).'
-        
-        const getCreateAppValidatorsDescription =
-            'Get the PWA Kit project creation question validators. Ensure you read the linked schema ' +
-            'for details on the data structure and `_ai` properties. ' +
-            'When asking the user to fulfill the templates questions use there validators to text the user input. ' +
-            'The validators will be defined in the templates questions `_ai` properties. Do not validate input that ' +
-            'is not defined in the templates questions `_ai` properties.'
-
-        // You can customize this to dynamically load the schema if desired
-        // TODO: These guidelines should be imported from the create app package.
-        const createAppGuidelines = {
-            tone: 'professional, friendly, concise',
-            languageRestrictions: 'no foul or offensive language',
-            questionScope: 'only ask questions provided in the schema',
-            conversationalStyle:
-                'keep questions direct and clear, avoid unnecessary elaboration',
-            examples: {
-                good: 'What is your project name?',
-                bad: 'Hey there buddy, would you mind terribly if I asked you to please provide me with a project name? No rush!'
-            }
-        }
-        // Register tools using the high-level API
+        // Register DeveloperGuidelinesTool
+        this.server.tool(
+            DeveloperGuidelinesTool.name,
+            DeveloperGuidelinesTool.description,
+            DeveloperGuidelinesTool.inputSchema,
+            DeveloperGuidelinesTool.fn
+        )
 
         this.server.tool(
             'analyze_code_structure',
