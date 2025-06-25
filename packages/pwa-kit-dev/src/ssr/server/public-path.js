@@ -17,6 +17,4 @@
 import {bundleBasePath} from '@salesforce/pwa-kit-runtime/utils/ssr-namespace-paths'
 
 /* global __webpack_public_path__: writable */
-// This global variable is used by webpack for HMR (Hot Module Replacement)
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 __webpack_public_path__ = `${bundleBasePath}/development/`

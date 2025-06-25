@@ -21,6 +21,8 @@ import {Route, Switch} from 'react-router-dom'
 import mockConfig from '@salesforce/retail-react-app/config/mocks/default'
 import * as sdk from '@salesforce/commerce-sdk-react'
 
+let mockCustomer = {}
+
 const MockedComponent = () => {
     return (
         <Switch>

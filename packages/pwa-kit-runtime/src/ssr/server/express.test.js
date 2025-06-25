@@ -1181,6 +1181,8 @@ describe('SLAS private client proxy', () => {
     test('does not add _sfdc_client_auth header if request not for /oauth2/trusted-agent/token', async () => {
         process.env.PWA_KIT_SLAS_CLIENT_SECRET = 'a secret'
 
+        const encodedCredentials = Buffer.from('clientId:a secret').toString('base64')
+
         const app = RemoteServerFactory._createApp(
             opts({
                 mobify: {
