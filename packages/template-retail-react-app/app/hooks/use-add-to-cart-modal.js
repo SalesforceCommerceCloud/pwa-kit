@@ -160,10 +160,10 @@ export const AddToCartModal = () => {
                                                 {itemsAdded.map(({product, variant, quantity}) => {
                                                     const variationAttributeValues =
                                                         product.variationAttributes?.length &&
-                                                        variant
+                                                        variant?.variationValues
                                                             ? getDisplayVariationValues(
                                                                   product.variationAttributes,
-                                                                  variant.variationValues
+                                                                  variant?.variationValues
                                                               )
                                                             : {}
                                                     return (
@@ -217,17 +217,17 @@ export const AddToCartModal = () => {
                                 itemsAdded.map(({product, variant, quantity}, index) => {
                                     const image = findImageGroupBy(product.imageGroups, {
                                         viewType: 'small',
-                                        selectedVariationAttributes: variant.variationValues
+                                        selectedVariationAttributes: variant?.variationValues
                                     })?.images?.[0]
                                     const priceData = getPriceData(product, {quantity})
                                     const variationAttributeValues = getDisplayVariationValues(
                                         product.variationAttributes,
-                                        variant.variationValues
+                                        variant?.variationValues
                                     )
 
                                     return (
                                         <Flex
-                                            key={variant.productId}
+                                            key={variant?.productId || product.id}
                                             justifyContent="space-between"
                                             marginBottom={index < itemsAdded - 1 ? 0 : 4}
                                             paddingBottom={4}

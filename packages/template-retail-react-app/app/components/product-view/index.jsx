@@ -397,13 +397,13 @@ const ProductView = forwardRef(
 
         useEffect(() => {
             if (
-                isProductPartOfBundle &&
+                (isProductPartOfBundle || isProductPartOfSet) &&
                 product &&
                 (!product.variationAttributes || product.variationAttributes.length === 0)
             ) {
                 onVariantSelected(product, null, childOfBundleQuantity || quantity)
             }
-        }, [product, childOfBundleQuantity, quantity])
+        }, [product, childOfBundleQuantity, quantity, isProductPartOfBundle, isProductPartOfSet])
 
         useEffect(() => {
             if (isProductPartOfBundle || isProductPartOfSet) {
