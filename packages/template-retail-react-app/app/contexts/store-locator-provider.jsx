@@ -28,8 +28,8 @@ export const StoreLocatorProvider = ({config, children}) => {
     const [state, setState] = useState({
         mode: 'input',
         formValues: {
-            countryCode: config.defaultCountryCode,
-            postalCode: config.defaultPostalCode
+            countryCode: '',
+            postalCode: ''
         },
         deviceCoordinates: {
             latitude: null,

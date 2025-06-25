@@ -51,8 +51,8 @@ describe('StoreLocatorProvider', () => {
         expect(contextValue?.state).toEqual({
             mode: 'input',
             formValues: {
-                countryCode: mockConfig.defaultCountryCode,
-                postalCode: mockConfig.defaultPostalCode
+                countryCode: '',
+                postalCode: ''
             },
             deviceCoordinates: {
                 latitude: null,
