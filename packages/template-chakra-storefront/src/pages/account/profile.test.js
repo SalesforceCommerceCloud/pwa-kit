@@ -9,7 +9,10 @@ import {screen, waitFor, within} from '@testing-library/react'
 import {createPathWithDefaults, renderWithProviders} from '../../utils/test-utils'
 import {rest} from 'msw'
 import AccountDetail from './profile'
-import {mockedRegisteredCustomerWithNoNumber, mockedRegisteredCustomer} from '../../mocks/mock-data'
+import {
+    mockedRegisteredCustomerWithNoNumber,
+    mockedRegisteredCustomer
+} from '../../../mocks/mock-data'
 import {Route, Switch} from 'react-router-dom'
 import mockConfig from '../../../mock-config'
 import * as sdk from '@salesforce/commerce-sdk-react'
