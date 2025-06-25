@@ -195,7 +195,6 @@ export const STORE_LOCATOR_SUPPORTED_COUNTRIES = [
         countryName: 'Germany'
     }
 ]
-
 export const STORE_LOCATOR_DEFAULT_POSTAL_CODE = '10178'
 export const STORE_LOCATOR_RADIUS = 100
 export const STORE_LOCATOR_RADIUS_UNIT = 'km'

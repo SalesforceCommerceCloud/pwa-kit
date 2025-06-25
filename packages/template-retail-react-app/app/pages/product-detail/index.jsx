@@ -447,7 +447,16 @@ const ProductDetail = () => {
                 }
             }
 
-            einstein.sendAddToCart(productItems)
+            const productItemsForEinstein = productSelectionValues.map(
+                ({product, variant, quantity}) => ({
+                    product,
+                    productId: variant.productId,
+                    price: variant.price,
+                    quantity
+                })
+            )
+            einstein.sendAddToCart(productItemsForEinstein)
+
             // Open modal with itemsAdded
             addToCartModal.onOpen({product, itemsAdded: productSelectionValues})
             return productSelectionValues

@@ -45,6 +45,7 @@ import {
     STORE_LOCATOR_DEFAULT_PAGE_SIZE,
     STORE_LOCATOR_SUPPORTED_COUNTRIES
 } from '@salesforce/retail-react-app/app/constants'
+
 /**
  * Use the AppConfig component to inject extra arguments into the getProps
  * methods for all Route Components in the app – typically you'd want to do this

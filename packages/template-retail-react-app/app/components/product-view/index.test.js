@@ -15,6 +15,7 @@ import ProductView from '@salesforce/retail-react-app/app/components/product-vie
 import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
 import userEvent from '@testing-library/user-event'
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
+import frMessages from '@salesforce/retail-react-app/app/static/translations/compiled/fr-FR.json'
 
 // Ensure useMultiSite returns site.id = 'site-1' for all tests
 jest.mock('@salesforce/retail-react-app/app/hooks/use-multi-site', () => ({
@@ -570,4 +571,25 @@ describe('ProductView showDeliveryOptions property', () => {
         expect(screen.getByRole('radio', {name: /ship to address/i})).toBeInTheDocument()
         expect(screen.getByRole('radio', {name: /pickup in store/i})).toBeInTheDocument()
     })
+})
+test('renders "Add to Cart" and "Add to Wishlist" buttons in French', async () => {
+    const addToCart = jest.fn()
+    const addToWishlist = jest.fn()
+    renderWithProviders(
+        <MockComponent
+            product={mockProductDetail}
+            addToCart={addToCart}
+            addToWishlist={addToWishlist}
+        />,
+        {
+            wrapperProps: {locale: {id: 'fr-FR'}, messages: frMessages}
+        }
+    )
+
+    const titles = await screen.findAllByText(/Black Single Pleat Athletic Fit Wool Suit/i)
+    expect(titles.length).toBeGreaterThan(0)
+    expect(screen.getByRole('button', {name: /ajouter au panier/i})).toBeInTheDocument()
+    expect(
+        screen.getByRole('button', {name: /ajouter à la liste de souhaits/i})
+    ).toBeInTheDocument()
 })

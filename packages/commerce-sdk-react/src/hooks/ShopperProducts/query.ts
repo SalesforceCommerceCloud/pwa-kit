@@ -6,13 +6,15 @@
  */
 import {UseQueryResult} from '@tanstack/react-query'
 import {ApiClients, ApiQueryOptions, Argument, DataType, NullableParameters} from '../types'
-import useCommerceApi from '../useCommerceApi'
 import {useQuery} from '../useQuery'
 import {mergeOptions, omitNullableParameters, pickValidParams} from '../utils'
 import * as queryKeyHelpers from './queryKeyHelpers'
 import {ShopperProducts} from 'commerce-sdk-isomorphic'
+import {CLIENT_KEYS} from '../../constant'
+import useCommerceApi from '../useCommerceApi'
 
-type Client = ApiClients['shopperProducts']
+const CLIENT_KEY = CLIENT_KEYS.SHOPPER_PRODUCTS
+type Client = NonNullable<ApiClients[typeof CLIENT_KEY]>
 
 /**
  * Allows access to multiple products by a single request. Only products that are online and assigned to a site catalog are returned. The maximum number of productIDs that can be requested are 24. Along with product details, the availability, product options, images, price, promotions, and variations for the valid products will be included, as appropriate.
@@ -31,7 +33,7 @@ export const useProducts = (
 ): UseQueryResult<DataType<Client['getProducts']>> => {
     type Options = Argument<Client['getProducts']>
     type Data = DataType<Client['getProducts']>
-    const {shopperProducts: client} = useCommerceApi()
+    const client = useCommerceApi(CLIENT_KEY)
     const methodName = 'getProducts'
     const requiredParameters = ShopperProducts.paramKeys[`${methodName}Required`]
 
@@ -73,7 +75,7 @@ export const useProduct = (
 ): UseQueryResult<DataType<Client['getProduct']>> => {
     type Options = Argument<Client['getProduct']>
     type Data = DataType<Client['getProduct']>
-    const {shopperProducts: client} = useCommerceApi()
+    const client = useCommerceApi(CLIENT_KEY)
     const methodName = 'getProduct'
     const requiredParameters = ShopperProducts.paramKeys[`${methodName}Required`]
 
@@ -115,7 +117,7 @@ export const useCategories = (
 ): UseQueryResult<DataType<Client['getCategories']>> => {
     type Options = Argument<Client['getCategories']>
     type Data = DataType<Client['getCategories']>
-    const {shopperProducts: client} = useCommerceApi()
+    const client = useCommerceApi(CLIENT_KEY)
     const methodName = 'getCategories'
     const requiredParameters = ShopperProducts.paramKeys[`${methodName}Required`]
 
@@ -159,7 +161,7 @@ export const useCategory = (
 ): UseQueryResult<DataType<Client['getCategory']>> => {
     type Options = Argument<Client['getCategory']>
     type Data = DataType<Client['getCategory']>
-    const {shopperProducts: client} = useCommerceApi()
+    const client = useCommerceApi(CLIENT_KEY)
     const methodName = 'getCategory'
     const requiredParameters = ShopperProducts.paramKeys[`${methodName}Required`]
 

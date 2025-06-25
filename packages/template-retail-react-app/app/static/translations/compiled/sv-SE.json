@@ -90,7 +90,7 @@
     },
     {
       "type": 0,
-      "value": " objekt"
+      "value": " artiklar"
     }
   ],
   "account_order_detail.heading.payment_method": [
@@ -361,6 +361,40 @@
       "value": "Stäng inloggningsformulär"
     }
   ],
+  "auth_modal.check_email.button.resend_link": [
+    {
+      "type": 0,
+      "value": "Skicka länk på nytt"
+    }
+  ],
+  "auth_modal.check_email.description.check_spam_folder": [
+    {
+      "type": 0,
+      "value": "Det kan ta några minuter innan länken kommer fram. Kontrollera din skräppostmapp om du har problem att hitta den."
+    }
+  ],
+  "auth_modal.check_email.description.just_sent": [
+    {
+      "type": 0,
+      "value": "Vi har skickat en inloggningslänk till "
+    },
+    {
+      "children": [
+        {
+          "type": 1,
+          "value": "email"
+        }
+      ],
+      "type": 8,
+      "value": "b"
+    }
+  ],
+  "auth_modal.check_email.title.check_your_email": [
+    {
+      "type": 0,
+      "value": "Kontrollera din e-post"
+    }
+  ],
   "auth_modal.description.now_signed_in": [
     {
       "type": 0,
@@ -570,7 +604,7 @@
   "checkout.button.place_order": [
     {
       "type": 0,
-      "value": "Gör beställning"
+      "value": "Slutför beställning"
     }
   ],
   "checkout.message.generic_error": [
@@ -660,7 +694,7 @@
   "checkout_confirmation.label.promo_applied": [
     {
       "type": 0,
-      "value": "Kampanjerbjudande tillämpat"
+      "value": "kampanjerbjudande tillämpat"
     }
   ],
   "checkout_confirmation.label.shipping": [
@@ -1021,6 +1055,12 @@
       "value": "Har du redan ett konto? Logga in"
     }
   ],
+  "contact_info.button.back_to_sign_in_options": [
+    {
+      "type": 0,
+      "value": "Tillbaka till inloggningsalternativ"
+    }
+  ],
   "contact_info.button.checkout_as_guest": [
     {
       "type": 0,
@@ -1033,6 +1073,18 @@
       "value": "Logga in"
     }
   ],
+  "contact_info.button.password": [
+    {
+      "type": 0,
+      "value": "Lösenord"
+    }
+  ],
+  "contact_info.button.secure_link": [
+    {
+      "type": 0,
+      "value": "Säker länk"
+    }
+  ],
   "contact_info.error.incorrect_username_or_password": [
     {
       "type": 0,
@@ -1043,6 +1095,12 @@
     {
       "type": 0,
       "value": "Har du glömt lösenordet?"
+    }
+  ],
+  "contact_info.message.or_login_with": [
+    {
+      "type": 0,
+      "value": "Eller logga in med"
     }
   ],
   "contact_info.title.contact_info": [
@@ -1117,6 +1175,48 @@
     {
       "type": 1,
       "value": "currentPrice"
+    }
+  ],
+  "dnt_notification.button.accept": [
+    {
+      "type": 0,
+      "value": "Acceptera"
+    }
+  ],
+  "dnt_notification.button.assistive_msg.accept": [
+    {
+      "type": 0,
+      "value": "Acceptera spårning"
+    }
+  ],
+  "dnt_notification.button.assistive_msg.close": [
+    {
+      "type": 0,
+      "value": "Stäng samtyckesformulär för spårning"
+    }
+  ],
+  "dnt_notification.button.assistive_msg.decline": [
+    {
+      "type": 0,
+      "value": "Neka spårning"
+    }
+  ],
+  "dnt_notification.button.decline": [
+    {
+      "type": 0,
+      "value": "Neka"
+    }
+  ],
+  "dnt_notification.description": [
+    {
+      "type": 0,
+      "value": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur."
+    }
+  ],
+  "dnt_notification.title": [
+    {
+      "type": 0,
+      "value": "Samtycke till spårning"
     }
   ],
   "drawer_menu.button.account_details": [
@@ -1409,6 +1509,12 @@
       "value": "Villkor"
     }
   ],
+  "footer.locale_selector.assistive_msg": [
+    {
+      "type": 0,
+      "value": "Välj språk"
+    }
+  ],
   "footer.message.copyright": [
     {
       "type": 0,
@@ -1427,10 +1533,16 @@
       "value": "Registrera dig för att hålla koll på de hetaste erbjudandena"
     }
   ],
+  "footer.subscribe.email.assistive_msg": [
+    {
+      "type": 0,
+      "value": "E-postadress för nyhetsbrev"
+    }
+  ],
   "footer.subscribe.heading.first_to_know": [
     {
       "type": 0,
-      "value": "Bli först med att veta"
+      "value": "Håll dig uppdaterad"
     }
   ],
   "form_action_buttons.button.cancel": [
@@ -1467,6 +1579,24 @@
     {
       "type": 0,
       "value": "Önskelista"
+    }
+  ],
+  "global.error.create_account": [
+    {
+      "type": 0,
+      "value": "Denna funktion är inte tillgänglig för närvarande. Du måste skapa ett konto för att få tillgång till den här funktionen."
+    }
+  ],
+  "global.error.feature_unavailable": [
+    {
+      "type": 0,
+      "value": "Denna funktion är inte tillgänglig för närvarande."
+    }
+  ],
+  "global.error.invalid_token": [
+    {
+      "type": 0,
+      "value": "Ogiltig token. Försök igen."
     }
   ],
   "global.error.something_went_wrong": [
@@ -1642,7 +1772,7 @@
   "home.features.description.components": [
     {
       "type": 0,
-      "value": "Har byggts med Chakra UI, ett enkelt, modulärt och lättillgängligt React-komponentbibliotek."
+      "value": "Byggt med Chakra UI, ett enkelt, modulärt och lättillgängligt React-komponentbibliotek."
     }
   ],
   "home.features.description.einstein_recommendations": [
@@ -1732,13 +1862,13 @@
   "home.hero_features.link.on_github": [
     {
       "type": 0,
-      "value": "Ladda ner på Github"
+      "value": "Ladda ner via Github"
     }
   ],
   "home.hero_features.link.on_managed_runtime": [
     {
       "type": 0,
-      "value": "Distribuera på Managed Runtime"
+      "value": "Distribuera via Managed Runtime"
     }
   ],
   "home.link.contact_us": [
@@ -1756,7 +1886,7 @@
   "home.link.read_docs": [
     {
       "type": 0,
-      "value": "Läs dokument"
+      "value": "Läs dokumenten"
     }
   ],
   "home.title.react_starter_store": [
@@ -2169,6 +2299,36 @@
       "value": "Skapa konto"
     }
   ],
+  "login_form.button.apple": [
+    {
+      "type": 0,
+      "value": "Apple"
+    }
+  ],
+  "login_form.button.back": [
+    {
+      "type": 0,
+      "value": "Tillbaka till inloggningsalternativ"
+    }
+  ],
+  "login_form.button.continue_securely": [
+    {
+      "type": 0,
+      "value": "Fortsätt tryggt och säkert"
+    }
+  ],
+  "login_form.button.google": [
+    {
+      "type": 0,
+      "value": "Google"
+    }
+  ],
+  "login_form.button.password": [
+    {
+      "type": 0,
+      "value": "Lösenord"
+    }
+  ],
   "login_form.button.sign_in": [
     {
       "type": 0,
@@ -2185,6 +2345,12 @@
     {
       "type": 0,
       "value": "Har du inget konto?"
+    }
+  ],
+  "login_form.message.or_login_with": [
+    {
+      "type": 0,
+      "value": "Eller logga in med"
     }
   ],
   "login_form.message.welcome_back": [
@@ -2288,7 +2454,7 @@
   "order_summary.label.promo_applied": [
     {
       "type": 0,
-      "value": "Kampanjerbjudande tillämpat"
+      "value": "kampanjerbjudande tillämpat"
     }
   ],
   "order_summary.label.promotions_applied": [
@@ -2347,6 +2513,12 @@
     {
       "type": 1,
       "value": "numOfPages"
+    }
+  ],
+  "pagination.field.page_number_select": [
+    {
+      "type": 0,
+      "value": "Välj sidnummer"
     }
   ],
   "pagination.link.next": [
@@ -2421,10 +2593,22 @@
       "value": "1 stor bokstav"
     }
   ],
+  "password_reset_success.toast": [
+    {
+      "type": 0,
+      "value": "Lösenordsåterställningen lyckades"
+    }
+  ],
   "payment_selection.heading.credit_card": [
     {
       "type": 0,
       "value": "Kreditkort"
+    }
+  ],
+  "payment_selection.radio_group.assistive_msg": [
+    {
+      "type": 0,
+      "value": "Betalning"
     }
   ],
   "payment_selection.tooltip.secure_payment": [
@@ -2436,7 +2620,7 @@
   "price_per_item.label.each": [
     {
       "type": 0,
-      "value": "st."
+      "value": " st."
     }
   ],
   "product_detail.accordion.button.product_detail": [
@@ -2613,6 +2797,12 @@
     {
       "type": 1,
       "value": "sortOption"
+    }
+  ],
+  "product_list.sort_by.label.assistive_msg": [
+    {
+      "type": 0,
+      "value": "Sortera produkter efter"
     }
   ],
   "product_scroller.assistive_msg.scroll_left": [
@@ -2795,6 +2985,12 @@
       "value": "Min profil"
     }
   ],
+  "profile_fields.label.profile_form": [
+    {
+      "type": 0,
+      "value": "Profilformulär"
+    }
+  ],
   "promo_code_fields.button.apply": [
     {
       "type": 0,
@@ -2893,38 +3089,6 @@
     {
       "type": 0,
       "value": "Skapa ett konto och få tillgång till de allra bästa produkterna, inspiration och vår community."
-    }
-  ],
-  "reset_password.button.back_to_sign_in": [
-    {
-      "type": 0,
-      "value": "Tillbaka till inloggning"
-    }
-  ],
-  "reset_password.info.receive_email_shortly": [
-    {
-      "type": 0,
-      "value": "Inom kort får du ett e-postmeddelande på adressen "
-    },
-    {
-      "children": [
-        {
-          "type": 1,
-          "value": "email"
-        }
-      ],
-      "type": 8,
-      "value": "b"
-    },
-    {
-      "type": 0,
-      "value": " med en länk för att återställa ditt lösenord."
-    }
-  ],
-  "reset_password.title.password_reset": [
-    {
-      "type": 0,
-      "value": "Återställning av lösenord"
     }
   ],
   "reset_password_form.action.sign_in": [
@@ -3052,7 +3216,7 @@
   "shipping_address_selection.title.edit_shipping": [
     {
       "type": 0,
-      "value": "Ändra fraktadress"
+      "value": "Redigera fraktadress"
     }
   ],
   "shipping_options.action.send_as_a_gift": [
@@ -3095,6 +3259,32 @@
     {
       "type": 0,
       "value": "Är du säker på att du vill logga ut? Du måste logga in igen för att fortsätta med din nuvarande beställning."
+    }
+  ],
+  "social_login_redirect.message.authenticating": [
+    {
+      "type": 0,
+      "value": "Autentiserar ..."
+    }
+  ],
+  "social_login_redirect.message.redirect_link": [
+    {
+      "type": 0,
+      "value": "Om du inte omdirigeras automatiskt klickar du på "
+    },
+    {
+      "children": [
+        {
+          "type": 0,
+          "value": "den här länken"
+        }
+      ],
+      "type": 8,
+      "value": "link"
+    },
+    {
+      "type": 0,
+      "value": " för att fortsätta."
     }
   ],
   "store_locator.action.find": [
@@ -3642,7 +3832,7 @@
   "use_promocode.info.promo_applied": [
     {
       "type": 0,
-      "value": "Kampanjerbjudande tillämpat"
+      "value": "kampanjerbjudande tillämpat"
     }
   ],
   "use_promocode.info.promo_removed": [
@@ -3765,6 +3955,18 @@
       "value": "Lösenordet måste innehålla minst 8 tecken."
     }
   ],
+  "use_update_password_fields.error.password_mismatch": [
+    {
+      "type": 0,
+      "value": "Lösenorden stämmer inte överens."
+    }
+  ],
+  "use_update_password_fields.error.required_confirm_password": [
+    {
+      "type": 0,
+      "value": "Bekräfta ditt lösenord."
+    }
+  ],
   "use_update_password_fields.error.required_new_password": [
     {
       "type": 0,
@@ -3787,6 +3989,12 @@
     {
       "type": 0,
       "value": "Lösenordet måste innehålla minst en stor bokstav."
+    }
+  ],
+  "use_update_password_fields.label.confirm_new_password": [
+    {
+      "type": 0,
+      "value": "Bekräfta nytt lösenord"
     }
   ],
   "use_update_password_fields.label.current_password": [

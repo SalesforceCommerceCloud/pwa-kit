@@ -20,6 +20,7 @@ import {
     ShopperStores
 } from 'commerce-sdk-isomorphic'
 import {helpers} from 'commerce-sdk-isomorphic'
+import {CommerceApiProviderProps} from '../provider'
 
 // --- GENERAL UTILITIES --- //
 
@@ -83,21 +84,21 @@ export type ApiClientConfigParams = {
  * A map of commerce-sdk-isomorphic API client instances.
  */
 export interface ApiClients {
-    shopperBaskets: ShopperBaskets<ApiClientConfigParams>
-    shopperContexts: ShopperContexts<ApiClientConfigParams>
-    shopperCustomers: ShopperCustomers<ApiClientConfigParams>
-    shopperExperience: ShopperExperience<ApiClientConfigParams>
-    shopperGiftCertificates: ShopperGiftCertificates<ApiClientConfigParams>
-    shopperLogin: ShopperLogin<ApiClientConfigParams>
-    shopperOrders: ShopperOrders<ApiClientConfigParams>
-    shopperProducts: ShopperProducts<ApiClientConfigParams>
-    shopperPromotions: ShopperPromotions<ApiClientConfigParams>
-    shopperSearch: ShopperSearch<ApiClientConfigParams>
-    shopperSeo: ShopperSeo<ApiClientConfigParams>
-    shopperStores: ShopperStores<ApiClientConfigParams>
+    shopperBaskets?: ShopperBaskets<ApiClientConfigParams>
+    shopperContexts?: ShopperContexts<ApiClientConfigParams>
+    shopperCustomers?: ShopperCustomers<ApiClientConfigParams>
+    shopperExperience?: ShopperExperience<ApiClientConfigParams>
+    shopperGiftCertificates?: ShopperGiftCertificates<ApiClientConfigParams>
+    shopperLogin?: ShopperLogin<ApiClientConfigParams>
+    shopperOrders?: ShopperOrders<ApiClientConfigParams>
+    shopperProducts?: ShopperProducts<ApiClientConfigParams>
+    shopperPromotions?: ShopperPromotions<ApiClientConfigParams>
+    shopperSearch?: ShopperSearch<ApiClientConfigParams>
+    shopperSeo?: ShopperSeo<ApiClientConfigParams>
+    shopperStores?: ShopperStores<ApiClientConfigParams>
 }
 
-export type ApiClient = ApiClients[keyof ApiClients]
+export type ApiClient = NonNullable<ApiClients[keyof ApiClients]>
 
 // --- API HELPERS --- //
 
@@ -226,3 +227,17 @@ export type TMutationVariables = {
     parameters?: {[key: string]: string | number | boolean | string[] | number[]}
     headers?: {[key: string]: string}
 } | void
+
+export type SDKClientTransformer<T> = (
+    params: T,
+    methodName: string,
+    options: any
+) => any | Promise<any>
+
+export type ErrorCallback<TParams> = (methodName: string, error: any, params: TParams) => void
+
+export interface SDKClientTransformConfig<TParams = Record<string, any>> {
+    props: Omit<CommerceApiProviderProps, 'children'>
+    transformer?: SDKClientTransformer<TParams>
+    onError?: ErrorCallback<TParams>
+}

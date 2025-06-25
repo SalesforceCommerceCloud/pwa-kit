@@ -6,13 +6,15 @@
  */
 import {UseQueryResult} from '@tanstack/react-query'
 import {ApiClients, ApiQueryOptions, Argument, DataType, NullableParameters} from '../types'
-import useCommerceApi from '../useCommerceApi'
 import {useQuery} from '../useQuery'
 import {mergeOptions, omitNullableParameters, pickValidParams} from '../utils'
 import * as queryKeyHelpers from './queryKeyHelpers'
 import {ShopperBaskets} from 'commerce-sdk-isomorphic'
+import {CLIENT_KEYS} from '../../constant'
+import useCommerceApi from '../useCommerceApi'
 
-type Client = ApiClients['shopperBaskets']
+const CLIENT_KEY = CLIENT_KEYS.SHOPPER_BASKETS
+type Client = NonNullable<ApiClients[typeof CLIENT_KEY]>
 
 /**
  * Gets a basket.
@@ -31,7 +33,7 @@ export const useBasket = (
 ): UseQueryResult<DataType<Client['getBasket']>> => {
     type Options = Argument<Client['getBasket']>
     type Data = DataType<Client['getBasket']>
-    const {shopperBaskets: client} = useCommerceApi()
+    const client = useCommerceApi(CLIENT_KEY)
     const methodName = 'getBasket'
     const requiredParameters = ShopperBaskets.paramKeys[`${methodName}Required`]
 
@@ -73,7 +75,7 @@ export const usePaymentMethodsForBasket = (
 ): UseQueryResult<DataType<Client['getPaymentMethodsForBasket']>> => {
     type Options = Argument<Client['getPaymentMethodsForBasket']>
     type Data = DataType<Client['getPaymentMethodsForBasket']>
-    const {shopperBaskets: client} = useCommerceApi()
+    const client = useCommerceApi(CLIENT_KEY)
     const methodName = 'getPaymentMethodsForBasket'
     const requiredParameters = ShopperBaskets.paramKeys[`${methodName}Required`]
 
@@ -115,7 +117,7 @@ export const usePriceBooksForBasket = (
 ): UseQueryResult<DataType<Client['getPriceBooksForBasket']>> => {
     type Options = Argument<Client['getPriceBooksForBasket']>
     type Data = DataType<Client['getPriceBooksForBasket']>
-    const {shopperBaskets: client} = useCommerceApi()
+    const client = useCommerceApi(CLIENT_KEY)
     const methodName = 'getPriceBooksForBasket'
     const requiredParameters = ShopperBaskets.paramKeys[`${methodName}Required`]
 
@@ -157,7 +159,7 @@ export const useShippingMethodsForShipment = (
 ): UseQueryResult<DataType<Client['getShippingMethodsForShipment']>> => {
     type Options = Argument<Client['getShippingMethodsForShipment']>
     type Data = DataType<Client['getShippingMethodsForShipment']>
-    const {shopperBaskets: client} = useCommerceApi()
+    const client = useCommerceApi(CLIENT_KEY)
     const methodName = 'getShippingMethodsForShipment'
     const requiredParameters = ShopperBaskets.paramKeys[`${methodName}Required`]
 
@@ -199,7 +201,7 @@ export const useTaxesFromBasket = (
 ): UseQueryResult<DataType<Client['getTaxesFromBasket']>> => {
     type Options = Argument<Client['getTaxesFromBasket']>
     type Data = DataType<Client['getTaxesFromBasket']>
-    const {shopperBaskets: client} = useCommerceApi()
+    const client = useCommerceApi(CLIENT_KEY)
     const methodName = 'getTaxesFromBasket'
     const requiredParameters = ShopperBaskets.paramKeys[`${methodName}Required`]
 
