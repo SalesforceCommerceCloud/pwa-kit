@@ -303,9 +303,9 @@ const OrderSummary = ({
                                         </Text>
                                         {!basket.orderNo && (
                                             <Button
-                                                variant="ghost"
+                                                variant="link-red"
                                                 size="sm"
-                                                colorScheme="red"
+                                                colorPallete="red"
                                                 onClick={() => removePromoCode(item.couponItemId)}
                                             >
                                                 <FormattedMessage

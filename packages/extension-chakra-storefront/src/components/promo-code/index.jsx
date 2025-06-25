@@ -107,7 +107,7 @@ export const PromoCode = ({form, submitPromoCode, itemProps}) => {
                             id="promocode.accordion.button.have_promocode"
                         />
                         <Accordion.ItemIndicator asChild>
-                            <ChevronDownIcon />
+                            <ChevronDownIcon color="blue.700" />
                         </Accordion.ItemIndicator>
                     </Button>
                 </Accordion.ItemTrigger>

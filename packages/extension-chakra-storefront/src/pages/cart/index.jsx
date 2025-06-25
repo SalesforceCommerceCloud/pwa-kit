@@ -9,7 +9,7 @@ import {FormattedMessage, useIntl} from 'react-intl'
 import {keepPreviousData} from '@tanstack/react-query'
 
 // Chakra Components
-import {Box, Stack, Grid, GridItem, Container, useDisclosure, Button} from '@chakra-ui/react'
+import {Box, Stack, Grid, GridItem, Container, useDisclosure, Button, Flex} from '@chakra-ui/react'
 
 // Project Components
 import CartCta from '../../pages/cart/partials/cart-cta'
@@ -651,18 +651,17 @@ const Cart = () => {
                 </Stack>
             </Container>
 
-            <Box
+            <Flex
                 h="130px"
                 position="sticky"
                 bottom={0}
                 bg="white"
-                display={{base: 'block', lg: 'none'}}
-                css={{
-                    '& > *': {alignItems: 'center'}
-                }}
+                alignItems="center"
+                flexDirection="column"
+                display={{base: 'flex', lg: 'none'}}
             >
                 <CartCta />
-            </Box>
+            </Flex>
             <ConfirmationModal
                 {...REMOVE_CART_ITEM_CONFIRMATION_DIALOG_CONFIG}
                 onPrimaryAction={() => {
