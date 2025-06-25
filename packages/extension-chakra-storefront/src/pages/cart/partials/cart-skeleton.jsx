@@ -20,10 +20,10 @@ import {FormattedMessage} from 'react-intl'
 
 const CartItemSkeleton = () => {
     return (
-        <Stack spacing={4} layerStyle="card" boxShadow="none">
+        <Stack gap={4} layerStyle="card" boxShadow="none">
             <Flex width="full" bg="white" marginBottom={[4, 3]}>
                 <Skeleton width={['88px', '136px']} height={['88px', '136px']} />
-                <Stack marginLeft={[4, 6]} spacing={2} flex={1}>
+                <Stack marginLeft={[4, 6]} gap={2} flex={1}>
                     <Skeleton width="80px" height="20px" />
                     <Skeleton
                         width={{base: '180px', sm: '180px', md: '280px', lg: '280px'}}
@@ -51,7 +51,7 @@ const CartSkeleton = () => {
             >
                 <Grid templateColumns={{base: '1fr', lg: '66% 1fr'}} gap={{base: 10, xl: 20}}>
                     <GridItem>
-                        <Stack paddingTop={4} spacing={4}>
+                        <Stack paddingTop={4} gap={4}>
                             <Text fontWeight="bold" fontSize={['xl', 'xl', 'xl', '2xl']}>
                                 <FormattedMessage
                                     defaultMessage="Cart"
@@ -63,14 +63,14 @@ const CartSkeleton = () => {
                         </Stack>
                     </GridItem>
                     <GridItem py={7}>
-                        <Stack paddingTop={{base: 0, lg: 8}} spacing={3} px={[6, 6, 6, 0]}>
+                        <Stack paddingTop={{base: 0, lg: 8}} gap={3} px={[6, 6, 6, 0]}>
                             <Heading fontSize="lg" pt={1}>
                                 <FormattedMessage
                                     defaultMessage="Order Summary"
                                     id="cart_skeleton.heading.order_summary"
                                 />
                             </Heading>
-                            <Stack spacing={3} align="flex-start">
+                            <Stack gap={3} align="flex-start">
                                 <Skeleton
                                     width={{base: '180px', sm: '180px', md: '280px', lg: '280px'}}
                                     height={4}

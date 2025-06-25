@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
-import {screen} from '@testing-library/react'
+import {act, screen} from '@testing-library/react'
 import {ListMenu} from '../../components/list-menu'
 import {renderWithProviders} from '../../utils/test-utils'
 import {mockCategories} from '../../mocks/mock-data'
@@ -17,7 +17,9 @@ describe('ListMenu', () => {
         renderWithProviders(<ListMenu root={mockCategories.root} itemsKey="categories" />)
 
         const categoryTrigger = screen.getByText(/Mens/i)
-        await user.hover(categoryTrigger)
+        await act(async () => {
+            await user.hover(categoryTrigger)
+        })
         expect(categoryTrigger).toBeInTheDocument()
         expect(screen.getByRole('navigation', {name: 'Main navigation'})).toBeInTheDocument()
         const suit = screen.getByText(/suits/i)

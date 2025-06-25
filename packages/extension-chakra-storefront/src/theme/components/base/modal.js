@@ -6,8 +6,8 @@
  */
 import {defineRecipe} from '@chakra-ui/react'
 
-export default {
+export default defineRecipe({
     base: {
-        dialog: {borderRadius: 'base'}
+        dialog: {borderRadius: 'sm'}
     }
-}
+})

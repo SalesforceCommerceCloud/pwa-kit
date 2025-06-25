@@ -68,6 +68,13 @@ test('uses intl from props when rendered outside provider tree', () => {
 test('throws error when rendered outside provider tree and no intl prop is passed', async () => {
     const errorMsg =
         'To localize messages, you must either have <IntlProvider> in the component ancestry or provide `intl` as a prop'
+
+    // To reduce noise on the terminal, this won't hindrance the assertion
+    const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
+
     // render without providers
     expect(() => renderWithChakraProvider(<Icons.LockIcon />)).toThrow(errorMsg)
+
+    // Restore console.error
+    consoleSpy.mockRestore()
 })
