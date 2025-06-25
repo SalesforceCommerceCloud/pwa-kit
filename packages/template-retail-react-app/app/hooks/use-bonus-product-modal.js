@@ -35,8 +35,7 @@ export const useBonusState = (basket) => {
     const [state, setState] = useState({
         isOpen: false,
         data: {},
-        existingBonusProducts: basket?.bonusDiscountLineItems || [],
-        newBonusProducts: []
+        existingBonusProducts: basket?.bonusDiscountLineItems || []
     })
     const {pathname} = useLocation()
     const {onOpen: onAddToCartModalOpen} = useAddToCartModalContext()
@@ -70,8 +69,7 @@ export const useBonusState = (basket) => {
             const updatedBonusProducts = [...prev.existingBonusProducts, ...newBonusItems]
             return {
                 ...prev,
-                existingBonusProducts: updatedBonusProducts,
-                newBonusProducts: newBonusItems
+                existingBonusProducts: updatedBonusProducts
             }
         })
     }
@@ -80,7 +78,6 @@ export const useBonusState = (basket) => {
         isOpen: state.isOpen,
         data: state.data,
         bonusProducts: state.existingBonusProducts,
-        newBonusProducts: state.newBonusProducts,
         addBonusProducts,
         onClose: () => {
             setState((prev) => ({
