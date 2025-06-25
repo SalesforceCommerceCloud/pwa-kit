@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
-import {screen} from '@testing-library/react'
+import {act, screen} from '@testing-library/react'
 import LoginForm from '../../components/login/index'
 import {renderWithProviders} from '../../utils/test-utils'
 import {useForm} from 'react-hook-form'
@@ -38,8 +38,9 @@ describe('LoginForm', () => {
                     handlePasswordlessLoginClick={mockPasswordlessLoginClick}
                 />
             )
-
-            await user.click(screen.getByRole('button', {name: 'Continue Securely'}))
+            await act(async () => {
+                await user.click(screen.getByRole('button', {name: 'Continue Securely'}))
+            })
             expect(screen.getByText(/Please enter your email address./)).toBeInTheDocument()
         })
 
@@ -48,8 +49,9 @@ describe('LoginForm', () => {
             const {user} = renderWithProviders(
                 <WrapperComponent isPasswordlessEnabled={true} setLoginType={mockSetLoginType} />
             )
-
-            await user.click(screen.getByRole('button', {name: 'Password'}))
+            await act(async () => {
+                await user.click(screen.getByRole('button', {name: 'Password'}))
+            })
             expect(screen.getByText(/Please enter your email address./)).toBeInTheDocument()
         })
     })
@@ -68,8 +70,9 @@ describe('LoginForm', () => {
 
         test('renders form errors when "Sign In" button is clicked', async () => {
             const {user} = renderWithProviders(<WrapperComponent />)
-
-            await user.click(screen.getByRole('button', {name: 'Sign In'}))
+            await act(async () => {
+                await user.click(screen.getByRole('button', {name: 'Sign In'}))
+            })
             expect(screen.getByText(/Please enter your email address./)).toBeInTheDocument()
         })
     })

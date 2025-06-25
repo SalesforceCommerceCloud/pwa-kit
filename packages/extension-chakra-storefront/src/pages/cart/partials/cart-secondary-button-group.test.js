@@ -6,6 +6,7 @@
  */
 import React from 'react'
 import PropTypes from 'prop-types'
+import {act} from '@testing-library/react'
 import {mockedCustomerProductListsDetails} from '../../../mocks/mock-data'
 import ItemVariantProvider from '../../../components/item-variant'
 import {renderWithProviders} from '../../../utils/test-utils'
@@ -13,10 +14,22 @@ import CartSecondaryButtonGroup from './cart-secondary-button-group'
 import {screen, waitFor} from '@testing-library/react'
 import {noop} from '../../../utils/utils'
 
+// Mock the useCurrentCustomer hook to prevent API calls and act warnings
+jest.mock('../../../hooks/use-current-customer', () => ({
+    useCurrentCustomer: () => ({
+        data: {
+            isRegistered: true,
+            customerId: 'test-customer-id'
+        }
+    })
+}))
+
 const MockedComponent = ({
     onAddToWishlistClick = noop,
     onEditClick = noop,
-    onRemoveItemClick = noop
+    onRemoveItemClick = noop,
+    onIsAGiftChange = noop,
+    isAGift = false
 }) => {
     const product = mockedCustomerProductListsDetails.data[0]
     return (
@@ -25,6 +38,8 @@ const MockedComponent = ({
                 onAddToWishlistClick={onAddToWishlistClick}
                 onEditClick={onEditClick}
                 onRemoveItemClick={onRemoveItemClick}
+                onIsAGiftChange={onIsAGiftChange}
+                isAGift={isAGift}
             />
         </ItemVariantProvider>
     )
@@ -33,11 +48,17 @@ const MockedComponent = ({
 MockedComponent.propTypes = {
     onAddToWishlistClick: PropTypes.func,
     onEditClick: PropTypes.func,
-    onRemoveItemClick: PropTypes.func
+    onRemoveItemClick: PropTypes.func,
+    onIsAGiftChange: PropTypes.func,
+    isAGift: PropTypes.bool
 }
 
 beforeEach(() => {
     jest.resetModules()
+})
+
+afterEach(() => {
+    jest.restoreAllMocks()
 })
 
 test('renders secondary action component', async () => {
@@ -46,26 +67,29 @@ test('renders secondary action component', async () => {
         name: /remove/i
     })
     expect(removeButton).toBeInTheDocument()
-    await user.click(removeButton)
 
-    const confirmButton = screen.getByRole('button', {name: /yes, remove item/i})
-    await waitFor(() => {
-        // Chakra UI renders multiple elements with toast title in DOM for accessibility.
-        // We need to assert the actual text within the alert
-        expect(confirmButton).toBeInTheDocument()
+    // Wrap the modal-opening click in act()
+    // to handle DialogRoot state updates in the ConfirmationModal
+    await act(async () => {
+        await user.click(removeButton)
     })
+
+    const confirmButton = await screen.findByRole('button', {name: /yes, remove item/i})
+    expect(confirmButton).toBeInTheDocument()
 })
 
 test('renders secondary with event handlers', async () => {
     const onRemoveItemClick = jest.fn()
     const onEditClick = jest.fn()
     const onAddToWishlistClick = jest.fn()
+    const onIsAGiftChange = jest.fn()
 
     const {user} = renderWithProviders(
         <MockedComponent
             onAddToWishlistClick={onAddToWishlistClick}
             onEditClick={onEditClick}
             onRemoveItemClick={onRemoveItemClick}
+            onIsAGiftChange={onIsAGiftChange}
         />
     )
 
@@ -74,7 +98,9 @@ test('renders secondary with event handlers', async () => {
     })
 
     expect(editButton).toBeInTheDocument()
-    await user.click(editButton)
+    await act(async () => {
+        await user.click(editButton)
+    })
     expect(onEditClick).toHaveBeenCalledTimes(1)
 
     const addToWishlistButton = screen.getByRole('button', {
@@ -89,15 +115,44 @@ test('renders secondary with event handlers', async () => {
 
     expect(removeButton).toBeInTheDocument()
 
-    await user.click(removeButton)
-
-    const confirmButton = screen.getByRole('button', {name: /yes, remove item/i})
-    await waitFor(() => {
-        // Chakra UI renders multiple elements with toast title in DOM for accessibility.
-        // We need to assert the actual text within the alert
-        expect(confirmButton).toBeInTheDocument()
+    await act(async () => {
+        await user.click(removeButton)
     })
-    await user.click(confirmButton)
 
-    expect(onRemoveItemClick).toHaveBeenCalledTimes(1)
+    const confirmButton = await screen.findByRole('button', {name: /yes, remove item/i})
+    expect(confirmButton).toBeInTheDocument()
+
+    // Wrap the modal-opening click in act()
+    // to handle DialogRoot state updates in the ConfirmationModal
+    await act(async () => {
+        await user.click(confirmButton)
+    })
+
+    await waitFor(() => {
+        expect(onRemoveItemClick).toHaveBeenCalledTimes(1)
+    })
+})
+
+test('handles gift checkbox change', async () => {
+    const onIsAGiftChange = jest.fn()
+
+    const {user} = renderWithProviders(
+        <MockedComponent onIsAGiftChange={onIsAGiftChange} isAGift={false} />
+    )
+
+    const giftCheckbox = screen.getByRole('checkbox', {name: /this is a gift/i})
+    expect(giftCheckbox).toBeInTheDocument()
+    expect(giftCheckbox).not.toBeChecked()
+
+    // Wrap the modal-opening click in act()
+    // to handle DialogRoot state updates in the ConfirmationModal
+    await act(async () => {
+        await user.click(giftCheckbox)
+    })
+
+    await waitFor(() => {
+        expect(onIsAGiftChange).toHaveBeenCalledTimes(1)
+    })
+
+    expect(giftCheckbox).toBeChecked()
 })

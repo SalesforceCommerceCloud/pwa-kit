@@ -6,7 +6,7 @@
  */
 import React from 'react'
 import {Button} from '@chakra-ui/react'
-import {screen, waitFor} from '@testing-library/react'
+import {act, screen, waitFor} from '@testing-library/react'
 import withRegistration from '../../components/with-registration/index'
 import {renderWithProviders} from '../../utils/test-utils'
 import userEvent from '@testing-library/user-event'
@@ -44,7 +44,9 @@ describe('Registered users tests', function () {
 
         const trigger = screen.getByText(/button/i)
         expect(trigger).toBeInTheDocument()
-        await user.click(trigger)
+        await act(async () => {
+            await user.click(trigger)
+        })
 
         await waitFor(() => {
             expect(onClick).toHaveBeenCalledTimes(1)
@@ -73,7 +75,9 @@ describe('Guest user tests', function () {
         )
 
         const trigger = await screen.findByText(/button/i)
-        await user.click(trigger)
+        await act(async () => {
+            await user.click(trigger)
+        })
 
         await waitFor(() => {
             expect(screen.getByLabelText(/email/i)).toBeInTheDocument()

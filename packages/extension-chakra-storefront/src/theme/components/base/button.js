@@ -55,12 +55,6 @@ const button = defineRecipe({
                 paddingLeft: 3,
                 paddingRight: 3
             },
-            // link: (props) => ({
-            //     color: props.colorPalette === 'red' ? 'red.500' : 'blue.600',
-            //     fontWeight: 'normal',
-            //     minWidth: '1em',
-            //     lineHeight: 4
-            // }),
             'link-red': {
                 ...baseLinkStyles,
                 color: 'red.500'
@@ -111,7 +105,8 @@ const button = defineRecipe({
         size: {
             md: {
                 height: 11,
-                minWidth: 11
+                minWidth: 11,
+                textStyle: 'md'
             }
         }
     }

@@ -31,6 +31,7 @@ module.exports = {
         createTestGlob('components/product-scroller'),
         createTestGlob('components/product-tile'),
         createTestGlob('components/product-view'),
+        createTestGlob('components/promo-popover'),
         createTestGlob('components/quantity-picker'),
         createTestGlob('components/search'),
         createTestGlob('components/social-icons'),
@@ -46,6 +47,8 @@ module.exports = {
         createTestGlob('components/social-login'),
         createTestGlob('components/toggle-card'),
         createTestGlob('pages/home'),
+        createTestGlob('pages/cart'),
+        createTestGlob('pages/product-list'),
         // createTestGlob('pages/login'),  // TODO: enable after Account page has been migrated
         createTestGlob('pages/login-redirect'),
         createTestGlob('pages/social-login-redirect'),
