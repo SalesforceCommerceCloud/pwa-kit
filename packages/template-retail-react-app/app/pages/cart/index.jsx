@@ -65,16 +65,6 @@ import {useSelectedStore} from '@salesforce/retail-react-app/app/hooks/use-selec
 
 const DEBOUNCE_WAIT = 750
 
-// Function to get selected inventory ID from localStorage
-const getSelectedInventoryId = (siteId) => {
-    const storeInfoKey = `store_${siteId || 'default'}`
-    try {
-        return JSON.parse(window.localStorage.getItem(storeInfoKey))?.inventoryId || null
-    } catch (e) {
-        return null
-    }
-}
-
 const Cart = () => {
     const {data: basket, isLoading} = useCurrentBasket()
 
@@ -159,6 +149,7 @@ const Cart = () => {
         const updateProductsByItemId = {}
         basket?.productItems?.forEach((productItem) => {
             let currentProduct = products?.[productItem?.productId]
+
             // calculate inventory for product bundles based on availability of children
             if (productItem?.bundledProductItems && bundleChildProductData) {
                 let lowestStockLevel =
@@ -172,6 +163,7 @@ const Cart = () => {
                     if (lowestStockLevel === bundleChildStockLevel)
                         productWithLowestInventory = bundleChild.productName
                 })
+
                 if (currentProduct?.inventory) {
                     currentProduct = {
                         ...currentProduct,
@@ -183,6 +175,7 @@ const Cart = () => {
                     }
                 }
 
+                // Update in-store inventories for the selected store with the lowest stock level and product name
                 if (selectedInventoryId) {
                     let selectedStoreInventory = currentProduct?.inventories?.find(
                         (inventory) => inventory.id === selectedInventoryId
