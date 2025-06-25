@@ -17,10 +17,10 @@ const fallback = <Skeleton height="75vh" width="100%" />
 
 // Page Loadables
 // const Account = loadable(() => import('overridable!./account'), {fallback})
-// const Cart = loadable(() => import('overridable!./cart'), {fallback})
-const Checkout = loadable(() => import('overridable!./checkout'), {
-    fallback
-})
+const Cart = loadable(() => import('overridable!./cart'), {fallback})
+// const Checkout = loadable(() => import('overridable!./checkout'), {
+//     fallback
+// })
 // const CheckoutConfirmation = loadable(() => import('overridable!./checkout/confirmation'), {
 //     fallback
 // })
@@ -60,8 +60,8 @@ SocialLoginRedirect.displayName = 'SocialLoginRedirect'
 
 export {
     // Account,
-    // Cart,
-    Checkout,
+    Cart,
+    // Checkout,
     // CheckoutConfirmation,
     Home,
     Login,

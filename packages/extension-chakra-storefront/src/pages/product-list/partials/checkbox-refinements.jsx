@@ -14,7 +14,7 @@ import {ADD_FILTER, REMOVE_FILTER} from '../../../pages/product-list/partials/re
 const CheckboxRefinements = ({filter, toggleFilter, selectedFilters}) => {
     const {formatMessage} = useIntl()
     return (
-        <Stack spacing={1}>
+        <Stack gap={1}>
             {filter.values?.map((value) => {
                 const isChecked = selectedFilters.includes(value.value)
                 // Don't display refinements with no results, unless we got there by selecting too
@@ -23,16 +23,22 @@ const CheckboxRefinements = ({filter, toggleFilter, selectedFilters}) => {
 
                 return (
                     <Box key={value.value}>
-                        <Checkbox
-                            isChecked={isChecked}
-                            onChange={() => toggleFilter(value, filter.attributeId, isChecked)}
+                        <Checkbox.Root
+                            checked={isChecked}
+                            onCheckedChange={() =>
+                                toggleFilter(value, filter.attributeId, isChecked)
+                            }
                             aria-label={formatMessage(
                                 isChecked ? REMOVE_FILTER : ADD_FILTER,
                                 value
                             )}
                         >
-                            {value.label}
-                        </Checkbox>
+                            <Checkbox.HiddenInput />
+                            <Checkbox.Control>
+                                <Checkbox.Indicator />
+                            </Checkbox.Control>
+                            <Checkbox.Label>{value.label}</Checkbox.Label>
+                        </Checkbox.Root>
                     </Box>
                 )
             })}

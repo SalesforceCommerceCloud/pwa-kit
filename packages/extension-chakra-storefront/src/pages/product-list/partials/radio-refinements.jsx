@@ -5,41 +5,34 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, {useRef} from 'react'
+import React from 'react'
 import PropTypes from 'prop-types'
 import {useIntl} from 'react-intl'
-import {Box, Text, Radio, Stack} from '@chakra-ui/react'
+import {RadioGroup, Stack} from '@chakra-ui/react'
 import {ADD_FILTER, REMOVE_FILTER} from '../../../pages/product-list/partials/refinements-utils'
 
 const RadioRefinement = ({filter, value, toggleFilter, isSelected}) => {
-    const buttonRef = useRef()
     const {formatMessage} = useIntl()
     // Because choosing a refinement is equivalent to a form submission, the best semantic choice
     // for the refinement is a button or a link, rather than a radio input. The radio element here
     // is purely for visual purposes, and should probably be replaced with a simple icon.
     return (
-        <Box>
-            <Radio
-                display="inline-flex"
-                height={{base: '44px', lg: '24px'}}
-                isChecked={isSelected}
-                // Ideally, this "icon" would be part of the button, but doing so with a radio input
-                // triggers `onClick` twice. The radio must be separate, and therefore we must add
-                // these workarounds to prevent it from receiving focus.
-                inputProps={{'aria-hidden': true, tabIndex: -1}}
-                onClick={() => buttonRef.current?.click()}
-            ></Radio>
-            <Text
-                ref={buttonRef}
-                ml={2}
-                as="button"
+        <RadioGroup.Item
+            value={value.value}
+            display="inline-flex"
+            height={{base: '44px', lg: '24px'}}
+            alignItems="center"
+            cursor="pointer"
+        >
+            <RadioGroup.ItemHiddenInput />
+            <RadioGroup.ItemIndicator cursor="pointer" />
+            <RadioGroup.ItemText
                 fontSize="sm"
-                onClick={() => toggleFilter(value, filter.attributeId, false, false)}
                 aria-label={formatMessage(isSelected ? REMOVE_FILTER : ADD_FILTER, value)}
             >
                 {value.label}
-            </Text>
-        </Box>
+            </RadioGroup.ItemText>
+        </RadioGroup.Item>
     )
 }
 
@@ -51,31 +44,53 @@ RadioRefinement.propTypes = {
 }
 
 const RadioRefinements = ({filter, toggleFilter, selectedFilters}) => {
+    const selectedValue =
+        selectedFilters.length > 0 ? selectedFilters[0]?.value || selectedFilters[0] : ''
+
+    const handleValueChange = (details) => {
+        const newValue = details.value
+        const valueObject = filter.values.find((v) => v.value === newValue)
+
+        if (valueObject) {
+            const isCurrentlySelected = selectedFilters.some(
+                (sf) => (typeof sf === 'string' ? sf : sf.value) === newValue
+            )
+
+            toggleFilter(valueObject, filter.attributeId, isCurrentlySelected, false)
+        }
+    }
+
     return (
-        <Stack spacing={1}>
-            {filter.values.map((value) => {
-                const isSelected = selectedFilters.includes(value.value)
-                // Don't display refinements with no results, unless we got there by selecting too
-                // many refinements
-                if (value.hitCount === 0 && !isSelected) return
-                return (
-                    <RadioRefinement
-                        key={value.value}
-                        value={value}
-                        filter={filter}
-                        toggleFilter={toggleFilter}
-                        isSelected={isSelected}
-                    />
-                )
-            })}
-        </Stack>
+        <RadioGroup.Root value={selectedValue} onValueChange={handleValueChange}>
+            <Stack gap={1}>
+                {filter.values.map((value) => {
+                    const isSelected = selectedFilters.some(
+                        (sf) => (typeof sf === 'string' ? sf : sf.value) === value.value
+                    )
+
+                    // Don't display refinements with no results, unless we got there by selecting too
+                    // many refinements
+                    if (value.hitCount === 0 && !isSelected) return null
+
+                    return (
+                        <RadioRefinement
+                            key={value.value}
+                            value={value}
+                            filter={filter}
+                            toggleFilter={toggleFilter}
+                            isSelected={isSelected}
+                        />
+                    )
+                })}
+            </Stack>
+        </RadioGroup.Root>
     )
 }
 
 RadioRefinements.propTypes = {
     filter: PropTypes.object,
     toggleFilter: PropTypes.func,
-    selectedFilters: PropTypes.arrayOf(PropTypes.object)
+    selectedFilters: PropTypes.arrayOf(PropTypes.oneOfType([PropTypes.string, PropTypes.object]))
 }
 
 export default RadioRefinements

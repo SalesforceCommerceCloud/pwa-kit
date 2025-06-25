@@ -6,27 +6,30 @@
  */
 
 import React from 'react'
-import {waitFor, within} from '@testing-library/react'
+import {act, waitFor, within} from '@testing-library/react'
 import '@testing-library/jest-dom'
 import {createToaster} from '@chakra-ui/react'
 import Toaster, {toaster} from './index'
 import {renderWithProviders} from '../../utils/test-utils'
 
+afterEach(() => {
+    jest.restoreAllMocks()
+})
 describe('Toaster Tests', () => {
-    it('renders toast group container', () => {
+    test('renders toast group container', () => {
         renderWithProviders(<Toaster toaster={toaster} />)
 
         const toastGroup = document.querySelector('[data-scope="toast"]')
         expect(toastGroup).toBeInTheDocument()
     })
 
-    it('renders toast group with correct placement', () => {
+    test('renders toast group with correct placement', () => {
         renderWithProviders(<Toaster toaster={toaster} />)
         const toastGroup = document.querySelector('[data-placement="top-end"]')
         expect(toastGroup).toBeInTheDocument()
     })
 
-    it('renders with custom toaster placement', () => {
+    test('renders with custom toaster placement', () => {
         const testToaster = createToaster({
             placement: 'bottom-start'
         })
@@ -36,7 +39,7 @@ describe('Toaster Tests', () => {
         expect(toastGroup).toHaveAttribute('id', 'toast-group:bottom-start')
     })
 
-    it('exports toaster instance with correct API', () => {
+    test('exports toaster instance with correct API', () => {
         expect(toaster).toBeDefined()
         expect(typeof toaster).toBe('object')
         expect(typeof toaster.create).toBe('function')
@@ -44,7 +47,7 @@ describe('Toaster Tests', () => {
         expect(typeof toaster.update).toBe('function')
     })
 
-    it('can create and render a toast', async () => {
+    test('can create and render a toast', async () => {
         renderWithProviders(<Toaster toaster={toaster} />)
 
         await waitFor(() => {
@@ -52,10 +55,12 @@ describe('Toaster Tests', () => {
             expect(toastGroup).toBeInTheDocument()
         })
 
-        toaster.create({
-            title: 'Test Toast',
-            description: 'This is a test description',
-            type: 'success'
+        await act(async () => {
+            toaster.create({
+                title: 'Test Toast',
+                description: 'This is a test description',
+                type: 'success'
+            })
         })
 
         await waitFor(() => {

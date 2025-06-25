@@ -12,7 +12,7 @@ import {
     Box,
     Flex,
     IconButton,
-    // Badge,
+    Badge,
     // Button,
     // Popover,
     // PopoverFooter,
@@ -37,9 +37,9 @@ import Search from '../../components/search'
 import withRegistration from '../../components/with-registration'
 import {
     AccountIcon,
-    BrandLogo
-    // BasketIcon,
-    // HamburgerIcon,
+    BrandLogo,
+    BasketIcon,
+    HamburgerIcon
     // ChevronDownIcon,
     // HeartIcon,
     // SignoutIcon,
@@ -165,22 +165,22 @@ const Header = ({
             <Box css={styles.content}>
                 {showLoading && <LoadingSpinner wrapperStyles={{height: '100vh'}} />}
                 <Flex wrap="wrap" alignItems={['baseline', 'baseline', 'baseline', 'center']}>
-                    {/*<IconButton*/}
-                    {/*    aria-label={intl.formatMessage({*/}
-                    {/*        id: 'header.button.assistive_msg.menu',*/}
-                    {/*        defaultMessage: 'Menu'*/}
-                    {/*    })}*/}
-                    {/*    title={intl.formatMessage({*/}
-                    {/*        id: 'header.button.assistive_msg.menu.open_dialog',*/}
-                    {/*        defaultMessage: 'Opens a dialog'*/}
-                    {/*    })}*/}
-                    {/*    css={styles.icons}*/}
-                    {/*    variant="unstyled"*/}
-                    {/*    display={{lg: 'none'}}*/}
-                    {/*    onClick={onMenuClick}*/}
-                    {/*>*/}
-                    {/*    <HamburgerIcon />*/}
-                    {/*</IconButton>*/}
+                    <IconButton
+                        aria-label={intl.formatMessage({
+                            id: 'header.button.assistive_msg.menu',
+                            defaultMessage: 'Menu'
+                        })}
+                        title={intl.formatMessage({
+                            id: 'header.button.assistive_msg.menu.open_dialog',
+                            defaultMessage: 'Opens a dialog'
+                        })}
+                        css={styles.icons}
+                        variant="unstyled"
+                        display={{lg: 'none'}}
+                        onClick={onMenuClick}
+                    >
+                        <HamburgerIcon />
+                    </IconButton>
                     <IconButton
                         aria-label={intl.formatMessage({
                             id: 'header.button.assistive_msg.logo',
@@ -347,26 +347,25 @@ const Header = ({
                     {/*        }}*/}
                     {/*    />*/}
                     {/*)}*/}
-                    {/*<IconButton*/}
-                    {/*    aria-label={intl.formatMessage(*/}
-                    {/*        {*/}
-                    {/*            id: 'header.button.assistive_msg.my_cart_with_num_items',*/}
-                    {/*            defaultMessage: 'My cart, number of items: {numItems}'*/}
-                    {/*        },*/}
-                    {/*        {numItems: totalItems}*/}
-                    {/*    )}*/}
-                    {/*    icon={*/}
-                    {/*        <>*/}
-                    {/*            <BasketIcon />*/}
-                    {/*            {basket && totalItems > 0 && (*/}
-                    {/*                <Badge variant="notification">{totalItems}</Badge>*/}
-                    {/*            )}*/}
-                    {/*        </>*/}
-                    {/*    }*/}
-                    {/*    variant="unstyled"*/}
-                    {/*    {...styles.icons}*/}
-                    {/*    onClick={onMyCartClick}*/}
-                    {/*/>*/}
+                    <IconButton
+                        aria-label={intl.formatMessage(
+                            {
+                                id: 'header.button.assistive_msg.my_cart_with_num_items',
+                                defaultMessage: 'My cart, number of items: {numItems}'
+                            },
+                            {numItems: totalItems}
+                        )}
+                        variant="unstyled"
+                        css={styles.icons}
+                        onClick={onMyCartClick}
+                    >
+                        <>
+                            <BasketIcon />
+                            {basket && totalItems > 0 && (
+                                <Badge variant="notification">{totalItems}</Badge>
+                            )}
+                        </>
+                    </IconButton>
                     <HideOnDesktop display={{base: 'contents', lg: 'none'}}>
                         <SearchBar />
                     </HideOnDesktop>
