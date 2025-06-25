@@ -21,60 +21,57 @@ const SeInputHandler = ({onOpenStoreLocator}) => {
         useSeStoreSelection()
 
     const {setParams} = useStoreLocatorParams()
-
-    const storeLocatorContext = useContext(StoreLocatorContext)
-    const selectedStoreId = storeLocatorContext?.state?.selectedStoreId
+    const {setState: setStoreLocatorState} = useContext(StoreLocatorContext) || {}
 
     useEffect(() => {
         const urlParams = new URLSearchParams(location.search)
         processSeParameters(urlParams)
     }, [location.search, processSeParameters])
 
+    // Handle store locator params updates
     useEffect(() => {
-        if (storeLocatorParams) {
-            setParams(storeLocatorParams)
+        if (!storeLocatorParams) return
+        setParams(storeLocatorParams)
+        const storeName = new URLSearchParams(location.search).get('store')
+        if (setStoreLocatorState && !storeName) {
+            if (storeLocatorParams.postalCode && storeLocatorParams.countryCode) {
+                setStoreLocatorState((prev) => ({
+                    ...prev,
+                    mode: 'input',
+                    formValues: {
+                        postalCode: storeLocatorParams.postalCode,
+                        countryCode: storeLocatorParams.countryCode
+                    }
+                }))
+            } else if (storeLocatorParams.latitude && storeLocatorParams.longitude) {
+                setStoreLocatorState((prev) => ({
+                    ...prev,
+                    mode: 'device',
+                    deviceCoordinates: {
+                        latitude: storeLocatorParams.latitude,
+                        longitude: storeLocatorParams.longitude
+                    }
+                }))
+            }
         }
-    }, [storeLocatorParams, setParams])
+    }, [storeLocatorParams, setParams, setStoreLocatorState])
 
     useEffect(() => {
         if (!shouldOpenModal || !storeLocatorParams) return
 
-        const hasSelectedStore = !!selectedStoreId
+        const urlParams = new URLSearchParams(location.search)
+        const hasSeParamKeys = ['lat', 'lng', 'zip', 'city', 'store', 'country']
 
-        if (hasSelectedStore) {
-            const urlParams = new URLSearchParams(location.search)
-            const hasSeParamKeys = ['lat', 'lng', 'zip', 'city', 'store', 'country']
-            const hasExternalQuery =
-                urlParams.has('q') || urlParams.has('search') || urlParams.has('query')
+        onOpenStoreLocator()
+        setShouldOpenModal(false)
 
-            const openModal = () => {
-                onOpenStoreLocator()
-            }
-
-            if (hasExternalQuery) {
-                setTimeout(openModal, 1500)
-            } else {
-                openModal()
-            }
-
-            setShouldOpenModal(false)
-
-            const hasSeParams = hasSeParamKeys.some((key) => urlParams.has(key))
-
-            if (hasSeParams) {
-                const cleanParams = new URLSearchParams(location.search)
-                hasSeParamKeys.forEach((key) => cleanParams.delete(key))
-
-                const cleanSearch = cleanParams.toString()
-                const newUrl = location.pathname + (cleanSearch ? `?${cleanSearch}` : '')
-
-                history.replace(newUrl)
-            }
+        const hasSeParams = hasSeParamKeys.some((key) => urlParams.has(key))
+        if (hasSeParams) {
+            cleanURLParams(location, history, hasSeParamKeys)
         }
     }, [
         shouldOpenModal,
         storeLocatorParams,
-        selectedStoreId,
         onOpenStoreLocator,
         setShouldOpenModal,
         location.search,
@@ -83,6 +80,16 @@ const SeInputHandler = ({onOpenStoreLocator}) => {
     ])
 
     return null
+}
+
+export const cleanURLParams = (location, history, hasSeParamKeys) => {
+    const cleanParams = new URLSearchParams(location.search)
+    hasSeParamKeys.forEach((key) => cleanParams.delete(key))
+
+    const cleanSearch = cleanParams.toString()
+    const newUrl = location.pathname + (cleanSearch ? `?${cleanSearch}` : '')
+
+    history.replace(newUrl)
 }
 
 SeInputHandler.propTypes = {

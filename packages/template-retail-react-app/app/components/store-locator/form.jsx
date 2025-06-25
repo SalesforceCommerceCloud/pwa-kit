@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, {useEffect} from 'react'
+import React, {useEffect, useRef} from 'react'
 import {
     Box,
     Button,
@@ -18,10 +18,19 @@ import {
 import {useForm, Controller} from 'react-hook-form'
 import {useStoreLocator} from '@salesforce/retail-react-app/app/hooks/use-store-locator'
 import {useGeolocation} from '@salesforce/retail-react-app/app/hooks/use-geo-location'
+import {useSelectedStore} from '@salesforce/retail-react-app/app/hooks/use-selected-store'
+import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
 
 export const StoreLocatorForm = () => {
     const {config, formValues, setFormValues, setDeviceCoordinates} = useStoreLocator()
     const {coordinates, error, refresh} = useGeolocation()
+    const {store: selectedStore} = useSelectedStore()
+    const {derivedData} = useCurrentBasket()
+    const initialLoadDone = useRef(false)
+    const shouldUseLocation = useRef(false)
+
+    const hasItemsInBasket = derivedData?.totalItems > 0
+
     const form = useForm({
         mode: 'onChange',
         reValidateMode: 'onChange',
@@ -30,10 +39,26 @@ export const StoreLocatorForm = () => {
             postalCode: formValues.postalCode
         }
     })
-    const {control} = form
+    const {control, reset} = form
+
     useEffect(() => {
-        if (coordinates.latitude && coordinates.longitude) {
+        if (selectedStore && !initialLoadDone.current && !formValues.postalCode) {
+            reset({
+                countryCode: selectedStore.countryCode,
+                postalCode: selectedStore.postalCode
+            })
+            setFormValues({
+                countryCode: selectedStore.countryCode,
+                postalCode: selectedStore.postalCode
+            })
+            initialLoadDone.current = true
+        }
+    }, [selectedStore, reset, setFormValues, formValues.postalCode])
+
+    useEffect(() => {
+        if (coordinates.latitude && coordinates.longitude && shouldUseLocation.current) {
             setDeviceCoordinates(coordinates)
+            shouldUseLocation.current = false
         }
     }, [coordinates])
 
@@ -44,11 +69,15 @@ export const StoreLocatorForm = () => {
     }
 
     const clearForm = () => {
-        form.reset()
+        form.reset({
+            countryCode: '',
+            postalCode: ''
+        })
         setFormValues({
             countryCode: '',
             postalCode: ''
         })
+        initialLoadDone.current = false
     }
 
     return (
@@ -59,99 +88,111 @@ export const StoreLocatorForm = () => {
                 void form.handleSubmit(submitForm)(e)
             }}
         >
-            <InputGroup>
-                {showCountrySelector && (
+            <Box as="fieldset" disabled={hasItemsInBasket} opacity={hasItemsInBasket ? 0.5 : 1}>
+                <InputGroup>
+                    {showCountrySelector && (
+                        <Controller
+                            name="countryCode"
+                            control={control}
+                            rules={{
+                                required: 'Please select a country.'
+                            }}
+                            render={({field}) => {
+                                return (
+                                    <FormControl isInvalid={!!form.formState.errors.countryCode}>
+                                        <Select
+                                            {...field}
+                                            marginBottom="10px"
+                                            placeholder={'Select a country'}
+                                            borderColor="gray.500"
+                                        >
+                                            {config.supportedCountries.map(
+                                                ({countryCode, countryName}) => {
+                                                    return (
+                                                        <option
+                                                            value={countryCode}
+                                                            key={countryCode}
+                                                        >
+                                                            {countryName}
+                                                        </option>
+                                                    )
+                                                }
+                                            )}
+                                        </Select>
+                                        {form.formState.errors.countryCode && (
+                                            <FormErrorMessage
+                                                sx={{marginBottom: '10px'}}
+                                                color="red.600"
+                                            >
+                                                {form.formState.errors.countryCode.message}
+                                            </FormErrorMessage>
+                                        )}
+                                    </FormControl>
+                                )
+                            }}
+                        />
+                    )}
+                </InputGroup>
+                <InputGroup>
                     <Controller
-                        name="countryCode"
+                        name="postalCode"
                         control={control}
                         rules={{
-                            required: 'Please select a country.'
+                            required: 'Please enter a postal code.'
                         }}
                         render={({field}) => {
                             return (
-                                <FormControl isInvalid={!!form.formState.errors.countryCode}>
-                                    <Select
-                                        {...field}
-                                        marginBottom="10px"
-                                        placeholder={'Select a country'}
-                                        borderColor="gray.500"
-                                    >
-                                        {config.supportedCountries.map(
-                                            ({countryCode, countryName}) => {
-                                                return (
-                                                    <option value={countryCode} key={countryCode}>
-                                                        {countryName}
-                                                    </option>
-                                                )
-                                            }
-                                        )}
-                                    </Select>
-                                    {form.formState.errors.countryCode && (
-                                        <FormErrorMessage
-                                            sx={{marginBottom: '10px'}}
-                                            color="red.600"
-                                        >
-                                            {form.formState.errors.countryCode.message}
+                                <FormControl isInvalid={!!form.formState.errors.postalCode}>
+                                    <Input {...field} placeholder={'Enter postal code'} />
+                                    {form.formState.errors.postalCode && (
+                                        <FormErrorMessage sx={{top: '-20px'}} color="red.600">
+                                            {form.formState.errors.postalCode.message}
                                         </FormErrorMessage>
                                     )}
                                 </FormControl>
                             )
                         }}
                     />
-                )}
-            </InputGroup>
-            <InputGroup>
-                <Controller
-                    name="postalCode"
-                    control={control}
-                    rules={{
-                        required: 'Please enter a postal code.'
+                    <Button
+                        key="find-button"
+                        type="submit"
+                        width="15%"
+                        marginLeft={2}
+                        variant="solid"
+                    >
+                        Find
+                    </Button>
+                </InputGroup>
+                <Box
+                    style={{display: 'flex', justifyContent: 'center', alignItems: 'center'}}
+                    margin="10px"
+                >
+                    Or
+                </Box>
+                <Button
+                    onClick={() => {
+                        clearForm()
+                        shouldUseLocation.current = true
+                        refresh()
                     }}
-                    render={({field}) => {
-                        return (
-                            <FormControl isInvalid={!!form.formState.errors.postalCode}>
-                                <Input {...field} placeholder={'Enter postal code'} />
-                                {form.formState.errors.postalCode && (
-                                    <FormErrorMessage sx={{top: '-20px'}} color="red.600">
-                                        {form.formState.errors.postalCode.message}
-                                    </FormErrorMessage>
-                                )}
-                            </FormControl>
-                        )
-                    }}
-                />
-                <Button key="find-button" type="submit" width="15%" marginLeft={2} variant="solid">
-                    Find
-                </Button>
-            </InputGroup>
-            <Box
-                style={{display: 'flex', justifyContent: 'center', alignItems: 'center'}}
-                margin="10px"
-            >
-                Or
-            </Box>
-            <Button
-                onClick={() => {
-                    clearForm()
-                    refresh()
-                }}
-                width="100%"
-                variant="solid"
-                fontWeight="bold"
-                marginBottom={4}
-            >
-                Use My Location
-            </Button>
-            <FormControl isInvalid={!!error}>
-                <FormErrorMessage
-                    color="red.600"
-                    alignItems="center"
-                    justifyContent="center"
+                    width="100%"
+                    variant="solid"
+                    fontWeight="bold"
                     marginBottom={4}
                 >
-                    Please agree to share your location
-                </FormErrorMessage>
-            </FormControl>
+                    Use My Location
+                </Button>
+                <FormControl isInvalid={!!error}>
+                    <FormErrorMessage
+                        color="red.600"
+                        alignItems="center"
+                        justifyContent="center"
+                        marginBottom={4}
+                    >
+                        Please agree to share your location
+                    </FormErrorMessage>
+                </FormControl>
+            </Box>
         </form>
     )
 }
