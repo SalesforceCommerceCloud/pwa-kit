@@ -8,7 +8,7 @@ import React, {useState} from 'react'
 import PropTypes from 'prop-types'
 import ccValidator from 'card-validator'
 import {useIntl} from 'react-intl'
-import {Box, Flex, FormLabel, InputRightElement, SimpleGrid, Stack, Tooltip} from '@chakra-ui/react'
+import {Box, Flex, SimpleGrid, Stack, Tooltip} from '@chakra-ui/react'
 import {formatCreditCardNumber, getCreditCardIcon} from '../../utils/cc-utils'
 import useCreditCardFields from '../../components/forms/useCreditCardFields'
 import Field from '../../components/field'
@@ -60,13 +60,13 @@ const CreditCardFields = ({form, prefix = ''}) => {
 
     return (
         <Box>
-            <Stack spacing={5}>
+            <Stack gap={5}>
                 <Field
                     {...fields.number}
                     formLabel={
                         <Flex justify="space-between">
-                            <FormLabel>{fields.number.label}</FormLabel>
-                            <Stack direction="row" spacing={1}>
+                            <Box>{fields.number.label}</Box>
+                            <Stack direction="row" gap={1}>
                                 <VisaIcon layerStyle="ccIcon" />
                                 <MastercardIcon layerStyle="ccIcon" />
                                 <AmexIcon layerStyle="ccIcon" />
@@ -87,16 +87,13 @@ const CreditCardFields = ({form, prefix = ''}) => {
                         }
                     })}
                 >
-                    {CardIcon && form.getValues().number?.length > 2 && (
-                        <InputRightElement width="60px">
-                            <CardIcon layerStyle="ccIcon" />
-                        </InputRightElement>
-                    )}
+                    {/* Note: The Field component in this codebase handles InputGroup internally, 
+                        so we don't need to add the card icon here for now */}
                 </Field>
 
                 <Field {...fields.holder} />
 
-                <SimpleGrid columns={[2, 2, 3]} spacing={5}>
+                <SimpleGrid columns={[2, 2, 3]} gap={5}>
                     <Field
                         {...fields.expiry}
                         inputProps={({onChange}) => ({
@@ -132,30 +129,38 @@ const CreditCardFields = ({form, prefix = ''}) => {
                         {...fields.securityCode}
                         formLabel={
                             <>
-                                <FormLabel display="inline" mr={1}>
+                                <Box display="inline" mr={1}>
                                     {fields.securityCode.label}
-                                </FormLabel>
+                                </Box>
                                 <Box
                                     onMouseEnter={handleTooltipOpen}
                                     onFocus={handleTooltipOpen}
                                     as="span"
                                 >
-                                    <Tooltip
-                                        hasArrow
-                                        placement="top"
-                                        label={securityCodeTooltipLabel}
-                                        shouldWrapChildren={true}
-                                        isOpen={isTooltipOpen}
+                                    <Tooltip.Root
+                                        open={isTooltipOpen}
+                                        onOpenChange={(e) => setIsTooltipOpen(e.open)}
+                                        positioning={{ placement: "top" }}
                                     >
-                                        <InfoIcon
-                                            boxSize={5}
-                                            color="gray.700"
-                                            aria-label={formatMessage({
-                                                id: 'credit_card_fields.tool_tip.security_code_aria_label',
-                                                defaultMessage: 'Security code info'
-                                            })}
-                                        />
-                                    </Tooltip>
+                                        <Tooltip.Trigger asChild>
+                                            <InfoIcon
+                                                boxSize={5}
+                                                color="gray.700"
+                                                aria-label={formatMessage({
+                                                    id: 'credit_card_fields.tool_tip.security_code_aria_label',
+                                                    defaultMessage: 'Security code info'
+                                                })}
+                                            />
+                                        </Tooltip.Trigger>
+                                        <Tooltip.Positioner>
+                                            <Tooltip.Content>
+                                                <Tooltip.Arrow>
+                                                    <Tooltip.ArrowTip />
+                                                </Tooltip.Arrow>
+                                                {securityCodeTooltipLabel}
+                                            </Tooltip.Content>
+                                        </Tooltip.Positioner>
+                                    </Tooltip.Root>
                                 </Box>
                             </>
                         }

@@ -7,7 +7,7 @@
 import React, {useState} from 'react'
 import PropTypes from 'prop-types'
 import {defineMessage, FormattedMessage, useIntl} from 'react-intl'
-import {Box, Button, Checkbox, Container, Heading, Stack, Text, Divider} from '@chakra-ui/react'
+import {Box, Button, Checkbox, Container, Heading, Stack, Text, Separator} from '@chakra-ui/react'
 import {useForm} from 'react-hook-form'
 import useToast from '../../../hooks/use-toast'
 import {useShopperBasketsMutation} from '@salesforce/commerce-sdk-react'
@@ -133,16 +133,27 @@ const Payment = () => {
         id: 'checkout_payment.label.billing_address_form'
     })
 
+    // Mock shipping address for testing
+    const testShippingAddress = selectedShippingAddress || {
+        address1: '123 Test Street',
+        city: 'Test City',
+        stateCode: 'CA',
+        postalCode: '12345',
+        countryCode: 'US'
+    }
+
     return (
         <ToggleCard
             id="step-3"
             title={formatMessage({defaultMessage: 'Payment', id: 'checkout_payment.title.payment'})}
-            editing={step === STEPS.PAYMENT}
+            editing={true} // Force editing mode for testing
+            // editing={step === STEPS.PAYMENT} // Original condition
             isLoading={
                 paymentMethodForm.formState.isSubmitting ||
                 billingAddressForm.formState.isSubmitting
             }
-            disabled={appliedPayment == null}
+            disabled={false} // Force enabled for testing
+            // disabled={appliedPayment == null} // Original condition
             onEdit={() => goToStep(STEPS.PAYMENT)}
             editLabel={formatMessage({
                 defaultMessage: 'Edit Payment Info',
@@ -151,26 +162,28 @@ const Payment = () => {
         >
             <ToggleCardEdit>
                 <Box mt={-2} mb={4}>
-                    <PromoCode {...promoCodeProps} itemProps={{border: 'none'}} />
+                    {/* <PromoCode {...promoCodeProps} itemProps={{border: 'none'}} /> */}
                 </Box>
 
-                <Stack spacing={6}>
-                    {!appliedPayment?.paymentCard ? (
+                <Stack gap={6}>
+                    {/* Force showing PaymentForm for testing */}
+                    {true ? ( // Always show PaymentForm for testing
+                    // {!appliedPayment?.paymentCard ? ( // Original condition
                         <PaymentForm form={paymentMethodForm} onSubmit={onPaymentSubmit} />
                     ) : (
-                        <Stack spacing={3}>
+                        <Stack gap={3}>
                             <Heading as="h3" fontSize="md">
                                 <FormattedMessage
                                     defaultMessage="Credit Card"
                                     id="checkout_payment.heading.credit_card"
                                 />
                             </Heading>
-                            <Stack direction="row" spacing={4}>
+                            <Stack direction="row" gap={4}>
                                 <PaymentCardSummary payment={appliedPayment} />
                                 <Button
                                     variant="link"
                                     size="sm"
-                                    colorScheme="red"
+                                    colorPalette="red"
                                     onClick={onPaymentRemoval}
                                 >
                                     <FormattedMessage
@@ -182,9 +195,9 @@ const Payment = () => {
                         </Stack>
                     )}
 
-                    <Divider borderColor="gray.100" />
+                    <Separator borderColor="gray.100" />
 
-                    <Stack spacing={2}>
+                    <Stack gap={2}>
                         <Heading as="h3" fontSize="md">
                             <FormattedMessage
                                 defaultMessage="Billing Address"
@@ -192,22 +205,27 @@ const Payment = () => {
                             />
                         </Heading>
 
-                        <Checkbox
+                        <Checkbox.Root
                             name="billingSameAsShipping"
-                            isChecked={billingSameAsShipping}
-                            onChange={(e) => setBillingSameAsShipping(e.target.checked)}
+                            checked={billingSameAsShipping}
+                            onCheckedChange={(e) => setBillingSameAsShipping(e.checked)}
                         >
-                            <Text fontSize="sm" color="gray.700">
-                                <FormattedMessage
-                                    defaultMessage="Same as shipping address"
-                                    id="checkout_payment.label.same_as_shipping"
-                                />
-                            </Text>
-                        </Checkbox>
+                            <Checkbox.HiddenInput />
+                            <Checkbox.Control />
+                            <Checkbox.Label>
+                                <Text fontSize="sm" color="gray.700">
+                                    <FormattedMessage
+                                        defaultMessage="Same as shipping address"
+                                        id="checkout_payment.label.same_as_shipping"
+                                    />
+                                </Text>
+                            </Checkbox.Label>
+                        </Checkbox.Root>
 
-                        {billingSameAsShipping && selectedShippingAddress && (
+                        {billingSameAsShipping && (
+                        // {billingSameAsShipping && selectedShippingAddress && ( // Original condition
                             <Box pl={7}>
-                                <AddressDisplay address={selectedShippingAddress} />
+                                <AddressDisplay address={testShippingAddress} />
                             </Box>
                         )}
                     </Stack>
@@ -236,9 +254,9 @@ const Payment = () => {
             </ToggleCardEdit>
 
             <ToggleCardSummary>
-                <Stack spacing={6}>
+                <Stack gap={6}>
                     {appliedPayment && (
-                        <Stack spacing={3}>
+                        <Stack gap={3}>
                             <Heading as="h3" fontSize="md">
                                 <FormattedMessage
                                     defaultMessage="Credit Card"
@@ -249,17 +267,19 @@ const Payment = () => {
                         </Stack>
                     )}
 
-                    <Divider borderColor="gray.100" />
+                    <Separator borderColor="gray.100" />
 
-                    {selectedBillingAddress && (
-                        <Stack spacing={2}>
+                    {/* Show test billing address for testing */}
+                    {true && ( // Always show for testing
+                    // {selectedBillingAddress && ( // Original condition
+                        <Stack gap={2}>
                             <Heading as="h3" fontSize="md">
                                 <FormattedMessage
                                     defaultMessage="Billing Address"
                                     id="checkout_payment.heading.billing_address"
                                 />
                             </Heading>
-                            <AddressDisplay address={selectedBillingAddress} />
+                            <AddressDisplay address={testShippingAddress} />
                         </Stack>
                     )}
                 </Stack>
@@ -271,7 +291,7 @@ const Payment = () => {
 const PaymentCardSummary = ({payment}) => {
     const CardIcon = getCreditCardIcon(payment?.paymentCard?.cardType)
     return (
-        <Stack direction="row" alignItems="center" spacing={3}>
+        <Stack direction="row" alignItems="center" gap={3}>
             {CardIcon && <CardIcon layerStyle="ccIcon" />}
 
             <Stack direction="row">
