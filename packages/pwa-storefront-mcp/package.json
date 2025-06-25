@@ -39,6 +39,10 @@
     "internal-lib-build": "3.11.0-dev.0",
     "@salesforce/pwa-kit-dev": "3.11.0-dev.0",
     "cross-env": "^5.2.1",
-    "nodemon": "^2.0.22"
+    "nodemon": "^2.0.22",
+    "@axe-core/playwright": "^4.10.1",
+    "@playwright/test": "^1.49.0",
+    "axe-core": "^4.10.3",
+    "playwright": "^1.49.0"
   }
 }
