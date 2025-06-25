@@ -80,7 +80,6 @@ import {
 } from '@salesforce/retail-react-app/app/constants'
 
 import Seo from '@salesforce/retail-react-app/app/components/seo'
-import {Helmet} from 'react-helmet'
 import ShopperAgent from '@salesforce/retail-react-app/app/components/shopper-agent'
 import {getPathWithLocale} from '@salesforce/retail-react-app/app/utils/url'
 

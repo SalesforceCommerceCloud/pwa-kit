@@ -3,7 +3,6 @@
 - Only allow requests for `/shopper/auth/` through the SLAS private client proxy. Also stop the proxy from swallowing SLAS errors [#2608](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2608)
 
 ## v3.10.0 (May 22, 2025)
-
 - Add referrer policy `strict-origin-when-cross-origin` and CSP relaxations for MIAW scripts [#2416](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2416)
 
 ## v3.9.2 (Mar 08, 2025)
