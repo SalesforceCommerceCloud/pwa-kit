@@ -405,18 +405,20 @@ export const AddToCartModal = () => {
                                     })}
                                 </Button>
 
-                                <Button
-                                    as={Link}
-                                    to="/checkout"
-                                    width="100%"
-                                    variant="outline"
-                                    rightIcon={<LockIcon />}
-                                >
-                                    {intl.formatMessage({
-                                        defaultMessage: 'Proceed to Checkout',
-                                        id: 'add_to_cart_modal.link.checkout'
-                                    })}
-                                    <LockIcon />
+                                <Button asChild>
+                                    <Link
+                                        to="/checkout"
+                                        width={['95%', '95%', '95%', '100%']}
+                                        marginTop={[6, 6, 2, 2]}
+                                        mb={4}
+                                        variant="solid"
+                                    >
+                                        <FormattedMessage
+                                            defaultMessage="Proceed to Checkout"
+                                            id="cart_cta.link.checkout"
+                                        />
+                                        <LockIcon />
+                                    </Link>
                                 </Button>
                             </Stack>
                         </Dialog.Footer>
