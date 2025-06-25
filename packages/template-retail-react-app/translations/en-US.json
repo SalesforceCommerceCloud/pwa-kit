@@ -1267,6 +1267,12 @@
   "product_view.error.no_store_selected_for_pickup": {
     "defaultMessage": "No valid store or inventory found for pickup"
   },
+  "product_view.error.select_pickup_in_store": {
+    "defaultMessage": "Please select 'Pickup in Store' to match the shipping method for your other items."
+  },
+  "product_view.error.select_ship_to_address": {
+    "defaultMessage": "Please select 'Ship to Address' to match the shipping method for your other items."
+  },
   "product_view.label.assistive_msg.quantity_decrement": {
     "defaultMessage": "Decrement Quantity for {productName}"
   },

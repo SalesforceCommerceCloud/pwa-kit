@@ -38,6 +38,11 @@ const defaultProps = {
     selectedFilters: {}
 }
 
+const propsWithFilterEnabled = {
+    toggleFilter: mockToggleFilter,
+    selectedFilters: {ilids: 'inv-456'}
+}
+
 const mockStoreData = {
     id: 'store-123',
     name: 'Test Store Location',
@@ -197,5 +202,43 @@ describe('StoreInventoryFilter', () => {
 
         // Ensure no modal was opened
         expect(screen.queryByTestId('store-locator-modal')).not.toBeInTheDocument()
+    })
+
+    test('applies filter when selected store changes and checkbox is checked', async () => {
+        const mockStoreData2 = {
+            id: 'store-456',
+            name: 'Test Store Location 2',
+            inventoryId: 'inv-222'
+        }
+
+        useSelectedStore.mockImplementation(() => ({
+            store: mockStoreData,
+            isLoading: false,
+            error: null,
+            hasSelectedStore: true
+        }))
+
+        renderWithProviders(<StoreInventoryFilter {...propsWithFilterEnabled} />)
+
+        // Verify the first store name is displayed
+        await waitFor(() => {
+            expect(screen.getByText('Test Store Location')).toBeInTheDocument()
+        })
+
+        mockToggleFilter.mockClear()
+
+        // Change to the second store
+        useSelectedStore.mockImplementation(() => ({
+            store: mockStoreData2,
+            isLoading: false,
+            error: null,
+            hasSelectedStore: true
+        }))
+        renderWithProviders(<StoreInventoryFilter {...propsWithFilterEnabled} />)
+
+        // The filter should have been applied with the new store's inventoryId
+        await waitFor(() => {
+            expect(mockToggleFilter).toHaveBeenCalledWith({value: 'inv-222'}, 'ilids', false, false)
+        })
     })
 })
