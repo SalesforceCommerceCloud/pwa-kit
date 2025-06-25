@@ -99,8 +99,8 @@ const StoreDisplay = ({
                                 <AccordionIcon />
                             </AccordionButton>
                             <AccordionPanel px={0} pb={2}>
-                                <Box fontSize="sm" whiteSpace="pre-line" color="gray.600">
-                                    {store.storeHours}
+                                <Box fontSize="sm" color="gray.600">
+                                    <div dangerouslySetInnerHTML={{__html: store.storeHours}} />
                                 </Box>
                             </AccordionPanel>
                         </AccordionItem>
