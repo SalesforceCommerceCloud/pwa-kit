@@ -17,7 +17,6 @@
 import {bundleBasePath} from '@salesforce/pwa-kit-runtime/utils/ssr-namespace-paths'
 
 /* global __webpack_public_path__: writable */
-// eslint-disable-next-line no-undef
-const webpackPublicPath = `${bundleBasePath}/development/`
-// eslint-disable-next-line no-undef
-__webpack_public_path__ = webpackPublicPath
+// This global variable is used by webpack for HMR (Hot Module Replacement)
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+__webpack_public_path__ = `${bundleBasePath}/development/`

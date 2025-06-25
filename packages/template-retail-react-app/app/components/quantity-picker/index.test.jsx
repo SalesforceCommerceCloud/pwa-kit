@@ -19,34 +19,30 @@ const MINUS = '\u2212' // HTML `&minus;`, not the same as '-' (\u002d)
 
 describe('QuantityPicker', () => {
     test('clicking plus increments value', async () => {
-        const user = userEvent.setup()
         renderWithProviders(<MockComponent />)
         const input = screen.getByRole('spinbutton')
         const button = screen.getByText('+')
-        await user.click(button)
+        await userEvent.click(button)
         expect(input.value).toBe('6')
     })
     test('clicking minus decrements value', async () => {
-        const user = userEvent.setup()
         renderWithProviders(<MockComponent />)
         const input = screen.getByRole('spinbutton')
         const button = screen.getByText(MINUS)
-        await user.click(button)
+        await userEvent.click(button)
         expect(input.value).toBe('4')
     })
     test('typing enter/space on plus increments value', async () => {
-        const user = userEvent.setup()
         renderWithProviders(<MockComponent />)
         const input = screen.getByRole('spinbutton')
         const button = screen.getByText('+')
-        await user.type(button, '{enter}')
+        fireEvent.keyDown(button, {key: 'Enter'})
         expect(input.value).toBe('6')
-        await user.type(button, '{space}')
+        fireEvent.keyDown(button, {key: ' '})
         expect(input.value).toBe('7')
     })
 
     test('keydown enter/space on plus increments value', async () => {
-        const user = userEvent.setup()
         renderWithProviders(<MockComponent />)
         const input = screen.getByRole('spinbutton')
         const button = screen.getByText('+')
@@ -57,18 +53,16 @@ describe('QuantityPicker', () => {
     })
 
     test('typing space on minus decrements value', async () => {
-        const user = userEvent.setup()
         renderWithProviders(<MockComponent />)
         const input = screen.getByRole('spinbutton')
         const button = screen.getByText(MINUS)
-        await user.type(button, '{enter}')
+        fireEvent.keyDown(button, {key: 'Enter'})
         expect(input.value).toBe('4')
-        await user.type(button, '{space}')
+        fireEvent.keyDown(button, {key: ' '})
         expect(input.value).toBe('3')
     })
 
     test('keydown enter/space on minus decrements value', async () => {
-        const user = userEvent.setup()
         renderWithProviders(<MockComponent />)
         const input = screen.getByRole('spinbutton')
         const button = screen.getByText(MINUS)
@@ -79,18 +73,16 @@ describe('QuantityPicker', () => {
     })
 
     test('plus button is tabbable', async () => {
-        const user = userEvent.setup()
         renderWithProviders(<MockComponent />)
         const input = screen.getByRole('spinbutton')
-        await user.type(input, '{tab}')
+        fireEvent.keyDown(input, {key: 'Tab'})
         const button = screen.getByText('+')
         expect(button).toHaveFocus()
     })
     test('minus button is tabbable', async () => {
-        const user = userEvent.setup()
         renderWithProviders(<MockComponent />)
         const input = screen.getByRole('spinbutton')
-        await user.type(input, '{shift>}{tab}') // > modifier in {shift>} means "keep key pressed"
+        fireEvent.keyDown(input, {key: 'Tab', shiftKey: true})
         const button = screen.getByText(MINUS)
         expect(button).toHaveFocus()
     })
