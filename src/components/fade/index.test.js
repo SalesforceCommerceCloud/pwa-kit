@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
-import {render, screen, waitFor} from '@testing-library/react'
+import {screen} from '@testing-library/react'
 import '@testing-library/jest-dom'
 
 import Fade from '../../components/fade'

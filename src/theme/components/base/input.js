@@ -8,44 +8,22 @@ import {defineRecipe} from '@chakra-ui/react'
 
 export default defineRecipe({
     base: {
-        focusVisibleRing: 'inside',
         _focusVisible: {
             background: 'transparent',
             borderColor: 'blue.500',
-            outlineWidth: 0
+            focusRingColor: 'blue.500'
         }
     },
     variants: {
         variant: {
             outline: {
-                field: {
-                    borderColor: 'gray.500'
-                }
+                borderColor: 'gray.500'
             },
             // Note: Chakra v3 input has removed filled variant
             // we added it back to preserve the style in the template
             filled: {
-                border: '2px solid {colors.gray.600}',
-                backgroundColor: 'gray.100',
-                focusVisibleRing: 'inside',
-                focusRingColor: 'var(--focus-color)',
-                _focus: {
-                    backgroundColor: 'white'
-                },
-                _focusVisible: {
-                    background: 'transparent',
-                    borderColor: 'blue.500',
-                    outlineWidth: 0
-                },
-                _hover: {
-                    backgroundColor: 'gray.100',
-                    _focus: {
-                        backgroundColor: 'white'
-                    }
-                },
-                _placeholder: {
-                    color: 'gray.700'
-                }
+                border: '1px solid {colors.gray.600}',
+                backgroundColor: 'gray.100'
             }
         }
     },
