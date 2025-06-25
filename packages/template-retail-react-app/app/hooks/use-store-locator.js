@@ -8,7 +8,7 @@
 import {useContext, useEffect} from 'react'
 import {useSearchStores} from '@salesforce/commerce-sdk-react'
 import {StoreLocatorContext} from '@salesforce/retail-react-app/app/contexts/store-locator-provider'
-import {STORE_LOCATOR_NUM_STORES_PER_REQUEST_API_MAX} from '../constants'
+import {STORE_LOCATOR_NUM_STORES_PER_REQUEST_API_MAX} from '@salesforce/retail-react-app/app/constants'
 
 const useStores = (state) => {
     const apiParameters =
