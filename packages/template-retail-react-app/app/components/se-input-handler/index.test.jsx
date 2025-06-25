@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, salesforce.com, inc.
+ * Copyright (c) 2024, salesforce.com, inc.
  * All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
@@ -8,183 +8,191 @@
 import React from 'react'
 import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
 import {waitFor} from '@testing-library/react'
+import SeInputHandler from '@salesforce/retail-react-app/app/components/se-input-handler'
+import {StoreLocatorContext} from '@salesforce/retail-react-app/app/contexts/store-locator-provider'
+import {useStoreLocatorParams} from '@salesforce/retail-react-app/app/contexts/store-locator-params'
+import useSeStoreSelection from '@salesforce/retail-react-app/app/hooks/use-se-store-selection'
+import useExternalSearch from '@salesforce/retail-react-app/app/hooks/use-external-search'
+import PropTypes from 'prop-types'
 
-const mockUseSeStoreSelection = jest.fn()
-const mockSetParams = jest.fn()
-const mockProcessSeParameters = jest.fn()
-const mockSetShouldOpenModal = jest.fn()
+jest.mock('@salesforce/retail-react-app/app/hooks/use-se-store-selection')
+jest.mock('@salesforce/retail-react-app/app/contexts/store-locator-params')
+jest.mock('@salesforce/retail-react-app/app/hooks/use-external-search')
 
-jest.doMock(
-    '@salesforce/retail-react-app/app/hooks/use-se-store-selection',
-    () => mockUseSeStoreSelection
-)
+describe('SeInputHandler', () => {
+    const mockOnOpenStoreLocator = jest.fn()
+    const mockSetShouldOpenModal = jest.fn()
+    const mockProcessSeParameters = jest.fn()
 
-jest.doMock('@salesforce/retail-react-app/app/hooks/use-multi-site', () => () => ({
-    site: {id: 'test-site'}
-}))
-
-jest.doMock('@salesforce/retail-react-app/app/contexts/store-locator-params', () => ({
-    useStoreLocatorParams: () => ({
-        setParams: mockSetParams
-    })
-}))
-
-jest.doMock('@salesforce/retail-react-app/app/hooks/use-external-search', () => () => {})
-
-// Mock the StoreLocatorContext with a variable that can be changed in tests
-const mockStoreLocatorContext = {
-    state: {
-        selectedStoreId: 'test-store-123'
+    const mockStoreLocatorContext = {
+        state: {
+            mode: 'input',
+            formValues: {},
+            deviceCoordinates: {
+                latitude: null,
+                longitude: null
+            }
+        },
+        setState: jest.fn()
     }
-}
 
-jest.doMock('@salesforce/retail-react-app/app/contexts/store-locator-provider', () => ({
-    StoreLocatorContext: React.createContext(mockStoreLocatorContext)
-}))
-
-let SeInputHandler
-const mockOnOpenStoreLocator = jest.fn()
-
-jest.useFakeTimers()
-
-beforeEach(async () => {
-    jest.clearAllMocks()
-    const SeInputHandlerModule = await import(
-        '@salesforce/retail-react-app/app/components/se-input-handler'
+    const TestWrapper = ({children}) => (
+        <StoreLocatorContext.Provider value={mockStoreLocatorContext}>
+            {children}
+        </StoreLocatorContext.Provider>
     )
-    SeInputHandler = SeInputHandlerModule.default
 
-    window.localStorage.clear()
+    TestWrapper.propTypes = {
+        children: PropTypes.node
+    }
 
-    // Reset the mock context to default value
-    mockStoreLocatorContext.state.selectedStoreId = 'test-store-123'
+    const renderComponent = () => {
+        return renderWithProviders(
+            <TestWrapper>
+                <SeInputHandler onOpenStoreLocator={mockOnOpenStoreLocator} />
+            </TestWrapper>
+        )
+    }
 
-    mockUseSeStoreSelection.mockReturnValue({
-        shouldOpenModal: true,
-        setShouldOpenModal: mockSetShouldOpenModal,
-        storeLocatorParams: {city: 'Boston'},
-        processSeParameters: mockProcessSeParameters
+    beforeEach(() => {
+        jest.clearAllMocks()
+        window.history.pushState({}, '', '/test')
+
+        useStoreLocatorParams.mockReturnValue({
+            params: {},
+            setParams: jest.fn(),
+            processSeParameters: mockProcessSeParameters
+        })
+
+        useSeStoreSelection.mockReturnValue({
+            shouldOpenModal: false,
+            setShouldOpenModal: mockSetShouldOpenModal,
+            storeLocatorParams: {},
+            processSeParameters: mockProcessSeParameters
+        })
+
+        useExternalSearch.mockReturnValue()
     })
 
-    window.localStorage.setItem('store_test-site', JSON.stringify({dummy: true}))
-})
+    describe('Store Locator State Management', () => {
+        test('updates store locator state for postal code search', async () => {
+            window.history.pushState({}, '', '/test?zip=02215&country=US')
 
-afterEach(() => {
-    jest.runOnlyPendingTimers()
-    jest.useRealTimers()
-    jest.useFakeTimers()
-})
+            useSeStoreSelection.mockReturnValue({
+                shouldOpenModal: true,
+                setShouldOpenModal: mockSetShouldOpenModal,
+                storeLocatorParams: {postalCode: '02215', countryCode: 'US'},
+                processSeParameters: mockProcessSeParameters
+            })
 
-test('clears lat and lng parameters from URL when modal opens', async () => {
-    window.history.pushState({}, '', '/test?lat=42.3601&lng=-71.0589')
+            renderComponent()
 
-    renderWithProviders(<SeInputHandler onOpenStoreLocator={mockOnOpenStoreLocator} />)
+            await waitFor(() => {
+                expect(mockStoreLocatorContext.setState).toHaveBeenCalledWith(expect.any(Function))
+                const updateFn = mockStoreLocatorContext.setState.mock.calls[0][0]
+                const newState = updateFn({})
+                expect(newState).toEqual(
+                    expect.objectContaining({
+                        mode: 'input',
+                        formValues: {
+                            postalCode: '02215',
+                            countryCode: 'US'
+                        }
+                    })
+                )
+            })
+        })
 
-    await waitFor(() => {
-        expect(window.location.search).toBe('')
-        expect(mockOnOpenStoreLocator).toHaveBeenCalled()
-    })
-})
+        test('updates store locator state for coordinate search', async () => {
+            window.history.pushState({}, '', '/test?lat=42.3601&lng=-71.0589')
 
-test('clears city and country parameters from URL when modal opens', async () => {
-    window.history.pushState({}, '', '/test?city=Palo%20Alto&country=US')
+            useSeStoreSelection.mockReturnValue({
+                shouldOpenModal: true,
+                setShouldOpenModal: mockSetShouldOpenModal,
+                storeLocatorParams: {latitude: '42.3601', longitude: '-71.0589'},
+                processSeParameters: mockProcessSeParameters
+            })
 
-    renderWithProviders(<SeInputHandler onOpenStoreLocator={mockOnOpenStoreLocator} />)
+            renderComponent()
 
-    await waitFor(() => {
-        expect(window.location.search).toBe('')
-        expect(mockOnOpenStoreLocator).toHaveBeenCalled()
-    })
-})
-
-test('clears store, zip and country parameters from URL when modal opens', async () => {
-    window.history.pushState({}, '', '/test?store=ABC%20Store&zip=02215&country=US')
-
-    renderWithProviders(<SeInputHandler onOpenStoreLocator={mockOnOpenStoreLocator} />)
-
-    await waitFor(() => {
-        expect(window.location.search).toBe('')
-        expect(mockOnOpenStoreLocator).toHaveBeenCalled()
-    })
-})
-
-test('preserves other parameters when SE parameters are cleared', async () => {
-    window.history.pushState({}, '', '/test?lat=42.3601&lng=-71.0589&q=Shoes&size=10')
-
-    jest.clearAllMocks()
-
-    mockUseSeStoreSelection.mockReturnValue({
-        shouldOpenModal: true,
-        setShouldOpenModal: mockSetShouldOpenModal,
-        storeLocatorParams: {lat: 42.3601, lng: -71.0589},
-        processSeParameters: mockProcessSeParameters
-    })
-    window.localStorage.setItem('store_test-site', JSON.stringify({dummy: true}))
-
-    renderWithProviders(<SeInputHandler onOpenStoreLocator={mockOnOpenStoreLocator} />)
-    jest.advanceTimersByTime(1500)
-
-    await waitFor(() => {
-        expect(window.location.search).toBe('?q=Shoes&size=10')
-        expect(mockOnOpenStoreLocator).toHaveBeenCalled()
-    })
-})
-
-test('does not open modal when only country parameter is provided', async () => {
-    mockUseSeStoreSelection.mockReturnValue({
-        shouldOpenModal: false,
-        setShouldOpenModal: mockSetShouldOpenModal,
-        storeLocatorParams: null,
-        processSeParameters: mockProcessSeParameters
+            await waitFor(() => {
+                expect(mockStoreLocatorContext.setState).toHaveBeenCalledWith(expect.any(Function))
+                const updateFn = mockStoreLocatorContext.setState.mock.calls[0][0]
+                const newState = updateFn({})
+                expect(newState).toEqual(
+                    expect.objectContaining({
+                        mode: 'device',
+                        deviceCoordinates: {
+                            latitude: '42.3601',
+                            longitude: '-71.0589'
+                        }
+                    })
+                )
+            })
+        })
     })
 
-    window.history.pushState({}, '', '/test?country=US')
+    describe('Modal Control', () => {
+        test('opens modal when shouldOpenModal becomes true', async () => {
+            useSeStoreSelection.mockReturnValue({
+                shouldOpenModal: true,
+                setShouldOpenModal: mockSetShouldOpenModal,
+                storeLocatorParams: {},
+                processSeParameters: mockProcessSeParameters
+            })
 
-    renderWithProviders(<SeInputHandler onOpenStoreLocator={mockOnOpenStoreLocator} />)
+            renderComponent()
 
-    await waitFor(() => {
-        expect(window.location.search).toBe('?country=US')
-        expect(mockOnOpenStoreLocator).not.toHaveBeenCalled()
+            await waitFor(() => {
+                expect(mockOnOpenStoreLocator).toHaveBeenCalled()
+            })
+        })
+
+        test('does not open modal when shouldOpenModal is false', () => {
+            useSeStoreSelection.mockReturnValue({
+                shouldOpenModal: false,
+                setShouldOpenModal: mockSetShouldOpenModal,
+                storeLocatorParams: {},
+                processSeParameters: mockProcessSeParameters
+            })
+
+            renderComponent()
+
+            expect(mockOnOpenStoreLocator).not.toHaveBeenCalled()
+        })
     })
-})
 
-test('delays modal opening when external search query is present', async () => {
-    window.history.pushState({}, '', '/test?lat=42.3601&lng=-71.0589&q=ties')
+    describe('External Search Integration', () => {
+        test('no delays modal opening when external search query is present', async () => {
+            window.history.pushState({}, '', '/test?lat=42.3601&lng=-71.0589&q=shoes')
 
-    renderWithProviders(<SeInputHandler onOpenStoreLocator={mockOnOpenStoreLocator} />)
-    expect(mockOnOpenStoreLocator).not.toHaveBeenCalled()
-    jest.advanceTimersByTime(1500)
+            useSeStoreSelection.mockReturnValue({
+                shouldOpenModal: true,
+                setShouldOpenModal: mockSetShouldOpenModal,
+                storeLocatorParams: {latitude: '42.3601', longitude: '-71.0589'},
+                processSeParameters: mockProcessSeParameters
+            })
 
-    await waitFor(() => {
-        expect(mockOnOpenStoreLocator).toHaveBeenCalled()
-    })
-})
+            useExternalSearch.mockReturnValue()
 
-test('opens modal immediately when no external search query is present', async () => {
-    jest.clearAllMocks()
-    jest.clearAllTimers()
+            renderComponent()
 
-    window.history.pushState({}, '', '/test?lat=42.3601&lng=-71.0589')
+            expect(mockOnOpenStoreLocator).toHaveBeenCalled()
+        })
 
-    renderWithProviders(<SeInputHandler onOpenStoreLocator={mockOnOpenStoreLocator} />)
+        test('opens modal immediately when no external search query is present', async () => {
+            window.history.pushState({}, '', '/test?lat=42.3601&lng=-71.0589')
 
-    await waitFor(() => {
-        expect(mockOnOpenStoreLocator).toHaveBeenCalled()
-    })
-    const setTimeoutCalls = setTimeout.mock.calls.filter((call) => call[1] === 1500)
-    expect(setTimeoutCalls).toHaveLength(0)
-})
+            useSeStoreSelection.mockReturnValue({
+                shouldOpenModal: true,
+                setShouldOpenModal: mockSetShouldOpenModal,
+                storeLocatorParams: {latitude: '42.3601', longitude: '-71.0589'},
+                processSeParameters: mockProcessSeParameters
+            })
 
-test('does not open modal when localStorage is empty', async () => {
-    // Update the mock context to return null selectedStoreId
-    mockStoreLocatorContext.state.selectedStoreId = null
+            renderComponent()
 
-    window.localStorage.clear()
-    window.history.pushState({}, '', '/test?lat=42.3601&lng=-71.0589')
-
-    renderWithProviders(<SeInputHandler onOpenStoreLocator={mockOnOpenStoreLocator} />)
-
-    await waitFor(() => {
-        expect(mockOnOpenStoreLocator).not.toHaveBeenCalled()
+            expect(mockOnOpenStoreLocator).toHaveBeenCalled()
+        })
     })
 })

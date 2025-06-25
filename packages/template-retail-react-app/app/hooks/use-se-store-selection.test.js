@@ -1,137 +1,312 @@
 /*
- * Copyright (c) 2021, salesforce.com, inc.
+ * Copyright (c) 2024, salesforce.com, inc.
  * All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import {STORE_LOCATOR_DEFAULT_COUNTRY_CODE} from '@salesforce/retail-react-app/app/constants'
+import {renderHook, act} from '@testing-library/react'
+import useSeStoreSelection from '@salesforce/retail-react-app/app/hooks/use-se-store-selection'
+import React from 'react'
+import {IntlProvider} from 'react-intl'
+import {BrowserRouter} from 'react-router-dom'
+import PropTypes from 'prop-types'
+import {StoreLocatorContext} from '@salesforce/retail-react-app/app/contexts/store-locator-provider'
+import {STORE_LOCATOR_DEFAULT_COUNTRY_CODE} from '../constants'
+import {useSearchStores} from '@salesforce/commerce-sdk-react'
+import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
 
-jest.mock('@salesforce/retail-react-app/app/hooks/use-se-store-selection', () => {
-    const mockHook = jest.fn(() => ({
-        isProcessing: false,
-        shouldOpenModal: false,
-        setShouldOpenModal: jest.fn(),
-        storeLocatorParams: null,
-        processSeParameters: jest.fn()
+jest.mock('@salesforce/commerce-sdk-react', () => ({
+    useSearchStores: jest.fn()
+}))
+
+jest.mock('@salesforce/retail-react-app/app/hooks/use-current-basket', () => ({
+    useCurrentBasket: jest.fn(() => ({
+        derivedData: {
+            totalItems: 0
+        }
     }))
+}))
 
-    const originalModule = jest.requireActual(
-        '@salesforce/retail-react-app/app/hooks/use-se-store-selection'
-    )
+const mockStoreLocatorContext = {
+    state: {
+        selectedStoreId: null,
+        isSeSelection: false,
+        mode: 'input',
+        formValues: {}
+    },
+    setState: jest.fn((callback) => {
+        const newState =
+            typeof callback === 'function' ? callback(mockStoreLocatorContext.state) : callback
+        mockStoreLocatorContext.state = {...mockStoreLocatorContext.state, ...newState}
+        return mockStoreLocatorContext.state
+    })
+}
 
-    return {
-        __esModule: true,
-        default: mockHook,
-        ...originalModule
-    }
-})
+const TestWrapper = ({children}) => (
+    <IntlProvider locale="en-US" defaultLocale="en-US">
+        <BrowserRouter>
+            <StoreLocatorContext.Provider value={mockStoreLocatorContext}>
+                {children}
+            </StoreLocatorContext.Provider>
+        </BrowserRouter>
+    </IntlProvider>
+)
 
-describe('useSeStoreSelection Hook Tests', () => {
+TestWrapper.propTypes = {
+    children: PropTypes.node.isRequired
+}
+
+describe('useSeStoreSelection', () => {
     beforeEach(() => {
-        window.localStorage.clear()
-    })
-
-    afterEach(() => {
         jest.clearAllMocks()
-    })
-
-    describe('Search Engine provided location parameter Detection', () => {
-        test('identifies Search Engine provided location parameters correctly', () => {
-            const seParams = new URLSearchParams('?lat=42.3601&lng=-71.0589')
-            const nonSeParams = new URLSearchParams('?product=test&page=1')
-
-            const hasSeParams = (params) =>
-                ['lat', 'lng', 'zip', 'city', 'store', 'country'].some((param) => params.has(param))
-
-            expect(hasSeParams(seParams)).toBe(true)
-            expect(hasSeParams(nonSeParams)).toBe(false)
-        })
-
-        test('validates coordinates', () => {
-            const validLat = '42.3601'
-            const invalidLat = 'invalid'
-
-            expect(!isNaN(parseFloat(validLat))).toBe(true)
-            expect(isNaN(parseFloat(invalidLat))).toBe(true)
-        })
-
-        test('handles URL encoding', () => {
-            const params = new URLSearchParams('?city=Palo%20Alto')
-            expect(params.get('city')).toBe('Palo Alto')
-        })
-    })
-
-    describe('Country Detection', () => {
-        test('uses explicit country when provided', () => {
-            const getCountry = (country) =>
-                country && country !== 'none' ? country : STORE_LOCATOR_DEFAULT_COUNTRY_CODE
-
-            expect(getCountry('US')).toBe('US')
-            expect(getCountry(null)).toBe(STORE_LOCATOR_DEFAULT_COUNTRY_CODE)
-            expect(getCountry('none')).toBe(STORE_LOCATOR_DEFAULT_COUNTRY_CODE)
-        })
-    })
-
-    describe('Store Matching', () => {
-        const stores = [
-            {id: '001', name: 'Union Square Store', city: 'San Francisco', postalCode: '94108'},
-            {id: '002', name: 'Downtown Store', city: 'Palo Alto', postalCode: '94102'}
-        ]
-
-        test('finds store by name', () => {
-            const match = stores.find((store) => store.name.toLowerCase().includes('union square'))
-            expect(match?.id).toBe('001')
-        })
-
-        test('finds store by postal code', () => {
-            const match = stores.find((store) => store.postalCode === '94102')
-            expect(match?.id).toBe('002')
-        })
-
-        test('finds store by city', () => {
-            const match = stores.find((store) => store.city.toLowerCase().includes('palo alto'))
-            expect(match?.id).toBe('002')
-        })
-    })
-
-    describe('localStorage Handling', () => {
-        test('detects Search Engine provided parameter selection', () => {
-            const storeData = {id: '123', isSeSelection: true}
-            window.localStorage.setItem('store_RefArch', JSON.stringify(storeData))
-
-            const stored = JSON.parse(window.localStorage.getItem('store_RefArch'))
-            expect(stored.isSeSelection).toBe(true)
-        })
-
-        test('handles invalid data gracefully', () => {
-            window.localStorage.setItem('store_RefArch', 'invalid')
-
-            let isValid = false
-            try {
-                JSON.parse(window.localStorage.getItem('store_RefArch'))
-                isValid = true
-            } catch (e) {
-                isValid = false
+        mockStoreLocatorContext.setState.mockClear()
+        mockStoreLocatorContext.state = {
+            selectedStoreId: null,
+            isSeSelection: false,
+            mode: 'input',
+            formValues: {}
+        }
+        useCurrentBasket.mockImplementation(() => ({
+            derivedData: {
+                totalItems: 0
             }
+        }))
+        useSearchStores.mockImplementation(() => ({
+            data: [],
+            isLoading: false,
+            error: null
+        }))
+    })
 
-            expect(isValid).toBe(false)
+    test('initializes with default values', () => {
+        const {result} = renderHook(() => useSeStoreSelection(), {
+            wrapper: TestWrapper
+        })
+
+        expect(result.current).toEqual({
+            isProcessing: false,
+            shouldOpenModal: false,
+            setShouldOpenModal: expect.any(Function),
+            storeLocatorParams: null,
+            processSeParameters: expect.any(Function)
         })
     })
 
-    describe('Parameter Validation', () => {
-        test('validates sufficient data', () => {
-            const data1 = {latitude: 42.3601, longitude: -71.0589}
-            const data2 = {storeName: 'Test Store'}
-            const data3 = {countryCode: 'US'}
+    test('handles coordinate-based search', async () => {
+        useSearchStores.mockImplementation(() => ({
+            data: {
+                data: [
+                    {
+                        id: 'store1',
+                        name: 'Test Store',
+                        latitude: 37.7749,
+                        longitude: -122.4194,
+                        postalCode: '94105',
+                        countryCode: 'US'
+                    }
+                ]
+            },
+            isLoading: false,
+            error: null
+        }))
 
-            const isValid = (data) =>
-                !!(data.latitude && data.longitude) ||
-                !!(data.storeName || data.zipcode || data.city)
-
-            expect(isValid(data1)).toBe(true)
-            expect(isValid(data2)).toBe(true)
-            expect(isValid(data3)).toBe(false)
+        const {result} = renderHook(() => useSeStoreSelection(), {
+            wrapper: TestWrapper
         })
+
+        await act(async () => {
+            const urlParams = new URLSearchParams('?lat=37.7749&lng=-122.4194')
+            await result.current.processSeParameters(urlParams)
+        })
+
+        expect(mockStoreLocatorContext.state).toEqual({
+            selectedStoreId: 'store1',
+            isSeSelection: true,
+            mode: 'input',
+            formValues: {
+                countryCode: 'US',
+                postalCode: '94105'
+            }
+        })
+    })
+
+    test('handles postal code search', async () => {
+        useSearchStores.mockImplementation(() => ({
+            data: {
+                data: [
+                    {
+                        id: 'store2',
+                        name: 'Test Store 2',
+                        postalCode: '94105',
+                        countryCode: STORE_LOCATOR_DEFAULT_COUNTRY_CODE
+                    }
+                ]
+            },
+            isLoading: false,
+            error: null
+        }))
+
+        const {result} = renderHook(() => useSeStoreSelection(), {
+            wrapper: TestWrapper
+        })
+
+        await act(async () => {
+            const urlParams = new URLSearchParams('?zip=94105')
+            await result.current.processSeParameters(urlParams)
+        })
+
+        expect(mockStoreLocatorContext.state).toEqual({
+            selectedStoreId: 'store2',
+            isSeSelection: true,
+            mode: 'input',
+            formValues: {
+                countryCode: STORE_LOCATOR_DEFAULT_COUNTRY_CODE,
+                postalCode: '94105'
+            }
+        })
+    })
+
+    test('handles city search', async () => {
+        useSearchStores.mockImplementation(() => ({
+            data: {
+                data: [
+                    {
+                        id: 'store3',
+                        name: 'Test Store 3',
+                        city: 'San Francisco',
+                        postalCode: '94105',
+                        countryCode: STORE_LOCATOR_DEFAULT_COUNTRY_CODE
+                    }
+                ]
+            },
+            isLoading: false,
+            error: null
+        }))
+
+        const {result} = renderHook(() => useSeStoreSelection(), {
+            wrapper: TestWrapper
+        })
+
+        await act(async () => {
+            const urlParams = new URLSearchParams('?city=San Francisco')
+            await result.current.processSeParameters(urlParams)
+        })
+
+        expect(mockStoreLocatorContext.state).toEqual({
+            selectedStoreId: 'store3',
+            isSeSelection: true,
+            mode: 'input',
+            formValues: {
+                countryCode: STORE_LOCATOR_DEFAULT_COUNTRY_CODE,
+                postalCode: '94105'
+            }
+        })
+    })
+
+    test('handles empty store data', async () => {
+        useSearchStores.mockImplementation(() => ({
+            data: {
+                data: []
+            },
+            isLoading: false,
+            error: null
+        }))
+
+        const {result} = renderHook(() => useSeStoreSelection(), {
+            wrapper: TestWrapper
+        })
+
+        await act(async () => {
+            const urlParams = new URLSearchParams('?zip=94105')
+            await result.current.processSeParameters(urlParams)
+        })
+
+        expect(mockStoreLocatorContext.state).toEqual({
+            selectedStoreId: null,
+            isSeSelection: false,
+            mode: 'input',
+            formValues: {}
+        })
+    })
+
+    test('handles loading state', async () => {
+        useSearchStores.mockImplementation(() => ({
+            data: null,
+            isLoading: true,
+            error: null
+        }))
+
+        const {result} = renderHook(() => useSeStoreSelection(), {
+            wrapper: TestWrapper
+        })
+
+        await act(async () => {
+            const urlParams = new URLSearchParams('?zip=94105')
+            await result.current.processSeParameters(urlParams)
+        })
+
+        expect(result.current.isProcessing).toBe(true)
+    })
+
+    test('handles error case', async () => {
+        jest.spyOn(console, 'error').mockImplementation(() => {})
+        useSearchStores.mockImplementation(() => ({
+            data: null,
+            isLoading: false,
+            error: new Error('API Error')
+        }))
+
+        const {result} = renderHook(() => useSeStoreSelection(), {
+            wrapper: TestWrapper
+        })
+
+        await act(async () => {
+            const urlParams = new URLSearchParams('?zip=94105')
+            await result.current.processSeParameters(urlParams)
+        })
+
+        expect(mockStoreLocatorContext.state).toEqual({
+            selectedStoreId: null,
+            isSeSelection: false,
+            mode: 'input',
+            formValues: {}
+        })
+        console.error.mockRestore()
+    })
+
+    test('handles basket integration', async () => {
+        useCurrentBasket.mockImplementation(() => ({
+            derivedData: {
+                totalItems: 2
+            }
+        }))
+
+        useSearchStores.mockImplementation(() => ({
+            data: {
+                data: [
+                    {
+                        id: 'store1',
+                        name: 'Test Store',
+                        postalCode: '94105',
+                        countryCode: STORE_LOCATOR_DEFAULT_COUNTRY_CODE
+                    }
+                ]
+            },
+            isLoading: false,
+            error: null
+        }))
+
+        const {result} = renderHook(() => useSeStoreSelection(), {
+            wrapper: TestWrapper
+        })
+
+        await act(async () => {
+            const urlParams = new URLSearchParams('?zip=94105')
+            await result.current.processSeParameters(urlParams)
+            result.current.setShouldOpenModal(true)
+        })
+
+        expect(result.current.shouldOpenModal).toBe(true)
     })
 })

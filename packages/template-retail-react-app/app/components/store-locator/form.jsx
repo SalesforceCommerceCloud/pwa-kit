@@ -27,6 +27,7 @@ export const StoreLocatorForm = () => {
     const {store: selectedStore} = useSelectedStore()
     const {derivedData} = useCurrentBasket()
     const initialLoadDone = useRef(false)
+    const shouldUseLocation = useRef(false)
 
     const hasItemsInBasket = derivedData?.totalItems > 0
 
@@ -55,8 +56,9 @@ export const StoreLocatorForm = () => {
     }, [selectedStore, reset, setFormValues, formValues.postalCode])
 
     useEffect(() => {
-        if (coordinates.latitude && coordinates.longitude) {
+        if (coordinates.latitude && coordinates.longitude && shouldUseLocation.current) {
             setDeviceCoordinates(coordinates)
+            shouldUseLocation.current = false
         }
     }, [coordinates])
 
@@ -107,7 +109,10 @@ export const StoreLocatorForm = () => {
                                             {config.supportedCountries.map(
                                                 ({countryCode, countryName}) => {
                                                     return (
-                                                        <option value={countryCode} key={countryCode}>
+                                                        <option
+                                                            value={countryCode}
+                                                            key={countryCode}
+                                                        >
                                                             {countryName}
                                                         </option>
                                                     )
@@ -148,7 +153,13 @@ export const StoreLocatorForm = () => {
                             )
                         }}
                     />
-                    <Button key="find-button" type="submit" width="15%" marginLeft={2} variant="solid">
+                    <Button
+                        key="find-button"
+                        type="submit"
+                        width="15%"
+                        marginLeft={2}
+                        variant="solid"
+                    >
                         Find
                     </Button>
                 </InputGroup>
@@ -161,6 +172,7 @@ export const StoreLocatorForm = () => {
                 <Button
                     onClick={() => {
                         clearForm()
+                        shouldUseLocation.current = true
                         refresh()
                     }}
                     width="100%"

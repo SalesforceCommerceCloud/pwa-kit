@@ -56,7 +56,7 @@ export const useStoreLocator = () => {
     const {data, isLoading} = useStores(state)
 
     useEffect(() => {
-        if (data?.data?.length > 0 && state.mode === 'input' && !state.isSeSelection) {
+        if (data?.data?.length > 0 && !state.isSeSelection) {
             const nearestStore = data.data[0]
             setState((prev) => ({
                 ...prev,
@@ -64,7 +64,7 @@ export const useStoreLocator = () => {
                 isSeSelection: true
             }))
         }
-    }, [data?.data, state.mode, state.isSeSelection])
+    }, [data?.data, state.isSeSelection])
 
     const setFormValues = (formValues) => {
         setState((prev) => ({

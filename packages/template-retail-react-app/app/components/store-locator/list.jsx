@@ -97,7 +97,7 @@ export const StoreLocatorList = () => {
             >
                 {displayStoreLocatorStatusMessage()}
             </Box>
-            
+
             <Box as="fieldset" disabled={hasItemsInBasket} opacity={hasItemsInBasket ? 0.5 : 1}>
                 <Accordion allowMultiple flex={[1, 1, 1, 5]}>
                     <AccordionItem>
