@@ -7,12 +7,14 @@
 import {UseQueryResult} from '@tanstack/react-query'
 import {ShopperSearch} from 'commerce-sdk-isomorphic'
 import {ApiClients, ApiQueryOptions, Argument, DataType, NullableParameters} from '../types'
-import useCommerceApi from '../useCommerceApi'
 import {useQuery} from '../useQuery'
 import {mergeOptions, omitNullableParameters, pickValidParams} from '../utils'
 import * as queryKeyHelpers from './queryKeyHelpers'
+import {CLIENT_KEYS} from '../../constant'
+import useCommerceApi from '../useCommerceApi'
 
-type Client = ApiClients['shopperSearch']
+const CLIENT_KEY = CLIENT_KEYS.SHOPPER_SEARCH
+type Client = NonNullable<ApiClients[typeof CLIENT_KEY]>
 
 /**
  * Provides keyword and refinement search functionality for products.
@@ -34,7 +36,7 @@ export const useProductSearch = (
 ): UseQueryResult<DataType<Client['productSearch']>> => {
     type Options = Argument<Client['productSearch']>
     type Data = DataType<Client['productSearch']>
-    const {shopperSearch: client} = useCommerceApi()
+    const client = useCommerceApi(CLIENT_KEY)
     const methodName = 'productSearch'
     const requiredParameters = ShopperSearch.paramKeys[`${methodName}Required`]
 
@@ -78,7 +80,7 @@ export const useSearchSuggestions = (
 ): UseQueryResult<DataType<Client['getSearchSuggestions']>> => {
     type Options = Argument<Client['getSearchSuggestions']>
     type Data = DataType<Client['getSearchSuggestions']>
-    const {shopperSearch: client} = useCommerceApi()
+    const client = useCommerceApi(CLIENT_KEY)
     const methodName = 'getSearchSuggestions'
     const requiredParameters = ShopperSearch.paramKeys[`${methodName}Required`]
 

@@ -22,6 +22,7 @@ import {useCustomerBaskets} from '../ShopperCustomers'
 import {ApiClients, Argument} from '../types'
 import {ShopperBasketsMutation, useShopperBasketsMutation} from './mutation'
 import * as queries from './query'
+import {CLIENT_KEYS} from '../../constant'
 
 jest.mock('../../auth/index.ts', () => {
     const {default: mockAuth} = jest.requireActual('../../auth/index.ts')
@@ -29,7 +30,8 @@ jest.mock('../../auth/index.ts', () => {
     return mockAuth
 })
 
-type Client = ApiClients['shopperBaskets']
+const CLIENT_KEY = CLIENT_KEYS.SHOPPER_BASKETS
+type Client = NonNullable<ApiClients[typeof CLIENT_KEY]>
 type Basket = ShopperBasketsTypes.Basket
 type BasketsResult = ShopperCustomersTypes.BasketsResult
 
@@ -52,8 +54,9 @@ const newBasket: Basket = {basketId: BASKET_ID, mockData: 'new basket'}
 // --- getCustomerBaskets constants --- //
 const customersEndpoint = '/customer/shopper-customers/'
 const CUSTOMER_ID = 'customer_id'
-// Can't use `makeOptions()` here because it's Shopper Customers, not Shopper Baskets
-const getCustomerBasketsOptions: Argument<ApiClients['shopperCustomers']['getCustomerBaskets']> = {
+const getCustomerBasketsOptions: Argument<
+    NonNullable<ApiClients['shopperCustomers']>['getCustomerBaskets']
+> = {
     parameters: {
         customerId: CUSTOMER_ID
     }

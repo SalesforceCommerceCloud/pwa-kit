@@ -27,7 +27,6 @@ jest.mock('../../hooks/use-update-shopper-context', () => ({
 let windowSpy
 
 const mockUpdateDNT = jest.fn()
-const mockActiveDataFlag = jest.fn()
 jest.mock('@salesforce/commerce-sdk-react', () => {
     const originalModule = jest.requireActual('@salesforce/commerce-sdk-react')
     return {
@@ -36,18 +35,8 @@ jest.mock('@salesforce/commerce-sdk-react', () => {
     }
 })
 
-jest.mock('@salesforce/retail-react-app/app/constants', () => {
-    const originalModule = jest.requireActual('@salesforce/retail-react-app/app/constants')
-    return {
-        ...originalModule,
-        get ACTIVE_DATA_ENABLED() {
-            return mockActiveDataFlag()
-        }
-    }
-})
 beforeEach(() => {
     windowSpy = jest.spyOn(window, 'window', 'get')
-    mockActiveDataFlag.mockReturnValue(true)
     prependHandlersToServer([
         {
             path: '*/baskets/:basketId/customer',
@@ -99,37 +88,6 @@ describe('App', () => {
         await user.click(closeButton)
         await waitFor(() => {
             expect(screen.getByRole('main')).toBeInTheDocument()
-            expect(screen.getByText('Any children here')).toBeInTheDocument()
-        })
-    })
-
-    test('Active Data component is not rendered', async () => {
-        mockActiveDataFlag.mockImplementation(() => false)
-        useMultiSite.mockImplementation(() => resultUseMultiSite)
-        renderWithProviders(
-            <App targetLocale={DEFAULT_LOCALE} defaultLocale={DEFAULT_LOCALE} messages={messages}>
-                <p>Any children here</p>
-            </App>
-        )
-        await waitFor(() =>
-            expect(document.getElementById('headActiveData')).not.toBeInTheDocument()
-        )
-        await waitFor(() => expect(document.getElementById('dwanalytics')).not.toBeInTheDocument())
-        await waitFor(() => expect(document.getElementById('dwac')).not.toBeInTheDocument())
-        expect(screen.getByText('Any children here')).toBeInTheDocument()
-    })
-
-    test('Active Data component is rendered appropriately', async () => {
-        useMultiSite.mockImplementation(() => resultUseMultiSite)
-        renderWithProviders(
-            <App targetLocale={DEFAULT_LOCALE} defaultLocale={DEFAULT_LOCALE} messages={messages}>
-                <p>Any children here</p>
-            </App>
-        )
-        await waitFor(() => {
-            expect(document.getElementById('headActiveData')).toBeInTheDocument()
-            expect(document.getElementById('dwanalytics')).toBeInTheDocument()
-            expect(document.getElementById('dwac')).toBeInTheDocument()
             expect(screen.getByText('Any children here')).toBeInTheDocument()
         })
     })

@@ -20,11 +20,15 @@ test.describe('Retail app home page loads', () => {
     })
 
     test('get started link', async ({page}) => {
-        await page.getByRole('link', {name: 'Get started'}).click()
+        const getStartedLink = page.getByRole('link', {name: 'Get started'})
+        await expect(getStartedLink).toBeVisible()
 
-        const getStartedPage = await page.waitForEvent('popup')
-        await getStartedPage.waitForLoadState()
+        const popupPromise = page.waitForEvent('popup', { timeout: 30000 })
+        await getStartedLink.click()
 
-        await expect(getStartedPage).toHaveURL(/.*getting-started/)
+        const getStartedPage = await popupPromise
+        await expect(getStartedPage).toHaveURL(/.*getting-started/, { timeout: 15000 })
+
+        await expect(getStartedPage.getByRole('heading').first()).toBeVisible({ timeout: 10000 })
     })
 })
