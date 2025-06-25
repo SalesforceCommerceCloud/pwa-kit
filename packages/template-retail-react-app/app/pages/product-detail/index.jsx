@@ -101,7 +101,8 @@ const ProductDetail = () => {
         addInventoryIdsToPickupItems,
         getPickupShippingMethodId,
         getDefaultShippingMethodId,
-        isCurrentShippingMethodPickup
+        isCurrentShippingMethodPickup,
+        hasPickupItems
     } = usePickupShipment()
 
     // Hook for shipping methods - we'll use refetch when needed
@@ -325,9 +326,9 @@ const ProductDetail = () => {
 
     /**************** Add To Cart ****************/
     const showToast = useToast()
-    const showError = () => {
+    const showError = (errorMessage) => {
         showToast({
-            title: formatMessage(API_ERROR_MESSAGE),
+            title: errorMessage || formatMessage(API_ERROR_MESSAGE),
             status: 'error'
         })
     }
@@ -355,7 +356,6 @@ const ProductDetail = () => {
                     quantity
                 }
             })
-
             // Add inventory IDs for pickup items using the hook helper
             productItems = addInventoryIdsToPickupItems(
                 productItems,
@@ -380,20 +380,44 @@ const ProductDetail = () => {
                 return
             }
 
+            // Check if any products have pickup selected
+            const hasAnyPickupSelected = hasPickupItems(
+                productSelectionValues,
+                pickupInStoreMap,
+                product
+            )
+
+            const currentShippingMethodIsPickup = isCurrentShippingMethodPickup(
+                basket?.shipments?.[0]?.shippingMethod
+            )
+            // Only perform the check if the basket exists and has at least one item
+            if (basket && basket.productItems?.length > 0) {
+                if (hasAnyPickupSelected && !currentShippingMethodIsPickup) {
+                    throw new Error(
+                        formatMessage({
+                            id: 'product_view.error.select_ship_to_address',
+                            defaultMessage:
+                                "Please select 'Ship to Address' to match the shipping method for your other items."
+                        })
+                    )
+                }
+                if (!hasAnyPickupSelected && currentShippingMethodIsPickup) {
+                    throw new Error(
+                        formatMessage({
+                            id: 'product_view.error.select_pickup_in_store',
+                            defaultMessage:
+                                "Please select 'Pickup in Store' to match the shipping method for your other items."
+                        })
+                    )
+                }
+            }
+
             const basketResponse = await addItemToNewOrExistingBasket(productItems)
 
             // Configure shipping method based on pickup selection
             if (basketResponse?.basketId && basketResponse.shipments.length > 0) {
                 const currentShippingMethod = basketResponse.shipments[0].shippingMethod
                 const isCurrentlyPickup = isCurrentShippingMethodPickup(currentShippingMethod)
-
-                // Check if any products have pickup selected
-                const hasAnyPickupSelected = productSelectionValues.some((item) => {
-                    const prodKey =
-                        (item.variant || item.product || product).productId ||
-                        (item.variant || item.product || product).id
-                    return pickupInStoreMap[prodKey]
-                })
 
                 if (hasAnyPickupSelected && !isCurrentlyPickup) {
                     // Fetch shipping methods to get available options
@@ -428,7 +452,7 @@ const ProductDetail = () => {
             addToCartModal.onOpen({product, itemsAdded: productSelectionValues})
             return productSelectionValues
         } catch (error) {
-            showError(error)
+            showError(error.message)
         }
     }
 
@@ -487,6 +511,49 @@ const ProductDetail = () => {
 
         try {
             const childProductSelections = Object.values(childProductSelection)
+            // Check if any products have pickup selected (including main product and bundle items)
+            const bundleSelectionValues = [
+                {product, variant: null, quantity},
+                ...childProductSelections
+            ]
+            const hasAnyPickupSelected = hasPickupItems(
+                bundleSelectionValues,
+                pickupInStoreMap,
+                product
+            )
+
+            // Check for delivery method conflicts before adding to cart
+            if (basket && basket.productItems?.length > 0) {
+                const currentShippingMethod = basket?.shipments?.[0]?.shippingMethod
+                const currentShippingMethodIsPickup =
+                    isCurrentShippingMethodPickup(currentShippingMethod)
+
+                // If there's no shipping method, treat it as non-pickup (ship to address)
+                if (
+                    hasAnyPickupSelected &&
+                    (!currentShippingMethod || !currentShippingMethodIsPickup)
+                ) {
+                    throw new Error(
+                        formatMessage({
+                            id: 'product_view.error.select_ship_to_address',
+                            defaultMessage:
+                                "Please select 'Ship to Address' to match the shipping method for your other items."
+                        })
+                    )
+                } else if (
+                    !hasAnyPickupSelected &&
+                    currentShippingMethod &&
+                    currentShippingMethodIsPickup
+                ) {
+                    throw new Error(
+                        formatMessage({
+                            id: 'product_view.error.select_pickup_in_store',
+                            defaultMessage:
+                                "Please select 'Pickup in Store' to match the shipping method for your other items."
+                        })
+                    )
+                }
+            }
 
             let productItems = [
                 {
@@ -538,11 +605,6 @@ const ProductDetail = () => {
             if (res.basketId && res.shipments.length > 0) {
                 const currentShippingMethod = res.shipments[0].shippingMethod
                 const isCurrentlyPickup = isCurrentShippingMethodPickup(currentShippingMethod)
-
-                // Check if any products have pickup selected (including bundle items)
-                const hasAnyPickupSelected =
-                    pickupInStoreMap[product.id] ||
-                    childProductSelections.some((child) => pickupInStoreMap[child.product.id])
 
                 // Fetch shipping methods to get available options
                 const {data: fetchedShippingMethods} = await refetchShippingMethods()

@@ -6311,6 +6311,34 @@
       "value": "]"
     }
   ],
+  "product_view.error.select_pickup_in_store": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ƥŀḗḗȧȧşḗḗ şḗḗŀḗḗƈŧ 'Ƥīƈķŭŭƥ īƞ Şŧǿǿřḗḗ' ŧǿǿ ḿȧȧŧƈħ ŧħḗḗ şħīƥƥīƞɠ ḿḗḗŧħǿǿḓ ƒǿǿř ẏǿǿŭŭř ǿǿŧħḗḗř īŧḗḗḿş."
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "product_view.error.select_ship_to_address": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ƥŀḗḗȧȧşḗḗ şḗḗŀḗḗƈŧ 'Şħīƥ ŧǿǿ Ȧḓḓřḗḗşş' ŧǿǿ ḿȧȧŧƈħ ŧħḗḗ şħīƥƥīƞɠ ḿḗḗŧħǿǿḓ ƒǿǿř ẏǿǿŭŭř ǿǿŧħḗḗř īŧḗḗḿş."
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
   "product_view.label.assistive_msg.quantity_decrement": [
     {
       "type": 0,

@@ -523,3 +523,51 @@ describe('ProductView stock status messages', () => {
         expect(button).toHaveTextContent(storeName)
     })
 })
+
+describe('ProductView showDeliveryOptions property', () => {
+    const siteId = 'site-1'
+    const storeInfoKey = `store_${siteId}`
+    const inventoryId = 'inventory_m_store_store1'
+
+    beforeEach(() => {
+        // Set up localStorage with inventoryId to enable pickup option
+        window.localStorage.setItem(storeInfoKey, JSON.stringify({inventoryId}))
+    })
+
+    afterEach(() => {
+        window.localStorage.clear()
+    })
+
+    test('shows delivery options when showDeliveryOptions is true (default)', async () => {
+        renderWithProviders(
+            <MockComponent product={mockProductDetail} showDeliveryOptions={true} />
+        )
+
+        // Delivery options should be visible
+        expect(screen.getByText(/Delivery:/i)).toBeInTheDocument()
+        expect(screen.getByRole('radio', {name: /ship to address/i})).toBeInTheDocument()
+        expect(screen.getByRole('radio', {name: /pickup in store/i})).toBeInTheDocument()
+    })
+
+    test('hides delivery options when showDeliveryOptions is false', async () => {
+        renderWithProviders(
+            <MockComponent product={mockProductDetail} showDeliveryOptions={false} />
+        )
+
+        // Delivery options should not be visible
+        expect(screen.queryByText(/Delivery:/i)).not.toBeInTheDocument()
+        expect(screen.queryByRole('radio', {name: /ship to address/i})).not.toBeInTheDocument()
+        expect(screen.queryByRole('radio', {name: /pickup in store/i})).not.toBeInTheDocument()
+        expect(screen.queryByTestId('store-stock-status-msg')).not.toBeInTheDocument()
+        expect(screen.queryByTestId('pickup-select-store-msg')).not.toBeInTheDocument()
+    })
+
+    test('shows delivery options when showDeliveryOptions is not provided (defaults to true)', async () => {
+        renderWithProviders(<MockComponent product={mockProductDetail} />)
+
+        // Delivery options should be visible by default
+        expect(screen.getByText(/Delivery:/i)).toBeInTheDocument()
+        expect(screen.getByRole('radio', {name: /ship to address/i})).toBeInTheDocument()
+        expect(screen.getByRole('radio', {name: /pickup in store/i})).toBeInTheDocument()
+    })
+})
