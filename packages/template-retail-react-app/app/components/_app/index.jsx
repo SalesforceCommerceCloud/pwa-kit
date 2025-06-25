@@ -47,7 +47,7 @@ import {DrawerMenu} from '@salesforce/retail-react-app/app/components/drawer-men
 import {ListMenu, ListMenuContent} from '@salesforce/retail-react-app/app/components/list-menu'
 import {HideOnDesktop, HideOnMobile} from '@salesforce/retail-react-app/app/components/responsive'
 import AboveHeader from '@salesforce/retail-react-app/app/components/_app/partials/above-header'
-import {StoreLocatorModal} from '@salesforce/retail-react-app/app/components/store-locator'
+import StoreLocatorModal from '@salesforce/retail-react-app/app/components/store-locator-modal'
 // Hooks
 import {AuthModal, useAuthModal} from '@salesforce/retail-react-app/app/hooks/use-auth-modal'
 import {
@@ -75,7 +75,8 @@ import {
     THEME_COLOR,
     CAT_MENU_DEFAULT_NAV_SSR_DEPTH,
     CAT_MENU_DEFAULT_ROOT_CATEGORY,
-    DEFAULT_LOCALE
+    DEFAULT_LOCALE,
+    ACTIVE_DATA_ENABLED
 } from '@salesforce/retail-react-app/app/constants'
 
 import Seo from '@salesforce/retail-react-app/app/components/seo'
@@ -291,6 +292,15 @@ const App = (props) => {
     return (
         <Box className="sf-app" {...styles.container}>
             <StorefrontPreview getToken={getTokenWhenReady}>
+                <Helmet>
+                    {ACTIVE_DATA_ENABLED && (
+                        <script
+                            src={getAssetUrl('static/head-active_data.js')}
+                            id="headActiveData"
+                            type="text/javascript"
+                        ></script>
+                    )}
+                </Helmet>
                 <IntlProvider
                     onError={(err) => {
                         if (!messages) {
@@ -449,6 +459,23 @@ const App = (props) => {
                         </Box>
                     </CurrencyProvider>
                 </IntlProvider>
+                {ACTIVE_DATA_ENABLED && (
+                    <script
+                        type="text/javascript"
+                        src={getAssetUrl('static/dwanalytics-22.2.js')}
+                        id="dwanalytics"
+                        async="async"
+                        onLoad={trackPage}
+                    ></script>
+                )}
+                {ACTIVE_DATA_ENABLED && (
+                    <script
+                        src={getAssetUrl('static/dwac-21.7.js')}
+                        type="text/javascript"
+                        id="dwac"
+                        async="async"
+                    ></script>
+                )}
             </StorefrontPreview>
         </Box>
     )
