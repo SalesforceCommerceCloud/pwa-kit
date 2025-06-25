@@ -13,6 +13,7 @@
 - PDP / PLP: Add page meta data tags that have been defined in BM [#2232](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2232)
 - Send PWA Kit events to Data Cloud [#2318](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2318)
 - Fix dependencies vulnerabilities [#2338](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2338)
+- Integrate Service Cloud's Messaging In App and Web (MIAW) chat service with commerce AI shopping agent [#2416](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2416)
 - Fix accessibility issues [#2375](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2375)
 - Update cc-datacloud-typescript package to use a fixed lock version [#2392](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2392)
 - Add Confirm New Password input field to Reset & Change Password flows [#2395](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2395)
