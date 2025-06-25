@@ -419,13 +419,6 @@ const ProductView = forwardRef(
             setPickupEnabled(!!selectedStore?.inventoryId)
         }, [selectedStore?.inventoryId])
 
-        const showError = (error) => {
-            showToast({
-                title: error?.message || 'An error occurred',
-                status: 'error'
-            })
-        }
-
         const handleDeliveryOptionChange = (value) => {
             setPickupInStore(value === 'pickup')
         }
