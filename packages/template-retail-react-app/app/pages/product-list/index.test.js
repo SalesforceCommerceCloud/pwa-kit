@@ -22,7 +22,7 @@ import {
 import ProductList from '.'
 import EmptySearchResults from '@salesforce/retail-react-app/app/pages/product-list/partials/empty-results'
 import {useProductSearch, useCategory} from '@salesforce/commerce-sdk-react'
-import {getSelectedStoreData} from '@salesforce/retail-react-app/app/utils/store-locator-utils'
+import {useSelectedStore} from '@salesforce/retail-react-app/app/hooks/use-selected-store'
 
 const MOCK_USE_QUERY_RESULT = {
     data: undefined,
@@ -58,8 +58,8 @@ jest.mock('@salesforce/commerce-sdk-react', () => {
     }
 })
 
-jest.mock('@salesforce/retail-react-app/app/utils/store-locator-utils', () => ({
-    getSelectedStoreData: jest.fn()
+jest.mock('@salesforce/retail-react-app/app/hooks/use-selected-store', () => ({
+    useSelectedStore: jest.fn()
 }))
 
 let mockProductListSearchResponse = mockProductSearch
@@ -109,6 +109,12 @@ beforeEach(() => {
     useCategory.mockImplementation(() => ({
         data: mockCategories.root.categories[0].categories[0]
     }))
+    useSelectedStore.mockReturnValue({
+        store: null,
+        isLoading: false,
+        error: null,
+        hasSelectedStore: false
+    })
 })
 
 afterEach(() => {
@@ -350,7 +356,12 @@ test('should filter by inventory when inventory filter is clicked', async () => 
         inventoryId: 'inventory_m_store_store12'
     }
 
-    getSelectedStoreData.mockReturnValue(mockStoreData)
+    useSelectedStore.mockReturnValue({
+        store: mockStoreData,
+        isLoading: false,
+        error: null,
+        hasSelectedStore: true
+    })
 
     window.history.pushState({}, 'ProductList', '/uk/en-GB/category/mens-clothing-jackets')
     const {user} = renderWithProviders(<MockedComponent />, {

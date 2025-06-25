@@ -35,13 +35,13 @@ import useEinstein from '@salesforce/retail-react-app/app/hooks/use-einstein'
 import useDataCloud from '@salesforce/retail-react-app/app/hooks/use-datacloud'
 import useActiveData from '@salesforce/retail-react-app/app/hooks/use-active-data'
 import {useServerContext} from '@salesforce/pwa-kit-react-sdk/ssr/universal/hooks'
-import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
 import usePickupShipment from '@salesforce/retail-react-app/app/hooks/use-pickup-shipment'
+import {useSelectedStore} from '@salesforce/retail-react-app/app/hooks/use-selected-store'
 // Project Components
 import RecommendedProducts from '@salesforce/retail-react-app/app/components/recommended-products'
 import ProductView from '@salesforce/retail-react-app/app/components/product-view'
 import InformationAccordion from '@salesforce/retail-react-app/app/pages/product-detail/partials/information-accordion'
-import StoreLocatorModal from '@salesforce/retail-react-app/app/components/store-locator-modal'
+import {StoreLocatorModal} from '@salesforce/retail-react-app/app/components/store-locator'
 
 import {HTTPNotFound, HTTPError} from '@salesforce/pwa-kit-react-sdk/ssr/universal/errors'
 import logger from '@salesforce/retail-react-app/app/utils/logger-instance'
@@ -73,39 +73,11 @@ const ProductDetail = () => {
     const toast = useToast()
     const navigate = useNavigation()
     const customerId = useCustomerId()
-    const {site} = useMultiSite()
-    const storeInfoKey = `store_${site.id}`
     const {
         isOpen: isStoreLocatorOpen,
         onOpen: onOpenStoreLocator,
         onClose: onCloseStoreLocator
     } = useDisclosure()
-
-    // --- Add state for inventoryId ---
-    const [selectedInventoryId, setSelectedInventoryId] = useState(() => {
-        try {
-            return JSON.parse(window.localStorage.getItem(storeInfoKey))?.inventoryId || null
-        } catch (e) {
-            return null
-        }
-    })
-
-    // --- Listen for store changes in localStorage ---
-    useEffect(() => {
-        function handleStorageChange() {
-            try {
-                setSelectedInventoryId(
-                    JSON.parse(window.localStorage.getItem(storeInfoKey))?.inventoryId || null
-                )
-            } catch (e) {
-                setSelectedInventoryId(null)
-            }
-        }
-        window.addEventListener('storage', handleStorageChange)
-        // Also update on mount in case store was changed in this tab
-        handleStorageChange()
-        return () => window.removeEventListener('storage', handleStorageChange)
-    }, [storeInfoKey])
 
     /****************************** Basket *********************************/
     const {data: basket, isLoading: isBasketLoading} = useCurrentBasket()
@@ -120,6 +92,9 @@ const ProductDetail = () => {
     }
 
     /*************************** Pick up in Store ********************/
+    const {store: selectedStore} = useSelectedStore()
+    const selectedInventoryId = selectedStore?.inventoryId || null
+
     const {
         configurePickupShipment,
         configureRegularShippingMethod,
@@ -383,7 +358,11 @@ const ProductDetail = () => {
             })
 
             // Add inventory IDs for pickup items using the hook helper
-            productItems = addInventoryIdsToPickupItems(productItems, pickupInStoreMap)
+            productItems = addInventoryIdsToPickupItems(
+                productItems,
+                pickupInStoreMap,
+                selectedStore
+            )
             // Defensive check: This block ensures that if, for any reason, pickup is selected for a product but no store (inventoryId) is set,
             // we show an error. With the current UI logic, this should never be reached, but it guards against unexpected state.
             if (
@@ -453,9 +432,14 @@ const ProductDetail = () => {
 
                     // Configure pickup shipment if pickup is selected but current method is not pickup
                     const pickupShippingMethodId = getPickupShippingMethodId(fetchedShippingMethods)
-                    await configurePickupShipment(basketResponse.basketId, productItems, {
-                        pickupShippingMethodId
-                    })
+                    await configurePickupShipment(
+                        basketResponse.basketId,
+                        productItems,
+                        selectedStore,
+                        {
+                            pickupShippingMethodId
+                        }
+                    )
                 } else if (!hasAnyPickupSelected && isCurrentlyPickup) {
                     // Fetch shipping methods to get available options
                     const {data: fetchedShippingMethods} = await refetchShippingMethods()
@@ -593,7 +577,11 @@ const ProductDetail = () => {
             ]
 
             // Add inventory IDs for pickup items using the hook helper
-            productItems = addInventoryIdsToPickupItems(productItems, pickupInStoreMap)
+            productItems = addInventoryIdsToPickupItems(
+                productItems,
+                pickupInStoreMap,
+                selectedStore
+            )
 
             const res = await addItemToNewOrExistingBasket(productItems)
             const bundleChildMasterIds = childProductSelections.map((child) => {
@@ -631,7 +619,7 @@ const ProductDetail = () => {
                 if (hasAnyPickupSelected && !isCurrentlyPickup) {
                     // Configure pickup shipment if pickup is selected but current method is not pickup
                     const pickupShippingMethodId = getPickupShippingMethodId(fetchedShippingMethods)
-                    await configurePickupShipment(res.basketId, productItems, {
+                    await configurePickupShipment(res.basketId, productItems, selectedStore, {
                         pickupShippingMethodId
                     })
                 } else if (!hasAnyPickupSelected && isCurrentlyPickup) {

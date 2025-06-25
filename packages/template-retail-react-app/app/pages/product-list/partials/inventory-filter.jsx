@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, {useEffect, useState} from 'react'
+import React from 'react'
 import {useIntl, FormattedMessage} from 'react-intl'
 import PropTypes from 'prop-types'
 import {
@@ -15,25 +15,15 @@ import {
     Text,
     useDisclosure
 } from '@salesforce/retail-react-app/app/components/shared/ui'
-import StoreLocatorModal from '@salesforce/retail-react-app/app/components/store-locator-modal'
-import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
-import {getSelectedStoreData} from '@salesforce/retail-react-app/app/utils/store-locator-utils'
+import {StoreLocatorModal} from '@salesforce/retail-react-app/app/components/store-locator'
+import {useSelectedStore} from '@salesforce/retail-react-app/app/hooks/use-selected-store'
 
 const StoreInventoryFilter = ({toggleFilter, selectedFilters}) => {
-    const [selectedStore, setSelectedStore] = useState(null)
     const {isOpen, onOpen, onClose} = useDisclosure()
-    const {site} = useMultiSite()
     const {formatMessage} = useIntl()
+    const {store: selectedStore} = useSelectedStore()
 
     const isChecked = selectedFilters?.ilids !== undefined
-
-    useEffect(() => {
-        const storeInfo = getSelectedStoreData(site?.id)
-
-        if (storeInfo?.name && storeInfo?.inventoryId) {
-            setSelectedStore(storeInfo)
-        }
-    }, [site?.id])
 
     const handleCheckboxChange = (e) => {
         // If no store is selected or no inventoryId, open store locator
@@ -56,13 +46,9 @@ const StoreInventoryFilter = ({toggleFilter, selectedFilters}) => {
     }
 
     const handleStoreLocatorClose = () => {
-        const storeInfo = getSelectedStoreData(site?.id)
-
-        if (storeInfo?.name && storeInfo?.inventoryId) {
-            setSelectedStore(storeInfo)
-
-            // Apply the filter when a store is selected from the locator
-            toggleFilter({value: storeInfo.inventoryId}, 'ilids', false, false)
+        // Apply the filter when a store is selected from the locator and the modal closes
+        if (selectedStore?.inventoryId) {
+            toggleFilter({value: selectedStore.inventoryId}, 'ilids', false, false)
         }
 
         onClose()

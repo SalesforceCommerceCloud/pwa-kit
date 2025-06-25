@@ -15,7 +15,8 @@ import {
     GridItem,
     Container,
     useDisclosure,
-    Button
+    Button,
+    Text
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 
 // Project Components
@@ -54,7 +55,8 @@ import {
     useShopperBasketsMutation,
     useShippingMethodsForShipment,
     useProducts,
-    useShopperCustomersMutation
+    useShopperCustomersMutation,
+    useStores
 } from '@salesforce/commerce-sdk-react'
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
 import UnavailableProductConfirmationModal from '@salesforce/retail-react-app/app/components/unavailable-product-confirmation-modal'
@@ -75,6 +77,22 @@ const getSelectedInventoryId = (siteId) => {
 
 const Cart = () => {
     const {data: basket, isLoading} = useCurrentBasket()
+
+    // Pickup in Store
+    const isPickupOrder = basket?.shipments[0]?.shippingMethod?.c_storePickupEnabled === true
+    const storeId = basket?.shipments?.[0]?.c_fromStoreId
+    const {data: storeData} = useStores(
+        {
+            parameters: {
+                ids: storeId
+            }
+        },
+        {
+            enabled: !!storeId
+        }
+    )
+    const storeName = storeData?.data?.[0]?.name
+
     const {site} = useMultiSite()
     const selectedInventoryId = getSelectedInventoryId(site?.id)
     const productIds = basket?.productItems?.map(({productId}) => productId).join(',') ?? ''
@@ -589,13 +607,32 @@ const Cart = () => {
                 <Stack spacing={24}>
                     <Stack spacing={4}>
                         <CartTitle />
-
                         <Grid
                             templateColumns={{base: '1fr', lg: '66% 1fr'}}
                             gap={{base: 10, xl: 20}}
                         >
                             <GridItem>
                                 <Stack spacing={4}>
+                                    <Box layerStyle="cardBordered" p={3}>
+                                        {isPickupOrder ? (
+                                            <Text fontWeight="bold">
+                                                <FormattedMessage
+                                                    defaultMessage="Pickup in Store ({storeName})"
+                                                    id="cart.order_type.pickup_in_store"
+                                                    values={{
+                                                        storeName
+                                                    }}
+                                                />
+                                            </Text>
+                                        ) : (
+                                            <Text fontWeight="bold">
+                                                <FormattedMessage
+                                                    defaultMessage="Delivery"
+                                                    id="cart.order_type.delivery"
+                                                />
+                                            </Text>
+                                        )}
+                                    </Box>
                                     {basket.productItems?.map((productItem, idx) => {
                                         return (
                                             <ProductItem

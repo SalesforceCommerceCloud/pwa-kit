@@ -10,7 +10,7 @@ import {useVariant} from '@salesforce/retail-react-app/app/hooks/use-variant'
 import {useIntl} from 'react-intl'
 import {useVariationParams} from '@salesforce/retail-react-app/app/hooks/use-variation-params'
 import {useVariationAttributes} from '@salesforce/retail-react-app/app/hooks/use-variation-attributes'
-import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
+import {useSelectedStore} from '@salesforce/retail-react-app/app/hooks/use-selected-store'
 
 const OUT_OF_STOCK = 'OUT_OF_STOCK'
 const UNFULFILLABLE = 'UNFULFILLABLE'
@@ -46,19 +46,7 @@ export const useDerivedProduct = (
         isProductPartOfBundle
     )
     const [quantity, setQuantity] = useState(initialQuantity)
-    const {site} = useMultiSite()
-
-    // TODO: This should be moved to a hook W-18751492
-    const selectedStore = (() => {
-        try {
-            if (typeof window !== 'undefined' && site?.id) {
-                return JSON.parse(window.localStorage.getItem(`store_${site.id}`))
-            }
-        } catch (e) {
-            // intentionally empty: ignore errors
-        }
-        return null
-    })()
+    const {store: selectedStore} = useSelectedStore()
 
     const selectedStoreInventory = getInventoryById(product, selectedStore?.inventoryId)
     const selectedStoreStockLevel = selectedStoreInventory?.stockLevel || 0

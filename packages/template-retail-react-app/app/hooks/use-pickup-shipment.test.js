@@ -17,13 +17,6 @@ jest.mock('@salesforce/commerce-sdk-react', () => ({
     }))
 }))
 
-jest.mock('@salesforce/retail-react-app/app/hooks/use-multi-site', () => ({
-    __esModule: true,
-    default: () => ({
-        site: {id: 'test-site'}
-    })
-}))
-
 // Use real localStorage for tests
 
 describe('usePickupShipment', () => {
@@ -80,31 +73,8 @@ describe('usePickupShipment', () => {
         expect(hasPickup).toBe(false)
     })
 
-    test('getStoreInfo returns parsed store data from localStorage', () => {
-        const storeData = {inventoryId: 'store-123', name: 'Test Store'}
-        localStorage.setItem('store_test-site', JSON.stringify(storeData))
-
-        const {result} = renderHook(() => usePickupShipment())
-
-        const storeInfo = result.current.getStoreInfo()
-
-        expect(storeInfo).toEqual(storeData)
-    })
-
-    test('getStoreInfo returns null when localStorage contains invalid JSON', () => {
-        // Store invalid JSON to trigger error handling
-        localStorage.setItem('store_test-site', 'invalid-json{')
-
-        const {result} = renderHook(() => usePickupShipment())
-
-        const storeInfo = result.current.getStoreInfo()
-
-        expect(storeInfo).toBeNull()
-    })
-
     test('addInventoryIdsToPickupItems adds inventory ID to pickup items', () => {
         const storeData = {inventoryId: 'store-123'}
-        localStorage.setItem('store_test-site', JSON.stringify(storeData))
 
         const {result} = renderHook(() => usePickupShipment())
 
@@ -116,7 +86,8 @@ describe('usePickupShipment', () => {
 
         const updatedItems = result.current.addInventoryIdsToPickupItems(
             productItems,
-            pickupInStoreMap
+            pickupInStoreMap,
+            storeData
         )
 
         expect(updatedItems[0]).toEqual({
@@ -131,8 +102,6 @@ describe('usePickupShipment', () => {
     })
 
     test('addInventoryIdsToPickupItems returns original items when no store info', () => {
-        // Don't set any store data in localStorage (already cleared in beforeEach)
-
         const {result} = renderHook(() => usePickupShipment())
 
         const productItems = [{productId: 'product-1', quantity: 1}]
@@ -140,7 +109,8 @@ describe('usePickupShipment', () => {
 
         const updatedItems = result.current.addInventoryIdsToPickupItems(
             productItems,
-            pickupInStoreMap
+            pickupInStoreMap,
+            null // No store info
         )
 
         expect(updatedItems).toEqual(productItems)
@@ -370,7 +340,8 @@ describe('usePickupShipment', () => {
 
         const updatedItems1 = result.current.addInventoryIdsToPickupItems(
             productItems1,
-            pickupInStoreMap1
+            pickupInStoreMap1,
+            storeData
         )
 
         expect(updatedItems1[0]).toEqual({
@@ -385,7 +356,8 @@ describe('usePickupShipment', () => {
 
         const updatedItems2 = result.current.addInventoryIdsToPickupItems(
             productItems2,
-            pickupInStoreMap2
+            pickupInStoreMap2,
+            storeData
         )
 
         expect(updatedItems2[0]).toEqual({
@@ -403,7 +375,8 @@ describe('usePickupShipment', () => {
 
         const updatedItems3 = result.current.addInventoryIdsToPickupItems(
             productItems3,
-            pickupInStoreMap3
+            pickupInStoreMap3,
+            storeData
         )
 
         expect(updatedItems3[0]).toEqual({
@@ -455,7 +428,6 @@ describe('usePickupShipment', () => {
 
         test('configures pickup shipment successfully with pickup items', async () => {
             const storeData = {inventoryId: 'store-123', id: 'store-id-456'}
-            localStorage.setItem('store_test-site', JSON.stringify(storeData))
 
             const {result} = renderHook(() => usePickupShipment())
 
@@ -465,7 +437,7 @@ describe('usePickupShipment', () => {
                 {productId: 'product-2', quantity: 2} // No inventoryId, not a pickup item
             ]
 
-            await result.current.configurePickupShipment(basketId, productItems)
+            await result.current.configurePickupShipment(basketId, productItems, storeData)
 
             expect(mockMutateAsync).toHaveBeenCalledWith({
                 parameters: {
@@ -483,7 +455,6 @@ describe('usePickupShipment', () => {
 
         test('uses custom pickupShippingMethodId when provided', async () => {
             const storeData = {inventoryId: 'store-123', id: 'store-id-456'}
-            localStorage.setItem('store_test-site', JSON.stringify(storeData))
 
             const {result} = renderHook(() => usePickupShipment())
 
@@ -491,7 +462,7 @@ describe('usePickupShipment', () => {
             const productItems = [{productId: 'product-1', inventoryId: 'store-123', quantity: 1}]
             const options = {pickupShippingMethodId: 'custom-pickup-method'}
 
-            await result.current.configurePickupShipment(basketId, productItems, options)
+            await result.current.configurePickupShipment(basketId, productItems, storeData, options)
 
             expect(mockMutateAsync).toHaveBeenCalledWith({
                 parameters: {
@@ -508,6 +479,7 @@ describe('usePickupShipment', () => {
         })
 
         test('returns early when no pickup items exist', async () => {
+            const storeData = {inventoryId: 'store-123', id: 'store-id-456'}
             const {result} = renderHook(() => usePickupShipment())
 
             const basketId = 'basket-123'
@@ -516,29 +488,23 @@ describe('usePickupShipment', () => {
                 {productId: 'product-2', quantity: 2} // No inventoryId
             ]
 
-            await result.current.configurePickupShipment(basketId, productItems)
+            await result.current.configurePickupShipment(basketId, productItems, storeData)
 
             expect(mockMutateAsync).not.toHaveBeenCalled()
         })
 
-        test('returns early when localStorage contains invalid JSON and throwOnError is false', async () => {
-            // Store invalid JSON to trigger error handling
-            localStorage.setItem('store_test-site', 'invalid-json{')
-
+        test('returns early when store info is invalid and throwOnError is false', async () => {
             const {result} = renderHook(() => usePickupShipment())
 
             const basketId = 'basket-123'
             const productItems = [{productId: 'product-1', inventoryId: 'store-123', quantity: 1}]
 
-            await result.current.configurePickupShipment(basketId, productItems)
+            await result.current.configurePickupShipment(basketId, productItems, null) // Invalid store info
 
             expect(mockMutateAsync).not.toHaveBeenCalled()
         })
 
-        test('throws error when localStorage contains invalid JSON and throwOnError is true', async () => {
-            // Store invalid JSON to trigger error handling
-            localStorage.setItem('store_test-site', 'invalid-json{')
-
+        test('throws error when store info is invalid and throwOnError is true', async () => {
             const {result} = renderHook(() => usePickupShipment())
 
             const basketId = 'basket-123'
@@ -546,26 +512,22 @@ describe('usePickupShipment', () => {
             const options = {throwOnError: true}
 
             await expect(
-                result.current.configurePickupShipment(basketId, productItems, options)
+                result.current.configurePickupShipment(basketId, productItems, null, options) // Invalid store info
             ).rejects.toThrow('Failed to retrieve store information')
         })
 
         test('returns early when no store info exists and throwOnError is false', async () => {
-            // Don't set any store data in localStorage (already cleared in beforeEach)
-
             const {result} = renderHook(() => usePickupShipment())
 
             const basketId = 'basket-123'
             const productItems = [{productId: 'product-1', inventoryId: 'store-123', quantity: 1}]
 
-            await result.current.configurePickupShipment(basketId, productItems)
+            await result.current.configurePickupShipment(basketId, productItems, null)
 
             expect(mockMutateAsync).not.toHaveBeenCalled()
         })
 
         test('throws error when no store info exists and throwOnError is true', async () => {
-            // Don't set any store data in localStorage (already cleared in beforeEach)
-
             const {result} = renderHook(() => usePickupShipment())
 
             const basketId = 'basket-123'
@@ -573,27 +535,25 @@ describe('usePickupShipment', () => {
             const options = {throwOnError: true}
 
             await expect(
-                result.current.configurePickupShipment(basketId, productItems, options)
+                result.current.configurePickupShipment(basketId, productItems, null, options)
             ).rejects.toThrow('Failed to retrieve store information')
         })
 
         test('returns early when store info missing inventoryId and throwOnError is false', async () => {
             const storeData = {id: 'store-id-456'} // Missing inventoryId
-            localStorage.setItem('store_test-site', JSON.stringify(storeData))
 
             const {result} = renderHook(() => usePickupShipment())
 
             const basketId = 'basket-123'
             const productItems = [{productId: 'product-1', inventoryId: 'store-123', quantity: 1}]
 
-            await result.current.configurePickupShipment(basketId, productItems)
+            await result.current.configurePickupShipment(basketId, productItems, storeData)
 
             expect(mockMutateAsync).not.toHaveBeenCalled()
         })
 
         test('throws error when store info missing inventoryId and throwOnError is true', async () => {
             const storeData = {id: 'store-id-456'} // Missing inventoryId
-            localStorage.setItem('store_test-site', JSON.stringify(storeData))
 
             const {result} = renderHook(() => usePickupShipment())
 
@@ -602,13 +562,12 @@ describe('usePickupShipment', () => {
             const options = {throwOnError: true}
 
             await expect(
-                result.current.configurePickupShipment(basketId, productItems, options)
+                result.current.configurePickupShipment(basketId, productItems, storeData, options)
             ).rejects.toThrow('No store inventory ID found')
         })
 
         test('logs warning when mutation fails and throwOnError is false', async () => {
             const storeData = {inventoryId: 'store-123', id: 'store-id-456'}
-            localStorage.setItem('store_test-site', JSON.stringify(storeData))
 
             const mutationError = new Error('Mutation failed')
             mockMutateAsync.mockRejectedValue(mutationError)
@@ -620,7 +579,7 @@ describe('usePickupShipment', () => {
             const basketId = 'basket-123'
             const productItems = [{productId: 'product-1', inventoryId: 'store-123', quantity: 1}]
 
-            await result.current.configurePickupShipment(basketId, productItems)
+            await result.current.configurePickupShipment(basketId, productItems, storeData)
 
             expect(consoleSpy).toHaveBeenCalledWith(
                 'Failed to configure pickup shipment:',
@@ -644,7 +603,7 @@ describe('usePickupShipment', () => {
             const options = {throwOnError: true}
 
             await expect(
-                result.current.configurePickupShipment(basketId, productItems, options)
+                result.current.configurePickupShipment(basketId, productItems, storeData, options)
             ).rejects.toThrow('Mutation failed')
         })
     })

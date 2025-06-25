@@ -5,19 +5,21 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import {useState, useEffect, useCallback, useMemo} from 'react'
+import {useState, useEffect, useCallback, useMemo, useContext} from 'react'
 import {useSearchStores} from '@salesforce/commerce-sdk-react'
 import {useIntl} from 'react-intl'
 import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
+import {StoreLocatorContext} from '@salesforce/retail-react-app/app/contexts/store-locator-provider'
 import {
-    STORE_LOCATOR_DISTANCE,
-    STORE_LOCATOR_DISTANCE_UNIT,
-    DEFAULT_STORE_LOCATOR_COUNTRY
+    STORE_LOCATOR_RADIUS,
+    STORE_LOCATOR_RADIUS_UNIT,
+    STORE_LOCATOR_DEFAULT_COUNTRY_CODE
 } from '@salesforce/retail-react-app/app/constants'
 
 const useSeStoreSelection = () => {
     const intl = useIntl()
     const {site} = useMultiSite()
+    const storeLocatorContext = useContext(StoreLocatorContext)
     const [locationData, setLocationData] = useState(null)
     const [isProcessing, setIsProcessing] = useState(false)
     const [shouldOpenModal, setShouldOpenModal] = useState(false)
@@ -29,7 +31,7 @@ const useSeStoreSelection = () => {
     const getCountryForPostalSearch = useCallback((zipcode, explicitCountry) => {
         return explicitCountry && explicitCountry !== 'none'
             ? explicitCountry
-            : DEFAULT_STORE_LOCATOR_COUNTRY.countryCode
+            : STORE_LOCATOR_DEFAULT_COUNTRY_CODE
     }, [])
 
     const {data: coordinateStoreData, isLoading: isLoadingCoordinateStores} = useSearchStores({
@@ -37,9 +39,9 @@ const useSeStoreSelection = () => {
             latitude: locationData?.latitude,
             longitude: locationData?.longitude,
             locale: intl.locale,
-            maxDistance: STORE_LOCATOR_DISTANCE,
+            maxDistance: STORE_LOCATOR_RADIUS,
             limit: 200,
-            distanceUnit: STORE_LOCATOR_DISTANCE_UNIT
+            distanceUnit: STORE_LOCATOR_RADIUS_UNIT
         },
         enabled:
             enableCoordinateSearch && Boolean(locationData?.latitude && locationData?.longitude)
@@ -55,25 +57,25 @@ const useSeStoreSelection = () => {
             postalCode: locationData?.zipcode,
             countryCode: countryCodeToUse,
             locale: intl.locale,
-            maxDistance: STORE_LOCATOR_DISTANCE,
+            maxDistance: STORE_LOCATOR_RADIUS,
             limit: 200,
-            distanceUnit: STORE_LOCATOR_DISTANCE_UNIT
+            distanceUnit: STORE_LOCATOR_RADIUS_UNIT
         },
         enabled: Boolean(locationData?.zipcode && !locationData?.latitude)
     })
 
     const getGlobalSearchParams = useCallback(() => {
-        const baseDistance = STORE_LOCATOR_DISTANCE * 200
+        const baseDistance = STORE_LOCATOR_RADIUS * 200
         const storeNameDistance =
             locationData?.storeName && locationData?.countryCode ? baseDistance * 2 : baseDistance
 
         return {
-            latitude: DEFAULT_STORE_LOCATOR_COUNTRY.latitude || 0,
-            longitude: DEFAULT_STORE_LOCATOR_COUNTRY.longitude || 0,
+            latitude: 0,
+            longitude: 0,
             locale: intl.locale,
             maxDistance: storeNameDistance,
             limit: 200,
-            distanceUnit: STORE_LOCATOR_DISTANCE_UNIT
+            distanceUnit: STORE_LOCATOR_RADIUS_UNIT
         }
     }, [locationData?.storeName, locationData?.countryCode, intl.locale])
 
@@ -100,22 +102,22 @@ const useSeStoreSelection = () => {
                         const sName = (store.name || '').toLowerCase().trim()
                         const searchName = locationData.storeName.toLowerCase().trim()
                         const countryMatch =
-                            (store.countryCode || DEFAULT_STORE_LOCATOR_COUNTRY.countryCode) ===
+                            (store.countryCode || STORE_LOCATOR_DEFAULT_COUNTRY_CODE) ===
                             locationData.countryCode
                         return (sName === searchName || sName.includes(searchName)) && countryMatch
                     })))
     )
 
     const getFallbackSearchParams = useCallback(() => {
-        const maxDistance = STORE_LOCATOR_DISTANCE * 500
+        const maxDistance = STORE_LOCATOR_RADIUS * 500
 
         return {
-            latitude: DEFAULT_STORE_LOCATOR_COUNTRY.latitude || 0,
-            longitude: DEFAULT_STORE_LOCATOR_COUNTRY.longitude || 0,
+            latitude: 0,
+            longitude: 0,
             locale: intl.locale,
             maxDistance,
             limit: 200,
-            distanceUnit: STORE_LOCATOR_DISTANCE_UNIT
+            distanceUnit: STORE_LOCATOR_RADIUS_UNIT
         }
     }, [intl.locale])
 
@@ -131,11 +133,11 @@ const useSeStoreSelection = () => {
             if (stores.length === 0) return null
 
             const cityKey = cityName.toLowerCase().trim()
-            const defaultCountry = countryCode || DEFAULT_STORE_LOCATOR_COUNTRY.countryCode
+            const defaultCountry = countryCode || STORE_LOCATOR_DEFAULT_COUNTRY_CODE
 
             let cityStores = stores.filter((store) => {
                 const storeCity = (store.city || '').toLowerCase().trim()
-                const storeCountry = store.countryCode || DEFAULT_STORE_LOCATOR_COUNTRY.countryCode
+                const storeCountry = store.countryCode || STORE_LOCATOR_DEFAULT_COUNTRY_CODE
                 const cityMatch =
                     storeCity === cityKey ||
                     storeCity.includes(cityKey) ||
@@ -192,9 +194,9 @@ const useSeStoreSelection = () => {
             latitude: cityCoords?.lat,
             longitude: cityCoords?.lng,
             locale: intl.locale,
-            maxDistance: STORE_LOCATOR_DISTANCE * 5,
+            maxDistance: STORE_LOCATOR_RADIUS * 5,
             limit: 200,
-            distanceUnit: STORE_LOCATOR_DISTANCE_UNIT
+            distanceUnit: STORE_LOCATOR_RADIUS_UNIT
         },
         enabled: Boolean(
             cityCoords &&
@@ -235,7 +237,6 @@ const useSeStoreSelection = () => {
         isLoadingCityStores ||
         isLoadingAllStores ||
         isLoadingFallbackStores
-
     const findMatchingStore = useCallback((stores, searchCriteria) => {
         if (!stores || stores.length === 0) return null
 
@@ -246,8 +247,7 @@ const useSeStoreSelection = () => {
             const filters = [
                 [
                     countryCode,
-                    (s) =>
-                        (s.countryCode || DEFAULT_STORE_LOCATOR_COUNTRY.countryCode) === countryCode
+                    (s) => (s.countryCode || STORE_LOCATOR_DEFAULT_COUNTRY_CODE) === countryCode
                 ],
                 [zipcode, (s) => (s.postalCode || s.address?.postalCode) === zipcode],
                 [
@@ -352,18 +352,13 @@ const useSeStoreSelection = () => {
                     }
                 }
 
-                if (typeof window !== 'undefined') {
-                    localStorage.setItem(
-                        storeInfoKey,
-                        JSON.stringify({
-                            id: selectedStore.id,
-                            name: selectedStore.name || null,
-                            inventoryId: selectedStore.inventoryId || null,
-                            isSeSelection: true,
-                            timestamp: Date.now(),
-                            seSearchParams
-                        })
-                    )
+                if (storeLocatorContext?.setState) {
+                    storeLocatorContext.setState((prevState) => ({
+                        ...prevState,
+                        selectedStore: selectedStore.id,
+                        isSeSelection: true
+                        // TODO: is there any value to saving seSearchParams here?
+                    }))
                 }
 
                 if (locationData.latitude && locationData.longitude) {
@@ -434,14 +429,8 @@ const useSeStoreSelection = () => {
             )
 
             if (!hasSeParams) {
-                if (typeof window !== 'undefined') {
-                    const existingStore = localStorage.getItem(storeInfoKey)
-                    if (existingStore) {
-                        const storeData = JSON.parse(existingStore)
-                        if (storeData.isSeSelection) {
-                            return
-                        }
-                    }
+                if (storeLocatorContext?.state?.isSeSelection) {
+                    return
                 }
                 return
             }
