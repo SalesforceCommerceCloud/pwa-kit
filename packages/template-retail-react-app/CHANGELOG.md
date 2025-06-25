@@ -3,12 +3,7 @@
 - Improved the layout of product tiles in product scroll and product list [#2446](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2446)
 - Updated 6 new languagues [#2495](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2495)
 - Show Bonus Product Label on OrderSummary component [#2524](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2524)
-- Added support for Shop in Store Functionality
-- Added support for PDP page to support Pickup in Store[#2537] (https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2537)
-- Compute store level inventory and refactor product view [#2553](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2553)
-- Show Bonus Product Label on OrderSummary component [#2524](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2524)
-- Updated store-locator component to work with Search Engines and location embedding [#2551](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2551)
-- Added additonal fixes for PDP page to support pickup in store[#2593] (https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2593)
+- Added support for Buy Online Pick up In Store (BOPIS) [#2646](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2646)
 
 ## v6.1.0 (May 22, 2025)
 

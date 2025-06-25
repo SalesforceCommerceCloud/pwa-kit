@@ -464,11 +464,13 @@ const ProductDetail = () => {
         return true
     }, [product, childProductSelection])
 
-    // Handles adding a product set to the cart.
+    /**************** Product Set Handlers ****************/
     // 1. Gather the selected child products from state.
     // 2. Call handleAddToCart with the selected products.
     // 3. The add-to-cart modal will be opened in handleAddToCart.
     const handleProductSetAddToCart = () => {
+        // Get all the selected products, and pass them to the addToCart handler which
+        // accepts an array.
         const productSelectionValues = Object.values(childProductSelection)
         handleAddToCart(productSelectionValues)
         // Modal will be opened in handleAddToCart
@@ -493,6 +495,9 @@ const ProductDetail = () => {
                     productId: product.id,
                     price: product.price,
                     quantity: quantity,
+                    // The add item endpoint in the shopper baskets API does not respect variant selections
+                    // for bundle children, so we have to make a follow up call to update the basket
+                    // with the chosen variant selections
                     bundledProductItems: childProductSelections.map((child) => {
                         return {
                             productId: child.variant.productId,
@@ -510,21 +515,31 @@ const ProductDetail = () => {
             )
 
             const res = await addItemToNewOrExistingBasket(productItems)
+
             const bundleChildMasterIds = childProductSelections.map((child) => {
                 return child.product.id
             })
+
+            // since the returned data includes all products in basket
+            // here we compare list of productIds in bundleProductItems of each productItem to filter out the
+            // current bundle that was last added into cart
             const currentBundle = res.productItems.find((productItem) => {
                 if (!productItem.bundledProductItems?.length) return
                 const bundleChildIds = productItem.bundledProductItems?.map((item) => {
+                    // seek out the bundle child that still uses masterId as product id
                     return item.productId
                 })
                 return bundleChildIds.every((id) => bundleChildMasterIds.includes(id))
             })
+
             const itemsToBeUpdated = getUpdateBundleChildArray(
                 currentBundle,
                 childProductSelections
             )
+
             if (itemsToBeUpdated.length) {
+                // make a follow up call to update child variant selection for product bundle
+                // since add item endpoint doesn't currently consider product bundle child variants
                 await updateItemsInBasketMutation.mutateAsync({
                     method: 'PATCH',
                     parameters: {
