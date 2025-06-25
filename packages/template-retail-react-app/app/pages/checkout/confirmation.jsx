@@ -81,7 +81,8 @@ const CheckoutConfirmation = () => {
                     firstName: data.firstName,
                     lastName: data.lastName,
                     email: data.email,
-                    login: data.email
+                    login: data.email,
+                    phoneHome: order.shipments[0].shippingAddress.phone
                 },
                 password: data.password
             }
