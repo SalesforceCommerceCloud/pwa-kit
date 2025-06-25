@@ -102,7 +102,7 @@ export const StoreLocatorList = () => {
                 <Accordion allowMultiple flex={[1, 1, 1, 5]}>
                     <AccordionItem>
                         <RadioGroup onChange={handleChange} value={selectedStoreId} width="100%">
-                            {storesToShow?.map((store, index) => (
+                            {storesToShow?.map((store) => (
                                 <StoreLocatorListItem
                                     key={store.id}
                                     store={store}
