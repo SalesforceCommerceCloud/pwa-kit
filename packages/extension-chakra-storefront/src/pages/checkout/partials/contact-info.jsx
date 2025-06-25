@@ -253,15 +253,15 @@ const ContactInfo = ({isSocialEnabled = false, isPasswordlessEnabled = false, id
             <ToggleCardSummary>
                 <Text>{basket?.customerInfo?.email || customer?.email}</Text>
 
-                {/* <SignOutConfirmationDialog */}
-                {/*     isOpen={signOutConfirmDialogIsOpen} */}
-                {/*     onClose={() => setSignOutConfirmDialogIsOpen(false)} */}
-                {/*     onConfirm={async () => { */}
-                {/*         await logout.mutateAsync() */}
-                {/*         navigate('/login') */}
-                {/*         setSignOutConfirmDialogIsOpen(false) */}
-                {/*     }} */}
-                {/* /> */}
+                <SignOutConfirmationDialog
+                    isOpen={signOutConfirmDialogIsOpen}
+                    onClose={() => setSignOutConfirmDialogIsOpen(false)}
+                    onConfirm={async () => {
+                        await logout.mutateAsync()
+                        navigate('/login')
+                        setSignOutConfirmDialogIsOpen(false)
+                    }}
+                />
             </ToggleCardSummary>
         </ToggleCard>
     )
@@ -277,7 +277,12 @@ const SignOutConfirmationDialog = ({isOpen, onConfirm, onClose}) => {
     const cancelRef = useRef()
 
     return (
-        <Dialog.Root open={isOpen} onOpenChange={(details) => !details.open && onClose()}>
+        <Dialog.Root
+            role="alertdialog"
+            initialFocusEl={cancelRef}
+            open={isOpen}
+            onOpenChange={(details) => !details.open && onClose()}
+        >
             <Portal>
                 <Dialog.Backdrop />
                 <Dialog.Positioner>
@@ -308,7 +313,7 @@ const SignOutConfirmationDialog = ({isOpen, onConfirm, onClose}) => {
                                     />
                                 </Button>
                             </Dialog.ActionTrigger>
-                            <Button colorScheme="red" onClick={onConfirm} ml={3}>
+                            <Button colorPalette="red" onClick={onConfirm} ml={3}>
                                 <FormattedMessage
                                     defaultMessage="Sign Out"
                                     id="signout_confirmation_dialog.button.sign_out"

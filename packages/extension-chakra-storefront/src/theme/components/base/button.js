@@ -21,16 +21,17 @@ const baseLinkStyles = {
 
 const button = defineRecipe({
     base: {
-        borderRadius: 'sm'
+        borderRadius: 'sm',
+        colorPalette: 'blue'
     },
     variants: {
         variant: {
             solid: {
-                backgroundColor: 'blue.600',
+                backgroundColor: 'colorPalette.600',
                 color: 'white',
-                _hover: {bg: 'blue.700', _disabled: {bg: 'blue.300'}},
-                _active: {bg: 'blue.800'},
-                _disabled: {bg: 'blue.300'}
+                _hover: {bg: 'colorPalette.700', _disabled: {bg: 'colorPalette.300'}},
+                _active: {bg: 'colorPalette.800'},
+                _disabled: {bg: 'colorPalette.300'}
             },
             'outline-black': {
                 color: 'gray.900',
