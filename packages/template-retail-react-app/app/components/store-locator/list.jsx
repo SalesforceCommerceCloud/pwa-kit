@@ -10,25 +10,34 @@ import {Accordion, AccordionItem, Box, Button, RadioGroup} from '@chakra-ui/reac
 import {StoreLocatorListItem} from '@salesforce/retail-react-app/app/components/store-locator/list-item'
 import {useStoreLocator} from '@salesforce/retail-react-app/app/hooks/use-store-locator'
 import {useSelectedStore} from '@salesforce/retail-react-app/app/hooks/use-selected-store'
+import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
 
 export const StoreLocatorList = () => {
     const {data, isLoading, config, formValues, mode, selectedStoreId, setSelectedStoreId} =
         useStoreLocator()
     const {store: selectedStore} = useSelectedStore()
+    const {derivedData} = useCurrentBasket()
     const [page, setPage] = useState(1)
+
+    const hasItemsInBasket = derivedData?.totalItems > 0
 
     useEffect(() => {
         setPage(1)
     }, [data])
 
     const handleChange = (selectedStoreId) => {
-        setSelectedStoreId(selectedStoreId)
+        if (!hasItemsInBasket) {
+            setSelectedStoreId(selectedStoreId)
+        }
     }
 
     const displayStoreLocatorStatusMessage = () => {
         if (isLoading) return 'Loading locations...'
         if (!data?.data?.length && !selectedStore)
             return 'Sorry, there are no locations in this area'
+        if (hasItemsInBasket) {
+            return 'Sorry, you have items in your basket. Please remove them to continue.'
+        }
 
         if (mode === 'input') {
             const countryName =
@@ -75,36 +84,39 @@ export const StoreLocatorList = () => {
 
     return (
         <>
-            <Accordion allowMultiple flex={[1, 1, 1, 5]}>
-                <AccordionItem>
-                    <Box
-                        flex="1"
-                        fontWeight="semibold"
-                        fontSize="md"
-                        style={{
-                            display: 'flex',
-                            justifyContent: 'center',
-                            alignItems: 'center',
-                            margin: '20px'
-                        }}
-                    >
-                        {displayStoreLocatorStatusMessage()}
-                    </Box>
-                </AccordionItem>
-                <RadioGroup onChange={handleChange} value={selectedStoreId} width="100%">
-                    {storesToShow?.map((store, index) => (
-                        <StoreLocatorListItem
-                            key={store.id}
-                            store={store}
-                            radioProps={{
-                                value: store.id,
-                                isChecked: selectedStoreId === store.id,
-                                'aria-describedby': `store-info-${store.id}`
-                            }}
-                        />
-                    ))}
-                </RadioGroup>
-            </Accordion>
+            <Box
+                flex="1"
+                fontWeight="semibold"
+                fontSize="md"
+                style={{
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    margin: '20px'
+                }}
+            >
+                {displayStoreLocatorStatusMessage()}
+            </Box>
+            
+            <Box as="fieldset" disabled={hasItemsInBasket} opacity={hasItemsInBasket ? 0.5 : 1}>
+                <Accordion allowMultiple flex={[1, 1, 1, 5]}>
+                    <AccordionItem>
+                        <RadioGroup onChange={handleChange} value={selectedStoreId} width="100%">
+                            {storesToShow?.map((store, index) => (
+                                <StoreLocatorListItem
+                                    key={store.id}
+                                    store={store}
+                                    radioProps={{
+                                        value: store.id,
+                                        isChecked: selectedStoreId === store.id,
+                                        'aria-describedby': `store-info-${store.id}`
+                                    }}
+                                />
+                            ))}
+                        </RadioGroup>
+                    </AccordionItem>
+                </Accordion>
+            </Box>
             {showLoadMoreButton && (
                 <Box paddingTop={3} marginTop={3}>
                     <Button

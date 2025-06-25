@@ -61,26 +61,13 @@ const SeInputHandler = ({onOpenStoreLocator}) => {
 
         const urlParams = new URLSearchParams(location.search)
         const hasSeParamKeys = ['lat', 'lng', 'zip', 'city', 'store', 'country']
-        const hasExternalQuery =
-            urlParams.has('q') || urlParams.has('search') || urlParams.has('query')
 
-        if (hasExternalQuery) {
-            setTimeout(onOpenStoreLocator, 1500)
-        } else {
-            onOpenStoreLocator()
-        }
-
+        onOpenStoreLocator()
         setShouldOpenModal(false)
 
         const hasSeParams = hasSeParamKeys.some((key) => urlParams.has(key))
         if (hasSeParams) {
-            const cleanParams = new URLSearchParams(location.search)
-            hasSeParamKeys.forEach((key) => cleanParams.delete(key))
-
-            const cleanSearch = cleanParams.toString()
-            const newUrl = location.pathname + (cleanSearch ? `?${cleanSearch}` : '')
-
-            history.replace(newUrl)
+            cleanURLParams(location, history, hasSeParamKeys)
         }
     }, [
         shouldOpenModal,
@@ -93,6 +80,16 @@ const SeInputHandler = ({onOpenStoreLocator}) => {
     ])
 
     return null
+}
+
+export const cleanURLParams = (location, history, hasSeParamKeys) => {
+    const cleanParams = new URLSearchParams(location.search)
+    hasSeParamKeys.forEach((key) => cleanParams.delete(key))
+
+    const cleanSearch = cleanParams.toString()
+    const newUrl = location.pathname + (cleanSearch ? `?${cleanSearch}` : '')
+
+    history.replace(newUrl)
 }
 
 SeInputHandler.propTypes = {
