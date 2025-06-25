@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React from 'react'
+import React, {useEffect} from 'react'
 import {useIntl, FormattedMessage} from 'react-intl'
 import PropTypes from 'prop-types'
 import {
@@ -24,6 +24,13 @@ const StoreInventoryFilter = ({toggleFilter, selectedFilters}) => {
     const {store: selectedStore} = useSelectedStore()
 
     const isChecked = selectedFilters?.ilids !== undefined
+
+    // Apply inventory filter when selected store changes
+    useEffect(() => {
+        if (selectedStore?.inventoryId && isChecked) {
+            toggleFilter({value: selectedStore.inventoryId}, 'ilids', false, false)
+        }
+    }, [selectedStore])
 
     const handleCheckboxChange = (e) => {
         // If no store is selected or no inventoryId, open store locator
