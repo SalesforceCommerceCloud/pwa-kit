@@ -2950,13 +2950,13 @@
   "product_view.error.select_pickup_in_store": [
     {
       "type": 0,
-      "value": "Select Pickup in Store to match your existing shipping method."
+      "value": "Please select 'Pickup in Store' to match the shipping method for your other items."
     }
   ],
   "product_view.error.select_ship_to_address": [
     {
       "type": 0,
-      "value": "Select Ship to Address to match your existing shipping method."
+      "value": "Please select 'Ship to Address' to match the shipping method for your other items."
     }
   ],
   "product_view.label.assistive_msg.quantity_decrement": [

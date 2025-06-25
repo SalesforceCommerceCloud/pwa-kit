@@ -59,17 +59,32 @@ import {
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
 import UnavailableProductConfirmationModal from '@salesforce/retail-react-app/app/components/unavailable-product-confirmation-modal'
 import {getUpdateBundleChildArray} from '@salesforce/retail-react-app/app/utils/product-utils'
+import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
 
 const DEBOUNCE_WAIT = 750
+
+// Function to get selected inventory ID from localStorage
+const getSelectedInventoryId = (siteId) => {
+    const storeInfoKey = `store_${siteId || 'default'}`
+    try {
+        return JSON.parse(window.localStorage.getItem(storeInfoKey))?.inventoryId || null
+    } catch (e) {
+        return null
+    }
+}
+
 const Cart = () => {
     const {data: basket, isLoading} = useCurrentBasket()
+    const {site} = useMultiSite()
+    const selectedInventoryId = getSelectedInventoryId(site?.id)
     const productIds = basket?.productItems?.map(({productId}) => productId).join(',') ?? ''
     const {data: products, isLoading: isProductsLoading} = useProducts(
         {
             parameters: {
                 ids: productIds,
                 allImages: true,
-                perPricebook: true
+                perPricebook: true,
+                ...(selectedInventoryId ? {inventoryIds: selectedInventoryId} : {})
             }
         },
         {
@@ -101,7 +116,8 @@ const Cart = () => {
                 ids: bundleChildVariantIds?.join(','),
                 allImages: false,
                 expand: ['availability', 'variations'],
-                select: '(data.(id,inventory))'
+                select: '(data.(id,inventory))',
+                ...(selectedInventoryId ? {inventoryIds: selectedInventoryId} : {})
             }
         },
         {
@@ -125,7 +141,6 @@ const Cart = () => {
         const updateProductsByItemId = {}
         basket?.productItems?.forEach((productItem) => {
             let currentProduct = products?.[productItem?.productId]
-
             // calculate inventory for product bundles based on availability of children
             if (productItem?.bundledProductItems && bundleChildProductData) {
                 let lowestStockLevel =
@@ -139,7 +154,6 @@ const Cart = () => {
                     if (lowestStockLevel === bundleChildStockLevel)
                         productWithLowestInventory = bundleChild.productName
                 })
-
                 if (currentProduct?.inventory) {
                     currentProduct = {
                         ...currentProduct,
@@ -147,6 +161,47 @@ const Cart = () => {
                             ...currentProduct.inventory,
                             stockLevel: lowestStockLevel,
                             lowestStockLevelProductName: productWithLowestInventory
+                        }
+                    }
+                }
+
+                if (selectedInventoryId) {
+                    let selectedStoreInventory = currentProduct?.inventories?.find(
+                        (inventory) => inventory.id === selectedInventoryId
+                    )
+                    let lowestInStoreStockLevel =
+                        selectedStoreInventory?.stockLevel ?? Number.MAX_SAFE_INTEGER
+                    let productWithLowestInventory = ''
+                    productItem?.bundledProductItems.forEach((bundleChild) => {
+                        const bundleChildInstoreInventory = bundleChildProductData?.[
+                            bundleChild.productId
+                        ]?.inventories?.find((inventory) => inventory.id === selectedInventoryId)
+                        const bundleChildInstoreStockLevel =
+                            bundleChildInstoreInventory?.stockLevel ?? Number.MAX_SAFE_INTEGER
+                        lowestInStoreStockLevel = Math.min(
+                            lowestInStoreStockLevel,
+                            bundleChildInstoreStockLevel
+                        )
+                        if (lowestInStoreStockLevel === bundleChildInstoreStockLevel)
+                            productWithLowestInventory = bundleChild.productName
+                    })
+
+                    // Update in-store inventories for the selected store with the lowest stock level and product name
+                    if (selectedStoreInventory) {
+                        const updatedInventories = currentProduct.inventories.map((inventory) => {
+                            if (inventory.id === selectedInventoryId) {
+                                return {
+                                    ...inventory,
+                                    stockLevel: lowestInStoreStockLevel,
+                                    lowestStockLevelProductName: productWithLowestInventory
+                                }
+                            }
+                            return inventory
+                        })
+
+                        currentProduct = {
+                            ...currentProduct,
+                            inventories: updatedInventories
                         }
                     }
                 }
@@ -599,6 +654,7 @@ const Cart = () => {
                                             updateCart={(variant, quantity) =>
                                                 handleUpdateCart(variant, quantity)
                                             }
+                                            showDeliveryOptions={false}
                                         />
                                     )}
                                     {isOpen && selectedItem.bundledProductItems && (

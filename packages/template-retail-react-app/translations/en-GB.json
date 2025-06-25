@@ -1262,10 +1262,10 @@
     "defaultMessage": "No valid store or inventory found for pickup"
   },
   "product_view.error.select_ship_to_address": {
-    "defaultMessage": "Select Ship to Address to match your existing shipping method."
+    "defaultMessage": "Please select 'Ship to Address' to match the shipping method for your other items."
   },
   "product_view.error.select_pickup_in_store": {
-    "defaultMessage": "Select Pickup in Store to match your existing shipping method."
+    "defaultMessage": "Please select 'Pickup in Store' to match the shipping method for your other items."
   },
   "product_view.label.assistive_msg.quantity_decrement": {
     "defaultMessage": "Decrement Quantity for {productName}"
