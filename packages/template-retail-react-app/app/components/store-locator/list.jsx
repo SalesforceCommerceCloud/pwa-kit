@@ -5,14 +5,16 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, {useEffect, useState} from 'react'
+import React, {useEffect, useState, useMemo} from 'react'
 import {Accordion, AccordionItem, Box, Button, RadioGroup} from '@chakra-ui/react'
 import {StoreLocatorListItem} from '@salesforce/retail-react-app/app/components/store-locator/list-item'
 import {useStoreLocator} from '@salesforce/retail-react-app/app/hooks/use-store-locator'
+import {useSelectedStore} from '@salesforce/retail-react-app/app/hooks/use-selected-store'
 
 export const StoreLocatorList = () => {
     const {data, isLoading, config, formValues, mode, selectedStoreId, setSelectedStoreId} =
         useStoreLocator()
+    const {store: selectedStore} = useSelectedStore()
     const [page, setPage] = useState(1)
 
     useEffect(() => {
@@ -25,7 +27,8 @@ export const StoreLocatorList = () => {
 
     const displayStoreLocatorStatusMessage = () => {
         if (isLoading) return 'Loading locations...'
-        if (data?.total === 0) return 'Sorry, there are no locations in this area'
+        if (!data?.data?.length && !selectedStore)
+            return 'Sorry, there are no locations in this area'
 
         if (mode === 'input') {
             const countryName =
@@ -34,18 +37,41 @@ export const StoreLocatorList = () => {
                           (o) => o.countryCode === formValues.countryCode
                       )?.countryName || config.defaultCountry
                     : config.defaultCountry
+            const displayZipCode = formValues.postalCode || data?.data[0]?.postalCode
 
             return `Viewing stores within ${String(config.radius)}${String(
                 config.radiusUnit
-            )} of ${String(data?.data[0].postalCode)} in ${String(countryName)}`
+            )} of ${String(displayZipCode)} in ${String(countryName)}`
         }
 
         return 'Viewing stores near your location'
     }
 
+    const sortedStores = useMemo(() => {
+        const stores = []
+
+        if (selectedStore && (!data?.data || !data.data.find((s) => s.id === selectedStore.id))) {
+            stores.push(selectedStore)
+        }
+
+        if (data?.data) {
+            stores.push(...data.data)
+        }
+
+        return stores.sort((a, b) => {
+            if (a.id === selectedStoreId) return -1
+            if (b.id === selectedStoreId) return 1
+
+            if (a.distance && b.distance) {
+                return a.distance - b.distance
+            }
+            return 0
+        })
+    }, [data?.data, selectedStoreId, selectedStore])
+
     const showNumberOfStores = page * config.defaultPageSize
-    const showLoadMoreButton = data?.total > showNumberOfStores
-    const storesToShow = data?.data?.slice(0, showNumberOfStores) || []
+    const showLoadMoreButton = sortedStores.length > showNumberOfStores
+    const storesToShow = sortedStores.slice(0, showNumberOfStores) || []
 
     return (
         <>
@@ -68,7 +94,7 @@ export const StoreLocatorList = () => {
                 <RadioGroup onChange={handleChange} value={selectedStoreId} width="100%">
                     {storesToShow?.map((store, index) => (
                         <StoreLocatorListItem
-                            key={index}
+                            key={store.id}
                             store={store}
                             radioProps={{
                                 value: store.id,

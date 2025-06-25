@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, {useEffect} from 'react'
+import React, {useEffect, useRef} from 'react'
 import {
     Box,
     Button,
@@ -18,10 +18,14 @@ import {
 import {useForm, Controller} from 'react-hook-form'
 import {useStoreLocator} from '@salesforce/retail-react-app/app/hooks/use-store-locator'
 import {useGeolocation} from '@salesforce/retail-react-app/app/hooks/use-geo-location'
+import {useSelectedStore} from '@salesforce/retail-react-app/app/hooks/use-selected-store'
 
 export const StoreLocatorForm = () => {
     const {config, formValues, setFormValues, setDeviceCoordinates} = useStoreLocator()
     const {coordinates, error, refresh} = useGeolocation()
+    const {store: selectedStore} = useSelectedStore()
+    const initialLoadDone = useRef(false)
+
     const form = useForm({
         mode: 'onChange',
         reValidateMode: 'onChange',
@@ -30,7 +34,22 @@ export const StoreLocatorForm = () => {
             postalCode: formValues.postalCode
         }
     })
-    const {control} = form
+    const {control, reset} = form
+
+    useEffect(() => {
+        if (selectedStore && !initialLoadDone.current && !formValues.postalCode) {
+            reset({
+                countryCode: selectedStore.countryCode,
+                postalCode: selectedStore.postalCode
+            })
+            setFormValues({
+                countryCode: selectedStore.countryCode,
+                postalCode: selectedStore.postalCode
+            })
+            initialLoadDone.current = true
+        }
+    }, [selectedStore, reset, setFormValues, formValues.postalCode])
+
     useEffect(() => {
         if (coordinates.latitude && coordinates.longitude) {
             setDeviceCoordinates(coordinates)
@@ -44,11 +63,15 @@ export const StoreLocatorForm = () => {
     }
 
     const clearForm = () => {
-        form.reset()
+        form.reset({
+            countryCode: '',
+            postalCode: ''
+        })
         setFormValues({
             countryCode: '',
             postalCode: ''
         })
+        initialLoadDone.current = false
     }
 
     return (

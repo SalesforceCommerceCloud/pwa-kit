@@ -8,7 +8,6 @@
 import {useState, useEffect, useCallback, useMemo, useContext} from 'react'
 import {useSearchStores} from '@salesforce/commerce-sdk-react'
 import {useIntl} from 'react-intl'
-import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
 import {StoreLocatorContext} from '@salesforce/retail-react-app/app/contexts/store-locator-provider'
 import {
     STORE_LOCATOR_RADIUS,
@@ -18,15 +17,12 @@ import {
 
 const useSeStoreSelection = () => {
     const intl = useIntl()
-    const {site} = useMultiSite()
     const storeLocatorContext = useContext(StoreLocatorContext)
     const [locationData, setLocationData] = useState(null)
     const [isProcessing, setIsProcessing] = useState(false)
     const [shouldOpenModal, setShouldOpenModal] = useState(false)
     const [storeLocatorParams, setStoreLocatorParams] = useState(null)
     const [enableCoordinateSearch, setEnableCoordinateSearch] = useState(false)
-
-    const storeInfoKey = `store_${site.id}`
 
     const getCountryForPostalSearch = useCallback((zipcode, explicitCountry) => {
         return explicitCountry && explicitCountry !== 'none'
@@ -321,47 +317,45 @@ const useSeStoreSelection = () => {
                 ...locationData,
                 countryCode: locationData.countryCode || countryCode
             }
-            const selectedStore =
-                findMatchingStore(storeSearchData.data, searchCriteria) || storeSearchData.data[0]
+
+            let selectedStore = null
+            if (locationData.storeName) {
+                selectedStore = storeSearchData.data.find(store => 
+                    store.name.toLowerCase() === locationData.storeName.toLowerCase()
+                )
+                
+                if (!selectedStore) {
+                    selectedStore = storeSearchData.data.find(store => 
+                        store.name.toLowerCase().includes(locationData.storeName.toLowerCase())
+                    )
+                }
+            }
+            
+            if (!selectedStore) {
+                selectedStore = findMatchingStore(storeSearchData.data, searchCriteria) || storeSearchData.data[0]
+            }
 
             if (selectedStore) {
-                let seSearchParams = {}
-                if (locationData.latitude && locationData.longitude) {
-                    seSearchParams = {
-                        latitude: locationData.latitude,
-                        longitude: locationData.longitude,
-                        countryCode: selectedStore?.countryCode
-                    }
-                } else if (locationData.zipcode) {
-                    seSearchParams = {
-                        postalCode: locationData.zipcode,
-                        countryCode: countryCode
-                    }
-                } else if (locationData.city && cityCoords) {
-                    if (cityCoords.postalCode) {
-                        seSearchParams = {
-                            postalCode: cityCoords.postalCode,
-                            countryCode: cityCoords.country
-                        }
-                    } else {
-                        seSearchParams = {
-                            latitude: cityCoords.lat,
-                            longitude: cityCoords.lng,
-                            countryCode: cityCoords.country
-                        }
-                    }
-                }
-
                 if (storeLocatorContext?.setState) {
                     storeLocatorContext.setState((prevState) => ({
                         ...prevState,
-                        selectedStore: selectedStore.id,
-                        isSeSelection: true
-                        // TODO: is there any value to saving seSearchParams here?
+                        selectedStoreId: selectedStore.id,
+                        isSeSelection: true,
+                        mode: 'input',
+                        formValues: {
+                            countryCode: selectedStore.countryCode,
+                            postalCode: selectedStore.postalCode
+                        }
                     }))
                 }
 
-                if (locationData.latitude && locationData.longitude) {
+                if (locationData.storeName) {
+                    setStoreLocatorParams({
+                        postalCode: selectedStore.postalCode,
+                        countryCode: selectedStore.countryCode,
+                        limit: 50
+                    })
+                } else if (locationData.latitude && locationData.longitude) {
                     setStoreLocatorParams({
                         latitude: locationData.latitude,
                         longitude: locationData.longitude,
@@ -375,52 +369,20 @@ const useSeStoreSelection = () => {
                         countryCode: countryCode,
                         limit: 50
                     })
-                } else if (locationData.city && cityCoords) {
-                    if (cityCoords.postalCode) {
-                        setStoreLocatorParams({
-                            postalCode: cityCoords.postalCode,
-                            countryCode: cityCoords.country,
-                            limit: 50
-                        })
-                    } else {
-                        setStoreLocatorParams({
-                            latitude: cityCoords.lat,
-                            longitude: cityCoords.lng,
-                            limit: 50
-                        })
-                    }
+                } else if (locationData.city) {
+                    setStoreLocatorParams({
+                        postalCode: selectedStore?.postalCode,
+                        countryCode: selectedStore?.countryCode || countryCode,
+                        limit: 50
+                    })
                 }
 
                 setShouldOpenModal(true)
-
-                if (typeof window !== 'undefined') {
-                    window.dispatchEvent(
-                        new CustomEvent('seStoreSelected', {
-                            detail: {
-                                store: selectedStore,
-                                source: 'search_engine',
-                                hasStoreName: Boolean(locationData.storeName),
-                                selectionMethod: locationData.storeName
-                                    ? 'name_match'
-                                    : 'nearest_location',
-                                countryCode: countryCode
-                            }
-                        })
-                    )
-                }
             }
 
             setIsProcessing(false)
         }
-    }, [
-        storeSearchData,
-        locationData,
-        isProcessing,
-        findMatchingStore,
-        storeInfoKey,
-        getCountryForPostalSearch,
-        cityCoords
-    ])
+    }, [storeSearchData, locationData, isProcessing, findMatchingStore, getCountryForPostalSearch])
 
     const processSeParameters = useCallback(
         (urlParams) => {
@@ -450,21 +412,34 @@ const useSeStoreSelection = () => {
                 parsedLng = parseFloat(lng)
             }
 
-            if ((parsedLat && parsedLng) || storeName || zipcode || city) {
-                const countryCode = country || getCountryForPostalSearch(zipcode, null)
-
-                setIsProcessing(true)
+            if (storeName) {
+                setLocationData({
+                    storeName,
+                    zipcode,
+                    countryCode: country || STORE_LOCATOR_DEFAULT_COUNTRY_CODE
+                })
+            }
+            else if (parsedLat && parsedLng) {
                 setLocationData({
                     latitude: parsedLat,
                     longitude: parsedLng,
-                    storeName,
+                    countryCode: country
+                })
+            } else if (zipcode) {
+                setLocationData({
                     zipcode,
+                    countryCode: country
+                })
+            } else if (city) {
+                setLocationData({
                     city,
-                    countryCode
+                    countryCode: country
                 })
             }
+
+            setIsProcessing(true)
         },
-        [getCountryForPostalSearch, storeInfoKey]
+        [storeLocatorContext?.state?.isSeSelection]
     )
 
     return {
