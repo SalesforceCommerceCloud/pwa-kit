@@ -27,7 +27,7 @@ test('Verify passwordless login request', async ({page}) => {
         route.continue()
     })
 
-    await page.goto(config.SOCIAL_LOGIN_RETAIL_APP_HOME + '/login')
+    await page.goto(config.MORE_LOGIN_OPTIONS_RETAIL_APP_HOME + '/login')
     await answerConsentTrackingForm(page)
 
     // fill in email
@@ -70,7 +70,7 @@ test('Verify password reset callback request', async ({page}) => {
         route.continue()
     })
 
-    await page.goto(config.SOCIAL_LOGIN_RETAIL_APP_HOME + '/login')
+    await page.goto(config.MORE_LOGIN_OPTIONS_RETAIL_APP_HOME + '/login')
     await answerConsentTrackingForm(page)
 
     // fill in email
@@ -117,7 +117,7 @@ test('Verify password reset request', async ({page}) => {
         route.continue()
     })
 
-    await page.goto(config.SOCIAL_LOGIN_RETAIL_APP_HOME + `/reset-password-landing?token=1234567&email=${GUEST_USER_CREDENTIALS.email}`)
+    await page.goto(config.MORE_LOGIN_OPTIONS_RETAIL_APP_HOME + `/reset-password-landing?token=1234567&email=${GUEST_USER_CREDENTIALS.email}`)
     await answerConsentTrackingForm(page)
 
     // Fill in the new password field
