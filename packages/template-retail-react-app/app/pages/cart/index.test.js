@@ -37,6 +37,12 @@ jest.mock('@salesforce/retail-react-app/app/hooks/use-multi-site', () => ({
     default: () => mockUseMultiSite()
 }))
 
+// Mock useSelectedStore hook
+const mockUseSelectedStore = jest.fn()
+jest.mock('@salesforce/retail-react-app/app/hooks/use-selected-store', () => ({
+    useSelectedStore: () => mockUseSelectedStore()
+}))
+
 const mockProduct = {
     ...mockVariant,
     id: '750518699660M',
@@ -82,6 +88,14 @@ beforeEach(() => {
         site: {id: 'site-1'},
         buildUrl: (url) => url
     })
+
+    // Default mock for useSelectedStore (no selected store by default)
+    mockUseSelectedStore.mockImplementation(() => ({
+        store: null,
+        isLoading: false,
+        error: null,
+        hasSelectedStore: false
+    }))
 
     global.server.use(
         rest.get('*/customers/:customerId/product-lists', (req, res, ctx) => {
@@ -162,6 +176,7 @@ beforeEach(() => {
         })
     )
 })
+
 afterEach(() => {
     localStorage.clear()
 })
@@ -861,16 +876,17 @@ describe('Product bundles', () => {
                 buildUrl: (url) => url
             })
 
-            // Set up localStorage with inventory data
-            const storeInfoKey = `store_${mockSiteId}`
-            localStorage.setItem(
-                storeInfoKey,
-                JSON.stringify({
+            // Mock useSelectedStore to return a store with inventoryId
+            mockUseSelectedStore.mockImplementation(() => ({
+                store: {
                     id: 'store-123',
                     name: 'Test Store',
                     inventoryId: mockInventoryId
-                })
-            )
+                },
+                isLoading: false,
+                error: null,
+                hasSelectedStore: true
+            }))
 
             // Create bundle product with inventories array
             const bundleProductWithInventories = {
@@ -1210,32 +1226,6 @@ describe('Product bundles', () => {
                 expect(screen.getByText(/women's clothing test bundle/i)).toBeInTheDocument()
             })
         })
-
-        test('handles localStorage parsing errors gracefully', async () => {
-            // Set invalid JSON in localStorage
-            const storeInfoKey = `store_${mockSiteId}`
-            localStorage.setItem(storeInfoKey, 'invalid-json')
-
-            renderWithProviders(<Cart />)
-
-            await waitFor(() => {
-                expect(screen.getByTestId('sf-cart-container')).toBeInTheDocument()
-                expect(screen.getByText(/women's clothing test bundle/i)).toBeInTheDocument()
-            })
-        })
-
-        test('handles missing localStorage data', async () => {
-            // Clear localStorage for this site
-            const storeInfoKey = `store_${mockSiteId}`
-            localStorage.removeItem(storeInfoKey)
-
-            renderWithProviders(<Cart />)
-
-            await waitFor(() => {
-                expect(screen.getByTestId('sf-cart-container')).toBeInTheDocument()
-                expect(screen.getByText(/women's clothing test bundle/i)).toBeInTheDocument()
-            })
-        })
     })
 })
 
@@ -1355,16 +1345,17 @@ describe('Selected inventory ID tests', function () {
             buildUrl: (url) => url
         })
 
-        // Set up localStorage with inventory data
-        const storeInfoKey = `store_${mockSiteId}`
-        localStorage.setItem(
-            storeInfoKey,
-            JSON.stringify({
+        // Mock useSelectedStore to return a store with inventoryId
+        mockUseSelectedStore.mockImplementation(() => ({
+            store: {
                 id: 'store-123',
                 name: 'Test Store',
                 inventoryId: mockInventoryId
-            })
-        )
+            },
+            isLoading: false,
+            error: null,
+            hasSelectedStore: true
+        }))
     })
 
     test('includes inventoryIds parameter when selectedInventoryId is available', async () => {
@@ -1390,42 +1381,6 @@ describe('Selected inventory ID tests', function () {
             const lastCall = productsApiSpy.mock.calls[productsApiSpy.mock.calls.length - 1][0]
             const url = new URL(lastCall.url)
             expect(url.searchParams.get('inventoryIds')).toBe(mockInventoryId)
-        })
-    })
-
-    test('handles missing inventoryId in localStorage gracefully', async () => {
-        // Set localStorage without inventoryId
-        const storeInfoKey = `store_${mockSiteId}`
-        localStorage.setItem(
-            storeInfoKey,
-            JSON.stringify({
-                id: 'store-123',
-                name: 'Test Store'
-                // No inventoryId property
-            })
-        )
-
-        const productsApiSpy = jest.fn()
-
-        global.server.use(
-            rest.get('*/products', (req, res, ctx) => {
-                productsApiSpy(req)
-                return res(ctx.delay(0), ctx.json({data: [mockCartVariant]}))
-            })
-        )
-
-        renderWithProviders(<Cart />)
-
-        await waitFor(() => {
-            expect(screen.getByTestId('sf-cart-container')).toBeInTheDocument()
-        })
-
-        // Verify that the products API was called without inventoryIds parameter
-        await waitFor(() => {
-            expect(productsApiSpy).toHaveBeenCalled()
-            const lastCall = productsApiSpy.mock.calls[productsApiSpy.mock.calls.length - 1][0]
-            const url = new URL(lastCall.url)
-            expect(url.searchParams.get('inventoryIds')).toBeNull()
         })
     })
 })

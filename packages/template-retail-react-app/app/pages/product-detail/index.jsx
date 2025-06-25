@@ -356,7 +356,6 @@ const ProductDetail = () => {
                     quantity
                 }
             })
-
             // Add inventory IDs for pickup items using the hook helper
             productItems = addInventoryIdsToPickupItems(
                 productItems,
@@ -391,12 +390,8 @@ const ProductDetail = () => {
             const currentShippingMethodIsPickup = isCurrentShippingMethodPickup(
                 basket?.shipments?.[0]?.shippingMethod
             )
-            // Only perform the check if the basket exists and has at least one item and the shipping method is not null
-            if (
-                basket &&
-                basket.productItems?.length > 0 &&
-                basket?.shipments?.[0]?.shippingMethod
-            ) {
+            // Only perform the check if the basket exists and has at least one item
+            if (basket && basket.productItems?.length > 0) {
                 if (hasAnyPickupSelected && !currentShippingMethodIsPickup) {
                     throw new Error(
                         formatMessage({
@@ -408,13 +403,11 @@ const ProductDetail = () => {
                 }
                 if (!hasAnyPickupSelected && currentShippingMethodIsPickup) {
                     throw new Error(
-                        showError(
-                            formatMessage({
-                                id: 'product_view.error.select_pickup_in_store',
-                                defaultMessage:
-                                    "Please select 'Pickup in Store' to match the shipping method for your other items."
-                            })
-                        )
+                        formatMessage({
+                            id: 'product_view.error.select_pickup_in_store',
+                            defaultMessage:
+                                "Please select 'Pickup in Store' to match the shipping method for your other items."
+                        })
                     )
                 }
             }

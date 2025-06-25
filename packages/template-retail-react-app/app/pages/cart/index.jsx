@@ -61,7 +61,7 @@ import {
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
 import UnavailableProductConfirmationModal from '@salesforce/retail-react-app/app/components/unavailable-product-confirmation-modal'
 import {getUpdateBundleChildArray} from '@salesforce/retail-react-app/app/utils/product-utils'
-import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
+import {useSelectedStore} from '@salesforce/retail-react-app/app/hooks/use-selected-store'
 
 const DEBOUNCE_WAIT = 750
 
@@ -93,8 +93,8 @@ const Cart = () => {
     )
     const storeName = storeData?.data?.[0]?.name
 
-    const {site} = useMultiSite()
-    const selectedInventoryId = getSelectedInventoryId(site?.id)
+    const {store: selectedStore} = useSelectedStore()
+    const selectedInventoryId = selectedStore?.inventoryId || null
     const productIds = basket?.productItems?.map(({productId}) => productId).join(',') ?? ''
     const {data: products, isLoading: isProductsLoading} = useProducts(
         {
