@@ -28,15 +28,8 @@ const cardBordered = {
 }
 
 export default defineLayerStyles({
-    card: {
-        description: 'Card',
-        value: card
-    },
-
-    cardBordered: {
-        description: 'Bordered card',
-        value: cardBordered
-    },
+    card,
+    cardBordered,
 
     ccIcon: {
         description: 'Credit card icon',
