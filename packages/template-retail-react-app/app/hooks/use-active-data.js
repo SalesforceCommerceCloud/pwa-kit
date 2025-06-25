@@ -4,110 +4,110 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-/*global dw*/
+/*global globalThis*/
 import {ACTIVE_DATA_ENABLED} from '@salesforce/retail-react-app/app/constants'
 import {proxyBasePath} from '@salesforce/pwa-kit-runtime/utils/ssr-namespace-paths'
 import logger from '@salesforce/retail-react-app/app/utils/logger-instance'
 
-const useActiveData = () => {
-    // Returns true when the feature flag is enabled and the tracking scripts have been executed
-    // This MUST be called before using the `dw` variable, otherwise a ReferenceError will be thrown
-    const canTrack = () => ACTIVE_DATA_ENABLED && typeof dw !== 'undefined'
+/**
+ * Only if `ACTIVE_DATA_ENABLED` is true, and only if not already loaded, asynchronously
+ * request/load/execute the script required for DW Active Data analytics to operate.
+ * @returns {Promise<boolean>}
+ */
+async function importDwActiveData() {
+    if (!ACTIVE_DATA_ENABLED || globalThis.dw?.ac) {
+        return ACTIVE_DATA_ENABLED
+    }
+    if (typeof globalThis.dw !== 'object' || globalThis.dw === null) {
+        globalThis.dw = {}
+    }
+
+    // Resolve the loading/import promise with `true`, if `globalThis.dw?.ac` is
+    // defined after successful loading. Resolve with `false`, if loading fails.
+    return import('../assets/js/active-data').then(
+        () => typeof globalThis.dw?.ac !== 'undefined',
+        () => false
+    )
+}
+
+function logError(method, error) {
+    logger.error(`ActiveData ${method} error'`, {
+        namespace: `useActiveData.${method}`,
+        additionalProperties: {error}
+    })
+}
+
+function trackSearchHits(productSearchResult) {
+    const ac = globalThis.dw?.ac
+    productSearchResult.hits.map(({productId}) =>
+        ac?._capture?.({id: productId, type: 'searchhit'})
+    )
+}
+
+export default function useActiveData() {
     return {
         async sendViewProduct(category, product, type) {
-            if (!canTrack()) return
             try {
-                if (dw?.ac) {
-                    if (category && category.id) {
-                        dw.ac.applyContext({category: category.id})
+                const canTrack = await importDwActiveData()
+                if (canTrack) {
+                    const ac = globalThis.dw?.ac
+                    if (category?.id) {
+                        ac?.applyContext?.({category: category.id})
                     }
-                    if (product && product.id) {
-                        dw.ac._capture({id: product.id, type: type})
+                    if (product?.id) {
+                        ac?._capture?.({id: product.id, type: type})
                     }
-                    if (dw.ac?._scheduleDataSubmission) {
-                        dw.ac._scheduleDataSubmission()
-                    }
+                    ac?._scheduleDataSubmission?.()
                 }
             } catch (err) {
-                logger.error('ActiveData sendViewProduct error', {
-                    namespace: 'useActiveData.sendViewProduct',
-                    additionalProperties: {error: err}
-                })
+                logError('sendViewProduct', err)
             }
         },
-        async sendViewSearch(searchParams, productSearchResult) {
-            if (!canTrack()) return
+        async sendViewSearch(searchData, productSearchResult) {
             try {
-                if (dw?.ac) {
-                    dw.ac.applyContext({searchData: searchParams})
-                    if (dw.ac?._scheduleDataSubmission) {
-                        dw.ac._scheduleDataSubmission()
-                    }
-                    productSearchResult.hits.map((productSearchItem) => {
-                        dw.ac._capture({id: productSearchItem.productId, type: 'searchhit'})
-                    })
+                const canTrack = await importDwActiveData()
+                if (canTrack) {
+                    const ac = globalThis.dw?.ac
+                    ac?.applyContext?.({searchData})
+                    trackSearchHits(productSearchResult)
+                    ac?._scheduleDataSubmission?.()
                 }
             } catch (err) {
-                logger.error('ActiveData sendViewSearch error', {
-                    namespace: 'useActiveData.sendViewSearch',
-                    additionalProperties: {error: err}
-                })
+                logError('sendViewSearch', err)
             }
         },
-        async sendViewCategory(searchParams, category, productSearchResult) {
-            if (!canTrack()) return
+        async sendViewCategory(searchData, category, productSearchResult) {
             try {
-                if (dw?.ac) {
-                    if (category && category.id) {
-                        dw.ac.applyContext({category: category.id, searchData: searchParams})
+                const canTrack = await importDwActiveData()
+                if (canTrack) {
+                    const ac = globalThis.dw?.ac
+                    if (category?.id) {
+                        ac?.applyContext?.({category: category.id, searchData})
                     }
-                    if (dw.ac?._scheduleDataSubmission) {
-                        dw.ac._scheduleDataSubmission()
-                    }
-                    productSearchResult.hits.map((productSearchItem) => {
-                        dw.ac._capture({id: productSearchItem.productId, type: 'searchhit'})
-                    })
+                    trackSearchHits(productSearchResult)
+                    ac?._scheduleDataSubmission?.()
                 }
             } catch (err) {
-                logger.error('ActiveData sendViewCategory error', {
-                    namespace: 'useActiveData.sendViewCategory',
-                    additionalProperties: {error: err}
-                })
+                logError('sendViewCategory', err)
             }
         },
         async trackPage(siteId, localeId, currency) {
-            if (!canTrack()) return
             try {
-                var activeDataUrl =
-                    `${proxyBasePath}/ocapi/on/demandware.store/Sites-` +
-                    siteId +
-                    '-Site/' +
-                    localeId +
-                    '/__Analytics-Start'
-                var dwAnalytics = dw.__dwAnalytics.getTracker(activeDataUrl)
-                if (typeof dw.ac == 'undefined') {
-                    dwAnalytics.trackPageView()
-                } else {
-                    try {
-                        if (typeof dw.ac._setSiteCurrency === 'function') {
-                            dw.ac._setSiteCurrency(currency)
-                        }
-                    } catch (err) {
-                        logger.error('ActiveData trackPage error', {
-                            namespace: 'useActiveData.trackPage',
-                            additionalProperties: {error: err}
-                        })
+                const canTrack = await importDwActiveData()
+                if (canTrack) {
+                    const ac = globalThis.dw?.ac
+                    if (!ac?._analytics) {
+                        ac?.setDWAnalytics?.(
+                            globalThis.dw?.__dwAnalytics?.getTracker?.(
+                                `${proxyBasePath}/ocapi/on/demandware.store/Sites-${siteId}-Site/${localeId}/__Analytics-Start`
+                            )
+                        )
                     }
-                    dw.ac.setDWAnalytics(dwAnalytics)
+                    ac?._setSiteCurrency?.(currency)
                 }
             } catch (err) {
-                logger.error('ActiveData trackPage error', {
-                    namespace: 'useActiveData.trackPage',
-                    additionalProperties: {error: err}
-                })
+                logError('trackPage', err)
             }
         }
     }
 }
-
-export default useActiveData

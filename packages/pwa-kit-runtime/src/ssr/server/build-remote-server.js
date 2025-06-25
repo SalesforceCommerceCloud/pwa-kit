@@ -171,6 +171,12 @@ export const RemoteServerFactory = {
         options.slasHostName = this._getSlasEndpoint(options)
         options.slasTarget = options.slasTarget || `https://${options.slasHostName}`
 
+        // Add extra condition to regex to only allow SLAS endpoints
+        options.slasApiPath = /\/shopper\/auth\/.*/
+        options.applySLASPrivateClientToEndpoints = new RegExp(
+            `${options.slasApiPath.source}(${options.applySLASPrivateClientToEndpoints.source})`
+        )
+
         return options
     },
 
@@ -706,7 +712,7 @@ export const RemoteServerFactory = {
                 target: options.slasTarget,
                 changeOrigin: true,
                 pathRewrite: {[slasPrivateProxyPath]: ''},
-                onProxyReq: (proxyRequest, incomingRequest) => {
+                onProxyReq: (proxyRequest, incomingRequest, res) => {
                     applyProxyRequestHeaders({
                         proxyRequest,
                         incomingRequest,
@@ -723,38 +729,17 @@ export const RemoteServerFactory = {
                     // purpose so we don't want to overwrite the header for those calls.
                     if (incomingRequest.path?.match(options.applySLASPrivateClientToEndpoints)) {
                         proxyRequest.setHeader('Authorization', `Basic ${encodedSlasCredentials}`)
+                    } else if (!incomingRequest.path?.match(options.slasApiPath)) {
+                        const message = `Request to ${incomingRequest.path} is not allowed through the SLAS Private Client Proxy`
+                        logger.error(message)
+                        return res.status(403).json({
+                            message: message
+                        })
                     }
 
                     // /oauth2/trusted-agent/token endpoint requires a different auth header
                     if (incomingRequest.path?.match(/\/oauth2\/trusted-agent\/token/)) {
                         proxyRequest.setHeader('_sfdc_client_auth', encodedSlasCredentials)
-                    }
-                },
-                onProxyRes: (proxyRes, req) => {
-                    if (proxyRes.statusCode && proxyRes.statusCode >= 400) {
-                        logger.error(
-                            `Failed to proxy SLAS Private Client request - ${proxyRes.statusCode}`,
-                            {
-                                namespace: '_setupSlasPrivateClientProxy',
-                                additionalProperties: {statusCode: proxyRes.statusCode}
-                            }
-                        )
-                        logger.error(
-                            `Please make sure you have enabled the SLAS Private Client Proxy in your ssr.js and set the correct environment variable PWA_KIT_SLAS_CLIENT_SECRET.`,
-                            {namespace: '_setupSlasPrivateClientProxy'}
-                        )
-                        logger.error(
-                            `SLAS Private Client Proxy Request URL - ${req.protocol}://${req.get(
-                                'host'
-                            )}${req.originalUrl}`,
-                            {
-                                namespace: '_setupSlasPrivateClientProxy',
-                                additionalProperties: {
-                                    protocol: req.protocol,
-                                    originalUrl: req.originalUrl
-                                }
-                            }
-                        )
                     }
                 }
             })

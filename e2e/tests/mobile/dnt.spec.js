@@ -8,7 +8,7 @@
 const {test, expect} = require('@playwright/test')
 const config = require('../../config.js')
 const {generateUserCredentials} = require('../../scripts/utils.js')
-const {registerShopper} = require('../../scripts/pageHelpers.js')
+const {registerShopper, answerConsentTrackingForm} = require('../../scripts/pageHelpers.js')
 
 const REGISTERED_USER_CREDENTIALS = generateUserCredentials()
 
@@ -69,6 +69,7 @@ test('Shopper can use the consent tracking form', async ({page}) => {
 
     // Registering after setting DNT persists the preference
     await registerShopper({page, userCredentials: REGISTERED_USER_CREDENTIALS})
+    await answerConsentTrackingForm(page, true)
     await checkDntCookie(page, '1')
 
     // Logging out clears the preference

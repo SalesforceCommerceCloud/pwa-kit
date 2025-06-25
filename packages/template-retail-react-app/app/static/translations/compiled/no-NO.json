@@ -14,7 +14,7 @@
   "account.logout_button.button.log_out": [
     {
       "type": 0,
-      "value": "Logg ut"
+      "value": "Logg av"
     }
   ],
   "account_addresses.badge.default": [
@@ -114,7 +114,7 @@
   "account_order_detail.label.order_number": [
     {
       "type": 0,
-      "value": "Ordrenummer: "
+      "value": "Bestillingsnummer: "
     },
     {
       "type": 1,
@@ -146,7 +146,7 @@
   "account_order_detail.link.back_to_history": [
     {
       "type": 0,
-      "value": "Tilbake til ordrehistorikk"
+      "value": "Tilbake til bestillingshistorikk"
     }
   ],
   "account_order_detail.shipping_status.not_shipped": [
@@ -170,7 +170,7 @@
   "account_order_detail.title.order_details": [
     {
       "type": 0,
-      "value": "Ordredetaljer"
+      "value": "Bestillingsdetaljer"
     }
   ],
   "account_order_history.button.continue_shopping": [
@@ -182,13 +182,13 @@
   "account_order_history.description.once_you_place_order": [
     {
       "type": 0,
-      "value": "Når du har lagt inn en ordre, vil detaljene vises her."
+      "value": "Når du har lagt inn en bestilling, vises detaljene her."
     }
   ],
   "account_order_history.heading.no_order_yet": [
     {
       "type": 0,
-      "value": "Du har ikke lagt inn en ordre ennå."
+      "value": "Du har ikke lagt inn en bestilling ennå."
     }
   ],
   "account_order_history.label.num_of_items": [
@@ -204,7 +204,7 @@
   "account_order_history.label.order_number": [
     {
       "type": 0,
-      "value": "Ordrenummer: "
+      "value": "Bestillingsnummer: "
     },
     {
       "type": 1,
@@ -240,7 +240,7 @@
   "account_order_history.title.order_history": [
     {
       "type": 0,
-      "value": "Ordrehistorikk"
+      "value": "Bestillingshistorikk"
     }
   ],
   "account_wishlist.button.continue_shopping": [
@@ -359,6 +359,40 @@
     {
       "type": 0,
       "value": "Lukk skjema for pålogging"
+    }
+  ],
+  "auth_modal.check_email.button.resend_link": [
+    {
+      "type": 0,
+      "value": "Send lenke på nytt"
+    }
+  ],
+  "auth_modal.check_email.description.check_spam_folder": [
+    {
+      "type": 0,
+      "value": "Det kan ta noen minutter før lenken kommer, sjekk søppelpostmappen din hvis du har problemer med å finne den"
+    }
+  ],
+  "auth_modal.check_email.description.just_sent": [
+    {
+      "type": 0,
+      "value": "Vi har nettopp sendt en lenke for pålogging til "
+    },
+    {
+      "children": [
+        {
+          "type": 1,
+          "value": "email"
+        }
+      ],
+      "type": 8,
+      "value": "b"
+    }
+  ],
+  "auth_modal.check_email.title.check_your_email": [
+    {
+      "type": 0,
+      "value": "Sjekk e-posten din"
     }
   ],
   "auth_modal.description.now_signed_in": [
@@ -708,7 +742,7 @@
   "checkout_confirmation.link.login": [
     {
       "type": 0,
-      "value": "Logg inn her"
+      "value": "Logg på her"
     }
   ],
   "checkout_confirmation.message.already_has_account": [
@@ -1018,7 +1052,13 @@
   "contact_info.button.already_have_account": [
     {
       "type": 0,
-      "value": "Har du allerede en konto? Logg inn"
+      "value": "Har du allerede en konto? Logg på"
+    }
+  ],
+  "contact_info.button.back_to_sign_in_options": [
+    {
+      "type": 0,
+      "value": "Tilbake til påloggingsalternativer"
     }
   ],
   "contact_info.button.checkout_as_guest": [
@@ -1030,19 +1070,37 @@
   "contact_info.button.login": [
     {
       "type": 0,
-      "value": "Logg inn"
+      "value": "Logg på"
+    }
+  ],
+  "contact_info.button.password": [
+    {
+      "type": 0,
+      "value": "Passord"
+    }
+  ],
+  "contact_info.button.secure_link": [
+    {
+      "type": 0,
+      "value": "Sikker lenke"
     }
   ],
   "contact_info.error.incorrect_username_or_password": [
     {
       "type": 0,
-      "value": "Feil brukernavn eller passord, vennligst prøv igjen."
+      "value": "Feil brukernavn eller passord, prøv igjen."
     }
   ],
   "contact_info.link.forgot_password": [
     {
       "type": 0,
       "value": "Glemt passordet?"
+    }
+  ],
+  "contact_info.message.or_login_with": [
+    {
+      "type": 0,
+      "value": "Eller pålogging med"
     }
   ],
   "contact_info.title.contact_info": [
@@ -1119,6 +1177,48 @@
       "value": "currentPrice"
     }
   ],
+  "dnt_notification.button.accept": [
+    {
+      "type": 0,
+      "value": "Godta"
+    }
+  ],
+  "dnt_notification.button.assistive_msg.accept": [
+    {
+      "type": 0,
+      "value": "Godta sporing"
+    }
+  ],
+  "dnt_notification.button.assistive_msg.close": [
+    {
+      "type": 0,
+      "value": "Lukk sporingsskjema for samtykke"
+    }
+  ],
+  "dnt_notification.button.assistive_msg.decline": [
+    {
+      "type": 0,
+      "value": "Sporing av tilbakegang"
+    }
+  ],
+  "dnt_notification.button.decline": [
+    {
+      "type": 0,
+      "value": "Nedgang"
+    }
+  ],
+  "dnt_notification.description": [
+    {
+      "type": 0,
+      "value": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur."
+    }
+  ],
+  "dnt_notification.title": [
+    {
+      "type": 0,
+      "value": "Samtykke til sporing"
+    }
+  ],
   "drawer_menu.button.account_details": [
     {
       "type": 0,
@@ -1134,7 +1234,7 @@
   "drawer_menu.button.log_out": [
     {
       "type": 0,
-      "value": "Logg ut"
+      "value": "Logg av"
     }
   ],
   "drawer_menu.button.my_account": [
@@ -1146,7 +1246,7 @@
   "drawer_menu.button.order_history": [
     {
       "type": 0,
-      "value": "Ordrehistorikk"
+      "value": "Bestillingshistorikk"
     }
   ],
   "drawer_menu.header.assistive_msg.title": [
@@ -1206,7 +1306,7 @@
   "drawer_menu.link.sign_in": [
     {
       "type": 0,
-      "value": "Logg inn"
+      "value": "Logg på"
     }
   ],
   "drawer_menu.link.site_map": [
@@ -1242,7 +1342,7 @@
   "empty_cart.link.sign_in": [
     {
       "type": 0,
-      "value": "Logg inn"
+      "value": "Logg på"
     }
   ],
   "empty_cart.message.continue_shopping": [
@@ -1254,7 +1354,7 @@
   "empty_cart.message.sign_in_or_continue_shopping": [
     {
       "type": 0,
-      "value": "Logg inn for å hente lagrede artikler eller fortsette å handle."
+      "value": "Logg på for å hente lagrede artikler eller fortsette å handle."
     }
   ],
   "empty_search_results.info.cant_find_anything_for_category": [
@@ -1388,7 +1488,7 @@
   "footer.link.signin_create_account": [
     {
       "type": 0,
-      "value": "Logg inn eller opprett konto"
+      "value": "Logg på eller opprett konto"
     }
   ],
   "footer.link.site_map": [
@@ -1409,6 +1509,12 @@
       "value": "Vilkår og betingelser"
     }
   ],
+  "footer.locale_selector.assistive_msg": [
+    {
+      "type": 0,
+      "value": "Velg språk"
+    }
+  ],
   "footer.message.copyright": [
     {
       "type": 0,
@@ -1425,6 +1531,12 @@
     {
       "type": 0,
       "value": "Registrer deg for å holde deg oppdatert om de beste tilbudene"
+    }
+  ],
+  "footer.subscribe.email.assistive_msg": [
+    {
+      "type": 0,
+      "value": "E-postadresse for nyhetsbrev"
     }
   ],
   "footer.subscribe.heading.first_to_know": [
@@ -1460,13 +1572,31 @@
   "global.account.link.order_history": [
     {
       "type": 0,
-      "value": "Ordrehistorikk"
+      "value": "Bestillingshistorikk"
     }
   ],
   "global.account.link.wishlist": [
     {
       "type": 0,
       "value": "Ønskeliste"
+    }
+  ],
+  "global.error.create_account": [
+    {
+      "type": 0,
+      "value": "Denne funksjonen er ikke tilgjengelig for øyeblikket. Du må opprette en konto for å få tilgang til denne funksjonen."
+    }
+  ],
+  "global.error.feature_unavailable": [
+    {
+      "type": 0,
+      "value": "Denne funksjonen er ikke tilgjengelig for øyeblikket."
+    }
+  ],
+  "global.error.invalid_token": [
+    {
+      "type": 0,
+      "value": "Ugyldig token, prøv igjen."
     }
   ],
   "global.error.something_went_wrong": [
@@ -2169,10 +2299,40 @@
       "value": "Opprett konto"
     }
   ],
+  "login_form.button.apple": [
+    {
+      "type": 0,
+      "value": "Apple"
+    }
+  ],
+  "login_form.button.back": [
+    {
+      "type": 0,
+      "value": "Tilbake til påloggingsalternativer"
+    }
+  ],
+  "login_form.button.continue_securely": [
+    {
+      "type": 0,
+      "value": "Fortsett på en sikker måte"
+    }
+  ],
+  "login_form.button.google": [
+    {
+      "type": 0,
+      "value": "Google"
+    }
+  ],
+  "login_form.button.password": [
+    {
+      "type": 0,
+      "value": "Passord"
+    }
+  ],
   "login_form.button.sign_in": [
     {
       "type": 0,
-      "value": "Logg inn"
+      "value": "Logg på"
     }
   ],
   "login_form.link.forgot_password": [
@@ -2187,6 +2347,12 @@
       "value": "Har du ikke en konto?"
     }
   ],
+  "login_form.message.or_login_with": [
+    {
+      "type": 0,
+      "value": "Eller pålogging med"
+    }
+  ],
   "login_form.message.welcome_back": [
     {
       "type": 0,
@@ -2196,7 +2362,7 @@
   "login_page.error.incorrect_username_or_password": [
     {
       "type": 0,
-      "value": "Feil brukernavn eller passord, vennligst prøv igjen."
+      "value": "Feil brukernavn eller passord, prøv igjen."
     }
   ],
   "offline_banner.description.browsing_offline_mode": [
@@ -2270,7 +2436,7 @@
   "order_summary.label.estimated_total": [
     {
       "type": 0,
-      "value": "Estimert total"
+      "value": "Anslått sum"
     }
   ],
   "order_summary.label.free": [
@@ -2349,6 +2515,12 @@
       "value": "numOfPages"
     }
   ],
+  "pagination.field.page_number_select": [
+    {
+      "type": 0,
+      "value": "Velg sidetall"
+    }
+  ],
   "pagination.link.next": [
     {
       "type": 0,
@@ -2421,10 +2593,22 @@
       "value": "1 stor bokstav"
     }
   ],
+  "password_reset_success.toast": [
+    {
+      "type": 0,
+      "value": "Passordet er tilbakestilt"
+    }
+  ],
   "payment_selection.heading.credit_card": [
     {
       "type": 0,
       "value": "Kredittkort"
+    }
+  ],
+  "payment_selection.radio_group.assistive_msg": [
+    {
+      "type": 0,
+      "value": "Betaling"
     }
   ],
   "payment_selection.tooltip.secure_payment": [
@@ -2615,6 +2799,12 @@
       "value": "sortOption"
     }
   ],
+  "product_list.sort_by.label.assistive_msg": [
+    {
+      "type": 0,
+      "value": "Sorter produkter etter"
+    }
+  ],
   "product_scroller.assistive_msg.scroll_left": [
     {
       "type": 0,
@@ -2795,6 +2985,12 @@
       "value": "Min profil"
     }
   ],
+  "profile_fields.label.profile_form": [
+    {
+      "type": 0,
+      "value": "Skjema for profil"
+    }
+  ],
   "promo_code_fields.button.apply": [
     {
       "type": 0,
@@ -2834,7 +3030,7 @@
   "register_form.action.sign_in": [
     {
       "type": 0,
-      "value": "Logg inn"
+      "value": "Logg på"
     }
   ],
   "register_form.button.create_account": [
@@ -2891,42 +3087,10 @@
       "value": "Opprett en konto og få tidlig tilgang til det aller beste innen produkter, inspirasjon og fellesskap."
     }
   ],
-  "reset_password.button.back_to_sign_in": [
-    {
-      "type": 0,
-      "value": "Tilbake til pålogging"
-    }
-  ],
-  "reset_password.info.receive_email_shortly": [
-    {
-      "type": 0,
-      "value": "Du vil om kort tid motta en e-post på "
-    },
-    {
-      "children": [
-        {
-          "type": 1,
-          "value": "email"
-        }
-      ],
-      "type": 8,
-      "value": "b"
-    },
-    {
-      "type": 0,
-      "value": " med en lenke for å tilbakestille passordet ditt."
-    }
-  ],
-  "reset_password.title.password_reset": [
-    {
-      "type": 0,
-      "value": "Tilbakestille passord"
-    }
-  ],
   "reset_password_form.action.sign_in": [
     {
       "type": 0,
-      "value": "Logg inn"
+      "value": "Logg på"
     }
   ],
   "reset_password_form.button.reset_password": [
@@ -3093,6 +3257,32 @@
       "value": "Er du sikker på at du vil logge ut? Du må logge inn igjen for å fortsette med din nåværende ordre."
     }
   ],
+  "social_login_redirect.message.authenticating": [
+    {
+      "type": 0,
+      "value": "Autentisering..."
+    }
+  ],
+  "social_login_redirect.message.redirect_link": [
+    {
+      "type": 0,
+      "value": "Hvis du ikke blir omdirigert automatisk, klikker du på "
+    },
+    {
+      "children": [
+        {
+          "type": 0,
+          "value": "denne lenken"
+        }
+      ],
+      "type": 8,
+      "value": "lenke"
+    },
+    {
+      "type": 0,
+      "value": " for å fortsette."
+    }
+  ],
   "store_locator.action.find": [
     {
       "type": 0,
@@ -3194,7 +3384,7 @@
   "store_locator.error.agree_to_share_your_location": [
     {
       "type": 0,
-      "value": "Vennligst godta å dele stedet der du befinner deg"
+      "value": "Vi ber deg godta å dele stedet der du befinner deg"
     }
   ],
   "store_locator.error.please_enter_a_postal_code": [
@@ -3438,25 +3628,25 @@
   "use_credit_card_fields.error.valid_card_number": [
     {
       "type": 0,
-      "value": "Vennligst skriv inn et gyldig kortnummer."
+      "value": "Skriv inn et gyldig kortnummer."
     }
   ],
   "use_credit_card_fields.error.valid_date": [
     {
       "type": 0,
-      "value": "Vennligst skriv inn en gyldig dato."
+      "value": "Skriv inn en gyldig dato."
     }
   ],
   "use_credit_card_fields.error.valid_name": [
     {
       "type": 0,
-      "value": "Vennligst skriv inn et gyldig navn."
+      "value": "Skriv inn et gyldig navn."
     }
   ],
   "use_credit_card_fields.error.valid_security_code": [
     {
       "type": 0,
-      "value": "Vennligst skriv inn en gyldig sikkerhetskode."
+      "value": "Skriv inn en gyldig sikkerhetskode."
     }
   ],
   "use_credit_card_fields.label.card_number": [
@@ -3568,7 +3758,7 @@
   "use_profile_fields.error.required_email": [
     {
       "type": 0,
-      "value": "Vennligst skriv inn en gyldig e-post adresse."
+      "value": "Skriv inn en gyldig e-post adresse."
     }
   ],
   "use_profile_fields.error.required_first_name": [
@@ -3616,7 +3806,7 @@
   "use_promo_code_fields.error.required_promo_code": [
     {
       "type": 0,
-      "value": "Vennligst oppgi en gyldig kampanjekode."
+      "value": "Oppgi en gyldig kampanjekode."
     }
   ],
   "use_promo_code_fields.label.promo_code": [
@@ -3664,7 +3854,7 @@
   "use_registration_fields.error.required_email": [
     {
       "type": 0,
-      "value": "Vennligst skriv inn en gyldig e-post adresse."
+      "value": "Skriv inn en gyldig e-post adresse."
     }
   ],
   "use_registration_fields.error.required_first_name": [
@@ -3730,7 +3920,7 @@
   "use_reset_password_fields.error.required_email": [
     {
       "type": 0,
-      "value": "Vennligst skriv inn en gyldig e-post adresse."
+      "value": "Skriv inn en gyldig e-post adresse."
     }
   ],
   "use_reset_password_fields.label.email": [
@@ -3757,6 +3947,18 @@
       "value": "Passordet må inneholde minst 8 tegn."
     }
   ],
+  "use_update_password_fields.error.password_mismatch": [
+    {
+      "type": 0,
+      "value": "Passordene stemmer ikke overens."
+    }
+  ],
+  "use_update_password_fields.error.required_confirm_password": [
+    {
+      "type": 0,
+      "value": "Bekreft passordet ditt."
+    }
+  ],
   "use_update_password_fields.error.required_new_password": [
     {
       "type": 0,
@@ -3779,6 +3981,12 @@
     {
       "type": 0,
       "value": "Passordet må inneholde minst én stor bokstav."
+    }
+  ],
+  "use_update_password_fields.label.confirm_new_password": [
+    {
+      "type": 0,
+      "value": "Bekreft nytt passord"
     }
   ],
   "use_update_password_fields.label.current_password": [
@@ -3928,7 +4136,7 @@
   "with_registration.info.please_sign_in": [
     {
       "type": 0,
-      "value": "Vennligst logg inn for å fortsette."
+      "value": "Logg på for å fortsette."
     }
   ]
 }

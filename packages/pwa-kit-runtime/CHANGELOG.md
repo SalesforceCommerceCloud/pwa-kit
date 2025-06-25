@@ -1,5 +1,6 @@
 ## v3.11.0-dev.0 (May 23, 2025)
 - Fix the logger so that it will now print out details of the given Error object [#2486](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2486)
+- Only allow requests for `/shopper/auth/` through the SLAS private client proxy. Also stop the proxy from swallowing SLAS errors [#2608](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2608)
 
 ## v3.10.0 (May 22, 2025)
 

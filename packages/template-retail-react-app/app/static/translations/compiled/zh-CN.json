@@ -361,6 +361,44 @@
       "value": "关闭登录表单"
     }
   ],
+  "auth_modal.check_email.button.resend_link": [
+    {
+      "type": 0,
+      "value": "重新发送链接"
+    }
+  ],
+  "auth_modal.check_email.description.check_spam_folder": [
+    {
+      "type": 0,
+      "value": "该链接可能需要几分钟才能收到，如果找不到，请检查您的垃圾邮件文件夹"
+    }
+  ],
+  "auth_modal.check_email.description.just_sent": [
+    {
+      "type": 0,
+      "value": "我们刚刚向 "
+    },
+    {
+      "children": [
+        {
+          "type": 1,
+          "value": "email"
+        }
+      ],
+      "type": 8,
+      "value": "b"
+    },
+    {
+      "type": 0,
+      "value": " 发送了登录链接"
+    }
+  ],
+  "auth_modal.check_email.title.check_your_email": [
+    {
+      "type": 0,
+      "value": "检查您的电子邮件"
+    }
+  ],
   "auth_modal.description.now_signed_in": [
     {
       "type": 0,
@@ -860,7 +898,7 @@
   "checkout_payment.label.billing_address_form": [
     {
       "type": 0,
-      "value": "帐单地址表格"
+      "value": "账单地址表格"
     }
   ],
   "checkout_payment.label.same_as_shipping": [
@@ -1025,6 +1063,12 @@
       "value": "已有账户？登录"
     }
   ],
+  "contact_info.button.back_to_sign_in_options": [
+    {
+      "type": 0,
+      "value": "返回登录选项"
+    }
+  ],
   "contact_info.button.checkout_as_guest": [
     {
       "type": 0,
@@ -1037,6 +1081,18 @@
       "value": "登录"
     }
   ],
+  "contact_info.button.password": [
+    {
+      "type": 0,
+      "value": "密码"
+    }
+  ],
+  "contact_info.button.secure_link": [
+    {
+      "type": 0,
+      "value": "安全链接"
+    }
+  ],
   "contact_info.error.incorrect_username_or_password": [
     {
       "type": 0,
@@ -1047,6 +1103,12 @@
     {
       "type": 0,
       "value": "忘记密码？"
+    }
+  ],
+  "contact_info.message.or_login_with": [
+    {
+      "type": 0,
+      "value": "或用以下方式登录："
     }
   ],
   "contact_info.title.contact_info": [
@@ -1091,6 +1153,10 @@
     {
       "type": 1,
       "value": "currentPrice"
+    },
+    {
+      "type": 0,
+      "value": " 起"
     }
   ],
   "display_price.assistive_msg.strikethrough_price": [
@@ -1111,13 +1177,13 @@
     {
       "type": 1,
       "value": "listPrice"
+    },
+    {
+      "type": 0,
+      "value": " 起"
     }
   ],
   "display_price.label.current_price_with_range": [
-    {
-      "type": 0,
-      "value": "从 "
-    },
     {
       "type": 1,
       "value": "currentPrice"
@@ -1125,6 +1191,48 @@
     {
       "type": 0,
       "value": " 起"
+    }
+  ],
+  "dnt_notification.button.accept": [
+    {
+      "type": 0,
+      "value": "接受"
+    }
+  ],
+  "dnt_notification.button.assistive_msg.accept": [
+    {
+      "type": 0,
+      "value": "接受追踪"
+    }
+  ],
+  "dnt_notification.button.assistive_msg.close": [
+    {
+      "type": 0,
+      "value": "关闭同意追踪表"
+    }
+  ],
+  "dnt_notification.button.assistive_msg.decline": [
+    {
+      "type": 0,
+      "value": "拒绝追踪"
+    }
+  ],
+  "dnt_notification.button.decline": [
+    {
+      "type": 0,
+      "value": "拒绝"
+    }
+  ],
+  "dnt_notification.description": [
+    {
+      "type": 0,
+      "value": "Lorem ipsum dolor sit amet， consectetur adipiscing elit， sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.Ut enim ad minim veniam， quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur."
+    }
+  ],
+  "dnt_notification.title": [
+    {
+      "type": 0,
+      "value": "追踪同意书"
     }
   ],
   "drawer_menu.button.account_details": [
@@ -1417,6 +1525,12 @@
       "value": "条款与条件"
     }
   ],
+  "footer.locale_selector.assistive_msg": [
+    {
+      "type": 0,
+      "value": "选择语言"
+    }
+  ],
   "footer.message.copyright": [
     {
       "type": 0,
@@ -1433,6 +1547,12 @@
     {
       "type": 0,
       "value": "注册以随时了解最热门的交易"
+    }
+  ],
+  "footer.subscribe.email.assistive_msg": [
+    {
+      "type": 0,
+      "value": "资讯订阅电子邮箱"
     }
   ],
   "footer.subscribe.heading.first_to_know": [
@@ -1475,6 +1595,24 @@
     {
       "type": 0,
       "value": "愿望清单"
+    }
+  ],
+  "global.error.create_account": [
+    {
+      "type": 0,
+      "value": "此功能当前不可用。您必须创建账户才能访问此功能。"
+    }
+  ],
+  "global.error.feature_unavailable": [
+    {
+      "type": 0,
+      "value": "此功能当前不可用。"
+    }
+  ],
+  "global.error.invalid_token": [
+    {
+      "type": 0,
+      "value": "令牌无效，请重试。"
     }
   ],
   "global.error.something_went_wrong": [
@@ -2173,6 +2311,36 @@
       "value": "创建账户"
     }
   ],
+  "login_form.button.apple": [
+    {
+      "type": 0,
+      "value": "Apple"
+    }
+  ],
+  "login_form.button.back": [
+    {
+      "type": 0,
+      "value": "返回登录选项"
+    }
+  ],
+  "login_form.button.continue_securely": [
+    {
+      "type": 0,
+      "value": "安全继续"
+    }
+  ],
+  "login_form.button.google": [
+    {
+      "type": 0,
+      "value": "Google"
+    }
+  ],
+  "login_form.button.password": [
+    {
+      "type": 0,
+      "value": "密码"
+    }
+  ],
   "login_form.button.sign_in": [
     {
       "type": 0,
@@ -2189,6 +2357,12 @@
     {
       "type": 0,
       "value": "没有账户？"
+    }
+  ],
+  "login_form.message.or_login_with": [
+    {
+      "type": 0,
+      "value": "或用以下方式登录："
     }
   ],
   "login_form.message.welcome_back": [
@@ -2353,6 +2527,12 @@
       "value": "numOfPages"
     }
   ],
+  "pagination.field.page_number_select": [
+    {
+      "type": 0,
+      "value": "选择页码"
+    }
+  ],
   "pagination.link.next": [
     {
       "type": 0,
@@ -2425,10 +2605,22 @@
       "value": "1 个大写字母"
     }
   ],
+  "password_reset_success.toast": [
+    {
+      "type": 0,
+      "value": "密码重置成功"
+    }
+  ],
   "payment_selection.heading.credit_card": [
     {
       "type": 0,
       "value": "信用卡"
+    }
+  ],
+  "payment_selection.radio_group.assistive_msg": [
+    {
+      "type": 0,
+      "value": "付款"
     }
   ],
   "payment_selection.tooltip.secure_payment": [
@@ -2619,6 +2811,12 @@
       "value": "sortOption"
     }
   ],
+  "product_list.sort_by.label.assistive_msg": [
+    {
+      "type": 0,
+      "value": "产品排序方式"
+    }
+  ],
   "product_scroller.assistive_msg.scroll_left": [
     {
       "type": 0,
@@ -2803,6 +3001,12 @@
       "value": "我的概况"
     }
   ],
+  "profile_fields.label.profile_form": [
+    {
+      "type": 0,
+      "value": "概况表"
+    }
+  ],
   "promo_code_fields.button.apply": [
     {
       "type": 0,
@@ -2899,38 +3103,6 @@
       "value": "创建账户并首先查看最佳产品、妙招和虚拟社区。"
     }
   ],
-  "reset_password.button.back_to_sign_in": [
-    {
-      "type": 0,
-      "value": "返回登录"
-    }
-  ],
-  "reset_password.info.receive_email_shortly": [
-    {
-      "type": 0,
-      "value": "您将通过 "
-    },
-    {
-      "children": [
-        {
-          "type": 1,
-          "value": "email"
-        }
-      ],
-      "type": 8,
-      "value": "b"
-    },
-    {
-      "type": 0,
-      "value": " 收到包含重置密码链接的电子邮件。"
-    }
-  ],
-  "reset_password.title.password_reset": [
-    {
-      "type": 0,
-      "value": "密码重置"
-    }
-  ],
   "reset_password_form.action.sign_in": [
     {
       "type": 0,
@@ -2998,7 +3170,7 @@
   "shipping_address.label.remove_button": [
     {
       "type": 0,
-      "value": "移除"
+      "value": "移除 "
     },
     {
       "type": 1,
@@ -3101,6 +3273,32 @@
       "value": "是否确定要注销？您需要重新登录才能继续处理当前订单。"
     }
   ],
+  "social_login_redirect.message.authenticating": [
+    {
+      "type": 0,
+      "value": "正在验证..."
+    }
+  ],
+  "social_login_redirect.message.redirect_link": [
+    {
+      "type": 0,
+      "value": "如果您没有被自动重定向，请点击"
+    },
+    {
+      "children": [
+        {
+          "type": 0,
+          "value": "此链接"
+        }
+      ],
+      "type": 8,
+      "value": "link"
+    },
+    {
+      "type": 0,
+      "value": "以继续。"
+    }
+  ],
   "store_locator.action.find": [
     {
       "type": 0,
@@ -3128,7 +3326,7 @@
   "store_locator.description.away": [
     {
       "type": 0,
-      "value": "離開"
+      "value": "离开"
     }
   ],
   "store_locator.description.loading_locations": [
@@ -3761,6 +3959,18 @@
       "value": "密码必须至少包含 8 个字符。"
     }
   ],
+  "use_update_password_fields.error.password_mismatch": [
+    {
+      "type": 0,
+      "value": "密码不匹配。"
+    }
+  ],
+  "use_update_password_fields.error.required_confirm_password": [
+    {
+      "type": 0,
+      "value": "请确认您的密码。"
+    }
+  ],
   "use_update_password_fields.error.required_new_password": [
     {
       "type": 0,
@@ -3783,6 +3993,12 @@
     {
       "type": 0,
       "value": "密码必须至少包含一个大写字母。"
+    }
+  ],
+  "use_update_password_fields.label.confirm_new_password": [
+    {
+      "type": 0,
+      "value": "确认新密码"
     }
   ],
   "use_update_password_fields.label.current_password": [
