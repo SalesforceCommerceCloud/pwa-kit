@@ -398,25 +398,21 @@ export const AddToCartModal = () => {
                                 </Text>
                             </Flex>
                             <Stack gap="4">
-                                <Button as={Link} to="/cart" width="100%" variant="solid">
-                                    {intl.formatMessage({
-                                        defaultMessage: 'View Cart',
-                                        id: 'add_to_cart_modal.link.view_cart'
-                                    })}
+                                <Button asChild>
+                                    <Link to="/cart" width="100%" variant="solid">
+                                        {intl.formatMessage({
+                                            defaultMessage: 'View Cart',
+                                            id: 'add_to_cart_modal.link.view_cart'
+                                        })}
+                                    </Link>
                                 </Button>
 
                                 <Button asChild>
-                                    <Link
-                                        to="/checkout"
-                                        width={['95%', '95%', '95%', '100%']}
-                                        marginTop={[6, 6, 2, 2]}
-                                        mb={4}
-                                        variant="solid"
-                                    >
-                                        <FormattedMessage
-                                            defaultMessage="Proceed to Checkout"
-                                            id="cart_cta.link.checkout"
-                                        />
+                                    <Link to="/checkout" width="100%" variant="outline">
+                                        {intl.formatMessage({
+                                            defaultMessage: 'Proceed to Checkout',
+                                            id: 'add_to_cart_modal.link.checkout'
+                                        })}
                                         <LockIcon />
                                     </Link>
                                 </Button>
