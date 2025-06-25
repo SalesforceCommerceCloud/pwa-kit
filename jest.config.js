@@ -7,42 +7,50 @@
 
 const path = require('path')
 const base = require('@salesforce/pwa-kit-dev/configs/jest/jest.config.js')
+
+const createTestGlob = (relativePath) => {
+    return `<rootDir>/src/${relativePath}/**/*.test.{js,jsx,ts,tsx}`
+}
+
 module.exports = {
     ...base,
 
     //NOTE: we manually re-enable tests here until we finish migrating to Chakra v3
     testMatch: [
-        '<rootDir>/src/components/display-price/**/*.test.js',
-        '<rootDir>/src/components/fade/**/*.test.js',
-        '<rootDir>/src/components/footer/**/*.test.js',
-        '<rootDir>/src/components/hero/**/*.test.js',
-        '<rootDir>/src/components/icons/**/*.test.js',
-        '<rootDir>/src/components/image-gallery/**/*.test.js',
-        '<rootDir>/src/components/drawer-menu/**/*.test.js',
-        '<rootDir>/src/components/links-list/**/*.test.js',
-        '<rootDir>/src/components/locale-selector/**/*.test.js',
-        '<rootDir>/src/components/nested-accordion/**/*.test.js',
-        '<rootDir>/src/components/pagination/**/*.test.js',
-        '<rootDir>/src/components/product-scroller/**/*.test.js',
-        '<rootDir>/src/components/product-tile/**/*.test.js',
-        '<rootDir>/src/components/product-view/**/*.test.js',
-        '<rootDir>/src/components/quantity-picker/**/*.test.js',
-        '<rootDir>/src/components/search/**/*.test.js',
-        '<rootDir>/src/components/social-icons/**/*.test.js',
-        '<rootDir>/src/components/swatch-group/**/*.test.js',
-        '<rootDir>/src/components/toaster/**/*.test.jsx',
-        '<rootDir>/src/components/list-menu/**/*.test.js',
-        '<rootDir>/src/components/login/**/*.test.js',
-        '<rootDir>/src/components/register/**/*.test.js',
-        '<rootDir>/src/components/email-confirmation/**/*.test.js',
-        '<rootDir>/src/components/field/**/*.test.js',
-        '<rootDir>/src/components/reset-password/**/*.test.js',
-        '<rootDir>/src/components/with-registration/**/*.test.js',
-        '<rootDir>/src/pages/home/**/*.test.js',
-        // '<rootDir>/src/pages/login/**/*.test.js',  // TODO: enable after Account page has been migrated
-        '<rootDir>/src/pages/login-redirect/**/*.test.js',
-        '<rootDir>/src/pages/social-login-redirect/**/*.test.js',
-        '<rootDir>/src/pages/registration/**/*.test.js',
+        createTestGlob('components/display-price'),
+        createTestGlob('components/fade'),
+        createTestGlob('components/footer'),
+        createTestGlob('components/hero'),
+        createTestGlob('components/icons'),
+        createTestGlob('components/image-gallery'),
+        createTestGlob('components/drawer-menu'),
+        createTestGlob('components/links-list'),
+        createTestGlob('components/locale-selector'),
+        createTestGlob('components/nested-accordion'),
+        createTestGlob('components/pagination'),
+        createTestGlob('components/product-scroller'),
+        createTestGlob('components/product-tile'),
+        createTestGlob('components/product-view'),
+        createTestGlob('components/promo-popover'),
+        createTestGlob('components/quantity-picker'),
+        createTestGlob('components/search'),
+        createTestGlob('components/social-icons'),
+        createTestGlob('components/swatch-group'),
+        createTestGlob('components/toaster'),
+        createTestGlob('components/list-menu'),
+        createTestGlob('components/login'),
+        createTestGlob('components/register'),
+        createTestGlob('components/email-confirmation'),
+        createTestGlob('components/field'),
+        createTestGlob('components/reset-password'),
+        createTestGlob('components/with-registration'),
+        createTestGlob('pages/home'),
+        createTestGlob('pages/cart'),
+        createTestGlob('pages/product-list'),
+        // createTestGlob('pages/login'),  // TODO: enable after Account page has been migrated
+        createTestGlob('pages/login-redirect'),
+        createTestGlob('pages/social-login-redirect'),
+        // createTestGlob('pages/registration'), // TODO: enable after Account page has been migrated
         '<rootDir>/src/utils/responsive-image.test.js',
         '<rootDir>/src/hooks/use-toast.test.js',
         '<rootDir>/src/pages/product-detail/metadata.test.js',

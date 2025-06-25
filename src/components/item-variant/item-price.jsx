@@ -66,7 +66,7 @@ const ItemPrice = ({currency, align = 'right', baseDirection = 'column', ...prop
             direction={baseDirection}
             justifyContent={align === 'left' ? 'flex-start' : 'flex-end'}
             alignItems="baseline"
-            spacing={priceData?.isOnSale ? 0 : 1}
+            gap={priceData?.isOnSale ? 0 : 1}
             wrap="nowrap"
             {...props}
         >

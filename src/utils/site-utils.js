@@ -7,8 +7,6 @@
 
 import {getExtensionConfig as getConfig} from '../utils/get-extension-config'
 
-import {absoluteUrl} from './url'
-
 /**
  * This functions takes an url and returns a site object,
  * an error will be thrown if no url is passed in or no site is found
