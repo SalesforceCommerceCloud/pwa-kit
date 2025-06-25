@@ -16,28 +16,21 @@ const EmptyCart = ({isRegistered}) => {
         <Box data-testid="sf-cart-empty" flex="1" minWidth="100%" width="full" background="gray.50">
             <Center>
                 <Stack gap={6} width={['343px', '444px']} marginTop="20%" marginBottom="20%">
-                    <Box css={{'& > *': {textAlign: 'center'}}}>
+                    <Center>
                         <BasketIcon boxSize={[8, 10]} />
-                    </Box>
+                    </Center>
                     <Stack gap={8}>
                         <Stack gap={2}>
-                            <Text
-                                lineHeight={1}
-                                css={{'& > *': {textAlign: 'center'}}}
-                                fontSize={['18px', '2xl']}
-                                fontWeight="bold"
-                            >
-                                <FormattedMessage
-                                    defaultMessage="Your cart is empty."
-                                    id="empty_cart.description.empty_cart"
-                                />
-                            </Text>
+                            <Center>
+                                <Text lineHeight={1} fontSize={['18px', '2xl']} fontWeight="bold">
+                                    <FormattedMessage
+                                        defaultMessage="Your cart is empty."
+                                        id="empty_cart.description.empty_cart"
+                                    />
+                                </Text>
+                            </Center>
 
-                            <Text
-                                css={{'& > *': {textAlign: 'center'}}}
-                                fontSize="md"
-                                color="gray.700"
-                            >
+                            <Text textAlign="center" fontSize="md" color="gray.700">
                                 {isRegistered ? (
                                     <FormattedMessage
                                         defaultMessage="Continue shopping to add items to your cart."
@@ -52,30 +45,30 @@ const EmptyCart = ({isRegistered}) => {
                             </Text>
                         </Stack>
                         <Stack justify="center" direction={['column', 'row']} gap={4}>
-                            <Button
-                                as={Link}
-                                href={'/'}
-                                width={['343px', '220px']}
-                                variant={isRegistered ? 'solid' : 'outline'}
-                                color={isRegistered ? 'white' : 'blue.600'}
-                            >
-                                <FormattedMessage
-                                    defaultMessage="Continue Shopping"
-                                    id="empty_cart.link.continue_shopping"
-                                />
-                            </Button>
-                            {!isRegistered && (
-                                <Button
-                                    as={Link}
-                                    href="/account"
+                            <Button variant="outline" asChild>
+                                <Link
+                                    borderColor="blue.600"
+                                    href={'/'}
+                                    bg="transparent"
                                     width={['343px', '220px']}
-                                    rightIcon={<AccountIcon />}
-                                    variant="solid"
+                                    variant={isRegistered ? 'solid' : 'outline'}
+                                    color={isRegistered ? 'white' : 'blue.600'}
                                 >
                                     <FormattedMessage
-                                        defaultMessage="Sign In"
-                                        id="empty_cart.link.sign_in"
+                                        defaultMessage="Continue Shopping"
+                                        id="empty_cart.link.continue_shopping"
                                     />
+                                </Link>
+                            </Button>
+                            {!isRegistered && (
+                                <Button asChild variant="solid">
+                                    <Link href="/account" width={['343px', '220px']}>
+                                        <FormattedMessage
+                                            defaultMessage="Sign In"
+                                            id="empty_cart.link.sign_in"
+                                        />
+                                        <AccountIcon />
+                                    </Link>
                                 </Button>
                             )}
                         </Stack>
