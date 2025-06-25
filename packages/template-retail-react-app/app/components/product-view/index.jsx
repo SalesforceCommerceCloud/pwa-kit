@@ -24,6 +24,7 @@ import {
 import {useCurrency, useDerivedProduct} from '@salesforce/retail-react-app/app/hooks'
 import {useAddToCartModalContext} from '@salesforce/retail-react-app/app/hooks/use-add-to-cart-modal'
 import {useBonusProductModalContext} from '@salesforce/retail-react-app/app/hooks/use-bonus-product-modal'
+import {useBonusProductSearch} from '@salesforce/retail-react-app/app/hooks/use-bonus-product-search'
 
 // project components
 import ImageGallery from '@salesforce/retail-react-app/app/components/image-gallery'
@@ -40,6 +41,7 @@ import Swatch from '@salesforce/retail-react-app/app/components/swatch-group/swa
 import SwatchGroup from '@salesforce/retail-react-app/app/components/swatch-group'
 import {getPriceData} from '@salesforce/retail-react-app/app/utils/product-utils'
 import PromoCallout from '@salesforce/retail-react-app/app/components/product-tile/promo-callout'
+import mockProductSearchResult from './ruleBasedPromoMock.json'
 
 const ProductViewHeader = ({
     name,
@@ -141,6 +143,9 @@ const ProductView = forwardRef(
         } = useBonusProductModalContext()
         const theme = useTheme()
         const [showOptionsMessage, toggleShowOptionsMessage] = useState(false)
+        const [promotionIdToSearch, setPromotionIdToSearch] = useState(null)
+        const {data: bonusProductSearchResult} = useBonusProductSearch(promotionIdToSearch)
+        
         const {
             showLoading,
             showInventoryMessage,
@@ -306,10 +311,38 @@ const ProductView = forwardRef(
                         // Show bonus product modal first if there are bonus items
                         if (newBonusItems?.length > 0) {
                             // Update bonusProducts list with the new bonus items
+                            let isRuleBasedPromotion = !newBonusItems.some(item => item.bonusProducts);
+                            let bonusProductsToShow = [];
+                            
+                            if(isRuleBasedPromotion) {
+                                setPromotionIdToSearch(newBonusItems[0].promotionId);
+                                let ruleBasedBonusProducts = [];
+                                console.log("bonusProductSearchResult : ", bonusProductSearchResult)
+                                console.log("mockProductSearchResult : ", mockProductSearchResult)
+                                if(mockProductSearchResult?.hits?.length > 0) {
+                                    mockProductSearchResult.hits.forEach((bonusProduct, index) => {
+                                        ruleBasedBonusProducts.push({
+                                            productId: bonusProduct.productId,
+                                            productName: bonusProduct.productName,
+                                            c_productUrl: bonusProduct.c_productUrl
+                                        });
+                                    });
+                                    bonusProductsToShow = ruleBasedBonusProducts;
+                                } 
+                            } else {
+                                let listBasedBonusProducts = [];
+                                newBonusItems[0].bonusProducts.forEach(bonusProduct => {
+                                    listBasedBonusProducts.push({
+                                        productId: bonusProduct.productId,
+                                        productName: bonusProduct.name,
+                                        c_productUrl: bonusProduct.c_productUrl
+                                    })
+                                })
+                                bonusProductsToShow = listBasedBonusProducts;
+                            }
                             addBonusProducts(newBonusItems)
                             onBonusProductModalOpen({
-                                newBonusItems,
-                                allBonusItems: addToCartResponse.bonusDiscountLineItems,
+                                newBonusItems: bonusProductsToShow,
                                 openAddToCartModalIfNeeded: true,
                                 product,
                                 itemsAdded,

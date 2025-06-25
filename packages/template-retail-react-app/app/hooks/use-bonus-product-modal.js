@@ -35,7 +35,8 @@ export const useBonusState = (basket) => {
     const [state, setState] = useState({
         isOpen: false,
         data: {},
-        bonusProducts: basket?.bonusDiscountLineItems || []
+        existingBonusProducts: basket?.bonusDiscountLineItems || [],
+        newBonusProducts: []
     })
     const {pathname} = useLocation()
     const {onOpen: onAddToCartModalOpen} = useAddToCartModalContext()
@@ -54,10 +55,10 @@ export const useBonusState = (basket) => {
         const currentBonusItems = basket?.bonusDiscountLineItems || []
         setState((prev) => {
             // Only update if the bonus items have actually changed
-            if (JSON.stringify(prev.bonusProducts) !== JSON.stringify(currentBonusItems)) {
+            if (JSON.stringify(prev.existingBonusProducts) !== JSON.stringify(currentBonusItems)) {
                 return {
                     ...prev,
-                    bonusProducts: currentBonusItems
+                    existingBonusProducts: currentBonusItems
                 }
             }
             return prev
@@ -66,10 +67,11 @@ export const useBonusState = (basket) => {
 
     const addBonusProducts = (newBonusItems) => {
         setState((prev) => {
-            const updatedBonusProducts = [...prev.bonusProducts, ...newBonusItems]
+            const updatedBonusProducts = [...prev.existingBonusProducts, ...newBonusItems]
             return {
                 ...prev,
-                bonusProducts: updatedBonusProducts
+                existingBonusProducts: updatedBonusProducts,
+                newBonusProducts: newBonusItems
             }
         })
     }
@@ -77,7 +79,8 @@ export const useBonusState = (basket) => {
     return {
         isOpen: state.isOpen,
         data: state.data,
-        bonusProducts: state.bonusProducts,
+        bonusProducts: state.existingBonusProducts,
+        newBonusProducts: state.newBonusProducts,
         addBonusProducts,
         onClose: () => {
             setState((prev) => ({
