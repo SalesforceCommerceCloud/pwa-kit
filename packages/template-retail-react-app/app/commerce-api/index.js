@@ -113,10 +113,17 @@ class CommerceAPI {
             }
         }
 
-        // Instantiate the SDK class proxies and create getters from our api mapping.
-        // The proxy handlers are called when accessing any of the mapped SDK class
-        // proxies, executing various pre-defined hooks for tapping into or modifying
-        // the outgoing method parameters and/or incoming SDK responses
+        /* Instantiate the SDK class proxies and create getters from our api mapping.
+         * @salesforce/commerce-sdk-react introduces a utility `transformSDKClient`
+         * that wraps any Commerce SDK client instance in a JavaScript Proxy,
+         * allowing you to intercept and transform method arguments, headers, parameters,
+         * and other options before each SDK call is made.
+         * `transformSDKClient` takes an SDK client instance and a configuration object. The configuration can include:
+         * - `props`: Arbitrary props/config you want to pass to your transformer.
+         * - `transformer`: A function that receives the props, method name, and original function args (options), and returns the transformed options.
+         * - `onError`: (Optional) A function to handle errors thrown by SDK methods.
+         * Every method call on the proxied client will pass through your transformer before being executed.
+         */
         const self = this
         Object.keys(apiConfigs).forEach((key) => {
             const SdkClass = apiConfigs[key].api
