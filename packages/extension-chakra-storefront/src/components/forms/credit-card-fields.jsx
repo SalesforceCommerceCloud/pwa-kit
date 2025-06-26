@@ -84,12 +84,13 @@ const CreditCardFields = ({form, prefix = ''}) => {
                                 : number
                             form.setValue('cardType', card?.type || '')
                             return onChange(formattedNumber)
-                        }
+                        },
+                        endElement:
+                            CardIcon && form.getValues().number?.length > 2 ? (
+                                <CardIcon layerStyle="ccIcon" />
+                            ) : undefined
                     })}
-                >
-                    {/* Note: The Field component in this codebase handles InputGroup internally, 
-                        so we don't need to add the card icon here for now */}
-                </Field>
+                />
 
                 <Field {...fields.holder} />
 
@@ -140,7 +141,7 @@ const CreditCardFields = ({form, prefix = ''}) => {
                                     <Tooltip.Root
                                         open={isTooltipOpen}
                                         onOpenChange={(e) => setIsTooltipOpen(e.open)}
-                                        positioning={{ placement: "top" }}
+                                        positioning={{placement: 'top'}}
                                     >
                                         <Tooltip.Trigger asChild>
                                             <InfoIcon

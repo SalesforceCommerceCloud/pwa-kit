@@ -8,7 +8,7 @@ import React, {useState} from 'react'
 import PropTypes from 'prop-types'
 import {Controller} from 'react-hook-form'
 import {
-    Field,
+    Field as ChakraField,
     IconButton,
     Input,
     InputGroup,
@@ -18,7 +18,7 @@ import {
 import {VisibilityIcon, VisibilityOffIcon, AlertIcon} from '../../components/icons'
 import {useIntl} from 'react-intl'
 
-const FieldComponent = ({
+const Field = ({
     name,
     label,
     formLabel,
@@ -61,22 +61,24 @@ const FieldComponent = ({
                     typeof inputProps === 'function' ? inputProps({value, onChange}) : inputProps
 
                 return (
-                    <Field.Root id={name} invalid={!!error}>
+                    <ChakraField.Root id={name} invalid={!!error}>
                         {!['checkbox', 'radio', 'hidden'].includes(type) &&
-                            (formLabel || <Field.Label>{label}</Field.Label>)}
+                            (formLabel || <ChakraField.Label>{label}</ChakraField.Label>)}
 
                         {['text', 'password', 'email', 'phone', 'tel', 'number'].includes(type) && (
                             <InputGroup
                                 endElement={
                                     type === 'password' ? (
                                         <IconButton
-                                            variant="ghost"
+                                            variant="ghosted"
                                             aria-label={passwordIconLabel}
                                             onClick={() => setHidePassword(!hidePassword)}
                                         >
                                             <PasswordIcon color="gray.500" boxSize={6} />
                                         </IconButton>
-                                    ) : undefined
+                                    ) : (
+                                        _inputProps?.endElement
+                                    )
                                 }
                             >
                                 <Input
@@ -132,23 +134,21 @@ const FieldComponent = ({
                         {children}
 
                         {error && type !== 'hidden' && (
-                            <Field.ErrorText color="red.600">
+                            <ChakraField.ErrorText color="red.600">
                                 <AlertIcon aria-hidden="true" mr={2} />
                                 {error.message}
-                            </Field.ErrorText>
+                            </ChakraField.ErrorText>
                         )}
 
-                        {helpText && (
-                            <Field.HelperText>{helpText}</Field.HelperText>
-                        )}
-                    </Field.Root>
+                        {helpText}
+                    </ChakraField.Root>
                 )
             }}
         />
     )
 }
 
-FieldComponent.propTypes = {
+Field.propTypes = {
     name: PropTypes.string,
     label: PropTypes.string,
     autoComplete: PropTypes.string,
@@ -176,4 +176,4 @@ FieldComponent.propTypes = {
     inputRef: PropTypes.object
 }
 
-export default FieldComponent
+export default Field
