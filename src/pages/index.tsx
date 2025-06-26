@@ -38,6 +38,10 @@ const ProductList = loadable(() => import('overridable!./product-list'), {
 const SocialLoginRedirect = loadable(() => import('overridable!./social-login-redirect'), {
     fallback
 })
+
+const PageNotFound = loadable(() => import('overridable!./page-not-found'), {
+    fallback
+})
 // const Wishlist = loadable(() => import('overridable!./account/wishlist'), {
 //     fallback
 // })
@@ -57,6 +61,7 @@ LoginRedirect.displayName = 'LoginRedirect'
 ProductDetail.displayName = 'ProductDetail'
 ProductList.displayName = 'ProductList'
 SocialLoginRedirect.displayName = 'SocialLoginRedirect'
+PageNotFound.displayName = 'PageNotFound'
 
 export {
     // Account,
@@ -70,5 +75,6 @@ export {
     LoginRedirect,
     ProductDetail,
     ProductList,
+    PageNotFound,
     SocialLoginRedirect
 }
