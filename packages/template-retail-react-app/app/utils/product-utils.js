@@ -23,15 +23,27 @@ import {productUrlBuilder, rebuildPathWithParams} from '@salesforce/retail-react
  * // returns { "Colour": "royal" }
  */
 export const getDisplayVariationValues = (variationAttributes, values = {}) => {
+    if (!variationAttributes || !Array.isArray(variationAttributes)) {
+        return {}
+    }
+
     const returnVal = Object.entries(values).reduce((acc, [id, value]) => {
         const attribute = variationAttributes.find(({id: attributeId}) => attributeId === id)
+        if (!attribute || !attribute.values) {
+            return acc
+        }
+
         const attributeValue = attribute.values.find(
             ({value: attributeValue}) => attributeValue === value
         )
-        return {
-            ...acc,
-            [attribute.name]: attributeValue.name
+
+        if (attributeValue) {
+            return {
+                ...acc,
+                [attribute.name]: attributeValue.name
+            }
         }
+        return acc
     }, {})
     return returnVal
 }
@@ -73,11 +85,13 @@ export const getUpdateBundleChildArray = (bundle, childProductSelections) => {
                 childProduct.product?.itemId === bundleChild.itemId
         )
 
-        // only update the item if the selected variant is different then what's in the current bundle
-        if (childSelection && childSelection.variant?.productId !== bundleChild.productId) {
+        const selectedProductId = childSelection?.variant?.productId || childSelection?.product?.id
+
+        // only update the item if the selected product is different from what's in the current bundle
+        if (childSelection && selectedProductId !== bundleChild.productId) {
             itemsToBeUpdated.push({
                 itemId: bundleChild.itemId,
-                productId: childSelection.variant.productId,
+                productId: selectedProductId,
                 quantity: childSelection.quantity ?? bundleChild.quantity
             })
         }

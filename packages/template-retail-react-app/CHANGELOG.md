@@ -5,7 +5,10 @@
 - Updated 6 new languages [#2495](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2495)
 - Fix Einstein event tracking for `addToCart` event [#2558](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2558)
 - Update latest translations for all languages [#2616](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2616)
-- Load active data scripts on demand only [#2623](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2623)
+- Support standard product on PDP [#2518](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2518)
+- Removed the "Edit" button from product cards of Standard Products [#2581](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2581)
+- Support standard product as a child item in bundles [#2574](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2574)
+- Support standard product as a child item in sets [#2636](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2636)
 - Show Bonus Products on Cart Page [#2547](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2547)
 
 ## v6.1.0 (May 22, 2025)
