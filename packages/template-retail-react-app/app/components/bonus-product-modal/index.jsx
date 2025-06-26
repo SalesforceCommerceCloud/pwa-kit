@@ -23,6 +23,7 @@ import {
     useDisclosure
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 import {useProducts} from '@salesforce/commerce-sdk-react'
+import {useHistory} from 'react-router-dom'
 import useEinstein from '@salesforce/retail-react-app/app/hooks/use-einstein'
 import DynamicImage from '@salesforce/retail-react-app/app/components/dynamic-image'
 import ProductViewModal from '@salesforce/retail-react-app/app/components/product-view-modal'
@@ -123,6 +124,7 @@ BonusProductItem.propTypes = {
 
 export const BonusProductModal = () => {
     const einstein = useEinstein() 
+    const history = useHistory()
     const {addItemToNewOrExistingBasket} = useShopperBasketsMutationHelper()
     const {isOpen, onClose, onClickClose,data} = useBonusProductModalContext()
     const {isOpen : isProductViewOpen, onOpen : onProductViewOpen, onClose : onProductViewClose} = useDisclosure()
@@ -187,17 +189,12 @@ export const BonusProductModal = () => {
 
             einstein.sendAddToCart(productItems)
 
-            // If the items were successfully added, set the return value to be used
-            // by the add to cart modal.
-            return {
-                ...response,
-                productSelectionValues
-            }
         } catch (error) {
             console.log('error', error)
             showError(error)
         } finally {
-            onProductViewHide()
+            onClickClose()
+            history.push('/cart')
         }
     }
 
@@ -212,24 +209,36 @@ export const BonusProductModal = () => {
     const productCount = bonusProducts.length
     const columns = Math.min(productCount, 3) // Max 3 columns, but fewer if less products
     const product = useMemo(() => {
-        const product = bonusProducts.find((product) => product.productId === selectedProduct)
-        return product
-    }, [bonusProducts, selectedProduct])
+        const bonusProduct = bonusProducts.find((product) => product.productId === selectedProduct)
+        if (!bonusProduct) return null
+        
+        // Get the full product data from the fetched products
+        const fullProductData = productsDataMap[bonusProduct.productId || bonusProduct.id]
+        
+        // Merge bonus product data with full product data
+        return fullProductData ? {
+            ...fullProductData,
+            ...bonusProduct
+        } : null
+    }, [bonusProducts, selectedProduct, productsDataMap])
 
     if (!isOpen) return null
 
     return (
         <>
-            {selectedProduct && (
+            {selectedProduct && product && (
                 <ProductViewModal
-                    isOpen={isProductViewOpen} onClose={onProductViewHide} onOpen={onProductViewOpen}
+                    isOpen={isProductViewOpen} 
+                    onClose={onProductViewHide} 
+                    onOpen={onProductViewOpen}
                     product={product}
                     addToCart={(variant, quantity) =>
                         handleAddToCart([{product: product, variant, quantity: quantity}])
                     }
                 />
             )}          
-            {!selectedProduct && (<Modal isOpen={isOpen} onClose={(onClose)} size="3xl" scrollBehavior="inside">
+            {!selectedProduct && (
+                <Modal isOpen={isOpen} onClose={(onClose)} size="3xl" scrollBehavior="inside">
                     <ModalOverlay />
                     <ModalContent>
                         <ModalHeader>
