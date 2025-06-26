@@ -56,7 +56,12 @@ import {rebuildPathWithParams} from '@salesforce/retail-react-app/app/utils/url'
 import {useHistory, useLocation, useParams} from 'react-router-dom'
 import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
 import {useWishList} from '@salesforce/retail-react-app/app/hooks/use-wish-list'
-import {handleAddToCart, handleChildProductValidation, handleProductBundleAddToCart, handleProductSetAddToCart} from '@salesforce/retail-react-app/app/utils/cart-utils'
+import {
+    handleAddToCart,
+    handleChildProductValidation,
+    handleProductBundleAddToCart,
+    handleProductSetAddToCart
+} from '@salesforce/retail-react-app/app/utils/cart-utils'
 
 const ProductDetail = () => {
     const {formatMessage} = useIntl()
@@ -358,28 +363,36 @@ const ProductDetail = () => {
                             category={primaryCategory?.parentCategoryTree || []}
                             addToCart={
                                 isProductASet
-                                    ? () => handleProductSetAddToCart(
-                                        childProductSelection,
-                                        addItemToNewOrExistingBasket,
-                                        einstein,
-                                        showError
-                                    )
-                                    : (variant, selectedQuantity) => handleProductBundleAddToCart(
-                                        product,
-                                        childProductSelection,
-                                        selectedQuantity,
-                                        addItemToNewOrExistingBasket,
-                                        updateItemsInBasketMutation,
-                                        einstein,
-                                        showError,
-                                        getUpdateBundleChildArray
-                                    )
+                                    ? () =>
+                                          handleProductSetAddToCart(
+                                              childProductSelection,
+                                              addItemToNewOrExistingBasket,
+                                              einstein,
+                                              showError
+                                          )
+                                    : (variant, selectedQuantity) =>
+                                          handleProductBundleAddToCart(
+                                              product,
+                                              childProductSelection,
+                                              selectedQuantity,
+                                              addItemToNewOrExistingBasket,
+                                              updateItemsInBasketMutation,
+                                              einstein,
+                                              showError,
+                                              getUpdateBundleChildArray
+                                          )
                             }
                             addToWishlist={handleAddToWishlist}
                             isProductLoading={isProductLoading}
                             isBasketLoading={isBasketLoading}
                             isWishlistLoading={isWishlistLoading}
-                            validateOrderability={() => handleChildProductValidation(childProductRefs, comboProduct, childProductSelection)}
+                            validateOrderability={() =>
+                                handleChildProductValidation(
+                                    childProductRefs,
+                                    comboProduct,
+                                    childProductSelection
+                                )
+                            }
                             childProductOrderability={childProductOrderability}
                             setSelectedBundleQuantity={setSelectedBundleQuantity}
                         />
@@ -410,13 +423,18 @@ const ProductDetail = () => {
                                             addToCart={
                                                 isProductASet
                                                     ? (variant, quantity) =>
-                                                          handleAddToCart([
-                                                              {
-                                                                  product: childProduct,
-                                                                  variant,
-                                                                  quantity
-                                                              }
-                                                          ], addItemToNewOrExistingBasket, einstein, showError)
+                                                          handleAddToCart(
+                                                              [
+                                                                  {
+                                                                      product: childProduct,
+                                                                      variant,
+                                                                      quantity
+                                                                  }
+                                                              ],
+                                                              addItemToNewOrExistingBasket,
+                                                              einstein,
+                                                              showError
+                                                          )
                                                     : null
                                             }
                                             addToWishlist={
@@ -463,7 +481,12 @@ const ProductDetail = () => {
                             product={product}
                             category={primaryCategory?.parentCategoryTree || []}
                             addToCart={(variant, quantity) =>
-                                handleAddToCart([{product, variant, quantity}], addItemToNewOrExistingBasket, einstein, showError)
+                                handleAddToCart(
+                                    [{product, variant, quantity}],
+                                    addItemToNewOrExistingBasket,
+                                    einstein,
+                                    showError
+                                )
                             }
                             addToWishlist={handleAddToWishlist}
                             isProductLoading={isProductLoading}

@@ -1,4 +1,9 @@
-// Handles cart-related actions for product detail page
+/*
+ * Copyright (c) 2025, Salesforce, Inc.
+ * All rights reserved.
+ * SPDX-License-Identifier: BSD-3-Clause
+ * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
+ */
 
 /**
  * Handles adding products to cart and sending data to Einstein.
@@ -49,7 +54,11 @@ export const handleAddToCart = async (
  * @param {Object} childProductSelection - The current selection state for child products.
  * @returns {boolean} True if all required child products are selected, false otherwise.
  */
-export const handleChildProductValidation = (childProductRefs, comboProduct, childProductSelection) => {
+export const handleChildProductValidation = (
+    childProductRefs,
+    comboProduct,
+    childProductSelection
+) => {
     // Run validation for all child products. This will ensure the error messages are shown.
     Object.values(childProductRefs.current).forEach(({validateOrderability}) => {
         validateOrderability({scrollErrorIntoView: false})
@@ -57,15 +66,13 @@ export const handleChildProductValidation = (childProductRefs, comboProduct, chi
 
     // Using state for which child products are selected, scroll to the first one that isn't selected and requires a variant selection.
     const selectedProductIds = Object.keys(childProductSelection)
-    const firstUnselectedProduct = comboProduct.childProducts.find(
-        ({product: childProduct}) => {
-            // Skip validation for standard products (no variations)
-            if (childProduct.type?.item) {
-                return false
-            }
-            return !selectedProductIds.includes(childProduct.id)
+    const firstUnselectedProduct = comboProduct.childProducts.find(({product: childProduct}) => {
+        // Skip validation for standard products (no variations)
+        if (childProduct.type?.item) {
+            return false
         }
-    )?.product
+        return !selectedProductIds.includes(childProduct.id)
+    })?.product
 
     if (firstUnselectedProduct) {
         // Get the reference to the product view and scroll to it.
@@ -144,10 +151,7 @@ export const handleProductBundleAddToCart = async (
             return bundleChildIds.every((id) => bundleChildMasterIds.includes(id))
         })
 
-        const itemsToBeUpdated = getUpdateBundleChildArray(
-            currentBundle,
-            childProductSelections
-        )
+        const itemsToBeUpdated = getUpdateBundleChildArray(currentBundle, childProductSelections)
 
         if (itemsToBeUpdated.length) {
             // make a follow up call to update child variant selection for product bundle
@@ -185,5 +189,10 @@ export const handleProductSetAddToCart = (
 ) => {
     // Get all the selected products, and pass them to the addToCart handler which accepts an array.
     const productSelectionValues = Object.values(childProductSelection)
-    return handleAddToCart(productSelectionValues, addItemToNewOrExistingBasket, einstein, showError)
+    return handleAddToCart(
+        productSelectionValues,
+        addItemToNewOrExistingBasket,
+        einstein,
+        showError
+    )
 }
