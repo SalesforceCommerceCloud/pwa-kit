@@ -11,26 +11,11 @@ import {z} from 'zod'
 import {AddComponentTool} from '../utils/AddComponentTool.js'
 import {InsertExistingComponentTool} from '../utils/InsertExistingComponentTool.js'
 import {CreateNewComponentTool} from '../utils/CreateNewComponentTool.js'
-import {generatePwaKitProject} from '../utils/GenerateProject.js'
-
-// TODO: It might be better to use and index file.
-
-// Preset and Template data
-import createAppPresets from '@salesforce/pwa-kit-create-app/data/presets.json' assert {type: 'json'}
-import createAppTemplates from '@salesforce/pwa-kit-create-app/data/templates.json' assert {type: 'json'}
-import createAppValidators from '@salesforce/pwa-kit-create-app/data/validators.json' assert {type: 'json'}
-
-
-// Preset and Template schemas
-import createAppPresetsSchema from '@salesforce/pwa-kit-create-app/schemas/presets.json' assert {type: 'json'}
-import createAppTemplatesSchema from '@salesforce/pwa-kit-create-app/schemas/templates.json' assert {type: 'json'}
-import createAppValidatorsSchema from '@salesforce/pwa-kit-create-app/schemas/validators.json' assert {type: 'json'}
-
 
 import fs from 'fs/promises'
 import path from 'path'
 import {fileURLToPath} from 'url'
-import {DeveloperGuidelinesTool} from '../utils/pwa-developer-guideline-tool.js'
+import {CreateProjectTool, DeveloperGuidelinesTool} from '../utils/index.js'
 
 class PwaStorefrontMCPServerHighLevel {
     constructor() {
@@ -42,7 +27,7 @@ class PwaStorefrontMCPServerHighLevel {
         })
 
         console.error = console.error.bind(console)
-        
+
         this.addComponentTool = new AddComponentTool()
         this.insertExistingComponentTool = new InsertExistingComponentTool()
         this.CreateNewComponentTool = new CreateNewComponentTool()
@@ -50,6 +35,22 @@ class PwaStorefrontMCPServerHighLevel {
     }
 
     setupTools() {
+        // Register CreateProjectTool
+        this.server.tool(
+            CreateProjectTool.name,
+            CreateProjectTool.description,
+            CreateProjectTool.inputSchema,
+            CreateProjectTool.fn
+        )
+
+        // Register DeveloperGuidelinesTool
+        this.server.tool(
+            CreateNewComponentTool.name,
+            CreateNewComponentTool.description,
+            CreateNewComponentTool.inputSchema,
+            CreateNewComponentTool.fn
+        )
+
         // Register DeveloperGuidelinesTool
         this.server.tool(
             DeveloperGuidelinesTool.name,
@@ -232,122 +233,6 @@ class PwaStorefrontMCPServerHighLevel {
                         type: 'text',
                         text: item.text
                     }))
-                }
-            }
-        )
-
-        // submit_pwa_kit_project_answers
-        this.server.tool(
-            'submit_pwa_kit_project_answers',
-            'Submit completed PWA Kit project answers to generate the PWA Kit project. This should be called after the get_project_questions tool is called and the answers are collected.',
-            {
-                selectedPreset: z.record(z.any()).describe('The selected preset for project generation')
-            },
-            async (thing) => {
-                try {
-                    const jsonData = {
-                        ...thing.selectedPreset.answers,
-                        'general.presetOrTemplateId': thing.selectedPreset.templateId
-                    }
-                    
-                    const result = await generatePwaKitProject(jsonData)
-                    
-                    return {
-                        content: [
-                            {
-                                type: 'text',
-                                text: `Project generation completed successfully:\n${result}`
-                            }
-                        ]
-                    }
-                } catch (error) {
-                    return {
-                        content: [
-                            {
-                                type: 'text',
-                                text: `Project generation failed: ${error.message}`
-                            }
-                        ],
-                        isError: true
-                    }
-                }
-            }
-        )
-
-        // get_create_app_validators
-        this.server.tool(
-            'get_create_app_validators',
-            getCreateAppValidatorsDescription,
-            {},
-            async () => {
-
-                return {
-                    content: [
-                        {
-                            type: 'text',
-                            text: JSON.stringify(
-                                {
-                                    validators: createAppValidators,
-                                    schema: createAppValidatorsSchema,
-                                    guidelines: createAppGuidelines
-                                },
-                                null,
-                                2
-                            )
-                        }
-                    ]
-                }
-            }
-        )
-
-        // get_create_app_presets
-        this.server.tool(
-            'get_create_app_presets',
-            getCreateAppPresetsDescription,
-            {},
-            async () => {
-
-                return {
-                    content: [
-                        {
-                            type: 'text',
-                            text: JSON.stringify(
-                                {
-                                    presets: createAppPresets,
-                                    schema: createAppPresetsSchema,
-                                    guidelines: createAppGuidelines
-                                },
-                                null,
-                                2
-                            )
-                        }
-                    ]
-                }
-            }
-        )
-
-        // get_create_app_templates
-        this.server.tool(
-            'get_create_app_templates',
-            getCreateAppTemplatesDescription,
-            {},
-            async () => {
-
-                return {
-                    content: [
-                        {
-                            type: 'text',
-                            text: JSON.stringify(
-                                {
-                                    templates: createAppTemplates,
-                                    schema: createAppTemplatesSchema,
-                                    guidelines: createAppGuidelines
-                                },
-                                null,
-                                2
-                            )
-                        }
-                    ]
                 }
             }
         )

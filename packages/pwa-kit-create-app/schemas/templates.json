@@ -18,7 +18,11 @@
                 ],
                 "properties": {
                     "id": {
-                        "type": "string"
+                        "type": "string",
+                        "_ai": {
+                            "instruction": "When creating a new project using a template, this property should be renamed to `presetOrTemplateId` and is used to identify the template.",
+                            "expectedUse": "Used as a unique identifier for the template."
+                        }
                     },
                     "name": {
                         "type": "string"

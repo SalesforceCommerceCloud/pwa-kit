@@ -54,6 +54,16 @@ const PRESETS = require('../data/presets.json').presets
 const TEMPLATES = require('../data/templates.json').templates
 const VALIDATORS = require('../data/validators.json').validators
 
+const PRESETS_SCHEMA = require('../schemas/presets.json')
+const TEMPLATES_SCHEMA = require('../schemas/templates.json')
+const VALIDATORS_SCHEMA = require('../schemas/validators.json')
+const { json } = require('stream/consumers')
+
+const SCHEMAS = {
+    presets: PRESETS_SCHEMA,
+    templates: TEMPLATES_SCHEMA,
+    validators: VALIDATORS_SCHEMA
+}
 // Questions composed of public presets and public templates.
 // NOTE: We have to do some weird stuff to determine if the thing we are selecting is a preset or a template.
 // There might be a better way to do this.
@@ -421,6 +431,27 @@ const main = async (opts) => {
         console.log('')
     }
 
+    if (opts.schema) {
+        // TODO: Add validation
+        console.log(JSON.stringify(SCHEMAS[opts.schema], null, 2))
+        return
+    }
+
+    if (opts.presets) {
+        console.log(JSON.stringify(PRESETS, null, 2))
+        return
+    }
+
+    if (opts.templates) {
+        console.log(JSON.stringify(TEMPLATES, null, 2))
+        return
+    }
+
+    if (opts.validators) {
+        console.log(JSON.stringify(VALIDATORS, null, 2))
+        return
+    }
+
     // The context object will have all the current information, like the selected preset, the answers
     // to "general" and "project" questions. It'll also be populated with details of the selected project,
     // like its `package.json` value.
@@ -569,15 +600,31 @@ const main = async (opts) => {
 
 if (require.main === module) {
     program.name(`pwa-kit-create-app`)
-    program.description(`Generate a new PWA Kit project, optionally using a preset.
+    program.description(`Generates a new PWA Kit project.
 
-Examples:
-
-   ${PRESETS.filter(({private}) => !private).map(({id, description}) => {
+Presets:
+${PRESETS.filter(({private}) => !private).map(({id, name, shortDescription}) => {
        return `
-  ${program.name()} --preset "${id}"\n${description}
+${name} (${id})
+${shortDescription}
         `
-   })}
+})}
+
+Templates:
+${TEMPLATES.filter(({private}) => !private).map(({id, name, shortDescription}) => {
+    return `
+${name} (${id})
+${shortDescription}
+     `
+})}
+
+Example Usage:
+
+   // Generate a project using a preset
+   npx @salesforce/${program.name()} --preset "retail-react-app-demo"
+
+   // Generate a project using answers from stdin
+   echo {"project.name":"MyProject", ...} |  npx @salesforce/${program.name()} --stdio
 
    `)
     program
@@ -595,6 +642,11 @@ Examples:
         )
         .option('--verbose', `Print additional logging information to the console.`, false)
         .option('--stdio', `Accept project generation answers from stdin as JSON`, false)
+        .option('--schema <type>', 'Show the schema for a type (preset, template, question)')
+        .option('--presets', 'Show available presets')
+        .option('--templates', 'Show available templates')
+        .option('--validators', 'Show available validators')
+        .option('--private', 'Include private templates/presets when listed')
 
     program.parse(process.argv)
 
