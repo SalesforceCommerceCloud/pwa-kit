@@ -41,7 +41,6 @@ import Swatch from '@salesforce/retail-react-app/app/components/swatch-group/swa
 import SwatchGroup from '@salesforce/retail-react-app/app/components/swatch-group'
 import {getPriceData} from '@salesforce/retail-react-app/app/utils/product-utils'
 import PromoCallout from '@salesforce/retail-react-app/app/components/product-tile/promo-callout'
-import mockProductSearchResult from './ruleBasedPromoMock.json'
 
 const ProductViewHeader = ({
     name,
@@ -145,7 +144,7 @@ const ProductView = forwardRef(
         const [showOptionsMessage, toggleShowOptionsMessage] = useState(false)
         const [promotionIdToSearch, setPromotionIdToSearch] = useState(null)
         const {data: bonusProductSearchResult} = useBonusProductSearch(promotionIdToSearch)
-        
+
         const {
             showLoading,
             showInventoryMessage,
@@ -311,34 +310,34 @@ const ProductView = forwardRef(
                         // Show bonus product modal first if there are bonus items
                         if (newBonusItems?.length > 0) {
                             // Update bonusProducts list with the new bonus items
-                            let isRuleBasedPromotion = !newBonusItems.some(item => item.bonusProducts);
-                            let bonusProductsToShow = [];
-                            
-                            if(isRuleBasedPromotion) {
-                                setPromotionIdToSearch(newBonusItems[0].promotionId);
-                                let ruleBasedBonusProducts = [];
-                                console.log("bonusProductSearchResult : ", bonusProductSearchResult)
-                                console.log("mockProductSearchResult : ", mockProductSearchResult)
-                                if(mockProductSearchResult?.hits?.length > 0) {
-                                    mockProductSearchResult.hits.forEach((bonusProduct, index) => {
+                            let isRuleBasedPromotion = !newBonusItems.some(
+                                (item) => item.bonusProducts
+                            )
+                            let bonusProductsToShow = []
+
+                            if (isRuleBasedPromotion) {
+                                setPromotionIdToSearch(newBonusItems[0].promotionId)
+                                let ruleBasedBonusProducts = []
+                                if (bonusProductSearchResult?.hits?.length > 0) {
+                                    bonusProductSearchResult.hits.forEach((bonusProduct, index) => {
                                         ruleBasedBonusProducts.push({
                                             productId: bonusProduct.productId,
                                             productName: bonusProduct.productName,
                                             c_productUrl: bonusProduct.c_productUrl
-                                        });
-                                    });
-                                    bonusProductsToShow = ruleBasedBonusProducts;
-                                } 
+                                        })
+                                    })
+                                    bonusProductsToShow = ruleBasedBonusProducts
+                                }
                             } else {
-                                let listBasedBonusProducts = [];
-                                newBonusItems[0].bonusProducts.forEach(bonusProduct => {
+                                let listBasedBonusProducts = []
+                                newBonusItems[0].bonusProducts.forEach((bonusProduct) => {
                                     listBasedBonusProducts.push({
                                         productId: bonusProduct.productId,
-                                        productName: bonusProduct.name,
-                                        c_productUrl: bonusProduct.c_productUrl
+                                        productName: bonusProduct.productName,
+                                        title: bonusProduct.title
                                     })
                                 })
-                                bonusProductsToShow = listBasedBonusProducts;
+                                bonusProductsToShow = listBasedBonusProducts
                             }
                             addBonusProducts(newBonusItems)
                             onBonusProductModalOpen({
