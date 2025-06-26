@@ -323,7 +323,7 @@ const ProductView = forwardRef(
                             onBonusProductModalOpen({
                                 newBonusItems,
                                 allBonusItems: addToCartResponse.bonusDiscountLineItems,
-                                openAddToCartModalIfNeeded: true,
+                                openAddToCartModalIfNeeded: false,
                                 product,
                                 itemsAdded,
                                 selectedQuantity: quantity
@@ -493,7 +493,7 @@ const ProductView = forwardRef(
                                     <HideOnMobile>
                                         {showFullLink && product && (
                                             <Link
-                                                to={`/product/${product.master.masterId}`}
+                                                to={`/product/${product.master?.masterId}`}
                                                 color="blue.600"
                                             >
                                                 <FormattedMessage
@@ -680,7 +680,7 @@ const ProductView = forwardRef(
                             <HideOnDesktop>
                                 {showFullLink && product && (
                                     <Link
-                                        to={`/product/${product.master.masterId}`}
+                                        to={`/product/${product.master?.masterId}`}
                                         color="blue.600"
                                     >
                                         <FormattedMessage
