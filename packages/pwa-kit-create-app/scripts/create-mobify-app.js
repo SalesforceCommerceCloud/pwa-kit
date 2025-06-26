@@ -268,7 +268,7 @@ const PRESETS = [
             ['project.einstein.siteId']: 'aaij-MobileFirst',
             ['project.dataCloud.appSourceId']: 'f22ae831-ac03-4bf6-afc1-3a0b19f1ea8e',
             ['project.dataCloud.tenantId']: 'mmydmztgh04dczjzmnsw0zd0g8.pc-rnd',
-            ['project.demo.enableDemoSettings']: false
+            ['project.demo.enableDemoSettings']: true
         },
         assets: ['translations'],
         private: false
