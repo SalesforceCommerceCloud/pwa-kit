@@ -48,6 +48,30 @@ jest.mock('@salesforce/commerce-sdk-react', () => {
     }
 })
 
+// Mock Einstein hook
+const mockSendAddToCart = jest.fn()
+const mockSendViewProduct = jest.fn()
+const mockGetRecommendations = jest.fn()
+jest.mock('@salesforce/retail-react-app/app/hooks/use-einstein', () => ({
+    __esModule: true,
+    default: () => ({
+        sendAddToCart: mockSendAddToCart,
+        sendViewProduct: mockSendViewProduct,
+        getRecommendations: mockGetRecommendations
+    })
+}))
+
+jest.mock('@salesforce/retail-react-app/app/components/recommended-products', () => {
+    return function MockedRecommendedProducts({ title }) {
+        return (
+            <div data-testid="recommended-products">
+                <h2>{title}</h2>
+                <div>Summer Bomber Jacket</div>
+            </div>
+        )
+    }
+})
+
 jest.mock('@salesforce/retail-react-app/app/constants', () => {
     const originalModule = jest.requireActual('@salesforce/retail-react-app/app/constants')
     return {
@@ -97,6 +121,9 @@ beforeEach(() => {
 afterEach(() => {
     jest.resetModules()
     jest.clearAllMocks()
+    mockSendAddToCart.mockClear()
+    mockSendViewProduct.mockClear()
+    mockGetRecommendations.mockClear()
 })
 
 test('should render product details page', async () => {
@@ -613,6 +640,53 @@ describe('standard product', () => {
 
         await waitFor(() => {
             expect(screen.getAllByTestId('product-view')).toHaveLength(4) // 1 parent + 3 children
+        })
+    })
+
+    test('adding to cart should send einstein event', async () => {
+        window.history.pushState({}, 'ProductDetail', '/uk/en-GB/product/a-standard-dress')
+
+        const initialBasket = {basketId: 'test-basket-id'}
+        renderWithProviders(<MockedComponent />, {wrapperProps: {initialBasket}})
+
+        await waitFor(() => {
+            expect(screen.getAllByText('White and Black Tone')[0]).toBeInTheDocument()
+            expect(screen.getByRole('button', {name: /add to cart/i})).toBeInTheDocument()
+        })
+
+        const addToCartButton = screen.getByRole('button', {name: /Add to Cart/i})
+        fireEvent.click(addToCartButton)
+
+        await waitFor(() => {
+            
+            expect(mockAddToCart).toHaveBeenCalledTimes(1)
+            expect(mockSendAddToCart).toHaveBeenCalledTimes(1)
+            
+            const addToCartArgs = mockSendAddToCart.mock.calls[0][0]
+            expect(addToCartArgs).toHaveLength(1)
+            
+            expect(item).toEqual(expect.objectContaining({
+                product: expect.objectContaining({
+                    id: mockStandardProductOrderable.id
+                }),
+                productId: mockStandardProductOrderable.id,
+                price: mockStandardProductOrderable.price,
+                quantity: 1
+            }))
+            
+            // Verify that all required properties are defined and have correct types
+            // These are the properties that _constructEinsteinItem expects
+            expect(item.productId).toBeDefined()
+            expect(item.price).toBeDefined() 
+            expect(item.quantity).toBeDefined()
+            expect(typeof item.productId).toBe('string')
+            expect(typeof item.price).toBe('number')
+            expect(typeof item.quantity).toBe('number')
+            
+            // Specifically verify the values match the standard product
+            expect(item.productId).toBe('a-standard-dress')
+            expect(item.price).toBe(4)
+            expect(item.quantity).toBe(1)
         })
     })
 })
