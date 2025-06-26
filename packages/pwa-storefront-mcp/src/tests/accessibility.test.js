@@ -11,15 +11,6 @@ export async function runAccessibilityTest(siteUrl) {
   // Run axe-core analysis on the loaded page
   const results = await new AxeBuilder({ page }).analyze();
 
-//   // If violations found, log details
-//   if (results.violations.length) {
-//     for (const violation of results.violations) {
-//       violation.nodes.forEach(node => {
-//         console.log(`  Element: ${node.html}`);
-//         console.log(`  Failure Summary: ${node.failureSummary}\n`);
-//       });
-//     }
-//   }
 
   await browser.close();
 
