@@ -49,6 +49,7 @@ export interface CommerceApiProviderProps extends ApiClientConfigParams {
     refreshTokenRegisteredCookieTTL?: number
     refreshTokenGuestCookieTTL?: number
     apiClients?: ApiClients
+    disableAuthInit?: boolean
 }
 
 /**
@@ -132,7 +133,8 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
         passwordlessLoginCallbackURI,
         refreshTokenRegisteredCookieTTL,
         refreshTokenGuestCookieTTL,
-        apiClients
+        apiClients,
+        disableAuthInit = false
     } = props
 
     // Set the logger based on provided configuration, or default to the console object if no logger is provided
@@ -270,7 +272,11 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
     ])
 
     // Initialize the session
-    useEffect(() => void auth.ready(), [auth])
+    useEffect(() => {
+        if (!disableAuthInit) {
+            void auth.ready()
+        }
+    }, [auth, disableAuthInit])
 
     return (
         <ConfigContext.Provider

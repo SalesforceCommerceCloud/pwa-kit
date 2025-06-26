@@ -8,14 +8,16 @@
 - Support standard product on PDP [#2518](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2518)
 - Removed the "Edit" button from product cards of Standard Products [#2581](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2581)
 - Support standard product as a child item in bundles [#2574](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2574)
+- Verify einstein activity with standard product [#2650](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2650)
 - Support standard product as a child item in sets [#2636](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2636)
+- Load active data scripts on demand only [#2623](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2623)
 - Refactor Add to Cart in PDP [#2664](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2664)
 
 ## v6.1.0 (May 22, 2025)
 
 - Fix hreflang alternate links [#2269](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2269)
 - PDP / PLP: Add page meta data tags that have been defined in BM [#2232](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2232)
-- Send PWA Kit events to Data Cloud [#318] (https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2229)
+- Send PWA Kit events to Data Cloud [#2318](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2318)
 - Fix dependencies vulnerabilities [#2338](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2338)
 - Fix accessibility issues [#2375](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2375)
 - Update cc-datacloud-typescript package to use a fixed lock version [#2392](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2392)
