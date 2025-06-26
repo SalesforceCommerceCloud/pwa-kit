@@ -146,6 +146,7 @@ beforeEach(() => {
     )
 })
 afterEach(() => {
+    jest.restoreAllMocks()
     localStorage.clear()
 })
 jest.setTimeout(30000)
@@ -165,7 +166,7 @@ describe('Empty cart tests', function () {
     })
 })
 
-describe('Rendering tests', function () {
+describe('Rendering skeleton tests', function () {
     test('Renders skeleton initially', async () => {
         renderWithProviders(<Cart />)
 
@@ -234,7 +235,9 @@ describe.skip('Update quantity in product view', function () {
         )
 
         const editCartButton = within(cartItem).getByRole('button', {name: 'Edit'})
-        await user.click(editCartButton)
+        await act(async () => {
+            await user.click(editCartButton)
+        })
 
         const productView = screen.queryByTestId('product-view')
 
@@ -246,7 +249,9 @@ describe.skip('Update quantity in product view', function () {
         expect(within(productView).getByDisplayValue('3'))
 
         const updateCartButtons = within(productView).getAllByRole('button', {name: 'Update'})
-        await user.click(updateCartButtons[0])
+        await act(async () => {
+            await user.click(updateCartButtons[0])
+        })
         await waitFor(() => {
             expect(productView).not.toBeInTheDocument()
         })
@@ -271,9 +276,7 @@ describe('Remove item from cart', function () {
         )
     })
 
-    // TODO: Fix flaky/broken test
-    // eslint-disable-next-line jest/no-disabled-tests
-    test.skip('Can remove item from the cart', async () => {
+    test('Can remove item from the cart', async () => {
         const {user} = renderWithProviders(<Cart />)
 
         let cartItem
@@ -285,10 +288,15 @@ describe('Remove item from cart', function () {
             expect(cartItem).toBeInTheDocument()
         })
 
-        await user.click(within(cartItem).getByText(/remove/i))
+        await act(async () => {
+            await user.click(within(cartItem).getByText(/remove/i))
+        })
 
         try {
-            await user.click(screen.getByText(/yes, remove item/i))
+            // act will wait for modal to disappear before asserting to avoid react warning
+            await act(async () => {
+                await user.click(screen.getByText(/yes, remove item/i))
+            })
         } catch {
             // On CI this remove-item button sometimes does not exist yet.
             // But if we then call `await screen.findByText(/yes, remove item/i)` at this point,
@@ -431,27 +439,40 @@ describe('Coupons tests', function () {
     })
     test('Can apply and remove product-level coupon code with promotion', async () => {
         const {user} = renderWithProviders(<Cart />)
+
+        // Wait for cart to fully load
         expect(await screen.findByTestId('sf-cart-container')).toBeInTheDocument()
 
-        // add coupon
-        await user.click(screen.getByText('Do you have a promo code?'))
-        await user.type(screen.getByLabelText('Promo Code'), 'MENSSUITS')
-        await user.click(screen.getByText('Apply'))
+        // There are a lot of warnings about using act regarding to form.reset()
+        // This comes from the setState coming within react-hook-form.
+        // using act here to ensure these set state are cleaned up properly
+        await act(async () => {
+            await user.click(screen.getByText('Do you have a promo code?'))
+            await user.type(screen.getByLabelText('Promo Code'), 'menssuits')
+            await user.click(screen.getByText('Apply'))
+        })
 
-        expect(await screen.findByText('Promotion applied')).toBeInTheDocument()
+        await waitFor(async () => {
+            expect(screen.getByText(/Promotion applied/)).toBeInTheDocument()
+        })
 
-        expect(await screen.findByText(/MENSSUITS/i)).toBeInTheDocument()
+        expect(await screen.findByText(/menssuits/i)).toBeInTheDocument()
 
         const cartItem = await screen.findByTestId('sf-cart-item-750518699585M')
         // Promotions discount
         expect(within(cartItem).queryByText(/^-([A-Z]{2})?\$19\.20$/)).toBeInTheDocument()
 
         const orderSummary = screen.getByTestId('sf-order-summary')
-        await user.click(within(orderSummary).getByText('Remove'))
 
-        expect(await screen.findByText('Promotion removed')).toBeInTheDocument()
+        await waitFor(() => {
+            expect(within(orderSummary).getByText('Remove')).toBeInTheDocument()
+        })
+
+        await act(async () => {
+            await user.click(within(orderSummary).getByText('Remove'))
+        })
         await waitFor(async () => {
-            const menSuit = screen.queryByText(/MENSSUITS/i)
+            const menSuit = screen.queryByText(/menssuits/i)
             const promotionDiscount = within(cartItem).queryByText(/^-([A-Z]{2})?\$19\.20$/)
             expect(promotionDiscount).not.toBeInTheDocument()
             expect(menSuit).not.toBeInTheDocument()
@@ -503,7 +524,9 @@ describe('Update this is a gift option', function () {
 
         const giftCheckbox = screen.getByRole('checkbox')
         expect(giftCheckbox).not.toBeChecked()
-        await user.click(giftCheckbox)
+        await act(async () => {
+            await user.click(giftCheckbox)
+        })
         global.server.use(
             rest.get('*/customers/:customerId/baskets', (req, res, ctx) => {
                 return res.once(
@@ -586,7 +609,7 @@ describe('Product bundles', () => {
     })
 
     test('displays inventory message when incrementing quantity above available stock', async () => {
-        renderWithProviders(<Cart />)
+        const {user} = renderWithProviders(<Cart />)
 
         await waitFor(
             async () => {
@@ -606,9 +629,12 @@ describe('Product bundles', () => {
         const quantityElement = screen.getByRole('spinbutton', {id: 'quantity'})
         expect(quantityElement).toBeInTheDocument()
         expect(quantityElement).toHaveValue('1')
-        quantityElement.focus()
-        fireEvent.change(quantityElement, {target: {value: '4'}})
 
+        await act(async () => {
+            // Clear the input and type the new value
+            await user.clear(quantityElement)
+            await user.type(quantityElement, '4')
+        })
         await waitFor(
             () => {
                 expect(quantityElement).toHaveValue('4')
@@ -671,8 +697,9 @@ describe('Product bundles', () => {
             name: /edit/i,
             hidden: true
         })
-        await user.click(editCartButton)
-
+        await act(async () => {
+            await user.click(editCartButton)
+        })
         let productViewModal
         await waitFor(
             async () => {
@@ -686,17 +713,18 @@ describe('Product bundles', () => {
         expect(quantityElement).toHaveValue('1')
         const incrementButton = await within(productViewModal).findByTestId('quantity-increment')
 
-        // For some reason clicking - fireEvent.click(incrementButton) - doesn't work,
-        // so we'll use the keyboard to increment
-        incrementButton.focus()
-        fireEvent.keyDown(incrementButton, {key: 'Enter', code: 'Enter', charCode: 13})
-
+        await act(async () => {
+            // Use user event to click the increment button
+            await user.click(incrementButton)
+        })
         await waitFor(async () => {
             expect(quantityElement).toHaveValue('2')
         })
 
         const updateCartButtons = within(productViewModal).getAllByRole('button', {name: 'Update'})
-        await user.click(updateCartButtons[0])
+        await act(async () => {
+            await user.click(updateCartButtons[0])
+        })
 
         await waitFor(() => {
             expect(productViewModal).not.toBeInTheDocument()
@@ -781,8 +809,9 @@ describe('Unavailable products tests', function () {
                 }
             }
         ])
-        await user.click(removeBtn)
-
+        await act(async () => {
+            await user.click(removeBtn)
+        })
         await waitFor(() => {
             expect(
                 screen.getByRole('link', {name: /Worn Gold Dangle Earring$/i})

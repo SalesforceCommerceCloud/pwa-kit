@@ -9,7 +9,7 @@ import {FormattedMessage, useIntl} from 'react-intl'
 import {keepPreviousData} from '@tanstack/react-query'
 
 // Chakra Components
-import {Box, Stack, Grid, GridItem, Container, useDisclosure, Button} from '@chakra-ui/react'
+import {Box, Stack, Grid, GridItem, Container, useDisclosure, Button, Flex} from '@chakra-ui/react'
 
 // Project Components
 import CartCta from '../../pages/cart/partials/cart-cta'
@@ -42,22 +42,21 @@ import {REMOVE_CART_ITEM_CONFIRMATION_DIALOG_CONFIG} from '../../pages/cart/part
 
 // Utilities
 import debounce from 'lodash/debounce'
-import {useCurrentBasket} from '../../hooks/use-current-basket'
+import {useCurrentBasket, useCurrentCustomer} from '../../hooks/'
 import {
     useShopperBasketsMutation,
     useShippingMethodsForShipment,
     useProducts,
     useShopperCustomersMutation
 } from '@salesforce/commerce-sdk-react'
-import {useCurrentCustomer} from '../../hooks/use-current-customer'
 import UnavailableProductConfirmationModal from '../../components/unavailable-product-confirmation-modal'
 import {getUpdateBundleChildArray} from '../../utils/product-utils'
 
 const DEBOUNCE_WAIT = 750
 const Cart = () => {
-    const {data: basket, isLoading} = useCurrentBasket()
+    const {data: basket, isPending} = useCurrentBasket()
     const productIds = basket?.productItems?.map(({productId}) => productId).join(',') ?? ''
-    const {data: products, isLoading: isProductsLoading} = useProducts(
+    const {data: products, isPending: isProductsPending} = useProducts(
         {
             parameters: {
                 ids: productIds,
@@ -163,7 +162,7 @@ const Cart = () => {
     const [localIsGiftItems, setLocalIsGiftItems] = useState({})
     const [isCartItemLoading, setCartItemLoading] = useState(false)
 
-    const {isOpen, onOpen, onClose} = useDisclosure()
+    const {open: isOpen, onOpen, onClose} = useDisclosure()
     const {formatMessage} = useIntl()
     const toast = useToast()
     const navigate = useNavigation()
@@ -507,13 +506,12 @@ const Cart = () => {
             }
         )
     }
-
     /********* Rendering  UI **********/
-    if (isLoading) {
+    if (isPending) {
         return <CartSkeleton />
     }
 
-    if (!isLoading && !basket?.productItems?.length) {
+    if (!isPending && !basket?.productItems?.length) {
         return <EmptyCart isRegistered={isRegistered} />
     }
     return (
@@ -524,8 +522,8 @@ const Cart = () => {
                 paddingTop={{base: 8, lg: 8}}
                 paddingBottom={{base: 8, lg: 14}}
             >
-                <Stack spacing={24}>
-                    <Stack spacing={4}>
+                <Stack gap={24}>
+                    <Stack gap={4}>
                         <CartTitle />
 
                         <Grid
@@ -533,7 +531,7 @@ const Cart = () => {
                             gap={{base: 10, xl: 20}}
                         >
                             <GridItem>
-                                <Stack spacing={4}>
+                                <Stack gap={4}>
                                     {basket.productItems?.map((productItem, idx) => {
                                         return (
                                             <ProductItem
@@ -561,7 +559,7 @@ const Cart = () => {
                                                     ...productItem,
                                                     ...(productsByItemId &&
                                                         productsByItemId[productItem.itemId]),
-                                                    isProductUnavailable: !isProductsLoading
+                                                    isProductUnavailable: !isProductsPending
                                                         ? !productsByItemId?.[productItem.itemId]
                                                         : undefined,
                                                     price: productItem.price,
@@ -608,7 +606,7 @@ const Cart = () => {
                                 </Box>
                             </GridItem>
                             <GridItem>
-                                <Stack spacing={4}>
+                                <Stack gap={4}>
                                     <OrderSummary
                                         showPromoCodeForm={true}
                                         isEstimate={true}
@@ -622,7 +620,7 @@ const Cart = () => {
                         </Grid>
 
                         {/* Product Recommendations */}
-                        <Stack spacing={16}>
+                        <Stack gap={16}>
                             <RecommendedProducts
                                 title={
                                     <FormattedMessage
@@ -653,16 +651,17 @@ const Cart = () => {
                 </Stack>
             </Container>
 
-            <Box
+            <Flex
                 h="130px"
                 position="sticky"
                 bottom={0}
                 bg="white"
-                display={{base: 'block', lg: 'none'}}
-                align="center"
+                alignItems="center"
+                flexDirection="column"
+                display={{base: 'flex', lg: 'none'}}
             >
                 <CartCta />
-            </Box>
+            </Flex>
             <ConfirmationModal
                 {...REMOVE_CART_ITEM_CONFIRMATION_DIALOG_CONFIG}
                 onPrimaryAction={() => {
