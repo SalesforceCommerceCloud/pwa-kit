@@ -253,7 +253,7 @@ export const DevServerMixin = {
         // Warning: Ugly part of the Bundle spec that we need to maintain.
         //
         // This function assumes that an SDK build step will copy all
-        // non-webpacked assets from the 'app' dir to the 'build' dir.
+        // non-webpacked assets from the 'src' dir to the 'build' dir.
         //
         // If you look carefully through the history, this has never
         // been true though – assets get copied from app/static to
@@ -270,7 +270,7 @@ export const DevServerMixin = {
         // https://salesforce-internal.slack.com/archives/C8YDDMKFZ/p1677793769255659?thread_ts=1677791840.174309&cid=C8YDDMKFZ
 
         return (req, res) => {
-            const baseDir = path.resolve(req.app.options.projectDir, 'app')
+            const baseDir = path.resolve(req.app.options.projectDir, 'src')
             return this._serveStaticFile(req, res, baseDir, filePath, opts)
         }
     },

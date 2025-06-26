@@ -60,7 +60,7 @@ const getProjectName = async () => {
 }
 
 const getAppEntrypoint = () => {
-    return p.join(process.cwd(), 'app', 'ssr.js')
+    return p.join(process.cwd(), 'src', 'ssr.js')
 }
 
 const main = async () => {

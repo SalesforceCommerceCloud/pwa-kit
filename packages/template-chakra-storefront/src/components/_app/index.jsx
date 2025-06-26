@@ -162,7 +162,7 @@ const App = (props) => {
 
     // Fetch the translation message data using the target locale.
     const {data: messages} = useQuery({
-        queryKey: ['app', 'translations', 'messages', targetLocale],
+        queryKey: ['static', 'translations', 'messages', targetLocale],
         queryFn: () => {
             if (is404ForMissingTranslationFile) {
                 // Return early to prevent an infinite loop
