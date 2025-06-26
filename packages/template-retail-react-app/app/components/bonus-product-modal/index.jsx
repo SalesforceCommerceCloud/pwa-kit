@@ -76,12 +76,7 @@ const BonusProductItem = ({product, productData, onClick, isLoading}) => {
 
     return (
         <VStack spacing={3} p={4} bg="white">
-            <AspectRatio
-                ratio={1}
-                width="150px"
-                minWidth="150px"
-                cursor="pointer"
-            >
+            <AspectRatio ratio={1} width="150px" minWidth="150px" cursor="pointer">
                 {image && (
                     <DynamicImage
                         src={`${image.disBaseLink || image.link}[?sw={width}&q=60]`}
@@ -122,10 +117,14 @@ BonusProductItem.propTypes = {
 }
 
 export const BonusProductModal = () => {
-    const einstein = useEinstein() 
+    const einstein = useEinstein()
     const {addItemToNewOrExistingBasket} = useShopperBasketsMutationHelper()
-    const {isOpen, onClose, onClickClose,data} = useBonusProductModalContext()
-    const {isOpen : isProductViewOpen, onOpen : onProductViewOpen, onClose : onProductViewClose} = useDisclosure()
+    const {isOpen, onClose, onClickClose, data} = useBonusProductModalContext()
+    const {
+        isOpen: isProductViewOpen,
+        onOpen: onProductViewOpen,
+        onClose: onProductViewClose
+    } = useDisclosure()
     const [selectedProducts, setSelectedProducts] = useState(new Set())
     const [selectedProduct, setSelectedProduct] = useState()
 
@@ -222,14 +221,17 @@ export const BonusProductModal = () => {
         <>
             {selectedProduct && (
                 <ProductViewModal
-                    isOpen={isProductViewOpen} onClose={onProductViewHide} onOpen={onProductViewOpen}
+                    isOpen={isProductViewOpen}
+                    onClose={onProductViewHide}
+                    onOpen={onProductViewOpen}
                     product={product}
                     addToCart={(variant, quantity) =>
                         handleAddToCart([{product: product, variant, quantity: quantity}])
                     }
                 />
-            )}          
-            {!selectedProduct && (<Modal isOpen={isOpen} onClose={(onClose)} size="3xl" scrollBehavior="inside">
+            )}
+            {!selectedProduct && (
+                <Modal isOpen={isOpen} onClose={onClose} size="3xl" scrollBehavior="inside">
                     <ModalOverlay />
                     <ModalContent>
                         <ModalHeader>
@@ -237,7 +239,7 @@ export const BonusProductModal = () => {
                                 Add Bonus Product ({selectedCount} of {maxBonusItems})
                             </Text>
                         </ModalHeader>
-                        <ModalCloseButton onClick={onClickClose}/>
+                        <ModalCloseButton onClick={onClickClose} />
 
                         <ModalBody bgColor="white" padding="6">
                             {bonusProducts.length > 0 ? (
