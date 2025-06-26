@@ -79,7 +79,7 @@ afterEach(() => {
  * Need to figure out a way to return mockRegisteredCustomer from getSkeletonCustomer().
  * getSkeletonCustomer() always returns `{ customerId: 'customer_id', authType: 'customer_type' }` for some reason
  * instead of the mockRegisteredCustomer.
-*/
+ */
 test.skip('Allows customer to create an account', async () => {
     // render our test component
     renderWithProviders(<MockedComponent />, {

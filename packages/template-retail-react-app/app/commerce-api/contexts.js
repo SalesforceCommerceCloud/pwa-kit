@@ -73,6 +73,7 @@ export const CommerceAPIProvider = ({value, children}) => {
                     redirectURI={`${getAppOrigin()}/callback`}
                     proxy={proxy}
                     apiClients={apiClients}
+                    disableAuthInit={true}
                 >
                     {children}
                 </CommerceSDKReactProvider>
