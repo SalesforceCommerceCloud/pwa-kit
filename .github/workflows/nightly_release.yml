@@ -33,7 +33,7 @@ jobs:
 
       - name: Get retail-react-app version
         run: |-
-          version=`jq -r ".version" packages/template-retail-react-app/package.json | cut -d "-" -f 1`
+          version=`jq -r ".version" packages/template-chakra-storefront/package.json | cut -d "-" -f 1`
           echo "retail_app_version_base=$version" >> "$GITHUB_ENV"
 
       - name: Get commerce-sdk-react version

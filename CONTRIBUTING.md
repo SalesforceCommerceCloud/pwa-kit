@@ -16,7 +16,7 @@ This repository is a [monorepo](https://en.wikipedia.org/wiki/Monorepo) that inc
 - `pwa-kit-runtime`: A package that contains runtime environments for applications to run on Managed Runtime
 - `template-express-minimal`: A project template that can be used as a starting point for a generic Express application (does not include React)
 - `template-mrt-reference-app`: A project template that is used by the Managed Runtime team to test platform features
-- `template-retail-react-app`: A project template that can be used as a starting point for a full retail storefront
+- `template-chakra-storefront`: A project template that can be used as a starting point for a full retail storefront
 - `template-typescript-minimal`: A project template with TypeScript support that can be used as a starting point for React projects
 - `test-commerce-sdk-react`: A project that is used to test `commerce-sdk-react` and demonstrate usage of the library
 

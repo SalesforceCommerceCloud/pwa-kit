@@ -33,7 +33,7 @@ This version of the application uses [Template Extensibility](https://developer.
 
 ## 🌍 Localization
 
-See the [Localization README.md](./packages/template-retail-react-app/translations/README.md) for important setup instructions for localization.
+See the [Localization README.md](./packages/template-chakra-storefront/static/translations/README.md) for important setup instructions for localization.
 
 ## 📖 Documentation
 

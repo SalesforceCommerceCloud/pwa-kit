@@ -3,7 +3,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  setup-template-retail-react-app:
+  setup-template-chakra-storefront:
     runs-on: ubuntu-latest
     steps:
       - name: Initialize
@@ -45,6 +45,6 @@ jobs:
         with:
           project_id: ${{ env.PROJECT_ID }}
           target_id: ${{ env.MRT_TARGET_ID }}
-          project_dir: "./packages/template-retail-react-app"
+          project_dir: "./packages/template-chakra-storefront"
           mobify_user: ${{ secrets.MOBIFY_CLIENT_USER }}
           mobify_api_key: ${{ secrets.MOBIFY_CLIENT_API_KEY }}
