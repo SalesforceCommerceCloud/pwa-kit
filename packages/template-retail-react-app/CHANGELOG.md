@@ -9,6 +9,7 @@
 - Removed the "Edit" button from product cards of Standard Products [#2581](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2581)
 - Support standard product as a child item in bundles [#2574](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2574)
 - Support standard product as a child item in sets [#2636](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2636)
+- Refactor Add to Cart in PDP [#2664](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2664)
 
 ## v6.1.0 (May 22, 2025)
 
