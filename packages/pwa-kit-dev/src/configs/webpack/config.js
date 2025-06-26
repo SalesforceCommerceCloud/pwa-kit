@@ -92,9 +92,9 @@ const entryPointExists = (segments) => {
     return false
 }
 
-const getAppEntryPoint = () => './app/main'
+const getAppEntryPoint = () => './src/main'
 
-const getServerEntryPoint = () => './app/ssr.js'
+const getServerEntryPoint = () => './src/ssr.js'
 
 const getPublicPathEntryPoint = () => {
     return resolve(
