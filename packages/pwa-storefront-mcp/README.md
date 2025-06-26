@@ -32,11 +32,11 @@ Open Cursor Application
 
 Go to Cursor Menu on top menu bar, then *Settings* > *Cursor Settings...* 
 
-![Cursor Settings Screenshot](./docs/images/cursor-settings.png)
+<img src="./docs/images/cursor-settings.png" alt="Cursor Settings Screenshot" width="50%" />
 
 Select Tools & Integrations > MCP Tools > New MCP Server
 
-![Cursor MCP Tools Screenshot](./docs/images/cursor-mcp-tools.png)
+<img src="./docs/images/cursor-mcp-tools.png" alt="Cursor MCP Tools Screenshot" width="50%" />
 
 You will be led to mcp.json file. Add this to your mcp.json:
 
@@ -90,7 +90,7 @@ Claude will:
 - Connect to it as a client
 - List available tools
 
-![Claude MCP Tools Screenshot](./docs/images/claude-list-tools.png)
+<img src="./docs/images/claude-list-tools.png" alt="Claude MCP Tools Screenshot" width="40%" />
 
 You can also enable/disable any available tools from here.
 
