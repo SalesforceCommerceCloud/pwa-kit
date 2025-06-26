@@ -48,50 +48,6 @@ export const handleAddToCart = async (
 }
 
 /**
- * Validates all child products in a set or bundle, scrolling to the first unselected product if needed.
- * @param {Object} childProductRefs - Ref object containing child product refs and their validateOrderability methods.
- * @param {Object} comboProduct - The normalized set or bundle product object.
- * @param {Object} childProductSelection - The current selection state for child products.
- * @returns {boolean} True if all required child products are selected, false otherwise.
- */
-export const handleChildProductValidation = (
-    childProductRefs,
-    comboProduct,
-    childProductSelection
-) => {
-    // Run validation for all child products. This will ensure the error messages are shown.
-    Object.values(childProductRefs.current).forEach(({validateOrderability}) => {
-        validateOrderability({scrollErrorIntoView: false})
-    })
-
-    // Using state for which child products are selected, scroll to the first one that isn't selected and requires a variant selection.
-    const selectedProductIds = Object.keys(childProductSelection)
-    const firstUnselectedProduct = comboProduct.childProducts.find(({product: childProduct}) => {
-        // Skip validation for standard products (no variations)
-        if (childProduct.type?.item) {
-            return false
-        }
-        return !selectedProductIds.includes(childProduct.id)
-    })?.product
-
-    if (firstUnselectedProduct) {
-        // Get the reference to the product view and scroll to it.
-        const {ref} = childProductRefs.current[firstUnselectedProduct.id]
-
-        if (ref.scrollIntoView) {
-            ref.scrollIntoView({
-                behavior: 'smooth',
-                block: 'end'
-            })
-        }
-
-        return false
-    }
-
-    return true
-}
-
-/**
  * Handles adding a product bundle to the cart, including updating child variant selections if needed.
  * @param {Object} product - The parent product (bundle).
  * @param {Object} childProductSelection - Object containing selected child products.

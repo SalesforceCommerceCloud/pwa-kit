@@ -58,7 +58,6 @@ import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
 import {useWishList} from '@salesforce/retail-react-app/app/hooks/use-wish-list'
 import {
     handleAddToCart,
-    handleChildProductValidation,
     handleProductBundleAddToCart,
     handleProductSetAddToCart
 } from '@salesforce/retail-react-app/app/utils/cart-utils'
@@ -304,6 +303,44 @@ const ProductDetail = () => {
         })
     }
 
+    /**************** Product Set/Bundles Handlers ****************/
+    const handleChildProductValidation = useCallback(() => {
+        // Run validation for all child products. This will ensure the error
+        // messages are shown.
+        Object.values(childProductRefs.current).forEach(({validateOrderability}) => {
+            validateOrderability({scrollErrorIntoView: false})
+        })
+
+        // Using ot state for which child products are selected, scroll to the first
+        // one that isn't selected and requires a variant selection.
+        const selectedProductIds = Object.keys(childProductSelection)
+        const firstUnselectedProduct = comboProduct.childProducts.find(
+            ({product: childProduct}) => {
+                // Skip validation for standard products (no variations)
+                if (childProduct.type?.item) {
+                    return false
+                }
+                return !selectedProductIds.includes(childProduct.id)
+            }
+        )?.product
+
+        if (firstUnselectedProduct) {
+            // Get the reference to the product view and scroll to it.
+            const {ref} = childProductRefs.current[firstUnselectedProduct.id]
+
+            if (ref.scrollIntoView) {
+                ref.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'end'
+                })
+            }
+
+            return false
+        }
+
+        return true
+    }, [product, childProductSelection])
+
     /**************** Einstein ****************/
     useEffect(() => {
         if (product && product.type.set) {
@@ -386,13 +423,7 @@ const ProductDetail = () => {
                             isProductLoading={isProductLoading}
                             isBasketLoading={isBasketLoading}
                             isWishlistLoading={isWishlistLoading}
-                            validateOrderability={() =>
-                                handleChildProductValidation(
-                                    childProductRefs,
-                                    comboProduct,
-                                    childProductSelection
-                                )
-                            }
+                            validateOrderability={handleChildProductValidation}
                             childProductOrderability={childProductOrderability}
                             setSelectedBundleQuantity={setSelectedBundleQuantity}
                         />
