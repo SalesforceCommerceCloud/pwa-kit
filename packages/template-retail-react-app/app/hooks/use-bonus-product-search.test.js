@@ -7,7 +7,7 @@
 
 import {renderHook} from '@testing-library/react'
 import {useProductSearch} from '@salesforce/commerce-sdk-react'
-import {useBonusProductSearch} from '@salesforce/retail-react-app/../../app/hooks/use-bonus-product-search'
+import {useBonusProductSearch} from '@salesforce/retail-react-app/app/hooks/use-bonus-product-search'
 import {HOME_SHOP_PRODUCTS_LIMIT} from '@salesforce/retail-react-app/app/constants'
 
 // Mock the commerce SDK hook
