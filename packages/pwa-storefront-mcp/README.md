@@ -68,7 +68,7 @@ You can go back to MCP Tools choose to enable/disable any MCP Server or tools.
 1. Go to Claude menu on top menu bar then "Developer" > "Edit Config"
 This will lead you to "claude_desktop_config.json" file.
 
-![Claude MCP Config Screenshot](./docs/images/claude-config.png)
+<img src="./docs/images/claude-config.png" alt="Claude MCP Config Screenshot" width="50%" />
 
 2. Add this server to your claude_desktop_config.json:
 
