@@ -4,11 +4,12 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {useState} from 'react'
+import React from 'react'
 import PropTypes from 'prop-types'
 import ccValidator from 'card-validator'
 import {useIntl} from 'react-intl'
-import {Box, Flex, SimpleGrid, Stack, Tooltip} from '@chakra-ui/react'
+import {Box, Flex, SimpleGrid, Stack, Field as ChakraField} from '@chakra-ui/react'
+import Tooltip from '../../components/tooltip'
 import {formatCreditCardNumber, getCreditCardIcon} from '../../utils/cc-utils'
 import useCreditCardFields from '../../components/forms/useCreditCardFields'
 import Field from '../../components/field'
@@ -16,7 +17,6 @@ import {AmexIcon, DiscoverIcon, MastercardIcon, VisaIcon, InfoIcon} from '../../
 
 const CreditCardFields = ({form, prefix = ''}) => {
     const {formatMessage} = useIntl()
-    const [isTooltipOpen, setIsTooltipOpen] = useState(false)
     const fields = useCreditCardFields({form, prefix})
 
     // Rerender the fields when we `cardType` changes so the detected
@@ -41,22 +41,6 @@ const CreditCardFields = ({form, prefix = ''}) => {
                   defaultMessage: 'This 3-digit code can be found on the back of your card.',
                   description: 'Generic credit card security code help text'
               })
-
-    const handleTooltipClose = () => {
-        setIsTooltipOpen(false)
-        if (document) {
-            document.removeEventListener('click', handleTooltipClose)
-            document.removeEventListener('keydown', handleTooltipClose)
-        }
-    }
-
-    const handleTooltipOpen = () => {
-        setIsTooltipOpen(true)
-        if (document) {
-            document.addEventListener('click', handleTooltipClose)
-            document.addEventListener('keydown', handleTooltipClose)
-        }
-    }
 
     return (
         <Box>
@@ -129,41 +113,22 @@ const CreditCardFields = ({form, prefix = ''}) => {
                     <Field
                         {...fields.securityCode}
                         formLabel={
-                            <>
-                                <Box display="inline" mr={1}>
-                                    {fields.securityCode.label}
-                                </Box>
-                                <Box
-                                    onMouseEnter={handleTooltipOpen}
-                                    onFocus={handleTooltipOpen}
-                                    as="span"
-                                >
-                                    <Tooltip.Root
-                                        open={isTooltipOpen}
-                                        onOpenChange={(e) => setIsTooltipOpen(e.open)}
-                                        positioning={{placement: 'top'}}
-                                    >
-                                        <Tooltip.Trigger asChild>
-                                            <InfoIcon
-                                                boxSize={5}
-                                                color="gray.700"
-                                                aria-label={formatMessage({
-                                                    id: 'credit_card_fields.tool_tip.security_code_aria_label',
-                                                    defaultMessage: 'Security code info'
-                                                })}
-                                            />
-                                        </Tooltip.Trigger>
-                                        <Tooltip.Positioner>
-                                            <Tooltip.Content>
-                                                <Tooltip.Arrow>
-                                                    <Tooltip.ArrowTip />
-                                                </Tooltip.Arrow>
-                                                {securityCodeTooltipLabel}
-                                            </Tooltip.Content>
-                                        </Tooltip.Positioner>
-                                    </Tooltip.Root>
-                                </Box>
-                            </>
+                            <ChakraField.Label>
+                                <Flex align="center" justify="space-between">
+                                    <Box>{fields.securityCode.label}</Box>
+                                    <Tooltip content={securityCodeTooltipLabel}>
+                                        <Box
+                                            as="button"
+                                            aria-label={formatMessage({
+                                                id: 'credit_card_fields.tool_tip.security_code_aria_label',
+                                                defaultMessage: 'Security code info'
+                                            })}
+                                        >
+                                            <InfoIcon boxSize={4} color="gray.700" />
+                                        </Box>
+                                    </Tooltip>
+                                </Flex>
+                            </ChakraField.Label>
                         }
                     />
                 </SimpleGrid>
