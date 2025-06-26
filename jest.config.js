@@ -44,6 +44,8 @@ module.exports = {
         createTestGlob('components/field'),
         createTestGlob('components/reset-password'),
         createTestGlob('components/with-registration'),
+        createTestGlob('components/social-login'),
+        createTestGlob('components/toggle-card'),
         createTestGlob('pages/home'),
         createTestGlob('pages/cart'),
         createTestGlob('pages/product-list'),
@@ -51,6 +53,8 @@ module.exports = {
         createTestGlob('pages/login-redirect'),
         createTestGlob('pages/social-login-redirect'),
         // createTestGlob('pages/registration'), // TODO: enable after Account page has been migrated
+        '<rootDir>/src/pages/checkout/partials/contact-info.test.js',
+        '<rootDir>/src/pages/checkout/partials/login-state.test.js',
         '<rootDir>/src/utils/responsive-image.test.js',
         '<rootDir>/src/hooks/use-toast.test.js'
         // '<rootDir>/src/hooks/use-auth-modal.test.js' // TODO: enable after Account page has been migrated

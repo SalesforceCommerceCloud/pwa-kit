@@ -29,12 +29,14 @@ const cardBordered = {
 
 export default defineLayerStyles({
     card,
-
     cardBordered,
 
     ccIcon: {
-        width: '34px',
-        height: '22px'
+        description: 'Credit card icon',
+        value: {
+            width: '34px',
+            height: '22px'
+        }
     },
 
     page: {

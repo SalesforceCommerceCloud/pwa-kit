@@ -6,7 +6,7 @@
  */
 import React, {useState} from 'react'
 import PropTypes from 'prop-types'
-import {Button, Divider, Text} from '@chakra-ui/react'
+import {Button, Separator, Text} from '@chakra-ui/react'
 import {FormattedMessage} from 'react-intl'
 import SocialLogin from '../../../components/social-login'
 
@@ -24,8 +24,8 @@ const LoginState = ({
     if (isSocialEnabled || isPasswordlessEnabled) {
         return showLoginButtons ? (
             <>
-                <Divider />
-                <Text align="center" fontSize="sm" marginTop={2} marginBottom={2}>
+                <Separator />
+                <Text textAlign="center" fontSize="sm" marginTop={2} marginBottom={2}>
                     <FormattedMessage
                         defaultMessage="Or Login With"
                         id="contact_info.message.or_login_with"
