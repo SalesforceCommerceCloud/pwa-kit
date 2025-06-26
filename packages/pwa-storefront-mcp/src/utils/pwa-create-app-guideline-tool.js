@@ -60,7 +60,8 @@ If the user requests a project using a **template**:
 
 export default {
     name: 'create-app_guidelines',
-    description: guidelinesDescription,
+    description: guidelinesText,
+    description: `This tool is used to provide the agent with the instructions on how to use the @salesforce/pwa-kit-create-app CLI tool to create a new PWA Kit projects. Do not attempt to create a project without using this tool first.`,
     inputSchema: EmptyJsonSchema,
     fn: async () => ({
         content: [
@@ -68,6 +69,7 @@ export default {
                 type: 'text',
                 text: JSON.stringify(
                 {
+                    guidelines: guidelinesText,
                     cli: CREATE_APP_SCHEMA.metadata.description,
                     schemas: {...CREATE_APP_SCHEMA.schemas},
                     data: {...CREATE_APP_SCHEMA.data}
