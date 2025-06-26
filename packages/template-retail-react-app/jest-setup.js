@@ -152,34 +152,6 @@ Object.defineProperty(window, 'matchMedia', {
     }))
 })
 
-// Mock @tanstack/react-query
-jest.mock('@tanstack/react-query', () => {
-    const originalModule = jest.requireActual('@tanstack/react-query')
-    return {
-        ...originalModule,
-        QueryClient: jest.fn().mockImplementation(() => ({
-            mount: jest.fn(),
-            unmount: jest.fn(),
-            isFetching: jest.fn().mockReturnValue(false),
-            isMutating: jest.fn().mockReturnValue(false),
-            getQueryData: jest.fn(),
-            setQueryData: jest.fn(),
-            getQueryCache: jest.fn().mockReturnValue({
-                findAll: jest.fn().mockReturnValue([]),
-                subscribe: jest.fn()
-            }),
-            getMutationCache: jest.fn().mockReturnValue({
-                findAll: jest.fn().mockReturnValue([]),
-                subscribe: jest.fn()
-            }),
-            invalidateQueries: jest.fn(),
-            refetchQueries: jest.fn(),
-            clear: jest.fn()
-        })),
-        QueryClientProvider: ({children}) => children
-    }
-})
-
 jest.mock('@salesforce/commerce-sdk-react', () => {
     return {
         CommerceApiProvider: ({children}) => children,
