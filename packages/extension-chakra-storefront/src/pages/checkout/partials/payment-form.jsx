@@ -7,7 +7,8 @@
 import React from 'react'
 import {FormattedMessage, FormattedNumber, useIntl} from 'react-intl'
 import PropTypes from 'prop-types'
-import {Box, Flex, RadioGroup, Stack, Text, Tooltip} from '@chakra-ui/react'
+import {Box, Flex, RadioGroup, Stack, Text} from '@chakra-ui/react'
+import Tooltip from '../../../components/tooltip'
 import {useCurrentBasket} from '../../../hooks/use-current-basket'
 import {LockIcon, PaypalIcon} from '../../../components/icons'
 import CreditCardFields from '../../../components/forms/credit-card-fields'
@@ -38,10 +39,15 @@ const PaymentForm = ({form, onSubmit}) => {
                                 borderBottom="1px solid"
                                 borderColor="gray.100"
                             >
-                                <RadioGroup.Item value="cc">
+                                <RadioGroup.Item
+                                    value="cc"
+                                    w="full"
+                                    display="flex"
+                                    alignItems="center"
+                                >
                                     <RadioGroup.ItemHiddenInput />
                                     <RadioGroup.ItemIndicator />
-                                    <RadioGroup.ItemText>
+                                    <RadioGroup.ItemText flex="1">
                                         <Flex justify="space-between">
                                             <Stack direction="row" align="center">
                                                 <Text fontWeight="bold">
@@ -50,25 +56,15 @@ const PaymentForm = ({form, onSubmit}) => {
                                                         id="payment_selection.heading.credit_card"
                                                     />
                                                 </Text>
-                                                <Tooltip.Root
-                                                    positioning={{ placement: "top" }}
+                                                <Tooltip
+                                                    content={formatMessage({
+                                                        defaultMessage:
+                                                            'This is a secure SSL encrypted payment.',
+                                                        id: 'payment_selection.tooltip.secure_payment'
+                                                    })}
                                                 >
-                                                    <Tooltip.Trigger asChild>
-                                                        <LockIcon color="gray.700" boxSize={5} />
-                                                    </Tooltip.Trigger>
-                                                    <Tooltip.Positioner>
-                                                        <Tooltip.Content>
-                                                            <Tooltip.Arrow>
-                                                                <Tooltip.ArrowTip />
-                                                            </Tooltip.Arrow>
-                                                            {formatMessage({
-                                                                defaultMessage:
-                                                                    'This is a secure SSL encrypted payment.',
-                                                                id: 'payment_selection.tooltip.secure_payment'
-                                                            })}
-                                                        </Tooltip.Content>
-                                                    </Tooltip.Positioner>
-                                                </Tooltip.Root>
+                                                    <LockIcon color="gray.700" boxSize={5} />
+                                                </Tooltip>
                                             </Stack>
                                             <Text fontWeight="bold">
                                                 <FormattedNumber
