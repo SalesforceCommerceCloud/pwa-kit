@@ -9,7 +9,7 @@ export const useBonusProductSearch = (promotionId) => {
             expand: ['promotions', 'variations', 'prices', 'images', 'custom_properties'],
             limit: HOME_SHOP_PRODUCTS_LIMIT,
             perPricebook: true,
-            refine: [`cgid=${promotionId}`, 'htype=master']
+            refine: [`pmid=${promotionId}`, 'htype=master']
         }
     })
     return {
