@@ -43,19 +43,6 @@ jest.mock('@salesforce/commerce-sdk-react', () => {
     }
 })
 
-jest.mock('../../commerce-api/hooks/useCustomer', () => {
-    const originalModule = jest.requireActual('../../commerce-api/hooks/useCustomer')
-    return {
-        __esModule: true,
-        default: () => ({
-            ...originalModule.default(),
-            isRegistered: false,
-            getSkeletonCustomer: () => mockRegisteredCustomer,
-            login: jest.fn().mockResolvedValue(mockRegisteredCustomer)
-        })
-    }
-})
-
 const MockedComponent = () => {
     const match = {
         params: {pageName: 'profile'}
@@ -72,7 +59,6 @@ const MockedComponent = () => {
 
 // Set up and clean up
 beforeEach(() => {
-    jest.useFakeTimers()
     global.server.use(
         rest.post('*/customers', (req, res, ctx) => {
             return res(ctx.delay(0), ctx.status(200), ctx.json(mockRegisteredCustomer))
@@ -85,15 +71,21 @@ beforeEach(() => {
 afterEach(() => {
     localStorage.clear()
     jest.resetModules()
-    jest.runOnlyPendingTimers()
-    jest.useRealTimers()
 })
 
+/*
+ * Skipping this test for now. Signup flow works fine.
+ * The signup function then calls self.login() which in turn calls getSkeletonCustomer().
+ * Need to figure out a way to return mockRegisteredCustomer from getSkeletonCustomer().
+ * getSkeletonCustomer() always returns `{ customerId: 'customer_id', authType: 'customer_type' }` for some reason
+ * instead of the mockRegisteredCustomer.
+*/
 test.skip('Allows customer to create an account', async () => {
     // render our test component
     renderWithProviders(<MockedComponent />, {
         wrapperProps: {siteAlias: 'uk', appConfig: mockConfig.app}
     })
+
     // fill out form and submit
     await user.type(screen.getByLabelText('First Name'), 'Tester')
     await user.type(screen.getByLabelText('Last Name'), 'Tester')
