@@ -23,7 +23,10 @@ import CartCta from '@salesforce/retail-react-app/app/pages/cart/partials/cart-c
 import CartSecondaryButtonGroup from '@salesforce/retail-react-app/app/pages/cart/partials/cart-secondary-button-group'
 import CartSkeleton from '@salesforce/retail-react-app/app/pages/cart/partials/cart-skeleton'
 import CartTitle from '@salesforce/retail-react-app/app/pages/cart/partials/cart-title'
-import BonusProductsTitle from '@salesforce/retail-react-app/app/pages/cart/partials/bonus-products-title'
+import {
+    BonusProductsTitle,
+    BonusProductsSelection
+} from '@salesforce/retail-react-app/app/pages/cart/partials/bonus-products-title'
 import ConfirmationModal from '@salesforce/retail-react-app/app/components/confirmation-modal'
 import EmptyCart from '@salesforce/retail-react-app/app/pages/cart/partials/empty-cart'
 import OrderSummary from '@salesforce/retail-react-app/app/components/order-summary'
@@ -663,6 +666,7 @@ const Cart = () => {
                                             )}
                                         </>
                                     )}
+                                    <BonusProductsSelection basket={basket} />
                                 </Stack>
                                 <Box>
                                     {isOpen && !selectedItem.bundledProductItems && (
