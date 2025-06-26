@@ -48,7 +48,12 @@ const PageNotFound = () => {
                 py={{base: 48, md: 60}}
             >
                 <SearchIcon boxSize={{base: '30px', md: '32px'}} mb={8} />
-                <Heading as="h2" fontSize={{base: 'xl', md: '2xl', lg: '3xl'}} mb={2} textAlign="center">
+                <Heading
+                    as="h2"
+                    fontSize={{base: 'xl', md: '2xl', lg: '3xl'}}
+                    mb={2}
+                    textAlign="center"
+                >
                     {intl.formatMessage({
                         defaultMessage: "The page you're looking for can't be found.",
                         id: 'page_not_found.title.page_cant_be_found'
