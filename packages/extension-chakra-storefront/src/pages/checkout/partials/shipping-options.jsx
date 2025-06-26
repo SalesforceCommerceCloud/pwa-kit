@@ -6,7 +6,7 @@
  */
 import React, {useEffect} from 'react'
 import {FormattedMessage, FormattedNumber, useIntl} from 'react-intl'
-import {Box, Button, Container, Flex, Radio, RadioGroup, Stack, Text} from '@chakra-ui/react'
+import {Box, Button, Container, Flex, HStack, RadioGroup, Stack, Text} from '@chakra-ui/react'
 import {useForm, Controller} from 'react-hook-form'
 import {useCheckout} from '../../../pages/checkout/util/checkout-context'
 import {ChevronDownIcon} from '../../../components/icons'
@@ -124,32 +124,36 @@ export default function ShippingOptions() {
                     onSubmit={form.handleSubmit(submitForm)}
                     data-testid="sf-checkout-shipping-options-form"
                 >
-                    <Stack spacing={6}>
+                    <Stack gap={6}>
                         {shippingMethods?.applicableShippingMethods && (
                             <Controller
                                 name="shippingMethodId"
                                 control={form.control}
                                 defaultValue=""
                                 render={({field: {value, onChange}}) => (
-                                    <RadioGroup
+                                    <RadioGroup.Root
                                         name="shipping-options-radiogroup"
                                         value={value}
-                                        onChange={onChange}
+                                        onValueChange={onChange}
                                     >
-                                        <Stack spacing={5}>
+                                        <Stack gap={5}>
                                             {shippingMethods.applicableShippingMethods.map(
                                                 (opt) => (
-                                                    <Radio value={opt.id} key={opt.id}>
+                                                    <RadioGroup.Item value={opt.id} key={opt.id}>
+                                                        <RadioGroup.ItemHiddenInput />
+                                                        <RadioGroup.ItemIndicator />
                                                         <Flex justify="space-between" w="full">
-                                                            <Box>
-                                                                <Text>{opt.name}</Text>
-                                                                <Text
-                                                                    fontSize="sm"
-                                                                    color="gray.600"
-                                                                >
-                                                                    {opt.description}
-                                                                </Text>
-                                                            </Box>
+                                                            <HStack>
+                                                                <Box>
+                                                                    <RadioGroup.ItemText>{opt.name}</RadioGroup.ItemText>
+                                                                    <Text
+                                                                        fontSize="sm"
+                                                                        color="gray.600"
+                                                                    >
+                                                                        {opt.description}
+                                                                    </Text>
+                                                                </Box>
+                                                            </HStack>
                                                             <Text fontWeight="bold">
                                                                 <FormattedNumber
                                                                     value={opt.price}
@@ -159,7 +163,7 @@ export default function ShippingOptions() {
                                                             </Text>
                                                         </Flex>
 
-                                                        {opt.shippingPromotions?.map((promo) => {
+                                                        {/* {opt.shippingPromotions?.map((promo) => {
                                                             return (
                                                                 <Text
                                                                     key={promo.promotionId}
@@ -169,18 +173,19 @@ export default function ShippingOptions() {
                                                                     {promo.calloutMsg}
                                                                 </Text>
                                                             )
-                                                        })}
-                                                    </Radio>
+                                                        })} */}
+                                                    </RadioGroup.Item>
                                                 )
                                             )}
                                         </Stack>
-                                    </RadioGroup>
+                                    </RadioGroup.Root>
                                 )}
                             />
                         )}
 
                         <Box>
-                            <Button variant="link" size="sm" rightIcon={<ChevronDownIcon />}>
+                            {/* TODO: Get the rightIcon to display */}
+                            <Button variant="link-blue" size="sm" rightIcon={<ChevronDownIcon />}>
                                 <FormattedMessage
                                     defaultMessage="Do you want to send this as a gift?"
                                     id="shipping_options.action.send_as_a_gift"

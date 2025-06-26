@@ -120,13 +120,12 @@ export default function ShippingAddress() {
             })}
         >
             <ToggleCardEdit>
-                TODO
-                {/* <ShippingAddressSelection */}
-                {/*     selectedAddress={selectedShippingAddress} */}
-                {/*     submitButtonLabel={submitButtonMessage} */}
-                {/*     onSubmit={submitAndContinue} */}
-                {/*     formTitleAriaLabel={shippingAddressAriaLabel} */}
-                {/* /> */}
+                <ShippingAddressSelection
+                    selectedAddress={selectedShippingAddress}
+                    submitButtonLabel={submitButtonMessage}
+                    onSubmit={submitAndContinue}
+                    formTitleAriaLabel={shippingAddressAriaLabel}
+                />
             </ToggleCardEdit>
             {selectedShippingAddress && (
                 <ToggleCardSummary>

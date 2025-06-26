@@ -53,7 +53,7 @@ const ActionCard = ({
                     {onEdit && (
                         <Button
                             onClick={onEdit}
-                            variant="link"
+                            variant="link-blue"
                             size="sm"
                             ref={editBtnRef}
                             aria-label={editBtnLabel}
@@ -63,7 +63,7 @@ const ActionCard = ({
                     )}
                     {onRemove && (
                         <Button
-                            variant="link"
+                            variant="link-red"
                             size="sm"
                             colorScheme="red"
                             onClick={handleRemove}
