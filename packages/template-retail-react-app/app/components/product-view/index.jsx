@@ -323,7 +323,6 @@ const ProductView = forwardRef(
                             onBonusProductModalOpen({
                                 newBonusItems,
                                 allBonusItems: addToCartResponse.bonusDiscountLineItems,
-                                openAddToCartModalIfNeeded: false,
                                 product,
                                 itemsAdded,
                                 selectedQuantity: quantity
@@ -552,7 +551,7 @@ const ProductView = forwardRef(
                                     <Skeleton height={20} width={64} />
                                 </>
                             ) : (
-                                variationAttributes.map(({id, name, selectedValue, values}) => {
+                                variationAttributes?.map(({id, name, selectedValue, values}) => {
                                     const swatches = values.map(
                                         ({href, name, image, value, orderable}, index) => {
                                             const content = image ? (

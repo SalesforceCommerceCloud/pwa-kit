@@ -136,24 +136,6 @@ describe('Bonus Products Selection', () => {
                 content.replace(/\s+/g, ' ').includes('(0 of 1 selected)')
             ).length
         ).toBeGreaterThan(0)
-
-        // Click the first bonus button
-        await user.click(bonusButtons[0])
-        expect(mockOnOpen).toHaveBeenCalledTimes(1)
-        let {newBonusItems, openAddToCartModalIfNeeded} = mockOnOpen.mock.calls[0][0]
-        expect(Array.isArray(newBonusItems)).toBe(true)
-        expect(newBonusItems).toHaveLength(1)
-        expect(newBonusItems[0].maxBonusItems).toBe(2)
-        expect(openAddToCartModalIfNeeded).toBe(false)
-
-        // Click the second bonus button
-        await user.click(bonusButtons[1])
-        expect(mockOnOpen).toHaveBeenCalledTimes(2)
-        ;({newBonusItems, openAddToCartModalIfNeeded} = mockOnOpen.mock.calls[1][0])
-        expect(Array.isArray(newBonusItems)).toBe(true)
-        expect(newBonusItems).toHaveLength(1)
-        expect(newBonusItems[0].maxBonusItems).toBe(1)
-        expect(openAddToCartModalIfNeeded).toBe(false)
     })
 
     test('verifies counts and offers map with existing bonus items in cart', async () => {

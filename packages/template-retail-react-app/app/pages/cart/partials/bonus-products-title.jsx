@@ -37,7 +37,6 @@ const BonusProductsSelection = ({basket}) => {
     const handleBonusButtonClick = (bonusOffers) => {
         onBonusProductModalOpen({
             newBonusItems: bonusOffers,
-            openAddToCartModalIfNeeded: false
         })
     }
     // Memoize bonus logic so it only recalculates when basket changes
