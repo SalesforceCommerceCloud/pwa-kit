@@ -145,6 +145,28 @@ const ProductView = forwardRef(
         const [promotionIdToSearch, setPromotionIdToSearch] = useState(null)
         const {data: bonusProductSearchResult} = useBonusProductSearch(promotionIdToSearch)
 
+        // State to track all promotion IDs and their results
+        const [promotionResults, setPromotionResults] = useState({})
+        const [pendingPromotionIds, setPendingPromotionIds] = useState([])
+
+        // Effect to handle multiple promotions sequentially
+        useEffect(() => {
+            if (bonusProductSearchResult?.hits?.length > 0 && promotionIdToSearch) {
+                // Store the result for current promotion
+                setPromotionResults((prev) => ({
+                    ...prev,
+                    [promotionIdToSearch]: bonusProductSearchResult
+                }))
+
+                // Move to next promotion if any pending
+                if (pendingPromotionIds.length > 0) {
+                    const nextPromotionId = pendingPromotionIds[0]
+                    setPendingPromotionIds((prev) => prev.slice(1))
+                    setPromotionIdToSearch(nextPromotionId)
+                }
+            }
+        }, [bonusProductSearchResult, promotionIdToSearch, pendingPromotionIds])
+
         const {
             showLoading,
             showInventoryMessage,
@@ -309,36 +331,54 @@ const ProductView = forwardRef(
                     if (isValidResponse) {
                         // Show bonus product modal first if there are bonus items
                         if (newBonusItems?.length > 0) {
-                            // Update bonusProducts list with the new bonus items
-                            let isRuleBasedPromotion = !newBonusItems.some(
+                            let bonusProductsToShow = []
+                            let ruleBasedBonusProducts = []
+                            let listBasedBonusProducts = newBonusItems.filter(
                                 (item) => item.bonusProducts
                             )
-                            let bonusProductsToShow = []
+                            // Collect all promotion IDs for rule-based promotions
+                            const promotionIds = newBonusItems
+                                .filter((item) => !item.bonusProducts) // Rule-based promotions don't have bonusProducts
+                                .map((item) => item.promotionId)
+                                .filter(Boolean)
 
-                            if (isRuleBasedPromotion) {
-                                setPromotionIdToSearch(newBonusItems[0].promotionId)
-                                let ruleBasedBonusProducts = []
-                                if (bonusProductSearchResult?.hits?.length > 0) {
-                                    bonusProductSearchResult.hits.forEach((bonusProduct) => {
-                                        ruleBasedBonusProducts.push({
+                            //create a map of promotionId and ids for rule based promotions
+                            const promotionIdToIdMap = newBonusItems
+                                .filter((item) => !item.bonusProducts)
+                                .reduce((acc, item) => {
+                                    acc[item.promotionId] = item.id
+                                    return acc
+                                }, {})
+
+                            // Start sequential processing if we have promotion IDs
+                            if (promotionIds.length > 0) {
+                                // Set first promotion ID and queue the rest
+                                setPromotionIdToSearch(promotionIds[0])
+                                setPendingPromotionIds(promotionIds.slice(1))
+                            }
+
+                            // Combine all stored results
+                            Object.entries(promotionResults).forEach(([promotionId, result]) => {
+                                if (result?.hits?.length > 0) {
+                                    let formattedBonusProducts = result.hits.map((bonusProduct) => {
+                                        return {
                                             productId: bonusProduct.productId,
                                             productName: bonusProduct.productName,
                                             c_productUrl: bonusProduct.c_productUrl
-                                        })
+                                        }
                                     })
-                                    bonusProductsToShow = ruleBasedBonusProducts
+                                    ruleBasedBonusProducts.push({
+                                        bonusProducts: formattedBonusProducts,
+                                        id: promotionIdToIdMap[promotionId]
+                                    })
                                 }
-                            } else {
-                                let listBasedBonusProducts = []
-                                newBonusItems[0].bonusProducts.forEach((bonusProduct) => {
-                                    listBasedBonusProducts.push({
-                                        productId: bonusProduct.productId,
-                                        productName: bonusProduct.productName,
-                                        title: bonusProduct.title
-                                    })
-                                })
-                                bonusProductsToShow = listBasedBonusProducts
-                            }
+                            })
+
+                            bonusProductsToShow = [
+                                ...ruleBasedBonusProducts,
+                                ...listBasedBonusProducts
+                            ]
+
                             addBonusProducts(newBonusItems)
                             onBonusProductModalOpen({
                                 newBonusItems: bonusProductsToShow,
