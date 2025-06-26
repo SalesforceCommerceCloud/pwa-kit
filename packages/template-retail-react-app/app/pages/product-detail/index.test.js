@@ -62,7 +62,7 @@ jest.mock('@salesforce/retail-react-app/app/hooks/use-einstein', () => ({
 }))
 
 jest.mock('@salesforce/retail-react-app/app/components/recommended-products', () => {
-    return function MockedRecommendedProducts({ title }) {
+    const MockedRecommendedProducts = ({title}) => {
         return (
             <div data-testid="recommended-products">
                 <h2>{title}</h2>
@@ -70,6 +70,13 @@ jest.mock('@salesforce/retail-react-app/app/components/recommended-products', ()
             </div>
         )
     }
+
+    MockedRecommendedProducts.propTypes = {
+        // eslint-disable-next-line @typescript-eslint/no-var-requires
+        title: require('prop-types').node
+    }
+
+    return MockedRecommendedProducts
 })
 
 jest.mock('@salesforce/retail-react-app/app/constants', () => {
@@ -121,9 +128,6 @@ beforeEach(() => {
 afterEach(() => {
     jest.resetModules()
     jest.clearAllMocks()
-    mockSendAddToCart.mockClear()
-    mockSendViewProduct.mockClear()
-    mockGetRecommendations.mockClear()
 })
 
 test('should render product details page', async () => {
@@ -658,31 +662,33 @@ describe('standard product', () => {
         fireEvent.click(addToCartButton)
 
         await waitFor(() => {
-            
             expect(mockAddToCart).toHaveBeenCalledTimes(1)
             expect(mockSendAddToCart).toHaveBeenCalledTimes(1)
-            
+
             const addToCartArgs = mockSendAddToCart.mock.calls[0][0]
             expect(addToCartArgs).toHaveLength(1)
-            
-            expect(item).toEqual(expect.objectContaining({
-                product: expect.objectContaining({
-                    id: mockStandardProductOrderable.id
-                }),
-                productId: mockStandardProductOrderable.id,
-                price: mockStandardProductOrderable.price,
-                quantity: 1
-            }))
-            
+            const item = addToCartArgs[0]
+
+            expect(item).toEqual(
+                expect.objectContaining({
+                    product: expect.objectContaining({
+                        id: mockStandardProductOrderable.id
+                    }),
+                    productId: mockStandardProductOrderable.id,
+                    price: mockStandardProductOrderable.price,
+                    quantity: 1
+                })
+            )
+
             // Verify that all required properties are defined and have correct types
             // These are the properties that _constructEinsteinItem expects
             expect(item.productId).toBeDefined()
-            expect(item.price).toBeDefined() 
+            expect(item.price).toBeDefined()
             expect(item.quantity).toBeDefined()
             expect(typeof item.productId).toBe('string')
             expect(typeof item.price).toBe('number')
             expect(typeof item.quantity).toBe('number')
-            
+
             // Specifically verify the values match the standard product
             expect(item.productId).toBe('a-standard-dress')
             expect(item.price).toBe(4)
