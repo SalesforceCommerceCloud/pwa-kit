@@ -17,7 +17,6 @@
   },
   "files": [
     "assets",
-    "data",
     "templates"
   ],
   "scripts": {
