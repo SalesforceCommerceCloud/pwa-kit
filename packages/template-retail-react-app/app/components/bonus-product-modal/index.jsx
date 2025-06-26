@@ -179,7 +179,7 @@ export const BonusProductModal = () => {
         try {
             const productItems = productSelectionValues.map(({variant, quantity}) => ({
                 productId: variant.productId,
-                price: variant.price,
+                bonusDiscountLineItemId: currentPromotion.id,
                 quantity
             }))
 
