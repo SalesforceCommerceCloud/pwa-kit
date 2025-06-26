@@ -91,7 +91,7 @@ export const AddToCartModal = () => {
                         margin="0"
                         borderRadius={{base: 'none', md: 'base'}}
                         bgColor="gray.50"
-                        containerProps={{'data-testid': 'add-to-cart-modal'}}
+                        data-testid="add-to-cart-modal"
                     >
                         <Dialog.Header paddingY="8" bgColor="white">
                             <Heading as="h1" fontSize="2xl">
@@ -332,24 +332,23 @@ export const AddToCartModal = () => {
                                         </Text>
                                     </Flex>
                                     <Stack gap="4">
-                                        <Button as={Link} to="/cart" width="100%" variant="solid">
-                                            {intl.formatMessage({
-                                                defaultMessage: 'View Cart',
-                                                id: 'add_to_cart_modal.link.view_cart'
-                                            })}
+                                        <Button asChild>
+                                            <Link to="/cart" width="100%" variant="solid">
+                                                {intl.formatMessage({
+                                                    defaultMessage: 'View Cart',
+                                                    id: 'add_to_cart_modal.link.view_cart'
+                                                })}
+                                            </Link>
                                         </Button>
 
-                                        <Button
-                                            as={Link}
-                                            to="/checkout"
-                                            width="100%"
-                                            variant="outline"
-                                        >
-                                            {intl.formatMessage({
-                                                defaultMessage: 'Proceed to Checkout',
-                                                id: 'add_to_cart_modal.link.checkout'
-                                            })}
-                                            <LockIcon />
+                                        <Button asChild>
+                                            <Link to="/checkout" width="100%" variant="outline">
+                                                {intl.formatMessage({
+                                                    defaultMessage: 'Proceed to Checkout',
+                                                    id: 'add_to_cart_modal.link.checkout'
+                                                })}
+                                                <LockIcon />
+                                            </Link>
                                         </Button>
                                     </Stack>
                                 </Box>
@@ -398,25 +397,23 @@ export const AddToCartModal = () => {
                                 </Text>
                             </Flex>
                             <Stack gap="4">
-                                <Button as={Link} to="/cart" width="100%" variant="solid">
-                                    {intl.formatMessage({
-                                        defaultMessage: 'View Cart',
-                                        id: 'add_to_cart_modal.link.view_cart'
-                                    })}
+                                <Button asChild>
+                                    <Link to="/cart" width="100%" variant="solid">
+                                        {intl.formatMessage({
+                                            defaultMessage: 'View Cart',
+                                            id: 'add_to_cart_modal.link.view_cart'
+                                        })}
+                                    </Link>
                                 </Button>
 
-                                <Button
-                                    as={Link}
-                                    to="/checkout"
-                                    width="100%"
-                                    variant="outline"
-                                    rightIcon={<LockIcon />}
-                                >
-                                    {intl.formatMessage({
-                                        defaultMessage: 'Proceed to Checkout',
-                                        id: 'add_to_cart_modal.link.checkout'
-                                    })}
-                                    <LockIcon />
+                                <Button asChild>
+                                    <Link to="/checkout" width="100%" variant="outline">
+                                        {intl.formatMessage({
+                                            defaultMessage: 'Proceed to Checkout',
+                                            id: 'add_to_cart_modal.link.checkout'
+                                        })}
+                                        <LockIcon />
+                                    </Link>
                                 </Button>
                             </Stack>
                         </Dialog.Footer>

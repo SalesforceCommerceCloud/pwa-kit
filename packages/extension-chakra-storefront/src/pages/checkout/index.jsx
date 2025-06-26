@@ -86,7 +86,7 @@ const Checkout = () => {
                             />
                             <ShippingAddress />
                             <ShippingOptions />
-                            <Payment />
+                            {/* <Payment /> TODO: bring this back */}
 
                             {step === 4 && (
                                 <Box pt={3} display={{base: 'none', lg: 'block'}}>

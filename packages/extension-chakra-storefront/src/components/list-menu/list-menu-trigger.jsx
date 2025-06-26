@@ -9,7 +9,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import {Link as RouteLink} from 'react-router-dom'
 
-import {Box, Popover, useSlotRecipe} from '@chakra-ui/react'
+import {Box, useSlotRecipe} from '@chakra-ui/react'
 
 import Link from '../../components/link'
 import {ChevronDownIcon} from '../../components/icons'

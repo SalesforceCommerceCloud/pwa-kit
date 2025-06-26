@@ -90,7 +90,7 @@ const ItemAttributes = ({includeQuantity, currency, ...props}) => {
     )
 
     return (
-        <Stack spacing={1.5} flex={1} {...props}>
+        <Stack gap={1.5} flex={1} {...props}>
             {variationValues &&
                 Object.keys(variationValues).map((key) => (
                     <Text

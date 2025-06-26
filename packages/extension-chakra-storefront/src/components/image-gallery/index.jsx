@@ -15,11 +15,10 @@ import {
     Box,
     Image,
     Flex,
-
-    // Hooks
     Skeleton as ChakraSkeleton,
     List,
-    useBreakpointValue,
+
+    // Hooks
     useSlotRecipe
 } from '@chakra-ui/react'
 import {findImageGroupBy} from '../../utils/image-groups-utils'
