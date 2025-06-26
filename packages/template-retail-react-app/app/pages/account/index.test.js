@@ -181,6 +181,6 @@ test('Allows customer to update password', async () => {
 
     expect(await screen.findByTestId('account-detail-page')).toBeInTheDocument()
 
-    user.click(el.getByText(/save/i))
+    await user.click(el.getByText(/save/i))
     // expect(await screen.findByText(/Profile Updated/i)).toBeInTheDocument()
 })
