@@ -11,7 +11,7 @@ import CREATE_APP_SCHEMA from '@salesforce/pwa-kit-create-app/program.json' asse
 import {EmptyJsonSchema} from './utils.js'
 
 
-const guidelinesDescription = `
+const guidelinesText = `
 # PWA Kit Create App — Agent Usage Guidelines
 
 ## Overview
