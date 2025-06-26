@@ -319,7 +319,7 @@ const ProductView = forwardRef(
                                 setPromotionIdToSearch(newBonusItems[0].promotionId)
                                 let ruleBasedBonusProducts = []
                                 if (bonusProductSearchResult?.hits?.length > 0) {
-                                    bonusProductSearchResult.hits.forEach((bonusProduct, index) => {
+                                    bonusProductSearchResult.hits.forEach((bonusProduct) => {
                                         ruleBasedBonusProducts.push({
                                             productId: bonusProduct.productId,
                                             productName: bonusProduct.productName,

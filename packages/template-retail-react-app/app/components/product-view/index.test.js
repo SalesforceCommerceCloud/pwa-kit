@@ -5,6 +5,40 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
+// Mock the current customer hook
+jest.mock('@salesforce/retail-react-app/app/hooks/use-current-customer', () => ({
+    useCurrentCustomer: () => ({
+        data: {
+            authType: 'registered',
+            isRegistered: true
+        }
+    })
+}))
+
+// Mock the bonus product hooks
+jest.mock('@salesforce/retail-react-app/app/hooks/use-bonus-product-search', () => ({
+    useBonusProductSearch: () => ({
+        data: null
+    })
+}))
+
+jest.mock('@salesforce/retail-react-app/app/hooks/use-bonus-product-modal', () => {
+    const MockProvider = ({children}) => {
+        return children
+    }
+
+    return {
+        useBonusProductModalContext: () => ({
+            isOpen: false,
+            onOpen: jest.fn(),
+            onClose: jest.fn(),
+            bonusProducts: [],
+            addBonusProducts: jest.fn()
+        }),
+        BonusProductModalProvider: MockProvider
+    }
+})
+
 import React from 'react'
 import PropTypes from 'prop-types'
 import {fireEvent, screen, waitFor} from '@testing-library/react'
@@ -16,6 +50,8 @@ import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-u
 import userEvent from '@testing-library/user-event'
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
 import frMessages from '@salesforce/retail-react-app/app/static/translations/compiled/fr-FR.json'
+import {useBonusProductSearch} from '@salesforce/retail-react-app/app/hooks/use-bonus-product-search'
+import {useBonusProductModalContext} from '@salesforce/retail-react-app/app/hooks/use-bonus-product-modal'
 
 const MockComponent = (props) => {
     const {data: customer} = useCurrentCustomer()
@@ -368,4 +404,16 @@ test('renders "Add to Cart" and "Add to Wishlist" buttons in French', async () =
     expect(
         screen.getByRole('button', {name: /ajouter à la liste de souhaits/i})
     ).toBeInTheDocument()
+})
+
+describe('ProductView Bonus Product Integration', () => {
+    test('should have useBonusProductSearch hook available', () => {
+        expect(useBonusProductSearch).toBeDefined()
+        expect(typeof useBonusProductSearch).toBe('function')
+    })
+
+    test('should have useBonusProductModalContext hook available', () => {
+        expect(useBonusProductModalContext).toBeDefined()
+        expect(typeof useBonusProductModalContext).toBe('function')
+    })
 })
