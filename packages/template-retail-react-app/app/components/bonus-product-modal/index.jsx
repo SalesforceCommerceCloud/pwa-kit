@@ -20,18 +20,21 @@ import {
     Skeleton,
     SimpleGrid,
     Button,
-    Checkbox
+    useDisclosure
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 import {useProducts} from '@salesforce/commerce-sdk-react'
+import useEinstein from '@salesforce/retail-react-app/app/hooks/use-einstein'
 import DynamicImage from '@salesforce/retail-react-app/app/components/dynamic-image'
+import ProductViewModal from '@salesforce/retail-react-app/app/components/product-view-modal'
 import PropTypes from 'prop-types'
 import {useBonusProductModalContext} from '@salesforce/retail-react-app/app/hooks/use-bonus-product-modal'
+import {useShopperBasketsMutationHelper} from '@salesforce/commerce-sdk-react'
 import {findImageGroupBy} from '@salesforce/retail-react-app/app/utils/image-groups-utils'
 import {FormattedMessage} from 'react-intl'
 import {filterImageGroups} from '@salesforce/retail-react-app/app/utils/product-utils'
 
 // Component to display individual bonus product with checkbox for selection
-const BonusProductItem = ({product, productData, isSelected, onToggle, isLoading}) => {
+const BonusProductItem = ({product, productData, onClick, isLoading}) => {
     const productName = product?.productName || product?.title
 
     // Get the appropriate image group from the passed product data
@@ -78,7 +81,6 @@ const BonusProductItem = ({product, productData, isSelected, onToggle, isLoading
                 width="150px"
                 minWidth="150px"
                 cursor="pointer"
-                onClick={() => onToggle(product)}
             >
                 {image && (
                     <DynamicImage
@@ -89,8 +91,10 @@ const BonusProductItem = ({product, productData, isSelected, onToggle, isLoading
                         imageProps={{
                             alt: productName,
                             borderRadius: 'md',
-                            objectFit: 'cover'
+                            objectFit: 'cover',
+                            style: {pointerEvents: 'all'}
                         }}
+                        onClick={onClick}
                     />
                 )}
             </AspectRatio>
@@ -105,13 +109,6 @@ const BonusProductItem = ({product, productData, isSelected, onToggle, isLoading
                 >
                     {productName}
                 </Text>
-                <Box width="full" display="flex" justifyContent="center">
-                    <Checkbox
-                        isChecked={isSelected}
-                        onChange={() => onToggle(product)}
-                        cursor="pointer"
-                    />
-                </Box>
             </VStack>
         </VStack>
     )
@@ -120,14 +117,17 @@ const BonusProductItem = ({product, productData, isSelected, onToggle, isLoading
 BonusProductItem.propTypes = {
     product: PropTypes.object.isRequired,
     productData: PropTypes.object,
-    isSelected: PropTypes.bool.isRequired,
-    onToggle: PropTypes.func.isRequired,
+    onClick: PropTypes.func.isRequired,
     isLoading: PropTypes.bool
 }
 
 export const BonusProductModal = () => {
-    const {isOpen, onClose, data} = useBonusProductModalContext()
+    const einstein = useEinstein() 
+    const {addItemToNewOrExistingBasket} = useShopperBasketsMutationHelper()
+    const {isOpen, onClose, onClickClose,data} = useBonusProductModalContext()
+    const {isOpen : isProductViewOpen, onOpen : onProductViewOpen, onClose : onProductViewClose} = useDisclosure()
     const [selectedProducts, setSelectedProducts] = useState(new Set())
+    const [selectedProduct, setSelectedProduct] = useState()
 
     // Extract bonus items from the response structure
     const bonusDiscountLineItems = data?.newBonusItems || data?.allBonusItems || []
@@ -166,30 +166,44 @@ export const BonusProductModal = () => {
     // Reset selections when modal opens
     useEffect(() => {
         if (isOpen) {
-            setSelectedProducts(new Set())
+            setSelectedProduct(null)
         }
     }, [isOpen])
 
-    const handleToggle = (product) => {
-        const productIdentifier = product.id || product.productId
-        const isSelected = selectedProducts.has(productIdentifier)
-        if (isSelected) {
-            setSelectedProducts((prev) => {
-                const newSet = new Set(prev)
-                newSet.delete(productIdentifier)
-                return newSet
-            })
-        } else if (selectedProducts.size < maxBonusItems) {
-            setSelectedProducts((prev) => {
-                const newSet = new Set(prev)
-                newSet.add(productIdentifier)
-                return newSet
-            })
+    const handleClickBonusProduct = (product) => {
+        setSelectedProduct(product.productId || product.id)
+        onProductViewOpen()
+    }
+
+    const handleAddToCart = async (productSelectionValues) => {
+        try {
+            const productItems = productSelectionValues.map(({variant, quantity}) => ({
+                productId: variant.productId,
+                price: variant.price,
+                quantity
+            }))
+
+            const response = await addItemToNewOrExistingBasket(productItems)
+
+            einstein.sendAddToCart(productItems)
+
+            // If the items were successfully added, set the return value to be used
+            // by the add to cart modal.
+            return {
+                ...response,
+                productSelectionValues
+            }
+        } catch (error) {
+            console.log('error', error)
+            showError(error)
+        } finally {
+            onProductViewHide()
         }
     }
 
-    const handleNext = () => {
-        onClose()
+    const onProductViewHide = () => {
+        setSelectedProduct(null)
+        onProductViewClose()
     }
 
     const selectedCount = selectedProducts.size
@@ -197,57 +211,72 @@ export const BonusProductModal = () => {
     // Calculate columns based on number of products
     const productCount = bonusProducts.length
     const columns = Math.min(productCount, 3) // Max 3 columns, but fewer if less products
+    const product = useMemo(() => {
+        const product = bonusProducts.find((product) => product.productId === selectedProduct)
+        return product
+    }, [bonusProducts, selectedProduct])
 
     if (!isOpen) return null
 
     return (
-        <Modal isOpen={isOpen} onClose={onClose} size="3xl" scrollBehavior="inside">
-            <ModalOverlay />
-            <ModalContent>
-                <ModalHeader>
-                    <Text fontSize="lg" fontWeight="bold">
-                        Add Bonus Product ({selectedCount} of {maxBonusItems})
-                    </Text>
-                </ModalHeader>
-                <ModalCloseButton />
-
-                <ModalBody bgColor="white" padding="6">
-                    {bonusProducts.length > 0 ? (
-                        <SimpleGrid columns={columns} spacing={8} justifyItems="start">
-                            {bonusProducts.map((product) => {
-                                const productId = product.productId || product.id
-                                const productData = productsDataMap[productId]
-
-                                return (
-                                    <BonusProductItem
-                                        key={productId}
-                                        product={product}
-                                        productData={productData}
-                                        isSelected={selectedProducts.has(productId)}
-                                        onToggle={handleToggle}
-                                        isLoading={isProductsLoading}
-                                    />
-                                )
-                            })}
-                        </SimpleGrid>
-                    ) : (
-                        <Box textAlign="center" py={8}>
-                            <Text color="gray.500">
-                                <FormattedMessage
-                                    defaultMessage="No bonus products available"
-                                    id="bonus_product_modal.no_products_available"
-                                />
+        <>
+            {selectedProduct && (
+                <ProductViewModal
+                    isOpen={isProductViewOpen} onClose={onProductViewHide} onOpen={onProductViewOpen}
+                    product={product}
+                    addToCart={(variant, quantity) =>
+                        handleAddToCart([{product: product, variant, quantity: quantity}])
+                    }
+                />
+            )}          
+            {!selectedProduct && (<Modal isOpen={isOpen} onClose={(onClose)} size="3xl" scrollBehavior="inside">
+                    <ModalOverlay />
+                    <ModalContent>
+                        <ModalHeader>
+                            <Text fontSize="lg" fontWeight="bold">
+                                Add Bonus Product ({selectedCount} of {maxBonusItems})
                             </Text>
-                        </Box>
-                    )}
-                </ModalBody>
+                        </ModalHeader>
+                        <ModalCloseButton onClick={onClickClose}/>
 
-                <ModalFooter justifyContent="center">
-                    <Button colorScheme="blue" onClick={handleNext}>
-                        Next
-                    </Button>
-                </ModalFooter>
-            </ModalContent>
-        </Modal>
+                        <ModalBody bgColor="white" padding="6">
+                            {bonusProducts.length > 0 ? (
+                                <SimpleGrid columns={columns} spacing={8} justifyItems="start">
+                                    {bonusProducts.map((product) => {
+                                        const productId = product.productId || product.id
+                                        const productData = productsDataMap[productId]
+
+                                        return (
+                                            <BonusProductItem
+                                                key={productId}
+                                                product={product}
+                                                productData={productData}
+                                                onClick={() => handleClickBonusProduct(product)}
+                                                isLoading={isProductsLoading}
+                                            />
+                                        )
+                                    })}
+                                </SimpleGrid>
+                            ) : (
+                                <Box textAlign="center" py={8}>
+                                    <Text color="gray.500">
+                                        <FormattedMessage
+                                            defaultMessage="No bonus products available"
+                                            id="bonus_product_modal.no_products_available"
+                                        />
+                                    </Text>
+                                </Box>
+                            )}
+                        </ModalBody>
+
+                        <ModalFooter justifyContent="center">
+                            <Button colorScheme="blue" onClick={onClickClose}>
+                                Cancel
+                            </Button>
+                        </ModalFooter>
+                    </ModalContent>
+                </Modal>
+            )}
+        </>
     )
 }
