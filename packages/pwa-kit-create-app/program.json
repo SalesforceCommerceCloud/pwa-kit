@@ -5,6 +5,13 @@
         "description": "This file contains the schema for the pwa-kit-create-app CLI tool. Includes the schemas for presets, templates, validators, and questions. It also includes the data for those presets, templates, and validators."
     },
     "schemas": {
+        "answers": {
+            "type": "object",
+            "_ai": {
+                "instruction": "Use this during project creation when piping in answers from stdin. It's very important that you include the template id keyed as `general.presetOrTemplateId` in the answers object. This can be derived from the `templateId` property of the preset object or the `id` property of the template object.",
+                "expectedUse": "This data object is used to store the answers to the template questions asked by the program and answered by the user."
+            }
+        },
         "questions": {
             "type": "array",
             "items": {
@@ -436,6 +443,21 @@
                 "source": "npm",
                 "questions": [
                     {
+                        "name": "project.extend",
+                        "message": "Do you wish to use template extensibility?",
+                        "type": "list",
+                        "choices": [
+                            {
+                                "name": "Yes",
+                                "value": true
+                            },
+                            {
+                                "name": "No",
+                                "value": false
+                            }
+                        ]
+                    },
+                    {
                         "name": "project.name",
                         "message": "What is the name of your Project?",
                         "validator": "validProjectName",
@@ -526,7 +548,7 @@
                         }
                     }
                 ],
-                "private": false
+                "private": true
             },
             {
                 "id": "express-minimal",

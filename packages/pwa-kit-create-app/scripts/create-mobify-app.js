@@ -387,7 +387,6 @@ const foundNode = process.versions.node
 const requiredNode = generatorPkg.engines.node
 const isUsingCompatibleNode = semver.satisfies(foundNode, new semver.Range(requiredNode))
 
-// TODO: This function will likely be moved to a helpers folder/file.
 /**
  * Reads all data from standard input (stdin) asynchronously and resolves with the complete input as a string.
  * Useful for accepting piped or redirected input, such as JSON answers for non-interactive CLI usage.
