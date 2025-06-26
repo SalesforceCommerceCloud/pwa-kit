@@ -11,10 +11,9 @@ import {getAppOrigin} from 'pwa-kit-react-sdk/utils/url'
 import {detectStorefrontPreview} from 'pwa-kit-react-sdk/ssr/universal/components/storefront-preview/utils'
 import ShopperBaskets from './shopper-baskets'
 import OcapiShopperOrders from './ocapi-shopper-orders'
-import Auth from '@salesforce/commerce-sdk-react/auth'
 import EinsteinAPI from './einstein'
+import Auth from '@salesforce/commerce-sdk-react/auth'
 import {DWSID_HEADER_KEY} from './constants'
-
 import {transformSDKClient} from '@salesforce/commerce-sdk-react/utils'
 
 /**
@@ -99,6 +98,7 @@ class CommerceAPI {
             shopperGiftCertificates: {
                 api: sdk.ShopperGiftCertificates
             },
+            shopperLogin: {api: sdk.ShopperLogin, sendLocale: false},
             shopperOrders: {api: OcapiShopperOrders},
             shopperProducts: {
                 api: sdk.ShopperProducts,

@@ -15,6 +15,7 @@ import theme from '../../theme'
 import CommerceAPI from '../../commerce-api'
 import {
     BasketProvider,
+    CommerceAPIProvider,
     CustomerProductListsProvider,
     CustomerProvider
 } from '../../commerce-api/contexts'
@@ -23,7 +24,6 @@ import {resolveSiteFromUrl} from '../../utils/site-utils'
 import {resolveLocaleFromUrl} from '../../utils/utils'
 import {getConfig} from 'pwa-kit-runtime/utils/ssr-config'
 import {createUrlTemplate} from '../../utils/url'
-import {CommerceAPIProvider} from '../../commerce-api/contexts'
 
 /**
  * Use the AppConfig component to inject extra arguments into the getProps

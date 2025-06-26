@@ -6,14 +6,16 @@
  */
 import React, {createContext, useReducer, useContext} from 'react'
 import {CommerceApiProvider as CommerceSDKReactProvider} from '@salesforce/commerce-sdk-react'
+import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
 import {getAppOrigin} from 'pwa-kit-react-sdk/utils/url'
 import {isServer} from '../utils/utils'
-import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
 
 /**
  * Provider and associated hook for accessing the Commerce API in React components.
  */
 export const CommerceAPIContext = createContext()
+export const useCommerceAPI = () => useContext(CommerceAPIContext)
+
 /* eslint-disable react/prop-types */
 export const CommerceAPIProvider = ({value, children}) => {
     const {api, site, locale} = value
@@ -78,8 +80,6 @@ export const CommerceAPIProvider = ({value, children}) => {
         </CommerceAPIContext.Provider>
     )
 }
-
-export const useCommerceAPI = () => useContext(CommerceAPIContext)
 
 /**
  * There are a few sources of global state in the react retail storefront.

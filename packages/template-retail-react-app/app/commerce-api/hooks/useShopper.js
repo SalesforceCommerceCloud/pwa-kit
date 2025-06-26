@@ -26,11 +26,11 @@ const useShopper = (opts = {}) => {
 
     // Handle basket init/updates in response to customer/basket changes.
     useEffect(() => {
-        const hasBasket = basket && basket.loaded && basket.basketId
+        const hasBasket = basket?.loaded
 
         // We have a customer but no basket, so we fetch a new or existing basket
         if (customer.isInitialized && !hasBasket) {
-            basket.getBasket()
+            basket.getOrCreateBasket()
             return
         }
 
@@ -41,7 +41,7 @@ const useShopper = (opts = {}) => {
             customer.isInitialized &&
             customer.customerId !== basket.customerInfo.customerId
         ) {
-            basket.getBasket()
+            basket.getOrCreateBasket()
             return
         }
 
