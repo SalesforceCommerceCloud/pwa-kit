@@ -311,8 +311,8 @@ const ProductDetail = () => {
             const productItemsForEinstein = productSelectionValues.map(
                 ({product, variant, quantity}) => ({
                     product,
-                    productId: variant?.productId || product?.id,
-                    price: variant?.price || product?.price,
+                    productId: variant.productId,
+                    price: variant.price,
                     quantity
                 })
             )
