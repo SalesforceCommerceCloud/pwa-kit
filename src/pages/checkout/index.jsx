@@ -86,7 +86,7 @@ const Checkout = () => {
                             />
                             <ShippingAddress />
                             <ShippingOptions />
-                            <Payment />
+                            {/* <Payment /> TODO: bring this back */}
 
                             {step === 4 && (
                                 <Box pt={3} display={{base: 'none', lg: 'block'}}>
@@ -109,15 +109,16 @@ const Checkout = () => {
                     </GridItem>
 
                     <GridItem py={6} px={[4, 4, 4, 0]}>
-                        <OrderSummary
-                            basket={basket}
-                            showTaxEstimationForm={false}
-                            showCartItems={true}
-                        />
+                        {/* TODO: bring this back */}
+                        {/*     <OrderSummary */}
+                        {/*         basket={basket} */}
+                        {/*         showTaxEstimationForm={false} */}
+                        {/*         showCartItems={true} */}
+                        {/*     /> */}
 
                         {step === 4 && (
                             <Box display={{base: 'none', lg: 'block'}} pt={2}>
-                                <Button w="full" onClick={submitOrder} isLoading={isLoading}>
+                                <Button w="full" onClick={submitOrder} loading={isLoading}>
                                     <FormattedMessage
                                         defaultMessage="Place Order"
                                         id="checkout.button.place_order"
@@ -204,10 +205,11 @@ const CheckoutContainer = () => {
             {isDeletingUnavailableItem && <LoadingSpinner wrapperStyles={{height: '100vh'}} />}
 
             <Checkout />
-            <UnavailableProductConfirmationModal
-                productItems={basket?.productItems}
-                handleUnavailableProducts={handleUnavailableProducts}
-            />
+            {/* TODO: bring this back */}
+            {/* <UnavailableProductConfirmationModal */}
+            {/*     productItems={basket?.productItems} */}
+            {/*     handleUnavailableProducts={handleUnavailableProducts} */}
+            {/* /> */}
         </CheckoutProvider>
     )
 }

@@ -21,16 +21,17 @@ const baseLinkStyles = {
 
 const button = defineRecipe({
     base: {
-        borderRadius: 'sm'
+        borderRadius: 'sm',
+        colorPalette: 'blue'
     },
     variants: {
         variant: {
             solid: {
-                backgroundColor: 'blue.600',
+                backgroundColor: 'colorPalette.600',
                 color: 'white',
-                _hover: {bg: 'blue.700', _disabled: {bg: 'blue.300'}},
-                _active: {bg: 'blue.800'},
-                _disabled: {bg: 'blue.300'}
+                _hover: {bg: 'colorPalette.700', _disabled: {bg: 'colorPalette.300'}},
+                _active: {bg: 'colorPalette.800'},
+                _disabled: {bg: 'colorPalette.300'}
             },
             'outline-black': {
                 color: 'gray.900',
@@ -54,12 +55,6 @@ const button = defineRecipe({
                 paddingLeft: 3,
                 paddingRight: 3
             },
-            // link: (props) => ({
-            //     color: props.colorPalette === 'red' ? 'red.500' : 'blue.600',
-            //     fontWeight: 'normal',
-            //     minWidth: '1em',
-            //     lineHeight: 4
-            // }),
             'link-red': {
                 ...baseLinkStyles,
                 color: 'red.500'
@@ -110,7 +105,8 @@ const button = defineRecipe({
         size: {
             md: {
                 height: 11,
-                minWidth: 11
+                minWidth: 11,
+                textStyle: 'md'
             }
         }
     }

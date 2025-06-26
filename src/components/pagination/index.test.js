@@ -13,7 +13,7 @@ const mockCurrentUrl = '/test?offset=25'
 
 test('Renders Paginaton', () => {
     const {getAllByRole} = renderWithProviders(
-        <Pagination urls={mockUrls} currentUrl={mockCurrentUrl} />
+        <Pagination urls={mockUrls} currentURL={mockCurrentUrl} />
     )
 
     const [prev, next] = getAllByRole('link')

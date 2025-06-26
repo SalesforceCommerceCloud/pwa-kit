@@ -86,11 +86,11 @@ class ChakraStorefront extends ApplicationExtension<Config> {
             //     path: config.pages.Account && config.pages.Account.path,
             //     component: Pages.Account
             // },
-            // {
-            //     path: config.pages.Checkout && config.pages.Checkout.path,
-            //     component: Pages.Checkout,
-            //     exact: true
-            // },
+            {
+                path: config.pages.Checkout && config.pages.Checkout.path,
+                component: Pages.Checkout,
+                exact: true
+            },
             // {
             //     path: config.pages.CheckoutConfirmation && config.pages.CheckoutConfirmation.path,
             //     component: Pages.CheckoutConfirmation
@@ -105,11 +105,11 @@ class ChakraStorefront extends ApplicationExtension<Config> {
                 component: Pages.SocialLoginRedirect,
                 exact: true
             },
-            // {
-            //     path: config.pages.Cart && config.pages.Cart.path,
-            //     component: Pages.Cart,
-            //     exact: true
-            // },
+            {
+                path: config.pages.Cart && config.pages.Cart.path,
+                component: Pages.Cart,
+                exact: true
+            },
             {
                 path: config.pages.ProductDetail && config.pages.ProductDetail.path,
                 component: Pages.ProductDetail

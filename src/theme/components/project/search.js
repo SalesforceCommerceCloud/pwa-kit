@@ -19,9 +19,8 @@ export default defineRecipe({
             borderColor: 'gray.600',
             border: '2px solid',
             backgroundColor: 'gray.100',
-            _focusVisible: {
-                background: 'transparent',
-                borderColor: 'blue.500'
+            _placeholder: {
+                color: 'gray.700'
             }
         }
     }

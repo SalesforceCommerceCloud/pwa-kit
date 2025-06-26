@@ -47,7 +47,7 @@ export const ToggleCard = ({
                 position="relative"
                 {...props}
             >
-                <Stack spacing={editing || (!editing && !disabled) ? 4 : 0}>
+                <Stack gap={editing || (!editing && !disabled) ? 4 : 0}>
                     <Flex justify="space-between">
                         <Heading
                             fontSize="lg"
@@ -60,7 +60,7 @@ export const ToggleCard = ({
                         </Heading>
                         {!editing && !disabled && onEdit && !disableEdit && (
                             <Button
-                                variant="link"
+                                variant="link-blue"
                                 size="sm"
                                 onClick={onEdit}
                                 aria-label={editLabel}

@@ -9,18 +9,18 @@ import PropTypes from 'prop-types'
 import {FormattedMessage, useIntl} from 'react-intl'
 
 // Chakra Components
-import {Box, Fade, Flex, Stack, Text, VisuallyHidden} from '@chakra-ui/react'
+import {Box, Flex, Stack, Text, VisuallyHidden} from '@chakra-ui/react'
 
 // Project Components
-import {HideOnDesktop, HideOnMobile} from '../../components/responsive'
-import ItemVariantProvider from '../../components/item-variant'
-import CartItemVariantImage from '../../components/item-variant/item-image'
-import CartItemVariantName from '../../components/item-variant/item-name'
-import CartItemVariantAttributes from '../../components/item-variant/item-attributes'
-import CartItemVariantPrice from '../../components/item-variant/item-price'
-import LoadingSpinner from '../../components/loading-spinner'
-import QuantityPicker from '../../components/quantity-picker'
-
+import {HideOnDesktop, HideOnMobile} from '../responsive'
+import ItemVariantProvider from '../item-variant'
+import CartItemVariantImage from '../item-variant/item-image'
+import CartItemVariantName from '../item-variant/item-name'
+import CartItemVariantAttributes from '../item-variant/item-attributes'
+import CartItemVariantPrice from '../item-variant/item-price'
+import Fade from '../fade'
+import LoadingSpinner from '../loading-spinner'
+import QuantityPicker from '../quantity-picker'
 // Utilities
 import {noop} from '../../utils/utils'
 
@@ -106,18 +106,18 @@ const ProductItem = ({
                                                 setQuantity(product.quantity)
                                             }
                                         }}
-                                        onChange={(stringValue, numberValue) => {
+                                        onValueChange={({value, valueAsNumber}) => {
                                             // Set the Quantity of product to value of input if value number
-                                            if (numberValue >= 0) {
+                                            if (valueAsNumber >= 0) {
                                                 // Call handler
-                                                onItemQuantityChange(numberValue).then(
+                                                onItemQuantityChange(valueAsNumber).then(
                                                     (isValidChange) =>
-                                                        isValidChange && setQuantity(numberValue)
+                                                        isValidChange && setQuantity(valueAsNumber)
                                                 )
-                                            } else if (stringValue === '') {
+                                            } else if (value === '') {
                                                 // We want to allow the use to clear the input to start a new input so here we set the quantity to '' so NAN is not displayed
                                                 // User will not be able to add '' quantity to the cart due to the add to cart button enablement rules
-                                                setQuantity(stringValue)
+                                                setQuantity(value)
                                             }
                                         }}
                                         productName={product?.name}
