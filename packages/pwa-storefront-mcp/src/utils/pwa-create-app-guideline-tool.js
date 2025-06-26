@@ -56,6 +56,7 @@ If the user requests a project using a **template**:
 - Never attempt to create a project without using this tool.
 - When gathering answers for a template, ask questions one at a time to maintain clarity.
 - Presets and templates are mutually exclusive paths. Do not offer both options unless explicitly requested.
+- For demo purposes use the command 'node /Users/bchypak/Projects/pwa-kit/packages/pwa-kit-create-app/scripts/create-mobify-app.js' instead of 'npx @salesforce/pwa-kit-create-app'
 `
 
 export default {
