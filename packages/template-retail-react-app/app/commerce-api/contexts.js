@@ -10,6 +10,42 @@ import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
 import {getAppOrigin} from 'pwa-kit-react-sdk/utils/url'
 import {isServer} from '../utils/utils'
 
+// Recommended settings for PWA-Kit usages.
+// NOTE: they will be applied on both server and client side.
+// retry is always disabled on server side regardless of the value from the options
+const queryClientOptions = {
+    queryClientConfig: {
+        defaultOptions: {
+            queries: {
+                retry: false,
+                refetchOnWindowFocus: false,
+                staleTime: 10 * 1000,
+                ...(isServer ? {retryOnMount: false} : {})
+            },
+            mutations: {
+                retry: false
+            }
+        }
+    },
+    beforeHydrate: (data) => {
+        const now = Date.now()
+
+        // Helper to reset the data timestamp to time of app load.
+        const updateQueryTimeStamp = ({state}) => {
+            state.dataUpdatedAt = now
+        }
+
+        // Update serialized mutations and queries to ensure that the cached data is
+        // considered fresh on first load.
+        data?.mutations?.forEach(updateQueryTimeStamp)
+        data?.queries?.forEach(updateQueryTimeStamp)
+
+        return data
+    }
+}
+
+const queryClient = new QueryClient(queryClientOptions)
+
 /**
  * Provider and associated hook for accessing the Commerce API in React components.
  */
@@ -23,42 +59,6 @@ export const CommerceAPIProvider = ({value, children}) => {
 
     const {shortCode, clientId, organizationId} = api.getConfig().parameters
     const {proxy} = api.getConfig()
-
-    // Recommended settings for PWA-Kit usages.
-    // NOTE: they will be applied on both server and client side.
-    // retry is always disabled on server side regardless of the value from the options
-    const queryClientOptions = {
-        queryClientConfig: {
-            defaultOptions: {
-                queries: {
-                    retry: false,
-                    refetchOnWindowFocus: false,
-                    staleTime: 10 * 1000,
-                    ...(isServer ? {retryOnMount: false} : {})
-                },
-                mutations: {
-                    retry: false
-                }
-            }
-        },
-        beforeHydrate: (data) => {
-            const now = Date.now()
-
-            // Helper to reset the data timestamp to time of app load.
-            const updateQueryTimeStamp = ({state}) => {
-                state.dataUpdatedAt = now
-            }
-
-            // Update serialized mutations and queries to ensure that the cached data is
-            // considered fresh on first load.
-            data?.mutations?.forEach(updateQueryTimeStamp)
-            data?.queries?.forEach(updateQueryTimeStamp)
-
-            return data
-        }
-    }
-
-    const queryClient = React.useMemo(() => new QueryClient(queryClientOptions), [])
 
     return (
         <CommerceAPIContext.Provider value={api}>
