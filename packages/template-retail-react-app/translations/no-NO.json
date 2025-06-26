@@ -6,7 +6,7 @@
     "defaultMessage": "Min konto"
   },
   "account.logout_button.button.log_out": {
-    "defaultMessage": "Logg ut"
+    "defaultMessage": "Logg av"
   },
   "account_addresses.badge.default": {
     "defaultMessage": "Standard"
@@ -54,7 +54,7 @@
     "defaultMessage": "Fraktmetode"
   },
   "account_order_detail.label.order_number": {
-    "defaultMessage": "Ordrenummer: {orderNumber}"
+    "defaultMessage": "Bestillingsnummer: {orderNumber}"
   },
   "account_order_detail.label.ordered_date": {
     "defaultMessage": "Bestilt: {date}"
@@ -66,7 +66,7 @@
     "defaultMessage": "Sporingsnummer"
   },
   "account_order_detail.link.back_to_history": {
-    "defaultMessage": "Tilbake til ordrehistorikk"
+    "defaultMessage": "Tilbake til bestillingshistorikk"
   },
   "account_order_detail.shipping_status.not_shipped": {
     "defaultMessage": "Ikke sendt"
@@ -78,23 +78,23 @@
     "defaultMessage": "Sendt"
   },
   "account_order_detail.title.order_details": {
-    "defaultMessage": "Ordredetaljer"
+    "defaultMessage": "Bestillingsdetaljer"
   },
   "account_order_history.button.continue_shopping": {
     "defaultMessage": "Fortsett å handle"
   },
   "account_order_history.description.once_you_place_order": {
-    "defaultMessage": "Når du har lagt inn en ordre, vil detaljene vises her."
+    "defaultMessage": "Når du har lagt inn en bestilling, vises detaljene her."
   },
   "account_order_history.heading.no_order_yet": {
-    "defaultMessage": "Du har ikke lagt inn en ordre ennå."
+    "defaultMessage": "Du har ikke lagt inn en bestilling ennå."
   },
   "account_order_history.label.num_of_items": {
     "defaultMessage": "{count} artikler",
     "description": "Number of items in order"
   },
   "account_order_history.label.order_number": {
-    "defaultMessage": "Ordrenummer: {orderNumber}"
+    "defaultMessage": "Bestillingsnummer: {orderNumber}"
   },
   "account_order_history.label.ordered_date": {
     "defaultMessage": "Bestilt: {date}"
@@ -106,7 +106,7 @@
     "defaultMessage": "Vis detaljer"
   },
   "account_order_history.title.order_history": {
-    "defaultMessage": "Ordrehistorikk"
+    "defaultMessage": "Bestillingshistorikk"
   },
   "account_wishlist.button.continue_shopping": {
     "defaultMessage": "Fortsett å handle"
@@ -146,6 +146,18 @@
   },
   "auth_modal.button.close.assistive_msg": {
     "defaultMessage": "Lukk skjema for pålogging"
+  },
+  "auth_modal.check_email.button.resend_link": {
+    "defaultMessage": "Send lenke på nytt"
+  },
+  "auth_modal.check_email.description.check_spam_folder": {
+    "defaultMessage": "Det kan ta noen minutter før lenken kommer, sjekk søppelpostmappen din hvis du har problemer med å finne den"
+  },
+  "auth_modal.check_email.description.just_sent": {
+    "defaultMessage": "Vi har nettopp sendt en lenke for pålogging til <b>{email}</b>"
+  },
+  "auth_modal.check_email.title.check_your_email": {
+    "defaultMessage": "Sjekk e-posten din"
   },
   "auth_modal.description.now_signed_in": {
     "defaultMessage": "Du er nå pålogget."
@@ -280,7 +292,7 @@
     "defaultMessage": "Fortsett å handle"
   },
   "checkout_confirmation.link.login": {
-    "defaultMessage": "Logg inn her"
+    "defaultMessage": "Logg på her"
   },
   "checkout_confirmation.message.already_has_account": {
     "defaultMessage": "Denne e-postadressen har allerede en konto."
@@ -404,19 +416,31 @@
     "defaultMessage": "Logg ut"
   },
   "contact_info.button.already_have_account": {
-    "defaultMessage": "Har du allerede en konto? Logg inn"
+    "defaultMessage": "Har du allerede en konto? Logg på"
+  },
+  "contact_info.button.back_to_sign_in_options": {
+    "defaultMessage": "Tilbake til påloggingsalternativer"
   },
   "contact_info.button.checkout_as_guest": {
     "defaultMessage": "Utfør betaling som gjest"
   },
   "contact_info.button.login": {
-    "defaultMessage": "Logg inn"
+    "defaultMessage": "Logg på"
+  },
+  "contact_info.button.password": {
+    "defaultMessage": "Passord"
+  },
+  "contact_info.button.secure_link": {
+    "defaultMessage": "Sikker lenke"
   },
   "contact_info.error.incorrect_username_or_password": {
-    "defaultMessage": "Feil brukernavn eller passord, vennligst prøv igjen."
+    "defaultMessage": "Feil brukernavn eller passord, prøv igjen."
   },
   "contact_info.link.forgot_password": {
     "defaultMessage": "Glemt passordet?"
+  },
+  "contact_info.message.or_login_with": {
+    "defaultMessage": "Eller pålogging med"
   },
   "contact_info.title.contact_info": {
     "defaultMessage": "Kontaktinformasjon"
@@ -447,6 +471,27 @@
   "display_price.label.current_price_with_range": {
     "defaultMessage": "Fra {currentPrice}"
   },
+  "dnt_notification.button.accept": {
+    "defaultMessage": "Godta"
+  },
+  "dnt_notification.button.assistive_msg.accept": {
+    "defaultMessage": "Godta sporing"
+  },
+  "dnt_notification.button.assistive_msg.close": {
+    "defaultMessage": "Lukk sporingsskjema for samtykke"
+  },
+  "dnt_notification.button.assistive_msg.decline": {
+    "defaultMessage": "Sporing av tilbakegang"
+  },
+  "dnt_notification.button.decline": {
+    "defaultMessage": "Nedgang"
+  },
+  "dnt_notification.description": {
+    "defaultMessage": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur."
+  },
+  "dnt_notification.title": {
+    "defaultMessage": "Samtykke til sporing"
+  },
   "drawer_menu.button.account_details": {
     "defaultMessage": "Kontoopplysninger"
   },
@@ -454,13 +499,13 @@
     "defaultMessage": "Adresser"
   },
   "drawer_menu.button.log_out": {
-    "defaultMessage": "Logg ut"
+    "defaultMessage": "Logg av"
   },
   "drawer_menu.button.my_account": {
     "defaultMessage": "Min konto"
   },
   "drawer_menu.button.order_history": {
-    "defaultMessage": "Ordrehistorikk"
+    "defaultMessage": "Bestillingshistorikk"
   },
   "drawer_menu.header.assistive_msg.title": {
     "defaultMessage": "Menyboks"
@@ -490,7 +535,7 @@
     "defaultMessage": "Shop alt"
   },
   "drawer_menu.link.sign_in": {
-    "defaultMessage": "Logg inn"
+    "defaultMessage": "Logg på"
   },
   "drawer_menu.link.site_map": {
     "defaultMessage": "Nettstedskart"
@@ -508,13 +553,13 @@
     "defaultMessage": "Fortsett å handle"
   },
   "empty_cart.link.sign_in": {
-    "defaultMessage": "Logg inn"
+    "defaultMessage": "Logg på"
   },
   "empty_cart.message.continue_shopping": {
     "defaultMessage": "Fortsett å handle for å legge til artikler i kurven."
   },
   "empty_cart.message.sign_in_or_continue_shopping": {
-    "defaultMessage": "Logg inn for å hente lagrede artikler eller fortsette å handle."
+    "defaultMessage": "Logg på for å hente lagrede artikler eller fortsette å handle."
   },
   "empty_search_results.info.cant_find_anything_for_category": {
     "defaultMessage": "Vi fant ikke noe for {category}. Prøv å søke etter et produkt eller {link}."
@@ -565,7 +610,7 @@
     "defaultMessage": "Frakt"
   },
   "footer.link.signin_create_account": {
-    "defaultMessage": "Logg inn eller opprett konto"
+    "defaultMessage": "Logg på eller opprett konto"
   },
   "footer.link.site_map": {
     "defaultMessage": "Nettstedskart"
@@ -576,6 +621,9 @@
   "footer.link.terms_conditions": {
     "defaultMessage": "Vilkår og betingelser"
   },
+  "footer.locale_selector.assistive_msg": {
+    "defaultMessage": "Velg språk"
+  },
   "footer.message.copyright": {
     "defaultMessage": "Salesforce eller dets tilknyttede selskaper. Alle rettigheter forbeholdt. Denne butikken er kun for demonstrasjonsformål. Ordrer som legges inn, vil IKKE bli behandlet."
   },
@@ -584,6 +632,9 @@
   },
   "footer.subscribe.description.sign_up": {
     "defaultMessage": "Registrer deg for å holde deg oppdatert om de beste tilbudene"
+  },
+  "footer.subscribe.email.assistive_msg": {
+    "defaultMessage": "E-postadresse for nyhetsbrev"
   },
   "footer.subscribe.heading.first_to_know": {
     "defaultMessage": "Bli den første som får vite det"
@@ -601,10 +652,19 @@
     "defaultMessage": "Adresser"
   },
   "global.account.link.order_history": {
-    "defaultMessage": "Ordrehistorikk"
+    "defaultMessage": "Bestillingshistorikk"
   },
   "global.account.link.wishlist": {
     "defaultMessage": "Ønskeliste"
+  },
+  "global.error.create_account": {
+    "defaultMessage": "Denne funksjonen er ikke tilgjengelig for øyeblikket. Du må opprette en konto for å få tilgang til denne funksjonen."
+  },
+  "global.error.feature_unavailable": {
+    "defaultMessage": "Denne funksjonen er ikke tilgjengelig for øyeblikket."
+  },
+  "global.error.invalid_token": {
+    "defaultMessage": "Ugyldig token, prøv igjen."
   },
   "global.error.something_went_wrong": {
     "defaultMessage": "Noe gikk galt. Prøv igjen."
@@ -927,8 +987,23 @@
   "login_form.action.create_account": {
     "defaultMessage": "Opprett konto"
   },
+  "login_form.button.apple": {
+    "defaultMessage": "Apple"
+  },
+  "login_form.button.back": {
+    "defaultMessage": "Tilbake til påloggingsalternativer"
+  },
+  "login_form.button.continue_securely": {
+    "defaultMessage": "Fortsett på en sikker måte"
+  },
+  "login_form.button.google": {
+    "defaultMessage": "Google"
+  },
+  "login_form.button.password": {
+    "defaultMessage": "Passord"
+  },
   "login_form.button.sign_in": {
-    "defaultMessage": "Logg inn"
+    "defaultMessage": "Logg på"
   },
   "login_form.link.forgot_password": {
     "defaultMessage": "Glemt passordet?"
@@ -936,11 +1011,14 @@
   "login_form.message.dont_have_account": {
     "defaultMessage": "Har du ikke en konto?"
   },
+  "login_form.message.or_login_with": {
+    "defaultMessage": "Eller pålogging med"
+  },
   "login_form.message.welcome_back": {
     "defaultMessage": "Velkommen tilbake"
   },
   "login_page.error.incorrect_username_or_password": {
-    "defaultMessage": "Feil brukernavn eller passord, vennligst prøv igjen."
+    "defaultMessage": "Feil brukernavn eller passord, prøv igjen."
   },
   "offline_banner.description.browsing_offline_mode": {
     "defaultMessage": "Du er for øyeblikket i frakoblet modus"
@@ -959,7 +1037,7 @@
     "defaultMessage": "Ordresammendrag"
   },
   "order_summary.label.estimated_total": {
-    "defaultMessage": "Estimert total"
+    "defaultMessage": "Anslått sum"
   },
   "order_summary.label.free": {
     "defaultMessage": "Gratis"
@@ -996,6 +1074,9 @@
   },
   "pagination.field.num_of_pages": {
     "defaultMessage": "av {numOfPages}"
+  },
+  "pagination.field.page_number_select": {
+    "defaultMessage": "Velg sidetall"
   },
   "pagination.link.next": {
     "defaultMessage": "Neste"
@@ -1038,8 +1119,14 @@
     "defaultMessage": "1 stor bokstav",
     "description": "Password requirement"
   },
+  "password_reset_success.toast": {
+    "defaultMessage": "Passordet er tilbakestilt"
+  },
   "payment_selection.heading.credit_card": {
     "defaultMessage": "Kredittkort"
+  },
+  "payment_selection.radio_group.assistive_msg": {
+    "defaultMessage": "Betaling"
   },
   "payment_selection.tooltip.secure_payment": {
     "defaultMessage": "Dette er en sikker SSL-kryptert betaling."
@@ -1107,6 +1194,9 @@
   },
   "product_list.select.sort_by": {
     "defaultMessage": "Sorter etter: {sortOption}"
+  },
+  "product_list.sort_by.label.assistive_msg": {
+    "defaultMessage": "Sorter produkter etter"
   },
   "product_scroller.assistive_msg.scroll_left": {
     "defaultMessage": "Bla produkter til venstre"
@@ -1186,6 +1276,9 @@
   "profile_card.title.my_profile": {
     "defaultMessage": "Min profil"
   },
+  "profile_fields.label.profile_form": {
+    "defaultMessage": "Skjema for profil"
+  },
   "promo_code_fields.button.apply": {
     "defaultMessage": "Bruk"
   },
@@ -1205,7 +1298,7 @@
     "defaultMessage": "Nylige søk"
   },
   "register_form.action.sign_in": {
-    "defaultMessage": "Logg inn"
+    "defaultMessage": "Logg på"
   },
   "register_form.button.create_account": {
     "defaultMessage": "Opprett konto"
@@ -1222,17 +1315,8 @@
   "register_form.message.create_an_account": {
     "defaultMessage": "Opprett en konto og få tidlig tilgang til det aller beste innen produkter, inspirasjon og fellesskap."
   },
-  "reset_password.button.back_to_sign_in": {
-    "defaultMessage": "Tilbake til pålogging"
-  },
-  "reset_password.info.receive_email_shortly": {
-    "defaultMessage": "Du vil om kort tid motta en e-post på <b>{email}</b> med en lenke for å tilbakestille passordet ditt."
-  },
-  "reset_password.title.password_reset": {
-    "defaultMessage": "Tilbakestille passord"
-  },
   "reset_password_form.action.sign_in": {
-    "defaultMessage": "Logg inn"
+    "defaultMessage": "Logg på"
   },
   "reset_password_form.button.reset_password": {
     "defaultMessage": "Tilbakestill passord"
@@ -1313,6 +1397,12 @@
   "signout_confirmation_dialog.message.sure_to_sign_out": {
     "defaultMessage": "Er du sikker på at du vil logge ut? Du må logge inn igjen for å fortsette med din nåværende ordre."
   },
+  "social_login_redirect.message.authenticating": {
+    "defaultMessage": "Autentisering..."
+  },
+  "social_login_redirect.message.redirect_link": {
+    "defaultMessage": "Hvis du ikke blir omdirigert automatisk, klikker du på <lenke>denne lenken</lenke> for å fortsette."
+  },
   "store_locator.action.find": {
     "defaultMessage": "Finn"
   },
@@ -1353,7 +1443,7 @@
     "defaultMessage": "USA"
   },
   "store_locator.error.agree_to_share_your_location": {
-    "defaultMessage": "Vennligst godta å dele stedet der du befinner deg"
+    "defaultMessage": "Vi ber deg godta å dele stedet der du befinner deg"
   },
   "store_locator.error.please_enter_a_postal_code": {
     "defaultMessage": "Oppgi et postnummer."
@@ -1475,16 +1565,16 @@
     "defaultMessage": "Skriv inn sikkerhetskoden."
   },
   "use_credit_card_fields.error.valid_card_number": {
-    "defaultMessage": "Vennligst skriv inn et gyldig kortnummer."
+    "defaultMessage": "Skriv inn et gyldig kortnummer."
   },
   "use_credit_card_fields.error.valid_date": {
-    "defaultMessage": "Vennligst skriv inn en gyldig dato."
+    "defaultMessage": "Skriv inn en gyldig dato."
   },
   "use_credit_card_fields.error.valid_name": {
-    "defaultMessage": "Vennligst skriv inn et gyldig navn."
+    "defaultMessage": "Skriv inn et gyldig navn."
   },
   "use_credit_card_fields.error.valid_security_code": {
-    "defaultMessage": "Vennligst skriv inn en gyldig sikkerhetskode."
+    "defaultMessage": "Skriv inn en gyldig sikkerhetskode."
   },
   "use_credit_card_fields.label.card_number": {
     "defaultMessage": "Kortnummer"
@@ -1526,7 +1616,7 @@
     "defaultMessage": "{productName} er ikke på lager"
   },
   "use_profile_fields.error.required_email": {
-    "defaultMessage": "Vennligst skriv inn en gyldig e-post adresse."
+    "defaultMessage": "Skriv inn en gyldig e-post adresse."
   },
   "use_profile_fields.error.required_first_name": {
     "defaultMessage": "Skriv inn fornavnet ditt."
@@ -1550,7 +1640,7 @@
     "defaultMessage": "Telefonnummer"
   },
   "use_promo_code_fields.error.required_promo_code": {
-    "defaultMessage": "Vennligst oppgi en gyldig kampanjekode."
+    "defaultMessage": "Oppgi en gyldig kampanjekode."
   },
   "use_promo_code_fields.label.promo_code": {
     "defaultMessage": "Kampanjekode"
@@ -1574,7 +1664,7 @@
     "defaultMessage": "Passordet må inneholde minst 8 tegn."
   },
   "use_registration_fields.error.required_email": {
-    "defaultMessage": "Vennligst skriv inn en gyldig e-post adresse."
+    "defaultMessage": "Skriv inn en gyldig e-post adresse."
   },
   "use_registration_fields.error.required_first_name": {
     "defaultMessage": "Skriv inn fornavnet ditt."
@@ -1607,7 +1697,7 @@
     "defaultMessage": "Registrer meg for mottak av e-post fra Salesforce (du kan melde deg av når som helst)"
   },
   "use_reset_password_fields.error.required_email": {
-    "defaultMessage": "Vennligst skriv inn en gyldig e-post adresse."
+    "defaultMessage": "Skriv inn en gyldig e-post adresse."
   },
   "use_reset_password_fields.label.email": {
     "defaultMessage": "E-post"
@@ -1621,6 +1711,12 @@
   "use_update_password_fields.error.minimum_characters": {
     "defaultMessage": "Passordet må inneholde minst 8 tegn."
   },
+  "use_update_password_fields.error.password_mismatch": {
+    "defaultMessage": "Passordene stemmer ikke overens."
+  },
+  "use_update_password_fields.error.required_confirm_password": {
+    "defaultMessage": "Bekreft passordet ditt."
+  },
   "use_update_password_fields.error.required_new_password": {
     "defaultMessage": "Oppgi et nytt passord."
   },
@@ -1632,6 +1728,9 @@
   },
   "use_update_password_fields.error.uppercase_letter": {
     "defaultMessage": "Passordet må inneholde minst én stor bokstav."
+  },
+  "use_update_password_fields.label.confirm_new_password": {
+    "defaultMessage": "Bekreft nytt passord"
   },
   "use_update_password_fields.label.current_password": {
     "defaultMessage": "Gjeldende passord"
@@ -1676,6 +1775,6 @@
     "defaultMessage": "Artikkel fjernet fra ønskeliste"
   },
   "with_registration.info.please_sign_in": {
-    "defaultMessage": "Vennligst logg inn for å fortsette."
+    "defaultMessage": "Logg på for å fortsette."
   }
 }

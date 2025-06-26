@@ -1087,7 +1087,7 @@ describe('SLAS private client proxy', () => {
 
     let proxyApp
     const proxyPort = 12345
-    const proxyPath = '/responseHeaders'
+    const proxyPath = '/shopper/auth/responseHeaders'
     const slasTarget = `http://localhost:${proxyPort}${proxyPath}`
 
     beforeAll(() => {
@@ -1139,7 +1139,7 @@ describe('SLAS private client proxy', () => {
         )
 
         return await request(app)
-            .get('/mobify/slas/private/somePath')
+            .get('/mobify/slas/private/shopper/auth/v1/somePath')
             .then((response) => {
                 expect(response.body.authorization).toBeUndefined()
                 expect(response.body.host).toBe('shortCode.api.commercecloud.salesforce.com')
@@ -1170,7 +1170,7 @@ describe('SLAS private client proxy', () => {
         )
 
         return await request(app)
-            .get('/mobify/slas/private/oauth2/token')
+            .get('/mobify/slas/private/shopper/auth/v1/oauth2/token')
             .then((response) => {
                 expect(response.body.authorization).toBe(`Basic ${encodedCredentials}`)
                 expect(response.body.host).toBe('shortCode.api.commercecloud.salesforce.com')
@@ -1201,7 +1201,7 @@ describe('SLAS private client proxy', () => {
         )
 
         return await request(app)
-            .get('/mobify/slas/oauth2/other-path')
+            .get('/mobify/slas/private/shopper/auth/v1/oauth2/other-path')
             .then((response) => {
                 expect(response.body._sfdc_client_auth).toBeUndefined()
             })
@@ -1231,11 +1231,36 @@ describe('SLAS private client proxy', () => {
         )
 
         return await request(app)
-            .get('/mobify/slas/private/oauth2/trusted-agent/token')
+            .get('/mobify/slas/private/shopper/auth/v1/oauth2/trusted-agent/token')
             .then((response) => {
                 expect(response.body['_sfdc_client_auth']).toBe(encodedCredentials)
                 expect(response.body.host).toBe('shortCode.api.commercecloud.salesforce.com')
                 expect(response.body['x-mobify']).toBe('true')
             })
+    }, 15000)
+
+    test('returns 403 if request is not for /shopper/auth endpoints', async () => {
+        process.env.PWA_KIT_SLAS_CLIENT_SECRET = 'a secret'
+
+        const app = RemoteServerFactory._createApp(
+            opts({
+                mobify: {
+                    app: {
+                        commerceAPI: {
+                            parameters: {
+                                clientId: 'clientId',
+                                shortCode: 'shortCode'
+                            }
+                        }
+                    }
+                },
+                useSLASPrivateClient: true,
+                slasTarget: slasTarget
+            })
+        )
+
+        return await request(app)
+            .get('/mobify/slas/private/shopper/auth-admin/v1/other-path')
+            .expect(403)
     }, 15000)
 })
