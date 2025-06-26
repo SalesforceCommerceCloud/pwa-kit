@@ -31,19 +31,11 @@ jobs:
   pwa-kit:
     strategy:
       matrix:
-        node: [14, 16, 18, 20]
-        npm: [6, 7, 8, 9, 10]
-        exclude:
-          - node: 14
-            npm: 9
-          - node: 14
-            npm: 10
-          - node: 16
-            npm: 6
-          - node: 16
-            npm: 10
+        node: [18, 20, 22]
+        npm: [8, 9, 10, 11]
+        exclude: # node 18 with npm 11 are not compatible
           - node: 18
-            npm: 6
+            npm: 11
     runs-on: ubuntu-latest
     env:
       # The "default" npm is the one that ships with a given version of node.
@@ -124,19 +116,11 @@ jobs:
   pwa-kit-windows:
     strategy:
       matrix:
-        node: [14, 16, 18, 20]
-        npm: [6, 7, 8, 9, 10]
-        exclude:
-          - node: 14
-            npm: 9
-          - node: 14
-            npm: 10
-          - node: 16
-            npm: 6
-          - node: 16
-            npm: 10
+        node: [18, 20, 22]
+        npm: [8, 9, 10, 11]
+        exclude: # node 18 with npm 11 are not compatible
           - node: 18
-            npm: 6
+            npm: 11
     env:
       # The "default" npm is the one that ships with a given version of node.
       # For more: https://nodejs.org/en/download/releases/
