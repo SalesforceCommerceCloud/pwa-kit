@@ -26,7 +26,7 @@ import CartTitle from '@salesforce/retail-react-app/app/pages/cart/partials/cart
 import {
     BonusProductsTitle,
     BonusProductsSelection
-} from '@salesforce/retail-react-app/app/pages/cart/partials/bonus-product-helper'
+} from '@salesforce/retail-react-app/app/pages/cart/partials/cart-bonus-products'
 import ConfirmationModal from '@salesforce/retail-react-app/app/components/confirmation-modal'
 import EmptyCart from '@salesforce/retail-react-app/app/pages/cart/partials/empty-cart'
 import OrderSummary from '@salesforce/retail-react-app/app/components/order-summary'

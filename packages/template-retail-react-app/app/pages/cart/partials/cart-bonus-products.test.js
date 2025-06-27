@@ -11,7 +11,7 @@ import {IntlProvider} from 'react-intl'
 import {
     BonusProductsTitle,
     BonusProductsSelection
-} from '@salesforce/retail-react-app/app/pages/cart/partials/bonus-product-helper'
+} from '@salesforce/retail-react-app/app/pages/cart/partials/cart-bonus-products'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
 import {useBonusProductModalContext} from '@salesforce/retail-react-app/app/hooks/use-bonus-product-modal'
 import {usePromotions} from '@salesforce/commerce-sdk-react'

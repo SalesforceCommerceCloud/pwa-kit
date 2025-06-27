@@ -90,8 +90,9 @@ describe('CartSelectBonusButton', () => {
                 selectedOfferCount={1}
             />
         )
-
-        expect(screen.queryByText('(1 of 3 selected)')).not.toBeInTheDocument()
+        const text = screen.getByText('(1 of 3 selected)')
+        expect(text).toBeInTheDocument()
+        expect(text).not.toBeVisible()
         expect(screen.getByRole('button', {name: /select bonus products/i})).toBeInTheDocument()
     })
 })

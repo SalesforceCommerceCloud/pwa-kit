@@ -6,7 +6,13 @@
  */
 import React from 'react'
 import PropTypes from 'prop-types'
-import {Box, Stack, Button, Text} from '@salesforce/retail-react-app/app/components/shared/ui'
+import {
+    Box,
+    Stack,
+    Button,
+    Text,
+    Skeleton
+} from '@salesforce/retail-react-app/app/components/shared/ui'
 
 const CartSelectBonusButton = ({
     handleBonusButtonClick,
@@ -16,11 +22,11 @@ const CartSelectBonusButton = ({
 }) => {
     return (
         <Stack spacing={2} p={6}>
-            {promotionName && (
+            <Skeleton isLoaded={!!promotionName}>
                 <Text fontSize="lg" fontWeight="bold">
                     {promotionName} ({selectedOfferCount} of {maxOfferCount} selected)
                 </Text>
-            )}
+            </Skeleton>
             <Box pt={2}>
                 <Button
                     onClick={handleBonusButtonClick}
