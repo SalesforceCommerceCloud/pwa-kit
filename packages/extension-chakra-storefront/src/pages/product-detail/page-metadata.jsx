@@ -19,7 +19,7 @@ import Seo from '../../components/seo'
  * @param {string} product.pageMetaTags.id - The id of the meta tag
  * @param {string} product.pageMetaTags.value - The value of the meta tag
  */
-export default function Metadata({product}) {
+export default function PageMetadata({product}) {
     if (!product) {
         return null
     }
@@ -33,7 +33,7 @@ export default function Metadata({product}) {
     return <Seo title={title} description={description} keywords={keywords} metaTags={metaTags} />
 }
 
-Metadata.propTypes = {
+PageMetadata.propTypes = {
     product: PropTypes.shape({
         pageTitle: PropTypes.string,
         pageDescription: PropTypes.string,
@@ -44,5 +44,5 @@ Metadata.propTypes = {
                 value: PropTypes.string.isRequired
             })
         )
-    }).isRequired
+    })
 }
