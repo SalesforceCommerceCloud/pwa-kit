@@ -110,19 +110,15 @@ const BonusProductsSelection = ({basket}) => {
             marginBottom={2}
             boxShadow="base"
         >
-            {Object.entries(bonusProductsOffersMap).map(([bonusDiscountId, offers]) => {
-                const promotionName = promotionInfoMap[offers.promotionId]?.details
-                if (!promotionName) return null // Only render when promotionName is available
-                return (
-                    <CartSelectBonusButton
-                        key={bonusDiscountId}
-                        promotionName={promotionName}
-                        maxOfferCount={offers.maxBonusItems}
-                        selectedOfferCount={bonusDiscountToQuantityMap[bonusDiscountId] || 0}
-                        handleBonusButtonClick={() => handleBonusButtonClick([offers])}
-                    />
-                )
-            })}
+            {Object.entries(bonusProductsOffersMap).map(([bonusDiscountId, offers]) => (
+                <CartSelectBonusButton
+                    key={bonusDiscountId}
+                    promotionName={promotionInfoMap[offers.promotionId]?.details}
+                    maxOfferCount={offers.maxBonusItems}
+                    selectedOfferCount={bonusDiscountToQuantityMap[bonusDiscountId] || 0}
+                    handleBonusButtonClick={() => handleBonusButtonClick([offers])}
+                />
+            ))}
         </Box>
     )
 }
