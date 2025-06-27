@@ -161,10 +161,6 @@ class CommerceAPI {
                             ...fetchOptions?.parameters
                         }
 
-                        if (self.auth.pendingToken) {
-                            await self.auth.pendingToken
-                        }
-
                         // Handle auth logic (replacing willSendRequest functionality)
                         let dwsidHeader = {}
                         const dwsid = self.auth.get('dwsid')
