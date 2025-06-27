@@ -29,8 +29,8 @@ import useEinstein from '../../hooks/use-einstein'
 import useDataCloud from '../../hooks/use-datacloud'
 import useActiveData from '../../hooks/use-active-data'
 import useToast from '../../hooks/use-toast'
-import {useWishList} from '../../hooks/use-wish-list'
 import {useProductDetailAnalytics} from './use-product-detail-analytics'
+import {useProductDetailWishlist} from './use-product-detail-wishlist'
 
 import {normalizeSetBundleProduct, getUpdateBundleChildArray} from '../../utils/product-utils'
 
@@ -52,6 +52,7 @@ export const useProductDetailData = () => {
     const toast = useToast()
     const navigate = useNavigation()
     const customerId = useCustomerId()
+    const {handleAddToWishlist, isWishlistLoading} = useProductDetailWishlist()
     const {maxCacheAge: MAX_CACHE_AGE, staleWhileRevalidate: STALE_WHILE_REVALIDATE} =
         useExtensionConfig()
 
@@ -206,66 +207,6 @@ export const useProductDetailData = () => {
         })
         history.replace(updatedUrl)
     }, [variant])
-
-    /**************** Wishlist ****************/
-    const {data: wishlist, isLoading: isWishlistLoading} = useWishList()
-    const createCustomerProductListItem = useShopperCustomersMutation(
-        'createCustomerProductListItem'
-    )
-
-    const handleAddToWishlist = (product, variant, quantity) => {
-        const isItemInWishlist = wishlist?.customerProductListItems?.find(
-            (i) => i.productId === variant?.productId || i.productId === product?.id
-        )
-
-        if (!isItemInWishlist) {
-            createCustomerProductListItem.mutate(
-                {
-                    parameters: {
-                        listId: wishlist.id,
-                        customerId
-                    },
-                    body: {
-                        // NOTE: API does not respect quantity, it always adds 1
-                        quantity,
-                        productId: variant?.productId || product?.id,
-                        public: false,
-                        priority: 1,
-                        type: 'product'
-                    }
-                },
-                {
-                    onSuccess: () => {
-                        toast({
-                            title: formatMessage(TOAST_MESSAGE_ADDED_TO_WISHLIST, {quantity: 1}),
-                            type: 'success',
-                            action: (
-                                <Button
-                                    variant="link"
-                                    onClick={() => navigate('/account/wishlist')}
-                                >
-                                    {formatMessage(TOAST_ACTION_VIEW_WISHLIST)}
-                                </Button>
-                            )
-                        })
-                    },
-                    onError: () => {
-                        showError()
-                    }
-                }
-            )
-        } else {
-            toast({
-                title: formatMessage(TOAST_MESSAGE_ALREADY_IN_WISHLIST),
-                type: 'info',
-                action: (
-                    <Button variant="link" onClick={() => navigate('/account/wishlist')}>
-                        {formatMessage(TOAST_ACTION_VIEW_WISHLIST)}
-                    </Button>
-                )
-            })
-        }
-    }
 
     /**************** Add To Cart ****************/
     const showError = () => {
