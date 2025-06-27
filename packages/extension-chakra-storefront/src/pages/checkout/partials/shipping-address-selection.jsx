@@ -207,11 +207,9 @@ const ShippingAddressSelection = ({
             setIsEditingAddress(false)
         }
 
-        const address = customer.addresses.find((addr) => addr.addressId === addressId)
-        setSelectedAddressId(addressId)
+        const address = customer.addresses.find((addr) => addr.addressId === addressId.value)
+        setSelectedAddressId(address.addressId)
 
-        console.log(addressId.value)
-        console.log(selectedAddressId.value)
         form.reset({...address})
     }
 
@@ -280,8 +278,14 @@ const ShippingAddressSelection = ({
                         defaultValue=""
                         control={form.control}
                         rules={{required: !isEditingAddress}}
-                        render={({field: {value}}) => (
-                            <RadioCardGroup value={value} onValueChange={handleAddressIdSelection}>
+                        render={({field: {value, onChange}}) => (
+                            <RadioCardGroup 
+                                value={value} 
+                                onValueChange={(selectedValue) => {
+                                    onChange(selectedValue)
+                                    handleAddressIdSelection(selectedValue)
+                                }}
+                            >
                                 <SimpleGrid
                                     columns={[1, 1, 2]}
                                     gap={4}
@@ -305,7 +309,7 @@ const ShippingAddressSelection = ({
                                         )
                                         return (
                                             <React.Fragment key={address.addressId}>
-                                                <RadioCard value={address.addressId} isSelected={address.addressId === selectedAddressId?.value}>
+                                                <RadioCard value={address.addressId} isSelected={address.addressId === selectedAddressId}>
                                                     <ActionCard
                                                         padding={0}
                                                         border="none"

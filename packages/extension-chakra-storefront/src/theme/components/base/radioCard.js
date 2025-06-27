@@ -25,6 +25,10 @@ export default defineSlotRecipe({
                 boxShadow: 'outline',
                 bg: 'transparent',
             },
+            _checked: {
+                border: '1px solid',
+                borderColor: 'blue.600',
+            },
         },
     },
 })

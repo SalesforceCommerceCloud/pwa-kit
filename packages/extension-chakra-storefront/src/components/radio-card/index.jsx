@@ -19,6 +19,7 @@ export const RadioCard = (props) => {
 
     return (
         <ChakraRadioCard.Item key={value} value={value} css={styles.item}>
+            {/* TODO: Use the _checked state of the radio card instead of isSelected */}
             {isSelected && (
                 <Box
                     position="absolute"
