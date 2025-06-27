@@ -44,5 +44,5 @@ Metadata.propTypes = {
                 value: PropTypes.string.isRequired
             })
         )
-    }).isRequired
+    })
 }
