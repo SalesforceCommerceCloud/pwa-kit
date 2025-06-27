@@ -19,7 +19,7 @@ import Seo from '../../components/seo'
  * @param {string} product.pageMetaTags.id - The id of the meta tag
  * @param {string} product.pageMetaTags.value - The value of the meta tag
  */
-export default function Metadata({product}) {
+export default function PageMetadata({product}) {
     if (!product) {
         return null
     }
