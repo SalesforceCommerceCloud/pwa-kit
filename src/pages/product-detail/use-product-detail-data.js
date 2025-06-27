@@ -9,7 +9,6 @@ import React, {useCallback, useEffect, useState} from 'react'
 import {useIntl} from 'react-intl'
 import {keepPreviousData} from '@tanstack/react-query'
 import {HTTPNotFound, HTTPError} from '@salesforce/pwa-kit-react-sdk/ssr/universal/errors'
-import {useServerContext} from '@salesforce/pwa-kit-react-sdk/ssr/universal/hooks'
 
 import {
     useProduct,
@@ -20,7 +19,7 @@ import {
 } from '@salesforce/commerce-sdk-react'
 import {useHistory, useLocation, useParams} from 'react-router-dom'
 
-import {useCurrentBasket, useExtensionConfig, useVariant} from '../../hooks'
+import {useCurrentBasket, useVariant} from '../../hooks'
 import useEinstein from '../../hooks/use-einstein'
 import useToast from '../../hooks/use-toast'
 import {useProductDetailAnalytics} from './use-product-detail-analytics'
@@ -38,20 +37,11 @@ export const useProductDetailData = () => {
     const einstein = useEinstein()
     const toast = useToast()
     const {handleAddToWishlist, isWishlistLoading} = useProductDetailWishlist()
-    const {maxCacheAge: MAX_CACHE_AGE, staleWhileRevalidate: STALE_WHILE_REVALIDATE} =
-        useExtensionConfig()
 
     /****************************** Basket *********************************/
     const {isLoading: isBasketLoading} = useCurrentBasket()
     const {addItemToNewOrExistingBasket} = useShopperBasketsMutationHelper()
     const updateItemsInBasketMutation = useShopperBasketsMutation('updateItemsInBasket')
-    const {res} = useServerContext()
-    if (res) {
-        res.set(
-            'Cache-Control',
-            `s-maxage=${MAX_CACHE_AGE}, stale-while-revalidate=${STALE_WHILE_REVALIDATE}`
-        )
-    }
 
     /*************************** Product Detail and Category ********************/
     const {productId} = useParams()
