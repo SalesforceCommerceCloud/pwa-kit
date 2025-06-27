@@ -117,6 +117,16 @@ class ChakraStorefront extends ApplicationExtension<Config> {
             {
                 path: config.pages.ProductList && config.pages.ProductList.path,
                 component: Pages.ProductList
+            },
+            {
+                path: config.pages.Checkout && config.pages.Checkout.path,
+                component: Pages.Checkout,
+                exact: true
+            },
+            {
+                path: config.pages.PageNotFound && config.pages.PageNotFound.path,
+                component: Pages.PageNotFound,
+                exact: true
             }
         ].filter((route) => route.path !== false)
 
