@@ -65,7 +65,8 @@ const CompositeProductDetails = ({
                                         // validation.
                                         childProductRefs.current[childProduct.id] = {
                                             ref: productViewRef,
-                                            validateOrderability: productViewRef.validateOrderability
+                                            validateOrderability:
+                                                productViewRef.validateOrderability
                                         }
                                     }
                                 }}
@@ -146,4 +147,4 @@ CompositeProductDetails.propTypes = {
     setChildProductOrderability: PropTypes.func
 }
 
-export default CompositeProductDetails 
+export default CompositeProductDetails

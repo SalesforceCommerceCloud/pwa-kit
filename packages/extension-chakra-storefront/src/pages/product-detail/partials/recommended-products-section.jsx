@@ -66,4 +66,4 @@ RecommendedProductsSection.propTypes = {
     isProductASet: PropTypes.bool
 }
 
-export default RecommendedProductsSection 
+export default RecommendedProductsSection
