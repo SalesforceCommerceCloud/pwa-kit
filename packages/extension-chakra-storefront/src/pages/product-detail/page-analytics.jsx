@@ -16,16 +16,11 @@ const PageAnalytics = ({product, category}) => {
     const einstein = useEinstein()
     const dataCloud = useDataCloud()
     const activeData = useActiveData()
-    console.log('page analytics')
-    console.log(product)
-    console.log(category)
 
     useEffect(() => {
-        console.log('useEffect')
         if (!product || !category) {
             return
         }
-        console.log('send analytics')
         if (product && product.type.set) {
             einstein.sendViewProduct(product)
             dataCloud.sendViewProduct(product)
