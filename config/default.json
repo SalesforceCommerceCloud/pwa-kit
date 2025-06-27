@@ -89,6 +89,9 @@
         "ProductDetail": {
             "path": "/product/:productId"
         },
+        "PageNotFound": {
+            "path": "/test"
+        },
         "ProductList": {
             "path": ["/search", "/category/:categoryId"],
             "imageViewType": "large",
