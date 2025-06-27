@@ -100,8 +100,8 @@ const BonusProductItem = ({product, productData, isSelected, onToggle, isLoading
                     fontWeight="semibold"
                     lineHeight="1.2"
                     textAlign="center"
-                    noOfLines={2}
-                    width="full"
+                    noOfLines={{base: 2, md: 2}}
+                    width={{base: '150px', md: 'full'}}
                 >
                     {productName}
                 </Text>
@@ -110,6 +110,7 @@ const BonusProductItem = ({product, productData, isSelected, onToggle, isLoading
                         isChecked={isSelected}
                         onChange={() => onToggle(product)}
                         cursor="pointer"
+                        aria-label={`Select bonus product: ${productName}`}
                     />
                 </Box>
             </VStack>
@@ -196,7 +197,6 @@ export const BonusProductModal = () => {
 
     // Calculate columns based on number of products
     const productCount = bonusProducts.length
-    const columns = Math.min(productCount, 3) // Max 3 columns, but fewer if less products
 
     if (!isOpen) return null
 
@@ -213,7 +213,11 @@ export const BonusProductModal = () => {
 
                 <ModalBody bgColor="white" padding="6">
                     {bonusProducts.length > 0 ? (
-                        <SimpleGrid columns={columns} spacing={8} justifyItems="start">
+                        <SimpleGrid
+                            columns={{base: 1, sm: 2, md: Math.min(productCount, 3)}}
+                            spacing={8}
+                            justifyItems={{base: 'center', sm: 'start'}}
+                        >
                             {bonusProducts.map((product) => {
                                 const productId = product.productId || product.id
                                 const productData = productsDataMap[productId]
