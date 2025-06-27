@@ -236,7 +236,14 @@ test('Can remove item from the cart', async () => {
     expect(await screen.findByTestId('sf-cart-empty')).toBeInTheDocument()
 })
 
-test.skip('Can apply and remove product-level coupon code with promotion', async () => {
+/*
+ * Skipping this test for now. Signup flow works fine.
+ * The signup function then calls self.login() which in turn calls getSkeletonCustomer().
+ * Need to figure out a way to return mockRegisteredCustomer from getSkeletonCustomer().
+ * getSkeletonCustomer() always returns `{ customerId: 'customer_id', authType: 'customer_type' }` for some reason
+ * instead of the mockRegisteredCustomer.
+ */
+test('Can apply and remove product-level coupon code with promotion', async () => {
     renderWithProviders(<WrappedCart />)
     expect(await screen.findByTestId('sf-cart-container')).toBeInTheDocument()
 
@@ -298,9 +305,9 @@ test.skip('Can apply and remove product-level coupon code with promotion', async
     }
 
     // add coupon
-    userEvent.click(screen.getByText('Do you have a promo code?'))
-    userEvent.type(screen.getByLabelText('Promo Code'), 'MENSSUITS')
-    userEvent.click(screen.getByText('Apply'))
+    await userEvent.click(screen.getByText('Do you have a promo code?'))
+    await userEvent.type(screen.getByLabelText('Promo Code'), 'MENSSUITS')
+    await userEvent.click(screen.getByText('Apply'))
 
     expect(await screen.findByText('Promotion applied')).toBeInTheDocument()
     expect(await screen.findByText(/MENSSUITS/i)).toBeInTheDocument()
@@ -311,7 +318,7 @@ test.skip('Can apply and remove product-level coupon code with promotion', async
     // remove coupon
     mockedBasketResponse = keysToCamel(mockBasketWithSuit)
     const orderSummary = screen.getByTestId('sf-order-summary')
-    userEvent.click(within(orderSummary).getByText('Remove'))
+    await userEvent.click(within(orderSummary).getByText('Remove'))
 
     expect(await screen.findByText('Promotion removed')).toBeInTheDocument()
     expect(await screen.queryByText(/MENSSUITS/i)).not.toBeInTheDocument()
