@@ -5,11 +5,10 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 // First party dependencies
-import CREATE_APP_SCHEMA from '@salesforce/pwa-kit-create-app/program.json' assert { type: 'json' }
+import CREATE_APP_SCHEMA from '@salesforce/pwa-kit-create-app/program.json' assert {type: 'json'}
 
 // Project dependencies
 import {EmptyJsonSchema} from './utils.js'
-
 
 const guidelinesText = `
 # PWA Kit Create App — Agent Usage Guidelines
@@ -60,7 +59,6 @@ If the user requests a project using a **template**:
 
 export default {
     name: 'create-app_guidelines',
-    description: guidelinesText,
     description: `This tool is used to provide the agent with the instructions on how to use the @salesforce/pwa-kit-create-app CLI tool to create a new PWA Kit projects. Do not attempt to create a project without using this tool first.`,
     inputSchema: EmptyJsonSchema,
     fn: async () => ({
@@ -68,15 +66,16 @@ export default {
             {
                 type: 'text',
                 text: JSON.stringify(
-                {
-                    guidelines: guidelinesText,
-                    cli: CREATE_APP_SCHEMA.metadata.description,
-                    schemas: {...CREATE_APP_SCHEMA.schemas},
-                    data: {...CREATE_APP_SCHEMA.data}
-                },
-                null,
-                2
-            )}
+                    {
+                        guidelines: guidelinesText,
+                        cli: CREATE_APP_SCHEMA.metadata.description,
+                        schemas: {...CREATE_APP_SCHEMA.schemas},
+                        data: {...CREATE_APP_SCHEMA.data}
+                    },
+                    null,
+                    2
+                )
+            }
         ]
     })
 }
