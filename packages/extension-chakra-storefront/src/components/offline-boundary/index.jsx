@@ -68,19 +68,15 @@ class OfflineBoundary extends React.Component {
         return (
             <React.Fragment>
                 {chunkLoadError ? (
-                    <div className="c-offline-boundary u-direction-column u-text-align-center u-padding-top u-padding-bottom">
+                    <div className="c-offline-boundary">
                         <AlertIcon />
-
-                        <h1 className="u-margin-bottom-md u-text-family">
-                            You are currently offline
-                        </h1>
-
-                        <p className="u-margin-bottom-lg">
+                        <h1>You are currently offline</h1>
+                        <p>
                             {"We couldn't load the next page on this connection. Please try again."}
                         </p>
-
                         <Button
-                            className="u-width-block-full pw--primary qa-retry-button"
+                            color="blue"
+                            className="qa-retry-button"
                             onClick={() => this.clearError()}
                         >
                             Retry Connection

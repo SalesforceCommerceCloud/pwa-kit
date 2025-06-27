@@ -6,18 +6,18 @@
  */
 import React from 'react'
 import {screen} from '@testing-library/react'
-// import userEvent from '@testing-library/user-event'
+import userEvent from '@testing-library/user-event'
 
-import OfflineBoundary from '../../components/offline-boundary/index'
-import {renderWithRouter} from '../../utils/test-utils'
+import OfflineBoundary, {UnwrappedOfflineBoundary} from '../../components/offline-boundary/index'
+import {renderWithProviders} from '../../utils/test-utils'
 
-// class ChunkLoadError extends Error {
-//     constructor(...params) {
-//         // Pass remaining arguments (including vendor specific ones) to parent constructor
-//         super(...params)
-//         this.name = 'ChunkLoadError'
-//     }
-// }
+class ChunkLoadError extends Error {
+    constructor(...params) {
+        // Pass remaining arguments (including vendor specific ones) to parent constructor
+        super(...params)
+        this.name = 'ChunkLoadError'
+    }
+}
 
 describe('The OfflineBoundary', () => {
     beforeEach(() => {
@@ -31,7 +31,7 @@ describe('The OfflineBoundary', () => {
     })
 
     test('should render its children', () => {
-        renderWithRouter(
+        renderWithProviders(
             <OfflineBoundary isOnline={true}>
                 <div id="child">child</div>
             </OfflineBoundary>
@@ -40,84 +40,79 @@ describe('The OfflineBoundary', () => {
         expect(screen.getByText(/child/i)).toBeInTheDocument()
     })
 
-    // TODO: Fix flaky/broken test
-    // eslint-disable-next-line jest/no-commented-out-tests
-    // test('should render the error splash when a child throws a chunk load error', () => {
-    //     const ThrowingComponent = () => {
-    //         throw new ChunkLoadError()
-    //     }
-    //     renderWithRouter(
-    //         <OfflineBoundary isOnline={true}>
-    //             <div>
-    //                 <ThrowingComponent />
-    //                 <div id="child">child</div>
-    //             </div>
-    //         </OfflineBoundary>
-    //     )
+    test('should render the error splash when a child throws a chunk load error', () => {
+        const ThrowingComponent = () => {
+            throw new ChunkLoadError()
+        }
+        renderWithProviders(
+            <OfflineBoundary isOnline={true}>
+                <div>
+                    <ThrowingComponent />
+                    <div id="child">child</div>
+                </div>
+            </OfflineBoundary>
+        )
 
-    //     expect(screen.getByRole('img', {name: /offline cloud/i})).toBeInTheDocument()
-    //     expect(
-    //         screen.getByRole('heading', {name: /you are currently offline/i})
-    //     ).toBeInTheDocument()
-    //     expect(screen.queryByText(/child/i)).not.toBeInTheDocument()
-    // })
+        expect(screen.getByRole('img', {hidden: true})).toBeInTheDocument()
+        expect(
+            screen.getByRole('heading', {name: /you are currently offline/i})
+        ).toBeInTheDocument()
+        expect(screen.queryByText(/child/i)).not.toBeInTheDocument()
+    })
 
     // TODO: Fix flaky/broken test
-    // eslint-disable-next-line jest/no-commented-out-tests
-    // test('should re-throw errors that are not chunk load errors', () => {
-    //     const ThrowingComponent = () => {
-    //         throw new Error('Anything else')
-    //     }
-    //     expect(() => {
-    //         renderWithRouter(
-    //             <OfflineBoundary isOnline={true}>
-    //                 <div>
-    //                     <ThrowingComponent />
-    //                     <div id="child">child</div>
-    //                 </div>
-    //             </OfflineBoundary>
-    //         )
-    //     }).toThrow()
-    // })
 
-    // TODO: Fix flaky/broken test
-    // eslint-disable-next-line jest/no-commented-out-tests
-    // test('should attempt to reload the page when the user clicks retry', () => {
-    //     let firstRender = true
-    //     const ThrowingOnceComponent = () => {
-    //         if (firstRender) {
-    //             firstRender = false
-    //             throw new ChunkLoadError()
-    //         } else {
-    //             return <div id="child">child</div>
-    //         }
-    //     }
-    //     renderWithRouter(
-    //         <OfflineBoundary isOnline={true}>
-    //             <ThrowingOnceComponent />
-    //         </OfflineBoundary>
-    //     )
+    test('should re-throw errors that are not chunk load errors', () => {
+        const ThrowingComponent = () => {
+            throw new Error('Anything else')
+        }
+        expect(() => {
+            renderWithProviders(
+                <OfflineBoundary isOnline={true}>
+                    <div>
+                        <ThrowingComponent />
+                        <div id="child">child</div>
+                    </div>
+                </OfflineBoundary>
+            )
+        }).toThrow()
+    })
 
-    //     expect(screen.getByRole('img', {name: /offline cloud/i})).toBeInTheDocument()
-    //     expect(
-    //         screen.getByRole('heading', {name: /you are currently offline/i})
-    //     ).toBeInTheDocument()
-    //     expect(screen.queryByText(/child/i)).not.toBeInTheDocument()
+    test('should call clearError when retry button is clicked', async () => {
+        const user = userEvent.setup()
+        const ThrowingComponent = () => {
+            throw new ChunkLoadError()
+        }
 
-    //     userEvent.click(screen.getByRole('button', {name: /retry connection/i}))
-    //     expect(screen.getByText(/child/i)).toBeInTheDocument()
-    //     expect(screen.queryByRole('img', {name: /offline cloud/i})).not.toBeInTheDocument()
-    //     expect(
-    //         screen.queryByRole('heading', {name: /you are currently offline/i})
-    //     ).not.toBeInTheDocument()
-    // })
+        // Create a spy on the clearError method
+        const clearErrorSpy = jest.spyOn(UnwrappedOfflineBoundary.prototype, 'clearError')
 
-    // TODO: Fix flaky/broken test
-    // eslint-disable-next-line jest/no-commented-out-tests
-    // test('should derive state from a chunk load error', () => {
-    //     const derived = UnwrappedOfflineBoundary.getDerivedStateFromError(
-    //         new ChunkLoadError('test')
-    //     )
-    //     expect(derived).toEqual({chunkLoadError: true})
-    // })
+        renderWithProviders(
+            <OfflineBoundary isOnline={true}>
+                <ThrowingComponent />
+            </OfflineBoundary>
+        )
+
+        // Verify error state is shown
+        expect(screen.getByRole('img', {hidden: true})).toBeInTheDocument()
+        expect(
+            screen.getByRole('heading', {name: /you are currently offline/i})
+        ).toBeInTheDocument()
+
+        // Click retry button
+        await user.click(screen.getByRole('button', {name: /retry connection/i}))
+
+        // Verify clearError was called
+        expect(clearErrorSpy).toHaveBeenCalled()
+
+        // Clean up the spy
+        clearErrorSpy.mockRestore()
+    })
+
+    test('should derive state from a chunk load error', () => {
+        const derived = UnwrappedOfflineBoundary.getDerivedStateFromError(
+            new ChunkLoadError('test')
+        )
+        expect(derived).toEqual({chunkLoadError: true})
+    })
 })

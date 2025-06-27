@@ -49,6 +49,8 @@ module.exports = {
         createTestGlob('pages/home'),
         createTestGlob('pages/cart'),
         createTestGlob('pages/product-list'),
+        createTestGlob('components/offline-banner'),
+        createTestGlob('components/offline-boundary'),
         // createTestGlob('pages/login'),  // TODO: enable after Account page has been migrated
         createTestGlob('pages/login-redirect'),
         createTestGlob('pages/social-login-redirect'),
