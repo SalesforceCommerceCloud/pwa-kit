@@ -8,7 +8,7 @@
 import {useEffect, useMemo} from 'react'
 import {useHistory, useLocation} from 'react-router-dom'
 import {useSearchParams} from '@salesforce/retail-react-app/app/hooks/use-search-params'
-import {searchUrlBuilder} from '@salesforce/retail-react-app/app/utils/url'
+import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
 
 /**
  * Routing when external search parameters are present in the URL to the appropriate search results
@@ -17,6 +17,8 @@ const useExternalSearch = () => {
     const history = useHistory()
     const location = useLocation()
     const [searchParams] = useSearchParams()
+    const {buildUrl} = useMultiSite()
+
     const hasStoreLocatorParams = useMemo(() => {
         const keys = ['lat', 'lng', 'zip', 'city', 'store', 'country']
         return keys.some((key) => Boolean(searchParams?.[key]))
@@ -58,7 +60,7 @@ const useExternalSearch = () => {
             return
         }
 
-        const searchUrl = searchUrlBuilder(query)
+        const searchUrl = buildUrl(`/search?q=${encodeURIComponent(query)}`)
 
         try {
             history.push(searchUrl)
@@ -72,7 +74,8 @@ const useExternalSearch = () => {
         searchParams?.search,
         searchParams?.query,
         history,
-        hasStoreLocatorParams
+        hasStoreLocatorParams,
+        buildUrl
     ])
 }
 
