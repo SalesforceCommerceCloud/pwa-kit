@@ -7,7 +7,6 @@
 
 import React, {Fragment, useCallback, useEffect, useState} from 'react'
 import PropTypes from 'prop-types'
-import {Helmet} from 'react-helmet'
 import {FormattedMessage, useIntl} from 'react-intl'
 import {keepPreviousData} from '@tanstack/react-query'
 import {normalizeSetBundleProduct, getUpdateBundleChildArray} from '../../utils/product-utils'
@@ -51,6 +50,7 @@ import {rebuildPathWithParams} from '../../utils/url'
 import {useHistory, useLocation, useParams} from 'react-router-dom'
 import useToast from '../../hooks/use-toast'
 import {useWishList} from '../../hooks/use-wish-list'
+import Metadata from './metadata'
 
 const ProductDetail = () => {
     const {formatMessage} = useIntl()
@@ -450,18 +450,7 @@ const ProductDetail = () => {
             layerStyle="page"
             data-testid="product-details-page"
         >
-            <Helmet>
-                <title>{product?.pageTitle}</title>
-                {product?.pageMetaTags?.length > 0 &&
-                    product.pageMetaTags.map(({id, value}) => (
-                        <meta name={id} content={value} key={id} />
-                    ))}
-                {/* Fallback for description if not included in pageMetaTags */}
-                {!product?.pageMetaTags?.some((tag) => tag.id === 'description') &&
-                    product?.pageDescription && (
-                        <meta name="description" content={product.pageDescription} />
-                    )}
-            </Helmet>
+            <Metadata product={product} />
 
             <Stack gap={16}>
                 {isProductASet || isProductABundle ? (
