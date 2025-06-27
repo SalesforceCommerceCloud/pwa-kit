@@ -99,7 +99,7 @@ jest.mock('jose', () => ({
 }))
 
 // Import only the functions we need to test
-import {validateSlasCallbackToken, emailLink} from '@salesforce/retail-react-app/../../app/ssr.js'
+import {validateSlasCallbackToken, emailLink} from '@salesforce/retail-react-app/app/ssr.js'
 
 // Mock environment variables
 const originalEnv = process.env
