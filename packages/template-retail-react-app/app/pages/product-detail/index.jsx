@@ -23,8 +23,7 @@ import {
     useShopperCustomersMutation,
     useShopperBasketsMutation,
     useCustomerId,
-    useShopperBasketsMutationHelper,
-    useShippingMethodsForShipment
+    useShopperBasketsMutationHelper
 } from '@salesforce/commerce-sdk-react'
 
 // Hooks
@@ -83,7 +82,6 @@ const ProductDetail = () => {
     const {data: basket, isLoading: isBasketLoading} = useCurrentBasket()
     const {addItemToNewOrExistingBasket} = useShopperBasketsMutationHelper()
     const updateItemsInBasketMutation = useShopperBasketsMutation('updateItemsInBasket')
-    const updateShipmentForBasketMutation = useShopperBasketsMutation('updateShipmentForBasket')
     const {res} = useServerContext()
     if (res) {
         res.set(
@@ -97,27 +95,11 @@ const ProductDetail = () => {
     const selectedInventoryId = selectedStore?.inventoryId || null
 
     const {
-        configurePickupShipment,
-        configureRegularShippingMethod,
         addInventoryIdsToPickupItems,
-        getPickupShippingMethodId,
-        getDefaultShippingMethodId,
+        configureShippingMethodIfNeeded,
         isCurrentShippingMethodPickup,
         hasPickupItems
-    } = usePickupShipment()
-
-    // Hook for shipping methods - we'll use refetch when needed
-    const {refetch: refetchShippingMethods} = useShippingMethodsForShipment(
-        {
-            parameters: {
-                basketId: basket?.basketId,
-                shipmentId: 'me'
-            }
-        },
-        {
-            enabled: false // Disable automatic fetching, we'll fetch manually when needed
-        }
-    )
+    } = usePickupShipment(basket)
 
     /*************************** Product Detail and Category ********************/
     const {productId} = useParams()
@@ -345,66 +327,6 @@ const ProductDetail = () => {
 
     const addToCartModal = useAddToCartModalContext()
 
-    /**
-     * Helper function to configure shipping method based on pickup selection
-     * @param {Object} basketResponse - The basket response from adding items
-     * @param {Array} productItems - Array of product items that were added
-     * @param {boolean} hasAnyPickupSelected - Whether any items have pickup selected
-     * @returns {Promise<void>}
-     */
-    const configureShippingMethodIfNeeded = async (
-        basketResponse,
-        productItems,
-        hasAnyPickupSelected
-    ) => {
-        if (!basketResponse?.basketId || !basketResponse.shipments.length) {
-            return
-        }
-
-        const currentShippingMethod = basketResponse.shipments[0].shippingMethod
-        const isCurrentlyPickup = isCurrentShippingMethodPickup(currentShippingMethod)
-
-        // Only configure if there's a mismatch between pickup selection and current method
-        if (
-            (hasAnyPickupSelected && !isCurrentlyPickup) ||
-            (!hasAnyPickupSelected && isCurrentlyPickup)
-        ) {
-            // Clear shipping address when there's a mismatch by updating shipment without shippingAddress
-            await updateShipmentForBasketMutation.mutateAsync({
-                parameters: {
-                    basketId: basketResponse.basketId,
-                    shipmentId: 'me'
-                },
-                body: {
-                    shippingAddress: {}
-                }
-            })
-
-            // Fetch shipping methods to get available options
-            const {data: fetchedShippingMethods} = await refetchShippingMethods()
-
-            if (hasAnyPickupSelected && !isCurrentlyPickup) {
-                // Configure pickup shipment if pickup is selected but current method is not pickup
-                const pickupShippingMethodId = getPickupShippingMethodId(fetchedShippingMethods)
-                await configurePickupShipment(
-                    basketResponse.basketId,
-                    productItems,
-                    selectedStore,
-                    {
-                        pickupShippingMethodId
-                    }
-                )
-            } else if (!hasAnyPickupSelected && isCurrentlyPickup) {
-                // Configure regular shipping if pickup is not selected but current method is pickup
-                const defaultShippingMethodId = getDefaultShippingMethodId(fetchedShippingMethods)
-                await configureRegularShippingMethod(
-                    basketResponse.basketId,
-                    defaultShippingMethodId
-                )
-            }
-        }
-    }
-
     const handleAddToCart = async (productSelectionValues = []) => {
         try {
             let productItems = productSelectionValues.map((item) => {
@@ -479,7 +401,8 @@ const ProductDetail = () => {
             await configureShippingMethodIfNeeded(
                 basketResponse,
                 productItems,
-                hasAnyPickupSelected
+                hasAnyPickupSelected,
+                selectedStore
             )
 
             const productItemsForEinstein = productSelectionValues.map(
@@ -661,7 +584,12 @@ const ProductDetail = () => {
             }
 
             // Configure shipping method based on pickup selection
-            await configureShippingMethodIfNeeded(res, productItems, hasAnyPickupSelected)
+            await configureShippingMethodIfNeeded(
+                res,
+                productItems,
+                hasAnyPickupSelected,
+                selectedStore
+            )
 
             einstein.sendAddToCart(productItems)
             // Open modal with itemsAdded and selectedQuantity for bundles
