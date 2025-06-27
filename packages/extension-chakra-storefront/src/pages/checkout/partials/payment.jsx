@@ -28,33 +28,19 @@ import {API_ERROR_MESSAGE} from '../../../constants'
 const Payment = () => {
     const {formatMessage} = useIntl()
     const {data: basket} = useCurrentBasket()
-
+    const selectedShippingAddress = basket?.shipments && basket?.shipments[0]?.shippingAddress
     //TODO: Change to const after deleting the test/mocked data
-    let selectedShippingAddress = basket?.shipments && basket?.shipments[0]?.shippingAddress
     let selectedBillingAddress = basket?.billingAddress
     let appliedPayment = basket?.paymentInstruments && basket?.paymentInstruments[0]
 
     // TODO: Testing/Mock data - remove this section after shipping and billing address components are migrated
-    const MOCK_DATA = {
-        shippingAddress: {
-            address1: '123 Test Street',
-            city: 'Test City',
-            stateCode: 'CA',
-            postalCode: '12345',
-            countryCode: 'US'
-        },
-        billingAddress: {
-            address1: '123 Test Street',
-            city: 'Test City',
-            stateCode: 'CA',
-            postalCode: '12345',
-            countryCode: 'US'
-        }
+    selectedBillingAddress = {
+        address1: '123 Test Street',
+        city: 'Test City',
+        stateCode: 'CA',
+        postalCode: '12345',
+        countryCode: 'US'
     }
-
-    selectedShippingAddress = MOCK_DATA.shippingAddress
-    selectedBillingAddress = MOCK_DATA.billingAddress
-
     const [billingSameAsShipping, setBillingSameAsShipping] = useState(true) // By default, have billing addr to be the same as shipping
     const {mutateAsync: addPaymentInstrumentToBasket} = useShopperBasketsMutation(
         'addPaymentInstrumentToBasket'
@@ -75,7 +61,7 @@ const Payment = () => {
 
     const {step, STEPS, goToStep, goToNextStep} = useCheckout()
 
-    // TODO: This is added for testing, remove after shipping address is migrated
+    // TODO: This is added for testing, remove after shipping and billing address components are migrated
     const [isEditing, setIsEditing] = useState(true)
 
     const billingAddressForm = useForm({
