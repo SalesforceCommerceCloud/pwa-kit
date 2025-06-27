@@ -415,9 +415,13 @@ const ProductView = forwardRef(
             }
         }, [showInventoryMessage, inventoryMessage])
 
+        // Auto-switch off pickup in store when product becomes unavailable at selected store
         useEffect(() => {
             setPickupEnabled(!!selectedStore?.inventoryId)
-        }, [selectedStore?.inventoryId])
+            if (pickupInStore && isSelectedStoreOutOfStock) {
+                setPickupInStore(false)
+            }
+        }, [selectedStore])
 
         const handleDeliveryOptionChange = (value) => {
             setPickupInStore(value === 'pickup')

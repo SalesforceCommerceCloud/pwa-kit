@@ -16,6 +16,7 @@ import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-u
 import userEvent from '@testing-library/user-event'
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
 import frMessages from '@salesforce/retail-react-app/app/static/translations/compiled/fr-FR.json'
+import {useSelectedStore} from '@salesforce/retail-react-app/app/hooks/use-selected-store'
 
 // Ensure useMultiSite returns site.id = 'site-1' for all tests
 jest.mock('@salesforce/retail-react-app/app/hooks/use-multi-site', () => ({
@@ -49,37 +50,27 @@ MockComponent.propTypes = {
     isBasketLoading: PropTypes.bool
 }
 
+const mockStoreData = {
+    id: 'store-1',
+    name: 'Test Store Location',
+    inventoryId: 'inventory_m_store_store1'
+}
+
 // Set up and clean up
 beforeEach(() => {
     // Since we're testing some navigation logic, we are using a simple Router
     // around our component. We need to initialize the default route/path here.
     window.history.pushState({}, 'Account', '/en/account')
 
-    // Mock useSelectedStore to read from localStorage
-    const {useSelectedStore} =
-        // eslint-disable-next-line @typescript-eslint/no-var-requires
-        require('@salesforce/retail-react-app/app/hooks/use-selected-store')
-    useSelectedStore.mockImplementation(() => {
-        const siteId = 'site-1'
-        const storeInfoKey = `store_${siteId}`
-        const storeInfo = JSON.parse(window.localStorage.getItem(storeInfoKey) || '{}')
-
-        return {
-            store: storeInfo.inventoryId
-                ? {
-                      inventoryId: storeInfo.inventoryId,
-                      name: storeInfo.name
-                  }
-                : null,
-            isLoading: false,
-            error: null,
-            hasSelectedStore: !!storeInfo.inventoryId
-        }
-    })
+    useSelectedStore.mockImplementation(() => ({
+        store: mockStoreData,
+        isLoading: false,
+        error: null,
+        hasSelectedStore: true
+    }))
 })
 afterEach(() => {
-    jest.resetModules()
-    localStorage.clear()
+    jest.clearAllMocks()
     sessionStorage.clear()
 })
 
@@ -414,14 +405,14 @@ test('renders a product bundle properly - child item', () => {
     expect(quantityPicker).toBeNull()
 })
 
-test('Pickup in store radio is enabled when inventoryId is present in localStorage', async () => {
-    // Arrange: Set up localStorage with inventoryId for the current site
-    const siteId = 'site-1'
-    const storeInfoKey = `store_${siteId}`
-    const inventoryId = 'inventory_m_store_store1'
-    window.localStorage.setItem(storeInfoKey, JSON.stringify({inventoryId}))
+test('Pickup in store radio is enabled when selected store is set', async () => {
+    // Ensure the product has inventory data for the store and is in stock
+    const mockProduct = {
+        ...mockProductDetail,
+        inventories: [{id: mockStoreData.inventoryId, orderable: true, stockLevel: 10}]
+    }
 
-    renderWithProviders(<MockComponent product={mockProductDetail} />)
+    renderWithProviders(<MockComponent product={mockProduct} />)
 
     // Assert: Radio is enabled
     const pickupRadio = await screen.findByRole('radio', {name: /pickup in store/i})
@@ -429,11 +420,6 @@ test('Pickup in store radio is enabled when inventoryId is present in localStora
 })
 
 test('Pickup in store radio is disabled when inventoryId is NOT present in localStorage', async () => {
-    // Arrange: Ensure localStorage does not have inventoryId for the current site
-    const siteId = 'site-1'
-    const storeInfoKey = `store_${siteId}`
-    window.localStorage.removeItem(storeInfoKey)
-
     renderWithProviders(<MockComponent product={mockProductDetail} />)
 
     // Assert: Radio is disabled
@@ -443,15 +429,11 @@ test('Pickup in store radio is disabled when inventoryId is NOT present in local
 
 test('Pickup in store radio is disabled when inventoryId is present but product is out of stock', async () => {
     const user = userEvent.setup()
-    const siteId = 'site-1'
-    const storeInfoKey = `store_${siteId}`
-    const inventoryId = 'inventory_m_store_store1'
-    window.localStorage.setItem(storeInfoKey, JSON.stringify({inventoryId}))
 
     // Product inventory is not orderable
     const mockProduct = {
         ...mockProductDetail,
-        inventories: [{id: inventoryId, orderable: false}]
+        inventories: [{id: mockStoreData.inventoryId, orderable: false}]
     }
 
     renderWithProviders(<MockComponent product={mockProduct} />)
@@ -464,14 +446,15 @@ test('Pickup in store radio is disabled when inventoryId is present but product 
 })
 
 test('shows "Pickup in Select Store" label when pickup is disabled due to no store/inventoryId', async () => {
-    // Arrange: Ensure localStorage does not have inventoryId for the current site
-    const siteId = 'site-1'
-    const storeInfoKey = `store_${siteId}`
-    window.localStorage.removeItem(storeInfoKey)
+    useSelectedStore.mockReturnValue({
+        store: null,
+        isLoading: false,
+        error: null,
+        hasSelectedStore: false
+    })
 
     renderWithProviders(<MockComponent product={mockProductDetail} />)
 
-    // Assert: The label is present and the button is correct
     const label = await screen.findByTestId('pickup-select-store-msg')
     expect(label).toBeInTheDocument()
     expect(label).toHaveTextContent(/Pickup in/i)
@@ -481,20 +464,12 @@ test('shows "Pickup in Select Store" label when pickup is disabled due to no sto
 })
 
 describe('ProductView stock status messages', () => {
-    const siteId = 'site-1'
-    const storeInfoKey = `store_${siteId}`
     const storeName = 'Test Store'
-    const inventoryId = 'inventory_m_store_store1'
-
-    afterEach(() => {
-        window.localStorage.clear()
-    })
 
     test('shows "In Stock at {storeName}" when store has inventory', async () => {
-        window.localStorage.setItem(storeInfoKey, JSON.stringify({inventoryId, name: storeName}))
         const mockProduct = {
             ...mockProductDetail,
-            inventories: [{id: inventoryId, orderable: true, stockLevel: 10}],
+            inventories: [{id: mockStoreData.inventoryId, orderable: true, stockLevel: 10}],
             name: 'Test Product'
         }
         renderWithProviders(<MockComponent product={mockProduct} />)
@@ -508,10 +483,9 @@ describe('ProductView stock status messages', () => {
     })
 
     test('shows "Out of Stock at {storeName}" when store is out of inventory', async () => {
-        window.localStorage.setItem(storeInfoKey, JSON.stringify({inventoryId, name: storeName}))
         const mockProduct = {
             ...mockProductDetail,
-            inventories: [{id: inventoryId, orderable: false}],
+            inventories: [{id: mockStoreData.inventoryId, orderable: false}],
             name: 'Test Product'
         }
         renderWithProviders(<MockComponent product={mockProduct} />)
@@ -526,19 +500,6 @@ describe('ProductView stock status messages', () => {
 })
 
 describe('ProductView showDeliveryOptions property', () => {
-    const siteId = 'site-1'
-    const storeInfoKey = `store_${siteId}`
-    const inventoryId = 'inventory_m_store_store1'
-
-    beforeEach(() => {
-        // Set up localStorage with inventoryId to enable pickup option
-        window.localStorage.setItem(storeInfoKey, JSON.stringify({inventoryId}))
-    })
-
-    afterEach(() => {
-        window.localStorage.clear()
-    })
-
     test('shows delivery options when showDeliveryOptions is true (default)', async () => {
         renderWithProviders(
             <MockComponent product={mockProductDetail} showDeliveryOptions={true} />
