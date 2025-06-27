@@ -210,17 +210,19 @@ function processFile(filePath, plugins) {
 
     // Only write output if we made changes
     if (modified) {
-        // Generate code from modified AST
-        const output = generate(ast, {
-            retainLines: true,
-            compact: false
-        }).code
-
-        // console.log(JSON.stringify(output.split('\n').slice(0, 100), null, 2));
-
-        // Replace the original file with the trimmed version
-        fs.writeFileSync(filePath, output)
-        console.log(`Updated file ${filePath}`)
+        try {
+            // Generate code from modified AST
+            const output = generate(ast, {
+                retainLines: true,
+                compact: false
+            }).code
+            // Replace the original file with the trimmed version
+            fs.writeFileSync(filePath, output)
+            console.log(`Updated file ${filePath}`)
+        } catch (e) {
+            console.error(`Error updating file ${filePath}: ${e.message}`)
+            throw e
+        }
     }
 }
 
