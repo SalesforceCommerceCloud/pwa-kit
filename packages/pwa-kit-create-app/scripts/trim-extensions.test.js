@@ -6,6 +6,7 @@
  */
 /* eslint-disable @typescript-eslint/no-var-requires */
 const fs = require('fs')
+const { execSync } = require('child_process')
 
 jest.mock('../assets/plugin-config', () => ({
     plugins: {
@@ -19,6 +20,37 @@ jest.mock('../assets/plugin-config', () => ({
 }))
 
 jest.mock('fs')
+jest.mock('child_process')
+
+// custom matcher to compare strings line by line with trimming
+expect.extend({
+    toEqualTrimmedLines(received, expected) {
+      const clean = str =>
+        str
+          .split('\n')
+          .map(line => line.trim())  // Trim each line
+          .filter(line => line.length > 0) // Optional: remove empty lines
+  
+      const receivedLines = clean(received)
+      const expectedLines = clean(expected)
+  
+      const pass = this.equals(receivedLines, expectedLines)
+  
+      if (pass) {
+        return {
+          pass: true,
+          message: () =>
+            `✅ Expected strings not to match line by line (but they did).\n\nExpected: ${this.utils.printExpected(expectedLines)}\nReceived: ${this.utils.printReceived(receivedLines)}`,
+        };
+      } else {
+        return {
+          pass: false,
+          message: () =>
+            `❌ Expected strings to match line by line (with trimming).\n\nExpected: ${this.utils.printExpected(expectedLines)}\nReceived: ${this.utils.printReceived(receivedLines)}`,
+        };
+      }
+    },
+  })
 
 const trimExtensions = require('./trim-extensions')
 
@@ -47,6 +79,7 @@ describe('trim-extensions', () => {
             }
         })
         fs.unlinkSync.mockReturnValue(true)
+        execSync.mockReturnValue(true)
     })
 
     it('handles OR operator correctly', () => {
@@ -62,8 +95,9 @@ describe('trim-extensions', () => {
         trimExtensions('/mock/dir', {SFDC_EXT_featureA: true, SFDC_EXT_featureB: false})
         expect(fs.writeFileSync).toHaveBeenCalledWith(
             expect.any(String),
-            "const feature = 'Feature Enabled';"
+            expect.toEqualTrimmedLines("const feature = 'Feature Enabled';")
         )
+        expect(execSync).toHaveBeenCalledWith('npx prettier --write /mock/dir/src/components/featureComponent.jsx')
     })
 
     it('handles variable declarations correctly', () => {
@@ -82,12 +116,13 @@ describe('trim-extensions', () => {
 
         expect(fs.writeFileSync).toHaveBeenCalledWith(
             expect.any(String),
-            "const featureAFunc = () => 'Feature A';"
+            expect.toEqualTrimmedLines("const featureAFunc = () => 'Feature A';")
         )
         expect(fs.writeFileSync).toHaveBeenCalledWith(
             expect.any(String),
             expect.not.stringContaining("const featureBFunc = () => 'Feature B';")
         )
+        expect(execSync).toHaveBeenCalledWith('npx prettier --write /mock/dir/src/components/featureComponent.jsx')
     })
 
     it('handles variable with ternary expressions correctly', () => {
@@ -104,12 +139,13 @@ describe('trim-extensions', () => {
 
         expect(fs.writeFileSync).toHaveBeenCalledWith(
             expect.any(String),
-            'const showFeature = Feature_A;'
+            expect.toEqualTrimmedLines("const showFeature = Feature_A;")
         )
         expect(fs.writeFileSync).toHaveBeenCalledWith(
             expect.any(String),
             expect.not.stringContaining('const showFeature = Feature_B')
         )
+        expect(execSync).toHaveBeenCalledWith('npx prettier --write /mock/dir/src/components/featureComponent.jsx')
     })
 
     it('handles return with ternary expressions correctly', () => {
@@ -122,10 +158,56 @@ describe('trim-extensions', () => {
 
         trimExtensions('/mock/dir', {SFDC_EXT_featureA: true})
 
+        const expected = `
+            function test() {
+                return Feature_A;
+            }
+        `
         expect(fs.writeFileSync).toHaveBeenCalledWith(
             expect.any(String),
-            expect.stringContaining('return Feature_A')
+            expect.toEqualTrimmedLines(expected)
         )
+        expect(execSync).toHaveBeenCalledWith('npx prettier --write /mock/dir/src/components/featureComponent.jsx')
+    })
+
+    it('handles PropTypes declarations correctly', () => {
+        const code = `
+            MyClass.PropTypes = {
+                name: PropTypes.string,
+                description: PropTypes.string
+            };
+            SFDC_EXT_featureA && (MyClass.PropType = {
+                ...MyClass.PropType,
+                featureAProp: PropTypes.string
+            });
+            SFDC_EXT_featureB && (MyClass.PropType = {
+                ...MyClass.PropType,
+                featureBProp: PropTypes.string
+            });
+        `
+        fs.readFileSync.mockReturnValue(code)
+
+        trimExtensions('/mock/dir', {SFDC_EXT_featureA: true})
+
+        const expected = `
+            MyClass.PropTypes = {
+                name: PropTypes.string,
+                description: PropTypes.string
+            };
+            MyClass.PropType = {
+                ...MyClass.PropType,
+                featureAProp: PropTypes.string
+            };
+        `
+        expect(fs.writeFileSync).toHaveBeenCalledWith(
+            expect.any(String),
+            expect.toEqualTrimmedLines(expected)
+        )
+        expect(fs.writeFileSync).not.toHaveBeenCalledWith(
+            expect.any(String),
+            expect.stringContaining('featureBProp: PropTypes.string')
+        )
+        expect(execSync).toHaveBeenCalledWith('npx prettier --write /mock/dir/src/components/featureComponent.jsx')
     })
 
     it('handles JSX elements in return statements correctly', () => {
@@ -143,14 +225,23 @@ describe('trim-extensions', () => {
 
         trimExtensions('/mock/dir', {SFDC_EXT_featureA: true, SFDC_EXT_featureB: false})
 
+        const expected = `
+            function test() {
+                return (
+                    <div>
+                        <ComponentA />
+                    </div>);
+            }
+        `
         expect(fs.writeFileSync).toHaveBeenCalledWith(
             expect.any(String),
-            expect.stringContaining('<ComponentA />')
+            expect.toEqualTrimmedLines(expected)
         )
         expect(fs.writeFileSync).not.toHaveBeenCalledWith(
             expect.any(String),
             expect.stringContaining('<ComponentB />')
         )
+        expect(execSync).toHaveBeenCalledWith('npx prettier --write /mock/dir/src/components/featureComponent.jsx')
     })
 
     it('does not remove referenced imports', () => {
