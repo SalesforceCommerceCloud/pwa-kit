@@ -6,13 +6,11 @@
  */
 
 import React from 'react'
-import {fireEvent, screen, waitFor} from '@testing-library/react'
+import {screen, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import ProductView from '@salesforce/retail-react-app/app/components/product-view'
 import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
-import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
 import {useBonusProductSearch} from '@salesforce/retail-react-app/app/hooks/use-bonus-product-search'
-import {useBonusProductModalContext} from '@salesforce/retail-react-app/app/hooks/use-bonus-product-modal'
 import * as useDerivedProductModule from '@salesforce/retail-react-app/app/hooks/use-derived-product'
 
 // Mock scrollIntoView for jsdom
