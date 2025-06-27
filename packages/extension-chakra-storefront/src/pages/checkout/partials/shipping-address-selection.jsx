@@ -209,8 +209,6 @@ const ShippingAddressSelection = ({
 
         // Chakra v3 radio returns the selected id in an object with a value property
         const address = customer.addresses.find((addr) => addr.addressId === addressId)
-        setSelectedAddressId(address.addressId)
-
         form.reset({...address})
     }
 
@@ -310,7 +308,7 @@ const ShippingAddressSelection = ({
                                         )
                                         return (
                                             <React.Fragment key={address.addressId}>
-                                                <RadioCard value={address.addressId} isSelected={address.addressId === selectedAddressId}>
+                                                <RadioCard value={address.addressId} isSelected={address.addressId === value}>
                                                     <ActionCard
                                                         padding={0}
                                                         border="none"

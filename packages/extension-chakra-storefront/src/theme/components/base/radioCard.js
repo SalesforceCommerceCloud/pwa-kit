@@ -26,7 +26,7 @@ export default defineSlotRecipe({
                 bg: 'transparent',
             },
             _checked: {
-                border: '1px solid',
+                zIndex: 1,
                 borderColor: 'blue.600',
             },
         },
