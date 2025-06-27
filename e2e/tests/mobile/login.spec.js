@@ -11,11 +11,12 @@ const {generateUserCredentials} = require('../../scripts/utils.js')
 const {answerConsentTrackingForm} = require('../../scripts/pageHelpers.js')
 
 const GUEST_USER_CREDENTIALS = generateUserCredentials()
+
 /**
  * Test that a user can login with passwordless login on mobile. There is no programmatic way to check the email,
  * so we will check that the necessary API call is being made and expected UI is shown
  */
-test('Verify passwordless login request', async ({page}) => {
+test('Verify passwordless login request on mobile', async ({page}) => {
     let interceptedRequest = null
     
     await page.route('**/mobify/slas/private/shopper/auth/v1/organizations/*/oauth2/passwordless/login', (route) => {
@@ -29,6 +30,7 @@ test('Verify passwordless login request', async ({page}) => {
     await page.locator('#email').scrollIntoViewIfNeeded()
     await page.fill('#email', config.PWA_E2E_USER_EMAIL)
 
+    await page.getByRole('button', {name: 'Continue Securely'}).scrollIntoViewIfNeeded()
     await page.getByRole('button', {name: 'Continue Securely'}).click()
     
     await page.waitForResponse('**/mobify/slas/private/shopper/auth/v1/organizations/*/oauth2/passwordless/login')
@@ -47,7 +49,7 @@ test('Verify passwordless login request', async ({page}) => {
     expect(params.get('callback_uri')).toMatch(/.*\/passwordless-login-callback$/)
 })
 
-test('Verify password reset callback request', async ({page}) => {
+test('Verify password reset callback request on mobile', async ({page}) => {
     let interceptedRequest = null
 
     await page.route('**/mobify/slas/private/shopper/auth/v1/organizations/*/oauth2/password/reset', (route) => {
@@ -61,10 +63,16 @@ test('Verify password reset callback request', async ({page}) => {
     await page.locator('#email').scrollIntoViewIfNeeded()
     await page.fill('#email', config.PWA_E2E_USER_EMAIL)
 
+    await page.getByRole('button', {name: 'Password'}).scrollIntoViewIfNeeded()
     await page.getByRole('button', {name: 'Password'}).click()
+    
+    await page.getByRole('button', {name: 'Forgot password?'}).scrollIntoViewIfNeeded()
     await page.getByRole('button', {name: 'Forgot password?'}).click()
 
+    await page.locator('#email').scrollIntoViewIfNeeded()
     await page.fill('#email', config.PWA_E2E_USER_EMAIL)
+    
+    await page.getByRole('button', {name: 'Reset Password'}).scrollIntoViewIfNeeded()
     await page.getByRole('button', {name: 'Reset Password'}).click()
     
     await page.waitForResponse('**/mobify/slas/private/shopper/auth/v1/organizations/*/oauth2/password/reset')
@@ -84,7 +92,7 @@ test('Verify password reset callback request', async ({page}) => {
     expect(params.get('hint')).toBe('cross_device')
 })
 
-test('Verify password reset request', async ({page}) => {
+test('Verify password reset request on mobile', async ({page}) => {
     let interceptedRequest = null
     await page.route('**/mobify/slas/private/shopper/auth/v1/organizations/*/oauth2/password/action', (route) => {
         interceptedRequest = route.request()
@@ -94,11 +102,16 @@ test('Verify password reset request', async ({page}) => {
     await page.goto(config.MORE_LOGIN_OPTIONS_RETAIL_APP_HOME + `/reset-password-landing?token=1234567&email=${GUEST_USER_CREDENTIALS.email}`)
     await answerConsentTrackingForm(page)
 
+    await page.locator('#password').scrollIntoViewIfNeeded()
     await page.fill('#password', GUEST_USER_CREDENTIALS.password)
+    
+    await page.locator('#confirmPassword').scrollIntoViewIfNeeded()
     await page.fill('#confirmPassword', GUEST_USER_CREDENTIALS.password)
     
     expect(await page.inputValue('#password')).toBe(GUEST_USER_CREDENTIALS.password)
     expect(await page.inputValue('#confirmPassword')).toBe(GUEST_USER_CREDENTIALS.password)
+    
+    await page.getByRole('button', {name: 'Reset Password'}).scrollIntoViewIfNeeded()
     await page.getByRole('button', {name: 'Reset Password'}).click()
 
     await page.waitForResponse('**/mobify/slas/private/shopper/auth/v1/organizations/*/oauth2/password/action')
