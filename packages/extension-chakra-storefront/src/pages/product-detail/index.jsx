@@ -34,6 +34,7 @@ import {useServerContext} from '@salesforce/pwa-kit-react-sdk/ssr/universal/hook
 import RecommendedProducts from '../../components/recommended-products'
 import ProductView from '../../components/product-view'
 import InformationAccordion from '../../pages/product-detail/partials/information-accordion'
+import ProductDetails from './partials/product-details'
 
 import {HTTPNotFound, HTTPError} from '@salesforce/pwa-kit-react-sdk/ssr/universal/errors'
 import logger from '../../utils/logger-instance'
@@ -453,114 +454,30 @@ const ProductDetail = () => {
             <Metadata product={product} />
 
             <Stack gap={16}>
-                {isProductASet || isProductABundle ? (
-                    <Fragment>
-                        <ProductView
-                            product={product}
-                            category={primaryCategory?.parentCategoryTree || []}
-                            addToCart={
-                                isProductASet
-                                    ? handleProductSetAddToCart
-                                    : handleProductBundleAddToCart
-                            }
-                            addToWishlist={handleAddToWishlist}
-                            isProductLoading={isProductLoading}
-                            isBasketLoading={isBasketLoading}
-                            isWishlistLoading={isWishlistLoading}
-                            validateOrderability={handleChildProductValidation}
-                            childProductOrderability={childProductOrderability}
-                            setSelectedBundleQuantity={setSelectedBundleQuantity}
-                        />
-
-                        <hr />
-
-                        {/* TODO: consider `childProduct.belongsToSet` */}
-                        {
-                            // Render the child products
-                            comboProduct.childProducts.map(
-                                ({product: childProduct, quantity: childQuantity}) => (
-                                    <Box key={childProduct.id} data-testid="child-product">
-                                        <ProductView
-                                            // Do not use an arrow function as we are manipulating the functions scope.
-                                            ref={function (ref) {
-                                                // Assign the "set" scope of the ref, this is how we access the internal
-                                                // validation.
-                                                childProductRefs.current[childProduct.id] = {
-                                                    ref,
-                                                    validateOrderability: this.validateOrderability
-                                                }
-                                            }}
-                                            product={childProduct}
-                                            isProductPartOfSet={isProductASet}
-                                            isProductPartOfBundle={isProductABundle}
-                                            childOfBundleQuantity={childQuantity}
-                                            selectedBundleParentQuantity={selectedBundleQuantity}
-                                            addToCart={
-                                                isProductASet
-                                                    ? (variant, quantity) =>
-                                                          handleAddToCart([
-                                                              {
-                                                                  product: childProduct,
-                                                                  variant,
-                                                                  quantity
-                                                              }
-                                                          ])
-                                                    : null
-                                            }
-                                            addToWishlist={
-                                                isProductASet ? handleAddToWishlist : null
-                                            }
-                                            onVariantSelected={(product, variant, quantity) => {
-                                                if (quantity) {
-                                                    setChildProductSelection((previousState) => ({
-                                                        ...previousState,
-                                                        [product.id]: {
-                                                            product,
-                                                            variant,
-                                                            quantity: isProductABundle
-                                                                ? childQuantity
-                                                                : quantity
-                                                        }
-                                                    }))
-                                                } else {
-                                                    const selections = {...childProductSelection}
-                                                    delete selections[product.id]
-                                                    setChildProductSelection(selections)
-                                                }
-                                            }}
-                                            isProductLoading={isProductLoading}
-                                            isBasketLoading={isBasketLoading}
-                                            isWishlistLoading={isWishlistLoading}
-                                            setChildProductOrderability={
-                                                setChildProductOrderability
-                                            }
-                                        />
-                                        <InformationAccordion product={childProduct} />
-
-                                        <Box display={['none', 'none', 'none', 'block']}>
-                                            <hr />
-                                        </Box>
-                                    </Box>
-                                )
-                            )
-                        }
-                    </Fragment>
-                ) : (
-                    <Fragment>
-                        <ProductView
-                            product={product}
-                            category={primaryCategory?.parentCategoryTree || []}
-                            addToCart={(variant, quantity) =>
-                                handleAddToCart([{product, variant, quantity}])
-                            }
-                            addToWishlist={handleAddToWishlist}
-                            isProductLoading={isProductLoading}
-                            isBasketLoading={isBasketLoading}
-                            isWishlistLoading={isWishlistLoading}
-                        />
-                        <InformationAccordion product={product} />
-                    </Fragment>
-                )}
+                <ProductDetails
+                    product={product}
+                    primaryCategory={primaryCategory}
+                    isProductASet={isProductASet}
+                    isProductABundle={isProductABundle}
+                    comboProduct={comboProduct}
+                    childProductRefs={childProductRefs}
+                    childProductSelection={childProductSelection}
+                    setChildProductSelection={setChildProductSelection}
+                    childProductOrderability={childProductOrderability}
+                    setChildProductOrderability={setChildProductOrderability}
+                    selectedBundleQuantity={selectedBundleQuantity}
+                    setSelectedBundleQuantity={setSelectedBundleQuantity}
+                    // Handlers
+                    handleAddToCart={handleAddToCart}
+                    handleAddToWishlist={handleAddToWishlist}
+                    handleProductSetAddToCart={handleProductSetAddToCart}
+                    handleProductBundleAddToCart={handleProductBundleAddToCart}
+                    handleChildProductValidation={handleChildProductValidation}
+                    // Loading states
+                    isProductLoading={isProductLoading}
+                    isBasketLoading={isBasketLoading}
+                    isWishlistLoading={isWishlistLoading}
+                />
 
                 {/* Product Recommendations */}
                 <Stack gap={16}>
