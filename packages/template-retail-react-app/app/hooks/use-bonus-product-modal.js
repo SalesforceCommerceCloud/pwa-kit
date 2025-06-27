@@ -84,9 +84,7 @@ export const useBonusState = (basket) => {
                 data: {}
             }))
         },
-        onClose: () => {
-            
-        },
+        onClose: () => {},
         onOpen: (data) => {
             setState((prev) => ({
                 ...prev,

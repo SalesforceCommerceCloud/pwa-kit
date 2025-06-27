@@ -5,6 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React, {useState, useEffect, useMemo} from 'react'
+import {useIntl} from 'react-intl'
 import {
     Modal,
     ModalCloseButton,
@@ -24,15 +25,18 @@ import {
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 import {useProducts} from '@salesforce/commerce-sdk-react'
 import {useHistory} from 'react-router-dom'
+import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
 import useEinstein from '@salesforce/retail-react-app/app/hooks/use-einstein'
 import DynamicImage from '@salesforce/retail-react-app/app/components/dynamic-image'
 import ProductViewModal from '@salesforce/retail-react-app/app/components/product-view-modal'
 import PropTypes from 'prop-types'
 import {useBonusProductModalContext} from '@salesforce/retail-react-app/app/hooks/use-bonus-product-modal'
 import {useShopperBasketsMutationHelper} from '@salesforce/commerce-sdk-react'
+import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
 import {findImageGroupBy} from '@salesforce/retail-react-app/app/utils/image-groups-utils'
 import {FormattedMessage} from 'react-intl'
 import {filterImageGroups} from '@salesforce/retail-react-app/app/utils/product-utils'
+import {API_ERROR_MESSAGE} from '@salesforce/retail-react-app/app/constants'
 
 // Component to display individual bonus product with checkbox for selection
 const BonusProductItem = ({product, productData, onClick, isLoading}) => {
@@ -77,18 +81,11 @@ const BonusProductItem = ({product, productData, onClick, isLoading}) => {
 
     return (
         <VStack spacing={3} p={4} bg="white">
-            <AspectRatio
-                ratio={1}
-                width="150px"
-                minWidth="150px"
-                cursor="pointer"
-            >
+            <AspectRatio ratio={1} width="150px" minWidth="150px" cursor="pointer">
                 {image && (
                     <DynamicImage
                         src={`${image.disBaseLink || image.link}[?sw={width}&q=60]`}
-                        widths={{
-                            base: '150px'
-                        }}
+                        widths={{base: '150px'}}
                         imageProps={{
                             alt: productName,
                             borderRadius: 'md',
@@ -123,12 +120,18 @@ BonusProductItem.propTypes = {
 }
 
 export const BonusProductModal = () => {
-    const einstein = useEinstein() 
+    const {data: basket} = useCurrentBasket()
+    const einstein = useEinstein()
     const history = useHistory()
+    const showToast = useToast()
+    const {formatMessage} = useIntl()
     const {addItemToNewOrExistingBasket} = useShopperBasketsMutationHelper()
-    const {isOpen, onClose, onClickClose,data} = useBonusProductModalContext()
-    const {isOpen : isProductViewOpen, onOpen : onProductViewOpen, onClose : onProductViewClose} = useDisclosure()
-    const [selectedProducts, setSelectedProducts] = useState(new Set())
+    const {isOpen, onClose, onClickClose, data} = useBonusProductModalContext()
+    const {
+        isOpen: isProductViewOpen,
+        onOpen: onProductViewOpen,
+        onClose: onProductViewClose
+    } = useDisclosure()
     const [selectedProduct, setSelectedProduct] = useState()
 
     // Extract bonus items from the response structure
@@ -136,6 +139,21 @@ export const BonusProductModal = () => {
     const currentPromotion = bonusDiscountLineItems[0] || {}
     const bonusProducts = currentPromotion.bonusProducts || []
     const maxBonusItems = currentPromotion.maxBonusItems || 1
+
+    // Get existing bonus products for this specific promotion
+    const existingBonusProducts = useMemo(() => {
+        if (!basket?.productItems || !currentPromotion.id) return []
+        return basket.productItems.filter(
+            (item) =>
+                item.bonusProductLineItem === true &&
+                item.bonusDiscountLineItemId === currentPromotion.id
+        )
+    }, [basket?.productItems, currentPromotion.id])
+    // Calculate how many more bonus items can be added
+    const currentBonusCount = existingBonusProducts.reduce(
+        (total, item) => total + item.quantity,
+        0
+    )
 
     // Get all product IDs for batch fetching
     const productIds = useMemo(() => {
@@ -172,6 +190,13 @@ export const BonusProductModal = () => {
         }
     }, [isOpen])
 
+    const showError = () => {
+        showToast({
+            title: formatMessage(API_ERROR_MESSAGE),
+            status: 'error'
+        })
+    }
+
     const handleClickBonusProduct = (product) => {
         setSelectedProduct(product.productId || product.id)
         onProductViewOpen()
@@ -185,13 +210,12 @@ export const BonusProductModal = () => {
                 quantity
             }))
 
-            const response = await addItemToNewOrExistingBasket(productItems)
+            await addItemToNewOrExistingBasket(productItems)
 
             einstein.sendAddToCart(productItems)
-
         } catch (error) {
             console.log('error', error)
-            showError(error)
+            showError()
         } finally {
             onClickClose()
             history.push('/cart')
@@ -203,23 +227,16 @@ export const BonusProductModal = () => {
         onProductViewClose()
     }
 
-    const selectedCount = selectedProducts.size
-
     // Calculate columns based on number of products
     const productCount = bonusProducts.length
     const columns = Math.min(productCount, 3) // Max 3 columns, but fewer if less products
     const product = useMemo(() => {
         const bonusProduct = bonusProducts.find((product) => product.productId === selectedProduct)
         if (!bonusProduct) return null
-        
         // Get the full product data from the fetched products
         const fullProductData = productsDataMap[bonusProduct.productId || bonusProduct.id]
-        
         // Merge bonus product data with full product data
-        return fullProductData ? {
-            ...fullProductData,
-            ...bonusProduct
-        } : null
+        return fullProductData ? {...fullProductData, ...bonusProduct} : null
     }, [bonusProducts, selectedProduct, productsDataMap])
 
     if (!isOpen) return null
@@ -228,25 +245,25 @@ export const BonusProductModal = () => {
         <>
             {selectedProduct && product && (
                 <ProductViewModal
-                    isOpen={isProductViewOpen} 
-                    onClose={onProductViewHide} 
+                    isOpen={isProductViewOpen}
+                    onClose={onProductViewHide}
                     onOpen={onProductViewOpen}
                     product={product}
                     addToCart={(variant, quantity) =>
                         handleAddToCart([{product: product, variant, quantity: quantity}])
                     }
                 />
-            )}          
+            )}
             {!selectedProduct && (
-                <Modal isOpen={isOpen} onClose={(onClose)} size="3xl" scrollBehavior="inside">
+                <Modal isOpen={isOpen} onClose={onClose} size="3xl" scrollBehavior="inside">
                     <ModalOverlay />
                     <ModalContent>
                         <ModalHeader>
                             <Text fontSize="lg" fontWeight="bold">
-                                Add Bonus Product ({selectedCount} of {maxBonusItems})
+                                Add Bonus Product ({currentBonusCount} of {maxBonusItems})
                             </Text>
                         </ModalHeader>
-                        <ModalCloseButton onClick={onClickClose}/>
+                        <ModalCloseButton onClick={onClickClose} />
 
                         <ModalBody bgColor="white" padding="6">
                             {bonusProducts.length > 0 ? (
