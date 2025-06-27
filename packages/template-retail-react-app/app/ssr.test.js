@@ -1,0 +1,483 @@
+/*
+ * Copyright (c) 2023, Salesforce, Inc.
+ * All rights reserved.
+ * SPDX-License-Identifier: BSD-3-Clause
+ * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
+ */
+
+import {rest} from 'msw'
+
+// Mock the runtime to prevent server startup during tests
+jest.mock('@salesforce/pwa-kit-runtime/ssr/server/express', () => ({
+    getRuntime: jest.fn(() => ({
+        createHandler: jest.fn((options, appHandler) => {
+            // Return a mock handler instead of creating actual server
+            return { handler: jest.fn() }
+        }),
+        serveStaticFile: jest.fn(),
+        serveServiceWorker: jest.fn(),
+        render: jest.fn()
+    }))
+}))
+
+// Mock other dependencies
+jest.mock('@salesforce/pwa-kit-runtime/utils/ssr-config', () => ({
+    getConfig: jest.fn(() => ({
+        app: {
+            login: {
+                passwordless: {
+                    callbackURI: '/passwordless-login-callback',
+                    landingPath: '/passwordless-login'
+                },
+                resetPassword: {
+                    callbackURI: '/reset-password-callback',
+                    landingPath: '/reset-password'
+                }
+            },
+            commerceAPI: {
+                parameters: {
+                    shortCode: 'test-shortcode',
+                    organizationId: 'f_ecom_test_001'
+                }
+            }
+        }
+    }))
+}))
+
+jest.mock('@salesforce/pwa-kit-react-sdk/utils/url', () => ({
+    getAppOrigin: jest.fn(() => 'https://test-app.com')
+}))
+
+jest.mock('@salesforce/pwa-kit-runtime/utils/middleware', () => ({
+    defaultPwaKitSecurityHeaders: jest.fn()
+}))
+
+jest.mock('helmet', () => jest.fn(() => jest.fn()))
+jest.mock('express', () => {
+    const mockExpress = jest.fn(() => ({
+        use: jest.fn(),
+        get: jest.fn(),
+        post: jest.fn()
+    }))
+    mockExpress.json = jest.fn()
+    mockExpress.urlencoded = jest.fn()
+    return mockExpress
+})
+
+jest.mock('jose', () => ({
+    createRemoteJWKSet: jest.fn(() => {
+        return jest.fn().mockResolvedValue({
+            keys: [{
+                kty: 'RSA',
+                use: 'sig',
+                kid: 'test-key-id',
+                n: 'test-modulus',
+                e: 'AQAB'
+            }]
+        })
+    }),
+    jwtVerify: jest.fn().mockResolvedValue({
+        payload: {
+            iss: 'prefix/prefix2/test_001/oauth2',
+            aud: 'test-audience',
+            exp: Math.floor(Date.now() / 1000) + 3600,
+            iat: Math.floor(Date.now() / 1000)
+        },
+        protectedHeader: {
+            alg: 'RS256',
+            kid: 'test-key-id'
+        }
+    }),
+    decodeJwt: jest.fn().mockReturnValue({
+        iss: 'prefix/prefix2/test_001/oauth2',
+        aud: 'test-audience',
+        exp: Math.floor(Date.now() / 1000) + 3600,
+        iat: Math.floor(Date.now() / 1000)
+    })
+}))
+
+// Import only the functions we need to test
+import { validateSlasCallbackToken, createRemoteJWKSet, emailLink, jwksCaching } from './ssr.js'
+
+// Mock environment variables
+const originalEnv = process.env
+
+beforeEach(() => {
+    process.env = {
+        ...originalEnv,
+        MARKETING_CLOUD_CLIENT_ID: 'test-client-id',
+        MARKETING_CLOUD_CLIENT_SECRET: 'test-client-secret',
+        MARKETING_CLOUD_SUBDOMAIN: 'test-subdomain',
+        MARKETING_CLOUD_PASSWORDLESS_LOGIN_TEMPLATE: 'passwordless-template',
+        MARKETING_CLOUD_RESET_PASSWORD_TEMPLATE: 'reset-password-template'
+    }
+    jest.clearAllMocks()
+})
+
+afterEach(() => {
+    process.env = originalEnv
+})
+
+describe('validateSlasCallbackToken', () => {
+    test('should successfully validate a valid token', async () => {
+        const testToken = 'valid-jwt-token'
+        
+        const result = await validateSlasCallbackToken(testToken)
+        
+        expect(result).toBeDefined()
+        expect(result.iss).toBe('prefix/prefix2/test_001/oauth2')
+        
+        const { decodeJwt, jwtVerify } = require('jose')
+        expect(decodeJwt).toHaveBeenCalledWith(testToken)
+        expect(jwtVerify).toHaveBeenCalled()
+    })
+
+    test('should throw error for invalid token', async () => {
+        const invalidToken = 'invalid-token'
+        
+        const { jwtVerify } = require('jose')
+        jwtVerify.mockRejectedValueOnce(new Error('Invalid token signature'))
+        
+        await expect(validateSlasCallbackToken(invalidToken)).rejects.toThrow(
+            'SLAS Token Validation Error: Invalid token signature'
+        )
+    })
+
+    test('should throw error for mismatched tenant ID', async () => {
+        const testToken = 'token-with-wrong-tenant'
+        
+        const { decodeJwt } = require('jose')
+        decodeJwt.mockReturnValueOnce({
+            iss: 'prefix/prefix2/wrong_tenant/oauth2'
+        })
+        
+        await expect(validateSlasCallbackToken(testToken)).rejects.toThrow(
+            'The tenant ID in your PWA Kit configuration ("test_001") does not match the tenant ID in the SLAS callback token ("wrong_tenant")'
+        )
+    })
+
+    test('should handle token with malformed issuer claim', async () => {
+        const testToken = 'token-with-malformed-issuer'
+        
+        const { decodeJwt } = require('jose')
+        decodeJwt.mockReturnValueOnce({
+            iss: 'malformed-issuer'
+        })
+        
+        // This should attempt to extract tenantId from tokens[2] which would be undefined
+        await expect(validateSlasCallbackToken(testToken)).rejects.toThrow()
+    })
+
+    test('should handle JWT verification failure', async () => {
+        const testToken = 'jwt-verification-failure-token'
+        
+        const { jwtVerify } = require('jose')
+        jwtVerify.mockRejectedValueOnce(new Error('JWT verification failed'))
+        
+        await expect(validateSlasCallbackToken(testToken)).rejects.toThrow(
+            'SLAS Token Validation Error: JWT verification failed'
+        )
+    })
+
+    test('should handle missing issuer claim', async () => {
+        const testToken = 'token-without-issuer'
+        
+        const { decodeJwt } = require('jose')
+        decodeJwt.mockReturnValueOnce({
+            aud: 'test-audience',
+            exp: Math.floor(Date.now() / 1000) + 3600
+        })
+        
+        await expect(validateSlasCallbackToken(testToken)).rejects.toThrow()
+    })
+})
+
+describe('emailLink function', () => {
+    beforeEach(() => {
+        // Set up MSW handlers for Marketing Cloud API
+        global.server.use(
+            rest.post('https://test-subdomain.auth.marketingcloudapis.com/v2/token', (req, res, ctx) => {
+                return res(ctx.delay(0), ctx.status(200), ctx.json({ access_token: 'mc-access-token' }))
+            }),
+            rest.post('https://test-subdomain.rest.marketingcloudapis.com/messaging/v1/email/messages/:messageId', (req, res, ctx) => {
+                return res(ctx.delay(0), ctx.status(200), ctx.json({ requestId: 'email-request-id', status: 'sent' }))
+            })
+        )
+    })
+
+    test('should send email via Marketing Cloud successfully', async () => {
+        const result = await emailLink(
+            'test@example.com',
+            'test-template',
+            'https://example.com/magic-link'
+        )
+
+        expect(result).toBeDefined()
+        expect(result.requestId).toBe('email-request-id')
+        expect(result.status).toBe('sent')
+    })
+
+    test('should handle Marketing Cloud token fetch failure', async () => {
+        // Reset all handlers and only add the failing token endpoint
+        global.server.resetHandlers(
+            rest.post('https://test-subdomain.auth.marketingcloudapis.com/v2/token', (req, res, ctx) => {
+                return res(ctx.delay(0), ctx.status(401), ctx.json({ error: 'Unauthorized' }))
+            })
+        )
+
+        await expect(emailLink(
+            'test@example.com',
+            'test-template',
+            'https://example.com/magic-link'
+        )).rejects.toThrow(/Failed to fetch Marketing Cloud access token|getaddrinfo ENOTFOUND|request.*failed/)
+    })
+
+    test('should handle Marketing Cloud email send failure', async () => {
+        global.server.use(
+            rest.post('https://test-subdomain.auth.marketingcloudapis.com/v2/token', (req, res, ctx) => {
+                return res(ctx.delay(0), ctx.status(200), ctx.json({ access_token: 'mc-access-token' }))
+            }),
+            rest.post('https://test-subdomain.rest.marketingcloudapis.com/messaging/v1/email/messages/:messageId', (req, res, ctx) => {
+                return res(ctx.delay(0), ctx.status(400), ctx.json({ error: 'Bad Request' }))
+            })
+        )
+
+        await expect(emailLink(
+            'test@example.com',
+            'test-template',
+            'https://example.com/magic-link'
+        )).rejects.toThrow('Failed to send email to Marketing Cloud')
+    })
+
+    test('should warn when Marketing Cloud environment variables are missing', () => {
+        const consoleSpy = jest.spyOn(console, 'warn').mockImplementation(() => {})
+        
+        // Store current env vars
+        const originalClientId = process.env.MARKETING_CLOUD_CLIENT_ID
+        const originalClientSecret = process.env.MARKETING_CLOUD_CLIENT_SECRET
+        const originalSubdomain = process.env.MARKETING_CLOUD_SUBDOMAIN
+        
+        // Temporarily remove env vars
+        delete process.env.MARKETING_CLOUD_CLIENT_ID
+        delete process.env.MARKETING_CLOUD_CLIENT_SECRET
+        delete process.env.MARKETING_CLOUD_SUBDOMAIN
+
+        // Call the function to trigger the warnings (but don't await it)
+        emailLink('test@example.com', 'test-template', 'https://example.com/magic-link').catch(() => {})
+
+        expect(consoleSpy).toHaveBeenCalledWith('MARKETING_CLOUD_CLIENT_ID is not set in the environment variables.')
+        expect(consoleSpy).toHaveBeenCalledWith(' MARKETING_CLOUD_CLIENT_SECRET is not set in the environment variables.')
+        expect(consoleSpy).toHaveBeenCalledWith('MARKETING_CLOUD_SUBDOMAIN is not set in the environment variables.')
+
+        // Restore env vars
+        if (originalClientId) process.env.MARKETING_CLOUD_CLIENT_ID = originalClientId
+        if (originalClientSecret) process.env.MARKETING_CLOUD_CLIENT_SECRET = originalClientSecret
+        if (originalSubdomain) process.env.MARKETING_CLOUD_SUBDOMAIN = originalSubdomain
+
+        consoleSpy.mockRestore()
+    })
+})
+
+describe('createRemoteJWKSet', () => {
+    test('should create JWKS URI with correct tenant ID', () => {
+        const tenantId = 'test_001'
+        
+        const result = createRemoteJWKSet(tenantId)
+        
+        expect(result).toBeDefined()
+        const { createRemoteJWKSet: joseCreateRemoteJWKSet } = require('jose')
+        expect(joseCreateRemoteJWKSet).toHaveBeenCalledWith(
+            new URL('https://test-app.com/test-shortcode/test_001/oauth2/jwks')
+        )
+    })
+
+    test('should throw error for mismatched tenant ID', () => {
+        const wrongTenantId = 'wrong_tenant'
+        
+        expect(() => createRemoteJWKSet(wrongTenantId)).toThrow(
+            'The tenant ID in your PWA Kit configuration ("test_001") does not match the tenant ID in the SLAS callback token ("wrong_tenant")'
+        )
+    })
+
+    test('should extract tenant ID from organizationId correctly', () => {
+        const tenantId = 'test_001'
+        
+        createRemoteJWKSet(tenantId)
+        
+        const { createRemoteJWKSet: joseCreateRemoteJWKSet } = require('jose')
+        const callArg = joseCreateRemoteJWKSet.mock.calls[joseCreateRemoteJWKSet.mock.calls.length - 1][0]
+        expect(callArg.pathname).toContain('/test-shortcode/test_001/oauth2/jwks')
+    })
+
+    test('should handle various tenant ID formats', () => {
+        const validTenantIds = ['abcd_001', 'test_s01', 'prod_stg', 'demo_dev', 'live_prd']
+        
+        // Mock config to return different tenant IDs
+        const mockGetConfig = require('@salesforce/pwa-kit-runtime/utils/ssr-config').getConfig
+        
+        validTenantIds.forEach(tenantId => {
+            mockGetConfig.mockReturnValueOnce({
+                app: {
+                    commerceAPI: {
+                        parameters: {
+                            shortCode: 'test-shortcode',
+                            organizationId: `f_ecom_${tenantId}`
+                        }
+                    }
+                }
+            })
+            
+            expect(() => createRemoteJWKSet(tenantId)).not.toThrow()
+        })
+    })
+})
+
+describe('jwksCaching', () => {
+    let mockReq, mockRes
+
+    beforeEach(() => {
+        mockReq = {}
+        mockRes = {
+            status: jest.fn().mockReturnThis(),
+            json: jest.fn().mockReturnThis(),
+            set: jest.fn().mockReturnThis()
+        }
+    })
+
+    test('should successfully cache JWKS response', async () => {
+        const options = {
+            shortCode: 'test-code',
+            tenantId: 'abcd_001'
+        }
+
+        global.server.use(
+            rest.get('https://test-code.api.commercecloud.salesforce.com/shopper/auth/v1/organizations/f_ecom_abcd_001/oauth2/jwks', (req, res, ctx) => {
+                return res(ctx.delay(0), ctx.status(200), ctx.json({ keys: [{ kty: 'RSA', use: 'sig' }] }))
+            })
+        )
+
+        await jwksCaching(mockReq, mockRes, options)
+
+        expect(mockRes.set).toHaveBeenCalledWith(
+            'Cache-Control',
+            'public, max-age=1209600, stale-while-revalidate=86400'
+        )
+        expect(mockRes.json).toHaveBeenCalledWith({
+            keys: [{ kty: 'RSA', use: 'sig' }]
+        })
+    })
+
+    test('should reject invalid tenant ID format', async () => {
+        const options = {
+            shortCode: 'test-code',
+            tenantId: 'invalid-tenant'
+        }
+
+        await jwksCaching(mockReq, mockRes, options)
+
+        expect(mockRes.status).toHaveBeenCalledWith(400)
+        expect(mockRes.json).toHaveBeenCalledWith({
+            error: 'Bad request parameters: Tenant ID or short code is invalid.'
+        })
+    })
+
+    test('should reject invalid short code format', async () => {
+        const options = {
+            shortCode: 'invalid@code',
+            tenantId: 'abcd_001'
+        }
+
+        await jwksCaching(mockReq, mockRes, options)
+
+        expect(mockRes.status).toHaveBeenCalledWith(400)
+        expect(mockRes.json).toHaveBeenCalledWith({
+            error: 'Bad request parameters: Tenant ID or short code is invalid.'
+        })
+    })
+
+    test('should handle JWKS fetch failure', async () => {
+        const options = {
+            shortCode: 'test-code',
+            tenantId: 'abcd_001'
+        }
+
+        global.server.use(
+            rest.get('https://test-code.api.commercecloud.salesforce.com/shopper/auth/v1/organizations/f_ecom_abcd_001/oauth2/jwks', (req, res, ctx) => {
+                return res(ctx.delay(0), ctx.status(404), ctx.json({ error: 'Not Found' }))
+            })
+        )
+
+        await jwksCaching(mockReq, mockRes, options)
+
+        expect(mockRes.status).toHaveBeenCalledWith(400)
+        expect(mockRes.json).toHaveBeenCalledWith({
+            error: 'Error while fetching data: Request failed with status: 404'
+        })
+    })
+
+    test('should accept valid tenant ID formats', async () => {
+        const validTenantIds = ['abcd_001', 'test_s01', 'prod_stg', 'demo_dev', 'live_prd']
+        
+        for (const tenantId of validTenantIds) {
+            const options = {
+                shortCode: 'valid-code',
+                tenantId
+            }
+
+            global.server.use(
+                rest.get(`https://valid-code.api.commercecloud.salesforce.com/shopper/auth/v1/organizations/f_ecom_${tenantId}/oauth2/jwks`, (req, res, ctx) => {
+                    return res(ctx.delay(0), ctx.status(200), ctx.json({ keys: [] }))
+                })
+            )
+
+            await jwksCaching(mockReq, mockRes, options)
+
+            expect(mockRes.status).not.toHaveBeenCalledWith(400)
+        }
+    })
+
+    test('should set correct cache headers', async () => {
+        const options = {
+            shortCode: 'test-code',
+            tenantId: 'abcd_001'
+        }
+
+        global.server.use(
+            rest.get('https://test-code.api.commercecloud.salesforce.com/shopper/auth/v1/organizations/f_ecom_abcd_001/oauth2/jwks', (req, res, ctx) => {
+                return res(ctx.delay(0), ctx.status(200), ctx.json({ keys: [] }))
+            })
+        )
+
+        await jwksCaching(mockReq, mockRes, options)
+
+        // Verify cache control header values
+        expect(mockRes.set).toHaveBeenCalledWith(
+            'Cache-Control',
+            'public, max-age=1209600, stale-while-revalidate=86400'
+        )
+        // 1209600 seconds = 14 days
+        // 86400 seconds = 1 day
+    })
+})
+
+describe('exported functions', () => {
+    test('validateSlasCallbackToken should be exported', () => {
+        expect(validateSlasCallbackToken).toBeDefined()
+        expect(typeof validateSlasCallbackToken).toBe('function')
+    })
+
+    test('createRemoteJWKSet should be exported', () => {
+        expect(createRemoteJWKSet).toBeDefined()
+        expect(typeof createRemoteJWKSet).toBe('function')
+    })
+
+    test('emailLink should be exported', () => {
+        expect(emailLink).toBeDefined()
+        expect(typeof emailLink).toBe('function')
+    })
+
+    test('jwksCaching should be exported', () => {
+        expect(jwksCaching).toBeDefined()
+        expect(typeof jwksCaching).toBe('function')
+    })
+}) 
