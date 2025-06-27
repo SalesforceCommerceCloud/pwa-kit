@@ -23,6 +23,7 @@ import {
     useDisclosure
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 import {useProducts} from '@salesforce/commerce-sdk-react'
+import useEinstein from '@salesforce/retail-react-app/app/hooks/use-einstein'
 import {useHistory} from 'react-router-dom'
 import DynamicImage from '@salesforce/retail-react-app/app/components/dynamic-image'
 import ProductViewModal from '@salesforce/retail-react-app/app/components/product-view-modal'
@@ -118,6 +119,7 @@ BonusProductItem.propTypes = {
 
 export const BonusProductModal = () => {
     const history = useHistory()
+    const einstein = useEinstein() 
     const {addItemToNewOrExistingBasket} = useShopperBasketsMutationHelper()
     const {isOpen, onClose, onClickClose, data} = useBonusProductModalContext()
     const {
