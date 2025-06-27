@@ -19,7 +19,6 @@ import {
 } from '@salesforce/commerce-sdk-react'
 import logger from '@salesforce/retail-react-app/app/utils/logger-instance'
 import {useAppOrigin} from '@salesforce/retail-react-app/app/hooks/use-app-origin'
-import loadable from '@loadable/component'
 
 // Chakra
 import {
@@ -34,7 +33,6 @@ import {SkipNavLink, SkipNavContent} from '@chakra-ui/skip-nav'
 
 // Contexts
 import {CurrencyProvider} from '@salesforce/retail-react-app/app/contexts'
-import {StoreLocatorParamsProvider} from '@salesforce/retail-react-app/app/contexts/store-locator-params'
 
 // Local Project Components
 import Header from '@salesforce/retail-react-app/app/components/header'
@@ -81,11 +79,6 @@ import {
 
 import Seo from '@salesforce/retail-react-app/app/components/seo'
 import {getPathWithLocale} from '@salesforce/retail-react-app/app/utils/url'
-import useExternalSearch from '@salesforce/retail-react-app/app/hooks/use-external-search'
-
-const SeInputHandler = loadable(() =>
-    import('@salesforce/retail-react-app/app/components/se-input-handler')
-)
 
 const PlaceholderComponent = () => (
     <Center p="2">
@@ -133,7 +126,6 @@ const App = (props) => {
     const {data: categoriesTree} = useCategory({
         parameters: {id: CAT_MENU_DEFAULT_ROOT_CATEGORY, levels: CAT_MENU_DEFAULT_NAV_SSR_DEPTH}
     })
-    useExternalSearch()
     const categories = flatten(categoriesTree || {}, 'categories')
     const {getTokenWhenReady} = useAccessToken()
     const appOrigin = useAppOrigin()
@@ -334,139 +326,125 @@ const App = (props) => {
                     defaultLocale={DEFAULT_LOCALE}
                 >
                     <CurrencyProvider currency={currency}>
-                        <StoreLocatorParamsProvider>
-                            <SeInputHandler onOpenStoreLocator={onOpenStoreLocator} />
-                            <Seo>
-                                <meta name="theme-color" content={THEME_COLOR} />
-                                <meta
-                                    name="apple-mobile-web-app-title"
-                                    content={DEFAULT_SITE_TITLE}
-                                />
-                                <link
-                                    rel="apple-touch-icon"
-                                    href={getAssetUrl('static/img/global/apple-touch-icon.png')}
-                                />
-                                <link rel="manifest" href={getAssetUrl('static/manifest.json')} />
+                        <Seo>
+                            <meta name="theme-color" content={THEME_COLOR} />
+                            <meta name="apple-mobile-web-app-title" content={DEFAULT_SITE_TITLE} />
+                            <link
+                                rel="apple-touch-icon"
+                                href={getAssetUrl('static/img/global/apple-touch-icon.png')}
+                            />
+                            <link rel="manifest" href={getAssetUrl('static/manifest.json')} />
 
-                                {/* Urls for all localized versions of this page (including current page)
-                                For more details on hrefLang, see https://developers.google.com/search/docs/advanced/crawling/localized-versions */}
-                                {site.l10n?.supportedLocales.map((locale) => (
-                                    <link
-                                        rel="alternate"
-                                        hrefLang={locale.id.toLowerCase()}
-                                        href={`${appOrigin}${getPathWithLocale(
-                                            locale.id,
-                                            buildUrl,
-                                            {
-                                                location: {
-                                                    ...location,
-                                                    search: ''
-                                                }
-                                            }
-                                        )}`}
-                                        key={locale.id}
-                                    />
-                                ))}
-                                {/* A general locale as fallback. For example: "en" if default locale is "en-GB" */}
+                            {/* Urls for all localized versions of this page (including current page)
+                            For more details on hrefLang, see https://developers.google.com/search/docs/advanced/crawling/localized-versions */}
+                            {site.l10n?.supportedLocales.map((locale) => (
                                 <link
                                     rel="alternate"
-                                    hrefLang={site.l10n.defaultLocale.slice(0, 2)}
+                                    hrefLang={locale.id.toLowerCase()}
                                     href={`${appOrigin}${getPathWithLocale(locale.id, buildUrl, {
                                         location: {
                                             ...location,
                                             search: ''
                                         }
                                     })}`}
+                                    key={locale.id}
                                 />
-                                {/* A wider fallback for user locales that the app does not support */}
-                                <link rel="alternate" hrefLang="x-default" href={`${appOrigin}/`} />
-                            </Seo>
+                            ))}
+                            {/* A general locale as fallback. For example: "en" if default locale is "en-GB" */}
+                            <link
+                                rel="alternate"
+                                hrefLang={site.l10n.defaultLocale.slice(0, 2)}
+                                href={`${appOrigin}${getPathWithLocale(locale.id, buildUrl, {
+                                    location: {
+                                        ...location,
+                                        search: ''
+                                    }
+                                })}`}
+                            />
+                            {/* A wider fallback for user locales that the app does not support */}
+                            <link rel="alternate" hrefLang="x-default" href={`${appOrigin}/`} />
+                        </Seo>
 
-                            <ScrollToTop />
+                        <ScrollToTop />
 
-                            <Box id="app" display="flex" flexDirection="column" flex={1}>
-                                <SkipNavLink zIndex="skipLink">Skip to Content</SkipNavLink>
-                                <StoreLocatorModal
-                                    isOpen={isOpenStoreLocator}
-                                    onClose={onCloseStoreLocator}
-                                />
-                                <Box {...styles.headerWrapper}>
-                                    {!isCheckout ? (
-                                        <>
-                                            <AboveHeader />
-                                            <Header
-                                                onMenuClick={onOpen}
-                                                onLogoClick={onLogoClick}
-                                                onMyCartClick={onCartClick}
-                                                onMyAccountClick={onAccountClick}
-                                                onWishlistClick={onWishlistClick}
-                                                onStoreLocatorClick={onOpenStoreLocator}
-                                            >
-                                                <HideOnDesktop>
-                                                    <DrawerMenu
-                                                        isOpen={isOpen}
-                                                        onClose={onClose}
-                                                        onLogoClick={onLogoClick}
-                                                        root={
-                                                            categories?.[
-                                                                CAT_MENU_DEFAULT_ROOT_CATEGORY
-                                                            ]
-                                                        }
-                                                        itemsKey="categories"
-                                                        itemsCountKey="onlineSubCategoriesCount"
-                                                        itemComponent={DrawerMenuItemWithData}
-                                                    />
-                                                </HideOnDesktop>
-
-                                                <HideOnMobile>
-                                                    <ListMenu
-                                                        root={
-                                                            categories?.[
-                                                                CAT_MENU_DEFAULT_ROOT_CATEGORY
-                                                            ]
-                                                        }
-                                                        itemsKey="categories"
-                                                        itemsCountKey="onlineSubCategoriesCount"
-                                                        contentComponent={ListMenuContentWithData}
-                                                    />
-                                                </HideOnMobile>
-                                            </Header>
-                                        </>
-                                    ) : (
-                                        <CheckoutHeader />
-                                    )}
-                                </Box>
-                                {!isOnline && <OfflineBanner />}
-                                <AddToCartModalProvider>
-                                    <SkipNavContent
-                                        style={{
-                                            display: 'flex',
-                                            flexDirection: 'column',
-                                            flex: 1,
-                                            outline: 0
-                                        }}
-                                    >
-                                        <Box
-                                            as="main"
-                                            id="app-main"
-                                            role="main"
-                                            display="flex"
-                                            flexDirection="column"
-                                            flex="1"
+                        <Box id="app" display="flex" flexDirection="column" flex={1}>
+                            <SkipNavLink zIndex="skipLink">Skip to Content</SkipNavLink>
+                            <StoreLocatorModal
+                                isOpen={isOpenStoreLocator}
+                                onClose={onCloseStoreLocator}
+                            />
+                            <Box {...styles.headerWrapper}>
+                                {!isCheckout ? (
+                                    <>
+                                        <AboveHeader />
+                                        <Header
+                                            onMenuClick={onOpen}
+                                            onLogoClick={onLogoClick}
+                                            onMyCartClick={onCartClick}
+                                            onMyAccountClick={onAccountClick}
+                                            onWishlistClick={onWishlistClick}
+                                            onStoreLocatorClick={onOpenStoreLocator}
                                         >
-                                            <OfflineBoundary isOnline={false}>
-                                                {children}
-                                            </OfflineBoundary>
-                                        </Box>
-                                    </SkipNavContent>
+                                            <HideOnDesktop>
+                                                <DrawerMenu
+                                                    isOpen={isOpen}
+                                                    onClose={onClose}
+                                                    onLogoClick={onLogoClick}
+                                                    root={
+                                                        categories?.[CAT_MENU_DEFAULT_ROOT_CATEGORY]
+                                                    }
+                                                    itemsKey="categories"
+                                                    itemsCountKey="onlineSubCategoriesCount"
+                                                    itemComponent={DrawerMenuItemWithData}
+                                                />
+                                            </HideOnDesktop>
 
-                                    {!isCheckout ? <Footer /> : <CheckoutFooter />}
-
-                                    <AuthModal {...authModal} />
-                                    <DntNotification {...dntNotification} />
-                                </AddToCartModalProvider>
+                                            <HideOnMobile>
+                                                <ListMenu
+                                                    root={
+                                                        categories?.[CAT_MENU_DEFAULT_ROOT_CATEGORY]
+                                                    }
+                                                    itemsKey="categories"
+                                                    itemsCountKey="onlineSubCategoriesCount"
+                                                    contentComponent={ListMenuContentWithData}
+                                                />
+                                            </HideOnMobile>
+                                        </Header>
+                                    </>
+                                ) : (
+                                    <CheckoutHeader />
+                                )}
                             </Box>
-                        </StoreLocatorParamsProvider>
+                            {!isOnline && <OfflineBanner />}
+                            <AddToCartModalProvider>
+                                <SkipNavContent
+                                    style={{
+                                        display: 'flex',
+                                        flexDirection: 'column',
+                                        flex: 1,
+                                        outline: 0
+                                    }}
+                                >
+                                    <Box
+                                        as="main"
+                                        id="app-main"
+                                        role="main"
+                                        display="flex"
+                                        flexDirection="column"
+                                        flex="1"
+                                    >
+                                        <OfflineBoundary isOnline={false}>
+                                            {children}
+                                        </OfflineBoundary>
+                                    </Box>
+                                </SkipNavContent>
+
+                                {!isCheckout ? <Footer /> : <CheckoutFooter />}
+
+                                <AuthModal {...authModal} />
+                                <DntNotification {...dntNotification} />
+                            </AddToCartModalProvider>
+                        </Box>
                     </CurrencyProvider>
                 </IntlProvider>
             </StorefrontPreview>
