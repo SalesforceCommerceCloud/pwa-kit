@@ -42,4 +42,4 @@ ProductDetails.propTypes = {
     setChildProductOrderability: PropTypes.func
 }
 
-export default ProductDetails 
+export default ProductDetails

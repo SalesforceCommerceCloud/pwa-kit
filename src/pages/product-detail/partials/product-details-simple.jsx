@@ -44,4 +44,4 @@ SimpleProductDetails.propTypes = {
     handleAddToCart: PropTypes.func
 }
 
-export default SimpleProductDetails 
+export default SimpleProductDetails

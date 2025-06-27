@@ -16,25 +16,19 @@ import {
     useProducts,
     useCategory,
     useShopperBasketsMutation,
-    useCustomerId,
     useShopperBasketsMutationHelper
 } from '@salesforce/commerce-sdk-react'
 import {useHistory, useLocation, useParams} from 'react-router-dom'
 
 import {useCurrentBasket, useExtensionConfig, useVariant} from '../../hooks'
-import useNavigation from '../../hooks/use-navigation'
 import useEinstein from '../../hooks/use-einstein'
-import useDataCloud from '../../hooks/use-datacloud'
-import useActiveData from '../../hooks/use-active-data'
 import useToast from '../../hooks/use-toast'
 import {useProductDetailAnalytics} from './use-product-detail-analytics'
 import {useProductDetailWishlist} from './use-product-detail-wishlist'
 
 import {normalizeSetBundleProduct, getUpdateBundleChildArray} from '../../utils/product-utils'
 
-import {
-    API_ERROR_MESSAGE
-} from '../../constants'
+import {API_ERROR_MESSAGE} from '../../constants'
 import {rebuildPathWithParams} from '../../utils/url'
 
 export const useProductDetailData = () => {
