@@ -236,13 +236,6 @@ test('Can remove item from the cart', async () => {
     expect(await screen.findByTestId('sf-cart-empty')).toBeInTheDocument()
 })
 
-/*
- * Skipping this test for now. Signup flow works fine.
- * The signup function then calls self.login() which in turn calls getSkeletonCustomer().
- * Need to figure out a way to return mockRegisteredCustomer from getSkeletonCustomer().
- * getSkeletonCustomer() always returns `{ customerId: 'customer_id', authType: 'customer_type' }` for some reason
- * instead of the mockRegisteredCustomer.
- */
 test('Can apply and remove product-level coupon code with promotion', async () => {
     renderWithProviders(<WrappedCart />)
     expect(await screen.findByTestId('sf-cart-container')).toBeInTheDocument()
