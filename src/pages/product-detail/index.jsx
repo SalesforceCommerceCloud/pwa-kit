@@ -9,7 +9,7 @@ import React from 'react'
 import {Box, Stack} from '@chakra-ui/react'
 import ProductDetails from './partials/product-details'
 import RecommendedProductsSection from './partials/recommended-products-section'
-import Metadata from './metadata'
+import PageMetadata from './page-metadata'
 import {useProductDetailData} from './use-product-detail-data'
 
 const ProductDetail = () => {
@@ -37,42 +37,43 @@ const ProductDetail = () => {
     } = useProductDetailData()
 
     return (
-        <Box
-            className="sf-product-detail-page"
-            layerStyle="page"
-            data-testid="product-details-page"
-        >
-            <Metadata product={product} />
+        <>
+            <PageMetadata product={product} />
+            <Box
+                className="sf-product-detail-page"
+                layerStyle="page"
+                data-testid="product-details-page"
+            >
+                <Stack gap={16}>
+                    <ProductDetails
+                        product={product}
+                        primaryCategory={primaryCategory}
+                        isProductASet={isProductASet}
+                        isProductABundle={isProductABundle}
+                        comboProduct={comboProduct}
+                        childProductRefs={childProductRefs}
+                        childProductSelection={childProductSelection}
+                        setChildProductSelection={setChildProductSelection}
+                        childProductOrderability={childProductOrderability}
+                        setChildProductOrderability={setChildProductOrderability}
+                        selectedBundleQuantity={selectedBundleQuantity}
+                        setSelectedBundleQuantity={setSelectedBundleQuantity}
+                        // Handlers
+                        handleAddToCart={handleAddToCart}
+                        handleAddToWishlist={handleAddToWishlist}
+                        handleProductSetAddToCart={handleProductSetAddToCart}
+                        handleProductBundleAddToCart={handleProductBundleAddToCart}
+                        handleChildProductValidation={handleChildProductValidation}
+                        // Loading states
+                        isProductLoading={isProductLoading}
+                        isBasketLoading={isBasketLoading}
+                        isWishlistLoading={isWishlistLoading}
+                    />
 
-            <Stack gap={16}>
-                <ProductDetails
-                    product={product}
-                    primaryCategory={primaryCategory}
-                    isProductASet={isProductASet}
-                    isProductABundle={isProductABundle}
-                    comboProduct={comboProduct}
-                    childProductRefs={childProductRefs}
-                    childProductSelection={childProductSelection}
-                    setChildProductSelection={setChildProductSelection}
-                    childProductOrderability={childProductOrderability}
-                    setChildProductOrderability={setChildProductOrderability}
-                    selectedBundleQuantity={selectedBundleQuantity}
-                    setSelectedBundleQuantity={setSelectedBundleQuantity}
-                    // Handlers
-                    handleAddToCart={handleAddToCart}
-                    handleAddToWishlist={handleAddToWishlist}
-                    handleProductSetAddToCart={handleProductSetAddToCart}
-                    handleProductBundleAddToCart={handleProductBundleAddToCart}
-                    handleChildProductValidation={handleChildProductValidation}
-                    // Loading states
-                    isProductLoading={isProductLoading}
-                    isBasketLoading={isBasketLoading}
-                    isWishlistLoading={isWishlistLoading}
-                />
-
-                <RecommendedProductsSection product={product} isProductASet={isProductASet} />
-            </Stack>
-        </Box>
+                    <RecommendedProductsSection product={product} isProductASet={isProductASet} />
+                </Stack>
+            </Box>
+        </>
     )
 }
 
