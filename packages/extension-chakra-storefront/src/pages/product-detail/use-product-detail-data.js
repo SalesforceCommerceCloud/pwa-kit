@@ -11,12 +11,10 @@ import {keepPreviousData} from '@tanstack/react-query'
 import {HTTPNotFound, HTTPError} from '@salesforce/pwa-kit-react-sdk/ssr/universal/errors'
 import {useServerContext} from '@salesforce/pwa-kit-react-sdk/ssr/universal/hooks'
 
-import {Button} from '@chakra-ui/react'
 import {
     useProduct,
     useProducts,
     useCategory,
-    useShopperCustomersMutation,
     useShopperBasketsMutation,
     useCustomerId,
     useShopperBasketsMutationHelper
@@ -35,10 +33,7 @@ import {useProductDetailWishlist} from './use-product-detail-wishlist'
 import {normalizeSetBundleProduct, getUpdateBundleChildArray} from '../../utils/product-utils'
 
 import {
-    API_ERROR_MESSAGE,
-    TOAST_ACTION_VIEW_WISHLIST,
-    TOAST_MESSAGE_ADDED_TO_WISHLIST,
-    TOAST_MESSAGE_ALREADY_IN_WISHLIST
+    API_ERROR_MESSAGE
 } from '../../constants'
 import {rebuildPathWithParams} from '../../utils/url'
 
@@ -47,11 +42,7 @@ export const useProductDetailData = () => {
     const history = useHistory()
     const location = useLocation()
     const einstein = useEinstein()
-    const dataCloud = useDataCloud()
-    const activeData = useActiveData()
     const toast = useToast()
-    const navigate = useNavigation()
-    const customerId = useCustomerId()
     const {handleAddToWishlist, isWishlistLoading} = useProductDetailWishlist()
     const {maxCacheAge: MAX_CACHE_AGE, staleWhileRevalidate: STALE_WHILE_REVALIDATE} =
         useExtensionConfig()
