@@ -165,7 +165,9 @@ const ProductView = forwardRef(
                 // Add current promotion result to ref
                 const currentPromotionResult = {
                     bonusProducts: formattedBonusProducts,
-                    id: bonusItemsForModal?.promotionIdToIdMap?.[promotionIdToSearch]
+                    id: bonusItemsForModal?.promotionIdToIdMap?.[promotionIdToSearch],
+                    maxBonusItems:
+                        bonusItemsForModal?.promotionIdToMaxBonusItemsMap?.[promotionIdToSearch]
                 }
                 ruleBasedPromotionsRef.current.push(currentPromotionResult)
 
@@ -371,13 +373,22 @@ const ProductView = forwardRef(
                                 .map((item) => item.promotionId)
                                 .filter(Boolean)
 
-                            //create a map of promotionId and ids for rule based promotions
-                            const promotionIdToIdMap = newBonusItems
-                                .filter((item) => !item.bonusProducts)
-                                .reduce((acc, item) => {
-                                    acc[item.promotionId] = item.id
-                                    return acc
-                                }, {})
+                            //create maps of promotionId to id and maxBonusItems for rule based promotions
+                            const {promotionIdToIdMap, promotionIdToMaxBonusItemsMap} =
+                                newBonusItems
+                                    .filter((item) => !item.bonusProducts)
+                                    .reduce(
+                                        (acc, item) => {
+                                            acc.promotionIdToIdMap[item.promotionId] = item.id
+                                            acc.promotionIdToMaxBonusItemsMap[item.promotionId] =
+                                                item.maxBonusItems
+                                            return acc
+                                        },
+                                        {
+                                            promotionIdToIdMap: {},
+                                            promotionIdToMaxBonusItemsMap: {}
+                                        }
+                                    )
 
                             // Start sequential processing if we have promotion IDs
                             if (ruleBasedPromotionIds.length > 0) {
@@ -388,6 +399,7 @@ const ProductView = forwardRef(
                                     itemsAdded,
                                     selectedQuantity: quantity,
                                     promotionIdToIdMap,
+                                    promotionIdToMaxBonusItemsMap,
                                     listBasedBonusProducts
                                 })
 
