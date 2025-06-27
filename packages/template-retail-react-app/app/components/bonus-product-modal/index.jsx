@@ -21,7 +21,7 @@ import {
 import {useProducts} from '@salesforce/commerce-sdk-react'
 import {useBonusProductModalContext} from '@salesforce/retail-react-app/app/hooks/use-bonus-product-modal'
 import {FormattedMessage} from 'react-intl'
-import BonusProductItem from '@salesforce/retail-react-app/../../app/components/bonus-product-modal/bonus-product-item'
+import BonusProductItem from './bonus-product-item'
 
 export const BonusProductModal = () => {
     const {isOpen, onClose, data} = useBonusProductModalContext()
