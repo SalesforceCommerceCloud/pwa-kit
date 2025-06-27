@@ -60,7 +60,7 @@ import {
     handleAddToCart,
     handleProductBundleAddToCart,
     handleProductSetAddToCart
-} from '@salesforce/retail-react-app/app/utils/cart-utils'
+} from '@salesforce/retail-react-app/app/utils/add-to-cart-utils'
 
 const ProductDetail = () => {
     const {formatMessage} = useIntl()
