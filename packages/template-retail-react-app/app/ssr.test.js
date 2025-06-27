@@ -97,7 +97,7 @@ jest.mock('jose', () => ({
 }))
 
 // Import only the functions we need to test
-import { validateSlasCallbackToken, createRemoteJWKSet, emailLink, jwksCaching } from './ssr.js'
+import { validateSlasCallbackToken, emailLink } from './ssr.js'
 
 // Mock environment variables
 const originalEnv = process.env
