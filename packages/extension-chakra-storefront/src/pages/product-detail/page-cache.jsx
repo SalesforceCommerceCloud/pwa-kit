@@ -7,8 +7,8 @@
 import {useServerContext} from '@salesforce/pwa-kit-react-sdk/ssr/universal/hooks'
 import {useExtensionConfig} from '../../hooks'
 /*
-* This component is used to set the cache headers for the page.
-*/
+ * This component is used to set the cache headers for the page.
+ */
 export default function PageCache() {
     const {res} = useServerContext()
     const {maxCacheAge: MAX_CACHE_AGE, staleWhileRevalidate: STALE_WHILE_REVALIDATE} =

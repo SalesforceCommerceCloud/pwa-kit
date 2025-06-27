@@ -12,9 +12,9 @@ import InformationAccordion from './information-accordion'
 
 /**
  * This component is used to render the product details for a composite product.
- * 
+ *
  * A composite product is a product that is made up of multiple products.
- * 
+ *
  * It can be a set or a bundle.
  */
 const CompositeProductDetails = ({
