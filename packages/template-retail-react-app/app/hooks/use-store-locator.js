@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import {useContext, useEffect} from 'react'
+import {useContext} from 'react'
 import {useSearchStores} from '@salesforce/commerce-sdk-react'
 import {StoreLocatorContext} from '@salesforce/retail-react-app/app/contexts/store-locator-provider'
 import {STORE_LOCATOR_NUM_STORES_PER_REQUEST_API_MAX} from '@salesforce/retail-react-app/app/constants'
@@ -55,23 +55,11 @@ export const useStoreLocator = () => {
     const {state, setState} = context
     const {data, isLoading} = useStores(state)
 
-    useEffect(() => {
-        if (data?.data?.length > 0 && !state.isSeSelection) {
-            const nearestStore = data.data[0]
-            setState((prev) => ({
-                ...prev,
-                selectedStoreId: nearestStore.id,
-                isSeSelection: true
-            }))
-        }
-    }, [data?.data, state.isSeSelection])
-
     const setFormValues = (formValues) => {
         setState((prev) => ({
             ...prev,
             formValues,
-            mode: 'input',
-            isSeSelection: false
+            mode: 'input'
         }))
     }
 
@@ -80,16 +68,14 @@ export const useStoreLocator = () => {
             ...prev,
             deviceCoordinates: coordinates,
             mode: 'device',
-            formValues: {countryCode: '', postalCode: ''},
-            isSeSelection: false
+            formValues: {countryCode: '', postalCode: ''}
         }))
     }
 
     const setSelectedStoreId = (selectedStoreId) => {
         setState((prev) => ({
             ...prev,
-            selectedStoreId,
-            isSeSelection: true // Mark manual store selection as SE selection
+            selectedStoreId
         }))
     }
 

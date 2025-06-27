@@ -18,11 +18,14 @@ export const StoreLocatorList = () => {
     const {store: selectedStore} = useSelectedStore()
     const {derivedData} = useCurrentBasket()
     const [page, setPage] = useState(1)
+    const [initialSelectedStoreId, setInitialSelectedStoreId] = useState(selectedStoreId)
 
     const hasItemsInBasket = derivedData?.totalItems > 0
 
     useEffect(() => {
         setPage(1)
+        // Capture the selected store on each page load
+        setInitialSelectedStoreId(selectedStoreId)
     }, [data])
 
     const handleChange = (selectedStoreId) => {
@@ -36,7 +39,7 @@ export const StoreLocatorList = () => {
         if (!data?.data?.length && !selectedStore)
             return 'Sorry, there are no locations in this area'
         if (hasItemsInBasket) {
-            return 'Sorry, you have items in your basket. Please remove them to continue.'
+            return 'Sorry, you have items in your basket. Please remove them change the selected store.'
         }
 
         if (mode === 'input') {
@@ -58,25 +61,32 @@ export const StoreLocatorList = () => {
 
     const sortedStores = useMemo(() => {
         const stores = []
+        const storeIds = new Set()
 
-        if (selectedStore && (!data?.data || !data.data.find((s) => s.id === selectedStore.id))) {
-            stores.push(selectedStore)
+        // Add all stores from search results first
+        if (data?.data) {
+            data.data.forEach((store) => {
+                stores.push(store)
+                storeIds.add(store.id)
+            })
         }
 
-        if (data?.data) {
-            stores.push(...data.data)
+        // Add selected store that isn't already in search results
+        if (selectedStore && !storeIds.has(selectedStore.id)) {
+            stores.push(selectedStore)
+            storeIds.add(selectedStore.id)
         }
 
         return stores.sort((a, b) => {
-            if (a.id === selectedStoreId) return -1
-            if (b.id === selectedStoreId) return 1
+            if (a.id === initialSelectedStoreId) return -1
+            if (b.id === initialSelectedStoreId) return 1
 
             if (a.distance && b.distance) {
                 return a.distance - b.distance
             }
             return 0
         })
-    }, [data?.data, selectedStoreId, selectedStore])
+    }, [data?.data, selectedStore, initialSelectedStoreId])
 
     const showNumberOfStores = page * config.defaultPageSize
     const showLoadMoreButton = sortedStores.length > showNumberOfStores
@@ -98,7 +108,7 @@ export const StoreLocatorList = () => {
                 {displayStoreLocatorStatusMessage()}
             </Box>
 
-            <Box as="fieldset" disabled={hasItemsInBasket} opacity={hasItemsInBasket ? 0.5 : 1}>
+            <Box as="fieldset">
                 <Accordion allowMultiple flex={[1, 1, 1, 5]}>
                     <AccordionItem>
                         <RadioGroup onChange={handleChange} value={selectedStoreId} width="100%">
@@ -109,7 +119,8 @@ export const StoreLocatorList = () => {
                                     radioProps={{
                                         value: store.id,
                                         isChecked: selectedStoreId === store.id,
-                                        'aria-describedby': `store-info-${store.id}`
+                                        'aria-describedby': `store-info-${store.id}`,
+                                        isDisabled: !store.inventoryId || hasItemsInBasket
                                     }}
                                 />
                             ))}

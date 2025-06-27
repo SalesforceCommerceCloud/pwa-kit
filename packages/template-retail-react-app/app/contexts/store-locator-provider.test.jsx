@@ -13,6 +13,22 @@ import {
 } from '@salesforce/retail-react-app/app/contexts/store-locator-provider'
 import {MultiSiteProvider} from '@salesforce/retail-react-app/app/contexts'
 
+// Mock useMultiSite hook
+jest.mock('@salesforce/retail-react-app/app/hooks/use-multi-site', () => ({
+    __esModule: true,
+    default: () => ({
+        site: {
+            id: 'RefArch',
+            alias: 'us'
+        },
+        locale: {
+            id: 'en-US',
+            preferredCurrency: 'USD'
+        },
+        buildUrl: (path) => path
+    })
+}))
+
 describe('StoreLocatorProvider', () => {
     const mockConfig = {
         defaultCountryCode: 'US',
@@ -23,6 +39,11 @@ describe('StoreLocatorProvider', () => {
         id: 'RefArch',
         alias: 'us'
     }
+
+    beforeEach(() => {
+        // Clear localStorage before each test
+        window.localStorage.clear()
+    })
 
     const TestWrapper = ({children}) => (
         <MultiSiteProvider site={mockSite}>
@@ -59,10 +80,28 @@ describe('StoreLocatorProvider', () => {
                 longitude: null
             },
             selectedStoreId: null,
-            isSeSelection: false,
             config: mockConfig
         })
         expect(typeof contextValue?.setState).toBe('function')
+    })
+
+    it('initializes with stored selectedStoreId from localStorage', () => {
+        // Set a value in localStorage before rendering
+        window.localStorage.setItem('selectedStore_RefArch', 'store123')
+
+        let contextValue
+        const TestComponent = () => {
+            contextValue = React.useContext(StoreLocatorContext)
+            return null
+        }
+
+        render(
+            <TestWrapper>
+                <TestComponent />
+            </TestWrapper>
+        )
+
+        expect(contextValue?.state.selectedStoreId).toBe('store123')
     })
 
     it('updates state correctly when setState is called', () => {
@@ -94,6 +133,29 @@ describe('StoreLocatorProvider', () => {
             countryCode: 'US',
             postalCode: '94105'
         })
+    })
+
+    it('updates localStorage when selectedStoreId changes', () => {
+        let contextValue
+        const TestComponent = () => {
+            contextValue = React.useContext(StoreLocatorContext)
+            return null
+        }
+
+        render(
+            <TestWrapper>
+                <TestComponent />
+            </TestWrapper>
+        )
+
+        act(() => {
+            contextValue?.setState((prev) => ({
+                ...prev,
+                selectedStoreId: 'store456'
+            }))
+        })
+
+        expect(window.localStorage.getItem('selectedStore_RefArch')).toBe('store456')
     })
 
     it('renders children correctly', () => {
