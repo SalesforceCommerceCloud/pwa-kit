@@ -71,7 +71,6 @@ describe('useStoreLocator', () => {
                 longitude: null
             },
             selectedStoreId: null,
-            isSeSelection: false,
             config
         })
     })
@@ -89,7 +88,6 @@ describe('useStoreLocator', () => {
             countryCode: 'US',
             postalCode: '94105'
         })
-        expect(result.current.isSeSelection).toBe(false)
     })
 
     it('updates device coordinates and switches to device mode', () => {
@@ -109,7 +107,6 @@ describe('useStoreLocator', () => {
             countryCode: '',
             postalCode: ''
         })
-        expect(result.current.isSeSelection).toBe(false)
     })
 
     it('calls useSearchStores with correct parameters in input mode', () => {
@@ -160,13 +157,11 @@ describe('useStoreLocator', () => {
         )
     })
 
-    it('automatically selects nearest store when data is received in input mode', () => {
-        const mockStores = {
-            data: [
-                {id: 'store1', name: 'Store 1'},
-                {id: 'store2', name: 'Store 2'}
-            ]
-        }
+    it('receives store data when form values are set in input mode', () => {
+        const mockStores = [
+            {id: 'store1', name: 'Store 1'},
+            {id: 'store2', name: 'Store 2'}
+        ]
         useSearchStores.mockReturnValue({
             data: mockStores,
             isLoading: false
@@ -180,8 +175,8 @@ describe('useStoreLocator', () => {
             })
         })
 
-        expect(result.current.selectedStoreId).toBe('store1')
-        expect(result.current.isSeSelection).toBe(true)
+        expect(result.current.data).toEqual(mockStores)
+        expect(result.current.selectedStoreId).toBeNull()
     })
 
     it('allows manual store selection', () => {
@@ -190,7 +185,6 @@ describe('useStoreLocator', () => {
             result.current.setSelectedStoreId('store123')
         })
         expect(result.current.selectedStoreId).toBe('store123')
-        expect(result.current.isSeSelection).toBe(true)
     })
 
     it('handles loading state', () => {

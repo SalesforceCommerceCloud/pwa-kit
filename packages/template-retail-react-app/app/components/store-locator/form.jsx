@@ -19,17 +19,13 @@ import {useForm, Controller} from 'react-hook-form'
 import {useStoreLocator} from '@salesforce/retail-react-app/app/hooks/use-store-locator'
 import {useGeolocation} from '@salesforce/retail-react-app/app/hooks/use-geo-location'
 import {useSelectedStore} from '@salesforce/retail-react-app/app/hooks/use-selected-store'
-import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
 
 export const StoreLocatorForm = () => {
     const {config, formValues, setFormValues, setDeviceCoordinates} = useStoreLocator()
     const {coordinates, error, refresh} = useGeolocation()
     const {store: selectedStore} = useSelectedStore()
-    const {derivedData} = useCurrentBasket()
     const initialLoadDone = useRef(false)
     const shouldUseLocation = useRef(false)
-
-    const hasItemsInBasket = derivedData?.totalItems > 0
 
     const form = useForm({
         mode: 'onChange',
@@ -88,7 +84,7 @@ export const StoreLocatorForm = () => {
                 void form.handleSubmit(submitForm)(e)
             }}
         >
-            <Box as="fieldset" disabled={hasItemsInBasket} opacity={hasItemsInBasket ? 0.5 : 1}>
+            <Box as="fieldset">
                 <InputGroup>
                     {showCountrySelector && (
                         <Controller

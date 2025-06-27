@@ -22,8 +22,8 @@ export const StoreLocatorProvider = ({config, children}) => {
     // remember the shopper's preferred store for the current site
     // TODO: Change this to `useLocalStorage` hook when localStorage detection is more robust
     const {site} = useMultiSite()
-    const siteId = `selectedStore_${site?.id}`
-    const selectedStoreId = readValue(siteId)
+    const selectedStoreBySiteId = `selectedStore_${site?.id}`
+    const selectedStoreId = readValue(selectedStoreBySiteId)
 
     const [state, setState] = useState({
         mode: 'input',
@@ -36,13 +36,12 @@ export const StoreLocatorProvider = ({config, children}) => {
             longitude: null
         },
         selectedStoreId,
-        isSeSelection: false,
         config
     })
 
     useEffect(() => {
         if (typeof window !== 'undefined' && state.selectedStoreId) {
-            window.localStorage.setItem(siteId, state.selectedStoreId)
+            window.localStorage.setItem(selectedStoreBySiteId, state.selectedStoreId)
         }
     }, [state.selectedStoreId])
 
