@@ -21,17 +21,19 @@ import {
     useCustomerId,
     useShopperBasketsMutationHelper
 } from '@salesforce/commerce-sdk-react'
+import {useHistory, useLocation, useParams} from 'react-router-dom'
 
 import {useCurrentBasket, useExtensionConfig, useVariant} from '../../hooks'
 import useNavigation from '../../hooks/use-navigation'
 import useEinstein from '../../hooks/use-einstein'
 import useDataCloud from '../../hooks/use-datacloud'
 import useActiveData from '../../hooks/use-active-data'
+import useToast from '../../hooks/use-toast'
+import {useWishList} from '../../hooks/use-wish-list'
+import {useProductDetailAnalytics} from './use-product-detail-analytics'
 
-import logger from '../../utils/logger-instance'
 import {normalizeSetBundleProduct, getUpdateBundleChildArray} from '../../utils/product-utils'
 
-// constant
 import {
     API_ERROR_MESSAGE,
     TOAST_ACTION_VIEW_WISHLIST,
@@ -39,9 +41,6 @@ import {
     TOAST_MESSAGE_ALREADY_IN_WISHLIST
 } from '../../constants'
 import {rebuildPathWithParams} from '../../utils/url'
-import {useHistory, useLocation, useParams} from 'react-router-dom'
-import useToast from '../../hooks/use-toast'
-import {useWishList} from '../../hooks/use-wish-list'
 
 export const useProductDetailData = () => {
     const {formatMessage} = useIntl()
@@ -403,37 +402,7 @@ export const useProductDetailData = () => {
         }
     }
 
-    /**************** Einstein ****************/
-    useEffect(() => {
-        if (product && product.type.set) {
-            einstein.sendViewProduct(product)
-            dataCloud.sendViewProduct(product)
-            const childrenProducts = product.setProducts
-            childrenProducts.map((child) => {
-                try {
-                    einstein.sendViewProduct(child)
-                } catch (err) {
-                    logger.error('Einstein sendViewProduct error', {
-                        namespace: 'ProductDetail.useEffect',
-                        additionalProperties: {error: err, child}
-                    })
-                }
-                activeData.sendViewProduct(category, child, 'detail')
-                dataCloud.sendViewProduct(child)
-            })
-        } else if (product) {
-            try {
-                einstein.sendViewProduct(product)
-            } catch (err) {
-                logger.error('Einstein sendViewProduct error', {
-                    namespace: 'ProductDetail.useEffect',
-                    additionalProperties: {error: err, product}
-                })
-            }
-            activeData.sendViewProduct(category, product, 'detail')
-            dataCloud.sendViewProduct(product)
-        }
-    }, [product])
+    useProductDetailAnalytics(product, category)
 
     return {
         product,
