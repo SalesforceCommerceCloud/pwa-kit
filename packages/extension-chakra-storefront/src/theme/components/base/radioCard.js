@@ -23,12 +23,12 @@ export default defineSlotRecipe({
             height: 'full',
             _focus: {
                 boxShadow: 'outline',
-                bg: 'transparent',
+                bg: 'transparent'
             },
             _checked: {
                 zIndex: 1,
-                borderColor: 'blue.600',
-            },
-        },
-    },
+                borderColor: 'blue.600'
+            }
+        }
+    }
 })

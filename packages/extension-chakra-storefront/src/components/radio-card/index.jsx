@@ -36,9 +36,7 @@ export const RadioCard = (props) => {
                 </Box>
             )}
             <ChakraRadioCard.ItemHiddenInput />
-            <ChakraRadioCard.ItemControl>
-                {children}
-            </ChakraRadioCard.ItemControl>
+            <ChakraRadioCard.ItemControl>{children}</ChakraRadioCard.ItemControl>
         </ChakraRadioCard.Item>
     )
 }
@@ -49,10 +47,12 @@ export const RadioCardGroup = (props) => {
     const styles = recipe()
 
     return (
-        <RadioCardGroupContext.Provider value={(itemProps) => ({...itemProps, value: itemProps.value})}>
-            <ChakraRadioCard.Root 
-                value={value} 
-                onValueChange={onValueChange} 
+        <RadioCardGroupContext.Provider
+            value={(itemProps) => ({...itemProps, value: itemProps.value})}
+        >
+            <ChakraRadioCard.Root
+                value={value}
+                onValueChange={onValueChange}
                 css={styles.root}
                 {...groupProps}
             >
@@ -63,4 +63,8 @@ export const RadioCardGroup = (props) => {
 }
 
 RadioCard.propTypes = {children: PropTypes.any}
-RadioCardGroup.propTypes = {children: PropTypes.any}
+RadioCardGroup.propTypes = {
+    value: PropTypes.any,
+    onValueChange: PropTypes.func,
+    children: PropTypes.any
+}

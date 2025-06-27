@@ -111,8 +111,8 @@ const Field = ({
                             <>
                                 <NativeSelect.Root ref={ref} value={value} {..._inputProps}>
                                     <NativeSelect.Field
-                                        value={value || ''} 
-                                        onChange={onChange} 
+                                        value={value || ''}
+                                        onChange={onChange}
                                         placeholder={placeholder}
                                     >
                                         {options.map((opt) => (

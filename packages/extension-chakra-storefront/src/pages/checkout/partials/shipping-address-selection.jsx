@@ -278,18 +278,14 @@ const ShippingAddressSelection = ({
                         control={form.control}
                         rules={{required: !isEditingAddress}}
                         render={({field: {value, onChange}}) => (
-                            <RadioCardGroup 
-                                value={value} 
+                            <RadioCardGroup
+                                value={value}
                                 onValueChange={(selected) => {
                                     onChange(selected.value)
                                     handleAddressIdSelection(selected.value)
                                 }}
                             >
-                                <SimpleGrid
-                                    columns={[1, 1, 2]}
-                                    gap={4}
-                                    gridAutoFlow="row dense"
-                                >
+                                <SimpleGrid columns={[1, 1, 2]} gap={4} gridAutoFlow="row dense">
                                     {customer.addresses?.map((address, index) => {
                                         const editLabel = formatMessage(
                                             {
@@ -308,7 +304,10 @@ const ShippingAddressSelection = ({
                                         )
                                         return (
                                             <React.Fragment key={address.addressId}>
-                                                <RadioCard value={address.addressId} isSelected={address.addressId === value}>
+                                                <RadioCard
+                                                    value={address.addressId}
+                                                    isSelected={address.addressId === value}
+                                                >
                                                     <ActionCard
                                                         padding={0}
                                                         border="none"

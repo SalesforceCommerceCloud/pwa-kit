@@ -147,24 +147,32 @@ export default function ShippingOptions() {
                                                         <Flex justify="space-between" w="full">
                                                             <HStack>
                                                                 <Box>
-                                                                    <RadioGroup.ItemText>{opt.name}</RadioGroup.ItemText>
+                                                                    <RadioGroup.ItemText>
+                                                                        {opt.name}
+                                                                    </RadioGroup.ItemText>
                                                                     <Text
                                                                         fontSize="sm"
                                                                         color="gray.600"
                                                                     >
                                                                         {opt.description}
                                                                     </Text>
-                                                                    {opt.shippingPromotions?.map((promo) => {
-                                                                        return (
-                                                                            <Text
-                                                                                key={promo.promotionId}
-                                                                                fontSize="sm"
-                                                                                color="green.600"
-                                                                            >
-                                                                                {promo.calloutMsg}
-                                                                            </Text>
-                                                                        )
-                                                                    })}
+                                                                    {opt.shippingPromotions?.map(
+                                                                        (promo) => {
+                                                                            return (
+                                                                                <Text
+                                                                                    key={
+                                                                                        promo.promotionId
+                                                                                    }
+                                                                                    fontSize="sm"
+                                                                                    color="green.600"
+                                                                                >
+                                                                                    {
+                                                                                        promo.calloutMsg
+                                                                                    }
+                                                                                </Text>
+                                                                            )
+                                                                        }
+                                                                    )}
                                                                 </Box>
                                                             </HStack>
                                                             <Text fontWeight="bold">
@@ -175,7 +183,6 @@ export default function ShippingOptions() {
                                                                 />
                                                             </Text>
                                                         </Flex>
-
                                                     </RadioGroup.Item>
                                                 )
                                             )}
