@@ -22,7 +22,6 @@ import {useHistory, useLocation, useParams} from 'react-router-dom'
 import {useCurrentBasket, useVariant} from '../../hooks'
 import useEinstein from '../../hooks/use-einstein'
 import useToast from '../../hooks/use-toast'
-import {useProductDetailAnalytics} from './use-product-detail-analytics'
 import {useProductDetailWishlist} from './use-product-detail-wishlist'
 
 import {normalizeSetBundleProduct, getUpdateBundleChildArray} from '../../utils/product-utils'
@@ -317,8 +316,6 @@ export const useProductDetailData = () => {
             showError(error)
         }
     }
-
-    useProductDetailAnalytics(product, category)
 
     return {
         product,
