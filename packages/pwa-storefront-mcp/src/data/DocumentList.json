@@ -1,0 +1,920 @@
+{
+    "data": [
+        {
+            "id": "ab_test",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/ab_test"
+        },
+        {
+            "id": "ab_test_group",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/ab_test_group"
+        },
+        {
+            "id": "ab_test_search_result",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/ab_test_search_result"
+        },
+        {
+            "id": "ab_test_segment",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/ab_test_segment"
+        },
+        {
+            "id": "ab_test_segment_stats",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/ab_test_segment_stats"
+        },
+        {
+            "id": "ab_test_trigger",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/ab_test_trigger"
+        },
+        {
+            "id": "ab_tests",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/ab_tests"
+        },
+        {
+            "id": "access_key_details",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/access_key_details"
+        },
+        {
+            "id": "access_key_update_request",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/access_key_update_request"
+        },
+        {
+            "id": "account_transaction",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/account_transaction"
+        },
+        {
+            "id": "alert_descriptor",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/alert_descriptor"
+        },
+        {
+            "id": "alert_descriptor_settings",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/alert_descriptor_settings"
+        },
+        {
+            "id": "alert_descriptors",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/alert_descriptors"
+        },
+        {
+            "id": "alert_descriptors_revalidation_request",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/alert_descriptors_revalidation_request"
+        },
+        {
+            "id": "alert_settings",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/alert_settings"
+        },
+        {
+            "id": "application_permissions",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/application_permissions"
+        },
+        {
+            "id": "bmpermissions",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/bmpermissions"
+        },
+        {
+            "id": "bool_filter",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/bool_filter"
+        },
+        {
+            "id": "bool_query",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/bool_query"
+        },
+        {
+            "id": "campaign",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/campaign"
+        },
+        {
+            "id": "campaign_search_result",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/campaign_search_result"
+        },
+        {
+            "id": "campaigns",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/campaigns"
+        },
+        {
+            "id": "cartridge_path_add_request",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/cartridge_path_add_request"
+        },
+        {
+            "id": "cartridge_path_api_response",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/cartridge_path_api_response"
+        },
+        {
+            "id": "cartridge_path_create_request",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/cartridge_path_create_request"
+        },
+        {
+            "id": "catalog",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/catalog"
+        },
+        {
+            "id": "catalog_category_id",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/catalog_category_id"
+        },
+        {
+            "id": "catalog_search_result",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/catalog_search_result"
+        },
+        {
+            "id": "catalogs",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/catalogs"
+        },
+        {
+            "id": "categories",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/categories"
+        },
+        {
+            "id": "category",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/category"
+        },
+        {
+            "id": "category_link",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/category_link"
+        },
+        {
+            "id": "category_links",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/category_links"
+        },
+        {
+            "id": "category_product_assignment",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/category_product_assignment"
+        },
+        {
+            "id": "category_product_assignment_search_request",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/category_product_assignment_search_request"
+        },
+        {
+            "id": "category_product_assignment_search_result",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/category_product_assignment_search_result"
+        },
+        {
+            "id": "category_search_result",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/category_search_result"
+        },
+        {
+            "id": "code_version",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/code_version"
+        },
+        {
+            "id": "code_version_result",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/code_version_result"
+        },
+        {
+            "id": "content_asset",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/content_asset"
+        },
+        {
+            "id": "content_asset_result",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/content_asset_result"
+        },
+        {
+            "id": "content_folder",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/content_folder"
+        },
+        {
+            "id": "content_folder_assignment",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/content_folder_assignment"
+        },
+        {
+            "id": "content_folder_result",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/content_folder_result"
+        },
+        {
+            "id": "content_sub_folder_result",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/content_sub_folder_result"
+        },
+        {
+            "id": "coupon",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/coupon"
+        },
+        {
+            "id": "coupon_code",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/coupon_code"
+        },
+        {
+            "id": "coupon_codes",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/coupon_codes"
+        },
+        {
+            "id": "coupon_multi_codes_request",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/coupon_multi_codes_request"
+        },
+        {
+            "id": "coupon_redemption",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/coupon_redemption"
+        },
+        {
+            "id": "coupon_redemption_search_result",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/coupon_redemption_search_result"
+        },
+        {
+            "id": "coupon_search_result",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/coupon_search_result"
+        },
+        {
+            "id": "coupon_system_code_config",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/coupon_system_code_config"
+        },
+        {
+            "id": "coupons",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/coupons"
+        },
+        {
+            "id": "credentials",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/credentials"
+        },
+        {
+            "id": "cscpermissions",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/cscpermissions"
+        },
+        {
+            "id": "custom_log_settings",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/custom_log_settings"
+        },
+        {
+            "id": "custom_object",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/custom_object"
+        },
+        {
+            "id": "custom_object_search_result",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/custom_object_search_result"
+        },
+        {
+            "id": "customer",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/customer"
+        },
+        {
+            "id": "customer_address",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/customer_address"
+        },
+        {
+            "id": "customer_address_result",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/customer_address_result"
+        },
+        {
+            "id": "customer_group",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/customer_group"
+        },
+        {
+            "id": "customer_group_member",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/customer_group_member"
+        },
+        {
+            "id": "customer_group_member_search_result",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/customer_group_member_search_result"
+        },
+        {
+            "id": "customer_group_members",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/customer_group_members"
+        },
+        {
+            "id": "customer_group_search_result",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/customer_group_search_result"
+        },
+        {
+            "id": "customer_groups",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/customer_groups"
+        },
+        {
+            "id": "customer_list",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/customer_list"
+        },
+        {
+            "id": "customer_list_link",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/customer_list_link"
+        },
+        {
+            "id": "customer_search_hit",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/customer_search_hit"
+        },
+        {
+            "id": "customer_search_result",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/customer_search_result"
+        },
+        {
+            "id": "ecdn_log_fetch_request",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/ecdn_log_fetch_request"
+        },
+        {
+            "id": "ecdn_log_fetch_response",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/ecdn_log_fetch_response"
+        },
+        {
+            "id": "empty_body",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/empty_body"
+        },
+        {
+            "id": "filter",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/filter"
+        },
+        {
+            "id": "filtered_query",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/filtered_query"
+        },
+        {
+            "id": "functional_permission",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/functional_permission"
+        },
+        {
+            "id": "functional_permissions",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/functional_permissions"
+        },
+        {
+            "id": "gift_certificate",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/gift_certificate"
+        },
+        {
+            "id": "gift_certificate_search_result",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/gift_certificate_search_result"
+        },
+        {
+            "id": "gift_certificates",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/gift_certificates"
+        },
+        {
+            "id": "image_group",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/image_group"
+        },
+        {
+            "id": "inventory_list",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/inventory_list"
+        },
+        {
+            "id": "inventory_list_search_result",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/inventory_list_search_result"
+        },
+        {
+            "id": "inventory_lists",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/inventory_lists"
+        },
+        {
+            "id": "job_execution",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/job_execution"
+        },
+        {
+            "id": "job_execution_continue_information",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/job_execution_continue_information"
+        },
+        {
+            "id": "job_execution_parameter",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/job_execution_parameter"
+        },
+        {
+            "id": "job_execution_retry_information",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/job_execution_retry_information"
+        },
+        {
+            "id": "job_execution_search_result",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/job_execution_search_result"
+        },
+        {
+            "id": "job_step_execution",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/job_step_execution"
+        },
+        {
+            "id": "locale",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/locale"
+        },
+        {
+            "id": "locale_permission",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/locale_permission"
+        },
+        {
+            "id": "locale_permissions",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/locale_permissions"
+        },
+        {
+            "id": "locale_result",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/locale_result"
+        },
+        {
+            "id": "log_category",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/log_category"
+        },
+        {
+            "id": "markup_text",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/markup_text"
+        },
+        {
+            "id": "master",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/master"
+        },
+        {
+            "id": "match_all_query",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/match_all_query"
+        },
+        {
+            "id": "media_file",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/media_file"
+        },
+        {
+            "id": "menu_action",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/menu_action"
+        },
+        {
+            "id": "menu_item",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/menu_item"
+        },
+        {
+            "id": "metric_response",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/metric_response"
+        },
+        {
+            "id": "module_permissions",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/module_permissions"
+        },
+        {
+            "id": "money",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/money"
+        },
+        {
+            "id": "nested_query",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/nested_query"
+        },
+        {
+            "id": "object_attribute_definition",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/object_attribute_definition"
+        },
+        {
+            "id": "object_attribute_definition_search_result",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/object_attribute_definition_search_result"
+        },
+        {
+            "id": "object_attribute_definitions",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/object_attribute_definitions"
+        },
+        {
+            "id": "object_attribute_group",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/object_attribute_group"
+        },
+        {
+            "id": "object_attribute_group_search_result",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/object_attribute_group_search_result"
+        },
+        {
+            "id": "object_attribute_groups",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/object_attribute_groups"
+        },
+        {
+            "id": "object_attribute_value_definition",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/object_attribute_value_definition"
+        },
+        {
+            "id": "object_type_definition",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/object_type_definition"
+        },
+        {
+            "id": "object_type_definition_search_result",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/object_type_definition_search_result"
+        },
+        {
+            "id": "object_type_definitions",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/object_type_definitions"
+        },
+        {
+            "id": "ocapi_configs_api_request",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/ocapi_configs_api_request"
+        },
+        {
+            "id": "ocapi_configs_api_response",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/ocapi_configs_api_response"
+        },
+        {
+            "id": "order_confirmation_status_update_request",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/order_confirmation_status_update_request"
+        },
+        {
+            "id": "order_export_status_update_request",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/order_export_status_update_request"
+        },
+        {
+            "id": "order_external_status_update_request",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/order_external_status_update_request"
+        },
+        {
+            "id": "order_payment_status_update_request",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/order_payment_status_update_request"
+        },
+        {
+            "id": "order_shipping_status_update_request",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/order_shipping_status_update_request"
+        },
+        {
+            "id": "order_status_update_request",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/order_status_update_request"
+        },
+        {
+            "id": "order_update_request",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/order_update_request"
+        },
+        {
+            "id": "organization_preferences",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/organization_preferences"
+        },
+        {
+            "id": "password_change_request",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/password_change_request"
+        },
+        {
+            "id": "path_record",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/path_record"
+        },
+        {
+            "id": "payment_instrument_update_request",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/payment_instrument_update_request"
+        },
+        {
+            "id": "payment_transaction_update_request",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/payment_transaction_update_request"
+        },
+        {
+            "id": "preference_value",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/preference_value"
+        },
+        {
+            "id": "preference_value_search_result",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/preference_value_search_result"
+        },
+        {
+            "id": "product",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/product"
+        },
+        {
+            "id": "product_inventory_record",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/product_inventory_record"
+        },
+        {
+            "id": "product_inventory_record_allocation",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/product_inventory_record_allocation"
+        },
+        {
+            "id": "product_inventory_records",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/product_inventory_records"
+        },
+        {
+            "id": "product_option",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/product_option"
+        },
+        {
+            "id": "product_option_value",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/product_option_value"
+        },
+        {
+            "id": "product_option_values",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/product_option_values"
+        },
+        {
+            "id": "product_options",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/product_options"
+        },
+        {
+            "id": "product_search_result",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/product_search_result"
+        },
+        {
+            "id": "product_type",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/product_type"
+        },
+        {
+            "id": "promotion",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/promotion"
+        },
+        {
+            "id": "promotion_abtest_group_assignment",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/promotion_abtest_group_assignment"
+        },
+        {
+            "id": "promotion_assignment_information",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/promotion_assignment_information"
+        },
+        {
+            "id": "promotion_campaign_assignment",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/promotion_campaign_assignment"
+        },
+        {
+            "id": "promotion_campaign_assignment_search_result",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/promotion_campaign_assignment_search_result"
+        },
+        {
+            "id": "promotion_search_result",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/promotion_search_result"
+        },
+        {
+            "id": "promotions",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/promotions"
+        },
+        {
+            "id": "query",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/query"
+        },
+        {
+            "id": "query_filter",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/query_filter"
+        },
+        {
+            "id": "range2_filter",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/range2_filter"
+        },
+        {
+            "id": "range_filter",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/range_filter"
+        },
+        {
+            "id": "recommender",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/recommender"
+        },
+        {
+            "id": "recommenders_result",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/recommenders_result"
+        },
+        {
+            "id": "recurrence",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/recurrence"
+        },
+        {
+            "id": "redemption_limit_per_period",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/redemption_limit_per_period"
+        },
+        {
+            "id": "redemption_limits",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/redemption_limits"
+        },
+        {
+            "id": "resource_info",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/resource_info"
+        },
+        {
+            "id": "resource_object",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/resource_object"
+        },
+        {
+            "id": "result_page",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/result_page"
+        },
+        {
+            "id": "role",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/role"
+        },
+        {
+            "id": "role_functional_permission",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/role_functional_permission"
+        },
+        {
+            "id": "role_functional_permissions",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/role_functional_permissions"
+        },
+        {
+            "id": "role_locale_permission",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/role_locale_permission"
+        },
+        {
+            "id": "role_locale_permissions",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/role_locale_permissions"
+        },
+        {
+            "id": "role_module_permission",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/role_module_permission"
+        },
+        {
+            "id": "role_module_permissions",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/role_module_permissions"
+        },
+        {
+            "id": "role_permissions",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/role_permissions"
+        },
+        {
+            "id": "role_search_request",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/role_search_request"
+        },
+        {
+            "id": "role_search_result",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/role_search_result"
+        },
+        {
+            "id": "role_webdav_permission",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/role_webdav_permission"
+        },
+        {
+            "id": "role_webdav_permissions",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/role_webdav_permissions"
+        },
+        {
+            "id": "roles",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/roles"
+        },
+        {
+            "id": "rule",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/rule"
+        },
+        {
+            "id": "schedule",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/schedule"
+        },
+        {
+            "id": "search_request",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/search_request"
+        },
+        {
+            "id": "shipping_address_update_request",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/shipping_address_update_request"
+        },
+        {
+            "id": "site",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/site"
+        },
+        {
+            "id": "site_preferences",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/site_preferences"
+        },
+        {
+            "id": "site_resource_info",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/site_resource_info"
+        },
+        {
+            "id": "site_search_result",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/site_search_result"
+        },
+        {
+            "id": "sites",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/sites"
+        },
+        {
+            "id": "slot",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/slot"
+        },
+        {
+            "id": "slot_configuration",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/slot_configuration"
+        },
+        {
+            "id": "slot_configuration_abtest_group_assignment",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/slot_configuration_abtest_group_assignment"
+        },
+        {
+            "id": "slot_configuration_assignment_information",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/slot_configuration_assignment_information"
+        },
+        {
+            "id": "slot_configuration_campaign_assignment",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/slot_configuration_campaign_assignment"
+        },
+        {
+            "id": "slot_configuration_campaign_assignment_search_result",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/slot_configuration_campaign_assignment_search_result"
+        },
+        {
+            "id": "slot_configuration_search_result",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/slot_configuration_search_result"
+        },
+        {
+            "id": "slot_configurations",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/slot_configurations"
+        },
+        {
+            "id": "slot_content",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/slot_content"
+        },
+        {
+            "id": "slot_search_result",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/slot_search_result"
+        },
+        {
+            "id": "slots",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/slots"
+        },
+        {
+            "id": "sort",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/sort"
+        },
+        {
+            "id": "sorting_rule",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/sorting_rule"
+        },
+        {
+            "id": "sorting_rule_search_result",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/sorting_rule_search_result"
+        },
+        {
+            "id": "sorting_rule_step",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/sorting_rule_step"
+        },
+        {
+            "id": "source_code_group",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/source_code_group"
+        },
+        {
+            "id": "source_code_group_search_result",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/source_code_group_search_result"
+        },
+        {
+            "id": "source_code_groups",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/source_code_groups"
+        },
+        {
+            "id": "source_code_redirect_info",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/source_code_redirect_info"
+        },
+        {
+            "id": "source_code_specification",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/source_code_specification"
+        },
+        {
+            "id": "status",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/status"
+        },
+        {
+            "id": "status_metadata",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/status_metadata"
+        },
+        {
+            "id": "store",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/store"
+        },
+        {
+            "id": "store_search_result",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/store_search_result"
+        },
+        {
+            "id": "stores",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/stores"
+        },
+        {
+            "id": "tag",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/tag"
+        },
+        {
+            "id": "term_filter",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/term_filter"
+        },
+        {
+            "id": "term_query",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/term_query"
+        },
+        {
+            "id": "text_query",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/text_query"
+        },
+        {
+            "id": "time_of_day",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/time_of_day"
+        },
+        {
+            "id": "user",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/user"
+        },
+        {
+            "id": "user_search_result",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/user_search_result"
+        },
+        {
+            "id": "users",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/users"
+        },
+        {
+            "id": "variant",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/variant"
+        },
+        {
+            "id": "variant_search_result",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/variant_search_result"
+        },
+        {
+            "id": "variants",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/variants"
+        },
+        {
+            "id": "variation_attribute",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/variation_attribute"
+        },
+        {
+            "id": "variation_attribute_value",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/variation_attribute_value"
+        },
+        {
+            "id": "variation_attribute_values",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/variation_attribute_values"
+        },
+        {
+            "id": "variation_attributes",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/variation_attributes"
+        },
+        {
+            "id": "variation_group",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/variation_group"
+        },
+        {
+            "id": "variation_groups",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/variation_groups"
+        },
+        {
+            "id": "version_range_object",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/version_range_object"
+        },
+        {
+            "id": "webdav_permission",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/webdav_permission"
+        },
+        {
+            "id": "webdav_permissions",
+            "link": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/webdav_permissions"
+        }
+    ]
+}
