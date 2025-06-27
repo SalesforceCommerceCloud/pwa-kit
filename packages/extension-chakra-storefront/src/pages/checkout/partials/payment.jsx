@@ -28,9 +28,33 @@ import {API_ERROR_MESSAGE} from '../../../constants'
 const Payment = () => {
     const {formatMessage} = useIntl()
     const {data: basket} = useCurrentBasket()
-    const selectedShippingAddress = basket?.shipments && basket?.shipments[0]?.shippingAddress
-    const selectedBillingAddress = basket?.billingAddress
-    const appliedPayment = basket?.paymentInstruments && basket?.paymentInstruments[0]
+
+    //TODO: Change to const after deleting the test/mocked data
+    let selectedShippingAddress = basket?.shipments && basket?.shipments[0]?.shippingAddress
+    let selectedBillingAddress = basket?.billingAddress
+    let appliedPayment = basket?.paymentInstruments && basket?.paymentInstruments[0]
+
+    // TODO: Testing/Mock data - remove this section after shipping and billing address components are migrated
+    const MOCK_DATA = {
+        shippingAddress: {
+            address1: '123 Test Street',
+            city: 'Test City',
+            stateCode: 'CA',
+            postalCode: '12345',
+            countryCode: 'US'
+        },
+        billingAddress: {
+            address1: '123 Test Street',
+            city: 'Test City',
+            stateCode: 'CA',
+            postalCode: '12345',
+            countryCode: 'US'
+        }
+    }
+
+    selectedShippingAddress = MOCK_DATA.shippingAddress
+    selectedBillingAddress = MOCK_DATA.billingAddress
+
     const [billingSameAsShipping, setBillingSameAsShipping] = useState(true) // By default, have billing addr to be the same as shipping
     const {mutateAsync: addPaymentInstrumentToBasket} = useShopperBasketsMutation(
         'addPaymentInstrumentToBasket'
@@ -50,6 +74,9 @@ const Payment = () => {
     }
 
     const {step, STEPS, goToStep, goToNextStep} = useCheckout()
+
+    // TODO: This is added for testing, remove after shipping address is migrated
+    const [isEditing, setIsEditing] = useState(true)
 
     const billingAddressForm = useForm({
         mode: 'onChange',
@@ -90,6 +117,11 @@ const Payment = () => {
         if (!isFormValid) {
             return
         }
+
+        // TODO: This is added for testing, remove after billing address is migrated
+        return Promise.resolve({success: true}) // Mock successful response
+
+        /* Original code:
         const billingAddress = billingSameAsShipping
             ? selectedShippingAddress
             : billingAddressForm.getValues()
@@ -100,6 +132,7 @@ const Payment = () => {
             body: address,
             parameters: {basketId: basket.basketId}
         })
+        */
     }
     const onPaymentRemoval = async () => {
         try {
@@ -124,6 +157,8 @@ const Payment = () => {
         const updatedBasket = await onBillingSubmit()
 
         if (updatedBasket) {
+            // TODO: This is added for testing, remove after shipping and billing address components are migrated
+            setIsEditing(false)
             goToNextStep()
         }
     })
@@ -133,28 +168,21 @@ const Payment = () => {
         id: 'checkout_payment.label.billing_address_form'
     })
 
-    // Mock shipping address for testing
-    const testShippingAddress = selectedShippingAddress || {
-        address1: '123 Test Street',
-        city: 'Test City',
-        stateCode: 'CA',
-        postalCode: '12345',
-        countryCode: 'US'
-    }
-
     return (
         <ToggleCard
             id="step-3"
             title={formatMessage({defaultMessage: 'Payment', id: 'checkout_payment.title.payment'})}
-            editing={true} // Force editing mode for testing
-            // editing={step === STEPS.PAYMENT} // Original condition
+            /*editing={step === STEPS.PAYMENT}*/ //TODO: Uncomment remove after shipping address is migrated
+            editing={isEditing} //// TODO: This is added for testing, remove after shipping address is migrated
             isLoading={
                 paymentMethodForm.formState.isSubmitting ||
                 billingAddressForm.formState.isSubmitting
             }
-            disabled={false} // Force enabled for testing
-            // disabled={appliedPayment == null} // Original condition
-            onEdit={() => goToStep(STEPS.PAYMENT)}
+            disabled={appliedPayment == null}
+            onEdit={() => {
+                setIsEditing(true) // TODO: This is added for testing, remove after shipping address is migrated
+                goToStep(STEPS.PAYMENT)
+            }}
             editLabel={formatMessage({
                 defaultMessage: 'Edit Payment Info',
                 id: 'toggle_card.action.editPaymentInfo'
@@ -166,9 +194,7 @@ const Payment = () => {
                 </Box>
 
                 <Stack gap={6}>
-                    {/* Force showing PaymentForm for testing */}
-                    {true ? ( // Always show PaymentForm for testing
-                    // {!appliedPayment?.paymentCard ? ( // Original condition
+                    {!appliedPayment?.paymentCard ? (
                         <PaymentForm form={paymentMethodForm} onSubmit={onPaymentSubmit} />
                     ) : (
                         <Stack gap={3}>
@@ -184,6 +210,7 @@ const Payment = () => {
                                     variant="link"
                                     size="sm"
                                     colorPalette="red"
+                                    color="red.500"
                                     onClick={onPaymentRemoval}
                                 >
                                     <FormattedMessage
@@ -222,10 +249,9 @@ const Payment = () => {
                             </Checkbox.Label>
                         </Checkbox.Root>
 
-                        {billingSameAsShipping && (
-                        // {billingSameAsShipping && selectedShippingAddress && ( // Original condition
+                        {billingSameAsShipping && selectedShippingAddress && (
                             <Box pl={7}>
-                                <AddressDisplay address={testShippingAddress} />
+                                <AddressDisplay address={selectedShippingAddress} />
                             </Box>
                         )}
                     </Stack>
@@ -269,9 +295,7 @@ const Payment = () => {
 
                     <Separator borderColor="gray.100" />
 
-                    {/* Show test billing address for testing */}
-                    {true && ( // Always show for testing
-                    // {selectedBillingAddress && ( // Original condition
+                    {selectedBillingAddress && (
                         <Stack gap={2}>
                             <Heading as="h3" fontSize="md">
                                 <FormattedMessage
@@ -279,7 +303,7 @@ const Payment = () => {
                                     id="checkout_payment.heading.billing_address"
                                 />
                             </Heading>
-                            <AddressDisplay address={testShippingAddress} />
+                            <AddressDisplay address={selectedBillingAddress} />
                         </Stack>
                     )}
                 </Stack>
