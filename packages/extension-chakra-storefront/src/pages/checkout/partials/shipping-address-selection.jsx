@@ -207,7 +207,8 @@ const ShippingAddressSelection = ({
             setIsEditingAddress(false)
         }
 
-        const address = customer.addresses.find((addr) => addr.addressId === addressId.value)
+        // Chakra v3 radio returns the selected id in an object with a value property
+        const address = customer.addresses.find((addr) => addr.addressId === addressId)
         setSelectedAddressId(address.addressId)
 
         form.reset({...address})
@@ -281,9 +282,9 @@ const ShippingAddressSelection = ({
                         render={({field: {value, onChange}}) => (
                             <RadioCardGroup 
                                 value={value} 
-                                onValueChange={(selectedValue) => {
-                                    onChange(selectedValue)
-                                    handleAddressIdSelection(selectedValue)
+                                onValueChange={(selected) => {
+                                    onChange(selected.value)
+                                    handleAddressIdSelection(selected.value)
                                 }}
                             >
                                 <SimpleGrid

@@ -134,7 +134,9 @@ export default function ShippingOptions() {
                                     <RadioGroup.Root
                                         name="shipping-options-radiogroup"
                                         value={value}
-                                        onValueChange={onChange}
+                                        onValueChange={(selected) => {
+                                            onChange(selected.value) // Chakra v3 radio returns the selected id in an object with a value property
+                                        }}
                                     >
                                         <Stack gap={5}>
                                             {shippingMethods.applicableShippingMethods.map(
@@ -152,6 +154,17 @@ export default function ShippingOptions() {
                                                                     >
                                                                         {opt.description}
                                                                     </Text>
+                                                                    {opt.shippingPromotions?.map((promo) => {
+                                                                        return (
+                                                                            <Text
+                                                                                key={promo.promotionId}
+                                                                                fontSize="sm"
+                                                                                color="green.600"
+                                                                            >
+                                                                                {promo.calloutMsg}
+                                                                            </Text>
+                                                                        )
+                                                                    })}
                                                                 </Box>
                                                             </HStack>
                                                             <Text fontWeight="bold">
@@ -163,17 +176,6 @@ export default function ShippingOptions() {
                                                             </Text>
                                                         </Flex>
 
-                                                        {/* {opt.shippingPromotions?.map((promo) => {
-                                                            return (
-                                                                <Text
-                                                                    key={promo.promotionId}
-                                                                    fontSize="sm"
-                                                                    color="green.600"
-                                                                >
-                                                                    {promo.calloutMsg}
-                                                                </Text>
-                                                            )
-                                                        })} */}
                                                     </RadioGroup.Item>
                                                 )
                                             )}
