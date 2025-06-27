@@ -8,9 +8,9 @@
 import React, {useCallback, useEffect, useState} from 'react'
 import {useIntl} from 'react-intl'
 import {keepPreviousData} from '@tanstack/react-query'
-import {normalizeSetBundleProduct, getUpdateBundleChildArray} from '../../utils/product-utils'
+import {HTTPNotFound, HTTPError} from '@salesforce/pwa-kit-react-sdk/ssr/universal/errors'
+import {useServerContext} from '@salesforce/pwa-kit-react-sdk/ssr/universal/hooks'
 
-// Components
 import {Button} from '@chakra-ui/react'
 import {
     useProduct,
@@ -22,17 +22,14 @@ import {
     useShopperBasketsMutationHelper
 } from '@salesforce/commerce-sdk-react'
 
-// Hooks
 import {useCurrentBasket, useExtensionConfig, useVariant} from '../../hooks'
 import useNavigation from '../../hooks/use-navigation'
 import useEinstein from '../../hooks/use-einstein'
 import useDataCloud from '../../hooks/use-datacloud'
 import useActiveData from '../../hooks/use-active-data'
-import {useServerContext} from '@salesforce/pwa-kit-react-sdk/ssr/universal/hooks'
-// Project Components
 
-import {HTTPNotFound, HTTPError} from '@salesforce/pwa-kit-react-sdk/ssr/universal/errors'
 import logger from '../../utils/logger-instance'
+import {normalizeSetBundleProduct, getUpdateBundleChildArray} from '../../utils/product-utils'
 
 // constant
 import {
@@ -458,7 +455,6 @@ export const useProductDetailData = () => {
         handleProductBundleAddToCart,
         handleChildProductValidation,
         isBasketLoading,
-        isWishlistLoading,
-        location
+        isWishlistLoading
     }
 }
