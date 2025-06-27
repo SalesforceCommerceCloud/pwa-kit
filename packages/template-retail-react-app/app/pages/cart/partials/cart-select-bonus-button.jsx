@@ -16,9 +16,11 @@ const CartSelectBonusButton = ({
 }) => {
     return (
         <Stack spacing={2} p={6}>
-            <Text fontSize="lg" fontWeight="bold">
-                {promotionName} ({selectedOfferCount} of {maxOfferCount} selected)
-            </Text>
+            {promotionName && (
+                <Text fontSize="lg" fontWeight="bold">
+                    {promotionName} ({selectedOfferCount} of {maxOfferCount} selected)
+                </Text>
+            )}
             <Box pt={2}>
                 <Button
                     onClick={handleBonusButtonClick}

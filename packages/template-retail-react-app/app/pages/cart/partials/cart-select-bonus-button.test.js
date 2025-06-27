@@ -21,7 +21,7 @@ describe('CartSelectBonusButton', () => {
         }))
     })
 
-    it('renders with correct count text', () => {
+    test('renders with correct count text', () => {
         render(
             <CartSelectBonusButton
                 handleBonusButtonClick={() => {}}
@@ -34,7 +34,7 @@ describe('CartSelectBonusButton', () => {
         expect(screen.getByText('Super Promo (0 of 2 selected)')).toBeInTheDocument()
     })
 
-    it('calls the handleBonusButtonClick when clicked', async () => {
+    test('calls the handleBonusButtonClick when clicked', async () => {
         const handleClick = jest.fn()
         const user = userEvent.setup()
 
@@ -54,7 +54,7 @@ describe('CartSelectBonusButton', () => {
         expect(screen.getByText('Holiday Bonus (0 of 1 selected)')).toBeInTheDocument()
     })
 
-    it('renders the select bonus products button', () => {
+    test('renders the select bonus products button', () => {
         render(
             <CartSelectBonusButton
                 handleBonusButtonClick={() => {}}
@@ -68,7 +68,7 @@ describe('CartSelectBonusButton', () => {
         expect(screen.getByText('Spring Sale (0 of 1 selected)')).toBeInTheDocument()
     })
 
-    it('renders with correct text when maxOfferCount is 0', () => {
+    test('renders with correct text when maxOfferCount is 0', () => {
         render(
             <CartSelectBonusButton
                 handleBonusButtonClick={() => {}}
@@ -82,7 +82,7 @@ describe('CartSelectBonusButton', () => {
         expect(screen.getByRole('button', {name: /select bonus products/i})).toBeInTheDocument()
     })
 
-    it('renders correctly when promotionName is not provided', () => {
+    test('renders correctly when promotionName is not provided', () => {
         render(
             <CartSelectBonusButton
                 handleBonusButtonClick={() => {}}
@@ -91,7 +91,7 @@ describe('CartSelectBonusButton', () => {
             />
         )
 
-        expect(screen.getByText('(1 of 3 selected)')).toBeInTheDocument()
+        expect(screen.queryByText('(1 of 3 selected)')).not.toBeInTheDocument()
         expect(screen.getByRole('button', {name: /select bonus products/i})).toBeInTheDocument()
     })
 })
