@@ -39,7 +39,7 @@ export const CheckoutProvider = ({children}) => {
 
         if (customer.isGuest && !basket.customerInfo?.email) {
             step = STEPS.CONTACT_INFO
-        } else if (!basket.shipments[0]?.shippingAddress) {
+        } else if (!basket.shipments[0]?.shippingAddress?.address1) {
             // Check if it's a pickup order
             const isPickupOrder =
                 basket?.shipments[0]?.shippingMethod?.c_storePickupEnabled === true
