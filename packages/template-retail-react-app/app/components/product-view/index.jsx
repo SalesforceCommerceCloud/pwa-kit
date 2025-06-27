@@ -304,7 +304,11 @@ const ProductView = forwardRef(
                     // See wishlist_primary_action for example.
                     if (isValidResponse) {
                         // Show bonus product modal first if there are bonus items
-                        if (newBonusItems?.length > 0) {
+                        // TODO: rule based promotions are not supported yet, this change will go to develop and release before Product Discovery team delivers TD-0262468
+                        if (
+                            newBonusItems?.length > 0 &&
+                            newBonusItems.some((item) => item.bonusProducts)
+                        ) {
                             // Update bonusProducts list with the new bonus items
                             addBonusProducts(newBonusItems)
                             onBonusProductModalOpen({
