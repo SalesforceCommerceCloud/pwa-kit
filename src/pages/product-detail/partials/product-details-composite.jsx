@@ -64,17 +64,12 @@ const CompositeProductDetails = ({
                         <Box key={childProduct.id} data-testid="child-product">
                             <ProductView
                                 // Do not use an arrow function as we are manipulating the functions scope.
-                                ref={function (productViewRef) {
-                                    // The ref callback will be called with `null` when the component unmounts.
-                                    // We need to guard against that to prevent a runtime error.
-                                    if (productViewRef) {
-                                        // Assign the "set" scope of the ref, this is how we access the internal
-                                        // validation.
-                                        childProductRefs.current[childProduct.id] = {
-                                            ref: productViewRef,
-                                            validateOrderability:
-                                                productViewRef.validateOrderability
-                                        }
+                                ref={function (ref) {
+                                    // Assign the "set" scope of the ref, this is how we access the internal
+                                    // validation.
+                                    childProductRefs.current[childProduct.id] = {
+                                        ref,
+                                        validateOrderability: this.validateOrderability
                                     }
                                 }}
                                 product={childProduct}
@@ -94,7 +89,9 @@ const CompositeProductDetails = ({
                                               ])
                                         : null
                                 }
-                                addToWishlist={isProductASet ? handleAddToWishlist : null}
+                                addToWishlist={
+                                    isProductASet ? handleAddToWishlist : null
+                                }
                                 onVariantSelected={(product, variant, quantity) => {
                                     if (quantity) {
                                         setChildProductSelection((previousState) => ({
@@ -116,7 +113,9 @@ const CompositeProductDetails = ({
                                 isProductLoading={isProductLoading}
                                 isBasketLoading={isBasketLoading}
                                 isWishlistLoading={isWishlistLoading}
-                                setChildProductOrderability={setChildProductOrderability}
+                                setChildProductOrderability={
+                                    setChildProductOrderability
+                                }
                             />
                             <InformationAccordion product={childProduct} />
 
