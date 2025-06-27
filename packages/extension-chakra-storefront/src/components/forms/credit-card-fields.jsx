@@ -116,7 +116,12 @@ const CreditCardFields = ({form, prefix = ''}) => {
                             <ChakraField.Label>
                                 <Flex align="center" justify="space-between">
                                     <Box>{fields.securityCode.label}</Box>
-                                    <Tooltip content={securityCodeTooltipLabel}>
+                                    <Tooltip
+                                        content={securityCodeTooltipLabel}
+                                        contentProps={{
+                                            css: {'--tooltip-bg': 'colors.blue.800'}
+                                        }}
+                                    >
                                         <Box
                                             as="button"
                                             aria-label={formatMessage({
@@ -124,7 +129,11 @@ const CreditCardFields = ({form, prefix = ''}) => {
                                                 defaultMessage: 'Security code info'
                                             })}
                                         >
-                                            <InfoIcon boxSize={4} color="gray.700" />
+                                            <InfoIcon
+                                                boxSize={4}
+                                                color="gray.700"
+                                                cursor="pointer"
+                                            />
                                         </Box>
                                     </Tooltip>
                                 </Flex>

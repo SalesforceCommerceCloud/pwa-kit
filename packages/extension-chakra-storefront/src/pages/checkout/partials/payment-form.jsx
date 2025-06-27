@@ -62,8 +62,19 @@ const PaymentForm = ({form, onSubmit}) => {
                                                             'This is a secure SSL encrypted payment.',
                                                         id: 'payment_selection.tooltip.secure_payment'
                                                     })}
+                                                    contentProps={{
+                                                        css: {'--tooltip-bg': 'colors.blue.800'}
+                                                    }}
+                                                    positioning={{
+                                                        strategy: 'fixed',
+                                                        flip: false
+                                                    }}
                                                 >
-                                                    <LockIcon color="gray.700" boxSize={5} />
+                                                    <LockIcon
+                                                        color="gray.700"
+                                                        boxSize={5}
+                                                        cursor="pointer"
+                                                    />
                                                 </Tooltip>
                                             </Stack>
                                             <Text fontWeight="bold">

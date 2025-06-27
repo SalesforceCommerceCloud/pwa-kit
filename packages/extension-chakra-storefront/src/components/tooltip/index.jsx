@@ -19,10 +19,7 @@ const Tooltip = React.forwardRef(
             openDelay = 500,
             closeDelay = 500,
             contentProps,
-            positioning,
-            bg, // New: direct background prop
-            color, // New: direct text color prop
-            ...props
+            positioning
         },
         ref
     ) => {
@@ -30,28 +27,23 @@ const Tooltip = React.forwardRef(
             return children
         }
 
-        // Merge direct styling props with contentProps
-        const mergedContentProps = {
-            ...contentProps,
-            css: {
-                ...(bg && {'--tooltip-bg': bg}),
-                ...(color && {'--tooltip-color': color}),
-                ...contentProps?.css
-            }
+        const positioningConfig = positioning || {}
+        const finalPositioning = {
+            placement,
+            ...positioningConfig
         }
 
         return (
             <ChakraTooltip.Root
                 openDelay={openDelay}
                 closeDelay={closeDelay}
-                positioning={{placement, ...positioning}}
-                {...props}
+                positioning={finalPositioning}
             >
                 <ChakraTooltip.Trigger asChild ref={ref}>
                     {children}
                 </ChakraTooltip.Trigger>
                 <ChakraTooltip.Positioner>
-                    <ChakraTooltip.Content {...mergedContentProps}>
+                    <ChakraTooltip.Content {...contentProps}>
                         {showArrow && (
                             <ChakraTooltip.Arrow>
                                 <ChakraTooltip.ArrowTip />
@@ -89,9 +81,7 @@ Tooltip.propTypes = {
     openDelay: PropTypes.number,
     closeDelay: PropTypes.number,
     contentProps: PropTypes.object,
-    positioning: PropTypes.object,
-    bg: PropTypes.string,
-    color: PropTypes.string
+    positioning: PropTypes.object
 }
 
 export default Tooltip
