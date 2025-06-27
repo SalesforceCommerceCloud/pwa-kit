@@ -33,7 +33,7 @@ export default function PageMetadata({product}) {
     return <Seo title={title} description={description} keywords={keywords} metaTags={metaTags} />
 }
 
-Metadata.propTypes = {
+PageMetadata.propTypes = {
     product: PropTypes.shape({
         pageTitle: PropTypes.string,
         pageDescription: PropTypes.string,

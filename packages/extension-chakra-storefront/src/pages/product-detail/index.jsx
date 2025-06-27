@@ -10,6 +10,7 @@ import {Box, Stack} from '@chakra-ui/react'
 import ProductDetails from './partials/product-details'
 import RecommendedProductsSection from './partials/recommended-products-section'
 import PageMetadata from './page-metadata'
+import PageCache from './page-cache'
 import {useProductDetailData} from './use-product-detail-data'
 
 const ProductDetail = () => {
@@ -38,6 +39,7 @@ const ProductDetail = () => {
 
     return (
         <>
+            <PageCache />
             <PageMetadata product={product} />
             <Box
                 className="sf-product-detail-page"
