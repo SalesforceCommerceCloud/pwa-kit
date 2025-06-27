@@ -56,6 +56,11 @@ import {rebuildPathWithParams} from '@salesforce/retail-react-app/app/utils/url'
 import {useHistory, useLocation, useParams} from 'react-router-dom'
 import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
 import {useWishList} from '@salesforce/retail-react-app/app/hooks/use-wish-list'
+import {
+    handleAddToCart,
+    handleProductBundleAddToCart,
+    handleProductSetAddToCart
+} from '@salesforce/retail-react-app/app/utils/add-to-cart-utils'
 
 const ProductDetail = () => {
     const {formatMessage} = useIntl()
@@ -298,35 +303,6 @@ const ProductDetail = () => {
         })
     }
 
-    const handleAddToCart = async (productSelectionValues) => {
-        try {
-            const productItems = productSelectionValues.map(({variant, product, quantity}) => ({
-                productId: variant?.productId || product?.id,
-                price: variant?.price || product?.price,
-                quantity
-            }))
-
-            await addItemToNewOrExistingBasket(productItems)
-
-            const productItemsForEinstein = productSelectionValues.map(
-                ({product, variant, quantity}) => ({
-                    product,
-                    productId: variant?.productId || product?.id,
-                    price: variant?.price || product?.price,
-                    quantity
-                })
-            )
-            einstein.sendAddToCart(productItemsForEinstein)
-
-            // If the items were successfully added, set the return value to be used
-            // by the add to cart modal.
-            return productSelectionValues
-        } catch (error) {
-            console.log('error', error)
-            showError(error)
-        }
-    }
-
     /**************** Product Set/Bundles Handlers ****************/
     const handleChildProductValidation = useCallback(() => {
         // Run validation for all child products. This will ensure the error
@@ -364,80 +340,6 @@ const ProductDetail = () => {
 
         return true
     }, [product, childProductSelection])
-
-    /**************** Product Set Handlers ****************/
-    const handleProductSetAddToCart = () => {
-        // Get all the selected products, and pass them to the addToCart handler which
-        // accepts an array.
-        const productSelectionValues = Object.values(childProductSelection)
-        return handleAddToCart(productSelectionValues)
-    }
-
-    /**************** Product Bundle Handlers ****************/
-    // Top level bundle does not have variants
-    const handleProductBundleAddToCart = async (variant, selectedQuantity) => {
-        try {
-            const childProductSelections = Object.values(childProductSelection)
-
-            const productItems = [
-                {
-                    productId: product.id,
-                    price: product.price,
-                    quantity: selectedQuantity,
-                    // The add item endpoint in the shopper baskets API does not respect variant selections
-                    // for bundle children, so we have to make a follow up call to update the basket
-                    // with the chosen variant selections
-                    bundledProductItems: childProductSelections.map((child) => {
-                        return {
-                            productId: child.variant?.productId || child.product?.id,
-                            quantity: child.quantity
-                        }
-                    })
-                }
-            ]
-
-            const res = await addItemToNewOrExistingBasket(productItems)
-
-            const bundleChildMasterIds = childProductSelections.map((child) => {
-                return child.product.id
-            })
-
-            // since the returned data includes all products in basket
-            // here we compare list of productIds in bundleProductItems of each productItem to filter out the
-            // current bundle that was last added into cart
-            const currentBundle = res.productItems.find((productItem) => {
-                if (!productItem.bundledProductItems?.length) return
-                const bundleChildIds = productItem.bundledProductItems?.map((item) => {
-                    // seek out the bundle child that still uses masterId as product id
-                    return item.productId
-                })
-                return bundleChildIds.every((id) => bundleChildMasterIds.includes(id))
-            })
-
-            const itemsToBeUpdated = getUpdateBundleChildArray(
-                currentBundle,
-                childProductSelections
-            )
-
-            if (itemsToBeUpdated.length) {
-                // make a follow up call to update child variant selection for product bundle
-                // since add item endpoint doesn't currently consider product bundle child variants
-                await updateItemsInBasketMutation.mutateAsync({
-                    method: 'PATCH',
-                    parameters: {
-                        basketId: res.basketId
-                    },
-                    body: itemsToBeUpdated
-                })
-            }
-
-            einstein.sendAddToCart(productItems)
-
-            return childProductSelections
-        } catch (error) {
-            showError(error)
-        }
-    }
 
     /**************** Einstein ****************/
     useEffect(() => {
@@ -498,8 +400,24 @@ const ProductDetail = () => {
                             category={primaryCategory?.parentCategoryTree || []}
                             addToCart={
                                 isProductASet
-                                    ? handleProductSetAddToCart
-                                    : handleProductBundleAddToCart
+                                    ? () =>
+                                          handleProductSetAddToCart(
+                                              childProductSelection,
+                                              addItemToNewOrExistingBasket,
+                                              einstein,
+                                              showError
+                                          )
+                                    : (variant, selectedQuantity) =>
+                                          handleProductBundleAddToCart(
+                                              product,
+                                              childProductSelection,
+                                              selectedQuantity,
+                                              addItemToNewOrExistingBasket,
+                                              updateItemsInBasketMutation,
+                                              einstein,
+                                              showError,
+                                              getUpdateBundleChildArray
+                                          )
                             }
                             addToWishlist={handleAddToWishlist}
                             isProductLoading={isProductLoading}
@@ -536,13 +454,18 @@ const ProductDetail = () => {
                                             addToCart={
                                                 isProductASet
                                                     ? (variant, quantity) =>
-                                                          handleAddToCart([
-                                                              {
-                                                                  product: childProduct,
-                                                                  variant,
-                                                                  quantity
-                                                              }
-                                                          ])
+                                                          handleAddToCart(
+                                                              [
+                                                                  {
+                                                                      product: childProduct,
+                                                                      variant,
+                                                                      quantity
+                                                                  }
+                                                              ],
+                                                              addItemToNewOrExistingBasket,
+                                                              einstein,
+                                                              showError
+                                                          )
                                                     : null
                                             }
                                             addToWishlist={
@@ -589,7 +512,12 @@ const ProductDetail = () => {
                             product={product}
                             category={primaryCategory?.parentCategoryTree || []}
                             addToCart={(variant, quantity) =>
-                                handleAddToCart([{product, variant, quantity}])
+                                handleAddToCart(
+                                    [{product, variant, quantity}],
+                                    addItemToNewOrExistingBasket,
+                                    einstein,
+                                    showError
+                                )
                             }
                             addToWishlist={handleAddToWishlist}
                             isProductLoading={isProductLoading}
