@@ -67,23 +67,22 @@ const PlaceholderComponent: React.FC = () => (
     </Center>
 )
 
-// const DrawerMenuItemWithData = withCommerceSdkReactHookData(
-//     ({itemComponent: ItemComponent, data, ...rest}: any) => (
-//         <Fade in={true}>
-//             <ItemComponent {...rest} item={data} itemComponent={DrawerMenuItemWithData} />
-//         </Fade>
-//     ),
-//     {
-//         hook: useCategory,
-//         queryOptions: ({item}: {item: {id: string}}) => ({
-//             parameters: {
-//                 id: item.id
-//             }
-//         }),
-//         placeholder: PlaceholderComponent
-//     }
-// )
-//
+const DrawerMenuItemWithData = withCommerceSdkReactHookData(
+    ({itemComponent: ItemComponent, data, ...rest}: any) => (
+        // TODO: should I keep the fade-in transition?
+        <ItemComponent {...rest} item={data} itemComponent={DrawerMenuItemWithData} />
+    ),
+    {
+        hook: useCategory,
+        queryOptions: ({item}: {item: {id: string}}) => ({
+            parameters: {
+                id: item.id
+            }
+        }),
+        placeholder: PlaceholderComponent
+    }
+)
+
 const ListMenuContentWithData = withCommerceSdkReactHookData(
     ({data, ...rest}: any) => <ListMenuContent {...rest} item={data} />,
     {
@@ -289,17 +288,18 @@ const withLayout = <P extends object>(WrappedComponent: React.ComponentType<P>) 
                                     onMyAccountClick={onAccountClick}
                                     onWishlistClick={onWishlistClick}
                                 >
-                                    {/*    <HideOnDesktop>*/}
-                                    {/*        <DrawerMenu*/}
-                                    {/*            isOpen={isOpen}*/}
-                                    {/*            onClose={onClose}*/}
-                                    {/*            onLogoClick={onLogoClick}*/}
-                                    {/*            root={categories?.[CAT_MENU_DEFAULT_ROOT_CATEGORY]}*/}
-                                    {/*            itemsKey="categories"*/}
-                                    {/*            itemsCountKey="onlineSubCategoriesCount"*/}
-                                    {/*            itemComponent={DrawerMenuItemWithData}*/}
-                                    {/*        />*/}
-                                    {/*    </HideOnDesktop>*/}
+                                    {/* TODO: mobile menu */}
+                                       <HideOnDesktop>
+                                           <DrawerMenu
+                                               isOpen={open}
+                                               onClose={onClose}
+                                               onLogoClick={onLogoClick}
+                                               root={categories?.[CAT_MENU_DEFAULT_ROOT_CATEGORY]}
+                                               itemsKey="categories"
+                                               itemsCountKey="onlineSubCategoriesCount"
+                                               itemComponent={DrawerMenuItemWithData}
+                                           />
+                                       </HideOnDesktop>
                                     <HideOnMobile>
                                         <ListMenu
                                             root={categories?.[CAT_MENU_DEFAULT_ROOT_CATEGORY]}
