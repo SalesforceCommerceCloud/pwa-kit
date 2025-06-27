@@ -11,7 +11,7 @@ const traverse = require('@babel/traverse').default
 const generate = require('@babel/generator').default
 const path = require('path')
 const pluginConfig = require('../assets/plugin-config')
-const { execSync } = require('child_process')
+const {execSync} = require('child_process')
 
 const removeComponentCandidates = [] // List of files that are candidates for removal, as a result of trimming.
 const SEPARATOR = path.sep // Use OS-specific path separator

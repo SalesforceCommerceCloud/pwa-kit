@@ -6,7 +6,7 @@
  */
 /* eslint-disable @typescript-eslint/no-var-requires */
 const fs = require('fs')
-const { execSync } = require('child_process')
+const {execSync} = require('child_process')
 
 jest.mock('../assets/plugin-config', () => ({
     plugins: {
@@ -25,32 +25,36 @@ jest.mock('child_process')
 // custom matcher to compare strings line by line with trimming
 expect.extend({
     toEqualTrimmedLines(received, expected) {
-      const clean = str =>
-        str
-          .split('\n')
-          .map(line => line.trim())  // Trim each line
-          .filter(line => line.length > 0) // Optional: remove empty lines
-  
-      const receivedLines = clean(received)
-      const expectedLines = clean(expected)
-  
-      const pass = this.equals(receivedLines, expectedLines)
-  
-      if (pass) {
-        return {
-          pass: true,
-          message: () =>
-            `✅ Expected strings not to match line by line (but they did).\n\nExpected: ${this.utils.printExpected(expectedLines)}\nReceived: ${this.utils.printReceived(receivedLines)}`,
-        };
-      } else {
-        return {
-          pass: false,
-          message: () =>
-            `❌ Expected strings to match line by line (with trimming).\n\nExpected: ${this.utils.printExpected(expectedLines)}\nReceived: ${this.utils.printReceived(receivedLines)}`,
-        };
-      }
-    },
-  })
+        const clean = (str) =>
+            str
+                .split('\n')
+                .map((line) => line.trim()) // Trim each line
+                .filter((line) => line.length > 0) // Optional: remove empty lines
+
+        const receivedLines = clean(received)
+        const expectedLines = clean(expected)
+
+        const pass = this.equals(receivedLines, expectedLines)
+
+        if (pass) {
+            return {
+                pass: true,
+                message: () =>
+                    `✅ Expected strings not to match line by line (but they did).\n\nExpected: ${this.utils.printExpected(
+                        expectedLines
+                    )}\nReceived: ${this.utils.printReceived(receivedLines)}`
+            }
+        } else {
+            return {
+                pass: false,
+                message: () =>
+                    `❌ Expected strings to match line by line (with trimming).\n\nExpected: ${this.utils.printExpected(
+                        expectedLines
+                    )}\nReceived: ${this.utils.printReceived(receivedLines)}`
+            }
+        }
+    }
+})
 
 const trimExtensions = require('./trim-extensions')
 
@@ -97,7 +101,9 @@ describe('trim-extensions', () => {
             expect.any(String),
             expect.toEqualTrimmedLines("const feature = 'Feature Enabled';")
         )
-        expect(execSync).toHaveBeenCalledWith('npx prettier --write /mock/dir/src/components/featureComponent.jsx')
+        expect(execSync).toHaveBeenCalledWith(
+            'npx prettier --write /mock/dir/src/components/featureComponent.jsx'
+        )
     })
 
     it('handles variable declarations correctly', () => {
@@ -122,7 +128,9 @@ describe('trim-extensions', () => {
             expect.any(String),
             expect.not.stringContaining("const featureBFunc = () => 'Feature B';")
         )
-        expect(execSync).toHaveBeenCalledWith('npx prettier --write /mock/dir/src/components/featureComponent.jsx')
+        expect(execSync).toHaveBeenCalledWith(
+            'npx prettier --write /mock/dir/src/components/featureComponent.jsx'
+        )
     })
 
     it('handles variable with ternary expressions correctly', () => {
@@ -139,13 +147,15 @@ describe('trim-extensions', () => {
 
         expect(fs.writeFileSync).toHaveBeenCalledWith(
             expect.any(String),
-            expect.toEqualTrimmedLines("const showFeature = Feature_A;")
+            expect.toEqualTrimmedLines('const showFeature = Feature_A;')
         )
         expect(fs.writeFileSync).toHaveBeenCalledWith(
             expect.any(String),
             expect.not.stringContaining('const showFeature = Feature_B')
         )
-        expect(execSync).toHaveBeenCalledWith('npx prettier --write /mock/dir/src/components/featureComponent.jsx')
+        expect(execSync).toHaveBeenCalledWith(
+            'npx prettier --write /mock/dir/src/components/featureComponent.jsx'
+        )
     })
 
     it('handles return with ternary expressions correctly', () => {
@@ -167,7 +177,9 @@ describe('trim-extensions', () => {
             expect.any(String),
             expect.toEqualTrimmedLines(expected)
         )
-        expect(execSync).toHaveBeenCalledWith('npx prettier --write /mock/dir/src/components/featureComponent.jsx')
+        expect(execSync).toHaveBeenCalledWith(
+            'npx prettier --write /mock/dir/src/components/featureComponent.jsx'
+        )
     })
 
     it('handles PropTypes declarations correctly', () => {
@@ -207,7 +219,9 @@ describe('trim-extensions', () => {
             expect.any(String),
             expect.stringContaining('featureBProp: PropTypes.string')
         )
-        expect(execSync).toHaveBeenCalledWith('npx prettier --write /mock/dir/src/components/featureComponent.jsx')
+        expect(execSync).toHaveBeenCalledWith(
+            'npx prettier --write /mock/dir/src/components/featureComponent.jsx'
+        )
     })
 
     it('handles JSX elements in return statements correctly', () => {
@@ -241,7 +255,9 @@ describe('trim-extensions', () => {
             expect.any(String),
             expect.stringContaining('<ComponentB />')
         )
-        expect(execSync).toHaveBeenCalledWith('npx prettier --write /mock/dir/src/components/featureComponent.jsx')
+        expect(execSync).toHaveBeenCalledWith(
+            'npx prettier --write /mock/dir/src/components/featureComponent.jsx'
+        )
     })
 
     it('does not remove referenced imports', () => {
