@@ -208,7 +208,10 @@ const ShippingAddressSelection = ({
         }
 
         const address = customer.addresses.find((addr) => addr.addressId === addressId)
+        setSelectedAddressId(addressId)
 
+        console.log(addressId.value)
+        console.log(selectedAddressId.value)
         form.reset({...address})
     }
 
@@ -278,7 +281,7 @@ const ShippingAddressSelection = ({
                         control={form.control}
                         rules={{required: !isEditingAddress}}
                         render={({field: {value}}) => (
-                            <RadioCardGroup value={value} onChange={handleAddressIdSelection}>
+                            <RadioCardGroup value={value} onValueChange={handleAddressIdSelection}>
                                 <SimpleGrid
                                     columns={[1, 1, 2]}
                                     gap={4}
@@ -302,7 +305,7 @@ const ShippingAddressSelection = ({
                                         )
                                         return (
                                             <React.Fragment key={address.addressId}>
-                                                <RadioCard value={address.addressId} isSelected={true}>
+                                                <RadioCard value={address.addressId} isSelected={address.addressId === selectedAddressId?.value}>
                                                     <ActionCard
                                                         padding={0}
                                                         border="none"

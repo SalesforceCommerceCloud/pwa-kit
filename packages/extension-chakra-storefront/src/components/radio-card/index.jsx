@@ -34,8 +34,8 @@ export const RadioCard = (props) => {
                     <CheckIcon color="white" position="absolute" right="-40px" top="1px" />
                 </Box>
             )}
-            <ChakraRadioCard.ItemHiddenInput css={styles.itemHiddenInput} />
-            <ChakraRadioCard.ItemControl css={styles.itemControl}>
+            <ChakraRadioCard.ItemHiddenInput />
+            <ChakraRadioCard.ItemControl>
                 {children}
             </ChakraRadioCard.ItemControl>
         </ChakraRadioCard.Item>
