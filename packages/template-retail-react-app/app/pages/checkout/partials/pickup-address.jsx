@@ -30,6 +30,7 @@ export default function PickupAddress() {
     const {data: basket} = useCurrentBasket()
 
     const selectedShippingAddress = basket?.shipments && basket?.shipments[0]?.shippingAddress
+    const isAddressFilled = selectedShippingAddress?.address1 && selectedShippingAddress?.city
 
     // Check if basket is a pickup order
     const isPickupOrder = basket?.shipments?.[0]?.shippingMethod?.c_storePickupEnabled === true
@@ -113,7 +114,7 @@ export default function PickupAddress() {
                     </Box>
                 </>
             )}
-            {selectedShippingAddress && (
+            {isAddressFilled && (
                 <ToggleCardSummary>
                     <Text fontWeight="bold" fontSize="md" mb={2}>
                         <FormattedMessage

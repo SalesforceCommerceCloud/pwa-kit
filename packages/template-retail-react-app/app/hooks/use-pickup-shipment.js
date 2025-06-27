@@ -5,14 +5,30 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import {useShopperBasketsMutation} from '@salesforce/commerce-sdk-react'
+import {
+    useShopperBasketsMutation,
+    useShippingMethodsForShipment
+} from '@salesforce/commerce-sdk-react'
 
 /**
  * Custom hook to handle pickup in store shipment configuration
  * @returns {Object} Object containing helper functions for pickup shipment management
  */
-export const usePickupShipment = () => {
+export const usePickupShipment = (basket) => {
     const updateShipmentForBasketMutation = useShopperBasketsMutation('updateShipmentForBasket')
+
+    // Hook for shipping methods - we'll use refetch when needed
+    const {refetch: refetchShippingMethods} = useShippingMethodsForShipment(
+        {
+            parameters: {
+                basketId: basket?.basketId,
+                shipmentId: 'me'
+            }
+        },
+        {
+            enabled: false // Disable automatic fetching, we'll fetch manually when needed
+        }
+    )
 
     /**
      * Gets the shipping method ID for pickup in store
@@ -169,9 +185,72 @@ export const usePickupShipment = () => {
         })
     }
 
+    /**
+     * Configure shipping method based on pickup selection
+     * @param {Object} basketResponse - The basket response from adding items
+     * @param {Array} productItems - Array of product items that were added
+     * @param {boolean} hasAnyPickupSelected - Whether any items have pickup selected
+     * @param {Object} selectedStore - The selected store information
+     * @returns {Promise<void>}
+     */
+    const configureShippingMethodIfNeeded = async (
+        basketResponse,
+        productItems,
+        hasAnyPickupSelected,
+        selectedStore
+    ) => {
+        if (!basketResponse?.basketId || !basketResponse.shipments.length) {
+            return
+        }
+
+        const currentShippingMethod = basketResponse.shipments[0].shippingMethod
+        const isCurrentlyPickup = isCurrentShippingMethodPickup(currentShippingMethod)
+
+        // Only configure if there's a mismatch between pickup selection and current method
+        if (
+            (hasAnyPickupSelected && !isCurrentlyPickup) ||
+            (!hasAnyPickupSelected && isCurrentlyPickup)
+        ) {
+            // Clear shipping address when there's a mismatch by updating shipment without shippingAddress
+            await updateShipmentForBasketMutation.mutateAsync({
+                parameters: {
+                    basketId: basketResponse.basketId,
+                    shipmentId: 'me'
+                },
+                body: {
+                    shippingAddress: {}
+                }
+            })
+
+            // Fetch shipping methods to get available options
+            const {data: fetchedShippingMethods} = await refetchShippingMethods()
+
+            if (hasAnyPickupSelected && !isCurrentlyPickup) {
+                // Configure pickup shipment if pickup is selected but current method is not pickup
+                const pickupShippingMethodId = getPickupShippingMethodId(fetchedShippingMethods)
+                await configurePickupShipment(
+                    basketResponse.basketId,
+                    productItems,
+                    selectedStore,
+                    {
+                        pickupShippingMethodId
+                    }
+                )
+            } else if (!hasAnyPickupSelected && isCurrentlyPickup) {
+                // Configure regular shipping if pickup is not selected but current method is pickup
+                const defaultShippingMethodId = getDefaultShippingMethodId(fetchedShippingMethods)
+                await configureRegularShippingMethod(
+                    basketResponse.basketId,
+                    defaultShippingMethodId
+                )
+            }
+        }
+    }
+
     return {
         configurePickupShipment,
         configureRegularShippingMethod,
+        configureShippingMethodIfNeeded,
         hasPickupItems,
         addInventoryIdsToPickupItems,
         getPickupShippingMethodId,
