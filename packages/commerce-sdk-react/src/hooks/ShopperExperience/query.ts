@@ -7,11 +7,14 @@
 import {UseQueryResult} from '@tanstack/react-query'
 import {ShopperExperience} from 'commerce-sdk-isomorphic'
 import {ApiClients, ApiQueryOptions, Argument, DataType, NullableParameters} from '../types'
-import useCommerceApi from '../useCommerceApi'
 import {useQuery} from '../useQuery'
 import {mergeOptions, omitNullableParameters, pickValidParams} from '../utils'
 import * as queryKeyHelpers from './queryKeyHelpers'
-type Client = ApiClients['shopperExperience']
+import {CLIENT_KEYS} from '../../constant'
+import useCommerceApi from '../useCommerceApi'
+
+const CLIENT_KEY = CLIENT_KEYS.SHOPPER_EXPERIENCE
+type Client = NonNullable<ApiClients[typeof CLIENT_KEY]>
 
 /**
  * Get Page Designer pages.
@@ -33,7 +36,7 @@ export const usePages = (
 ): UseQueryResult<DataType<Client['getPages']>> => {
     type Options = Argument<Client['getPages']>
     type Data = DataType<Client['getPages']>
-    const {shopperExperience: client} = useCommerceApi()
+    const client = useCommerceApi(CLIENT_KEY)
     const methodName = 'getPages'
     const requiredParameters = ShopperExperience.paramKeys[`${methodName}Required`]
 
@@ -81,7 +84,7 @@ export const usePage = (
 ): UseQueryResult<DataType<Client['getPage']>> => {
     type Options = Argument<Client['getPage']>
     type Data = DataType<Client['getPage']>
-    const {shopperExperience: client} = useCommerceApi()
+    const client = useCommerceApi(CLIENT_KEY)
     const methodName = 'getPage'
     const requiredParameters = ShopperExperience.paramKeys[`${methodName}Required`]
 

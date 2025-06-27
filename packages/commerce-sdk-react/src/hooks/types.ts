@@ -84,21 +84,21 @@ export type ApiClientConfigParams = {
  * A map of commerce-sdk-isomorphic API client instances.
  */
 export interface ApiClients {
-    shopperBaskets: ShopperBaskets<ApiClientConfigParams>
-    shopperContexts: ShopperContexts<ApiClientConfigParams>
-    shopperCustomers: ShopperCustomers<ApiClientConfigParams>
-    shopperExperience: ShopperExperience<ApiClientConfigParams>
-    shopperGiftCertificates: ShopperGiftCertificates<ApiClientConfigParams>
-    shopperLogin: ShopperLogin<ApiClientConfigParams>
-    shopperOrders: ShopperOrders<ApiClientConfigParams>
-    shopperProducts: ShopperProducts<ApiClientConfigParams>
-    shopperPromotions: ShopperPromotions<ApiClientConfigParams>
-    shopperSearch: ShopperSearch<ApiClientConfigParams>
-    shopperSeo: ShopperSeo<ApiClientConfigParams>
-    shopperStores: ShopperStores<ApiClientConfigParams>
+    shopperBaskets?: ShopperBaskets<ApiClientConfigParams>
+    shopperContexts?: ShopperContexts<ApiClientConfigParams>
+    shopperCustomers?: ShopperCustomers<ApiClientConfigParams>
+    shopperExperience?: ShopperExperience<ApiClientConfigParams>
+    shopperGiftCertificates?: ShopperGiftCertificates<ApiClientConfigParams>
+    shopperLogin?: ShopperLogin<ApiClientConfigParams>
+    shopperOrders?: ShopperOrders<ApiClientConfigParams>
+    shopperProducts?: ShopperProducts<ApiClientConfigParams>
+    shopperPromotions?: ShopperPromotions<ApiClientConfigParams>
+    shopperSearch?: ShopperSearch<ApiClientConfigParams>
+    shopperSeo?: ShopperSeo<ApiClientConfigParams>
+    shopperStores?: ShopperStores<ApiClientConfigParams>
 }
 
-export type ApiClient = ApiClients[keyof ApiClients]
+export type ApiClient = NonNullable<ApiClients[keyof ApiClients]>
 
 // --- API HELPERS --- //
 

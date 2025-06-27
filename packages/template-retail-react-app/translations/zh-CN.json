@@ -147,6 +147,18 @@
   "auth_modal.button.close.assistive_msg": {
     "defaultMessage": "关闭登录表单"
   },
+  "auth_modal.check_email.button.resend_link": {
+    "defaultMessage": "重新发送链接"
+  },
+  "auth_modal.check_email.description.check_spam_folder": {
+    "defaultMessage": "该链接可能需要几分钟才能收到，如果找不到，请检查您的垃圾邮件文件夹"
+  },
+  "auth_modal.check_email.description.just_sent": {
+    "defaultMessage": "我们刚刚向 <b>{email}</b> 发送了登录链接"
+  },
+  "auth_modal.check_email.title.check_your_email": {
+    "defaultMessage": "检查您的电子邮件"
+  },
   "auth_modal.description.now_signed_in": {
     "defaultMessage": "您现在已登录。"
   },
@@ -329,7 +341,7 @@
     "defaultMessage": "信用卡"
   },
   "checkout_payment.label.billing_address_form": {
-    "defaultMessage": "帐单地址表格"
+    "defaultMessage": "账单地址表格"
   },
   "checkout_payment.label.same_as_shipping": {
     "defaultMessage": "与送货地址相同"
@@ -406,17 +418,29 @@
   "contact_info.button.already_have_account": {
     "defaultMessage": "已有账户？登录"
   },
+  "contact_info.button.back_to_sign_in_options": {
+    "defaultMessage": "返回登录选项"
+  },
   "contact_info.button.checkout_as_guest": {
     "defaultMessage": "以访客身份结账"
   },
   "contact_info.button.login": {
     "defaultMessage": "登录"
   },
+  "contact_info.button.password": {
+    "defaultMessage": "密码"
+  },
+  "contact_info.button.secure_link": {
+    "defaultMessage": "安全链接"
+  },
   "contact_info.error.incorrect_username_or_password": {
     "defaultMessage": "用户名或密码错误，请重试。"
   },
   "contact_info.link.forgot_password": {
     "defaultMessage": "忘记密码？"
+  },
+  "contact_info.message.or_login_with": {
+    "defaultMessage": "或用以下方式登录："
   },
   "contact_info.title.contact_info": {
     "defaultMessage": "联系信息"
@@ -436,16 +460,37 @@
     "defaultMessage": "当前价格 {currentPrice}"
   },
   "display_price.assistive_msg.current_price_with_range": {
-    "defaultMessage": "从当前价格 {currentPrice}"
+    "defaultMessage": "从当前价格 {currentPrice} 起"
   },
   "display_price.assistive_msg.strikethrough_price": {
     "defaultMessage": "原价 {listPrice}"
   },
   "display_price.assistive_msg.strikethrough_price_with_range": {
-    "defaultMessage": "从原价 {listPrice}"
+    "defaultMessage": "从原价 {listPrice} 起"
   },
   "display_price.label.current_price_with_range": {
-    "defaultMessage": "从 {currentPrice} 起"
+    "defaultMessage": "{currentPrice} 起"
+  },
+  "dnt_notification.button.accept": {
+    "defaultMessage": "接受"
+  },
+  "dnt_notification.button.assistive_msg.accept": {
+    "defaultMessage": "接受追踪"
+  },
+  "dnt_notification.button.assistive_msg.close": {
+    "defaultMessage": "关闭同意追踪表"
+  },
+  "dnt_notification.button.assistive_msg.decline": {
+    "defaultMessage": "拒绝追踪"
+  },
+  "dnt_notification.button.decline": {
+    "defaultMessage": "拒绝"
+  },
+  "dnt_notification.description": {
+    "defaultMessage": "Lorem ipsum dolor sit amet， consectetur adipiscing elit， sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.Ut enim ad minim veniam， quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur."
+  },
+  "dnt_notification.title": {
+    "defaultMessage": "追踪同意书"
   },
   "drawer_menu.button.account_details": {
     "defaultMessage": "账户详情"
@@ -576,6 +621,9 @@
   "footer.link.terms_conditions": {
     "defaultMessage": "条款与条件"
   },
+  "footer.locale_selector.assistive_msg": {
+    "defaultMessage": "选择语言"
+  },
   "footer.message.copyright": {
     "defaultMessage": "Salesforce 或其附属公司。保留所有权利。此仅为示范商店。所下订单不会被处理。"
   },
@@ -584,6 +632,9 @@
   },
   "footer.subscribe.description.sign_up": {
     "defaultMessage": "注册以随时了解最热门的交易"
+  },
+  "footer.subscribe.email.assistive_msg": {
+    "defaultMessage": "资讯订阅电子邮箱"
   },
   "footer.subscribe.heading.first_to_know": {
     "defaultMessage": "率先了解"
@@ -605,6 +656,15 @@
   },
   "global.account.link.wishlist": {
     "defaultMessage": "愿望清单"
+  },
+  "global.error.create_account": {
+    "defaultMessage": "此功能当前不可用。您必须创建账户才能访问此功能。"
+  },
+  "global.error.feature_unavailable": {
+    "defaultMessage": "此功能当前不可用。"
+  },
+  "global.error.invalid_token": {
+    "defaultMessage": "令牌无效，请重试。"
   },
   "global.error.something_went_wrong": {
     "defaultMessage": "出现错误。重试。"
@@ -927,6 +987,21 @@
   "login_form.action.create_account": {
     "defaultMessage": "创建账户"
   },
+  "login_form.button.apple": {
+    "defaultMessage": "Apple"
+  },
+  "login_form.button.back": {
+    "defaultMessage": "返回登录选项"
+  },
+  "login_form.button.continue_securely": {
+    "defaultMessage": "安全继续"
+  },
+  "login_form.button.google": {
+    "defaultMessage": "Google"
+  },
+  "login_form.button.password": {
+    "defaultMessage": "密码"
+  },
   "login_form.button.sign_in": {
     "defaultMessage": "登录"
   },
@@ -935,6 +1010,9 @@
   },
   "login_form.message.dont_have_account": {
     "defaultMessage": "没有账户？"
+  },
+  "login_form.message.or_login_with": {
+    "defaultMessage": "或用以下方式登录："
   },
   "login_form.message.welcome_back": {
     "defaultMessage": "欢迎回来"
@@ -997,6 +1075,9 @@
   "pagination.field.num_of_pages": {
     "defaultMessage": "/ {numOfPages}"
   },
+  "pagination.field.page_number_select": {
+    "defaultMessage": "选择页码"
+  },
   "pagination.link.next": {
     "defaultMessage": "下一步"
   },
@@ -1038,8 +1119,14 @@
     "defaultMessage": "1 个大写字母",
     "description": "Password requirement"
   },
+  "password_reset_success.toast": {
+    "defaultMessage": "密码重置成功"
+  },
   "payment_selection.heading.credit_card": {
     "defaultMessage": "信用卡"
+  },
+  "payment_selection.radio_group.assistive_msg": {
+    "defaultMessage": "付款"
   },
   "payment_selection.tooltip.secure_payment": {
     "defaultMessage": "这是一种安全的 SSL 加密支付。"
@@ -1107,6 +1194,9 @@
   },
   "product_list.select.sort_by": {
     "defaultMessage": "排序标准：{sortOption}"
+  },
+  "product_list.sort_by.label.assistive_msg": {
+    "defaultMessage": "产品排序方式"
   },
   "product_scroller.assistive_msg.scroll_left": {
     "defaultMessage": "向左滚动产品"
@@ -1186,6 +1276,9 @@
   "profile_card.title.my_profile": {
     "defaultMessage": "我的概况"
   },
+  "profile_fields.label.profile_form": {
+    "defaultMessage": "概况表"
+  },
   "promo_code_fields.button.apply": {
     "defaultMessage": "确定"
   },
@@ -1222,15 +1315,6 @@
   "register_form.message.create_an_account": {
     "defaultMessage": "创建账户并首先查看最佳产品、妙招和虚拟社区。"
   },
-  "reset_password.button.back_to_sign_in": {
-    "defaultMessage": "返回登录"
-  },
-  "reset_password.info.receive_email_shortly": {
-    "defaultMessage": "您将通过 <b>{email}</b> 收到包含重置密码链接的电子邮件。"
-  },
-  "reset_password.title.password_reset": {
-    "defaultMessage": "密码重置"
-  },
   "reset_password_form.action.sign_in": {
     "defaultMessage": "登录"
   },
@@ -1263,7 +1347,7 @@
     "defaultMessage": "编辑 {address}"
   },
   "shipping_address.label.remove_button": {
-    "defaultMessage": "移除{address}"
+    "defaultMessage": "移除 {address}"
   },
   "shipping_address.label.shipping_address_form": {
     "defaultMessage": "送货地址表格"
@@ -1313,6 +1397,12 @@
   "signout_confirmation_dialog.message.sure_to_sign_out": {
     "defaultMessage": "是否确定要注销？您需要重新登录才能继续处理当前订单。"
   },
+  "social_login_redirect.message.authenticating": {
+    "defaultMessage": "正在验证..."
+  },
+  "social_login_redirect.message.redirect_link": {
+    "defaultMessage": "如果您没有被自动重定向，请点击<link>此链接</link>以继续。"
+  },
   "store_locator.action.find": {
     "defaultMessage": "查找"
   },
@@ -1326,7 +1416,7 @@
     "defaultMessage": "查看更多"
   },
   "store_locator.description.away": {
-    "defaultMessage": "離開"
+    "defaultMessage": "离开"
   },
   "store_locator.description.loading_locations": {
     "defaultMessage": "正在加载位置..."
@@ -1621,6 +1711,12 @@
   "use_update_password_fields.error.minimum_characters": {
     "defaultMessage": "密码必须至少包含 8 个字符。"
   },
+  "use_update_password_fields.error.password_mismatch": {
+    "defaultMessage": "密码不匹配。"
+  },
+  "use_update_password_fields.error.required_confirm_password": {
+    "defaultMessage": "请确认您的密码。"
+  },
   "use_update_password_fields.error.required_new_password": {
     "defaultMessage": "请提供新密码。"
   },
@@ -1632,6 +1728,9 @@
   },
   "use_update_password_fields.error.uppercase_letter": {
     "defaultMessage": "密码必须至少包含一个大写字母。"
+  },
+  "use_update_password_fields.label.confirm_new_password": {
+    "defaultMessage": "确认新密码"
   },
   "use_update_password_fields.label.current_password": {
     "defaultMessage": "当前密码"

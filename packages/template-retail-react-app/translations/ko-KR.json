@@ -147,6 +147,18 @@
   "auth_modal.button.close.assistive_msg": {
     "defaultMessage": "로그인 양식 닫기"
   },
+  "auth_modal.check_email.button.resend_link": {
+    "defaultMessage": "링크 재전송"
+  },
+  "auth_modal.check_email.description.check_spam_folder": {
+    "defaultMessage": "링크가 도착하는 데 몇 분 정도 걸릴 수 있습니다. 링크를 찾는 데 문제가 있는 경우 스팸 폴더를 확인하십시오."
+  },
+  "auth_modal.check_email.description.just_sent": {
+    "defaultMessage": "방금 <b>{email}</b>(으)로 로그인 링크를 보냈습니다."
+  },
+  "auth_modal.check_email.title.check_your_email": {
+    "defaultMessage": "이메일을 확인하십시오."
+  },
   "auth_modal.description.now_signed_in": {
     "defaultMessage": "이제 로그인되었습니다."
   },
@@ -406,17 +418,29 @@
   "contact_info.button.already_have_account": {
     "defaultMessage": "계정이 이미 있습니까? 로그인"
   },
+  "contact_info.button.back_to_sign_in_options": {
+    "defaultMessage": "로그인 옵션으로 돌아가기"
+  },
   "contact_info.button.checkout_as_guest": {
     "defaultMessage": "비회원으로 체크아웃"
   },
   "contact_info.button.login": {
     "defaultMessage": "로그인"
   },
+  "contact_info.button.password": {
+    "defaultMessage": "암호"
+  },
+  "contact_info.button.secure_link": {
+    "defaultMessage": "보안 링크"
+  },
   "contact_info.error.incorrect_username_or_password": {
     "defaultMessage": "사용자 이름 또는 암호가 올바르지 않습니다. 다시 시도하십시오."
   },
   "contact_info.link.forgot_password": {
     "defaultMessage": "암호가 기억나지 않습니까?"
+  },
+  "contact_info.message.or_login_with": {
+    "defaultMessage": "또는 다음으로 로그인"
   },
   "contact_info.title.contact_info": {
     "defaultMessage": "연락처 정보"
@@ -446,6 +470,27 @@
   },
   "display_price.label.current_price_with_range": {
     "defaultMessage": "{currentPrice}부터 시작"
+  },
+  "dnt_notification.button.accept": {
+    "defaultMessage": "채택"
+  },
+  "dnt_notification.button.assistive_msg.accept": {
+    "defaultMessage": "추적 수락"
+  },
+  "dnt_notification.button.assistive_msg.close": {
+    "defaultMessage": "추적 동의 양식 닫기"
+  },
+  "dnt_notification.button.assistive_msg.decline": {
+    "defaultMessage": "추적 거부"
+  },
+  "dnt_notification.button.decline": {
+    "defaultMessage": "거부"
+  },
+  "dnt_notification.description": {
+    "defaultMessage": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur."
+  },
+  "dnt_notification.title": {
+    "defaultMessage": "추적 동의"
   },
   "drawer_menu.button.account_details": {
     "defaultMessage": "계정 세부 정보"
@@ -576,6 +621,9 @@
   "footer.link.terms_conditions": {
     "defaultMessage": "이용 약관"
   },
+  "footer.locale_selector.assistive_msg": {
+    "defaultMessage": "언어 선택"
+  },
   "footer.message.copyright": {
     "defaultMessage": "Salesforce or its affiliates. All rights reserved. 데모용 매장입니다. 주문이 처리되지 않습니다."
   },
@@ -584,6 +632,9 @@
   },
   "footer.subscribe.description.sign_up": {
     "defaultMessage": "특별한 구매 기회를 놓치지 않으려면 가입하세요."
+  },
+  "footer.subscribe.email.assistive_msg": {
+    "defaultMessage": "뉴스레터 수신 이메일 주소"
   },
   "footer.subscribe.heading.first_to_know": {
     "defaultMessage": "최신 정보를 누구보다 빨리 받아보세요."
@@ -605,6 +656,15 @@
   },
   "global.account.link.wishlist": {
     "defaultMessage": "위시리스트"
+  },
+  "global.error.create_account": {
+    "defaultMessage": "이 기능은 현재 사용할 수 없습니다. 이 기능에 액세스하려면 계정을 만들어야 합니다."
+  },
+  "global.error.feature_unavailable": {
+    "defaultMessage": "이 기능은 현재 사용할 수 없습니다."
+  },
+  "global.error.invalid_token": {
+    "defaultMessage": "유효하지 않은 토큰입니다. 다시 시도하십시오."
   },
   "global.error.something_went_wrong": {
     "defaultMessage": "문제가 발생했습니다. 다시 시도하십시오."
@@ -664,7 +724,7 @@
     "defaultMessage": "올바른 위치로 안내해 드립니다."
   },
   "home.description.shop_products": {
-    "defaultMessage": "이 섹션에는 카탈로그의 컨텐츠가 포함되어 있습니다. 대체하는 방법은 {docLink}에서 확인하세요.",
+    "defaultMessage": "이 섹션에는 카탈로그의 컨텐츠가 포함되어 있습니다. 바꾸는 방법은 {docLink}에서 확인하세요.",
     "description": "{docLink} is a html button that links the user to https://sfdc.co/business-manager-manage-catalogs"
   },
   "home.features.description.cart_checkout": {
@@ -674,7 +734,7 @@
     "defaultMessage": "이용이 간편한 모듈식 React 구성요소 라이브러리인 Chakra UI를 사용하여 구축되었습니다."
   },
   "home.features.description.einstein_recommendations": {
-    "defaultMessage": "권장 제품을 통해 모든 구매자에게 다른 추천 제품이나 오퍼를 제공합니다."
+    "defaultMessage": "제품 추천을 통해 모든 구매자에게 다른 추천 제품이나 오퍼를 제공합니다."
   },
   "home.features.description.my_account": {
     "defaultMessage": "구매자가 프로필, 주소, 결제, 주문 등의 계정 정보를 관리할 수 있습니다."
@@ -731,7 +791,7 @@
     "defaultMessage": "문서 읽기"
   },
   "home.title.react_starter_store": {
-    "defaultMessage": "소매점용 React PWA Starter Store"
+    "defaultMessage": "소매점용 React PWA 스타터 스토어"
   },
   "icons.assistive_msg.lock": {
     "defaultMessage": "보안"
@@ -927,6 +987,21 @@
   "login_form.action.create_account": {
     "defaultMessage": "계정 생성"
   },
+  "login_form.button.apple": {
+    "defaultMessage": "Apple"
+  },
+  "login_form.button.back": {
+    "defaultMessage": "로그인 옵션으로 돌아가기"
+  },
+  "login_form.button.continue_securely": {
+    "defaultMessage": "보안 모드로 계속하기"
+  },
+  "login_form.button.google": {
+    "defaultMessage": "Google"
+  },
+  "login_form.button.password": {
+    "defaultMessage": "암호"
+  },
   "login_form.button.sign_in": {
     "defaultMessage": "로그인"
   },
@@ -935,6 +1010,9 @@
   },
   "login_form.message.dont_have_account": {
     "defaultMessage": "계정이 없습니까?"
+  },
+  "login_form.message.or_login_with": {
+    "defaultMessage": "또는 다음으로 로그인"
   },
   "login_form.message.welcome_back": {
     "defaultMessage": "다시 오신 것을 환영합니다."
@@ -997,6 +1075,9 @@
   "pagination.field.num_of_pages": {
     "defaultMessage": "/{numOfPages}"
   },
+  "pagination.field.page_number_select": {
+    "defaultMessage": "페이지 번호 선택"
+  },
   "pagination.link.next": {
     "defaultMessage": "다음"
   },
@@ -1038,8 +1119,14 @@
     "defaultMessage": "대문자 1개",
     "description": "Password requirement"
   },
+  "password_reset_success.toast": {
+    "defaultMessage": "암호 재설정 성공"
+  },
   "payment_selection.heading.credit_card": {
     "defaultMessage": "신용카드"
+  },
+  "payment_selection.radio_group.assistive_msg": {
+    "defaultMessage": "결제"
   },
   "payment_selection.tooltip.secure_payment": {
     "defaultMessage": "안전한 SSL 암호화 결제입니다."
@@ -1107,6 +1194,9 @@
   },
   "product_list.select.sort_by": {
     "defaultMessage": "정렬 기준: {sortOption}"
+  },
+  "product_list.sort_by.label.assistive_msg": {
+    "defaultMessage": "제품 정렬 기준"
   },
   "product_scroller.assistive_msg.scroll_left": {
     "defaultMessage": "제품 왼쪽으로 스크롤"
@@ -1186,6 +1276,9 @@
   "profile_card.title.my_profile": {
     "defaultMessage": "내 프로필"
   },
+  "profile_fields.label.profile_form": {
+    "defaultMessage": "프로필 양식"
+  },
   "promo_code_fields.button.apply": {
     "defaultMessage": "적용"
   },
@@ -1221,15 +1314,6 @@
   },
   "register_form.message.create_an_account": {
     "defaultMessage": "계정을 만들고 최고의 제품, 아이디어, 커뮤니티를 누구보다 빨리 이용해 보세요."
-  },
-  "reset_password.button.back_to_sign_in": {
-    "defaultMessage": "로그인 페이지로 돌아가기"
-  },
-  "reset_password.info.receive_email_shortly": {
-    "defaultMessage": "<b>{email}</b>(으)로 암호 재설정 링크가 포함된 이메일이 곧 발송됩니다."
-  },
-  "reset_password.title.password_reset": {
-    "defaultMessage": "암호 재설정"
   },
   "reset_password_form.action.sign_in": {
     "defaultMessage": "로그인"
@@ -1312,6 +1396,12 @@
   },
   "signout_confirmation_dialog.message.sure_to_sign_out": {
     "defaultMessage": "로그아웃하시겠습니까? 현재 주문을 처리하려면 다시 로그인해야 합니다."
+  },
+  "social_login_redirect.message.authenticating": {
+    "defaultMessage": "인증 중..."
+  },
+  "social_login_redirect.message.redirect_link": {
+    "defaultMessage": "자동으로 리디렉션되지 않으면 <link>이 링크</link>를 클릭하여 계속 진행하십시오."
   },
   "store_locator.action.find": {
     "defaultMessage": "찾기"
@@ -1621,6 +1711,12 @@
   "use_update_password_fields.error.minimum_characters": {
     "defaultMessage": "암호는 8자 이상이어야 합니다."
   },
+  "use_update_password_fields.error.password_mismatch": {
+    "defaultMessage": "암호가 일치하지 않습니다."
+  },
+  "use_update_password_fields.error.required_confirm_password": {
+    "defaultMessage": "암호를 확인해 주십시오."
+  },
   "use_update_password_fields.error.required_new_password": {
     "defaultMessage": "새 암호를 제공하십시오."
   },
@@ -1632,6 +1728,9 @@
   },
   "use_update_password_fields.error.uppercase_letter": {
     "defaultMessage": "암호에는 대문자가 하나 이상 포함되어야 합니다."
+  },
+  "use_update_password_fields.label.confirm_new_password": {
+    "defaultMessage": "새 암호 확인"
   },
   "use_update_password_fields.label.current_password": {
     "defaultMessage": "현재 암호"

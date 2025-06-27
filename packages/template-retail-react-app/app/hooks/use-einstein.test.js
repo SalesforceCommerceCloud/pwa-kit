@@ -35,6 +35,78 @@ afterAll(() => {
 })
 
 describe('EinsteinAPI', () => {
+    test('_constructEinsteinProduct handles variationGroup product type', () => {
+        const variationGroupProduct = {
+            id: 'test-variation-group-id',
+            price: 99.99,
+            type: {
+                variationGroup: true
+            },
+            master: {
+                masterId: 'master-product-id'
+            }
+        }
+
+        const result = einsteinApi._constructEinsteinProduct(variationGroupProduct)
+
+        expect(result).toEqual({
+            altId: 'test-variation-group-id',
+            id: 'master-product-id',
+            price: 99.99,
+            sku: 'test-variation-group-id',
+            type: 'vgroup'
+        })
+    })
+
+    test('_constructEinsteinProduct handles variant product type', () => {
+        const variantProduct = {
+            id: 'test-variant-id',
+            price: 99.99,
+            type: {
+                variant: true
+            },
+            master: {
+                masterId: 'master-product-id'
+            }
+        }
+
+        const result = einsteinApi._constructEinsteinProduct(variantProduct)
+
+        expect(result).toEqual({
+            id: 'master-product-id',
+            price: 99.99,
+            sku: 'test-variant-id'
+        })
+    })
+
+    test('_constructEinsteinItem handles variationGroup product type', () => {
+        const variationGroupItem = {
+            product: {
+                id: 'test-variation-group-id',
+                type: {
+                    variationGroup: true
+                },
+                master: {
+                    masterId: 'master-product-id'
+                }
+            },
+            productId: 'test-variation-group-id',
+            price: 99.99,
+            quantity: 2
+        }
+
+        const result = einsteinApi._constructEinsteinItem(variationGroupItem)
+
+        expect(result).toEqual({
+            id: 'master-product-id',
+            quantity: 2,
+            price: 99.99,
+            sku: 'test-variation-group-id',
+            type: 'vgroup',
+            altId: 'test-variation-group-id'
+        })
+    })
+
     test('viewProduct sends expected api request', async () => {
         await einsteinApi.sendViewProduct(mockProduct, {cookieId: 'test-usid'})
 
@@ -46,7 +118,7 @@ describe('EinsteinAPI', () => {
                     'Content-Type': 'application/json',
                     'x-cq-client-id': 'test-id'
                 },
-                body: '{"product":{"id":"56736828M","sku":"56736828M","altId":"","altIdType":""},"cookieId":"test-usid","realm":"test","instanceType":"sbx"}'
+                body: '{"product":{"id":"56736828M","price":155},"cookieId":"test-usid","realm":"test","instanceType":"sbx"}'
             }
         )
     })
@@ -158,12 +230,12 @@ describe('EinsteinAPI', () => {
                     'Content-Type': 'application/json',
                     'x-cq-client-id': 'test-id'
                 },
-                body: '{"products":[{"id":"682875719029M","sku":"","price":29.99,"quantity":1}],"amount":29.99,"cookieId":"test-usid","realm":"test","instanceType":"sbx"}'
+                body: '{"products":[{"id":"682875719029M","price":29.99,"quantity":1}],"amount":29.99,"cookieId":"test-usid","realm":"test","instanceType":"sbx"}'
             }
         )
     })
 
-    test('checkouStep sends expected api request', async () => {
+    test('checkoutStep sends expected api request', async () => {
         const checkoutStepName = 'CheckoutStep'
         const checkoutStep = 0
         await einsteinApi.sendCheckoutStep(checkoutStepName, checkoutStep, mockBasket, {
@@ -192,7 +264,7 @@ describe('EinsteinAPI', () => {
                     'Content-Type': 'application/json',
                     'x-cq-client-id': 'test-id'
                 },
-                body: '{"products":[{"id":"883360544021M","sku":"","price":155,"quantity":1}],"cookieId":"test-usid","realm":"test","instanceType":"sbx"}'
+                body: '{"products":[{"id":"883360544021M","price":155,"quantity":1}],"cookieId":"test-usid","realm":"test","instanceType":"sbx"}'
             }
         )
     })
@@ -209,7 +281,7 @@ describe('EinsteinAPI', () => {
                     'Content-Type': 'application/json',
                     'x-cq-client-id': 'test-id'
                 },
-                body: '{"recommenderName":"testRecommender","__recoUUID":"883360544021M","product":{"id":"56736828M","sku":"56736828M","altId":"","altIdType":""},"cookieId":"test-usid","realm":"test","instanceType":"sbx"}'
+                body: '{"recommenderName":"testRecommender","__recoUUID":"883360544021M","product":{"id":"56736828M","price":155},"cookieId":"test-usid","realm":"test","instanceType":"sbx"}'
             }
         )
     })
@@ -246,6 +318,33 @@ describe('EinsteinAPI', () => {
                     'Content-Type': 'application/json',
                     'x-cq-client-id': 'test-id'
                 }
+            }
+        )
+    })
+
+    test('sendViewProduct handles variationGroup product type', async () => {
+        const variationGroupProduct = {
+            id: 'test-variation-group-id',
+            price: 99.99,
+            type: {
+                variationGroup: true
+            },
+            master: {
+                masterId: 'master-product-id'
+            }
+        }
+
+        await einsteinApi.sendViewProduct(variationGroupProduct, {cookieId: 'test-usid'})
+
+        expect(fetch).toHaveBeenCalledWith(
+            'http://localhost/test-path/v3/activities/test-site-id/viewProduct',
+            {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'x-cq-client-id': 'test-id'
+                },
+                body: '{"product":{"altId":"test-variation-group-id","id":"master-product-id","price":99.99,"sku":"test-variation-group-id","type":"vgroup"},"cookieId":"test-usid","realm":"test","instanceType":"sbx"}'
             }
         )
     })
