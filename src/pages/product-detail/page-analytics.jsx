@@ -56,4 +56,4 @@ PageAnalytics.propTypes = {
     category: PropTypes.object
 }
 
-export default PageAnalytics 
+export default PageAnalytics
