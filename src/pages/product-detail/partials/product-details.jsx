@@ -6,8 +6,8 @@
  */
 import React from 'react'
 import PropTypes from 'prop-types'
-import SimpleProductDetails from './simple-product-details'
-import CompositeProductDetails from './composite-product-details'
+import SimpleProductDetails from './product-details-simple'
+import CompositeProductDetails from './product-details-composite'
 
 const ProductDetails = (props) => {
     const {isProductASet, isProductABundle} = props
