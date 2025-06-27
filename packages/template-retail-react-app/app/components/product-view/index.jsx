@@ -146,26 +146,57 @@ const ProductView = forwardRef(
         const {data: bonusProductSearchResult} = useBonusProductSearch(promotionIdToSearch)
 
         // State to track all promotion IDs and their results
-        const [promotionResults, setPromotionResults] = useState({})
         const [pendingPromotionIds, setPendingPromotionIds] = useState([])
+        const [bonusItemsForModal, setBonusItemsForModal] = useState(null)
+        const ruleBasedPromotionsRef = useRef([])
 
         // Effect to handle multiple promotions sequentially
         useEffect(() => {
             if (bonusProductSearchResult?.hits?.length > 0 && promotionIdToSearch) {
-                // Store the result for current promotion
-                setPromotionResults((prev) => ({
-                    ...prev,
-                    [promotionIdToSearch]: bonusProductSearchResult
-                }))
+                // Format the bonus products for current promotion
+                let formattedBonusProducts = bonusProductSearchResult.hits.map((bonusProduct) => {
+                    return {
+                        productId: bonusProduct.productId,
+                        productName: bonusProduct.productName,
+                        c_productUrl: bonusProduct.c_productUrl
+                    }
+                })
+
+                // Add current promotion result to ref
+                const currentPromotionResult = {
+                    bonusProducts: formattedBonusProducts,
+                    id: bonusItemsForModal?.promotionIdToIdMap?.[promotionIdToSearch]
+                }
+                ruleBasedPromotionsRef.current.push(currentPromotionResult)
 
                 // Move to next promotion if any pending
                 if (pendingPromotionIds.length > 0) {
                     const nextPromotionId = pendingPromotionIds[0]
                     setPendingPromotionIds((prev) => prev.slice(1))
                     setPromotionIdToSearch(nextPromotionId)
+                } else {
+                    // All promotions processed, now open the modal
+                    const bonusProductsToShow = [
+                        ...ruleBasedPromotionsRef.current,
+                        ...bonusItemsForModal.listBasedBonusProducts
+                    ]
+
+                    addBonusProducts(bonusItemsForModal.newBonusItems)
+                    onBonusProductModalOpen({
+                        newBonusItems: bonusProductsToShow,
+                        openAddToCartModalIfNeeded: true,
+                        product: bonusItemsForModal.product,
+                        itemsAdded: bonusItemsForModal.itemsAdded,
+                        selectedQuantity: bonusItemsForModal.selectedQuantity
+                    })
+
+                    // Clear state
+                    setBonusItemsForModal(null)
+                    setPromotionIdToSearch(null)
+                    ruleBasedPromotionsRef.current = []
                 }
             }
-        }, [bonusProductSearchResult, promotionIdToSearch, pendingPromotionIds])
+        }, [bonusProductSearchResult])
 
         const {
             showLoading,
@@ -331,13 +362,11 @@ const ProductView = forwardRef(
                     if (isValidResponse) {
                         // Show bonus product modal first if there are bonus items
                         if (newBonusItems?.length > 0) {
-                            let bonusProductsToShow = []
-                            let ruleBasedBonusProducts = []
                             let listBasedBonusProducts = newBonusItems.filter(
                                 (item) => item.bonusProducts
                             )
                             // Collect all promotion IDs for rule-based promotions
-                            const promotionIds = newBonusItems
+                            const ruleBasedPromotionIds = newBonusItems
                                 .filter((item) => !item.bonusProducts) // Rule-based promotions don't have bonusProducts
                                 .map((item) => item.promotionId)
                                 .filter(Boolean)
@@ -351,42 +380,31 @@ const ProductView = forwardRef(
                                 }, {})
 
                             // Start sequential processing if we have promotion IDs
-                            if (promotionIds.length > 0) {
+                            if (ruleBasedPromotionIds.length > 0) {
+                                // Store bonus items for processing in useEffect
+                                setBonusItemsForModal({
+                                    newBonusItems,
+                                    product,
+                                    itemsAdded,
+                                    selectedQuantity: quantity,
+                                    promotionIdToIdMap,
+                                    listBasedBonusProducts
+                                })
+
                                 // Set first promotion ID and queue the rest
-                                setPromotionIdToSearch(promotionIds[0])
-                                setPendingPromotionIds(promotionIds.slice(1))
+                                setPromotionIdToSearch(ruleBasedPromotionIds[0])
+                                setPendingPromotionIds(ruleBasedPromotionIds.slice(1))
+                            } else {
+                                // No rule-based promotions, just show list-based ones immediately
+                                addBonusProducts(newBonusItems)
+                                onBonusProductModalOpen({
+                                    newBonusItems: listBasedBonusProducts,
+                                    openAddToCartModalIfNeeded: true,
+                                    product,
+                                    itemsAdded,
+                                    selectedQuantity: quantity
+                                })
                             }
-
-                            // Combine all stored results
-                            Object.entries(promotionResults).forEach(([promotionId, result]) => {
-                                if (result?.hits?.length > 0) {
-                                    let formattedBonusProducts = result.hits.map((bonusProduct) => {
-                                        return {
-                                            productId: bonusProduct.productId,
-                                            productName: bonusProduct.productName,
-                                            c_productUrl: bonusProduct.c_productUrl
-                                        }
-                                    })
-                                    ruleBasedBonusProducts.push({
-                                        bonusProducts: formattedBonusProducts,
-                                        id: promotionIdToIdMap[promotionId]
-                                    })
-                                }
-                            })
-
-                            bonusProductsToShow = [
-                                ...ruleBasedBonusProducts,
-                                ...listBasedBonusProducts
-                            ]
-
-                            addBonusProducts(newBonusItems)
-                            onBonusProductModalOpen({
-                                newBonusItems: bonusProductsToShow,
-                                openAddToCartModalIfNeeded: true,
-                                product,
-                                itemsAdded,
-                                selectedQuantity: quantity
-                            })
                         } else {
                             // If no bonus items, just show add to cart modal
                             onAddToCartModalOpen({

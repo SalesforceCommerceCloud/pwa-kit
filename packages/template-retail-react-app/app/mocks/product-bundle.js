@@ -1225,7 +1225,8 @@ export const mockProductBundle = {
     },
     unitQuantity: 0,
     c_isNewtest: false,
-    c_isSale: false
+    c_isSale: false,
+    variationAttributes: []
 }
 
 export const mockBundleItemsAdded = [

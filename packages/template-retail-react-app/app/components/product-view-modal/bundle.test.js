@@ -171,6 +171,7 @@ test('bundle product view modal disables update button when quantity exceeds chi
 
     // Set product bundle quantity selection to 4
     fireEvent.change(quantityInput, {target: {value: '4'}})
+    fireEvent.blur(quantityInput) // Trigger validation
     fireEvent.keyDown(quantityInput, {key: 'Enter', code: 'Enter', charCode: 13})
 
     fireEvent.click(sizeSelectBtn)
