@@ -89,9 +89,7 @@ const CompositeProductDetails = ({
                                               ])
                                         : null
                                 }
-                                addToWishlist={
-                                    isProductASet ? handleAddToWishlist : null
-                                }
+                                addToWishlist={isProductASet ? handleAddToWishlist : null}
                                 onVariantSelected={(product, variant, quantity) => {
                                     if (quantity) {
                                         setChildProductSelection((previousState) => ({
@@ -113,9 +111,7 @@ const CompositeProductDetails = ({
                                 isProductLoading={isProductLoading}
                                 isBasketLoading={isBasketLoading}
                                 isWishlistLoading={isWishlistLoading}
-                                setChildProductOrderability={
-                                    setChildProductOrderability
-                                }
+                                setChildProductOrderability={setChildProductOrderability}
                             />
                             <InformationAccordion product={childProduct} />
 
