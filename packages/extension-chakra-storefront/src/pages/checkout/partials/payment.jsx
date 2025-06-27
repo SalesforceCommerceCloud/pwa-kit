@@ -190,7 +190,7 @@ const Payment = () => {
         >
             <ToggleCardEdit>
                 <Box mt={-2} mb={4}>
-                    {/* <PromoCode {...promoCodeProps} itemProps={{border: 'none'}} /> */}
+                    <PromoCode {...promoCodeProps} itemProps={{border: 'none'}} />
                 </Box>
 
                 <Stack gap={6}>
