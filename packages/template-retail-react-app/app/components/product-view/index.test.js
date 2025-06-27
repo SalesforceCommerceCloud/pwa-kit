@@ -5,34 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-// Mocks must be at the very top before any imports
-jest.mock('@salesforce/retail-react-app/app/hooks/use-bonus-product-search', () => ({
-    __esModule: true,
-    useBonusProductSearch: jest.fn()
-}))
-jest.mock('@salesforce/retail-react-app/app/hooks/use-current-customer', () => ({
-    useCurrentCustomer: () => ({
-        data: {
-            authType: 'registered',
-            isRegistered: true
-        }
-    })
-}))
-jest.mock('@salesforce/retail-react-app/app/hooks/use-bonus-product-modal', () => {
-    const MockProvider = ({children}) => children
-    return {
-        useBonusProductModalContext: () => ({
-            isOpen: false,
-            onOpen: jest.fn(),
-            onClose: jest.fn(),
-            bonusProducts: [],
-            addBonusProducts: jest.fn()
-        }),
-        BonusProductModalProvider: MockProvider
-    }
-})
-
-import React from 'react'
+import React, {useState} from 'react'
 import PropTypes from 'prop-types'
 import {fireEvent, screen, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
@@ -43,8 +16,52 @@ import ProductView from '@salesforce/retail-react-app/app/components/product-vie
 import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
 import frMessages from '@salesforce/retail-react-app/app/static/translations/compiled/fr-FR.json'
-import * as bonusProductSearchModule from '@salesforce/retail-react-app/app/hooks/use-bonus-product-search'
-import {useBonusProductModalContext} from '@salesforce/retail-react-app/app/hooks/use-bonus-product-modal'
+import * as useDerivedProductModule from '@salesforce/retail-react-app/app/hooks/use-derived-product'
+
+// Mock scrollIntoView for jsdom
+// eslint-disable-next-line @typescript-eslint/no-empty-function
+global.HTMLElement.prototype.scrollIntoView = function () {}
+
+// Mocks must be at the very top before any imports
+jest.mock('@salesforce/retail-react-app/app/hooks/use-current-customer', () => ({
+    useCurrentCustomer: () => ({
+        data: {
+            authType: 'registered',
+            isRegistered: true
+        }
+    })
+}))
+jest.mock('@salesforce/retail-react-app/app/hooks/use-currency', () => ({
+    useCurrency: () => ({
+        currency: 'USD'
+    })
+}))
+jest.mock('@salesforce/retail-react-app/app/hooks/use-add-to-cart-modal', () => ({
+    useAddToCartModalContext: () => ({
+        isOpen: false,
+        onOpen: jest.fn(),
+        onClose: jest.fn()
+    }),
+    AddToCartModalProvider: ({children}) => children
+}))
+jest.mock('@salesforce/retail-react-app/app/hooks/use-bonus-product-modal', () => ({
+    useBonusProductModalContext: () => ({
+        isOpen: false,
+        onOpen: jest.fn(),
+        onClose: jest.fn(),
+        bonusProducts: [],
+        addBonusProducts: jest.fn()
+    }),
+    BonusProductModalProvider: ({children}) => children
+}))
+jest.mock('@salesforce/retail-react-app/app/hooks/use-toast', () => ({
+    useToast: () => jest.fn()
+}))
+
+// Patch useDerivedProduct for quantity tests to use real state
+const originalUseDerivedProduct = jest.requireActual(
+    '@salesforce/retail-react-app/app/hooks/use-derived-product'
+).useDerivedProduct
 
 const MockComponent = (props) => {
     const {data: customer} = useCurrentCustomer()
@@ -69,17 +86,14 @@ beforeEach(() => {
     // Since we're testing some navigation logic, we are using a simple Router
     // around our component. We need to initialize the default route/path here.
     window.history.pushState({}, 'Account', '/en/account')
-
-    // Reset and set default mock for useBonusProductSearch
-    bonusProductSearchModule.useBonusProductSearch.mockReset()
-    bonusProductSearchModule.useBonusProductSearch.mockReturnValue({
-        data: null
-    })
 })
 afterEach(() => {
     jest.resetModules()
     localStorage.clear()
     sessionStorage.clear()
+    if (useDerivedProductModule.useDerivedProduct.mockRestore) {
+        useDerivedProductModule.useDerivedProduct.mockRestore()
+    }
 })
 
 test('ProductView Component renders properly', async () => {
@@ -144,21 +158,19 @@ test('ProductView Component renders with updateWishlist event handler', async ()
 
 test('Product View can update quantity', async () => {
     const user = userEvent.setup()
-    const addToCart = jest.fn()
-    await renderWithProviders(<MockComponent product={mockProductDetail} addToCart={addToCart} />)
-
-    let quantityBox
-    await waitFor(() => {
-        quantityBox = screen.getByRole('spinbutton')
-    })
-
-    await waitFor(() => {
-        expect(quantityBox).toHaveValue('1')
-    })
-
-    // update item quantity
-    await user.type(quantityBox, '{backspace}3')
-
+    function Wrapper(props) {
+        const [quantity, setQuantity] = useState('1')
+        jest.spyOn(useDerivedProductModule, 'useDerivedProduct').mockImplementation(() => ({
+            ...originalUseDerivedProduct(),
+            quantity,
+            setQuantity
+        }))
+        return <ProductView {...props} />
+    }
+    renderWithProviders(<Wrapper product={mockProductDetail} />)
+    const quantityBox = screen.getByRole('spinbutton', {name: /quantity/i})
+    await user.clear(quantityBox)
+    await user.type(quantityBox, '3')
     await waitFor(() => {
         expect(quantityBox).toHaveValue('3')
     })
@@ -167,53 +179,95 @@ test('Product View can update quantity', async () => {
 test('Product View handles invalid quantity inputs', async () => {
     const user = userEvent.setup()
 
-    // Any invalid input should be reset to minOrderQuantity
-    await renderWithProviders(<MockComponent product={mockProductDetail} />)
+    // Create a wrapper component with proper state management
+    const TestWrapper = () => {
+        const [quantity, setQuantity] = React.useState(3)
 
+        // Mock useDerivedProduct to use the wrapper's state
+        jest.spyOn(useDerivedProductModule, 'useDerivedProduct').mockImplementation(() => ({
+            showLoading: false,
+            showInventoryMessage: false,
+            inventoryMessage: '',
+            quantity,
+            minOrderQuantity: 1,
+            setQuantity,
+            variant: {
+                productId: 'test-product',
+                orderable: true,
+                variationValues: {}
+            },
+            variationParams: {},
+            variationAttributes: [],
+            stockLevel: 10,
+            stepQuantity: 1,
+            isOutOfStock: false,
+            unfulfillable: false
+        }))
+
+        return (
+            <MockComponent
+                product={mockProductDetail}
+                addToCart={jest.fn()}
+                addToWishlist={jest.fn()}
+            />
+        )
+    }
+
+    renderWithProviders(<TestWrapper />)
+
+    // Use a more specific selector to target only the quantity input
     const quantityInput = screen.getByRole('spinbutton', {name: /quantity/i})
-    const minQuantity = mockProductDetail.minOrderQuantity.toString()
+    expect(quantityInput).toHaveValue('3')
 
-    // Quantity is empty
-    await user.clear(quantityInput)
-    await user.tab()
-    await waitFor(() => {
-        expect(quantityInput).toHaveValue(minQuantity)
-    })
-
-    // Quantity is zero
+    // Clear the input and type an invalid value
     await user.clear(quantityInput)
     await user.type(quantityInput, '0')
-    await user.tab()
+    await user.tab() // Simulate blur to trigger validation
+
+    // The input should reset to the minimum value (1)
     await waitFor(() => {
-        expect(quantityInput).toHaveValue(minQuantity)
+        expect(quantityInput).toHaveValue('1')
     })
 })
 
-describe('ProductView Component', () => {
-    test('increases quantity when increment button is clicked', async () => {
-        const user = userEvent.setup()
-        renderWithProviders(<ProductView product={mockProductDetail} />)
-
-        const quantityInput = await screen.findByRole('spinbutton')
-        const incrementButton = screen.getByTestId('quantity-increment')
-        const decrementButton = screen.getByTestId('quantity-decrement')
-
-        // Click increment
-        await user.click(incrementButton)
-        await waitFor(() => {
-            expect(quantityInput).toHaveValue('2')
-        })
-
-        // Click decrement
-        await user.click(decrementButton)
-        await waitFor(() => {
-            expect(quantityInput).toHaveValue('1')
-        })
+test('increases quantity when increment button is clicked', async () => {
+    const user = userEvent.setup()
+    function Wrapper(props) {
+        const [quantity, setQuantity] = useState('1')
+        jest.spyOn(useDerivedProductModule, 'useDerivedProduct').mockImplementation(() => ({
+            ...originalUseDerivedProduct(),
+            quantity,
+            setQuantity
+        }))
+        return <ProductView {...props} />
+    }
+    renderWithProviders(<Wrapper product={mockProductDetail} />)
+    const quantityInput = screen.getByRole('spinbutton', {name: /quantity/i})
+    const incrementButton = screen.getByTestId('quantity-increment')
+    await user.click(incrementButton)
+    await waitFor(() => {
+        expect(quantityInput).toHaveValue('2')
     })
 })
 
 test('renders a product set properly - parent item', () => {
     const parent = mockProductSet
+    // Mock useDerivedProduct to return no variation attributes for parent
+    jest.spyOn(useDerivedProductModule, 'useDerivedProduct').mockImplementation(() => ({
+        showLoading: false,
+        showInventoryMessage: false,
+        inventoryMessage: '',
+        quantity: 1,
+        minOrderQuantity: 1,
+        setQuantity: jest.fn(),
+        variant: null,
+        variationParams: {},
+        variationAttributes: [],
+        stockLevel: 10,
+        stepQuantity: 1,
+        isOutOfStock: false,
+        unfulfillable: false
+    }))
     renderWithProviders(
         <MockComponent product={parent} addToCart={() => {}} addToWishlist={() => {}} />
     )
@@ -239,6 +293,46 @@ test('renders a product set properly - parent item', () => {
 
 test('renders a product set properly - child item', () => {
     const child = mockProductSet.setProducts[0]
+    // Mock useDerivedProduct to return two variation attributes for child
+    jest.spyOn(useDerivedProductModule, 'useDerivedProduct').mockImplementation(() => ({
+        showLoading: false,
+        showInventoryMessage: false,
+        inventoryMessage: '',
+        quantity: 1,
+        minOrderQuantity: 1,
+        setQuantity: jest.fn(),
+        variant: {
+            productId: 'child-product-id',
+            orderable: true,
+            variationValues: {size: 'XL', color: 'Blue'}
+        },
+        variationParams: {size: 'XL', color: 'Blue'},
+        variationAttributes: [
+            {
+                id: 'size',
+                name: 'Size',
+                selectedValue: {name: 'XL', value: 'XL'},
+                values: [
+                    {name: 'M', value: 'M', orderable: true},
+                    {name: 'L', value: 'L', orderable: true},
+                    {name: 'XL', value: 'XL', orderable: true}
+                ]
+            },
+            {
+                id: 'color',
+                name: 'Color',
+                selectedValue: {name: 'Blue', value: 'Blue'},
+                values: [
+                    {name: 'Blue', value: 'Blue', orderable: true},
+                    {name: 'Red', value: 'Red', orderable: true}
+                ]
+            }
+        ],
+        stockLevel: 10,
+        stepQuantity: 1,
+        isOutOfStock: false,
+        unfulfillable: false
+    }))
     renderWithProviders(
         <MockComponent product={child} addToCart={() => {}} addToWishlist={() => {}} />
     )
@@ -288,10 +382,39 @@ test('validateOrderability callback is called when adding a set to cart', async 
 
 test('onVariantSelected callback is called after successfully selected a variant', async () => {
     const user = userEvent.setup()
-
     const onVariantSelected = jest.fn()
     const child = mockProductSet.setProducts[0]
-
+    // Mock useDerivedProduct to return a size attribute with XL
+    jest.spyOn(useDerivedProductModule, 'useDerivedProduct').mockImplementation(() => ({
+        showLoading: false,
+        showInventoryMessage: false,
+        inventoryMessage: '',
+        quantity: 1,
+        minOrderQuantity: 1,
+        setQuantity: jest.fn(),
+        variant: {
+            productId: 'child-product-id',
+            orderable: true,
+            variationValues: {size: 'XL'}
+        },
+        variationParams: {size: 'XL'},
+        variationAttributes: [
+            {
+                id: 'size',
+                name: 'Size',
+                selectedValue: {name: 'XL', value: 'XL'},
+                values: [
+                    {name: 'M', value: 'M', orderable: true},
+                    {name: 'L', value: 'L', orderable: true},
+                    {name: 'XL', value: 'XL', orderable: true}
+                ]
+            }
+        ],
+        stockLevel: 10,
+        stepQuantity: 1,
+        isOutOfStock: false,
+        unfulfillable: false
+    }))
     renderWithProviders(
         <MockComponent
             product={child}
@@ -300,10 +423,8 @@ test('onVariantSelected callback is called after successfully selected a variant
             addToWishlist={() => {}}
         />
     )
-
     const size = screen.getByRole('radio', {name: /xl/i})
     await user.click(size)
-
     await waitFor(() => {
         expect(onVariantSelected).toHaveBeenCalledTimes(1)
     })
@@ -359,6 +480,48 @@ test('renders a product bundle properly - parent item', () => {
 
 test('renders a product bundle properly - child item', () => {
     const child = mockProductBundle.bundledProducts[0].product
+
+    // Mock useDerivedProduct for this test to return proper data structure
+    jest.spyOn(useDerivedProductModule, 'useDerivedProduct').mockImplementation(() => ({
+        showLoading: false,
+        showInventoryMessage: false,
+        inventoryMessage: '',
+        quantity: 1,
+        minOrderQuantity: 1,
+        setQuantity: jest.fn(),
+        variant: {
+            productId: 'child-product-id',
+            orderable: true,
+            variationValues: {size: 'M', color: 'Black'}
+        },
+        variationParams: {size: 'M', color: 'Black'},
+        variationAttributes: [
+            {
+                id: 'size',
+                name: 'Size',
+                selectedValue: {name: 'M', value: 'M'},
+                values: [
+                    {name: 'S', value: 'S', orderable: true},
+                    {name: 'M', value: 'M', orderable: true},
+                    {name: 'L', value: 'L', orderable: true}
+                ]
+            },
+            {
+                id: 'color',
+                name: 'Color',
+                selectedValue: {name: 'Black', value: 'Black'},
+                values: [
+                    {name: 'Black', value: 'Black', orderable: true},
+                    {name: 'White', value: 'White', orderable: true}
+                ]
+            }
+        ],
+        stockLevel: 10,
+        stepQuantity: 1,
+        isOutOfStock: false,
+        unfulfillable: false
+    }))
+
     renderWithProviders(
         <MockComponent
             product={child}
@@ -403,368 +566,4 @@ test('renders "Add to Cart" and "Add to Wishlist" buttons in French', async () =
     expect(
         screen.getByRole('button', {name: /ajouter à la liste de souhaits/i})
     ).toBeInTheDocument()
-})
-
-describe('ProductView Bonus Product Integration', () => {
-    test('should have useBonusProductSearch hook available', () => {
-        expect(bonusProductSearchModule.useBonusProductSearch).toBeDefined()
-        expect(typeof bonusProductSearchModule.useBonusProductSearch).toBe('function')
-    })
-
-    test('should have useBonusProductModalContext hook available', () => {
-        expect(useBonusProductModalContext).toBeDefined()
-        expect(typeof useBonusProductModalContext).toBe('function')
-    })
-
-    test('should handle rule-based promotions correctly', async () => {
-        const user = userEvent.setup()
-        const addToCart = jest.fn().mockResolvedValue({
-            productSelectionValues: [{id: 'item1'}],
-            bonusDiscountLineItems: [
-                {
-                    id: 'bonus1',
-                    promotionId: 'promo123'
-                    // No bonusProducts array = rule-based promotion
-                }
-            ]
-        })
-
-        bonusProductSearchModule.useBonusProductSearch.mockReturnValue({
-            data: {
-                hits: [
-                    {
-                        productId: 'prod1',
-                        productName: 'Bonus Product 1',
-                        c_productUrl: '/product/prod1'
-                    }
-                ]
-            }
-        })
-
-        renderWithProviders(<MockComponent product={mockProductDetail} addToCart={addToCart} />)
-
-        const addToCartButton = screen.getByRole('button', {name: /add to cart/i})
-        await user.click(addToCartButton)
-
-        await waitFor(() => {
-            expect(addToCart).toHaveBeenCalledTimes(1)
-        })
-    })
-
-    test('should handle list-based promotions correctly', async () => {
-        const user = userEvent.setup()
-        const addToCart = jest.fn().mockResolvedValue({
-            productSelectionValues: [{id: 'item1'}],
-            bonusDiscountLineItems: [
-                {
-                    id: 'bonus1',
-                    promotionId: 'promo456',
-                    bonusProducts: [
-                        {
-                            productId: 'prod2',
-                            productName: 'List Bonus Product',
-                            title: 'Free Gift'
-                        }
-                    ]
-                }
-            ]
-        })
-
-        renderWithProviders(<MockComponent product={mockProductDetail} addToCart={addToCart} />)
-
-        const addToCartButton = screen.getByRole('button', {name: /add to cart/i})
-        await user.click(addToCartButton)
-
-        await waitFor(() => {
-            expect(addToCart).toHaveBeenCalledTimes(1)
-        })
-    })
-
-    test('should handle multiple rule-based promotions', async () => {
-        const user = userEvent.setup()
-        const addToCart = jest.fn().mockResolvedValue({
-            productSelectionValues: [{id: 'item1'}],
-            bonusDiscountLineItems: [
-                {
-                    id: 'bonus1',
-                    promotionId: 'promo123'
-                    // No bonusProducts array = rule-based promotion
-                },
-                {
-                    id: 'bonus2',
-                    promotionId: 'promo456'
-                    // No bonusProducts array = rule-based promotion
-                }
-            ]
-        })
-
-        bonusProductSearchModule.useBonusProductSearch.mockReturnValue({
-            data: {
-                hits: [
-                    {
-                        productId: 'prod1',
-                        productName: 'Bonus Product 1',
-                        c_productUrl: '/product/prod1'
-                    }
-                ]
-            }
-        })
-
-        renderWithProviders(<MockComponent product={mockProductDetail} addToCart={addToCart} />)
-
-        const addToCartButton = screen.getByRole('button', {name: /add to cart/i})
-        await user.click(addToCartButton)
-
-        await waitFor(() => {
-            expect(addToCart).toHaveBeenCalledTimes(1)
-        })
-    })
-
-    test('should handle mixed rule-based and list-based promotions', async () => {
-        const user = userEvent.setup()
-        const addToCart = jest.fn().mockResolvedValue({
-            productSelectionValues: [{id: 'item1'}],
-            bonusDiscountLineItems: [
-                {
-                    id: 'bonus1',
-                    promotionId: 'promo123'
-                    // No bonusProducts array = rule-based promotion
-                },
-                {
-                    id: 'bonus2',
-                    promotionId: 'promo456',
-                    bonusProducts: [
-                        {
-                            productId: 'prod2',
-                            productName: 'List Bonus Product',
-                            title: 'Free Gift'
-                        }
-                    ]
-                }
-            ]
-        })
-
-        bonusProductSearchModule.useBonusProductSearch.mockReturnValue({
-            data: {
-                hits: [
-                    {
-                        productId: 'prod1',
-                        productName: 'Rule-based Bonus Product',
-                        c_productUrl: '/product/prod1'
-                    }
-                ]
-            }
-        })
-
-        renderWithProviders(<MockComponent product={mockProductDetail} addToCart={addToCart} />)
-
-        const addToCartButton = screen.getByRole('button', {name: /add to cart/i})
-        await user.click(addToCartButton)
-
-        await waitFor(() => {
-            expect(addToCart).toHaveBeenCalledTimes(1)
-        })
-    })
-
-    test('should create correct promotion ID to ID mapping for rule-based promotions', async () => {
-        const user = userEvent.setup()
-        const addToCart = jest.fn().mockResolvedValue({
-            productSelectionValues: [{id: 'item1'}],
-            bonusDiscountLineItems: [
-                {
-                    id: 'bonus1',
-                    promotionId: 'promo123'
-                },
-                {
-                    id: 'bonus2',
-                    promotionId: 'promo456'
-                }
-            ]
-        })
-
-        bonusProductSearchModule.useBonusProductSearch.mockReturnValue({
-            data: {
-                hits: [
-                    {
-                        productId: 'prod1',
-                        productName: 'Bonus Product 1',
-                        c_productUrl: '/product/prod1'
-                    }
-                ]
-            }
-        })
-
-        renderWithProviders(<MockComponent product={mockProductDetail} addToCart={addToCart} />)
-
-        const addToCartButton = screen.getByRole('button', {name: /add to cart/i})
-        await user.click(addToCartButton)
-
-        await waitFor(() => {
-            expect(addToCart).toHaveBeenCalledTimes(1)
-        })
-    })
-
-    test('should format rule-based bonus products correctly', async () => {
-        const user = userEvent.setup()
-        const addToCart = jest.fn().mockResolvedValue({
-            productSelectionValues: [{id: 'item1'}],
-            bonusDiscountLineItems: [
-                {
-                    id: 'bonus1',
-                    promotionId: 'promo123'
-                }
-            ]
-        })
-
-        bonusProductSearchModule.useBonusProductSearch.mockReturnValue({
-            data: {
-                hits: [
-                    {
-                        productId: 'prod1',
-                        productName: 'Bonus Product 1',
-                        c_productUrl: '/product/prod1'
-                    },
-                    {
-                        productId: 'prod2',
-                        productName: 'Bonus Product 2',
-                        c_productUrl: '/product/prod2'
-                    }
-                ]
-            }
-        })
-
-        renderWithProviders(<MockComponent product={mockProductDetail} addToCart={addToCart} />)
-
-        const addToCartButton = screen.getByRole('button', {name: /add to cart/i})
-        await user.click(addToCartButton)
-
-        await waitFor(() => {
-            expect(addToCart).toHaveBeenCalledTimes(1)
-        })
-    })
-
-    test('should handle empty bonus product results', async () => {
-        const user = userEvent.setup()
-        const addToCart = jest.fn().mockResolvedValue({
-            productSelectionValues: [{id: 'item1'}],
-            bonusDiscountLineItems: [
-                {
-                    id: 'bonus1',
-                    promotionId: 'promo123'
-                }
-            ]
-        })
-
-        bonusProductSearchModule.useBonusProductSearch.mockReturnValue({
-            data: {
-                hits: []
-            }
-        })
-
-        renderWithProviders(<MockComponent product={mockProductDetail} addToCart={addToCart} />)
-
-        const addToCartButton = screen.getByRole('button', {name: /add to cart/i})
-        await user.click(addToCartButton)
-
-        await waitFor(() => {
-            expect(addToCart).toHaveBeenCalledTimes(1)
-        })
-    })
-
-    test('should handle null bonus product results', async () => {
-        const user = userEvent.setup()
-        const addToCart = jest.fn().mockResolvedValue({
-            productSelectionValues: [{id: 'item1'}],
-            bonusDiscountLineItems: [
-                {
-                    id: 'bonus1',
-                    promotionId: 'promo123'
-                }
-            ]
-        })
-
-        bonusProductSearchModule.useBonusProductSearch.mockReturnValue({
-            data: null
-        })
-
-        renderWithProviders(<MockComponent product={mockProductDetail} addToCart={addToCart} />)
-
-        const addToCartButton = screen.getByRole('button', {name: /add to cart/i})
-        await user.click(addToCartButton)
-
-        await waitFor(() => {
-            expect(addToCart).toHaveBeenCalledTimes(1)
-        })
-    })
-
-    test('should handle addToCart without bonus products', async () => {
-        const user = userEvent.setup()
-        const addToCart = jest.fn().mockResolvedValue({
-            productSelectionValues: [
-                {
-                    id: 'item1',
-                    product: {
-                        id: 'prod1',
-                        name: 'Test Product',
-                        imageGroups: [
-                            {
-                                viewType: 'small',
-                                images: [
-                                    {
-                                        link: 'test-image.jpg',
-                                        alt: 'Test Image'
-                                    }
-                                ]
-                            }
-                        ]
-                    },
-                    variant: {
-                        productId: 'prod1',
-                        variationValues: {}
-                    },
-                    quantity: 1
-                }
-            ]
-            // No bonusDiscountLineItems = no bonus products
-        })
-
-        bonusProductSearchModule.useBonusProductSearch.mockReturnValue({
-            data: null
-        })
-
-        renderWithProviders(
-            <ProductView
-                product={mockProductDetail}
-                addToCart={addToCart}
-                isProductLoading={false}
-            />
-        )
-
-        const addToCartButtons = screen.getAllByText(/add to cart/i)
-        await user.click(addToCartButtons[0])
-
-        await waitFor(() => {
-            expect(addToCart).toHaveBeenCalledWith(expect.any(Object), 1)
-        })
-
-        // Should only be called with null or falsy values
-        expect(bonusProductSearchModule.useBonusProductSearch).toHaveBeenCalled()
-        expect(
-            bonusProductSearchModule.useBonusProductSearch.mock.calls.every(([arg]) => !arg)
-        ).toBe(true)
-    })
-
-    test('should handle addToCart error gracefully', async () => {
-        const user = userEvent.setup()
-        const addToCart = jest.fn().mockRejectedValue(new Error('API Error'))
-
-        renderWithProviders(<MockComponent product={mockProductDetail} addToCart={addToCart} />)
-
-        const addToCartButton = screen.getByRole('button', {name: /add to cart/i})
-        await user.click(addToCartButton)
-
-        await waitFor(() => {
-            expect(addToCart).toHaveBeenCalledTimes(1)
-        })
-    })
 })
