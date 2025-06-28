@@ -1,6 +1,7 @@
 ## 4.0.0-extensibility-preview.5
 - Deprecate V3 Extensibility and experimental V4 Extensibility (#2573)
 - Move extensibility logic to generator (#2573)
+- Apply prettier to trimmed files (#2688)
 
 ## v3.10.0 (Feb 18, 2025)
 - Add Data Cloud API configuration to `default.js`. [#2318] (https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2229)
