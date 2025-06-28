@@ -22,7 +22,7 @@ module.exports = {
     },
     setupFilesAfterEnv: [path.join(__dirname, 'jest-setup.js')],
     collectCoverageFrom: [
-        'srcpages/**/*.{js,jsx}',
+        'src/pages/**/*.{js,jsx}',
         'src/components/**/*.{js,jsx}',
         'src/hooks/**/*.{js,jsx}',
         'src/utils/**/*.{js,jsx}',
