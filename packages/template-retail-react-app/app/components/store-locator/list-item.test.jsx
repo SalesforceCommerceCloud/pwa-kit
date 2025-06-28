@@ -46,7 +46,7 @@ describe('StoreLocatorListItem', () => {
         ).toBe(true)
         expect(screen.getByText('0.5 mi away')).toBeTruthy()
         expect(screen.getByText('Phone: 555-1234')).toBeTruthy()
-        expect(screen.getByText('View More')).toBeTruthy()
+        expect(screen.getByText('Store Hours')).toBeTruthy()
     })
 
     it('handles missing optional fields', () => {
@@ -64,6 +64,6 @@ describe('StoreLocatorListItem', () => {
         expect(screen.getByText(/Simple City/)).toBeTruthy()
         expect(screen.queryByText(/away/)).toBeNull()
         expect(screen.queryByText(/Phone:/)).toBeNull()
-        expect(screen.queryByText('View More')).toBeNull()
+        expect(screen.queryByText('Store Hours')).toBeNull()
     })
 })

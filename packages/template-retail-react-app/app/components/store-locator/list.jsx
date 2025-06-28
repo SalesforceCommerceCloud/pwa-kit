@@ -7,15 +7,17 @@
 
 import React, {useEffect, useState, useMemo} from 'react'
 import {Accordion, AccordionItem, Box, Button, RadioGroup} from '@chakra-ui/react'
+import {useIntl} from 'react-intl'
 import {StoreLocatorListItem} from '@salesforce/retail-react-app/app/components/store-locator/list-item'
 import {useStoreLocator} from '@salesforce/retail-react-app/app/hooks/use-store-locator'
 import {useSelectedStore} from '@salesforce/retail-react-app/app/hooks/use-selected-store'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
 
 export const StoreLocatorList = () => {
+    const intl = useIntl()
     const {data, isLoading, config, formValues, mode, selectedStoreId, setSelectedStoreId} =
         useStoreLocator()
-    const {store: selectedStore} = useSelectedStore()
+    const {selectedStore} = useSelectedStore()
     const {derivedData} = useCurrentBasket()
     const [page, setPage] = useState(1)
     const [initialSelectedStoreId, setInitialSelectedStoreId] = useState(selectedStoreId)
@@ -35,11 +37,22 @@ export const StoreLocatorList = () => {
     }
 
     const displayStoreLocatorStatusMessage = () => {
-        if (isLoading) return 'Loading locations...'
+        if (isLoading)
+            return intl.formatMessage({
+                id: 'store_locator.description.loading_locations',
+                defaultMessage: 'Loading locations...'
+            })
         if (!data?.data?.length && !selectedStore)
-            return 'Sorry, there are no locations in this area'
+            return intl.formatMessage({
+                id: 'store_locator.description.no_locations',
+                defaultMessage: 'Sorry, there are no locations in this area.'
+            })
         if (hasItemsInBasket) {
-            return 'Sorry, you have items in your basket. Please remove them change the selected store.'
+            return intl.formatMessage({
+                id: 'store_locator.error.items_in_basket',
+                defaultMessage:
+                    'Sorry, you have items in your basket. Please remove them to change the selected store.'
+            })
         }
 
         if (mode === 'input') {
@@ -51,12 +64,25 @@ export const StoreLocatorList = () => {
                     : config.defaultCountry
             const displayZipCode = formValues.postalCode || data?.data[0]?.postalCode
 
-            return `Viewing stores within ${String(config.radius)}${String(
-                config.radiusUnit
-            )} of ${String(displayZipCode)} in ${String(countryName)}`
+            return intl.formatMessage(
+                {
+                    id: 'store_locator.description.viewing_near_postal_code',
+                    defaultMessage:
+                        'Viewing stores within {distance}{distanceUnit} of {postalCode} in {countryName}'
+                },
+                {
+                    distance: config.radius,
+                    distanceUnit: config.radiusUnit,
+                    postalCode: displayZipCode,
+                    countryName: countryName
+                }
+            )
         }
 
-        return 'Viewing stores near your location'
+        return intl.formatMessage({
+            id: 'store_locator.description.viewing_near_your_location',
+            defaultMessage: 'Viewing stores near your location'
+        })
     }
 
     const sortedStores = useMemo(() => {
@@ -139,7 +165,10 @@ export const StoreLocatorList = () => {
                         variant="outline"
                         marginBottom={4}
                     >
-                        Load More
+                        {intl.formatMessage({
+                            id: 'store_locator.pagination.load_more',
+                            defaultMessage: 'Load More'
+                        })}
                     </Button>
                 </Box>
             )}

@@ -9,11 +9,13 @@ import React, {useState, useEffect, createContext} from 'react'
 import PropTypes from 'prop-types'
 import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
 
+const onClient = typeof window !== 'undefined'
+
 const readValue = (key) => {
-    if (typeof window === 'undefined') {
-        return null
+    if (onClient) {
+        return window.localStorage.getItem(key)
     }
-    return window.localStorage.getItem(key)
+    return null
 }
 
 export const StoreLocatorContext = createContext(null)
@@ -40,7 +42,7 @@ export const StoreLocatorProvider = ({config, children}) => {
     })
 
     useEffect(() => {
-        if (typeof window !== 'undefined' && state.selectedStoreId) {
+        if (onClient && state.selectedStoreId) {
             window.localStorage.setItem(selectedStoreBySiteId, state.selectedStoreId)
         }
     }, [state.selectedStoreId])

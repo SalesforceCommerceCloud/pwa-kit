@@ -21,7 +21,7 @@ import {useSelectedStore} from '@salesforce/retail-react-app/app/hooks/use-selec
 const StoreInventoryFilter = ({toggleFilter, selectedFilters}) => {
     const {isOpen, onOpen, onClose} = useDisclosure()
     const {formatMessage} = useIntl()
-    const {store: selectedStore} = useSelectedStore()
+    const {selectedStore} = useSelectedStore()
 
     const isChecked = selectedFilters?.ilids !== undefined
 

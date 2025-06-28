@@ -15,7 +15,7 @@ import {useSelectedStore} from '@salesforce/retail-react-app/app/hooks/use-selec
 
 const SelectedRefinements = ({toggleFilter, selectedFilterValues, filters, handleReset}) => {
     const {formatMessage} = useIntl()
-    const {store: selectedStore} = useSelectedStore()
+    const {selectedStore} = useSelectedStore()
     const priceFilterValues = filters?.find((filter) => filter.attributeId === 'price')
     let selectedFilters = []
     for (const key in selectedFilterValues) {

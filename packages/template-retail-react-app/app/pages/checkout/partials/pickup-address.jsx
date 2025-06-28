@@ -20,7 +20,7 @@ import {useCheckout} from '@salesforce/retail-react-app/app/pages/checkout/util/
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
 import {useShopperBasketsMutation, useStores} from '@salesforce/commerce-sdk-react'
 
-export default function PickupAddress() {
+const PickupAddress = () => {
     const {formatMessage} = useIntl()
     const [isLoading, setIsLoading] = useState()
     const updateShippingAddressForShipment = useShopperBasketsMutation(
@@ -101,7 +101,7 @@ export default function PickupAddress() {
                             id="pickup_address.title.store_information"
                         />
                     </Text>
-                    {pickupAddress && <AddressDisplay address={pickupAddress} />}
+                    <AddressDisplay address={pickupAddress} />
                     <Box pt={3}>
                         <Container variant="form">
                             <Button w="full" onClick={() => submitAndContinue(pickupAddress)}>
@@ -128,3 +128,5 @@ export default function PickupAddress() {
         </ToggleCard>
     )
 }
+
+export default PickupAddress

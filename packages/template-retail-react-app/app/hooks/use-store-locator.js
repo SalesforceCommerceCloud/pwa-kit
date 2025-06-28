@@ -53,8 +53,13 @@ export const useStoreLocator = () => {
     }
 
     const {state, setState} = context
-    const {data, isLoading} = useStores(state)
+    const storesQuery = useStores(state)
 
+    // There are two modes, input and device.
+    // The input mode is when the user is searching for a store
+    // by entering a postal code and country code.
+    // The device mode is when the user is searching for a store by sharing their location.
+    // The mode is implicitly set by user's action.
     const setFormValues = (formValues) => {
         setState((prev) => ({
             ...prev,
@@ -81,8 +86,8 @@ export const useStoreLocator = () => {
 
     return {
         ...state,
-        data,
-        isLoading,
+        // Especially data, isLoading, and error are useful
+        ...storesQuery,
         // Actions
         setFormValues,
         setDeviceCoordinates,

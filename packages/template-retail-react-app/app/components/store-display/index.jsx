@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024, salesforce.com, inc.
+ * Copyright (c) 2025, salesforce.com, inc.
  * All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
@@ -21,7 +21,11 @@ const StoreDisplay = ({
     showDistance = false,
     showStoreHours = true,
     showPhone = true,
-    showEmail = true
+    showEmail = true,
+    nameStyle = {fontSize: 'md', fontWeight: 'bold'},
+    textSize = 'sm',
+    accordionButtonStyle = {},
+    accordionPanelStyle = {}
 }) => {
     const intl = useIntl()
 
@@ -31,50 +35,65 @@ const StoreDisplay = ({
 
     return (
         <Box id={`store-info-${store.id}`}>
-            {store.name && (
-                <Box fontSize="md" fontWeight="bold">
-                    {store.name}
-                </Box>
-            )}
-            <Box fontSize="sm" color="gray.600">
+            {store.name && <Box {...nameStyle}>{store.name}</Box>}
+            <Box fontSize={textSize} color="gray.600">
                 {store.address1}
             </Box>
-            <Box fontSize="sm" color="gray.600">
-                {store.city}, {store.stateCode ? store.stateCode : ''} {store.postalCode}
+            <Box fontSize={textSize} color="gray.600">
+                {intl.formatMessage(
+                    {
+                        id: 'store_display.format.address_line_2',
+                        defaultMessage: '{city}, {stateCode} {postalCode}'
+                    },
+                    {
+                        city: store.city,
+                        stateCode: store.stateCode || '',
+                        postalCode: store.postalCode
+                    }
+                )}
             </Box>
             {showDistance && store.distance !== undefined && (
                 <>
                     <br />
-                    <Box fontSize="sm" color="gray.600">
-                        {store.distance} {store.distanceUnit}{' '}
-                        {intl.formatMessage({
-                            id: 'store_locator.description.away',
-                            defaultMessage: 'away'
-                        })}
+                    <Box fontSize={textSize} color="gray.600">
+                        {intl.formatMessage(
+                            {
+                                id: 'store_locator.description.away',
+                                defaultMessage: '{distance} {unit} away'
+                            },
+                            {
+                                distance: store.distance,
+                                unit: store.distanceUnit
+                            }
+                        )}
                     </Box>
                 </>
             )}
             {showEmail && store.c_customerServiceEmail && (
                 <>
                     <br />
-                    <Box fontSize="sm" color="gray.600">
-                        {intl.formatMessage({
-                            id: 'store_locator.description.email',
-                            defaultMessage: 'Email:'
-                        })}{' '}
-                        {store.c_customerServiceEmail}
+                    <Box fontSize={textSize} color="gray.600">
+                        {intl.formatMessage(
+                            {
+                                id: 'store_locator.description.email',
+                                defaultMessage: 'Email: {email}'
+                            },
+                            {email: store.c_customerServiceEmail}
+                        )}
                     </Box>
                 </>
             )}
             {showPhone && store.phone && (
                 <>
                     <br />
-                    <Box fontSize="sm" color="gray.600">
-                        {intl.formatMessage({
-                            id: 'store_locator.description.phone',
-                            defaultMessage: 'Phone:'
-                        })}{' '}
-                        {store.phone}
+                    <Box fontSize={textSize} color="gray.600">
+                        {intl.formatMessage(
+                            {
+                                id: 'store_locator.description.phone',
+                                defaultMessage: 'Phone: {phone}'
+                            },
+                            {phone: store.phone}
+                        )}
                     </Box>
                 </>
             )}
@@ -89,6 +108,7 @@ const StoreDisplay = ({
                                 fontSize="sm"
                                 fontWeight="semibold"
                                 _hover={{bg: 'transparent'}}
+                                {...accordionButtonStyle}
                             >
                                 <Box flex="1" textAlign="left">
                                     {intl.formatMessage({
@@ -98,8 +118,8 @@ const StoreDisplay = ({
                                 </Box>
                                 <AccordionIcon />
                             </AccordionButton>
-                            <AccordionPanel px={0} pb={2}>
-                                <Box fontSize="sm" color="gray.600">
+                            <AccordionPanel px={0} pb={2} {...accordionPanelStyle}>
+                                <Box fontSize={textSize} color="gray.600">
                                     <div dangerouslySetInnerHTML={{__html: store.storeHours}} />
                                 </Box>
                             </AccordionPanel>
@@ -133,7 +153,15 @@ StoreDisplay.propTypes = {
     /** Whether to show phone number */
     showPhone: PropTypes.bool,
     /** Whether to show email address */
-    showEmail: PropTypes.bool
+    showEmail: PropTypes.bool,
+    /** Style object for store name */
+    nameStyle: PropTypes.object,
+    /** Font size for general text */
+    textSize: PropTypes.string,
+    /** Custom style props for accordion button */
+    accordionButtonStyle: PropTypes.object,
+    /** Custom style props for accordion panel */
+    accordionPanelStyle: PropTypes.object
 }
 
 export default StoreDisplay

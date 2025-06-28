@@ -46,7 +46,7 @@ export const useDerivedProduct = (
         isProductPartOfBundle
     )
     const [quantity, setQuantity] = useState(initialQuantity)
-    const {store: selectedStore} = useSelectedStore()
+    const {selectedStore} = useSelectedStore()
 
     const selectedStoreInventory = getInventoryById(product, selectedStore?.inventoryId)
     const selectedStoreStockLevel = selectedStoreInventory?.stockLevel || 0

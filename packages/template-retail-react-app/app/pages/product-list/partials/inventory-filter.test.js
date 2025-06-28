@@ -54,7 +54,7 @@ describe('StoreInventoryFilter', () => {
         jest.clearAllMocks()
         localStorage.clear()
         useSelectedStore.mockReturnValue({
-            store: null,
+            selectedStore: null,
             isLoading: false,
             error: null,
             hasSelectedStore: false
@@ -72,7 +72,7 @@ describe('StoreInventoryFilter', () => {
 
     test('displays selected store name when store data exists', async () => {
         useSelectedStore.mockReturnValue({
-            store: mockStoreData,
+            selectedStore: mockStoreData,
             isLoading: false,
             error: null,
             hasSelectedStore: true
@@ -109,7 +109,7 @@ describe('StoreInventoryFilter', () => {
     test('opens store locator modal when store name is clicked', async () => {
         const user = userEvent.setup()
         useSelectedStore.mockReturnValue({
-            store: mockStoreData,
+            selectedStore: mockStoreData,
             isLoading: false,
             error: null,
             hasSelectedStore: true
@@ -129,7 +129,7 @@ describe('StoreInventoryFilter', () => {
     test('calls toggleFilter when checkbox is changed with selected store', async () => {
         const user = userEvent.setup()
         useSelectedStore.mockReturnValue({
-            store: mockStoreData,
+            selectedStore: mockStoreData,
             isLoading: false,
             error: null,
             hasSelectedStore: true
@@ -150,7 +150,7 @@ describe('StoreInventoryFilter', () => {
     test('calls toggleFilter to remove filter when checkbox is unchecked', async () => {
         const user = userEvent.setup()
         useSelectedStore.mockReturnValue({
-            store: mockStoreData,
+            selectedStore: mockStoreData,
             isLoading: false,
             error: null,
             hasSelectedStore: true
@@ -180,7 +180,7 @@ describe('StoreInventoryFilter', () => {
 
         // Set up with a store already selected
         useSelectedStore.mockReturnValue({
-            store: mockStoreData,
+            selectedStore: mockStoreData,
             isLoading: false,
             error: null,
             hasSelectedStore: true
@@ -212,7 +212,7 @@ describe('StoreInventoryFilter', () => {
         }
 
         useSelectedStore.mockImplementation(() => ({
-            store: mockStoreData,
+            selectedStore: mockStoreData,
             isLoading: false,
             error: null,
             hasSelectedStore: true
@@ -229,7 +229,7 @@ describe('StoreInventoryFilter', () => {
 
         // Change to the second store
         useSelectedStore.mockImplementation(() => ({
-            store: mockStoreData2,
+            selectedStore: mockStoreData2,
             isLoading: false,
             error: null,
             hasSelectedStore: true

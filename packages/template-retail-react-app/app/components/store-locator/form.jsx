@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, {useEffect, useRef} from 'react'
+import React, {useEffect, useRef, useState} from 'react'
 import {
     Box,
     Button,
@@ -16,16 +16,18 @@ import {
     Input
 } from '@chakra-ui/react'
 import {useForm, Controller} from 'react-hook-form'
+import {useIntl} from 'react-intl'
 import {useStoreLocator} from '@salesforce/retail-react-app/app/hooks/use-store-locator'
 import {useGeolocation} from '@salesforce/retail-react-app/app/hooks/use-geo-location'
 import {useSelectedStore} from '@salesforce/retail-react-app/app/hooks/use-selected-store'
 
 export const StoreLocatorForm = () => {
+    const intl = useIntl()
     const {config, formValues, setFormValues, setDeviceCoordinates} = useStoreLocator()
     const {coordinates, error, refresh} = useGeolocation()
-    const {store: selectedStore} = useSelectedStore()
+    const {selectedStore} = useSelectedStore()
     const initialLoadDone = useRef(false)
-    const shouldUseLocation = useRef(false)
+    const [shouldUseLocation, setShouldUseLocation] = useState(false)
 
     const form = useForm({
         mode: 'onChange',
@@ -52,9 +54,9 @@ export const StoreLocatorForm = () => {
     }, [selectedStore, reset, setFormValues, formValues.postalCode])
 
     useEffect(() => {
-        if (coordinates.latitude && coordinates.longitude && shouldUseLocation.current) {
+        if (coordinates.latitude && coordinates.longitude && shouldUseLocation) {
             setDeviceCoordinates(coordinates)
-            shouldUseLocation.current = false
+            setShouldUseLocation(false)
         }
     }, [coordinates])
 
@@ -74,6 +76,7 @@ export const StoreLocatorForm = () => {
             postalCode: ''
         })
         initialLoadDone.current = false
+        setShouldUseLocation(true)
     }
 
     return (
@@ -91,7 +94,10 @@ export const StoreLocatorForm = () => {
                             name="countryCode"
                             control={control}
                             rules={{
-                                required: 'Please select a country.'
+                                required: intl.formatMessage({
+                                    id: 'store_locator.error.please_select_a_country',
+                                    defaultMessage: 'Please select a country.'
+                                })
                             }}
                             render={({field}) => {
                                 return (
@@ -99,7 +105,10 @@ export const StoreLocatorForm = () => {
                                         <Select
                                             {...field}
                                             marginBottom="10px"
-                                            placeholder={'Select a country'}
+                                            placeholder={intl.formatMessage({
+                                                id: 'store_locator.action.select_a_country',
+                                                defaultMessage: 'Select a country'
+                                            })}
                                             borderColor="gray.500"
                                         >
                                             {config.supportedCountries.map(
@@ -134,12 +143,21 @@ export const StoreLocatorForm = () => {
                         name="postalCode"
                         control={control}
                         rules={{
-                            required: 'Please enter a postal code.'
+                            required: intl.formatMessage({
+                                id: 'store_locator.error.please_enter_a_postal_code',
+                                defaultMessage: 'Please enter a postal code.'
+                            })
                         }}
                         render={({field}) => {
                             return (
                                 <FormControl isInvalid={!!form.formState.errors.postalCode}>
-                                    <Input {...field} placeholder={'Enter postal code'} />
+                                    <Input
+                                        {...field}
+                                        placeholder={intl.formatMessage({
+                                            id: 'store_locator.field.placeholder.enter_postal_code',
+                                            defaultMessage: 'Enter postal code'
+                                        })}
+                                    />
                                     {form.formState.errors.postalCode && (
                                         <FormErrorMessage sx={{top: '-20px'}} color="red.600">
                                             {form.formState.errors.postalCode.message}
@@ -156,19 +174,24 @@ export const StoreLocatorForm = () => {
                         marginLeft={2}
                         variant="solid"
                     >
-                        Find
+                        {intl.formatMessage({
+                            id: 'store_locator.action.find',
+                            defaultMessage: 'Find'
+                        })}
                     </Button>
                 </InputGroup>
                 <Box
                     style={{display: 'flex', justifyContent: 'center', alignItems: 'center'}}
                     margin="10px"
                 >
-                    Or
+                    {intl.formatMessage({
+                        id: 'store_locator.description.or',
+                        defaultMessage: 'Or'
+                    })}
                 </Box>
                 <Button
                     onClick={() => {
                         clearForm()
-                        shouldUseLocation.current = true
                         refresh()
                     }}
                     width="100%"
@@ -176,7 +199,10 @@ export const StoreLocatorForm = () => {
                     fontWeight="bold"
                     marginBottom={4}
                 >
-                    Use My Location
+                    {intl.formatMessage({
+                        id: 'store_locator.action.use_my_location',
+                        defaultMessage: 'Use My Location'
+                    })}
                 </Button>
                 <FormControl isInvalid={!!error}>
                     <FormErrorMessage
@@ -185,7 +211,10 @@ export const StoreLocatorForm = () => {
                         justifyContent="center"
                         marginBottom={4}
                     >
-                        Please agree to share your location
+                        {intl.formatMessage({
+                            id: 'store_locator.error.agree_to_share_your_location',
+                            defaultMessage: 'Please agree to share your location'
+                        })}
                     </FormErrorMessage>
                 </FormControl>
             </Box>

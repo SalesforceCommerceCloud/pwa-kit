@@ -110,7 +110,7 @@ beforeEach(() => {
         data: mockCategories.root.categories[0].categories[0]
     }))
     useSelectedStore.mockReturnValue({
-        store: null,
+        selectedStore: null,
         isLoading: false,
         error: null,
         hasSelectedStore: false
@@ -357,7 +357,7 @@ test('should filter by inventory when inventory filter is clicked', async () => 
     }
 
     useSelectedStore.mockReturnValue({
-        store: mockStoreData,
+        selectedStore: mockStoreData,
         isLoading: false,
         error: null,
         hasSelectedStore: true
