@@ -256,7 +256,7 @@ export const DevServerMixin = {
         // non-webpacked assets from the 'src' dir to the 'build' dir.
         //
         // If you look carefully through the history, this has never
-        // been true though – assets get copied from app/static to
+        // been true though – assets get copied from src/static to
         // build/static but this isn't really clear from the API.
         //
         // To see where those assets get copied, see here:

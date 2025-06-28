@@ -32,8 +32,5 @@
         /* Completeness */
         "skipLibCheck": true
     },
-    "exclude": [
-        "node_modules",
-        "static"
-    ]
+    "exclude": ["node_modules", "src/static"]
 }
