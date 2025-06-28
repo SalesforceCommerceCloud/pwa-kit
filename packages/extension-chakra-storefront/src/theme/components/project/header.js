@@ -8,18 +8,48 @@ import {defineRecipe} from '@chakra-ui/react'
 
 export default defineRecipe({
     slots: [
+        'accountIconButton',
+        'arrowDownIconButton',
+        'bodyContainer',
         'container',
         'content',
-        'searchContainer',
-        'bodyContainer',
-        'logo',
+        'dropdownMenuBody',
+        'dropdownMenuTitle',
         'icons',
-        'accountIconButton',
-        'wishListIconButton',
-        'arrowDownIconButton',
-        'signout'
+        'logo',
+        'menuContent',
+        'menuPositioner',
+        'searchContainer',
+        'signout',
+        'wishListIconButton'
     ],
     base: {
+        accountIconButton: {
+            height: 11,
+            minWidth: 'auto',
+            cursor: 'pointer',
+            alignSelf: ['self-start', 'self-start', 'self-start', 'auto'],
+            _focus: {
+                boxShadow: 'outline'
+            },
+            _focusVisible: {
+                outline: 0
+            }
+        },
+        arrowDownButton: {
+            height: 11,
+            minWidth: 'auto',
+            marginRight: 0,
+            alignSelf: ['self-start', 'self-start', 'self-start', 'auto'],
+            cursor: 'pointer',
+            _focus: {
+                boxShadow: 'outline'
+            },
+            _focusVisible: {
+                outline: 0
+            },
+            display: ['none', 'none', 'none', 'block']
+        },
         container: {
             minWidth: 'xs',
             width: 'full',
@@ -35,51 +65,31 @@ export default defineRecipe({
             paddingTop: [1, 1, 2, 4],
             paddingBottom: [3, 3, 2, 4]
         },
-        searchContainer: {
-            order: [2, 2, 2, 'inherit'],
-            width: ['full', 'full', 'full', 60],
-            marginRight: [0, 0, 0, 4],
-            marginBottom: [1, 1, 2, 0]
-        },
         bodyContainer: {
             flex: '1'
+        },
+        dropdownMenuBody: {
+            padding: 0,
+            pb: 2
+        },
+        dropdownMenuTitle: {
+            px: 7,
+            py: 6,
+            pb: 2
+        },
+        iconButton: {
+            marginBottom: [1, 1, 2, 0]
         },
         logo: {
             width: [8, 8, 8, 12],
             height: [6, 6, 6, 8]
         },
-        icons: {
+
+        searchContainer: {
+            order: [2, 2, 2, 'inherit'],
+            width: ['full', 'full', 'full', 60],
+            marginRight: [0, 0, 0, 4],
             marginBottom: [1, 1, 2, 0]
-        },
-        accountIcon: {
-            height: 11,
-            minWidth: 'auto',
-            cursor: 'pointer',
-            alignSelf: ['self-start', 'self-start', 'self-start', 'auto'],
-            _focus: {
-                boxShadow: 'outline'
-            },
-            _focusVisible: {
-                outline: 0
-            }
-        },
-        arrowDown: {
-            height: 11,
-            minWidth: 'auto',
-            marginRight: 0,
-            alignSelf: ['self-start', 'self-start', 'self-start', 'auto'],
-            cursor: 'pointer',
-            _focus: {
-                boxShadow: 'outline'
-            },
-            _focusVisible: {
-                outline: 0
-            },
-            display: ['none', 'none', 'none', 'block']
-        },
-        wishlistIcon: {
-            // More breathing room between the account and wishlist icons
-            marginLeft: 2
         },
         signout: {
             width: '100%',
@@ -98,6 +108,10 @@ export default defineRecipe({
         },
         signoutIcon: {
             marginRight: 2
+        },
+        wishlistIcon: {
+            // More breathing room between the account and wishlist icons
+            marginLeft: 2
         }
     }
 })

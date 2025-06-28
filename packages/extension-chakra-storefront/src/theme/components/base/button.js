@@ -22,7 +22,10 @@ const baseLinkStyles = {
 const button = defineRecipe({
     base: {
         borderRadius: 'sm',
-        colorPalette: 'blue'
+        colorPalette: 'blue',
+        _focusVisible: {
+            outline: '2px solid transparent'
+        }
     },
     variants: {
         variant: {
