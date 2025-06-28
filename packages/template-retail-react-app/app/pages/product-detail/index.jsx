@@ -96,7 +96,7 @@ const ProductDetail = () => {
 
     const {
         addInventoryIdsToPickupItems,
-        configureShippingMethodIfNeeded,
+        updateShippingMethodIfNeeded,
         isCurrentShippingMethodPickup,
         hasPickupItems
     } = usePickupShipment(basket)
@@ -398,7 +398,7 @@ const ProductDetail = () => {
             const basketResponse = await addItemToNewOrExistingBasket(productItems)
 
             // Configure shipping method based on pickup selection
-            await configureShippingMethodIfNeeded(
+            await updateShippingMethodIfNeeded(
                 basketResponse,
                 productItems,
                 hasAnyPickupSelected,
@@ -584,7 +584,7 @@ const ProductDetail = () => {
             }
 
             // Configure shipping method based on pickup selection
-            await configureShippingMethodIfNeeded(
+            await updateShippingMethodIfNeeded(
                 res,
                 productItems,
                 hasAnyPickupSelected,

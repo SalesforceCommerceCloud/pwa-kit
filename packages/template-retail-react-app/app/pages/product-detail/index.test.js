@@ -633,8 +633,8 @@ describe('Delivery Options Restrictions', () => {
             ]
         }
 
-        // Track if configurePickupShipment was called
-        let configurePickupShipmentCalled = false
+        // Track if updatePickupShipment was called
+        let updatePickupShipmentCalled = false
         let shipmentUpdateRequest = null
 
         // Mock the product to be a simple master product with inventory
@@ -652,18 +652,18 @@ describe('Delivery Options Restrictions', () => {
                         shipments: [
                             {
                                 shipmentId: 'me'
-                                // No shippingMethod property - this triggers configurePickupShipment
+                                // No shippingMethod property - this triggers updatePickupShipment
                             }
                         ]
                     })
                 )
             }),
-            // Mock the shipment update call that configurePickupShipment makes
+            // Mock the shipment update call that updatePickupShipment makes
             rest.patch('*/baskets/:basketId/shipments/:shipmentId', async (req, res, ctx) => {
-                configurePickupShipmentCalled = true
+                updatePickupShipmentCalled = true
                 shipmentUpdateRequest = await req.json()
 
-                // Verify the correct parameters are passed to configurePickupShipment
+                // Verify the correct parameters are passed to updatePickupShipment
                 expect(req.params.basketId).toBe('test-basket-id')
                 expect(req.params.shipmentId).toBe('me')
                 expect(shipmentUpdateRequest.shippingMethod.id).toBe('GBP005')

@@ -74,8 +74,10 @@ export const usePickupShipment = (basket) => {
      * @param {string} options.pickupShippingMethodId - Shipping method ID for pickup (default: '005')
      * @param {boolean} options.throwOnError - Whether to throw on error (default: false)
      */
-    const configurePickupShipment = async (basketId, productItems, storeInfo, options = {}) => {
-        const {pickupShippingMethodId = '005', throwOnError = false} = options
+    const updatePickupShipment = async (basketId, productItems, storeInfo, options = {}) => {
+        const defaultPickupShippingMethodId = '005'
+        const {pickupShippingMethodId = defaultPickupShippingMethodId, throwOnError = false} =
+            options
 
         try {
             const pickupItems = productItems.filter((item) => item.inventoryId)
@@ -120,7 +122,7 @@ export const usePickupShipment = (basket) => {
      * @param {string} shippingMethodId - The shipping method ID to set
      * @param {boolean} throwOnError - Whether to throw on error (default: false)
      */
-    const configureRegularShippingMethod = async (
+    const updateRegularShippingMethod = async (
         basketId,
         shippingMethodId,
         throwOnError = false
@@ -193,7 +195,7 @@ export const usePickupShipment = (basket) => {
      * @param {Object} selectedStore - The selected store information
      * @returns {Promise<void>}
      */
-    const configureShippingMethodIfNeeded = async (
+    const updateShippingMethodIfNeeded = async (
         basketResponse,
         productItems,
         hasAnyPickupSelected,
@@ -228,35 +230,27 @@ export const usePickupShipment = (basket) => {
             if (hasAnyPickupSelected && !isCurrentlyPickup) {
                 // Configure pickup shipment if pickup is selected but current method is not pickup
                 const pickupShippingMethodId = getPickupShippingMethodId(fetchedShippingMethods)
-                await configurePickupShipment(
-                    basketResponse.basketId,
-                    productItems,
-                    selectedStore,
-                    {
-                        pickupShippingMethodId
-                    }
-                )
+                await updatePickupShipment(basketResponse.basketId, productItems, selectedStore, {
+                    pickupShippingMethodId
+                })
             } else if (!hasAnyPickupSelected && isCurrentlyPickup) {
                 // Configure regular shipping if pickup is not selected but current method is pickup
                 const defaultShippingMethodId = getDefaultShippingMethodId(fetchedShippingMethods)
-                await configureRegularShippingMethod(
-                    basketResponse.basketId,
-                    defaultShippingMethodId
-                )
+                await updateRegularShippingMethod(basketResponse.basketId, defaultShippingMethodId)
             }
         }
     }
 
     return {
-        configurePickupShipment,
-        configureRegularShippingMethod,
-        configureShippingMethodIfNeeded,
+        updatePickupShipment,
+        updateRegularShippingMethod,
+        updateShippingMethodIfNeeded,
         hasPickupItems,
         addInventoryIdsToPickupItems,
         getPickupShippingMethodId,
         getDefaultShippingMethodId,
         isCurrentShippingMethodPickup,
-        isLoading: updateShipmentForBasketMutation.isLoading
+        updateShipmentForBasketMutation
     }
 }
 
