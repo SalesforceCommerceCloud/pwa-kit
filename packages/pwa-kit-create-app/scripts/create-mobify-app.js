@@ -886,8 +886,9 @@ const main = async (opts) => {
         process.exit(1)
     }
 
-    if (presetId && !context.preset) {
-        context.preset = PRESETS.find(({id}) => id === presetId)
+    // If no preset is provided, use the first preset or the preset specified by the GENERATOR_PRESET environment variable
+    if (!context.preset) {
+        context.preset = presetId ? PRESETS.find(({id}) => id === presetId) : PRESETS[0]
     }
 
     const {interactive = false, getQuestions, answers = {}} = context.preset
