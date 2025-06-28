@@ -91,7 +91,7 @@ const ProductDetail = () => {
     }
 
     /*************************** Pick up in Store ********************/
-    const {store: selectedStore} = useSelectedStore()
+    const {selectedStore} = useSelectedStore()
     const selectedInventoryId = selectedStore?.inventoryId || null
 
     const {

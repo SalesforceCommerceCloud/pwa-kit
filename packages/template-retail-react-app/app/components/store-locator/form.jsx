@@ -23,7 +23,7 @@ import {useSelectedStore} from '@salesforce/retail-react-app/app/hooks/use-selec
 export const StoreLocatorForm = () => {
     const {config, formValues, setFormValues, setDeviceCoordinates} = useStoreLocator()
     const {coordinates, error, refresh} = useGeolocation()
-    const {store: selectedStore} = useSelectedStore()
+    const {selectedStore} = useSelectedStore()
     const initialLoadDone = useRef(false)
     const shouldUseLocation = useRef(false)
 

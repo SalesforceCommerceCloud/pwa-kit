@@ -15,7 +15,7 @@ import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-curre
 export const StoreLocatorList = () => {
     const {data, isLoading, config, formValues, mode, selectedStoreId, setSelectedStoreId} =
         useStoreLocator()
-    const {store: selectedStore} = useSelectedStore()
+    const {selectedStore} = useSelectedStore()
     const {derivedData} = useCurrentBasket()
     const [page, setPage] = useState(1)
     const [initialSelectedStoreId, setInitialSelectedStoreId] = useState(selectedStoreId)

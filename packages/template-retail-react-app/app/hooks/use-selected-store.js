@@ -40,10 +40,10 @@ export const useSelectedStore = () => {
     )
 
     // Extract the first store from the response data
-    const store = storeData?.data?.[0]
+    const selectedStore = storeData?.data?.[0]
 
     return {
-        store,
+        selectedStore,
         isLoading,
         error,
         hasSelectedStore: !!selectedStoreId

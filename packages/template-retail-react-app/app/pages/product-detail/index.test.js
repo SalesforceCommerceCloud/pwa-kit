@@ -91,7 +91,7 @@ beforeEach(() => {
 
     // Default mock for useSelectedStore (no selected store by default)
     mockUseSelectedStore.mockImplementation(() => ({
-        store: null,
+        selectedStore: null,
         isLoading: false,
         error: null,
         hasSelectedStore: false
@@ -548,7 +548,7 @@ describe('Delivery Options Restrictions', () => {
         const inventoryId = 'inventory_m_store_store1'
         const storeId = 'store-123'
         mockUseSelectedStore.mockImplementation(() => ({
-            store: {
+            selectedStore: {
                 id: storeId,
                 name: 'Test Store',
                 inventoryId: inventoryId
@@ -610,7 +610,7 @@ describe('Delivery Options Restrictions', () => {
         const inventoryId = 'inventory_m_store_store1'
         const storeId = 'store-123'
         mockUseSelectedStore.mockImplementation(() => ({
-            store: {
+            selectedStore: {
                 id: storeId,
                 name: 'Test Store',
                 inventoryId: inventoryId
@@ -734,7 +734,7 @@ describe('Delivery Options Restrictions', () => {
         const inventoryId = 'inventory_m_store_store1'
         const storeId = 'store-123'
         mockUseSelectedStore.mockImplementation(() => ({
-            store: {
+            selectedStore: {
                 id: storeId,
                 name: 'Test Store',
                 inventoryId: inventoryId
@@ -796,7 +796,7 @@ test('fetches product with inventoryIds when store is selected', async () => {
     // Mock useSelectedStore to return a store with inventoryId
     const inventoryId = 'inventory_m_store_store1'
     mockUseSelectedStore.mockImplementation(() => ({
-        store: {
+        selectedStore: {
             id: 'store-123',
             name: 'Test Store',
             inventoryId: inventoryId
@@ -826,7 +826,7 @@ test('Add to Cart (Pickup in Store) includes inventoryId for the selected varian
     // Mock useSelectedStore to return a store with inventoryId
     const inventoryId = 'inventory_m_store_store1'
     mockUseSelectedStore.mockImplementation(() => ({
-        store: {
+        selectedStore: {
             id: 'store-123',
             name: 'Test Store',
             inventoryId: inventoryId

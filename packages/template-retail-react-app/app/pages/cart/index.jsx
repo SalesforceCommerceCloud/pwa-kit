@@ -83,7 +83,7 @@ const Cart = () => {
     )
     const storeName = storeData?.data?.[0]?.name
 
-    const {store: selectedStore} = useSelectedStore()
+    const {selectedStore} = useSelectedStore()
     const selectedInventoryId = selectedStore?.inventoryId || null
     const productIds = basket?.productItems?.map(({productId}) => productId).join(',') ?? ''
     const {data: products, isLoading: isProductsLoading} = useProducts(

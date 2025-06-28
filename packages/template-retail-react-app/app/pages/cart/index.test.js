@@ -91,7 +91,7 @@ beforeEach(() => {
 
     // Default mock for useSelectedStore (no selected store by default)
     mockUseSelectedStore.mockImplementation(() => ({
-        store: null,
+        selectedStore: null,
         isLoading: false,
         error: null,
         hasSelectedStore: false
@@ -878,7 +878,7 @@ describe('Product bundles', () => {
 
             // Mock useSelectedStore to return a store with inventoryId
             mockUseSelectedStore.mockImplementation(() => ({
-                store: {
+                selectedStore: {
                     id: 'store-123',
                     name: 'Test Store',
                     inventoryId: mockInventoryId
@@ -1347,7 +1347,7 @@ describe('Selected inventory ID tests', function () {
 
         // Mock useSelectedStore to return a store with inventoryId
         mockUseSelectedStore.mockImplementation(() => ({
-            store: {
+            selectedStore: {
                 id: 'store-123',
                 name: 'Test Store',
                 inventoryId: mockInventoryId

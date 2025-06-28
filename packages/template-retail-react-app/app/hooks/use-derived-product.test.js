@@ -67,7 +67,7 @@ describe('useDerivedProduct hook', () => {
 
         // Default mock for useSelectedStore - no store selected
         useSelectedStore.mockReturnValue({
-            store: null,
+            selectedStore: null,
             isLoading: false,
             error: null,
             hasSelectedStore: false
@@ -212,7 +212,7 @@ describe('useDerivedProduct hook', () => {
         test('when store is selected, should return product is in stock when storestockLevel is greater then 0 and greater then asked quantity', () => {
             // Mock useSelectedStore to return a store with inventoryId
             useSelectedStore.mockReturnValue({
-                store: {inventoryId},
+                selectedStore: {inventoryId},
                 isLoading: false,
                 error: null,
                 hasSelectedStore: true
@@ -249,7 +249,7 @@ describe('useDerivedProduct hook', () => {
         test('when store is selected, should return product is out of stock message when storestockLevel is 0 or less then asked quantity', () => {
             // Mock useSelectedStore to return a store with inventoryId
             useSelectedStore.mockReturnValue({
-                store: {inventoryId},
+                selectedStore: {inventoryId},
                 isLoading: false,
                 error: null,
                 hasSelectedStore: true
@@ -286,7 +286,7 @@ describe('useDerivedProduct hook', () => {
         test('when store is selected, should show selected store info', () => {
             // Mock useSelectedStore to return a store with inventoryId
             useSelectedStore.mockReturnValue({
-                store: {inventoryId},
+                selectedStore: {inventoryId},
                 isLoading: false,
                 error: null,
                 hasSelectedStore: true

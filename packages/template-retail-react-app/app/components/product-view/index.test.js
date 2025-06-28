@@ -63,7 +63,7 @@ beforeEach(() => {
     window.history.pushState({}, 'Account', '/en/account')
 
     useSelectedStore.mockImplementation(() => ({
-        store: mockStoreData,
+        selectedStore: mockStoreData,
         isLoading: false,
         error: null,
         hasSelectedStore: true
@@ -447,7 +447,7 @@ test('Pickup in store radio is disabled when inventoryId is present but product 
 
 test('shows "Pickup in Select Store" label when pickup is disabled due to no store/inventoryId', async () => {
     useSelectedStore.mockReturnValue({
-        store: null,
+        selectedStore: null,
         isLoading: false,
         error: null,
         hasSelectedStore: false
