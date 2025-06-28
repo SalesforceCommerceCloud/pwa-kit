@@ -24,11 +24,7 @@ export const useSelectedStore = () => {
     const selectedStoreId = state.selectedStoreId
 
     // Use the useStores hook to fetch store details by ID
-    const {
-        data: storeData,
-        isLoading,
-        error
-    } = useStores(
+    const {data: storeData, ...restOfQuery} = useStores(
         {
             parameters: {
                 ids: selectedStoreId
@@ -43,9 +39,8 @@ export const useSelectedStore = () => {
     const selectedStore = storeData?.data?.[0]
 
     return {
+        ...restOfQuery,
         selectedStore,
-        isLoading,
-        error,
         hasSelectedStore: !!selectedStoreId
     }
 }

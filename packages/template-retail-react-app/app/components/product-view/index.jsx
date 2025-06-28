@@ -19,10 +19,10 @@ import {
     Text,
     VStack,
     Fade,
-    useTheme,
     Stack,
     Radio,
-    RadioGroup
+    RadioGroup,
+    useTheme
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 import {useCurrency, useDerivedProduct} from '@salesforce/retail-react-app/app/hooks'
 import {useAddToCartModalContext} from '@salesforce/retail-react-app/app/hooks/use-add-to-cart-modal'

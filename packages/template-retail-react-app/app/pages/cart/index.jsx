@@ -14,9 +14,9 @@ import {
     Grid,
     GridItem,
     Container,
-    useDisclosure,
     Button,
-    Text
+    Text,
+    useDisclosure
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 
 // Project Components

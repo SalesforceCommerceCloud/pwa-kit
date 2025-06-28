@@ -53,7 +53,7 @@ export const useStoreLocator = () => {
     }
 
     const {state, setState} = context
-    const {data, isLoading} = useStores(state)
+    const storesQuery = useStores(state)
 
     // There are two modes, input and device.
     // The input mode is when the user is searching for a store
@@ -86,8 +86,8 @@ export const useStoreLocator = () => {
 
     return {
         ...state,
-        data,
-        isLoading,
+        // Especially data, isLoading, and error are useful
+        ...storesQuery,
         // Actions
         setFormValues,
         setDeviceCoordinates,

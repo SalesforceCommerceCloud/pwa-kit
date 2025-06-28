@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, {useEffect, useRef} from 'react'
+import React, {useEffect, useRef, useState} from 'react'
 import {
     Box,
     Button,
@@ -25,7 +25,7 @@ export const StoreLocatorForm = () => {
     const {coordinates, error, refresh} = useGeolocation()
     const {selectedStore} = useSelectedStore()
     const initialLoadDone = useRef(false)
-    const shouldUseLocation = useRef(false)
+    const [shouldUseLocation, setShouldUseLocation] = useState(false)
 
     const form = useForm({
         mode: 'onChange',
@@ -52,9 +52,9 @@ export const StoreLocatorForm = () => {
     }, [selectedStore, reset, setFormValues, formValues.postalCode])
 
     useEffect(() => {
-        if (coordinates.latitude && coordinates.longitude && shouldUseLocation.current) {
+        if (coordinates.latitude && coordinates.longitude && shouldUseLocation) {
             setDeviceCoordinates(coordinates)
-            shouldUseLocation.current = false
+            setShouldUseLocation(false)
         }
     }, [coordinates])
 
@@ -74,6 +74,7 @@ export const StoreLocatorForm = () => {
             postalCode: ''
         })
         initialLoadDone.current = false
+        setShouldUseLocation(true)
     }
 
     return (
@@ -168,7 +169,6 @@ export const StoreLocatorForm = () => {
                 <Button
                     onClick={() => {
                         clearForm()
-                        shouldUseLocation.current = true
                         refresh()
                     }}
                     width="100%"

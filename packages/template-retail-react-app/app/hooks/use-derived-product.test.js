@@ -197,18 +197,7 @@ describe('useDerivedProduct hook', () => {
     })
 
     describe('when store is selected', () => {
-        const siteId = 'site-1'
-        const storeInfoKey = `store_${siteId}`
         const inventoryId = 'inventory_m_store_store1'
-
-        beforeEach(() => {
-            window.localStorage.setItem(storeInfoKey, JSON.stringify({inventoryId}))
-        })
-
-        afterEach(() => {
-            window.localStorage.removeItem(storeInfoKey)
-        })
-
         test('when store is selected, should return product is in stock when storestockLevel is greater then 0 and greater then asked quantity', () => {
             // Mock useSelectedStore to return a store with inventoryId
             useSelectedStore.mockReturnValue({
