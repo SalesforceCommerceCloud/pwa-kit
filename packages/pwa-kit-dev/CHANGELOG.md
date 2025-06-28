@@ -1,5 +1,7 @@
 ## v4.0.0-extensibility-preview.5 (May 06, 2025)
 
+-   - Migrate directory structure from `app/*` to `src/*` [#2693](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2693)
+
 ## v3.10.0-dev (Feb 18, 2025)
 
 -   Support source map for both client and server on MRT [#240](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2240)

@@ -1,3 +1,6 @@
+## 0.1.0-extensibility-preview.5
+- Migrate directory structure from `app/*` to `src/*` [#2693](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2693)
+
 ## 0.1.0-extensibility-preview.4
 - Fix hreflang alternate links [#2269](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2269)
 - PDP / PLP: Add page meta data tags that have been defined in BM [#2232](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2232)
