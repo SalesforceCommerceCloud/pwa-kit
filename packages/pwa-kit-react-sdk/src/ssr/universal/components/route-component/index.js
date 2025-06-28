@@ -396,31 +396,28 @@ export const routeComponent = (Wrapped, isPage, locals) => {
 }
 
 /**
- * Get all of the routes, including those from the app itself, the app
- * extensions, and the SDK's internal routes.
- *
- * Also, wrap each route's component with the route-component HOC so that
- * they all support `getProps` methods server-side and client-side in the same way.
+ * Wrap all the components found in the application's route config with the
+ * route-component HOC so that they all support `getProps` methods server-side
+ * and client-side in the same way.
  *
  * @private
  */
-export const getAllRoutes = async (locals = {}) => {
+export const getRoutes = (locals = {}) => {
+    let _routes = appRoutes
     const {applicationExtensions = []} = locals
-    const extensionRoutes = (
-        await Promise.all(
-            applicationExtensions.map((extension) =>
-                typeof extension.getRoutesAsync === 'function'
-                    ? extension.getRoutesAsync({locals})
-                    : extension.getRoutes({locals})
-            )
-        )
-    ).flat()
+    if (typeof appRoutes === 'function') {
+        _routes = appRoutes()
+    }
+
+    // Call the `extendRoutes` function for all the Application Extensions.
+    applicationExtensions.forEach((applicationExtension) => {
+        _routes = applicationExtension.extendRoutes(_routes)
+    })
 
     const allRoutes = [
         // NOTE: this route needs to be above _routes, in case _routes has a fallback route of `path: '*'`
         {path: '/__pwa-kit/refresh', component: Refresh},
-        ...extensionRoutes,
-        ...(typeof appRoutes === 'function' ? appRoutes() : appRoutes),
+        ..._routes,
         {path: '*', component: Throw404}
     ]
 

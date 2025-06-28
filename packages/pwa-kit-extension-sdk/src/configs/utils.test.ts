@@ -7,7 +7,7 @@
 import * as fse from 'fs-extra'
 import * as path from 'path'
 import {buildBabelExtensibilityArgs} from './babel/utils'
-import {ApplicationExtensionEntry, ApplicationExtensionEntryTuple} from '../types'
+import {ApplicationExtensionEntry} from '../types'
 import {LOCAL_EXTENSIONS_DIR, OVERRIDABLE_FILE_NAME, NODE_MODULES_FOLDER} from './constants'
 import {getOverridesFromFile, getForceOverridesFilePaths} from './utils'
 import e from 'express'
@@ -18,7 +18,7 @@ jest.mock('fs-extra', () => ({
     readFileSync: jest.fn()
 }))
 
-const EXTENSIONS: ApplicationExtensionEntryTuple[] = [
+const EXTENSIONS: ApplicationExtensionEntry[] = [
     ['@salesforce/extension-this', {enabled: true}],
     ['@salesforce/extension-that', {enabled: true}]
 ]

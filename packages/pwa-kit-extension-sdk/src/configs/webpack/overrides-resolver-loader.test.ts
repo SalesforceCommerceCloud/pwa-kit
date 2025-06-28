@@ -10,14 +10,14 @@ import {runWebpackCompiler} from './test-utils'
 import {validateOverrideSource, __OVERRIDABLE_CACHE__} from './overrides-resolver-loader'
 import OverrideStatsPlugin, {OverrideStatsEntry} from './override-stats-plugin'
 import * as utils from '../../shared/utils'
-import {ApplicationExtensionEntryTuple, ApplicationExtensionConfig} from '../../types'
+import {ApplicationExtensionEntry, ApplicationExtensionConfig} from '../../types'
 
 // Define mock for isExtensionPackage
 jest.mock('../../shared/utils', () => {
     const original = jest.requireActual('../../shared/utils')
 
     // Implementation of expand function from shared/utils/helpers.ts
-    const expand = (extensions: unknown[] = []): ApplicationExtensionEntryTuple[] => {
+    const expand = (extensions: unknown[] = []): ApplicationExtensionEntry[] => {
         const DEFAULT_CONFIG: ApplicationExtensionConfig & Record<string, unknown> = {enabled: true}
 
         return extensions

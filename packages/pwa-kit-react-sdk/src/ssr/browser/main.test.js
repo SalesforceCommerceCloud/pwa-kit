@@ -7,13 +7,13 @@
 import React from 'react'
 import {OuterApp} from './main'
 import {render, screen} from '@testing-library/react'
-import {getAllRoutes, routeComponent} from '../universal/components/route-component'
+import {getRoutes, routeComponent} from '../universal/components/route-component'
 import * as errors from '../universal/errors'
 import {uuidv4} from '../../utils/uuidv4.client'
 
 jest.mock('../../utils/uuidv4.client')
 describe('main', function () {
-    test('OuterApp renders without error', async () => {
+    test('OuterApp renders without error', () => {
         uuidv4.mockReturnValueOnce('7f21aea5-6962-4162-8204-9da85c802022')
         const oldPreloadedState = window.__PRELOADED_STATE__
         window.__PRELOADED_STATE__ = {
@@ -24,7 +24,7 @@ describe('main', function () {
         const props = {
             error: undefined,
             locals,
-            routes: await getAllRoutes(locals),
+            routes: getRoutes(locals),
             WrappedApp: routeComponent(App, false, locals),
             extensions: []
         }
@@ -33,7 +33,7 @@ describe('main', function () {
         window.__PRELOADED_STATE__ = oldPreloadedState
     })
 
-    test('OuterApp triggers the error page when there is an error', async () => {
+    test('OuterApp triggers the error page when there is an error', () => {
         const oldWindowError = window.__ERROR__
         window.__ERROR__ = new errors.HTTPNotFound('Not found')
         const App = () => <div>App</div>
@@ -41,7 +41,7 @@ describe('main', function () {
         const props = {
             error: window.__ERROR__,
             locals,
-            routes: await getAllRoutes(locals),
+            routes: getRoutes(locals),
             WrappedApp: routeComponent(App, false, locals),
             extensions: []
         }

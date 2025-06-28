@@ -10,6 +10,7 @@ import path from 'path'
 import {PathLike} from 'fs'
 
 import * as extensionUtils from './extensibility'
+import {ApplicationExtensionEntry} from '../../types'
 
 // Mock the fs-extra module
 jest.mock('fs-extra')
@@ -110,7 +111,7 @@ describe('extensibilityUtils', () => {
     describe('buildAliases', () => {
         interface AliasTestCase {
             name: string
-            extensions?: string[]
+            extensions?: ApplicationExtensionEntry[]
             expected: Record<string, string>
         }
 
@@ -127,7 +128,7 @@ describe('extensibilityUtils', () => {
             },
             {
                 name: 'returns a defined object with correct mapping when one extension is provided',
-                extensions: ['@extension-good'],
+                extensions: [['@extension-good', {enabled: true}]],
                 expected: {
                     '@extension-good': path.join(
                         process.cwd(),
@@ -139,7 +140,10 @@ describe('extensibilityUtils', () => {
             },
             {
                 name: 'returns defined objects with correct mapping when multiple extensions are provided',
-                extensions: ['@extension-one', '@extension-two'],
+                extensions: [
+                    ['@extension-one', {enabled: true}],
+                    ['@extension-two', {enabled: true}]
+                ],
                 expected: {
                     '@extension-one': path.join(
                         process.cwd(),
@@ -217,7 +221,9 @@ describe('extensibilityUtils', () => {
                 }
             })
 
-            const result = extensionUtils.validateExtensionDependencies(['my-extension'])
+            const result = extensionUtils.validateExtensionDependencies([
+                ['my-extension', {enabled: true}]
+            ])
             expect(result).toStrictEqual({
                 success: true
             })
@@ -239,8 +245,8 @@ describe('extensibilityUtils', () => {
             })
 
             const result = extensionUtils.validateExtensionDependencies([
-                'package-one',
-                'package-two'
+                ['package-one', {enabled: true}],
+                ['package-two', {enabled: true}]
             ])
             expect(result).toStrictEqual({
                 success: true
@@ -264,7 +270,7 @@ describe('extensibilityUtils', () => {
 
             const result = extensionUtils.validateExtensionDependencies([
                 ['package-one', {enabled: false}],
-                'package-two'
+                ['package-two', {enabled: true}]
             ])
             expect(result.success).toBe(false)
             expect(Array.isArray(result.errors) && result.errors.length > 0).toBe(true)

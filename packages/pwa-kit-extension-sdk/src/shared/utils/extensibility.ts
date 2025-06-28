@@ -11,11 +11,7 @@ import path, {resolve} from 'path'
 import merge from 'lodash.merge'
 
 // Types
-import {
-    ApplicationExtensionConfig,
-    ApplicationExtensionEntry,
-    ApplicationExtensionEntryTuple
-} from '../../types'
+import {ApplicationExtensionConfig, ApplicationExtensionEntry} from '../../types'
 
 import {expand} from './index'
 
@@ -132,7 +128,7 @@ export const validateExtensionDependencies = (
 ): {success: boolean; errors?: Error[]} => {
     const extensions = expand(appExtensions)
 
-    const hasRequiredDependencies = (extension: ApplicationExtensionEntryTuple) => {
+    const hasRequiredDependencies = (extension: ApplicationExtensionEntry) => {
         const dependencies = getDependencies(extension)
         if (dependencies.length === 0) return {success: true, dependencies}
 
@@ -167,7 +163,7 @@ export const validateExtensionDependencies = (
     }
 }
 
-const getDependencies = (extension: ApplicationExtensionEntryTuple) => {
+const getDependencies = (extension: ApplicationExtensionEntry) => {
     const projectDir = process.cwd()
     const pkg = fse.readJsonSync(resolve(projectDir, 'node_modules', extension[0], 'package.json'))
 
@@ -183,8 +179,8 @@ const getDependencies = (extension: ApplicationExtensionEntryTuple) => {
 }
 
 const getPreviousExtensions = (
-    currentExtension: ApplicationExtensionEntryTuple,
-    extensions: ApplicationExtensionEntryTuple[]
+    currentExtension: ApplicationExtensionEntry,
+    extensions: ApplicationExtensionEntry[]
 ) => {
     const array = extensions.slice().reverse()
     const index = array.findIndex((extension) => extension[0] === currentExtension[0])
@@ -195,9 +191,9 @@ const getPreviousExtensions = (
  * For the given extension, merge its user-defined config and default config
  */
 export const mergeWithDefaultConfig = (
-    extension: ApplicationExtensionEntryTuple,
-    defaultConfig?: ApplicationExtensionEntryTuple[1]
-): ApplicationExtensionEntryTuple => {
+    extension: ApplicationExtensionEntry,
+    defaultConfig?: ApplicationExtensionEntry[1]
+): ApplicationExtensionEntry => {
     const packageName = extension[0]
     const userDefinedConfig = extension[1]
     defaultConfig = defaultConfig ?? getExtensionDefaultConfig(packageName)

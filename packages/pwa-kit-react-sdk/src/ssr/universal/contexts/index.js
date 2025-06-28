@@ -63,26 +63,4 @@ CorrelationIdProvider.propTypes = {
     location: PropTypes.object
 }
 
-const RoutesContext = React.createContext()
-
-/**
- * This provider initializes the routes
- * @param children
- * @param routes - array of routes
- */
-const RoutesProvider = ({routes, children}) => {
-    const [_routes, setRoutes] = useState(routes)
-
-    return (
-        <RoutesContext.Provider value={{routes: _routes, setRoutes}}>
-            {children}
-        </RoutesContext.Provider>
-    )
-}
-
-RoutesProvider.propTypes = {
-    routes: PropTypes.array.isRequired,
-    children: PropTypes.node.isRequired
-}
-
-export {CorrelationIdContext, CorrelationIdProvider, ServerContext, RoutesContext, RoutesProvider}
+export {CorrelationIdContext, CorrelationIdProvider, ServerContext}

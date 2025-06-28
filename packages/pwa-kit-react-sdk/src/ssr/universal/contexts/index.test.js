@@ -10,8 +10,8 @@ import {render, screen} from '@testing-library/react'
 import {Router} from 'react-router-dom'
 import {createMemoryHistory} from 'history'
 
-import {CorrelationIdProvider, RoutesProvider} from './index'
-import {useCorrelationId, useRoutes} from '../hooks'
+import {CorrelationIdProvider} from './index'
+import {useCorrelationId} from '../hooks'
 import crypto from 'crypto'
 import PropTypes from 'prop-types'
 import userEvent from '@testing-library/user-event'
@@ -108,32 +108,4 @@ describe('CorrelationIdProvider', function () {
     })
 })
 
-describe('RoutesProvider', () => {
-    it('provides routes via context', () => {
-        const testRoutes = [{path: '/home'}, {path: '/about'}]
-
-        const TestComponent = () => {
-            const {routes} = useRoutes()
-            return <div>{routes.map((route) => route.path).join(', ')}</div>
-        }
-
-        render(
-            <RoutesProvider routes={testRoutes}>
-                <TestComponent />
-            </RoutesProvider>
-        )
-
-        expect(screen.getByText('/home, /about')).toBeInTheDocument()
-    })
-
-    it('throws an error when useRoutes is used outside RoutesProvider', () => {
-        const TestComponent = () => {
-            useRoutes()
-            return null
-        }
-
-        expect(() => render(<TestComponent />)).toThrow(
-            'useRoutes must be used within a RoutesProvider'
-        )
-    })
-})
+// RoutesProvider and useRoutes were removed as part of routing system simplification

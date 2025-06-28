@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import {ApplicationExtensionEntryTuple, ApplicationExtensionConfig} from '../../types'
+import {ApplicationExtensionEntry, ApplicationExtensionConfig} from '../../types'
 
 // NOTE: please make sure that the imported modules do not include 'path'.
 // This way getConfiguredExtensions can be called from both server and client side.
@@ -61,8 +61,8 @@ export const kebabToLowerCamelCase = (str: string) =>
         )
         .join('')
 
-// Returns true if the entry has a valid format for an ApplicationExtensionEntryTuple
-const isApplicationExtensionEntryTuple = (entry: unknown[]): boolean => {
+// Returns true if the entry has a valid format for an ApplicationExtensionEntry
+const isApplicationExtensionEntry = (entry: unknown[]): boolean => {
     const [nameRef, config] = entry || []
     const isValid = typeof nameRef === 'string' && typeof config === 'object'
 
@@ -95,7 +95,7 @@ const isApplicationExtensionEntryTuple = (entry: unknown[]): boolean => {
  *   ['@salesforce/extension-c', {enabled: true}]
  * ]
  */
-export const expand = (extensions: unknown[] = []): ApplicationExtensionEntryTuple[] =>
+export const expand = (extensions: unknown[] = []): ApplicationExtensionEntry[] =>
     extensions
         .filter((extension) => Boolean(extension))
         .map((extension) => {
@@ -105,7 +105,7 @@ export const expand = (extensions: unknown[] = []): ApplicationExtensionEntryTup
 
             return tuple
         })
-        .filter(isApplicationExtensionEntryTuple)
+        .filter(isApplicationExtensionEntry)
 
 /**
  * Returns the list of configured extensions, given the configurations found in a config file or package.json's `mobify`
@@ -113,7 +113,7 @@ export const expand = (extensions: unknown[] = []): ApplicationExtensionEntryTup
  * import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
  * getConfiguredExtensions(getConfig())
  */
-export const getConfiguredExtensions = (config: any): ApplicationExtensionEntryTuple[] => {
+export const getConfiguredExtensions = (config: any): ApplicationExtensionEntry[] => {
     // Note: this path to the `extensions` property may change
     return expand(config?.app?.extensions || []).filter(([, config]) => config?.enabled !== false)
 }

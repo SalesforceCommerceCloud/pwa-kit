@@ -34,7 +34,7 @@ import Document from '../universal/components/_document'
 import Throw404 from '../universal/components/throw-404'
 import {getAppConfig} from '../universal/compatibility'
 import Switch from '../universal/components/switch'
-import {getAllRoutes, routeComponent} from '../universal/components/route-component'
+import {getRoutes, routeComponent} from '../universal/components/route-component'
 import * as errors from '../universal/errors'
 import logger from '../../utils/logger-instance'
 import PerformanceTimer, {PERFORMANCE_MARKS} from '../../utils/performance'
@@ -139,7 +139,7 @@ export const render = async (req, res, next) => {
         locals: res.locals
     })
 
-    let routes = await getAllRoutes(res.locals)
+    let routes = getRoutes(res.locals)
 
     const [pathname] = req.originalUrl.split('?')
 
@@ -150,22 +150,11 @@ export const render = async (req, res, next) => {
         })
     }
 
-    // Some application extensions need to be serialized because they have asynchronous state
-    const serializedExtensions = Object.fromEntries(
-        applicationExtensions.flatMap((extension) => {
-            if (typeof extension.getRoutesAsync !== 'function') return []
-            const routes = extension.serializeAsyncRoutes()
-            // TODO W-18257236: Use a unique key for each extension like the extension ID from
-            // extension-meta.json
-            return [[extension.getName(), {routes}]]
-        })
-    )
-
     // Step 1 - Find the match.
 
     // Call `beforeRouteMatch` application extension hook.
     applicationExtensions.forEach((applicationExtension) => {
-        routes = applicationExtension.beforeRouteMatch({allRoutes: routes, locals: res.locals})
+        routes = applicationExtension.beforeRouteMatch(routes)
     })
 
     res.__performanceTimer.mark(PERFORMANCE_MARKS.routeMatching, 'start')
@@ -239,8 +228,7 @@ export const render = async (req, res, next) => {
             res,
             location,
             config,
-            appJSX,
-            serializedExtensions
+            appJSX
         })
     } catch (e) {
         // This is an unrecoverable error.
@@ -305,7 +293,7 @@ const renderToString = (jsx, extractor) =>
     ReactDOMServer.renderToString(extractor.collectChunks(jsx))
 
 const renderApp = (args) => {
-    const {req, res, appStateError, appJSX, appState, config, serializedExtensions} = args
+    const {req, res, appStateError, appJSX, appState, config} = args
     const extractor = new ChunkExtractor({statsFile: BUNDLES_PATH, publicPath: getAssetUrl()})
 
     const ssrOnly = 'mobify_server_only' in req.query || '__server_only' in req.query
@@ -369,7 +357,6 @@ const renderApp = (args) => {
         __CONFIG__: config,
         __PRELOADED_STATE__: appState,
         __ERROR__: error,
-        __EXTENSIONS__: serializedExtensions,
         // `window.Progressive` has a long history at Mobify and some
         // client-side code depends on it. Maintain its name out of tradition.
         Progressive: getWindowProgressive(req, res)
