@@ -84,7 +84,7 @@ describe('StoreLocatorList', () => {
         })
 
         renderWithProviders(<StoreLocatorList />)
-        expect(screen.getByText('Sorry, there are no locations in this area')).toBeTruthy()
+        expect(screen.getByText('Sorry, there are no locations in this area.')).toBeTruthy()
     })
 
     test('renders stores with pagination', () => {

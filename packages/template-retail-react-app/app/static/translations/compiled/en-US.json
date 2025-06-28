@@ -3413,6 +3413,28 @@
       "value": " to proceed."
     }
   ],
+  "store_display.format.address_line_2": [
+    {
+      "type": 1,
+      "value": "city"
+    },
+    {
+      "type": 0,
+      "value": ", "
+    },
+    {
+      "type": 1,
+      "value": "stateCode"
+    },
+    {
+      "type": 0,
+      "value": " "
+    },
+    {
+      "type": 1,
+      "value": "postalCode"
+    }
+  ],
   "store_display.label.store_hours": [
     {
       "type": 0,
@@ -3473,22 +3495,156 @@
       "value": "action"
     }
   ],
-  "store_locator.description.away": [
+  "store_locator.action.find": [
     {
       "type": 0,
-      "value": "away"
+      "value": "Find"
+    }
+  ],
+  "store_locator.action.select_a_country": [
+    {
+      "type": 0,
+      "value": "Select a country"
+    }
+  ],
+  "store_locator.action.use_my_location": [
+    {
+      "type": 0,
+      "value": "Use My Location"
+    }
+  ],
+  "store_locator.description.away": [
+    {
+      "type": 1,
+      "value": "distance"
+    },
+    {
+      "type": 0,
+      "value": " "
+    },
+    {
+      "type": 1,
+      "value": "unit"
+    },
+    {
+      "type": 0,
+      "value": " away"
     }
   ],
   "store_locator.description.email": [
     {
       "type": 0,
-      "value": "Email:"
+      "value": "Email: "
+    },
+    {
+      "type": 1,
+      "value": "email"
+    }
+  ],
+  "store_locator.description.loading_locations": [
+    {
+      "type": 0,
+      "value": "Loading locations..."
+    }
+  ],
+  "store_locator.description.no_locations": [
+    {
+      "type": 0,
+      "value": "Sorry, there are no locations in this area."
+    }
+  ],
+  "store_locator.description.or": [
+    {
+      "type": 0,
+      "value": "Or"
     }
   ],
   "store_locator.description.phone": [
     {
       "type": 0,
-      "value": "Phone:"
+      "value": "Phone: "
+    },
+    {
+      "type": 1,
+      "value": "phone"
+    }
+  ],
+  "store_locator.description.viewing_near_postal_code": [
+    {
+      "type": 0,
+      "value": "Viewing stores within "
+    },
+    {
+      "type": 1,
+      "value": "distance"
+    },
+    {
+      "type": 1,
+      "value": "distanceUnit"
+    },
+    {
+      "type": 0,
+      "value": " of "
+    },
+    {
+      "type": 1,
+      "value": "postalCode"
+    },
+    {
+      "type": 0,
+      "value": " in "
+    },
+    {
+      "type": 1,
+      "value": "countryName"
+    }
+  ],
+  "store_locator.description.viewing_near_your_location": [
+    {
+      "type": 0,
+      "value": "Viewing stores near your location"
+    }
+  ],
+  "store_locator.error.agree_to_share_your_location": [
+    {
+      "type": 0,
+      "value": "Please agree to share your location"
+    }
+  ],
+  "store_locator.error.items_in_basket": [
+    {
+      "type": 0,
+      "value": "Sorry, you have items in your basket. Please remove them to change the selected store."
+    }
+  ],
+  "store_locator.error.please_enter_a_postal_code": [
+    {
+      "type": 0,
+      "value": "Please enter a postal code."
+    }
+  ],
+  "store_locator.error.please_select_a_country": [
+    {
+      "type": 0,
+      "value": "Please select a country."
+    }
+  ],
+  "store_locator.field.placeholder.enter_postal_code": [
+    {
+      "type": 0,
+      "value": "Enter postal code"
+    }
+  ],
+  "store_locator.pagination.load_more": [
+    {
+      "type": 0,
+      "value": "Load More"
+    }
+  ],
+  "store_locator.title": [
+    {
+      "type": 0,
+      "value": "Find a Store"
     }
   ],
   "swatch_group.selected.label": [
