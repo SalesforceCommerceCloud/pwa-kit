@@ -34,17 +34,18 @@ class ChakraStorefront extends ApplicationExtension<Config> {
     extendApp<T extends React.ComponentType<T>>(
         App: React.ComponentType<T>
     ): React.ComponentType<T> {
-        const HOCs = [
-            withChakraUI,
-            withCommerceSdkReact,
-            withCurrency,
+        // NOTE: The order of these HOCs is important!
+        const requiredHOCs = [
             withLayout,
-            withMultiSite,
+            withChakraUI,
+            withCurrency,
             withReactIntl,
-            withStorefrontPreview
+            withMultiSite,
+            withStorefrontPreview,
+            withCommerceSdkReact
         ]
 
-        return applyHOCs(App, HOCs)
+        return applyHOCs(App, requiredHOCs)
     }
 
     extendRoutes(routes: RouteProps[]): RouteProps[] {
