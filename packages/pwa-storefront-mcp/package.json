@@ -50,6 +50,7 @@
     "@salesforce/pwa-kit-dev": "3.11.0-dev.0",
     "axe-core": "^4.10.3",
     "cross-env": "^5.2.1",
+    "cross-spawn": "^7.0.6",
     "internal-lib-build": "3.11.0-dev.0",
     "nodemon": "^2.0.22",
     "playwright": "^1.49.0"

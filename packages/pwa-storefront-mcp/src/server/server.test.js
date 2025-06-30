@@ -4,7 +4,13 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import {spawn} from 'child_process'
+// import {spawn} from 'child_process'
+import {spawn} from 'cross-spawn'
+import path from 'path'
+
+const BABEL_NODE_PATH = path.resolve(
+    './node_modules/.bin/babel-node' + (process.platform === 'win32' ? '.cmd' : '')
+)
 
 function sendJsonRpcRequest(child, request) {
     return new Promise((resolve, reject) => {
@@ -30,7 +36,7 @@ function sendJsonRpcRequest(child, request) {
 
 describe('PwaStorefrontMCPServerHighLevel integration', () => {
     it('should list registered tools via stdio', async () => {
-        const child = spawn('./node_modules/.bin/babel-node', ['src/server/server.js'], {
+        const child = spawn(BABEL_NODE_PATH, ['src/server/server.js'], {
             cwd: process.cwd(),
             stdio: ['pipe', 'pipe', 'inherit']
         })
