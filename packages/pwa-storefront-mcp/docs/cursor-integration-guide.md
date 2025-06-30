@@ -293,7 +293,7 @@ generateComponents().catch(console.error);
 1. **Use the MCP Server**: The MCP server provides intelligent analysis and proper code insertion.
 2. **Validate Syntax**: Always check generated code for syntax errors
 3. **Preserve Formatting**: Maintain consistent code style and indentation
-4. **Handle Imports**: Ensure necessary imports are added when inserting components
+4. **Handle Imports**: Ensure necessary imports are added when inserting components.
 5. **Test Integration**: Verify that inserted components work with existing code.
 
 ## Demo Commands
