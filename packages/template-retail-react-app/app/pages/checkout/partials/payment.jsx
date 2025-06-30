@@ -53,7 +53,7 @@ const Payment = () => {
     const isPickupOrder = isBopisEnabled
         ? basket?.shipments[0]?.shippingMethod?.c_storePickupEnabled === true
         : false
-    const [useShippingAddressForBilling, setUseShippingAddressForBilling] = useState(true)
+    const [billingSameAsShipping, setBillingSameAsShipping] = useState(!isPickupOrder)
     const {mutateAsync: addPaymentInstrumentToBasket} = useShopperBasketsMutation(
         'addPaymentInstrumentToBasket'
     )
@@ -112,7 +112,7 @@ const Payment = () => {
         if (!isFormValid) {
             return
         }
-        const billingAddress = useShippingAddressForBilling
+        const billingAddress = billingSameAsShipping
             ? selectedShippingAddress
             : billingAddressForm.getValues()
         // Using destructuring to remove properties from the object...
@@ -214,28 +214,29 @@ const Payment = () => {
                             />
                         </Heading>
 
-                        {isBopisEnabled && isPickupOrder && (
+                        {isBopisEnabled && !isPickupOrder && (
                             <Checkbox
-                                isChecked={useShippingAddressForBilling}
-                                onChange={(e) => setUseShippingAddressForBilling(e.target.checked)}
+                                name="billingSameAsShipping"
+                                isChecked={billingSameAsShipping}
+                                onChange={(e) => setBillingSameAsShipping(e.target.checked)}
                             >
                                 <Text fontSize="sm" color="gray.700">
                                     <FormattedMessage
-                                        defaultMessage="Use pickup address for billing"
-                                        id="checkout.payment.billing_address.use_pickup_address"
+                                        defaultMessage="Same as shipping address"
+                                        id="checkout_payment.label.same_as_shipping"
                                     />
                                 </Text>
                             </Checkbox>
                         )}
 
-                        {useShippingAddressForBilling && selectedShippingAddress && (
+                        {billingSameAsShipping && selectedShippingAddress && (
                             <Box pl={7}>
                                 <AddressDisplay address={selectedShippingAddress} />
                             </Box>
                         )}
                     </Stack>
 
-                    {!useShippingAddressForBilling && (
+                    {!billingSameAsShipping && (
                         <ShippingAddressSelection
                             form={billingAddressForm}
                             selectedAddress={selectedBillingAddress}
