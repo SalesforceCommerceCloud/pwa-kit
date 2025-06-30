@@ -125,7 +125,7 @@ To run the server in development mode:
 npm start
 ```
 
-The server will output debug information to stderr and handle MCP protocol messages via stdio.
+The server outputs debug information to stderr and handle MCP protocol messages via stdio.
 
 # Project Structure
 
