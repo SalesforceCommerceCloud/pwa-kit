@@ -197,7 +197,7 @@ interface ProductCardProps {
 }
 ```
 
-Please create a ProductCard component using this interface.
+Create a ProductCard component using this interface.
 ```
 
 ## Method 4: VSCode/Cursor Extensions
