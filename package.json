@@ -41,6 +41,7 @@
   "dependencies": {
     "@babel/parser": "^7.27.5",
     "@babel/traverse": "^7.27.4",
-    "node-fetch": "^2.6.9"
+    "node-fetch": "^2.6.9",
+    "prettier": "^3.6.2"
   }
 }
