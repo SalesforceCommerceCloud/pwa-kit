@@ -258,8 +258,8 @@ const CheckoutConfirmation = () => {
                                             />
                                         </Heading>
 
-                                        <Stack spacing={1}>
-                                            <Heading as="h3" fontSize="sm">
+                                        <Stack spacing={2}>
+                                            <Heading as="h3" fontSize="md">
                                                 <FormattedMessage
                                                     defaultMessage="Pickup Address"
                                                     id="checkout_confirmation.heading.pickup_address"

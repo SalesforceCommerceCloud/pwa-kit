@@ -36,10 +36,7 @@ import PaymentForm from '@salesforce/retail-react-app/app/pages/checkout/partial
 import ShippingAddressSelection from '@salesforce/retail-react-app/app/pages/checkout/partials/shipping-address-selection'
 import AddressDisplay from '@salesforce/retail-react-app/app/components/address-display'
 import {PromoCode, usePromoCode} from '@salesforce/retail-react-app/app/components/promo-code'
-import {
-    API_ERROR_MESSAGE,
-    STORE_LOCATOR_IS_ENABLED
-} from '@salesforce/retail-react-app/app/constants'
+import {API_ERROR_MESSAGE} from '@salesforce/retail-react-app/app/constants'
 
 const Payment = () => {
     const {formatMessage} = useIntl()
@@ -48,11 +45,7 @@ const Payment = () => {
     const selectedBillingAddress = basket?.billingAddress
     const appliedPayment = basket?.paymentInstruments && basket?.paymentInstruments[0]
 
-    // Only enable BOPIS functionality if the feature toggle is on
-    const isBopisEnabled = STORE_LOCATOR_IS_ENABLED
-    const isPickupOrder = isBopisEnabled
-        ? basket?.shipments[0]?.shippingMethod?.c_storePickupEnabled === true
-        : false
+    const isPickupOrder = basket?.shipments[0]?.shippingMethod?.c_storePickupEnabled === true
     const [billingSameAsShipping, setBillingSameAsShipping] = useState(!isPickupOrder)
     const {mutateAsync: addPaymentInstrumentToBasket} = useShopperBasketsMutation(
         'addPaymentInstrumentToBasket'
@@ -214,7 +207,7 @@ const Payment = () => {
                             />
                         </Heading>
 
-                        {isBopisEnabled && !isPickupOrder && (
+                        {!isPickupOrder && (
                             <Checkbox
                                 name="billingSameAsShipping"
                                 isChecked={billingSameAsShipping}
