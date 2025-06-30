@@ -6,7 +6,7 @@ Install and run this MCP server as a local MCP server or run locally via `npx` (
 
 ## What is MCP?
 
-The Model Context Protocol (MCP) is an open protocol that enables secure connections between host applications (like Claude Desktop or other AI assistants) and external data sources and tools.
+The Model Context Protocol (MCP) is an open protocol that enables secure connections between host applications, such as Claude Desktop or other AI assistants, and external data sources and tools.
 
 ## Features
 
