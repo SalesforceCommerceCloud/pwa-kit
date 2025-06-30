@@ -17,7 +17,8 @@
   },
   "files": [
     "assets",
-    "templates"
+    "templates",
+    "program.json"
   ],
   "scripts": {
     "format": "internal-lib-build format \"**/*.{js,jsx}\"",
