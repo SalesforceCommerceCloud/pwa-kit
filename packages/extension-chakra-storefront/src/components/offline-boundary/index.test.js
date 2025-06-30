@@ -7,9 +7,17 @@
 import React from 'react'
 import {screen} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import {ChakraProvider} from '@chakra-ui/react'
+import theme from '../../theme'
+import {renderWithRouter} from '../../utils/test-utils'
 
 import OfflineBoundary, {UnwrappedOfflineBoundary} from '../../components/offline-boundary/index'
-import {renderWithProviders} from '../../utils/test-utils'
+
+// Custom render function that combines Router and Chakra contexts
+const renderWithRouterAndChakra = (component) => {
+    const ComponentWithChakra = () => <ChakraProvider value={theme}>{component}</ChakraProvider>
+    return renderWithRouter(<ComponentWithChakra />)
+}
 
 class ChunkLoadError extends Error {
     constructor(...params) {
@@ -31,7 +39,7 @@ describe('The OfflineBoundary', () => {
     })
 
     test('should render its children', () => {
-        renderWithProviders(
+        renderWithRouterAndChakra(
             <OfflineBoundary isOnline={true}>
                 <div id="child">child</div>
             </OfflineBoundary>
@@ -44,7 +52,7 @@ describe('The OfflineBoundary', () => {
         const ThrowingComponent = () => {
             throw new ChunkLoadError()
         }
-        renderWithProviders(
+        renderWithRouterAndChakra(
             <OfflineBoundary isOnline={true}>
                 <div>
                     <ThrowingComponent />
@@ -65,7 +73,7 @@ describe('The OfflineBoundary', () => {
             throw new Error('Anything else')
         }
         expect(() => {
-            renderWithProviders(
+            renderWithRouterAndChakra(
                 <OfflineBoundary isOnline={true}>
                     <div>
                         <ThrowingComponent />
@@ -83,7 +91,7 @@ describe('The OfflineBoundary', () => {
         }
         const clearErrorSpy = jest.spyOn(UnwrappedOfflineBoundary.prototype, 'clearError')
 
-        renderWithProviders(
+        renderWithRouterAndChakra(
             <OfflineBoundary isOnline={true}>
                 <ThrowingComponent />
             </OfflineBoundary>
