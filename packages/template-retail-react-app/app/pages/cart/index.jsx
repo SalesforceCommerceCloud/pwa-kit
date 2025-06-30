@@ -44,7 +44,8 @@ import {
     TOAST_ACTION_VIEW_WISHLIST,
     TOAST_MESSAGE_ADDED_TO_WISHLIST,
     TOAST_MESSAGE_REMOVED_ITEM_FROM_CART,
-    TOAST_MESSAGE_ALREADY_IN_WISHLIST
+    TOAST_MESSAGE_ALREADY_IN_WISHLIST,
+    STORE_LOCATOR_IS_ENABLED
 } from '@salesforce/retail-react-app/app/constants'
 import {REMOVE_CART_ITEM_CONFIRMATION_DIALOG_CONFIG} from '@salesforce/retail-react-app/app/pages/cart/partials/cart-secondary-button-group'
 
@@ -68,8 +69,10 @@ const DEBOUNCE_WAIT = 750
 const Cart = () => {
     const {data: basket, isLoading} = useCurrentBasket()
 
-    // Pickup in Store
-    const isPickupOrder = basket?.shipments[0]?.shippingMethod?.c_storePickupEnabled === true
+    // Pickup in Store - only enabled if feature toggle is on
+    const isPickupOrder = STORE_LOCATOR_IS_ENABLED
+        ? basket?.shipments[0]?.shippingMethod?.c_storePickupEnabled === true
+        : false
     const storeId = basket?.shipments?.[0]?.c_fromStoreId
     const {data: storeData} = useStores(
         {
@@ -78,7 +81,7 @@ const Cart = () => {
             }
         },
         {
-            enabled: !!storeId
+            enabled: !!storeId && STORE_LOCATOR_IS_ENABLED
         }
     )
     const storeName = storeData?.data?.[0]?.name
@@ -606,26 +609,29 @@ const Cart = () => {
                         >
                             <GridItem>
                                 <Stack spacing={4}>
-                                    <Box layerStyle="cardBordered" p={3}>
-                                        {isPickupOrder ? (
-                                            <Text fontWeight="bold">
-                                                <FormattedMessage
-                                                    defaultMessage="Pickup in Store ({storeName})"
-                                                    id="cart.order_type.pickup_in_store"
-                                                    values={{
-                                                        storeName
-                                                    }}
-                                                />
-                                            </Text>
-                                        ) : (
-                                            <Text fontWeight="bold">
-                                                <FormattedMessage
-                                                    defaultMessage="Delivery"
-                                                    id="cart.order_type.delivery"
-                                                />
-                                            </Text>
-                                        )}
-                                    </Box>
+                                    {/* Order Type Display */}
+                                    {STORE_LOCATOR_IS_ENABLED && (
+                                        <Box layerStyle="cardBordered" p={3}>
+                                            {isPickupOrder ? (
+                                                <Text fontWeight="bold">
+                                                    <FormattedMessage
+                                                        defaultMessage="Pickup in Store ({storeName})"
+                                                        id="cart.order_type.pickup_in_store"
+                                                        values={{
+                                                            storeName
+                                                        }}
+                                                    />
+                                                </Text>
+                                            ) : (
+                                                <Text fontWeight="bold">
+                                                    <FormattedMessage
+                                                        defaultMessage="Delivery"
+                                                        id="cart.order_type.delivery"
+                                                    />
+                                                </Text>
+                                            )}
+                                        </Box>
+                                    )}
                                     {basket.productItems?.map((productItem, idx) => {
                                         return (
                                             <ProductItem

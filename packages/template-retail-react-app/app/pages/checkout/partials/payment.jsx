@@ -46,7 +46,7 @@ const Payment = () => {
     const appliedPayment = basket?.paymentInstruments && basket?.paymentInstruments[0]
 
     const isPickupOrder = basket?.shipments[0]?.shippingMethod?.c_storePickupEnabled === true
-    const [billingSameAsShipping, setBillingSameAsShipping] = useState(!isPickupOrder) // By default, have billing addr to be the same as shipping
+    const [billingSameAsShipping, setBillingSameAsShipping] = useState(!isPickupOrder)
     const {mutateAsync: addPaymentInstrumentToBasket} = useShopperBasketsMutation(
         'addPaymentInstrumentToBasket'
     )

@@ -42,7 +42,10 @@ import CartItemVariantName from '@salesforce/retail-react-app/app/components/ite
 import CartItemVariantAttributes from '@salesforce/retail-react-app/app/components/item-variant/item-attributes'
 import CartItemVariantPrice from '@salesforce/retail-react-app/app/components/item-variant/item-price'
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
-import {API_ERROR_MESSAGE} from '@salesforce/retail-react-app/app/constants'
+import {
+    API_ERROR_MESSAGE,
+    STORE_LOCATOR_IS_ENABLED
+} from '@salesforce/retail-react-app/app/constants'
 import {useCurrency} from '@salesforce/retail-react-app/app/hooks'
 
 const onClient = typeof window !== 'undefined'
@@ -67,7 +70,9 @@ const CheckoutConfirmation = () => {
     const form = useForm()
 
     // Check if this is a pickup order and get store details
-    const isPickupOrder = order?.shipments?.[0]?.shippingMethod?.c_storePickupEnabled === true
+    const isPickupOrder = STORE_LOCATOR_IS_ENABLED
+        ? order?.shipments?.[0]?.shippingMethod?.c_storePickupEnabled === true
+        : false
     const storeId = order?.shipments?.[0]?.c_fromStoreId
     const {data: storeData} = useStores(
         {
@@ -252,8 +257,8 @@ const CheckoutConfirmation = () => {
                                             />
                                         </Heading>
 
-                                        <Stack spacing={1}>
-                                            <Heading as="h3" fontSize="sm">
+                                        <Stack spacing={2}>
+                                            <Heading as="h3" fontSize="md">
                                                 <FormattedMessage
                                                     defaultMessage="Pickup Address"
                                                     id="checkout_confirmation.heading.pickup_address"

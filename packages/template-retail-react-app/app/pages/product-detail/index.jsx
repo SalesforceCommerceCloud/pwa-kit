@@ -36,6 +36,7 @@ import useActiveData from '@salesforce/retail-react-app/app/hooks/use-active-dat
 import {useServerContext} from '@salesforce/pwa-kit-react-sdk/ssr/universal/hooks'
 import usePickupShipment from '@salesforce/retail-react-app/app/hooks/use-pickup-shipment'
 import {useSelectedStore} from '@salesforce/retail-react-app/app/hooks/use-selected-store'
+import {STORE_LOCATOR_IS_ENABLED} from '@salesforce/retail-react-app/app/constants'
 // Project Components
 import RecommendedProducts from '@salesforce/retail-react-app/app/components/recommended-products'
 import ProductView from '@salesforce/retail-react-app/app/components/product-view'
@@ -675,6 +676,7 @@ const ProductDetail = () => {
                                 product && handlePickupInStoreChange(product.id, checked)
                             }
                             onOpenStoreLocator={onOpenStoreLocator}
+                            showDeliveryOptions={STORE_LOCATOR_IS_ENABLED}
                         />
 
                         <hr />
@@ -745,6 +747,7 @@ const ProductDetail = () => {
                                                 handlePickupInStoreChange(childProduct.id, checked)
                                             }
                                             onOpenStoreLocator={onOpenStoreLocator}
+                                            showDeliveryOptions={STORE_LOCATOR_IS_ENABLED}
                                         />
                                         <InformationAccordion product={childProduct} />
 
@@ -775,6 +778,7 @@ const ProductDetail = () => {
                                 product && handlePickupInStoreChange(product.id, checked)
                             }
                             onOpenStoreLocator={onOpenStoreLocator}
+                            showDeliveryOptions={STORE_LOCATOR_IS_ENABLED}
                         />
                         <InformationAccordion product={product} />
                     </Fragment>
@@ -824,7 +828,9 @@ const ProductDetail = () => {
                     />
                 </Stack>
             </Stack>
-            <StoreLocatorModal isOpen={isStoreLocatorOpen} onClose={onCloseStoreLocator} />
+            {STORE_LOCATOR_IS_ENABLED && (
+                <StoreLocatorModal isOpen={isStoreLocatorOpen} onClose={onCloseStoreLocator} />
+            )}
         </Box>
     )
 }

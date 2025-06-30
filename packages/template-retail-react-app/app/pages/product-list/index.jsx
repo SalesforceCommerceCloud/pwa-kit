@@ -90,7 +90,8 @@ import {
     TOAST_MESSAGE_REMOVED_FROM_WISHLIST,
     STALE_WHILE_REVALIDATE,
     PRODUCT_LIST_IMAGE_VIEW_TYPE,
-    PRODUCT_LIST_SELECTABLE_ATTRIBUTE_ID
+    PRODUCT_LIST_SELECTABLE_ATTRIBUTE_ID,
+    STORE_LOCATOR_IS_ENABLED
 } from '@salesforce/retail-react-app/app/constants'
 import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
 import LoadingSpinner from '@salesforce/retail-react-app/app/components/loading-spinner'
@@ -396,6 +397,15 @@ const ProductList = (props) => {
         navigate(newPath)
     }
 
+    // Create reusable StoreInventoryFilter component to avoid repetition
+    const storeInventoryFilterComponent = (
+        <StoreInventoryFilter
+            key="storeInventoryFilter"
+            toggleFilter={toggleFilter}
+            selectedFilters={productSearchResult?.selectedRefinements || {}}
+        />
+    )
+
     /**************** Einstein ****************/
     useEffect(() => {
         if (productSearchResult) {
@@ -555,24 +565,16 @@ const ProductList = (props) => {
                             itemsBefore={
                                 category?.categories
                                     ? [
-                                          <CategoryLinks key="itemsBefore" category={category} />,
-                                          <StoreInventoryFilter
-                                              key="storeInventoryFilter"
-                                              toggleFilter={toggleFilter}
-                                              selectedFilters={
-                                                  productSearchResult?.selectedRefinements || {}
-                                              }
-                                          />
-                                      ]
+                                          <CategoryLinks
+                                              key="itemsBefore"
+                                              category={category}
+                                              onSelect={onClose}
+                                          />,
+                                          STORE_LOCATOR_IS_ENABLED && storeInventoryFilterComponent
+                                      ].filter(Boolean)
                                     : [
-                                          <StoreInventoryFilter
-                                              key="storeInventoryFilter"
-                                              toggleFilter={toggleFilter}
-                                              selectedFilters={
-                                                  productSearchResult?.selectedRefinements || {}
-                                              }
-                                          />
-                                      ]
+                                          STORE_LOCATOR_IS_ENABLED && storeInventoryFilterComponent
+                                      ].filter(Boolean)
                             }
                             isLoading={filtersLoading}
                             toggleFilter={toggleFilter}
@@ -712,23 +714,11 @@ const ProductList = (props) => {
                                               category={category}
                                               onSelect={onClose}
                                           />,
-                                          <StoreInventoryFilter
-                                              key="storeInventoryFilter"
-                                              toggleFilter={toggleFilter}
-                                              selectedFilters={
-                                                  productSearchResult?.selectedRefinements || {}
-                                              }
-                                          />
-                                      ]
+                                          STORE_LOCATOR_IS_ENABLED && storeInventoryFilterComponent
+                                      ].filter(Boolean)
                                     : [
-                                          <StoreInventoryFilter
-                                              key="storeInventoryFilter"
-                                              toggleFilter={toggleFilter}
-                                              selectedFilters={
-                                                  productSearchResult?.selectedRefinements || {}
-                                              }
-                                          />
-                                      ]
+                                          STORE_LOCATOR_IS_ENABLED && storeInventoryFilterComponent
+                                      ].filter(Boolean)
                             }
                             excludedFilters={['cgid']}
                         />

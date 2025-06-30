@@ -34,7 +34,8 @@ import {useShopperOrdersMutation, useShopperBasketsMutation} from '@salesforce/c
 import UnavailableProductConfirmationModal from '@salesforce/retail-react-app/app/components/unavailable-product-confirmation-modal'
 import {
     API_ERROR_MESSAGE,
-    TOAST_MESSAGE_REMOVED_ITEM_FROM_CART
+    TOAST_MESSAGE_REMOVED_ITEM_FROM_CART,
+    STORE_LOCATOR_IS_ENABLED
 } from '@salesforce/retail-react-app/app/constants'
 import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
 import LoadingSpinner from '@salesforce/retail-react-app/app/components/loading-spinner'
@@ -53,7 +54,10 @@ const Checkout = () => {
     const isSocialEnabled = !!social?.enabled
     const isPasswordlessEnabled = !!passwordless?.enabled
 
-    const isPickupOrder = basket?.shipments[0]?.shippingMethod?.c_storePickupEnabled === true
+    // Only enable BOPIS functionality if the feature toggle is on
+    const isPickupOrder = STORE_LOCATOR_IS_ENABLED
+        ? basket?.shipments[0]?.shippingMethod?.c_storePickupEnabled === true
+        : false
 
     useEffect(() => {
         if (error || step === 4) {
