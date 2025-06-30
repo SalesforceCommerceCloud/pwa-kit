@@ -6,12 +6,12 @@
  */
 import React from 'react'
 import PropTypes from 'prop-types'
-import { fireEvent, screen, waitFor, act } from '@testing-library/react'
+import {fireEvent, screen, waitFor, act} from '@testing-library/react'
 import Header from '../../components/header/index'
-import { renderWithProviders, createPathWithDefaults } from '../../utils/test-utils'
-import { rest } from 'msw'
-import { createMemoryHistory } from 'history'
-import { mockCustomerBaskets, mockedRegisteredCustomer } from '../../mocks/mock-data'
+import {renderWithProviders, createPathWithDefaults} from '../../utils/test-utils'
+import {rest} from 'msw'
+import {createMemoryHistory} from 'history'
+import {mockCustomerBaskets, mockedRegisteredCustomer} from '../../mocks/mock-data'
 
 jest.mock('@chakra-ui/react', () => {
     const originalModule = jest.requireActual('@chakra-ui/react')
@@ -29,7 +29,7 @@ jest.mock('@salesforce/pwa-kit-extension-sdk/react', () => ({
     })
 }))
 
-const MockedComponent = ({ history }) => {
+const MockedComponent = ({history}) => {
     const onAccountClick = () => {
         history.push(createPathWithDefaults('/account'))
     }
@@ -136,7 +136,7 @@ test('renders Header with event handlers', async () => {
  * The badge component on the cart that shows the number of items in the cart
  * should only be displayed when there is a valid cart loaded.
  */
-const testBaskets = [null, undefined, { total: 0 }]
+const testBaskets = [null, undefined, {total: 0}]
 
 test.each(testBaskets)(
     `does not render cart badge when basket value is not defined`,
@@ -201,7 +201,7 @@ test('route to account page when an authenticated users click on account icon', 
 
     // Test keyDown on the AccountIcon
     await act(async () => {
-        fireEvent.keyDown(accountIcon, { key: 'Enter', code: 'Enter' })
+        fireEvent.keyDown(accountIcon, {key: 'Enter', code: 'Enter'})
     })
     await waitFor(() => {
         expect(history.push).toHaveBeenCalledWith(createPathWithDefaults('/account'))
@@ -214,14 +214,14 @@ test.skip('route to wishlist page when an authenticated users click on wishlist 
     // mock push function
     history.push = jest.fn()
 
-    const { user } = renderWithProviders(<MockedComponent history={history} />)
+    const {user} = renderWithProviders(<MockedComponent history={history} />)
 
     await waitFor(() => {
         // Look for account icon
         const accountTrigger = screen.getByLabelText('Open account menu')
         expect(accountTrigger).toBeInTheDocument()
     })
-    const wishlistIcon = screen.getByRole('button', { name: /wishlist/i })
+    const wishlistIcon = screen.getByRole('button', {name: /wishlist/i})
     await act(async () => {
         await user.click(wishlistIcon)
     })

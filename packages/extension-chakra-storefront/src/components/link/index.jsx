@@ -40,7 +40,8 @@ Link.propTypes = {
     href: PropTypes.string,
     to: PropTypes.string,
     useNavLink: PropTypes.bool,
-    children: PropTypes.node
+    children: PropTypes.node,
+    css: PropTypes.oneOfType([PropTypes.object, PropTypes.func, PropTypes.array, PropTypes.string])
 }
 
 export default React.memo(Link)

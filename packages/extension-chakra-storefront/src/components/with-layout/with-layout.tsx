@@ -46,6 +46,7 @@ import Header from '../header'
 // import OfflineBoundary from '../offline-boundary'
 import Seo from '../seo'
 import ScrollToTop from '../scroll-to-top'
+import Fade from '../fade'
 
 // Local Project Hooks
 import {AuthModal, useAuthModal} from '../../hooks/use-auth-modal'
@@ -69,8 +70,9 @@ const PlaceholderComponent: React.FC = () => (
 
 const DrawerMenuItemWithData = withCommerceSdkReactHookData(
     ({itemComponent: ItemComponent, data, ...rest}: any) => (
-        // TODO: should I keep the fade-in transition?
-        <ItemComponent {...rest} item={data} itemComponent={DrawerMenuItemWithData} />
+        <Fade>
+            <ItemComponent {...rest} item={data} itemComponent={DrawerMenuItemWithData} />
+        </Fade>
     ),
     {
         hook: useCategory,
@@ -289,17 +291,17 @@ const withLayout = <P extends object>(WrappedComponent: React.ComponentType<P>) 
                                     onWishlistClick={onWishlistClick}
                                 >
                                     {/* TODO: mobile menu */}
-                                       <HideOnDesktop>
-                                           <DrawerMenu
-                                               isOpen={open}
-                                               onClose={onClose}
-                                               onLogoClick={onLogoClick}
-                                               root={categories?.[CAT_MENU_DEFAULT_ROOT_CATEGORY]}
-                                               itemsKey="categories"
-                                               itemsCountKey="onlineSubCategoriesCount"
-                                               itemComponent={DrawerMenuItemWithData}
-                                           />
-                                       </HideOnDesktop>
+                                    <HideOnDesktop>
+                                        <DrawerMenu
+                                            isOpen={open}
+                                            onClose={onClose}
+                                            onLogoClick={onLogoClick}
+                                            root={categories?.[CAT_MENU_DEFAULT_ROOT_CATEGORY]}
+                                            itemsKey="categories"
+                                            itemsCountKey="onlineSubCategoriesCount"
+                                            itemComponent={DrawerMenuItemWithData}
+                                        />
+                                    </HideOnDesktop>
                                     <HideOnMobile>
                                         <ListMenu
                                             root={categories?.[CAT_MENU_DEFAULT_ROOT_CATEGORY]}
