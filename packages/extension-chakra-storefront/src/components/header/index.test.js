@@ -6,13 +6,12 @@
  */
 import React from 'react'
 import PropTypes from 'prop-types'
-import userEvent from '@testing-library/user-event'
-import {fireEvent, screen, waitFor, act} from '@testing-library/react'
+import { fireEvent, screen, waitFor, act } from '@testing-library/react'
 import Header from '../../components/header/index'
-import {renderWithProviders, createPathWithDefaults} from '../../utils/test-utils'
-import {rest} from 'msw'
-import {createMemoryHistory} from 'history'
-import {mockCustomerBaskets, mockedRegisteredCustomer} from '../../mocks/mock-data'
+import { renderWithProviders, createPathWithDefaults } from '../../utils/test-utils'
+import { rest } from 'msw'
+import { createMemoryHistory } from 'history'
+import { mockCustomerBaskets, mockedRegisteredCustomer } from '../../mocks/mock-data'
 
 jest.mock('@chakra-ui/react', () => {
     const originalModule = jest.requireActual('@chakra-ui/react')
@@ -30,7 +29,7 @@ jest.mock('@salesforce/pwa-kit-extension-sdk/react', () => ({
     })
 }))
 
-const MockedComponent = ({history}) => {
+const MockedComponent = ({ history }) => {
     const onAccountClick = () => {
         history.push(createPathWithDefaults('/account'))
     }
@@ -57,23 +56,26 @@ beforeEach(() => {
     )
 })
 afterEach(() => {
+    jest.restoreAllMocks()
     localStorage.clear()
 })
+
 test('renders Header', async () => {
     renderWithProviders(<Header />)
 
     await waitFor(() => {
         const menu = screen.getByLabelText('Menu')
         const logo = screen.getByLabelText('Logo')
-        const account = screen.getByLabelText(/my account/i)
-        const cart = screen.getByLabelText('My cart, number of items: 0')
-        const wishlist = screen.getByLabelText('Wishlist')
+        // header is rendering registered user
+        const account = screen.getByLabelText(/Open account menu/i)
+        const cart = screen.getByLabelText('My cart, number of items: 2')
         const searchInput = document.querySelector('input[type="search"]')
         expect(menu).toBeInTheDocument()
         expect(logo).toBeInTheDocument()
         expect(account).toBeInTheDocument()
         expect(cart).toBeInTheDocument()
-        expect(wishlist).toBeInTheDocument()
+        // Note: Wishlist button is currently commented out in the header component
+        // expect(wishlist).toBeInTheDocument()
         expect(searchInput).toBeInTheDocument()
     })
 })
@@ -91,28 +93,50 @@ test('renders Header with event handlers', async () => {
             onMyCartClick={onMyCartClick}
         />
     )
+    // wait til the component is properly rendered before performing any action
     await waitFor(() => {
-        const menu = screen.getByLabelText('Menu')
-        const logo = screen.getByLabelText('Logo')
-        const account = screen.getByLabelText(/my account/i)
-        const cart = screen.getByLabelText('My cart, number of items: 0')
-        expect(menu).toBeInTheDocument()
-        fireEvent.click(menu)
-        expect(onMenuClick).toHaveBeenCalledTimes(1)
-        fireEvent.click(logo)
-        expect(onLogoClick).toHaveBeenCalledTimes(1)
-        fireEvent.click(account)
-        expect(onMyAccountClick).toHaveBeenCalledTimes(1)
-        fireEvent.click(cart)
-        expect(onMyCartClick).toHaveBeenCalledTimes(1)
+        expect(screen.getByLabelText('Menu')).toBeInTheDocument()
+        expect(screen.getByLabelText('Logo')).toBeInTheDocument()
+        expect(screen.getByLabelText(/Open account menu/i)).toBeInTheDocument()
+        expect(screen.getByLabelText(/My cart, number of items: 2/i)).toBeInTheDocument()
     })
+    const menu = screen.getByLabelText('Menu')
+    const logo = screen.getByLabelText('Logo')
+    const account = screen.getByLabelText(/Open account menu/i)
+    const cart = screen.getByLabelText(/My cart, number of items: 2/)
+
+    await act(async () => {
+        fireEvent.click(menu)
+    })
+    expect(onMenuClick).toHaveBeenCalledTimes(1)
+
+    await act(async () => {
+        fireEvent.click(logo)
+    })
+    expect(onLogoClick).toHaveBeenCalledTimes(1)
+
+    await act(async () => {
+        fireEvent.click(cart)
+    })
+    expect(onMyCartClick).toHaveBeenCalledTimes(1)
+
+    await act(async () => {
+        fireEvent.mouseEnter(account)
+    })
+    // The onClick handler is on the AccountIcon inside the button,
+    // so we need to find and click that
+    const accountIcon = account.querySelector('svg[aria-label="account"]')
+    await act(async () => {
+        fireEvent.click(accountIcon)
+    })
+    expect(onMyAccountClick).toHaveBeenCalledTimes(1)
 })
 
 /**
  * The badge component on the cart that shows the number of items in the cart
  * should only be displayed when there is a valid cart loaded.
  */
-const testBaskets = [null, undefined, {total: 0}]
+const testBaskets = [null, undefined, { total: 0 }]
 
 test.each(testBaskets)(
     `does not render cart badge when basket value is not defined`,
@@ -149,73 +173,90 @@ test('renders cart badge when basket is loaded', async () => {
 
 test('route to account page when an authenticated users click on account icon', async () => {
     const history = createMemoryHistory()
-    // mock push function
     history.push = jest.fn()
     renderWithProviders(<MockedComponent history={history} />)
 
     await waitFor(() => {
-        // Look for account icon
-        const accountTrigger = screen.getByLabelText('Open account menu')
+        // Look for account button
+        const accountTrigger = screen.getByLabelText(/Open account menu/)
         expect(accountTrigger).toBeInTheDocument()
     })
-    const accountIcon = screen.getByLabelText(/my account/i)
-    fireEvent.click(accountIcon)
+
+    const accountButton = screen.getByLabelText(/Open account menu/)
+
+    await act(async () => {
+        // Use mouseEnter to open the popover, then click on the AccountIcon inside
+        fireEvent.mouseEnter(accountButton)
+    })
+
+    // The onClick handler is on the AccountIcon inside the button,
+    // so we need to find and click that
+    const accountIcon = accountButton.querySelector('svg[aria-label="account"]')
+    await act(async () => {
+        fireEvent.click(accountIcon)
+    })
     await waitFor(() => {
         expect(history.push).toHaveBeenCalledWith(createPathWithDefaults('/account'))
     })
 
-    fireEvent.keyDown(accountIcon, {key: 'Enter', code: 'Enter'})
+    // Test keyDown on the AccountIcon
+    await act(async () => {
+        fireEvent.keyDown(accountIcon, { key: 'Enter', code: 'Enter' })
+    })
     await waitFor(() => {
         expect(history.push).toHaveBeenCalledWith(createPathWithDefaults('/account'))
     })
 })
 
-test('route to wishlist page when an authenticated users click on wishlist icon', async () => {
-    const user = userEvent.setup()
+// unskip when wishlist page is converted to chakra v3
+test.skip('route to wishlist page when an authenticated users click on wishlist icon', async () => {
     const history = createMemoryHistory()
     // mock push function
     history.push = jest.fn()
 
-    renderWithProviders(<MockedComponent history={history} />)
+    const { user } = renderWithProviders(<MockedComponent history={history} />)
 
     await waitFor(() => {
         // Look for account icon
         const accountTrigger = screen.getByLabelText('Open account menu')
         expect(accountTrigger).toBeInTheDocument()
     })
-    const wishlistIcon = screen.getByRole('button', {name: /wishlist/i})
-    await user.click(wishlistIcon)
+    const wishlistIcon = screen.getByRole('button', { name: /wishlist/i })
+    await act(async () => {
+        await user.click(wishlistIcon)
+    })
     await waitFor(() => {
         expect(history.push).toHaveBeenCalledWith(createPathWithDefaults('/account/wishlist'))
     })
 })
 
 test('shows dropdown menu when an authenticated users hover on the account icon', async () => {
-    const user = userEvent.setup()
     global.server.use(
         rest.post('*/customers/action/login', (req, res, ctx) => {
             return res(ctx.delay(0), ctx.status(200), ctx.json(mockedRegisteredCustomer))
         })
     )
     const history = createMemoryHistory()
-    // mock push function
     history.push = jest.fn()
+
     await act(async () => {
         renderWithProviders(<MockedComponent history={history} />)
     })
 
     await waitFor(() => {
-        // Look for account icon
-        const accountTrigger = screen.getByLabelText('Open account menu')
+        // Look for account button
+        const accountTrigger = screen.getByLabelText(/Open account menu/i)
         expect(accountTrigger).toBeInTheDocument()
     })
-    const accountIcon = screen.getByLabelText(/my account/i)
-    fireEvent.click(accountIcon)
-    await waitFor(() => {
-        expect(history.push).toHaveBeenCalledWith(createPathWithDefaults('/account'))
-    })
-    await user.hover(accountIcon)
 
+    const accountButton = screen.getByLabelText(/Open account menu/i)
+
+    // Use mouseEnter to open the popover/dropdown
+    await act(async () => {
+        fireEvent.mouseEnter(accountButton)
+    })
+
+    // Now check that the dropdown menu items are visible
     await waitFor(() => {
         expect(screen.getByText(/account details/i)).toBeInTheDocument()
         expect(screen.getByText(/addresses/i)).toBeInTheDocument()
