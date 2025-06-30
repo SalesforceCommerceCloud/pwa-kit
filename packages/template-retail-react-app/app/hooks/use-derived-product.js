@@ -5,12 +5,13 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import {useEffect, useState} from 'react'
+import {useEffect, useState, useMemo} from 'react'
 import {useVariant} from '@salesforce/retail-react-app/app/hooks/use-variant'
 import {useIntl} from 'react-intl'
 import {useVariationParams} from '@salesforce/retail-react-app/app/hooks/use-variation-params'
 import {useVariationAttributes} from '@salesforce/retail-react-app/app/hooks/use-variation-attributes'
 import {useSelectedStore} from '@salesforce/retail-react-app/app/hooks/use-selected-store'
+import {STORE_LOCATOR_IS_ENABLED} from '@salesforce/retail-react-app/app/constants'
 
 const OUT_OF_STOCK = 'OUT_OF_STOCK'
 const UNFULFILLABLE = 'UNFULFILLABLE'
@@ -47,8 +48,12 @@ export const useDerivedProduct = (
     )
     const [quantity, setQuantity] = useState(initialQuantity)
     const {selectedStore} = useSelectedStore()
+    
+    // Only enable BOPIS functionality if the feature toggle is on
+    const isBopisEnabled = STORE_LOCATOR_IS_ENABLED
+    const selectedInventoryId = isBopisEnabled ? selectedStore?.inventoryId || null : null
 
-    const selectedStoreInventory = getInventoryById(product, selectedStore?.inventoryId)
+    const selectedStoreInventory = getInventoryById(product, selectedInventoryId)
     const selectedStoreStockLevel = selectedStoreInventory?.stockLevel || 0
     // selectedStoreStockLevel and selectedStoreInventory are already variant specific,
     // so we don't need to check for variation attributes
@@ -116,7 +121,7 @@ export const useDerivedProduct = (
         stockLevel,
         isOutOfStock,
         unfulfillable,
-        isSelectedStoreOutOfStock,
-        selectedStore
+        isSelectedStoreOutOfStock: isBopisEnabled ? isSelectedStoreOutOfStock : false,
+        selectedStore: isBopisEnabled ? selectedStore : null
     }
 }

@@ -36,6 +36,7 @@ import useActiveData from '@salesforce/retail-react-app/app/hooks/use-active-dat
 import {useServerContext} from '@salesforce/pwa-kit-react-sdk/ssr/universal/hooks'
 import usePickupShipment from '@salesforce/retail-react-app/app/hooks/use-pickup-shipment'
 import {useSelectedStore} from '@salesforce/retail-react-app/app/hooks/use-selected-store'
+import {STORE_LOCATOR_IS_ENABLED} from '@salesforce/retail-react-app/app/constants'
 // Project Components
 import RecommendedProducts from '@salesforce/retail-react-app/app/components/recommended-products'
 import ProductView from '@salesforce/retail-react-app/app/components/product-view'
@@ -100,6 +101,9 @@ const ProductDetail = () => {
         isCurrentShippingMethodPickup,
         hasPickupItems
     } = usePickupShipment(basket)
+
+    // Only enable BOPIS functionality if the feature toggle is enabled
+    const isBopisEnabled = STORE_LOCATOR_IS_ENABLED
 
     /*************************** Product Detail and Category ********************/
     const {productId} = useParams()
@@ -670,11 +674,11 @@ const ProductDetail = () => {
                             childProductOrderability={childProductOrderability}
                             setSelectedBundleQuantity={setSelectedBundleQuantity}
                             selectedBundleParentQuantity={selectedBundleQuantity}
-                            pickupInStore={!!pickupInStoreMap[product?.id]}
-                            setPickupInStore={(checked) =>
-                                product && handlePickupInStoreChange(product.id, checked)
-                            }
-                            onOpenStoreLocator={onOpenStoreLocator}
+                            pickupInStore={isBopisEnabled ? !!pickupInStoreMap[product?.id] : false}
+                            setPickupInStore={isBopisEnabled ? (checked) =>
+                                product && handlePickupInStoreChange(product.id, checked) : () => {}}
+                            onOpenStoreLocator={isBopisEnabled ? onOpenStoreLocator : () => {}}
+                            showDeliveryOptions={isBopisEnabled}
                         />
 
                         <hr />
@@ -739,12 +743,12 @@ const ProductDetail = () => {
                                             setChildProductOrderability={
                                                 setChildProductOrderability
                                             }
-                                            pickupInStore={!!pickupInStoreMap[childProduct?.id]}
-                                            setPickupInStore={(checked) =>
+                                            pickupInStore={isBopisEnabled ? !!pickupInStoreMap[childProduct?.id] : false}
+                                            setPickupInStore={isBopisEnabled ? (checked) =>
                                                 childProduct &&
-                                                handlePickupInStoreChange(childProduct.id, checked)
-                                            }
-                                            onOpenStoreLocator={onOpenStoreLocator}
+                                                handlePickupInStoreChange(childProduct.id, checked) : () => {}}
+                                            onOpenStoreLocator={isBopisEnabled ? onOpenStoreLocator : () => {}}
+                                            showDeliveryOptions={isBopisEnabled}
                                         />
                                         <InformationAccordion product={childProduct} />
 
@@ -771,11 +775,11 @@ const ProductDetail = () => {
                             setChildProductOrderability={setChildProductOrderability}
                             setSelectedBundleQuantity={setSelectedBundleQuantity}
                             selectedBundleParentQuantity={selectedBundleQuantity}
-                            pickupInStore={!!pickupInStoreMap[product?.id]}
-                            setPickupInStore={(checked) =>
-                                product && handlePickupInStoreChange(product.id, checked)
-                            }
-                            onOpenStoreLocator={onOpenStoreLocator}
+                            pickupInStore={isBopisEnabled ? !!pickupInStoreMap[product?.id] : false}
+                            setPickupInStore={isBopisEnabled ? (checked) =>
+                                product && handlePickupInStoreChange(product.id, checked) : () => {}}
+                            onOpenStoreLocator={isBopisEnabled ? onOpenStoreLocator : () => {}}
+                            showDeliveryOptions={isBopisEnabled}
                         />
                         <InformationAccordion product={product} />
                     </Fragment>
@@ -825,7 +829,9 @@ const ProductDetail = () => {
                     />
                 </Stack>
             </Stack>
-            <StoreLocatorModal isOpen={isStoreLocatorOpen} onClose={onCloseStoreLocator} />
+            {isBopisEnabled && (
+                <StoreLocatorModal isOpen={isStoreLocatorOpen} onClose={onCloseStoreLocator} />
+            )}
         </Box>
     )
 }

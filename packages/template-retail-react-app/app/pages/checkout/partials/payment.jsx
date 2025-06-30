@@ -36,7 +36,7 @@ import PaymentForm from '@salesforce/retail-react-app/app/pages/checkout/partial
 import ShippingAddressSelection from '@salesforce/retail-react-app/app/pages/checkout/partials/shipping-address-selection'
 import AddressDisplay from '@salesforce/retail-react-app/app/components/address-display'
 import {PromoCode, usePromoCode} from '@salesforce/retail-react-app/app/components/promo-code'
-import {API_ERROR_MESSAGE} from '@salesforce/retail-react-app/app/constants'
+import {API_ERROR_MESSAGE, STORE_LOCATOR_IS_ENABLED} from '@salesforce/retail-react-app/app/constants'
 
 const Payment = () => {
     const {formatMessage} = useIntl()
@@ -45,8 +45,10 @@ const Payment = () => {
     const selectedBillingAddress = basket?.billingAddress
     const appliedPayment = basket?.paymentInstruments && basket?.paymentInstruments[0]
 
-    const isPickupOrder = basket?.shipments[0]?.shippingMethod?.c_storePickupEnabled === true
-    const [billingSameAsShipping, setBillingSameAsShipping] = useState(!isPickupOrder) // By default, have billing addr to be the same as shipping
+    // Only enable BOPIS functionality if the feature toggle is on
+    const isBopisEnabled = STORE_LOCATOR_IS_ENABLED
+    const isPickupOrder = isBopisEnabled ? basket?.shipments[0]?.shippingMethod?.c_storePickupEnabled === true : false
+    const [useShippingAddressForBilling, setUseShippingAddressForBilling] = useState(true)
     const {mutateAsync: addPaymentInstrumentToBasket} = useShopperBasketsMutation(
         'addPaymentInstrumentToBasket'
     )
@@ -105,7 +107,7 @@ const Payment = () => {
         if (!isFormValid) {
             return
         }
-        const billingAddress = billingSameAsShipping
+        const billingAddress = useShippingAddressForBilling
             ? selectedShippingAddress
             : billingAddressForm.getValues()
         // Using destructuring to remove properties from the object...
@@ -207,29 +209,28 @@ const Payment = () => {
                             />
                         </Heading>
 
-                        {!isPickupOrder && (
+                        {isBopisEnabled && isPickupOrder && (
                             <Checkbox
-                                name="billingSameAsShipping"
-                                isChecked={billingSameAsShipping}
-                                onChange={(e) => setBillingSameAsShipping(e.target.checked)}
+                                isChecked={useShippingAddressForBilling}
+                                onChange={(e) => setUseShippingAddressForBilling(e.target.checked)}
                             >
                                 <Text fontSize="sm" color="gray.700">
                                     <FormattedMessage
-                                        defaultMessage="Same as shipping address"
-                                        id="checkout_payment.label.same_as_shipping"
+                                        defaultMessage="Use pickup address for billing"
+                                        id="checkout.payment.billing_address.use_pickup_address"
                                     />
                                 </Text>
                             </Checkbox>
                         )}
 
-                        {billingSameAsShipping && selectedShippingAddress && (
+                        {useShippingAddressForBilling && selectedShippingAddress && (
                             <Box pl={7}>
                                 <AddressDisplay address={selectedShippingAddress} />
                             </Box>
                         )}
                     </Stack>
 
-                    {!billingSameAsShipping && (
+                    {!useShippingAddressForBilling && (
                         <ShippingAddressSelection
                             form={billingAddressForm}
                             selectedAddress={selectedBillingAddress}

@@ -8,6 +8,7 @@
 import React, {useState, useEffect, createContext} from 'react'
 import PropTypes from 'prop-types'
 import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
+import {STORE_LOCATOR_IS_ENABLED} from '@salesforce/retail-react-app/app/constants'
 
 const onClient = typeof window !== 'undefined'
 
@@ -21,11 +22,14 @@ const readValue = (key) => {
 export const StoreLocatorContext = createContext(null)
 
 export const StoreLocatorProvider = ({config, children}) => {
+    // Only enable BOPIS functionality if the feature toggle is on
+    const isBopisEnabled = STORE_LOCATOR_IS_ENABLED
+    
     // remember the shopper's preferred store for the current site
     // TODO: Change this to `useLocalStorage` hook when localStorage detection is more robust
     const {site} = useMultiSite()
     const selectedStoreBySiteId = `selectedStore_${site?.id}`
-    const selectedStoreId = readValue(selectedStoreBySiteId)
+    const selectedStoreId = isBopisEnabled ? readValue(selectedStoreBySiteId) : null
 
     const [state, setState] = useState({
         mode: 'input',
@@ -42,10 +46,10 @@ export const StoreLocatorProvider = ({config, children}) => {
     })
 
     useEffect(() => {
-        if (onClient && state.selectedStoreId) {
+        if (isBopisEnabled && onClient && state.selectedStoreId) {
             window.localStorage.setItem(selectedStoreBySiteId, state.selectedStoreId)
         }
-    }, [state.selectedStoreId])
+    }, [state.selectedStoreId, isBopisEnabled])
 
     const value = {
         state,

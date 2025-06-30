@@ -9,6 +9,7 @@ import PropTypes from 'prop-types'
 import useEinstein from '@salesforce/retail-react-app/app/hooks/use-einstein'
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
+import {STORE_LOCATOR_IS_ENABLED} from '@salesforce/retail-react-app/app/constants'
 
 const CheckoutContext = React.createContext()
 
@@ -40,8 +41,9 @@ export const CheckoutProvider = ({children}) => {
         if (customer.isGuest && !basket.customerInfo?.email) {
             step = STEPS.CONTACT_INFO
         } else if (!basket.shipments[0]?.shippingAddress?.address1) {
-            // Check if it's a pickup order
-            const isPickupOrder =
+            // Check if it's a pickup order - only if BOPIS is enabled
+            const isBopisEnabled = STORE_LOCATOR_IS_ENABLED
+            const isPickupOrder = isBopisEnabled && 
                 basket?.shipments[0]?.shippingMethod?.c_storePickupEnabled === true
             step = isPickupOrder ? STEPS.PICKUP_ADDRESS : STEPS.SHIPPING_ADDRESS
         } else if (!basket.shipments[0]?.shippingMethod) {
@@ -75,22 +77,27 @@ export const CheckoutProvider = ({children}) => {
         }
     }, [step])
 
+    const goToNextStep = () => {
+        // Check if current step is CONTACT_INFO
+        if (step === STEPS.CONTACT_INFO) {
+            // Determine if it's a pickup order - only if BOPIS is enabled
+            const isBopisEnabled = STORE_LOCATOR_IS_ENABLED
+            const isPickupOrder = isBopisEnabled && 
+                basket?.shipments[0]?.shippingMethod?.c_storePickupEnabled === true
+            // Skip to appropriate next step
+            setStep(isPickupOrder ? STEPS.PICKUP_ADDRESS : STEPS.SHIPPING_ADDRESS)
+        } else {
+            setStep(step + 1)
+        }
+    }
+
+    const goToStep = (step) => setStep(step)
+
     const value = {
         step,
         STEPS,
-        goToNextStep: () => {
-            // Check if current step is CONTACT_INFO
-            if (step === STEPS.CONTACT_INFO) {
-                // Determine if it's a pickup order
-                const isPickupOrder =
-                    basket?.shipments[0]?.shippingMethod?.c_storePickupEnabled === true
-                // Skip to appropriate next step
-                setStep(isPickupOrder ? STEPS.PICKUP_ADDRESS : STEPS.SHIPPING_ADDRESS)
-            } else {
-                setStep(step + 1)
-            }
-        },
-        goToStep: (step) => setStep(step)
+        goToNextStep,
+        goToStep
     }
 
     return <CheckoutContext.Provider value={value}>{children}</CheckoutContext.Provider>
