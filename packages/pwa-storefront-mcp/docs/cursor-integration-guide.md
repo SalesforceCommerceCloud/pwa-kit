@@ -172,7 +172,7 @@ await insertReactComponent('./src/App.js', 'button', {
 
 ### 2. **Structured Prompts:**
 ```
-Please insert a React component with these specifications:
+Insert a React component with these specifications.
 - Type: ProductCard
 - Name: FeaturedProduct
 - Styling: Tailwind CSS
