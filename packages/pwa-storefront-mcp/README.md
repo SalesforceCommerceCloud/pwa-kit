@@ -99,7 +99,7 @@ The server runs on stdio, so you can test it with any MCP-compatible client.
 
 ### Method 3: Manually start MCP Server
 
-You can also manually the server from command line and sending JSON-RPC messages:
+You can also manually start the server from command line and sending JSON-RPC messages:
 
 ```bash
 cd {{dir-to-mcp}}
