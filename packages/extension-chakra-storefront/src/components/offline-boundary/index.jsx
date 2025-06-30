@@ -68,7 +68,7 @@ class OfflineBoundary extends React.Component {
         return (
             <React.Fragment>
                 {chunkLoadError ? (
-                    <div className="c-offline-boundary">
+                    <div>
                         <AlertIcon />
                         <h1>You are currently offline</h1>
                         <p>
