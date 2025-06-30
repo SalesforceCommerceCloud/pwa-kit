@@ -1,6 +1,6 @@
 # PWA Storefront MCP Server
 
-An Model Context Protocol (MCP) server that works together with IDEs with AI coding assistant ability to help PWA Storefront developers with their development.
+A Model Context Protocol (MCP) server that provides AI coding assistance for developing  PWA-kit-based storefront apps in an IDE.
 
 Install and run this MCP server as a local MCP server or run locally via `npx` (when it's available on `npm` in feature).
 
