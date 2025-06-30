@@ -766,7 +766,6 @@ const ProductDetail = () => {
                             isProductLoading={isProductLoading}
                             isBasketLoading={isBasketLoading}
                             isWishlistLoading={isWishlistLoading}
-                            validateOrderability={handleChildProductValidation}
                             childProductOrderability={childProductOrderability}
                             setChildProductOrderability={setChildProductOrderability}
                             setSelectedBundleQuantity={setSelectedBundleQuantity}
