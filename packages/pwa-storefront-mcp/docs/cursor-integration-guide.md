@@ -182,7 +182,7 @@ Insert a React component with these specifications.
 
 ### 3. **Code Generation Prompts:**
 ```
-Generate and insert a complete React component:
+Generate and insert a complete React component.
 
 ```typescript
 interface ProductCardProps {
