@@ -30,7 +30,7 @@ npm install
 
 Open Cursor Application
 
-Go to Cursor Menu on top menu bar, then *Settings* > *Cursor Settings...* 
+2. In the Cursor Menu on the top menu bar, click **Settings** > **Cursor Settings...**. 
 
 <img src="./docs/images/cursor-settings.png" alt="Cursor Settings Screenshot" width="50%" />
 
