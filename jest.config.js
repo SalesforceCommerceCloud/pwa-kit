@@ -94,6 +94,7 @@ module.exports = {
     },
     setupFilesAfterEnv: [path.join(__dirname, 'jest-setup.js')],
     collectCoverageFrom: [
+        'src/**/*.{js,jsx}',
         'app/**/*.{js,jsx}',
         'non-pwa/**/*.{js,jsx}',
         'worker/**/*.{js,jsx}',
