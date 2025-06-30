@@ -518,6 +518,9 @@ describe('product bundles', () => {
 })
 
 describe('Delivery Options Restrictions', () => {
+    const inventoryId = 'inventory_m_store_store1'
+    const storeId = 'store-123'
+
     const pickupShippingMethod = {c_storePickupEnabled: true}
     const shipToAddressShippingMethod = {
         id: 'shipping',
@@ -543,12 +546,23 @@ describe('Delivery Options Restrictions', () => {
         ]
     }
 
+    // Create a product with a matching, orderable inventory
+    const masterProductWithInventory = {
+        ...masterProduct,
+        inventories: [
+            {
+                id: inventoryId,
+                orderable: true,
+                ats: 10,
+                stockLevel: 10
+            }
+        ]
+    }
+
     test('shows error when adding pickup item to basket with non-pickup shipping method', async () => {
         // Mock useSelectedStore to return a store with inventoryId
-        const inventoryId = 'inventory_m_store_store1'
-        const storeId = 'store-123'
         mockUseSelectedStore.mockImplementation(() => ({
-            selectedStore: {
+            store: {
                 id: storeId,
                 name: 'Test Store',
                 inventoryId: inventoryId
@@ -558,20 +572,6 @@ describe('Delivery Options Restrictions', () => {
             hasSelectedStore: true
         }))
 
-        // Create a product with a matching, orderable inventory
-        const masterProductWithInventory = {
-            ...masterProduct,
-            inventories: [
-                {
-                    id: inventoryId,
-                    orderable: true,
-                    ats: 10,
-                    stockLevel: 10
-                }
-            ]
-        }
-
-        // Mock the product to be a simple master product with inventory
         global.server.use(
             rest.get('*/products/:productId', (req, res, ctx) => {
                 return res(ctx.json(masterProductWithInventory))
@@ -580,7 +580,10 @@ describe('Delivery Options Restrictions', () => {
                 return res(ctx.json({baskets: [baseBasket], total: 1}))
             })
         )
-
+        
+        // Navigate to specific variant before adding to cart 
+        window.history.pushState({}, 'ProductDetail', '/uk/en-GB/product/25517823M?color=JJG80XX&size=9LG')
+        
         renderWithProviders(<MockedComponent />)
         // Wait for page to load
         expect(await screen.findByTestId('product-details-page')).toBeInTheDocument()
@@ -607,8 +610,6 @@ describe('Delivery Options Restrictions', () => {
 
     test('Add to Cart with Pickup configures shipment when basket has no shipping method', async () => {
         // Mock useSelectedStore to return a store with inventoryId
-        const inventoryId = 'inventory_m_store_store1'
-        const storeId = 'store-123'
         mockUseSelectedStore.mockImplementation(() => ({
             selectedStore: {
                 id: storeId,
@@ -619,19 +620,6 @@ describe('Delivery Options Restrictions', () => {
             error: null,
             hasSelectedStore: true
         }))
-
-        // Create a product with a matching, orderable inventory
-        const masterProductWithInventory = {
-            ...masterProduct,
-            inventories: [
-                {
-                    id: inventoryId,
-                    orderable: true,
-                    ats: 10,
-                    stockLevel: 10
-                }
-            ]
-        }
 
         // Track if updatePickupShipment was called
         let updatePickupShipmentCalled = false
@@ -702,6 +690,9 @@ describe('Delivery Options Restrictions', () => {
             )
         )
 
+        // Navigate to specific variant before adding to cart 
+        window.history.pushState({}, 'ProductDetail', '/uk/en-GB/product/25517823M?color=JJG80XX&size=9LG')
+
         renderWithProviders(<MockedComponent />)
 
         // Wait for page to load
@@ -731,8 +722,6 @@ describe('Delivery Options Restrictions', () => {
 
     test('shows error when adding non-pickup item to basket with pickup shipping method', async () => {
         // Mock useSelectedStore to return a store with inventoryId
-        const inventoryId = 'inventory_m_store_store1'
-        const storeId = 'store-123'
         mockUseSelectedStore.mockImplementation(() => ({
             selectedStore: {
                 id: storeId,
@@ -743,20 +732,6 @@ describe('Delivery Options Restrictions', () => {
             error: null,
             hasSelectedStore: true
         }))
-
-        // Create a product with a matching, orderable inventory
-        const masterProductWithInventory = {
-            ...masterProduct,
-            inventories: [
-                {
-                    id: inventoryId,
-                    orderable: true,
-                    ats: 10,
-                    stockLevel: 10
-                }
-            ]
-        }
-
         // Mock the product to be a simple master product with inventory
         global.server.use(
             rest.get('*/products/:productId', (req, res, ctx) => {
@@ -767,7 +742,11 @@ describe('Delivery Options Restrictions', () => {
             })
         )
 
+        // Navigate to specific variant before adding to cart 
+        window.history.pushState({}, 'ProductDetail', '/uk/en-GB/product/25517823M?color=JJG80XX&size=9LG')
+
         renderWithProviders(<MockedComponent />)
+        
         // Wait for page to load
         expect(await screen.findByTestId('product-details-page')).toBeInTheDocument()
         // Wait for the page to fully load
