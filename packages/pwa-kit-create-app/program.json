@@ -1,0 +1,695 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "metadata": {
+        "name": "pwa-kit-create-app",
+        "description": "This file contains the schema for the pwa-kit-create-app CLI tool. Includes the schemas for presets, templates, validators, and questions. It also includes the data for those presets, templates, and validators."
+    },
+    "schemas": {
+        "answers": {
+            "type": "object",
+            "_ai": {
+                "instruction": "Use this during project creation when piping in answers from stdin. It's very important that you include the template id keyed as `general.presetOrTemplateId` in the answers object. This can be derived from the `templateId` property of the preset object or the `id` property of the template object.",
+                "expectedUse": "This data object is used to store the answers to the template questions asked by the program and answered by the user."
+            }
+        },
+        "questions": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "required": [
+                    "name",
+                    "message"
+                ],
+                "properties": {
+                    "name": {
+                        "type": "string"
+                    },
+                    "message": {
+                        "type": "string"
+                    },
+                    "type": {
+                        "type": "string"
+                    },
+                    "choices": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "required": [
+                                "name",
+                                "value"
+                            ],
+                            "properties": {
+                                "name": {
+                                    "type": "string"
+                                },
+                                "value": {}
+                            }
+                        }
+                    }
+                },
+                "additionalProperties": true
+            }
+        },
+        "presets": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "required": [
+                    "id",
+                    "name",
+                    "description",
+                    "answers",
+                    "private",
+                    "templateId"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "string"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "description": {
+                        "type": "string"
+                    },
+                    "shortDescription": {
+                        "type": "string"
+                    },
+                    "templateId": {
+                        "type": "string"
+                    },
+                    "answers": {
+                        "type": "object",
+                        "additionalProperties": {}
+                    },
+                    "private": {
+                        "type": "boolean",
+                        "_ai": {
+                            "instruction": "This property is used to filter what presets are shown to the user. If the preset is private, should NOT be shown to the user in a list of selectable presets. This equates to the 'when' property Inquirer question schema.",
+                            "expectedUse": "Hiding presets from the user."
+                        }
+                    }
+                },
+                "additionalProperties": false
+            },
+            "_ai": {
+                "instruction": "This property is used as a source of all available presets. When an AI agent is asked to select a preset, the selected preset should be returned as the 'general.presetOrTemplateId' property including all the presets answers under the 'answers' property.",
+                "expectedUse": "List of all available presets."
+            }
+        },
+        "templates": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "required": [
+                    "id",
+                    "name",
+                    "description",
+                    "source",
+                    "questions",
+                    "private"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "_ai": {
+                            "instruction": "When creating a new project using a template, this property should be renamed to `presetOrTemplateId` and is used to identify the template.",
+                            "expectedUse": "Used as a unique identifier for the template."
+                        }
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "description": {
+                        "type": "string"
+                    },
+                    "shortDescription": {
+                        "type": "string"
+                    },
+                    "source": {
+                        "type": "object",
+                        "properties": {
+                            "type": {
+                                "type": "string",
+                                "enum": [
+                                    "npm",
+                                    "name"
+                                ]
+                            },
+                            "name": {
+                                "type": "string"
+                            }
+                        },
+                        "required": [
+                            "type"
+                        ]
+                    },
+                    "questions": {
+                        "$ref": "questions.json",
+                        "_ai": {
+                            "instruction": "This property references the Inquirer Question interface defined here https://github.com/DefinitelyTyped/DefinitelyTyped/blob/master/types/inquirer/index.d.ts",
+                            "expectedUse": "Instruct agent on how to ask the user questions."
+                        }
+                    },
+                    "assets": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "answers": {
+                        "type": "object",
+                        "additionalProperties": {}
+                    },
+                    "private": {
+                        "type": "boolean",
+                        "_ai": {
+                            "instruction": "This property is used to filter what templates are shown to the user.",
+                            "expectedUse": "Hiding templates from the user."
+                        }
+                    }
+                },
+                "additionalProperties": false
+            },
+            "_ai": {
+                "instruction": "Do not display templates that are private. Answer is a key/value pair where the key is `project.template` and the value is the template id.",
+                "expectedUse": "Asking the user which template they want to use."
+            }
+        },
+        "validators": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "description": "The unique identifier for the validator."
+                    },
+                    "name": {
+                        "type": "string",
+                        "description": "The name of the validator."
+                    },
+                    "description": {
+                        "type": "string",
+                        "description": "A brief description of what the validator does."
+                    },
+                    "message": {
+                        "type": "string",
+                        "description": "The error message to display if validation fails.",
+                        "_ai": {
+                            "instruction": "When validation fails, use this message to inform the user what went wrong.",
+                            "expectedUse": "For validation error feedback."
+                        }
+                    },
+                    "regex": {
+                        "type": "string",
+                        "description": "The validation logic, often a regular expression or a reference to a function.",
+                        "_ai": {
+                            "instruction": "Use this regex to validate the user input.",
+                            "expectedUse": "For validation of user input."
+                        }
+                    }
+                },
+                "required": [
+                    "id",
+                    "name",
+                    "description",
+                    "message",
+                    "regex"
+                ]
+            }
+        },
+        "options": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "name": {
+                        "type": "string"
+                    },
+                    "description": {
+                        "type": "string"
+                    },
+                    "defaultValue": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "name",
+                    "description"
+                ]
+            }
+        },
+        "examples": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "description": {
+                        "type": "string"
+                    },
+                    "command": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "description",
+                    "command"
+                ]
+            }
+        }
+    },
+    "data": {
+        "presets": [
+            {
+                "id": "retail-react-app-demo",
+                "name": "Retail React App Demo",
+                "description": "Generate a project using the settings for a special B2C Commerce instance that is used for demo purposes. No questions are asked. Use this preset to try out PWA Kit.",
+                "shortDescription": "The Retail app with demo Commerce Cloud instance",
+                "templateId": "retail-react-app",
+                "answers": {
+                    "project.extend": true,
+                    "project.hybrid": false,
+                    "project.name": "demo-storefront",
+                    "project.commerce.instanceUrl": "https://zzte-053.dx.commercecloud.salesforce.com",
+                    "project.commerce.clientId": "1d763261-6522-4913-9d52-5d947d3b94c4",
+                    "project.commerce.siteId": "RefArch",
+                    "project.commerce.organizationId": "f_ecom_zzte_053",
+                    "project.commerce.shortCode": "kv7kzm78",
+                    "project.commerce.isSlasPrivate": false,
+                    "project.einstein.clientId": "1ea06c6e-c936-4324-bcf0-fada93f83bb1",
+                    "project.einstein.siteId": "aaij-MobileFirst",
+                    "project.dataCloud.appSourceId": "f22ae831-ac03-4bf6-afc1-3a0b19f1ea8e",
+                    "project.dataCloud.tenantId": "mmydmztgh04dczjzmnsw0zd0g8.pc-rnd",
+                    "project.demo.enableDemoSettings": false
+                },
+                "private": false
+            },
+            {
+                "id": "retail-react-app-demo-site-internal",
+                "name": "Retail React App Demo Store",
+                "description": "Generates a project using the settings for a special B2C Commerce instance that is used for demo purposes. The demo site is accessible at https://pwa-kit.mobify-storefront.com/ This environment uses a SLAS private client and has social and passwordless login enabled. This environment is set up to use multiple locales. Future features that are enabled for the demo environment may be added to this preset.",
+                "shortDescription": "The Retail app with demo Commerce Cloud instance and a private SLAS client",
+                "templateId": "retail-react-app",
+                "answers": {
+                    "project.extend": false,
+                    "project.hybrid": false,
+                    "project.name": "demo-storefront",
+                    "project.commerce.instanceUrl": "https://zzrf-001.dx.commercecloud.salesforce.com",
+                    "project.commerce.clientId": "083859f2-5d93-4209-b999-a112266d63a0",
+                    "project.commerce.siteId": "RefArchGlobal",
+                    "project.commerce.organizationId": "f_ecom_zzrf_001",
+                    "project.commerce.shortCode": "kv7kzm78",
+                    "project.commerce.isSlasPrivate": true,
+                    "project.einstein.clientId": "1ea06c6e-c936-4324-bcf0-fada93f83bb1",
+                    "project.einstein.siteId": "aaij-MobileFirst",
+                    "project.dataCloud.appSourceId": "f22ae831-ac03-4bf6-afc1-3a0b19f1ea8e",
+                    "project.dataCloud.tenantId": "mmydmztgh04dczjzmnsw0zd0g8.pc-rnd",
+                    "project.demo.enableDemoSettings": true
+                },
+                "private": true
+            },
+            {
+                "id": "retail-react-app-test-project",
+                "name": "Retail React App Test Project",
+                "description": "",
+                "templateId": "retail-react-app",
+                "answers": {
+                    "project.extend": true,
+                    "project.hybrid": false,
+                    "project.name": "retail-react-app",
+                    "project.commerce.instanceUrl": "https://zzrf-001.dx.commercecloud.salesforce.com",
+                    "project.commerce.clientId": "c9c45bfd-0ed3-4aa2-9971-40f88962b836",
+                    "project.commerce.siteId": "RefArch",
+                    "project.commerce.organizationId": "f_ecom_zzrf_001",
+                    "project.commerce.shortCode": "kv7kzm78",
+                    "project.commerce.isSlasPrivate": false,
+                    "project.einstein.clientId": "1ea06c6e-c936-4324-bcf0-fada93f83bb1",
+                    "project.einstein.siteId": "aaij-MobileFirst",
+                    "project.dataCloud.appSourceId": "f22ae831-ac03-4bf6-afc1-3a0b19f1ea8e",
+                    "project.dataCloud.tenantId": "mmydmztgh04dczjzmnsw0zd0g8.pc-rnd",
+                    "project.demo.enableDemoSettings": false
+                },
+                "private": true
+            },
+            {
+                "id": "retail-react-app-private-slas-client",
+                "name": "Retail React App Private SLAS client project",
+                "description": "",
+                "templateId": "retail-react-app",
+                "answers": {
+                    "project.extend": true,
+                    "project.hybrid": false,
+                    "project.name": "retail-react-app",
+                    "project.commerce.instanceUrl": "https://zzrf-002.dx.commercecloud.salesforce.com",
+                    "project.commerce.clientId": "89655706-9a0d-49ba-a1e5-18bb2d616374",
+                    "project.commerce.siteId": "RefArch",
+                    "project.commerce.organizationId": "f_ecom_zzrf_002",
+                    "project.commerce.shortCode": "kv7kzm78",
+                    "project.commerce.isSlasPrivate": true,
+                    "project.einstein.clientId": "1ea06c6e-c936-4324-bcf0-fada93f83bb1",
+                    "project.einstein.siteId": "aaij-MobileFirst",
+                    "project.dataCloud.appSourceId": "f22ae831-ac03-4bf6-afc1-3a0b19f1ea8e",
+                    "project.dataCloud.tenantId": "mmydmztgh04dczjzmnsw0zd0g8.pc-rnd",
+                    "project.demo.enableDemoSettings": false
+                },
+                "private": true
+            },
+            {
+                "id": "retail-react-app-bug-bounty",
+                "name": "Retail React App Bug Bounty Project",
+                "description": "",
+                "templateId": "retail-react-app",
+                "answers": {
+                    "project.extend": true,
+                    "project.hybrid": false,
+                    "project.name": "retail-react-app",
+                    "project.commerce.instanceUrl": "https://zzec-006.dx.commercecloud.salesforce.com",
+                    "project.commerce.clientId": "b56e7ad3-2237-42c9-8f55-41e63ebca420",
+                    "project.commerce.siteId": "RefArch",
+                    "project.commerce.organizationId": "f_ecom_zzec_006",
+                    "project.commerce.shortCode": "staging-001",
+                    "project.commerce.isSlasPrivate": true,
+                    "project.einstein.clientId": "1ea06c6e-c936-4324-bcf0-fada93f83bb1",
+                    "project.einstein.siteId": "aaij-MobileFirst",
+                    "project.dataCloud.appSourceId": "f22ae831-ac03-4bf6-afc1-3a0b19f1ea8e",
+                    "project.dataCloud.tenantId": "mmydmztgh04dczjzmnsw0zd0g8.pc-rnd",
+                    "project.demo.enableDemoSettings": false
+                },
+                "private": true
+            },
+            {
+                "id": "retail-react-app-hybrid-test-project",
+                "name": "Retail React App Hybrid Test Private SLAS Project",
+                "description": "",
+                "templateId": "retail-react-app",
+                "answers": {
+                    "project.extend": true,
+                    "project.hybrid": true,
+                    "project.name": "retail-react-app",
+                    "project.commerce.instanceUrl": "https://test.phased-launch-testing.com/",
+                    "project.commerce.clientId": "99b4e081-00cf-454a-95b0-26ac2b824931",
+                    "project.commerce.siteId": "RefArch",
+                    "project.commerce.organizationId": "f_ecom_bdpx_dev",
+                    "project.commerce.shortCode": "xitgmcd3",
+                    "project.commerce.isSlasPrivate": true,
+                    "project.einstein.clientId": "1ea06c6e-c936-4324-bcf0-fada93f83bb1",
+                    "project.einstein.siteId": "aaij-MobileFirst",
+                    "project.dataCloud.appSourceId": "f22ae831-ac03-4bf6-afc1-3a0b19f1ea8e",
+                    "project.dataCloud.tenantId": "mmydmztgh04dczjzmnsw0zd0g8.pc-rnd",
+                    "project.demo.enableDemoSettings": false
+                },
+                "private": true
+            },
+            {
+                "id": "retail-react-app-hybrid-public-client-test-project",
+                "name": "Retail React App Hybrid Test Public SLAS client project",
+                "description": "",
+                "templateId": "retail-react-app",
+                "answers": {
+                    "project.extend": true,
+                    "project.hybrid": true,
+                    "project.name": "retail-react-app",
+                    "project.commerce.instanceUrl": "https://www.phased-launch-testing.com/",
+                    "project.commerce.clientId": "e7e22b7f-a904-4f3a-8022-49dbee696485",
+                    "project.commerce.siteId": "RefArch",
+                    "project.commerce.organizationId": "f_ecom_bjnl_prd",
+                    "project.commerce.shortCode": "performance-001",
+                    "project.commerce.isSlasPrivate": false,
+                    "project.einstein.clientId": "1ea06c6e-c936-4324-bcf0-fada93f83bb1",
+                    "project.einstein.siteId": "aaij-MobileFirst",
+                    "project.dataCloud.appSourceId": "f22ae831-ac03-4bf6-afc1-3a0b19f1ea8e",
+                    "project.dataCloud.tenantId": "mmydmztgh04dczjzmnsw0zd0g8.pc-rnd",
+                    "project.demo.enableDemoSettings": false
+                },
+                "private": true
+            },
+            {
+                "id": "typescript-minimal-test-project",
+                "name": "Template Minimal Test Project",
+                "description": "",
+                "templateId": "typescript-minimal",
+                "answers": {
+                    "project.name": "typescript-minimal"
+                },
+                "private": true
+            },
+            {
+                "id": "express-minimal-test-project",
+                "name": "Express Minimal Test Project",
+                "description": "",
+                "templateId": "typescript-minimal",
+                "answers": {
+                    "project.name": "express-minimal"
+                },
+                "private": true
+            }
+        ],
+        "templates": [
+            {
+                "id": "retail-react-app",
+                "name": "Retail React App",
+                "description": "Generate a project using custom settings by answering questions about a B2C Commerce instance. Use this preset to connect to an existing instance, such as a sandbox.",
+                "shortDescription": "The Retail app using your own Commerce Cloud instance",
+                "source": {
+                    "type": "npm",
+                    "name": "@salesforce/retail-react-app"
+                },
+                "questions": [
+                    {
+                        "name": "project.extend",
+                        "message": "Do you wish to use template extensibility?",
+                        "type": "list",
+                        "choices": [
+                            {
+                                "name": "Yes",
+                                "value": true
+                            },
+                            {
+                                "name": "No",
+                                "value": false
+                            }
+                        ]
+                    },
+                    {
+                        "name": "project.name",
+                        "message": "What is the name of your Project?",
+                        "validator": "validProjectName",
+                        "_ai": {
+                            "instruction": "Should validate the user input using the 'validateProjectName' validator.",
+                            "expectedUse": "Instruct agent on how to validate user input."
+                        }
+                    },
+                    {
+                        "name": "project.commerce.instanceUrl",
+                        "message": "What is the URL for your Commerce Cloud instance?",
+                        "validator": "validUrl",
+                        "_ai": {
+                            "instruction": "Should validate the user input using the 'validUrl' validator.",
+                            "expectedUse": "Instruct agent on how to validate user input."
+                        }
+                    },
+                    {
+                        "name": "project.commerce.clientId",
+                        "message": "What is your SLAS Client ID?",
+                        "validator": "validClientId",
+                        "_ai": {
+                            "instruction": "Should validate the user input using the 'validClientId' validator.",
+                            "expectedUse": "Instruct agent on how to validate user input."
+                        }
+                    },
+                    {
+                        "name": "project.commerce.isSlasPrivate",
+                        "message": "Is your SLAS client private?",
+                        "type": "list",
+                        "choices": [
+                            {
+                                "name": "Yes",
+                                "value": true
+                            },
+                            {
+                                "name": "No",
+                                "value": false
+                            }
+                        ]
+                    },
+                    {
+                        "name": "project.commerce.siteId",
+                        "message": "What is your Site ID in Business Manager?",
+                        "validator": "validSiteId",
+                        "_ai": {
+                            "instruction": "Should validate the user input using the 'validSiteId' validator.",
+                            "expectedUse": "Instruct agent on how to validate user input."
+                        }
+                    },
+                    {
+                        "name": "project.commerce.organizationId",
+                        "message": "What is your Commerce API organization ID in Business Manager?",
+                        "validator": "validOrganizationId",
+                        "_ai": {
+                            "instruction": "Should validate the user input using the 'validOrganizationId' validator.",
+                            "expectedUse": "Instruct agent on how to validate user input."
+                        }
+                    },
+                    {
+                        "name": "project.commerce.shortCode",
+                        "message": "What is your Commerce API short code in Business Manager?",
+                        "validator": "validShortCode",
+                        "_ai": {
+                            "instruction": "Should validate the user input using the 'validShortCode' validator.",
+                            "expectedUse": "Instruct agent on how to validate user input."
+                        }
+                    }
+                ],
+                "assets": [
+                    "translations"
+                ],
+                "private": false
+            },
+            {
+                "id": "typescript-minimal",
+                "name": "Template Minimal Project",
+                "description": "Generate a project using a bare-bones TypeScript app template. Use this as a TypeScript starting point or as a base on top of which to build new TypeScript project templates for Managed Runtime.",
+                "source": {
+                    "type": "bundle"
+                },
+                "questions": [
+                    {
+                        "name": "project.name",
+                        "message": "What is the name of your Project?",
+                        "validator": "validateProjectName",
+                        "_ai": {
+                            "instruction": "Should validate the user input using the 'validateProjectName' validator.",
+                            "expectedUse": "Instruct agent on how to validate user input."
+                        }
+                    }
+                ],
+                "private": true
+            },
+            {
+                "id": "express-minimal",
+                "name": "Express Minimal Project",
+                "description": "Generate a project using a bare-bones express app template. Use this as a starting point for APIs or as a base on top of which to build new project templates for Managed Runtime.",
+                "source": {
+                    "type": "bundle"
+                },
+                "questions": [
+                    {
+                        "name": "project.name",
+                        "message": "What is the name of your Project?",
+                        "validator": "validateProjectName",
+                        "_ai": {
+                            "instruction": "Should validate the user input using the 'validateProjectName' validator.",
+                            "expectedUse": "Instruct agent on how to validate user input."
+                        }
+                    }
+                ],
+                "private": true
+            },
+            {
+                "id": "mrt-reference-app",
+                "name": "Managed Runtime Reference App",
+                "description": "",
+                "source": {
+                    "type": "bundle"
+                },
+                "questions": [
+                    {
+                        "name": "project.name",
+                        "message": "What is the name of your Project?",
+                        "validator": "validateProjectName",
+                        "_ai": {
+                            "instruction": "Should validate the user input using the 'validateProjectName' validator.",
+                            "expectedUse": "Instruct agent on how to validate user input."
+                        }
+                    }
+                ],
+                "answers": {
+                    "project.name": "mrt-reference-app"
+                },
+                "private": true
+            }
+        ],
+        "validators": [
+            {
+                "id": "validProjectName",
+                "name": "Valid Project Name",
+                "description": "Ensures the project name is valid (letters, numbers, space, hyphens, 1-20 characters).",
+                "message": "Value can only contain letters, numbers, space and hyphens; with a maximum length is 20 characters.",
+                "regex": "^[a-zA-Z0-9-\\\\s]{1,20}$"
+            },
+            {
+                "id": "validUrl",
+                "name": "Valid URL",
+                "description": "Ensures the value is an absolute URL.",
+                "message": "Value must be an absolute URL",
+                "regex": "^(https?):\\/\\/[^\\s/$.?#].[^\\s]*$"
+            },
+            {
+                "id": "validSiteId",
+                "name": "Valid Site ID",
+                "description": "Ensures the Site ID is valid.",
+                "message": "Valid characters are alphanumeric, hyphen, or underscore",
+                "regex": "^[a-z0-9_-]+$"
+            },
+            {
+                "id": "validShortCode",
+                "name": "Valid Short Code",
+                "description": "Ensures the short code is valid.",
+                "message": "Invalid format. Use docs to find more information about valid configurations: https://developer.salesforce.com/docs/commerce/commerce-api/guide/commerce-api-configuration-values",
+                "regex": "^([0-9A-Z]{8})$"
+            },
+            {
+                "id": "validClientId",
+                "name": "Valid Client ID",
+                "description": "Ensures the client ID is valid.",
+                "message": "Invalid format. Use docs to find more information about valid configurations: https://developer.salesforce.com/docs/commerce/commerce-api/guide/base-url.html",
+                "regex": "^([0-9A-Z]{8}-[0-9A-Z]{4}-[0-9A-Z]{4}-[0-9A-Z]{4}-[0-9A-Z]{12}|aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa)$"
+            },
+            {
+                "id": "validOrganizationId",
+                "name": "Valid Organization ID",
+                "description": "Ensures the organization ID is valid.",
+                "message": "Invalid format. Use docs to find more information about valid configurations: https://developer.salesforce.com/docs/commerce/commerce-api/guide/base-url.html",
+                "regex": "^(f_ecom)_([A-Z]{4})_(prd|stg|dev|[0-9]{3}|s[0-9]{2})$"
+            }
+        ],
+        "options": [
+            {
+                "name": "--outputDir <path>",
+                "description": "Path to the output directory for the new project"
+            },
+            {
+                "name": "--preset <name>",
+                "description": "The name of a project preset to use."
+            },
+            {
+                "name": "--templateVersion <version>",
+                "description": "The version of the template to be generated when it's source is NPM.",
+                "defaultValue": "latest"
+            },
+            {
+                "name": "--verbose",
+                "description": "Print additional logging information to the console."
+            },
+            {
+                "name": "--stdio",
+                "description": "Accept project generation answers from stdin as JSON"
+            }, 
+            {
+                "name": "--displayProgram",
+                "description": "Display the program.json file detailing the program schema/data and exit"
+            }
+        ],
+        "examples": [
+            {
+                "description": "Generate a project using a preset",
+                "command": "npx @salesforce/pwa-kit-create-app --preset retail-react-app-demo"
+            },
+            {
+                "description": "Generate a project using answers from stdin",
+                "command": "echo {\"project.name\":\"MyProject\", ...} |  npx @salesforce/pwa-kit-create-app --stdio"
+            }
+        ]
+    }
+}
