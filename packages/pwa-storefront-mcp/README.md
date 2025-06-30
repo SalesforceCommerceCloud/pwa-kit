@@ -34,7 +34,7 @@ Go to Cursor Menu on top menu bar, then *Settings* > *Cursor Settings...*
 
 <img src="./docs/images/cursor-settings.png" alt="Cursor Settings Screenshot" width="50%" />
 
-Select Tools & Integrations > MCP Tools > New MCP Server
+3. Click **Tools & Integrations** > **MCP Tools** > **New MCP Server**.
 
 <img src="./docs/images/cursor-mcp-tools.png" alt="Cursor MCP Tools Screenshot" width="50%" />
 
