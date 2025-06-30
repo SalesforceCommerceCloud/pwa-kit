@@ -1,0 +1,320 @@
+name: Sync More Logins E2E Branch with Develop
+
+on:
+  # Trigger when develop branch is updated
+  push:
+    branches:
+      - develop
+  # Run daily at 2 AM UTC to catch any missed syncs
+  schedule:
+    - cron: '0 2 * * *'
+  # Allow manual triggering with options
+  workflow_dispatch:
+    inputs:
+      force_sync:
+        description: 'Force sync even if conflicts exist (overwrites E2E branch)'
+        required: false
+        default: false
+        type: boolean
+      sync_strategy:
+        description: 'Sync strategy to use'
+        required: false
+        default: 'merge'
+        type: choice
+        options:
+          - merge
+          - rebase
+          - reset
+
+jobs:
+  sync-branch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Configure git
+        run: |
+          git config --global user.name ${{ secrets.GIT_CONFIG_USERNAME }}
+          git config --global user.email ${{ secrets.GIT_CONFIG_EMAIL }}
+
+      - name: Sync more-logins-e2e-test with develop
+        id: sync
+        run: |
+          set -e
+          
+          # Fetch all branches
+          git fetch origin
+          
+          # Check if the target branch exists
+          if ! git show-ref --verify --quiet refs/remotes/origin/more-logins-e2e-test; then
+            echo "Branch more-logins-e2e-test does not exist. Creating it from develop..."
+            git checkout -b more-logins-e2e-test origin/develop
+            git push origin more-logins-e2e-test
+            echo "✅ Created more-logins-e2e-test branch from develop"
+            echo "status=created" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+          
+          # Switch to the target branch
+          git checkout more-logins-e2e-test
+          git reset --hard origin/more-logins-e2e-test
+          
+          # Check if we're already up to date
+          if git merge-base --is-ancestor origin/develop HEAD; then
+            echo "✅ more-logins-e2e-test is already up to date with develop"
+            echo "status=up-to-date" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+          
+          STRATEGY="${{ github.event.inputs.sync_strategy || 'merge' }}"
+          echo "🔄 Attempting to sync using strategy: $STRATEGY"
+          
+          if [ "${{ github.event.inputs.force_sync }}" = "true" ]; then
+            echo "🔧 Force sync requested. Resetting to develop..."
+            git reset --hard origin/develop
+            git push --force origin more-logins-e2e-test
+            echo "⚠️  Force synced more-logins-e2e-test with develop (all conflicts overwritten)"
+            echo "status=force-synced" >> $GITHUB_OUTPUT
+          elif [ "$STRATEGY" = "rebase" ]; then
+            if git rebase origin/develop; then
+              echo "✅ Successfully rebased more-logins-e2e-test onto develop"
+              git push --force-with-lease origin more-logins-e2e-test
+              echo "status=rebased" >> $GITHUB_OUTPUT
+            else
+              echo "❌ Rebase conflicts detected!"
+              git rebase --abort
+              echo "status=conflict" >> $GITHUB_OUTPUT
+              exit 1
+            fi
+          elif [ "$STRATEGY" = "reset" ]; then
+            git reset --hard origin/develop
+            git push --force origin more-logins-e2e-test
+            echo "✅ Reset more-logins-e2e-test to match develop"
+            echo "status=reset" >> $GITHUB_OUTPUT
+          else
+            # Default merge strategy
+            if git merge origin/develop --no-edit; then
+              echo "✅ Successfully merged develop into more-logins-e2e-test"
+              git push origin more-logins-e2e-test
+              echo "status=merged" >> $GITHUB_OUTPUT
+            else
+              echo "❌ Merge conflicts detected!"
+              echo "📋 Files with conflicts:"
+              git diff --name-only --diff-filter=U || true
+              git merge --abort
+              echo "status=conflict" >> $GITHUB_OUTPUT
+              exit 1
+            fi
+          fi
+
+      - name: Create conflict resolution issue
+        if: steps.sync.outputs.status == 'conflict'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const conflictFiles = `${{ steps.sync.outputs.conflict_files || 'Unknown files' }}`;
+            const issueBody = `
+            ## 🚨 Automatic Sync Failed - Merge Conflicts Detected
+            
+            The automatic sync from \`develop\` to \`more-logins-e2e-test\` failed due to merge conflicts.
+            
+            ### Conflicting Files:
+            \`\`\`
+            ${conflictFiles}
+            \`\`\`
+            
+            ### Resolution Options:
+            
+            #### Option 1: Manual Resolution
+            \`\`\`bash
+            git checkout more-logins-e2e-test
+            git pull origin more-logins-e2e-test
+            git merge develop
+            # Resolve conflicts manually
+            git add .
+            git commit -m "Resolve merge conflicts from develop"
+            git push origin more-logins-e2e-test
+            \`\`\`
+            
+            #### Option 2: Force Sync (Overwrites E2E changes)
+            Go to [Actions](../../actions/workflows/sync-more-logins-e2e.yml) and run the workflow manually with "Force sync" enabled.
+            
+            #### Option 3: Reset Strategy
+            Go to [Actions](../../actions/workflows/sync-more-logins-e2e.yml) and run the workflow manually with "reset" strategy.
+            
+            ### Auto-close
+            This issue will be automatically closed when the sync succeeds.
+            `;
+            
+            // Check if issue already exists
+            const existingIssues = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open',
+              labels: 'sync-conflict'
+            });
+            
+            if (existingIssues.data.length === 0) {
+              await github.rest.issues.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                title: '🚨 E2E Branch Sync Conflict - Manual Resolution Required',
+                body: issueBody,
+                labels: ['sync-conflict', 'automation']
+              });
+            }
+
+      - name: Close conflict resolution issues
+        if: steps.sync.outputs.status != 'conflict'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const issues = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open',
+              labels: 'sync-conflict'
+            });
+            
+            for (const issue of issues.data) {
+              await github.rest.issues.update({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issue.number,
+                state: 'closed'
+              });
+              
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issue.number,
+                body: '✅ Sync conflict resolved automatically. Closing this issue.'
+              });
+            }
+
+  deploy:
+    needs: sync-branch
+    if: needs.sync-branch.outputs.status != 'conflict' && needs.sync-branch.outputs.status != 'up-to-date'
+    runs-on: ubuntu-latest
+    environment: more-logins-e2e
+    
+    steps:
+      - name: Checkout more-logins-e2e-test branch
+        uses: actions/checkout@v4
+        with:
+          ref: more-logins-e2e-test
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'npm'
+
+      - name: Install Monorepo Dependencies
+        run: |
+          # Install node dependencies
+          node ./scripts/gtime.js monorepo_install npm ci
+
+      - name: Build project
+        run: npm run build
+
+      - name: Create MRT credentials file
+        uses: "./.github/actions/create_mrt"
+        with:
+          mobify_user: ${{ secrets.MOBIFY_CLIENT_USER }}
+          mobify_api_key: ${{ secrets.MOBIFY_CLIENT_API_KEY }}
+
+      - name: Deploy to MRT
+        uses: "./.github/actions/push_to_mrt"
+        with:
+          CWD: "./packages/template-retail-react-app"
+          TARGET: more-logins-e2e
+          PROJECT: pwa-kit
+          MESSAGE: "Auto-sync from develop - build ${{ github.run_id }} (${{ github.sha }})"
+          FLAGS: --wait
+
+      - name: Get deployment URL
+        id: deployment-url
+        run: |
+          URL="https://scaffold-pwa-more-logins-e2e.mobify-storefront.com"
+          echo "url=${URL}" >> $GITHUB_OUTPUT
+          echo "🚀 Deployment URL: ${URL}"
+
+      - name: Wait for deployment to be ready
+        run: |
+          URL="${{ steps.deployment-url.outputs.url }}"
+          echo "⏳ Waiting for deployment to be ready at: $URL"
+          
+          for i in {1..30}; do
+            if curl -f -s "$URL" > /dev/null; then
+              echo "✅ Deployment is ready!"
+              exit 0
+            fi
+            echo "Attempt $i/30: Site not ready yet, waiting 30 seconds..."
+            sleep 30
+          done
+          
+          echo "❌ Deployment did not become ready within 15 minutes"
+          exit 1
+
+  notify:
+    needs: [sync-branch, deploy]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send notification
+        run: |
+          SYNC_STATUS="${{ needs.sync-branch.outputs.status }}"
+          DEPLOY_STATUS="${{ needs.deploy.result }}"
+          
+          echo "📊 Sync & Deploy Summary:"
+          echo "========================="
+          
+          case $SYNC_STATUS in
+            "created")
+              echo "✅ Created more-logins-e2e-test branch from develop"
+              ;;
+            "up-to-date")
+              echo "✅ more-logins-e2e-test is already up to date with develop"
+              ;;
+            "merged")
+              echo "✅ Successfully merged develop into more-logins-e2e-test"
+              ;;
+            "rebased")
+              echo "✅ Successfully rebased more-logins-e2e-test onto develop"
+              ;;
+            "reset")
+              echo "✅ Reset more-logins-e2e-test to match develop"
+              ;;
+            "force-synced")
+              echo "⚠️  Force synced more-logins-e2e-test with develop"
+              ;;
+            "conflict")
+              echo "❌ Sync failed due to conflicts - manual resolution required"
+              ;;
+            *)
+              echo "❓ Unknown sync status: $SYNC_STATUS"
+              ;;
+          esac
+          
+          if [ "$SYNC_STATUS" != "conflict" ] && [ "$SYNC_STATUS" != "up-to-date" ]; then
+            case $DEPLOY_STATUS in
+              "success")
+                echo "🚀 Successfully deployed to e2e-tests-more-logins"
+                echo "🔗 URL: https://scaffold-pwa-more-logins-e2e.mobify-storefront.com
+                ;;
+              "failure")
+                echo "❌ Deployment failed - check logs for details"
+                ;;
+              "skipped")
+                echo "⏭️  Deployment skipped"
+                ;;
+              *)
+                echo "❓ Unknown deployment status: $DEPLOY_STATUS"
+                ;;
+            esac
+          fi 
