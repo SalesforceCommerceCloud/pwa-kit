@@ -59,7 +59,7 @@ Cursor will:
 - Connect to it as a client
 - List available tools
 
-You can go back to MCP Tools choose to enable/disable any MCP Server or tools.
+You can go back to MCP Tools and choose to enable/disable any MCP Server or tools.
 
 ### Method 2: Run MCP Server from Claude
 
