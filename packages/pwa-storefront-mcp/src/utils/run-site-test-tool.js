@@ -4,10 +4,6 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import {execSync} from 'child_process'
-import path from 'path'
-
-// Import the new function-based tests
 import {runPerformanceTest} from './run-site-test-performance.js'
 import {runAccessibilityTest} from './run-site-test-accessibility.js'
 
@@ -22,14 +18,17 @@ export class TestWithPlaywrightTool {
      */
     async run(testType, siteUrl = DEFAULT_SITE_URL) {
         switch (testType) {
-            case 'performance':
+            case 'performance': {
                 return runPerformanceTest(siteUrl)
-            case 'accessibility':
+            }
+            case 'accessibility': {
                 return runAccessibilityTest(siteUrl)
-            default:
+            }
+            default: {
                 const result = {error: 'unsupported test type'}
                 console.log('Unsupported test type result:', result)
                 return result
+            }
         }
     }
 }
