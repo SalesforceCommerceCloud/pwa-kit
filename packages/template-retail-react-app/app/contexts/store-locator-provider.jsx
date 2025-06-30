@@ -24,7 +24,7 @@ export const StoreLocatorContext = createContext(null)
 export const StoreLocatorProvider = ({config, children}) => {
     // Only enable BOPIS functionality if the feature toggle is on
     const isBopisEnabled = STORE_LOCATOR_IS_ENABLED
-    
+
     // remember the shopper's preferred store for the current site
     // TODO: Change this to `useLocalStorage` hook when localStorage detection is more robust
     const {site} = useMultiSite()

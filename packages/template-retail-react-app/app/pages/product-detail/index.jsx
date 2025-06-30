@@ -675,8 +675,12 @@ const ProductDetail = () => {
                             setSelectedBundleQuantity={setSelectedBundleQuantity}
                             selectedBundleParentQuantity={selectedBundleQuantity}
                             pickupInStore={isBopisEnabled ? !!pickupInStoreMap[product?.id] : false}
-                            setPickupInStore={isBopisEnabled ? (checked) =>
-                                product && handlePickupInStoreChange(product.id, checked) : () => {}}
+                            setPickupInStore={
+                                isBopisEnabled
+                                    ? (checked) =>
+                                          product && handlePickupInStoreChange(product.id, checked)
+                                    : () => {}
+                            }
                             onOpenStoreLocator={isBopisEnabled ? onOpenStoreLocator : () => {}}
                             showDeliveryOptions={isBopisEnabled}
                         />
@@ -743,11 +747,24 @@ const ProductDetail = () => {
                                             setChildProductOrderability={
                                                 setChildProductOrderability
                                             }
-                                            pickupInStore={isBopisEnabled ? !!pickupInStoreMap[childProduct?.id] : false}
-                                            setPickupInStore={isBopisEnabled ? (checked) =>
-                                                childProduct &&
-                                                handlePickupInStoreChange(childProduct.id, checked) : () => {}}
-                                            onOpenStoreLocator={isBopisEnabled ? onOpenStoreLocator : () => {}}
+                                            pickupInStore={
+                                                isBopisEnabled
+                                                    ? !!pickupInStoreMap[childProduct?.id]
+                                                    : false
+                                            }
+                                            setPickupInStore={
+                                                isBopisEnabled
+                                                    ? (checked) =>
+                                                          childProduct &&
+                                                          handlePickupInStoreChange(
+                                                              childProduct.id,
+                                                              checked
+                                                          )
+                                                    : () => {}
+                                            }
+                                            onOpenStoreLocator={
+                                                isBopisEnabled ? onOpenStoreLocator : () => {}
+                                            }
                                             showDeliveryOptions={isBopisEnabled}
                                         />
                                         <InformationAccordion product={childProduct} />
@@ -776,8 +793,12 @@ const ProductDetail = () => {
                             setSelectedBundleQuantity={setSelectedBundleQuantity}
                             selectedBundleParentQuantity={selectedBundleQuantity}
                             pickupInStore={isBopisEnabled ? !!pickupInStoreMap[product?.id] : false}
-                            setPickupInStore={isBopisEnabled ? (checked) =>
-                                product && handlePickupInStoreChange(product.id, checked) : () => {}}
+                            setPickupInStore={
+                                isBopisEnabled
+                                    ? (checked) =>
+                                          product && handlePickupInStoreChange(product.id, checked)
+                                    : () => {}
+                            }
                             onOpenStoreLocator={isBopisEnabled ? onOpenStoreLocator : () => {}}
                             showDeliveryOptions={isBopisEnabled}
                         />

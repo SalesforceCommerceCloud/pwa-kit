@@ -36,7 +36,10 @@ import PaymentForm from '@salesforce/retail-react-app/app/pages/checkout/partial
 import ShippingAddressSelection from '@salesforce/retail-react-app/app/pages/checkout/partials/shipping-address-selection'
 import AddressDisplay from '@salesforce/retail-react-app/app/components/address-display'
 import {PromoCode, usePromoCode} from '@salesforce/retail-react-app/app/components/promo-code'
-import {API_ERROR_MESSAGE, STORE_LOCATOR_IS_ENABLED} from '@salesforce/retail-react-app/app/constants'
+import {
+    API_ERROR_MESSAGE,
+    STORE_LOCATOR_IS_ENABLED
+} from '@salesforce/retail-react-app/app/constants'
 
 const Payment = () => {
     const {formatMessage} = useIntl()
@@ -47,7 +50,9 @@ const Payment = () => {
 
     // Only enable BOPIS functionality if the feature toggle is on
     const isBopisEnabled = STORE_LOCATOR_IS_ENABLED
-    const isPickupOrder = isBopisEnabled ? basket?.shipments[0]?.shippingMethod?.c_storePickupEnabled === true : false
+    const isPickupOrder = isBopisEnabled
+        ? basket?.shipments[0]?.shippingMethod?.c_storePickupEnabled === true
+        : false
     const [useShippingAddressForBilling, setUseShippingAddressForBilling] = useState(true)
     const {mutateAsync: addPaymentInstrumentToBasket} = useShopperBasketsMutation(
         'addPaymentInstrumentToBasket'

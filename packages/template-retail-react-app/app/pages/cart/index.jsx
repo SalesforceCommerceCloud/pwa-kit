@@ -6,8 +6,6 @@
  */
 import React, {useState, useMemo} from 'react'
 import {FormattedMessage, useIntl} from 'react-intl'
-import {Helmet} from 'react-helmet'
-import {useNavigate} from 'react-router-dom'
 
 // Chakra Components
 import {
@@ -33,7 +31,6 @@ import ProductItem from '@salesforce/retail-react-app/app/components/product-ite
 import ProductViewModal from '@salesforce/retail-react-app/app/components/product-view-modal'
 import BundleProductViewModal from '@salesforce/retail-react-app/app/components/product-view-modal/bundle'
 import RecommendedProducts from '@salesforce/retail-react-app/app/components/recommended-products'
-import StoreDisplay from '@salesforce/retail-react-app/app/components/store-display'
 
 // Hooks
 import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
@@ -74,7 +71,9 @@ const Cart = () => {
 
     // Pickup in Store - only enabled if feature toggle is on
     const isBopisEnabled = STORE_LOCATOR_IS_ENABLED
-    const isPickupOrder = isBopisEnabled ? basket?.shipments[0]?.shippingMethod?.c_storePickupEnabled === true : false
+    const isPickupOrder = isBopisEnabled
+        ? basket?.shipments[0]?.shippingMethod?.c_storePickupEnabled === true
+        : false
     const storeId = isBopisEnabled ? basket?.shipments?.[0]?.c_fromStoreId : null
     const {data: storeData} = useStores(
         {

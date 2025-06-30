@@ -5,8 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React, {Fragment, useEffect} from 'react'
-import {FormattedMessage, FormattedNumber, useIntl} from 'react-intl'
-import {Helmet} from 'react-helmet'
+import {FormattedMessage, FormattedNumber} from 'react-intl'
 import {
     Box,
     Button,
@@ -43,7 +42,10 @@ import CartItemVariantName from '@salesforce/retail-react-app/app/components/ite
 import CartItemVariantAttributes from '@salesforce/retail-react-app/app/components/item-variant/item-attributes'
 import CartItemVariantPrice from '@salesforce/retail-react-app/app/components/item-variant/item-price'
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
-import {API_ERROR_MESSAGE, STORE_LOCATOR_IS_ENABLED} from '@salesforce/retail-react-app/app/constants'
+import {
+    API_ERROR_MESSAGE,
+    STORE_LOCATOR_IS_ENABLED
+} from '@salesforce/retail-react-app/app/constants'
 import {useCurrency} from '@salesforce/retail-react-app/app/hooks'
 
 const onClient = typeof window !== 'undefined'
@@ -67,10 +69,12 @@ const CheckoutConfirmation = () => {
     const productItemsMap = products?.data.reduce((map, item) => ({...map, [item.id]: item}), {})
     const form = useForm()
 
-    // Only enable BOPIS functionality if the feature toggle is on
+    // Check if this is a pickup order and get store details
     const isBopisEnabled = STORE_LOCATOR_IS_ENABLED
-    const isPickupOrder = isBopisEnabled ? order?.shipments?.[0]?.shippingMethod?.c_storePickupEnabled === true : false
-    const storeId = isBopisEnabled ? order?.shipments?.[0]?.c_fromStoreId : null
+    const isPickupOrder = isBopisEnabled
+        ? order?.shipments?.[0]?.shippingMethod?.c_storePickupEnabled === true
+        : false
+    const storeId = order?.shipments?.[0]?.c_fromStoreId
     const {data: storeData} = useStores(
         {
             parameters: {
@@ -242,66 +246,90 @@ const CheckoutConfirmation = () => {
                         </Box>
                     )}
 
-                    {/* Order Type and Store Information */}
-                    {isBopisEnabled && (
-                        <Box mb={6}>
-                            <Heading as="h2" fontSize="lg" mb={4}>
+                    <Box layerStyle="card" rounded={[0, 0, 'base']} px={[4, 4, 6]} py={[6, 6, 8]}>
+                        <Container variant="form">
+                            <Stack spacing={6}>
                                 {isPickupOrder ? (
-                                    <FormattedMessage
-                                        defaultMessage="Pickup Order"
-                                        id="checkout_confirmation.label.pickup_order"
-                                    />
+                                    <>
+                                        <Heading fontSize="lg">
+                                            <FormattedMessage
+                                                defaultMessage="Pickup Details"
+                                                id="checkout_confirmation.heading.pickup_details"
+                                            />
+                                        </Heading>
+
+                                        <Stack spacing={1}>
+                                            <Heading as="h3" fontSize="sm">
+                                                <FormattedMessage
+                                                    defaultMessage="Pickup Address"
+                                                    id="checkout_confirmation.heading.pickup_address"
+                                                />
+                                            </Heading>
+                                            {store ? (
+                                                <StoreDisplay
+                                                    store={store}
+                                                    showDistance={false}
+                                                    showEmail={true}
+                                                    showPhone={true}
+                                                    showStoreHours={true}
+                                                />
+                                            ) : (
+                                                <Text>
+                                                    <FormattedMessage
+                                                        defaultMessage="Store information not available"
+                                                        id="checkout_confirmation.message.store_info_unavailable"
+                                                    />
+                                                </Text>
+                                            )}
+                                        </Stack>
+                                    </>
                                 ) : (
-                                    <FormattedMessage
-                                        defaultMessage="Delivery Order"
-                                        id="checkout_confirmation.label.delivery_order"
-                                    />
+                                    <>
+                                        <Heading fontSize="lg">
+                                            <FormattedMessage
+                                                defaultMessage="Delivery Details"
+                                                id="checkout_confirmation.heading.delivery_details"
+                                            />
+                                        </Heading>
+
+                                        <SimpleGrid columns={[1, 1, 2]} spacing={6}>
+                                            <Stack spacing={1}>
+                                                <Heading as="h3" fontSize="sm">
+                                                    <FormattedMessage
+                                                        defaultMessage="Shipping Address"
+                                                        id="checkout_confirmation.heading.shipping_address"
+                                                    />
+                                                </Heading>
+                                                <AddressDisplay
+                                                    address={order.shipments[0].shippingAddress}
+                                                />
+                                            </Stack>
+
+                                            <Stack spacing={1}>
+                                                <Heading as="h3" fontSize="sm">
+                                                    <FormattedMessage
+                                                        defaultMessage="Shipping Method"
+                                                        id="checkout_confirmation.heading.shipping_method"
+                                                    />
+                                                </Heading>
+                                                <Box>
+                                                    <Text>
+                                                        {order.shipments[0].shippingMethod.name}
+                                                    </Text>
+                                                    <Text>
+                                                        {
+                                                            order.shipments[0].shippingMethod
+                                                                .description
+                                                        }
+                                                    </Text>
+                                                </Box>
+                                            </Stack>
+                                        </SimpleGrid>
+                                    </>
                                 )}
-                            </Heading>
-
-                            {isPickupOrder && store && (
-                                <Box p={4} bg="blue.50" borderRadius="md">
-                                    <Text fontWeight={600} mb={2}>
-                                        <FormattedMessage
-                                            defaultMessage="Pickup Location"
-                                            id="checkout_confirmation.label.pickup_location"
-                                        />
-                                    </Text>
-                                    <StoreDisplay
-                                        store={store}
-                                        showDistance={false}
-                                        showStoreHours={true}
-                                        showPhone={true}
-                                        showEmail={false}
-                                        nameStyle={{fontSize: 'md', fontWeight: '600'}}
-                                        textSize="sm"
-                                    />
-                                </Box>
-                            )}
-
-                            {!isPickupOrder && order?.shipments?.[0]?.shippingAddress && (
-                                <Box p={4} bg="gray.50" borderRadius="md">
-                                    <Text fontWeight={600} mb={2}>
-                                        <FormattedMessage
-                                            defaultMessage="Delivery Address"
-                                            id="checkout_confirmation.label.delivery_address"
-                                        />
-                                    </Text>
-                                    <Text fontSize="sm">
-                                        {order.shipments[0].shippingAddress.address1}
-                                        {order.shipments[0].shippingAddress.address2 && (
-                                            <br />
-                                        )}
-                                        {order.shipments[0].shippingAddress.address2}
-                                        <br />
-                                        {order.shipments[0].shippingAddress.city},{' '}
-                                        {order.shipments[0].shippingAddress.stateCode}{' '}
-                                        {order.shipments[0].shippingAddress.postalCode}
-                                    </Text>
-                                </Box>
-                            )}
-                        </Box>
-                    )}
+                            </Stack>
+                        </Container>
+                    </Box>
 
                     <Box layerStyle="card" rounded={[0, 0, 'base']} px={[4, 4, 6]} py={[6, 6, 8]}>
                         <Container variant="form">

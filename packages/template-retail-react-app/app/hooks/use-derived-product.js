@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import {useEffect, useState, useMemo} from 'react'
+import {useEffect, useState} from 'react'
 import {useVariant} from '@salesforce/retail-react-app/app/hooks/use-variant'
 import {useIntl} from 'react-intl'
 import {useVariationParams} from '@salesforce/retail-react-app/app/hooks/use-variation-params'
@@ -48,7 +48,7 @@ export const useDerivedProduct = (
     )
     const [quantity, setQuantity] = useState(initialQuantity)
     const {selectedStore} = useSelectedStore()
-    
+
     // Only enable BOPIS functionality if the feature toggle is on
     const isBopisEnabled = STORE_LOCATOR_IS_ENABLED
     const selectedInventoryId = isBopisEnabled ? selectedStore?.inventoryId || null : null

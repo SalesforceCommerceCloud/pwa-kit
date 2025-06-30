@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, {forwardRef, useEffect, useMemo, useRef, useState, useCallback} from 'react'
+import React, {forwardRef, useEffect, useMemo, useRef, useState} from 'react'
 import PropTypes from 'prop-types'
 import {useLocation} from 'react-router-dom'
 import {useIntl, FormattedMessage} from 'react-intl'
@@ -26,8 +26,6 @@ import {
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 import {useCurrency, useDerivedProduct} from '@salesforce/retail-react-app/app/hooks'
 import {useAddToCartModalContext} from '@salesforce/retail-react-app/app/hooks/use-add-to-cart-modal'
-import {StoreLocatorModal} from '@salesforce/retail-react-app/app/components/store-locator'
-import {useSelectedStore} from '@salesforce/retail-react-app/app/hooks/use-selected-store'
 import {STORE_LOCATOR_IS_ENABLED} from '@salesforce/retail-react-app/app/constants'
 
 // project components
@@ -735,7 +733,9 @@ const ProductView = forwardRef(
                                                                               as="button"
                                                                               color="blue.600"
                                                                               textDecoration="underline"
-                                                                              onClick={onOpenStoreLocator}
+                                                                              onClick={
+                                                                                  onOpenStoreLocator
+                                                                              }
                                                                           >
                                                                               {storeName}
                                                                           </Link>
@@ -754,7 +754,9 @@ const ProductView = forwardRef(
                                                                               as="button"
                                                                               color="blue.600"
                                                                               textDecoration="underline"
-                                                                              onClick={onOpenStoreLocator}
+                                                                              onClick={
+                                                                                  onOpenStoreLocator
+                                                                              }
                                                                           >
                                                                               {storeName}
                                                                           </Link>

@@ -56,7 +56,9 @@ const Checkout = () => {
 
     // Only enable BOPIS functionality if the feature toggle is on
     const isBopisEnabled = STORE_LOCATOR_IS_ENABLED
-    const isPickupOrder = isBopisEnabled ? basket?.shipments[0]?.shippingMethod?.c_storePickupEnabled === true : false
+    const isPickupOrder = isBopisEnabled
+        ? basket?.shipments[0]?.shippingMethod?.c_storePickupEnabled === true
+        : false
 
     useEffect(() => {
         if (error || step === 4) {

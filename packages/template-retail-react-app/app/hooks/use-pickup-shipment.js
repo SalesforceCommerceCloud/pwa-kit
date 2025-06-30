@@ -18,7 +18,7 @@ import {STORE_LOCATOR_IS_ENABLED} from '@salesforce/retail-react-app/app/constan
 export const usePickupShipment = (basket) => {
     // Only enable BOPIS functionality if the feature toggle is on
     const isBopisEnabled = STORE_LOCATOR_IS_ENABLED
-    
+
     const updateShipmentForBasketMutation = useShopperBasketsMutation('updateShipmentForBasket')
 
     // Hook for shipping methods - we'll use refetch when needed
@@ -80,7 +80,7 @@ export const usePickupShipment = (basket) => {
      */
     const updatePickupShipment = async (basketId, productItems, storeInfo, options = {}) => {
         if (!isBopisEnabled) return
-        
+
         const defaultPickupShippingMethodId = '005'
         const {pickupShippingMethodId = defaultPickupShippingMethodId, throwOnError = false} =
             options
@@ -164,7 +164,7 @@ export const usePickupShipment = (basket) => {
      */
     const hasPickupItems = (productSelectionValues, pickupInStoreMap, mainProduct) => {
         if (!isBopisEnabled) return false
-        
+
         return productSelectionValues.some((item) => {
             const prodKey =
                 (item.variant || item.product || mainProduct).productId ||
