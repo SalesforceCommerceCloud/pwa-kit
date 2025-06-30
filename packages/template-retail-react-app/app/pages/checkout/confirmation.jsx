@@ -70,8 +70,7 @@ const CheckoutConfirmation = () => {
     const form = useForm()
 
     // Check if this is a pickup order and get store details
-    const isBopisEnabled = STORE_LOCATOR_IS_ENABLED
-    const isPickupOrder = isBopisEnabled
+    const isPickupOrder = STORE_LOCATOR_IS_ENABLED
         ? order?.shipments?.[0]?.shippingMethod?.c_storePickupEnabled === true
         : false
     const storeId = order?.shipments?.[0]?.c_fromStoreId
@@ -82,7 +81,7 @@ const CheckoutConfirmation = () => {
             }
         },
         {
-            enabled: !!storeId && isPickupOrder && onClient && isBopisEnabled
+            enabled: !!storeId && isPickupOrder && onClient
         }
     )
     const store = storeData?.data?.[0]

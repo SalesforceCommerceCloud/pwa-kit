@@ -157,8 +157,6 @@ export const usePickupShipment = (basket) => {
      * @returns {boolean} True if any items are pickup items
      */
     const hasPickupItems = (productSelectionValues, pickupInStoreMap, mainProduct) => {
-        if (!isBopisEnabled) return false
-
         return productSelectionValues.some((item) => {
             const prodKey =
                 (item.variant || item.product || mainProduct).productId ||
