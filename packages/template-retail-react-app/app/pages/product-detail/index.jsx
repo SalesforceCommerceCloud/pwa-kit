@@ -674,15 +674,12 @@ const ProductDetail = () => {
                             childProductOrderability={childProductOrderability}
                             setSelectedBundleQuantity={setSelectedBundleQuantity}
                             selectedBundleParentQuantity={selectedBundleQuantity}
-                            pickupInStore={isBopisEnabled ? !!pickupInStoreMap[product?.id] : false}
-                            setPickupInStore={
-                                isBopisEnabled
-                                    ? (checked) =>
-                                          product && handlePickupInStoreChange(product.id, checked)
-                                    : () => {}
+                            pickupInStore={!!pickupInStoreMap[product?.id]}
+                            setPickupInStore={(checked) =>
+                                product && handlePickupInStoreChange(product.id, checked)
                             }
-                            onOpenStoreLocator={isBopisEnabled ? onOpenStoreLocator : () => {}}
-                            showDeliveryOptions={isBopisEnabled}
+                            onOpenStoreLocator={onOpenStoreLocator}
+                            showDeliveryOptions={STORE_LOCATOR_IS_ENABLED}
                         />
 
                         <hr />
@@ -747,25 +744,13 @@ const ProductDetail = () => {
                                             setChildProductOrderability={
                                                 setChildProductOrderability
                                             }
-                                            pickupInStore={
-                                                isBopisEnabled
-                                                    ? !!pickupInStoreMap[childProduct?.id]
-                                                    : false
+                                            pickupInStore={!!pickupInStoreMap[childProduct?.id]}
+                                            setPickupInStore={(checked) =>
+                                                childProduct &&
+                                                handlePickupInStoreChange(childProduct.id, checked)
                                             }
-                                            setPickupInStore={
-                                                isBopisEnabled
-                                                    ? (checked) =>
-                                                          childProduct &&
-                                                          handlePickupInStoreChange(
-                                                              childProduct.id,
-                                                              checked
-                                                          )
-                                                    : () => {}
-                                            }
-                                            onOpenStoreLocator={
-                                                isBopisEnabled ? onOpenStoreLocator : () => {}
-                                            }
-                                            showDeliveryOptions={isBopisEnabled}
+                                            onOpenStoreLocator={onOpenStoreLocator}
+                                            showDeliveryOptions={STORE_LOCATOR_IS_ENABLED}
                                         />
                                         <InformationAccordion product={childProduct} />
 

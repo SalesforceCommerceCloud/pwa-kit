@@ -42,9 +42,8 @@ export const CheckoutProvider = ({children}) => {
             step = STEPS.CONTACT_INFO
         } else if (!basket.shipments[0]?.shippingAddress?.address1) {
             // Check if it's a pickup order - only if BOPIS is enabled
-            const isBopisEnabled = STORE_LOCATOR_IS_ENABLED
             const isPickupOrder =
-                isBopisEnabled &&
+                STORE_LOCATOR_IS_ENABLED &&
                 basket?.shipments[0]?.shippingMethod?.c_storePickupEnabled === true
             step = isPickupOrder ? STEPS.PICKUP_ADDRESS : STEPS.SHIPPING_ADDRESS
         } else if (!basket.shipments[0]?.shippingMethod) {
@@ -82,9 +81,8 @@ export const CheckoutProvider = ({children}) => {
         // Check if current step is CONTACT_INFO
         if (step === STEPS.CONTACT_INFO) {
             // Determine if it's a pickup order - only if BOPIS is enabled
-            const isBopisEnabled = STORE_LOCATOR_IS_ENABLED
             const isPickupOrder =
-                isBopisEnabled &&
+                STORE_LOCATOR_IS_ENABLED &&
                 basket?.shipments[0]?.shippingMethod?.c_storePickupEnabled === true
             // Skip to appropriate next step
             setStep(isPickupOrder ? STEPS.PICKUP_ADDRESS : STEPS.SHIPPING_ADDRESS)

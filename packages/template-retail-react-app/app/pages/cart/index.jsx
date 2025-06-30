@@ -70,11 +70,10 @@ const Cart = () => {
     const {data: basket, isLoading} = useCurrentBasket()
 
     // Pickup in Store - only enabled if feature toggle is on
-    const isBopisEnabled = STORE_LOCATOR_IS_ENABLED
-    const isPickupOrder = isBopisEnabled
+    const isPickupOrder = STORE_LOCATOR_IS_ENABLED
         ? basket?.shipments[0]?.shippingMethod?.c_storePickupEnabled === true
         : false
-    const storeId = isBopisEnabled ? basket?.shipments?.[0]?.c_fromStoreId : null
+    const storeId = basket?.shipments?.[0]?.c_fromStoreId
     const {data: storeData} = useStores(
         {
             parameters: {
@@ -82,13 +81,13 @@ const Cart = () => {
             }
         },
         {
-            enabled: !!storeId && isBopisEnabled
+            enabled: !!storeId && STORE_LOCATOR_IS_ENABLED
         }
     )
     const storeName = storeData?.data?.[0]?.name
 
     const {selectedStore} = useSelectedStore()
-    const selectedInventoryId = isBopisEnabled ? selectedStore?.inventoryId || null : null
+    const selectedInventoryId = selectedStore?.inventoryId || null
     const productIds = basket?.productItems?.map(({productId}) => productId).join(',') ?? ''
     const {data: products, isLoading: isProductsLoading} = useProducts(
         {
@@ -611,7 +610,7 @@ const Cart = () => {
                             <GridItem>
                                 <Stack spacing={4}>
                                     {/* Order Type Display */}
-                                    {isBopisEnabled && (
+                                    {STORE_LOCATOR_IS_ENABLED && (
                                         <Box layerStyle="cardBordered" p={3}>
                                             {isPickupOrder ? (
                                                 <Text fontWeight="bold">

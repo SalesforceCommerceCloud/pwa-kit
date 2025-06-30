@@ -55,8 +55,7 @@ const Checkout = () => {
     const isPasswordlessEnabled = !!passwordless?.enabled
 
     // Only enable BOPIS functionality if the feature toggle is on
-    const isBopisEnabled = STORE_LOCATOR_IS_ENABLED
-    const isPickupOrder = isBopisEnabled
+    const isPickupOrder = STORE_LOCATOR_IS_ENABLED
         ? basket?.shipments[0]?.shippingMethod?.c_storePickupEnabled === true
         : false
 
@@ -107,7 +106,7 @@ const Checkout = () => {
                                 isPasswordlessEnabled={isPasswordlessEnabled}
                                 idps={idps}
                             />
-                            {isBopisEnabled && isPickupOrder ? (
+                            {STORE_LOCATOR_IS_ENABLED && isPickupOrder ? (
                                 <PickupAddress />
                             ) : (
                                 <ShippingAddress />
