@@ -56,7 +56,7 @@ You will be led to mcp.json file. Add this to your mcp.json:
 Cursor will:
 
 - Start the MCP server
-- Connect to it as a client
+- Connect to the MCP server as a client.
 - List available tools.
 
 You can go back to MCP Tools and choose to enable/disable any MCP Server or tools.
