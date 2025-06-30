@@ -76,7 +76,9 @@ const Field = ({
                                         >
                                             <PasswordIcon color="gray.500" boxSize={6} />
                                         </IconButton>
-                                    ) : undefined
+                                    ) : (
+                                        _inputProps?.endElement
+                                    )
                                 }
                             >
                                 <>
