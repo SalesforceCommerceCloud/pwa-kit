@@ -676,13 +676,14 @@ const ProductView = forwardRef(
                                         <Box mb={4}>
                                             <Text fontWeight={600} mb={3}>
                                                 <FormattedMessage
-                                                    defaultMessage="Delivery Options"
-                                                    id="product_view.label.delivery_options"
+                                                    defaultMessage="Delivery:"
+                                                    id="product_view.label.delivery"
                                                 />
                                             </Text>
                                             <RadioGroup
                                                 value={pickupInStore ? 'pickup' : 'ship'}
                                                 onChange={handleDeliveryOptionChange}
+                                                mb={1}
                                             >
                                                 <Stack direction="column" spacing={2}>
                                                     <Radio value="ship" isDisabled={disableButton}>
