@@ -580,10 +580,14 @@ describe('Delivery Options Restrictions', () => {
                 return res(ctx.json({baskets: [baseBasket], total: 1}))
             })
         )
-        
-        // Navigate to specific variant before adding to cart 
-        window.history.pushState({}, 'ProductDetail', '/uk/en-GB/product/25517823M?color=JJG80XX&size=9LG')
-        
+
+        // Navigate to specific variant before adding to cart
+        window.history.pushState(
+            {},
+            'ProductDetail',
+            '/uk/en-GB/product/25517823M?color=JJG80XX&size=9LG'
+        )
+
         renderWithProviders(<MockedComponent />)
         // Wait for page to load
         expect(await screen.findByTestId('product-details-page')).toBeInTheDocument()
@@ -690,8 +694,12 @@ describe('Delivery Options Restrictions', () => {
             )
         )
 
-        // Navigate to specific variant before adding to cart 
-        window.history.pushState({}, 'ProductDetail', '/uk/en-GB/product/25517823M?color=JJG80XX&size=9LG')
+        // Navigate to specific variant before adding to cart
+        window.history.pushState(
+            {},
+            'ProductDetail',
+            '/uk/en-GB/product/25517823M?color=JJG80XX&size=9LG'
+        )
 
         renderWithProviders(<MockedComponent />)
 
@@ -742,11 +750,15 @@ describe('Delivery Options Restrictions', () => {
             })
         )
 
-        // Navigate to specific variant before adding to cart 
-        window.history.pushState({}, 'ProductDetail', '/uk/en-GB/product/25517823M?color=JJG80XX&size=9LG')
+        // Navigate to specific variant before adding to cart
+        window.history.pushState(
+            {},
+            'ProductDetail',
+            '/uk/en-GB/product/25517823M?color=JJG80XX&size=9LG'
+        )
 
         renderWithProviders(<MockedComponent />)
-        
+
         // Wait for page to load
         expect(await screen.findByTestId('product-details-page')).toBeInTheDocument()
         // Wait for the page to fully load

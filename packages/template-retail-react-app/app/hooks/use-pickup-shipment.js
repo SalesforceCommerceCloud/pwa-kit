@@ -161,12 +161,12 @@ export const usePickupShipment = (basket) => {
             const prodKey =
                 (item.variant || item.product || mainProduct).productId ||
                 (item.variant || item.product || mainProduct).id
-            
+
             // Check if the variant product ID is in the pickup map
             if (pickupInStoreMap[prodKey]) {
                 return true
             }
-            
+
             // If not found, also check the master product ID
             return pickupInStoreMap[mainProduct?.id]
         })
