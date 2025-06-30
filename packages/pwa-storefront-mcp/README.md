@@ -70,7 +70,7 @@ This will lead you to "claude_desktop_config.json" file.
 
 <img src="./docs/images/claude-config.png" alt="Claude MCP Config Screenshot" width="50%" />
 
-2. Add this server to your claude_desktop_config.json:
+2. Add this server definition to your `claude_desktop_config.json`.
 
 ```json
 {
