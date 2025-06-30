@@ -106,11 +106,7 @@ const Checkout = () => {
                                 isPasswordlessEnabled={isPasswordlessEnabled}
                                 idps={idps}
                             />
-                            {isPickupOrder ? (
-                                <PickupAddress />
-                            ) : (
-                                <ShippingAddress />
-                            )}
+                            {isPickupOrder ? <PickupAddress /> : <ShippingAddress />}
                             {!isPickupOrder && <ShippingOptions />}
                             <Payment />
 
