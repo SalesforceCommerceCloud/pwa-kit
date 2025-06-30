@@ -7,6 +7,7 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 const fs = require('fs')
 const {execSync} = require('child_process')
+const path = require('path')
 
 jest.mock('../assets/plugin-config', () => ({
     plugins: {
@@ -102,7 +103,13 @@ describe('trim-extensions', () => {
             expect.toEqualTrimmedLines("const feature = 'Feature Enabled';")
         )
         expect(execSync).toHaveBeenCalledWith(
-            'npx prettier --write /mock/dir/src/components/featureComponent.jsx'
+            `npx prettier --write ${path.join(
+                '/mock',
+                'dir',
+                'src',
+                'components',
+                'featureComponent.jsx'
+            )}`
         )
     })
 
@@ -129,7 +136,13 @@ describe('trim-extensions', () => {
             expect.not.stringContaining("const featureBFunc = () => 'Feature B';")
         )
         expect(execSync).toHaveBeenCalledWith(
-            'npx prettier --write /mock/dir/src/components/featureComponent.jsx'
+            `npx prettier --write ${path.join(
+                '/mock',
+                'dir',
+                'src',
+                'components',
+                'featureComponent.jsx'
+            )}`
         )
     })
 
@@ -154,7 +167,13 @@ describe('trim-extensions', () => {
             expect.not.stringContaining('const showFeature = Feature_B')
         )
         expect(execSync).toHaveBeenCalledWith(
-            'npx prettier --write /mock/dir/src/components/featureComponent.jsx'
+            `npx prettier --write ${path.join(
+                '/mock',
+                'dir',
+                'src',
+                'components',
+                'featureComponent.jsx'
+            )}`
         )
     })
 
@@ -178,7 +197,13 @@ describe('trim-extensions', () => {
             expect.toEqualTrimmedLines(expected)
         )
         expect(execSync).toHaveBeenCalledWith(
-            'npx prettier --write /mock/dir/src/components/featureComponent.jsx'
+            `npx prettier --write ${path.join(
+                '/mock',
+                'dir',
+                'src',
+                'components',
+                'featureComponent.jsx'
+            )}`
         )
     })
 
@@ -220,7 +245,13 @@ describe('trim-extensions', () => {
             expect.stringContaining('featureBProp: PropTypes.string')
         )
         expect(execSync).toHaveBeenCalledWith(
-            'npx prettier --write /mock/dir/src/components/featureComponent.jsx'
+            `npx prettier --write ${path.join(
+                '/mock',
+                'dir',
+                'src',
+                'components',
+                'featureComponent.jsx'
+            )}`
         )
     })
 
@@ -256,7 +287,13 @@ describe('trim-extensions', () => {
             expect.stringContaining('<ComponentB />')
         )
         expect(execSync).toHaveBeenCalledWith(
-            'npx prettier --write /mock/dir/src/components/featureComponent.jsx'
+            `npx prettier --write ${path.join(
+                '/mock',
+                'dir',
+                'src',
+                'components',
+                'featureComponent.jsx'
+            )}`
         )
     })
 
