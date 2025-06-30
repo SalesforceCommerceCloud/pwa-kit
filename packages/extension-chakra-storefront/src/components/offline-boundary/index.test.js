@@ -60,8 +60,6 @@ describe('The OfflineBoundary', () => {
         expect(screen.queryByText(/child/i)).not.toBeInTheDocument()
     })
 
-    // TODO: Fix flaky/broken test
-
     test('should re-throw errors that are not chunk load errors', () => {
         const ThrowingComponent = () => {
             throw new Error('Anything else')
@@ -83,8 +81,6 @@ describe('The OfflineBoundary', () => {
         const ThrowingComponent = () => {
             throw new ChunkLoadError()
         }
-
-        // Create a spy on the clearError method
         const clearErrorSpy = jest.spyOn(UnwrappedOfflineBoundary.prototype, 'clearError')
 
         renderWithProviders(
@@ -93,19 +89,14 @@ describe('The OfflineBoundary', () => {
             </OfflineBoundary>
         )
 
-        // Verify error state is shown
         expect(screen.getByRole('img', {hidden: true})).toBeInTheDocument()
         expect(
             screen.getByRole('heading', {name: /you are currently offline/i})
         ).toBeInTheDocument()
 
-        // Click retry button
         await user.click(screen.getByRole('button', {name: /retry connection/i}))
-
-        // Verify clearError was called
         expect(clearErrorSpy).toHaveBeenCalled()
 
-        // Clean up the spy
         clearErrorSpy.mockRestore()
     })
 

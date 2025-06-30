@@ -74,13 +74,7 @@ class OfflineBoundary extends React.Component {
                         <p>
                             {"We couldn't load the next page on this connection. Please try again."}
                         </p>
-                        <Button
-                            color="blue"
-                            className="qa-retry-button"
-                            onClick={() => this.clearError()}
-                        >
-                            Retry Connection
-                        </Button>
+                        <Button onClick={() => this.clearError()}>Retry Connection</Button>
                     </div>
                 ) : (
                     children

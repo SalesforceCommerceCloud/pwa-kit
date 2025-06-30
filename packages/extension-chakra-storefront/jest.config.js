@@ -97,6 +97,7 @@ module.exports = {
         'non-pwa/**/*.{js,jsx}',
         'worker/**/*.{js,jsx}',
         'scripts/generator/*.{js,jsx}',
+        'src/**/*.{js,jsx}',
         '!app/pages/test-container/**/*.{js,jsx}',
         '!app/utils/test-utils.js',
         '!app/mocks/*.js',
