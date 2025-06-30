@@ -84,7 +84,7 @@ This will lead you to "claude_desktop_config.json" file.
 }
 ```
 
-Claude will:
+After you modify the `claude_desktop_config.json` file, Claude will do these actions.
 
 - Start the MCP server.
 - Connect to the MCP server as a client.
