@@ -26,7 +26,7 @@ npm install
 
 ## Run the MCP Server
 
-### Method 1: Run MCP Server From Cursor
+### Method 1: Run MCP Server from Cursor
 
 1. Open the Cursor application.
 
