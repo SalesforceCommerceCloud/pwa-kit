@@ -27,6 +27,11 @@ on:
           - rebase
           - reset
 
+permissions:
+  contents: write
+  issues: write
+  pull-requests: read
+
 jobs:
   sync-branch:
     runs-on: ubuntu-latest
@@ -262,60 +267,4 @@ jobs:
           echo "❌ Deployment did not become ready within 15 minutes"
           exit 1
 
-  notify:
-    needs: [sync-branch, deploy]
-    if: always()
-    runs-on: ubuntu-latest
-    steps:
-      - name: Send notification
-        run: |
-          SYNC_STATUS="${{ needs.sync-branch.outputs.status }}"
-          DEPLOY_STATUS="${{ needs.deploy.result }}"
-          
-          echo "📊 Sync & Deploy Summary:"
-          echo "========================="
-          
-          case $SYNC_STATUS in
-            "created")
-              echo "✅ Created more-logins-e2e-test branch from develop"
-              ;;
-            "up-to-date")
-              echo "✅ more-logins-e2e-test is already up to date with develop"
-              ;;
-            "merged")
-              echo "✅ Successfully merged develop into more-logins-e2e-test"
-              ;;
-            "rebased")
-              echo "✅ Successfully rebased more-logins-e2e-test onto develop"
-              ;;
-            "reset")
-              echo "✅ Reset more-logins-e2e-test to match develop"
-              ;;
-            "force-synced")
-              echo "⚠️  Force synced more-logins-e2e-test with develop"
-              ;;
-            "conflict")
-              echo "❌ Sync failed due to conflicts - manual resolution required"
-              ;;
-            *)
-              echo "❓ Unknown sync status: $SYNC_STATUS"
-              ;;
-          esac
-          
-          if [ "$SYNC_STATUS" != "conflict" ] && [ "$SYNC_STATUS" != "up-to-date" ]; then
-            case $DEPLOY_STATUS in
-              "success")
-                echo "🚀 Successfully deployed to e2e-tests-more-logins"
-                echo "🔗 URL: https://scaffold-pwa-more-logins-e2e.mobify-storefront.com
-                ;;
-              "failure")
-                echo "❌ Deployment failed - check logs for details"
-                ;;
-              "skipped")
-                echo "⏭️  Deployment skipped"
-                ;;
-              *)
-                echo "❓ Unknown deployment status: $DEPLOY_STATUS"
-                ;;
-            esac
-          fi 
+  # Removed notify job - no notifications needed 
