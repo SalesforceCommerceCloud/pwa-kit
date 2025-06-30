@@ -7,7 +7,7 @@
 import React from 'react'
 import {screen} from '@testing-library/react'
 import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
-import BonusProductItem from '@salesforce/retail-react-app/app/components/bonus-product-modal/bonus-product-item'
+import BonusProductItem from 'components/bonus-product-item/bonus-product-item'
 
 const baseProduct = {
     id: '1',
