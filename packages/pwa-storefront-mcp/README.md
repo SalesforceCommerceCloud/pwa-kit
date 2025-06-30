@@ -88,7 +88,7 @@ Claude will:
 
 - Start the MCP server
 - Connect to it as a client
-- List available tools
+- List available tools.
 
 <img src="./docs/images/claude-list-tools.png" alt="Claude MCP Tools Screenshot" width="40%" />
 
