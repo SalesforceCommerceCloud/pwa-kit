@@ -7,7 +7,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import {withRouter} from 'react-router-dom'
-import {Button} from '@chakra-ui/react'
+import {Button, Box, Heading, Text} from '@chakra-ui/react'
 import {AlertIcon} from '../../components/icons'
 
 // import Button from '@salesforce/pwa-kit-react-sdk/components/button'
@@ -68,14 +68,14 @@ class OfflineBoundary extends React.Component {
         return (
             <React.Fragment>
                 {chunkLoadError ? (
-                    <div>
+                    <Box>
                         <AlertIcon />
-                        <h1>You are currently offline</h1>
-                        <p>
+                        <Heading>You are currently offline</Heading>
+                        <Text>
                             {"We couldn't load the next page on this connection. Please try again."}
-                        </p>
+                        </Text>
                         <Button onClick={() => this.clearError()}>Retry Connection</Button>
-                    </div>
+                    </Box>
                 ) : (
                     children
                 )}
