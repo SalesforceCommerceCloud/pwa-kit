@@ -5,7 +5,7 @@ This guide shows different methods to programmatically insert code blocks in fil
 ## Method 1: Using Your MCP Server (Recommended)
 
 ### Setup
-1. **Configure the MCP Server in Cursor:**
+1. **Configure the MCP Server in Cursor.**
    ```json
    // Add to your Cursor MCP configuration
    {
