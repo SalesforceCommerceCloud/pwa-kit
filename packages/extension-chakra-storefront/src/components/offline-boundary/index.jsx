@@ -10,9 +10,6 @@ import {withRouter} from 'react-router-dom'
 import {Button, Box, Heading, Text} from '@chakra-ui/react'
 import {AlertIcon} from '../../components/icons'
 
-// import Button from '@salesforce/pwa-kit-react-sdk/components/button'
-// import Icon from '@salesforce/pwa-kit-react-sdk/components/icon'
-
 /**
  * OfflineBoundary is a React Error boundary that catches errors thrown when
  * dynamically loading pages and renders a fallback.
