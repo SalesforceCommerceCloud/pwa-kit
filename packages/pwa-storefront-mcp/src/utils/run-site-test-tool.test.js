@@ -1,14 +1,14 @@
-const {TestWithPlaywrightTool} = require('../utils/run-site-test-tool.js')
+import {TestWithPlaywrightTool} from './run-site-test-tool.js'
 
 // Mock the imported test functions to avoid running real Playwright tests
-jest.mock('../tests/performance.test.js', () => ({
+jest.mock('./run-site-test-performance.js', () => ({
     runPerformanceTest: jest.fn(async (url) => ({mock: 'performance', url}))
 }))
-jest.mock('../tests/accessibility.test.js', () => ({
+jest.mock('./run-site-test-accessibility.js', () => ({
     runAccessibilityTest: jest.fn(async (url) => ({mock: 'accessibility', url}))
 }))
 
-const DEFAULT_SITE_URL = 'https://www.adidas.com/us'
+const DEFAULT_SITE_URL = 'https://pwa-kit.mobify-storefront.com'
 
 describe('TestWithPlaywrightTool', () => {
     let tool
@@ -17,8 +17,8 @@ describe('TestWithPlaywrightTool', () => {
     })
 
     it('runs performance test with provided siteUrl', async () => {
-        const result = await tool.run('performance', 'https://example.com')
-        expect(result).toEqual({mock: 'performance', url: 'https://example.com'})
+        const result = await tool.run('performance', DEFAULT_SITE_URL)
+        expect(result).toEqual({mock: 'performance', url: DEFAULT_SITE_URL})
     })
 
     it('runs performance test with default siteUrl if not provided', async () => {

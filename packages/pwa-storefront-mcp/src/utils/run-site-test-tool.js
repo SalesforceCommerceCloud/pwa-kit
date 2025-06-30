@@ -8,10 +8,10 @@ import {execSync} from 'child_process'
 import path from 'path'
 
 // Import the new function-based tests
-import { runPerformanceTest } from '../tests/performance.test.js'
-import { runAccessibilityTest } from '../tests/accessibility.test.js'
+import { runPerformanceTest } from './run-site-test-performance.js'
+import { runAccessibilityTest } from './run-site-test-accessibility.js'
 
-const DEFAULT_SITE_URL = 'https://www.adidas.com/us';
+const DEFAULT_SITE_URL = 'https://pwa-kit.mobify-storefront.com';
 
 export class TestWithPlaywrightTool {
   /**
@@ -20,20 +20,16 @@ export class TestWithPlaywrightTool {
    * @param {string} [siteUrl] - Optional site URL to test
    * @returns {object} - Result of the test run
    */
-  async run(testType, siteUrl) {
-    if (testType === 'performance') {
-      if (!siteUrl) {
-        throw new Error('siteUrl is required for performance test');
-      }
-      const result = await runPerformanceTest(siteUrl || DEFAULT_SITE_URL)
-      return result
-    } else if (testType === 'accessibility') {
-      const result = await runAccessibilityTest(siteUrl || DEFAULT_SITE_URL)
-      return result
-    } else {
-      const result = {error: 'unsupported test type'}
-      console.log('Unsupported test type result:', result)
-      return result
+  async run(testType, siteUrl = DEFAULT_SITE_URL) {
+    switch (testType) {
+      case 'performance':
+        return runPerformanceTest(siteUrl)
+      case 'accessibility':
+        return runAccessibilityTest(siteUrl)
+      default:
+        const result = {error: 'unsupported test type'}
+        console.log('Unsupported test type result:', result)
+        return result
     }
   }
 }
