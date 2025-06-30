@@ -18,7 +18,7 @@ This guide shows different methods to programmatically insert code blocks in fil
    }
    ```
 
-2. **Restart Cursor** to load the MCP server
+2. **Restart Cursor** to load the MCP server.
 
 ### Using the Tools
 
