@@ -106,7 +106,7 @@ const Checkout = () => {
                                 isPasswordlessEnabled={isPasswordlessEnabled}
                                 idps={idps}
                             />
-                            {STORE_LOCATOR_IS_ENABLED && isPickupOrder ? (
+                            {isPickupOrder ? (
                                 <PickupAddress />
                             ) : (
                                 <ShippingAddress />
