@@ -12,7 +12,7 @@ The Model Context Protocol (MCP) is an open protocol that enables secure connect
 
 The PWA Storefront MCP Server provides these features.
 
-- `development_guidelines`: Help developers to understand and follow PWA Storefront developer guidelines and best practices
+- `development_guidelines`: Helps developers understand and follow PWA Storefront developer guidelines and best practices.
 - `create_new_component`: Helps developers create a new PWA Storefront component. This feature guides developers through a few simple questions and then generates code for the component based on the commerce data model used, layouts, etc.
 - `submit_pwa_kit_project_answers`: Helps developers generate a new PWA Storefront project.
 
