@@ -226,7 +226,9 @@ jobs:
           node ./scripts/gtime.js monorepo_install npm ci
 
       - name: Build project
-        run: npm run build
+        run: |
+          cd packages/template-retail-react-app
+          npm run build
 
       - name: Create MRT credentials file
         uses: "./.github/actions/create_mrt"
