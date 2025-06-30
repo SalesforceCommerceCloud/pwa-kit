@@ -57,7 +57,7 @@ Cursor will:
 
 - Start the MCP server
 - Connect to it as a client
-- List available tools
+- List available tools.
 
 You can go back to MCP Tools and choose to enable/disable any MCP Server or tools.
 
