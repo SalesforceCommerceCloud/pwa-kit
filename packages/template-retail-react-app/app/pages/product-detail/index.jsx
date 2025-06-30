@@ -102,9 +102,6 @@ const ProductDetail = () => {
         hasPickupItems
     } = usePickupShipment(basket)
 
-    // Only enable BOPIS functionality if the feature toggle is enabled
-    const isBopisEnabled = STORE_LOCATOR_IS_ENABLED
-
     /*************************** Product Detail and Category ********************/
     const {productId} = useParams()
     const urlParams = new URLSearchParams(location.search)
@@ -777,15 +774,12 @@ const ProductDetail = () => {
                             setChildProductOrderability={setChildProductOrderability}
                             setSelectedBundleQuantity={setSelectedBundleQuantity}
                             selectedBundleParentQuantity={selectedBundleQuantity}
-                            pickupInStore={isBopisEnabled ? !!pickupInStoreMap[product?.id] : false}
-                            setPickupInStore={
-                                isBopisEnabled
-                                    ? (checked) =>
-                                          product && handlePickupInStoreChange(product.id, checked)
-                                    : () => {}
+                            pickupInStore={!!pickupInStoreMap[product?.id]}
+                            setPickupInStore={(checked) =>
+                                product && handlePickupInStoreChange(product.id, checked)
                             }
-                            onOpenStoreLocator={isBopisEnabled ? onOpenStoreLocator : () => {}}
-                            showDeliveryOptions={isBopisEnabled}
+                            onOpenStoreLocator={onOpenStoreLocator}
+                            showDeliveryOptions={STORE_LOCATOR_IS_ENABLED}
                         />
                         <InformationAccordion product={product} />
                     </Fragment>
@@ -835,7 +829,7 @@ const ProductDetail = () => {
                     />
                 </Stack>
             </Stack>
-            {isBopisEnabled && (
+            {STORE_LOCATOR_IS_ENABLED && (
                 <StoreLocatorModal isOpen={isStoreLocatorOpen} onClose={onCloseStoreLocator} />
             )}
         </Box>
