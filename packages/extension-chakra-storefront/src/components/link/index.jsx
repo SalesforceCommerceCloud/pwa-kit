@@ -10,7 +10,7 @@ import {Link as ChakraLink} from '@chakra-ui/react'
 import {Link as SPALink, NavLink as NavSPALink} from 'react-router-dom'
 import useMultiSite from '../../hooks/use-multi-site'
 
-const Link = React.forwardRef(({href, to, useNavLink = false, ...props}, ref) => {
+const Link = React.forwardRef(({href, to, useNavLink = false, css, ...props}, ref) => {
     const _href = to || href
     const {buildUrl} = useMultiSite()
     const updatedHref = buildUrl(_href)
@@ -19,6 +19,7 @@ const Link = React.forwardRef(({href, to, useNavLink = false, ...props}, ref) =>
             as={useNavLink ? NavSPALink : SPALink}
             {...(useNavLink && {exact: true})}
             {...props}
+            css={css}
             to={updatedHref}
             ref={ref}
         />

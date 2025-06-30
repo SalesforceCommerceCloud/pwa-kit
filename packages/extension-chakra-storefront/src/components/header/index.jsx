@@ -8,7 +8,6 @@ import React, {useRef, useState} from 'react'
 import PropTypes from 'prop-types'
 import {useIntl} from 'react-intl'
 import {
-    // useMultiStyleConfig,
     Box,
     Flex,
     IconButton,
@@ -18,7 +17,6 @@ import {
     List,
     Popover,
     Portal,
-    Stack,
     Text,
     useDisclosure,
     useMediaQuery,
@@ -45,8 +43,7 @@ import {
     ChevronDownIcon,
     HeartIcon,
     SignoutIcon,
-    ChevronUpIcon
-    // StoreIcon
+    StoreIcon
 } from '../icons'
 
 import {navLinks, messages} from '../../pages/account/constant'
@@ -239,7 +236,9 @@ const Header = ({
                                     onKeyDown={handleKeyDown}
                                 >
                                     <AccountIcon boxSize={6} onClick={onMyAccountClick} />
-                                    <ChevronDownIcon />
+                                    <HideOnMobile>
+                                        <ChevronDownIcon />
+                                    </HideOnMobile>
                                 </IconButton>
                             </Popover.Trigger>
 
@@ -269,6 +268,7 @@ const Header = ({
                                             <Box asChild px={3}>
                                                 <nav>
                                                     <List.Root
+                                                        variant="plain"
                                                         as="ul"
                                                         data-testid="account-detail-nav"
                                                     >
@@ -279,55 +279,44 @@ const Header = ({
                                                                     key={link.name}
                                                                     value={link.name}
                                                                 >
-                                                                    <Button asChild variant="ghost">
-                                                                        <Link
-                                                                            px={4}
-                                                                            fontWeight="600"
-                                                                            to={`/account${link.path}`}
-                                                                            display="flex"
-                                                                            justifyContent="flex-start"
-                                                                            fontSize="sm"
-                                                                            color="inherit"
-                                                                            _hover={{
-                                                                                bg: 'gray.50'
-                                                                            }}
-                                                                        >
-                                                                            <LinkIcon
-                                                                                boxSize={5}
-                                                                                mr={3}
-                                                                            />
-                                                                            {intl.formatMessage(
-                                                                                messages[link.name]
-                                                                            )}
-                                                                        </Link>
-                                                                    </Button>
+                                                                    <Link
+                                                                        colorPallette="blue"
+                                                                        css={styles.menuAccountLink}
+                                                                        to={`/account${link.path}`}
+                                                                    >
+                                                                        <LinkIcon
+                                                                            boxSize={5}
+                                                                            mr={3}
+                                                                        />
+                                                                        {intl.formatMessage(
+                                                                            messages[link.name]
+                                                                        )}
+                                                                    </Link>
                                                                 </List.Item>
                                                             )
                                                         })}
                                                     </List.Root>
                                                 </nav>
                                             </Box>
-                                            <Popover.Footer
-                                                px={3}
-                                                py={2}
-                                                onClick={onSignoutClick}
-                                                cursor="pointer"
-                                            >
-                                                <Separator />
-                                                <Button variant="unstyled" css={styles.signout}>
-                                                    <Flex>
-                                                        <SignoutIcon
-                                                            aria-hidden={true}
-                                                            boxSize={5}
-                                                            css={styles.signoutIcon}
-                                                        />
-                                                        <Text as="span" css={styles.signoutText}>
-                                                            {intl.formatMessage({
-                                                                defaultMessage: 'Log out',
-                                                                id: 'header.popover.action.log_out'
-                                                            })}
-                                                        </Text>
-                                                    </Flex>
+                                            <Separator mx={3} my={2} />
+
+                                            <Popover.Footer px={3} py={0}>
+                                                <Button
+                                                    variant="ghost"
+                                                    css={styles.signoutButton}
+                                                    onClick={onSignoutClick}
+                                                >
+                                                    <SignoutIcon
+                                                        aria-hidden={true}
+                                                        boxSize={5}
+                                                        css={styles.signoutIcon}
+                                                    />
+                                                    <Text as="span" css={styles.signoutText}>
+                                                        {intl.formatMessage({
+                                                            defaultMessage: 'Log out',
+                                                            id: 'header.popover.action.log_out'
+                                                        })}
+                                                    </Text>
                                                 </Button>
                                             </Popover.Footer>
                                         </Popover.Body>
@@ -347,20 +336,21 @@ const Header = ({
                     {/*    {...styles.wishlistIcon}*/}
                     {/*    onClick={onWishlistClick}*/}
                     {/*/>*/}
-                    {/*{isStoreLocatorEnabled && (*/}
-                    {/*    <IconButton*/}
-                    {/*        aria-label={intl.formatMessage({*/}
-                    {/*            defaultMessage: 'Store Locator',*/}
-                    {/*            id: 'header.button.assistive_msg.store_locator'*/}
-                    {/*        })}*/}
-                    {/*        icon={<StoreIcon />}*/}
-                    {/*        {...styles.iconButton}*/}
-                    {/*        variant="unstyled"*/}
-                    {/*        onClick={() => {*/}
-                    {/*            openModal()*/}
-                    {/*        }}*/}
-                    {/*    />*/}
-                    {/*)}*/}
+                    {isStoreLocatorEnabled && (
+                        <IconButton
+                            aria-label={intl.formatMessage({
+                                defaultMessage: 'Store Locator',
+                                id: 'header.button.assistive_msg.store_locator'
+                            })}
+                            css={styles.iconButton}
+                            variant="unstyled"
+                            onClick={() => {
+                                openModal()
+                            }}
+                        >
+                            <StoreIcon boxSize={6} />
+                        </IconButton>
+                    )}
                     <IconButton
                         aria-label={intl.formatMessage(
                             {

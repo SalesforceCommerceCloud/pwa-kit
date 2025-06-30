@@ -17,10 +17,9 @@ export default defineRecipe({
         'dropdownMenuTitle',
         'icons',
         'logo',
-        'menuContent',
-        'menuPositioner',
+        'menuAccountLink',
         'searchContainer',
-        'signout',
+        'signoutButton',
         'wishListIconButton'
     ],
     base: {
@@ -84,30 +83,49 @@ export default defineRecipe({
             width: [8, 8, 8, 12],
             height: [6, 6, 6, 8]
         },
-
+        menuAccountLink: {
+            borderRadius: 'sm',
+            colorPalette: 'blue',
+            px: 4,
+            fontWeight: 600,
+            display: 'flex',
+            height: 11,
+            width: '100%',
+            fontSize: 'sm',
+            color: 'inherit',
+            justifyContent: 'flex-start',
+            _hover: {
+                bg: 'gray.50'
+            }
+        },
         searchContainer: {
             order: [2, 2, 2, 'inherit'],
             width: ['full', 'full', 'full', 60],
             marginRight: [0, 0, 0, 4],
             marginBottom: [1, 1, 2, 0]
         },
-        signout: {
+        signoutButton: {
+            display: 'flex',
+            justifyContent: 'flex-start',
             width: '100%',
+            color: 'gray.900',
+            fontWeight: 400,
+            fontSize: 'sm',
             borderRadius: '4px',
             height: 11,
             padding: 4,
             py: 3,
+            gap: 3,
             marginTop: 1,
             _hover: {
                 background: 'gray.50'
             }
         },
         signoutText: {
-            fontSize: 'sm',
             fontWeight: 'normal'
         },
         signoutIcon: {
-            marginRight: 2
+            marginRight: 3
         },
         wishlistIcon: {
             // More breathing room between the account and wishlist icons
