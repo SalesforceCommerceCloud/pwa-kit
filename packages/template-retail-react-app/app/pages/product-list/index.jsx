@@ -200,15 +200,6 @@ const ProductList = (props) => {
         )
     }
 
-    // Create reusable StoreInventoryFilter component to avoid repetition
-    const storeInventoryFilterComponent = (
-        <StoreInventoryFilter
-            key="storeInventoryFilter"
-            toggleFilter={toggleFilter}
-            selectedFilters={productSearchResult?.selectedRefinements || {}}
-        />
-    )
-
     /**************** Error Handling ****************/
     const errorStatus = error?.response?.status
     switch (errorStatus) {
@@ -405,6 +396,15 @@ const ProductList = (props) => {
 
         navigate(newPath)
     }
+
+    // Create reusable StoreInventoryFilter component to avoid repetition
+    const storeInventoryFilterComponent = (
+        <StoreInventoryFilter
+            key="storeInventoryFilter"
+            toggleFilter={toggleFilter}
+            selectedFilters={productSearchResult?.selectedRefinements || {}}
+        />
+    )
 
     /**************** Einstein ****************/
     useEffect(() => {
