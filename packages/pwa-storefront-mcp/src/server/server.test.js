@@ -30,7 +30,8 @@ function sendJsonRpcRequest(child, request) {
 
 describe('PwaStorefrontMCPServerHighLevel integration', () => {
     it('should list registered tools via stdio', async () => {
-        const child = spawn('node', ['src/server/server.js'], {
+        console.log('Starting server...')
+        const child = spawn('./node_modules/.bin/babel-node', ['src/server/server.js'], {
             cwd: process.cwd(),
             stdio: ['pipe', 'pipe', 'inherit']
         })
