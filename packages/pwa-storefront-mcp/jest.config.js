@@ -11,6 +11,7 @@ module.exports = {
     ...parentConfig,
     testEnvironment: 'node',
     testMatch: ['**/__tests__/**/*.js', '**/?(*.)+(spec|test).js'],
+    testPathIgnorePatterns: ['bin/*', 'coverage/*', 'dist/*', 'node_modules/*', 'scripts/*'],
     collectCoverageFrom: ['src/**/*.js', '!src/**/*.test.js', '!src/**/*.spec.js'],
     coverageDirectory: 'coverage',
     coverageReporters: ['text', 'lcov', 'html'],
