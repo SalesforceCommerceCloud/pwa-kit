@@ -27,7 +27,7 @@ runs:
         fi
       shell: bash
 
-    - name: Get latest PR labels
+    - name: Get latest PR data
       id: get_pr
       uses: octokit/request-action@v2.x
       with:
