@@ -13,6 +13,7 @@ import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-curre
 // Mock the hooks
 jest.mock('@salesforce/commerce-sdk-react')
 jest.mock('@salesforce/retail-react-app/app/hooks/use-current-basket')
+jest.mock('@salesforce/retail-react-app/app/hooks/use-bonus-product-modal')
 
 describe('BonusProductModal', () => {
     const mockProductData = {
@@ -95,6 +96,23 @@ describe('BonusProductModal', () => {
         useCurrentBasket.mockReturnValue({
             data: mockBasketWithoutBonusItems
         })
+
+        renderWithProviders(<div>Test content</div>)
+
+        expect(screen.queryByText('Add Bonus Product')).not.toBeInTheDocument()
+    })
+
+    test('renders bonus products in a single centered column on mobile (no horizontal scroll)', () => {
+        useCurrentBasket.mockReturnValue({
+            data: mockBasketWithBonusItems
+        })
+        useProducts.mockReturnValue({
+            data: mockProductData,
+            isLoading: false
+        })
+
+        window.innerWidth = 375
+        window.dispatchEvent(new Event('resize'))
 
         renderWithProviders(<div>Test content</div>)
 
