@@ -193,10 +193,9 @@ const Payment = () => {
                             <Stack direction="row" gap={4}>
                                 <PaymentCardSummary payment={appliedPayment} />
                                 <Button
-                                    variant="link"
+                                    variant="link-red"
                                     size="sm"
                                     colorPalette="red"
-                                    color="red.500"
                                     onClick={onPaymentRemoval}
                                 >
                                     <FormattedMessage
