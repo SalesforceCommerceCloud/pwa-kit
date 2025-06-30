@@ -245,10 +245,10 @@ const Header = ({
                             <Portal>
                                 <Popover.Positioner>
                                     <Popover.Content
-                                        // onMouseLeave={() => {
-                                        //     hasEnterPopoverContent.current = false
-                                        //     onAccountMenuClose()
-                                        // }}
+                                        onMouseLeave={() => {
+                                            hasEnterPopoverContent.current = false
+                                            onAccountMenuClose()
+                                        }}
                                         onMouseOver={() => {
                                             hasEnterPopoverContent.current = true
                                         }}
@@ -280,9 +280,9 @@ const Header = ({
                                                                     value={link.name}
                                                                 >
                                                                     <Link
-                                                                        colorPallette="blue"
-                                                                        css={styles.menuAccountLink}
+                                                                        useNavLink={true}
                                                                         to={`/account${link.path}`}
+                                                                        css={styles.menuAccountLink}
                                                                     >
                                                                         <LinkIcon
                                                                             boxSize={5}

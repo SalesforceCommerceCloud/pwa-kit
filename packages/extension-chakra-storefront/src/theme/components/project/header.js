@@ -93,9 +93,16 @@ export default defineRecipe({
             width: '100%',
             fontSize: 'sm',
             color: 'inherit',
+            textDecoration: 'none',
             justifyContent: 'flex-start',
             _hover: {
                 bg: 'gray.50'
+            },
+            '&.active': {
+                bg: 'gray.50',
+                borderLeft: 'solid',
+                borderLeftColor: 'gray.600',
+                borderLeftWidth: '4px'
             }
         },
         searchContainer: {
