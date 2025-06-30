@@ -595,9 +595,6 @@ const Cart = () => {
     }
     return (
         <Box background="gray.50" flex="1" data-testid="sf-cart-container">
-            {/* <Helmet>
-                <title>Cart</title>
-            </Helmet> */}
             <Container
                 maxWidth="container.xl"
                 px={[4, 6, 6, 4]}
