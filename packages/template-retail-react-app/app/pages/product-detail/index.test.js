@@ -562,7 +562,7 @@ describe('Delivery Options Restrictions', () => {
     test('shows error when adding pickup item to basket with non-pickup shipping method', async () => {
         // Mock useSelectedStore to return a store with inventoryId
         mockUseSelectedStore.mockImplementation(() => ({
-            store: {
+            selectedStore: {
                 id: storeId,
                 name: 'Test Store',
                 inventoryId: inventoryId
