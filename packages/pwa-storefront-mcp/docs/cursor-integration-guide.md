@@ -303,7 +303,7 @@ Run the demo to see the MCP server in action:
 npm run demo  # or: node demo.js
 ```
 
-This will demonstrate:
+This demo demonstrates the following:
 - Code structure analysis
 - Component insertion
 - New file creation
