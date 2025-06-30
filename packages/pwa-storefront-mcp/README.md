@@ -38,7 +38,7 @@ Select Tools & Integrations > MCP Tools > New MCP Server
 
 <img src="./docs/images/cursor-mcp-tools.png" alt="Cursor MCP Tools Screenshot" width="50%" />
 
-You will be led to mcp.json file. Add this to your mcp.json:
+The `mcp.json` file opens. Add this definition to your `mcp.json` file.
 
 ```json
 {
