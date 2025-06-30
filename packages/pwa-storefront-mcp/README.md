@@ -55,7 +55,7 @@ You will be led to mcp.json file. Add this to your mcp.json:
 
 Cursor will:
 
-- Start the MCP server
+- Start the MCP server.
 - Connect to the MCP server as a client.
 - List available tools.
 
