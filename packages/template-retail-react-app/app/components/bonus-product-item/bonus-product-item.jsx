@@ -22,7 +22,6 @@ const BonusProductItem = ({product, productData, isSelected, onToggle, isLoading
     const productName = product?.productName || product?.title
 
     // Get the appropriate image group from the passed product data
-    // Use filterImageGroups to get variant-specific images when available
     const imageGroup = useMemo(() => {
         if (!productData?.imageGroups) return null
 
