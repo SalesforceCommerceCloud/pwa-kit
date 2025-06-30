@@ -151,9 +151,9 @@ test('Create Account form - phone number from order shipping address is saved to
         expect(registrationRequestBody).not.toBeNull()
     })
 
-    // Verify that the phone number from the order's shipping address is included in the registration
+    // Verify that the phone number from the order's billing address is included in the registration
     expect(registrationRequestBody.customer.phoneHome).toBe(
-        mockOrder.shipments[0].shippingAddress.phone
+        mockOrder.billingAddress.phone
     )
     expect(registrationRequestBody.customer.phoneHome).toBe('(778) 888-8888')
 
@@ -176,7 +176,7 @@ test('Integration test - phone number from order is visible in customer account 
                  email: mockOrder.customerInfo.email,
                  firstName: mockOrder.billingAddress.firstName,
                  lastName: mockOrder.billingAddress.lastName,
-                 phoneHome: mockOrder.shipments[0].shippingAddress.phone,
+                 phoneHome: mockOrder.billingAddress.phone,
                  login: mockOrder.customerInfo.email
              }
              return res(ctx.status(200), ctx.json(savedCustomerData))
@@ -198,7 +198,7 @@ test('Integration test - phone number from order is visible in customer account 
                              lastName: mockOrder.billingAddress.lastName,
                              address1: mockOrder.shipments[0].shippingAddress.address1,
                              city: mockOrder.shipments[0].shippingAddress.city,
-                             phone: mockOrder.shipments[0].shippingAddress.phone,
+                             phone: mockOrder.billingAddress.phone,
                              postalCode: mockOrder.shipments[0].shippingAddress.postalCode,
                              stateCode: mockOrder.shipments[0].shippingAddress.stateCode,
                              countryCode: mockOrder.shipments[0].shippingAddress.countryCode
@@ -245,7 +245,7 @@ test('Integration test - phone number from order is visible in customer account 
     // and verifying the phone number is displayed in the UI, but that would require
     // additional setup of the Account page component and its dependencies.
 
-    // The key assertion is that the phone from the order's shipping address
-    // is correctly saved to the customer's phoneHome field during registration
-    expect(savedCustomerData.phoneHome).toBe(mockOrder.shipments[0].shippingAddress.phone)
+         // The key assertion is that the phone from the order's billing address
+     // is correctly saved to the customer's phoneHome field during registration
+     expect(savedCustomerData.phoneHome).toBe(mockOrder.billingAddress.phone)
 })
