@@ -86,7 +86,7 @@ This will lead you to "claude_desktop_config.json" file.
 
 Claude will:
 
-- Start the MCP server
+- Start the MCP server.
 - Connect to the MCP server as a client.
 - List available tools.
 
