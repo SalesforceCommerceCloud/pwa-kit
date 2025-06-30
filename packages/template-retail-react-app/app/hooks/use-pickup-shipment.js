@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Salesforce, Inc.
+ * Copyright (c) 2025, Salesforce, Inc.
  * All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
@@ -9,16 +9,12 @@ import {
     useShopperBasketsMutation,
     useShippingMethodsForShipment
 } from '@salesforce/commerce-sdk-react'
-import {STORE_LOCATOR_IS_ENABLED} from '@salesforce/retail-react-app/app/constants'
 
 /**
  * Custom hook to handle pickup in store shipment configuration
  * @returns {Object} Object containing helper functions for pickup shipment management
  */
 export const usePickupShipment = (basket) => {
-    // Only enable BOPIS functionality if the feature toggle is on
-    const isBopisEnabled = STORE_LOCATOR_IS_ENABLED
-
     const updateShipmentForBasketMutation = useShopperBasketsMutation('updateShipmentForBasket')
 
     // Hook for shipping methods - we'll use refetch when needed
@@ -40,7 +36,7 @@ export const usePickupShipment = (basket) => {
      * @returns {string|null} The shipping method ID for pickup in store, or null if not found
      */
     const getPickupShippingMethodId = (shippingMethods) => {
-        if (!isBopisEnabled || !shippingMethods?.applicableShippingMethods) {
+        if (!shippingMethods?.applicableShippingMethods) {
             return null
         }
 
@@ -66,7 +62,7 @@ export const usePickupShipment = (basket) => {
      * @returns {boolean} True if the current shipping method is a pickup method
      */
     const isCurrentShippingMethodPickup = (currentShippingMethod) => {
-        return isBopisEnabled && currentShippingMethod?.c_storePickupEnabled === true
+        return currentShippingMethod?.c_storePickupEnabled === true
     }
 
     /**
@@ -79,8 +75,6 @@ export const usePickupShipment = (basket) => {
      * @param {boolean} options.throwOnError - Whether to throw on error (default: false)
      */
     const updatePickupShipment = async (basketId, productItems, storeInfo, options = {}) => {
-        if (!isBopisEnabled) return
-
         const defaultPickupShippingMethodId = '005'
         const {pickupShippingMethodId = defaultPickupShippingMethodId, throwOnError = false} =
             options
@@ -181,7 +175,7 @@ export const usePickupShipment = (basket) => {
      * @returns {Array} Updated product items with inventory IDs
      */
     const addInventoryIdsToPickupItems = (productItems, pickupInStoreMap, storeInfo) => {
-        if (!isBopisEnabled || !storeInfo?.inventoryId) return productItems
+        if (!storeInfo?.inventoryId) return productItems
 
         return productItems.map((item) => {
             const prodKey = item.productId || item.id
@@ -209,7 +203,7 @@ export const usePickupShipment = (basket) => {
         hasAnyPickupSelected,
         selectedStore
     ) => {
-        if (!isBopisEnabled || !basketResponse?.basketId || !basketResponse.shipments.length) {
+        if (!basketResponse?.basketId || !basketResponse.shipments.length) {
             return
         }
 
