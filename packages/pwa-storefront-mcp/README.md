@@ -53,7 +53,7 @@ You will be led to mcp.json file. Add this to your mcp.json:
 } 
 ```
 
-Cursor will:
+After you modify the `mcp.json` file, cursor will do these actions.
 
 - Start the MCP server.
 - Connect to the MCP server as a client.
