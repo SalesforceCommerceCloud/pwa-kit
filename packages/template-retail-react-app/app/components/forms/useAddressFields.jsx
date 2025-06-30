@@ -12,7 +12,8 @@ import {
     provinceOptions
 } from '@salesforce/retail-react-app/app/components/forms/state-province-options'
 import {SHIPPING_COUNTRY_CODES} from '@salesforce/retail-react-app/app/constants'
-import {getAddressSuggestions} from '@salesforce/retail-react-app/app/utils/mockAddressService' // TODO: replace with the actual API call to the address service
+import {getAddressSuggestions} from '@salesforce/retail-react-app/app/mocks/mockAddressService' // TODO: replace with the actual API call to the address service
+import {parseAddressSuggestion} from '@salesforce/retail-react-app/app/mocks/mockAddressService'
 
 const messages = defineMessages({
     required: {defaultMessage: 'Required', id: 'use_address_fields.error.required'},
@@ -62,38 +63,54 @@ export default function useAddressFields({
 
     const countryCode = watch('countryCode')
 
+    // Reset address fields when country changes
+    useEffect(() => {
+        // Clear address fields when country changes
+        setValue(`${prefix}address1`, '')
+        setValue(`${prefix}city`, '')
+        setValue(`${prefix}stateCode`, '')
+        setValue(`${prefix}postalCode`, '')
+        // Clear autocomplete suggestions
+        setSuggestions([])
+        setShowDropdown(false)
+        setIsDismissed(false)
+    }, [countryCode, prefix, setValue])
+
     // Handle address input changes with debouncing
-    const handleAddressInputChange = useCallback(async (value) => {
-        // Clear any existing timeout
-        if (debounceTimeoutRef.current) {
-            clearTimeout(debounceTimeoutRef.current)
-        }
-
-        // If input is too short, clear suggestions
-        if (!value || value.length < 3) {
-            setSuggestions([])
-            setShowDropdown(false)
-            return
-        }
-
-        // Set loading state
-        setIsLoading(true)
-
-        // Debounce the API call
-        debounceTimeoutRef.current = setTimeout(async () => {
-            try {
-                const results = await getAddressSuggestions(value, countryCode)
-                setSuggestions(results)
-                setShowDropdown(true)
-                setIsDismissed(false)
-            } catch (error) {
-                console.error('Error fetching address suggestions:', error)
-                setSuggestions([])
-            } finally {
-                setIsLoading(false)
+    const handleAddressInputChange = useCallback(
+        async (value) => {
+            // Clear any existing timeout
+            if (debounceTimeoutRef.current) {
+                clearTimeout(debounceTimeoutRef.current)
             }
-        }, 300) // 300ms debounce
-    }, [countryCode])
+
+            // If input is too short, clear suggestions
+            if (!value || value.length < 3) {
+                setSuggestions([])
+                setShowDropdown(false)
+                return
+            }
+
+            // Set loading state
+            setIsLoading(true)
+
+            // Debounce the API call
+            debounceTimeoutRef.current = setTimeout(async () => {
+                try {
+                    const results = await getAddressSuggestions(value, countryCode)
+                    setSuggestions(results)
+                    setShowDropdown(true)
+                    setIsDismissed(false)
+                } catch (error) {
+                    console.error('Error fetching address suggestions:', error)
+                    setSuggestions([])
+                } finally {
+                    setIsLoading(false)
+                }
+            }, 300) // 300ms debounce
+        },
+        [countryCode]
+    )
 
     // Handle address field focus when user clicks into the address field
     const handleAddressFocus = useCallback(() => {
@@ -101,12 +118,15 @@ export default function useAddressFields({
     }, [])
 
     // Handle cut event
-    const handleAddressCut = useCallback((e) => {
-        // Get the new value after the cut operation
-        const newValue = e.target.value
-        // Trigger the address change handler with the new value
-        handleAddressInputChange(newValue)
-    }, [handleAddressInputChange])
+    const handleAddressCut = useCallback(
+        (e) => {
+            // Get the new value after the cut operation
+            const newValue = e.target.value
+            // Trigger the address change handler with the new value
+            handleAddressInputChange(newValue)
+        },
+        [handleAddressInputChange]
+    )
 
     // Handle click outside to close dropdown
     useEffect(() => {
@@ -115,12 +135,14 @@ export default function useAddressFields({
             const addressInput = document.querySelector(`input[name="${prefix}address1"]`)
             // Get the dropdown element
             const dropdown = document.querySelector('[data-testid="address-suggestion-dropdown"]')
-            
+
             // If click is outside both the input and dropdown, close the dropdown
-            if (addressInput && 
-                dropdown && 
-                !addressInput.contains(event.target) && 
-                !dropdown.contains(event.target)) {
+            if (
+                addressInput &&
+                dropdown &&
+                !addressInput.contains(event.target) &&
+                !dropdown.contains(event.target)
+            ) {
                 setShowDropdown(false)
                 setIsDismissed(true)
                 setSuggestions([])
@@ -146,7 +168,28 @@ export default function useAddressFields({
     // Handle suggestion selection
     const handleSuggestionSelect = useCallback(
         (suggestion) => {
-            setValue(`${prefix}address1`, suggestion.mainText)
+            // Parse the address suggestion to extract individual fields
+            const parsedFields = parseAddressSuggestion(suggestion)
+
+            // Populate all address fields
+            setValue(`${prefix}address1`, parsedFields.address1)
+
+            if (parsedFields.city) {
+                setValue(`${prefix}city`, parsedFields.city)
+            }
+
+            if (parsedFields.stateCode) {
+                setValue(`${prefix}stateCode`, parsedFields.stateCode)
+            }
+
+            if (parsedFields.postalCode) {
+                setValue(`${prefix}postalCode`, parsedFields.postalCode)
+            }
+
+            if (parsedFields.countryCode) {
+                setValue(`${prefix}countryCode`, parsedFields.countryCode)
+            }
+
             setShowDropdown(false)
             setIsDismissed(true)
             setSuggestions([])
@@ -286,7 +329,7 @@ export default function useAddressFields({
             rules: {
                 required:
                     countryCode === 'CA'
-                        ? 'Please select your province.' 
+                        ? 'Please select your province.' // FYI we won't translate this
                         : formatMessage({
                               defaultMessage: 'Please select your state.',
                               id: 'use_address_fields.error.please_select_your_state_or_province',
@@ -305,7 +348,7 @@ export default function useAddressFields({
             rules: {
                 required:
                     countryCode === 'CA'
-                        ? 'Please enter your postal code.' 
+                        ? 'Please enter your postal code.'
                         : formatMessage({
                               defaultMessage: 'Please enter your zip code.',
                               id: 'use_address_fields.error.please_enter_your_postal_or_zip',

@@ -122,7 +122,7 @@ const AddressSuggestionDropdown = ({
                     onClick={() => onSelectSuggestion(suggestion)}
                     role="button"
                     tabIndex={0}
-                    onKeyPress={(e) => {
+                    onKeyDown={(e) => {
                         if (e.key === 'Enter' || e.key === ' ') {
                             onSelectSuggestion(suggestion)
                         }
@@ -197,4 +197,4 @@ AddressSuggestionDropdown.propTypes = {
     isLoading: PropTypes.bool
 }
 
-export default AddressSuggestionDropdown 
+export default AddressSuggestionDropdown

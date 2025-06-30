@@ -7,7 +7,7 @@
 
 /**
  * Mock Address Service
- * Temporarily simulates Google Places API for address autocomplete  
+ * Temporarily simulates Google Places API for address autocomplete
  */
 
 // Sample address data structured like Google Places API
@@ -180,7 +180,7 @@ const MOCK_ADDRESSES = [
  * @param {number} delay - Delay in milliseconds
  */
 const simulateDelay = (delay = 200) => {
-    return new Promise(resolve => setTimeout(resolve, delay))
+    return new Promise((resolve) => setTimeout(resolve, delay))
 }
 
 /**
@@ -192,25 +192,95 @@ const simulateDelay = (delay = 200) => {
 export const getAddressSuggestions = async (input, countryCode) => {
     // Simulate API delay
     await simulateDelay(300)
-    
+
     // Convert input to lowercase for case-insensitive matching
     const searchTerm = input.toLowerCase().trim()
-    
+
     // Filter addresses that match the input and country
-    const filteredAddresses = MOCK_ADDRESSES.filter(address => {
+    const filteredAddresses = MOCK_ADDRESSES.filter((address) => {
         const fullAddress = address.address.toLowerCase()
         const mainText = address.mainText.toLowerCase()
         const secondaryText = address.secondaryText.toLowerCase()
-        
+
         // Check if address is in the selected country
         const isInSelectedCountry = address.country === countryCode
-        
+
         // Match against full address or main text, and country
         const matchesSearch = fullAddress.includes(searchTerm) || mainText.includes(searchTerm)
         const matches = matchesSearch && isInSelectedCountry
-        
+
         return matches
     })
-    
+
     return filteredAddresses
-} 
+}
+
+/**
+ * Parse address suggestion data to extract individual address fields
+ * @param {Object} suggestion - Address suggestion object from the API
+ * @returns {Object} Parsed address fields
+ */
+export const parseAddressSuggestion = (suggestion) => {
+    const {mainText, secondaryText, country} = suggestion
+
+    // Initialize parsed fields
+    const parsedFields = {
+        address1: mainText,
+        countryCode: country
+    }
+
+    if (!secondaryText) {
+        return parsedFields
+    }
+
+    // Parse secondary text to extract city, state, and postal code
+    // Format examples:
+    // "New York, NY 10001, USA"
+    // "Toronto, ON M5C 1W4, Canada"
+    // "London, UK NW1 6XE"
+    // "New York" (single part)
+
+    const parts = secondaryText.split(',')
+
+    if (parts.length >= 2) {
+        // Extract city (first part)
+        parsedFields.city = parts[0].trim()
+
+        // Extract state and postal code (second part)
+        const statePostalPart = parts[1].trim()
+
+        // Handle different formats for state/province and postal code
+        if (country === 'US') {
+            // US format: "NY 10001"
+            const statePostalMatch = statePostalPart.match(/^([A-Z]{2})\s+(\d{5}(?:-\d{4})?)$/)
+            if (statePostalMatch) {
+                parsedFields.stateCode = statePostalMatch[1]
+                parsedFields.postalCode = statePostalMatch[2]
+            }
+        } else if (country === 'CA') {
+            // Canadian format: "ON M5C 1W4"
+            const provincePostalMatch = statePostalPart.match(
+                /^([A-Z]{2})\s+([A-Z]\d[A-Z]\s+\d[A-Z]\d)$/
+            )
+            if (provincePostalMatch) {
+                parsedFields.stateCode = provincePostalMatch[1]
+                parsedFields.postalCode = provincePostalMatch[2]
+            }
+        } else {
+            // Other countries: try to extract state/province and postal code
+            // This is a simplified approach - in a real implementation, you'd need
+            // country-specific parsing logic
+            const words = statePostalPart.split(/\s+/)
+            if (words.length >= 2) {
+                // Assume first word is state/province, rest is postal code
+                parsedFields.stateCode = words[0]
+                parsedFields.postalCode = words.slice(1).join(' ')
+            }
+        }
+    } else if (parts.length === 1) {
+        // Handle case where secondaryText has only one part (e.g., "New York")
+        parsedFields.city = parts[0].trim()
+    }
+
+    return parsedFields
+}
