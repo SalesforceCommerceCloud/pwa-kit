@@ -5,6 +5,7 @@ on:
   push:
     branches:
       - develop
+      - W-18685522-reset-and-passwordless-integration-test # TODO: remove this branch after testing
   # Run daily at 2 AM UTC to catch any missed syncs
   schedule:
     - cron: '0 2 * * *'
