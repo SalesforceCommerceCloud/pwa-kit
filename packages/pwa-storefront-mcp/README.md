@@ -28,7 +28,7 @@ npm install
 
 ### Method 1: Run MCP Server From Cursor
 
-Open Cursor Application
+1. Open the Cursor application.
 
 2. In the Cursor Menu on the top menu bar, click **Settings** > **Cursor Settings...**. 
 
