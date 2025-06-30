@@ -42,6 +42,7 @@ import RecommendedProducts from '@salesforce/retail-react-app/app/components/rec
 import ProductView from '@salesforce/retail-react-app/app/components/product-view'
 import InformationAccordion from '@salesforce/retail-react-app/app/pages/product-detail/partials/information-accordion'
 import {StoreLocatorModal} from '@salesforce/retail-react-app/app/components/store-locator'
+import Island from '@salesforce/retail-react-app/app/components/island'
 
 import {HTTPNotFound, HTTPError} from '@salesforce/pwa-kit-react-sdk/ssr/universal/errors'
 import logger from '@salesforce/retail-react-app/app/utils/logger-instance'
@@ -655,29 +656,31 @@ const ProductDetail = () => {
             <Stack spacing={16}>
                 {isProductASet || isProductABundle ? (
                     <Fragment>
-                        <ProductView
-                            product={product}
-                            category={primaryCategory?.parentCategoryTree || []}
-                            addToCart={
-                                isProductASet
-                                    ? handleProductSetAddToCart
-                                    : handleProductBundleAddToCart
-                            }
-                            addToWishlist={handleAddToWishlist}
-                            isProductLoading={isProductLoading}
-                            isBasketLoading={isBasketLoading}
-                            isWishlistLoading={isWishlistLoading}
-                            validateOrderability={handleChildProductValidation}
-                            childProductOrderability={childProductOrderability}
-                            setSelectedBundleQuantity={setSelectedBundleQuantity}
-                            selectedBundleParentQuantity={selectedBundleQuantity}
-                            pickupInStore={!!pickupInStoreMap[product?.id]}
-                            setPickupInStore={(checked) =>
-                                product && handlePickupInStoreChange(product.id, checked)
-                            }
-                            onOpenStoreLocator={onOpenStoreLocator}
-                            showDeliveryOptions={STORE_LOCATOR_IS_ENABLED}
-                        />
+                        <Island hydrateOn={'visible'}>
+                            <ProductView
+                                product={product}
+                                category={primaryCategory?.parentCategoryTree || []}
+                                addToCart={
+                                    isProductASet
+                                        ? handleProductSetAddToCart
+                                        : handleProductBundleAddToCart
+                                }
+                                addToWishlist={handleAddToWishlist}
+                                isProductLoading={isProductLoading}
+                                isBasketLoading={isBasketLoading}
+                                isWishlistLoading={isWishlistLoading}
+                                validateOrderability={handleChildProductValidation}
+                                childProductOrderability={childProductOrderability}
+                                setSelectedBundleQuantity={setSelectedBundleQuantity}
+                                selectedBundleParentQuantity={selectedBundleQuantity}
+                                pickupInStore={!!pickupInStoreMap[product?.id]}
+                                setPickupInStore={(checked) =>
+                                    product && handlePickupInStoreChange(product.id, checked)
+                                }
+                                onOpenStoreLocator={onOpenStoreLocator}
+                                showDeliveryOptions={STORE_LOCATOR_IS_ENABLED}
+                            />
+                        </Island>
 
                         <hr />
 
@@ -686,146 +689,166 @@ const ProductDetail = () => {
                             // Render the child products
                             comboProduct.childProducts.map(
                                 ({product: childProduct, quantity: childQuantity}) => (
-                                    <Box key={childProduct.id} data-testid="child-product">
-                                        <ProductView
-                                            // Do not use an arrow function as we are manipulating the functions scope.
-                                            ref={function (ref) {
-                                                // Assign the "set" scope of the ref, this is how we access the internal
-                                                // validation.
-                                                childProductRefs.current[childProduct.id] = {
-                                                    ref,
-                                                    validateOrderability: this.validateOrderability
+                                    <Island hydrateOn={'visible'} key={childProduct.id}>
+                                        <Box data-testid="child-product">
+                                            <ProductView
+                                                // Do not use an arrow function as we are manipulating the functions scope.
+                                                ref={function (ref) {
+                                                    // Assign the "set" scope of the ref, this is how we access the internal
+                                                    // validation.
+                                                    childProductRefs.current[childProduct.id] = {
+                                                        ref,
+                                                        validateOrderability:
+                                                            this.validateOrderability
+                                                    }
+                                                }}
+                                                product={childProduct}
+                                                isProductPartOfSet={isProductASet}
+                                                isProductPartOfBundle={isProductABundle}
+                                                childOfBundleQuantity={childQuantity}
+                                                selectedBundleParentQuantity={
+                                                    selectedBundleQuantity
                                                 }
-                                            }}
-                                            product={childProduct}
-                                            isProductPartOfSet={isProductASet}
-                                            isProductPartOfBundle={isProductABundle}
-                                            childOfBundleQuantity={childQuantity}
-                                            selectedBundleParentQuantity={selectedBundleQuantity}
-                                            addToCart={
-                                                isProductASet
-                                                    ? (variant, quantity) =>
-                                                          handleAddToCart([
-                                                              {
-                                                                  product: childProduct,
-                                                                  variant,
-                                                                  quantity
-                                                              }
-                                                          ])
-                                                    : null
-                                            }
-                                            addToWishlist={
-                                                isProductASet ? handleAddToWishlist : null
-                                            }
-                                            onVariantSelected={(product, variant, quantity) => {
-                                                if (quantity) {
-                                                    setChildProductSelection((previousState) => ({
-                                                        ...previousState,
-                                                        [product.id]: {
-                                                            product,
-                                                            variant,
-                                                            quantity: isProductABundle
-                                                                ? childQuantity
-                                                                : quantity
+                                                addToCart={
+                                                    isProductASet
+                                                        ? (variant, quantity) =>
+                                                              handleAddToCart([
+                                                                  {
+                                                                      product: childProduct,
+                                                                      variant,
+                                                                      quantity
+                                                                  }
+                                                              ])
+                                                        : null
+                                                }
+                                                addToWishlist={
+                                                    isProductASet ? handleAddToWishlist : null
+                                                }
+                                                onVariantSelected={(product, variant, quantity) => {
+                                                    if (quantity) {
+                                                        setChildProductSelection(
+                                                            (previousState) => ({
+                                                                ...previousState,
+                                                                [product.id]: {
+                                                                    product,
+                                                                    variant,
+                                                                    quantity: isProductABundle
+                                                                        ? childQuantity
+                                                                        : quantity
+                                                                }
+                                                            })
+                                                        )
+                                                    } else {
+                                                        const selections = {
+                                                            ...childProductSelection
                                                         }
-                                                    }))
-                                                } else {
-                                                    const selections = {...childProductSelection}
-                                                    delete selections[product.id]
-                                                    setChildProductSelection(selections)
+                                                        delete selections[product.id]
+                                                        setChildProductSelection(selections)
+                                                    }
+                                                }}
+                                                isProductLoading={isProductLoading}
+                                                isBasketLoading={isBasketLoading}
+                                                isWishlistLoading={isWishlistLoading}
+                                                setChildProductOrderability={
+                                                    setChildProductOrderability
                                                 }
-                                            }}
-                                            isProductLoading={isProductLoading}
-                                            isBasketLoading={isBasketLoading}
-                                            isWishlistLoading={isWishlistLoading}
-                                            setChildProductOrderability={
-                                                setChildProductOrderability
-                                            }
-                                            pickupInStore={!!pickupInStoreMap[childProduct?.id]}
-                                            setPickupInStore={(checked) =>
-                                                childProduct &&
-                                                handlePickupInStoreChange(childProduct.id, checked)
-                                            }
-                                            onOpenStoreLocator={onOpenStoreLocator}
-                                            showDeliveryOptions={STORE_LOCATOR_IS_ENABLED}
-                                        />
-                                        <InformationAccordion product={childProduct} />
+                                                pickupInStore={!!pickupInStoreMap[childProduct?.id]}
+                                                setPickupInStore={(checked) =>
+                                                    childProduct &&
+                                                    handlePickupInStoreChange(
+                                                        childProduct.id,
+                                                        checked
+                                                    )
+                                                }
+                                                onOpenStoreLocator={onOpenStoreLocator}
+                                                showDeliveryOptions={STORE_LOCATOR_IS_ENABLED}
+                                            />
+                                            <InformationAccordion product={childProduct} />
 
-                                        <Box display={['none', 'none', 'none', 'block']}>
-                                            <hr />
+                                            <Box display={['none', 'none', 'none', 'block']}>
+                                                <hr />
+                                            </Box>
                                         </Box>
-                                    </Box>
+                                    </Island>
                                 )
                             )
                         }
                     </Fragment>
                 ) : (
                     <Fragment>
-                        <ProductView
-                            product={product}
-                            category={primaryCategory?.parentCategoryTree || []}
-                            addToCart={handleAddToCart}
-                            addToWishlist={handleAddToWishlist}
-                            isProductLoading={isProductLoading}
-                            isBasketLoading={isBasketLoading}
-                            isWishlistLoading={isWishlistLoading}
-                            childProductOrderability={childProductOrderability}
-                            setChildProductOrderability={setChildProductOrderability}
-                            setSelectedBundleQuantity={setSelectedBundleQuantity}
-                            selectedBundleParentQuantity={selectedBundleQuantity}
-                            pickupInStore={!!pickupInStoreMap[product?.id]}
-                            setPickupInStore={(checked) =>
-                                product && handlePickupInStoreChange(product.id, checked)
-                            }
-                            onOpenStoreLocator={onOpenStoreLocator}
-                            showDeliveryOptions={STORE_LOCATOR_IS_ENABLED}
-                        />
-                        <InformationAccordion product={product} />
+                        <Island hydrateOn={'visible'}>
+                            <ProductView
+                                product={product}
+                                category={primaryCategory?.parentCategoryTree || []}
+                                addToCart={handleAddToCart}
+                                addToWishlist={handleAddToWishlist}
+                                isProductLoading={isProductLoading}
+                                isBasketLoading={isBasketLoading}
+                                isWishlistLoading={isWishlistLoading}
+                                childProductOrderability={childProductOrderability}
+                                setChildProductOrderability={setChildProductOrderability}
+                                setSelectedBundleQuantity={setSelectedBundleQuantity}
+                                selectedBundleParentQuantity={selectedBundleQuantity}
+                                pickupInStore={!!pickupInStoreMap[product?.id]}
+                                setPickupInStore={(checked) =>
+                                    product && handlePickupInStoreChange(product.id, checked)
+                                }
+                                onOpenStoreLocator={onOpenStoreLocator}
+                                showDeliveryOptions={STORE_LOCATOR_IS_ENABLED}
+                            />
+                            <InformationAccordion product={product} />
+                        </Island>
                     </Fragment>
                 )}
 
                 {/* Product Recommendations */}
                 <Stack spacing={16}>
                     {!isProductASet && (
+                        <Island hydrateOn={'visible'}>
+                            <RecommendedProducts
+                                title={
+                                    <FormattedMessage
+                                        defaultMessage="Complete the Set"
+                                        id="product_detail.recommended_products.title.complete_set"
+                                    />
+                                }
+                                recommender={EINSTEIN_RECOMMENDERS.PDP_COMPLETE_SET}
+                                products={[product]}
+                                mx={{base: -4, md: -8, lg: 0}}
+                                shouldFetch={() => product?.id}
+                            />
+                        </Island>
+                    )}
+                    <Island hydrateOn={'visible'}>
                         <RecommendedProducts
                             title={
                                 <FormattedMessage
-                                    defaultMessage="Complete the Set"
-                                    id="product_detail.recommended_products.title.complete_set"
+                                    defaultMessage="You might also like"
+                                    id="product_detail.recommended_products.title.might_also_like"
                                 />
                             }
-                            recommender={EINSTEIN_RECOMMENDERS.PDP_COMPLETE_SET}
+                            recommender={EINSTEIN_RECOMMENDERS.PDP_MIGHT_ALSO_LIKE}
                             products={[product]}
                             mx={{base: -4, md: -8, lg: 0}}
                             shouldFetch={() => product?.id}
                         />
-                    )}
-                    <RecommendedProducts
-                        title={
-                            <FormattedMessage
-                                defaultMessage="You might also like"
-                                id="product_detail.recommended_products.title.might_also_like"
-                            />
-                        }
-                        recommender={EINSTEIN_RECOMMENDERS.PDP_MIGHT_ALSO_LIKE}
-                        products={[product]}
-                        mx={{base: -4, md: -8, lg: 0}}
-                        shouldFetch={() => product?.id}
-                    />
+                    </Island>
 
-                    <RecommendedProducts
-                        // The Recently Viewed recommender doesn't use `products`, so instead we
-                        // provide a key to update the recommendations on navigation.
-                        key={location.key}
-                        title={
-                            <FormattedMessage
-                                defaultMessage="Recently Viewed"
-                                id="product_detail.recommended_products.title.recently_viewed"
-                            />
-                        }
-                        recommender={EINSTEIN_RECOMMENDERS.PDP_RECENTLY_VIEWED}
-                        mx={{base: -4, md: -8, lg: 0}}
-                    />
+                    <Island hydrateOn={'visible'}>
+                        <RecommendedProducts
+                            // The Recently Viewed recommender doesn't use `products`, so instead we
+                            // provide a key to update the recommendations on navigation.
+                            key={location.key}
+                            title={
+                                <FormattedMessage
+                                    defaultMessage="Recently Viewed"
+                                    id="product_detail.recommended_products.title.recently_viewed"
+                                />
+                            }
+                            recommender={EINSTEIN_RECOMMENDERS.PDP_RECENTLY_VIEWED}
+                            mx={{base: -4, md: -8, lg: 0}}
+                        />
+                    </Island>
                 </Stack>
             </Stack>
             {STORE_LOCATOR_IS_ENABLED && (
