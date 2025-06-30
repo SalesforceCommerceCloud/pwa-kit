@@ -200,6 +200,15 @@ const ProductList = (props) => {
         )
     }
 
+    // Create reusable StoreInventoryFilter component to avoid repetition
+    const storeInventoryFilterComponent = (
+        <StoreInventoryFilter
+            key="storeInventoryFilter"
+            toggleFilter={toggleFilter}
+            selectedFilters={productSearchResult?.selectedRefinements || {}}
+        />
+    )
+
     /**************** Error Handling ****************/
     const errorStatus = error?.response?.status
     switch (errorStatus) {
@@ -561,26 +570,10 @@ const ProductList = (props) => {
                                               category={category}
                                               onSelect={onClose}
                                           />,
-                                          STORE_LOCATOR_IS_ENABLED && (
-                                              <StoreInventoryFilter
-                                                  key="storeInventoryFilter"
-                                                  toggleFilter={toggleFilter}
-                                                  selectedFilters={
-                                                      productSearchResult?.selectedRefinements || {}
-                                                  }
-                                              />
-                                          )
+                                          STORE_LOCATOR_IS_ENABLED && storeInventoryFilterComponent
                                       ].filter(Boolean)
                                     : [
-                                          STORE_LOCATOR_IS_ENABLED && (
-                                              <StoreInventoryFilter
-                                                  key="storeInventoryFilter"
-                                                  toggleFilter={toggleFilter}
-                                                  selectedFilters={
-                                                      productSearchResult?.selectedRefinements || {}
-                                                  }
-                                              />
-                                          )
+                                          STORE_LOCATOR_IS_ENABLED && storeInventoryFilterComponent
                                       ].filter(Boolean)
                             }
                             isLoading={filtersLoading}
@@ -721,26 +714,10 @@ const ProductList = (props) => {
                                               category={category}
                                               onSelect={onClose}
                                           />,
-                                          STORE_LOCATOR_IS_ENABLED && (
-                                              <StoreInventoryFilter
-                                                  key="storeInventoryFilter"
-                                                  toggleFilter={toggleFilter}
-                                                  selectedFilters={
-                                                      productSearchResult?.selectedRefinements || {}
-                                                  }
-                                              />
-                                          )
+                                          STORE_LOCATOR_IS_ENABLED && storeInventoryFilterComponent
                                       ].filter(Boolean)
                                     : [
-                                          STORE_LOCATOR_IS_ENABLED && (
-                                              <StoreInventoryFilter
-                                                  key="storeInventoryFilter"
-                                                  toggleFilter={toggleFilter}
-                                                  selectedFilters={
-                                                      productSearchResult?.selectedRefinements || {}
-                                                  }
-                                              />
-                                          )
+                                          STORE_LOCATOR_IS_ENABLED && storeInventoryFilterComponent
                                       ].filter(Boolean)
                             }
                             excludedFilters={['cgid']}
