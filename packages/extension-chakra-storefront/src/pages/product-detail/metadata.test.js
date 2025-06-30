@@ -10,8 +10,8 @@ import {render} from '@testing-library/react'
 import Metadata from './metadata'
 
 jest.mock('../../components/seo', () => {
-    return function MockSeo(props) {
-        return <div data-testid="seo" data-props={JSON.stringify(props)} />
+    return function MockSeo({metaTags, ...props}) {
+        return <div data-testid="seo" data-props={JSON.stringify({metaTags, ...props})} />
     }
 })
 
