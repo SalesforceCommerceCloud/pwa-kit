@@ -2,7 +2,7 @@
 
 An Model Context Protocol (MCP) server that works together with IDEs with AI coding assistant ability to help PWA Storefront developers with their development.
 
-This MCP server should be run as a local MCP server installed by developers or run locally via npx (when it's available on npm in feature).
+Install and run this MCP server as a local MCP server or run locally via `npx` (when it's available on `npm` in feature).
 
 ## What is MCP?
 
