@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
-import {screen} from '@testing-library/react'
+import {screen, act} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import {ChakraProvider} from '@chakra-ui/react'
 import theme from '../../theme'
@@ -102,7 +102,11 @@ describe('The OfflineBoundary', () => {
             screen.getByRole('heading', {name: /you are currently offline/i})
         ).toBeInTheDocument()
 
-        await user.click(screen.getByRole('button', {name: /retry connection/i}))
+        const retryButton = screen.getByRole('button', {name: /retry connection/i})
+        await act(async () => {
+            await user.click(retryButton)
+        })
+
         expect(clearErrorSpy).toHaveBeenCalled()
 
         clearErrorSpy.mockRestore()
