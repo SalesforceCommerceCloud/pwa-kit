@@ -134,7 +134,7 @@ export default defineRecipe({
         signoutIcon: {
             marginRight: 3
         },
-        wishlistIcon: {
+        wishlistIconButton: {
             // More breathing room between the account and wishlist icons
             marginLeft: 2
         }

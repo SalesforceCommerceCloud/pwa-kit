@@ -325,17 +325,18 @@ const Header = ({
                             </Portal>
                         </Popover.Root>
                     )}
-                    {/*<IconButtonWithRegistration*/}
-                    {/*    aria-label={intl.formatMessage({*/}
-                    {/*        defaultMessage: 'Wishlist',*/}
-                    {/*        id: 'header.button.assistive_msg.wishlist'*/}
-                    {/*    })}*/}
-                    {/*    icon={<HeartIcon />}*/}
-                    {/*    variant="unstyled"*/}
-                    {/*    {...styles.iconButton}*/}
-                    {/*    {...styles.wishlistIcon}*/}
-                    {/*    onClick={onWishlistClick}*/}
-                    {/*/>*/}
+                    <IconButtonWithRegistration
+                        aria-label={intl.formatMessage({
+                            defaultMessage: 'Wishlist',
+                            id: 'header.button.assistive_msg.wishlist'
+                        })}
+                        variant="unstyled"
+                        css={{...styles.iconButton, ...styles.wishlistIconButton}}
+                        // uncomment when we fix wishlist
+                        // onClick={onWishlistClick}
+                    >
+                        <HeartIcon boxSize={6} />
+                    </IconButtonWithRegistration>
                     {isStoreLocatorEnabled && (
                         <IconButton
                             aria-label={intl.formatMessage({
