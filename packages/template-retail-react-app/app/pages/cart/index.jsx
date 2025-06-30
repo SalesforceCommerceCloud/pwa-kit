@@ -33,7 +33,7 @@ import ProductItem from '@salesforce/retail-react-app/app/components/product-ite
 import ProductViewModal from '@salesforce/retail-react-app/app/components/product-view-modal'
 import BundleProductViewModal from '@salesforce/retail-react-app/app/components/product-view-modal/bundle'
 import RecommendedProducts from '@salesforce/retail-react-app/app/components/recommended-products'
-import {StoreDisplay} from '@salesforce/retail-react-app/app/components/store-display'
+import StoreDisplay from '@salesforce/retail-react-app/app/components/store-display'
 
 // Hooks
 import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
@@ -596,9 +596,9 @@ const Cart = () => {
     }
     return (
         <Box background="gray.50" flex="1" data-testid="sf-cart-container">
-            <Helmet>
+            {/* <Helmet>
                 <title>Cart</title>
-            </Helmet>
+            </Helmet> */}
             <Container
                 maxWidth="container.xl"
                 px={[4, 6, 6, 4]}
@@ -616,64 +616,25 @@ const Cart = () => {
                                 <Stack spacing={4}>
                                     {/* Order Type Display */}
                                     {isBopisEnabled && (
-                                        <Box mb={4}>
-                                            <Text fontWeight={600} fontSize="lg">
-                                                {isPickupOrder ? (
+                                        <Box layerStyle="cardBordered" p={3}>
+                                            {isPickupOrder ? (
+                                                <Text fontWeight="bold">
                                                     <FormattedMessage
-                                                        defaultMessage="Pickup Order"
-                                                        id="cart.label.pickup_order"
+                                                        defaultMessage="Pickup in Store ({storeName})"
+                                                        id="cart.order_type.pickup_in_store"
+                                                        values={{
+                                                            storeName
+                                                        }}
                                                     />
-                                                ) : (
+                                                </Text>
+                                            ) : (
+                                                <Text fontWeight="bold">
                                                     <FormattedMessage
-                                                        defaultMessage="Delivery Order"
-                                                        id="cart.label.delivery_order"
+                                                        defaultMessage="Delivery"
+                                                        id="cart.order_type.delivery"
                                                     />
-                                                )}
-                                            </Text>
-                                        </Box>
-                                    )}
-
-                                    {/* Store Information for Pickup Orders */}
-                                    {isBopisEnabled && isPickupOrder && storeData?.data?.[0] && (
-                                        <Box mb={4} p={4} bg="blue.50" borderRadius="md">
-                                            <Text fontWeight={600} mb={2}>
-                                                <FormattedMessage
-                                                    defaultMessage="Pickup Location"
-                                                    id="cart.label.pickup_location"
-                                                />
-                                            </Text>
-                                            <StoreDisplay
-                                                store={storeData.data[0]}
-                                                showDistance={false}
-                                                showStoreHours={true}
-                                                showPhone={true}
-                                                showEmail={false}
-                                                nameStyle={{fontSize: 'md', fontWeight: '600'}}
-                                                textSize="sm"
-                                            />
-                                        </Box>
-                                    )}
-
-                                    {/* Delivery Information for Non-Pickup Orders */}
-                                    {isBopisEnabled && !isPickupOrder && basket?.shipments?.[0]?.shippingAddress && (
-                                        <Box mb={4} p={4} bg="gray.50" borderRadius="md">
-                                            <Text fontWeight={600} mb={2}>
-                                                <FormattedMessage
-                                                    defaultMessage="Delivery Address"
-                                                    id="cart.label.delivery_address"
-                                                />
-                                            </Text>
-                                            <Text fontSize="sm">
-                                                {basket.shipments[0].shippingAddress.address1}
-                                                {basket.shipments[0].shippingAddress.address2 && (
-                                                    <br />
-                                                )}
-                                                {basket.shipments[0].shippingAddress.address2}
-                                                <br />
-                                                {basket.shipments[0].shippingAddress.city},{' '}
-                                                {basket.shipments[0].shippingAddress.stateCode}{' '}
-                                                {basket.shipments[0].shippingAddress.postalCode}
-                                            </Text>
+                                                </Text>
+                                            )}
                                         </Box>
                                     )}
                                     {basket.productItems?.map((productItem, idx) => {
