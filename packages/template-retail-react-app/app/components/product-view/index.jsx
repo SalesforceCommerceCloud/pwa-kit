@@ -715,25 +715,56 @@ const ProductView = forwardRef(
 
                                         {STORE_LOCATOR_IS_ENABLED && (
                                             <>
-                                                {pickupInStore && storeName && inventoryId && (
-                                                    <Box
-                                                        p={3}
-                                                        bg="blue.50"
-                                                        border="1px solid"
-                                                        borderColor="blue.200"
-                                                        borderRadius="md"
-                                                        mb={4}
+                                                {storeName && inventoryId && (
+                                                    <Text
+                                                        color="black"
+                                                        fontWeight={600}
+                                                        mb={2}
+                                                        data-testid="store-stock-status-msg"
                                                     >
-                                                        <Text fontSize="sm" color="blue.800">
-                                                            <FormattedMessage
-                                                                defaultMessage="Pickup at {storeName}"
-                                                                id="product_view.label.pickup_at_store"
-                                                                values={{storeName}}
-                                                            />
-                                                        </Text>
-                                                    </Box>
+                                                        {!isSelectedStoreOutOfStock
+                                                            ? intl.formatMessage(
+                                                                  {
+                                                                      id: 'product_view.status.in_stock_at_store',
+                                                                      defaultMessage:
+                                                                          'In Stock at {storeName}'
+                                                                  },
+                                                                  {
+                                                                      storeName: (
+                                                                          <Link
+                                                                              as="button"
+                                                                              color="blue.600"
+                                                                              textDecoration="underline"
+                                                                              onClick={onOpenStoreLocator}
+                                                                          >
+                                                                              {storeName}
+                                                                          </Link>
+                                                                      )
+                                                                  }
+                                                              )
+                                                            : intl.formatMessage(
+                                                                  {
+                                                                      id: 'product_view.status.out_of_stock_at_store',
+                                                                      defaultMessage:
+                                                                          'Out of Stock at {storeName}'
+                                                                  },
+                                                                  {
+                                                                      storeName: (
+                                                                          <Link
+                                                                              as="button"
+                                                                              color="blue.600"
+                                                                              textDecoration="underline"
+                                                                              onClick={onOpenStoreLocator}
+                                                                          >
+                                                                              {storeName}
+                                                                          </Link>
+                                                                      )
+                                                                  }
+                                                              )}
+                                                    </Text>
                                                 )}
 
+                                                {/* Show label if pickup is disabled due to no store/inventoryId */}
                                                 {!pickupEnabled && !storeName && !inventoryId && (
                                                     <Text
                                                         color="black"

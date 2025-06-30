@@ -8,25 +8,12 @@
 import {useContext} from 'react'
 import {useStores} from '@salesforce/commerce-sdk-react'
 import {StoreLocatorContext} from '@salesforce/retail-react-app/app/contexts/store-locator-provider'
-import {STORE_LOCATOR_IS_ENABLED} from '@salesforce/retail-react-app/app/constants'
 
 /**
  * Custom hook to get the selected store from StoreLocatorContext and retrieve store details
  * @returns {Object} Object containing store data, loading state, and error state
  */
 export const useSelectedStore = () => {
-    // Only enable BOPIS functionality if the feature toggle is on
-    const isBopisEnabled = STORE_LOCATOR_IS_ENABLED
-    
-    if (!isBopisEnabled) {
-        return {
-            selectedStore: null,
-            hasSelectedStore: false,
-            isLoading: false,
-            error: null
-        }
-    }
-
     const context = useContext(StoreLocatorContext)
 
     if (!context) {
