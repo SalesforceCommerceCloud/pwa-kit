@@ -5,6 +5,7 @@
 - Updated 6 new languages [#2495](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2495)
 - Fix Einstein event tracking for `addToCart` event [#2558](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2558)
 - Update latest translations for all languages [#2616](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2616)
+- Added support for Buy Online Pick up In Store (BOPIS) [#2646](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2646)
 - Support standard product on PDP [#2518](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2518)
 - Removed the "Edit" button from product cards of Standard Products [#2581](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2581)
 - Support standard product as a child item in bundles [#2574](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2574)

@@ -173,10 +173,10 @@ export const AddToCartModal = () => {
                                                                 fontWeight="700"
                                                                 fontSize="sm"
                                                             >
-                                                                {product.name}{' '}
-                                                                {quantity > 1
-                                                                    ? `(${quantity})`
-                                                                    : ''}
+                                                                {(variant.name || product.name) +
+                                                                    (quantity > 1
+                                                                        ? ` (${quantity})`
+                                                                        : '')}
                                                             </Text>
                                                             {Object.keys(variationAttributeValues)
                                                                 .length > 0 && (
@@ -220,16 +220,23 @@ export const AddToCartModal = () => {
                                         selectedVariationAttributes: variant?.variationValues
                                     })?.images?.[0]
                                     const priceData = getPriceData(product, {quantity})
-                                    const variationAttributeValues = getDisplayVariationValues(
-                                        product.variationAttributes,
-                                        variant?.variationValues
-                                    )
+                                    const variationAttributeValues =
+                                        variant && product.variationAttributes
+                                            ? getDisplayVariationValues(
+                                                  product.variationAttributes,
+                                                  variant?.variationValues
+                                              )
+                                            : {}
 
                                     return (
                                         <Flex
-                                            key={variant?.productId || product.id}
+                                            key={
+                                                variant?.productId ||
+                                                product.productId ||
+                                                product.id
+                                            }
                                             justifyContent="space-between"
-                                            marginBottom={index < itemsAdded - 1 ? 0 : 4}
+                                            marginBottom={index < itemsAdded.length - 1 ? 0 : 4}
                                             paddingBottom={4}
                                             borderBottomWidth={{base: '1px', lg: '0px'}}
                                             borderColor="gray.200"

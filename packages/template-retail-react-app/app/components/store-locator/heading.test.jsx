@@ -6,12 +6,13 @@
  */
 
 import React from 'react'
-import {render, screen} from '@testing-library/react'
+import {screen} from '@testing-library/react'
 import {StoreLocatorHeading} from '@salesforce/retail-react-app/app/components/store-locator/heading'
+import {renderWithReactIntl} from '@salesforce/retail-react-app/app/utils/test-utils'
 
 describe('StoreLocatorHeading', () => {
     test('renders heading with correct text', () => {
-        render(<StoreLocatorHeading />)
+        renderWithReactIntl(<StoreLocatorHeading />)
 
         const heading = screen.getByText('Find a Store')
         expect(heading).toBeTruthy()

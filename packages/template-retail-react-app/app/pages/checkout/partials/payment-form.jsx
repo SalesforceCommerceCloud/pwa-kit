@@ -14,8 +14,7 @@ import {
     RadioGroup,
     Stack,
     Text,
-    Tooltip,
-    Heading
+    Tooltip
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
 import {LockIcon, PaypalIcon} from '@salesforce/retail-react-app/app/components/icons'

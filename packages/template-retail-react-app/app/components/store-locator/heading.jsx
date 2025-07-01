@@ -7,12 +7,18 @@
 
 import React from 'react'
 import {Heading} from '@chakra-ui/react'
+import {useIntl} from 'react-intl'
 
 export const StoreLocatorHeading = () => {
+    const intl = useIntl()
+
     return (
         <>
             <Heading fontSize="2xl" marginBottom={6}>
-                Find a Store
+                {intl.formatMessage({
+                    id: 'store_locator.title',
+                    defaultMessage: 'Find a Store'
+                })}
             </Heading>
         </>
     )

@@ -7,52 +7,27 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import {AccordionItem, AccordionButton, AccordionIcon, AccordionPanel, Box} from '@chakra-ui/react'
+import {AccordionItem, Box, Radio, HStack} from '@chakra-ui/react'
+import StoreDisplay from '@salesforce/retail-react-app/app/components/store-display'
 
-export const StoreLocatorListItem = ({store}) => {
+export const StoreLocatorListItem = ({store, radioProps}) => {
     return (
         <AccordionItem>
             <Box margin="10px">
-                {store.name && <Box fontSize="lg">{store.name}</Box>}
-                <Box fontSize="md" color="gray.600">
-                    {store.address1}
-                </Box>
-                <Box fontSize="md" color="gray.600">
-                    {store.city}, {store.stateCode ? store.stateCode : ''} {store.postalCode}
-                </Box>
-                {store.distance !== undefined && (
-                    <>
-                        <br />
-                        <Box fontSize="md" color="gray.600">
-                            {store.distance} {store.distanceUnit}
-                            {' away'}
-                        </Box>
-                    </>
-                )}
-                {store.phone && (
-                    <>
-                        <br />
-                        <Box fontSize="md" color="gray.600">
-                            {'Phone: '}
-                            {store.phone}
-                        </Box>
-                    </>
-                )}
-                {store.storeHours && (
-                    <>
-                        <AccordionButton color="blue.700" style={{marginTop: '10px'}}>
-                            <Box fontSize="lg">View More</Box>
-                            <AccordionIcon />
-                        </AccordionButton>
-                        <AccordionPanel mb={6} mt={4}>
-                            <div
-                                dangerouslySetInnerHTML={{
-                                    __html: store.storeHours
-                                }}
-                            />
-                        </AccordionPanel>
-                    </>
-                )}
+                <HStack align="flex-start" spacing={3}>
+                    <Radio {...radioProps} mt="1px" />
+                    <StoreDisplay
+                        store={store}
+                        showDistance={true}
+                        showStoreHours={true}
+                        showPhone={true}
+                        showEmail={false}
+                        nameStyle={{fontSize: 'lg'}}
+                        textSize="md"
+                        accordionButtonStyle={{style: {marginTop: '10px'}}}
+                        accordionPanelStyle={{mb: 6, mt: 4}}
+                    />
+                </HStack>
             </Box>
         </AccordionItem>
     )
@@ -69,5 +44,6 @@ StoreLocatorListItem.propTypes = {
         distanceUnit: PropTypes.string,
         phone: PropTypes.string,
         storeHours: PropTypes.string
-    }).isRequired
+    }).isRequired,
+    radioProps: PropTypes.object
 }
