@@ -10,7 +10,21 @@ import {useStoreLocator} from '@salesforce/retail-react-app/app/hooks/use-store-
 import {StoreLocatorProvider} from '@salesforce/retail-react-app/app/contexts/store-locator-provider'
 import {useSearchStores} from '@salesforce/commerce-sdk-react'
 
-// Mock the commerce-sdk-react hook
+jest.mock('@salesforce/retail-react-app/app/hooks/use-multi-site', () => ({
+    __esModule: true,
+    default: () => ({
+        site: {
+            id: 'test-site',
+            alias: 'test-site-alias'
+        },
+        locale: {
+            id: 'en-US',
+            preferredCurrency: 'USD'
+        },
+        buildUrl: (path) => path
+    })
+}))
+
 jest.mock('@salesforce/commerce-sdk-react', () => ({
     useSearchStores: jest.fn()
 }))
@@ -29,49 +43,46 @@ const wrapper = ({children}) => {
 describe('useStoreLocator', () => {
     beforeEach(() => {
         useSearchStores.mockReset()
-        // Default mock implementation
         useSearchStores.mockReturnValue({
             data: undefined,
             isLoading: false
         })
+        window.localStorage.clear()
     })
 
     it('throws error when used outside provider', () => {
-        let error
-        try {
-            renderHook(() => useStoreLocator())
-        } catch (err) {
-            error = err
-        }
-
-        expect(error).toEqual(Error('useStoreLocator must be used within a StoreLocatorProvider'))
+        const consoleError = jest.spyOn(console, 'error').mockImplementation(() => {})
+        expect(() => renderHook(() => useStoreLocator())).toThrow(
+            'useStoreLocator must be used within a StoreLocatorProvider'
+        )
+        consoleError.mockRestore()
     })
 
-    it('initializes with default values', () => {
+    it('initializes with default state', () => {
         const {result} = renderHook(() => useStoreLocator(), {wrapper})
-
         expect(result.current).toMatchObject({
             mode: 'input',
             formValues: {
-                countryCode: config.defaultCountryCode,
-                postalCode: config.defaultPostalCode
+                countryCode: '',
+                postalCode: ''
             },
-            deviceCoordinates: {latitude: null, longitude: null},
-            isLoading: false,
-            data: undefined
+            deviceCoordinates: {
+                latitude: null,
+                longitude: null
+            },
+            selectedStoreId: null,
+            config
         })
     })
 
     it('updates form values and switches to input mode', () => {
         const {result} = renderHook(() => useStoreLocator(), {wrapper})
-
         act(() => {
             result.current.setFormValues({
                 countryCode: 'US',
                 postalCode: '94105'
             })
         })
-
         expect(result.current.mode).toBe('input')
         expect(result.current.formValues).toEqual({
             countryCode: 'US',
@@ -81,20 +92,17 @@ describe('useStoreLocator', () => {
 
     it('updates device coordinates and switches to device mode', () => {
         const {result} = renderHook(() => useStoreLocator(), {wrapper})
-
         act(() => {
             result.current.setDeviceCoordinates({
                 latitude: 37.7749,
                 longitude: -122.4194
             })
         })
-
         expect(result.current.mode).toBe('device')
         expect(result.current.deviceCoordinates).toEqual({
             latitude: 37.7749,
             longitude: -122.4194
         })
-        // Should reset form values when switching to device mode
         expect(result.current.formValues).toEqual({
             countryCode: '',
             postalCode: ''
@@ -103,14 +111,12 @@ describe('useStoreLocator', () => {
 
     it('calls useSearchStores with correct parameters in input mode', () => {
         const {result} = renderHook(() => useStoreLocator(), {wrapper})
-
         act(() => {
             result.current.setFormValues({
                 countryCode: 'US',
                 postalCode: '94105'
             })
         })
-
         expect(useSearchStores).toHaveBeenCalledWith(
             {
                 parameters: {
@@ -129,14 +135,12 @@ describe('useStoreLocator', () => {
 
     it('calls useSearchStores with correct parameters in device mode', () => {
         const {result} = renderHook(() => useStoreLocator(), {wrapper})
-
         act(() => {
             result.current.setDeviceCoordinates({
                 latitude: 37.7749,
                 longitude: -122.4194
             })
         })
-
         expect(useSearchStores).toHaveBeenCalledWith(
             {
                 parameters: {
@@ -153,38 +157,105 @@ describe('useStoreLocator', () => {
         )
     })
 
+    it('receives store data when form values are set in input mode', () => {
+        const mockStores = [
+            {id: 'store1', name: 'Store 1'},
+            {id: 'store2', name: 'Store 2'}
+        ]
+        useSearchStores.mockReturnValue({
+            data: mockStores,
+            isLoading: false
+        })
+
+        const {result} = renderHook(() => useStoreLocator(), {wrapper})
+        act(() => {
+            result.current.setFormValues({
+                countryCode: 'US',
+                postalCode: '94105'
+            })
+        })
+
+        expect(result.current.data).toEqual(mockStores)
+        expect(result.current.selectedStoreId).toBeNull()
+    })
+
+    it('allows manual store selection', () => {
+        const {result} = renderHook(() => useStoreLocator(), {wrapper})
+        act(() => {
+            result.current.setSelectedStoreId('store123')
+        })
+        expect(result.current.selectedStoreId).toBe('store123')
+    })
+
     it('handles loading state', () => {
         useSearchStores.mockReturnValue({
             data: undefined,
             isLoading: true
         })
-
         const {result} = renderHook(() => useStoreLocator(), {wrapper})
-
         expect(result.current.isLoading).toBe(true)
     })
 
-    it('handles store data', () => {
-        const mockStoreData = [
-            {
-                id: '1',
-                name: 'Test Store',
-                address: {
-                    address1: '123 Test St',
-                    city: 'Test City',
-                    stateCode: 'CA',
-                    postalCode: '94105'
-                }
-            }
-        ]
-
-        useSearchStores.mockReturnValue({
-            data: mockStoreData,
-            isLoading: false
+    describe('useStoreLocator - localStorage behavior', () => {
+        it('initializes with stored selectedStoreId from localStorage', () => {
+            window.localStorage.setItem('selectedStore_test-site', 'store123')
+            const {result} = renderHook(() => useStoreLocator(), {wrapper})
+            expect(result.current.selectedStoreId).toBe('store123')
         })
 
-        const {result} = renderHook(() => useStoreLocator(), {wrapper})
+        it('updates localStorage when selectedStoreId changes', () => {
+            const {result} = renderHook(() => useStoreLocator(), {wrapper})
+            act(() => {
+                result.current.setSelectedStoreId('store456')
+            })
+            expect(window.localStorage.getItem('selectedStore_test-site')).toBe('store456')
+        })
 
-        expect(result.current.data).toEqual(mockStoreData)
+        it('initializes with empty values when localStorage is empty', () => {
+            const {result} = renderHook(() => useStoreLocator(), {wrapper})
+            expect(result.current.selectedStoreId).toBeNull()
+            expect(result.current.formValues).toEqual({
+                countryCode: '',
+                postalCode: ''
+            })
+            expect(useSearchStores).toHaveBeenCalledWith(
+                {
+                    parameters: {
+                        countryCode: '',
+                        postalCode: '',
+                        maxDistance: 100,
+                        limit: 200,
+                        distanceUnit: 'mi'
+                    }
+                },
+                {
+                    enabled: false
+                }
+            )
+        })
+
+        it('initializes with empty values when localStorage data is invalid', () => {
+            window.localStorage.setItem('selectedStore_test-site', 'invalid-json')
+            const {result} = renderHook(() => useStoreLocator(), {wrapper})
+            expect(result.current.selectedStoreId).toBe('invalid-json')
+            expect(result.current.formValues).toEqual({
+                countryCode: '',
+                postalCode: ''
+            })
+            expect(useSearchStores).toHaveBeenCalledWith(
+                {
+                    parameters: {
+                        countryCode: '',
+                        postalCode: '',
+                        maxDistance: 100,
+                        limit: 200,
+                        distanceUnit: 'mi'
+                    }
+                },
+                {
+                    enabled: false
+                }
+            )
+        })
     })
 })

@@ -74,7 +74,8 @@ import {
     THEME_COLOR,
     CAT_MENU_DEFAULT_NAV_SSR_DEPTH,
     CAT_MENU_DEFAULT_ROOT_CATEGORY,
-    DEFAULT_LOCALE
+    DEFAULT_LOCALE,
+    STORE_LOCATOR_IS_ENABLED
 } from '@salesforce/retail-react-app/app/constants'
 
 import Seo from '@salesforce/retail-react-app/app/components/seo'
@@ -354,10 +355,12 @@ const App = (props) => {
 
                         <Box id="app" display="flex" flexDirection="column" flex={1}>
                             <SkipNavLink zIndex="skipLink">Skip to Content</SkipNavLink>
-                            <StoreLocatorModal
-                                isOpen={isOpenStoreLocator}
-                                onClose={onCloseStoreLocator}
-                            />
+                            {STORE_LOCATOR_IS_ENABLED && (
+                                <StoreLocatorModal
+                                    isOpen={isOpenStoreLocator}
+                                    onClose={onCloseStoreLocator}
+                                />
+                            )}
                             <Box {...styles.headerWrapper}>
                                 {!isCheckout ? (
                                     <>

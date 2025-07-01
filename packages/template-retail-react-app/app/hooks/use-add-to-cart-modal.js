@@ -156,21 +156,23 @@ export const AddToCartModal = () => {
                                             >
                                                 {itemsAdded.map(({product, variant, quantity}) => {
                                                     const variationAttributeValues =
-                                                        getDisplayVariationValues(
-                                                            product.variationAttributes,
-                                                            variant.variationValues
-                                                        )
+                                                        variant && product.variationAttributes
+                                                            ? getDisplayVariationValues(
+                                                                  product.variationAttributes,
+                                                                  variant.variationValues
+                                                              )
+                                                            : {}
                                                     return (
-                                                        <Box key={variant.productId}>
+                                                        <Box key={variant?.productId || product.id}>
                                                             <Text
                                                                 color="gray.700"
                                                                 fontWeight="700"
                                                                 fontSize="sm"
                                                             >
-                                                                {product.name}{' '}
-                                                                {quantity > 1
-                                                                    ? `(${quantity})`
-                                                                    : ''}
+                                                                {(variant.name || product.name) +
+                                                                    (quantity > 1
+                                                                        ? ` (${quantity})`
+                                                                        : '')}
                                                             </Text>
                                                             <Box
                                                                 color="gray.600"
@@ -208,19 +210,26 @@ export const AddToCartModal = () => {
                                 itemsAdded.map(({product, variant, quantity}, index) => {
                                     const image = findImageGroupBy(product.imageGroups, {
                                         viewType: 'small',
-                                        selectedVariationAttributes: variant.variationValues
+                                        selectedVariationAttributes: variant?.variationValues
                                     })?.images?.[0]
                                     const priceData = getPriceData(product, {quantity})
-                                    const variationAttributeValues = getDisplayVariationValues(
-                                        product.variationAttributes,
-                                        variant.variationValues
-                                    )
+                                    const variationAttributeValues =
+                                        variant && product.variationAttributes
+                                            ? getDisplayVariationValues(
+                                                  product.variationAttributes,
+                                                  variant.variationValues
+                                              )
+                                            : {}
 
                                     return (
                                         <Flex
-                                            key={variant.productId}
+                                            key={
+                                                variant?.productId ||
+                                                product.productId ||
+                                                product.id
+                                            }
                                             justifyContent="space-between"
-                                            marginBottom={index < itemsAdded - 1 ? 0 : 4}
+                                            marginBottom={index < itemsAdded.length - 1 ? 0 : 4}
                                             paddingBottom={4}
                                             borderBottomWidth={{base: '1px', lg: '0px'}}
                                             borderColor="gray.200"
@@ -230,7 +239,7 @@ export const AddToCartModal = () => {
                                             <Flex gridGap="4">
                                                 <Box w="24" flex="none">
                                                     <AspectRatio ratio="1">
-                                                        <img src={image.link} alt={image.alt} />
+                                                        <img src={image?.link} alt={image?.alt} />
                                                     </AspectRatio>
                                                 </Box>
 

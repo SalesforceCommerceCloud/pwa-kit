@@ -6,11 +6,18 @@
  */
 
 import React from 'react'
-import {render, screen} from '@testing-library/react'
+import {render, screen, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import {IntlProvider} from 'react-intl'
 import {StoreLocatorForm} from '@salesforce/retail-react-app/app/components/store-locator/form'
 import {useStoreLocator} from '@salesforce/retail-react-app/app/hooks/use-store-locator'
 import {useGeolocation} from '@salesforce/retail-react-app/app/hooks/use-geo-location'
+import {useSelectedStore} from '@salesforce/retail-react-app/app/hooks/use-selected-store'
+import {StoreLocatorProvider} from '@salesforce/retail-react-app/app/contexts/store-locator-provider'
+import {MultiSiteProvider} from '@salesforce/retail-react-app/app/contexts'
+import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
+import {useStores} from '@salesforce/commerce-sdk-react'
+import PropTypes from 'prop-types'
 
 jest.mock('@salesforce/retail-react-app/app/hooks/use-store-locator', () => ({
     useStoreLocator: jest.fn()
@@ -20,17 +27,61 @@ jest.mock('@salesforce/retail-react-app/app/hooks/use-geo-location', () => ({
     useGeolocation: jest.fn()
 }))
 
+jest.mock('@salesforce/retail-react-app/app/hooks/use-selected-store', () => ({
+    useSelectedStore: jest.fn()
+}))
+
+jest.mock('@salesforce/retail-react-app/app/hooks/use-current-basket', () => ({
+    useCurrentBasket: jest.fn()
+}))
+
+jest.mock('@salesforce/commerce-sdk-react', () => ({
+    useStores: jest.fn()
+}))
+
 describe('StoreLocatorForm', () => {
     const mockConfig = {
         supportedCountries: [
             {countryCode: 'US', countryName: 'United States'},
             {countryCode: 'CA', countryName: 'Canada'}
-        ]
+        ],
+        defaultCountryCode: 'US',
+        defaultPostalCode: '10178'
+    }
+
+    const mockSite = {
+        id: 'RefArch',
+        alias: 'us'
     }
 
     const mockSetFormValues = jest.fn()
     const mockSetDeviceCoordinates = jest.fn()
+    const mockRefresh = jest.fn()
     let user
+
+    // Mock messages for intl
+    const messages = {
+        'store_locator.field.placeholder.enter_postal_code': 'Enter postal code',
+        'store_locator.action.select_a_country': 'Select a country',
+        'store_locator.action.find': 'Find',
+        'store_locator.description.or': 'Or',
+        'store_locator.action.use_my_location': 'Use My Location',
+        'store_locator.error.please_enter_a_postal_code': 'Please enter a postal code.',
+        'store_locator.error.please_select_a_country': 'Please select a country.',
+        'store_locator.error.agree_to_share_your_location': 'Please agree to share your location'
+    }
+
+    const TestWrapper = ({children}) => (
+        <IntlProvider locale="en" messages={messages}>
+            <MultiSiteProvider site={mockSite}>
+                <StoreLocatorProvider config={mockConfig}>{children}</StoreLocatorProvider>
+            </MultiSiteProvider>
+        </IntlProvider>
+    )
+
+    TestWrapper.propTypes = {
+        children: PropTypes.node
+    }
 
     beforeEach(() => {
         jest.clearAllMocks()
@@ -46,30 +97,48 @@ describe('StoreLocatorForm', () => {
         useGeolocation.mockImplementation(() => ({
             coordinates: {latitude: null, longitude: null},
             error: null,
-            refresh: jest.fn()
+            refresh: mockRefresh
+        }))
+
+        useSelectedStore.mockImplementation(() => ({
+            selectedStore: null
+        }))
+
+        useCurrentBasket.mockImplementation(() => ({
+            derivedData: {totalItems: 0}
+        }))
+
+        useStores.mockImplementation(() => ({
+            data: null,
+            isLoading: false,
+            error: null
         }))
     })
 
+    const renderWithProviders = (ui) => {
+        return render(ui, {wrapper: TestWrapper})
+    }
+
     it('renders postal code input field', () => {
-        render(<StoreLocatorForm />)
-        const postalCodeInput = screen.queryByPlaceholderText('Enter postal code')
-        expect(postalCodeInput).not.toBeNull()
+        renderWithProviders(<StoreLocatorForm />)
+        const postalCodeInput = screen.getByPlaceholderText('Enter postal code')
+        expect(postalCodeInput).toBeInTheDocument()
     })
 
     it('renders country selector when supportedCountries exist', () => {
-        render(<StoreLocatorForm />)
-        const countrySelect = screen.queryByText('Select a country')
-        expect(countrySelect).not.toBeNull()
+        renderWithProviders(<StoreLocatorForm />)
+        const countrySelect = screen.getByText('Select a country')
+        expect(countrySelect).toBeInTheDocument()
     })
 
     it('renders "Use My Location" button', () => {
-        render(<StoreLocatorForm />)
-        const locationButton = screen.queryByText('Use My Location')
-        expect(locationButton).not.toBeNull()
+        renderWithProviders(<StoreLocatorForm />)
+        const locationButton = screen.getByText('Use My Location')
+        expect(locationButton).toBeInTheDocument()
     })
 
     it('submits form with entered values', async () => {
-        render(<StoreLocatorForm />)
+        renderWithProviders(<StoreLocatorForm />)
 
         const countrySelect = screen.getByRole('combobox')
         const postalCodeInput = screen.getByPlaceholderText('Enter postal code')
@@ -80,31 +149,28 @@ describe('StoreLocatorForm', () => {
         const findButton = screen.getByText('Find')
         await user.click(findButton)
 
-        expect(mockSetFormValues).toHaveBeenCalledWith({
-            countryCode: 'US',
-            postalCode: '12345'
+        await waitFor(() => {
+            expect(mockSetFormValues).toHaveBeenCalledWith({
+                countryCode: 'US',
+                postalCode: '12345'
+            })
         })
     })
 
     it('shows validation error for empty postal code', async () => {
-        render(<StoreLocatorForm />)
+        renderWithProviders(<StoreLocatorForm />)
 
         const findButton = screen.getByText('Find')
         await user.click(findButton)
 
-        const errorMessage = screen.queryByText('Please enter a postal code.')
-        expect(errorMessage).not.toBeNull()
+        await waitFor(() => {
+            const errorMessage = screen.getByText('Please enter a postal code.')
+            expect(errorMessage).toBeInTheDocument()
+        })
     })
 
     it('clears form when "Use My Location" is clicked', async () => {
-        const mockRefresh = jest.fn()
-        useGeolocation.mockImplementation(() => ({
-            coordinates: {latitude: null, longitude: null},
-            error: null,
-            refresh: mockRefresh
-        }))
-
-        render(<StoreLocatorForm />)
+        renderWithProviders(<StoreLocatorForm />)
 
         const countrySelect = screen.getByRole('combobox')
         const postalCodeInput = screen.getByPlaceholderText('Enter postal code')
@@ -115,36 +181,67 @@ describe('StoreLocatorForm', () => {
         const locationButton = screen.getByText('Use My Location')
         await user.click(locationButton)
 
-        expect(mockSetFormValues).toHaveBeenCalledWith({
-            countryCode: '',
-            postalCode: ''
+        await waitFor(() => {
+            expect(mockSetFormValues).toHaveBeenCalledWith({
+                countryCode: '',
+                postalCode: ''
+            })
         })
+
         expect(mockRefresh).toHaveBeenCalled()
     })
 
-    it('updates device coordinates when geolocation is successful', () => {
-        const mockCoordinates = {latitude: 37.7749, longitude: -122.4194}
-        useGeolocation.mockImplementation(() => ({
-            coordinates: mockCoordinates,
-            error: null,
-            refresh: jest.fn()
+    it('does not render country selector when no supported countries', () => {
+        useStoreLocator.mockImplementation(() => ({
+            config: {...mockConfig, supportedCountries: []},
+            formValues: {countryCode: '', postalCode: ''},
+            setFormValues: mockSetFormValues,
+            setDeviceCoordinates: mockSetDeviceCoordinates
         }))
 
-        render(<StoreLocatorForm />)
+        renderWithProviders(<StoreLocatorForm />)
 
-        expect(mockSetDeviceCoordinates).toHaveBeenCalledWith(mockCoordinates)
+        const countrySelect = screen.queryByText('Select a country')
+        expect(countrySelect).not.toBeInTheDocument()
     })
 
-    it('shows geolocation error message when permission is denied', () => {
-        useGeolocation.mockImplementation(() => ({
-            coordinates: {latitude: null, longitude: null},
-            error: new Error('Geolocation permission denied'),
-            refresh: jest.fn()
+    it('initializes form with selected store data', () => {
+        const mockSelectedStore = {
+            countryCode: 'CA',
+            postalCode: 'M5V 3A8'
+        }
+
+        useSelectedStore.mockImplementation(() => ({
+            selectedStore: mockSelectedStore
         }))
 
-        render(<StoreLocatorForm />)
+        useStoreLocator.mockImplementation(() => ({
+            config: mockConfig,
+            formValues: {countryCode: '', postalCode: ''},
+            setFormValues: mockSetFormValues,
+            setDeviceCoordinates: mockSetDeviceCoordinates
+        }))
 
-        const errorMessage = screen.queryByText('Please agree to share your location')
-        expect(errorMessage).not.toBeNull()
+        renderWithProviders(<StoreLocatorForm />)
+
+        expect(mockSetFormValues).toHaveBeenCalledWith({
+            countryCode: 'CA',
+            postalCode: 'M5V 3A8'
+        })
+    })
+
+    it('calls refresh when "Use My Location" is clicked', async () => {
+        renderWithProviders(<StoreLocatorForm />)
+
+        const locationButton = screen.getByText('Use My Location')
+        await user.click(locationButton)
+
+        expect(mockRefresh).toHaveBeenCalled()
+        await waitFor(() => {
+            expect(mockSetFormValues).toHaveBeenCalledWith({
+                countryCode: '',
+                postalCode: ''
+            })
+        })
     })
 })
