@@ -5,6 +5,7 @@ on:
   push:
     branches:
       - develop
+      - W-18685522-reset-and-passwordless-integration-test
   # Run daily at 11 PM PST (7 AM UTC) to catch any missed syncs
   schedule:
     - cron: '0 7 * * *'
@@ -16,15 +17,6 @@ on:
         required: false
         default: false
         type: boolean
-      sync_strategy:
-        description: 'Sync strategy to use'
-        required: false
-        default: 'merge'
-        type: choice
-        options:
-          - merge
-          - rebase
-          - reset
 
 permissions:
   contents: write
@@ -75,31 +67,12 @@ jobs:
             exit 0
           fi
           
-          STRATEGY="${{ github.event.inputs.sync_strategy || 'merge' }}"
-          echo "🔄 Attempting to sync using strategy: $STRATEGY"
-          
           if [ "${{ github.event.inputs.force_sync }}" = "true" ]; then
             echo "🔧 Force sync requested. Resetting to develop..."
             git reset --hard origin/develop
             git push --force origin more-logins-e2e-test
             echo "⚠️  Force synced more-logins-e2e-test with develop (all conflicts overwritten)"
             echo "status=force-synced" >> $GITHUB_OUTPUT
-          elif [ "$STRATEGY" = "rebase" ]; then
-            if git rebase origin/develop; then
-              echo "✅ Successfully rebased more-logins-e2e-test onto develop"
-              git push --force-with-lease origin more-logins-e2e-test
-              echo "status=rebased" >> $GITHUB_OUTPUT
-            else
-              echo "❌ Rebase conflicts detected!"
-              git rebase --abort
-              echo "status=conflict" >> $GITHUB_OUTPUT
-              exit 1
-            fi
-          elif [ "$STRATEGY" = "reset" ]; then
-            git reset --hard origin/develop
-            git push --force origin more-logins-e2e-test
-            echo "✅ Reset more-logins-e2e-test to match develop"
-            echo "status=reset" >> $GITHUB_OUTPUT
           else
             # Default merge strategy
             if git merge origin/develop --no-edit; then
@@ -243,29 +216,3 @@ jobs:
           PROJECT: scaffold-pwa
           MESSAGE: "Auto-sync from develop - build ${{ github.run_id }} (${{ github.sha }})"
           FLAGS: --wait
-
-      - name: Get deployment URL
-        id: deployment-url
-        run: |
-          URL="https://scaffold-pwa-more-logins-e2e.mobify-storefront.com"
-          echo "url=${URL}" >> $GITHUB_OUTPUT
-          echo "🚀 Deployment URL: ${URL}"
-
-      - name: Wait for deployment to be ready
-        run: |
-          URL="${{ steps.deployment-url.outputs.url }}"
-          echo "⏳ Waiting for deployment to be ready at: $URL"
-          
-          for i in {1..30}; do
-            if curl -f -s "$URL" > /dev/null; then
-              echo "✅ Deployment is ready!"
-              exit 0
-            fi
-            echo "Attempt $i/30: Site not ready yet, waiting 30 seconds..."
-            sleep 30
-          done
-          
-          echo "❌ Deployment did not become ready within 15 minutes"
-          exit 1
-
-  # Removed notify job - no notifications needed 
