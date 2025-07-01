@@ -47,4 +47,37 @@
 - Copy the basic examples and modify gradually
 - Test frequently as you build
 - Ask for help when stuck - these are complex components!
-- Start with mock data before integrating real APIs 
+- Start with mock data before integrating real APIs
+
+## 📊 Data Structure: ProductHit
+
+All product components work with **ProductHit** objects from Salesforce Commerce Cloud's search API:
+
+```javascript
+// Basic ProductHit structure
+{
+  productId: '25686571M',
+  productName: 'Product Name',
+  price: 299.99,
+  hitType: 'master', // 'master', 'product', 'set', 'bundle'
+  image: {
+    alt: 'Product description',
+    link: 'https://example.com/image.jpg'
+  }
+}
+```
+
+### Hit Types
+- **`master`**: Product with variants (colors, sizes)
+- **`product`**: Simple product (single item)
+- **`set`**: Product set (multiple items sold together)
+- **`bundle`**: Product bundle (parent with child items)
+
+### Key Properties
+- `productId`: Unique identifier
+- `productName`: Display name
+- `price`: Current price
+- `image`: Primary product image
+- `imageGroups`: Multiple image sizes
+- `variants`: Product variations
+- `variationAttributes`: Available options (color, size, etc.) 
