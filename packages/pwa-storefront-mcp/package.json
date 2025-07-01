@@ -14,7 +14,7 @@
   ],
   "scripts": {
     "build": "cross-env NODE_ENV=production internal-lib-build build",
-    "build:watch": "nodemon --watch 'src/**' --ext 'tsx,ts' --exec  'npm run build'",
+    "build:watch": "nodemon --watch 'src/**' --ext 'js,ts' --exec  'npm run build'",
     "format": "pwa-kit-dev format \"**/*.{js,jsx}\"",
     "lint": "npm run lint:js",
     "lint:fix": "npm run lint:js -- --fix",
@@ -23,7 +23,7 @@
     "test": "internal-lib-build test",
     "test:inspect": "node --inspect-brk jest --runInBand",
     "test:watch": "npm test -- --watch",
-    "start": "babel-node --extensions \".js,.ts\" src/server/server.js"
+    "start": "node dist/server/server.js"
   },
   "keywords": [
     "mcp",
@@ -40,7 +40,6 @@
   "dependencies": {
     "@babel/runtime": "^7.21.0",
     "@modelcontextprotocol/sdk": "^1.13.2",
-    "node-pty": "1.0.0",
     "zod": "^3.25.56"
   },
   "devDependencies": {

@@ -460,8 +460,13 @@ const getAnswersFromStdin = async () => {
 /**
  * Prints the contents of program.json in a nicely formatted way and exits the process.
  */
-const printProgramJsonAndExit = () => {
-    console.log(JSON.stringify(PROGRAM, null, 2))
+const printProgramJsonAndExit = async () => {
+    const output = JSON.stringify(PROGRAM, null, 2)
+    await new Promise((resolve) => {
+        process.stdout.write(output + '\n', () => {
+            resolve()
+        })
+    })
     process.exit(0)
 }
 
@@ -490,7 +495,7 @@ const main = async (opts) => {
 
     // Exit if the preset provided is not valid.
     if (displayProgram) {
-        printProgramJsonAndExit()
+        await printProgramJsonAndExit()
     }
 
     // Exit if the preset provided is not valid.
