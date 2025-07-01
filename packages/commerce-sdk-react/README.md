@@ -1,6 +1,6 @@
 :loudspeaker: Hey there, Salesforce Commerce Cloud community!
 
-We’re excited to hear your thoughts on your developer experience with PWA Kit and the Composable Storefront generally! Your feedback is incredibly valuable in helping us guide our roadmap and improve our offering.
+We're excited to hear your thoughts on your developer experience with PWA Kit and the Composable Storefront generally! Your feedback is incredibly valuable in helping us guide our roadmap and improve our offering.
 
 :clipboard: Take our quick survey here: [Survey](https://forms.gle/bUZNxQ3QKUcrjhV18) 
 
@@ -483,6 +483,109 @@ useEncUserId() => {encUserId: String, getEncUserIdWhenReady: Promise}
 useUsid() => {usid: String, getUsidWhenReady: Promise}
 ```
 
+## Advanced: Customizing SDK Clients with `transformSDKClient`
+
+To support advanced use cases, such as integrating with older templates or customizing API client behavior, `commerce-sdk-react` provides a utility called `transformSDKClient`. This utility wraps any Commerce SDK client instance in a JavaScript Proxy, enabling you to intercept and transform method arguments, headers, parameters, and other options before each SDK call is made.
+
+This is especially useful for:
+-   Adapting SDK clients for legacy or custom templates.
+-   Removing references to unused SDK clients.
+
+### How It Works
+
+`transformSDKClient` takes an SDK client instance and a configuration object. The configuration can include:
+-   `props`: Arbitrary props you want to pass to your transformer.
+-   `transformer`: A function that receives the props, method name, and options, and returns the transformed options.
+-   `onError`: (Optional) A function to handle errors thrown by SDK methods.
+
+Every method call on the proxied client passes through your transformer before being executed.
+
+#### Example: Passing Custom SDK Clients to the Provider
+
+You can use this utility to pass in your own SDK clients to the `CommerceApiProvider` via the `apiClients` prop, and apply custom transformations globally.
+
+```js
+import {CommerceApiProvider} from '@salesforce/commerce-sdk-react'
+import {ShopperProducts} from 'commerce-sdk-isomorphic'
+
+// Create your SDK client instances as usual
+const myShopperProductsClient = new ShopperProducts({
+    // ...your config
+})
+
+// Pass your client(s) in the apiClients prop
+const apiClients = {
+    shopperProducts: myShopperProductsClient
+    // ...add other clients as needed
+}
+
+const App = ({children}) => (
+    <CommerceApiProvider
+        // ...other required props
+        apiClients={apiClients}
+        // You can also pass custom headers, fetchOptions, etc.
+    >
+        {children}
+    </CommerceApiProvider>
+)
+```
+
+> **Note:** The `CommerceApiProvider` will automatically wrap each client in `apiClients` with `transformSDKClient`, using a default transformer that injects headers and fetch options from the provider props. You must use props passed to `CommerceApiProvider` for setting custom headers and fetch options. `transformSDKClient` merges headers and options passed in as props with the default values.
+
+### API Reference
+
+```ts
+transformSDKClient<T>(
+    client: T,
+    config: {
+        props?: any,
+        transformer?: (props, methodName: string, options: any) => any,
+        onError?: (methodName: string, error: any, options: any) => void
+    }
+): T
+```
+
+- **client**: The SDK client instance to wrap.
+- **config**:
+  - **props**: Any extra data you want to pass to your transformer.
+  - **transformer**: Function to transform method arguments before each SDK call.
+  - **onError**: (Optional) Function to handle errors from SDK methods.
+
+
+> **Note:** If you choose to pass the `apiClients` prop, you are responsible for providing all SDK clients you intend to use in your application. Any hooks or features that rely on a missing client will throw an error at runtime. This allows for customization, but requires you to explicitly include each client you need.
+
+### Handling Missing SDK Clients
+
+With the introduction of the optional `apiClients` prop and support for custom SDK client injection, `commerce-sdk-react` now provides robust error handling for missing clients. If you attempt to use a query or mutation hook for a client that was not initialized or passed to the `CommerceApiProvider`, a clear error will be thrown.
+
+For example, if you call a hook like `useShopperProducts` but did not provide a `shopperProducts` client in your `apiClients` prop, you will see an error message similar to this error.
+
+```text
+Missing required client: shopperProducts. Please initialize shopperProducts class and provide it in CommerceApiProvider's apiClients prop.
+```
+
+This ensures that your application fails fast and provides actionable feedback, making it easier to debug configuration issues—especially when integrating with older templates or customizing your SDK client setup.
+
+### Disabling Automatic Auth Initialization
+
+By default, `CommerceApiProvider` automatically initializes authentication by calling `auth.ready()` as soon as the provider renders. This is the standard and recommended behavior for most applications.
+
+**New in v3.4.0:** You can now optionally disable this automatic initialization by passing the `disableAuthInit` prop:
+
+```jsx
+<CommerceApiProvider
+    // ...other required props
+    disableAuthInit={true}
+>
+    {children}
+</CommerceApiProvider>
+```
+
+- **Default:** `disableAuthInit` is `false` (auth is initialized automatically).
+- **When to use:** Set `disableAuthInit` to `true` if you are initializing authentication outside of the provider (for example, in legacy PWA Kit templates or when using SSR with `getProps`). This prevents duplicate initialization and potential issues with tokens or customer information.
+
+> **Note:** For most modern PWA Kit and React Query-based apps, you do **not** need to set this prop.
+
 ## Roadmap
 
 -   Optimistic update support
@@ -501,3 +604,4 @@ useUsid() => {usid: String, getUsidWhenReady: Promise}
 -   [Routing](https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/routing.html)
 -   [Phased Headless Rollouts](https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/phased-headless-rollouts.html)
 -   [Launch Your Storefront](https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/launching-your-storefront.html)
+

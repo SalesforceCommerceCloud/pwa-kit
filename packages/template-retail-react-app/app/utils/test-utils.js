@@ -161,9 +161,7 @@ export const TestProviders = ({
                             <StoreLocatorProvider config={storeLocatorConfig}>
                                 <Router>
                                     <ChakraProvider theme={theme}>
-                                        <AddToCartModalProvider>
-                                            {children}
-                                        </AddToCartModalProvider>
+                                        <AddToCartModalProvider>{children}</AddToCartModalProvider>
                                     </ChakraProvider>
                                 </Router>
                             </StoreLocatorProvider>

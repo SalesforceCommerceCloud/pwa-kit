@@ -117,9 +117,9 @@ describe('Storefront Preview Component', function () {
         const parameters = {basketId: '123'}
         const MockedComponent = ({enableStorefrontPreview}: {enableStorefrontPreview: boolean}) => {
             const apiClients = useCommerceApi()
-            getBasketSpy = jest.spyOn(apiClients.shopperBaskets, 'getBasket')
+            getBasketSpy = jest.spyOn(apiClients.shopperBaskets!, 'getBasket')
             useEffect(() => {
-                void apiClients.shopperBaskets.getBasket({parameters})
+                void apiClients.shopperBaskets!.getBasket({parameters})
             }, [])
             return (
                 <StorefrontPreview enabled={enableStorefrontPreview} getToken={() => 'my-token'} />

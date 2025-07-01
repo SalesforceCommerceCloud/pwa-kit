@@ -1,14 +1,19 @@
 ## v7.0.0-dev.0 (May 20, 2025)
 
 - Improved the layout of product tiles in product scroll and product list [#2446](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2446)
-- Updated 6 new languagues [#2495](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2495)
+- [a11y] Ensure voiceover announces contents of the email confirmation modal [#2540](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2540)
+- Updated 6 new languages [#2495](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2495)
+- Fix Einstein event tracking for `addToCart` event [#2558](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2558)
+- Update latest translations for all languages [#2616](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2616)
+- Load active data scripts on demand only [#2623](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2623)
+- Provide base image for convenient perf optimizations [#2642](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2642)
 - Show Bonus Products on Cart Page [#2547](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2547)
 
 ## v6.1.0 (May 22, 2025)
 
 - Fix hreflang alternate links [#2269](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2269)
 - PDP / PLP: Add page meta data tags that have been defined in BM [#2232](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2232)
-- Send PWA Kit events to Data Cloud [#318] (https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2229)
+- Send PWA Kit events to Data Cloud [#2318](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2318)
 - Fix dependencies vulnerabilities [#2338](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2338)
 - Fix accessibility issues [#2375](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2375)
 - Update cc-datacloud-typescript package to use a fixed lock version [#2392](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2392)

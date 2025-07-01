@@ -6,20 +6,22 @@
  */
 import React, {useMemo} from 'react'
 import PropTypes from 'prop-types'
-import {Img, Box, useTheme} from '@salesforce/retail-react-app/app/components/shared/ui'
+import {Box, useTheme} from '@salesforce/retail-react-app/app/components/shared/ui'
+import Image from '@salesforce/retail-react-app/app/components/image'
 import {getResponsiveImageAttributes} from '@salesforce/retail-react-app/app/utils/responsive-image'
 
 /**
- * Quickly create a responsive image using your dynamic image service
+ * Quickly create a responsive image using your Dynamic Imaging Service
  * @example
  *  // Widths without a unit are interpreted as px values
  * <DynamicImage src="http://example.com/image.jpg[?sw={width}&q=60]" widths={[100, 360, 720]} />
  * <DynamicImage src="http://example.com/image.jpg[?sw={width}&q=60]" widths={{base: 100, sm: 360, md: 720}} />
  * // You can also use units of px or vw
  * <DynamicImage src="http://example.com/image.jpg[?sw={width}&q=60]" widths={['50vw', '100vw', '500px']} />
+ * @see {@link https://help.salesforce.com/s/articleView?id=cc.b2c_image_transformation_service.htm&type=5}
  */
 const DynamicImage = ({src, widths, imageProps, as, ...rest}) => {
-    const Component = as ? as : Img
+    const Component = as ? as : Image
     const theme = useTheme()
 
     const responsiveImageProps = useMemo(

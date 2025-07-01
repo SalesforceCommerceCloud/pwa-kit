@@ -72,4 +72,20 @@ describe('provider', () => {
         expect(element).toBeInTheDocument()
         expect(element.textContent?.includes('/mobify/slas/private')).toBeTruthy()
     })
+
+    test('does not call Auth.ready() when disableAuthInit is true', () => {
+        renderWithProviders(<h1>Auth not initialized!</h1>, {disableAuthInit: true})
+        expect(screen.getByText('Auth not initialized!')).toBeInTheDocument()
+        expect(Auth).toHaveBeenCalledTimes(1)
+        const authInstance = (Auth as jest.Mock).mock.instances[0]
+        expect(authInstance.ready).toHaveBeenCalledTimes(0)
+    })
+
+    test('calls Auth.ready() when disableAuthInit is false', () => {
+        renderWithProviders(<h1>Auth initialized!</h1>, {disableAuthInit: false})
+        expect(screen.getByText('Auth initialized!')).toBeInTheDocument()
+        expect(Auth).toHaveBeenCalledTimes(1)
+        const authInstance = (Auth as jest.Mock).mock.instances[0]
+        expect(authInstance.ready).toHaveBeenCalledTimes(1)
+    })
 })

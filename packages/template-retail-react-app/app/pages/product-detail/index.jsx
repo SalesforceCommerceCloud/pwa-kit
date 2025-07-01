@@ -304,7 +304,15 @@ const ProductDetail = () => {
 
             await addItemToNewOrExistingBasket(productItems)
 
-            einstein.sendAddToCart(productItems)
+            const productItemsForEinstein = productSelectionValues.map(
+                ({product, variant, quantity}) => ({
+                    product,
+                    productId: variant.productId,
+                    price: variant.price,
+                    quantity
+                })
+            )
+            einstein.sendAddToCart(productItemsForEinstein)
 
             // If the items were successfully added, set the return value to be used
             // by the add to cart modal.
