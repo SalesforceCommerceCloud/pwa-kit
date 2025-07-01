@@ -162,7 +162,7 @@ const App = (props) => {
 
     // Fetch the translation message data using the target locale.
     const {data: messages} = useQuery({
-        queryKey: ['app', 'translations', 'messages', targetLocale],
+        queryKey: ['static', 'translations', 'messages', targetLocale],
         queryFn: () => {
             if (is404ForMissingTranslationFile) {
                 // Return early to prevent an infinite loop
@@ -305,7 +305,7 @@ const App = (props) => {
                     locale={targetLocale}
                     messages={messages}
                     // For react-intl, the _default locale_ refers to the locale that the inline `defaultMessage`s are written for.
-                    // NOTE: if you update this value, please also update the following npm scripts in `template-retail-react-app/package.json`:
+                    // NOTE: if you update this value, please also update the following npm scripts in `template-chakra-storefront/package.json`:
                     // - "extract-default-translations"
                     // - "compile-translations:pseudo"
                     defaultLocale={appConfig.defaultAppLocale}

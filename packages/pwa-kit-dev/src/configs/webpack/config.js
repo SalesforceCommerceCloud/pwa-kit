@@ -92,9 +92,9 @@ const entryPointExists = (segments) => {
     return false
 }
 
-const getAppEntryPoint = () => './app/main'
+const getAppEntryPoint = () => './src/main'
 
-const getServerEntryPoint = () => './app/ssr.js'
+const getServerEntryPoint = () => './src/ssr.js'
 
 const getPublicPathEntryPoint = () => {
     return resolve(
@@ -356,7 +356,7 @@ const enableReactRefresh = (config) => {
 }
 
 const client =
-    entryPointExists(['app', 'main']) &&
+    entryPointExists(['src', 'main']) &&
     baseConfig('web')
         .extend(withChunking)
         .extend((config) => {
@@ -377,7 +377,7 @@ const client =
                     new LoadablePlugin({writeToDisk: true}),
                     analyzeBundle && getBundleAnalyzerPlugin(CLIENT)
                 ].filter(Boolean),
-                // Hide the performance hints, since we already have a similar `bundlesize` check in `template-retail-react-app` package
+                // Hide the performance hints, since we already have a similar `bundlesize` check in `template-chakra-storefront` package
                 performance: {
                     hints: false
                 }
@@ -396,7 +396,7 @@ const clientOptional = baseConfig('web')
             ...config,
             name: CLIENT_OPTIONAL,
             entry: {
-                ...optional('loader', resolve(projectDir, 'app', 'loader.js')),
+                ...optional('loader', resolve(projectDir, 'src', 'loader.js')),
                 ...optional('worker', resolve(projectDir, 'worker', 'main.js')),
                 ...optional('fetch-polyfill', resolve(projectDir, 'node_modules', 'whatwg-fetch'))
             },
@@ -482,13 +482,13 @@ const ssr = (() => {
 })()
 
 const requestProcessor =
-    entryPointExists(['app', 'request-processor']) &&
+    entryPointExists(['src', 'request-processor']) &&
     baseConfig('node')
         .extend((config) => {
             return {
                 ...config,
                 name: REQUEST_PROCESSOR,
-                entry: './app/request-processor.js',
+                entry: './src/request-processor.js',
                 output: {
                     path: buildDir,
                     filename: 'request-processor.js',

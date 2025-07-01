@@ -1,4 +1,5 @@
 ## 4.0.0-extensibility-preview.5
+- Migrate directory structure from `app/*` to `src/*` [#2693](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2693)
 - Deprecate V3 Extensibility and experimental V4 Extensibility (#2573)
 - Move extensibility logic to generator (#2573)
 - Apply prettier to trimmed files (#2688)

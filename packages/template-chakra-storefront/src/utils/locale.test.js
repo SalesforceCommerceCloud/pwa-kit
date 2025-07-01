@@ -19,7 +19,7 @@ jest.mock('cross-fetch', () => {
         }
 
         const locale = matched[1]
-        const json = await import(`../../static/translations/compiled/${locale}.json`)
+        const json = await import(`../static/translations/compiled/${locale}.json`)
 
         return {
             ok: true,

@@ -48,7 +48,7 @@ npm install @salesforce/commerce-sdk-react @tanstack/react-query
 To integrate this library with your PWA Kit application you can use the `CommerceApiProvider` directly assuming that you use the `withReactQuery` higher order component to wrap your `AppConfig` component. Below is a snippet of how this is accomplished.
 
 ```jsx
-// app/components/_app-config/index.jsx
+// src/components/_app-config/index.jsx
 
 import {CommerceApiProvider} from '@salesforce/commerce-sdk-react'
 import {withReactQuery} from '@salesforce/pwa-kit-react-sdk/ssr/universal/components/with-react-query'

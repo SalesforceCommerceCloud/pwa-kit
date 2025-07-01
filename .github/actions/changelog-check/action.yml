@@ -64,7 +64,7 @@ runs:
         fi
         echo "Changed files: $CHANGED_FILES"
         
-        PUBLIC_PACKAGES=("commerce-sdk-react" "pwa-kit-create-app" "pwa-kit-dev" "pwa-kit-react-sdk" "pwa-kit-runtime" "template-retail-react-app")
+        PUBLIC_PACKAGES=("commerce-sdk-react" "pwa-kit-create-app" "pwa-kit-dev" "pwa-kit-react-sdk" "pwa-kit-runtime")
 
         for PACKAGE in "${PUBLIC_PACKAGES[@]}"; do
           if echo "$CHANGED_FILES" | grep -iq "^packages/$PACKAGE/"; then

@@ -15,7 +15,7 @@ import {IntlProvider} from 'react-intl'
 import mockProductDetail from '../../mocks/variant-750518699578M'
 import {useProductViewModal} from './use-product-view-modal'
 import {DEFAULT_LOCALE, renderWithProviders} from '../utils/test-utils'
-import messages from '../../static/translations/compiled/en-GB.json'
+import messages from '../static/translations/compiled/en-GB.json'
 import {rest} from 'msw'
 
 jest.mock('@salesforce/commerce-sdk-react', () => {
