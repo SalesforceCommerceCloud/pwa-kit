@@ -1,0 +1,398 @@
+---
+description: Product list component requirement template 
+globs: "**/components/**"
+type: agent-requested
+alwaysApply: false
+---
+# Product List Component
+
+## Data Model
+- Array of Products (single items)
+- Array of Product Bundles (parent with child items; only parent can be added to cart)
+- Array of Product Sets (logical groups; all items added to cart together, no parent/child)
+- Mixed array (products, bundles, and sets together)
+
+## Features/Props
+- Grid/List view toggle
+- Sorting options (price, name, rating, newest, popularity)
+- Filtering (category, price range, rating, availability)
+- Pagination or infinite scroll
+- Search functionality
+- Loading states and skeletons
+- Empty state handling
+- Product count display
+- View mode persistence
+- Responsive grid/list layouts
+- Bulk actions (add multiple to cart, wishlist)
+
+## Look & Feel
+- Theme
+- Skeleton
+- Style (grid/list view options)
+- Responsive design
+- Loading animations
+- Empty state design
+
+## Example Requirement Object
+```js
+const requirement = {
+  dataModel: 'Product[]' | 'ProductBundle[]' | 'ProductSet[]' | 'Mixed[]',
+  features: ['Grid/List Toggle', 'Sorting', 'Filtering', 'Pagination', 'Search', 'Loading States', 'Empty State', 'Product Count', 'View Persistence', 'Responsive Layout', 'Bulk Actions'],
+  lookAndFeel: ['Theme', 'Skeleton', 'Style', 'Responsive', 'Loading Animations', 'Empty State Design']
+}
+```
+
+## Example Usage
+```jsx
+<ProductList 
+  products={products}
+  onAddToCart={onAddToCart}
+  onWishlistToggle={onWishlistToggle}
+  onQuickView={onQuickView}
+  viewMode="grid"
+  sortBy="price"
+  filters={filters}
+  onLoadMore={onLoadMore}
+/>
+```
+
+## Best Practices
+- Support both grid and list view modes with smooth transitions.
+- Implement proper sorting with clear visual indicators.
+- Provide comprehensive filtering with clear active filter display.
+- Use infinite scroll or pagination based on performance requirements.
+- Show loading skeletons for better perceived performance.
+- Handle empty states gracefully with helpful messaging.
+- Display product count and current view information.
+- Persist user preferences (view mode, sort order, filters).
+- Ensure responsive design works on all screen sizes.
+- Implement proper accessibility (keyboard navigation, screen readers).
+- Use virtualization for large product lists to improve performance.
+- Validate all props and document requirements.
+
+## Bad Practices
+- No view mode toggle or poor transitions between modes.
+- Limited sorting options or unclear sort indicators.
+- No filtering capabilities or poor filter UX.
+- No pagination/infinite scroll for large lists.
+- No loading states (poor perceived performance).
+- Poor empty state handling (no helpful messaging).
+- No product count or view information.
+- Not persisting user preferences.
+- Non-responsive design (breaks on mobile).
+- Ignoring accessibility (no keyboard support, missing ARIA labels).
+- Loading all products at once (no virtualization for large lists).
+- Not validating props or documenting requirements.
+
+## Example Component Skeleton
+```jsx
+/*
+Requirement:
+{
+  dataModel: 'Product[]' | 'ProductBundle[]' | 'ProductSet[]' | 'Mixed[]',
+  features: ['Grid/List Toggle', 'Sorting', 'Filtering', 'Pagination', 'Search', 'Loading States', 'Empty State', 'Product Count', 'View Persistence', 'Responsive Layout', 'Bulk Actions'],
+  lookAndFeel: ['Theme', 'Skeleton', 'Style', 'Responsive', 'Loading Animations', 'Empty State Design']
+}
+*/
+
+import React, {useState, useEffect, useMemo} from 'react'
+import PropTypes from 'prop-types'
+import {Box, Text, Button, Skeleton, useTheme, Select, HStack, VStack, Grid, Flex, Spinner} from '@salesforce/retail-react-app/app/components/shared/ui'
+import {Grid as GridIcon, List as ListIcon, Filter, Search} from '@salesforce/retail-react-app/app/components/shared/icons'
+import ProductTile from './ProductTile'
+// import ProductListTile from './ProductListTile'
+// import ProductFilters from './ProductFilters'
+// import ProductSearch from './ProductSearch'
+
+const ProductList = ({
+  products = [],
+  onAddToCart,
+  onWishlistToggle,
+  onQuickView,
+  viewMode: initialViewMode = 'grid',
+  sortBy: initialSortBy = 'name',
+  filters = {},
+  onLoadMore,
+  isLoading = false,
+  hasMore = false,
+  showFilters = true,
+  showSearch = true,
+  showSort = true,
+  showViewToggle = true,
+  itemsPerPage = 12
+}) => {
+  const [viewMode, setViewMode] = useState(initialViewMode)
+  const [sortBy, setSortBy] = useState(initialSortBy)
+  const [currentFilters, setCurrentFilters] = useState(filters)
+  const [searchQuery, setSearchQuery] = useState('')
+  const [currentPage, setCurrentPage] = useState(1)
+  const theme = useTheme()
+
+  // Persist view mode preference
+  useEffect(() => {
+    localStorage.setItem('productListViewMode', viewMode)
+  }, [viewMode])
+
+  // Load view mode preference
+  useEffect(() => {
+    const savedViewMode = localStorage.getItem('productListViewMode')
+    if (savedViewMode) setViewMode(savedViewMode)
+  }, [])
+
+  // Sort and filter products
+  const processedProducts = useMemo(() => {
+    let filtered = products.filter(product => {
+      // Search filter
+      if (searchQuery && !product.name.toLowerCase().includes(searchQuery.toLowerCase())) {
+        return false
+      }
+      
+      // Apply other filters (category, price range, etc.)
+      if (currentFilters.category && product.category !== currentFilters.category) {
+        return false
+      }
+      if (currentFilters.minPrice && product.price < currentFilters.minPrice) {
+        return false
+      }
+      if (currentFilters.maxPrice && product.price > currentFilters.maxPrice) {
+        return false
+      }
+      if (currentFilters.inStock && product.stock === 0) {
+        return false
+      }
+      
+      return true
+    })
+
+    // Sort products
+    filtered.sort((a, b) => {
+      switch (sortBy) {
+        case 'price':
+          return a.price - b.price
+        case 'price-desc':
+          return b.price - a.price
+        case 'name':
+          return a.name.localeCompare(b.name)
+        case 'rating':
+          return (b.rating || 0) - (a.rating || 0)
+        case 'newest':
+          return new Date(b.createdAt) - new Date(a.createdAt)
+        case 'popularity':
+          return (b.salesCount || 0) - (a.salesCount || 0)
+        default:
+          return 0
+      }
+    })
+
+    return filtered
+  }, [products, searchQuery, currentFilters, sortBy])
+
+  // Paginate products
+  const paginatedProducts = useMemo(() => {
+    const startIndex = (currentPage - 1) * itemsPerPage
+    return processedProducts.slice(startIndex, startIndex + itemsPerPage)
+  }, [processedProducts, currentPage, itemsPerPage])
+
+  const handleLoadMore = () => {
+    if (hasMore && onLoadMore) {
+      onLoadMore()
+    } else {
+      setCurrentPage(prev => prev + 1)
+    }
+  }
+
+  const handleFilterChange = (newFilters) => {
+    setCurrentFilters(newFilters)
+    setCurrentPage(1) // Reset to first page when filters change
+  }
+
+  const renderEmptyState = () => (
+    <Box textAlign="center" py={10}>
+      <Text fontSize="xl" fontWeight="bold" mb={2}>
+        No products found
+      </Text>
+      <Text color="gray.600" mb={4}>
+        Try adjusting your search or filters to find what you're looking for.
+      </Text>
+      <Button onClick={() => {
+        setSearchQuery('')
+        setCurrentFilters({})
+        setCurrentPage(1)
+      }}>
+        Clear Filters
+      </Button>
+    </Box>
+  )
+
+  const renderProductGrid = () => (
+    <Grid
+      templateColumns={{
+        base: 'repeat(1, 1fr)',
+        md: 'repeat(2, 1fr)',
+        lg: 'repeat(3, 1fr)',
+        xl: 'repeat(4, 1fr)'
+      }}
+      gap={4}
+    >
+      {paginatedProducts.map((product) => (
+        <ProductTile
+          key={product.productId}
+          product={product}
+          onAddToCart={onAddToCart}
+          onWishlistToggle={onWishlistToggle}
+          onQuickView={onQuickView}
+          viewMode={viewMode}
+        />
+      ))}
+    </Grid>
+  )
+
+  const renderProductList = () => (
+    <VStack spacing={4}>
+      {paginatedProducts.map((product) => (
+        // <ProductListTile
+        //   key={product.productId}
+        //   product={product}
+        //   onAddToCart={onAddToCart}
+        //   onWishlistToggle={onWishlistToggle}
+        //   onQuickView={onQuickView}
+        // />
+        <Box key={product.productId} p={4} border="1px solid" borderColor="gray.200" borderRadius="md">
+          <Text>{product.name} - ${product.price}</Text>
+        </Box>
+      ))}
+    </VStack>
+  )
+
+  return (
+    <Box>
+      {/* Header with controls */}
+      <Box mb={6}>
+        <Flex justify="space-between" align="center" mb={4}>
+          <Text fontSize="lg" fontWeight="bold">
+            Products ({processedProducts.length})
+          </Text>
+          
+          <HStack spacing={4}>
+            {/* Search */}
+            {showSearch && (
+              <Box position="relative">
+                <Search position="absolute" left={3} top="50%" transform="translateY(-50%)" color="gray.400" />
+                <input
+                  type="text"
+                  placeholder="Search products..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  style={{
+                    padding: '8px 12px 8px 36px',
+                    border: '1px solid #e2e8f0',
+                    borderRadius: '6px',
+                    width: '250px'
+                  }}
+                />
+              </Box>
+            )}
+
+            {/* Sort */}
+            {showSort && (
+              <Select
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value)}
+                width="200px"
+              >
+                <option value="name">Name A-Z</option>
+                <option value="price">Price Low-High</option>
+                <option value="price-desc">Price High-Low</option>
+                <option value="rating">Highest Rated</option>
+                <option value="newest">Newest First</option>
+                <option value="popularity">Most Popular</option>
+              </Select>
+            )}
+
+            {/* View Toggle */}
+            {showViewToggle && (
+              <HStack spacing={1}>
+                <Button
+                  size="sm"
+                  variant={viewMode === 'grid' ? 'solid' : 'outline'}
+                  onClick={() => setViewMode('grid')}
+                  aria-label="Grid view"
+                >
+                  <GridIcon />
+                </Button>
+                <Button
+                  size="sm"
+                  variant={viewMode === 'list' ? 'solid' : 'outline'}
+                  onClick={() => setViewMode('list')}
+                  aria-label="List view"
+                >
+                  <ListIcon />
+                </Button>
+              </HStack>
+            )}
+          </HStack>
+        </Flex>
+
+        {/* Filters */}
+        {showFilters && (
+          <Box mb={4}>
+            {/* <ProductFilters 
+              filters={currentFilters}
+              onFilterChange={handleFilterChange}
+            /> */}
+            <Text fontSize="sm" color="gray.600">
+              Filters: {Object.keys(currentFilters).length > 0 ? 
+                Object.entries(currentFilters).map(([key, value]) => `${key}: ${value}`).join(', ') : 
+                'None applied'
+              }
+            </Text>
+          </Box>
+        )}
+      </Box>
+
+      {/* Product Grid/List */}
+      <Skeleton isLoaded={!isLoading}>
+        {processedProducts.length === 0 ? (
+          renderEmptyState()
+        ) : (
+          <>
+            {viewMode === 'grid' ? renderProductGrid() : renderProductList()}
+            
+            {/* Load More / Pagination */}
+            {(hasMore || currentPage * itemsPerPage < processedProducts.length) && (
+              <Box textAlign="center" mt={8}>
+                <Button
+                  onClick={handleLoadMore}
+                  isLoading={isLoading}
+                  loadingText="Loading..."
+                >
+                  Load More Products
+                </Button>
+              </Box>
+            )}
+          </>
+        )}
+      </Skeleton>
+    </Box>
+  )
+}
+
+ProductList.propTypes = {
+  products: PropTypes.array.isRequired,
+  onAddToCart: PropTypes.func.isRequired,
+  onWishlistToggle: PropTypes.func,
+  onQuickView: PropTypes.func,
+  viewMode: PropTypes.oneOf(['grid', 'list']),
+  sortBy: PropTypes.string,
+  filters: PropTypes.object,
+  onLoadMore: PropTypes.func,
+  isLoading: PropTypes.bool,
+  hasMore: PropTypes.bool,
+  showFilters: PropTypes.bool,
+  showSearch: PropTypes.bool,
+  showSort: PropTypes.bool,
+  showViewToggle: PropTypes.bool,
+  itemsPerPage: PropTypes.number
+}
+
+export default ProductList

@@ -1,0 +1,303 @@
+---
+description: Product Tile component requirement template
+globs: "**/components/**"
+type: agent-requested
+alwaysApply: false
+---
+name: Product Tile Component
+description: Requirements and examples for creating product tile components (cards, grid items)
+globs: ["**/components/**"]
+
+# Product Tile Component
+
+## 🚀 Quick Start (Beginner)
+If you're new to product components, start here:
+
+### Basic Product Tile
+```jsx
+const ProductTile = ({ product, onAddToCart }) => {
+  return (
+    <div className="product-tile">
+      <img src={product.image} alt={product.name} />
+      <h3>{product.name}</h3>
+      <p>{product.price}</p>
+      <button onClick={() => onAddToCart(product)}>
+        Add to Cart
+      </button>
+    </div>
+  )
+}
+```
+
+### Essential Props
+- `product`: Product data object
+- `onAddToCart`: Function to add product to cart
+- `className`: Optional styling
+
+---
+
+## 📋 Full Requirements (Advanced)
+
+### Data Model
+- Product (single item)
+- Product Bundle (parent with child items; only parent can be added to cart)
+- Product Set (logical group; all items added to cart together, no parent/child)
+
+## Features/Props
+- Product image (primary image with optional hover gallery)
+- Product name and price
+- Quick Add to Cart (single, bundle parent, or set)
+- Wishlist/Favorite toggle
+- Quick view modal trigger
+- Rating/Reviews display
+- Sale/Badge indicators
+- Stock status
+- Variant preview (color swatches, size preview)
+- Bundle/Set item count indicator
+
+## Look & Feel
+- Theme
+- Skeleton
+- Style (grid/list view options)
+- Hover effects
+- Responsive design
+
+## Example Requirement Object
+```js
+const requirement = {
+  dataModel: 'Product' | 'ProductBundle' | 'ProductSet',
+  features: ['Image', 'Quick Add to Cart', 'Wishlist', 'Quick View', 'Rating', 'Sale Badge', 'Stock Status', 'Variant Preview', 'Bundle/Set Indicator'],
+  lookAndFeel: ['Theme', 'Skeleton', 'Style', 'Hover Effects', 'Responsive']
+}
+```
+
+## Example Usage
+```jsx
+<ProductTile 
+  product={product} 
+  onAddToCart={onAddToCart}
+  onWishlistToggle={onWishlistToggle}
+  onQuickView={onQuickView}
+  viewMode="grid"
+/>
+```
+
+## Best Practices
+- For bundles: Show bundle indicator and item count; only allow adding the parent to cart.
+- For sets: Show set indicator and item count; add all items to cart together.
+- Use lazy loading for images with proper alt text.
+- Implement hover effects for better UX (image gallery, quick actions).
+- Show stock status clearly (in stock, low stock, out of stock).
+- Display sale badges prominently when applicable.
+- Use skeleton loading states for better perceived performance.
+- Support both grid and list view modes.
+- Ensure accessibility (keyboard navigation, screen reader support).
+- Validate all props and document requirements.
+
+## Bad Practices
+- For bundles: Allowing child items to be added individually, or not showing bundle indicators.
+- For sets: Treating one item as parent, or not adding all items together.
+- Loading all images at once (no lazy loading).
+- No hover states or interactive feedback.
+- Missing stock status or sale indicators.
+- No loading states (poor perceived performance).
+- Hardcoded layout (no responsive design).
+- Ignoring accessibility (no keyboard support, missing ARIA labels).
+- Not validating props or documenting requirements.
+
+## Example Component Skeleton
+```jsx
+/*
+Requirement:
+{
+  dataModel: 'Product' | 'ProductBundle' | 'ProductSet',
+  features: ['Image', 'Quick Add to Cart', 'Wishlist', 'Quick View', 'Rating', 'Sale Badge', 'Stock Status', 'Variant Preview', 'Bundle/Set Indicator'],
+  lookAndFeel: ['Theme', 'Skeleton', 'Style', 'Hover Effects', 'Responsive']
+}
+*/
+
+import React, {useState} from 'react'
+import PropTypes from 'prop-types'
+import {Box, Text, Button, Skeleton, useTheme, Badge, IconButton} from '@salesforce/retail-react-app/app/components/shared/ui'
+import {Heart, Eye, ShoppingCart} from '@salesforce/retail-react-app/app/components/shared/icons'
+// import ProductImage from './ProductImage'
+// import RatingDisplay from './RatingDisplay'
+// import VariantPreview from './VariantPreview'
+
+const ProductTile = ({
+  product,
+  onAddToCart,
+  onWishlistToggle,
+  onQuickView,
+  viewMode = 'grid',
+  showWishlist = true,
+  showQuickView = true,
+  showRating = true
+}) => {
+  const [isLoading, setIsLoading] = useState(false)
+  const [isHovered, setIsHovered] = useState(false)
+  const theme = useTheme()
+
+  const handleAddToCart = async () => {
+    setIsLoading(true)
+    await onAddToCart(product, 1)
+    setIsLoading(false)
+  }
+
+  const getStockStatus = () => {
+    if (product.stock === 0) return {status: 'out', color: 'red', text: 'Out of Stock'}
+    if (product.stock <= 5) return {status: 'low', color: 'orange', text: 'Low Stock'}
+    return {status: 'in', color: 'green', text: 'In Stock'}
+  }
+
+  const renderBundleOrSetIndicator = () => {
+    if (product.type === 'bundle' && product.childItems) {
+      return (
+        <Badge colorScheme="blue" position="absolute" top={2} right={2}>
+          Bundle ({product.childItems.length} items)
+        </Badge>
+      )
+    }
+    if (product.type === 'set' && product.setItems) {
+      return (
+        <Badge colorScheme="purple" position="absolute" top={2} right={2}>
+          Set ({product.setItems.length} items)
+        </Badge>
+      )
+    }
+    return null
+  }
+
+  const stockStatus = getStockStatus()
+
+  return (
+    <Skeleton isLoaded={!!product}>
+      <Box
+        bg={theme.colors.background}
+        border="1px solid"
+        borderColor={theme.colors.border}
+        borderRadius="md"
+        p={3}
+        position="relative"
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+        transition="all 0.2s"
+        _hover={{transform: 'translateY(-2px)', boxShadow: 'lg'}}
+        cursor="pointer"
+      >
+        {renderBundleOrSetIndicator()}
+        
+        {/* Product Image */}
+        <Box position="relative" mb={3}>
+          {/* <ProductImage 
+            images={product.imageGroups} 
+            isHovered={isHovered}
+            alt={product.name}
+          /> */}
+          <Box 
+            bg="gray.200" 
+            height={viewMode === 'grid' ? '200px' : '100px'} 
+            borderRadius="md"
+            display="flex"
+            alignItems="center"
+            justifyContent="center"
+          >
+            <Text color="gray.500">Product Image</Text>
+          </Box>
+          
+          {/* Quick Actions on Hover */}
+          {isHovered && (
+            <Box
+              position="absolute"
+              top={2}
+              left={2}
+              display="flex"
+              flexDirection="column"
+              gap={1}
+            >
+              {showWishlist && (
+                <IconButton
+                  size="sm"
+                  icon={<Heart />}
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    onWishlistToggle?.(product)
+                  }}
+                  aria-label="Add to wishlist"
+                />
+              )}
+              {showQuickView && (
+                <IconButton
+                  size="sm"
+                  icon={<Eye />}
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    onQuickView?.(product)
+                  }}
+                  aria-label="Quick view"
+                />
+              )}
+            </Box>
+          )}
+        </Box>
+
+        {/* Product Info */}
+        <Box>
+          <Text fontSize="sm" fontWeight="medium" mb={1} noOfLines={2}>
+            {product.name}
+          </Text>
+          
+          <Box display="flex" alignItems="center" gap={2} mb={2}>
+            <Text fontSize="lg" fontWeight="bold" color={theme.colors.primary}>
+              ${product.price}
+            </Text>
+            {product.originalPrice && product.originalPrice > product.price && (
+              <Text fontSize="sm" textDecoration="line-through" color="gray.500">
+                ${product.originalPrice}
+              </Text>
+            )}
+          </Box>
+
+          {/* Rating */}
+          {showRating && product.rating && (
+            <Box display="flex" alignItems="center" gap={1} mb={2}>
+              {/* <RatingDisplay rating={product.rating} /> */}
+              <Text fontSize="sm" color="gray.600">
+                ★ {product.rating} ({product.reviewCount || 0})
+              </Text>
+            </Box>
+          )}
+
+          {/* Stock Status */}
+          <Badge colorScheme={stockStatus.color} size="sm" mb={2}>
+            {stockStatus.text}
+          </Badge>
+
+          {/* Quick Add to Cart */}
+          <Button
+            size="sm"
+            leftIcon={<ShoppingCart />}
+            onClick={handleAddToCart}
+            isDisabled={isLoading || stockStatus.status === 'out'}
+            width="full"
+          >
+            {isLoading ? 'Adding...' : 'Add to Cart'}
+          </Button>
+        </Box>
+      </Box>
+    </Skeleton>
+  )
+}
+
+ProductTile.propTypes = {
+  product: PropTypes.object.isRequired,
+  onAddToCart: PropTypes.func.isRequired,
+  onWishlistToggle: PropTypes.func,
+  onQuickView: PropTypes.func,
+  viewMode: PropTypes.oneOf(['grid', 'list']),
+  showWishlist: PropTypes.bool,
+  showQuickView: PropTypes.bool,
+  showRating: PropTypes.bool
+}
+
+export default ProductTile

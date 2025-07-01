@@ -1,0 +1,33 @@
+---
+description: Requirement template for a Product Detail component (supports single products, bundles, and sets)
+globs: 
+alwaysApply: false
+---
+
+# Requirement-Driven Product Component Creation (Start Here)
+
+This rule is your entry point for building Product components in a requirement-driven, modular way.
+
+## How to Use
+- Browse the `.cursor/rules/product-component-requirements-mdc/` directory.
+- Each `.mdc` file in that directory describes a specific Product component scenario (e.g., product-tile, product-list, product-detail).
+- Each file includes:
+  - Data model
+  - Features/props
+  - Look & feel
+  - Example requirement object
+  - Example code usage
+  - **Best practices** (what to do)
+  - **Bad practices** (what to avoid)
+
+## Why This Structure?
+- Encourages a requirement-driven, modular approach to component development.
+- Makes it easy to find, reuse, and update requirements for common Product scenarios.
+- Helps teams avoid common mistakes and maintain high code quality.
+
+## Adding New Requirements
+- Add a new `.mdc` file for each new Product component scenario in the `product-requirements-mdc` directory.
+- Include both best and bad practices for maximum clarity.
+- Update the directory as new scenarios or conventions arise.
+
+**Start every Product component with a requirement!**

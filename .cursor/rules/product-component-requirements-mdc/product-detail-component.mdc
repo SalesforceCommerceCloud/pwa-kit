@@ -1,0 +1,158 @@
+---
+description: Product Detail component requirement template
+globs: "**/components/**"
+type: agent-requested
+alwaysApply: false
+---
+
+# Product Detail Component
+
+## Data Model
+- Product
+- Product Bundle (parent with child items; only parent can be added to cart)
+- Product Set (logical group; all items added to cart together, no parent/child)
+
+## Features/Props
+- Show product images (gallery)
+- Show product name, price, description
+- Add to Cart (single, bundle parent, or set)
+- Quantity Selector (for product or bundle parent; for sets, quantity per item if supported)
+- Show Reviews
+- Show Affinity/Recommendations
+- Variant selection (color, size, etc.)
+- Show all items in bundle/set with details
+
+## Look & Feel
+- Theme
+- Skeleton
+- Style
+
+## Example Requirement Object
+```js
+const requirement = {
+  dataModel: 'Product' | 'ProductBundle' | 'ProductSet',
+  features: ['Gallery', 'Add to Cart', 'Quantity Selector', 'Show Reviews', 'Variant Selection', 'Show Bundle/Set Items'],
+  lookAndFeel: ['Theme', 'Skeleton', 'Style']
+}
+```
+
+## Example Usage
+```jsx
+<ProductDetail product={product} onAddToCart={onAddToCart} />
+```
+
+## Best Practices
+- For bundles: Only allow the parent product to be added to cart; display all child items with details, but do not allow adding/removing them individually.
+- For sets: Display all items in the set; when the set is added to cart, all items are added together. There is no parent/child distinction.
+- Use dedicated subcomponents for gallery, reviews, and variant selection.
+- Scaffold all features as configurable props.
+- Use skeletons for loading states.
+- Support theming and custom styles.
+- Validate all props and document requirements.
+- Ensure accessibility (alt text, keyboard navigation, ARIA labels).
+
+## Bad Practices
+- For bundles: Allowing child items to be added to cart individually, or not showing all child items.
+- For sets: Treating one item as a parent, or not adding all items to cart together.
+- Mixing all logic in one large component (no subcomponents).
+- Hardcoding feature logic (not making features optional/configurable).
+- Ignoring loading states (no skeletons or spinners).
+- Not supporting theming or custom styles.
+- Skipping accessibility (missing alt text, no keyboard support).
+- Not validating props or documenting requirements.
+
+## Example Component Skeleton
+```jsx
+/*
+Requirement:
+{
+  dataModel: 'Product' | 'ProductBundle' | 'ProductSet',
+  features: ['Gallery', 'Add to Cart', 'Quantity Selector', 'Show Reviews', 'Variant Selection', 'Show Bundle/Set Items'],
+  lookAndFeel: ['Theme', 'Skeleton', 'Style']
+}
+*/
+
+import React, {useState} from 'react'
+import PropTypes from 'prop-types'
+import {Box, Text, Button, Skeleton, useTheme} from '@salesforce/retail-react-app/app/components/shared/ui'
+import {QuantityPicker} from '@salesforce/retail-react-app/app/components/quantity-picker'
+import RecommendedProducts from '@salesforce/retail-react-app/app/components/recommended-products'
+// import ProductGallery from './ProductGallery'
+// import ProductReviews from './ProductReviews'
+// import VariantSelector from './VariantSelector'
+
+const ProductDetail = ({product, onAddToCart, showReviews = true, showRecommendations = true}) => {
+  const [quantity, setQuantity] = useState(1)
+  const [isLoading, setIsLoading] = useState(false)
+  const theme = useTheme()
+
+  const handleAddToCart = async () => {
+    setIsLoading(true)
+    await onAddToCart(product, quantity)
+    setIsLoading(false)
+  }
+
+  // Example: Render bundle/set items
+  const renderBundleOrSetItems = () => {
+    if (product.type === 'bundle' && product.childItems) {
+      return (
+        <Box mt={4}>
+          <Text fontWeight="bold">Bundle Includes:</Text>
+          {product.childItems.map((item) => (
+            <Box key={item.productId} ml={4}>
+              <Text>{item.name}</Text>
+              {/* No add to cart for child items */}
+            </Box>
+          ))}
+        </Box>
+      )
+    }
+    if (product.type === 'set' && product.setItems) {
+      return (
+        <Box mt={4}>
+          <Text fontWeight="bold">Set Includes:</Text>
+          {product.setItems.map((item) => (
+            <Box key={item.productId} ml={4}>
+              <Text>{item.name}</Text>
+              {/* All items in set are added to cart together */}
+            </Box>
+          ))}
+        </Box>
+      )
+    }
+    return null
+  }
+
+  return (
+    <Skeleton isLoaded={!!product}>
+      <Box bg={theme.colors.background} color={theme.colors.text} p={4} borderRadius="md">
+        {/* <ProductGallery images={product.imageGroups} /> */}
+        <Text fontSize="xl" fontWeight="bold">{product.name}</Text>
+        <Text>{product.description}</Text>
+        {/* <VariantSelector variants={product.variants} /> */}
+        <QuantityPicker value={quantity} onChange={setQuantity} min={1} max={product.stock || 10} />
+        <Button onClick={handleAddToCart} isDisabled={isLoading} mt={2}>
+          {isLoading ? 'Adding...' : 'Add to Cart'}
+        </Button>
+        {renderBundleOrSetItems()}
+        {showReviews && (
+          // <ProductReviews productId={product.productId} />
+          <Text>Reviews go here</Text>
+        )}
+        {showRecommendations && (
+          <RecommendedProducts productId={product.productId} />
+        )}
+      </Box>
+    </Skeleton>
+  )
+}
+
+ProductDetail.propTypes = {
+  product: PropTypes.object.isRequired,
+  onAddToCart: PropTypes.func.isRequired,
+  showReviews: PropTypes.bool,
+  showRecommendations: PropTypes.bool
+}
+
+export default ProductDetail
+```
