@@ -565,7 +565,7 @@ const ProductList = (props) => {
                                           .map((value, index) => (
                                               <ProductTileSkeleton key={index} />
                                           ))
-                                    : productSearchResult?.hits?.map((productSearchItem) => {
+                                    : productSearchResult?.hits?.map((productSearchItem, index) => {
                                           const productId = productSearchItem.productId
                                           const isInWishlist =
                                               !!wishlist?.customerProductListItems?.find(
@@ -610,7 +610,17 @@ const ProductList = (props) => {
                                                           '20vw',
                                                           '20vw',
                                                           '25vw'
-                                                      ]
+                                                      ],
+                                                      // The first two product images should render eagerly to
+                                                      // ensure prioritized loading for above-the-fold images
+                                                      // on mobile.
+                                                      ...(index < 2
+                                                          ? {
+                                                                imageProps: {
+                                                                    loading: 'eager'
+                                                                }
+                                                            }
+                                                          : {})
                                                   }}
                                               />
                                           )

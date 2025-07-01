@@ -5,6 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
+import {Helmet} from 'react-helmet'
 import PropTypes from 'prop-types'
 
 import {rest} from 'msw'
@@ -56,6 +57,12 @@ jest.mock('@salesforce/commerce-sdk-react', () => {
         useCategory: jest.fn()
     }
 })
+
+jest.mock('@salesforce/retail-react-app/app/components/image/utils', () => ({
+    ...jest.requireActual('@salesforce/retail-react-app/app/components/image/utils'),
+    isServer: jest.fn().mockReturnValue(true)
+}))
+
 let mockProductListSearchResponse = mockProductSearch
 
 const MockedComponent = ({isLoading}) => {
@@ -117,6 +124,27 @@ test('should render product list page', async () => {
     expect(await screen.findByTestId('sf-product-list-page')).toBeInTheDocument()
     await waitFor(() => {
         expect(screen.getByText(/Classic Glen Plaid Pant/i)).toBeInTheDocument()
+    })
+
+    const helmet = Helmet.peek()
+    expect(helmet.linkTags).toHaveLength(2)
+    expect(helmet.linkTags[0]).toStrictEqual({
+        as: 'image',
+        rel: 'preload',
+        href: 'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw1c5f9222/images/large/PG.10221626.JJ3WCXX.PZ.jpg',
+        imageSizes:
+            '(min-width: 80em) 25vw, (min-width: 62em) 20vw, (min-width: 48em) 20vw, (min-width: 30em) 50vw, 50vw',
+        imageSrcSet:
+            'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw1c5f9222/images/large/PG.10221626.JJ3WCXX.PZ.jpg?sw=198&q=60 198w, https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw1c5f9222/images/large/PG.10221626.JJ3WCXX.PZ.jpg?sw=396&q=60 396w, https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw1c5f9222/images/large/PG.10221626.JJ3WCXX.PZ.jpg?sw=240&q=60 240w, https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw1c5f9222/images/large/PG.10221626.JJ3WCXX.PZ.jpg?sw=480&q=60 480w, https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw1c5f9222/images/large/PG.10221626.JJ3WCXX.PZ.jpg?sw=256&q=60 256w, https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw1c5f9222/images/large/PG.10221626.JJ3WCXX.PZ.jpg?sw=512&q=60 512w, https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw1c5f9222/images/large/PG.10221626.JJ3WCXX.PZ.jpg?sw=384&q=60 384w, https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw1c5f9222/images/large/PG.10221626.JJ3WCXX.PZ.jpg?sw=768&q=60 768w'
+    })
+    expect(helmet.linkTags[1]).toStrictEqual({
+        as: 'image',
+        rel: 'preload',
+        href: 'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw22e88fa3/images/large/PG.10224484.JJ0CZXX.PZ.jpg',
+        imageSizes:
+            '(min-width: 80em) 25vw, (min-width: 62em) 20vw, (min-width: 48em) 20vw, (min-width: 30em) 50vw, 50vw',
+        imageSrcSet:
+            'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw22e88fa3/images/large/PG.10224484.JJ0CZXX.PZ.jpg?sw=198&q=60 198w, https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw22e88fa3/images/large/PG.10224484.JJ0CZXX.PZ.jpg?sw=396&q=60 396w, https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw22e88fa3/images/large/PG.10224484.JJ0CZXX.PZ.jpg?sw=240&q=60 240w, https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw22e88fa3/images/large/PG.10224484.JJ0CZXX.PZ.jpg?sw=480&q=60 480w, https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw22e88fa3/images/large/PG.10224484.JJ0CZXX.PZ.jpg?sw=256&q=60 256w, https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw22e88fa3/images/large/PG.10224484.JJ0CZXX.PZ.jpg?sw=512&q=60 512w, https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw22e88fa3/images/large/PG.10224484.JJ0CZXX.PZ.jpg?sw=384&q=60 384w, https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw22e88fa3/images/large/PG.10224484.JJ0CZXX.PZ.jpg?sw=768&q=60 768w'
     })
 })
 
