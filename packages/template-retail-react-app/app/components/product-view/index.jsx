@@ -24,6 +24,12 @@ import {
     RadioGroup,
     useTheme
 } from '@salesforce/retail-react-app/app/components/shared/ui'
+
+// Constants
+const DELIVERY_OPTIONS = {
+    SHIP: 'ship',
+    PICKUP: 'pickup'
+}
 import {useCurrency, useDerivedProduct} from '@salesforce/retail-react-app/app/hooks'
 import {useAddToCartModalContext} from '@salesforce/retail-react-app/app/hooks/use-add-to-cart-modal'
 import {STORE_LOCATOR_IS_ENABLED} from '@salesforce/retail-react-app/app/constants'
@@ -425,7 +431,7 @@ const ProductView = forwardRef(
         }, [selectedStore])
 
         const handleDeliveryOptionChange = (value) => {
-            setPickupInStore(value === 'pickup')
+            setPickupInStore(value === DELIVERY_OPTIONS.PICKUP)
         }
 
         return (
@@ -681,12 +687,19 @@ const ProductView = forwardRef(
                                                 />
                                             </Text>
                                             <RadioGroup
-                                                value={pickupInStore ? 'pickup' : 'ship'}
+                                                value={
+                                                    pickupInStore
+                                                        ? DELIVERY_OPTIONS.PICKUP
+                                                        : DELIVERY_OPTIONS.SHIP
+                                                }
                                                 onChange={handleDeliveryOptionChange}
                                                 mb={1}
                                             >
                                                 <Stack direction="column" spacing={2}>
-                                                    <Radio value="ship" isDisabled={disableButton}>
+                                                    <Radio
+                                                        value={DELIVERY_OPTIONS.SHIP}
+                                                        isDisabled={disableButton}
+                                                    >
                                                         <FormattedMessage
                                                             defaultMessage="Ship to Address"
                                                             id="product_view.label.ship_to_address"
@@ -694,7 +707,7 @@ const ProductView = forwardRef(
                                                     </Radio>
                                                     {STORE_LOCATOR_IS_ENABLED && (
                                                         <Radio
-                                                            value="pickup"
+                                                            value={DELIVERY_OPTIONS.PICKUP}
                                                             isDisabled={
                                                                 !pickupEnabled ||
                                                                 (storeName &&
