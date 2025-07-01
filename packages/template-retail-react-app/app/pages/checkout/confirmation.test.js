@@ -152,9 +152,7 @@ test('Create Account form - phone number from order shipping address is saved to
     })
 
     // Verify that the phone number from the order's billing address is included in the registration
-    expect(registrationRequestBody.customer.phoneHome).toBe(
-        mockOrder.billingAddress.phone
-    )
+    expect(registrationRequestBody.customer.phoneHome).toBe(mockOrder.billingAddress.phone)
     expect(registrationRequestBody.customer.phoneHome).toBe('(778) 888-8888')
 
     // Verify other expected customer data (firstName/lastName come from order's billingAddress)
@@ -170,17 +168,17 @@ test('Integration test - phone number from order is visible in customer account 
 
     global.server.use(
         // Mock customer registration
-                 rest.post('*/customers', (req, res, ctx) => {
-             savedCustomerData = {
-                 customerId: 'new-customer-id-123',
-                 email: mockOrder.customerInfo.email,
-                 firstName: mockOrder.billingAddress.firstName,
-                 lastName: mockOrder.billingAddress.lastName,
-                 phoneHome: mockOrder.billingAddress.phone,
-                 login: mockOrder.customerInfo.email
-             }
-             return res(ctx.status(200), ctx.json(savedCustomerData))
-         }),
+        rest.post('*/customers', (req, res, ctx) => {
+            savedCustomerData = {
+                customerId: 'new-customer-id-123',
+                email: mockOrder.customerInfo.email,
+                firstName: mockOrder.billingAddress.firstName,
+                lastName: mockOrder.billingAddress.lastName,
+                phoneHome: mockOrder.billingAddress.phone,
+                login: mockOrder.customerInfo.email
+            }
+            return res(ctx.status(200), ctx.json(savedCustomerData))
+        }),
         // Mock address creation
         rest.post('*/customers/*/addresses', (_, res, ctx) => {
             return res(ctx.status(200))
@@ -192,17 +190,17 @@ test('Integration test - phone number from order is visible in customer account 
                 ctx.json({
                     ...savedCustomerData,
                     addresses: [
-                                                 {
-                             addressId: 'address-1',
-                             firstName: mockOrder.billingAddress.firstName,
-                             lastName: mockOrder.billingAddress.lastName,
-                             address1: mockOrder.shipments[0].shippingAddress.address1,
-                             city: mockOrder.shipments[0].shippingAddress.city,
-                             phone: mockOrder.billingAddress.phone,
-                             postalCode: mockOrder.shipments[0].shippingAddress.postalCode,
-                             stateCode: mockOrder.shipments[0].shippingAddress.stateCode,
-                             countryCode: mockOrder.shipments[0].shippingAddress.countryCode
-                         }
+                        {
+                            addressId: 'address-1',
+                            firstName: mockOrder.billingAddress.firstName,
+                            lastName: mockOrder.billingAddress.lastName,
+                            address1: mockOrder.shipments[0].shippingAddress.address1,
+                            city: mockOrder.shipments[0].shippingAddress.city,
+                            phone: mockOrder.billingAddress.phone,
+                            postalCode: mockOrder.shipments[0].shippingAddress.postalCode,
+                            stateCode: mockOrder.shipments[0].shippingAddress.stateCode,
+                            countryCode: mockOrder.shipments[0].shippingAddress.countryCode
+                        }
                     ]
                 })
             )
@@ -220,13 +218,13 @@ test('Integration test - phone number from order is visible in customer account 
         wrapperProps: {isGuest: true}
     })
 
-         // Step 1: Fill out and submit the registration form
-     const createAccountButton = await screen.findByRole('button', {name: /create account/i})
-     const password = screen.getByLabelText('Password')
+    // Step 1: Fill out and submit the registration form
+    const createAccountButton = await screen.findByRole('button', {name: /create account/i})
+    const password = screen.getByLabelText('Password')
 
-     // Fill out the form (firstName and lastName are hidden fields pre-filled from order data)
-     await user.type(password, 'P4ssword!')
-     await user.click(createAccountButton)
+    // Fill out the form (firstName and lastName are hidden fields pre-filled from order data)
+    await user.type(password, 'P4ssword!')
+    await user.click(createAccountButton)
 
     // Step 2: Wait for redirect to account page
     await waitFor(
@@ -245,7 +243,7 @@ test('Integration test - phone number from order is visible in customer account 
     // and verifying the phone number is displayed in the UI, but that would require
     // additional setup of the Account page component and its dependencies.
 
-         // The key assertion is that the phone from the order's billing address
-     // is correctly saved to the customer's phoneHome field during registration
-     expect(savedCustomerData.phoneHome).toBe(mockOrder.billingAddress.phone)
+    // The key assertion is that the phone from the order's billing address
+    // is correctly saved to the customer's phoneHome field during registration
+    expect(savedCustomerData.phoneHome).toBe(mockOrder.billingAddress.phone)
 })
