@@ -1,10 +1,39 @@
 ---
-description: Product list component requirement template 
+description: Product list component requirement template
 globs: "**/components/**"
 type: agent-requested
 alwaysApply: false
 ---
 # Product List Component
+
+## 🚀 Quick Start (Beginner)
+If you're new to product components, start here:
+
+### Basic Product List
+```jsx
+const ProductList = ({ products, onAddToCart }) => {
+  return (
+    <div className="product-list">
+      {products.map(product => (
+        <ProductTile 
+          key={product.id}
+          product={product}
+          onAddToCart={onAddToCart}
+        />
+      ))}
+    </div>
+  )
+}
+```
+
+### Essential Props
+- `products`: Array of product objects
+- `onAddToCart`: Function to add product to cart
+- `className`: Optional styling
+
+---
+
+## 📋 Full Requirements (Advanced)
 
 ## Data Model
 - Array of Products (single items)
@@ -22,7 +51,7 @@ alwaysApply: false
 - Empty state handling
 - Product count display
 - View mode persistence
-- Responsive grid/list layouts
+- Responsive grid/list layout
 - Bulk actions (add multiple to cart, wishlist)
 
 ## Look & Feel

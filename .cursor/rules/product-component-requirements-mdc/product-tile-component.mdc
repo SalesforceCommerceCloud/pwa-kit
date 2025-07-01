@@ -4,9 +4,6 @@ globs: "**/components/**"
 type: agent-requested
 alwaysApply: false
 ---
-name: Product Tile Component
-description: Requirements and examples for creating product tile components (cards, grid items)
-globs: ["**/components/**"]
 
 # Product Tile Component
 

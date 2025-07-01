@@ -7,7 +7,36 @@ alwaysApply: false
 
 # Product Detail Component
 
-## Data Model
+## 🚀 Quick Start (Beginner)
+If you're new to product components, start here:
+
+### Basic Product Detail
+```jsx
+const ProductDetail = ({ product, onAddToCart }) => {
+  return (
+    <div className="product-detail">
+      <img src={product.image} alt={product.name} />
+      <h1>{product.name}</h1>
+      <p>{product.description}</p>
+      <p>Price: {product.price}</p>
+      <button onClick={() => onAddToCart(product)}>
+        Add to Cart
+      </button>
+    </div>
+  )
+}
+```
+
+### Essential Props
+- `product`: Product data object
+- `onAddToCart`: Function to add product to cart
+- `className`: Optional styling
+
+---
+
+## 📋 Full Requirements (Advanced)
+
+### Data Model
 - Product
 - Product Bundle (parent with child items; only parent can be added to cart)
 - Product Set (logical group; all items added to cart together, no parent/child)
