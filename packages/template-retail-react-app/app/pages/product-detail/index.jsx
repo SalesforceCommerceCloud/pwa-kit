@@ -317,7 +317,6 @@ const ProductDetail = () => {
             // If the items were successfully added, set the return value to be used
             // by the add to cart modal.
             return productSelectionValues
-            
         } catch (error) {
             console.log('error', error)
             showError(error)
