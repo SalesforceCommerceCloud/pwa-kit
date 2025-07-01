@@ -4,7 +4,6 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-// import {spawn} from 'child_process'
 import {spawn} from 'cross-spawn'
 import path from 'path'
 
