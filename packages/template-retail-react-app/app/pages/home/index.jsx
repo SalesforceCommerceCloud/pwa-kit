@@ -99,7 +99,8 @@ const Home = () => {
                 })}
                 img={{
                     src: getAssetUrl('static/img/hero.png'),
-                    alt: 'npx pwa-kit-create-app'
+                    alt: 'npx pwa-kit-create-app',
+                    fetchPriority: 'high'
                 }}
                 actions={
                     <Stack spacing={{base: 4, sm: 6}} direction={{base: 'column', sm: 'row'}}>

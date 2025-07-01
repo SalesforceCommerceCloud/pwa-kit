@@ -48,6 +48,38 @@ const semver = require('semver')
 const slugify = require('slugify')
 const generatorPkg = require('../package.json')
 const Handlebars = require('handlebars')
+const PROGRAM = require('../program.json')
+
+// Presets, Templates and Validators
+const {
+    examples: EXAMPLES,
+    options: OPTIONS,
+    presets: PRESETS,
+    templates: TEMPLATES,
+    validators: VALIDATORS
+} = PROGRAM.data
+
+// Questions composed of public presets and public templates.
+// NOTE: We have to do some weird stuff to determine if the thing we are selecting is a preset or a template.
+// There might be a better way to do this.
+// NOTE: Id's between presets and templates are unique. We should not break this contract.
+const INITIAL_QUESTIONS = [
+    {
+        name: 'general.presetOrTemplateId',
+        message: 'Choose a project preset to get started:',
+        type: 'list',
+        choices: [
+            ...PRESETS.filter(({private}) => !private).map(({shortDescription, id}) => ({
+                name: shortDescription,
+                value: id
+            })),
+            ...TEMPLATES.filter(({private}) => !private).map(({shortDescription, id}) => ({
+                name: shortDescription,
+                value: id
+            }))
+        ].sort((a, b) => (a.name || '').localeCompare(b.name))
+    }
+]
 
 const program = new Command()
 
@@ -55,7 +87,7 @@ sh.set('-e')
 
 // Handlebars helpers
 
-// Our eslint script uses exscaped double quotes to have windows compatibility. This helper
+// Our eslint script uses escaped double quotes to have windows compatibility. This helper
 // will ensure those escaped double quotes are still escaped after processing the template.
 Handlebars.registerHelper('script', (object) => object.replaceAll('"', '\\"'))
 
@@ -64,44 +96,11 @@ const validPreset = (preset) => {
     return ALL_PRESET_NAMES.includes(preset)
 }
 
-const validProjectName = (s) => {
-    if (s.length > PROJECT_ID_MAX_LENGTH) {
-        return `Maximum length is ${PROJECT_ID_MAX_LENGTH} characters.`
-    }
-    const regex = new RegExp(`^[a-zA-Z0-9-\\s]{1,${PROJECT_ID_MAX_LENGTH}}$`)
-    return regex.test(s) || 'Value can only contain letters, numbers, space and hyphens.'
-}
-
-const validUrl = (s) => {
-    try {
-        new URL(s)
-        return true
-    } catch (err) {
-        return 'Value must be an absolute URL'
-    }
-}
-
-const validSiteId = (s) =>
-    /^[a-z0-9_-]+$/i.test(s) || 'Valid characters are alphanumeric, hyphen, or underscore'
-
-// To see definitions for Commerce API configuration values, go to
-// https://developer.salesforce.com/docs/commerce/commerce-api/guide/commerce-api-configuration-values.
-const defaultCommerceAPIError =
-    'Invalid format. Use docs to find more information about valid configurations: https://developer.salesforce.com/docs/commerce/commerce-api/guide/commerce-api-configuration-values'
-const validShortCode = (s) => /(^[0-9A-Z]{8}$)/i.test(s) || defaultCommerceAPIError
-
-const validClientId = (s) =>
-    /(^[0-9A-Z]{8}-[0-9A-Z]{4}-[0-9A-Z]{4}-[0-9A-Z]{4}-[0-9A-Z]{12}$)/i.test(s) ||
-    s === 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa' ||
-    defaultCommerceAPIError
-const validOrganizationId = (s) =>
-    /^(f_ecom)_([A-Z]{4})_(prd|stg|dev|[0-9]{3}|s[0-9]{2})$/i.test(s) || defaultCommerceAPIError
-
 // Globals
 const GENERATED_PROJECT_VERSION = '0.0.1'
 
 const INITIAL_CONTEXT = {
-    preset: undefined,
+    template: undefined,
     answers: {
         general: {},
         project: {}
@@ -109,441 +108,12 @@ const INITIAL_CONTEXT = {
 }
 const TEMPLATE_SOURCE_NPM = 'npm'
 const TEMPLATE_SOURCE_BUNDLE = 'bundle'
-const DEFAULT_TEMPLATE_VERSION = 'latest'
-
-const EXTENSIBILITY_QUESTIONS = [
-    {
-        name: 'project.extend',
-        message: 'Do you wish to use template extensibility?',
-        type: 'list',
-        choices: [
-            {
-                name: 'No',
-                value: false
-            },
-            {
-                name: 'Yes',
-                value: true
-            }
-        ]
-    }
-]
-
-const HYBRID_QUESTIONS = [
-    {
-        name: 'project.hybrid',
-        message: 'Do you wish to set up a phased headless rollout?',
-        type: 'list',
-        choices: [
-            {
-                name: 'No',
-                value: false
-            },
-            {
-                name: 'Yes',
-                value: true
-            }
-        ]
-    }
-]
-
-const MRT_REFERENCE_QUESTIONS = [
-    {
-        name: 'project.name',
-        validate: validProjectName,
-        message: 'What is the name of your Project?'
-    }
-]
-
-const EXPRESS_MINIMAL_QUESTIONS = [
-    {
-        name: 'project.name',
-        validate: validProjectName,
-        message: 'What is the name of your Project?'
-    }
-]
-
-const TYPESCRIPT_MINIMAL_QUESTIONS = [
-    {
-        name: 'project.name',
-        validate: validProjectName,
-        message: 'What is the name of your Project?'
-    }
-]
-
-const RETAIL_REACT_APP_QUESTIONS = [
-    {
-        name: 'project.name',
-        validate: validProjectName,
-        message: 'What is the name of your Project?'
-    },
-    {
-        name: 'project.commerce.instanceUrl',
-        message: 'What is the URL for your Commerce Cloud instance?',
-        validate: validUrl
-    },
-    {
-        name: 'project.commerce.clientId',
-        message: 'What is your SLAS Client ID?',
-        validate: validClientId
-    },
-    {
-        name: 'project.commerce.isSlasPrivate',
-        message: 'Is your SLAS client private?',
-        type: 'list',
-        choices: [
-            {
-                name: 'Yes',
-                value: true
-            },
-            {
-                name: 'No',
-                value: false
-            }
-        ]
-    },
-    {
-        name: 'project.commerce.siteId',
-        message: 'What is your Site ID in Business Manager?',
-        validate: validSiteId
-    },
-    {
-        name: 'project.commerce.organizationId',
-        message: 'What is your Commerce API organization ID in Business Manager?',
-        validate: validOrganizationId
-    },
-    {
-        name: 'project.commerce.shortCode',
-        message: 'What is your Commerce API short code in Business Manager?',
-        validate: validShortCode
-    }
-]
-
-// Project dictionary describing details and how the generator should ask questions etc.
-const PRESETS = [
-    {
-        id: 'retail-react-app',
-        name: 'Retail React App',
-        description: `
-            Generate a project using custom settings by answering questions about a
-            B2C Commerce instance.
-
-            Use this preset to connect to an existing instance, such as a sandbox.
-        `,
-        shortDescription: 'The Retail app using your own Commerce Cloud instance',
-        templateSource: {
-            type: TEMPLATE_SOURCE_NPM,
-            id: '@salesforce/retail-react-app'
-        },
-        questions: [...EXTENSIBILITY_QUESTIONS, ...RETAIL_REACT_APP_QUESTIONS],
-        assets: ['translations'],
-        private: false
-    },
-    {
-        id: 'retail-react-app-demo',
-        name: 'Retail React App Demo',
-        description: `
-            Generate a project using the settings for a special B2C Commerce
-            instance that is used for demo purposes. No questions are asked.
-
-            Use this preset to try out PWA Kit.
-        `,
-        shortDescription: 'The Retail app with demo Commerce Cloud instance',
-        templateSource: {
-            type: TEMPLATE_SOURCE_NPM,
-            id: '@salesforce/retail-react-app'
-        },
-        questions: [...EXTENSIBILITY_QUESTIONS, ...RETAIL_REACT_APP_QUESTIONS],
-        answers: {
-            ['project.extend']: true,
-            ['project.hybrid']: false,
-            ['project.name']: 'demo-storefront',
-            ['project.commerce.instanceUrl']: 'https://production-sitegenesis-dw.demandware.net',
-            ['project.commerce.clientId']: '44cfcf31-d64d-4227-9cce-1d9b0716c321',
-            ['project.commerce.siteId']: 'RefArch',
-            ['project.commerce.organizationId']: 'f_ecom_aaia_prd',
-            ['project.commerce.shortCode']: 'xfdy2axw',
-            ['project.commerce.isSlasPrivate']: false,
-            ['project.einstein.clientId']: '1ea06c6e-c936-4324-bcf0-fada93f83bb1',
-            ['project.einstein.siteId']: 'aaij-MobileFirst',
-            ['project.dataCloud.appSourceId']: 'f22ae831-ac03-4bf6-afc1-3a0b19f1ea8e',
-            ['project.dataCloud.tenantId']: 'mmydmztgh04dczjzmnsw0zd0g8.pc-rnd',
-            ['project.demo.enableDemoSettings']: false
-        },
-        assets: ['translations'],
-        private: false
-    },
-    {
-        id: 'retail-react-app-demo-site-internal',
-        name: 'Retail React App Demo Store',
-        description: `
-            Generates a project using the settings for a special B2C Commerce instance that is used
-            for demo purposes. The demo site is accessible at https://pwa-kit.mobify-storefront.com/
-
-            This environment uses a SLAS private client and has social and passwordless login enabled.
-            This environment is set up to use multiple locales.
-            Future features that are enabled for the demo environment may be added to this preset.
-        `,
-        shortDescription:
-            'The Retail app with demo Commerce Cloud instance and a private SLAS client',
-        templateSource: {
-            type: TEMPLATE_SOURCE_NPM,
-            id: '@salesforce/retail-react-app'
-        },
-        questions: [...EXTENSIBILITY_QUESTIONS, ...RETAIL_REACT_APP_QUESTIONS],
-        answers: {
-            ['project.extend']: false, // Intentionally not an extensible project so that the correct logos appear on demo site
-            ['project.hybrid']: false,
-            ['project.name']: 'demo-storefront',
-            ['project.commerce.instanceUrl']: 'https://zzrf-001.dx.commercecloud.salesforce.com',
-            ['project.commerce.clientId']: '083859f2-5d93-4209-b999-a112266d63a0',
-            ['project.commerce.siteId']: 'RefArchGlobal',
-            ['project.commerce.organizationId']: 'f_ecom_zzrf_001',
-            ['project.commerce.shortCode']: 'kv7kzm78',
-            ['project.commerce.isSlasPrivate']: true,
-            ['project.einstein.clientId']: '1ea06c6e-c936-4324-bcf0-fada93f83bb1',
-            ['project.einstein.siteId']: 'aaij-MobileFirst',
-            ['project.dataCloud.appSourceId']: 'f22ae831-ac03-4bf6-afc1-3a0b19f1ea8e',
-            ['project.dataCloud.tenantId']: 'mmydmztgh04dczjzmnsw0zd0g8.pc-rnd',
-            ['project.demo.enableDemoSettings']: true // True only for presets deployed to demo environments like pwa-kit.mobify-storefront.com
-        },
-        assets: ['translations'],
-        private: true
-    },
-    {
-        id: 'retail-react-app-test-project',
-        name: 'Retail React App Test Project',
-        description: '',
-        templateSource: {
-            type: TEMPLATE_SOURCE_NPM,
-            id: '@salesforce/retail-react-app'
-        },
-        questions: [...EXTENSIBILITY_QUESTIONS, ...RETAIL_REACT_APP_QUESTIONS],
-        answers: {
-            ['project.extend']: true,
-            ['project.hybrid']: false,
-            ['project.name']: 'retail-react-app',
-            ['project.commerce.instanceUrl']: 'https://zzrf-001.dx.commercecloud.salesforce.com',
-            ['project.commerce.clientId']: 'c9c45bfd-0ed3-4aa2-9971-40f88962b836',
-            ['project.commerce.siteId']: 'RefArch',
-            ['project.commerce.organizationId']: 'f_ecom_zzrf_001',
-            ['project.commerce.shortCode']: 'kv7kzm78',
-            ['project.commerce.isSlasPrivate']: false,
-            ['project.einstein.clientId']: '1ea06c6e-c936-4324-bcf0-fada93f83bb1',
-            ['project.einstein.siteId']: 'aaij-MobileFirst',
-            ['project.dataCloud.appSourceId']: 'f22ae831-ac03-4bf6-afc1-3a0b19f1ea8e',
-            ['project.dataCloud.tenantId']: 'mmydmztgh04dczjzmnsw0zd0g8.pc-rnd',
-            ['project.demo.enableDemoSettings']: false
-        },
-        assets: ['translations'],
-        private: true
-    },
-    {
-        id: 'retail-react-app-private-slas-client',
-        name: 'Retail React App Private SLAS client project',
-        description: '',
-        templateSource: {
-            type: TEMPLATE_SOURCE_NPM,
-            id: '@salesforce/retail-react-app'
-        },
-        questions: [...EXTENSIBILITY_QUESTIONS, ...RETAIL_REACT_APP_QUESTIONS],
-        answers: {
-            ['project.extend']: true,
-            ['project.hybrid']: false,
-            ['project.name']: 'retail-react-app',
-            ['project.commerce.instanceUrl']: 'https://zzrf-002.dx.commercecloud.salesforce.com',
-            ['project.commerce.clientId']: '89655706-9a0d-49ba-a1e5-18bb2d616374',
-            ['project.commerce.siteId']: 'RefArch',
-            ['project.commerce.organizationId']: 'f_ecom_zzrf_002',
-            ['project.commerce.shortCode']: 'kv7kzm78',
-            ['project.commerce.isSlasPrivate']: true,
-            ['project.einstein.clientId']: '1ea06c6e-c936-4324-bcf0-fada93f83bb1',
-            ['project.einstein.siteId']: 'aaij-MobileFirst',
-            ['project.dataCloud.appSourceId']: 'f22ae831-ac03-4bf6-afc1-3a0b19f1ea8e',
-            ['project.dataCloud.tenantId']: 'mmydmztgh04dczjzmnsw0zd0g8.pc-rnd',
-            ['project.demo.enableDemoSettings']: false
-        },
-        assets: ['translations'],
-        private: true
-    },
-    {
-        id: 'retail-react-app-bug-bounty',
-        name: 'Retail React App Bug Bounty Project',
-        description: '',
-        templateSource: {
-            type: TEMPLATE_SOURCE_NPM,
-            id: '@salesforce/retail-react-app'
-        },
-        questions: [...EXTENSIBILITY_QUESTIONS, ...RETAIL_REACT_APP_QUESTIONS],
-        answers: {
-            ['project.extend']: true,
-            ['project.hybrid']: false,
-            ['project.name']: 'retail-react-app',
-            ['project.commerce.instanceUrl']: 'https://zzec-006.dx.commercecloud.salesforce.com',
-            ['project.commerce.clientId']: 'b56e7ad3-2237-42c9-8f55-41e63ebca420',
-            ['project.commerce.siteId']: 'RefArch',
-            ['project.commerce.organizationId']: 'f_ecom_zzec_006',
-            ['project.commerce.shortCode']: 'staging-001',
-            ['project.einstein.clientId']: '1ea06c6e-c936-4324-bcf0-fada93f83bb1',
-            ['project.einstein.siteId']: 'aaij-MobileFirst',
-            ['project.dataCloud.appSourceId']: 'f22ae831-ac03-4bf6-afc1-3a0b19f1ea8e',
-            ['project.dataCloud.tenantId']: 'mmydmztgh04dczjzmnsw0zd0g8.pc-rnd',
-            ['project.commerce.isSlasPrivate']: true,
-            ['project.demo.enableDemoSettings']: false
-        },
-        assets: ['translations'],
-        private: true
-    },
-    {
-        id: 'retail-react-app-hybrid-test-project',
-        name: 'Retail React App Hybrid Test Private SLAS Project',
-        description: '',
-        templateSource: {
-            type: TEMPLATE_SOURCE_NPM,
-            id: '@salesforce/retail-react-app'
-        },
-        questions: [...EXTENSIBILITY_QUESTIONS, ...HYBRID_QUESTIONS, ...RETAIL_REACT_APP_QUESTIONS],
-        answers: {
-            ['project.extend']: true,
-            ['project.hybrid']: true,
-            ['project.name']: 'retail-react-app',
-            ['project.commerce.instanceUrl']: 'https://test.phased-launch-testing.com/',
-            ['project.commerce.clientId']: '99b4e081-00cf-454a-95b0-26ac2b824931',
-            ['project.commerce.siteId']: 'RefArch',
-            ['project.commerce.organizationId']: 'f_ecom_bdpx_dev',
-            ['project.commerce.shortCode']: 'xitgmcd3',
-            ['project.einstein.clientId']: '1ea06c6e-c936-4324-bcf0-fada93f83bb1',
-            ['project.einstein.siteId']: 'aaij-MobileFirst',
-            ['project.commerce.isSlasPrivate']: true,
-            ['project.dataCloud.appSourceId']: 'f22ae831-ac03-4bf6-afc1-3a0b19f1ea8e',
-            ['project.dataCloud.tenantId']: 'mmydmztgh04dczjzmnsw0zd0g8.pc-rnd',
-            ['project.demo.enableDemoSettings']: false
-        },
-        assets: ['translations'],
-        private: true
-    },
-    {
-        id: 'retail-react-app-hybrid-public-client-test-project',
-        name: 'Retail React App Hybrid Test Public SLAS client project',
-        description: '',
-        templateSource: {
-            type: TEMPLATE_SOURCE_NPM,
-            id: '@salesforce/retail-react-app'
-        },
-        questions: [...EXTENSIBILITY_QUESTIONS, ...HYBRID_QUESTIONS, ...RETAIL_REACT_APP_QUESTIONS],
-        answers: {
-            ['project.extend']: true,
-            ['project.hybrid']: true,
-            ['project.name']: 'retail-react-app',
-            ['project.commerce.instanceUrl']: 'https://www.phased-launch-testing.com/',
-            ['project.commerce.clientId']: 'e7e22b7f-a904-4f3a-8022-49dbee696485',
-            ['project.commerce.siteId']: 'RefArch',
-            ['project.commerce.organizationId']: 'f_ecom_bjnl_prd',
-            ['project.commerce.shortCode']: 'performance-001',
-            ['project.einstein.clientId']: '1ea06c6e-c936-4324-bcf0-fada93f83bb1',
-            ['project.einstein.siteId']: 'aaij-MobileFirst',
-            ['project.commerce.isSlasPrivate']: false,
-            ['project.dataCloud.appSourceId']: 'f22ae831-ac03-4bf6-afc1-3a0b19f1ea8e',
-            ['project.dataCloud.tenantId']: 'mmydmztgh04dczjzmnsw0zd0g8.pc-rnd',
-            ['project.demo.enableDemoSettings']: false
-        },
-        assets: ['translations'],
-        private: true
-    },
-    {
-        id: 'typescript-minimal-test-project',
-        name: 'Template Minimal Test Project',
-        description: '',
-        templateSource: {
-            type: TEMPLATE_SOURCE_BUNDLE,
-            id: 'typescript-minimal'
-        },
-        private: true
-    },
-    {
-        id: 'typescript-minimal',
-        name: 'Template Minimal Project',
-        description: `
-            Generate a project using a bare-bones TypeScript app template.
-
-            Use this as a TypeScript starting point or as a base on top of
-            which to build new TypeScript project templates for Managed Runtime.
-        `,
-        templateSource: {
-            type: TEMPLATE_SOURCE_BUNDLE,
-            id: 'typescript-minimal'
-        },
-        questions: TYPESCRIPT_MINIMAL_QUESTIONS,
-        private: true
-    },
-    {
-        id: 'express-minimal-test-project',
-        name: 'Express Minimal Test Project',
-        description: '',
-        templateSource: {
-            type: TEMPLATE_SOURCE_BUNDLE,
-            id: 'express-minimal'
-        },
-        questions: EXPRESS_MINIMAL_QUESTIONS,
-        answers: {
-            ['project.name']: 'express-minimal'
-        },
-        private: true
-    },
-    {
-        id: 'express-minimal',
-        name: 'Express Minimal Project',
-        description: `
-            Generate a project using a bare-bones express app template.
-
-            Use this as a starting point for APIs or as a base on top of
-            which to build new project templates for Managed Runtime.
-        `,
-        templateSource: {
-            type: TEMPLATE_SOURCE_BUNDLE,
-            id: 'express-minimal'
-        },
-        questions: EXPRESS_MINIMAL_QUESTIONS,
-        private: true
-    },
-    {
-        id: 'mrt-reference-app',
-        name: 'Managed Runtime Reference App',
-        description: '',
-        templateSource: {
-            type: TEMPLATE_SOURCE_BUNDLE,
-            id: 'mrt-reference-app'
-        },
-        questions: MRT_REFERENCE_QUESTIONS,
-        answers: {
-            ['project.name']: 'mrt-reference-app'
-        },
-        private: true
-    }
-]
-
-const PRESET_QUESTIONS = [
-    {
-        name: 'general.presetId',
-        message: 'Choose a project preset to get started:',
-        type: 'list',
-        choices: PRESETS.filter(({private}) => !private).map(({shortDescription, id}) => ({
-            name: shortDescription,
-            value: id
-        }))
-    }
-]
 
 const BOOTSTRAP_DIR = p.join(__dirname, '..', 'assets', 'bootstrap', 'js')
-
 const ASSETS_TEMPLATES_DIR = p.join(__dirname, '..', 'assets', 'templates')
-
 const PRIVATE_PRESET_NAMES = PRESETS.filter(({private}) => !!private).map(({id}) => id)
-
 const PUBLIC_PRESET_NAMES = PRESETS.filter(({private}) => !private).map(({id}) => id)
-
 const ALL_PRESET_NAMES = PRIVATE_PRESET_NAMES.concat(PUBLIC_PRESET_NAMES)
-
 const PROJECT_ID_MAX_LENGTH = 20
 
 // Utilities
@@ -728,8 +298,8 @@ const processTemplate = (relFile, inputDir, outputDir, context) => {
  * @param {*} param2
  */
 const runGenerator = (context, {outputDir, templateVersion, verbose}) => {
-    const {answers, preset} = context
-    const {templateSource} = preset
+    const {answers, template} = context
+    const {id, source} = template
     const {extend = false} = answers.project
 
     // Check if the output directory doesn't already exist.
@@ -739,13 +309,12 @@ const runGenerator = (context, {outputDir, templateVersion, verbose}) => {
     // downloading from NPM or copying from the template bundle folder.
     const tmp = fs.mkdtempSync(p.resolve(os.tmpdir(), 'extract-template'))
     const packagePath = p.join(tmp, 'package')
-    const {id, type} = templateSource
     let tarPath
 
-    switch (type) {
+    switch (source.type) {
         case TEMPLATE_SOURCE_NPM: {
             const tarFile = sh
-                .exec(`npm pack ${id}@${templateVersion} --pack-destination="${tmp}"`, {
+                .exec(`npm pack ${source.name}@${templateVersion} --pack-destination="${tmp}"`, {
                     silent: true
                 })
                 .stdout.trim()
@@ -753,10 +322,10 @@ const runGenerator = (context, {outputDir, templateVersion, verbose}) => {
             break
         }
         case TEMPLATE_SOURCE_BUNDLE:
-            tarPath = p.join(__dirname, '..', 'templates', `${id}.tar.gz`)
+            tarPath = p.join(__dirname, '..', 'templates', `${source?.name || id}.tar.gz`)
             break
         default: {
-            const msg = `Error: Cannot handle template source type ${type}.`
+            const msg = `Error: Cannot handle template source type ${source.type}.`
             console.error(msg)
             process.exit(1)
         }
@@ -777,12 +346,13 @@ const runGenerator = (context, {outputDir, templateVersion, verbose}) => {
                 processTemplate(relFilePath, BOOTSTRAP_DIR, outputDir, context)
             )
 
-        // Copy required assets defind on the preset level.
-        const {assets = []} = preset
+        // Copy required assets defined on the preset level.
+        const {assets = []} = template
         assets.forEach((asset) => {
             sh.cp('-rf', p.join(packagePath, asset), outputDir)
         })
     } else {
+        console.log('Copying base template from package or npm: ', packagePath, outputDir)
         // Copy the base template either from the package or npm.
         sh.cp('-rf', packagePath, outputDir)
 
@@ -802,7 +372,7 @@ const runGenerator = (context, {outputDir, templateVersion, verbose}) => {
         const pkgJsonPath = p.resolve(outputDir, 'package.json')
         const pkgJSON = readJson(pkgJsonPath)
         const finalPkgData = merge(pkgJSON, {
-            name: slugifyName(context.answers.project.name || context.preset.id),
+            name: slugifyName(context.answers.project.name || context.template.id),
             version: GENERATED_PROJECT_VERSION
         })
         writeJson(pkgJsonPath, finalPkgData)
@@ -819,6 +389,82 @@ const foundNode = process.versions.node
 const requiredNode = generatorPkg.engines.node
 const isUsingCompatibleNode = semver.satisfies(foundNode, new semver.Range(requiredNode))
 
+/**
+ * Reads all data from standard input (stdin) asynchronously and resolves with the complete input as a string.
+ * Useful for accepting piped or redirected input, such as JSON answers for non-interactive CLI usage.
+ *
+ * @returns {Promise<string>} A promise that resolves with the full stdin input as a string.
+ */
+const readStdin = async () => {
+    return new Promise((resolve, reject) => {
+        let input = ''
+        process.stdin.setEncoding('utf8')
+
+        process.stdin.on('data', (chunk) => {
+            input += chunk
+        })
+
+        process.stdin.on('end', () => {
+            resolve(input)
+        })
+
+        process.stdin.on('error', (err) => {
+            reject(err)
+        })
+    })
+}
+
+/**
+ * Validates the parsed answers object for required fields and structure.
+ * Currently only checks for 'general.presetOrTemplateId', but can be extended for more robust validation.
+ * Throws an error if validation fails.
+ *
+ * @param {Object} answers - The parsed answers object from stdin.
+ */
+const validateAnswers = (answers) => {
+    if (!answers['general.presetOrTemplateId']) {
+        throw new Error('Missing required field: "general.presetOrTemplateId"')
+    }
+
+    // Future enhancement: Add validation for template specific answers.
+}
+
+/**
+ * Reads and parses JSON input from stdin for non-interactive CLI usage.
+ * Exits the process with an error message if input is invalid or missing required fields.
+ *
+ * @returns {Promise<Object>} - The merged answers object.
+ */
+const getAnswersFromStdin = async () => {
+    try {
+        const input = await readStdin()
+        if (!input.trim()) {
+            throw new Error('No input received. Please pipe valid JSON to stdin.')
+        }
+        const parsedInput = JSON.parse(input)
+
+        // Do answer validation.
+        validateAnswers(parsedInput)
+
+        return expandObject(parsedInput)
+    } catch (err) {
+        if (err instanceof SyntaxError) {
+            console.error('Invalid JSON format in stdin input')
+        } else {
+            console.error('Failed to process stdin input:', err.message)
+        }
+        process.exit(1)
+    }
+}
+
+/**
+ * Prints the contents of program.json in a nicely formatted way and exits the process.
+ */
+const printProgramJsonAndExit = () => {
+    console.log(JSON.stringify(PROGRAM, null, 2))
+    process.exit(0)
+}
+
 const main = async (opts) => {
     if (!isUsingCompatibleNode) {
         console.log('')
@@ -834,10 +480,18 @@ const main = async (opts) => {
     // to "general" and "project" questions. It'll also be populated with details of the selected project,
     // like its `package.json` value.
     let context = INITIAL_CONTEXT
-    let {outputDir, verbose, preset, templateVersion} = opts
+    let isPreset = false
+    let answers = {}
+    let selectedTemplate
+    let {outputDir, verbose, preset, templateVersion, stdio, displayProgram} = opts
     const {prompt} = inquirer
     const OUTPUT_DIR_FLAG_ACTIVE = !!outputDir
     const presetId = preset || process.env.GENERATOR_PRESET
+
+    // Exit if the preset provided is not valid.
+    if (displayProgram) {
+        printProgramJsonAndExit()
+    }
 
     // Exit if the preset provided is not valid.
     if (presetId && !validPreset(presetId)) {
@@ -851,37 +505,68 @@ const main = async (opts) => {
         process.exit(1)
     }
 
-    // If there is no preset arg, prompt the user with a selection of presets.
-    if (!presetId) {
-        context.answers = await prompt(PRESET_QUESTIONS)
+    // If there is no preset provided via the CLI, check for stdio input or prompt the user
+    if (stdio) {
+        answers = await getAnswersFromStdin()
+    } else {
+        answers = await prompt(
+            INITIAL_QUESTIONS,
+            presetId ? {general: {presetOrTemplateId: presetId}} : {}
+        )
     }
 
-    // Add the selected preset to the context object.
-    const selectedPreset = PRESETS.find(
-        ({id}) => id === (presetId || context.answers.general.presetId)
-    )
+    // Determine if the selection is a preset or template.
+    isPreset = PRESETS.some(({id}) => id === answers?.general?.presetOrTemplateId)
 
-    // Add the preset to the context.
-    context.preset = selectedPreset
+    // Update the answer with the actual template id.
+    if (isPreset) {
+        const selectedPreset = PRESETS.find(({id}) => id === answers.general.presetOrTemplateId)
 
-    // If using the preset, output the preset name
-    if (presetId) {
-        console.log(`Using preset "${selectedPreset.name}"`)
+        // NOTE: This is a little weird, but we'll set this value to the template id and treat is as such from this point forward..
+        answers.general.presetOrTemplateId = selectedPreset.templateId
+
+        // Expand the preset answers into the answers object.
+        answers = merge(answers, expandObject(selectedPreset.answers))
     }
+
+    // Since we know we have the template id, we can find the template.
+    selectedTemplate = TEMPLATES.find(({id}) => id === answers.general.presetOrTemplateId)
+
+    // Give some feedback to the user.
+    console.log(`Using template "${selectedTemplate.id}"`)
+
+    // Assign the  preset to the context.
+    context.template = selectedTemplate
+    context.answers = answers
 
     if (!OUTPUT_DIR_FLAG_ACTIVE) {
-        outputDir = p.join(process.cwd(), selectedPreset.id)
+        outputDir = p.join(process.cwd(), selectedTemplate.id)
     }
 
-    // Ask preset specific questions and merge into the current context.
-    const {questions = {}, answers = {}} = selectedPreset
-    if (questions) {
-        const projectAnswers = await prompt(questions, answers)
+    // Ask template specific questions and merge into the current context.
+    // NOTE: Only questions that don't have supplied answers will be asked. This is how we get away with simplifying the code.
+    let {questions} = selectedTemplate
 
-        context = merge(context, {
-            answers: expandObject(projectAnswers)
-        })
-    }
+    // Inquirer doesn't support Regex values for the "validate" property. So lets make a function for it.
+    questions = questions.map((question) => {
+        const validator = VALIDATORS.find(({id}) => id === question.validator)
+
+        return {
+            ...question,
+            validate: validator?.regex
+                ? (input) => new RegExp(validator.regex, 'i').test(input) || validator.message
+                : undefined
+        }
+    })
+
+    // As the template specific questions. If we already have answers from the preset, then no questions
+    // will be asked.
+    const projectAnswers = await prompt(questions, answers)
+
+    // Update the context.
+    context = merge(context, {
+        answers: expandObject(projectAnswers)
+    })
 
     if (context.answers.project.commerce?.instanceUrl) {
         // Remove protocol since we only use this to setup the OCAPI proxy
@@ -889,33 +574,33 @@ const main = async (opts) => {
         context.answers.project.commerce.instanceUrl = url.hostname
     }
 
-    // Inject the packageJSON into the context for extensibile projects.
+    // Inject the packageJSON into the context for extensible projects.
     if (context.answers.project.extend) {
         const pkgJSON = JSON.parse(
-            sh.exec(`npm view ${selectedPreset.templateSource.id}@${templateVersion} --json`, {
+            sh.exec(`npm view ${selectedTemplate.source.name}@${templateVersion} --json`, {
                 silent: true
             }).stdout
         )
 
         // NOTE: Here we are rewriting a specific script (extract-default-translations) in order
         // to update the script location for extensibility. In the future we'll hopefully
-        // move transations outside of the template and into the sdk where the script for
+        // move translations outside of the template and into the sdk where the script for
         // building translations will ultimately live, meaning we won't have to do this. So
         // its OK for now.
         if (pkgJSON?.scripts['extract-default-translations']) {
             pkgJSON.scripts['extract-default-translations'] = pkgJSON.scripts[
                 'extract-default-translations'
-            ].replace('./', `./node_modules/${selectedPreset.templateSource.id}/`)
+            ].replace('./', `./node_modules/${selectedTemplate.source.name}/`)
         }
         if (pkgJSON?.scripts['compile-translations']) {
             pkgJSON.scripts['compile-translations'] = pkgJSON.scripts[
                 'compile-translations'
-            ].replace('./', `./node_modules/${selectedPreset.templateSource.id}/`)
+            ].replace('./', `./node_modules/${selectedTemplate.source.name}/`)
         }
         if (pkgJSON?.scripts['compile-translations:pseudo']) {
             pkgJSON.scripts['compile-translations:pseudo'] = pkgJSON.scripts[
                 'compile-translations:pseudo'
-            ].replace('./', `./node_modules/${selectedPreset.templateSource.id}/`)
+            ].replace('./', `./node_modules/${selectedTemplate.source.name}/`)
         }
 
         context = merge(
@@ -935,31 +620,27 @@ const main = async (opts) => {
 
 if (require.main === module) {
     program.name(`pwa-kit-create-app`)
-    program.description(`Generate a new PWA Kit project, optionally using a preset.
+    program.description(`Generates a new PWA Kit project.
 
-Examples:
-
-   ${PRESETS.filter(({private}) => !private).map(({id, description}) => {
-       return `
-  ${program.name()} --preset "${id}"\n${description}
-        `
-   })}
-
+Example Usage:
+   ${EXAMPLES.map(
+       (example) => `
+// ${example.description}\n${example.command}`
+   ).join('\n')}
    `)
-    program
-        .option('--outputDir <path>', `Path to the output directory for the new project`)
-        .option(
-            '--preset <name>',
-            `The name of a project preset to use (choices: ${PUBLIC_PRESET_NAMES.map(
-                (x) => `"${x}"`
-            ).join(', ')})`
-        )
-        .option(
-            '--templateVersion <version>',
-            `The version of the template to be generated when it's source is NPM.`,
-            DEFAULT_TEMPLATE_VERSION
-        )
-        .option('--verbose', `Print additional logging information to the console.`, false)
+
+    OPTIONS.forEach((option) => {
+        if (option.name === '--preset') {
+            program.option(
+                option.name,
+                `The name of a project preset to use (choices: ${PUBLIC_PRESET_NAMES.map(
+                    (x) => `"${x}"`
+                ).join(', ')})`
+            )
+        } else {
+            program.option(option.name, option.description, option.defaultValue)
+        }
+    })
 
     program.parse(process.argv)
 
