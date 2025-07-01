@@ -1,6 +1,7 @@
 ---
-description: Requirement template for a Product Detail component (supports single products, bundles, and sets)
-globs: 
+description: Requirement template for a Product component
+globs: "**/components/**"
+type: agent-requested
 alwaysApply: false
 ---
 
@@ -12,6 +13,7 @@ This rule is your entry point for building Product components in a requirement-d
 - Browse the `.cursor/rules/product-component-requirements-mdc/` directory.
 - Each `.mdc` file in that directory describes a specific Product component scenario (e.g., product-tile, product-list, product-detail).
 - Each file includes:
+  - Quick Start
   - Data model
   - Features/props
   - Look & feel
