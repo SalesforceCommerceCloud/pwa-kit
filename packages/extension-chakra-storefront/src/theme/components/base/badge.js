@@ -9,6 +9,17 @@ import {defineRecipe} from '@chakra-ui/react'
 export default defineRecipe({
     variants: {
         variant: {
+            solid: {
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                borderRadius: 'md',
+                fontWeight: 'medium',
+                fontSize: 'xs',
+                lineHeight: '1.2',
+                textTransform: 'uppercase',
+                letterSpacing: 'wider'
+            },
             notification: {
                 display: 'inline-flex',
                 justifyContent: 'center',

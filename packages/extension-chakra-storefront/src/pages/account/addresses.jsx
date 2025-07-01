@@ -93,12 +93,12 @@ const ShippingAddressForm = ({form, hasAddresses, selectedAddressId, toggleEdit,
                         <form onSubmit={form.handleSubmit(submitForm)}>
                             <Stack spacing={6}>
                                 {form.formState.errors?.global && (
-                                    <Alert status="error">
+                                    <Alert.Root status="error">
                                         <AlertIcon color="red.600" boxSize={4} />
                                         <Text fontSize="sm" ml={3}>
                                             {form.formState.errors.global.message}
                                         </Text>
-                                    </Alert>
+                                    </Alert.Root>
                                 )}
                                 <AddressFields form={form} />
                                 <FormActionButtons onCancel={toggleEdit} />
@@ -348,7 +348,7 @@ const AccountAddresses = () => {
                                     removeBtnLabel={removeLabel}
                                 >
                                     {address.preferred && (
-                                        <Badge
+                                        <Badge.Root
                                             position="absolute"
                                             fontSize="xs"
                                             right={4}
@@ -356,11 +356,13 @@ const AccountAddresses = () => {
                                             bg="gray.100"
                                             color="gray.900"
                                         >
-                                            <FormattedMessage
-                                                defaultMessage="Default"
-                                                id="account_addresses.badge.default"
-                                            />
-                                        </Badge>
+                                            <Badge.Label>
+                                                <FormattedMessage
+                                                    defaultMessage="Default"
+                                                    id="account_addresses.badge.default"
+                                                />
+                                            </Badge.Label>
+                                        </Badge.Root>
                                     )}
                                     <AddressDisplay address={address} />
                                     {isEditing && address.addressId === selectedAddressId && (

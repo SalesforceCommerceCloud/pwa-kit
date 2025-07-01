@@ -21,11 +21,11 @@ export const navLinks = [
         path: '',
         icon: AccountIcon
     },
-    {
-        name: 'wishlist',
-        path: '/wishlist',
-        icon: HeartIcon
-    },
+    // {
+    //     name: 'wishlist',
+    //     path: '/wishlist',
+    //     icon: HeartIcon
+    // },
     {
         name: 'orders',
         path: '/orders',

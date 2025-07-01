@@ -5,35 +5,25 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, {useEffect, useState} from 'react'
+import React, {useState} from 'react'
 import PropTypes from 'prop-types'
 import {FormattedMessage, useIntl} from 'react-intl'
-import {Route, Switch, Redirect, useLocation, useRouteMatch} from 'react-router-dom'
+import {Redirect, useLocation, useRouteMatch} from 'react-router-dom'
+import {Route, Switch} from 'react-router-dom'
 import {
-    Accordion,
-    AccordionButton,
-    AccordionItem,
-    AccordionPanel,
     Box,
     Button,
     Flex,
     Grid,
     Heading,
     Stack,
-    Text,
-    Divider
+    Text
 } from '@chakra-ui/react'
 import Seo from '../../components/seo'
 import Link from '../../components/link'
-import {ChevronDownIcon, ChevronUpIcon, SignoutIcon} from '../../components/icons'
-import AccountDetail from '../../pages/account/profile'
 import AccountAddresses from '../../pages/account/addresses'
-import AccountOrders from '../../pages/account/orders'
-import AccountWishlist from '../../pages/account/wishlist/index'
-
 import {messages, navLinks} from '../../pages/account/constant'
 import useNavigation from '../../hooks/use-navigation'
-import LoadingSpinner from '../../components/loading-spinner'
 import useMultiSite from '../../hooks/use-multi-site'
 import useEinstein from '../../hooks/use-einstein'
 import useDataCloud from '../../hooks/use-datacloud'
@@ -81,7 +71,8 @@ const Account = () => {
     const {formatMessage} = useIntl()
     const {data: customer} = useCurrentCustomer()
     const {isRegistered, customerType} = customer
-
+    const {buildUrl} = useMultiSite()
+    
     const logout = useAuthHelper(AuthHelpers.Logout)
     const location = useLocation()
     const navigate = useNavigation()
@@ -92,27 +83,23 @@ const Account = () => {
     const einstein = useEinstein()
     const dataCloud = useDataCloud()
 
-    const {buildUrl} = useMultiSite()
-    /**************** Einstein ****************/
-    useEffect(() => {
+    React.useEffect(() => {
         einstein.sendViewPage(location.pathname)
         dataCloud.sendViewPage(location.pathname)
     }, [location])
 
     const onSignoutClick = async () => {
         setShowLoading(true)
-        await logout.mutateAsync()
-        navigate('/login')
+        // await logout.mutateAsync()
+        // navigate('/login')
     }
 
     // If we have customer data and they are not registered, push to login page
-    // Using Redirect allows us to store the directed page to location
-    // so we can direct users back after they are successfully log in
     if (customerType !== null && !isRegistered && onClient) {
         const path = buildUrl('/login')
         return <Redirect to={{pathname: path, state: {directedFrom: '/account'}}} />
     }
-
+    
     return (
         <Box
             data-testid={isRegistered && isHydrated() ? 'account-page' : 'account-page-skeleton'}
@@ -121,85 +108,14 @@ const Account = () => {
         >
             <Seo title="My Account" description="Customer Account Page" />
             <Grid templateColumns={{base: '1fr', lg: '320px 1fr'}} gap={{base: 10, lg: 24}}>
-                {/* small screen nav accordion */}
-                <Accordion
-                    display={{base: 'block', lg: 'none'}}
-                    allowToggle={true}
-                    reduceMotion={true}
-                    index={mobileNavIndex}
-                    onChange={setMobileNavIndex}
-                >
-                    <AccordionItem border="none" background="gray.50" borderRadius="base">
-                        {({isExpanded}) => (
-                            <>
-                                <AccordionButton
-                                    as={Button}
-                                    height={16}
-                                    paddingLeft={8}
-                                    variant="ghost"
-                                    color="black"
-                                    _active={{background: 'gray.100'}}
-                                    _expanded={{background: 'transparent'}}
-                                >
-                                    <Flex align="center" justify="center">
-                                        <Heading as="h2" fontSize="16px">
-                                            <FormattedMessage
-                                                defaultMessage="My Account"
-                                                id="account.accordion.button.my_account"
-                                            />
-                                        </Heading>
-                                        {isExpanded ? <ChevronUpIcon /> : <ChevronDownIcon />}
-                                    </Flex>
-                                </AccordionButton>
-                                <AccordionPanel px={4} paddingBottom={4}>
-                                    <Flex as="nav" spacing={0} direction="column">
-                                        <Stack spacing={0} as="ul" data-testid="account-nav">
-                                            {navLinks.map((link) => (
-                                                <Box
-                                                    align="center"
-                                                    key={link.name}
-                                                    as="li"
-                                                    listStyleType="none"
-                                                >
-                                                    <Button
-                                                        as={Link}
-                                                        to={`/account${link.path}`}
-                                                        useNavLink={true}
-                                                        variant="menu-link-mobile"
-                                                        justifyContent="center"
-                                                        fontSize="md"
-                                                        fontWeight="normal"
-                                                        width="100%"
-                                                        onClick={() => setMobileNavIndex(-1)}
-                                                    >
-                                                        {formatMessage(messages[link.name])}
-                                                    </Button>
-                                                </Box>
-                                            ))}
-
-                                            <LogoutButton
-                                                justify="center"
-                                                onClick={onSignoutClick}
-                                            />
-                                        </Stack>
-                                    </Flex>
-                                </AccordionPanel>
-                            </>
-                        )}
-                    </AccordionItem>
-                </Accordion>
-
-                {/* large screen nav sidebar */}
+                {/* Navigation Sidebar */}
                 <Stack display={{base: 'none', lg: 'flex'}} spacing={4}>
-                    {showLoading && <LoadingSpinner wrapperStyles={{height: '100vh'}} />}
-
                     <Heading as="h2" fontSize="18px">
                         <FormattedMessage
                             defaultMessage="My Account"
                             id="account.heading.my_account"
                         />
                     </Heading>
-
                     <Flex spacing={0} as="nav" data-testid="account-detail-nav" direction="column">
                         {navLinks.map((link) => {
                             const LinkIcon = link.icon
@@ -216,24 +132,27 @@ const Account = () => {
                                 </Button>
                             )
                         })}
-                        <LogoutButton onClick={onSignoutClick} />
                     </Flex>
+                    <Button onClick={onSignoutClick}>Logout</Button>
                 </Stack>
 
-                <Switch>
-                    <Route exact path={path}>
-                        <AccountDetail />
-                    </Route>
-                    <Route exact path={`${path}/wishlist`}>
-                        <AccountWishlist />
-                    </Route>
-                    <Route exact path={`${path}/addresses`}>
-                        <AccountAddresses />
-                    </Route>
-                    <Route path={`${path}/orders`}>
-                        <AccountOrders />
-                    </Route>
-                </Switch>
+                {/* Main Content */}
+                <Box>
+                    <Heading>Account Page</Heading>
+                    <Text>Path: {path}</Text>
+                    <Text>Registered: {isRegistered ? 'Yes' : 'No'}</Text>
+                    <Text>Customer Type: {customerType}</Text>
+
+                    <Switch>
+                        <Route path={`${path}/addresses`} component={AccountAddresses} />
+                        <Route exact path={path}>
+                            <Box>
+                                <Heading>Account Profile</Heading>
+                                <Text>This is the account profile page</Text>
+                            </Box>
+                        </Route>
+                    </Switch>
+                </Box>
             </Grid>
         </Box>
     )

@@ -12,7 +12,7 @@ import {
     IconButton,
     Input,
     InputGroup,
-    NativeSelect,
+    Select,
     Checkbox
 } from '@chakra-ui/react'
 import {VisibilityIcon, VisibilityOffIcon, AlertIcon} from '../icons'
@@ -109,22 +109,22 @@ const Field = ({
 
                         {type === 'select' && (
                             <>
-                                <NativeSelect.Root ref={ref} value={value} {..._inputProps}>
-                                    <NativeSelect.Field
+                                <Select.Root ref={ref} value={value} {..._inputProps}>
+                                    <Select.Field
                                         onChange={onChange}
                                         placeholder={placeholder}
                                     >
                                         {options.map((opt) => (
-                                            <option
+                                            <Select.Option
                                                 key={`${opt.label}-${opt.value}`}
                                                 value={opt.value}
                                             >
                                                 {opt.label}
-                                            </option>
+                                            </Select.Option>
                                         ))}
-                                    </NativeSelect.Field>
-                                    <NativeSelect.Indicator />
-                                </NativeSelect.Root>
+                                    </Select.Field>
+                                    <Select.Indicator />
+                                </Select.Root>
                                 {children}
                             </>
                         )}
