@@ -600,56 +600,72 @@ const ProductList = (props) => {
                                               .map((value, index) => (
                                                   <ProductTileSkeleton key={index} />
                                               ))
-                                        : productSearchResult?.hits?.map((productSearchItem) => {
-                                              const productId = productSearchItem.productId
-                                              const isInWishlist =
-                                                  !!wishlist?.customerProductListItems?.find(
-                                                      (item) => item.productId === productId
-                                                  )
+                                        : productSearchResult?.hits?.map(
+                                              (productSearchItem, index) => {
+                                                  const productId = productSearchItem.productId
+                                                  const isInWishlist =
+                                                      !!wishlist?.customerProductListItems?.find(
+                                                          (item) => item.productId === productId
+                                                      )
 
-                                              return (
-                                                  <ProductTile
-                                                      data-testid={`sf-product-tile-${productSearchItem.productId}`}
-                                                      key={productSearchItem.productId}
-                                                      product={productSearchItem}
-                                                      enableFavourite={true}
-                                                      isFavourite={isInWishlist}
-                                                      isRefreshingData={isRefetching && isFetched}
-                                                      imageViewType={PRODUCT_LIST_IMAGE_VIEW_TYPE}
-                                                      selectableAttributeId={
-                                                          PRODUCT_LIST_SELECTABLE_ATTRIBUTE_ID
-                                                      }
-                                                      onClick={() => {
-                                                          if (searchQuery) {
-                                                              einstein.sendClickSearch(
-                                                                  searchQuery,
-                                                                  productSearchItem
-                                                              )
-                                                          } else if (category) {
-                                                              einstein.sendClickCategory(
-                                                                  category,
-                                                                  productSearchItem
-                                                              )
+                                                  return (
+                                                      <ProductTile
+                                                          data-testid={`sf-product-tile-${productSearchItem.productId}`}
+                                                          key={productSearchItem.productId}
+                                                          product={productSearchItem}
+                                                          enableFavourite={true}
+                                                          isFavourite={isInWishlist}
+                                                          isRefreshingData={
+                                                              isRefetching && isFetched
                                                           }
-                                                      }}
-                                                      onFavouriteToggle={(toBeFavourite) => {
-                                                          const action = toBeFavourite
-                                                              ? addItemToWishlist
-                                                              : removeItemFromWishlist
-                                                          return action(productSearchItem)
-                                                      }}
-                                                      dynamicImageProps={{
-                                                          widths: [
-                                                              '50vw',
-                                                              '50vw',
-                                                              '20vw',
-                                                              '20vw',
-                                                              '25vw'
-                                                          ]
-                                                      }}
-                                                  />
-                                              )
-                                          })}
+                                                          imageViewType={
+                                                              PRODUCT_LIST_IMAGE_VIEW_TYPE
+                                                          }
+                                                          selectableAttributeId={
+                                                              PRODUCT_LIST_SELECTABLE_ATTRIBUTE_ID
+                                                          }
+                                                          onClick={() => {
+                                                              if (searchQuery) {
+                                                                  einstein.sendClickSearch(
+                                                                      searchQuery,
+                                                                      productSearchItem
+                                                                  )
+                                                              } else if (category) {
+                                                                  einstein.sendClickCategory(
+                                                                      category,
+                                                                      productSearchItem
+                                                                  )
+                                                              }
+                                                          }}
+                                                          onFavouriteToggle={(toBeFavourite) => {
+                                                              const action = toBeFavourite
+                                                                  ? addItemToWishlist
+                                                                  : removeItemFromWishlist
+                                                              return action(productSearchItem)
+                                                          }}
+                                                          dynamicImageProps={{
+                                                              widths: [
+                                                                  '50vw',
+                                                                  '50vw',
+                                                                  '20vw',
+                                                                  '20vw',
+                                                                  '25vw'
+                                                              ],
+                                                              // The first two product images should render eagerly to
+                                                              // ensure prioritized loading for above-the-fold images
+                                                              // on mobile.
+                                                              ...(index < 2
+                                                                  ? {
+                                                                        imageProps: {
+                                                                            loading: 'eager'
+                                                                        }
+                                                                    }
+                                                                  : {})
+                                                          }}
+                                                      />
+                                                  )
+                                              }
+                                          )}
                                 </SimpleGrid>
                                 {/* Footer */}
                                 <Flex
