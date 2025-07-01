@@ -5,10 +5,9 @@ on:
   push:
     branches:
       - develop
-      - W-18685522-reset-and-passwordless-integration-test # TODO: remove this branch after testing
-  # Run daily at 2 AM UTC to catch any missed syncs
+  # Run daily at 11 PM PST (7 AM UTC) to catch any missed syncs
   schedule:
-    - cron: '0 2 * * *'
+    - cron: '0 7 * * *'
   # Allow manual triggering with options
   workflow_dispatch:
     inputs:
