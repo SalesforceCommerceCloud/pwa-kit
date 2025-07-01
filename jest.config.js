@@ -49,6 +49,8 @@ module.exports = {
         createTestGlob('pages/home'),
         createTestGlob('pages/cart'),
         createTestGlob('pages/product-list'),
+        createTestGlob('components/offline-banner'),
+        createTestGlob('components/offline-boundary'),
         // createTestGlob('pages/login'),  // TODO: enable after Account page has been migrated
         createTestGlob('pages/login-redirect'),
         createTestGlob('pages/social-login-redirect'),
@@ -99,6 +101,7 @@ module.exports = {
         'non-pwa/**/*.{js,jsx}',
         'worker/**/*.{js,jsx}',
         'scripts/generator/*.{js,jsx}',
+        'src/**/*.{js,jsx}',
         '!app/pages/test-container/**/*.{js,jsx}',
         '!app/utils/test-utils.js',
         '!app/mocks/*.js',
