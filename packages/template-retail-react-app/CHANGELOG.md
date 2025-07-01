@@ -6,6 +6,7 @@
 - Fix Einstein event tracking for `addToCart` event [#2558](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2558)
 - Update latest translations for all languages [#2616](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2616)
 - Load active data scripts on demand only [#2623](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2623)
+- Provide base image for convenient perf optimizations [#2642](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2642)
 
 ## v6.1.0 (May 22, 2025)
 
