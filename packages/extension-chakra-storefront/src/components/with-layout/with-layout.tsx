@@ -42,8 +42,8 @@ import CheckoutHeader from '../../pages/checkout/partials/checkout-header'
 import CheckoutFooter from '../../pages/checkout/partials/checkout-footer'
 import Footer from '../footer'
 import Header from '../header'
-// import OfflineBanner from '../offline-banner'
-// import OfflineBoundary from '../offline-boundary'
+import OfflineBanner from '../offline-banner'
+import OfflineBoundary from '../offline-boundary'
 import Seo from '../seo'
 import ScrollToTop from '../scroll-to-top'
 import Fade from '../fade'
@@ -275,7 +275,6 @@ const withLayout = <P extends object>(WrappedComponent: React.ComponentType<P>) 
                 </Seo>
 
                 <ScrollToTop />
-
                 <Box id="app" display="flex" flexDirection="column" flex={1}>
                     {/*TODO: recreating this component because @chakra-ui/skip-nav does not have V3 version*/}
                     {/*<SkipNavLink zIndex="skipLink">Skip to Content</SkipNavLink>*/}
@@ -316,7 +315,7 @@ const withLayout = <P extends object>(WrappedComponent: React.ComponentType<P>) 
                             <CheckoutHeader />
                         )}
                     </Box>
-                    {/*{!isOnline && <OfflineBanner />}*/}
+                    {!isOnline && <OfflineBanner />}
                     <AddToCartModalProvider>
                         {/*TODO: recreating this component because @chakra-ui/skip-nav does not have V3 version*/}
                         {/*<SkipNavContent*/}
@@ -335,10 +334,9 @@ const withLayout = <P extends object>(WrappedComponent: React.ComponentType<P>) 
                             flexDirection="column"
                             flex="1"
                         >
-                            {/*<OfflineBoundary isOnline={false}>*/}
-
-                            <WrappedComponent {...(props as P)} />
-                            {/*</OfflineBoundary>*/}
+                            <OfflineBoundary isOnline={isOnline}>
+                                <WrappedComponent {...(props as P)} />
+                            </OfflineBoundary>
                         </Box>
                         {/*</SkipNavContent>*/}
 

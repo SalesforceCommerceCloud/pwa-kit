@@ -8,7 +8,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import {render} from '@testing-library/react'
-import Metadata from './metadata'
+import Metadata from './page-metadata'
 
 jest.mock('../../components/seo', () => {
     function MockSeo({metaTags, ...props}) {

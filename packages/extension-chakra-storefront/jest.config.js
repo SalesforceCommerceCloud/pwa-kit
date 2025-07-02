@@ -50,6 +50,8 @@ module.exports = {
         createTestGlob('pages/home'),
         createTestGlob('pages/cart'),
         createTestGlob('pages/product-list'),
+        createTestGlob('components/offline-banner'),
+        createTestGlob('components/offline-boundary'),
         // createTestGlob('pages/login'),  // TODO: enable after Account page has been migrated
         createTestGlob('pages/login-redirect'),
         createTestGlob('pages/social-login-redirect'),
@@ -95,10 +97,12 @@ module.exports = {
     },
     setupFilesAfterEnv: [path.join(__dirname, 'jest-setup.js')],
     collectCoverageFrom: [
+        'src/**/*.{js,jsx}',
         'app/**/*.{js,jsx}',
         'non-pwa/**/*.{js,jsx}',
         'worker/**/*.{js,jsx}',
         'scripts/generator/*.{js,jsx}',
+        'src/**/*.{js,jsx}',
         '!app/pages/test-container/**/*.{js,jsx}',
         '!app/utils/test-utils.js',
         '!app/mocks/*.js',
