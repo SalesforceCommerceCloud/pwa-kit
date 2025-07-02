@@ -32,31 +32,6 @@ import extensionMeta from '../extension-meta.json'
 // Pages
 import * as Pages from './pages'
 
-// START: This is for testing purposes only, please remove before merging
-import LoadingSpinner from './components/loading-spinner'
-import PageActionPlaceHolder from './components/page-action-placeholder'
-import {HeartIcon} from './components/icons'
-
-const LoadingSpinnerPage = () => {
-    return (
-        <LoadingSpinner />
-    )
-}
-
-const PageActionPlaceHolderPage = () => {
-    return (
-        <PageActionPlaceHolder 
-            data-testid="empty-wishlist"
-            icon={<HeartIcon boxSize={8} />}
-            heading={'No Wishlist Items'}
-            text={'Continue shopping and add items to your wishlist.'}
-            buttonText={'Continue Shopping'}
-            buttonProps={{leftIcon: undefined}}
-        />
-    )
-}
-// END: This is for testing purposes only, please remove before merging
-
 class ChakraStorefront extends ApplicationExtension<Config> {
     static readonly id = extensionMeta.id
 
@@ -81,21 +56,6 @@ class ChakraStorefront extends ApplicationExtension<Config> {
         const config = this.getConfig()
 
         const extensionRoutes = [
-            {
-                path: '/loading-spinner',
-                component: LoadingSpinnerPage,
-                exact: true
-            },
-            {
-                path: '/page-action-placeholder',
-                component: PageActionPlaceHolderPage,
-                exact: true
-            },
-            {
-                path: '/page-action-placeholder',
-                component: PageActionPlaceHolder,
-                exact: true
-            },
             {
                 path: config.pages.Home && config.pages.Home.path,
                 component: Pages.Home,
