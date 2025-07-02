@@ -41,8 +41,8 @@ const DEFAULT_SKELETON_COUNT = 3
 const BoxArrow = () => {
     return (
         <Box
-            width={3}
-            height={3}
+            width={4}
+            height={4}
             borderLeft="1px solid"
             borderTop="1px solid"
             borderColor="blue.600"
@@ -61,19 +61,19 @@ const ShippingAddressForm = ({form, hasAddresses, selectedAddressId, toggleEdit,
         <Box
             border="1px solid"
             borderColor="gray.200"
-            borderRadius="base"
+            rounded="base"
             position="relative"
             {...(hasAddresses && {
                 gridColumn: [1, 'span 2', 'span 2', 'span 2', 'span 3'],
-                paddingX: [4, 4, 6],
-                paddingY: 6,
+                px: [4, 4, 6],
+                py: 6,
                 rounded: 'base',
                 border: '1px solid',
                 borderColor: 'blue.600'
             })}
         >
             {form.formState.isSubmitting && <LoadingSpinner />}
-            <Stack gap={6} padding={6}>
+            <Stack gap={6} p={6}>
                 <Heading as="h3" size="sm">
                     {selectedAddressId ? (
                         <FormattedMessage
@@ -272,12 +272,12 @@ const AccountAddresses = () => {
                     {new Array(DEFAULT_SKELETON_COUNT).fill().map((_, index) => {
                         return (
                             <ActionCard key={index}>
-                                <Stack gap={2} marginBottom={7}>
-                                    <Skeleton height="23px" width="120px" />
+                                <Stack gap={2} mb={7}>
+                                    <Skeleton height={6} width={30} />
 
-                                    <Skeleton height="23px" width="84px" />
+                                    <Skeleton height={6} width={21} />
 
-                                    <Skeleton height="23px" width="104px" />
+                                    <Skeleton height={6} width={26} />
                                 </Stack>
                             </ActionCard>
                         )
@@ -297,7 +297,7 @@ const AccountAddresses = () => {
                             minHeight={11}
                             rounded="base"
                             fontWeight="medium"
-                            leftIcon={<PlusIcon display="block" boxSize={'15px'} />}
+                            leftIcon={<PlusIcon display="block" boxSize={4} />}
                             onClick={() => toggleEdit()}
                         >
                             <FormattedMessage
