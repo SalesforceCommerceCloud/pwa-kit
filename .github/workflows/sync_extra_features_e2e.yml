@@ -47,10 +47,6 @@ jobs:
           # Fetch all branches
           git fetch origin
     
-          # Just to test
-          echo "status=conflict" >> $GITHUB_OUTPUT
-          exit 1
-          
           # Check if the target branch exists
           if ! git show-ref --verify --quiet refs/remotes/origin/extra-features-e2e-branch; then
             echo "Branch extra-features-e2e-branch does not exist. Creating it from develop..."
@@ -110,9 +106,8 @@ jobs:
             ${conflictFiles}
             \`\`\`
             
-            ### Resolution Options:
             
-            #### Option 1: Manual Resolution
+            ### Manual Resolution:
             \`\`\`bash
             git checkout extra-features-e2e-branch
             git pull origin extra-features-e2e-branch
@@ -123,14 +118,7 @@ jobs:
             git push origin extra-features-e2e-branch
             \`\`\`
             
-            #### Option 2: Force Sync (Overwrites E2E changes)
-            Go to [Actions](../../actions/workflows/sync-more-logins-e2e.yml) and run the workflow manually with "Force sync" enabled.
-            
-            #### Option 3: Reset Strategy
-            Go to [Actions](../../actions/workflows/sync-more-logins-e2e.yml) and run the workflow manually with "reset" strategy.
-            
-            ### Auto-close
-            This issue will be automatically closed when the sync succeeds.
+            ### After resolving the conflicts, close this issue
             `;
 
             // Check if issue already exists
