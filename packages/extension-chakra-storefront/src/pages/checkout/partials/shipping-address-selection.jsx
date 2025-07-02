@@ -219,7 +219,6 @@ const ShippingAddressSelection = ({
             setIsEditingAddress(false)
         }
 
-        // Chakra v3 radio returns the selected id in an object with a value property
         const address = customer.addresses.find((addr) => addr.addressId === addressId)
         form.reset({...address})
     }
