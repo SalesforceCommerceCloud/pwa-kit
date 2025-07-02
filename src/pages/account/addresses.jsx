@@ -93,7 +93,7 @@ const ShippingAddressForm = ({form, hasAddresses, selectedAddressId, toggleEdit,
                             <Stack gap={6}>
                                 {form.formState.errors?.global && (
                                     <Alert.Root colorPalette="red">
-                                        <Alert.Indicator boxSize={4}/>
+                                        <Alert.Indicator boxSize={4} />
                                         <Alert.Content>
                                             <Text fontSize="sm">
                                                 {form.formState.errors.global.message}
@@ -349,11 +349,7 @@ const AccountAddresses = () => {
                                     removeBtnLabel={removeLabel}
                                 >
                                     {address.preferred && (
-                                        <Badge
-                                            position="absolute"
-                                            right={4}
-                                            variant="default"
-                                        >
+                                        <Badge position="absolute" right={4} variant="default">
                                             <FormattedMessage
                                                 defaultMessage="Default"
                                                 id="account_addresses.badge.default"
