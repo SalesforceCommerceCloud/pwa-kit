@@ -46,10 +46,10 @@ import CartItemVariantPrice from '@salesforce/retail-react-app/app/components/it
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
 import {
     API_ERROR_MESSAGE,
-    STORE_LOCATOR_IS_ENABLED
+    STORE_LOCATOR_IS_ENABLED,
+    DEFAULT_ADDRESS_ID
 } from '@salesforce/retail-react-app/app/constants'
 import {useCurrency} from '@salesforce/retail-react-app/app/hooks'
-import {nanoid} from 'nanoid'
 
 const onClient = typeof window !== 'undefined'
 
@@ -113,7 +113,7 @@ const CheckoutConfirmation = () => {
                 const shippingAddress = order.shipments[0].shippingAddress
                 let {id, ...shippingAddressWithoutId} = shippingAddress
                 const bodyShippingAddress = {
-                    addressId: nanoid(),
+                    addressId: DEFAULT_ADDRESS_ID,
                     ...shippingAddressWithoutId
                 }
                 await createCustomerAddress.mutateAsync({
@@ -121,12 +121,7 @@ const CheckoutConfirmation = () => {
                     parameters: {customerId: customerId}
                 })
             } catch (error) {
-                toast({
-                    title: formatMessage(API_ERROR_MESSAGE),
-                    status: 'error',
-                    position: 'top-right',
-                    isClosable: true
-                })
+                // Fail silently
             }
         }
 
