@@ -7,5 +7,6 @@
 import CreateAppGuidelinesTool from './pwa-create-app-guideline-tool'
 import CreateNewComponentTool from './create-new-component-tool'
 import DeveloperGuidelinesTool from './pwa-developer-guideline-tool'
+import CreateCustomizePageTool from './create-customize-page-tool'
 
-export {CreateAppGuidelinesTool, CreateNewComponentTool, DeveloperGuidelinesTool}
+export {CreateAppGuidelinesTool, CreateNewComponentTool, DeveloperGuidelinesTool, CreateCustomizePageTool}

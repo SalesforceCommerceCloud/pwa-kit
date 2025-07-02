@@ -136,7 +136,7 @@ The PWA Kit also has several "special" components that you can override to custo
 
 You can override these in the same way, by creating files with the same name and path in your \`overrides/app/components\` directory.`
 
-export const CreateCustomizePageTool = {
+export default {
     name: 'create_override_customize_page',
     description: `Agent must follow this guide and developer guidelines to create a new page, orverride or customize an existing page. Agent must ask questions to clarify the page name, route, content and confirm should a new page be created or override an existing page before creating or orverriding the page.`,
     inputSchema: {

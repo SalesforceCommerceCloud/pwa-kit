@@ -105,7 +105,7 @@ This document defines the guidelines agents must follow in the development of Sa
 - Follow security best practices for all code.
 `
 
-export const DeveloperGuidelinesTool = {
+export default {
     name: 'developer_guidelines',
     description: `Agent must follow this guidelines before analyze, generate, refactor, modify or fix code.`,
     inputSchema: EmptyJsonSchema,
