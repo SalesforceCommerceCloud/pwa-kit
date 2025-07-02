@@ -12,6 +12,7 @@ import {z} from 'zod'
 import {CreateAppGuidelinesTool, CreateNewComponentTool, DeveloperGuidelinesTool} from '../utils'
 import {HookRecommenderTool} from '../utils/hook-recommender-tool'
 import {TestWithPlaywrightTool} from '../utils/run-site-test-tool'
+import {CreateCustomizePageTool} from '../utils/create-customize-page-tool'
 
 // NOTE: This is a workaround to import JSON files as ES modules.
 // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -20,17 +21,6 @@ const productDocument = require('../data/ProductDocument.json')
 const categoryDocument = require('../data/CategoryDocument.json')
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const documentList = require('../data/DocumentList.json')
-import {
-    CreateAppGuidelinesTool,
-    CreateNewComponentTool,
-    DeveloperGuidelinesTool
-} from '../utils/index.js'
-import {HookRecommenderTool} from '../utils/hook-recommender-tool.js'
-import {CreateCustomizePageTool} from '../utils/create-customize-page-tool.js'
-import productDocument from '../data/ProductDocument.json' with { type: 'json' }
-import categoryDocument from '../data/CategoryDocument.json' with { type: 'json' }
-import documentList from '../data/DocumentList.json' with { type: 'json' }
-import {TestWithPlaywrightTool} from '../utils/run-site-test-tool.js'
 
 class PwaStorefrontMCPServerHighLevel {
     constructor() {
@@ -66,20 +56,20 @@ class PwaStorefrontMCPServerHighLevel {
             CreateAppGuidelinesTool.fn
         )
 
-        // Register DeveloperGuidelinesTool
-        this.server.tool(
-            DeveloperGuidelinesTool.name,
-            DeveloperGuidelinesTool.description,
-            DeveloperGuidelinesTool.inputSchema,
-            DeveloperGuidelinesTool.fn
-        )
-
         // Register CreateCustomizePageTool
         this.server.tool(
             CreateCustomizePageTool.name,
             CreateCustomizePageTool.description,
             CreateCustomizePageTool.inputSchema,
             CreateCustomizePageTool.fn
+        )
+
+        // Register DeveloperGuidelinesTool
+        this.server.tool(
+            DeveloperGuidelinesTool.name,
+            DeveloperGuidelinesTool.description,
+            DeveloperGuidelinesTool.inputSchema,
+            DeveloperGuidelinesTool.fn
         )
 
         this.server.tool(
