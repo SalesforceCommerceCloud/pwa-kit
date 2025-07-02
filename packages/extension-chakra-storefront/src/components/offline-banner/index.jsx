@@ -9,7 +9,7 @@ import React from 'react'
 import {useIntl} from 'react-intl'
 
 // Components
-import {Alert, AlertDescription, Flex} from '@chakra-ui/react'
+import {Alert, Flex} from '@chakra-ui/react'
 
 // Icons
 import {AlertIcon} from '../../components/icons'
@@ -20,17 +20,17 @@ import {AlertIcon} from '../../components/icons'
 const OfflineBanner = ({...props}) => {
     const intl = useIntl()
     return (
-        <Alert status="warning" {...props}>
+        <Alert.Root status="warning" colorPalette="blue" {...props}>
             <Flex align="center">
                 <AlertIcon mr={2} />
-                <AlertDescription>
+                <Alert.Title>
                     {intl.formatMessage({
                         id: 'offline_banner.description.browsing_offline_mode',
                         defaultMessage: "You're currently browsing in offline mode"
                     })}
-                </AlertDescription>
+                </Alert.Title>
             </Flex>
-        </Alert>
+        </Alert.Root>
     )
 }
 
