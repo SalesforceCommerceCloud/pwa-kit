@@ -99,7 +99,11 @@ jobs:
             const issueBody = `
             ## 🚨 Automatic Sync Failed - Merge Conflicts Detected
             
-            The automatic sync from \`develop\` to \`extra-features-e2e-branch\` failed due to merge conflicts.
+            Some features in PWA kit are defaulted to be off in \`develop\` branch (e.g. if they only work with private client). 
+            Hence there is another site that has these features enabled that E2E tests of these extra features are run against.
+            The \`extra-features-e2e-branch\` is used for this site.
+            
+            A job is run nightly to sync \`develop\` to \`extra-features-e2e-branch\` branch, but today this automatic sync from \`develop\` to \`extra-features-e2e-branch\` failed due to merge conflicts.
             
             ### Conflicting Files:
             \`\`\`
@@ -133,7 +137,7 @@ jobs:
               await github.rest.issues.create({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
-                title: '🚨 E2E Branch Sync Conflict - Manual Resolution Required',
+                title: '🚨 Extra Features E2E Branch Sync Conflict - Manual Resolution Required',
                 body: issueBody,
                 labels: ['sync-conflict', 'automation']
               });
