@@ -133,6 +133,24 @@ jobs:
             This issue will be automatically closed when the sync succeeds.
             `;
 
+            // Check if issue already exists
+            const existingIssues = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open',
+              labels: 'sync-conflict'
+            });
+            
+            if (existingIssues.data.length === 0) {
+              await github.rest.issues.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                title: '🚨 E2E Branch Sync Conflict - Manual Resolution Required',
+                body: issueBody,
+                labels: ['sync-conflict', 'automation']
+              });
+            }
+
   deploy:
     needs: sync-branch
     if: needs.sync-branch.outputs.status != 'conflict' && needs.sync-branch.outputs.status != 'up-to-date'
