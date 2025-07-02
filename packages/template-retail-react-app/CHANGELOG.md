@@ -7,6 +7,7 @@
 - Update latest translations for all languages [#2616](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2616)
 - Load active data scripts on demand only [#2623](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2623)
 - Show Bonus Products on Cart Page [#2547](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2547)
+- Show the Bonus Product in a Product View Modal to enable adding it to the cart [#2680](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2680)
 
 ## v6.1.0 (May 22, 2025)
 
