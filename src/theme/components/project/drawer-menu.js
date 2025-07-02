@@ -18,7 +18,9 @@ export default defineSlotRecipe({
         'icon',
         'localeSelector',
         'logo',
-        'signout',
+        'signoutButton',
+        'signoutText',
+        'signoutIcon',
         'socialsItem'
     ],
     base: {
@@ -72,8 +74,29 @@ export default defineSlotRecipe({
             width: 12,
             height: 8
         },
-        signout: {
-            width: '100%'
+        signoutButton: {
+            display: 'flex',
+            justifyContent: 'flex-start',
+            width: '100%',
+            color: 'gray.900',
+            fontWeight: 400,
+            fontSize: 'sm',
+            borderRadius: '4px',
+            height: 11,
+            padding: 4,
+            py: 3,
+            gap: 1,
+            pl: 8,
+            marginTop: 1,
+            _hover: {
+                background: 'gray.50'
+            }
+        },
+        signoutText: {
+            fontWeight: 'normal'
+        },
+        signoutIcon: {
+            marginRight: 1
         },
         socialsItem: {}
     }
