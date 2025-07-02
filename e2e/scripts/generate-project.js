@@ -65,8 +65,6 @@ program
     .option('--project-key <key>', 'Project key', (value) => {
         const validKeys = [
             'chakra-storefront-demo',
-            'chakra-storefront-ext',
-            'chakra-storefront-no-ext',
             'chakra-storefront-private-client',
             'chakra-storefront-bug-bounty',
             'chakra-storefront-demo-site'
