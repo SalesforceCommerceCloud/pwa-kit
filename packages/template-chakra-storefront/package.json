@@ -1,5 +1,5 @@
 {
-  "name": "@salesforce/chakra-storefront",
+  "name": "template-chakra-storefront",
   "version": "0.1.0-extensibility-preview.5",
   "private": true,
   "bugs": {
