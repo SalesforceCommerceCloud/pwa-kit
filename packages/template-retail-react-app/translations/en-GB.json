@@ -427,6 +427,9 @@
   "contact_info.button.login": {
     "defaultMessage": "Log In"
   },
+  "contact_info.button.otp": {
+    "defaultMessage": "One-Time Password (OTP)"
+  },
   "contact_info.button.password": {
     "defaultMessage": "Password"
   },
@@ -999,6 +1002,9 @@
   "login_form.button.google": {
     "defaultMessage": "Google"
   },
+  "login_form.button.otp": {
+    "defaultMessage": "One-Time Password (OTP)"
+  },
   "login_form.button.password": {
     "defaultMessage": "Password"
   },
@@ -1059,6 +1065,21 @@
   },
   "order_summary.label.tax": {
     "defaultMessage": "Tax"
+  },
+  "otp.button.resend_code": {
+    "defaultMessage": "Resend Code"
+  },
+  "otp.button.resend_timer": {
+    "defaultMessage": "Resend code in {seconds}s"
+  },
+  "otp.button.verify_sign_in": {
+    "defaultMessage": "Verify & Sign In"
+  },
+  "otp.message.code_sent": {
+    "defaultMessage": "We've sent an 8-digit code to your email {email}"
+  },
+  "otp.title.enter_verification_code": {
+    "defaultMessage": "Enter Verification Code"
   },
   "page_not_found.action.go_back": {
     "defaultMessage": "Back to previous page"

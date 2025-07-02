@@ -1073,6 +1073,12 @@
       "value": "Log In"
     }
   ],
+  "contact_info.button.otp": [
+    {
+      "type": 0,
+      "value": "One-Time Password (OTP)"
+    }
+  ],
   "contact_info.button.password": [
     {
       "type": 0,
@@ -2323,6 +2329,12 @@
       "value": "Google"
     }
   ],
+  "login_form.button.otp": [
+    {
+      "type": 0,
+      "value": "One-Time Password (OTP)"
+    }
+  ],
   "login_form.button.password": [
     {
       "type": 0,
@@ -2479,6 +2491,48 @@
     {
       "type": 0,
       "value": "Tax"
+    }
+  ],
+  "otp.button.resend_code": [
+    {
+      "type": 0,
+      "value": "Resend Code"
+    }
+  ],
+  "otp.button.resend_timer": [
+    {
+      "type": 0,
+      "value": "Resend code in "
+    },
+    {
+      "type": 1,
+      "value": "seconds"
+    },
+    {
+      "type": 0,
+      "value": "s"
+    }
+  ],
+  "otp.button.verify_sign_in": [
+    {
+      "type": 0,
+      "value": "Verify & Sign In"
+    }
+  ],
+  "otp.message.code_sent": [
+    {
+      "type": 0,
+      "value": "We've sent an 8-digit code to your email "
+    },
+    {
+      "type": 1,
+      "value": "email"
+    }
+  ],
+  "otp.title.enter_verification_code": [
+    {
+      "type": 0,
+      "value": "Enter Verification Code"
     }
   ],
   "page_not_found.action.go_back": [

@@ -2209,6 +2209,20 @@
       "value": "]"
     }
   ],
+  "contact_info.button.otp": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ǿƞḗḗ-Ŧīḿḗḗ Ƥȧȧşşẇǿǿřḓ (ǾŦƤ)"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
   "contact_info.button.password": [
     {
       "type": 0,
@@ -4971,6 +4985,20 @@
       "value": "]"
     }
   ],
+  "login_form.button.otp": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ǿƞḗḗ-Ŧīḿḗḗ Ƥȧȧşşẇǿǿřḓ (ǾŦƤ)"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
   "login_form.button.password": [
     {
       "type": 0,
@@ -5283,6 +5311,88 @@
     {
       "type": 0,
       "value": "Ŧȧȧẋ"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "otp.button.resend_code": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Řḗḗşḗḗƞḓ Ƈǿǿḓḗḗ"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "otp.button.resend_timer": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Řḗḗşḗḗƞḓ ƈǿǿḓḗḗ īƞ "
+    },
+    {
+      "type": 1,
+      "value": "seconds"
+    },
+    {
+      "type": 0,
+      "value": "ş"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "otp.button.verify_sign_in": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ṽḗḗřīƒẏ & Şīɠƞ Īƞ"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "otp.message.code_sent": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ẇḗḗ'ṽḗḗ şḗḗƞŧ ȧȧƞ 8-ḓīɠīŧ ƈǿǿḓḗḗ ŧǿǿ ẏǿǿŭŭř ḗḗḿȧȧīŀ "
+    },
+    {
+      "type": 1,
+      "value": "email"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "otp.title.enter_verification_code": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ḗƞŧḗḗř Ṽḗḗřīƒīƈȧȧŧīǿǿƞ Ƈǿǿḓḗḗ"
     },
     {
       "type": 0,
