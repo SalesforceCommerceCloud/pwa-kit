@@ -232,7 +232,7 @@ describe('scriptUtils', () => {
             originalCwd = process.cwd()
         })
         afterEach(() => process.chdir(originalCwd))
-        test('works in retail-react-app', async () => {
+        test('works in chakra-storefront', async () => {
             expect(await scriptUtils.getProjectDependencyTree()).toMatchObject({
                 name: '@salesforce/pwa-kit-dev',
                 version: pkg.version,

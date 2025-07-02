@@ -31,10 +31,10 @@ jobs:
       - name: Get nightly version
         run:  echo "nightly_version=${{ env.monorepo_version_base }}-nightly-${{ env.release_timestamp }}" >> "$GITHUB_ENV"
 
-      - name: Get retail-react-app version
+      - name: Get chakra-storefront version
         run: |-
           version=`jq -r ".version" packages/template-chakra-storefront/package.json | cut -d "-" -f 1`
-          echo "retail_app_version_base=$version" >> "$GITHUB_ENV"
+          echo "chakra_storefront_version_base=$version" >> "$GITHUB_ENV"
 
       - name: Get commerce-sdk-react version
         run: |-
@@ -75,9 +75,9 @@ jobs:
         run: |-
           npm run bump-version -- "${{ env.nightly_version }}"
 
-      - name: Bump version (retail-react-app)
+      - name: Bump version (chakra-storefront)
         run: |-
-          npm run bump-version:retail-react-app -- "${{ env.retail_app_version_base }}-nightly-${{ env.release_timestamp }}"
+          npm run bump-version:chakra-storefront -- "${{ env.chakra_storefront_version_base }}-nightly-${{ env.release_timestamp }}"
 
       - name: Bump version (commerce-sdk-react)
         run: |-

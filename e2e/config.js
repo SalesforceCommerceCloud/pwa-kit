@@ -10,27 +10,27 @@ module.exports = {
     process.env.RETAIL_APP_HOME ||
     "https://scaffold-pwa-e2e-tests-pwa-kit.mobify-storefront.com",
   GENERATED_PROJECTS_DIR: "../generated-projects",
-  GENERATE_PROJECTS: ["retail-app-demo"],
+  GENERATE_PROJECTS: ["chakra-storefront-demo"],
   GENERATOR_CMD:
     "node packages/pwa-kit-create-app/scripts/create-mobify-app-dev.js --outputDir",
   CLI_RESPONSES: {
-    "retail-app-demo": [
+    "chakra-storefront-demo": [
       {
         expectedPrompt: /Choose a project preset to get started:/i,
         response: "2\n",
       },
     ],
-    "retail-app-private-client": [],
-    "retail-react-app-bug-bounty": [],
-    "retail-react-app-demo-site": [],
+    "chakra-storefront-private-client": [],
+    "chakra-storefront-bug-bounty": [],
+    "chakra-storefront-demo-site": [],
   },
   PRESET: {
-    "retail-app-private-client": "retail-react-app-private-slas-client",
-    "retail-react-app-bug-bounty": "retail-react-app-bug-bounty",
-    "retail-react-app-demo-site": "retail-react-app-demo-site-internal"
+    "chakra-storefront-private-client": "chakra-storefront-private-slas-client",
+    "chakra-storefront-bug-bounty": "chakra-storefront-bug-bounty",
+    "chakra-storefront-demo-site": "chakra-storefront-demo-site-internal"
   },
   EXPECTED_GENERATED_ARTIFACTS: {
-    "retail-app-demo": [
+    "chakra-storefront-demo": [
       ".eslintignore",
       ".eslintrc.js",
       ".prettierrc.yaml",

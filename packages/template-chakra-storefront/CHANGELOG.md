@@ -8,4 +8,4 @@
 - Fix dependencies vulnerabilities [#2338](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2338)
 - Fix accessibility issues [#2375](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2375)
 
-For historical changelog, look for the original `retail-react-app` in the [release notes](https://github.com/SalesforceCommerceCloud/pwa-kit/releases).
+For historical changelog, look for the original `chakra-storfront` in the [release notes](https://github.com/SalesforceCommerceCloud/pwa-kit/releases).

@@ -3,7 +3,7 @@
   "version": "4.0.0-extensibility-preview.5",
   "scripts": {
     "bump-version": "node ./scripts/bump-version/index.js",
-    "bump-version:retail-react-app": "node ./scripts/bump-version/index.js --package=@salesforce/retail-react-app",
+    "bump-version:chakra-storefront": "node ./scripts/bump-version/index.js --package=template-chakra-storefront",
     "bump-version:commerce-sdk-react": "node ./scripts/bump-version/index.js --package=@salesforce/commerce-sdk-react",
     "bump-version:template-chakra-storefront": "node ./scripts/bump-version/index.js --package=@salesforce/template-chakra-storefront",
     "bump-version:extension-chakra-store-locator": "node ./scripts/bump-version/index.js --package=@salesforce/extension-chakra-store-locator",

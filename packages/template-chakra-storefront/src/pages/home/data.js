@@ -6,7 +6,7 @@
  */
 
 /**
- * This is the data used in by the Retail React App home page.
+ * This is the data used in by the Chakra Storefront home page.
  * The example static data is created for demonstration purposes.
  * Typically you'd get this information from the API or possibly
  * from content slots.

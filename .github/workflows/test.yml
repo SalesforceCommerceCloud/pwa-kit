@@ -72,7 +72,7 @@ jobs:
       IS_MRT_NODE: ${{ matrix.node == 22 && matrix.npm == 10 }}
 
       # Generate project outside of pwa-kit repo. Otherwise, the publish_to_npm action will complain about dirty working tree.
-      PROJECT_DIR: ../generated-retail-react-app-test-project
+      PROJECT_DIR: ../generated-chakra-storefront-test-project
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -84,12 +84,12 @@ jobs:
           npm: ${{ matrix.npm }}
           update_npm: ${{ env.IS_DEFAULT_NPM == 'false' }}
 
-      - name: Generate retail-react-app-test-project
+      - name: Generate chakra-storefront-test-project
         # Generate project only for those actions that use `env.PROJECT_DIR`
         if: env.IS_DEFAULT_NPM == 'true'
         uses: "./.github/actions/generate_app_with_preset"
         with:
-          preset: retail-react-app-test-project
+          preset: chakra-storefront-test-project
           output_dir: ${{ env.PROJECT_DIR }}
         timeout-minutes: 8
 
@@ -163,7 +163,7 @@ jobs:
       # (We also use this env var for making sure a step runs once for the current node version)
       # Note: For node 18, the default was npm 9 until v18.19.0, when it became npm 10
       IS_DEFAULT_NPM: ${{ (matrix.node == 18 && matrix.npm == 10) || (matrix.node == 20 && matrix.npm == 10) || (matrix.node == 22 && matrix.npm == 10) }}
-      PROJECT_DIR: generated-retail-react-app-test-project
+      PROJECT_DIR: generated-chakra-storefront-test-project
     steps:
         - name: Checkout
           uses: actions/checkout@v4
@@ -175,12 +175,12 @@ jobs:
             npm: ${{ matrix.npm }}
             update_npm: ${{ env.IS_DEFAULT_NPM == 'false' }}
 
-        - name: Generate retail-react-app-test-project
+        - name: Generate chakra-storefront-test-project
           # Generate project only for those actions that use `env.PROJECT_DIR`
           if: env.IS_DEFAULT_NPM == 'true'
           uses: "./.github/actions/generate_app_with_preset"
           with:
-            preset: retail-react-app-test-project
+            preset: chakra-storefront-test-project
             output_dir: ${{ env.PROJECT_DIR }}
           timeout-minutes: 8
 
@@ -201,10 +201,10 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        template: [retail-react-app-test-project, express-minimal-test-project, typescript-minimal-test-project]
+        template: [chakra-storefront-test-project, express-minimal-test-project, typescript-minimal-test-project]
     runs-on: ubuntu-latest
     env:
-      IS_TEMPLATE_FROM_RETAIL_REACT_APP: ${{ matrix.template == 'retail-react-app-test-project' }}
+      IS_TEMPLATE_FROM_RETAIL_REACT_APP: ${{ matrix.template == 'chakra-storefront-test-project' }}
       PROJECT_DIR: generated-${{ matrix.template }}
     steps:
       - name: Checkout
@@ -269,7 +269,7 @@ jobs:
           mobify_api_key: ${{ secrets.MOBIFY_CLIENT_API_KEY }}
 
       - name: Push Bundle to MRT
-        if: env.IS_NOT_FORK == 'true' && env.DEVELOP == 'true' && matrix.template == 'retail-react-app-test-project'
+        if: env.IS_NOT_FORK == 'true' && env.DEVELOP == 'true' && matrix.template == 'chakra-storefront-test-project'
         uses: "./.github/actions/push_to_mrt"
         with:
           CWD: ${{ env.PROJECT_DIR }}
@@ -292,10 +292,10 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        template: [retail-react-app-test-project, express-minimal-test-project, typescript-minimal-test-project]
+        template: [chakra-storefront-test-project, express-minimal-test-project, typescript-minimal-test-project]
     runs-on: windows-latest
     env:
-      IS_TEMPLATE_FROM_RETAIL_REACT_APP: ${{ matrix.template == 'retail-react-app-test-project' }}
+      IS_TEMPLATE_FROM_RETAIL_REACT_APP: ${{ matrix.template == 'chakra-storefront-test-project' }}
       PROJECT_DIR: generated-${{ matrix.template }}
     steps:
       - name: Checkout
@@ -343,7 +343,7 @@ jobs:
   #     fail-fast: false
   #   runs-on: ubuntu-latest
   #   env:
-  #     PROJECT_DIR: generated-retail-react-app-test-project
+  #     PROJECT_DIR: generated-chakra-storefront-test-project
   #   steps:
   #     - name: Checkout
   #       uses: actions/checkout@v4
@@ -353,10 +353,10 @@ jobs:
   #       with:
   #         node: ${{ env.MRT_NODE }}
 
-  #     - name: Generate retail-react-app-test-project
+  #     - name: Generate chakra-storefront-test-project
   #       uses: "./.github/actions/generate_app_with_preset"
   #       with:
-  #         preset: retail-react-app-test-project
+  #         preset: chakra-storefront-test-project
   #         output_dir: ${{ env.PROJECT_DIR }}
   #       timeout-minutes: 8
 
@@ -364,7 +364,7 @@ jobs:
   #       uses: "./.github/actions/lighthouse_ci"
   #       with:
   #         project_dir: ${{ env.PROJECT_DIR }}
-  #         config_filename: lighthouserc.retail-react-app.js
+  #         config_filename: lighthouserc.chakra-storefront.js
 
   bundle-sizes:
     needs: changelog-check
@@ -372,7 +372,7 @@ jobs:
       fail-fast: false
     runs-on: ubuntu-latest
     env:
-      PROJECT_DIR: generated-retail-react-app-test-project
+      PROJECT_DIR: generated-chakra-storefront-test-project
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -382,10 +382,10 @@ jobs:
         with:
           node: ${{ env.MRT_NODE }}
 
-      - name: Generate retail-react-app-test-project
+      - name: Generate chakra-storefront-test-project
         uses: "./.github/actions/generate_app_with_preset"
         with:
-          preset: retail-react-app-test-project
+          preset: chakra-storefront-test-project
           output_dir: ${{ env.PROJECT_DIR }}
         timeout-minutes: 8
 

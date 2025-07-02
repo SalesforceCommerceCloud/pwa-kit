@@ -43,7 +43,7 @@ import {useProductSearch} from '@salesforce/commerce-sdk-react'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 
 /**
- * This is the home page for Retail React App.
+ * This is the home page for Chakra Storefront.
  * The page is created for demonstration purposes.
  * The page renders SEO metadata and a few promotion
  * categories and products, data is from local file.
@@ -89,8 +89,8 @@ const Home = () => {
         <Box data-testid="home-page" layerStyle="page">
             <Seo
                 title="Home Page"
-                description="Commerce Cloud Retail React App"
-                keywords="Commerce Cloud, Retail React App, React Storefront"
+                description="Commerce Cloud Chakra Storefront"
+                keywords="Commerce Cloud, Chakra Storefront, React Storefront"
             />
 
             <Hero

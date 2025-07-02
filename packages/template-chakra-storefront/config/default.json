@@ -44,7 +44,7 @@
     },
     "defaultSite": "RefArchGlobal",
     "defaultAppLocale": "en-US",
-    "defaultSiteTitle": "Retail React App",
+    "defaultSiteTitle": "Chakra Storefront",
     "pages": {
         "account": {
             "path": "/account",

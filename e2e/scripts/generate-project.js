@@ -60,16 +60,16 @@ const main = async (opts) => {
 // Define the program with description and arguments
 program
     .description(
-        'Generate a retail-react-app project using the key <project-key> or the JSON <project-config>'
+        'Generate a chakra-storefront project using the key <project-key> or the JSON <project-config>'
     )
     .option('--project-key <key>', 'Project key', (value) => {
         const validKeys = [
-            'retail-app-demo',
-            'retail-app-ext',
-            'retail-app-no-ext',
-            'retail-app-private-client',
-            'retail-react-app-bug-bounty',
-            'retail-react-app-demo-site'
+            'chakra-storefront-demo',
+            'chakra-storefront-ext',
+            'chakra-storefront-no-ext',
+            'chakra-storefront-private-client',
+            'chakra-storefront-bug-bounty',
+            'chakra-storefront-demo-site'
         ]
         if (!validKeys.includes(value)) {
             throw new Error('Invalid project key.')

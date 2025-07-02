@@ -47,20 +47,20 @@ jobs:
         run: |-
           # Check the installed version of playwright
           echo "Playwright version: $(npm list playwright --depth=0)"
-          
+
           # Check the installed version of @playwright/test
           echo "@playwright/test version: $(npm list @playwright/test --depth=0)"
 
       - name: Generate Retail App Demo
         uses: ./.github/actions/e2e_generate_app
         with:
-          PROJECT_KEY: "retail-app-demo"
+          PROJECT_KEY: "chakra-storefront-demo"
 
       - name: Validate Generated Retail App Demo
         uses: ./.github/actions/e2e_validate_generated_app
         with:
-          PROJECT_KEY: "retail-app-demo"
-  run-generator-retail-app-no-ext:
+          PROJECT_KEY: "chakra-storefront-demo"
+  run-generator-chakra-storefront-no-ext:
     strategy:
       fail-fast: false
       # Run one matrix env at a time because we need to deploy each app to MRT and run e2e tests there
@@ -104,7 +104,7 @@ jobs:
         run: |-
           # Check the installed version of playwright
           echo "Playwright version: $(npm list playwright --depth=0)"
-          
+
           # Check the installed version of @playwright/test
           echo "@playwright/test version: $(npm list @playwright/test --depth=0)"
 
@@ -116,13 +116,13 @@ jobs:
       - name: Generate Retail App Without Extensibility
         uses: ./.github/actions/e2e_generate_app
         with:
-          PROJECT_KEY: "retail-app-no-ext"
+          PROJECT_KEY: "chakra-storefront-no-ext"
           TEMPLATE_VERSION: ${{ env.retail_app_template_version }}
 
       - name: Validate Retail App Without Extensibility
         uses: ./.github/actions/e2e_validate_generated_app
         with:
-          PROJECT_KEY: "retail-app-no-ext"
+          PROJECT_KEY: "chakra-storefront-no-ext"
           TEMPLATE_VERSION: ${{ env.retail_app_template_version }}
 
       - name: Create MRT credentials file
@@ -134,7 +134,7 @@ jobs:
       - name: Push Bundle to MRT (E2E Test PWA Kit)
         uses: "./.github/actions/push_to_mrt"
         with:
-          CWD: "../generated-projects/retail-app-no-ext"
+          CWD: "../generated-projects/chakra-storefront-no-ext"
           TARGET: e2e-tests-pwa-kit
           FLAGS: --wait
 
@@ -145,13 +145,13 @@ jobs:
       - name: Run Playwright tests
         run: npm run test:e2e
   notify-slack-pwa-no-ext:
-    needs: [run-generator-retail-app-no-ext]
+    needs: [run-generator-chakra-storefront-no-ext]
     if: ${{ always() }}
     runs-on: ubuntu-latest
     steps:
       - name: Send GitHub Action data to Slack workflow (Generated)
         id: slack-success
-        if: ${{ github.event_name == 'schedule' && needs.run-generator-retail-app-no-ext.result == 'success' }}
+        if: ${{ github.event_name == 'schedule' && needs.run-generator-chakra-storefront-no-ext.result == 'success' }}
         uses: slackapi/slack-github-action@v1.23.0
         with:
           payload: |
@@ -163,7 +163,7 @@ jobs:
 
       - name: Send GitHub Action data to Slack workflow (Generated)
         id: slack-failure
-        if: ${{ github.event_name == 'schedule' && needs.run-generator-retail-app-no-ext.result != 'success'  }}
+        if: ${{ github.event_name == 'schedule' && needs.run-generator-chakra-storefront-no-ext.result != 'success'  }}
         uses: slackapi/slack-github-action@v1.23.0
         with:
           payload: |
@@ -172,10 +172,10 @@ jobs:
             }
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-  run-generator-retail-app-ext:
+  run-generator-chakra-storefront-ext:
     # Run after the previous job completes irrespective of its result
     if: ${{ always() }}
-    needs: [run-generator-retail-app-no-ext]
+    needs: [run-generator-chakra-storefront-no-ext]
     strategy:
       fail-fast: false
       # Run one matrix env at a time because we need to deploy each app to MRT and run e2e tests there
@@ -221,7 +221,7 @@ jobs:
         run: |-
           # Check the installed version of playwright
           echo "Playwright version: $(npm list playwright --depth=0)"
-          
+
           # Check the installed version of @playwright/test
           echo "@playwright/test version: $(npm list @playwright/test --depth=0)"
 
@@ -233,13 +233,13 @@ jobs:
       - name: Generate Retail App With Extensibility
         uses: ./.github/actions/e2e_generate_app
         with:
-          PROJECT_KEY: "retail-app-ext"
+          PROJECT_KEY: "chakra-storefront-ext"
           TEMPLATE_VERSION: ${{ env.retail_app_template_version }}
 
       - name: Validated Generated Retail App Demo
         uses: ./.github/actions/e2e_validate_generated_app
         with:
-          PROJECT_KEY: "retail-app-ext"
+          PROJECT_KEY: "chakra-storefront-ext"
           TEMPLATE_VERSION: ${{ env.retail_app_template_version }}
 
       - name: Create MRT credentials file
@@ -251,7 +251,7 @@ jobs:
       - name: Push Bundle to MRT (E2E Test PWA Kit)
         uses: "./.github/actions/push_to_mrt"
         with:
-          CWD: "../generated-projects/retail-app-ext"
+          CWD: "../generated-projects/chakra-storefront-ext"
           TARGET: e2e-tests-pwa-kit
           FLAGS: --wait
 
@@ -267,13 +267,13 @@ jobs:
         run: npm run test:e2e:a11y
 
   notify-slack-pwa-ext:
-    needs: [run-generator-retail-app-ext]
+    needs: [run-generator-chakra-storefront-ext]
     if: ${{ always() }}
     runs-on: ubuntu-latest
     steps:
       - name: Send GitHub Action data to Slack workflow (Generated)
         id: slack-success
-        if: ${{ github.event_name == 'schedule' && needs.run-generator-retail-app-ext.result == 'success' }}
+        if: ${{ github.event_name == 'schedule' && needs.run-generator-chakra-storefront-ext.result == 'success' }}
         uses: slackapi/slack-github-action@v1.23.0
         with:
           payload: |
@@ -285,7 +285,7 @@ jobs:
 
       - name: Send GitHub Action data to Slack workflow (Generated)
         id: slack-failure
-        if: ${{ github.event_name == 'schedule' && needs.run-generator-retail-app-ext.result != 'success'  }}
+        if: ${{ github.event_name == 'schedule' && needs.run-generator-chakra-storefront-ext.result != 'success'  }}
         uses: slackapi/slack-github-action@v1.23.0
         with:
           payload: |
@@ -336,7 +336,7 @@ jobs:
         run: |-
           # Check the installed version of playwright
           echo "Playwright version: $(npm list playwright --depth=0)"
-          
+
           # Check the installed version of @playwright/test
           echo "@playwright/test version: $(npm list @playwright/test --depth=0)"
 
@@ -348,13 +348,13 @@ jobs:
       - name: Generate Retail App Private Client
         uses: ./.github/actions/e2e_generate_app
         with:
-          PROJECT_KEY: "retail-app-private-client"
+          PROJECT_KEY: "chakra-storefront-private-client"
           TEMPLATE_VERSION: ${{ env.retail_app_template_version }}
 
       - name: Validate Generated Retail App Private Client
         uses: ./.github/actions/e2e_validate_generated_app
         with:
-          PROJECT_KEY: "retail-app-private-client"
+          PROJECT_KEY: "chakra-storefront-private-client"
           TEMPLATE_VERSION: ${{ env.retail_app_template_version }}
 
       - name: Create MRT credentials file
@@ -366,7 +366,7 @@ jobs:
       - name: Push Bundle to MRT
         uses: "./.github/actions/push_to_mrt"
         with:
-          CWD: "../generated-projects/retail-app-private-client"
+          CWD: "../generated-projects/chakra-storefront-private-client"
           TARGET: e2e-pwa-kit-private
           FLAGS: --wait
 

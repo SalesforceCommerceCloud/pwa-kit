@@ -31,7 +31,7 @@ module.exports = {
     },
     defaultSite: 'site-1',
     defaultAppLocale: 'en-GB',
-    defaultSiteTitle: 'Retail React App',
+    defaultSiteTitle: 'Chakra Storefront',
     einsteinAPI: {
         host: 'http://localhost:7777',
         einsteinId: '11111111',

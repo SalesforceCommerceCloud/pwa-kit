@@ -1,7 +1,7 @@
 name: e2e_generate_app
 inputs:
   PROJECT_KEY:
-    description: Project key to specify project to generate ("retail-app-demo")
+    description: Project key to specify project to generate ("chakra-storefront-demo")
     required: true
     type: string
 

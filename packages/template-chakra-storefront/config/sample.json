@@ -16,7 +16,7 @@
     },
     "defaultSite": "RefArchGlobal",
     "defaultAppLocale": "en-US",
-    "defaultSiteTitle": "Retail React App",
+    "defaultSiteTitle": "Chakra Storefront",
     "defaultDnt": true,
     "einsteinAPI": {
         "host": "https://api.cquotient.com",

@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       IS_LATEST_RELEASE: ${{ steps.checkRelease.outputs.IS_LATEST_RELEASE }}
-    steps:  
+    steps:
       - name: Checkout
         uses: actions/checkout@v4
 
@@ -21,7 +21,7 @@ jobs:
         uses: ./.github/actions/check_if_latest_release
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-      
+
       - name: Update Github Outputs
         id: checkRelease
         run: |-
@@ -40,14 +40,14 @@ jobs:
       matrix:
         environment:
           - name: bug-bounty
-            project_key: retail-react-app-bug-bounty
+            project_key: chakra-storefront-bug-bounty
             target: testing
             project: pwa-kit
             mobify_user: MOBIFY_STG_CLIENT_USER
             mobify_api_key: MOBIFY_STG_CLIENT_API_KEY
             flags: --cloud-origin https://cloud-testing.mobify-staging.com -c ~/.mobify --wait
           - name: demo-site
-            project_key: retail-react-app-demo-site
+            project_key: chakra-storefront-demo-site
             target: production
             project: scaffold-pwa
             mobify_user: MOBIFY_CLIENT_USER

@@ -44,7 +44,7 @@ jobs:
         id: initialize
         run: |
           set -e
-          echo "PROJECT_DIR=my-retail-react-app" >> $GITHUB_ENV
+          echo "PROJECT_DIR=my-chakra-storefront" >> $GITHUB_ENV
 
       - name: Checkout
         id: checkout

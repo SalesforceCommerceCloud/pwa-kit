@@ -6,5 +6,5 @@
  */
 import createLogger from '@salesforce/pwa-kit-runtime/utils/logger-factory'
 
-const logger = Object.freeze(createLogger({packageName: 'retail-react-app'}))
+const logger = Object.freeze(createLogger({packageName: 'chakra-storefront'}))
 export default logger

@@ -9,7 +9,6 @@
 const sh = require('shelljs')
 
 // The branch naming convention for releasing a particular package is: release-<package-name>-1.1.x
-// For example: 'release-retail-react-app-1.1.x'
 const RELEASE_ONE_PACKAGE = /release-([-a-z]+)-\d+\./i
 
 const main = () => {
@@ -17,9 +16,6 @@ const main = () => {
     verifyCleanWorkingTree()
 
     const branchName = sh.exec('git branch --show-current', {silent: true}).trim()
-    // DEBUG
-    // const branchName = 'release-3.0.x'
-    // const branchName = 'release-retail-react-app-1.0.x'
 
     console.log('--- Given the current branch:', branchName)
 
