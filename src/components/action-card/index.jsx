@@ -38,7 +38,6 @@ const ActionCard = ({
 
     return (
         <Box
-            spacing={4}
             p={4}
             position="relative"
             border="1px solid"
