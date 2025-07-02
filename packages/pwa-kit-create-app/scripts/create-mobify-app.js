@@ -229,7 +229,7 @@ const PRESETS = [
         shortDescription: 'The Retail app using your own Commerce Cloud instance',
         templateSource: {
             type: TEMPLATE_SOURCE_NPM,
-            id: '@salesforce/chakra-storefront'
+            id: 'chakra-storefront'
         },
         interactive: true,
         getQuestions: () =>
@@ -263,7 +263,7 @@ const PRESETS = [
         shortDescription: 'The Retail app with demo Commerce Cloud instance',
         templateSource: {
             type: TEMPLATE_SOURCE_NPM,
-            id: '@salesforce/chakra-storefront'
+            id: 'chakra-storefront'
         },
         getQuestions: () =>
             createRetailReactAppQuestions({
@@ -299,7 +299,7 @@ const PRESETS = [
             'The Retail app with demo Commerce Cloud instance and a private SLAS client',
         templateSource: {
             type: TEMPLATE_SOURCE_NPM,
-            id: '@salesforce/chakra-storefront'
+            id: 'chakra-storefront'
         },
         answers: {
             ['project.hybrid']: false,
@@ -352,7 +352,7 @@ const PRESETS = [
         description: '',
         templateSource: {
             type: TEMPLATE_SOURCE_NPM,
-            id: '@salesforce/chakra-storefront'
+            id: 'chakra-storefront'
         },
         getQuestions: () =>
             createRetailReactAppQuestions({
@@ -379,7 +379,7 @@ const PRESETS = [
         description: '',
         templateSource: {
             type: TEMPLATE_SOURCE_NPM,
-            id: '@salesforce/chakra-storefront'
+            id: 'chakra-storefront'
         },
         getQuestions: () =>
             createRetailReactAppQuestions({
@@ -406,7 +406,7 @@ const PRESETS = [
         description: '',
         templateSource: {
             type: TEMPLATE_SOURCE_NPM,
-            id: '@salesforce/chakra-storefront'
+            id: 'chakra-storefront'
         },
         getQuestions: () => [
             ...HYBRID_QUESTIONS,
@@ -435,7 +435,7 @@ const PRESETS = [
         description: '',
         templateSource: {
             type: TEMPLATE_SOURCE_NPM,
-            id: '@salesforce/chakra-storefront'
+            id: 'chakra-storefront'
         },
         getQuestions: () => [
             ...HYBRID_QUESTIONS,
