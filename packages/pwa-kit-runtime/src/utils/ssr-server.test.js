@@ -587,7 +587,6 @@ describe('processLambdaResponse', () => {
             const response = {}
             const res = processLambdaResponse(response, testCase.event)
             testCase.validate(res.headers)
-            expect(testCase.validate).toBeDefined()
         })
     })
 })
@@ -649,12 +648,12 @@ describe('processExpressResponse', () => {
 
     responseTypes.forEach((responseType) =>
         testCases.forEach((testCase) =>
+            // eslint-disable-next-line jest/expect-expect
             test(`${testCase.name} (${responseType.name})`, () => {
                 const headers = Object.assign({}, testCase.headers)
                 const response = responseType.create(headers)
                 processExpressResponse(response)
                 testCase.validate(headers)
-                expect(testCase.validate).toBeDefined()
             })
         )
     )

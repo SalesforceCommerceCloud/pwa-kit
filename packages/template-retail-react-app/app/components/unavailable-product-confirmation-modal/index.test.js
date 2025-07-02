@@ -103,6 +103,7 @@ describe('UnavailableProductConfirmationModal', () => {
     })
 
     test('opens confirmation modal when unavailable products are found with defined productIds prop', async () => {
+        const mockProductIds = ['701642889899M', '701642889830M']
         prependHandlersToServer([
             {
                 path: '*/products',
