@@ -105,5 +105,5 @@ const requirement = {
 
 ## 🔍 Analysis Rule
 
-Analyze node_modules/@salesforce/retail-react-app/app/components/product-tile/ to understand how product tiles are implemented. Study the image handling, pricing display, variant selection, and interaction patterns. 
+Analyze "node_modules/@salesforce/*retail-react-app*/app/pages/*product*/" to understand how product tiles are implemented. Study the image handling, pricing display, variant selection, and interaction patterns. 
 

@@ -116,4 +116,4 @@ const requirement = {
 
 ## 🔍 Analysis Rule
 
-Analyze node_modules/@salesforce/retail-react-app/app/pages/product-list/ to understand how product listing pages are implemented. Study the search functionality, filtering, pagination, and grid/list display patterns. 
+Analyze "node_modules/@salesforce/*retail-react-app*/app/pages/*product*/" to understand how product listing pages are implemented. Study the search functionality, filtering, pagination, and grid/list display patterns. 

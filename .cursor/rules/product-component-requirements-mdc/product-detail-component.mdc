@@ -93,5 +93,5 @@ const requirement = {
 
 ## 🔍 Analysis Rule
 
-Analyze node_modules/@salesforce/retail-react-app/app/pages/product-detail/ to understand how product detail pages are implemented. Study the data models, component structure, and patterns used for single products, bundles, and sets. Guide developers based on actual implementation patterns found in the template.
+Analyze "node_modules/@salesforce/*retail-react-app*/app/pages/*product*/" to understand how product detail pages are implemented. Study the data models, component structure, and patterns used for single products, bundles, and sets. Guide developers based on actual implementation patterns found in the template.
 
