@@ -301,6 +301,7 @@ const withLayout = <P extends object>(WrappedComponent: React.ComponentType<P>) 
                                             itemComponent={DrawerMenuItemWithData}
                                         />
                                     </HideOnDesktop>
+                                    {/*TODO: Fix menu to load children lazily.*/}
                                     <HideOnMobile>
                                         <ListMenu
                                             root={categories?.[CAT_MENU_DEFAULT_ROOT_CATEGORY]}
