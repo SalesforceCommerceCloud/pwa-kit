@@ -70,7 +70,7 @@ const PlaceholderComponent: React.FC = () => (
 
 const DrawerMenuItemWithData = withCommerceSdkReactHookData(
     ({itemComponent: ItemComponent, data, ...rest}: any) => (
-        <Fade>
+        <Fade in={true}>
             <ItemComponent {...rest} item={data} itemComponent={DrawerMenuItemWithData} />
         </Fade>
     ),
