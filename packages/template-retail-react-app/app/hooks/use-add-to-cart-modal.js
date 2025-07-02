@@ -173,7 +173,7 @@ export const AddToCartModal = () => {
                                                                 fontWeight="700"
                                                                 fontSize="sm"
                                                             >
-                                                                {(variant.name || product.name) +
+                                                                {(variant?.name || product.name) +
                                                                     (quantity > 1
                                                                         ? ` (${quantity})`
                                                                         : '')}
