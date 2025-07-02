@@ -45,6 +45,10 @@ jobs:
           
           # Fetch all branches
           git fetch origin
+    
+          # Just to test
+          echo "status=conflict" >> $GITHUB_OUTPUT
+          exit 1
           
           # Check if the target branch exists
           if ! git show-ref --verify --quiet refs/remotes/origin/extra-features-e2e-branch; then
@@ -66,10 +70,6 @@ jobs:
             echo "status=up-to-date" >> $GITHUB_OUTPUT
             exit 0
           fi
-          
-          # Just to test
-          echo "status=conflict" >> $GITHUB_OUTPUT
-          exit 1
 
           if [ "${{ github.event.inputs.force_sync }}" = "true" ]; then
             echo "🔧 Force sync requested. Resetting to develop..."
