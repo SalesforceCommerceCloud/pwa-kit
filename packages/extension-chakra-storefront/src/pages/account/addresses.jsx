@@ -92,14 +92,12 @@ const ShippingAddressForm = ({form, hasAddresses, selectedAddressId, toggleEdit,
                         <form onSubmit={form.handleSubmit(submitForm)}>
                             <Stack spacing={6}>
                                 {form.formState.errors?.global && (
-                                    <Alert.Root colorPalette="red">
-                                        <Alert.Indicator boxSize={4}/>
-                                        <Alert.Content>
-                                            <Text fontSize="sm">
-                                                {form.formState.errors.global.message}
-                                            </Text>
-                                        </Alert.Content>
-                                    </Alert.Root>
+                                    <Alert status="error">
+                                        <AlertIcon color="red.600" boxSize={4} />
+                                        <Text fontSize="sm" ml={3}>
+                                            {form.formState.errors.global.message}
+                                        </Text>
+                                    </Alert>
                                 )}
                                 <AddressFields form={form} />
                                 <FormActionButtons onCancel={toggleEdit} />
@@ -351,7 +349,6 @@ const AccountAddresses = () => {
                                     {address.preferred && (
                                         <Badge
                                             position="absolute"
-                                            fontSize="xs"
                                             right={4}
                                             variant="default"
                                         >
