@@ -42,10 +42,6 @@ const button = defineRecipe({
                 color: 'blue.600',
                 _hover: {bg: 'gray.50'}
             },
-            // (props) =>
-            // console.log('props', props) || props.colorPalette === 'black'
-            //     ? {color: 'gray.900', _hover: {bg: 'gray.50'}, borderColor: 'gray.200'}
-            //     : {color: 'blue.600', _hover: {bg: 'gray.50'}},
             footer: {
                 fontSize: 'sm',
                 backgroundColor: 'gray.100',
