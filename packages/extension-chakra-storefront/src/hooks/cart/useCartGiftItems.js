@@ -17,7 +17,7 @@ import {useShopperBasketsMutation} from '@salesforce/commerce-sdk-react'
  */
 export const useCartGiftItems = (basket, setCartItemLoading, setSelectedItem, showError) => {
     const [localIsGiftItems, setLocalIsGiftItems] = useState({})
-    
+
     const updateItemInBasketMutation = useShopperBasketsMutation('updateItemInBasket')
 
     const handleIsAGiftChange = async (product, checked) => {
@@ -66,4 +66,4 @@ export const useCartGiftItems = (basket, setCartItemLoading, setSelectedItem, sh
         localIsGiftItems,
         handleIsAGiftChange
     }
-} 
+}

@@ -4,6 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
+import React from 'react'
 import {Button} from '@chakra-ui/react'
 import {useIntl} from 'react-intl'
 import {useShopperCustomersMutation} from '@salesforce/commerce-sdk-react'
@@ -26,7 +27,7 @@ export const useCartWishlist = (showError) => {
     const {formatMessage} = useIntl()
     const toast = useToast()
     const navigate = useNavigation()
-    
+
     const {data: wishlist} = useWishList()
     const {data: customer} = useCurrentCustomer()
     const {customerId} = customer || {}
@@ -88,4 +89,4 @@ export const useCartWishlist = (showError) => {
     return {
         handleAddToWishlist
     }
-} 
+}

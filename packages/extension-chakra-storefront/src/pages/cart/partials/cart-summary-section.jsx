@@ -5,6 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
+import PropTypes from 'prop-types'
 import {Box, Stack, Flex} from '@chakra-ui/react'
 import OrderSummary from '../../../components/order-summary'
 import CartCta from './cart-cta'
@@ -44,4 +45,9 @@ const CartSummarySection = ({basket, isDesktop = true}) => {
     )
 }
 
-export default CartSummarySection 
+CartSummarySection.propTypes = {
+    basket: PropTypes.object.isRequired,
+    isDesktop: PropTypes.bool.isRequired
+}
+
+export default CartSummarySection

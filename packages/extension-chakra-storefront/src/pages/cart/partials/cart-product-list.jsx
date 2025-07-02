@@ -5,6 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
+import PropTypes from 'prop-types'
 import {Stack} from '@chakra-ui/react'
 import ProductItem from '../../../components/product-item'
 import CartSecondaryButtonGroup from './cart-secondary-button-group'
@@ -85,4 +86,31 @@ const CartProductList = ({
     )
 }
 
-export default CartProductList 
+CartProductList.propTypes = {
+    basket: PropTypes.shape({
+        productItems: PropTypes.arrayOf(
+            PropTypes.shape({
+                itemId: PropTypes.string,
+                productId: PropTypes.string,
+                gift: PropTypes.bool,
+                price: PropTypes.number,
+                quantity: PropTypes.number
+            })
+        )
+    }).isRequired,
+    productsByItemId: PropTypes.object,
+    localQuantity: PropTypes.object.isRequired,
+    localIsGiftItems: PropTypes.object.isRequired,
+    isProductsPending: PropTypes.bool.isRequired,
+    isCartItemLoading: PropTypes.bool.isRequired,
+    selectedItem: PropTypes.shape({
+        itemId: PropTypes.string
+    }),
+    handleChangeItemQuantity: PropTypes.func.isRequired,
+    handleIsAGiftChange: PropTypes.func.isRequired,
+    handleAddToWishlist: PropTypes.func.isRequired,
+    handleEditClick: PropTypes.func.isRequired,
+    handleRemoveItem: PropTypes.func.isRequired
+}
+
+export default CartProductList

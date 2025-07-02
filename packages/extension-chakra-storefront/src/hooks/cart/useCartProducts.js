@@ -16,7 +16,7 @@ import {useProducts} from '@salesforce/commerce-sdk-react'
 export const useCartProducts = (basket) => {
     // Main product IDs from basket items
     const productIds = basket?.productItems?.map(({productId}) => productId).join(',') ?? ''
-    
+
     // Fetch main products
     const {data: products, isPending: isProductsPending} = useProducts(
         {
@@ -113,4 +113,4 @@ export const useCartProducts = (basket) => {
         bundleChildProductData,
         productsByItemId
     }
-} 
+}
