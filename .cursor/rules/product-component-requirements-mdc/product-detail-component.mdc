@@ -1,7 +1,6 @@
 ---
 description: Product Detail component requirement template
 globs: "**/components/**"
-type: agent-requested
 alwaysApply: false
 ---
 
@@ -90,98 +89,9 @@ const requirement = {
 - Skipping accessibility (missing alt text, no keyboard support).
 - Not validating props or documenting requirements.
 
-## Example Component Skeleton
-```jsx
-/*
-Requirement:
-{
-  dataModel: 'Product' | 'ProductBundle' | 'ProductSet',
-  features: ['Gallery', 'Add to Cart', 'Quantity Selector', 'Show Reviews', 'Variant Selection', 'Show Bundle/Set Items'],
-  lookAndFeel: ['Theme', 'Skeleton', 'Style']
-}
-*/
+---
 
-import React, {useState} from 'react'
-import PropTypes from 'prop-types'
-import {Box, Text, Button, Skeleton, useTheme} from '@salesforce/retail-react-app/app/components/shared/ui'
-import {QuantityPicker} from '@salesforce/retail-react-app/app/components/quantity-picker'
-import RecommendedProducts from '@salesforce/retail-react-app/app/components/recommended-products'
-// import ProductGallery from './ProductGallery'
-// import ProductReviews from './ProductReviews'
-// import VariantSelector from './VariantSelector'
+## 🔍 Analysis Rule
 
-const ProductDetail = ({product, onAddToCart, showReviews = true, showRecommendations = true}) => {
-  const [quantity, setQuantity] = useState(1)
-  const [isLoading, setIsLoading] = useState(false)
-  const theme = useTheme()
+Analyze node_modules/@salesforce/retail-react-app/app/pages/product-detail/ to understand how product detail pages are implemented. Study the data models, component structure, and patterns used for single products, bundles, and sets. Guide developers based on actual implementation patterns found in the template.
 
-  const handleAddToCart = async () => {
-    setIsLoading(true)
-    await onAddToCart(product, quantity)
-    setIsLoading(false)
-  }
-
-  // Example: Render bundle/set items
-  const renderBundleOrSetItems = () => {
-    if (product.type === 'bundle' && product.childItems) {
-      return (
-        <Box mt={4}>
-          <Text fontWeight="bold">Bundle Includes:</Text>
-          {product.childItems.map((item) => (
-            <Box key={item.productId} ml={4}>
-              <Text>{item.name}</Text>
-              {/* No add to cart for child items */}
-            </Box>
-          ))}
-        </Box>
-      )
-    }
-    if (product.type === 'set' && product.setItems) {
-      return (
-        <Box mt={4}>
-          <Text fontWeight="bold">Set Includes:</Text>
-          {product.setItems.map((item) => (
-            <Box key={item.productId} ml={4}>
-              <Text>{item.name}</Text>
-              {/* All items in set are added to cart together */}
-            </Box>
-          ))}
-        </Box>
-      )
-    }
-    return null
-  }
-
-  return (
-    <Skeleton isLoaded={!!product}>
-      <Box bg={theme.colors.background} color={theme.colors.text} p={4} borderRadius="md">
-        {/* <ProductGallery images={product.imageGroups} /> */}
-        <Text fontSize="xl" fontWeight="bold">{product.name}</Text>
-        <Text>{product.description}</Text>
-        {/* <VariantSelector variants={product.variants} /> */}
-        <QuantityPicker value={quantity} onChange={setQuantity} min={1} max={product.stock || 10} />
-        <Button onClick={handleAddToCart} isDisabled={isLoading} mt={2}>
-          {isLoading ? 'Adding...' : 'Add to Cart'}
-        </Button>
-        {renderBundleOrSetItems()}
-        {showReviews && (
-          // <ProductReviews productId={product.productId} />
-          <Text>Reviews go here</Text>
-        )}
-        {showRecommendations && (
-          <RecommendedProducts productId={product.productId} />
-        )}
-      </Box>
-    </Skeleton>
-  )
-}
-
-ProductDetail.propTypes = {
-  product: PropTypes.object.isRequired,
-  onAddToCart: PropTypes.func.isRequired,
-  showReviews: PropTypes.bool,
-  showRecommendations: PropTypes.bool
-}
-
-export default ProductDetail
-```

@@ -1,83 +1,27 @@
-# Product Component Development Guide
+# Product Component Requirements
 
-## 🚀 Getting Started (Beginner-Friendly)
+This directory contains hybrid rules for product components that combine structured requirements with intelligent analysis. Each rule provides clear guidance on what to build while instructing the AI to study the actual implementation in `node_modules/@salesforce/retail-react-app`.
 
-### Quick Start Path
-1. **Start Simple**: Use `product-tile-component.mdc` for basic product displays
-2. **Add Lists**: Move to `product-list-component.mdc` when you need collections
-3. **Go Deep**: Use `product-detail-component.mdc` for full product pages
+## Rules
 
-### For New Developers
-- Focus on one component type at a time
-- Start with the "Basic Implementation" examples
-- Skip advanced features until you're comfortable with basics
-- Use the "Common Mistakes" sections to avoid pitfalls
+- `product-detail-component.mdc` - Requirements and analysis for product detail pages
+- `product-list-component.mdc` - Requirements and analysis for product listing pages  
+- `product-tile-component.mdc` - Requirements and analysis for product tile components
 
-### When You're Ready for More
-- Explore "Advanced Features" sections
-- Study the "Best Practices" examples
-- Review "Testing Guidelines" for quality assurance
+## Hybrid Approach
 
-## 📚 Component Complexity Levels
+Each rule combines:
 
-| Component | Complexity | Best For |
-|-----------|------------|----------|
-| Product Tile | ⭐ Beginner | Simple product cards, grids |
-| Product List | ⭐⭐ Intermediate | Product collections, search results |
-| Product Detail | ⭐⭐⭐ Advanced | Full product pages, complex layouts |
+### 📋 **Structured Requirements**
+- Clear data models (Product, Bundle, Set)
+- Essential features and props
+- Best practices and bad practices
+- Look & feel requirements
 
-## 🎯 Quick Reference
+### 🔍 **Analysis-Based Guidance**
+- Instructions to analyze actual codebase
+- Study real implementation patterns
+- Guide developers based on actual code
+- Provide contextual advice
 
-### Product Tile
-- **Use when**: Displaying products in grids, carousels, or lists
-- **Key features**: Image, name, price, quick actions
-- **Start here**: Perfect for beginners
-
-### Product List  
-- **Use when**: Showing multiple products with filtering/sorting
-- **Key features**: Grid/list views, pagination, filters
-- **Prerequisites**: Comfortable with Product Tiles
-
-### Product Detail
-- **Use when**: Full product information pages
-- **Key features**: Complete product data, variants, add to cart
-- **Prerequisites**: Experience with Tiles and Lists
-
-## 💡 Tips for Success
-- Copy the basic examples and modify gradually
-- Test frequently as you build
-- Ask for help when stuck - these are complex components!
-- Start with mock data before integrating real APIs
-
-## 📊 Data Structure: ProductHit
-
-All product components work with **ProductHit** objects from Salesforce Commerce Cloud's search API:
-
-```javascript
-// Basic ProductHit structure
-{
-  productId: '25686571M',
-  productName: 'Product Name',
-  price: 299.99,
-  hitType: 'master', // 'master', 'product', 'set', 'bundle'
-  image: {
-    alt: 'Product description',
-    link: 'https://example.com/image.jpg'
-  }
-}
-```
-
-### Hit Types
-- **`master`**: Product with variants (colors, sizes)
-- **`product`**: Simple product (single item)
-- **`set`**: Product set (multiple items sold together)
-- **`bundle`**: Product bundle (parent with child items)
-
-### Key Properties
-- `productId`: Unique identifier
-- `productName`: Display name
-- `price`: Current price
-- `image`: Primary product image
-- `imageGroups`: Multiple image sizes
-- `variants`: Product variations
-- `variationAttributes`: Available options (color, size, etc.) 
+This approach provides the clarity of structured requirements while leveraging the intelligence of analysis-based guidance. 

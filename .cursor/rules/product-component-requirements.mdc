@@ -1,7 +1,6 @@
 ---
 description: Requirement template for a Product component
 globs: "**/components/**"
-type: agent-requested
 alwaysApply: false
 ---
 
