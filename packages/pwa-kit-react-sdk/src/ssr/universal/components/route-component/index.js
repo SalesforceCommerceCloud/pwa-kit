@@ -409,7 +409,7 @@ export const getAllRoutes = async (locals = {}) => {
     const extensionRoutes = (
         await Promise.all(
             applicationExtensions.map((extension) =>
-                typeof extension.getRoutesAsync === 'function'
+                extension.getRoutesAsync
                     ? extension.getRoutesAsync({locals})
                     : extension.getRoutes({locals})
             )
