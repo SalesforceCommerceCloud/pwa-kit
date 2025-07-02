@@ -12,7 +12,7 @@ import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-curre
 const BonusProductsTitle = () => {
     const {data: basket} = useCurrentBasket()
     const bonusItemsCount =
-        basket?.productItems?.filter((item) => item.bonusProductLineItem).length || 0
+        basket?.productItems?.filter((item) => item.bonusProductLineItem)?.length || 0
 
     return (
         <Heading as="h2" fontSize="xl">
