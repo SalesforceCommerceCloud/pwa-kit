@@ -41,9 +41,9 @@ test.describe('Accessibility Tests with Snapshots for guest user', () => {
 
         await topsNav.click()
         const productTile = page.getByRole('link', {
-            name: /Cotton Turtleneck Sweater/i
+            name: /Floral Ruffle Top/i
         })
-        await expect(productTile.getByText(/From \$39\.99/i)).toBeVisible()
+        await expect(productTile.getByText(/From \£35\.19/i)).toBeVisible()
 
         // Run the a11y test
         await runAccessibilityTest(page, ['guest', 'plp-a11y-violations.json'])
@@ -61,8 +61,8 @@ test.describe('Accessibility Tests with Snapshots for guest user', () => {
         const getProductRes = await getProductPromise
         expect(getProductRes.status()).toBe(200)
         // ensure that the page is fully loaded before starting a11y scan
-        await expect(page.getByRole('heading', {name: /Cotton Turtleneck Sweater/i})).toBeVisible()
-        await expect(page.getByText(/From \$39\.99/i).nth(1)).toBeVisible()
+        await expect(page.getByRole('heading', {name: /Floral Ruffle Top/i})).toBeVisible()
+        await expect(page.getByText(/From \£35\.19/i).nth(1)).toBeVisible()
 
         const addToWishlistButton = page.getByRole('button', {name: /Add to Wishlist/i})
         await expect(addToWishlistButton).toBeVisible()
@@ -105,7 +105,7 @@ test.describe('Accessibility Tests with Snapshots for guest user', () => {
         await page.waitForLoadState()
 
         // make sure the cart is fully load
-        await expect(page.getByRole('link', {name: /Cotton Turtleneck Sweater/i})).toBeVisible()
+        await expect(page.getByRole('link', {name: /Floral Ruffle Top/i})).toBeVisible()
 
         // Run the a11y test
         await runAccessibilityTest(page, ['guest', 'cart-a11y-violations.json'])
@@ -119,7 +119,7 @@ test.describe('Accessibility Tests with Snapshots for guest user', () => {
         await page.waitForLoadState()
 
         // make sure the cart is fully load
-        await expect(page.getByRole('link', {name: /Cotton Turtleneck Sweater/i})).toBeVisible()
+        await expect(page.getByRole('link', {name: /Floral Ruffle Top/i})).toBeVisible()
 
         await checkoutProduct({
             page,
