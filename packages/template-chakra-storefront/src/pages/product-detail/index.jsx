@@ -9,6 +9,7 @@ import React, {Fragment, useCallback, useEffect, useState} from 'react'
 import PropTypes from 'prop-types'
 import {Helmet} from 'react-helmet'
 import {FormattedMessage, useIntl} from 'react-intl'
+import {keepPreviousData} from '@tanstack/react-query'
 import {normalizeSetBundleProduct, getUpdateBundleChildArray} from '../../utils/product-utils'
 
 // Components
@@ -106,7 +107,7 @@ const ProductDetail = () => {
         {
             // When shoppers select a different variant (and the app fetches the new data),
             // the old data is still rendered (and not the skeletons).
-            keepPreviousData: true
+            placeholderData: keepPreviousData
         }
     )
 
@@ -148,7 +149,7 @@ const ProductDetail = () => {
         },
         {
             enabled: bundleChildVariantIds?.length > 0,
-            keepPreviousData: true
+            placeholderData: keepPreviousData
         }
     )
 

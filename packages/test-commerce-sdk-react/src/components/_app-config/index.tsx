@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React, {useState, ReactElement} from 'react'
-import {CommerceApiProvider} from '@salesforce/commerce-sdk-react'
+import {CommerceApiProvider, resetDehydratedStateTimeStamp} from '@salesforce/commerce-sdk-react'
 import {withReactQuery} from '@salesforce/pwa-kit-react-sdk/ssr/universal/components/with-react-query'
 import {useCorrelationId} from '@salesforce/pwa-kit-react-sdk/ssr/universal/hooks'
 import {proxyBasePath} from '@salesforce/pwa-kit-runtime/utils/ssr-namespace-paths'
@@ -71,8 +71,6 @@ AppConfig.restore = () => {}
 AppConfig.extraGetPropsArgs = () => {}
 AppConfig.freeze = () => {}
 
-const isServerSide = typeof window === 'undefined'
-
 // Recommended settings for PWA-Kit usages.
 // NOTE: they will be applied on both server and client side.
 const options = {
@@ -80,16 +78,15 @@ const options = {
         defaultOptions: {
             queries: {
                 retry: false,
-                staleTime: 2 * 1000,
-                ...(isServerSide ? {retryOnMount: false} : {}),
-                // Option for debugging changes in cache with React Query Dev Tools
-                refetchOnWindowFocus: false
+                refetchOnWindowFocus: false,
+                staleTime: 10 * 1000
             },
             mutations: {
                 retry: false
             }
         }
-    }
+    },
+    beforeHydrate: resetDehydratedStateTimeStamp
 }
 
 export default withReactQuery(AppConfig, options)

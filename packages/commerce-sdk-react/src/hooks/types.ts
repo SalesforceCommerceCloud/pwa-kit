@@ -4,7 +4,14 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import {InvalidateQueryFilters, QueryFilters, Updater, UseQueryOptions} from '@tanstack/react-query'
+import {
+    DefaultError,
+    InvalidateQueryFilters,
+    QueryFilters,
+    QueryKey,
+    Updater,
+    UseQueryOptions
+} from '@tanstack/react-query'
 import {
     ShopperBaskets,
     ShopperContexts,
@@ -152,9 +159,12 @@ export type ApiQueryKey<Params extends Record<string, unknown> = Record<string, 
     readonly [...path: (string | undefined)[], parameters: Params]
 
 /** Query options for endpoint hooks. */
-export type ApiQueryOptions<Method extends ApiMethod<any, unknown>> = Prettify<
+export type ApiQueryOptions<
+    Method extends ApiMethod<any, unknown>,
+    TError = DefaultError
+> = Prettify<
     Omit<
-        UseQueryOptions<DataType<Method>, unknown, DataType<Method>, ApiQueryKey>,
+        UseQueryOptions<DataType<Method>, TError, DataType<Method>, ApiQueryKey>,
         'queryFn' | 'queryKey'
     >
 >
@@ -178,7 +188,7 @@ export type OmitNullableParameters<T extends {parameters: object}> = Omit<T, 'pa
  * @property updater - Either the new data or a function that accepts old data and returns new data
  */
 export type CacheUpdateUpdate<T> = {
-    queryKey: ApiQueryKey
+    queryKey: QueryKey
     updater?: Updater<T | undefined, T | undefined>
 }
 

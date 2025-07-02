@@ -17,8 +17,8 @@ const options = {
         defaultOptions: {
             queries: {
                 retry: false,
-                staleTime: 2 * 1000,
-                ...(isServerSide ? {retryOnMount: false} : {})
+                refetchOnWindowFocus: false,
+                staleTime: 10 * 1000
             },
             mutations: {
                 retry: false

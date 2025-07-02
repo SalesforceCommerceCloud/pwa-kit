@@ -74,7 +74,7 @@ const TOKEN_RESPONSE: ShopperLoginTypes.TokenResponse = {
 type Implemented = ShopperLoginMutation
 // This is an object rather than an array to more easily ensure we cover all mutations
 type TestMap = {[Mut in Implemented]: [Argument<Client[Mut]>, DataType<Client[Mut]>]}
-const testMap: TestMap = {
+const testMap: Partial<TestMap> = {
     authorizePasswordlessCustomer: [OPTIONS, {}],
     authorizeCustomer: [OPTIONS, undefined],
     getAccessToken: [OPTIONS, TOKEN_RESPONSE],

@@ -19,6 +19,7 @@ import {
     useBreakpointValue
 } from '@chakra-ui/react'
 import ProductView from '../product-view'
+import {keepPreviousData} from '@tanstack/react-query'
 import {useProductViewModal} from '../../hooks/use-product-view-modal'
 import {useProducts} from '@salesforce/commerce-sdk-react'
 import ImageGallery, {Skeleton as ImageGallerySkeleton} from '../image-gallery'
@@ -51,7 +52,7 @@ const BundleProductViewModal = ({product: bundle, isOpen, onClose, updateCart, .
         {parameters: {ids: childProductIds, allImages: true}},
         {
             enabled: Boolean(childProductIds),
-            keepPreviousData: true
+            placeholderData: keepPreviousData
         }
     )
 

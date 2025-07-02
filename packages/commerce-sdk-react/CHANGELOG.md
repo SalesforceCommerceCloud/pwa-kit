@@ -1,4 +1,8 @@
-## v3.3.0-extensibility-preview.5 (May 06, 2025)
+## v4.0.0-dev (Mar 07, 2025)
+- Upgrade `@tanstack/react-query` to v5 [#2303](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2303)
+- Refactor all API hooks to use the new `createUseQuery` and `createUseMutation` hook [#2353](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2353)
+
+## v3.3.0-extensibility-preview.5 (Jul 02, 2025)
 - Migrate directory structure from `app/*` to `src/*` [#2693](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2693)
 
 ## v3.3.0-extensibility-preview.4 (Feb 12, 2025)

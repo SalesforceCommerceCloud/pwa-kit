@@ -110,7 +110,7 @@ function UseShopperOrders() {
         <>
             <div>
                 <h1>Account Orders</h1>
-                {loginRegisteredUser.isLoading ? (
+                {loginRegisteredUser.isPending ? (
                     <span>Logging in...</span>
                 ) : (
                     <h3>Logged in as {loginRegisteredUser?.variables?.username}</h3>

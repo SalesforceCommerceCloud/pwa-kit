@@ -254,8 +254,6 @@ function UseCustomer() {
                 <>
                     <button
                         onClick={() => {
-                            queryClient.removeQueries([{entity: 'customer'}])
-
                             return loginRegisteredUser.mutate({
                                 username: 'kobe@test.com',
                                 password: 'Test1234!'

@@ -15,7 +15,7 @@ module.exports = {
         '^react$': '<rootDir>/node_modules/react/index.js',
         '^react-router-dom(.*)$': '<rootDir>/node_modules/react-router-dom/index.js',
         '^@tanstack/react-query$':
-            '<rootDir>/node_modules/@tanstack/react-query/build/lib/index.js',
+            '<rootDir>/node_modules/@tanstack/react-query/build/modern/index.cjs',
         '^is-what$': '<rootDir>/node_modules/is-what/dist/cjs/index.cjs',
         '^copy-anything$': '<rootDir>/node_modules/copy-anything/dist/cjs/index.cjs',
         "^@salesforce/cc-datacloud-typescript$": "<rootDir>/node_modules/@salesforce/cc-datacloud-typescript/dist/index.js",
