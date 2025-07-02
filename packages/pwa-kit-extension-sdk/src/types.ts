@@ -5,8 +5,6 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import {RouteProps as _RouteProps} from 'react-router-dom'
-
 /**
  * This is the base configuration type for all Application Extensions. Modify this
  * type if you are adding new configurations that are general to all extensions.
@@ -37,26 +35,4 @@ export type BuildCandidatePathsOptions = {
     canonicalSource: string
     projectDir: string
     extensionEntries: ApplicationExtensionEntry[]
-}
-
-/**
- * Parameters for the `getRoutes` and `getRoutesAsync` methods
- */
-export interface GetRoutesParams {
-    locals: Record<string, any>
-}
-
-/*
- * Same as react-router's RouteProps, but now supports `componentName` if the route is meant to be serializable
- */
-export type RouteProps = _RouteProps & {
-    componentName?: string
-}
-
-/**
- * Parameters for the `beforeRouteMatch` method
- */
-export interface BeforeRouteMatchParams {
-    allRoutes: RouteProps[]
-    locals: Record<string, any>
 }

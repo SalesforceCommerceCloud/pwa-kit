@@ -19,7 +19,7 @@ import {ServerContext, CorrelationIdProvider} from '../universal/contexts'
 import App from '../universal/components/_app'
 import {getAppConfig} from '../universal/compatibility'
 import Switch from '../universal/components/switch'
-import {getAllRoutes, routeComponent} from '../universal/components/route-component'
+import {getRoutes, routeComponent} from '../universal/components/route-component'
 import {uuidv4} from '../../utils/uuidv4.client'
 import logger from '../../utils/logger-instance'
 
@@ -53,7 +53,7 @@ export const OuterApp = ({routes, error, extensions, WrappedApp, locals, onHydra
     // Invoke the Application Extensions 'beforeRouteMatch' hook. This hook accepts ALL the routes for the current
     // application including all routes added from the configured extensions.
     extensions.forEach((applicationExtension) => {
-        routes = applicationExtension.beforeRouteMatch({allRoutes: routes, locals})
+        routes = applicationExtension.beforeRouteMatch(routes)
     })
 
     return (
@@ -112,7 +112,7 @@ export const start = async () => {
     // this to set up, eg. Redux stores.
     const locals = {}
 
-    // AppConfig.restore *must* come before getAllRoutes()
+    // AppConfig.restore *must* come before getRoutes()
     AppConfig.restore(locals, window.__PRELOADED_STATE__.__STATE_MANAGEMENT_LIBRARY)
 
     // We need to tell the routeComponent HOC when the app is hydrating in order to
@@ -132,11 +132,10 @@ export const start = async () => {
         locals
     })
 
-    const routes = await getAllRoutes(locals)
     const props = {
         error: window.__ERROR__,
         locals: locals,
-        routes,
+        routes: getRoutes(locals),
         extensions: applicationExtensions,
         WrappedApp
     }
