@@ -178,7 +178,7 @@ jobs:
     needs: sync-branch
     if: needs.sync-branch.outputs.status != 'conflict' && needs.sync-branch.outputs.status != 'up-to-date'
     runs-on: ubuntu-latest
-    environment: more-logins-e2e
+    environment: extra-features-e2e
     
     steps:
       - name: Checkout more-logins-e2e-test branch
@@ -212,7 +212,7 @@ jobs:
         uses: "./.github/actions/push_to_mrt"
         with:
           CWD: "./packages/template-retail-react-app"
-          TARGET: more-logins-e2e
+          TARGET: extra-features-e2e
           PROJECT: scaffold-pwa
           MESSAGE: "Auto-sync from develop - build ${{ github.run_id }} (${{ github.sha }})"
           FLAGS: --wait
