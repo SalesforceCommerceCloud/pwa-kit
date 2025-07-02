@@ -67,6 +67,10 @@ jobs:
             exit 0
           fi
           
+          # Just to test
+          echo "status=conflict" >> $GITHUB_OUTPUT
+          exit 1
+
           if [ "${{ github.event.inputs.force_sync }}" = "true" ]; then
             echo "🔧 Force sync requested. Resetting to develop..."
             git reset --hard origin/develop
@@ -127,52 +131,6 @@ jobs:
             ### Auto-close
             This issue will be automatically closed when the sync succeeds.
             `;
-            
-            // Check if issue already exists
-            const existingIssues = await github.rest.issues.listForRepo({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              state: 'open',
-              labels: 'sync-conflict'
-            });
-            
-            if (existingIssues.data.length === 0) {
-              await github.rest.issues.create({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                title: '🚨 E2E Branch Sync Conflict - Manual Resolution Required',
-                body: issueBody,
-                labels: ['sync-conflict', 'automation']
-              });
-            }
-
-      - name: Close conflict resolution issues
-        if: steps.sync.outputs.status != 'conflict'
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const issues = await github.rest.issues.listForRepo({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              state: 'open',
-              labels: 'sync-conflict'
-            });
-            
-            for (const issue of issues.data) {
-              await github.rest.issues.update({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                issue_number: issue.number,
-                state: 'closed'
-              });
-              
-              await github.rest.issues.createComment({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                issue_number: issue.number,
-                body: '✅ Sync conflict resolved automatically. Closing this issue.'
-              });
-            }
 
   deploy:
     needs: sync-branch
