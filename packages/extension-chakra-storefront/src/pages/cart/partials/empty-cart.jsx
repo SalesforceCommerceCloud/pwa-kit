@@ -45,15 +45,14 @@ const EmptyCart = ({isRegistered}) => {
                             </Text>
                         </Stack>
                         <Stack justify="center" direction={['column', 'row']} gap={4}>
-                            <Button variant="outline" asChild>
-                                <Link
-                                    borderColor="blue.600"
-                                    href={'/'}
-                                    bg="transparent"
-                                    width={['343px', '220px']}
-                                    variant={isRegistered ? 'solid' : 'outline'}
-                                    color={isRegistered ? 'white' : 'blue.600'}
-                                >
+                            <Button
+                                color={isRegistered ? 'white' : 'blue.600'}
+                                variant={isRegistered ? 'solid' : 'outline'}
+                                borderColor="blue.600"
+                                width={['343px', '220px']}
+                                asChild
+                            >
+                                <Link href={'/'}>
                                     <FormattedMessage
                                         defaultMessage="Continue Shopping"
                                         id="empty_cart.link.continue_shopping"

@@ -199,16 +199,22 @@ const DrawerMenu = ({
                                         }
                                         itemsAfter={({depth}) =>
                                             depth === 1 && (
-                                                <Button variant="unstyled" onClick={onSignoutClick}>
-                                                    <Flex align={'center'}>
-                                                        <SignoutIcon boxSize={5} />
-                                                        <Text as="span">
-                                                            {intl.formatMessage({
-                                                                id: 'drawer_menu.button.log_out',
-                                                                defaultMessage: 'Log Out'
-                                                            })}
-                                                        </Text>
-                                                    </Flex>
+                                                <Button
+                                                    variant="ghost"
+                                                    css={styles.signoutButton}
+                                                    onClick={onSignoutClick}
+                                                >
+                                                    <SignoutIcon
+                                                        aria-hidden={true}
+                                                        boxSize={5}
+                                                        css={styles.signoutIcon}
+                                                    />
+                                                    <Text css={styles.signoutText} as="span">
+                                                        {intl.formatMessage({
+                                                            id: 'drawer_menu.button.log_out',
+                                                            defaultMessage: 'Log Out'
+                                                        })}
+                                                    </Text>
                                                 </Button>
                                             )
                                         }
