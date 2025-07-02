@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React, {Fragment, useEffect} from 'react'
-import {FormattedMessage, FormattedNumber} from 'react-intl'
+import {FormattedMessage, FormattedNumber, useIntl} from 'react-intl'
 import {
     Box,
     Button,
@@ -18,7 +18,8 @@ import {
     Text,
     Alert,
     AlertIcon,
-    Divider
+    Divider,
+    useToast
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 import {useForm} from 'react-hook-form'
 import {useParams} from 'react-router-dom'
@@ -27,7 +28,8 @@ import {
     useProducts,
     useAuthHelper,
     AuthHelpers,
-    useStores
+    useStores,
+    useShopperCustomersMutation
 } from '@salesforce/commerce-sdk-react'
 import {getCreditCardIcon} from '@salesforce/retail-react-app/app/utils/cc-utils'
 import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
@@ -47,14 +49,17 @@ import {
     STORE_LOCATOR_IS_ENABLED
 } from '@salesforce/retail-react-app/app/constants'
 import {useCurrency} from '@salesforce/retail-react-app/app/hooks'
+import {nanoid} from 'nanoid'
 
 const onClient = typeof window !== 'undefined'
 
 const CheckoutConfirmation = () => {
+    const {formatMessage} = useIntl()
     const {orderNo} = useParams()
     const navigate = useNavigation()
     const {data: customer} = useCurrentCustomer()
     const register = useAuthHelper(AuthHelpers.Register)
+    const createCustomerAddress = useShopperCustomersMutation('createCustomerAddress')
     const {data: order} = useOrder(
         {
             parameters: {orderNo}
@@ -68,6 +73,7 @@ const CheckoutConfirmation = () => {
     const {data: products} = useProducts({parameters: {ids: itemIds?.join(',')}})
     const productItemsMap = products?.data.reduce((map, item) => ({...map, [item.id]: item}), {})
     const form = useForm()
+    const toast = useToast()
 
     // Check if this is a pickup order and get store details
     const isPickupOrder = STORE_LOCATOR_IS_ENABLED
@@ -102,6 +108,28 @@ const CheckoutConfirmation = () => {
     const CardIcon = getCreditCardIcon(order.paymentInstruments[0].paymentCard?.cardType)
 
     const submitForm = async (data) => {
+        const saveShippingAddress = async (customerId) => {
+            try {
+                const shippingAddress = order.shipments[0].shippingAddress
+                let {id, ...shippingAddressWithoutId} = shippingAddress
+                const bodyShippingAddress = {
+                    addressId: nanoid(),
+                    ...shippingAddressWithoutId
+                }
+                await createCustomerAddress.mutateAsync({
+                    body: bodyShippingAddress,
+                    parameters: {customerId: customerId}
+                })
+            } catch (error) {
+                toast({
+                    title: formatMessage(API_ERROR_MESSAGE),
+                    status: 'error',
+                    position: 'top-right',
+                    isClosable: true
+                })
+            }
+        }
+
         try {
             const body = {
                 customer: {
@@ -112,7 +140,10 @@ const CheckoutConfirmation = () => {
                 },
                 password: data.password
             }
-            await register.mutateAsync(body)
+            const registerData = await register.mutateAsync(body)
+
+            // Save the shipping address from this order, should not block account creation
+            await saveShippingAddress(registerData.customerId)
 
             navigate(`/account`)
         } catch (error) {
