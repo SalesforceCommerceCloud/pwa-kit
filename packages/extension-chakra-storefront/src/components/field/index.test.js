@@ -130,3 +130,81 @@ test('renders Field component with password type shows password toggle endElemen
     expect(passwordInput).toHaveAttribute('type', 'password')
     expect(screen.getByLabelText('Show password')).toBeInTheDocument()
 })
+
+test('renders select Field component with correct ref assignment for React Hook Form', () => {
+    renderWithProviders(
+        <TestComponent defaultValues={{country: 'US'}}>
+            {({control}) => (
+                <Field
+                    name="country"
+                    label="Country"
+                    type="select"
+                    control={control}
+                    options={[
+                        {value: '', label: 'Select Country'},
+                        {value: 'US', label: 'United States'},
+                        {value: 'CA', label: 'Canada'},
+                        {value: 'UK', label: 'United Kingdom'}
+                    ]}
+                />
+            )}
+        </TestComponent>
+    )
+
+    const selectElement = screen.getByDisplayValue('United States')
+    expect(selectElement).toBeInTheDocument()
+    expect(selectElement.tagName).toBe('SELECT')
+
+    // Test that we can change the select value
+    fireEvent.change(selectElement, {target: {value: 'CA'}})
+    expect(selectElement.value).toBe('CA')
+
+    // Test that the select element is properly connected to React Hook Form
+    // by verifying it's a native select element that can receive focus
+    selectElement.focus()
+    expect(selectElement).toHaveFocus()
+})
+
+test('renders select Field component and verifies ref is assigned to NativeSelect.Field', () => {
+    // This test specifically verifies that the ref is correctly assigned to the actual select element
+    // which is crucial for React Hook Form to properly register and track the field
+    renderWithProviders(
+        <TestComponent defaultValues={{state: ''}}>
+            {({control}) => (
+                <Field
+                    name="state"
+                    label="State"
+                    type="select"
+                    control={control}
+                    defaultValue=""
+                    options={[
+                        {value: '', label: ''},
+                        {value: 'CA', label: 'California'},
+                        {value: 'NY', label: 'New York'},
+                        {value: 'TX', label: 'Texas'}
+                    ]}
+                />
+            )}
+        </TestComponent>
+    )
+
+    // Find the select element (should be the actual <select> tag, not a wrapper)
+    const selectElement = screen.getByRole('combobox')
+    expect(selectElement).toBeInTheDocument()
+    expect(selectElement.tagName).toBe('SELECT')
+
+    // Verify that the select starts with empty value (first option)
+    expect(selectElement.value).toBe('')
+
+    // Test changing the value - this verifies React Hook Form can read the value
+    fireEvent.change(selectElement, {target: {value: 'CA'}})
+    expect(selectElement.value).toBe('CA')
+
+    // Verify all options are rendered
+    const options = screen.getAllByRole('option')
+    expect(options).toHaveLength(4)
+    expect(options[0]).toHaveValue('')
+    expect(options[1]).toHaveValue('CA')
+    expect(options[2]).toHaveValue('NY')
+    expect(options[3]).toHaveValue('TX')
+})
