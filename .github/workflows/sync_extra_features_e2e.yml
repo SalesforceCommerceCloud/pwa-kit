@@ -38,7 +38,7 @@ jobs:
           git config --global user.name ${{ secrets.GIT_CONFIG_USERNAME }}
           git config --global user.email ${{ secrets.GIT_CONFIG_EMAIL }}
 
-      - name: Sync more-logins-e2e-test with develop
+      - name: Sync extra-features-e2e-branch with develop
         id: sync
         run: |
           set -e
@@ -47,22 +47,22 @@ jobs:
           git fetch origin
           
           # Check if the target branch exists
-          if ! git show-ref --verify --quiet refs/remotes/origin/more-logins-e2e-test; then
-            echo "Branch more-logins-e2e-test does not exist. Creating it from develop..."
-            git checkout -b more-logins-e2e-test origin/develop
-            git push origin more-logins-e2e-test
-            echo "✅ Created more-logins-e2e-test branch from develop"
+          if ! git show-ref --verify --quiet refs/remotes/origin/extra-features-e2e-branch; then
+            echo "Branch extra-features-e2e-branch does not exist. Creating it from develop..."
+            git checkout -b extra-features-e2e-branch origin/develop
+            git push origin extra-features-e2e-branch
+            echo "✅ Created extra-features-e2e-branch branch from develop"
             echo "status=created" >> $GITHUB_OUTPUT
             exit 0
           fi
           
           # Switch to the target branch
-          git checkout more-logins-e2e-test
-          git reset --hard origin/more-logins-e2e-test
+          git checkout extra-features-e2e-branch
+          git reset --hard origin/extra-features-e2e-branch
           
           # Check if we're already up to date
           if git merge-base --is-ancestor origin/develop HEAD; then
-            echo "✅ more-logins-e2e-test is already up to date with develop"
+            echo "✅ extra-features-e2e-branch is already up to date with develop"
             echo "status=up-to-date" >> $GITHUB_OUTPUT
             exit 0
           fi
@@ -70,14 +70,14 @@ jobs:
           if [ "${{ github.event.inputs.force_sync }}" = "true" ]; then
             echo "🔧 Force sync requested. Resetting to develop..."
             git reset --hard origin/develop
-            git push --force origin more-logins-e2e-test
-            echo "⚠️  Force synced more-logins-e2e-test with develop (all conflicts overwritten)"
+            git push --force origin extra-features-e2e-branch
+            echo "⚠️  Force synced extra-features-e2e-branch with develop (all conflicts overwritten)"
             echo "status=force-synced" >> $GITHUB_OUTPUT
           else
             # Default merge strategy
             if git merge origin/develop --no-edit; then
-              echo "✅ Successfully merged develop into more-logins-e2e-test"
-              git push origin more-logins-e2e-test
+              echo "✅ Successfully merged develop into extra-features-e2e-branch"
+              git push origin extra-features-e2e-branch
               echo "status=merged" >> $GITHUB_OUTPUT
             else
               echo "❌ Merge conflicts detected!"
@@ -98,7 +98,7 @@ jobs:
             const issueBody = `
             ## 🚨 Automatic Sync Failed - Merge Conflicts Detected
             
-            The automatic sync from \`develop\` to \`more-logins-e2e-test\` failed due to merge conflicts.
+            The automatic sync from \`develop\` to \`extra-features-e2e-branch\` failed due to merge conflicts.
             
             ### Conflicting Files:
             \`\`\`
@@ -109,13 +109,13 @@ jobs:
             
             #### Option 1: Manual Resolution
             \`\`\`bash
-            git checkout more-logins-e2e-test
-            git pull origin more-logins-e2e-test
+            git checkout extra-features-e2e-branch
+            git pull origin extra-features-e2e-branch
             git merge develop
             # Resolve conflicts manually
             git add .
             git commit -m "Resolve merge conflicts from develop"
-            git push origin more-logins-e2e-test
+            git push origin extra-features-e2e-branch
             \`\`\`
             
             #### Option 2: Force Sync (Overwrites E2E changes)
@@ -181,10 +181,10 @@ jobs:
     environment: extra-features-e2e
     
     steps:
-      - name: Checkout more-logins-e2e-test branch
+      - name: Checkout extra-features-e2e-branch branch
         uses: actions/checkout@v4
         with:
-          ref: more-logins-e2e-test
+          ref: extra-features-e2e-branch
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
