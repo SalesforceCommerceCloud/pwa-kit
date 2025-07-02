@@ -59,4 +59,4 @@ export const useCartShipping = (basket) => {
         updateShippingMethodForShipmentsMutation,
         shippingMethodsQuery
     }
-} 
+}

@@ -34,8 +34,7 @@ const Cart = () => {
     const showError = useCartErrorHandler()
 
     // Product data and processing
-    const {products, isProductsPending, bundleChildProductData, productsByItemId} =
-        useCartProducts(basket)
+    const {isProductsPending, productsByItemId} = useCartProducts(basket)
 
     // Cart operations
     const {

@@ -5,6 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
+import PropTypes from 'prop-types'
 import {Box, useDisclosure} from '@chakra-ui/react'
 import ConfirmationModal from '../../../components/confirmation-modal'
 import ProductViewModal from '../../../components/product-view-modal'
@@ -82,4 +83,21 @@ const CartModals = ({
     )
 }
 
-export default CartModals 
+CartModals.propTypes = {
+    isOpen: PropTypes.bool.isRequired,
+    onOpen: PropTypes.func.isRequired,
+    onClose: PropTypes.func.isRequired,
+    selectedItem: PropTypes.shape({
+        itemId: PropTypes.string,
+        bundledProductItems: PropTypes.array
+    }),
+    handleUpdateCart: PropTypes.func.isRequired,
+    handleUpdateBundle: PropTypes.func.isRequired,
+    handleRemoveItem: PropTypes.func.isRequired,
+    basket: PropTypes.shape({
+        productItems: PropTypes.array
+    }),
+    handleUnavailableProducts: PropTypes.func.isRequired
+}
+
+export default CartModals

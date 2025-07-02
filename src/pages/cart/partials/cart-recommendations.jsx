@@ -5,6 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
+import PropTypes from 'prop-types'
 import {FormattedMessage} from 'react-intl'
 import {Stack} from '@chakra-ui/react'
 import RecommendedProducts from '../../../components/recommended-products'
@@ -45,4 +46,16 @@ const CartRecommendations = ({basket}) => {
     )
 }
 
-export default CartRecommendations 
+CartRecommendations.propTypes = {
+    basket: PropTypes.shape({
+        basketId: PropTypes.string,
+        productItems: PropTypes.arrayOf(
+            PropTypes.shape({
+                itemId: PropTypes.string,
+                productId: PropTypes.string
+            })
+        )
+    })
+}
+
+export default CartRecommendations
