@@ -59,7 +59,7 @@ const ProductItem = ({
                         <Stack spacing={3} flex={1}>
                             <Stack spacing={1}>
                                 <CartItemVariantName />
-                                <CartItemVariantAttributes />
+                                <CartItemVariantAttributes excludeBonusLabel />
                                 <HideOnDesktop>
                                     <Box marginTop={2}>
                                         <CartItemVariantPrice
