@@ -15,8 +15,7 @@ export default defineSlotRecipe({
             filled: {
                 field: {
                     border: '2px solid',
-                    borderColor: 'transparent',
-                    background: 'red.200',
+                    borderColor: 'gray.100',
                     _hover: {
                         background: 'gray.200'
                     },
@@ -30,7 +29,7 @@ export default defineSlotRecipe({
                     }
                 },
                 indicator: {
-                    color: 'white'
+                    color: 'black'
                 }
             }
         }

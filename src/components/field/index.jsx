@@ -70,7 +70,7 @@ const Field = ({
                                 endElement={
                                     type === 'password' ? (
                                         <IconButton
-                                            variant="ghosted"
+                                            variant="ghost"
                                             aria-label={passwordIconLabel}
                                             onClick={() => setHidePassword(!hidePassword)}
                                         >
@@ -113,6 +113,7 @@ const Field = ({
                             <>
                                 <NativeSelect.Root ref={ref} value={value} {..._inputProps}>
                                     <NativeSelect.Field
+                                        value={value || ''}
                                         onChange={onChange}
                                         placeholder={placeholder}
                                     >
