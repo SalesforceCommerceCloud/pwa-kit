@@ -64,10 +64,14 @@ export default defineSlotRecipe({
         localeSelectorRoot: {},
         localeSelectorField: {
             fontSize: 'md',
+            borderColor: 'transparent',
             background: 'gray.800',
             _hover: {
                 background: 'whiteAlpha.500'
             }
+        },
+        indicator: {
+            color: 'white'
         },
         localeDropdownOption: {
             color: 'black'
