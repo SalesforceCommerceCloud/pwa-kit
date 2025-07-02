@@ -8,24 +8,23 @@
 import {useContext} from 'react'
 import {useSearchStores} from '@salesforce/commerce-sdk-react'
 import {StoreLocatorContext} from '@salesforce/retail-react-app/app/contexts/store-locator-provider'
+import {STORE_LOCATOR_NUM_STORES_PER_REQUEST_API_MAX} from '@salesforce/retail-react-app/app/constants'
 
 const useStores = (state) => {
-    //This is an API limit and is therefore not configurable
-    const NUM_STORES_PER_REQUEST_API_MAX = 200
     const apiParameters =
         state.mode === 'input'
             ? {
                   countryCode: state.formValues.countryCode,
                   postalCode: state.formValues.postalCode,
                   maxDistance: state.config.radius,
-                  limit: NUM_STORES_PER_REQUEST_API_MAX,
+                  limit: STORE_LOCATOR_NUM_STORES_PER_REQUEST_API_MAX,
                   distanceUnit: state.config.radiusUnit
               }
             : {
                   latitude: state.deviceCoordinates.latitude,
                   longitude: state.deviceCoordinates.longitude,
                   maxDistance: state.config.radius,
-                  limit: NUM_STORES_PER_REQUEST_API_MAX,
+                  limit: STORE_LOCATOR_NUM_STORES_PER_REQUEST_API_MAX,
                   distanceUnit: state.config.radiusUnit
               }
     const shouldFetchStores =
@@ -54,7 +53,7 @@ export const useStoreLocator = () => {
     }
 
     const {state, setState} = context
-    const {data, isLoading} = useStores(state)
+    const storesQuery = useStores(state)
 
     // There are two modes, input and device.
     // The input mode is when the user is searching for a store
@@ -62,7 +61,11 @@ export const useStoreLocator = () => {
     // The device mode is when the user is searching for a store by sharing their location.
     // The mode is implicitly set by user's action.
     const setFormValues = (formValues) => {
-        setState((prev) => ({...prev, formValues, mode: 'input'}))
+        setState((prev) => ({
+            ...prev,
+            formValues,
+            mode: 'input'
+        }))
     }
 
     const setDeviceCoordinates = (coordinates) => {
@@ -74,12 +77,20 @@ export const useStoreLocator = () => {
         }))
     }
 
+    const setSelectedStoreId = (selectedStoreId) => {
+        setState((prev) => ({
+            ...prev,
+            selectedStoreId
+        }))
+    }
+
     return {
         ...state,
-        data,
-        isLoading,
+        // Especially data, isLoading, and error are useful
+        ...storesQuery,
         // Actions
         setFormValues,
-        setDeviceCoordinates
+        setDeviceCoordinates,
+        setSelectedStoreId
     }
 }

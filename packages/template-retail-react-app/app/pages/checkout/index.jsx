@@ -22,6 +22,7 @@ import {
     useCheckout
 } from '@salesforce/retail-react-app/app/pages/checkout/util/checkout-context'
 import ContactInfo from '@salesforce/retail-react-app/app/pages/checkout/partials/contact-info'
+import PickupAddress from '@salesforce/retail-react-app/app/pages/checkout/partials/pickup-address'
 import ShippingAddress from '@salesforce/retail-react-app/app/pages/checkout/partials/shipping-address'
 import ShippingOptions from '@salesforce/retail-react-app/app/pages/checkout/partials/shipping-options'
 import Payment from '@salesforce/retail-react-app/app/pages/checkout/partials/payment'
@@ -33,7 +34,8 @@ import {useShopperOrdersMutation, useShopperBasketsMutation} from '@salesforce/c
 import UnavailableProductConfirmationModal from '@salesforce/retail-react-app/app/components/unavailable-product-confirmation-modal'
 import {
     API_ERROR_MESSAGE,
-    TOAST_MESSAGE_REMOVED_ITEM_FROM_CART
+    TOAST_MESSAGE_REMOVED_ITEM_FROM_CART,
+    STORE_LOCATOR_IS_ENABLED
 } from '@salesforce/retail-react-app/app/constants'
 import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
 import LoadingSpinner from '@salesforce/retail-react-app/app/components/loading-spinner'
@@ -51,6 +53,11 @@ const Checkout = () => {
     const idps = social?.idps
     const isSocialEnabled = !!social?.enabled
     const isPasswordlessEnabled = !!passwordless?.enabled
+
+    // Only enable BOPIS functionality if the feature toggle is on
+    const isPickupOrder = STORE_LOCATOR_IS_ENABLED
+        ? basket?.shipments[0]?.shippingMethod?.c_storePickupEnabled === true
+        : false
 
     useEffect(() => {
         if (error || step === 4) {
@@ -99,11 +106,11 @@ const Checkout = () => {
                                 isPasswordlessEnabled={isPasswordlessEnabled}
                                 idps={idps}
                             />
-                            <ShippingAddress />
-                            <ShippingOptions />
+                            {isPickupOrder ? <PickupAddress /> : <ShippingAddress />}
+                            {!isPickupOrder && <ShippingOptions />}
                             <Payment />
 
-                            {step === 4 && (
+                            {step === 5 && (
                                 <Box pt={3} display={{base: 'none', lg: 'block'}}>
                                     <Container variant="form">
                                         <Button
@@ -130,7 +137,7 @@ const Checkout = () => {
                             showCartItems={true}
                         />
 
-                        {step === 4 && (
+                        {step === 5 && (
                             <Box display={{base: 'none', lg: 'block'}} pt={2}>
                                 <Button w="full" onClick={submitOrder} isLoading={isLoading}>
                                     <FormattedMessage
@@ -144,7 +151,7 @@ const Checkout = () => {
                 </Grid>
             </Container>
 
-            {step === 4 && (
+            {step === 5 && (
                 <Box
                     display={{lg: 'none'}}
                     position="sticky"

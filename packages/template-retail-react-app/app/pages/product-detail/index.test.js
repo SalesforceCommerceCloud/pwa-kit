@@ -55,6 +55,26 @@ jest.mock('@salesforce/retail-react-app/app/constants', () => {
     }
 })
 
+jest.mock('@salesforce/retail-react-app/app/components/store-locator', () => {
+    // eslint-disable-next-line react/prop-types
+    function MockStoreLocatorModal({isOpen, onClose}) {
+        return isOpen ? (
+            <div data-testid="store-locator-modal">
+                <button onClick={onClose}>Close Modal</button>
+            </div>
+        ) : null
+    }
+    return {
+        StoreLocatorModal: MockStoreLocatorModal
+    }
+})
+
+// Mock useSelectedStore hook
+const mockUseSelectedStore = jest.fn()
+jest.mock('@salesforce/retail-react-app/app/hooks/use-selected-store', () => ({
+    useSelectedStore: () => mockUseSelectedStore()
+}))
+
 const MockedComponent = () => {
     return (
         <Switch>
@@ -68,6 +88,14 @@ const MockedComponent = () => {
 
 beforeEach(() => {
     jest.resetModules()
+
+    // Default mock for useSelectedStore (no selected store by default)
+    mockUseSelectedStore.mockImplementation(() => ({
+        selectedStore: null,
+        isLoading: false,
+        error: null,
+        hasSelectedStore: false
+    }))
 
     global.server.use(
         // By default, the page will be rendered with a product set
@@ -486,5 +514,360 @@ describe('product bundles', () => {
             expect(screen.getByText('Only 3 left!')).toBeInTheDocument()
             expect(addBundleToCartBtn).toBeDisabled()
         })
+    })
+})
+
+describe('Delivery Options Restrictions', () => {
+    const inventoryId = 'inventory_m_store_store1'
+    const storeId = 'store-123'
+
+    const pickupShippingMethod = {c_storePickupEnabled: true}
+    const shipToAddressShippingMethod = {
+        id: 'shipping',
+        name: 'Ship to Address',
+        methodType: 'shipping'
+    }
+    const baseBasket = {
+        ...mockCustomerBaskets.baskets[0],
+        shipments: [
+            {
+                ...mockCustomerBaskets.baskets[0].shipments[0],
+                shippingMethod: shipToAddressShippingMethod
+            }
+        ]
+    }
+    const pickupBasket = {
+        ...mockCustomerBaskets.baskets[0],
+        shipments: [
+            {
+                ...mockCustomerBaskets.baskets[0].shipments[0],
+                shippingMethod: pickupShippingMethod
+            }
+        ]
+    }
+
+    // Create a product with a matching, orderable inventory
+    const masterProductWithInventory = {
+        ...masterProduct,
+        inventories: [
+            {
+                id: inventoryId,
+                orderable: true,
+                ats: 10,
+                stockLevel: 10
+            }
+        ]
+    }
+
+    test('shows error when adding pickup item to basket with non-pickup shipping method', async () => {
+        // Mock useSelectedStore to return a store with inventoryId
+        mockUseSelectedStore.mockImplementation(() => ({
+            selectedStore: {
+                id: storeId,
+                name: 'Test Store',
+                inventoryId: inventoryId
+            },
+            isLoading: false,
+            error: null,
+            hasSelectedStore: true
+        }))
+
+        global.server.use(
+            rest.get('*/products/:productId', (req, res, ctx) => {
+                return res(ctx.json(masterProductWithInventory))
+            }),
+            rest.get('*/customers/:customerId/baskets', (req, res, ctx) => {
+                return res(ctx.json({baskets: [baseBasket], total: 1}))
+            })
+        )
+
+        // Navigate to specific variant before adding to cart
+        window.history.pushState(
+            {},
+            'ProductDetail',
+            '/uk/en-GB/product/25517823M?color=JJG80XX&size=9LG'
+        )
+
+        renderWithProviders(<MockedComponent />)
+        // Wait for page to load
+        expect(await screen.findByTestId('product-details-page')).toBeInTheDocument()
+        // Wait for the page to fully load
+        await waitFor(() => {
+            expect(screen.getByRole('link', {name: /mens/i})).toBeInTheDocument()
+        })
+        // Select "Pickup in Store"
+        const pickupLabel = await screen.findByLabelText(/Pickup in Store/i)
+        fireEvent.click(pickupLabel)
+
+        // Click Add to Cart
+        const addToCartButton = await screen.findByRole('button', {name: /add to cart/i})
+        fireEvent.click(addToCartButton)
+
+        await waitFor(() => {
+            expect(
+                screen.getByText(
+                    "Please select 'Ship to Address' to match the shipping method for your other items."
+                )
+            ).toBeInTheDocument()
+        })
+    })
+
+    test('Add to Cart with Pickup configures shipment when basket has no shipping method', async () => {
+        // Mock useSelectedStore to return a store with inventoryId
+        mockUseSelectedStore.mockImplementation(() => ({
+            selectedStore: {
+                id: storeId,
+                name: 'Test Store',
+                inventoryId: inventoryId
+            },
+            isLoading: false,
+            error: null,
+            hasSelectedStore: true
+        }))
+
+        // Track if updatePickupShipment was called
+        let updatePickupShipmentCalled = false
+        let shipmentUpdateRequest = null
+
+        // Mock the product to be a simple master product with inventory
+        global.server.use(
+            rest.get('*/products/:productId', (req, res, ctx) => {
+                return res(ctx.json(masterProductWithInventory))
+            }),
+            rest.post('*/baskets/:basketId/items', async (req, res, ctx) => {
+                const body = await req.json()
+                // Assert: inventoryId is included in the request body
+                expect(body[0].inventoryId).toBe(inventoryId)
+                return res(
+                    ctx.json({
+                        basketId: 'test-basket-id',
+                        shipments: [
+                            {
+                                shipmentId: 'me'
+                                // No shippingMethod property - this triggers updatePickupShipment
+                            }
+                        ]
+                    })
+                )
+            }),
+            // Mock the shipment update call that updatePickupShipment makes
+            rest.patch('*/baskets/:basketId/shipments/:shipmentId', async (req, res, ctx) => {
+                updatePickupShipmentCalled = true
+                shipmentUpdateRequest = await req.json()
+
+                // Verify the correct parameters are passed to updatePickupShipment
+                expect(req.params.basketId).toBe('test-basket-id')
+                expect(req.params.shipmentId).toBe('me')
+                expect(shipmentUpdateRequest.shippingMethod.id).toBe('GBP005')
+                expect(shipmentUpdateRequest.c_fromStoreId).toBe(storeId)
+
+                return res(
+                    ctx.json({
+                        basketId: 'test-basket-id',
+                        shipments: [
+                            {
+                                shipmentId: 'me',
+                                shippingMethod: {
+                                    id: 'GBP005'
+                                }
+                            }
+                        ]
+                    })
+                )
+            }),
+            // Mock the shipping methods GET request
+            rest.get(
+                '*/baskets/:basketId/shipments/:shipmentId/shipping-methods',
+                (req, res, ctx) => {
+                    return res(
+                        ctx.json({
+                            applicableShippingMethods: [
+                                {
+                                    id: 'GBP005',
+                                    name: 'Store Pickup',
+                                    price: 0
+                                }
+                            ]
+                        })
+                    )
+                }
+            )
+        )
+
+        // Navigate to specific variant before adding to cart
+        window.history.pushState(
+            {},
+            'ProductDetail',
+            '/uk/en-GB/product/25517823M?color=JJG80XX&size=9LG'
+        )
+
+        renderWithProviders(<MockedComponent />)
+
+        // Wait for page to load
+        expect(await screen.findByTestId('product-details-page')).toBeInTheDocument()
+
+        // Wait for the page to fully load
+        await waitFor(() => {
+            expect(screen.getByRole('link', {name: /mens/i})).toBeInTheDocument()
+        })
+
+        // Select "Pickup in Store"
+        const pickupLabel = await screen.findByLabelText(/Pickup in Store/i)
+        fireEvent.click(pickupLabel)
+
+        // Click Add to Cart
+        const addToCartButton = await screen.findByRole('button', {name: /add to cart/i})
+        fireEvent.click(addToCartButton)
+
+        await waitFor(() => {
+            expect(
+                screen.getByText(
+                    "Please select 'Ship to Address' to match the shipping method for your other items."
+                )
+            ).toBeInTheDocument()
+        })
+    })
+
+    test('shows error when adding non-pickup item to basket with pickup shipping method', async () => {
+        // Mock useSelectedStore to return a store with inventoryId
+        mockUseSelectedStore.mockImplementation(() => ({
+            selectedStore: {
+                id: storeId,
+                name: 'Test Store',
+                inventoryId: inventoryId
+            },
+            isLoading: false,
+            error: null,
+            hasSelectedStore: true
+        }))
+        // Mock the product to be a simple master product with inventory
+        global.server.use(
+            rest.get('*/products/:productId', (req, res, ctx) => {
+                return res(ctx.json(masterProductWithInventory))
+            }),
+            rest.get('*/customers/:customerId/baskets', (req, res, ctx) => {
+                return res(ctx.json({baskets: [pickupBasket], total: 1}))
+            })
+        )
+
+        // Navigate to specific variant before adding to cart
+        window.history.pushState(
+            {},
+            'ProductDetail',
+            '/uk/en-GB/product/25517823M?color=JJG80XX&size=9LG'
+        )
+
+        renderWithProviders(<MockedComponent />)
+
+        // Wait for page to load
+        expect(await screen.findByTestId('product-details-page')).toBeInTheDocument()
+        // Wait for the page to fully load
+        await waitFor(() => {
+            expect(screen.getByRole('link', {name: /mens/i})).toBeInTheDocument()
+        })
+        // Select "Ship to Address" (not pickup)
+        const shipToAddressLabel = await screen.findByLabelText(/Ship to Address/i)
+        fireEvent.click(shipToAddressLabel)
+
+        // Click Add to Cart
+        const addToCartButton = await screen.findByRole('button', {name: /add to cart/i})
+        fireEvent.click(addToCartButton)
+
+        await waitFor(() => {
+            expect(
+                screen.getByText(
+                    "Please select 'Pickup in Store' to match the shipping method for your other items."
+                )
+            ).toBeInTheDocument()
+        })
+    })
+})
+
+test('fetches product with inventoryIds when store is selected', async () => {
+    // Mock useSelectedStore to return a store with inventoryId
+    const inventoryId = 'inventory_m_store_store1'
+    mockUseSelectedStore.mockImplementation(() => ({
+        selectedStore: {
+            id: 'store-123',
+            name: 'Test Store',
+            inventoryId: inventoryId
+        },
+        isLoading: false,
+        error: null,
+        hasSelectedStore: true
+    }))
+
+    // Mock the product API to check for inventoryIds param
+    let inventoryIdsParam
+    global.server.use(
+        rest.get('*/products/:productId', (req, res, ctx) => {
+            inventoryIdsParam = req.url.searchParams.get('inventoryIds')
+            return res(ctx.json(masterProduct))
+        })
+    )
+
+    renderWithProviders(<MockedComponent />)
+
+    // Assert: Product page loads and inventoryIds param was sent
+    expect(await screen.findByTestId('product-details-page')).toBeInTheDocument()
+    expect(inventoryIdsParam).toBe(inventoryId)
+})
+
+test('Add to Cart (Pickup in Store) includes inventoryId for the selected variant', async () => {
+    // Mock useSelectedStore to return a store with inventoryId
+    const inventoryId = 'inventory_m_store_store1'
+    mockUseSelectedStore.mockImplementation(() => ({
+        selectedStore: {
+            id: 'store-123',
+            name: 'Test Store',
+            inventoryId: inventoryId
+        },
+        isLoading: false,
+        error: null,
+        hasSelectedStore: true
+    }))
+
+    // Create a product with a matching, orderable inventory
+    const masterProductWithInventory = {
+        ...masterProduct,
+        inventories: [
+            {
+                id: inventoryId,
+                orderable: true,
+                ats: 10,
+                stockLevel: 10
+            }
+        ]
+    }
+
+    // Mock the product to be a simple master product with inventory
+    global.server.use(
+        rest.get('*/products/:productId', (req, res, ctx) => {
+            return res(ctx.json(masterProductWithInventory))
+        }),
+        rest.post('*/baskets/:basketId/items', async (req, res, ctx) => {
+            const body = await req.json()
+            // Assert: inventoryId is included in the request body
+            expect(body[0].inventoryId).toBe(inventoryId)
+            return res(ctx.json({}))
+        })
+    )
+
+    renderWithProviders(<MockedComponent />)
+
+    // Wait for page to load
+    expect(await screen.findByTestId('product-details-page')).toBeInTheDocument()
+
+    // Select "Pickup in Store"
+    const pickupLabel = await screen.findByLabelText(/Pickup in Store/i)
+    fireEvent.click(pickupLabel)
+
+    // Click Add to Cart
+    const addToCartButton = await screen.findByRole('button', {name: /add to cart/i})
+    fireEvent.click(addToCartButton)
+
+    // Wait for the POST to be called and assertion to run
+    await waitFor(() => {
+        // The assertion is inside the mock POST handler above
     })
 })

@@ -37,6 +37,7 @@ export default function ShippingAddress() {
     const {data: customer} = useCurrentCustomer()
     const {data: basket} = useCurrentBasket()
     const selectedShippingAddress = basket?.shipments && basket?.shipments[0]?.shippingAddress
+    const isAddressFilled = selectedShippingAddress?.address1 && selectedShippingAddress?.city
     const {step, STEPS, goToStep, goToNextStep} = useCheckout()
     const createCustomerAddress = useShopperCustomersMutation('createCustomerAddress')
     const updateCustomerAddress = useShopperCustomersMutation('updateCustomerAddress')
@@ -131,7 +132,7 @@ export default function ShippingAddress() {
                     formTitleAriaLabel={shippingAddressAriaLabel}
                 />
             </ToggleCardEdit>
-            {selectedShippingAddress && (
+            {isAddressFilled && (
                 <ToggleCardSummary>
                     <AddressDisplay address={selectedShippingAddress} />
                 </ToggleCardSummary>

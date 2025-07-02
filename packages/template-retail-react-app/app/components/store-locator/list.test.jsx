@@ -5,7 +5,8 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
-import {render, screen, fireEvent} from '@testing-library/react'
+import {screen, fireEvent} from '@testing-library/react'
+import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
 import {StoreLocatorList} from '@salesforce/retail-react-app/app/components/store-locator/list'
 import {useStoreLocator} from '@salesforce/retail-react-app/app/hooks/use-store-locator'
 
@@ -17,6 +18,7 @@ const mockStores = {
     total: 3,
     data: [
         {
+            id: 'store-1',
             name: 'Store 1',
             address1: '123 Main St',
             city: 'Boston',
@@ -25,6 +27,7 @@ const mockStores = {
             phone: '555-0123'
         },
         {
+            id: 'store-2',
             name: 'Store 2',
             address1: '456 Oak St',
             city: 'Boston',
@@ -33,6 +36,7 @@ const mockStores = {
             phone: '555-0124'
         },
         {
+            id: 'store-3',
             name: 'Store 3',
             address1: '789 Pine St',
             city: 'Boston',
@@ -54,6 +58,7 @@ const defaultConfig = {
 describe('StoreLocatorList', () => {
     beforeEach(() => {
         jest.clearAllMocks()
+        localStorage.clear()
     })
 
     test('renders loading state', () => {
@@ -65,7 +70,7 @@ describe('StoreLocatorList', () => {
             mode: 'input'
         })
 
-        render(<StoreLocatorList />)
+        renderWithProviders(<StoreLocatorList />)
         expect(screen.getByText('Loading locations...')).toBeTruthy()
     })
 
@@ -78,8 +83,8 @@ describe('StoreLocatorList', () => {
             mode: 'input'
         })
 
-        render(<StoreLocatorList />)
-        expect(screen.getByText('Sorry, there are no locations in this area')).toBeTruthy()
+        renderWithProviders(<StoreLocatorList />)
+        expect(screen.getByText('Sorry, there are no locations in this area.')).toBeTruthy()
     })
 
     test('renders stores with pagination', () => {
@@ -91,7 +96,7 @@ describe('StoreLocatorList', () => {
             mode: 'input'
         })
 
-        render(<StoreLocatorList />)
+        renderWithProviders(<StoreLocatorList />)
 
         // Initially shows only first 2 stores (defaultPageSize)
         expect(screen.getByText('Store 1')).toBeTruthy()
@@ -120,7 +125,7 @@ describe('StoreLocatorList', () => {
             mode: 'input'
         })
 
-        render(<StoreLocatorList />)
+        renderWithProviders(<StoreLocatorList />)
         expect(
             screen.getByText(/Viewing stores within 10mi of 02108 in United States/)
         ).toBeTruthy()
@@ -135,7 +140,7 @@ describe('StoreLocatorList', () => {
             mode: 'geolocation'
         })
 
-        render(<StoreLocatorList />)
+        renderWithProviders(<StoreLocatorList />)
         expect(screen.getByText('Viewing stores near your location')).toBeTruthy()
     })
 })
