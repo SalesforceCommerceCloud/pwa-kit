@@ -5,19 +5,27 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
-import {screen} from '@testing-library/react'
-// import userEvent from '@testing-library/user-event'
-
-import OfflineBoundary from '../../components/offline-boundary/index'
+import {screen, act} from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
+import {ChakraProvider} from '@chakra-ui/react'
+import theme from '../../theme'
 import {renderWithRouter} from '../../utils/test-utils'
 
-// class ChunkLoadError extends Error {
-//     constructor(...params) {
-//         // Pass remaining arguments (including vendor specific ones) to parent constructor
-//         super(...params)
-//         this.name = 'ChunkLoadError'
-//     }
-// }
+import OfflineBoundary, {UnwrappedOfflineBoundary} from '../../components/offline-boundary/index'
+
+// Custom render function that combines Router and Chakra contexts
+const renderWithRouterAndChakra = (component) => {
+    const ComponentWithChakra = () => <ChakraProvider value={theme}>{component}</ChakraProvider>
+    return renderWithRouter(<ComponentWithChakra />)
+}
+
+class ChunkLoadError extends Error {
+    constructor(...params) {
+        // Pass remaining arguments (including vendor specific ones) to parent constructor
+        super(...params)
+        this.name = 'ChunkLoadError'
+    }
+}
 
 describe('The OfflineBoundary', () => {
     beforeEach(() => {
@@ -31,7 +39,7 @@ describe('The OfflineBoundary', () => {
     })
 
     test('should render its children', () => {
-        renderWithRouter(
+        renderWithRouterAndChakra(
             <OfflineBoundary isOnline={true}>
                 <div id="child">child</div>
             </OfflineBoundary>
@@ -40,84 +48,74 @@ describe('The OfflineBoundary', () => {
         expect(screen.getByText(/child/i)).toBeInTheDocument()
     })
 
-    // TODO: Fix flaky/broken test
-    // eslint-disable-next-line jest/no-commented-out-tests
-    // test('should render the error splash when a child throws a chunk load error', () => {
-    //     const ThrowingComponent = () => {
-    //         throw new ChunkLoadError()
-    //     }
-    //     renderWithRouter(
-    //         <OfflineBoundary isOnline={true}>
-    //             <div>
-    //                 <ThrowingComponent />
-    //                 <div id="child">child</div>
-    //             </div>
-    //         </OfflineBoundary>
-    //     )
+    test('should render the error splash when a child throws a chunk load error', () => {
+        const ThrowingComponent = () => {
+            throw new ChunkLoadError()
+        }
+        renderWithRouterAndChakra(
+            <OfflineBoundary isOnline={true}>
+                <div>
+                    <ThrowingComponent />
+                    <div id="child">child</div>
+                </div>
+            </OfflineBoundary>
+        )
 
-    //     expect(screen.getByRole('img', {name: /offline cloud/i})).toBeInTheDocument()
-    //     expect(
-    //         screen.getByRole('heading', {name: /you are currently offline/i})
-    //     ).toBeInTheDocument()
-    //     expect(screen.queryByText(/child/i)).not.toBeInTheDocument()
-    // })
+        expect(screen.getByRole('img', {hidden: true})).toBeInTheDocument()
+        expect(
+            screen.getByRole('heading', {name: /you are currently offline/i})
+        ).toBeInTheDocument()
+        expect(screen.queryByText(/child/i)).not.toBeInTheDocument()
+    })
 
-    // TODO: Fix flaky/broken test
-    // eslint-disable-next-line jest/no-commented-out-tests
-    // test('should re-throw errors that are not chunk load errors', () => {
-    //     const ThrowingComponent = () => {
-    //         throw new Error('Anything else')
-    //     }
-    //     expect(() => {
-    //         renderWithRouter(
-    //             <OfflineBoundary isOnline={true}>
-    //                 <div>
-    //                     <ThrowingComponent />
-    //                     <div id="child">child</div>
-    //                 </div>
-    //             </OfflineBoundary>
-    //         )
-    //     }).toThrow()
-    // })
+    test('should re-throw errors that are not chunk load errors', () => {
+        const ThrowingComponent = () => {
+            throw new Error('Anything else')
+        }
+        expect(() => {
+            renderWithRouterAndChakra(
+                <OfflineBoundary isOnline={true}>
+                    <div>
+                        <ThrowingComponent />
+                        <div id="child">child</div>
+                    </div>
+                </OfflineBoundary>
+            )
+        }).toThrow()
+    })
 
-    // TODO: Fix flaky/broken test
-    // eslint-disable-next-line jest/no-commented-out-tests
-    // test('should attempt to reload the page when the user clicks retry', () => {
-    //     let firstRender = true
-    //     const ThrowingOnceComponent = () => {
-    //         if (firstRender) {
-    //             firstRender = false
-    //             throw new ChunkLoadError()
-    //         } else {
-    //             return <div id="child">child</div>
-    //         }
-    //     }
-    //     renderWithRouter(
-    //         <OfflineBoundary isOnline={true}>
-    //             <ThrowingOnceComponent />
-    //         </OfflineBoundary>
-    //     )
+    test('should call clearError when retry button is clicked', async () => {
+        const user = userEvent.setup()
+        const ThrowingComponent = () => {
+            throw new ChunkLoadError()
+        }
+        const clearErrorSpy = jest.spyOn(UnwrappedOfflineBoundary.prototype, 'clearError')
 
-    //     expect(screen.getByRole('img', {name: /offline cloud/i})).toBeInTheDocument()
-    //     expect(
-    //         screen.getByRole('heading', {name: /you are currently offline/i})
-    //     ).toBeInTheDocument()
-    //     expect(screen.queryByText(/child/i)).not.toBeInTheDocument()
+        renderWithRouterAndChakra(
+            <OfflineBoundary isOnline={true}>
+                <ThrowingComponent />
+            </OfflineBoundary>
+        )
 
-    //     userEvent.click(screen.getByRole('button', {name: /retry connection/i}))
-    //     expect(screen.getByText(/child/i)).toBeInTheDocument()
-    //     expect(screen.queryByRole('img', {name: /offline cloud/i})).not.toBeInTheDocument()
-    //     expect(
-    //         screen.queryByRole('heading', {name: /you are currently offline/i})
-    //     ).not.toBeInTheDocument()
-    // })
+        expect(screen.getByRole('img', {hidden: true})).toBeInTheDocument()
+        expect(
+            screen.getByRole('heading', {name: /you are currently offline/i})
+        ).toBeInTheDocument()
 
-    // TODO: Fix flaky/broken test
-    // eslint-disable-next-line jest/no-commented-out-tests
-    // test('should derive state from a chunk load error', () => {
-    //     const derived = UnwrappedOfflineBoundary.getDerivedStateFromError(
-    //         new ChunkLoadError('test')
-    //     )
-    //     expect(derived).toEqual({chunkLoadError: true})
-    // })
+        const retryButton = screen.getByRole('button', {name: /retry connection/i})
+        await act(async () => {
+            await user.click(retryButton)
+        })
+
+        expect(clearErrorSpy).toHaveBeenCalled()
+
+        clearErrorSpy.mockRestore()
+    })
+
+    test('should derive state from a chunk load error', () => {
+        const derived = UnwrappedOfflineBoundary.getDerivedStateFromError(
+            new ChunkLoadError('test')
+        )
+        expect(derived).toEqual({chunkLoadError: true})
+    })
 })

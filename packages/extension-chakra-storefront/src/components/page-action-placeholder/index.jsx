@@ -12,16 +12,9 @@ import {PlusIcon} from '../../components/icons'
 
 const PageActionPlaceHolder = ({heading, text, icon, buttonText, buttonProps, onButtonClick}) => {
     return (
-        <Stack
-            spacing={2}
-            py={12}
-            px={4}
-            alignItems="center"
-            borderRadius="base"
-            background="gray.50"
-        >
+        <Stack gap={2} py={12} px={4} alignItems="center" borderRadius="base" background="gray.50">
             <Box>{icon}</Box>
-            <Stack spacing={6} alignItems="center">
+            <Stack gap={6} alignItems="center">
                 <Box>
                     <Text align="center" fontSize="lg" fontWeight="bold">
                         {heading}
