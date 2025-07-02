@@ -6,14 +6,9 @@
  */
 import fs from 'fs'
 import path from 'path'
-import pty from 'node-pty'
-import {fileURLToPath} from 'url'
+import {spawn} from 'cross-spawn'
 import {zodToJsonSchema} from 'zod-to-json-schema'
 import {z} from 'zod'
-
-// Emulate __dirname
-const __filename = fileURLToPath(import.meta.url)
-const __dirname = path.dirname(__filename)
 
 // Private schema used to generate the JSON schema
 const emptySchema = z.object({}).strict()
@@ -37,37 +32,43 @@ export const toPascalCase = (str) =>
     str.replace(/(^\w|[-_\s]\w)/g, (match) => match.replace(/[-_\s]/, '').toUpperCase())
 
 /**
- * Spawns a pseudo-terminal process and captures its output.
+ * Runs a shell command and captures its stdout/stderr as a string.
  *
- * This is useful for running CLI tools that emit different output
- * when run in a TTY environment (e.g., with color, formatting, or paging).
- *
- * @param {string} command - The command to execute (e.g., 'npx').
- * @param {string[]} [args=[]] - An array of arguments to pass to the command.
- * @returns {Promise<string>} Resolves with the full output from the process if it exits with code 0,
- *                            otherwise rejects with an Error containing the exit code.
- *
- * @example
- * const output = await runWithPty('npx', ['some-cli', '--help'])
+ * @param {string} command - The executable to run (e.g. "node", "npx", "ls").
+ * @param {string[]} args - Arguments to pass to the command.
+ * @param {Object} [options] - Optional spawn options (e.g. cwd).
+ * @returns {Promise<string>} - Resolves with combined stdout and stderr.
  */
-export const runWithPty = (command, args = []) => {
+export const runCommand = async (command, args = [], options = {}) => {
     return new Promise((resolve, reject) => {
-        const ptyProcess = pty.spawn(command, args, {
-            name: 'xterm-color',
-            env: process.env
+        const child = spawn(command, args, {
+            ...options,
+            stdio: ['ignore', 'pipe', 'pipe'], // ignore stdin, pipe out/err
+            shell: false // be explicit — set to true if you want shell features
         })
 
         let output = ''
 
-        ptyProcess.onData((data) => {
-            output += data
+        child.stdout.on('data', (chunk) => {
+            output += chunk.toString()
         })
 
-        ptyProcess.onExit(({exitCode}) => {
-            if (exitCode === 0) {
+        child.stderr.on('data', (chunk) => {
+            output += chunk.toString() // combine stderr into output
+        })
+
+        child.on('error', (err) => {
+            reject(err)
+        })
+
+        child.on('close', (code) => {
+            if (code === 0) {
                 resolve(output)
             } else {
-                reject(new Error(`PTY exited with code ${exitCode}`))
+                const error = new Error(`Command failed with exit code ${code}`)
+                error.output = output
+                error.code = code
+                reject(error)
             }
         })
     })

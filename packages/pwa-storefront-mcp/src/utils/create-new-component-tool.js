@@ -6,8 +6,8 @@
  */
 import fs from 'fs/promises'
 import path from 'path'
-import {HookRecommenderTool} from './hook-recommender-tool.js'
-import {toKebabCase, toPascalCase} from './utils.js'
+import {HookRecommenderTool} from './hook-recommender-tool'
+import {toKebabCase, toPascalCase} from './utils'
 
 export const getCopyrightHeader = () => {
     const year = new Date().getFullYear()

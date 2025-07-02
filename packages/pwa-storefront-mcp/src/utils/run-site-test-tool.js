@@ -4,8 +4,8 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import {runPerformanceTest} from './run-site-test-performance.js'
-import {runAccessibilityTest} from './run-site-test-accessibility.js'
+import {runPerformanceTest} from './run-site-test-performance'
+import {runAccessibilityTest} from './run-site-test-accessibility'
 
 const DEFAULT_SITE_URL = 'https://pwa-kit.mobify-storefront.com'
 

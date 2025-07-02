@@ -7,7 +7,7 @@
 import path from 'path'
 
 // Project dependencies
-import {EmptyJsonSchema, isMonoRepo, runWithPty} from './utils.js'
+import {EmptyJsonSchema, isMonoRepo, runCommand} from './utils'
 
 // const CREATE_APP_VERSION = 'latest'
 const CREATE_APP_VERSION = '3.11.0-nightly-20250630080227'
@@ -76,7 +76,7 @@ export default {
 
         // Run the display program and get the output.
         try {
-            programOutput = await runWithPty(NPX_COMMAND, [
+            programOutput = await runCommand(NPX_COMMAND, [
                 CREATE_APP_COMMAND,
                 DISPLAY_PROGRAM_COMMAND
             ])

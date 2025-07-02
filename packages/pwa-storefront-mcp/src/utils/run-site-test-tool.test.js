@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import {TestWithPlaywrightTool} from './run-site-test-tool.js'
+import {TestWithPlaywrightTool} from './run-site-test-tool'
 
 // Mock the imported test functions to avoid running real Playwright tests
 jest.mock('./run-site-test-performance.js', () => ({
