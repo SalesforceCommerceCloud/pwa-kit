@@ -406,7 +406,7 @@ const PRESETS = [
         description: '',
         templateSource: {
             type: TEMPLATE_SOURCE_BUNDLE,
-            id: '@salesforce/chakra-storefront'
+            id: 'chakra-storefront'
         },
         getQuestions: () => [
             ...HYBRID_QUESTIONS,
@@ -435,7 +435,7 @@ const PRESETS = [
         description: '',
         templateSource: {
             type: TEMPLATE_SOURCE_BUNDLE,
-            id: '@salesforce/chakra-storefront'
+            id: 'chakra-storefront'
         },
         getQuestions: () => [
             ...HYBRID_QUESTIONS,
