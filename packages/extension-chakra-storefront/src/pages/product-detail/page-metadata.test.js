@@ -6,18 +6,13 @@
  */
 
 import React from 'react'
-import PropTypes from 'prop-types'
 import {render} from '@testing-library/react'
 import Metadata from './page-metadata'
 
 jest.mock('../../components/seo', () => {
-    function MockSeo({metaTags, ...props}) {
-        return <div data-testid="seo" data-props={JSON.stringify({metaTags, ...props})} />
+    return function MockSeo(props) {
+        return <div data-testid="seo" data-props={JSON.stringify(props)} />
     }
-    MockSeo.propTypes = {
-        metaTags: PropTypes.array
-    }
-    return MockSeo
 })
 
 describe('Metadata', () => {
