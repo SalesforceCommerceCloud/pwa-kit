@@ -7,6 +7,9 @@
 import React, {useState, useEffect, useMemo} from 'react'
 import {useIntl} from 'react-intl'
 import {
+    VStack,
+    AspectRatio,
+    Skeleton,
     Modal,
     ModalCloseButton,
     ModalContent,
