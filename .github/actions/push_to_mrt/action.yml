@@ -18,6 +18,7 @@ runs:
   steps:
     - name: Push Bundle to MRT
       run: |-
+        cd ${{ inputs.CWD }}
         if [[ ${{ inputs.TARGET }} ]]; then
           npm run push -- -s ${{ inputs.PROJECT }} --message "${{ inputs.MESSAGE }}" --target ${{ inputs.TARGET }} ${{ inputs.FLAGS }}
         fi
