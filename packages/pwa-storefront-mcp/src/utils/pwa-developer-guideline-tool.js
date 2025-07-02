@@ -9,7 +9,7 @@ import {EmptyJsonSchema} from './utils.js'
 const guidelinesText = `# Salesforce Commerce Composable Storefront Development Guidelines
 
 ## Overview
-This document offers guidelines in the development of Salesforce Commerce Composable Storefront applications using PWA Kit. The AI should possess a comprehensive understanding of the PWA Kit architecture, sample Retail React App, Chakra UI, and standard React application practices.
+This document defines the guidelines agents must follow in the development of Salesforce Commerce Composable Storefront applications using PWA Kit. Agents must possess a comprehensive understanding of the PWA Kit architecture, sample Retail React App(\`@salesforce/retail-react-app/\`), Chakra UI, and standard React application practices before attempting to analyze/ generate / refactor / modify / fix code.
 
 ## Core Principles
 
@@ -84,7 +84,7 @@ This document offers guidelines in the development of Salesforce Commerce Compos
 - When integrating libraries like Redux, AppConfig methods such as restore, freeze, extraGetPropsArgs, and render are utilized.
 
 ### PWA Kit Extensibility
-- In PWA Kit v3, you can extend a base template (@salesforce/retail-react-app) by replacing specific files using a local "overrides directory."
+- In PWA Kit v3, you can extend a base template (\`@salesforce/retail-react-app\`) by replacing specific files using a local "overrides directory."
 - Extensibility is configured in package.json with the base template (ccExtensibility.extends) and your overrides directory (ccExtensibility.overridesDir).
 - To override a file, recreate its exact path and filename in your overrides directory.
 
@@ -105,10 +105,9 @@ This document offers guidelines in the development of Salesforce Commerce Compos
 - Follow security best practices for all code.
 `
 
-export default {
-    name: 'development_guidelines',
-    description: `You must follow this development guidelines before attempting to analyze/ generate / refactor / modify / fix code.
-    - e.g. "Create a customer service Chat component", "Find bugs in my_script.jsx", "Refactor my_script.jsx to use React Hooks"`,
+export const DeveloperGuidelinesTool = {
+    name: 'developer_guidelines',
+    description: `Agent must follow this guidelines before analyze, generate, refactor, modify or fix code.`,
     inputSchema: EmptyJsonSchema,
     fn: async () => ({
         content: [{type: 'text', text: guidelinesText}]

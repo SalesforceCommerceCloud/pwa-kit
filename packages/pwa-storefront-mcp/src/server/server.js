@@ -14,6 +14,7 @@ import {
     DeveloperGuidelinesTool
 } from '../utils/index.js'
 import {HookRecommenderTool} from '../utils/hook-recommender-tool.js'
+import {CreateCustomizePageTool} from '../utils/create-customize-page-tool.js'
 import productDocument from '../data/ProductDocument.json' with { type: 'json' }
 import categoryDocument from '../data/CategoryDocument.json' with { type: 'json' }
 import documentList from '../data/DocumentList.json' with { type: 'json' }
@@ -59,6 +60,14 @@ class PwaStorefrontMCPServerHighLevel {
             DeveloperGuidelinesTool.description,
             DeveloperGuidelinesTool.inputSchema,
             DeveloperGuidelinesTool.fn
+        )
+
+        // Register CreateCustomizePageTool
+        this.server.tool(
+            CreateCustomizePageTool.name,
+            CreateCustomizePageTool.description,
+            CreateCustomizePageTool.inputSchema,
+            CreateCustomizePageTool.fn
         )
 
         this.server.tool(
