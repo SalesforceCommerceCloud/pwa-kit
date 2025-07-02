@@ -696,3 +696,78 @@ export const wishlistFlow = async ({page, registeredUserCredentials, a11y = {}})
     // wishlist
     await validateWishlist({page, a11y})
 }
+
+/**
+ * Navigates to a PLP and opens the store inventory filter to select a store.
+ * 
+ * This helper function demonstrates the store inventory filtering functionality by:
+ * 1. Navigating to the Womens > Tops category PLP
+ * 2. Opening the store locator modal
+ * 3. Searching for stores by postal code
+ * 4. Returning the available store selection options
+ * 
+ * This is useful for testing store inventory features and BOPIS (Buy Online, Pick Up In Store) functionality.
+ *
+ * @param {Object} options.page - Playwright page object representing a browser tab/window
+ */
+export const selectStore = async ({page}) => {
+    // Navigate to a product category (Womens > Tops)
+    await page.getByRole('link', {name: 'Womens'}).hover()
+    const topsNav = await page.getByRole('link', {name: 'Tops', exact: true})
+    await expect(topsNav).toBeVisible()
+    await topsNav.click()
+
+    // Verify we're on the PLP
+    await expect(page.getByRole('heading', {name: 'Tops'})).toBeVisible()
+    const productTile = page.getByRole('link', {
+        name: /Floral Ruffle Top/i
+    })
+    const productTileImg = productTile.locator('img')
+    await productTileImg.waitFor({state: 'visible'})
+    
+    // Look for the store inventory filter component
+    const storeInventoryFilter = page.getByTestId('sf-store-inventory-filter')
+    await expect(storeInventoryFilter).toBeVisible()
+
+    // Verify the filter shows "Select Store" initially
+    await expect(page.getByText('Select Store')).toBeVisible()
+    await expect(page.getByText('Shop by Availability')).toBeVisible()
+
+    // Click on the store inventory filter checkbox to open store locator
+    const inventoryCheckbox = page.getByTestId('sf-store-inventory-filter-checkbox')
+    await inventoryCheckbox.click()
+
+    // Verify store locator modal opens and select a store
+    await expect(page.getByText('Find a Store')).toBeVisible()
+    await page.locator('select[name="countryCode"]').selectOption({label: 'United States'})
+    await page.locator('input[name="postalCode"]').fill('01803')
+    const findButton = page.getByRole('button', {name: 'Find'})
+    await expect(findButton).toBeVisible()
+    await findButton.click()
+
+    // Wait for stores to load in the modal
+    await page.waitForLoadState()
+
+    // Select the first available store (if any stores are available)
+    await expect(page.getByText(/Burlington Retail Store/i)).toBeVisible()
+    
+    // Find and click the first available store label
+    const storeRadioLabels = page.locator('label.chakra-radio:has(input[aria-describedby^="store-info-"])')
+    const storeCount = await storeRadioLabels.count()
+
+    if (storeCount > 0) {
+        // Select the first store
+        await storeRadioLabels.first().click()
+        
+        // Close the store locator modal
+        await page.locator('button[aria-label="Close"]').click()
+        await page.waitForLoadState()
+        await expect(page.getByText('Find a Store')).not.toBeVisible()
+    } else {
+        // If no stores are available, verify the appropriate message is shown
+        await expect(page.getByText('Sorry, there are no locations in this area.')).toBeVisible()
+        
+        // Close the modal
+        await page.getByRole('button', {name: 'Close'}).click()
+    }
+}
