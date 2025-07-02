@@ -47,9 +47,9 @@ const ActionCard = ({
             {...props}
         >
             {showLoading && <LoadingSpinner />}
-            <Stack spacing={3}>
+            <Stack gap={3}>
                 <Box>{children}</Box>
-                <Stack direction="row" spacing={4}>
+                <Stack direction="row" gap={4}>
                     {onEdit && (
                         <Button
                             onClick={onEdit}
