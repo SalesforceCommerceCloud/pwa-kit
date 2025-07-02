@@ -11,7 +11,6 @@ import PropTypes from 'prop-types'
 
 import {
     Alert,
-    AlertIcon,
     Badge,
     Box,
     Button,
