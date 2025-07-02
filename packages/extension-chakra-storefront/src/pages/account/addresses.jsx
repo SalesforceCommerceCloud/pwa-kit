@@ -11,7 +11,6 @@ import PropTypes from 'prop-types'
 
 import {
     Alert,
-    AlertIcon,
     Badge,
     Box,
     Button,
@@ -27,7 +26,7 @@ import {useForm} from 'react-hook-form'
 import useToast from '../../hooks/use-toast'
 
 import LoadingSpinner from '../../components/loading-spinner'
-import {LocationIcon, PlusIcon} from '../../components/icons'
+import {LocationIcon, PlusIcon, AlertIcon} from '../../components/icons'
 import ActionCard from '../../components/action-card'
 import AddressFields from '../../components/forms/address-fields'
 import AddressDisplay from '../../components/address-display'
