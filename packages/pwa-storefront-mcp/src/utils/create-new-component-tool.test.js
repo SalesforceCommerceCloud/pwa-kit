@@ -1,4 +1,11 @@
+/*
+ * Copyright (c) 2025, Salesforce, Inc.
+ * All rights reserved.
+ * SPDX-License-Identifier: BSD-3-Clause
+ * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
+ */
 import CreateNewComponentTool from './create-new-component-tool.js'
+import * as fs from 'fs/promises'
 
 // Mock fs/promises to avoid actual file operations
 jest.mock('fs/promises', () => ({
@@ -6,8 +13,6 @@ jest.mock('fs/promises', () => ({
     writeFile: jest.fn().mockResolvedValue(undefined),
     access: jest.fn().mockResolvedValue(undefined)
 }))
-
-const fs = require('fs/promises')
 
 describe('CreateNewComponentTool', () => {
     beforeEach(() => {
@@ -83,13 +88,9 @@ describe('CreateNewComponentTool', () => {
             imageGroups: {type: 'array'}
         }
         await expect(
-            tool.updateComponentToPresentational(
-                'product',
-                'ProductDisplay',
-                '/tmp',
-                dataModel,
-                {list: false}
-            )
+            tool.updateComponentToPresentational('product', 'ProductDisplay', '/tmp', dataModel, {
+                list: false
+            })
         ).resolves.toMatch(/Updated .* to presentational component for product/)
         expect(fs.writeFile).toHaveBeenCalledWith(
             expect.stringContaining('product-display/index.jsx'),
@@ -106,13 +107,9 @@ describe('CreateNewComponentTool', () => {
             imageGroups: {type: 'array'}
         }
         await expect(
-            tool.updateComponentToPresentational(
-                'product',
-                'ProductList',
-                '/tmp',
-                dataModel,
-                {list: true}
-            )
+            tool.updateComponentToPresentational('product', 'ProductList', '/tmp', dataModel, {
+                list: true
+            })
         ).resolves.toMatch(/Updated .* to presentational component for product/)
         expect(fs.writeFile).toHaveBeenCalledWith(
             expect.stringContaining('product-list/index.jsx'),
@@ -137,4 +134,4 @@ describe('CreateNewComponentTool', () => {
             entityType: null
         })
     })
-}) 
+})
