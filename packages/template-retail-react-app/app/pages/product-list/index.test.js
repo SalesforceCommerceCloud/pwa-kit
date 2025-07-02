@@ -23,6 +23,7 @@ import {
 import ProductList from '.'
 import EmptySearchResults from '@salesforce/retail-react-app/app/pages/product-list/partials/empty-results'
 import {useProductSearch, useCategory} from '@salesforce/commerce-sdk-react'
+import {useSelectedStore} from '@salesforce/retail-react-app/app/hooks/use-selected-store'
 
 const MOCK_USE_QUERY_RESULT = {
     data: undefined,
@@ -57,6 +58,10 @@ jest.mock('@salesforce/commerce-sdk-react', () => {
         useCategory: jest.fn()
     }
 })
+
+jest.mock('@salesforce/retail-react-app/app/hooks/use-selected-store', () => ({
+    useSelectedStore: jest.fn()
+}))
 
 jest.mock('@salesforce/retail-react-app/app/components/image/utils', () => ({
     ...jest.requireActual('@salesforce/retail-react-app/app/components/image/utils'),
@@ -110,6 +115,12 @@ beforeEach(() => {
     useCategory.mockImplementation(() => ({
         data: mockCategories.root.categories[0].categories[0]
     }))
+    useSelectedStore.mockReturnValue({
+        selectedStore: null,
+        isLoading: false,
+        error: null,
+        hasSelectedStore: false
+    })
 })
 
 afterEach(() => {
@@ -351,4 +362,61 @@ test('should filter out refinements in the disallow list', async () => {
         expect(screen.getByText('Size')).toBeInTheDocument()
         expect(screen.getByText('Price')).toBeInTheDocument()
     })
+})
+test('should display Store Inventory Filter component', async () => {
+    window.history.pushState({}, 'ProductList', '/uk/en-GB/category/mens-clothing-jackets')
+    renderWithProviders(<MockedComponent />, {
+        wrapperProps: {siteAlias: 'uk', locale: {id: 'en-GB'}}
+    })
+
+    // Wait for the page to load
+    expect(await screen.findByTestId('sf-product-list-page')).toBeInTheDocument()
+
+    // Check that the Store Inventory Filter component is present
+    expect(await screen.findByTestId('sf-store-inventory-filter')).toBeInTheDocument()
+})
+
+test('should filter by inventory when inventory filter is clicked', async () => {
+    const mockStoreData = {
+        id: 'store-123',
+        name: 'Test Store',
+        inventoryId: 'inventory_m_store_store12'
+    }
+
+    useSelectedStore.mockReturnValue({
+        selectedStore: mockStoreData,
+        isLoading: false,
+        error: null,
+        hasSelectedStore: true
+    })
+
+    window.history.pushState({}, 'ProductList', '/uk/en-GB/category/mens-clothing-jackets')
+    const {user} = renderWithProviders(<MockedComponent />, {
+        wrapperProps: {siteAlias: 'uk', locale: {id: 'en-GB'}}
+    })
+
+    expect(await screen.findByTestId('sf-product-list-page')).toBeInTheDocument()
+
+    await waitFor(() => {
+        expect(screen.getByTestId('sf-store-inventory-filter')).toBeInTheDocument()
+    })
+
+    useProductSearch.mockClear()
+    const inventoryCheckbox = await screen.findByTestId('sf-store-inventory-filter-checkbox')
+    await user.click(inventoryCheckbox)
+
+    // Verify that useProductSearch was called with the inventory filter
+    await waitFor(() => {
+        expect(useProductSearch).toHaveBeenCalledWith(
+            expect.objectContaining({
+                parameters: expect.objectContaining({
+                    refine: expect.arrayContaining(['ilids=inventory_m_store_store12'])
+                })
+            }),
+            {keepPreviousData: true}
+        )
+    })
+
+    // Verify URL hasn't changed
+    expect(window.location.pathname).toBe('/uk/en-GB/category/mens-clothing-jackets')
 })

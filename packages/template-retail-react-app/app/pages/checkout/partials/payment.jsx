@@ -44,7 +44,9 @@ const Payment = () => {
     const selectedShippingAddress = basket?.shipments && basket?.shipments[0]?.shippingAddress
     const selectedBillingAddress = basket?.billingAddress
     const appliedPayment = basket?.paymentInstruments && basket?.paymentInstruments[0]
-    const [billingSameAsShipping, setBillingSameAsShipping] = useState(true) // By default, have billing addr to be the same as shipping
+
+    const isPickupOrder = basket?.shipments[0]?.shippingMethod?.c_storePickupEnabled === true
+    const [billingSameAsShipping, setBillingSameAsShipping] = useState(!isPickupOrder)
     const {mutateAsync: addPaymentInstrumentToBasket} = useShopperBasketsMutation(
         'addPaymentInstrumentToBasket'
     )
@@ -205,18 +207,20 @@ const Payment = () => {
                             />
                         </Heading>
 
-                        <Checkbox
-                            name="billingSameAsShipping"
-                            isChecked={billingSameAsShipping}
-                            onChange={(e) => setBillingSameAsShipping(e.target.checked)}
-                        >
-                            <Text fontSize="sm" color="gray.700">
-                                <FormattedMessage
-                                    defaultMessage="Same as shipping address"
-                                    id="checkout_payment.label.same_as_shipping"
-                                />
-                            </Text>
-                        </Checkbox>
+                        {!isPickupOrder && (
+                            <Checkbox
+                                name="billingSameAsShipping"
+                                isChecked={billingSameAsShipping}
+                                onChange={(e) => setBillingSameAsShipping(e.target.checked)}
+                            >
+                                <Text fontSize="sm" color="gray.700">
+                                    <FormattedMessage
+                                        defaultMessage="Same as shipping address"
+                                        id="checkout_payment.label.same_as_shipping"
+                                    />
+                                </Text>
+                            </Checkbox>
+                        )}
 
                         {billingSameAsShipping && selectedShippingAddress && (
                             <Box pl={7}>

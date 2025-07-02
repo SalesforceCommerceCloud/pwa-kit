@@ -14,8 +14,9 @@ import {
     Grid,
     GridItem,
     Container,
-    useDisclosure,
-    Button
+    Button,
+    Text,
+    useDisclosure
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 
 // Project Components
@@ -43,7 +44,8 @@ import {
     TOAST_ACTION_VIEW_WISHLIST,
     TOAST_MESSAGE_ADDED_TO_WISHLIST,
     TOAST_MESSAGE_REMOVED_ITEM_FROM_CART,
-    TOAST_MESSAGE_ALREADY_IN_WISHLIST
+    TOAST_MESSAGE_ALREADY_IN_WISHLIST,
+    STORE_LOCATOR_IS_ENABLED
 } from '@salesforce/retail-react-app/app/constants'
 import {REMOVE_CART_ITEM_CONFIRMATION_DIALOG_CONFIG} from '@salesforce/retail-react-app/app/pages/cart/partials/cart-secondary-button-group'
 
@@ -54,22 +56,46 @@ import {
     useShopperBasketsMutation,
     useShippingMethodsForShipment,
     useProducts,
-    useShopperCustomersMutation
+    useShopperCustomersMutation,
+    useStores
 } from '@salesforce/commerce-sdk-react'
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
 import UnavailableProductConfirmationModal from '@salesforce/retail-react-app/app/components/unavailable-product-confirmation-modal'
 import {getUpdateBundleChildArray} from '@salesforce/retail-react-app/app/utils/product-utils'
+import {useSelectedStore} from '@salesforce/retail-react-app/app/hooks/use-selected-store'
 
 const DEBOUNCE_WAIT = 750
+
 const Cart = () => {
     const {data: basket, isLoading} = useCurrentBasket()
+
+    // Pickup in Store - only enabled if feature toggle is on
+    const isPickupOrder = STORE_LOCATOR_IS_ENABLED
+        ? basket?.shipments[0]?.shippingMethod?.c_storePickupEnabled === true
+        : false
+    const storeId = basket?.shipments?.[0]?.c_fromStoreId
+    const {data: storeData} = useStores(
+        {
+            parameters: {
+                ids: storeId
+            }
+        },
+        {
+            enabled: !!storeId && STORE_LOCATOR_IS_ENABLED
+        }
+    )
+    const storeName = storeData?.data?.[0]?.name
+
+    const {selectedStore} = useSelectedStore()
+    const selectedInventoryId = selectedStore?.inventoryId || null
     const productIds = basket?.productItems?.map(({productId}) => productId).join(',') ?? ''
     const {data: products, isLoading: isProductsLoading} = useProducts(
         {
             parameters: {
                 ids: productIds,
                 allImages: true,
-                perPricebook: true
+                perPricebook: true,
+                ...(selectedInventoryId ? {inventoryIds: selectedInventoryId} : {})
             }
         },
         {
@@ -101,7 +127,8 @@ const Cart = () => {
                 ids: bundleChildVariantIds?.join(','),
                 allImages: false,
                 expand: ['availability', 'variations'],
-                select: '(data.(id,inventory))'
+                select: '(data.(id,inventory))',
+                ...(selectedInventoryId ? {inventoryIds: selectedInventoryId} : {})
             }
         },
         {
@@ -147,6 +174,48 @@ const Cart = () => {
                             ...currentProduct.inventory,
                             stockLevel: lowestStockLevel,
                             lowestStockLevelProductName: productWithLowestInventory
+                        }
+                    }
+                }
+
+                // Update in-store inventories for the selected store with the lowest stock level and product name
+                if (selectedInventoryId) {
+                    let selectedStoreInventory = currentProduct?.inventories?.find(
+                        (inventory) => inventory.id === selectedInventoryId
+                    )
+                    let lowestInStoreStockLevel =
+                        selectedStoreInventory?.stockLevel ?? Number.MAX_SAFE_INTEGER
+                    let productWithLowestInventory = ''
+                    productItem?.bundledProductItems.forEach((bundleChild) => {
+                        const bundleChildInstoreInventory = bundleChildProductData?.[
+                            bundleChild.productId
+                        ]?.inventories?.find((inventory) => inventory.id === selectedInventoryId)
+                        const bundleChildInstoreStockLevel =
+                            bundleChildInstoreInventory?.stockLevel ?? Number.MAX_SAFE_INTEGER
+                        lowestInStoreStockLevel = Math.min(
+                            lowestInStoreStockLevel,
+                            bundleChildInstoreStockLevel
+                        )
+                        if (lowestInStoreStockLevel === bundleChildInstoreStockLevel)
+                            productWithLowestInventory = bundleChild.productName
+                    })
+
+                    // Update in-store inventories for the selected store with the lowest stock level and product name
+                    if (selectedStoreInventory) {
+                        const updatedInventories = currentProduct.inventories.map((inventory) => {
+                            if (inventory.id === selectedInventoryId) {
+                                return {
+                                    ...inventory,
+                                    stockLevel: lowestInStoreStockLevel,
+                                    lowestStockLevelProductName: productWithLowestInventory
+                                }
+                            }
+                            return inventory
+                        })
+
+                        currentProduct = {
+                            ...currentProduct,
+                            inventories: updatedInventories
                         }
                     }
                 }
@@ -534,13 +603,35 @@ const Cart = () => {
                 <Stack spacing={24}>
                     <Stack spacing={4}>
                         <CartTitle />
-
                         <Grid
                             templateColumns={{base: '1fr', lg: '66% 1fr'}}
                             gap={{base: 10, xl: 20}}
                         >
                             <GridItem>
                                 <Stack spacing={4}>
+                                    {/* Order Type Display */}
+                                    {STORE_LOCATOR_IS_ENABLED && (
+                                        <Box layerStyle="cardBordered" p={3}>
+                                            {isPickupOrder ? (
+                                                <Text fontWeight="bold">
+                                                    <FormattedMessage
+                                                        defaultMessage="Pickup in Store ({storeName})"
+                                                        id="cart.order_type.pickup_in_store"
+                                                        values={{
+                                                            storeName
+                                                        }}
+                                                    />
+                                                </Text>
+                                            ) : (
+                                                <Text fontWeight="bold">
+                                                    <FormattedMessage
+                                                        defaultMessage="Delivery"
+                                                        id="cart.order_type.delivery"
+                                                    />
+                                                </Text>
+                                            )}
+                                        </Box>
+                                    )}
                                     {basket.productItems?.map((productItem, idx) => {
                                         return (
                                             <ProductItem
@@ -599,6 +690,7 @@ const Cart = () => {
                                             updateCart={(variant, quantity) =>
                                                 handleUpdateCart(variant, quantity)
                                             }
+                                            showDeliveryOptions={false}
                                         />
                                     )}
                                     {isOpen && selectedItem.bundledProductItems && (

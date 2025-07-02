@@ -1,0 +1,158 @@
+/*
+ * Copyright (c) 2025, salesforce.com, inc.
+ * All rights reserved.
+ * SPDX-License-Identifier: BSD-3-Clause
+ * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
+ */
+import React from 'react'
+import {screen, waitFor, cleanup} from '@testing-library/react'
+import PickupAddress from '@salesforce/retail-react-app/app/pages/checkout/partials/pickup-address'
+import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
+
+// Mock useShopperBasketsMutation
+const mockMutateAsync = jest.fn()
+jest.mock('@salesforce/commerce-sdk-react', () => {
+    const originalModule = jest.requireActual('@salesforce/commerce-sdk-react')
+    return {
+        ...originalModule,
+        useShopperBasketsMutation: () => ({
+            mutateAsync: mockMutateAsync
+        }),
+        useStores: () => ({
+            data: {
+                data: [
+                    {
+                        id: 'store-123',
+                        name: 'Test Store',
+                        address1: '123 Main Street',
+                        city: 'San Francisco',
+                        stateCode: 'CA',
+                        postalCode: '94105',
+                        countryCode: 'US',
+                        phone: '555-123-4567',
+                        storeHours: 'Mon-Fri: 9AM-6PM',
+                        storeType: 'retail'
+                    }
+                ]
+            },
+            isLoading: false,
+            error: null
+        })
+    }
+})
+
+// Ensure useMultiSite returns site.id = 'site-1' for all tests
+jest.mock('@salesforce/retail-react-app/app/hooks/use-multi-site', () => ({
+    __esModule: true,
+    default: () => ({
+        site: {id: 'site-1'}
+    })
+}))
+
+jest.mock('@salesforce/retail-react-app/app/hooks/use-current-basket', () => ({
+    useCurrentBasket: () => ({
+        data: {
+            basketId: 'e4547d1b21d01bf5ad92d30c9d',
+            currency: 'GBP',
+            customerInfo: {
+                customerId: 'ablXcZlbAXmewRledJmqYYlKk0'
+            },
+            orderTotal: 25.17,
+            productItems: [
+                {
+                    itemId: '7f9637386161502d31f4563db5',
+                    itemText: 'Long Sleeve Crew Neck',
+                    price: 19.18,
+                    productId: '701643070725M',
+                    productName: 'Long Sleeve Crew Neck',
+                    quantity: 2,
+                    shipmentId: 'me'
+                }
+            ],
+            shipments: [
+                {
+                    shipmentId: 'me',
+                    shipmentTotal: 25.17,
+                    shippingStatus: 'not_shipped',
+                    shippingTotal: 5.99
+                }
+            ],
+            c_fromStoreId: 'store-123'
+        },
+        derivedData: {
+            hasBasket: true,
+            totalItems: 2
+        }
+    })
+}))
+
+jest.mock('@salesforce/retail-react-app/app/pages/checkout/util/checkout-context', () => ({
+    useCheckout: () => ({
+        step: 1,
+        STEPS: {
+            CONTACT_INFO: 0,
+            PICKUP_ADDRESS: 1,
+            SHIPPING_ADDRESS: 2,
+            SHIPPING_OPTIONS: 3,
+            PAYMENT: 4,
+            REVIEW_ORDER: 5
+        },
+        goToStep: jest.fn()
+    })
+}))
+
+describe('PickupAddress', () => {
+    beforeEach(() => {
+        jest.resetModules()
+        jest.clearAllMocks()
+    })
+
+    afterEach(() => {
+        cleanup()
+        jest.clearAllMocks()
+    })
+
+    test('displays pickup address when available', async () => {
+        renderWithProviders(<PickupAddress />)
+
+        await waitFor(() => {
+            expect(screen.getByText('Pickup Address & Information')).toBeInTheDocument()
+        })
+
+        expect(screen.getByText('Store Information')).toBeInTheDocument()
+        expect(screen.getByText('Continue to Payment')).toBeInTheDocument()
+
+        expect(screen.getByText('123 Main Street')).toBeInTheDocument()
+        expect(screen.getByText('San Francisco, CA 94105')).toBeInTheDocument()
+    })
+
+    test('submits pickup address and continues to payment', async () => {
+        const {user} = renderWithProviders(<PickupAddress />)
+
+        await waitFor(() => {
+            expect(screen.getByText('Continue to Payment')).toBeInTheDocument()
+        })
+
+        await user.click(screen.getByText('Continue to Payment'))
+
+        await waitFor(() => {
+            expect(mockMutateAsync).toHaveBeenCalledWith({
+                parameters: {
+                    basketId: 'e4547d1b21d01bf5ad92d30c9d',
+                    shipmentId: 'me',
+                    useAsBilling: false
+                },
+                body: {
+                    address1: '123 Main Street',
+                    city: 'San Francisco',
+                    countryCode: 'US',
+                    postalCode: '94105',
+                    stateCode: 'CA',
+                    firstName: 'Test Store',
+                    lastName: 'Pickup',
+                    phone: '555-123-4567'
+                }
+            })
+        })
+    })
+})

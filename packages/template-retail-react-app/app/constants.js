@@ -184,7 +184,6 @@ export const REMOVE_UNAVAILABLE_CART_ITEM_DIALOG_CONFIG = {
     }),
     onPrimaryAction: noop
 }
-
 export const STORE_LOCATOR_IS_ENABLED = true
 export const STORE_LOCATOR_SUPPORTED_COUNTRIES = [
     {
