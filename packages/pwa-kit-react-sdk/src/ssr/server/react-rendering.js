@@ -81,7 +81,7 @@ const logAndFormatError = (err) => {
 // as best as we can.
 export const getLocationSearch = (req, opts = {}) => {
     const {interpretPlusSignAsSpace = false} = opts
-    const [, search] = req.originalUrl.split('?')
+    const [_, search] = req.originalUrl.split('?')
     const params = new URLSearchParams(search)
 
     const newParams = new URLSearchParams()
