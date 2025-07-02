@@ -8,14 +8,7 @@ on:
   # Run daily at 11 PM PST (7 AM UTC) to catch any missed syncs
   schedule:
     - cron: '0 7 * * *'
-  # Allow manual triggering with options
   workflow_dispatch:
-    inputs:
-      force_sync:
-        description: 'Force sync even if conflicts exist (overwrites E2E branch)'
-        required: false
-        default: false
-        type: boolean
 
 permissions:
   contents: write
@@ -67,26 +60,17 @@ jobs:
             exit 0
           fi
 
-          if [ "${{ github.event.inputs.force_sync }}" = "true" ]; then
-            echo "🔧 Force sync requested. Resetting to develop..."
-            git reset --hard origin/develop
-            git push --force origin extra-features-e2e-branch
-            echo "⚠️  Force synced extra-features-e2e-branch with develop (all conflicts overwritten)"
-            echo "status=force-synced" >> $GITHUB_OUTPUT
+          if git merge origin/develop --no-edit; then
+            echo "✅ Successfully merged develop into extra-features-e2e-branch"
+            git push origin extra-features-e2e-branch
+            echo "status=merged" >> $GITHUB_OUTPUT
           else
-            # Default merge strategy
-            if git merge origin/develop --no-edit; then
-              echo "✅ Successfully merged develop into extra-features-e2e-branch"
-              git push origin extra-features-e2e-branch
-              echo "status=merged" >> $GITHUB_OUTPUT
-            else
-              echo "❌ Merge conflicts detected!"
-              echo "📋 Files with conflicts:"
-              git diff --name-only --diff-filter=U || true
-              git merge --abort
-              echo "status=conflict" >> $GITHUB_OUTPUT
-              exit 1
-            fi
+            echo "❌ Merge conflicts detected!"
+            echo "📋 Files with conflicts:"
+            git diff --name-only --diff-filter=U || true
+            git merge --abort
+            echo "status=conflict" >> $GITHUB_OUTPUT
+            exit 1
           fi
 
       - name: Create conflict resolution issue
