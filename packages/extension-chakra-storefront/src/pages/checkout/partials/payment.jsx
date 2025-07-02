@@ -29,18 +29,9 @@ const Payment = () => {
     const {formatMessage} = useIntl()
     const {data: basket} = useCurrentBasket()
     const selectedShippingAddress = basket?.shipments && basket?.shipments[0]?.shippingAddress
-    //TODO: Change to const after deleting the test/mocked data
-    let selectedBillingAddress = basket?.billingAddress
-    let appliedPayment = basket?.paymentInstruments && basket?.paymentInstruments[0]
+    const selectedBillingAddress = basket?.billingAddress
+    const appliedPayment = basket?.paymentInstruments && basket?.paymentInstruments[0]
 
-    // TODO: Testing/Mock data - remove this section after shipping and billing address components are migrated
-    selectedBillingAddress = {
-        address1: '123 Test Street',
-        city: 'Test City',
-        stateCode: 'CA',
-        postalCode: '12345',
-        countryCode: 'US'
-    }
     const [billingSameAsShipping, setBillingSameAsShipping] = useState(true) // By default, have billing addr to be the same as shipping
     const {mutateAsync: addPaymentInstrumentToBasket} = useShopperBasketsMutation(
         'addPaymentInstrumentToBasket'
@@ -60,9 +51,6 @@ const Payment = () => {
     }
 
     const {step, STEPS, goToStep, goToNextStep} = useCheckout()
-
-    // TODO: This is added for testing, remove after shipping and billing address components are migrated
-    const [isEditing, setIsEditing] = useState(true)
 
     const billingAddressForm = useForm({
         mode: 'onChange',
@@ -143,8 +131,6 @@ const Payment = () => {
         const updatedBasket = await onBillingSubmit()
 
         if (updatedBasket) {
-            // TODO: This is added for testing, remove after shipping and billing address components are migrated
-            setIsEditing(false)
             goToNextStep()
         }
     })
@@ -158,15 +144,13 @@ const Payment = () => {
         <ToggleCard
             id="step-3"
             title={formatMessage({defaultMessage: 'Payment', id: 'checkout_payment.title.payment'})}
-            /*editing={step === STEPS.PAYMENT}*/ //TODO: Uncomment remove after shipping address is migrated
-            editing={isEditing} //// TODO: This is added for testing, remove after shipping address is migrated
+            editing={step === STEPS.PAYMENT}
             isLoading={
                 paymentMethodForm.formState.isSubmitting ||
                 billingAddressForm.formState.isSubmitting
             }
             disabled={appliedPayment == null}
             onEdit={() => {
-                setIsEditing(true) // TODO: This is added for testing, remove after shipping address is migrated
                 goToStep(STEPS.PAYMENT)
             }}
             editLabel={formatMessage({
