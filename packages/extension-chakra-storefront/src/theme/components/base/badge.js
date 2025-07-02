@@ -23,6 +23,12 @@ export default defineRecipe({
                 border: '1px solid',
                 borderColor: 'white',
                 borderRadius: 'full'
+            },
+            default: {
+                backgroundColor: 'gray.100',
+                color: 'gray.900',
+                fontSize: 'xs',
+                fontWeight: 'medium'
             }
         }
     }
