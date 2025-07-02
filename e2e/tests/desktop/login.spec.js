@@ -23,7 +23,7 @@ test('Verify passwordless login request', async ({page}) => {
         route.continue()
     })
 
-    await page.goto(config.MORE_LOGIN_OPTIONS_RETAIL_APP_HOME + '/login')
+    await page.goto(config.EXTRA_FEATURES_E2E_RETAIL_APP_HOME + '/login')
     await answerConsentTrackingForm(page)
 
     await page.locator('#email').scrollIntoViewIfNeeded()
@@ -55,7 +55,7 @@ test('Verify password reset callback request', async ({page}) => {
         route.continue()
     })
 
-    await page.goto(config.MORE_LOGIN_OPTIONS_RETAIL_APP_HOME + '/login')
+    await page.goto(config.EXTRA_FEATURES_E2E_RETAIL_APP_HOME + '/login')
     await answerConsentTrackingForm(page)
 
     await page.locator('#email').scrollIntoViewIfNeeded()
@@ -91,7 +91,7 @@ test('Verify password reset request', async ({page}) => {
         route.continue()
     })
 
-    await page.goto(config.MORE_LOGIN_OPTIONS_RETAIL_APP_HOME + `/reset-password-landing?token=1234567&email=${GUEST_USER_CREDENTIALS.email}`)
+    await page.goto(config.EXTRA_FEATURES_E2E_RETAIL_APP_HOME + `/reset-password-landing?token=1234567&email=${GUEST_USER_CREDENTIALS.email}`)
     await answerConsentTrackingForm(page)
 
     await page.fill('#password', GUEST_USER_CREDENTIALS.password)
