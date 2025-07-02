@@ -15,21 +15,18 @@
         }
     },
     "mobify": {
-        "app": {
-        "extensions": []
-        },
         "ssrEnabled": true,
         "ssrOnly": [
-        "ssr.js",
-        "ssr.js.map",
-        "node_modules/**/*.*"
+            "ssr.js",
+            "ssr.js.map",
+            "node_modules/**/*.*"
         ],
         "ssrShared": [
-        "static/favicon.ico",
-        "static/robots.txt",
-        "**/*.js",
-        "**/*.js.map",
-        "**/*.json"
+            "static/favicon.ico",
+            "static/robots.txt",
+            "**/*.js",
+            "**/*.js.map",
+            "**/*.json"
         ],
         "ssrParameters": {
         "ssrFunctionNodeVersion": "22.x",

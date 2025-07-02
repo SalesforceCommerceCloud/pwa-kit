@@ -228,7 +228,7 @@ const PRESETS = [
         `,
         shortDescription: 'The Retail app using your own Commerce Cloud instance',
         templateSource: {
-            type: TEMPLATE_SOURCE_NPM,
+            type: TEMPLATE_SOURCE_BUNDLE,
             id: 'chakra-storefront'
         },
         interactive: true,
@@ -262,7 +262,7 @@ const PRESETS = [
         `,
         shortDescription: 'The Retail app with demo Commerce Cloud instance',
         templateSource: {
-            type: TEMPLATE_SOURCE_NPM,
+            type: TEMPLATE_SOURCE_BUNDLE,
             id: 'chakra-storefront'
         },
         getQuestions: () =>
@@ -298,7 +298,7 @@ const PRESETS = [
         shortDescription:
             'The Retail app with demo Commerce Cloud instance and a private SLAS client',
         templateSource: {
-            type: TEMPLATE_SOURCE_NPM,
+            type: TEMPLATE_SOURCE_BUNDLE,
             id: 'chakra-storefront'
         },
         answers: {
@@ -351,7 +351,7 @@ const PRESETS = [
         name: 'Chakra Storefront Private SLAS client project',
         description: '',
         templateSource: {
-            type: TEMPLATE_SOURCE_NPM,
+            type: TEMPLATE_SOURCE_BUNDLE,
             id: 'chakra-storefront'
         },
         getQuestions: () =>
@@ -378,7 +378,7 @@ const PRESETS = [
         name: 'Chakra Storefront Bug Bounty Project',
         description: '',
         templateSource: {
-            type: TEMPLATE_SOURCE_NPM,
+            type: TEMPLATE_SOURCE_BUNDLE,
             id: 'chakra-storefront'
         },
         getQuestions: () =>
@@ -405,7 +405,7 @@ const PRESETS = [
         name: 'Chakra Storefront Hybrid Test Private SLAS Project',
         description: '',
         templateSource: {
-            type: TEMPLATE_SOURCE_NPM,
+            type: TEMPLATE_SOURCE_BUNDLE,
             id: 'chakra-storefront'
         },
         getQuestions: () => [
@@ -434,7 +434,7 @@ const PRESETS = [
         name: 'Chakra Storefront Hybrid Test Public SLAS client project',
         description: '',
         templateSource: {
-            type: TEMPLATE_SOURCE_NPM,
+            type: TEMPLATE_SOURCE_BUNDLE,
             id: 'chakra-storefront'
         },
         getQuestions: () => [
