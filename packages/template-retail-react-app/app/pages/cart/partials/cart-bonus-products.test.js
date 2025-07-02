@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024, Salesforce, Inc.
+ * Copyright (c) 2025, Salesforce, Inc.
  * All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
@@ -11,7 +11,7 @@ import {IntlProvider} from 'react-intl'
 import {
     BonusProductsTitle,
     BonusProductsSelection
-} from '@salesforce/retail-react-app/app/pages/cart/partials/bonus-products-title'
+} from '@salesforce/retail-react-app/app/pages/cart/partials/cart-bonus-products'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
 import {useBonusProductModalContext} from '@salesforce/retail-react-app/app/hooks/use-bonus-product-modal'
 import {usePromotions} from '@salesforce/commerce-sdk-react'
@@ -49,7 +49,7 @@ describe('BonusProductsTitle', () => {
         jest.clearAllMocks()
     })
 
-    it('renders title with 1 item when one bonus product', () => {
+    test('renders title with 1 item when one bonus product', () => {
         const basketData = {
             productItems: [
                 {id: '1', bonusProductLineItem: true},
@@ -60,7 +60,7 @@ describe('BonusProductsTitle', () => {
         expect(screen.getByText('Bonus Products (1 item)')).toBeInTheDocument()
     })
 
-    it('renders title with multiple items when multiple bonus products', () => {
+    test('renders title with multiple items when multiple bonus products', () => {
         const basketData = {
             productItems: [
                 {id: '1', bonusProductLineItem: true},

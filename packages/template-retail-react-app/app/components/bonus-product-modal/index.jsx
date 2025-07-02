@@ -16,9 +16,6 @@ import {
     ModalBody,
     Text,
     Box,
-    VStack,
-    AspectRatio,
-    Skeleton,
     SimpleGrid,
     Button,
     useDisclosure

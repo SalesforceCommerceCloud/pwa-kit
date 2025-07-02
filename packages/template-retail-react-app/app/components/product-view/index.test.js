@@ -369,3 +369,36 @@ test('renders "Add to Cart" and "Add to Wishlist" buttons in French', async () =
         screen.getByRole('button', {name: /ajouter à la liste de souhaits/i})
     ).toBeInTheDocument()
 })
+
+test('add to cart modal is opened when there are only rule-based promotions', async () => {
+    const user = userEvent.setup()
+
+    // Mock addToCart to return rule-based promotions (no bonusProducts array)
+    const addToCart = jest.fn().mockResolvedValue({
+        bonusDiscountLineItems: [
+            {
+                id: 'rule-based-item-1',
+                promotionId: 'promo-123',
+                maxBonusItems: 2
+                // Note: no bonusProducts array - this is a rule-based promotion
+            },
+            {
+                id: 'rule-based-item-2',
+                promotionId: 'promo-456',
+                maxBonusItems: 1
+                // Note: no bonusProducts array - this is a rule-based promotion
+            }
+        ]
+    })
+
+    renderWithProviders(<MockComponent product={mockProductDetail} addToCart={addToCart} />)
+
+    // Click add to cart button
+    const addToCartButton = screen.getByRole('button', {name: /add to cart/i})
+    await user.click(addToCartButton)
+
+    // Wait for addToCart to be called
+    await waitFor(() => {
+        expect(addToCart).toHaveBeenCalledTimes(1)
+    })
+})
