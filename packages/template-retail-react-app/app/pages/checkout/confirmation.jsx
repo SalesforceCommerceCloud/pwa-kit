@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React, {Fragment, useEffect} from 'react'
-import {FormattedMessage, FormattedNumber, useIntl} from 'react-intl'
+import {FormattedMessage, FormattedNumber} from 'react-intl'
 import {
     Box,
     Button,
@@ -18,8 +18,7 @@ import {
     Text,
     Alert,
     AlertIcon,
-    Divider,
-    useToast
+    Divider
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 import {useForm} from 'react-hook-form'
 import {useParams} from 'react-router-dom'
@@ -46,15 +45,14 @@ import CartItemVariantPrice from '@salesforce/retail-react-app/app/components/it
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
 import {
     API_ERROR_MESSAGE,
-    STORE_LOCATOR_IS_ENABLED,
-    DEFAULT_ADDRESS_ID
+    STORE_LOCATOR_IS_ENABLED
 } from '@salesforce/retail-react-app/app/constants'
 import {useCurrency} from '@salesforce/retail-react-app/app/hooks'
+import {nanoid} from 'nanoid'
 
 const onClient = typeof window !== 'undefined'
 
 const CheckoutConfirmation = () => {
-    const {formatMessage} = useIntl()
     const {orderNo} = useParams()
     const navigate = useNavigation()
     const {data: customer} = useCurrentCustomer()
@@ -73,7 +71,6 @@ const CheckoutConfirmation = () => {
     const {data: products} = useProducts({parameters: {ids: itemIds?.join(',')}})
     const productItemsMap = products?.data.reduce((map, item) => ({...map, [item.id]: item}), {})
     const form = useForm()
-    const toast = useToast()
 
     // Check if this is a pickup order and get store details
     const isPickupOrder = STORE_LOCATOR_IS_ENABLED
@@ -113,7 +110,7 @@ const CheckoutConfirmation = () => {
                 const shippingAddress = order.shipments[0].shippingAddress
                 let {id, ...shippingAddressWithoutId} = shippingAddress
                 const bodyShippingAddress = {
-                    addressId: DEFAULT_ADDRESS_ID,
+                    addressId: nanoid(),
                     ...shippingAddressWithoutId
                 }
                 await createCustomerAddress.mutateAsync({
