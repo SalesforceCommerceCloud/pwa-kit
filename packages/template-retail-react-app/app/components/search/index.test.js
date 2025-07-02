@@ -35,7 +35,7 @@ jest.mock('@salesforce/pwa-kit-runtime/utils/ssr-config', () => {
 })
 
 function getMockedConfigWithCommerceAgentSettings(mockConfig, enabled, askAgentOnSearch) {
-    const commerceAgentSettings = JSON.parse(mockConfig.app.commerceAgent)
+    const commerceAgentSettings = mockConfig.app.commerceAgent
     const changedSettings = {
         ...commerceAgentSettings,
         enabled,
@@ -45,7 +45,7 @@ function getMockedConfigWithCommerceAgentSettings(mockConfig, enabled, askAgentO
         ...mockConfig,
         app: {
             ...mockConfig.app,
-            commerceAgent: JSON.stringify(changedSettings)
+            commerceAgent: changedSettings
         }
     }
 }
