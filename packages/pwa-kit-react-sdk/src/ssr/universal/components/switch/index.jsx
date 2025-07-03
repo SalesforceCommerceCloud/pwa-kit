@@ -9,8 +9,6 @@ import PropTypes from 'prop-types'
 import {Switch as RouterSwitch, Route} from 'react-router-dom'
 import AppErrorBoundary from '../app-error-boundary'
 import {UIDReset, UIDFork} from 'react-uid'
-import {RoutesProvider} from '../../contexts'
-import {useRoutes} from '../../hooks'
 
 /**
  * The Switch component packages up the bits of rendering that are shared between
@@ -27,11 +25,20 @@ const Switch = (props) => {
         <UIDReset>
             <AppErrorBoundary error={error}>
                 {!error && (
-                    <RoutesProvider routes={routes}>
-                        <App preloadedProps={appState.appProps}>
-                            <RoutesConsumer appState={appState} />
-                        </App>
-                    </RoutesProvider>
+                    <App preloadedProps={appState.appProps}>
+                        <RouterSwitch>
+                            {routes.map((route, i) => {
+                                const {component: Component, ...routeProps} = route
+                                return (
+                                    <Route key={i} {...routeProps}>
+                                        <UIDFork>
+                                            <Component preloadedProps={appState.pageProps} />
+                                        </UIDFork>
+                                    </Route>
+                                )
+                            })}
+                        </RouterSwitch>
+                    </App>
                 )}
             </AppErrorBoundary>
         </UIDReset>
@@ -44,29 +51,6 @@ Switch.propTypes = {
     routes: PropTypes.array,
     App: PropTypes.func,
     preloadedProps: PropTypes.object
-}
-
-const RoutesConsumer = ({appState}) => {
-    const {routes} = useRoutes()
-
-    return (
-        <RouterSwitch>
-            {routes.map((route, i) => {
-                const {component: Component, ...routeProps} = route
-                return (
-                    <Route key={i} {...routeProps}>
-                        <UIDFork>
-                            <Component preloadedProps={appState.pageProps} />
-                        </UIDFork>
-                    </Route>
-                )
-            })}
-        </RouterSwitch>
-    )
-}
-
-RoutesConsumer.propTypes = {
-    appState: PropTypes.object.isRequired
 }
 
 export default Switch
