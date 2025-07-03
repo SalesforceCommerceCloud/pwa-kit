@@ -575,9 +575,7 @@ const ProductList = (props) => {
                                           />,
                                           createStoreInventoryFilter()
                                       ].filter(Boolean)
-                                    : [
-                                          createStoreInventoryFilter()
-                                      ].filter(Boolean)
+                                    : [createStoreInventoryFilter()].filter(Boolean)
                             }
                             isLoading={filtersLoading}
                             toggleFilter={toggleFilter}
@@ -735,9 +733,7 @@ const ProductList = (props) => {
                                           />,
                                           createStoreInventoryFilter()
                                       ].filter(Boolean)
-                                    : [
-                                          createStoreInventoryFilter()
-                                      ].filter(Boolean)
+                                    : [createStoreInventoryFilter()].filter(Boolean)
                             }
                             excludedFilters={['cgid']}
                         />
