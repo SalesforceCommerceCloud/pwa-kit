@@ -13,7 +13,7 @@ import {
     CreateAppGuidelinesTool,
     CreateNewComponentTool,
     DeveloperGuidelinesTool,
-    CreateCustomizePageTool
+    CreatePageTool
 } from '../utils'
 import {TestWithPlaywrightTool} from '../utils/run-site-test-tool'
 
@@ -58,12 +58,12 @@ class PwaStorefrontMCPServerHighLevel {
             CreateAppGuidelinesTool.fn
         )
 
-        // Register CreateCustomizePageTool
+        // Register CreatePageTool
         this.server.tool(
-            CreateCustomizePageTool.name,
-            CreateCustomizePageTool.description,
-            CreateCustomizePageTool.inputSchema,
-            CreateCustomizePageTool.fn
+            CreatePageTool.name,
+            CreatePageTool.description,
+            CreatePageTool.inputSchema,
+            CreatePageTool.fn
         )
 
         // Register DeveloperGuidelinesTool

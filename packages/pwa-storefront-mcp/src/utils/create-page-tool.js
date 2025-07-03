@@ -135,7 +135,7 @@ You can override these in the same way, by creating files with the same name and
 
 import {EmptyJsonSchema} from './utils'
 
-export default {
+const CreatePageTool = {
     name: 'create_override_customize_page',
     description: `Agent must follow this guide to create a new page, orverride or customize an existing page. Agent must ask questions to clarify the page name, route, content, desired page content.`,
     inputSchema: EmptyJsonSchema,
@@ -145,3 +145,5 @@ export default {
         }
     }
 }
+
+export default CreatePageTool

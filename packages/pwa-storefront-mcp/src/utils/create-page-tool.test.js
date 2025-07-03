@@ -4,12 +4,12 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import CreateCustomizePageTool from './create-customize-page-tool'
+import CreatePageTool from './create-page-tool'
 import {EmptyJsonSchema} from './utils'
 
-describe('Create/Override/Customize Page Tool', () => {
+describe('Create Page Tool', () => {
     it('should have correct structure', () => {
-        expect(CreateCustomizePageTool).toMatchObject({
+        expect(CreatePageTool).toMatchObject({
             name: 'create_override_customize_page',
             description: expect.stringContaining(
                 'Agent must follow this guide to create a new page'
@@ -20,7 +20,7 @@ describe('Create/Override/Customize Page Tool', () => {
     })
 
     it('should return guidelines content when executed', async () => {
-        const result = await CreateCustomizePageTool.fn()
+        const result = await CreatePageTool.fn()
         expect(result).toEqual({
             content: [
                 {
@@ -34,7 +34,7 @@ describe('Create/Override/Customize Page Tool', () => {
     })
 
     it('should include all major sections in the guidelines', async () => {
-        const result = await CreateCustomizePageTool.fn()
+        const result = await CreatePageTool.fn()
         const guidelineText = result.content[0].text
         const requiredSections = [
             'Overview',
