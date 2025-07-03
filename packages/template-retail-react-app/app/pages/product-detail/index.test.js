@@ -945,20 +945,23 @@ describe('standard product', () => {
                 )
             }),
             // Mock shipping methods API call
-            rest.get('*/baskets/:basketId/shipments/:shipmentId/shipping-methods', (req, res, ctx) => {
-                return res(
-                    ctx.json({
-                        applicableShippingMethods: [
-                            {
-                                id: '001',
-                                name: 'Ground',
-                                price: 15.99
-                            }
-                        ],
-                        defaultShippingMethodId: '001'
-                    })
-                )
-            }),
+            rest.get(
+                '*/baskets/:basketId/shipments/:shipmentId/shipping-methods',
+                (req, res, ctx) => {
+                    return res(
+                        ctx.json({
+                            applicableShippingMethods: [
+                                {
+                                    id: '001',
+                                    name: 'Ground',
+                                    price: 15.99
+                                }
+                            ],
+                            defaultShippingMethodId: '001'
+                        })
+                    )
+                }
+            ),
             // Mock update shipment API call
             rest.patch('*/baskets/:basketId/shipments/:shipmentId', (req, res, ctx) => {
                 return res(ctx.json({}))
