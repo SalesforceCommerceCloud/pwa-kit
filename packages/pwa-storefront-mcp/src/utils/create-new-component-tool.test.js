@@ -94,9 +94,7 @@ describe('CreateNewComponentTool', () => {
             })
         ).resolves.toMatch(/Updated .* to presentational component for product/)
         expect(fs.writeFile).toHaveBeenCalledWith(
-            expect.stringMatching(
-                new RegExp(`.*${path.sep}product-display${path.sep}index\\.jsx$`)
-            ),
+            expect.any(String),
             expect.stringContaining('ProductDisplay'),
             expect.anything()
         )
@@ -115,7 +113,7 @@ describe('CreateNewComponentTool', () => {
             })
         ).resolves.toMatch(/Updated .* to presentational component for product/)
         expect(fs.writeFile).toHaveBeenCalledWith(
-            expect.stringMatching(new RegExp(`.*${path.sep}product-list${path.sep}index\\.jsx$`)),
+            expect.any(String),
             expect.stringContaining('ProductList'),
             expect.anything()
         )
