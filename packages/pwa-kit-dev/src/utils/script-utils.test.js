@@ -168,7 +168,7 @@ describe('scriptUtils', () => {
                 '@salesforce/pwa-kit-react-sdk',
                 dependencyTreeMockData.differentMinorVersions
             )
-            expect(lowestVersion).toBe('1.9.0')
+            expect(lowestVersion).toBe('1.10.0')
         })
 
         test('should work when patch version is different', async () => {
