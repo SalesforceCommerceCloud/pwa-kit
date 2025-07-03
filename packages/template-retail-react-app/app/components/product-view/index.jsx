@@ -305,7 +305,7 @@ const ProductView = forwardRef(
                     return
                 }
                 try {
-                    const itemsAdded = await addToCart([{variant: variant || product, quantity}])
+                    const itemsAdded = await addToCart([{variant, product, quantity}])
                     // Open modal only when `addToCart` returns some data
                     // It's possible that the item has been added to cart, but we don't want to open the modal.
                     // See wishlist_primary_action for example.
@@ -422,7 +422,7 @@ const ProductView = forwardRef(
             if (
                 (isProductPartOfBundle || isProductPartOfSet) &&
                 product &&
-                (!product.variationAttributes || product.variationAttributes.length === 0)
+                product.type?.item
             ) {
                 onVariantSelected(product, null, childOfBundleQuantity || quantity)
             }
