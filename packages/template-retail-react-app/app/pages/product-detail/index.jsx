@@ -413,8 +413,6 @@ const ProductDetail = () => {
             )
             einstein.sendAddToCart(productItemsForEinstein)
 
-            // Open modal with itemsAdded
-            // addToCartModal.onOpen({product, itemsAdded: productSelectionValues})
             return productSelectionValues
         } catch (error) {
             showError(error.message)
@@ -589,8 +587,7 @@ const ProductDetail = () => {
             )
 
             einstein.sendAddToCart(productItems)
-            // Open modal with itemsAdded and selectedQuantity for bundles
-            // addToCartModal.onOpen({product, itemsAdded: childProductSelections, selectedQuantity})
+
             return childProductSelections
         } catch (error) {
             showError(error)
