@@ -29,4 +29,10 @@ describe('BonusProductQuantity', () => {
         const quantityElement = screen.getByText(/Quantity: 1/)
         expect(quantityElement).toHaveAttribute('aria-label')
     })
+
+    test('renders skeleton when product is undefined', () => {
+        renderWithIntl(<BonusProductQuantity product={undefined} />)
+        // The Skeleton component from Chakra UI renders a div with class "chakra-skeleton"
+        expect(document.querySelector('.chakra-skeleton')).toBeInTheDocument()
+    })
 })

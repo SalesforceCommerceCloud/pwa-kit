@@ -5,38 +5,22 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
-import PropTypes from 'prop-types'
-import {render, screen} from '@testing-library/react'
-import {IntlProvider} from 'react-intl'
+import {screen} from '@testing-library/react'
+import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
 import BonusProductsTitle from '@salesforce/retail-react-app/app/pages/cart/partials/bonus-products-title'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
 
 // Mock the useCurrentBasket hook
 jest.mock('@salesforce/retail-react-app/app/hooks/use-current-basket')
 
-const MockedComponent = ({basketData}) => {
-    useCurrentBasket.mockReturnValue({data: basketData})
-    return (
-        <IntlProvider messages={{}} locale="en">
-            <BonusProductsTitle />
-        </IntlProvider>
-    )
-}
-
-MockedComponent.propTypes = {
-    basketData: PropTypes.shape({
-        productItems: PropTypes.arrayOf(
-            PropTypes.shape({
-                id: PropTypes.string,
-                bonusProductLineItem: PropTypes.bool
-            })
-        )
-    })
-}
-
 describe('BonusProductsTitle', () => {
     beforeEach(() => {
         jest.clearAllMocks()
+        // Provide a default mock that includes derivedData to prevent AddToCartModal errors
+        useCurrentBasket.mockReturnValue({
+            data: {},
+            derivedData: {totalItems: 0}
+        })
     })
 
     it('renders title with 1 item when one bonus product', () => {
@@ -46,7 +30,12 @@ describe('BonusProductsTitle', () => {
                 {id: '2', bonusProductLineItem: false}
             ]
         }
-        render(<MockedComponent basketData={basketData} />)
+        useCurrentBasket.mockReturnValue({
+            data: basketData,
+            derivedData: {totalItems: 2}
+        })
+
+        renderWithProviders(<BonusProductsTitle />)
         expect(screen.getByText('Bonus Products (1 item)')).toBeInTheDocument()
     })
 
@@ -58,7 +47,12 @@ describe('BonusProductsTitle', () => {
                 {id: '3', bonusProductLineItem: false}
             ]
         }
-        render(<MockedComponent basketData={basketData} />)
+        useCurrentBasket.mockReturnValue({
+            data: basketData,
+            derivedData: {totalItems: 3}
+        })
+
+        renderWithProviders(<BonusProductsTitle />)
         expect(screen.getByText('Bonus Products (2 items)')).toBeInTheDocument()
     })
 })

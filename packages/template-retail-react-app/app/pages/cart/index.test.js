@@ -1232,11 +1232,13 @@ describe('Product bundles', () => {
 
 describe('Bonus products', () => {
     beforeEach(() => {
-        global.server.use(
-            rest.get('*/customers/:customerId/baskets', (req, res, ctx) => {
-                return res(ctx.delay(0), ctx.json(mockBonusProductBasket))
-            })
-        )
+        prependHandlersToServer([
+            {
+                path: '*/customers/:customerId/baskets',
+                method: 'get',
+                res: () => mockBonusProductBasket
+            }
+        ])
     })
 
     test('renders bonus products in cart with correct styling and no quantity picker', async () => {
@@ -1247,8 +1249,9 @@ describe('Bonus products', () => {
             expect(screen.queryByTestId('sf-cart-skeleton')).not.toBeInTheDocument()
         })
 
-        const regularProduct = screen.getByTestId('sf-cart-item-701642889830M')
-        const bonusProduct = screen.getByTestId('sf-cart-item-013742335262M')
+        // Find products by their names
+        const regularProduct = screen.getByText('Belted Cardigan With Studs')
+        const bonusProduct = screen.getByText('Free Gift with Purchase')
 
         expect(regularProduct).toBeInTheDocument()
         expect(bonusProduct).toBeInTheDocument()
@@ -1256,25 +1259,59 @@ describe('Bonus products', () => {
     })
 })
 
-describe('Unavailable products tests', () => {
-    beforeEach(() => {
-        global.server.use(
-            rest.get('*/customers/:customerId/baskets', (req, res, ctx) => {
-                return res(ctx.delay(0), ctx.json(mockBaskets))
-            })
-        )
-    })
-
+describe('Unavailable products tests', function () {
     test('Remove unavailable/out of stock/low stock products from cart', async () => {
-        renderWithProviders(<Cart />)
+        prependHandlersToServer([
+            {path: '*/customers/:customerId/baskets', res: () => mockBaskets},
+            {path: '*/products', res: () => mockProducts}
+        ])
 
-        // Wait for the cart to load
+        const {user, getByText} = renderWithProviders(<Cart />)
         await waitFor(() => {
-            expect(screen.queryByTestId('sf-cart-skeleton')).not.toBeInTheDocument()
+            expect(screen.getByTestId('sf-cart-container')).toBeInTheDocument()
+            expect(screen.getByText(/Worn Gold Dangle Earring/i)).toBeInTheDocument()
+            expect(screen.getByText(/Straight Leg Trousers/i)).toBeInTheDocument()
         })
 
-        const regularProduct = screen.getByTestId('sf-cart-item-013742335262M')
-        expect(regularProduct).toBeInTheDocument()
+        await waitFor(async () => {
+            expect(getByText(/Items Unavailable/i)).toBeVisible()
+            expect(
+                getByText(
+                    /Some items are no longer available online and will be removed from your cart./i
+                )
+            ).toBeVisible()
+        })
+        await waitFor(async () => {
+            expect(getByText(/Items Unavailable/i)).toBeVisible()
+            expect(
+                getByText(
+                    /Some items are no longer available online and will be removed from your cart./i
+                )
+            ).toBeVisible()
+        })
+
+        const removeBtn = screen.getByRole('button', {
+            name: /remove unavailable products/i
+        })
+        expect(removeBtn).toBeInTheDocument()
+
+        prependHandlersToServer([
+            {
+                path: '*/baskets/:basket/items/:itemId',
+                method: 'delete',
+                res: () => {}
+            }
+        ])
+        await user.click(removeBtn)
+
+        await waitFor(() => {
+            expect(
+                screen.getByRole('link', {name: /Worn Gold Dangle Earring$/i})
+            ).toBeInTheDocument()
+            expect(
+                screen.queryByRole('link', {name: /Straight Leg Trousers$/i})
+            ).not.toBeInTheDocument()
+        })
     })
 })
 

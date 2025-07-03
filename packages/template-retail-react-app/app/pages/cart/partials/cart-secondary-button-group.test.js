@@ -108,12 +108,12 @@ test('renders secondary with event handlers', async () => {
     expect(onRemoveItemClick).toHaveBeenCalledTimes(1)
 })
 
-test('hides wishlist and gift checkbox for bonus product', async () => {
+test('hides remove, wishlist and gift checkbox for bonus product', async () => {
     const {user} = renderWithProviders(<MockedComponent isBonusProduct={true} />)
 
-    expect(screen.getByRole('button', {name: /remove/i})).toBeInTheDocument()
     expect(screen.getByRole('button', {name: /edit/i})).toBeInTheDocument()
 
+    expect(screen.queryByRole('button', {name: /remove/i})).not.toBeInTheDocument()
     expect(screen.queryByRole('button', {name: /add to wishlist/i})).not.toBeInTheDocument()
     expect(screen.queryByRole('checkbox', {name: /this is a gift/i})).not.toBeInTheDocument()
 })

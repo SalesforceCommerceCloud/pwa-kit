@@ -7,37 +7,39 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import {FormattedMessage, useIntl} from 'react-intl'
-import {Text} from '@salesforce/retail-react-app/app/components/shared/ui'
+import {Text, Skeleton} from '@salesforce/retail-react-app/app/components/shared/ui'
 
 const BonusProductQuantity = ({product}) => {
     const intl = useIntl()
     return (
-        <Text
-            fontSize="sm"
-            color="gray.700"
-            aria-label={intl.formatMessage(
-                {
-                    id: 'item_variant.quantity.label',
-                    defaultMessage:
-                        'Quantity selector for {productName}. Selected quantity is {quantity}'
-                },
-                {
-                    quantity: product?.quantity,
-                    productName: product?.name
-                }
-            )}
-        >
-            <FormattedMessage
-                defaultMessage="Quantity: {quantity}"
-                id="bonus_product_item.label.quantity"
-                values={{quantity: product?.quantity}}
-            />
-        </Text>
+        <Skeleton isLoaded={product}>
+            <Text
+                fontSize="sm"
+                color="gray.700"
+                aria-label={intl.formatMessage(
+                    {
+                        id: 'item_variant.quantity.label',
+                        defaultMessage:
+                            'Quantity selector for {productName}. Selected quantity is {quantity}'
+                    },
+                    {
+                        quantity: product?.quantity,
+                        productName: product?.name
+                    }
+                )}
+            >
+                <FormattedMessage
+                    defaultMessage="Quantity: {quantity}"
+                    id="bonus_product_item.label.quantity"
+                    values={{quantity: product?.quantity}}
+                />
+            </Text>
+        </Skeleton>
     )
 }
 
 BonusProductQuantity.propTypes = {
-    product: PropTypes.object.isRequired
+    product: PropTypes.object
 }
 
 export default BonusProductQuantity

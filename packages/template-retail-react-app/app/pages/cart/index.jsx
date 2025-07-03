@@ -585,6 +585,56 @@ const Cart = () => {
         )
     }
 
+    // Categorize products into regular and bonus
+    const categorizedProducts = useMemo(() => {
+        return basket?.productItems?.reduce(
+            (acc, productItem) => {
+                if (productItem.bonusProductLineItem) {
+                    acc.bonusProducts.push(productItem)
+                } else {
+                    acc.regularProducts.push(productItem)
+                }
+                return acc
+            },
+            {regularProducts: [], bonusProducts: []}
+        )
+    }, [basket?.productItems])
+
+    // Function to create product items
+    const createProductItemProps = (productItem, isBonusProduct = false) => ({
+        isBonusProduct,
+        secondaryActions: (
+            <CartSecondaryButtonGroup
+                isAGift={
+                    localIsGiftItems[productItem.itemId]
+                        ? localIsGiftItems[productItem.itemId]
+                        : productItem.gift
+                }
+                onIsAGiftChange={handleIsAGiftChange}
+                onAddToWishlistClick={handleAddToWishlist}
+                onEditClick={(product) => {
+                    setSelectedItem(product)
+                    onOpen()
+                }}
+                onRemoveItemClick={handleRemoveItem}
+            />
+        ),
+        product: {
+            ...productItem,
+            ...(productsByItemId && productsByItemId[productItem.itemId]),
+            isProductUnavailable: !isProductsLoading
+                ? !productsByItemId?.[productItem.itemId]
+                : undefined,
+            price: productItem.price,
+            quantity: localQuantity[productItem.itemId]
+                ? localQuantity[productItem.itemId]
+                : productItem.quantity
+        },
+        onItemQuantityChange: handleChangeItemQuantity.bind(this, productItem),
+        showLoading: isCartItemLoading && selectedItem?.itemId === productItem.itemId,
+        handleRemoveItem
+    })
+
     /********* Rendering  UI **********/
     if (isLoading) {
         return <CartSkeleton />
@@ -593,19 +643,6 @@ const Cart = () => {
     if (!isLoading && !basket?.productItems?.length) {
         return <EmptyCart isRegistered={isRegistered} />
     }
-
-    // Categorize products into regular and bonus
-    const categorizedProducts = basket.productItems?.reduce(
-        (acc, productItem) => {
-            if (productItem.bonusProductLineItem) {
-                acc.bonusProducts.push(productItem)
-            } else {
-                acc.regularProducts.push(productItem)
-            }
-            return acc
-        },
-        {regularProducts: [], bonusProducts: []}
-    )
 
     return (
         <Box background="gray.50" flex="1" data-testid="sf-cart-container">
@@ -651,43 +688,7 @@ const Cart = () => {
                                     {categorizedProducts.regularProducts.map((productItem) => (
                                         <ProductItem
                                             key={productItem.itemId}
-                                            secondaryActions={
-                                                <CartSecondaryButtonGroup
-                                                    isAGift={
-                                                        localIsGiftItems[productItem.itemId]
-                                                            ? localIsGiftItems[productItem.itemId]
-                                                            : productItem.gift
-                                                    }
-                                                    onIsAGiftChange={handleIsAGiftChange}
-                                                    onAddToWishlistClick={handleAddToWishlist}
-                                                    onEditClick={(product) => {
-                                                        setSelectedItem(product)
-                                                        onOpen()
-                                                    }}
-                                                    onRemoveItemClick={handleRemoveItem}
-                                                />
-                                            }
-                                            product={{
-                                                ...productItem,
-                                                ...(productsByItemId &&
-                                                    productsByItemId[productItem.itemId]),
-                                                isProductUnavailable: !isProductsLoading
-                                                    ? !productsByItemId?.[productItem.itemId]
-                                                    : undefined,
-                                                price: productItem.price,
-                                                quantity: localQuantity[productItem.itemId]
-                                                    ? localQuantity[productItem.itemId]
-                                                    : productItem.quantity
-                                            }}
-                                            onItemQuantityChange={handleChangeItemQuantity.bind(
-                                                this,
-                                                productItem
-                                            )}
-                                            showLoading={
-                                                isCartItemLoading &&
-                                                selectedItem?.itemId === productItem.itemId
-                                            }
-                                            handleRemoveItem={handleRemoveItem}
+                                            {...createProductItemProps(productItem, false)}
                                         />
                                     ))}
 
@@ -701,54 +702,10 @@ const Cart = () => {
                                                 (productItem) => (
                                                     <ProductItem
                                                         key={productItem.itemId}
-                                                        secondaryActions={
-                                                            <CartSecondaryButtonGroup
-                                                                isAGift={
-                                                                    localIsGiftItems[
-                                                                        productItem.itemId
-                                                                    ]
-                                                                        ? localIsGiftItems[
-                                                                              productItem.itemId
-                                                                          ]
-                                                                        : productItem.gift
-                                                                }
-                                                                onIsAGiftChange={
-                                                                    handleIsAGiftChange
-                                                                }
-                                                                onAddToWishlistClick={
-                                                                    handleAddToWishlist
-                                                                }
-                                                                onEditClick={(product) => {
-                                                                    setSelectedItem(product)
-                                                                    onOpen()
-                                                                }}
-                                                                onRemoveItemClick={handleRemoveItem}
-                                                            />
-                                                        }
-                                                        product={{
-                                                            ...productItem,
-                                                            ...(productsByItemId &&
-                                                                productsByItemId[
-                                                                    productItem.itemId
-                                                                ]),
-                                                            isProductUnavailable: !isProductsLoading
-                                                                ? !productsByItemId?.[
-                                                                      productItem.itemId
-                                                                  ]
-                                                                : undefined,
-                                                            price: productItem.price,
-                                                            quantity: localQuantity[
-                                                                productItem.itemId
-                                                            ]
-                                                                ? localQuantity[productItem.itemId]
-                                                                : productItem.quantity
-                                                        }}
-                                                        showLoading={
-                                                            isCartItemLoading &&
-                                                            selectedItem?.itemId ===
-                                                                productItem.itemId
-                                                        }
-                                                        handleRemoveItem={handleRemoveItem}
+                                                        {...createProductItemProps(
+                                                            productItem,
+                                                            true
+                                                        )}
                                                     />
                                                 )
                                             )}

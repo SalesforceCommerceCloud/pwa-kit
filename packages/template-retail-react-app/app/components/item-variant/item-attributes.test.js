@@ -74,7 +74,6 @@ test('component renders product bundles without variant data', async () => {
     })
 })
 
-// Helper function to render the component with a given variant and props
 const renderComponent = (variant, props = {}) => {
     renderWithProviders(
         <ItemVariantProvider variant={variant}>
@@ -83,70 +82,66 @@ const renderComponent = (variant, props = {}) => {
     )
 }
 
-test('renders Bonus Product when bonusProductLineItem is true', async () => {
-    const mockVariantWithBonusProduct = {
-        ...mockBundledProductItemsVariant,
-        bonusProductLineItem: true // Simulate the bonus product flag
-    }
+describe('bonus product', () => {
+    test('renders Bonus Product when bonusProductLineItem is true', async () => {
+        const mockVariantWithBonusProduct = {
+            ...mockBundledProductItemsVariant,
+            bonusProductLineItem: true
+        }
 
-    // Case 1: excludeBonusLabel is true
-    renderComponent(mockVariantWithBonusProduct, {excludeBonusLabel: true})
+        renderComponent(mockVariantWithBonusProduct, {excludeBonusLabel: true})
 
-    await waitFor(() => {
-        expect(screen.queryByText(/Bonus Product/i)).not.toBeInTheDocument() // Fixed assertion
+        await waitFor(() => {
+            expect(screen.queryByText(/Bonus Product/i)).not.toBeInTheDocument()
+        })
+
+        renderComponent(mockVariantWithBonusProduct, {excludeBonusLabel: false})
+
+        await waitFor(() => {
+            expect(screen.getByText(/Bonus Product/i)).toBeInTheDocument()
+        })
     })
 
-    // Case 3: excludeBonusLabel is false
-    renderComponent(mockVariantWithBonusProduct, {excludeBonusLabel: false})
+    test('renders Bonus Product when excludeBonusLabel is not set', async () => {
+        const mockVariantWithOutBonusProduct = {
+            ...mockBundledProductItemsVariant,
+            bonusProductLineItem: false
+        }
 
-    await waitFor(() => {
-        expect(screen.getByText(/Bonus Product/i)).toBeInTheDocument()
-    })
-})
+        renderComponent(mockVariantWithOutBonusProduct)
 
-test('renders Bonus Product when excludeBonusLabel is not set', async () => {
-    // Case 1: Variant has no bonus product
-    const mockVariantWithOutBonusProduct = {
-        ...mockBundledProductItemsVariant,
-        bonusProductLineItem: false // Simulate the bonus product flag
-    }
+        await waitFor(() => {
+            expect(screen.queryByText(/Bonus Product/i)).not.toBeInTheDocument()
+        })
 
-    renderComponent(mockVariantWithOutBonusProduct)
+        const mockVariantWithBonusProduct = {
+            ...mockBundledProductItemsVariant,
+            bonusProductLineItem: true
+        }
 
-    await waitFor(() => {
-        expect(screen.queryByText(/Bonus Product/i)).not.toBeInTheDocument() // Fixed assertion
-    })
+        renderComponent(mockVariantWithBonusProduct)
 
-    // Case 2: Variant has bonus product
-    const mockVariantWithBonusProduct = {
-        ...mockBundledProductItemsVariant,
-        bonusProductLineItem: true // Simulate the bonus product flag
-    }
-
-    renderComponent(mockVariantWithBonusProduct)
-
-    await waitFor(() => {
-        expect(screen.queryByText(/Bonus Product/i)).toBeInTheDocument() // Fixed assertion
-    })
-})
-
-test('does not render Bonus Product when bonusProductLineItem is false', async () => {
-    const mockVariantWithoutBonusProduct = {
-        ...mockBundledProductItemsVariant,
-        bonusProductLineItem: false // Simulate the absence of the bonus product flag
-    }
-
-    // Case 1: excludeBonusLabel is true
-    renderComponent(mockVariantWithoutBonusProduct, {excludeBonusLabel: true})
-
-    await waitFor(() => {
-        expect(screen.queryByText(/Bonus Product/i)).not.toBeInTheDocument()
+        await waitFor(() => {
+            expect(screen.queryByText(/Bonus Product/i)).toBeInTheDocument()
+        })
     })
 
-    // Case 2: excludeBonusLabel is false
-    renderComponent(mockVariantWithoutBonusProduct, {excludeBonusLabel: false})
+    test('does not render Bonus Product when bonusProductLineItem is false', async () => {
+        const mockVariantWithoutBonusProduct = {
+            ...mockBundledProductItemsVariant,
+            bonusProductLineItem: false
+        }
 
-    await waitFor(() => {
-        expect(screen.queryByText(/Bonus Product/i)).not.toBeInTheDocument()
+        renderComponent(mockVariantWithoutBonusProduct, {excludeBonusLabel: true})
+
+        await waitFor(() => {
+            expect(screen.queryByText(/Bonus Product/i)).not.toBeInTheDocument()
+        })
+
+        renderComponent(mockVariantWithoutBonusProduct, {excludeBonusLabel: false})
+
+        await waitFor(() => {
+            expect(screen.queryByText(/Bonus Product/i)).not.toBeInTheDocument()
+        })
     })
 })
