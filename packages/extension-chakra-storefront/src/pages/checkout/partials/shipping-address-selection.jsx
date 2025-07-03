@@ -154,19 +154,7 @@ const ShippingAddressSelection = ({
 
     useEffect(() => {
         if (isBillingAddress) {
-            // For billing address, use proper default values if no selectedAddress
-            const defaultValues = selectedAddress ? {...selectedAddress} : {
-                firstName: '',
-                lastName: '',
-                phone: '',
-                countryCode: 'US',
-                address1: '',
-                city: '',
-                stateCode: '',
-                postalCode: '',
-                addressId: ''
-            }
-            form.reset(defaultValues)
+            form.reset({...selectedAddress})
             return
         }
         // Automatically select the customer's default/preferred shipping address
