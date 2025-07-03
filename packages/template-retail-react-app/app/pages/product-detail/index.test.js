@@ -925,11 +925,43 @@ describe('standard product', () => {
                             {
                                 productId: requestBody[0].productId,
                                 price: requestBody[0].price,
-                                quantity: requestBody[0].quantity
+                                quantity: requestBody[0].quantity,
+                                itemId: 'test-item-id',
+                                productName: 'Test Product'
+                            }
+                        ],
+                        productSubTotal: requestBody[0].price * requestBody[0].quantity,
+                        productTotal: requestBody[0].price * requestBody[0].quantity,
+                        orderTotal: requestBody[0].price * requestBody[0].quantity,
+                        shipments: [
+                            {
+                                shippingMethod: {
+                                    id: '001',
+                                    name: 'Ground'
+                                }
                             }
                         ]
                     })
                 )
+            }),
+            // Mock shipping methods API call
+            rest.get('*/baskets/:basketId/shipments/:shipmentId/shipping-methods', (req, res, ctx) => {
+                return res(
+                    ctx.json({
+                        applicableShippingMethods: [
+                            {
+                                id: '001',
+                                name: 'Ground',
+                                price: 15.99
+                            }
+                        ],
+                        defaultShippingMethodId: '001'
+                    })
+                )
+            }),
+            // Mock update shipment API call
+            rest.patch('*/baskets/:basketId/shipments/:shipmentId', (req, res, ctx) => {
+                return res(ctx.json({}))
             })
         )
     })
