@@ -17,7 +17,7 @@ export default defineRecipe({
                     borderWidth: 1,
                     borderStyle: 'solid',
                     color: 'gray.900',
-                    borderRadius: 0
+                    borderRadius: 'none'
                 }
             }
         }
