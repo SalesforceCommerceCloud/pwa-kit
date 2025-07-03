@@ -27,4 +27,4 @@ const options = {
     }
 }
 
-export default withReactQuery(withLegacyGetProps(AppConfig), options)
+export default withReactQuery(AppConfig, options)
