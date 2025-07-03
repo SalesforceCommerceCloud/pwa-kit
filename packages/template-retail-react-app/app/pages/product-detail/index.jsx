@@ -60,7 +60,6 @@ import {rebuildPathWithParams} from '@salesforce/retail-react-app/app/utils/url'
 import {useHistory, useLocation, useParams} from 'react-router-dom'
 import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
 import {useWishList} from '@salesforce/retail-react-app/app/hooks/use-wish-list'
-import {useAddToCartModalContext} from '@salesforce/retail-react-app/app/hooks/use-add-to-cart-modal'
 import {useDisclosure} from '@salesforce/retail-react-app/app/components/shared/ui'
 
 const ProductDetail = () => {
@@ -326,8 +325,6 @@ const ProductDetail = () => {
         }))
     }
 
-    const addToCartModal = useAddToCartModalContext()
-
     const handleAddToCart = async (productSelectionValues = []) => {
         try {
             let productItems = productSelectionValues.map((item) => {
@@ -417,7 +414,7 @@ const ProductDetail = () => {
             einstein.sendAddToCart(productItemsForEinstein)
 
             // Open modal with itemsAdded
-            addToCartModal.onOpen({product, itemsAdded: productSelectionValues})
+            // addToCartModal.onOpen({product, itemsAdded: productSelectionValues})
             return productSelectionValues
         } catch (error) {
             showError(error.message)
@@ -464,8 +461,7 @@ const ProductDetail = () => {
         // Get all the selected products, and pass them to the addToCart handler which
         // accepts an array.
         const productSelectionValues = Object.values(childProductSelection)
-        handleAddToCart(productSelectionValues)
-        // Modal will be opened in handleAddToCart
+        return handleAddToCart(productSelectionValues)
     }
 
     /**************** Product Bundle Handlers ****************/
@@ -594,7 +590,7 @@ const ProductDetail = () => {
 
             einstein.sendAddToCart(productItems)
             // Open modal with itemsAdded and selectedQuantity for bundles
-            addToCartModal.onOpen({product, itemsAdded: childProductSelections, selectedQuantity})
+            // addToCartModal.onOpen({product, itemsAdded: childProductSelections, selectedQuantity})
             return childProductSelections
         } catch (error) {
             showError(error)
@@ -704,7 +700,7 @@ const ProductDetail = () => {
                                             selectedBundleParentQuantity={selectedBundleQuantity}
                                             addToCart={
                                                 isProductASet
-                                                    ? (variant, quantity) =>
+                                                    ? (product, variant, quantity) =>
                                                           handleAddToCart([
                                                               {
                                                                   product: childProduct,
