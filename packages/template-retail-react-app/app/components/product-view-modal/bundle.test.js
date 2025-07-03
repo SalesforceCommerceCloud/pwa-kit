@@ -223,7 +223,7 @@ test('modal displays standard product child name when bundle contains a standard
         rest.get('*/products', (req, res, ctx) => {
             const ids = req.url.searchParams.get('ids')
             if (ids && ids.includes(mockStandardProductOrderable.id)) {
-                return res(ctx.json({ data: [mockStandardProductOrderable], total: 1 }))
+                return res(ctx.json({data: [mockStandardProductOrderable], total: 1}))
             }
             return res(ctx.json(mockProductBundleWithVariants))
         })
@@ -244,7 +244,7 @@ test('modal displays standard product child name when bundle contains a standard
             </div>
         )
     }
-    MockComponent.propTypes = { updateCart: PropTypes.func }
+    MockComponent.propTypes = {updateCart: PropTypes.func}
 
     renderWithProviders(<MockComponent />)
     await waitFor(() => {
