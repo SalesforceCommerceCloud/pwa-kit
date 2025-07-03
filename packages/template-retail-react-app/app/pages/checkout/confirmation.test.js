@@ -29,6 +29,16 @@ const MockedComponent = () => {
     )
 }
 
+const mockCustomer = {
+    authType: 'registered',
+    customerId: 'registeredCustomerId',
+    customerNo: '00151503',
+    email: 'jkeane@64labs.com',
+    firstName: 'John',
+    lastName: 'Keane',
+    login: 'jkeane@64labs.com'
+}
+
 beforeEach(() => {
     global.server.use(
         rest.get('*/orders/:orderId', (req, res, ctx) => {
@@ -94,6 +104,9 @@ test('Create Account form - renders error message', async () => {
 test('Create Account form - successful submission results in redirect to the Account page', async () => {
     global.server.use(
         rest.post('*/customers', (_, res, ctx) => {
+            return res(ctx.status(200), ctx.json(mockCustomer))
+        }),
+        rest.post('*/customers/:customerId/addresses', (_, res, ctx) => {
             return res(ctx.status(200))
         })
     )
@@ -105,6 +118,35 @@ test('Create Account form - successful submission results in redirect to the Acc
     const createAccountButton = await screen.findByRole('button', {name: /create account/i})
     const password = screen.getByLabelText('Password')
 
+    await user.type(password, 'P4ssword!')
+    await user.click(createAccountButton)
+
+    await waitFor(() => {
+        expect(window.location.pathname).toBe('/uk/en-GB/account')
+    })
+})
+
+test('Create Account form - successful submission results in redirect to the Account page even if shipping address is not saved', async () => {
+    global.server.use(
+        rest.post('*/customers', (_, res, ctx) => {
+            return res(ctx.status(200), ctx.json(mockCustomer))
+        }),
+        rest.post('*/customers/:customerId/addresses', (_, res, ctx) => {
+            const failedAddressCreation = {
+                title: 'Invalid Customer',
+                type: 'https://api.commercecloud.salesforce.com/documentation/error/v1/errors/invalid-customer',
+                detail: 'The customer is invalid.'
+            }
+            return res(ctx.status(400), ctx.json(failedAddressCreation))
+        })
+    )
+
+    const {user} = renderWithProviders(<MockedComponent />, {
+        wrapperProps: {isGuest: true}
+    })
+
+    const createAccountButton = await screen.findByRole('button', {name: /create account/i})
+    const password = screen.getByLabelText('Password')
     await user.type(password, 'P4ssword!')
     await user.click(createAccountButton)
 
