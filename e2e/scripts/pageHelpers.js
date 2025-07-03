@@ -691,7 +691,7 @@ export const wishlistFlow = async ({page, registeredUserCredentials, a11y = {}})
  *
  * @param {Object} options.page - Playwright page object representing a browser tab/window
  */
-export const selectStore = async ({page}) => {
+export const selectStoreFromPLP = async ({page}) => {
     // Navigate to a product category (Womens > Tops)
     await page.getByRole('link', {name: 'Womens'}).hover()
     const topsNav = await page.getByRole('link', {name: 'Tops', exact: true})

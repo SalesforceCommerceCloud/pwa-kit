@@ -8,7 +8,7 @@
 const {test, expect, waitFor} = require('@playwright/test')
 const config = require('../../config.js')
 const {generateUserCredentials} = require('../../scripts/utils.js')
-const {registerShopper, answerConsentTrackingForm, addProductToCart, checkoutProduct, selectStore} = require('../../scripts/pageHelpers.js')
+const {registerShopper, answerConsentTrackingForm, addProductToCart, checkoutProduct, selectStoreFromPLP} = require('../../scripts/pageHelpers.js')
 
 
 
@@ -21,7 +21,7 @@ test('Selecting store from store locator sets the PLP filter', async ({page}) =>
     await answerConsentTrackingForm(page)
 
     // Select a store from the store locator modal
-    await selectStore({page})
+    await selectStoreFromPLP({page})
 
     // Verify the filter is updated with the store name
     const inventoryFilter = page.locator('input[aria-label*="Filter Products by Store Availability at"]')
@@ -36,7 +36,7 @@ test('Adding a product via Pickup in Store to Cart shows pickup address in Check
     await answerConsentTrackingForm(page)
 
     // Select a store from the store locator modal
-    await selectStore({page})
+    await selectStoreFromPLP({page})
 
     // Go to Men's PLP
     await page.getByRole('link', {name: 'Mens', exact: true}).hover()
@@ -53,36 +53,43 @@ test('Adding a product via Pickup in Store to Cart shows pickup address in Check
     // Select size and Pickup in Store option
     await expect(page.getByRole('heading', {name: /Refined Denim Pants/i})).toBeVisible()
     await page.getByRole('radio', {name: '30'}).click()
-    const addToCartButton = page.getByRole('button', {name: /Add to Cart/i})
-    
     await page.waitForLoadState()
+    
+    // Select pickup option immediately after size selection
     const pickupRadio = page.locator('label.chakra-radio:has(input[value="pickup"])')
     await pickupRadio.click()
-    await pickupRadio.click() // Click again to ensure selection
+    await page.waitForLoadState()
     
-    // Verify the pickup radio is selected before proceeding
+    // Verify the pickup radio is selected
     await expect(pickupRadio).toHaveAttribute('data-checked')
+    
+    const addToCartButton = page.getByRole('button', {name: /Add to Cart/i})
+    await page.waitForLoadState()
 
     // Add to Cart
-    await page.waitForLoadState()
     await addToCartButton.click()
     
     // Navigate to cart
     await expect(page.getByText(/1 item added to cart/i)).toBeVisible()
     await page.getByRole('link', {name: 'View Cart'}).click()
+    await expect(page.getByText(/Order Summary/i)).toBeVisible()
 
 //     // Verify the Pickup in Store header is displayed in Cart
 //     await expect(page.getByText(/Pickup in Store/i)).toBeVisible()
 
-//     // Proceed to checkout
-//     const checkoutButton = page.getByRole('link', {name: 'Proceed to Checkout'})
-//     await expect(checkoutButton).toBeVisible()
-//     await checkoutButton.click()
-//     await page.waitForLoadState()
+    // Proceed to checkout
+    const checkoutButton = page.getByRole('link', {name: 'Proceed to Checkout'})
+    await expect(checkoutButton).toBeVisible()
+    await checkoutButton.click()
+    await page.waitForLoadState()
 
-//     // Verify the pickup address is displayed
-//     await page.locator('input[type="email"]').fill('test@test.com')
-//     await page.getByText(/Continue as Guest/i).click()
+    // Verify the pickup address is displayed
+    await page.locator('input[type="email"]').fill('test@test.com')
+    await page.getByRole('button', {name: /Checkout as guest/i}).click()
+
+    // Confirm the email input toggles to show edit button on clicking "Checkout as guest"
+    const step0Card = page.locator("div[data-testid='sf-toggle-card-step-0']")
+    await expect(step0Card.getByRole('button', {name: /Edit/i})).toBeVisible()
 
 //     // Verify the pickup address is displayed
 //     await expect(page.getByText(/Burlington Retail Store/i)).toBeVisible()
