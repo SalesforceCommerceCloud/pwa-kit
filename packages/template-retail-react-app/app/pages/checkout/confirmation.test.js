@@ -260,7 +260,7 @@ describe('Account form', () => {
         // The key assertion is that the phone from the order's billing address
         // is correctly saved to the customer's phoneHome field during registration
         expect(savedCustomerData.phoneHome).toBe(mockOrder.billingAddress.phone)
-    })  
+    })
 
     test('Create Account form - successful submission results in redirect to the Account page even if shipping address is not saved', async () => {
         global.server.use(
@@ -289,4 +289,5 @@ describe('Account form', () => {
         await waitFor(() => {
             expect(window.location.pathname).toBe('/uk/en-GB/account')
         })
-    })      
+    })
+})
