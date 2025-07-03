@@ -54,7 +54,7 @@ test.skip('Registered shopper logged in through social retains persisted cart', 
     await expect(page.getByRole('heading', {name: /Floral Ruffle Top/i})).toBeVisible({
         timeout: 15000
     })
-    await page.getByRole('radio', {name: 'L', exact: true}).click()
+    await page.getByRole('radio', {name: 'M', exact: true}).click()
 
     await page.locator("button[data-testid='quantity-increment']").click()
 

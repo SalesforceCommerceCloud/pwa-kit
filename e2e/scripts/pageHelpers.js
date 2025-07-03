@@ -171,7 +171,7 @@ export const navigateToPDPDesktopSocial = async ({
 /**
  * Adds the `Floral Ruffle Top` product to the cart with the variant:
  * Colour: Cardinal Red Multi
- * Size: L
+ * Size: M
  *
  * @param {Object} options.page - Object that represents a tab/window in the browser provided by playwright
  * @param {Boolean} options.isMobile - Flag to indicate if device type is mobile or not, defaulted to false
@@ -186,7 +186,7 @@ export const addProductToCart = async ({page, isMobile = false}) => {
 
     // PDP
     await expect(page.getByRole('heading', {name: /Floral Ruffle Top/i})).toBeVisible()
-    await page.getByRole('radio', {name: 'L', exact: true}).click()
+    await page.getByRole('radio', {name: 'M', exact: true}).click()
 
     await page.locator("button[data-testid='quantity-increment']").click()
 
@@ -194,7 +194,7 @@ export const addProductToCart = async ({page, isMobile = false}) => {
     // So we need to look at the page URL to verify selected variants
     const updatedPageURL = await page.url()
     const params = updatedPageURL.split('?')[1]
-    expect(params).toMatch(/size=9LG/i)
+    expect(params).toMatch(/size=9MD/i)
     expect(params).toMatch(/color=JJ9DFXX/i)
     await page.getByRole('button', {name: /Add to Cart/i}).click()
 
@@ -276,7 +276,7 @@ export const validateOrderHistory = async ({page, a11y = {}}) => {
 
     await expect(page.getByRole('heading', {name: /Order Details/i})).toBeVisible()
     await expect(page.getByRole('heading', {name: /Floral Ruffle Top/i})).toBeVisible()
-    await expect(page.getByText(/Size: L/i)).toBeVisible()
+    await expect(page.getByText(/Size: M/i)).toBeVisible()
     if (checkA11y) {
         await runAccessibilityTest(page, [snapShotName, 'order-history-a11y-violations.json'])
     }
@@ -297,7 +297,7 @@ export const validateWishlist = async ({page, a11y = {}}) => {
 
     await expect(page.getByRole('heading', {name: /Floral Ruffle Top/i})).toBeVisible()
     await expect(page.getByText(/Colour: Cardinal Red Multi/i)).toBeVisible()
-    await expect(page.getByText(/Size: L/i)).toBeVisible()
+    await expect(page.getByText(/Size: M/i)).toBeVisible()
     if (checkA11y) {
         await runAccessibilityTest(page, [snapShotName, 'wishlist-violations.json'])
     }
@@ -671,7 +671,7 @@ export const wishlistFlow = async ({page, registeredUserCredentials, a11y = {}})
     // add product to wishlist
     await expect(page.getByRole('heading', {name: /Floral Ruffle Top/i})).toBeVisible()
 
-    await page.getByRole('radio', {name: 'L', exact: true}).click()
+    await page.getByRole('radio', {name: 'M', exact: true}).click()
     await page.getByRole('button', {name: /Add to Wishlist/i}).click()
 
     // wishlist

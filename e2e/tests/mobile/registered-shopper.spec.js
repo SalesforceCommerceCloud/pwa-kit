@@ -171,7 +171,7 @@ test('Registered shopper can add item to wishlist', async ({page}) => {
 
     // add product to wishlist
     await expect(page.getByRole('heading', {name: /Floral Ruffle Top/i})).toBeVisible()
-    await page.getByRole('radio', {name: 'L', exact: true}).click()
+    await page.getByRole('radio', {name: 'M', exact: true}).click()
     await page.getByRole('button', {name: /Add to Wishlist/i}).click()
 
     // wishlist

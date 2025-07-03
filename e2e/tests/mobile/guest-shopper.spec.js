@@ -108,7 +108,7 @@ test('Guest shopper can edit product item in cart', async ({page}) => {
     await expect(page.getByRole('link', {name: /Floral Ruffle Top/i})).toBeVisible()
 
     await expect(page.getByText(/Colour: Cardinal Red Multi/i)).toBeVisible()
-    await expect(page.getByText(/Size: L/i)).toBeVisible()
+    await expect(page.getByText(/Size: M/i)).toBeVisible()
 
     await page.getByRole('button', {name: 'Edit'}).click()
     await expect(page.getByTestId('product-view')).toBeVisible()
