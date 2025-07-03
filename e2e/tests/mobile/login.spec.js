@@ -49,7 +49,8 @@ test('Verify passwordless login request on mobile', async ({page}) => {
     expect(params.get('callback_uri')).toMatch(/.*\/passwordless-login-callback$/)
 })
 
-test('Verify password reset callback request on mobile', async ({page}) => {
+
+test('Verify password reset callback request on mobile (extra features enabled)', async ({page}) => {
     let interceptedRequest = null
 
     await page.route('**/mobify/slas/private/shopper/auth/v1/organizations/*/oauth2/password/reset', (route) => {
@@ -63,34 +64,67 @@ test('Verify password reset callback request on mobile', async ({page}) => {
     await page.locator('#email').scrollIntoViewIfNeeded()
     await page.fill('#email', config.PWA_E2E_USER_EMAIL)
 
-    await page.getByRole('button', {name: 'Password'}).scrollIntoViewIfNeeded()
     await page.getByRole('button', {name: 'Password'}).click()
-    
-    await page.getByRole('button', {name: 'Forgot password?'}).scrollIntoViewIfNeeded()
     await page.getByRole('button', {name: 'Forgot password?'}).click()
 
-    await page.locator('#email').scrollIntoViewIfNeeded()
     await page.fill('#email', config.PWA_E2E_USER_EMAIL)
-    
-    await page.getByRole('button', {name: 'Reset Password'}).scrollIntoViewIfNeeded()
-    await page.getByRole('button', {name: 'Reset Password'}).click()
-    
+    await page.getByRole('button', {name: /reset password/i}).click()
+
     await page.waitForResponse('**/mobify/slas/private/shopper/auth/v1/organizations/*/oauth2/password/reset')
-    
+
     expect(interceptedRequest).toBeTruthy()
     expect(interceptedRequest.method()).toBe('POST')
-    
+
     const postData = interceptedRequest.postData()
     expect(postData).toBeTruthy()
-    
+
     const params = new URLSearchParams(postData)
-    
+
     expect(params.get('user_id')).toBe(config.PWA_E2E_USER_EMAIL)
     expect(params.get('mode')).toBe('callback')
     expect(params.get('channel_id')).toBe('RefArchGlobal')
     expect(params.get('callback_uri')).toMatch(/.*\/reset-password-callback$/)
     expect(params.get('hint')).toBe('cross_device')
 })
+
+test('Verify password reset callback request on mobile when extra login features are not enabled', async ({page}) => {
+    let interceptedRequest = null
+
+    await page.route('**/mobify/proxy/api/shopper/auth/v1/organizations/*/oauth2/password/reset', (route) => {
+        interceptedRequest = route.request()
+        route.continue()
+    })
+
+    await page.goto(config.RETAIL_APP_HOME + '/login')
+    await answerConsentTrackingForm(page)
+
+    await page.locator('#email').scrollIntoViewIfNeeded()
+    await page.fill('#email', config.PWA_E2E_USER_EMAIL)
+
+    await page.getByRole('button', {name: 'Forgot password?'}).click()
+
+
+    await page.waitForSelector('form[data-testid="sf-auth-modal-form"] >> text=Reset Password')
+    await page.fill('form[data-testid="sf-auth-modal-form"] #email', config.PWA_E2E_USER_EMAIL)
+    await page.getByRole('button', {name: /reset password/i}).click()
+
+    await page.waitForResponse('**/mobify/proxy/api/shopper/auth/v1/organizations/*/oauth2/password/reset')
+
+    expect(interceptedRequest).toBeTruthy()
+    expect(interceptedRequest.method()).toBe('POST')
+
+    const postData = interceptedRequest.postData()
+    expect(postData).toBeTruthy()
+
+    const params = new URLSearchParams(postData)
+
+    expect(params.get('user_id')).toBe(config.PWA_E2E_USER_EMAIL)
+    expect(params.get('mode')).toBe('callback')
+    expect(params.get('channel_id')).toBe('RefArch')
+    expect(params.get('callback_uri')).toMatch(/.*\/reset-password-callback$/)
+    expect(params.get('hint')).toBe('cross_device')
+})
+
 
 test('Verify password reset request on mobile', async ({page}) => {
     let interceptedRequest = null
