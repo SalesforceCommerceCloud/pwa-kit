@@ -262,7 +262,7 @@ describe('Account form', () => {
         expect(savedCustomerData.phoneHome).toBe(mockOrder.billingAddress.phone)
     })
 
-    test('Create Account form - successful submission results in redirect to the Account page even if shipping address is not saved', async () => {
+    test('successful submission redirects to the Account page even if shipping address is not saved', async () => {
         global.server.use(
             rest.post('*/customers', (_, res, ctx) => {
                 return res(ctx.status(200), ctx.json(mockCustomer))
