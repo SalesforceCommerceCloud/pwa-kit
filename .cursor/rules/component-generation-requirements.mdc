@@ -1,0 +1,249 @@
+---
+description: USE when generating components 
+globs: "**/components/**"
+alwaysApply: false
+---
+# Create and Generate React Components in PWA Kit
+
+## Overview
+- Agent must follow the following steps to handle user request to create a new component:
+  - Agent must ask user to provide the component name, purpose, and desired functionality.
+  - Agent should determine the appropriate component type (presentational, container, form, etc.).
+  - Collected component information must be displayed and asked for confirmation.
+
+## Instructions to Create a New Component
+
+You need to create a new React component following established patterns and best practices.
+
+### 1. Create the Component File
+First, create a new file for your component. A good practice is to place it in the `app/components` directory.
+For example, to create a new "User Profile" component, you would create the file `app/components/user-profile/index.jsx`:
+
+```jsx
+import React from 'react'
+import {Box, Avatar, Text} from '@salesforce/retail-react-app/app/components/shared/ui'
+import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
+
+const UserProfile = ({userId}) => {
+    const {data: customer, loading, error} = useCurrentCustomer()
+    
+    if (loading) return <Box>Loading...</Box>
+    if (error) return <Box>Error loading user</Box>
+    if (!customer) return <Box>User not found</Box>
+    
+    return (
+        <Box p={{base: 4, md: 8}}>
+            <Avatar src={customer.avatar} alt={customer.firstName} size="lg" mb={4} />
+            <Text as="h2" fontSize="xl" fontWeight="bold" mb={2}>
+                {customer.firstName} {customer.lastName}
+            </Text>
+            <Text color="gray.600">
+                {customer.email}
+            </Text>
+        </Box>
+    )
+}
+
+export default UserProfile
+```
+
+### 2. Component Structure Guidelines
+- **Always use functional components** with React hooks
+- **Include proper error handling** for data fetching
+- **Use semantic HTML elements** and proper accessibility
+- **Follow naming conventions**: PascalCase for components, camelCase for props
+- **Include TypeScript interfaces** when using TypeScript
+
+### 3. File Organization
+```
+app/components/
+├── user-profile/
+│   ├── index.jsx         // Main component
+│   ├── user-profile.test.jsx // Tests
+│   └── user-profile.stories.jsx // Storybook
+```
+
+## Overriding an Existing Component
+
+Override components from the base template by creating files with the same name and path in your project's `overrides` directory.
+
+### 1. Identify the Component to Override
+The component in the base template is located at `app/components/component-name/index.jsx`.
+
+### 2. Create the Overriding File
+To override this component, create a new file with the exact same path inside your `overrides` directory: `overrides/app/components/component-name/index.jsx`.
+
+### 3. Customize the Component
+Now you can add your custom code to this new file. You can either copy the original content and modify it, extend the original component or create a new component from scratch.
+
+Here's an example of how you might add a custom feature to extend an existing component:
+
+```jsx
+// overrides/app/components/product-card/index.jsx
+import React from 'react'
+import {Box, Badge} from '@salesforce/retail-react-app/app/components/shared/ui'
+import {default as BaseProductCard} from '@salesforce/retail-react-app/app/components/product-card'
+
+const CustomProductCard = (props) => {
+    return (
+        <Box position="relative">
+            <Badge 
+                position="absolute" 
+                top={2} 
+                right={2} 
+                colorScheme="red" 
+                variant="solid"
+            >
+                New!
+            </Badge>
+            <BaseProductCard {...props} />
+        </Box>
+    )
+}
+
+// You must export the component as default
+export default CustomProductCard
+```
+
+In this example, we're importing the original `ProductCard` component and wrapping it with our own custom component to add a "New!" badge.
+
+## Component Best Practices
+
+### Component Structure
+- **Single Responsibility**: One main purpose per component
+- **Functional Components**: Always use hooks-based approach
+- **Error Handling**: Include loading and error states
+- **Accessibility**: Use semantic HTML and ARIA labels
+- **Type Safety**: Include TypeScript interfaces when possible
+
+### Naming Conventions
+- **Components**: PascalCase (e.g., `UserProfile`, `ProductCard`)
+- **Files**: kebab-case for directories (e.g., `user-profile/`)
+- **Props**: camelCase (e.g., `userId`, `productName`)
+- **Hooks**: camelCase starting with 'use' (e.g., `useUser`, `useProduct`)
+
+### File Organization
+- Place components in `app/components/` directory
+- Use index.jsx for main component file
+- Include test files with `.test.jsx` suffix
+- Include Storybook files with `.stories.jsx` suffix
+
+## Common Patterns to Avoid
+
+### Component Anti-patterns
+- **Class Components**: Use functional components with hooks
+- **Large Components**: Break down components over 200 lines
+- **Mixed Concerns**: Don't mix UI logic with business logic
+- **Poor Error Handling**: Always handle loading and error states
+- **Missing Accessibility**: Include proper ARIA labels and semantic HTML
+
+## Special Component Types
+
+The PWA Kit also has several "special" component types that you can create for different purposes:
+
+### Presentational Components
+Components that focus on displaying data without business logic:
+```jsx
+// app/components/product-image/index.jsx
+import React from 'react'
+import {Image} from '@salesforce/retail-react-app/app/components/shared/ui'
+
+const ProductImage = ({src, alt, ...props}) => {
+    return <Image src={src} alt={alt} {...props} />
+}
+
+export default ProductImage
+```
+
+### Container Components
+Components that handle data fetching and state management:
+```jsx
+// app/components/product-details-container/index.jsx
+import React from 'react'
+import {useProduct} from '@salesforce/retail-react-app/app/hooks/use-product'
+import ProductDetails from './product-details'
+
+const ProductDetailsContainer = ({productId}) => {
+    const {data: product, loading, error} = useProduct(productId)
+    
+    if (loading) return <div>Loading...</div>
+    if (error) return <div>Error loading product</div>
+    
+    return <ProductDetails product={product} />
+}
+
+export default ProductDetailsContainer
+```
+
+### Form Components
+Components that handle user input and form submission:
+```jsx
+// app/components/contact-form/index.jsx
+import React from 'react'
+import {Box, Button, Input, Textarea} from '@salesforce/retail-react-app/app/components/shared/ui'
+
+const ContactForm = ({onSubmit}) => {
+    const handleSubmit = (e) => {
+        e.preventDefault()
+        // Handle form submission
+        onSubmit(formData)
+    }
+    
+    return (
+        <Box as="form" onSubmit={handleSubmit}>
+            <Input name="name" placeholder="Your name" mb={4} />
+            <Input name="email" type="email" placeholder="Your email" mb={4} />
+            <Textarea name="message" placeholder="Your message" mb={4} />
+            <Button type="submit">Send Message</Button>
+        </Box>
+    )
+}
+
+export default ContactForm
+```
+
+## Testing Rules
+
+### Unit Tests
+- Test component renders with valid props
+- Test loading states
+- Test error states
+- Test component functionality
+- Test accessibility features
+
+### Integration Tests
+- Test with real data
+- Test component composition
+- Test user interactions
+- Test responsive behavior
+
+## Accessibility Rules
+
+### ARIA Guidelines
+- Add proper labels for interactive elements
+- Use semantic HTML elements
+- Include role attributes where needed
+- Test with screen readers
+
+### Keyboard Navigation
+- Ensure all interactive elements are keyboard accessible
+- Test tab order
+- Include focus indicators
+- Handle keyboard events
+
+## Error Handling Rules
+
+### Loading States
+```javascript
+if (loading) return <div>Loading...</div>;
+```
+
+### Error States
+```javascript
+if (error) return <div>Error: {error.message}</div>;
+```
+
+### Empty States
+```javascript
+if (!data) return <div>No data available</div>;
+```
