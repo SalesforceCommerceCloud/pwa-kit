@@ -68,10 +68,6 @@ export const routes = [
     },
     {{/if}}
     {{#if answers.project.hybrid}}
-    // remove routes from the base template that we want to go to SFRA
-    ..._routes.filter((route) => {
-        return !(route.path === '/cart' || route.path === '/checkout' || route.path === '*')
-    }),
     {
         path: '*',
         component: withRouter((props) => {
@@ -166,7 +162,7 @@ export const routes = [
     {
         path: '/store-locator',
         component: StoreLocator
-    }{{#if answers.project.hybrid}},
+    }{{#if !answers.project.hybrid}},
     {
         path: '*',
         component: PageNotFound

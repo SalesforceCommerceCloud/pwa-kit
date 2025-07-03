@@ -60,38 +60,6 @@ export const routes = [
         component: Home,
         exact: true
     },
-    {{#if answers.project.hybrid}}
-    {
-        path: '/home',
-        component: Home,
-        exact: true
-    },
-    {{/if}}
-    {{#if answers.project.hybrid}}
-    // remove routes from the base template that we want to go to SFRA
-    ..._routes.filter((route) => {
-        return !(route.path === '/cart' || route.path === '/checkout' || route.path === '*')
-    }),
-    {
-        path: '*',
-        component: withRouter((props) => {
-            const { location, history } = props
-            const urlParams = new URLSearchParams(location.search)
-
-            useEffect(() => {
-                const newURL = new URL(window.location)
-                if (!urlParams.has('redirected')) {
-                    newURL.searchParams.append('redirected', '1')
-                    window.location.href = newURL
-                }
-            }, [location.pathname])
-            if (urlParams.has('redirected')) {
-                return <PageNotFound {...props} />
-            }
-            return null
-        })
-    },
-    {{/if}}
     {
         path: '/login',
         component: Login,
@@ -140,13 +108,11 @@ export const routes = [
         component: SocialLoginRedirect,
         exact: true
     },
-    {{#if !answers.project.hybrid}}
     {
         path: '/cart',
         component: Cart,
         exact: true
     },
-    {{/if}}
     {
         path: '/product/:productId',
         component: ProductDetail
@@ -166,11 +132,11 @@ export const routes = [
     {
         path: '/store-locator',
         component: StoreLocator
-    }{{#if answers.project.hybrid}},
+    },
     {
         path: '*',
         component: PageNotFound
-    }{{/if}}
+    }
 ]
 
 export default () => {
