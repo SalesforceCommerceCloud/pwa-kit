@@ -133,6 +133,7 @@ export const AddToCartModal = () => {
                                     <Flex gridGap="4">
                                         <Box w="24" flex="none">
                                             <AspectRatio ratio="1">
+                                                {/* TODO: remove empty string fallback and use a placeholder image */}
                                                 <img
                                                     src={bundleImage?.link || ''}
                                                     alt={bundleImage?.alt || ''}
