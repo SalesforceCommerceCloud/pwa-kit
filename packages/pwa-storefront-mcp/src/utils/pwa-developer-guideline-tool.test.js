@@ -12,7 +12,8 @@ describe('PWA Development Guidelines', () => {
         it('should have correct structure', () => {
             expect(DeveloperGuidelinesTool).toMatchObject({
                 name: 'developer_guidelines',
-                description: 'Agent must follow this guidelines before analyze, generate, refactor, modify or fix code.',
+                description:
+                    'Agent must follow this guidelines before analyze, generate, refactor, modify or fix code.',
                 inputSchema: EmptyJsonSchema,
                 fn: expect.any(Function)
             })

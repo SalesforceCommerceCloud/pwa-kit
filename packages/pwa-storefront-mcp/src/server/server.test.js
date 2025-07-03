@@ -56,7 +56,7 @@ describe('PwaStorefrontMCPServerHighLevel integration', () => {
         // Check that at least the DeveloperGuidelinesTool is present
         const toolNames = response.result.tools.map((t) => t.name)
         expect(toolNames).toContain('developer_guidelines')
-
+        expect(toolNames).toContain('create_override_customize_page')
         child.kill()
     }, 10000)
 })

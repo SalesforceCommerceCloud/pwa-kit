@@ -10,15 +10,14 @@ const guidelinesText = () => `# Create and Override Pages in PWA Kit Composable 
 ## Overview
 
 - Agent must follow the following steps to handle user request to create a new page, override or customize an existing page:
-  - Agent must ask user to provide the page name, page route and desired data models that will be used in the page.
+  - Agent must ask user to provide the page name, page route and desired content of the page.
   - If Extensibility is enabled and page is available to override. Agent should ask user if they want to override the page. .
-- Collected page name, page route and desired data models must be displayed and asked for confirmation.
-- Find and use best matching hooks from \`node_modules/@salesforce/retail-react-app/app/hooks\` and \`node_modules/@salesforce/commerce-sdk-react/hooks\` to fetch and mutate data.
+- Collected page name, page route and desired content must be displayed and asked for confirmation.
 
 ## Instruction to verify if Extensibility is Enabled
 
 - Extensibility is enabled if ccExtensibility.extends and ccExtensibility.overridesDir is configured in package.json.
-- Analyze and infer routes and page components listed in \`@salesforce/retail-react-app/app/routes\` to determine if the page asked by user can be overridden.
+- Analyze routes and page components listed in \`node_modules/@salesforce/retail-react-app/app\` to determine if the page asked by user can be overridden.
   - If the page route is not listed, we cannot override the page.
   - If the page route is listed, agent should ask user if they want to override the page.
 
@@ -80,7 +79,7 @@ Now, if you run your development server and navigate to \`/contact-us\`, you wil
 
 ## Overriding an Existing Page
 
-Override files from the base template (\`@salesforce/retail-react-app\`) by creating files with the same name and path in your project's \`overrides\` directory.
+Override files from the base template (\`node_modules/@salesforce/retail-react-app\`) by creating files with the same name and path in your project's \`overrides\` directory.
 
 Let's say you want to customize the Product Detail Page (PDP).
 
@@ -138,13 +137,11 @@ import {EmptyJsonSchema} from './utils'
 
 export default {
     name: 'create_override_customize_page',
-    description: `Agent must follow this guide to create a new page, orverride or customize an existing page. Agent must ask questions to clarify the page name, route, content, desired data models to be used in the page and confirm should a new page be created or override an existing page before proceeding.`,
+    description: `Agent must follow this guide to create a new page, orverride or customize an existing page. Agent must ask questions to clarify the page name, route, content, desired page content.`,
     inputSchema: EmptyJsonSchema,
     fn: async () => {
         return {
-            content: [
-                {type: 'text', text: guidelinesText()}
-            ]
+            content: [{type: 'text', text: guidelinesText()}]
         }
     }
 }
