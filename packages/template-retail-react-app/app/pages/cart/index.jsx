@@ -615,7 +615,7 @@ const Cart = () => {
                                             {isPickupOrder ? (
                                                 <Text fontWeight="bold">
                                                     <FormattedMessage
-                                                        defaultMessage="Pickup in Store ({storeName})"
+                                                        defaultMessage="Pick Up in Store ({storeName})"
                                                         id="cart.order_type.pickup_in_store"
                                                         values={{
                                                             storeName

@@ -480,7 +480,7 @@
   "cart.order_type.pickup_in_store": [
     {
       "type": 0,
-      "value": "Pickup in Store ("
+      "value": "Pick Up in Store ("
     },
     {
       "type": 1,
@@ -826,7 +826,7 @@
   "checkout_confirmation.message.store_info_unavailable": [
     {
       "type": 0,
-      "value": "Store information not available"
+      "value": "Store information isn't available"
     }
   ],
   "checkout_confirmation.message.will_email_shortly": [
@@ -2964,13 +2964,13 @@
   "product_view.error.select_pickup_in_store": [
     {
       "type": 0,
-      "value": "Please select 'Pickup in Store' to match the shipping method for your other items."
+      "value": "Select 'Pick Up in Store' to match the shipping method for your other items."
     }
   ],
   "product_view.error.select_ship_to_address": [
     {
       "type": 0,
-      "value": "Please select 'Ship to Address' to match the shipping method for your other items."
+      "value": "Select 'Ship to Address' to match the shipping method for your other items."
     }
   ],
   "product_view.label.assistive_msg.quantity_decrement": [
@@ -3002,13 +3002,13 @@
   "product_view.label.pickup_in_select_store_prefix": [
     {
       "type": 0,
-      "value": "Pickup in"
+      "value": "Pick Up in"
     }
   ],
   "product_view.label.pickup_in_store": [
     {
       "type": 0,
-      "value": "Pickup in Store"
+      "value": "Pick Up in Store"
     }
   ],
   "product_view.label.quantity": [
@@ -3579,6 +3579,10 @@
       "value": "distance"
     },
     {
+      "type": 0,
+      "value": " "
+    },
+    {
       "type": 1,
       "value": "distanceUnit"
     },
@@ -3608,25 +3612,25 @@
   "store_locator.error.agree_to_share_your_location": [
     {
       "type": 0,
-      "value": "Please agree to share your location"
+      "value": "Please agree to share your location."
     }
   ],
   "store_locator.error.items_in_basket": [
     {
       "type": 0,
-      "value": "Sorry, you have items in your basket. Please remove them to change the selected store."
+      "value": "Sorry, you have items in your basket. Remove them to change the selected store."
     }
   ],
   "store_locator.error.please_enter_a_postal_code": [
     {
       "type": 0,
-      "value": "Please enter a postal code."
+      "value": "Enter a postal code."
     }
   ],
   "store_locator.error.please_select_a_country": [
     {
       "type": 0,
-      "value": "Please select a country."
+      "value": "Select a country."
     }
   ],
   "store_locator.field.placeholder.enter_postal_code": [

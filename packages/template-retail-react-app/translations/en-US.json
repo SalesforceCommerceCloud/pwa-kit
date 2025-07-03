@@ -190,7 +190,7 @@
     "defaultMessage": "Delivery"
   },
   "cart.order_type.pickup_in_store": {
-    "defaultMessage": "Pickup in Store ({storeName})"
+    "defaultMessage": "Pick Up in Store ({storeName})"
   },
   "cart.product_edit_modal.modal_label": {
     "defaultMessage": "Edit modal for {productName}"
@@ -314,7 +314,7 @@
     "description": "# item(s) in order"
   },
   "checkout_confirmation.message.store_info_unavailable": {
-    "defaultMessage": "Store information not available"
+    "defaultMessage": "Store information isn't available"
   },
   "checkout_confirmation.message.will_email_shortly": {
     "defaultMessage": "We will send an email to <b>{email}</b> with your confirmation number and receipt shortly."
@@ -1265,10 +1265,10 @@
     "defaultMessage": "No valid store or inventory found for pickup"
   },
   "product_view.error.select_pickup_in_store": {
-    "defaultMessage": "Please select 'Pickup in Store' to match the shipping method for your other items."
+    "defaultMessage": "Select 'Pick Up in Store' to match the shipping method for your other items."
   },
   "product_view.error.select_ship_to_address": {
-    "defaultMessage": "Please select 'Ship to Address' to match the shipping method for your other items."
+    "defaultMessage": "Select 'Ship to Address' to match the shipping method for your other items."
   },
   "product_view.label.assistive_msg.quantity_decrement": {
     "defaultMessage": "Decrement Quantity for {productName}"
@@ -1280,10 +1280,10 @@
     "defaultMessage": "Delivery:"
   },
   "product_view.label.pickup_in_select_store_prefix": {
-    "defaultMessage": "Pickup in"
+    "defaultMessage": "Pick Up in"
   },
   "product_view.label.pickup_in_store": {
-    "defaultMessage": "Pickup in Store"
+    "defaultMessage": "Pick Up in Store"
   },
   "product_view.label.quantity": {
     "defaultMessage": "Quantity"
@@ -1515,22 +1515,22 @@
     "defaultMessage": "Phone: {phone}"
   },
   "store_locator.description.viewing_near_postal_code": {
-    "defaultMessage": "Viewing stores within {distance}{distanceUnit} of {postalCode} in {countryName}"
+    "defaultMessage": "Viewing stores within {distance} {distanceUnit} of {postalCode} in {countryName}"
   },
   "store_locator.description.viewing_near_your_location": {
     "defaultMessage": "Viewing stores near your location"
   },
   "store_locator.error.agree_to_share_your_location": {
-    "defaultMessage": "Please agree to share your location"
+    "defaultMessage": "Please agree to share your location."
   },
   "store_locator.error.items_in_basket": {
-    "defaultMessage": "Sorry, you have items in your basket. Please remove them to change the selected store."
+    "defaultMessage": "Sorry, you have items in your basket. Remove them to change the selected store."
   },
   "store_locator.error.please_enter_a_postal_code": {
-    "defaultMessage": "Please enter a postal code."
+    "defaultMessage": "Enter a postal code."
   },
   "store_locator.error.please_select_a_country": {
-    "defaultMessage": "Please select a country."
+    "defaultMessage": "Select a country."
   },
   "store_locator.field.placeholder.enter_postal_code": {
     "defaultMessage": "Enter postal code"

@@ -716,7 +716,7 @@ const ProductView = forwardRef(
                                                             }
                                                         >
                                                             <FormattedMessage
-                                                                defaultMessage="Pickup in Store"
+                                                                defaultMessage="Pick Up in Store"
                                                                 id="product_view.label.pickup_in_store"
                                                             />
                                                         </Radio>
@@ -789,7 +789,7 @@ const ProductView = forwardRef(
                                                         data-testid="pickup-select-store-msg"
                                                     >
                                                         <FormattedMessage
-                                                            defaultMessage="Pickup in "
+                                                            defaultMessage="Pick Up in "
                                                             id="product_view.label.pickup_in_select_store_prefix"
                                                         />{' '}
                                                         <Link

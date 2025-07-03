@@ -381,7 +381,7 @@ const ProductDetail = () => {
                         formatMessage({
                             id: 'product_view.error.select_ship_to_address',
                             defaultMessage:
-                                "Please select 'Ship to Address' to match the shipping method for your other items."
+                                "Select 'Ship to Address' to match the shipping method for your other items."
                         })
                     )
                 }
@@ -390,7 +390,7 @@ const ProductDetail = () => {
                         formatMessage({
                             id: 'product_view.error.select_pickup_in_store',
                             defaultMessage:
-                                "Please select 'Pickup in Store' to match the shipping method for your other items."
+                                "Select 'Pick Up in Store' to match the shipping method for your other items."
                         })
                     )
                 }
@@ -507,7 +507,7 @@ const ProductDetail = () => {
                         formatMessage({
                             id: 'product_view.error.select_ship_to_address',
                             defaultMessage:
-                                "Please select 'Ship to Address' to match the shipping method for your other items."
+                                "Select 'Ship to Address' to match the shipping method for your other items."
                         })
                     )
                 } else if (
@@ -519,7 +519,7 @@ const ProductDetail = () => {
                         formatMessage({
                             id: 'product_view.error.select_pickup_in_store',
                             defaultMessage:
-                                "Please select 'Pickup in Store' to match the shipping method for your other items."
+                                "Select 'Pick Up in Store' to match the shipping method for your other items."
                         })
                     )
                 }
