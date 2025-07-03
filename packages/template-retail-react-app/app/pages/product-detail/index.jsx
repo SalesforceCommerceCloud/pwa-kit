@@ -163,9 +163,9 @@ const ProductDetail = () => {
     const isProductASet = product?.type.set
     const isProductABundle = product?.type.bundle
 
-    let bundleChildVariantIds = ''
+    let bundleChildProductIds = ''
     if (isProductABundle)
-        bundleChildVariantIds = Object.keys(childProductSelection)
+        bundleChildProductIds = Object.keys(childProductSelection)
             ?.map(
                 (key) =>
                     childProductSelection[key].variant?.productId ||
@@ -176,14 +176,14 @@ const ProductDetail = () => {
     const {data: bundleChildrenData} = useProducts(
         {
             parameters: {
-                ids: bundleChildVariantIds,
+                ids: bundleChildProductIds,
                 allImages: false,
                 expand: ['availability', 'variations'],
                 select: '(data.(id,inventory,master))'
             }
         },
         {
-            enabled: bundleChildVariantIds?.length > 0,
+            enabled: bundleChildProductIds?.length > 0,
             keepPreviousData: true
         }
     )
