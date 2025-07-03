@@ -203,6 +203,11 @@ export const STORE_LOCATOR_DEFAULT_COUNTRY_CODE = 'DE'
 export const STORE_LOCATOR_DEFAULT_PAGE_SIZE = 10
 export const STORE_LOCATOR_NUM_STORES_PER_REQUEST_API_MAX = 200 // This is an API limit and is therefore not configurable
 
+// Make sure to first set STORE_LOCATOR_IS_ENABLED to allow for pick up in store
+// before setting MULTISHIP_FOR_PICKUP_IS_ENABLED
+export const MULTISHIP_FOR_PICKUP_IS_ENABLED = false
+export const MULTISHIP_FOR_DELIVERY_IS_ENABLED = false
+
 export const DEFAULT_DNT_STATE = true
 // Constants for shopper context
 // Supported non-string field types used in SHOPPER_CONTEXT_SEARCH_PARAMS below.
