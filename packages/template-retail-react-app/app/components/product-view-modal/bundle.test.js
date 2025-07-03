@@ -17,6 +17,7 @@ import {
     mockProductBundle
 } from '@salesforce/retail-react-app/app/mocks/product-bundle'
 import {rest} from 'msw'
+import {mockStandardProductOrderable} from '@salesforce/retail-react-app/app/mocks/standard-product'
 
 const MockComponent = ({updateCart}) => {
     const {isOpen, onOpen, onClose} = useDisclosure()
@@ -199,5 +200,60 @@ test('bundle product view modal disables update button when quantity exceeds chi
         expect(within(swingTankProductView).getAllByText('L')).toHaveLength(2)
         expect(updateBtn).toBeDisabled()
         expect(screen.getByText('Only 1 left!')).toBeInTheDocument()
+    })
+})
+
+test('modal displays standard product child name when bundle contains a standard product', async () => {
+    // Create a bundle with a standard product as the first child
+    const bundleWithStandardChild = {
+        ...mockBundledProductItemsVariant,
+        bundledProductItems: [
+            {
+                ...mockBundledProductItemsVariant.bundledProductItems[0],
+                productId: mockStandardProductOrderable.id,
+                productName: mockStandardProductOrderable.name,
+                itemText: mockStandardProductOrderable.name
+            },
+            ...mockBundledProductItemsVariant.bundledProductItems.slice(1)
+        ]
+    }
+
+    // Custom MSW handler for this test
+    global.server.use(
+        rest.get('*/products', (req, res, ctx) => {
+            const ids = req.url.searchParams.get('ids')
+            if (ids && ids.includes(mockStandardProductOrderable.id)) {
+                return res(ctx.json({ data: [mockStandardProductOrderable], total: 1 }))
+            }
+            return res(ctx.json(mockProductBundleWithVariants))
+        })
+    )
+
+    const MockComponent = ({updateCart}) => {
+        const {isOpen, onOpen, onClose} = useDisclosure()
+        return (
+            <div>
+                <button onClick={onOpen}>Open Modal</button>
+                <BundleProductViewModal
+                    updateCart={updateCart}
+                    onOpen={onOpen}
+                    onClose={onClose}
+                    isOpen={isOpen}
+                    product={bundleWithStandardChild}
+                />
+            </div>
+        )
+    }
+    MockComponent.propTypes = { updateCart: PropTypes.func }
+
+    renderWithProviders(<MockComponent />)
+    await waitFor(() => {
+        const trigger = screen.getByText(/open modal/i)
+        fireEvent.click(trigger)
+    })
+
+    // Assert the standard product child name is rendered
+    await waitFor(() => {
+        expect(screen.getAllByText(mockStandardProductOrderable.name)[0]).toBeInTheDocument()
     })
 })
