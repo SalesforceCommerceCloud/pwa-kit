@@ -6,6 +6,7 @@
  */
 import CreateNewComponentTool from './create-new-component-tool.js'
 import * as fs from 'fs/promises'
+import path from 'path'
 
 // Mock fs/promises to avoid actual file operations
 jest.mock('fs/promises', () => ({
@@ -93,7 +94,9 @@ describe('CreateNewComponentTool', () => {
             })
         ).resolves.toMatch(/Updated .* to presentational component for product/)
         expect(fs.writeFile).toHaveBeenCalledWith(
-            expect.stringMatching(/.*product-display[\/\\]index\.jsx$/),
+            expect.stringMatching(
+                new RegExp(`.*${path.sep}product-display${path.sep}index\\.jsx$`)
+            ),
             expect.stringContaining('ProductDisplay'),
             expect.anything()
         )
@@ -112,7 +115,7 @@ describe('CreateNewComponentTool', () => {
             })
         ).resolves.toMatch(/Updated .* to presentational component for product/)
         expect(fs.writeFile).toHaveBeenCalledWith(
-            expect.stringMatching(/.*product-list[\/\\]index\.jsx$/),
+            expect.stringMatching(new RegExp(`.*${path.sep}product-list${path.sep}index\\.jsx$`)),
             expect.stringContaining('ProductList'),
             expect.anything()
         )
