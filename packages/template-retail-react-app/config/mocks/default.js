@@ -24,11 +24,9 @@ const commerceAgentSettings = {
     siteId: 'RefArchGlobal'
 }
 
-const commerceAgentSettingsString = JSON.stringify(commerceAgentSettings)
-
 module.exports = {
     app: {
-        commerceAgent: commerceAgentSettingsString,
+        commerceAgent: commerceAgentSettings,
         url: {
             locale: 'path',
             site: 'path',

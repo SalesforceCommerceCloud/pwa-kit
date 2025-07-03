@@ -93,7 +93,7 @@ const formatSuggestions = (searchSuggestions, input) => {
  */
 const Search = (props) => {
     const config = getConfig()
-    const {enabled, askAgentOnSearch} = JSON.parse(config.app.commerceAgent)
+    const {enabled, askAgentOnSearch} = config.app.commerceAgent
     const askAgentOnSearchEnabled = isAskAgentOnSearchEnabled(enabled, askAgentOnSearch)
     const [isOpen, setIsOpen] = useState(false)
     const [searchQuery, setSearchQuery] = useState('')
