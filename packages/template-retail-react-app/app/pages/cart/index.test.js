@@ -1299,7 +1299,33 @@ describe('Unavailable products tests', function () {
             {
                 path: '*/baskets/:basket/items/:itemId',
                 method: 'delete',
-                res: () => {}
+                res: () => {
+                    return {
+                        ...mockBaskets.baskets[0],
+                        productItems: [
+                            {
+                                adjustedTax: 3.05,
+                                basePrice: 12.8,
+                                bonusProductLineItem: false,
+                                gift: false,
+                                itemId: '7b1a03848f0807f99f37ea93e4',
+                                itemText: 'Worn Gold Dangle Earring',
+                                price: 64,
+                                priceAfterItemDiscount: 64,
+                                priceAfterOrderDiscount: 64,
+                                productId: '013742335262M',
+                                productName: 'Worn Gold Dangle Earring',
+                                quantity: 5,
+                                shipmentId: 'me',
+                                shippingItemId: '247699907591b6b94c9f38cf08',
+                                tax: 3.05,
+                                taxBasis: 64,
+                                taxClassId: 'standard',
+                                taxRate: 0.05
+                            }
+                        ]
+                    }
+                }
             }
         ])
         await user.click(removeBtn)
