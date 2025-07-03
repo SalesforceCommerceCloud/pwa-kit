@@ -5,24 +5,19 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-const guidelinesText = (pageName, pageRoute, isCreateNewPage) => `# Create and Override Pages in PWA Kit Composable Storefront
+const guidelinesText = () => `# Create and Override Pages in PWA Kit Composable Storefront
 
 ## Overview
 
-- This document defines the behavior agents must follow when create or override or customize a page on PWA Kit projects.
-- All user requests must be followed by the following steps:
-  - Agent must ask user to provide the page name and route.
-  - Agent should ask user if they want to override the page, if Extensibility/Page Override is enabled and page is available to override.
-- All parameters must be collected before proceeding. Collected parameters must be displayed to user for confirmation.
+- Agent must follow the following steps to handle user request to create a new page, override or customize an existing page:
+  - Agent must ask user to provide the page name, page route and desired data models that will be used in the page.
+  - If Extensibility is enabled and page is available to override. Agent should ask user if they want to override the page. .
+- Collected page name, page route and desired data models must be displayed and asked for confirmation.
+- Find and use best matching hooks from \`node_modules/@salesforce/retail-react-app/app/hooks\` and \`node_modules/@salesforce/commerce-sdk-react/hooks\` to fetch and mutate data.
 
-User's input:
-- **Page Name**: ${pageName}
-- **Page Route**: ${pageRoute}
-- **Is Create New Page**: ${isCreateNewPage}
+## Instruction to verify if Extensibility is Enabled
 
-## Instruction to verify if Extensibility/Page Override is Enabled
-
-- Extensibility/Page Override is enabled if ccExtensibility.extends and ccExtensibility.overridesDir is configured in package.json.
+- Extensibility is enabled if ccExtensibility.extends and ccExtensibility.overridesDir is configured in package.json.
 - Analyze and infer routes and page components listed in \`@salesforce/retail-react-app/app/routes\` to determine if the page asked by user can be overridden.
   - If the page route is not listed, we cannot override the page.
   - If the page route is listed, agent should ask user if they want to override the page.
@@ -40,15 +35,18 @@ For example, to create a new "Contact Us" page, you would create the file \`app/
 \`\`\`jsx
 import React from 'react'
 import {Box, Heading, Text} from '@salesforce/retail-react-app/app/components/shared/ui'
+import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
 
 const ContactUs = () => {
+    const {data: customer} = useCurrentCustomer()
+
     return (
         <Box p={{base: 4, md: 8}}>
             <Heading as="h1" size="xl" mb={4}>
                 Contact Us
             </Heading>
             <Text>
-                If you have any questions, please feel free to reach out to us.
+                Hello \${customer?.firstName}, If you have any questions, please feel free to reach out to us.
             </Text>
             {/* Add your contact form or other information here */}
         </Box>
@@ -136,31 +134,16 @@ The PWA Kit also has several "special" components that you can override to custo
 
 You can override these in the same way, by creating files with the same name and path in your \`overrides/app/components\` directory.`
 
+import {EmptyJsonSchema} from './utils'
+
 export default {
     name: 'create_override_customize_page',
-    description: `Agent must follow this guide and developer guidelines to create a new page, orverride or customize an existing page. Agent must ask questions to clarify the page name, route, content and confirm should a new page be created or override an existing page before creating or orverriding the page.`,
-    inputSchema: {
-        type: 'object',
-        properties: {
-            pageName: {
-                type: 'string',
-                description: 'The name of the page (e.g., "Contact Us", "About Us", "Product Detail")'
-            },
-            pageRoute: {
-                type: 'string',
-                description: 'The URL path for the page (e.g., "/contact-us", "/about-us", "/product-detail")'
-            },
-            isCreateNewPage: {
-                type: 'boolean',
-                description: 'Whether to create a new page (true) or customize an existing page (false). If Extensibility/Page Override is disabled, it will be false and no need to ask user.'
-            }
-        },
-        required: ['pageName', 'pageRoute', 'isCreateNewPage']
-    },
-    fn: async ({pageName, pageRoute, isCreateNewPage}) => {
+    description: `Agent must follow this guide to create a new page, orverride or customize an existing page. Agent must ask questions to clarify the page name, route, content, desired data models to be used in the page and confirm should a new page be created or override an existing page before proceeding.`,
+    inputSchema: EmptyJsonSchema,
+    fn: async () => {
         return {
             content: [
-                {type: 'text', text: guidelinesText(pageName, pageRoute, isCreateNewPage)}
+                {type: 'text', text: guidelinesText()}
             ]
         }
     }

@@ -91,7 +91,7 @@ This document defines the guidelines agents must follow in the development of Sa
 ### PWA Kit Storefront Development
 - Start development with Retail React App sample codebase and tooling.
 - Use included npm scripts for automating development tasks like build, test, and lint.
-- Access Shopper data through the commerce-sdk-react hooks to fetch, cache, and mutate utilizing Salesforce Commerce API (SLAS) and OCAPI.
+- Access Shopper data through \`node_modules/@salesforce/retail-react-app/app/hooks\` or \`node_modules/@salesforce/commerce-sdk-react/hooks\` hooks to fetch, cache, and mutate utilizing Salesforce Commerce API (SLAS) and OCAPI.
 - Use Chakra UI and existing components when available.
 - Create simple, functional, modular, reusable components.
 - Use the React Helmet library to modify the HTML tags in Document, such as <head>.
