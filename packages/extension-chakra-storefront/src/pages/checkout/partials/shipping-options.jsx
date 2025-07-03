@@ -143,7 +143,7 @@ export default function ShippingOptions() {
                                                 (opt) => (
                                                     <RadioGroup.Item value={opt.id} key={opt.id}>
                                                         <RadioGroup.ItemHiddenInput />
-                                                        <RadioGroup.ItemIndicator />
+                                                        <RadioGroup.ItemIndicator colorPalette="blue" />
                                                         <Flex justify="space-between" w="full">
                                                             <HStack>
                                                                 <Box>
