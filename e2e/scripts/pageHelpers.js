@@ -543,7 +543,7 @@ export const registeredUserHappyPath = async ({page, registeredUserCredentials, 
     // cart
     await page.getByLabel(/My cart/i).click()
 
-    await expect(page.getByRole('link', {name: 'Belted Ribbed Boat Neck Sweater'})).toBeVisible()
+    await expect(page.getByRole('link', {name: /Belted Ribbed Boat Neck Sweater/i})).toBeVisible()
 
     await page.getByRole('link', {name: 'Proceed to Checkout'}).click()
 
