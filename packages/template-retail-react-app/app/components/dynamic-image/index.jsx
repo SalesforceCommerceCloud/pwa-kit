@@ -20,13 +20,14 @@ import {getResponsiveImageAttributes} from '@salesforce/retail-react-app/app/uti
  * <DynamicImage src="http://example.com/image.jpg[?sw={width}&q=60]" widths={['50vw', '100vw', '500px']} />
  * @see {@link https://help.salesforce.com/s/articleView?id=cc.b2c_image_transformation_service.htm&type=5}
  */
-const DynamicImage = ({src, widths, imageProps, as, ...rest}) => {
+const DynamicImage = ({src, widths, densities, imageProps, as, ...rest}) => {
     const Component = as ? as : Image
     const theme = useTheme()
 
     const responsiveImageProps = useMemo(
-        () => getResponsiveImageAttributes({src, widths, breakpoints: theme.breakpoints}),
-        [src, widths, theme.breakpoints]
+        () =>
+            getResponsiveImageAttributes({src, widths, densities, breakpoints: theme.breakpoints}),
+        [src, widths, densities, theme.breakpoints]
     )
 
     return (
@@ -45,6 +46,10 @@ DynamicImage.propTypes = {
      * Image widths relative to the breakpoints, whose units can either be px or vw or unit-less. They will be mapped to the corresponding `sizes` and `srcSet`.
      */
     widths: PropTypes.oneOfType([PropTypes.array, PropTypes.object]),
+    /**
+     * Image density factors to apply relative to the breakpoints. Will be mapped to the corresponding `srcSet`.
+     */
+    densities: PropTypes.array,
     /**
      * Props to pass to the inner image component
      */

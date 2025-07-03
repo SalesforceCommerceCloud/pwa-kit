@@ -92,6 +92,7 @@ import {
     STALE_WHILE_REVALIDATE,
     PRODUCT_LIST_IMAGE_VIEW_TYPE,
     PRODUCT_LIST_SELECTABLE_ATTRIBUTE_ID,
+    PRODUCT_LIST_IMAGE_RESPONSIVE_DENSITIES,
     STORE_LOCATOR_IS_ENABLED
 } from '@salesforce/retail-react-app/app/constants'
 import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
@@ -660,10 +661,13 @@ const ProductList = (props) => {
                                                                       '20vw',
                                                                       '25vw'
                                                                   ],
-                                                                  // The first two product images should render eagerly to
-                                                                  // ensure prioritized loading for above-the-fold images
-                                                                  // on mobile.
-                                                                  ...(index < 2
+                                                                  densities:
+                                                                      PRODUCT_LIST_IMAGE_RESPONSIVE_DENSITIES,
+                                                                  // For the sake of LCP, load the first three product images
+                                                                  // eagerly to ensure prioritized loading for all plus one
+                                                                  // above-the-fold images on mobile and most above-the-fold
+                                                                  // images on tablet and desktop.
+                                                                  ...(index < 3
                                                                       ? {
                                                                             imageProps: {
                                                                                 loading: 'eager'

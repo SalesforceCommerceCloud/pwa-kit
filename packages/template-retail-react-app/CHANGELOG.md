@@ -15,6 +15,7 @@
 - Provide support for partial hydration [#2696](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2696)
 - Show Automatic Bonus Products on Cart Page [#2704](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2704)
 - Support Standard Products [2697](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2697)
+- Use `<picture>` element for responsive images and support influencing density factors [#2724](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2724)
 
 
 ## v6.1.0 (May 22, 2025)

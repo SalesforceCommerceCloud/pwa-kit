@@ -29,6 +29,7 @@ export const RECENT_SEARCH_MIN_LENGTH = 3
 // Constants for product list page
 export const PRODUCT_LIST_IMAGE_VIEW_TYPE = 'medium'
 export const PRODUCT_LIST_SELECTABLE_ATTRIBUTE_ID = 'color'
+export const PRODUCT_LIST_IMAGE_RESPONSIVE_DENSITIES = [1]
 
 // Constants for product tile page
 export const PRODUCT_TILE_IMAGE_VIEW_TYPE = 'medium'

@@ -21,11 +21,12 @@ const buildSrcSet = (pxWidths) => {
     const uniqueArray = [...new Set(pxWidths)]
     const widths = uniqueArray.sort()
 
-    return widths
-        .map((width) => {
-            return `${urlWithWidth(width)} ${width}w, ${urlWithWidth(width * 2)} ${width * 2}w`
-        })
-        .join(', ')
+    const result = widths.reduce((acc, width) => {
+        acc.add(`${urlWithWidth(width)} ${width}w`)
+        acc.add(`${urlWithWidth(width * 2)} ${width * 2}w`)
+        return acc
+    }, new Set())
+    return [...result].join(', ')
 }
 const urlWithWidth = (width) => getSrc(disImageURL.withOptionalParams, width)
 
@@ -166,5 +167,231 @@ test('passing in theme breakpoints', () => {
         src: disImageURL.withoutOptionalParams,
         sizes: '(min-width: 320px) 360px, 100vw',
         srcSet: buildSrcSet([320, 360])
+    })
+})
+
+describe('densities', () => {
+    test('passing invalid density factors', () => {
+        const props = getResponsiveImageAttributes({
+            src: disImageURL.withOptionalParams,
+            widths: ['50vw', '50vw'],
+            densities: 'invalid'
+        })
+        expect(props).toStrictEqual({
+            src: disImageURL.withoutOptionalParams,
+            sizes: '(min-width: 30em) 50vw, 50vw',
+            srcSet: buildSrcSet([240, 384, 496, 640, 768])
+        })
+    })
+
+    test('passing simple density factors array', () => {
+        const props = getResponsiveImageAttributes({
+            src: disImageURL.withOptionalParams,
+            widths: ['50vw', '50vw'],
+            densities: [1, 2, 3]
+        })
+        expect(props).toStrictEqual({
+            src: disImageURL.withoutOptionalParams,
+            sizes: '(min-width: 30em) 50vw, 50vw',
+            srcSet: [240, 384 * 2, 496 * 3, 640 * 3, 768 * 3]
+                .map((width) => `${urlWithWidth(width)} ${width}w`)
+                .join(', ')
+        })
+    })
+
+    test('passing simple density factors object', () => {
+        const props = getResponsiveImageAttributes({
+            src: disImageURL.withOptionalParams,
+            widths: ['50vw', '50vw'],
+            densities: {
+                base: 1,
+                sm: 2,
+                md: 3
+            }
+        })
+        expect(props).toStrictEqual({
+            src: disImageURL.withoutOptionalParams,
+            sizes: '(min-width: 30em) 50vw, 50vw',
+            srcSet: [240, 384 * 2, 496 * 3, 640 * 3, 768 * 3]
+                .map((width) => `${urlWithWidth(width)} ${width}w`)
+                .join(', ')
+        })
+    })
+
+    test('passing invalid simple density factors array', () => {
+        const props = getResponsiveImageAttributes({
+            src: disImageURL.withOptionalParams,
+            widths: ['50vw', '50vw'],
+            densities: ['invalid', NaN]
+        })
+        expect(props).toStrictEqual({
+            src: disImageURL.withoutOptionalParams,
+            sizes: '(min-width: 30em) 50vw, 50vw',
+            srcSet: buildSrcSet([240, 384, 496, 640, 768])
+        })
+    })
+
+    test('passing invalid simple density factors object', () => {
+        const props = getResponsiveImageAttributes({
+            src: disImageURL.withOptionalParams,
+            widths: ['50vw', '50vw'],
+            densities: {
+                base: 'invalid',
+                sm: NaN,
+                md: ['invalid']
+            }
+        })
+        expect(props).toStrictEqual({
+            src: disImageURL.withoutOptionalParams,
+            sizes: '(min-width: 30em) 50vw, 50vw',
+            srcSet: buildSrcSet([240, 384, 496, 640, 768])
+        })
+    })
+
+    test('passing density factor tuples array', () => {
+        const props = getResponsiveImageAttributes({
+            src: disImageURL.withOptionalParams,
+            widths: ['50vw', '50vw'],
+            densities: [[1, 0.5], 2, [3, 2.5], [4]]
+        })
+        expect(props).toStrictEqual({
+            src: disImageURL.withoutOptionalParams,
+            sizes: '(min-width: 30em) 50vw, 50vw',
+            srcSet: [
+                [240, 120],
+                [768, 768],
+                [1488, 1240],
+                [2560, 2560],
+                [3072, 3072]
+            ]
+                .map(([w1, w2]) => `${urlWithWidth(w2)} ${w1}w`)
+                .join(', ')
+        })
+    })
+
+    test('passing density factor tuples object', () => {
+        const props = getResponsiveImageAttributes({
+            src: disImageURL.withOptionalParams,
+            widths: ['50vw', '50vw'],
+            densities: {
+                base: [1, 0.5],
+                sm: 2,
+                md: [3, 2.5],
+                lg: [4]
+            }
+        })
+        expect(props).toStrictEqual({
+            src: disImageURL.withoutOptionalParams,
+            sizes: '(min-width: 30em) 50vw, 50vw',
+            srcSet: [
+                [240, 120],
+                [768, 768],
+                [1488, 1240],
+                [2560, 2560],
+                [3072, 3072]
+            ]
+                .map(([w1, w2]) => `${urlWithWidth(w2)} ${w1}w`)
+                .join(', ')
+        })
+    })
+
+    test('passing invalid density factor tuples array', () => {
+        const props = getResponsiveImageAttributes({
+            src: disImageURL.withOptionalParams,
+            widths: ['50vw', '50vw'],
+            densities: [[1, 'invalid'], ['invalid'], [2, NaN], [NaN]]
+        })
+        expect(props).toStrictEqual({
+            src: disImageURL.withoutOptionalParams,
+            sizes: '(min-width: 30em) 50vw, 50vw',
+            srcSet: [240, 384, 768, 992, 640, 1280, 1536]
+                .map((width) => `${urlWithWidth(width)} ${width}w`)
+                .join(', ')
+        })
+    })
+
+    test('passing full density factor tuples array', () => {
+        const props = getResponsiveImageAttributes({
+            src: disImageURL.withOptionalParams,
+            widths: ['50vw', '50vw'],
+            densities: [[[1, 0.5], 2, [3, 2.5]], [[1, 1], [2]], [[3, 2.5]], [[1]]]
+        })
+        expect(props).toStrictEqual({
+            src: disImageURL.withoutOptionalParams,
+            sizes: '(min-width: 30em) 50vw, 50vw',
+            srcSet: [
+                [240, 120],
+                [480, 480],
+                [720, 600],
+                [384, 384],
+                [768, 768],
+                [1488, 1240],
+                [640, 640]
+            ]
+                .map(([w1, w2]) => `${urlWithWidth(w2)} ${w1}w`)
+                .join(', ')
+        })
+    })
+
+    test('passing full density factor tuples object', () => {
+        const props = getResponsiveImageAttributes({
+            src: disImageURL.withOptionalParams,
+            widths: ['50vw', '50vw'],
+            densities: {
+                base: [[1, 0.5], 2, [3, 2.5]],
+                sm: [[1, 1], [2]],
+                md: [[3, 2.5]],
+                lg: [[1]]
+            }
+        })
+        expect(props).toStrictEqual({
+            src: disImageURL.withoutOptionalParams,
+            sizes: '(min-width: 30em) 50vw, 50vw',
+            srcSet: [
+                [240, 120],
+                [480, 480],
+                [720, 600],
+                [384, 384],
+                [768, 768],
+                [1488, 1240],
+                [640, 640]
+            ]
+                .map(([w1, w2]) => `${urlWithWidth(w2)} ${w1}w`)
+                .join(', ')
+        })
+    })
+
+    test('passing invalid full density factor tuples array', () => {
+        const props = getResponsiveImageAttributes({
+            src: disImageURL.withOptionalParams,
+            widths: ['50vw', '50vw'],
+            densities: [[[1, 'invalid'], ['invalid'], [[2, NaN]]], [NaN], [[NaN]], [[[NaN]]]]
+        })
+        expect(props).toStrictEqual({
+            src: disImageURL.withoutOptionalParams,
+            sizes: '(min-width: 30em) 50vw, 50vw',
+            srcSet: buildSrcSet([240, 384, 496, 640, 768])
+        })
+    })
+
+    test('passing theme breakpoints and density factors', () => {
+        const props = getResponsiveImageAttributes({
+            src: disImageURL.withOptionalParams,
+            widths: ['100vw', 360],
+            densities: [1, 2],
+            breakpoints: {
+                base: '0px',
+                sm: '320px',
+                md: '768px',
+                lg: '960px',
+                xl: '1200px',
+                '2xl': '1536px'
+            }
+        })
+        expect(props).toStrictEqual({
+            src: disImageURL.withoutOptionalParams,
+            sizes: '(min-width: 320px) 360px, 100vw',
+            srcSet: [320, 720].map((width) => `${urlWithWidth(width)} ${width}w`).join(', ')
+        })
     })
 })
