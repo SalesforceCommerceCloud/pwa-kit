@@ -61,8 +61,8 @@ export const answerConsentTrackingForm = async (page, dnt = false) => {
 }
 
 /**
- * Navigates to the `Floral Ruffle Top` PDP (Product Detail Page) on mobile
- * with the Cardinal Red Multi variant selected
+ * Navigates to the `Belted Ribbed Boat Neck Sweater` PDP (Product Detail Page) on mobile
+ * with the Black variant selected
  *
  * @param {Object} options.page - Object that represents a tab/window in the browser provided by playwright
  */
@@ -96,19 +96,29 @@ export const navigateToPDPMobile = async ({page}) => {
 
     // PLP
     const productTile = page.getByRole('link', {
-        name: /Floral Ruffle Top/i
+        name: /Belted Ribbed Boat Neck Sweater/i
     })
     await productTile.scrollIntoViewIfNeeded()
     // selecting swatch
     const productTileImg = productTile.locator('img')
     await productTileImg.waitFor({state: 'visible'})
-    await expect(productTile.getByText(/From \£35\.19/i)).toBeVisible()
+    const initialSrc = await productTileImg.getAttribute('src')
+    await expect(productTile.getByText(/From \£50\.56/i)).toBeVisible()
+
+    await productTile.getByLabel(/Black/, {exact: true}).hover()
+    // Make sure the image src has changed
+    await expect(async () => {
+        const newSrc = await productTileImg.getAttribute('src')
+        expect(newSrc).not.toBe(initialSrc)
+    }).toPass()
+    await expect(productTile.getByText(/From \£50\.56/i)).toBeVisible()
+
     await productTile.click()
 }
 
 /**
- * Navigates to the `Floral Ruffle Top` PDP (Product Detail Page) on Desktop
- * with the Cardinal Red Multi variant selected.
+ * Navigates to the `Belted Ribbed Boat Neck Sweater` PDP (Product Detail Page) on Desktop
+ * with the Black variant selected.
  *
  * @param {Object} options.page - Object that represents a tab/window in the browser provided by playwright
  */
@@ -124,19 +134,28 @@ export const navigateToPDPDesktop = async ({page}) => {
 
     // PLP
     const productTile = page.getByRole('link', {
-        name: /Floral Ruffle Top/i
+        name: /Belted Ribbed Boat Neck Sweater/i
     })
     // selecting swatch
     const productTileImg = productTile.locator('img')
     await productTileImg.waitFor({state: 'visible'})
-    await expect(productTile.getByText(/From \£35\.19/i)).toBeVisible()
+    const initialSrc = await productTileImg.getAttribute('src')
+    await expect(productTile.getByText(/From \£50\.56/i)).toBeVisible()
+
+    await productTile.getByLabel(/Black/, {exact: true}).hover()
+    // Make sure the image src has changed
+    await expect(async () => {
+        const newSrc = await productTileImg.getAttribute('src')
+        expect(newSrc).not.toBe(initialSrc)
+    }).toPass()
+    await expect(productTile.getByText(/From \£50\.56/i)).toBeVisible()
 
     await productTile.click()
 }
 
 /**
- * Navigates to the `Floral Ruffle Top` PDP (Product Detail Page) on Desktop
- * with the Cardinal Red Multi variant selected.
+ * Navigates to the `Belted Ribbed Boat Neck Sweater` PDP (Product Detail Page) on Desktop
+ * with the Black variant selected.
  *
  * @param {Object} options.page - Object that represents a tab/window in the browser provided by playwright
  */
@@ -169,15 +188,15 @@ export const navigateToPDPDesktopSocial = async ({
 }
 
 /**
- * Adds the `Floral Ruffle Top` product to the cart with the variant:
- * Colour: Cardinal Red Multi
+ * Adds the `Belted Ribbed Boat Neck Sweater` product to the cart with the variant:
+ * Colour: Black
  * Size: M
  *
  * @param {Object} options.page - Object that represents a tab/window in the browser provided by playwright
  * @param {Boolean} options.isMobile - Flag to indicate if device type is mobile or not, defaulted to false
  */
 export const addProductToCart = async ({page, isMobile = false}) => {
-    // Navigate to Floral Ruffle Top with Cardinal Red Multi color variant selected
+    // Navigate to Belted Ribbed Boat Neck Sweater with Black color variant selected
     if (isMobile) {
         await navigateToPDPMobile({page})
     } else {
@@ -185,7 +204,7 @@ export const addProductToCart = async ({page, isMobile = false}) => {
     }
 
     // PDP
-    await expect(page.getByRole('heading', {name: /Floral Ruffle Top/i})).toBeVisible()
+    await expect(page.getByRole('heading', {name: /Belted Ribbed Boat Neck Sweater/i})).toBeVisible()
     await page.getByRole('radio', {name: 'M', exact: true}).click()
 
     await page.locator("button[data-testid='quantity-increment']").click()
@@ -195,7 +214,7 @@ export const addProductToCart = async ({page, isMobile = false}) => {
     const updatedPageURL = await page.url()
     const params = updatedPageURL.split('?')[1]
     expect(params).toMatch(/size=9MD/i)
-    expect(params).toMatch(/color=JJ9DFXX/i)
+    expect(params).toMatch(/color=JJ3WCXX&/i)
     await page.getByRole('button', {name: /Add to Cart/i}).click()
 
     const addedToCartModal = page.getByText(/2 items added to cart/i)
@@ -261,7 +280,7 @@ export const registerShopper = async ({page, userCredentials, isMobile = false})
 }
 
 /**
- * Validates that the `Floral Ruffle Top` product appears in the Order History page
+ * Validates that the `Belted Ribbed Boat Neck Sweater` product appears in the Order History page
  *
  * @param {Object} options.page - Object that represents a tab/window in the browser provided by playwright
  */
@@ -275,7 +294,7 @@ export const validateOrderHistory = async ({page, a11y = {}}) => {
     await page.getByRole('link', {name: 'View details'}).click()
 
     await expect(page.getByRole('heading', {name: /Order Details/i})).toBeVisible()
-    await expect(page.getByRole('heading', {name: /Floral Ruffle Top/i})).toBeVisible()
+    await expect(page.getByRole('heading', {name: /Belted Ribbed Boat Neck Sweater/i})).toBeVisible()
     await expect(page.getByText(/Size: M/i)).toBeVisible()
     if (checkA11y) {
         await runAccessibilityTest(page, [snapShotName, 'order-history-a11y-violations.json'])
@@ -283,7 +302,7 @@ export const validateOrderHistory = async ({page, a11y = {}}) => {
 }
 
 /**
- * Validates that the `Floral Ruffle Top` product appears in the Wishlist page
+ * Validates that the `Belted Ribbed Boat Neck Sweater` product appears in the Wishlist page
  *
  * @param {Object} options.page - Object that represents a tab/window in the browser provided by playwright
  */
@@ -295,8 +314,8 @@ export const validateWishlist = async ({page, a11y = {}}) => {
 
     await expect(page.getByRole('heading', {name: /Wishlist/i})).toBeVisible()
 
-    await expect(page.getByRole('heading', {name: /Floral Ruffle Top/i})).toBeVisible()
-    await expect(page.getByText(/Colour: Cardinal Red Multi/i)).toBeVisible()
+    await expect(page.getByRole('heading', {name: /Belted Ribbed Boat Neck Sweater/i})).toBeVisible()
+    await expect(page.getByText(/Colour: Black/i)).toBeVisible()
     await expect(page.getByText(/Size: M/i)).toBeVisible()
     if (checkA11y) {
         await runAccessibilityTest(page, [snapShotName, 'wishlist-violations.json'])
@@ -524,7 +543,7 @@ export const registeredUserHappyPath = async ({page, registeredUserCredentials, 
     // cart
     await page.getByLabel(/My cart/i).click()
 
-    await expect(page.getByRole('link', {name: /Floral Ruffle Top/i})).toBeVisible()
+    await expect(page.getByRole('link', {name: 'Belted Ribbed Boat Neck Sweater'})).toBeVisible()
 
     await page.getByRole('link', {name: 'Proceed to Checkout'}).click()
 
@@ -611,7 +630,7 @@ export const registeredUserHappyPath = async ({page, registeredUserCredentials, 
 
     await expect(page.getByRole('heading', {name: /Order Summary/i})).toBeVisible()
     await expect(page.getByText(/2 Items/i)).toBeVisible()
-    await expect(page.getByRole('link', {name: /Floral Ruffle Top/i})).toBeVisible()
+    await expect(page.getByRole('link', {name: /Belted Ribbed Boat Neck Sweater/i})).toBeVisible()
     if (checkA11y) {
         await runAccessibilityTest(page, [
             'registered',
@@ -669,7 +688,7 @@ export const wishlistFlow = async ({page, registeredUserCredentials, a11y = {}})
     await navigateToPDPDesktop({page})
 
     // add product to wishlist
-    await expect(page.getByRole('heading', {name: /Floral Ruffle Top/i})).toBeVisible()
+    await expect(page.getByRole('heading', {name: /Belted Ribbed Boat Neck Sweater/i})).toBeVisible()
 
     await page.getByRole('radio', {name: 'M', exact: true}).click()
     await page.getByRole('button', {name: /Add to Wishlist/i}).click()
@@ -701,7 +720,7 @@ export const selectStoreFromPLP = async ({page}) => {
     // Verify we're on the PLP
     await expect(page.getByRole('heading', {name: 'Tops'})).toBeVisible()
     const productTile = page.getByRole('link', {
-        name: /Floral Ruffle Top/i
+        name: /Belted Ribbed Boat Neck Sweater/i
     })
     const productTileImg = productTile.locator('img')
     await productTileImg.waitFor({state: 'visible'})
