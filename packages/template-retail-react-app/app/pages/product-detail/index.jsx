@@ -62,11 +62,6 @@ import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
 import {useWishList} from '@salesforce/retail-react-app/app/hooks/use-wish-list'
 import {useAddToCartModalContext} from '@salesforce/retail-react-app/app/hooks/use-add-to-cart-modal'
 import {useDisclosure} from '@salesforce/retail-react-app/app/components/shared/ui'
-import {
-    handleAddToCart,
-    handleProductBundleAddToCart,
-    handleProductSetAddToCart
-} from '@salesforce/retail-react-app/app/utils/add-to-cart-utils'
 
 const ProductDetail = () => {
     const {formatMessage} = useIntl()
@@ -344,8 +339,8 @@ const ProductDetail = () => {
                 // Use variant if present, otherwise use the main product
                 const prod = variant || item.product || product
                 return {
-                    productId: prod.productId || prod.id, // productId for variant, id for product
-                    price: prod.price,
+                    productId: prod?.productId || prod?.id, // productId for variant, id for product
+                    price: prod?.price,
                     quantity
                 }
             })
@@ -418,8 +413,8 @@ const ProductDetail = () => {
             const productItemsForEinstein = productSelectionValues.map(
                 ({product, variant, quantity}) => ({
                     product,
-                    productId: variant.productId,
-                    price: variant.price,
+                    productId: variant?.productId || product?.id,
+                    price: variant?.price || product?.price,
                     quantity
                 })
             )
@@ -550,7 +545,7 @@ const ProductDetail = () => {
                     // with the chosen variant selections
                     bundledProductItems: childProductSelections.map((child) => {
                         return {
-                            productId: child.variant.productId,
+                            productId: child.variant?.productId || child.product?.id,
                             quantity: child.quantity
                         }
                     })
@@ -675,24 +670,8 @@ const ProductDetail = () => {
                             category={primaryCategory?.parentCategoryTree || []}
                             addToCart={
                                 isProductASet
-                                    ? () =>
-                                          handleProductSetAddToCart(
-                                              childProductSelection,
-                                              addItemToNewOrExistingBasket,
-                                              einstein,
-                                              showError
-                                          )
-                                    : (variant, selectedQuantity) =>
-                                          handleProductBundleAddToCart(
-                                              product,
-                                              childProductSelection,
-                                              selectedQuantity,
-                                              addItemToNewOrExistingBasket,
-                                              updateItemsInBasketMutation,
-                                              einstein,
-                                              showError,
-                                              getUpdateBundleChildArray
-                                          )
+                                    ? handleProductSetAddToCart
+                                    : handleProductBundleAddToCart
                             }
                             addToWishlist={handleAddToWishlist}
                             isProductLoading={isProductLoading}
@@ -736,18 +715,13 @@ const ProductDetail = () => {
                                             addToCart={
                                                 isProductASet
                                                     ? (variant, quantity) =>
-                                                          handleAddToCart(
-                                                              [
-                                                                  {
-                                                                      product: childProduct,
-                                                                      variant,
-                                                                      quantity
-                                                                  }
-                                                              ],
-                                                              addItemToNewOrExistingBasket,
-                                                              einstein,
-                                                              showError
-                                                          )
+                                                          handleAddToCart([
+                                                              {
+                                                                  product: childProduct,
+                                                                  variant,
+                                                                  quantity
+                                                              }
+                                                          ])
                                                     : null
                                             }
                                             addToWishlist={
@@ -800,14 +774,7 @@ const ProductDetail = () => {
                         <ProductView
                             product={product}
                             category={primaryCategory?.parentCategoryTree || []}
-                            addToCart={(variant, quantity) =>
-                                handleAddToCart(
-                                    [{product, variant, quantity}],
-                                    addItemToNewOrExistingBasket,
-                                    einstein,
-                                    showError
-                                )
-                            }
+                            addToCart={handleAddToCart}
                             addToWishlist={handleAddToWishlist}
                             isProductLoading={isProductLoading}
                             isBasketLoading={isBasketLoading}
