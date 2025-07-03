@@ -74,7 +74,6 @@ describe('useBonusState', () => {
     test('onClose calls onAddToCartModalOpen if needed', () => {
         const {result} = renderHook(() => useBonusState())
         const data = {
-            openAddToCartModalIfNeeded: true,
             product: {id: 'p1'},
             itemsAdded: 2,
             selectedQuantity: 1

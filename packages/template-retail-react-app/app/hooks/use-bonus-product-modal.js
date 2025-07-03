@@ -7,7 +7,6 @@
 import React, {useContext, useState, useEffect} from 'react'
 import {useLocation} from 'react-router-dom'
 import PropTypes from 'prop-types'
-import {useAddToCartModalContext} from '@salesforce/retail-react-app/app/hooks/use-add-to-cart-modal'
 import {BonusProductModal} from '@salesforce/retail-react-app/app/components/bonus-product-modal'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
 
@@ -38,7 +37,6 @@ export const useBonusState = (basket) => {
         bonusProducts: basket?.bonusDiscountLineItems || []
     })
     const {pathname} = useLocation()
-    const {onOpen: onAddToCartModalOpen} = useAddToCartModalContext()
 
     useEffect(() => {
         if (state.isOpen) {
@@ -79,21 +77,14 @@ export const useBonusState = (basket) => {
         data: state.data,
         bonusProducts: state.bonusProducts,
         addBonusProducts,
-        onClose: () => {
+        onClickClose: () => {
             setState((prev) => ({
                 ...prev,
                 isOpen: false,
                 data: {}
             }))
-
-            if (state.data.openAddToCartModalIfNeeded && state.data.product) {
-                onAddToCartModalOpen({
-                    product: state.data.product,
-                    itemsAdded: state.data.itemsAdded,
-                    selectedQuantity: state.data.selectedQuantity
-                })
-            }
         },
+        onClose: () => {},
         onOpen: (data) => {
             setState((prev) => ({
                 ...prev,

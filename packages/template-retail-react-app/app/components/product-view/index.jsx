@@ -160,8 +160,8 @@ const ProductView = forwardRef(
             return getPriceData(product, {quantity})
         }, [product, quantity])
         const canAddToWishlist = !isProductLoading
-        const isProductASet = product?.type.set
-        const isProductABundle = product?.type.bundle
+        const isProductASet = product?.type?.set
+        const isProductABundle = product?.type?.bundle
         const errorContainerRef = useRef(null)
 
         const {disableButton, customInventoryMessage} = useMemo(() => {
@@ -314,7 +314,6 @@ const ProductView = forwardRef(
                             onBonusProductModalOpen({
                                 newBonusItems,
                                 allBonusItems: addToCartResponse.bonusDiscountLineItems,
-                                openAddToCartModalIfNeeded: true,
                                 product,
                                 itemsAdded,
                                 selectedQuantity: quantity
@@ -474,7 +473,7 @@ const ProductView = forwardRef(
                                     <HideOnMobile>
                                         {showFullLink && product && (
                                             <Link
-                                                to={`/product/${product.master.masterId}`}
+                                                to={`/product/${product.master?.masterId}`}
                                                 color="blue.600"
                                             >
                                                 <FormattedMessage
@@ -533,7 +532,7 @@ const ProductView = forwardRef(
                                     <Skeleton height={20} width={64} />
                                 </>
                             ) : (
-                                variationAttributes.map(({id, name, selectedValue, values}) => {
+                                variationAttributes?.map(({id, name, selectedValue, values}) => {
                                     const swatches = values.map(
                                         ({href, name, image, value, orderable}, index) => {
                                             const content = image ? (
@@ -661,7 +660,7 @@ const ProductView = forwardRef(
                             <HideOnDesktop>
                                 {showFullLink && product && (
                                     <Link
-                                        to={`/product/${product.master.masterId}`}
+                                        to={`/product/${product.master?.masterId}`}
                                         color="blue.600"
                                     >
                                         <FormattedMessage
