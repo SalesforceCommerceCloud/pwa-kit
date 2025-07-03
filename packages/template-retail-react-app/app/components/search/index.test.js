@@ -110,7 +110,8 @@ test('shows previously searched items when focused', async () => {
 })
 
 test('saves recent searches on submit', async () => {
-    const user = setupUserEvent()
+    jest.useRealTimers()
+    const {user} = renderWithProviders(<SearchInput />)
     setSessionJSONItem(RECENT_SEARCH_KEY, ['Dresses', 'Suits', 'Tops'])
     renderWithProviders(<SearchInput />)
     const searchInput = document.querySelector('input[type="search"]')
@@ -119,7 +120,8 @@ test('saves recent searches on submit', async () => {
 })
 
 test('limits number of saved recent searches', async () => {
-    const user = setupUserEvent()
+    jest.useRealTimers()
+    const {user} = renderWithProviders(<SearchInput />)
 
     setSessionJSONItem(RECENT_SEARCH_KEY, ['Dresses', 'Suits', 'Tops', 'Gloves', 'Bracelets'])
     renderWithProviders(<SearchInput />)
@@ -130,8 +132,7 @@ test('limits number of saved recent searches', async () => {
 
 test('suggestions render when there are some', async () => {
     jest.useRealTimers()
-    const user = userEvent.setup()
-    renderWithProviders(<SearchInput />)
+    const {user} = renderWithProviders(<SearchInput />)
     const searchInput = document.querySelector('input[type="search"]')
     await user.type(searchInput, 'Dress')
 
