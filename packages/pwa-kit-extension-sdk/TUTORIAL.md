@@ -254,7 +254,7 @@ This powerful system enables you to:
 * Enhance performance monitoring
 
 
-`getRoutes` is a method of the ApplicationExtension class that allows you to add new routes for your React application, and `beforeRouteMatch` is used to modify existing routes if necessary.
+`extendRoutes` is a method of the ApplicationExtension class that allows you to add/modify the routes for your React application and `beforeRouteMatch` is used to modify all routes if necessary during server side rendering.
 
 
 ### Creating a Public Interface with Overridable Files 🎯

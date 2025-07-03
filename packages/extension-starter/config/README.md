@@ -62,7 +62,7 @@ Your extensions configuration can be used in different ways depending on the con
 
 The exported extension classes in `setup-app.ts` and `setup-server.ts` are extended from the `ApplicationExtension` class. This class provide a method called `getConfig` which returns the configuration your extension was instantiated with. you can use this method to grab the configuration and use it however you want. 
 
-Please refer to the `src/setup-app.ts` file to see a sample of how `getConfig` is being used in the `getRoutes` implementation.
+Please refer to the `src/setup-app.ts` file to see a sample of how it's being used in the `extendRoutes` implementation.
 
 ### React Components
 

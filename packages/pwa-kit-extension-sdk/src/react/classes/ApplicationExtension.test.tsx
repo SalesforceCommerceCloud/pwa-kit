@@ -4,8 +4,9 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
+import {RouteProps} from 'react-router-dom'
 import {ApplicationExtension} from './ApplicationExtension'
-import {ApplicationExtensionConfig, RouteProps} from '../../types'
+import {ApplicationExtensionConfig} from '../../types'
 import React from 'react'
 
 class TestConfig implements ApplicationExtensionConfig {
@@ -34,40 +35,32 @@ describe('ApplicationExtension', () => {
         })
     })
 
-    describe('getRoutes', () => {
-        test('initially return an empty array', () => {
-            const routes = extension.getRoutes({locals: {}})
-            expect(routes).toHaveLength(0)
+    describe('extendRoutes', () => {
+        test('should return the routes array without modification', () => {
+            const routes: RouteProps[] = [
+                {path: '/home', component: mockComponent},
+                {path: '/about', component: mockComponent}
+            ]
+
+            const result = extension.extendRoutes(routes)
+            expect(result).toEqual(routes)
         })
 
-        test('should allow adding a new route', () => {
+        test('should allow for modification of routes', () => {
+            const routes: RouteProps[] = [{path: '/home', component: mockComponent}]
             const additionalRoute: RouteProps = {path: '/new', component: mockComponent}
-            const getRoutesSpy = jest.spyOn(extension, 'getRoutes').mockImplementation(() => {
-                return [additionalRoute]
-            })
 
-            const routes = extension.getRoutes({locals: {}})
-            expect(routes).toContainEqual(additionalRoute)
-            expect(routes).toHaveLength(1)
+            const extendRoutesSpy = jest
+                .spyOn(extension, 'extendRoutes')
+                .mockImplementation((baseRoutes) => {
+                    return [...baseRoutes, additionalRoute]
+                })
 
-            getRoutesSpy.mockRestore()
-        })
-    })
+            const modifiedRoutes = extension.extendRoutes(routes)
+            expect(modifiedRoutes).toContainEqual(additionalRoute)
+            expect(modifiedRoutes).toHaveLength(routes.length + 1)
 
-    describe('getRoutesAsync', () => {
-        test('initially not implemented', () => {
-            // eslint-disable-next-line @typescript-eslint/unbound-method
-            expect(extension.getRoutesAsync).toBeUndefined()
-        })
-    })
-
-    describe('beforeRouteMatch', () => {
-        test('initially returns all of the routes unmodified', () => {
-            const route: RouteProps = {path: '/new', component: mockComponent}
-            const allRoutes = [route]
-
-            const result = extension.beforeRouteMatch({allRoutes, locals: {}})
-            expect(result).toStrictEqual(allRoutes)
+            extendRoutesSpy.mockRestore()
         })
     })
 })
