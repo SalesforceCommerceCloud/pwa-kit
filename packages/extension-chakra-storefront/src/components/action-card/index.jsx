@@ -38,8 +38,7 @@ const ActionCard = ({
 
     return (
         <Box
-            spacing={4}
-            p={4}
+            gap={4}
             position="relative"
             border="1px solid"
             borderColor="gray.100"
@@ -47,9 +46,9 @@ const ActionCard = ({
             {...props}
         >
             {showLoading && <LoadingSpinner />}
-            <Stack spacing={3}>
+            <Stack gap={3}>
                 <Box>{children}</Box>
-                <Stack direction="row" spacing={4}>
+                <Stack direction="row" gap={4}>
                     {onEdit && (
                         <Button
                             onClick={onEdit}
@@ -65,9 +64,7 @@ const ActionCard = ({
                         <Button
                             variant="link-red"
                             size="sm"
-                            colorScheme="red"
                             onClick={handleRemove}
-                            color="red.600"
                             aria-label={removeBtnLabel}
                         >
                             <FormattedMessage
