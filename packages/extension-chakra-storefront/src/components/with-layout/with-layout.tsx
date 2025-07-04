@@ -121,7 +121,6 @@ const withLayout = <P extends object>(WrappedComponent: React.ComponentType<P>) 
         const location = useLocation()
         const authModal = useAuthModal()
         const dntNotification = useDntNotification()
-        console.log('dntNotification', dntNotification)
         const {site, locale, buildUrl} = useMultiSite()
         const [isOnline, setIsOnline] = useState<boolean>(true)
 

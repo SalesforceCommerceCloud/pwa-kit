@@ -31,7 +31,6 @@ export const DntNotification = ({isOpen, onOpen, onClose}) => {
 
     useEffect(() => {
         if (selectedDnt === undefined) {
-            console.log('Test---')
             onOpen()
         } else {
             onClose()
