@@ -63,13 +63,18 @@ module.exports = defineConfig({
             testDir: './e2e/tests/a11y/desktop'
         },
         {
-            name: 'extra-features',
+            name: 'extra-features-desktop',
             testMatch: [
-                'e2e/tests/desktop/extra-features.spec.js',
+                'e2e/tests/desktop/extra-features.spec.js'
+            ],
+            use: { ...devices['Desktop Chrome'] }
+        },
+        {
+            name: 'extra-features-mobile',
+            testMatch: [
                 'e2e/tests/mobile/extra-features.spec.js'
             ],
-            grep: /extra features enabled|extra login features are not enabled|passwordless login/i,
-            use: { ...devices['Desktop Chrome'] }
+            use: { ...devices['Pixel 5'] }
         }
     ]
 })
