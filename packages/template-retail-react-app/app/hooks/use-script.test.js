@@ -23,7 +23,7 @@ TestComponent.propTypes = {
 describe('useScript hook', () => {
     beforeEach(() => {
         // Clear any existing scripts
-        const scripts = document.querySelectorAll('script[data-status]')
+        const scripts = document.querySelectorAll('script[src]')
         scripts.forEach((script) => script.remove())
     })
 
@@ -33,18 +33,17 @@ describe('useScript hook', () => {
         expect(getByTestId('script-status').textContent).toBe(
             JSON.stringify({loaded: false, error: false})
         )
-        expect(document.querySelector('script[data-status]')).toBeNull()
+        expect(document.querySelector('script[src]')).toBeNull()
     })
 
     test('should create and append script element when a script element does not exist', () => {
         const src = 'https://test-script.js/'
         render(<TestComponent src={src} />)
 
-        const script = document.querySelector('script[data-status]')
+        const script = document.querySelector(`script[src="${src}"]`)
         expect(script).not.toBeNull()
         expect(script.src).toBe(src)
         expect(script.async).toBe(true)
-        expect(script.getAttribute('data-status')).toBe('loading')
     })
 
     test('should not create a script element when a script element already exists', () => {
@@ -53,14 +52,13 @@ describe('useScript hook', () => {
         // Create an existing script
         const existingScript = document.createElement('script')
         existingScript.src = src
-        existingScript.setAttribute('data-status', 'loading')
         document.body.appendChild(existingScript)
 
-        const initialScriptCount = document.querySelectorAll('script[data-status]').length
+        const initialScriptCount = document.querySelectorAll(`script[src="${src}"]`).length
 
         render(<TestComponent src={src} />)
 
-        const finalScriptCount = document.querySelectorAll('script[data-status]').length
+        const finalScriptCount = document.querySelectorAll(`script[src="${src}"]`).length
         expect(finalScriptCount).toBe(initialScriptCount)
     })
 
@@ -68,7 +66,7 @@ describe('useScript hook', () => {
         const src = 'https://test-script.js'
         const {getByTestId} = render(<TestComponent src={src} />)
 
-        const script = document.querySelector('script[data-status]')
+        const script = document.querySelector(`script[src="${src}"]`)
 
         // Simulate script load event
         act(() => {
@@ -84,7 +82,7 @@ describe('useScript hook', () => {
         const src = 'https://test-script.js'
         const {getByTestId} = render(<TestComponent src={src} />)
 
-        const script = document.querySelector('script[data-status]')
+        const script = document.querySelector(`script[src="${src}"]`)
 
         // Simulate script error event
         act(() => {
@@ -102,19 +100,19 @@ describe('useScript hook', () => {
         // First render
         const {getByTestId, rerender} = render(<TestComponent src={src} />)
 
-        const script = document.querySelector('script[data-status]')
+        const script = document.querySelector(`script[src="${src}"]`)
 
         // Simulate first script load
         act(() => {
             script.dispatchEvent(new Event('load'))
         })
 
-        const initialScriptCount = document.querySelectorAll('script[data-status]').length
+        const initialScriptCount = document.querySelectorAll(`script[src="${src}"]`).length
 
         // Re-render with same src
         rerender(<TestComponent src={src} />)
 
-        const finalScriptCount = document.querySelectorAll('script[data-status]').length
+        const finalScriptCount = document.querySelectorAll(`script[src="${src}"]`).length
         expect(finalScriptCount).toBe(initialScriptCount)
 
         // State should remain loaded
@@ -129,7 +127,7 @@ describe('useScript hook', () => {
 
         const {rerender} = render(<TestComponent src={src1} />)
 
-        const script1 = document.querySelector('script[data-status]')
+        const script1 = document.querySelector(`script[src="${src1}"]`)
 
         // Simulate first script load
         act(() => {
@@ -139,7 +137,7 @@ describe('useScript hook', () => {
         // Re-render with different src
         rerender(<TestComponent src={src2} />)
 
-        const script2 = document.querySelector('script[data-status]')
+        const script2 = document.querySelector(`script[src="${src1}"]`)
         expect(script2.src).toBe(src1)
     })
 })

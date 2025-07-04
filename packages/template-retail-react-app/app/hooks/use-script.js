@@ -28,7 +28,6 @@ const useScript = (src) => {
             const script = document.createElement('script')
             script.src = src
             script.async = true
-            script.setAttribute('data-status', 'loading')
             document.body.appendChild(script)
 
             const onScriptLoad = (event) => {
