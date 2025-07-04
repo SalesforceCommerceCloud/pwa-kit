@@ -193,7 +193,7 @@ const AccountOrderHistory = () => {
                                 <Stack
                                     direction={{base: 'column', lg: 'row'}}
                                     alignItems={{base: 'flex-start', lg: 'center'}}
-                                    gap={{base: '2px', lg: 3}}
+                                    gap={{base: '2px', lg: '3'}}
                                     separator={
                                         <Separator
                                             visibility={{base: 'hidden', lg: 'visible'}}
