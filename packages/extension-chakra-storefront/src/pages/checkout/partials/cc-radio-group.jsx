@@ -7,7 +7,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import {FormattedMessage} from 'react-intl'
-import {Box, Button, Stack, Text, SimpleGrid, Field} from '@chakra-ui/react'
+import {Button, Stack, Text, SimpleGrid, Field} from '@chakra-ui/react'
 import {PlusIcon} from '../../../components/icons'
 import {RadioCard, RadioCardGroup} from '../../../components/radio-card'
 import ActionCard from '../../../components/action-card'
@@ -30,16 +30,18 @@ const CCRadioGroup = ({
             isRequired={!isEditingPayment}
         >
             {form.formState.errors.paymentInstrumentId && (
-                <FormErrorMessage marginTop={0} marginBottom={4}>
+                <Field.ErrorText marginTop={0} marginBottom={4}>
                     {form.formState.errors.paymentInstrumentId.message}
-                </FormErrorMessage>
+                </Field.ErrorText>
             )}
 
-            <RadioCardGroup value={value} onValueChange={(selected) => {
-                // Chakra v3 radio returns the selected id in an object with a value property
-                onPaymentIdChange(selected.value)}
-            }
-                >
+            <RadioCardGroup
+                value={value}
+                onValueChange={(selected) => {
+                    // Chakra v3 radio returns the selected id in an object with a value property
+                    onPaymentIdChange(selected.value)
+                }}
+            >
                 <Stack gap={4}>
                     <SimpleGrid columns={[1, 1, 2]} gap={4}>
                         {customer.paymentInstruments?.map((payment, index) => {
@@ -57,19 +59,19 @@ const CCRadioGroup = ({
                                             border="none"
                                             onRemove={() => {}}
                                             data-testid={`sf-checkout-payment-option-${index}`}
-                                            removeBtnLabel={"cc_radio_group.action.remove"}
+                                            removeBtnLabel={'cc_radio_group.action.remove'}
                                         >
                                             <Text>{payment.paymentCard?.cardType}</Text>
-                                                <Stack direction="row">
-                                                    <Text>
-                                                        &bull;&bull;&bull;&bull;{' '}
-                                                        {payment.paymentCard?.numberLastDigits}
-                                                    </Text>
-                                                    <Text>
-                                                        {payment.paymentCard?.expirationMonth}/
-                                                        {payment.paymentCard?.expirationYear}
-                                                    </Text>
-                                                </Stack>
+                                            <Stack direction="row">
+                                                <Text>
+                                                    &bull;&bull;&bull;&bull;{' '}
+                                                    {payment.paymentCard?.numberLastDigits}
+                                                </Text>
+                                                <Text>
+                                                    {payment.paymentCard?.expirationMonth}/
+                                                    {payment.paymentCard?.expirationYear}
+                                                </Text>
+                                            </Stack>
                                             <Text>{payment.paymentCard.holder}</Text>
                                         </ActionCard>
                                     </Stack>
