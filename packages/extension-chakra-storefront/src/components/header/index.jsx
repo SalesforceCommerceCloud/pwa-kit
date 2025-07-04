@@ -50,7 +50,7 @@ import {navLinks, messages} from '../../pages/account/constant'
 import useNavigation from '../../hooks/use-navigation'
 import LoadingSpinner from '../../components/loading-spinner'
 import {HideOnDesktop, HideOnMobile} from '../responsive'
-import {isHydrated, noop} from '../../utils/utils'
+import {noop} from '../../utils/utils'
 import {useLocation} from 'react-router-dom'
 
 const IconButtonWithRegistration = withRegistration(IconButton)
