@@ -152,7 +152,8 @@ const Header = ({
         onAccountMenuClose()
     }, [location.pathname])
 
-    const handleIconsMouseLeave = () => {
+    const handleIconsMouseLeave = (e) => {
+        console.log('e', e)
         // don't close the menu if users enter the popover content
         setTimeout(() => {
             if (!hasEnterPopoverContent.current) onAccountMenuClose()
@@ -166,7 +167,6 @@ const Header = ({
             popoverTriggerRef.current.focus()
         }
     }
-    console.log('isMenuOpen', isAccountMenuOpen)
 
     return (
         <Box css={styles.container} {...props}>
