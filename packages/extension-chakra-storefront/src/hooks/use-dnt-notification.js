@@ -98,7 +98,6 @@ export const DntNotification = ({isOpen, onOpen, onClose}) => {
             preventScroll={false}
             onOpenChange={isOpen ? onClose : onOpen}
             placement="bottom"
-            onClose={onCloseNotification}
         >
             <Dialog.Positioner pointerEvents="none">
                 <Dialog.Content
@@ -113,7 +112,15 @@ export const DntNotification = ({isOpen, onOpen, onClose}) => {
                 >
                     <Box boxShadow="0 12px 48px rgba(0, 0, 0, 0.3)">
                         <Dialog.CloseTrigger asChild>
-                            <CloseButton colorPalette="gray" size="xs" />
+                            <CloseButton
+                                onClick={onCloseNotification}
+                                colorPalette="gray"
+                                size="xs"
+                                aria-label={formatMessage({
+                                    id: 'dnt_notification.button.assistive_msg.close',
+                                    defaultMessage: 'Close consent tracking form'
+                                })}
+                            />
                         </Dialog.CloseTrigger>
                         <Dialog.Body pb="8" bg="white" paddingBottom="14" marginTop="7">
                             <Heading as="h3" fontSize={25} width="100%">

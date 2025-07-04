@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
-import {screen, waitFor} from '@testing-library/react'
+import {act, screen, waitFor} from '@testing-library/react'
 import {renderWithProviders} from '../utils/test-utils'
 import {DntNotification, useDntNotification} from './use-dnt-notification'
 
@@ -20,6 +20,7 @@ jest.mock('@salesforce/commerce-sdk-react', () => {
 
 const MockedComponent = () => {
     const dntNotification = useDntNotification()
+    console.log('dntNotification', dntNotification)
     return <DntNotification {...dntNotification} />
 }
 
@@ -37,11 +38,17 @@ test('Notification renders properly', async () => {
 
 test('Clicking out of notification does setDNT(null)', async () => {
     const {user} = renderWithProviders(<MockedComponent />)
+    let closeButton
+    await waitFor(async () => {
+        screen.logTestingPlaygroundURL()
 
-    // open the notification
-    const closeButton = screen.getByLabelText('Close consent tracking form')
-    expect(closeButton).toHaveAttribute('aria-label', 'Close consent tracking form')
-    await user.click(closeButton)
+        // open the notification
+        closeButton = screen.getByLabelText('Close consent tracking form')
+        expect(closeButton).toHaveAttribute('aria-label', 'Close consent tracking form')
+    })
+    await act(async () => {
+        await user.click(closeButton)
+    })
 
     await waitFor(() => {
         expect(mockUpdateDNT).toHaveBeenCalledWith(null)
@@ -54,7 +61,9 @@ test('Clicking Accept does setDNT(false)', async () => {
     // open the notification
     const acceptButton = screen.getAllByText('Accept')[0]
     expect(acceptButton).toHaveAttribute('aria-label', 'Accept tracking')
-    await user.click(acceptButton)
+    await act(async () => {
+        await user.click(acceptButton)
+    })
 
     await waitFor(() => {
         expect(mockUpdateDNT).toHaveBeenCalledWith(false)
@@ -67,7 +76,9 @@ test('Clicking Decline does setDNT(true)', async () => {
     // open the notification
     const declineButton = screen.getAllByText('Decline')[0]
     expect(declineButton).toHaveAttribute('aria-label', 'Decline tracking')
-    await user.click(declineButton)
+    await act(async () => {
+        await user.click(declineButton)
+    })
 
     await waitFor(() => {
         expect(mockUpdateDNT).toHaveBeenCalledWith(true)
