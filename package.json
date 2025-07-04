@@ -21,7 +21,7 @@
     "test": "lerna run --stream --concurrency=1 test",
     "test:max-file-size": "lerna run --stream test:max-file-size",
     "check-dep-version": "syncpack list-mismatches --types prod,dev",
-    "test:e2e:extra_features": "npx playwright test --project=extra-features-desktop --project=extra-featuers-mobile"
+    "test:e2e:extra_features": "npx playwright test --project=extra-features-desktop --project=extra-features-mobile"
   },
   "devDependencies": {
     "@playwright/test": "^1.49.0",
