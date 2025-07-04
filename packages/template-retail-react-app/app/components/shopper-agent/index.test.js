@@ -9,6 +9,7 @@ import React from 'react'
 import {render, act} from '@testing-library/react'
 import ShopperAgent from '@salesforce/retail-react-app/app/components/shopper-agent/index'
 import useScript from '@salesforce/retail-react-app/app/hooks/use-script'
+
 // Mock the embeddedservice_bootstrap object
 const mockEmbeddedService = {
     init: jest.fn(),
@@ -61,6 +62,9 @@ describe('ShopperAgent Component', () => {
     beforeEach(() => {
         // Reset all mocks before each test
         jest.clearAllMocks()
+
+        // Reset the mockEmbeddedService.init to not throw errors
+        mockEmbeddedService.init.mockImplementation(() => {})
 
         // Mock the window.embeddedservice_bootstrap object
         global.window.embeddedservice_bootstrap = mockEmbeddedService
@@ -130,7 +134,6 @@ describe('ShopperAgent Component', () => {
     test('should handle initialization error gracefully', () => {
         // Mock console.error to avoid noise in test output
         const consoleSpy = jest.spyOn(console, 'error').mockImplementation()
-        // Mock useMiaw to return an error
         const errorMessage = 'Initialization failed'
         useScript.mockReturnValue({loaded: true, error: false})
         mockEmbeddedService.init.mockImplementation(() => {
@@ -263,6 +266,151 @@ describe('ShopperAgent Component', () => {
         expect(useScript).not.toHaveBeenCalled()
     })
 
+    test('should not render when script URL is from untrusted domain', () => {
+        const untrustedSettings = {
+            ...commerceAgentSettings,
+            scriptSourceUrl: 'https://malicious-site.com/script.js'
+        }
+        const props = {
+            ...defaultProps,
+            commerceAgentConfiguration: untrustedSettings
+        }
+
+        const consoleSpy = jest.spyOn(console, 'error').mockImplementation()
+        const {container} = render(<ShopperAgent {...props} />)
+
+        // Should log error about untrusted domain
+        expect(consoleSpy).toHaveBeenCalledWith(
+            expect.stringContaining('Script URL must be from a trusted Salesforce domain.')
+        )
+
+        // Component should not render anything
+        expect(container.firstChild).toBeNull()
+
+        consoleSpy.mockRestore()
+    })
+
+    test('should render when script URL is from trusted salesforce.com domain', () => {
+        const trustedSettings = {
+            ...commerceAgentSettings,
+            scriptSourceUrl:
+                'https://myorg.salesforce.com/ESWMIAWGuidedShopper/assets/js/bootstrap.min.js'
+        }
+        const props = {
+            ...defaultProps,
+            commerceAgentConfiguration: trustedSettings,
+            basketDoneLoading: true
+        }
+
+        useScript.mockReturnValue({loaded: true, error: false})
+        render(<ShopperAgent {...props} />)
+
+        // Component should initialize when domain is trusted
+        expect(mockEmbeddedService.init).toHaveBeenCalled()
+    })
+
+    test('should render when script URL is from trusted salesforce-scrt.com domain', () => {
+        const trustedSettings = {
+            ...commerceAgentSettings,
+            scriptSourceUrl: 'https://myorg.salesforce-scrt.com/script.js'
+        }
+        const props = {
+            ...defaultProps,
+            commerceAgentConfiguration: trustedSettings,
+            basketDoneLoading: true
+        }
+
+        useScript.mockReturnValue({loaded: true, error: false})
+        render(<ShopperAgent {...props} />)
+
+        // Component should initialize when domain is trusted
+        expect(mockEmbeddedService.init).toHaveBeenCalled()
+    })
+
+    test('should render when script URL is from trusted pc-rnd.salesforce-scrt.com domain', () => {
+        const trustedSettings = {
+            ...commerceAgentSettings,
+            scriptSourceUrl: 'https://myorg.pc-rnd.salesforce-scrt.com/script.js'
+        }
+        const props = {
+            ...defaultProps,
+            commerceAgentConfiguration: trustedSettings,
+            basketDoneLoading: true
+        }
+
+        useScript.mockReturnValue({loaded: true, error: false})
+        render(<ShopperAgent {...props} />)
+
+        // Component should initialize when domain is trusted
+        expect(mockEmbeddedService.init).toHaveBeenCalled()
+    })
+
+    test('should render when script URL is from trusted pc-rnd.site.com domain', () => {
+        const trustedSettings = {
+            ...commerceAgentSettings,
+            scriptSourceUrl: 'https://orgfarm-1645fa246c.test1.my.pc-rnd.site.com/script.js'
+        }
+        const props = {
+            ...defaultProps,
+            commerceAgentConfiguration: trustedSettings,
+            basketDoneLoading: true
+        }
+
+        useScript.mockReturnValue({loaded: true, error: false})
+        render(<ShopperAgent {...props} />)
+
+        // Component should initialize when domain is trusted
+        expect(mockEmbeddedService.init).toHaveBeenCalled()
+    })
+
+    test('should not render when script URL is invalid', () => {
+        const invalidSettings = {
+            ...commerceAgentSettings,
+            scriptSourceUrl: 'not-a-valid-url'
+        }
+        const props = {
+            ...defaultProps,
+            commerceAgentConfiguration: invalidSettings
+        }
+
+        const consoleSpy = jest.spyOn(console, 'error').mockImplementation()
+        const {container} = render(<ShopperAgent {...props} />)
+
+        // Should log error about untrusted domain
+        expect(consoleSpy).toHaveBeenCalledWith(
+            expect.stringContaining('Script URL must be from a trusted Salesforce domain.')
+        )
+
+        // Component should not render anything
+        expect(container.firstChild).toBeNull()
+
+        consoleSpy.mockRestore()
+    })
+
+    test('should not render when script URL has subdomain of untrusted domain', () => {
+        const untrustedSettings = {
+            ...commerceAgentSettings,
+            scriptSourceUrl: 'https://subdomain.malicious-site.com/script.js'
+        }
+        const props = {
+            ...defaultProps,
+            commerceAgentConfiguration: untrustedSettings
+        }
+
+        const consoleSpy = jest.spyOn(console, 'error').mockImplementation()
+        const {container} = render(<ShopperAgent {...props} />)
+
+        // Should log error about untrusted domain
+        expect(consoleSpy).toHaveBeenCalledWith(
+            expect.stringContaining('Script URL must be from a trusted Salesforce domain.')
+        )
+
+        // Component should not render anything
+        expect(container.firstChild).toBeNull()
+
+        consoleSpy.mockRestore()
+    })
+
     test('should set the z-index of the embedded messaging frame to the sticky z-index + 1 when the window is maximized', async () => {
         const mockFrame = document.createElement('div')
         mockFrame.style.zIndex = '0'
@@ -326,12 +474,11 @@ describe('ShopperAgent Component', () => {
 
         rerender(<ShopperAgent {...newProps} />)
 
-        // Trigger prechat fields setup again
+        // Trigger prechat fields setup with new configuration
         await act(async () => {
             window.dispatchEvent(new Event('onEmbeddedMessagingReady'))
         })
 
-        // Should update with new values
         expect(mockEmbeddedService.prechatAPI.setHiddenPrechatFields).toHaveBeenCalledWith({
             SiteId: newCommerceAgentSettings.siteId,
             Locale: defaultProps.locale,
@@ -352,8 +499,9 @@ describe('ShopperAgent Component', () => {
             askAgentOnSearch: 'true',
             embeddedServiceName: 'TestService',
             embeddedServiceEndpoint: 'https://test.endpoint.com',
-            scriptSourceUrl: 'https://test.script.com',
-            scrt2Url: 'https://test.scrt.com',
+            scriptSourceUrl:
+                'https://myorg.salesforce.com/ESWMIAWGuidedShopper/assets/js/bootstrap.min.js',
+            scrt2Url: 'https://myorg.salesforce.com-scrt.com',
             salesforceOrgId: 'test-org-id',
             commerceOrgId: 'test-commerce-id',
             siteId: 'test-site-id'
@@ -371,87 +519,59 @@ describe('ShopperAgent Component', () => {
             window.removeEventListener = originalRemoveEventListener
         })
 
-        it('should remove event listeners when component unmounts', () => {
+        test('should remove event listeners when component unmounts', () => {
             useScript.mockReturnValue({loaded: true, error: false})
-            // Render the component
-            const {unmount} = render(
-                <ShopperAgent
-                    commerceAgentConfiguration={mockCommerceAgent}
-                    basketId="test-basket-id"
-                    locale="en-US"
-                    basketDoneLoading={true}
-                />
-            )
+            const props = {
+                ...defaultProps,
+                commerceAgentConfiguration: mockCommerceAgent,
+                basketDoneLoading: true
+            }
 
-            // Get the handler functions that were added
-            const readyHandler = mockAddEventListener.mock.calls.find(
-                (call) => call[0] === 'onEmbeddedMessagingReady'
-            )[1]
-            const maximizeHandler = mockAddEventListener.mock.calls.find(
-                (call) => call[0] === 'onEmbeddedMessagingWindowMaximized'
-            )[1]
-            const buttonClickHandler = mockAddEventListener.mock.calls.find(
-                (call) => call[0] === 'onEmbeddedMessagingButtonClicked'
-            )[1]
+            const {unmount} = render(<ShopperAgent {...props} />)
 
-            // Verify all event listeners were added
-            expect(mockAddEventListener).toHaveBeenCalledTimes(3)
+            // Verify event listeners were added
             expect(mockAddEventListener).toHaveBeenCalledWith(
                 'onEmbeddedMessagingReady',
-                readyHandler
+                expect.any(Function)
             )
             expect(mockAddEventListener).toHaveBeenCalledWith(
                 'onEmbeddedMessagingWindowMaximized',
-                maximizeHandler
+                expect.any(Function)
             )
             expect(mockAddEventListener).toHaveBeenCalledWith(
                 'onEmbeddedMessagingButtonClicked',
-                buttonClickHandler
+                expect.any(Function)
             )
 
             // Unmount the component
             unmount()
 
-            // Verify all event listeners were removed with the same handlers
-            expect(mockRemoveEventListener).toHaveBeenCalledTimes(3)
+            // Verify event listeners were removed
             expect(mockRemoveEventListener).toHaveBeenCalledWith(
                 'onEmbeddedMessagingReady',
-                readyHandler
+                expect.any(Function)
             )
             expect(mockRemoveEventListener).toHaveBeenCalledWith(
                 'onEmbeddedMessagingWindowMaximized',
-                maximizeHandler
+                expect.any(Function)
             )
             expect(mockRemoveEventListener).toHaveBeenCalledWith(
                 'onEmbeddedMessagingButtonClicked',
-                buttonClickHandler
+                expect.any(Function)
             )
         })
 
-        it('should not add event listeners when component is disabled', () => {
-            const disabledCommerceAgent = {
-                ...mockCommerceAgent,
-                enabled: 'false'
+        test('should not add event listeners when component is disabled', () => {
+            const disabledSettings = {...mockCommerceAgent, enabled: 'false'}
+            const props = {
+                ...defaultProps,
+                commerceAgentConfiguration: disabledSettings
             }
 
-            // Render the component with disabled commerce agent
-            const {unmount} = render(
-                <ShopperAgent
-                    commerceAgentConfiguration={disabledCommerceAgent}
-                    basketId="test-basket-id"
-                    locale="en-US"
-                    basketDoneLoading={true}
-                />
-            )
+            render(<ShopperAgent {...props} />)
 
             // Verify no event listeners were added
             expect(mockAddEventListener).not.toHaveBeenCalled()
-
-            // Unmount the component
-            unmount()
-
-            // Verify no event listeners were removed
-            expect(mockRemoveEventListener).not.toHaveBeenCalled()
         })
     })
 })

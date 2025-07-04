@@ -46,7 +46,7 @@ import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 const onClient = typeof window !== 'undefined'
 
 function isAskAgentOnSearchEnabled(enabled, askAgentOnSearch) {
-    return enabled === 'true' && askAgentOnSearch == 'true' && onClient
+    return enabled === 'true' && askAgentOnSearch === 'true' && onClient
 }
 
 const formatSuggestions = (searchSuggestions, input) => {
