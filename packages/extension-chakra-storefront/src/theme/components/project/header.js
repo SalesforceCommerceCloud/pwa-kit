@@ -8,18 +8,47 @@ import {defineRecipe} from '@chakra-ui/react'
 
 export default defineRecipe({
     slots: [
+        'accountIconButton',
+        'arrowDownIconButton',
+        'bodyContainer',
         'container',
         'content',
-        'searchContainer',
-        'bodyContainer',
-        'logo',
+        'dropdownMenuBody',
+        'dropdownMenuTitle',
         'icons',
-        'accountIconButton',
-        'wishListIconButton',
-        'arrowDownIconButton',
-        'signout'
+        'logo',
+        'menuAccountLink',
+        'searchContainer',
+        'signoutButton',
+        'wishListIconButton'
     ],
     base: {
+        accountIconButton: {
+            height: 11,
+            minWidth: 'auto',
+            cursor: 'pointer',
+            alignSelf: ['self-start', 'self-start', 'self-start', 'auto'],
+            _focus: {
+                boxShadow: 'outline'
+            },
+            _focusVisible: {
+                outline: 0
+            }
+        },
+        arrowDownButton: {
+            height: 11,
+            minWidth: 'auto',
+            marginRight: 0,
+            alignSelf: ['self-start', 'self-start', 'self-start', 'auto'],
+            cursor: 'pointer',
+            _focus: {
+                boxShadow: 'outline'
+            },
+            _focusVisible: {
+                outline: 0
+            },
+            display: ['none', 'none', 'none', 'block']
+        },
         container: {
             minWidth: 'xs',
             width: 'full',
@@ -35,69 +64,79 @@ export default defineRecipe({
             paddingTop: [1, 1, 2, 4],
             paddingBottom: [3, 3, 2, 4]
         },
+        bodyContainer: {
+            flex: '1'
+        },
+        dropdownMenuBody: {
+            padding: 0,
+            pb: 2
+        },
+        dropdownMenuTitle: {
+            px: 7,
+            py: 6,
+            pb: 2
+        },
+        iconButton: {
+            marginBottom: [1, 1, 2, 0]
+        },
+        logo: {
+            width: [8, 8, 8, 12],
+            height: [6, 6, 6, 8]
+        },
+        menuAccountLink: {
+            borderRadius: 'sm',
+            colorPalette: 'blue',
+            px: 4,
+            fontWeight: 600,
+            display: 'flex',
+            height: 11,
+            width: '100%',
+            fontSize: 'sm',
+            color: 'inherit',
+            textDecoration: 'none',
+            justifyContent: 'flex-start',
+            _hover: {
+                bg: 'gray.50'
+            },
+            '&.active': {
+                bg: 'gray.50',
+                borderLeft: 'solid',
+                borderLeftColor: 'gray.600',
+                borderLeftWidth: '4px'
+            }
+        },
         searchContainer: {
             order: [2, 2, 2, 'inherit'],
             width: ['full', 'full', 'full', 60],
             marginRight: [0, 0, 0, 4],
             marginBottom: [1, 1, 2, 0]
         },
-        bodyContainer: {
-            flex: '1'
-        },
-        logo: {
-            width: [8, 8, 8, 12],
-            height: [6, 6, 6, 8]
-        },
-        icons: {
-            marginBottom: [1, 1, 2, 0]
-        },
-        accountIcon: {
-            height: 11,
-            minWidth: 'auto',
-            cursor: 'pointer',
-            alignSelf: ['self-start', 'self-start', 'self-start', 'auto'],
-            _focus: {
-                boxShadow: 'outline'
-            },
-            _focusVisible: {
-                outline: 0
-            }
-        },
-        arrowDown: {
-            height: 11,
-            minWidth: 'auto',
-            marginRight: 0,
-            alignSelf: ['self-start', 'self-start', 'self-start', 'auto'],
-            cursor: 'pointer',
-            _focus: {
-                boxShadow: 'outline'
-            },
-            _focusVisible: {
-                outline: 0
-            },
-            display: ['none', 'none', 'none', 'block']
-        },
-        wishlistIcon: {
-            // More breathing room between the account and wishlist icons
-            marginLeft: 2
-        },
-        signout: {
+        signoutButton: {
+            display: 'flex',
+            justifyContent: 'flex-start',
             width: '100%',
+            color: 'gray.900',
+            fontWeight: 400,
+            fontSize: 'sm',
             borderRadius: '4px',
             height: 11,
             padding: 4,
             py: 3,
+            gap: 3,
             marginTop: 1,
             _hover: {
                 background: 'gray.50'
             }
         },
         signoutText: {
-            fontSize: 'sm',
             fontWeight: 'normal'
         },
         signoutIcon: {
-            marginRight: 2
+            marginRight: 3
+        },
+        wishlistIconButton: {
+            // More breathing room between the account and wishlist icons
+            marginLeft: 2
         }
     }
 })

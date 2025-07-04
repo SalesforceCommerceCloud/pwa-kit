@@ -24,6 +24,7 @@ module.exports = {
         createTestGlob('components/icons'),
         createTestGlob('components/image-gallery'),
         createTestGlob('components/drawer-menu'),
+        createTestGlob('components/header'),
         createTestGlob('components/links-list'),
         createTestGlob('components/locale-selector'),
         createTestGlob('components/nested-accordion'),
@@ -61,7 +62,7 @@ module.exports = {
         '<rootDir>/src/hooks/use-toast.test.js',
         '<rootDir>/src/pages/product-detail/metadata.test.js',
         '<rootDir>/src/pages/product-list/metadata.test.js',
-        '<rootDir>/src/hooks/use-toast.test.js',
+        '<rootDir>/src/hooks/use-toast.test.js'
         // '<rootDir>/src/hooks/use-auth-modal.test.js' // TODO: enable after Account page has been migrated
     ],
     moduleNameMapper: {

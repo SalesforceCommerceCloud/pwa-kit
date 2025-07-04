@@ -46,6 +46,7 @@ import OfflineBanner from '../offline-banner'
 import OfflineBoundary from '../offline-boundary'
 import Seo from '../seo'
 import ScrollToTop from '../scroll-to-top'
+import Fade from '../fade'
 
 // Local Project Hooks
 import {AuthModal, useAuthModal} from '../../hooks/use-auth-modal'
@@ -67,23 +68,23 @@ const PlaceholderComponent: React.FC = () => (
     </Center>
 )
 
-// const DrawerMenuItemWithData = withCommerceSdkReactHookData(
-//     ({itemComponent: ItemComponent, data, ...rest}: any) => (
-//         <Fade in={true}>
-//             <ItemComponent {...rest} item={data} itemComponent={DrawerMenuItemWithData} />
-//         </Fade>
-//     ),
-//     {
-//         hook: useCategory,
-//         queryOptions: ({item}: {item: {id: string}}) => ({
-//             parameters: {
-//                 id: item.id
-//             }
-//         }),
-//         placeholder: PlaceholderComponent
-//     }
-// )
-//
+const DrawerMenuItemWithData = withCommerceSdkReactHookData(
+    ({itemComponent: ItemComponent, data, ...rest}: any) => (
+        <Fade in={true}>
+            <ItemComponent {...rest} item={data} itemComponent={DrawerMenuItemWithData} />
+        </Fade>
+    ),
+    {
+        hook: useCategory,
+        queryOptions: ({item}: {item: {id: string}}) => ({
+            parameters: {
+                id: item.id
+            }
+        }),
+        placeholder: PlaceholderComponent
+    }
+)
+
 const ListMenuContentWithData = withCommerceSdkReactHookData(
     ({data, ...rest}: any) => <ListMenuContent {...rest} item={data} />,
     {
@@ -288,17 +289,19 @@ const withLayout = <P extends object>(WrappedComponent: React.ComponentType<P>) 
                                     onMyAccountClick={onAccountClick}
                                     onWishlistClick={onWishlistClick}
                                 >
-                                    {/*    <HideOnDesktop>*/}
-                                    {/*        <DrawerMenu*/}
-                                    {/*            isOpen={isOpen}*/}
-                                    {/*            onClose={onClose}*/}
-                                    {/*            onLogoClick={onLogoClick}*/}
-                                    {/*            root={categories?.[CAT_MENU_DEFAULT_ROOT_CATEGORY]}*/}
-                                    {/*            itemsKey="categories"*/}
-                                    {/*            itemsCountKey="onlineSubCategoriesCount"*/}
-                                    {/*            itemComponent={DrawerMenuItemWithData}*/}
-                                    {/*        />*/}
-                                    {/*    </HideOnDesktop>*/}
+                                    {/* TODO: mobile menu */}
+                                    <HideOnDesktop>
+                                        <DrawerMenu
+                                            isOpen={open}
+                                            onClose={onClose}
+                                            onLogoClick={onLogoClick}
+                                            root={categories?.[CAT_MENU_DEFAULT_ROOT_CATEGORY]}
+                                            itemsKey="categories"
+                                            itemsCountKey="onlineSubCategoriesCount"
+                                            itemComponent={DrawerMenuItemWithData}
+                                        />
+                                    </HideOnDesktop>
+                                    {/*TODO: Fix menu to load children lazily.*/}
                                     <HideOnMobile>
                                         <ListMenu
                                             root={categories?.[CAT_MENU_DEFAULT_ROOT_CATEGORY]}
