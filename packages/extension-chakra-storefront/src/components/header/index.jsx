@@ -257,7 +257,7 @@ const Header = ({
                                         <Popover.Body css={styles.dropdownMenuBody}>
                                             <Popover.Header pb={1}>
                                                 <Popover.Title>
-                                                    <Heading as="h2" fontWeight={700} size="lg">
+                                                    <Heading as="h2" size="lg">
                                                         {intl.formatMessage({
                                                             defaultMessage: 'My Account',
                                                             id: 'header.popover.title.my_account'
@@ -275,23 +275,25 @@ const Header = ({
                                                         {navLinks.map((link) => {
                                                             const LinkIcon = link.icon
                                                             return (
-                                                                <List.Item
-                                                                    key={link.name}
-                                                                    value={link.name}
-                                                                >
-                                                                    <Link
-                                                                        useNavLink={true}
-                                                                        to={`/account${link.path}`}
+                                                                <List.Item key={link.name}>
+                                                                    <Button
+                                                                        asChild
+                                                                        variant="menu-link"
                                                                         css={styles.menuAccountLink}
                                                                     >
-                                                                        <LinkIcon
-                                                                            boxSize={5}
-                                                                            mr={3}
-                                                                        />
-                                                                        {intl.formatMessage(
-                                                                            messages[link.name]
-                                                                        )}
-                                                                    </Link>
+                                                                        <Link
+                                                                            to={`/account${link.path}`}
+                                                                            useNavLink={true}
+                                                                        >
+                                                                            <LinkIcon
+                                                                                boxSize={5}
+                                                                                mr={2}
+                                                                            />
+                                                                            {intl.formatMessage(
+                                                                                messages[link.name]
+                                                                            )}
+                                                                        </Link>
+                                                                    </Button>
                                                                 </List.Item>
                                                             )
                                                         })}

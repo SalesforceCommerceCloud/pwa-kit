@@ -84,26 +84,11 @@ export default defineRecipe({
             height: [6, 6, 6, 8]
         },
         menuAccountLink: {
-            borderRadius: 'sm',
-            colorPalette: 'blue',
-            px: 4,
-            fontWeight: 600,
-            display: 'flex',
-            height: 11,
-            width: '100%',
             fontSize: 'sm',
-            color: 'inherit',
-            textDecoration: 'none',
-            justifyContent: 'flex-start',
-            _hover: {
-                bg: 'gray.50'
-            },
-            '&.active': {
-                bg: 'gray.50',
-                borderLeft: 'solid',
-                borderLeftColor: 'gray.600',
-                borderLeftWidth: '4px'
-            }
+            fontWeight: 'semibold',
+            borderLeftWidth: '4px',
+            borderLeftStyle: 'solid',
+            borderLeftColor: 'transparent'
         },
         searchContainer: {
             order: [2, 2, 2, 'inherit'],

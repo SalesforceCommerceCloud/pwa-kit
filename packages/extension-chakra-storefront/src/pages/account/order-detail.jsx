@@ -9,17 +9,17 @@ import React, {useEffect, useRef} from 'react'
 import {FormattedMessage, useIntl} from 'react-intl'
 import {useHistory, useRouteMatch} from 'react-router-dom'
 import {
-    Box,
-    Heading,
-    Text,
-    Stack,
     Badge,
-    Flex,
+    Box,
     Button,
-    Divider,
+    Flex,
     Grid,
+    Heading,
+    Separator,
+    Skeleton,
     SimpleGrid,
-    Skeleton
+    Stack,
+    Text
 } from '@chakra-ui/react'
 import {getCreditCardIcon} from '../../utils/cc-utils'
 import {useOrder, useProducts} from '@salesforce/commerce-sdk-react'
@@ -36,7 +36,7 @@ const onClient = typeof window !== 'undefined'
 
 const OrderProducts = ({productItems, currency}) => {
     const orderProductIds = productItems.map((product) => product.productId)
-    const {data: products, isLoading} = useProducts(
+    const {data: products, isPending} = useProducts(
         {
             parameters: {
                 ids: orderProductIds
@@ -64,7 +64,7 @@ const OrderProducts = ({productItems, currency}) => {
 
     return (
         <>
-            {!isLoading &&
+            {!isPending &&
                 variants?.map((variant, index) => {
                     return (
                         <Box
@@ -76,8 +76,8 @@ const OrderProducts = ({productItems, currency}) => {
                         >
                             <ItemVariantProvider variant={variant} currency={currency}>
                                 <Flex width="full" alignItems="flex-start">
-                                    <CartItemVariantImage width={['88px', 36]} mr={4} />
-                                    <Stack spacing={1} marginTop="-3px" flex={1}>
+                                    <CartItemVariantImage width={['88px', 36]} mr="4" />
+                                    <Stack gap="1" marginTop="-3px" flex={1}>
                                         <CartItemVariantName />
                                         <Flex
                                             width="full"
@@ -110,7 +110,7 @@ const AccountOrderDetail = () => {
     const history = useHistory()
     const {formatMessage, formatDate} = useIntl()
 
-    const {data: order, isLoading: isOrderLoading} = useOrder(
+    const {data: order, isPending: isOrderLoading} = useOrder(
         {
             parameters: {orderNo: params.orderNo}
         },
@@ -118,7 +118,7 @@ const AccountOrderDetail = () => {
             enabled: onClient && !!params.orderNo
         }
     )
-    const isLoading = isOrderLoading || !order
+    const isPending = isOrderLoading || !order
     const shipment = order?.shipments[0]
     const {shippingAddress, shippingMethod, shippingStatus, trackingNumber} = shipment || {}
     const paymentCard = order?.paymentInstruments[0]?.paymentCard
@@ -132,14 +132,12 @@ const AccountOrderDetail = () => {
     }, [])
 
     return (
-        <Stack spacing={6} data-testid="account-order-details-page">
+        <Stack gap="6" data-testid="account-order-details-page">
             <Stack>
                 <Box>
                     <Button
-                        as={Link}
-                        to={'/account/orders'}
-                        variant="link"
-                        leftIcon={<ChevronLeftIcon />}
+                        asChild
+                        variant="link-blue"
                         size="sm"
                         onClick={(e) => {
                             if (history.action === 'PUSH') {
@@ -148,14 +146,17 @@ const AccountOrderDetail = () => {
                             }
                         }}
                     >
-                        <FormattedMessage
-                            defaultMessage="Back to Order History"
-                            id="account_order_detail.link.back_to_history"
-                        />
+                        <Link to={'/account/orders'}>
+                            <ChevronLeftIcon boxSize="6" />
+                            <FormattedMessage
+                                defaultMessage="Back to Order History"
+                                id="account_order_detail.link.back_to_history"
+                            />
+                        </Link>
                     </Button>
                 </Box>
 
-                <Stack spacing={[1, 2]}>
+                <Stack gap={[1, 2]}>
                     <Heading as="h1" fontSize={['lg', '2xl']} tabIndex="0" ref={headingRef}>
                         <FormattedMessage
                             defaultMessage="Order Details"
@@ -163,13 +164,13 @@ const AccountOrderDetail = () => {
                         />
                     </Heading>
 
-                    {!isLoading ? (
+                    {!isPending ? (
                         <Stack
                             direction={['column', 'row']}
                             alignItems={['flex-start', 'center']}
-                            spacing={[0, 3]}
-                            divider={
-                                <Divider
+                            gap={[0, 3]}
+                            separator={
+                                <Separator
                                     visibility={{base: 'visible'}}
                                     orientation="vertical"
                                     h={[0, 4]}
@@ -197,7 +198,9 @@ const AccountOrderDetail = () => {
                                         values={{orderNumber: order.orderNo}}
                                     />
                                 </Text>
-                                <Badge colorScheme="green">{order.status}</Badge>
+                                <Badge colorPalette="green" fontWeight="bold">
+                                    {order.status?.toUpperCase()}
+                                </Badge>
                             </Stack>
                         </Stack>
                     ) : (
@@ -208,8 +211,8 @@ const AccountOrderDetail = () => {
 
             <Box layerStyle="cardBordered">
                 <Grid templateColumns={{base: '1fr', xl: '60% 1fr'}} gap={{base: 6, xl: 2}}>
-                    <SimpleGrid columns={{base: 1, sm: 2}} columnGap={4} rowGap={5} py={{xl: 6}}>
-                        {isLoading ? (
+                    <SimpleGrid columns={{base: 1, sm: 2}} columnGap="4" rowGap="5" py={{xl: 6}}>
+                        {isPending ? (
                             <>
                                 <Stack>
                                     <Skeleton h="20px" w="84px" />
@@ -233,8 +236,8 @@ const AccountOrderDetail = () => {
                             </>
                         ) : (
                             <>
-                                <Stack spacing={1}>
-                                    <Heading as="h2" fontSize="sm" pt={1}>
+                                <Stack gap="1">
+                                    <Heading as="h2" fontSize="sm" pt="1">
                                         <FormattedMessage
                                             defaultMessage="Shipping Method"
                                             id="account_order_detail.heading.shipping_method"
@@ -275,8 +278,8 @@ const AccountOrderDetail = () => {
                                         </Text>
                                     </Box>
                                 </Stack>
-                                <Stack spacing={1}>
-                                    <Heading as="h2" fontSize="sm" pt={1}>
+                                <Stack gap="1">
+                                    <Heading as="h2" fontSize="sm" pt="1">
                                         <FormattedMessage
                                             defaultMessage="Payment Method"
                                             id="account_order_detail.heading.payment_method"
@@ -301,8 +304,8 @@ const AccountOrderDetail = () => {
                                         </Box>
                                     </Stack>
                                 </Stack>
-                                <Stack spacing={1}>
-                                    <Heading as="h2" fontSize="sm" pt={1}>
+                                <Stack gap="1">
+                                    <Heading as="h2" fontSize="sm" pt="1">
                                         <FormattedMessage
                                             defaultMessage="Shipping Address"
                                             id="account_order_detail.heading.shipping_address"
@@ -319,7 +322,7 @@ const AccountOrderDetail = () => {
                                         </Text>
                                     </Box>
                                 </Stack>
-                                <Stack spacing={1}>
+                                <Stack gap="1">
                                     <Heading as="h2" fontSize="sm" pt={1}>
                                         <FormattedMessage
                                             defaultMessage="Billing Address"
@@ -343,7 +346,7 @@ const AccountOrderDetail = () => {
                         )}
                     </SimpleGrid>
 
-                    {!isLoading ? (
+                    {!isPending ? (
                         <Box
                             py={{base: 6}}
                             px={{base: 6, xl: 8}}
@@ -358,8 +361,8 @@ const AccountOrderDetail = () => {
                 </Grid>
             </Box>
 
-            <Stack spacing={4}>
-                {!isLoading && (
+            <Stack gap="4">
+                {!isPending && (
                     <Text>
                         <FormattedMessage
                             defaultMessage="{count} items"
@@ -369,8 +372,8 @@ const AccountOrderDetail = () => {
                     </Text>
                 )}
 
-                <Stack spacing={4}>
-                    {isLoading ? (
+                <Stack gap="4">
+                    {isPending ? (
                         [1, 2, 3].map((i) => (
                             <Box
                                 key={i}
@@ -380,9 +383,9 @@ const AccountOrderDetail = () => {
                                 borderRadius="base"
                             >
                                 <Flex width="full" align="flex-start">
-                                    <Skeleton boxSize={['88px', 36]} mr={4} />
+                                    <Skeleton boxSize={['88px', 36]} mr="4" />
 
-                                    <Stack spacing={2}>
+                                    <Stack gap={2}>
                                         <Skeleton h="20px" w="112px" />
                                         <Skeleton h="20px" w="84px" />
                                         <Skeleton h="20px" w="140px" />

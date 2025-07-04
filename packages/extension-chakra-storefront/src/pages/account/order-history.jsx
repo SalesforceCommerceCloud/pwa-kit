@@ -16,10 +16,10 @@ import {
     Badge,
     Flex,
     Button,
-    Divider,
+    Separator,
     Grid,
     AspectRatio,
-    Img,
+    Image,
     Skeleton
 } from '@chakra-ui/react'
 import {useCustomerOrders, useProducts} from '@salesforce/commerce-sdk-react'
@@ -33,7 +33,7 @@ import PropTypes from 'prop-types'
 
 const OrderProductImages = ({productItems}) => {
     const ids = productItems.map((item) => item.productId).join(',') ?? ''
-    const {data: {data: products} = {}, isLoading} = useProducts({
+    const {data: {data: products} = {}, isPending} = useProducts({
         parameters: {
             ids: ids
         }
@@ -45,7 +45,7 @@ const OrderProductImages = ({productItems}) => {
 
     return (
         <>
-            {!isLoading && products
+            {!isPending && products
                 ? images.map((image, index) => {
                       return (
                           <AspectRatio
@@ -56,7 +56,7 @@ const OrderProductImages = ({productItems}) => {
                               borderRadius="base"
                               overflow="hidden"
                           >
-                              <Img
+                              <Image
                                   alt={image?.alt}
                                   src={image?.disBaseLink || image?.link}
                                   fallback={<Box background="gray.100" boxSize="full" />}
@@ -89,7 +89,7 @@ const AccountOrderHistory = () => {
     const searchParams = useSearchParams(accountConfig.orderSearchParam)
     const {limit, offset} = searchParams[0]
 
-    const {data: {data: orders, ...paging} = {}, isLoading} = useCustomerOrders(
+    const {data: {data: orders, ...paging} = {}, isPending} = useCustomerOrders(
         {
             parameters: {customerId, limit, offset}
         },
@@ -111,7 +111,7 @@ const AccountOrderHistory = () => {
     }, [customer, searchParams.offset])
 
     return (
-        <Stack spacing={4} data-testid="account-order-history-page">
+        <Stack gap="4" data-testid="account-order-history-page">
             <Stack>
                 <Heading as="h1" fontSize="2xl" tabIndex="0" ref={headingRef}>
                     <FormattedMessage
@@ -121,14 +121,14 @@ const AccountOrderHistory = () => {
                 </Heading>
             </Stack>
 
-            {isLoading ? (
+            {isPending ? (
                 [1, 2, 3].map((i) => (
-                    <Stack key={i} spacing={4} layerStyle="cardBordered">
-                        <Stack spacing={2}>
+                    <Stack key={i} gap="4" layerStyle="cardBordered">
+                        <Stack gap={2}>
                             <Skeleton h="20px" w="112px" />
                             <Skeleton h="20px" w="200px" />
                         </Stack>
-                        <Grid templateColumns={{base: 'repeat(auto-fit, 88px)'}} gap={4}>
+                        <Grid templateColumns={{base: 'repeat(auto-fit, 88px)'}} gap="4">
                             {Array.from(Array(4).keys()).map((i) => (
                                 <Skeleton key={i} w="88px" h="88px" />
                             ))}
@@ -137,10 +137,10 @@ const AccountOrderHistory = () => {
                     </Stack>
                 ))
             ) : (
-                <Stack spacing={4}>
+                <Stack gap="4">
                     {orders?.map((order) => {
                         return (
-                            <Stack key={order.orderNo} spacing={4} layerStyle="cardBordered">
+                            <Stack key={order.orderNo} gap="4" layerStyle="cardBordered">
                                 <Box>
                                     <Flex justifyContent="space-between">
                                         <Text fontWeight="bold" fontSize="lg">
@@ -158,18 +158,21 @@ const AccountOrderHistory = () => {
                                         </Text>
                                         <Box>
                                             <Button
-                                                as={Link}
-                                                to={`/account/orders/${order.orderNo}`}
-                                                variant="link"
-                                                rightIcon={
-                                                    <ChevronRightIcon boxSize={5} mx={-1.5} />
-                                                }
+                                                asChild
+                                                variant="link-blue"
                                                 fontSize={{base: 'sm', lg: 'md'}}
                                             >
-                                                <FormattedMessage
-                                                    defaultMessage="View details"
-                                                    id="account_order_history.link.view_details"
-                                                />
+                                                <Link to={`/account/orders/${order.orderNo}`}>
+                                                    <FormattedMessage
+                                                        defaultMessage="View details"
+                                                        id="account_order_history.link.view_details"
+                                                    />
+                                                    <ChevronRightIcon
+                                                        boxSize={5}
+                                                        mx={-1.5}
+                                                        ml={1}
+                                                    />
+                                                </Link>
                                             </Button>
                                         </Box>
                                     </Flex>
@@ -181,19 +184,21 @@ const AccountOrderHistory = () => {
                                                 values={{orderNumber: order.orderNo}}
                                             />
                                         </Text>
-                                        <Badge colorScheme="green">{order.status}</Badge>
+                                        <Badge colorPalette="green" fontWeight="bold">
+                                            {order.status?.toUpperCase()}
+                                        </Badge>
                                     </Stack>
                                 </Box>
-                                <Grid templateColumns={{base: 'repeat(auto-fit, 88px)'}} gap={4}>
+                                <Grid templateColumns={{base: 'repeat(auto-fit, 88px)'}} gap="4">
                                     <OrderProductImages productItems={order.productItems} />
                                 </Grid>
 
                                 <Stack
                                     direction={{base: 'column', lg: 'row'}}
                                     alignItems={{base: 'flex-start', lg: 'center'}}
-                                    spacing={{base: '2px', lg: 3}}
-                                    divider={
-                                        <Divider
+                                    gap={{base: '2px', lg: 3}}
+                                    Separator={
+                                        <Separator
                                             visibility={{base: 'hidden', lg: 'visible'}}
                                             orientation={'vertical'}
                                             h={{base: 0, lg: 4}}
@@ -230,7 +235,7 @@ const AccountOrderHistory = () => {
                     })}
 
                     {hasOrders && orders?.length < paging.total && (
-                        <Box pt={4}>
+                        <Box pt="4">
                             <Pagination
                                 currentURL={`${location.pathname}${location.search}`}
                                 urls={pageUrls}
@@ -240,7 +245,7 @@ const AccountOrderHistory = () => {
                 </Stack>
             )}
 
-            {!hasOrders && !isLoading && (
+            {!hasOrders && !isPending && (
                 <Stack data-testid="account-order-history-place-holder">
                     <PageActionPlaceHolder
                         icon={<ReceiptIcon boxSize={8} />}
@@ -257,7 +262,7 @@ const AccountOrderHistory = () => {
                             defaultMessage: 'Continue Shopping',
                             id: 'account_order_history.button.continue_shopping'
                         })}
-                        buttonProps={{leftIcon: undefined}}
+                        buttonProps={{}}
                         onButtonClick={() => navigate('/')}
                     />
                 </Stack>
