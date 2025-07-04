@@ -430,5 +430,7 @@ jobs:
           cache: npm
       - name: Install Monorepo Dependencies
         run: node ./scripts/gtime.js monorepo_install npm ci
+      - name: Install Playwright Browsers
+        run: npx playwright install --with-deps
       - name: Run extra features login tests
         run: npm run test:e2e:extra_features
