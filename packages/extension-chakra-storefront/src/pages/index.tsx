@@ -66,7 +66,7 @@ PageNotFound.displayName = 'PageNotFound'
 export {
     Account,
     Cart,
-    // Checkout,
+    Checkout,
     // CheckoutConfirmation,
     Home,
     Login,
