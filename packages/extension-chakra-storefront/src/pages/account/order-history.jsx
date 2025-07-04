@@ -194,7 +194,7 @@ const AccountOrderHistory = () => {
                                     direction={{base: 'column', lg: 'row'}}
                                     alignItems={{base: 'flex-start', lg: 'center'}}
                                     gap={{base: '2px', lg: 3}}
-                                    Separator={
+                                    separator={
                                         <Separator
                                             visibility={{base: 'hidden', lg: 'visible'}}
                                             orientation={'vertical'}
