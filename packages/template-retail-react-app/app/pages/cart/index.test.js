@@ -15,7 +15,7 @@ import {
     mockEmptyBasket,
     mockCartVariant,
     mockedCustomerProductLists,
-    mockBonusProductBasket
+    mockBasketWithBonusProducts
 } from '@salesforce/retail-react-app/app/mocks/mock-data'
 import mockVariant from '@salesforce/retail-react-app/app/mocks/variant-750518699578M'
 import {rest} from 'msw'
@@ -1236,7 +1236,7 @@ describe('Bonus products', () => {
             {
                 path: '*/customers/:customerId/baskets',
                 method: 'get',
-                res: () => mockBonusProductBasket
+                res: () => mockBasketWithBonusProducts
             }
         ])
     })
