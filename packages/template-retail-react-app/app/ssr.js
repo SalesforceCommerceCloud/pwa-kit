@@ -324,9 +324,6 @@ const {handler} = runtime.createHandler(options, (app) => {
                         '*.site.com'
                     ]
                 }
-            },
-            referrerPolicy: {
-                policy: 'strict-origin-when-cross-origin'
             }
         })
     )
