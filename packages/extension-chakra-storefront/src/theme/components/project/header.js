@@ -4,18 +4,18 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import {defineRecipe} from '@chakra-ui/react'
+import {defineSlotRecipe} from '@chakra-ui/react'
 
-export default defineRecipe({
+export default defineSlotRecipe({
     slots: [
         'accountIconButton',
-        'arrowDownIconButton',
+        'arrowDownButton',
         'bodyContainer',
         'container',
         'content',
         'dropdownMenuBody',
         'dropdownMenuTitle',
-        'icons',
+        'iconButton',
         'logo',
         'menuAccountLink',
         'searchContainer',
@@ -37,6 +37,7 @@ export default defineRecipe({
         },
         arrowDownButton: {
             height: 11,
+            justifyContent: 'flex-start',
             minWidth: 'auto',
             marginRight: 0,
             alignSelf: ['self-start', 'self-start', 'self-start', 'auto'],
