@@ -62,7 +62,8 @@ module.exports = {
         '<rootDir>/src/hooks/use-toast.test.js',
         '<rootDir>/src/pages/product-detail/metadata.test.js',
         '<rootDir>/src/pages/product-list/metadata.test.js',
-        '<rootDir>/src/hooks/use-toast.test.js'
+        '<rootDir>/src/hooks/use-toast.test.js',
+        '<rootDir>/src/hooks/use-dnt-notification.test.js'
         // '<rootDir>/src/hooks/use-auth-modal.test.js' // TODO: enable after Account page has been migrated
     ],
     moduleNameMapper: {

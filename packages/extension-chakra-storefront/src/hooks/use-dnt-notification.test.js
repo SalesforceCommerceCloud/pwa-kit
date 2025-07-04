@@ -20,7 +20,6 @@ jest.mock('@salesforce/commerce-sdk-react', () => {
 
 const MockedComponent = () => {
     const dntNotification = useDntNotification()
-    console.log('dntNotification', dntNotification)
     return <DntNotification {...dntNotification} />
 }
 
@@ -39,9 +38,8 @@ test('Notification renders properly', async () => {
 test('Clicking out of notification does setDNT(null)', async () => {
     const {user} = renderWithProviders(<MockedComponent />)
     let closeButton
+    // give some time for modal to show up
     await waitFor(async () => {
-        screen.logTestingPlaygroundURL()
-
         // open the notification
         closeButton = screen.getByLabelText('Close consent tracking form')
         expect(closeButton).toHaveAttribute('aria-label', 'Close consent tracking form')
@@ -58,9 +56,13 @@ test('Clicking out of notification does setDNT(null)', async () => {
 test('Clicking Accept does setDNT(false)', async () => {
     const {user} = renderWithProviders(<MockedComponent />)
 
-    // open the notification
-    const acceptButton = screen.getAllByText('Accept')[0]
-    expect(acceptButton).toHaveAttribute('aria-label', 'Accept tracking')
+    let acceptButton
+    // give some time for modal to show up
+    await waitFor(async () => {
+        // open the notification
+        acceptButton = screen.getAllByText('Accept')[0]
+        expect(acceptButton).toHaveAttribute('aria-label', 'Accept tracking')
+    })
     await act(async () => {
         await user.click(acceptButton)
     })
@@ -72,10 +74,13 @@ test('Clicking Accept does setDNT(false)', async () => {
 
 test('Clicking Decline does setDNT(true)', async () => {
     const {user} = renderWithProviders(<MockedComponent />)
-
-    // open the notification
-    const declineButton = screen.getAllByText('Decline')[0]
-    expect(declineButton).toHaveAttribute('aria-label', 'Decline tracking')
+    let declineButton
+    // wait for modal to show up
+    await waitFor(async () => {
+        // open the notification
+        declineButton = screen.getAllByText('Decline')[0]
+        expect(declineButton).toHaveAttribute('aria-label', 'Decline tracking')
+    })
     await act(async () => {
         await user.click(declineButton)
     })
