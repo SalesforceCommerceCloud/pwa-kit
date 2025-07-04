@@ -1,3 +1,6 @@
+## v3.12.0-dev.0 (tbd)
+- This feature introduces an AI-powered shopping assistant that integrates Salesforce Embedded Messaging Service with PWA Kit applications. The shopper agent provides real-time chat support, search assistance, and personalized shopping guidance directly within the e-commerce experience. [#2658](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2658)
+
 ## v3.11.0-dev.0 (May 23, 2025)
 - Add `program.json` + Support for Agent-Friendly CLI Input via stdio [#2662](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2662)
 - Change the default ECOM instance in the generated application [#2610](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2610)
@@ -6,7 +9,6 @@
 ## v3.10.0 (May 22, 2025)
 - Add Data Cloud API configuration to `default.js`. [#2318](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2318)
 - Fix dependencies vulnerabilities [#2338](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2338)
-- Added referrer policy `strict-origin-when-cross-origin` in `ssr.js` [#2416](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2416)
 
 ## v3.9.1 (Mar 05, 2025)
 - Update PWA-Kit SDKs to v3.9.1 [#2301](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2301)
