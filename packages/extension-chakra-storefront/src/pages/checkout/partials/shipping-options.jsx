@@ -193,12 +193,12 @@ export default function ShippingOptions() {
                         )}
 
                         <Box>
-                            {/* TODO: Get the rightIcon to display */}
-                            <Button variant="link-blue" size="sm" rightIcon={<ChevronDownIcon />}>
+                            <Button variant="link-blue" size="sm">
                                 <FormattedMessage
                                     defaultMessage="Do you want to send this as a gift?"
                                     id="shipping_options.action.send_as_a_gift"
                                 />
+                                <ChevronDownIcon />
                             </Button>
                         </Box>
                         <Box>
