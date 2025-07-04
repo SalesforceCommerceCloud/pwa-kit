@@ -89,9 +89,9 @@ const CCRadioGroup = ({
                                 minHeight={['44px', '44px', '154px']}
                                 rounded="base"
                                 fontWeight="medium"
-                                leftIcon={<PlusIcon boxSize={'15px'} />}
                                 onClick={togglePaymentEdit}
                             >
+                                <PlusIcon boxSize={'15px'} />
                                 <FormattedMessage
                                     defaultMessage="Add New Card"
                                     id="cc_radio_group.button.add_new_card"
