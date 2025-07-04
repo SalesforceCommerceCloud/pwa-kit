@@ -72,7 +72,7 @@ describe('ShopperAgent Component', () => {
         useScript.mockReturnValue({loaded: false, error: false})
 
         // Clear any existing scripts
-        const scripts = document.querySelectorAll('script[data-status]')
+        const scripts = document.querySelectorAll('script[src]')
         scripts.forEach((script) => script.remove())
     })
 

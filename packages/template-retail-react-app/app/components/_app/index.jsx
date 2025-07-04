@@ -358,13 +358,15 @@ const App = (props) => {
                             <link rel="alternate" hrefLang="x-default" href={`${appOrigin}/`} />
                         </Seo>
 
-                        <ShopperAgent
-                            commerceAgentConfiguration={commerceAgentConfiguration}
-                            domainUrl={`${appOrigin}${buildUrl(location.pathname)}`}
-                            locale={locale?.id}
-                            basketId={basket?.basketId}
-                            basketDoneLoading={basketQueryLastUpdateTime > 0}
-                        />
+                        {commerceAgentConfiguration?.enabled === 'true' && (
+                            <ShopperAgent
+                                commerceAgentConfiguration={commerceAgentConfiguration}
+                                domainUrl={`${appOrigin}${buildUrl(location.pathname)}`}
+                                locale={locale?.id}
+                                basketId={basket?.basketId}
+                                basketDoneLoading={basketQueryLastUpdateTime > 0}
+                            />
+                        )}
 
                         <ScrollToTop />
 
