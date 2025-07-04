@@ -210,8 +210,13 @@ const AccountOrderDetail = () => {
             </Stack>
 
             <Box layerStyle="cardBordered">
-                <Grid templateColumns={{base: '1fr', xl: '60% 1fr'}} gap={{base: 6, xl: 2}}>
-                    <SimpleGrid columns={{base: 1, sm: 2}} columnGap="4" rowGap="5" py={{xl: 6}}>
+                <Grid templateColumns={{base: '1fr', xl: '60% 1fr'}} gap={{base: '6', xl: '2'}}>
+                    <SimpleGrid
+                        columns={{base: '1', sm: '2'}}
+                        columnGap="4"
+                        rowGap="5"
+                        py={{xl: '6'}}
+                    >
                         {isPending ? (
                             <>
                                 <Stack>
@@ -323,7 +328,7 @@ const AccountOrderDetail = () => {
                                     </Box>
                                 </Stack>
                                 <Stack gap="1">
-                                    <Heading as="h2" fontSize="sm" pt={1}>
+                                    <Heading as="h2" fontSize="sm" pt="1">
                                         <FormattedMessage
                                             defaultMessage="Billing Address"
                                             id="account_order_detail.heading.billing_address"
@@ -345,11 +350,10 @@ const AccountOrderDetail = () => {
                             </>
                         )}
                     </SimpleGrid>
-
                     {!isPending ? (
                         <Box
-                            py={{base: 6}}
-                            px={{base: 6, xl: 8}}
+                            py={{base: '6'}}
+                            px={{base: '6', xl: '8'}}
                             background="gray.50"
                             borderRadius="base"
                         >
@@ -377,13 +381,13 @@ const AccountOrderDetail = () => {
                         [1, 2, 3].map((i) => (
                             <Box
                                 key={i}
-                                p={[4, 6]}
+                                p={['4', '6']}
                                 border="1px solid"
                                 borderColor="gray.100"
                                 borderRadius="base"
                             >
                                 <Flex width="full" align="flex-start">
-                                    <Skeleton boxSize={['88px', 36]} mr="4" />
+                                    <Skeleton boxSize={['88', '36']} mr="4" />
 
                                     <Stack gap={2}>
                                         <Skeleton h="20px" w="112px" />
