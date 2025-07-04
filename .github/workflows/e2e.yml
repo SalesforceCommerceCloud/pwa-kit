@@ -432,5 +432,7 @@ jobs:
         run: node ./scripts/gtime.js monorepo_install npm ci
       - name: Install Playwright Browsers
         run: npx playwright install --with-deps
+      - name: Set PWA Kit E2E Test User
+        run: export PWA_E2E_USER_EMAIL=e2e.pwa.kit@gmail.com PWA_E2E_USER_PASSWORD=hpv_pek-JZK_xkz0wzf
       - name: Run extra features login tests
         run: npm run test:e2e:extra_features
