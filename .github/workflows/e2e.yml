@@ -3,7 +3,7 @@ on:
   push:
     branches:
       - develop
-      - extra-features-e2e-branch # Just testing
+      - W-18685522-reset-and-passwordless-integration-test # Just testing
   workflow_dispatch:
   schedule:
     # Run every day at 12am (PST) - cron uses UTC times
