@@ -25,9 +25,7 @@ import {useDNT} from '@salesforce/commerce-sdk-react'
 import {useLocation} from 'react-router-dom'
 
 export const DntNotification = ({isOpen, onOpen, onClose}) => {
-    console.log('isOpen', isOpen)
     const {selectedDnt, updateDNT} = useDNT()
-    console.log('selectedDnt', selectedDnt)
     const {formatMessage} = useIntl()
     const location = useLocation()
 
@@ -96,13 +94,14 @@ export const DntNotification = ({isOpen, onOpen, onClose}) => {
             data-testid="sf-dnt-notification"
             closeOnInteractOutside={false}
             trapFocus={false}
+            modal={false}
             open={isOpen}
             preventScroll={false}
             onOpenChange={isOpen ? onClose : onOpen}
             placement="bottom"
             onClose={onCloseNotification}
         >
-            <Dialog.Positioner>
+            <Dialog.Positioner pointerEvents="none">
                 <Dialog.Content
                     width="100%"
                     maxWidth="100%"
