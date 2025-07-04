@@ -207,6 +207,7 @@ export const render = async (req, res, next) => {
         appStateError = new errors.HTTPNotFound('Not found')
     } else {
         res.__performanceTimer.mark(PERFORMANCE_MARKS.fetchStrategies, 'start')
+        // TODO
         const ret = await AppConfig.initAppState({
             App: WrappedApp,
             component,
@@ -221,6 +222,7 @@ export const render = async (req, res, next) => {
             ...ret.appState,
             __STATE_MANAGEMENT_LIBRARY: AppConfig.freeze(res.locals)
         }
+        console.log('--- react-rendering appState', appState)
         appStateError = ret.error
         res.__performanceTimer.mark(PERFORMANCE_MARKS.fetchStrategies, 'end')
     }

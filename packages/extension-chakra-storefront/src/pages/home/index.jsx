@@ -171,6 +171,8 @@ const Home = () => {
                 </SimpleGrid>
             </Section>
 
+            <div>is product search still loading: {isLoading ? 'yes' : 'no'}</div>
+
             {productSearchResult && (
                 <Section
                     padding={4}

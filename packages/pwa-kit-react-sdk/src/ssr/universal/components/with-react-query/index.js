@@ -70,10 +70,12 @@ export const withReactQuery = (Wrapped, options = {}) => {
 
             res.__performanceTimer.mark(PERFORMANCE_MARKS.reactQueryPrerender, 'start')
             // Use `ssrPrepass` to collect all uses of `useQuery`.
+            // TODO
             await ssrPrepass(appJSX)
             res.__performanceTimer.mark(PERFORMANCE_MARKS.reactQueryPrerender, 'end')
             const queryCache = queryClient.getQueryCache()
             const queries = queryCache.getAll().filter((q) => q.options.enabled !== false)
+            console.log('--- withReactQuery queries', queries, queryCache.getAll())
             await Promise.all(
                 queries.map((q, i) => {
                     // always include the index to avoid duplicate entries
@@ -101,7 +103,9 @@ export const withReactQuery = (Wrapped, options = {}) => {
                 })
             )
 
-            return {[STATE_KEY]: dehydrate(queryClient)}
+            const result = {[STATE_KEY]: dehydrate(queryClient)}
+            console.log('--- withReactQuery doInitAppState', result)
+            return result
         }
 
         /**
