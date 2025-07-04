@@ -9,6 +9,7 @@ module.exports = {
   RETAIL_APP_HOME:
     process.env.RETAIL_APP_HOME ||
     "https://scaffold-pwa-e2e-tests-pwa-kit.mobify-storefront.com",
+  RETAIL_APP_HOME_SITE: "RefArch",
   GENERATED_PROJECTS_DIR: "../generated-projects",
   GENERATE_PROJECTS: ["retail-app-demo", "retail-app-ext", "retail-app-no-ext"],
   GENERATOR_CMD:
@@ -162,5 +163,6 @@ module.exports = {
   },
   PWA_E2E_USER_EMAIL: process.env.PWA_E2E_USER_EMAIL,
   PWA_E2E_USER_PASSWORD: process.env.PWA_E2E_USER_PASSWORD,
-  EXTRA_FEATURES_E2E_RETAIL_APP_HOME: "https://scaffold-pwa-extra-features-e2e.mobify-storefront.com"
+  EXTRA_FEATURES_E2E_RETAIL_APP_HOME: "https://scaffold-pwa-extra-features-e2e.mobify-storefront.com",
+  EXTRA_FEATURES_E2E_RETAIL_APP_HOME_SITE: "RefArchGlobal"
 };

@@ -6,7 +6,7 @@
  */
 
 const {test, expect} = require('@playwright/test')
-const config = require('../../config')
+const config = require('../../config.js')
 const {generateUserCredentials} = require('../../scripts/utils.js')
 const {answerConsentTrackingForm} = require('../../scripts/pageHelpers.js')
 
@@ -45,7 +45,7 @@ test('Verify passwordless login request on mobile', async ({page}) => {
     
     expect(params.get('user_id')).toBe(config.PWA_E2E_USER_EMAIL)
     expect(params.get('mode')).toBe('callback')
-    expect(params.get('channel_id')).toBe('RefArchGlobal')
+    expect(params.get('channel_id')).toBe(config.EXTRA_FEATURES_E2E_RETAIL_APP_HOME_SITE)
     expect(params.get('callback_uri')).toMatch(/.*\/passwordless-login-callback$/)
 })
 
@@ -82,7 +82,7 @@ test('Verify password reset callback request on mobile (extra features enabled)'
 
     expect(params.get('user_id')).toBe(config.PWA_E2E_USER_EMAIL)
     expect(params.get('mode')).toBe('callback')
-    expect(params.get('channel_id')).toBe('RefArchGlobal')
+    expect(params.get('channel_id')).toBe(config.EXTRA_FEATURES_E2E_RETAIL_APP_HOME_SITE)
     expect(params.get('callback_uri')).toMatch(/.*\/reset-password-callback$/)
     expect(params.get('hint')).toBe('cross_device')
 })
@@ -120,7 +120,7 @@ test('Verify password reset callback request on mobile when extra login features
 
     expect(params.get('user_id')).toBe(config.PWA_E2E_USER_EMAIL)
     expect(params.get('mode')).toBe('callback')
-    expect(params.get('channel_id')).toBe('RefArch')
+    expect(params.get('channel_id')).toBe(config.RETAIL_APP_HOME_SITE)
     expect(params.get('callback_uri')).toMatch(/.*\/reset-password-callback$/)
     expect(params.get('hint')).toBe('cross_device')
 })
