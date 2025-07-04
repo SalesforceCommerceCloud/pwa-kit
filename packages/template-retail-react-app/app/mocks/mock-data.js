@@ -5712,7 +5712,7 @@ export const mockPasswordUpdateFalure = {
     errorMessage: 'Customer\u0027s current password is not valid'
 }
 
-export const mockBonusProductBasket = {
+export const mockBasketWithBonusProducts = {}
     baskets: [
         {
             ...mockCustomerBaskets.baskets[0],
