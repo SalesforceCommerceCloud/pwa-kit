@@ -111,7 +111,7 @@ const AccountOrderHistory = () => {
     }, [customer, searchParams.offset])
 
     return (
-        <Stack gap="4" data-testid="account-order-history-page">
+        <Stack gap={4} data-testid="account-order-history-page">
             <Stack>
                 <Heading as="h1" fontSize="2xl" tabIndex="0" ref={headingRef}>
                     <FormattedMessage
@@ -123,12 +123,12 @@ const AccountOrderHistory = () => {
 
             {isPending ? (
                 [1, 2, 3].map((i) => (
-                    <Stack key={i} gap="4" layerStyle="cardBordered">
+                    <Stack key={i} gap={4} layerStyle="cardBordered">
                         <Stack gap={2}>
                             <Skeleton h="20px" w="112px" />
                             <Skeleton h="20px" w="200px" />
                         </Stack>
-                        <Grid templateColumns={{base: 'repeat(auto-fit, 88px)'}} gap="4">
+                        <Grid templateColumns={{base: 'repeat(auto-fit, 88px)'}} gap={4}>
                             {Array.from(Array(4).keys()).map((i) => (
                                 <Skeleton key={i} w="88px" h="88px" />
                             ))}
@@ -137,10 +137,10 @@ const AccountOrderHistory = () => {
                     </Stack>
                 ))
             ) : (
-                <Stack gap="4">
+                <Stack gap={4}>
                     {orders?.map((order) => {
                         return (
-                            <Stack key={order.orderNo} gap="4" layerStyle="cardBordered">
+                            <Stack key={order.orderNo} gap={4} layerStyle="cardBordered">
                                 <Box>
                                     <Flex justifyContent="space-between">
                                         <Text fontWeight="bold" fontSize="lg">
@@ -168,9 +168,9 @@ const AccountOrderHistory = () => {
                                                         id="account_order_history.link.view_details"
                                                     />
                                                     <ChevronRightIcon
-                                                        boxSize={5}
-                                                        mx={-1.5}
-                                                        ml={1}
+                                                        boxSize="5"
+                                                        mx="-1.5"
+                                                        ml="1"
                                                     />
                                                 </Link>
                                             </Button>
@@ -189,7 +189,7 @@ const AccountOrderHistory = () => {
                                         </Badge>
                                     </Stack>
                                 </Box>
-                                <Grid templateColumns={{base: 'repeat(auto-fit, 88px)'}} gap="4">
+                                <Grid templateColumns={{base: 'repeat(auto-fit, 88px)'}} gap={4}>
                                     <OrderProductImages productItems={order.productItems} />
                                 </Grid>
 
@@ -235,7 +235,7 @@ const AccountOrderHistory = () => {
                     })}
 
                     {hasOrders && orders?.length < paging.total && (
-                        <Box pt="4">
+                        <Box pt={4}>
                             <Pagination
                                 currentURL={`${location.pathname}${location.search}`}
                                 urls={pageUrls}
@@ -248,7 +248,7 @@ const AccountOrderHistory = () => {
             {!hasOrders && !isPending && (
                 <Stack data-testid="account-order-history-place-holder">
                     <PageActionPlaceHolder
-                        icon={<ReceiptIcon boxSize={8} />}
+                        icon={<ReceiptIcon boxSize="8" />}
                         heading={formatMessage({
                             defaultMessage: "You haven't placed an order yet.",
                             id: 'account_order_history.heading.no_order_yet'

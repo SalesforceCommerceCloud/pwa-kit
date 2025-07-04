@@ -49,9 +49,9 @@ const LogoutButton = ({onClick}) => {
     const {formatMessage} = useIntl()
     return (
         <>
-            <Separator colorScheme={'gray'} marginTop={3} />
-            <Button variant="ghost" css={styles.signoutButton} onClick={onClick} gap={5}>
-                <SignoutIcon aria-hidden={true} boxSize={5} css={styles.signoutIcon} />
+            <Separator colorScheme="gray" marginTop="3" />
+            <Button variant="ghost" css={styles.signoutButton} onClick={onClick} gap="5">
+                <SignoutIcon aria-hidden={true} boxSize="5" css={styles.signoutIcon} />
                 <Text as="span" css={styles.signoutText}>
                     {formatMessage({
                         defaultMessage: 'Log Out',
@@ -130,8 +130,8 @@ const Account = () => {
                         borderRadius="base"
                     >
                         <Accordion.ItemTrigger
-                            height={16}
-                            paddingLeft={8}
+                            height="16"
+                            paddingLeft="8"
                             variant="ghost"
                             color="black"
                             _active={{background: 'gray.100'}}
@@ -149,9 +149,9 @@ const Account = () => {
                                 </Accordion.ItemIndicator>
                             </Flex>
                         </Accordion.ItemTrigger>
-                        <Accordion.ItemContent px={4} paddingBottom={4}>
-                            <Flex as="nav" gap={0} direction="column">
-                                <Stack gap={0}>
+                        <Accordion.ItemContent px="4" paddingBottom="4">
+                            <Flex as="nav" gap="0" direction="column">
+                                <Stack gap="0">
                                     <List.Root variant="plain" as="ul" data-testid="account-nav">
                                         {navLinks.map((link) => {
                                             const LinkIcon = link.icon
@@ -167,7 +167,7 @@ const Account = () => {
                                                             useNavLink={true}
                                                             onClick={() => setMobileNavOpen(false)}
                                                         >
-                                                            <LinkIcon boxSize={5} mr={2} />
+                                                            <LinkIcon boxSize="5" mr="2" />
                                                             {formatMessage(messages[link.name])}
                                                         </Link>
                                                     </Button>
@@ -183,7 +183,7 @@ const Account = () => {
                     </Accordion.Item>
                 </Accordion.Root>
                 {/*large screen nav sidebar*/}
-                <Stack display={{base: 'none', lg: 'flex'}} gap={4}>
+                <Stack display={{base: 'none', lg: 'flex'}} gap="4">
                     {showLoading && <LoadingSpinner wrapperStyles={{height: '100vh'}} />}
 
                     <Heading as="h2" fontSize="18px">
@@ -193,7 +193,7 @@ const Account = () => {
                         />
                     </Heading>
 
-                    <Flex gap={0} as="nav" data-testid="account-detail-nav" direction="column">
+                    <Flex gap="0" as="nav" data-testid="account-detail-nav" direction="column">
                         <List.Root variant="plain" as="ul">
                             {navLinks.map((link) => {
                                 const LinkIcon = link.icon
@@ -205,7 +205,7 @@ const Account = () => {
                                             css={styles.menuAccountLink}
                                         >
                                             <Link to={`/account${link.path}`} useNavLink={true}>
-                                                <LinkIcon boxSize={5} mr={2} />
+                                                <LinkIcon boxSize="5" mr="2" />
                                                 {formatMessage(messages[link.name])}
                                             </Link>
                                         </Button>

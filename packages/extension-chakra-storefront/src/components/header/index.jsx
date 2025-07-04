@@ -208,7 +208,7 @@ const Header = ({
                             onClick={onMyAccountClick}
                             onMouseOver={isDesktop ? onAccountMenuOpen : noop}
                         >
-                            <AccountIcon boxSize={6} />
+                            <AccountIcon boxSize="6" />
                         </IconButtonWithRegistration>
                     )}
 
@@ -235,7 +235,7 @@ const Header = ({
                                     ref={popoverTriggerRef}
                                     onKeyDown={handleKeyDown}
                                 >
-                                    <AccountIcon boxSize={6} onClick={onMyAccountClick} />
+                                    <AccountIcon boxSize="6" onClick={onMyAccountClick} />
                                     <HideOnMobile>
                                         <ChevronDownIcon />
                                     </HideOnMobile>
@@ -265,7 +265,7 @@ const Header = ({
                                                     </Heading>
                                                 </Popover.Title>
                                             </Popover.Header>
-                                            <Box asChild px={3}>
+                                            <Box asChild px="3">
                                                 <nav>
                                                     <List.Root
                                                         variant="plain"
@@ -286,8 +286,8 @@ const Header = ({
                                                                             useNavLink={true}
                                                                         >
                                                                             <LinkIcon
-                                                                                boxSize={5}
-                                                                                mr={2}
+                                                                                boxSize="5"
+                                                                                mr="2"
                                                                             />
                                                                             {intl.formatMessage(
                                                                                 messages[link.name]
@@ -300,9 +300,9 @@ const Header = ({
                                                     </List.Root>
                                                 </nav>
                                             </Box>
-                                            <Separator mx={3} my={2} />
+                                            <Separator mx="3" my="2" />
 
-                                            <Popover.Footer px={3} py={0}>
+                                            <Popover.Footer px="3" py="0">
                                                 <Button
                                                     variant="ghost"
                                                     css={styles.signoutButton}
@@ -310,7 +310,7 @@ const Header = ({
                                                 >
                                                     <SignoutIcon
                                                         aria-hidden={true}
-                                                        boxSize={5}
+                                                        boxSize="5"
                                                         css={styles.signoutIcon}
                                                     />
                                                     <Text as="span" css={styles.signoutText}>
@@ -337,7 +337,7 @@ const Header = ({
                         // uncomment when we fix wishlist
                         // onClick={onWishlistClick}
                     >
-                        <HeartIcon boxSize={6} />
+                        <HeartIcon boxSize="6" />
                     </IconButtonWithRegistration>
                     {isStoreLocatorEnabled && (
                         <IconButton
@@ -351,7 +351,7 @@ const Header = ({
                                 openModal()
                             }}
                         >
-                            <StoreIcon boxSize={6} />
+                            <StoreIcon boxSize="6" />
                         </IconButton>
                     )}
                     <IconButton
@@ -367,7 +367,7 @@ const Header = ({
                         onClick={onMyCartClick}
                     >
                         <>
-                            <BasketIcon boxSize={6} />
+                            <BasketIcon boxSize="6" />
                             {basket && totalItems > 0 && (
                                 <Badge variant="notification">{totalItems}</Badge>
                             )}
