@@ -1,5 +1,9 @@
 name: SalesforceCommerceCloud/pwa-kit/e2e
 on:
+  push:
+    branches:
+      - develop
+      - extra-features-e2e-branch # Just testing
   workflow_dispatch:
   schedule:
     # Run every day at 12am (PST) - cron uses UTC times
@@ -411,3 +415,18 @@ jobs:
             }
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+
+  test-extra-features-login:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - name: Install Monorepo Dependencies
+        run: node ./scripts/gtime.js monorepo_install npm ci
+      - name: Run extra features login tests
+        run: npm run test:e2e:extra_features
