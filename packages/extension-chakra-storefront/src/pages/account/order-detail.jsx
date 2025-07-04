@@ -156,7 +156,7 @@ const AccountOrderDetail = () => {
                     </Button>
                 </Box>
 
-                <Stack gap={[1, 2]}>
+                <Stack gap={['1', '2']}>
                     <Heading as="h1" fontSize={['lg', '2xl']} tabIndex="0" ref={headingRef}>
                         <FormattedMessage
                             defaultMessage="Order Details"
@@ -168,12 +168,12 @@ const AccountOrderDetail = () => {
                         <Stack
                             direction={['column', 'row']}
                             alignItems={['flex-start', 'center']}
-                            gap={[0, 3]}
+                            gap={['0', '3']}
                             separator={
                                 <Separator
                                     visibility={{base: 'visible'}}
                                     orientation="vertical"
-                                    h={[0, 4]}
+                                    h={['0', '4']}
                                 />
                             }
                         >
@@ -389,7 +389,7 @@ const AccountOrderDetail = () => {
                                 <Flex width="full" align="flex-start">
                                     <Skeleton boxSize={['88', '36']} mr="4" />
 
-                                    <Stack gap={2}>
+                                    <Stack gap="2">
                                         <Skeleton h="20px" w="112px" />
                                         <Skeleton h="20px" w="84px" />
                                         <Skeleton h="20px" w="140px" />
