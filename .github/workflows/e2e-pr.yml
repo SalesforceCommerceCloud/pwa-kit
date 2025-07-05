@@ -1,0 +1,112 @@
+name: SalesforceCommerceCloud/pwa-kit/e2e-pr
+on:
+    workflow_dispatch:
+    pull_request: # Default: opened, reopened, synchronize (head branch updated)
+    merge_group: # Trigger GA workflow when a pull request is added to a merge queue.
+    push:
+        branches:
+            - develop
+            - 'release-*'
+
+jobs:
+    test_e2e_private:
+        runs-on: ubuntu-latest
+        steps:
+           # Skipping the entire workflow for now until all steps are implemented.
+            - name: Skip Check
+              run: | 
+                echo "SKIP_WORKFLOW=true" >> "$GITHUB_ENV"
+
+            - name: Checkout
+              uses: actions/checkout@v4
+
+            - name: Check PWA Kit Version
+              run: |-
+                  version=`jq -r ".version" package.json`
+                  echo "pwa_kit_version=$version" >> "$GITHUB_ENV"
+
+            # TODO: Skip the entire workflow since we don't have e2e tests for PWA Kit v2.x
+            - name: Skip if PWA Kit version older than v3.x
+              if: ${{ env.SKIP_WORKFLOW != 'true' }}
+              run: |
+                  major_version=$(echo "${{ env.pwa_kit_version }}" | cut -d. -f1)
+                   if [ "$major_version" -lt 3 ]; then
+                     echo "PWA Kit version is older than v3.x, skipping workflow."
+                     echo "SKIP_WORKFLOW=true" >> "$GITHUB_ENV"
+                   fi
+
+            # Only test for latest Node version supported by MRT
+            - name: Setup Node
+              if: ${{ env.SKIP_WORKFLOW != 'true' }}
+              uses: actions/setup-node@v4
+              with:
+                  node-version: 22
+                  cache: npm
+
+            # Check central resource allocation on AWS and get a lock on an available environment from the pool.
+            # Returns the MRT target ID if lock is acquired, otherwise returns an error state.
+            - name: Get MRT Target lock
+              if: ${{ env.SKIP_WORKFLOW != 'true' }}
+              id: get_mrt_target_lock
+              run: |
+                  echo "TODO: Implement .github/actions/get_mrt_target_lock"
+
+            - name: Create MRT target
+              id: create_mrt_target
+              if: ${{ env.SKIP_WORKFLOW != 'true' && steps.get_mrt_target_lock.outputs.status == 'ERR_NO_AVAILABLE_TARGETS' }}
+              run: |
+                  echo "TODO: Call .github/actions/create_mrt_target with correct inputs"
+
+            - name: Get Template Version
+              if: ${{ env.SKIP_WORKFLOW != 'true' }}
+              run: |-
+                  version=`jq -r ".version" packages/template-retail-react-app/package.json`
+                  echo "retail_app_template_version=$version" >> "$GITHUB_ENV"
+
+            - name: Generate Retail App Private Client
+              if: ${{ env.SKIP_WORKFLOW != 'true' }}
+              uses: ./.github/actions/e2e_generate_app
+              with:
+                  PROJECT_KEY: 'retail-app-private-client'
+                  TEMPLATE_VERSION: ${{ env.retail_app_template_version }}
+
+            - name: Validate Retail App Without Extensibility
+              if: ${{ env.SKIP_WORKFLOW != 'true' }}
+              uses: ./.github/actions/e2e_validate_generated_app
+              with:
+                  PROJECT_KEY: 'retail-app-no-ext'
+                  TEMPLATE_VERSION: ${{ env.retail_app_template_version }}
+
+            # TODO: Revisit the next 2 steps to see if we can use the existing .github/actions/deploy_app action.
+            - name: Create MRT credentials file
+              if: ${{ env.SKIP_WORKFLOW != 'true' }}
+              uses: './.github/actions/create_mrt'
+              with:
+                  mobify_user: ${{ secrets.MOBIFY_CLIENT_USER }}
+                  mobify_api_key: ${{ secrets.MOBIFY_CLIENT_API_KEY }}
+
+            - name: Push Bundle to MRT (E2E Test PWA Kit)
+              if: ${{ env.SKIP_WORKFLOW != 'true' }}
+              uses: './.github/actions/push_to_mrt'
+              with:
+                  CWD: '../generated-projects/retail-app-no-ext'
+                  # TODO: Use the MRT target ID from the target lock step above.
+                  TARGET: e2e-tests-pwa-kit
+                  FLAGS: --wait
+
+            - name: Install Playwright Browsers
+              if: ${{ env.SKIP_WORKFLOW != 'true' }}
+              run: npx playwright install --with-deps
+
+            - name: Run Playwright tests
+              if: ${{ env.SKIP_WORKFLOW != 'true' }}
+              run: npm run test:e2e
+
+            - name: Run Playwright a11y tests
+              if: ${{ env.SKIP_WORKFLOW != 'true' }}
+              run: npm run test:e2e:a11y
+
+            - name: Release MRT Target Lock
+              if: always() # Always release the target lock back to the pool even if the tests fail.
+              run: |
+                echo "TODO: Implement .github/actions/release_mrt_target_lock"
