@@ -164,5 +164,5 @@ module.exports = {
   PWA_E2E_USER_EMAIL: process.env.PWA_E2E_USER_EMAIL,
   PWA_E2E_USER_PASSWORD: process.env.PWA_E2E_USER_PASSWORD,
   EXTRA_FEATURES_E2E_RETAIL_APP_HOME: "https://scaffold-pwa-extra-features-e2e.mobify-storefront.com",
-  EXTRA_FEATURES_E2E_RETAIL_APP_HOME_SITE: "RefArch"
+  EXTRA_FEATURES_E2E_RETAIL_APP_HOME_SITE: "RefArchGlobal"
 };
