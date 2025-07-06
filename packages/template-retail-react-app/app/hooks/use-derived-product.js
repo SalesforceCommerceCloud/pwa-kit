@@ -39,7 +39,7 @@ export const useDerivedProduct = (
     const lowestStockLevelProductName = product?.inventory?.lowestStockLevelProductName
     const intl = useIntl()
     const variant = useVariant(product, isProductPartOfSet, isProductPartOfBundle)
-    const isStandardProduct = product?.type.item
+    const isStandardProduct = product?.type?.item
     const variationParams = useVariationParams(product, isProductPartOfSet, isProductPartOfBundle)
     const variationAttributes = useVariationAttributes(
         product,
