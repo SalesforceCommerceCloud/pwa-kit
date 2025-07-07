@@ -7,6 +7,10 @@
 import {defineRecipe} from '@chakra-ui/react'
 
 export default defineRecipe({
+    base: {
+        fontSize: 'xs',
+        fontWeight: 'medium'
+    },
     variants: {
         variant: {
             notification: {
