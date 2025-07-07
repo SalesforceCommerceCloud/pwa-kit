@@ -1,5 +1,5 @@
 import {renderHook, act} from '@testing-library/react'
-import {useCartWishlist} from './useCartWishlist'
+import {useCartWishlist} from './use-cart-wishlist'
 import React from 'react'
 import {useWishList} from '../use-wish-list'
 

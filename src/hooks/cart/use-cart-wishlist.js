@@ -9,7 +9,7 @@ import {Button} from '@chakra-ui/react'
 import {useIntl} from 'react-intl'
 import {useShopperCustomersMutation} from '@salesforce/commerce-sdk-react'
 import {useWishList} from '../use-wish-list'
-import {useCurrentCustomer} from '../'
+import {useCurrentCustomer} from '..'
 import useToast from '../use-toast'
 import useNavigation from '../use-navigation'
 import {
