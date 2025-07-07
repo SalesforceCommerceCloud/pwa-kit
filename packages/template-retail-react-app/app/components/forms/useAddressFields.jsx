@@ -12,8 +12,10 @@ import {
     provinceOptions
 } from '@salesforce/retail-react-app/app/components/forms/state-province-options'
 import {SHIPPING_COUNTRY_CODES} from '@salesforce/retail-react-app/app/constants'
-import {getAddressSuggestions} from '@salesforce/retail-react-app/app/utils/address-suggestions' // TODO: replace with the actual API call to the address service
-import {parseAddressSuggestion} from '@salesforce/retail-react-app/app/utils/address-suggestions'
+import {
+    getAddressSuggestions,
+    parseAddressSuggestion
+} from '@salesforce/retail-react-app/app/utils/address-suggestions' // TODO: replace with the actual API call to the address service
 
 const messages = defineMessages({
     required: {defaultMessage: 'Required', id: 'use_address_fields.error.required'},
