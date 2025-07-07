@@ -45,16 +45,16 @@ test('Registered shopper can add item to wishlist', async ({page}) => {
 test.skip('Registered shopper logged in through social retains persisted cart', async ({page}) => {
     navigateToPDPDesktopSocial({
         page,
-        productName: 'Floral Ruffle Top',
+        productName: 'Belted Ribbed Boat Neck Sweater',
         productColor: 'Cardinal Red Multi',
         productPrice: '£35.19'
     })
 
     // Add to Cart
-    await expect(page.getByRole('heading', {name: /Floral Ruffle Top/i})).toBeVisible({
+    await expect(page.getByRole('heading', {name: /Belted Ribbed Boat Neck Sweater/i})).toBeVisible({
         timeout: 15000
     })
-    await page.getByRole('radio', {name: 'L', exact: true}).click()
+    await page.getByRole('radio', {name: 'M', exact: true}).click()
 
     await page.locator("button[data-testid='quantity-increment']").click()
 
@@ -80,7 +80,7 @@ test.skip('Registered shopper logged in through social retains persisted cart', 
     // Check Items in Cart
     await page.getByLabel(/My cart/i).click()
     await page.waitForLoadState()
-    await expect(page.getByRole('link', {name: /Floral Ruffle Top/i})).toBeVisible()
+    await expect(page.getByRole('link', {name: /Belted Ribbed Boat Neck Sweater/i})).toBeVisible()
 })
 
 export {registeredUserHappyPath}

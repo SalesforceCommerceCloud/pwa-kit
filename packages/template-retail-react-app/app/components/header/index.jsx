@@ -156,7 +156,7 @@ const Header = ({
     }
 
     return (
-        <Box {...styles.container} {...props}>
+        <Box as="header" role="banner" {...styles.container} {...props}>
             <Box {...styles.content}>
                 {showLoading && <LoadingSpinner wrapperStyles={{height: '100vh'}} />}
                 <Flex wrap="wrap" alignItems={['baseline', 'baseline', 'baseline', 'center']}>

@@ -21,13 +21,13 @@ test('Guest shopper can checkout items as guest', async ({page}) => {
     // cart
     await page.getByLabel(/My cart/i).click()
 
-    await expect(page.getByRole('link', {name: /Cotton Turtleneck Sweater/i})).toBeVisible()
+    await expect(page.getByRole('link', {name: /Belted Ribbed Boat Neck Sweater/i})).toBeVisible()
 
     await checkoutProduct({page, userCredentials: GUEST_USER_CREDENTIALS})
 
     await expect(page.getByRole('heading', {name: /Order Summary/i})).toBeVisible()
     await expect(page.getByText(/2 Items/i)).toBeVisible()
-    await expect(page.getByRole('link', {name: /Cotton Turtleneck Sweater/i})).toBeVisible()
+    await expect(page.getByRole('link', {name: /Belted Ribbed Boat Neck Sweater/i})).toBeVisible()
 })
 
 /**
@@ -40,10 +40,10 @@ test('Guest shopper can edit product item in cart', async ({page}) => {
     await page.getByLabel(/My cart/i).click()
     await page.waitForLoadState()
 
-    await expect(page.getByRole('link', {name: /Cotton Turtleneck Sweater/i})).toBeVisible()
+    await expect(page.getByRole('link', {name: /Belted Ribbed Boat Neck Sweater/i})).toBeVisible()
 
-    await expect(page.getByText(/Color: Black/i)).toBeVisible()
-    await expect(page.getByText(/Size: L/i)).toBeVisible()
+    await expect(page.getByText(/Colour: Black/i)).toBeVisible()
+    await expect(page.getByText(/Size: M/i)).toBeVisible()
 
     // open product edit modal
     const editBtn = page.getByRole('button', {name: /Edit/i})
@@ -57,13 +57,13 @@ test('Guest shopper can edit product item in cart', async ({page}) => {
     // Product edit modal should be open
     await expect(page.getByTestId('product-view')).toBeVisible()
 
-    await page.getByRole('radio', {name: 'S', exact: true}).click()
-    await page.getByRole('radio', {name: 'Meadow Violet', exact: true}).click()
+    await page.getByRole('radio', {name: 'L', exact: true}).click()
+    await page.getByRole('radio', {name: 'New Rattan', exact: true}).click()
     await page.getByRole('button', {name: /Update/i}).click()
 
     await page.waitForLoadState()
-    await expect(page.getByText(/Color: Meadow Violet/i)).toBeVisible()
-    await expect(page.getByText(/Size: S/i)).toBeVisible()
+    await expect(page.getByText(/Size: L/i)).toBeVisible()
+    await expect(page.getByText(/Colour: New Rattan/i)).toBeVisible()
 })
 
 /**
@@ -99,7 +99,7 @@ test('Guest shopper can checkout product bundle', async ({page}) => {
     await expect(page.getByText(/Turquoise and Gold Hoop Earring/i)).toBeVisible()
 
     const qtyText = page.locator('text="Qty: 1"')
-    const colorGoldText = page.locator('text="Color: Gold"')
+    const colorGoldText = page.locator('text="Colour: Gold"')
     await expect(colorGoldText).toHaveCount(3)
     await expect(qtyText).toHaveCount(3)
 
