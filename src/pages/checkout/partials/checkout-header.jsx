@@ -32,16 +32,12 @@ const CheckoutHeader = () => {
 
                     <Button
                         as={Link}
+                        padding={0}
                         href="/cart"
                         display="inline-flex"
                         variant="unstyled"
                         color="gray.900"
-                        rightIcon={
-                            <Center position="relative" width={11} height={11}>
-                                <BasketIcon position="absolute" left="0px" />
-                                <Badge variant="notification">{totalItems}</Badge>
-                            </Center>
-                        }
+                        fontWeight="semibold"
                         aria-label={intl.formatMessage(
                             {
                                 id: 'checkout_header.link.assistive_msg.cart',
@@ -54,6 +50,12 @@ const CheckoutHeader = () => {
                             defaultMessage="Back to cart"
                             id="checkout_header.link.cart"
                         />
+                        <Center position="relative" width={11} height={11}>
+                            <BasketIcon position="absolute" left="0px" />
+                            <Badge variant="notification" padding={0}>
+                                {totalItems}
+                            </Badge>
+                        </Center>
                     </Button>
                 </Flex>
             </Box>
