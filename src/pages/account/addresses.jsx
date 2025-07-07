@@ -61,13 +61,13 @@ const ShippingAddressForm = ({form, hasAddresses, selectedAddressId, toggleEdit,
         <Box
             border="1px solid"
             borderColor="gray.200"
-            rounded="base"
+            rounded="md"
             position="relative"
             {...(hasAddresses && {
                 gridColumn: [1, 'span 2', 'span 2', 'span 2', 'span 3'],
                 px: [4, 4, 6],
                 py: 6,
-                rounded: 'base',
+                rounded: 'md',
                 border: '1px solid',
                 borderColor: 'blue.600'
             })}
@@ -295,7 +295,7 @@ const AccountAddresses = () => {
                             color="blue.600"
                             height={{lg: 'full'}}
                             minHeight={11}
-                            rounded="base"
+                            rounded="md"
                             fontWeight="medium"
                             leftIcon={<PlusIcon display="block" boxSize={4} />}
                             onClick={() => toggleEdit()}

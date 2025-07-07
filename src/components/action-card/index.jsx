@@ -42,7 +42,7 @@ const ActionCard = ({
             position="relative"
             border="1px solid"
             borderColor="gray.100"
-            borderRadius="base"
+            rounded="md"
             {...props}
         >
             {showLoading && <LoadingSpinner />}
