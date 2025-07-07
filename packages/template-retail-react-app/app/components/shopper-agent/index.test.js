@@ -216,7 +216,7 @@ describe('ShopperAgent Component', () => {
             Locale: defaultProps.locale,
             OrganizationId: commerceAgentSettings.commerceOrgId,
             UsId: 'test-usid',
-            IsCartMgmtSupported: true
+            IsCartMgmtSupported: 'true'
         })
 
         // Reset mock to test button click event
@@ -455,7 +455,7 @@ describe('ShopperAgent Component', () => {
             Locale: defaultProps.locale,
             OrganizationId: commerceAgentSettings.commerceOrgId,
             UsId: 'test-usid',
-            IsCartMgmtSupported: true
+            IsCartMgmtSupported: 'true'
         })
 
         // Reset mock
@@ -484,7 +484,7 @@ describe('ShopperAgent Component', () => {
             Locale: defaultProps.locale,
             OrganizationId: newCommerceAgentSettings.commerceOrgId,
             UsId: 'test-usid',
-            IsCartMgmtSupported: true
+            IsCartMgmtSupported: 'true'
         })
     })
 
