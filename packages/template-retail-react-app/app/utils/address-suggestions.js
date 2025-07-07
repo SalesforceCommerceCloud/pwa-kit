@@ -41,15 +41,17 @@ export const getAddressSuggestions = async (input, countryCode) => {
 
         // Extract country from the last term (country is always the last term)
         const countryTerm = address.terms[address.terms.length - 1]?.value || ''
-        const isInSelectedCountry = countryTerm === countryCode || 
-                                  (countryCode === 'US' && countryTerm === 'USA') ||
-                                  (countryCode === 'GB' && countryTerm === 'UK') ||
-                                  (countryCode === 'CA' && countryTerm === 'Canada')
+        const isInSelectedCountry =
+            countryTerm === countryCode ||
+            (countryCode === 'US' && countryTerm === 'USA') ||
+            (countryCode === 'GB' && countryTerm === 'UK') ||
+            (countryCode === 'CA' && countryTerm === 'Canada')
 
         // Match against description, main text, or secondary text, and country
-        const matchesSearch = description.includes(searchTerm) || 
-                             mainText.includes(searchTerm) || 
-                             secondaryText.includes(searchTerm)
+        const matchesSearch =
+            description.includes(searchTerm) ||
+            mainText.includes(searchTerm) ||
+            secondaryText.includes(searchTerm)
         const matches = matchesSearch && isInSelectedCountry
 
         return matches

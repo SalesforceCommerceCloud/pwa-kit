@@ -13,16 +13,12 @@
 export const mockAddresses = [
     {
         description: '123 Main Street, New York, NY 10001, USA',
-        matched_substrings: [
-            {length: 3, offset: 0}
-        ],
+        matched_substrings: [{length: 3, offset: 0}],
         place_id: 'ChIJ1234567890',
         reference: 'ref_1234567890',
         structured_formatting: {
             main_text: '123 Main Street',
-            main_text_matched_substrings: [
-                {length: 3, offset: 0}
-            ],
+            main_text_matched_substrings: [{length: 3, offset: 0}],
             secondary_text: 'New York, NY 10001, USA'
         },
         terms: [
@@ -36,16 +32,12 @@ export const mockAddresses = [
     },
     {
         description: '456 Oak Avenue, Los Angeles, CA 90210, USA',
-        matched_substrings: [
-            {length: 3, offset: 0}
-        ],
+        matched_substrings: [{length: 3, offset: 0}],
         place_id: 'ChIJ4567890123',
         reference: 'ref_4567890123',
         structured_formatting: {
             main_text: '456 Oak Avenue',
-            main_text_matched_substrings: [
-                {length: 3, offset: 0}
-            ],
+            main_text_matched_substrings: [{length: 3, offset: 0}],
             secondary_text: 'Los Angeles, CA 90210, USA'
         },
         terms: [
@@ -59,16 +51,12 @@ export const mockAddresses = [
     },
     {
         description: '789 Pine Road, Chicago, IL 60601, USA',
-        matched_substrings: [
-            {length: 3, offset: 0}
-        ],
+        matched_substrings: [{length: 3, offset: 0}],
         place_id: 'ChIJ7890123456',
         reference: 'ref_7890123456',
         structured_formatting: {
             main_text: '789 Pine Road',
-            main_text_matched_substrings: [
-                {length: 3, offset: 0}
-            ],
+            main_text_matched_substrings: [{length: 3, offset: 0}],
             secondary_text: 'Chicago, IL 60601, USA'
         },
         terms: [
@@ -82,16 +70,12 @@ export const mockAddresses = [
     },
     {
         description: '321 Elm Street, Miami, FL 33101, USA',
-        matched_substrings: [
-            {length: 3, offset: 0}
-        ],
+        matched_substrings: [{length: 3, offset: 0}],
         place_id: 'ChIJ3210987654',
         reference: 'ref_3210987654',
         structured_formatting: {
             main_text: '321 Elm Street',
-            main_text_matched_substrings: [
-                {length: 3, offset: 0}
-            ],
+            main_text_matched_substrings: [{length: 3, offset: 0}],
             secondary_text: 'Miami, FL 33101, USA'
         },
         terms: [
@@ -105,16 +89,12 @@ export const mockAddresses = [
     },
     {
         description: '654 Cedar Lane, Seattle, WA 98101, USA',
-        matched_substrings: [
-            {length: 3, offset: 0}
-        ],
+        matched_substrings: [{length: 3, offset: 0}],
         place_id: 'ChIJ6543210987',
         reference: 'ref_6543210987',
         structured_formatting: {
             main_text: '654 Cedar Lane',
-            main_text_matched_substrings: [
-                {length: 3, offset: 0}
-            ],
+            main_text_matched_substrings: [{length: 3, offset: 0}],
             secondary_text: 'Seattle, WA 98101, USA'
         },
         terms: [
@@ -128,16 +108,12 @@ export const mockAddresses = [
     },
     {
         description: '987 Maple Drive, Austin, TX 78701, USA',
-        matched_substrings: [
-            {length: 3, offset: 0}
-        ],
+        matched_substrings: [{length: 3, offset: 0}],
         place_id: 'ChIJ9876543210',
         reference: 'ref_9876543210',
         structured_formatting: {
             main_text: '987 Maple Drive',
-            main_text_matched_substrings: [
-                {length: 3, offset: 0}
-            ],
+            main_text_matched_substrings: [{length: 3, offset: 0}],
             secondary_text: 'Austin, TX 78701, USA'
         },
         terms: [
@@ -151,16 +127,12 @@ export const mockAddresses = [
     },
     {
         description: '147 Broadway, New York, NY 10038, USA',
-        matched_substrings: [
-            {length: 3, offset: 0}
-        ],
+        matched_substrings: [{length: 3, offset: 0}],
         place_id: 'ChIJ1472583690',
         reference: 'ref_1472583690',
         structured_formatting: {
             main_text: '147 Broadway',
-            main_text_matched_substrings: [
-                {length: 3, offset: 0}
-            ],
+            main_text_matched_substrings: [{length: 3, offset: 0}],
             secondary_text: 'New York, NY 10038, USA'
         },
         terms: [
@@ -174,16 +146,12 @@ export const mockAddresses = [
     },
     {
         description: '258 Market Street, San Francisco, CA 94102, USA',
-        matched_substrings: [
-            {length: 3, offset: 0}
-        ],
+        matched_substrings: [{length: 3, offset: 0}],
         place_id: 'ChIJ2583691470',
         reference: 'ref_2583691470',
         structured_formatting: {
             main_text: '258 Market Street',
-            main_text_matched_substrings: [
-                {length: 3, offset: 0}
-            ],
+            main_text_matched_substrings: [{length: 3, offset: 0}],
             secondary_text: 'San Francisco, CA 94102, USA'
         },
         terms: [
@@ -197,16 +165,12 @@ export const mockAddresses = [
     },
     {
         description: '369 State Street, Boston, MA 02101, USA',
-        matched_substrings: [
-            {length: 3, offset: 0}
-        ],
+        matched_substrings: [{length: 3, offset: 0}],
         place_id: 'ChIJ3691472580',
         reference: 'ref_3691472580',
         structured_formatting: {
             main_text: '369 State Street',
-            main_text_matched_substrings: [
-                {length: 3, offset: 0}
-            ],
+            main_text_matched_substrings: [{length: 3, offset: 0}],
             secondary_text: 'Boston, MA 02101, USA'
         },
         terms: [
@@ -220,16 +184,12 @@ export const mockAddresses = [
     },
     {
         description: '159 Washington Avenue, Philadelphia, PA 19101, USA',
-        matched_substrings: [
-            {length: 3, offset: 0}
-        ],
+        matched_substrings: [{length: 3, offset: 0}],
         place_id: 'ChIJ1592583691',
         reference: 'ref_1592583691',
         structured_formatting: {
             main_text: '159 Washington Avenue',
-            main_text_matched_substrings: [
-                {length: 3, offset: 0}
-            ],
+            main_text_matched_substrings: [{length: 3, offset: 0}],
             secondary_text: 'Philadelphia, PA 19101, USA'
         },
         terms: [
@@ -243,16 +203,12 @@ export const mockAddresses = [
     },
     {
         description: '42 Wallaby Way, Sydney, NSW 2000, Australia',
-        matched_substrings: [
-            {length: 2, offset: 0}
-        ],
+        matched_substrings: [{length: 2, offset: 0}],
         place_id: 'ChIJ42wallabyway',
         reference: 'ref_42wallabyway',
         structured_formatting: {
             main_text: '42 Wallaby Way',
-            main_text_matched_substrings: [
-                {length: 2, offset: 0}
-            ],
+            main_text_matched_substrings: [{length: 2, offset: 0}],
             secondary_text: 'Sydney, NSW 2000, Australia'
         },
         terms: [
@@ -266,16 +222,12 @@ export const mockAddresses = [
     },
     {
         description: '221B Baker Street, London, UK NW1 6XE',
-        matched_substrings: [
-            {length: 3, offset: 0}
-        ],
+        matched_substrings: [{length: 3, offset: 0}],
         place_id: 'ChIJ221bbakerstreet',
         reference: 'ref_221bbakerstreet',
         structured_formatting: {
             main_text: '221B Baker Street',
-            main_text_matched_substrings: [
-                {length: 3, offset: 0}
-            ],
+            main_text_matched_substrings: [{length: 3, offset: 0}],
             secondary_text: 'London, UK NW1 6XE'
         },
         terms: [
@@ -288,16 +240,12 @@ export const mockAddresses = [
     },
     {
         description: '1600 Pennsylvania Avenue NW, Washington, DC 20500, USA',
-        matched_substrings: [
-            {length: 4, offset: 0}
-        ],
+        matched_substrings: [{length: 4, offset: 0}],
         place_id: 'ChIJ1600pennsylvania',
         reference: 'ref_1600pennsylvania',
         structured_formatting: {
             main_text: '1600 Pennsylvania Avenue NW',
-            main_text_matched_substrings: [
-                {length: 4, offset: 0}
-            ],
+            main_text_matched_substrings: [{length: 4, offset: 0}],
             secondary_text: 'Washington, DC 20500, USA'
         },
         terms: [
@@ -311,16 +259,12 @@ export const mockAddresses = [
     },
     {
         description: '1 Infinite Loop, Cupertino, CA 95014, USA',
-        matched_substrings: [
-            {length: 1, offset: 0}
-        ],
+        matched_substrings: [{length: 1, offset: 0}],
         place_id: 'ChIJ1infiniteloop',
         reference: 'ref_1infiniteloop',
         structured_formatting: {
             main_text: '1 Infinite Loop',
-            main_text_matched_substrings: [
-                {length: 1, offset: 0}
-            ],
+            main_text_matched_substrings: [{length: 1, offset: 0}],
             secondary_text: 'Cupertino, CA 95014, USA'
         },
         terms: [
@@ -334,16 +278,12 @@ export const mockAddresses = [
     },
     {
         description: '350 Fifth Avenue, New York, NY 10118, USA',
-        matched_substrings: [
-            {length: 3, offset: 0}
-        ],
+        matched_substrings: [{length: 3, offset: 0}],
         place_id: 'ChIJ350fifthavenue',
         reference: 'ref_350fifthavenue',
         structured_formatting: {
             main_text: '350 Fifth Avenue',
-            main_text_matched_substrings: [
-                {length: 3, offset: 0}
-            ],
+            main_text_matched_substrings: [{length: 3, offset: 0}],
             secondary_text: 'New York, NY 10118, USA'
         },
         terms: [
@@ -357,16 +297,12 @@ export const mockAddresses = [
     },
     {
         description: '1234 Tech Boulevard, San Jose, CA 95113, USA',
-        matched_substrings: [
-            {length: 4, offset: 0}
-        ],
+        matched_substrings: [{length: 4, offset: 0}],
         place_id: 'ChIJ1234techblvd',
         reference: 'ref_1234techblvd',
         structured_formatting: {
             main_text: '1234 Tech Boulevard',
-            main_text_matched_substrings: [
-                {length: 4, offset: 0}
-            ],
+            main_text_matched_substrings: [{length: 4, offset: 0}],
             secondary_text: 'San Jose, CA 95113, USA'
         },
         terms: [
@@ -380,16 +316,12 @@ export const mockAddresses = [
     },
     {
         description: '567 Innovation Drive, Mountain View, CA 94043, USA',
-        matched_substrings: [
-            {length: 3, offset: 0}
-        ],
+        matched_substrings: [{length: 3, offset: 0}],
         place_id: 'ChIJ567innovation',
         reference: 'ref_567innovation',
         structured_formatting: {
             main_text: '567 Innovation Drive',
-            main_text_matched_substrings: [
-                {length: 3, offset: 0}
-            ],
+            main_text_matched_substrings: [{length: 3, offset: 0}],
             secondary_text: 'Mountain View, CA 94043, USA'
         },
         terms: [
@@ -403,16 +335,12 @@ export const mockAddresses = [
     },
     {
         description: '890 Startup Circle, Palo Alto, CA 94301, USA',
-        matched_substrings: [
-            {length: 3, offset: 0}
-        ],
+        matched_substrings: [{length: 3, offset: 0}],
         place_id: 'ChIJ890startup',
         reference: 'ref_890startup',
         structured_formatting: {
             main_text: '890 Startup Circle',
-            main_text_matched_substrings: [
-                {length: 3, offset: 0}
-            ],
+            main_text_matched_substrings: [{length: 3, offset: 0}],
             secondary_text: 'Palo Alto, CA 94301, USA'
         },
         terms: [
@@ -426,16 +354,12 @@ export const mockAddresses = [
     },
     {
         description: '234 Venture Way, Menlo Park, CA 94025, USA',
-        matched_substrings: [
-            {length: 3, offset: 0}
-        ],
+        matched_substrings: [{length: 3, offset: 0}],
         place_id: 'ChIJ234venture',
         reference: 'ref_234venture',
         structured_formatting: {
             main_text: '234 Venture Way',
-            main_text_matched_substrings: [
-                {length: 3, offset: 0}
-            ],
+            main_text_matched_substrings: [{length: 3, offset: 0}],
             secondary_text: 'Menlo Park, CA 94025, USA'
         },
         terms: [
@@ -449,16 +373,12 @@ export const mockAddresses = [
     },
     {
         description: '789 Silicon Valley Road, Santa Clara, CA 95054, USA',
-        matched_substrings: [
-            {length: 3, offset: 0}
-        ],
+        matched_substrings: [{length: 3, offset: 0}],
         place_id: 'ChIJ789silicon',
         reference: 'ref_789silicon',
         structured_formatting: {
             main_text: '789 Silicon Valley Road',
-            main_text_matched_substrings: [
-                {length: 3, offset: 0}
-            ],
+            main_text_matched_substrings: [{length: 3, offset: 0}],
             secondary_text: 'Santa Clara, CA 95054, USA'
         },
         terms: [
@@ -472,16 +392,12 @@ export const mockAddresses = [
     },
     {
         description: '123 Yonge Street, Toronto, ON M5C 1W4, Canada',
-        matched_substrings: [
-            {length: 3, offset: 0}
-        ],
+        matched_substrings: [{length: 3, offset: 0}],
         place_id: 'ChIJ123yonge',
         reference: 'ref_123yonge',
         structured_formatting: {
             main_text: '123 Yonge Street',
-            main_text_matched_substrings: [
-                {length: 3, offset: 0}
-            ],
+            main_text_matched_substrings: [{length: 3, offset: 0}],
             secondary_text: 'Toronto, ON M5C 1W4, Canada'
         },
         terms: [
@@ -495,16 +411,12 @@ export const mockAddresses = [
     },
     {
         description: '456 Robson Street, Vancouver, BC V6B 2A3, Canada',
-        matched_substrings: [
-            {length: 3, offset: 0}
-        ],
+        matched_substrings: [{length: 3, offset: 0}],
         place_id: 'ChIJ456robson',
         reference: 'ref_456robson',
         structured_formatting: {
             main_text: '456 Robson Street',
-            main_text_matched_substrings: [
-                {length: 3, offset: 0}
-            ],
+            main_text_matched_substrings: [{length: 3, offset: 0}],
             secondary_text: 'Vancouver, BC V6B 2A3, Canada'
         },
         terms: [
@@ -518,16 +430,12 @@ export const mockAddresses = [
     },
     {
         description: '789 Sainte-Catherine Street, Montreal, QC H3B 1B1, Canada',
-        matched_substrings: [
-            {length: 3, offset: 0}
-        ],
+        matched_substrings: [{length: 3, offset: 0}],
         place_id: 'ChIJ789sainte',
         reference: 'ref_789sainte',
         structured_formatting: {
             main_text: '789 Sainte-Catherine Street',
-            main_text_matched_substrings: [
-                {length: 3, offset: 0}
-            ],
+            main_text_matched_substrings: [{length: 3, offset: 0}],
             secondary_text: 'Montreal, QC H3B 1B1, Canada'
         },
         terms: [
@@ -539,4 +447,4 @@ export const mockAddresses = [
         ],
         types: ['street_address']
     }
-] 
+]

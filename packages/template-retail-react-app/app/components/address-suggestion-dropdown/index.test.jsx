@@ -8,7 +8,7 @@
 import React from 'react'
 import {render, screen, fireEvent} from '@testing-library/react'
 import '@testing-library/jest-dom'
-import AddressSuggestionDropdown from './index'
+import AddressSuggestionDropdown from '@salesforce/retail-react-app/../../app/components/address-suggestion-dropdown/index'
 
 describe('AddressSuggestionDropdown', () => {
     const mockSuggestions = [
@@ -82,16 +82,18 @@ describe('AddressSuggestionDropdown', () => {
                 {...defaultProps}
                 isVisible={true}
                 isLoading={true}
-                suggestions={[{
-                    description: 'dummy',
-                    place_id: 'dummy',
-                    structured_formatting: {
-                        main_text: 'dummy',
-                        secondary_text: 'dummy'
-                    },
-                    terms: [],
-                    types: []
-                }]}
+                suggestions={[
+                    {
+                        description: 'dummy',
+                        place_id: 'dummy',
+                        structured_formatting: {
+                            main_text: 'dummy',
+                            secondary_text: 'dummy'
+                        },
+                        terms: [],
+                        types: []
+                    }
+                ]}
             />
         )
 
@@ -179,9 +181,7 @@ describe('AddressSuggestionDropdown', () => {
                     main_text: '123 Main Street',
                     secondary_text: null
                 },
-                terms: [
-                    {offset: 0, value: '123 Main Street'}
-                ],
+                terms: [{offset: 0, value: '123 Main Street'}],
                 types: ['street_address']
             }
         ]
