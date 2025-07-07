@@ -111,7 +111,7 @@ const TEMPLATE_SOURCE_BUNDLE = 'bundle'
 
 const BOOTSTRAP_DIR = p.join(__dirname, '..', 'assets', 'bootstrap', 'js')
 const ASSETS_TEMPLATES_DIR = p.join(__dirname, '..', 'assets', 'templates')
-const CURSOR_RULES_DIR = p.join(__dirname, '..', '.cursor')
+const CURSOR_RULES_FROM_DIR = p.join(__dirname, '..', 'assets', 'cursor-rules')
 const PRIVATE_PRESET_NAMES = PRESETS.filter(({private}) => !!private).map(({id}) => id)
 const PUBLIC_PRESET_NAMES = PRESETS.filter(({private}) => !private).map(({id}) => id)
 const ALL_PRESET_NAMES = PRIVATE_PRESET_NAMES.concat(PUBLIC_PRESET_NAMES)
@@ -354,8 +354,16 @@ const runGenerator = (context, {outputDir, templateVersion, verbose}) => {
         })
 
         // Copy the .cursor/rules directory if it exists
-        if (sh.test('-e', CURSOR_RULES_DIR)) {
-            sh.cp('-rf', CURSOR_RULES_DIR, outputDir)
+        if (sh.test('-e', CURSOR_RULES_FROM_DIR)) {
+            const outputCursorRulesDir = p.join(outputDir, '.cursor', 'rules')
+            
+            // Create the directory if it doesn't exist
+            if (!sh.test('-e', outputCursorRulesDir)) {
+                fs.mkdirSync(outputCursorRulesDir, { recursive: true })
+            }
+            
+            // Copy the contents of CURSOR_RULES_FROM_DIR to outputCursorRulesDir
+            sh.cp('-rf', p.join(CURSOR_RULES_FROM_DIR, '*'), outputCursorRulesDir)
         }
     } else {
         console.log('Copying base template from package or npm: ', packagePath, outputDir)
