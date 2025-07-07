@@ -37,8 +37,6 @@ const OtpAuth = ({
     const OTP_LENGTH = 8
     const [otpValues, setOtpValues] = useState(new Array(OTP_LENGTH).fill(''))
     const [resendTimer, setResendTimer] = useState(0)
-    const [isVerifying, setIsVerifying] = useState(false)
-    const [verificationError, setVerificationError] = useState('')
     const inputRefs = useRef([])
     // Privacy-aware user identification hooks
     const {getUsidWhenReady} = useUsid()
@@ -63,7 +61,7 @@ const OtpAuth = ({
 
     // Initialize refs array
     useEffect(() => {
-        inputRefs.current = inputRefs.current.slice(0, OTP_LENGTH)
+        inputRefs.current = inputRefs.current.slice(0, 8)
     }, [])
 
     // Handle resend timer
@@ -159,10 +157,7 @@ const OtpAuth = ({
 
     const handleOtpChange = async (index, value) => {
         // Only allow digits
-        if (!isNumericValue(value)) return
-
-        // Clear any previous verification error
-        setVerificationError('')
+        if (!/^\d*$/.test(value)) return
 
         const newOtpValues = [...otpValues]
         newOtpValues[index] = value
@@ -173,13 +168,8 @@ const OtpAuth = ({
         form.setValue('otp', otpString)
 
         // Auto-focus next input
-        if (value && index < OTP_LENGTH - 1) {
+        if (value && index < 7) {
             inputRefs.current[index + 1]?.focus()
-        }
-
-        // If all digits are entered, automatically verify OTP
-        if (otpString.length === OTP_LENGTH && !isVerifying) {
-            await verifyOtpCode(otpString)
         }
     }
 
@@ -190,22 +180,14 @@ const OtpAuth = ({
         }
     }
 
-    const handlePaste = async (e) => {
+    const handlePaste = (e) => {
         e.preventDefault()
-        const pastedData = e.clipboardData.getData('text').replace(/\D/g, '').slice(0, OTP_LENGTH)
-        if (pastedData.length === OTP_LENGTH) {
-            // Clear any previous verification error
-            setVerificationError('')
-
+        const pastedData = e.clipboardData.getData('text').replace(/\D/g, '').slice(0, 8)
+        if (pastedData.length === 8) {
             const newOtpValues = pastedData.split('')
             setOtpValues(newOtpValues)
             form.setValue('otp', pastedData)
             inputRefs.current[7]?.focus()
-
-            // Automatically verify the pasted OTP
-            if (!isVerifying) {
-                await verifyOtpCode(pastedData)
-            }
         }
     }
 
@@ -268,24 +250,15 @@ const OtpAuth = ({
     const isResendDisabled = resendTimer > 0 || isVerifying
 
     return (
-        <Modal isOpen={isOpen} onClose={onClose} isCentered size="lg" closeOnOverlayClick={false}>
-            <ModalOverlay />
-            <ModalContent>
-                <ModalHeader>
+        <Stack spacing={8} paddingLeft={4} paddingRight={4} alignItems="center">
+            {/* Header with title */}
+            <Stack spacing={6} alignItems="center" textAlign="center">
+                <Heading fontSize="2xl" fontWeight="normal" color="gray.700">
                     <FormattedMessage
                         defaultMessage="Confirm it's you"
                         id="otp.title.confirm_its_you"
                     />
-                </ModalHeader>
-                <ModalCloseButton disabled={isVerifying} />
-                <ModalBody pb={6}>
-                    <Stack spacing={12} paddingLeft={4} paddingRight={4} alignItems="center">
-                        <Text fontSize="md" maxWidth="300px" textAlign="center">
-                            <FormattedMessage
-                                defaultMessage="To use your account information enter the code sent to your email."
-                                id="otp.message.enter_code_for_account"
-                            />
-                        </Text>
+                </Heading>
 
                         {/* OTP Input */}
                         <SimpleGrid columns={OTP_LENGTH} spacing={3}>
@@ -321,22 +294,56 @@ const OtpAuth = ({
                             ))}
                         </SimpleGrid>
 
-                        {/* Loading indicator during verification */}
-                        {isVerifying && (
-                            <Text fontSize="sm" color="blue.500">
-                                <FormattedMessage
-                                    defaultMessage="Verifying code..."
-                                    id="otp.message.verifying"
-                                />
-                            </Text>
-                        )}
+            {/* OTP Input with Phone Icon */}
+            <Flex alignItems="center" spacing={4}>
+                <Icon as={PhoneIcon} color="blue.500" boxSize={5} mr={4} />
+                <SimpleGrid columns={8} spacing={3}>
+                    {otpValues.map((value, index) => (
+                        <Input
+                            key={index}
+                            ref={(el) => (inputRefs.current[index] = el)}
+                            value={value}
+                            onChange={(e) => handleOtpChange(index, e.target.value)}
+                            onKeyDown={(e) => handleKeyDown(index, e)}
+                            onPaste={handlePaste}
+                            type="text"
+                            inputMode="numeric"
+                            maxLength={1}
+                            textAlign="center"
+                            fontSize="lg"
+                            fontWeight="bold"
+                            size="lg"
+                            width="48px"
+                            height="56px"
+                            borderRadius="md"
+                            borderColor="gray.300"
+                            borderWidth="2px"
+                            _focus={{
+                                borderColor: 'blue.500',
+                                boxShadow: '0 0 0 1px var(--chakra-colors-blue-500)'
+                            }}
+                            _hover={{
+                                borderColor: 'gray.400'
+                            }}
+                        />
+                    ))}
+                </SimpleGrid>
+            </Flex>
 
-                        {/* Error message */}
-                        {verificationError && (
-                            <Text fontSize="sm" color="red.500" textAlign="center">
-                                {verificationError}
-                            </Text>
-                        )}
+            {/* Buttons */}
+            <HStack spacing={4} width="100%" justifyContent="center">
+                <Button
+                    onClick={() => setShowOtpView(false)}
+                    variant="outline"
+                    colorScheme="gray"
+                    size="lg"
+                    minWidth="160px"
+                >
+                    <FormattedMessage
+                        defaultMessage="Checkout as a guest"
+                        id="otp.button.checkout_as_guest"
+                    />
+                </Button>
 
                         {/* Buttons */}
                         <HStack spacing={4} width="100%" justifyContent="center">
@@ -396,8 +403,6 @@ const OtpAuth = ({
 }
 
 OtpAuth.propTypes = {
-    isOpen: PropTypes.bool.isRequired,
-    onClose: PropTypes.func.isRequired,
     form: PropTypes.object.isRequired,
     handleSendEmailOtp: PropTypes.func.isRequired,
     handleOtpVerification: PropTypes.func.isRequired,
