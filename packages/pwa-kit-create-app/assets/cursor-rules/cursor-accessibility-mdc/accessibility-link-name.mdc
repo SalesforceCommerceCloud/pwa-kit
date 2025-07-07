@@ -1,0 +1,26 @@
+---
+description: When accessibility is checked. Check if Anchor tags must have accessible names
+globs: 
+alwaysApply: false
+---
+
+# Rule: accessibility-link-name
+
+Anchor tags must have accessible names
+
+## 🔍 Pattern
+
+```regex
+<a(?![^>]*\b(aria-label|aria-labelledby|title)=)(?![^>]*>\s*\w+\s*</a>)
+```
+
+## 📍 Examples
+
+```tsx
+// ❌ Bad
+<a href="/profile"></a>
+// ✅ Good
+<a href="/profile">Your Profile</a>
+// ✅ Good
+<a href="/profile" aria-label="Profile page"><UserIcon /></a>
+```
