@@ -60,6 +60,7 @@ import PageHeader from '@salesforce/retail-react-app/app/pages/product-list/part
 import AbovePageHeader from '@salesforce/retail-react-app/app/pages/product-list/partials/above-page-header'
 import PageDesignerPromotionalBanner from '@salesforce/retail-react-app/app/pages/product-list/partials/page-designer-promotional-banner'
 import StoreInventoryFilter from '@salesforce/retail-react-app/app/pages/product-list/partials/inventory-filter'
+import Island from '@salesforce/retail-react-app/app/components/island'
 
 // Icons
 import {FilterIcon, ChevronDownIcon} from '@salesforce/retail-react-app/app/components/icons'
@@ -561,27 +562,31 @@ const ProductList = (props) => {
                 {/* Body  */}
                 <Grid templateColumns={{base: '1fr', md: '280px 1fr'}} columnGap={6}>
                     <Stack display={{base: 'none', md: 'flex'}}>
-                        <Refinements
-                            itemsBefore={
-                                category?.categories
-                                    ? [
-                                          <CategoryLinks
-                                              key="itemsBefore"
-                                              category={category}
-                                              onSelect={onClose}
-                                          />,
-                                          STORE_LOCATOR_IS_ENABLED && storeInventoryFilterComponent
-                                      ].filter(Boolean)
-                                    : [
-                                          STORE_LOCATOR_IS_ENABLED && storeInventoryFilterComponent
-                                      ].filter(Boolean)
-                            }
-                            isLoading={filtersLoading}
-                            toggleFilter={toggleFilter}
-                            filters={productSearchResult?.refinements}
-                            excludedFilters={['cgid']}
-                            selectedFilters={searchParams.refine}
-                        />
+                        <Island hydrateOn={'visible'}>
+                            <Refinements
+                                itemsBefore={
+                                    category?.categories
+                                        ? [
+                                              <CategoryLinks
+                                                  key="itemsBefore"
+                                                  category={category}
+                                                  onSelect={onClose}
+                                              />,
+                                              STORE_LOCATOR_IS_ENABLED &&
+                                                  storeInventoryFilterComponent
+                                          ].filter(Boolean)
+                                        : [
+                                              STORE_LOCATOR_IS_ENABLED &&
+                                                  storeInventoryFilterComponent
+                                          ].filter(Boolean)
+                                }
+                                isLoading={filtersLoading}
+                                toggleFilter={toggleFilter}
+                                filters={productSearchResult?.refinements}
+                                excludedFilters={['cgid']}
+                                selectedFilters={searchParams.refine}
+                            />
+                        </Island>
                     </Stack>
                     <Box>
                         {showNoResults ? (
@@ -609,60 +614,66 @@ const ProductList = (props) => {
                                                       )
 
                                                   return (
-                                                      <ProductTile
-                                                          data-testid={`sf-product-tile-${productSearchItem.productId}`}
+                                                      <Island
+                                                          hydrateOn={'visible'}
                                                           key={productSearchItem.productId}
-                                                          product={productSearchItem}
-                                                          enableFavourite={true}
-                                                          isFavourite={isInWishlist}
-                                                          isRefreshingData={
-                                                              isRefetching && isFetched
-                                                          }
-                                                          imageViewType={
-                                                              PRODUCT_LIST_IMAGE_VIEW_TYPE
-                                                          }
-                                                          selectableAttributeId={
-                                                              PRODUCT_LIST_SELECTABLE_ATTRIBUTE_ID
-                                                          }
-                                                          onClick={() => {
-                                                              if (searchQuery) {
-                                                                  einstein.sendClickSearch(
-                                                                      searchQuery,
-                                                                      productSearchItem
-                                                                  )
-                                                              } else if (category) {
-                                                                  einstein.sendClickCategory(
-                                                                      category,
-                                                                      productSearchItem
-                                                                  )
+                                                      >
+                                                          <ProductTile
+                                                              data-testid={`sf-product-tile-${productSearchItem.productId}`}
+                                                              product={productSearchItem}
+                                                              enableFavourite={true}
+                                                              isFavourite={isInWishlist}
+                                                              isRefreshingData={
+                                                                  isRefetching && isFetched
                                                               }
-                                                          }}
-                                                          onFavouriteToggle={(toBeFavourite) => {
-                                                              const action = toBeFavourite
-                                                                  ? addItemToWishlist
-                                                                  : removeItemFromWishlist
-                                                              return action(productSearchItem)
-                                                          }}
-                                                          dynamicImageProps={{
-                                                              widths: [
-                                                                  '50vw',
-                                                                  '50vw',
-                                                                  '20vw',
-                                                                  '20vw',
-                                                                  '25vw'
-                                                              ],
-                                                              // The first two product images should render eagerly to
-                                                              // ensure prioritized loading for above-the-fold images
-                                                              // on mobile.
-                                                              ...(index < 2
-                                                                  ? {
-                                                                        imageProps: {
-                                                                            loading: 'eager'
+                                                              imageViewType={
+                                                                  PRODUCT_LIST_IMAGE_VIEW_TYPE
+                                                              }
+                                                              selectableAttributeId={
+                                                                  PRODUCT_LIST_SELECTABLE_ATTRIBUTE_ID
+                                                              }
+                                                              onClick={() => {
+                                                                  if (searchQuery) {
+                                                                      einstein.sendClickSearch(
+                                                                          searchQuery,
+                                                                          productSearchItem
+                                                                      )
+                                                                  } else if (category) {
+                                                                      einstein.sendClickCategory(
+                                                                          category,
+                                                                          productSearchItem
+                                                                      )
+                                                                  }
+                                                              }}
+                                                              onFavouriteToggle={(
+                                                                  toBeFavourite
+                                                              ) => {
+                                                                  const action = toBeFavourite
+                                                                      ? addItemToWishlist
+                                                                      : removeItemFromWishlist
+                                                                  return action(productSearchItem)
+                                                              }}
+                                                              dynamicImageProps={{
+                                                                  widths: [
+                                                                      '50vw',
+                                                                      '50vw',
+                                                                      '20vw',
+                                                                      '20vw',
+                                                                      '25vw'
+                                                                  ],
+                                                                  // The first two product images should render eagerly to
+                                                                  // ensure prioritized loading for above-the-fold images
+                                                                  // on mobile.
+                                                                  ...(index < 2
+                                                                      ? {
+                                                                            imageProps: {
+                                                                                loading: 'eager'
+                                                                            }
                                                                         }
-                                                                    }
-                                                                  : {})
-                                                          }}
-                                                      />
+                                                                      : {})
+                                                              }}
+                                                          />
+                                                      </Island>
                                                   )
                                               }
                                           )}
