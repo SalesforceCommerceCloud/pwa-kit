@@ -155,11 +155,11 @@ const AddressSuggestionDropdown = ({
                         {/* Address Text */}
                         <Box flex={1}>
                             <Text fontSize="sm" noOfLines={1}>
-                                {suggestion.mainText}
+                                {suggestion.structured_formatting.main_text}
                             </Text>
-                            {suggestion.secondaryText && (
+                            {suggestion.structured_formatting.secondary_text && (
                                 <Text fontSize="xs" color="gray.500" noOfLines={1}>
-                                    {suggestion.secondaryText}
+                                    {suggestion.structured_formatting.secondary_text}
                                 </Text>
                             )}
                         </Box>
@@ -174,10 +174,19 @@ AddressSuggestionDropdown.propTypes = {
     /** Array of address suggestions to display */
     suggestions: PropTypes.arrayOf(
         PropTypes.shape({
-            id: PropTypes.string,
-            address: PropTypes.string,
-            mainText: PropTypes.string,
-            secondaryText: PropTypes.string
+            description: PropTypes.string,
+            place_id: PropTypes.string,
+            structured_formatting: PropTypes.shape({
+                main_text: PropTypes.string,
+                secondary_text: PropTypes.string
+            }),
+            terms: PropTypes.arrayOf(
+                PropTypes.shape({
+                    offset: PropTypes.number,
+                    value: PropTypes.string
+                })
+            ),
+            types: PropTypes.arrayOf(PropTypes.string)
         })
     ),
 

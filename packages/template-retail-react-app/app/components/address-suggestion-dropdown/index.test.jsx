@@ -8,19 +8,41 @@
 import React from 'react'
 import {render, screen, fireEvent} from '@testing-library/react'
 import '@testing-library/jest-dom'
-import AddressSuggestionDropdown from './address-suggestion-dropdown'
+import AddressSuggestionDropdown from './index'
 
 describe('AddressSuggestionDropdown', () => {
     const mockSuggestions = [
         {
-            mainText: '123 Main Street',
-            secondaryText: 'New York, NY 10001, USA',
-            country: 'US'
+            description: '123 Main Street, New York, NY 10001, USA',
+            place_id: 'ChIJ1234567890',
+            structured_formatting: {
+                main_text: '123 Main Street',
+                secondary_text: 'New York, NY 10001, USA'
+            },
+            terms: [
+                {offset: 0, value: '123 Main Street'},
+                {offset: 17, value: 'New York'},
+                {offset: 27, value: 'NY'},
+                {offset: 30, value: '10001'},
+                {offset: 37, value: 'USA'}
+            ],
+            types: ['street_address']
         },
         {
-            mainText: '456 Oak Avenue',
-            secondaryText: 'Los Angeles, CA 90210, USA',
-            country: 'US'
+            description: '456 Oak Avenue, Los Angeles, CA 90210, USA',
+            place_id: 'ChIJ4567890123',
+            structured_formatting: {
+                main_text: '456 Oak Avenue',
+                secondary_text: 'Los Angeles, CA 90210, USA'
+            },
+            terms: [
+                {offset: 0, value: '456 Oak Avenue'},
+                {offset: 16, value: 'Los Angeles'},
+                {offset: 29, value: 'CA'},
+                {offset: 32, value: '90210'},
+                {offset: 39, value: 'USA'}
+            ],
+            types: ['street_address']
         }
     ]
 
@@ -60,7 +82,16 @@ describe('AddressSuggestionDropdown', () => {
                 {...defaultProps}
                 isVisible={true}
                 isLoading={true}
-                suggestions={[{mainText: 'dummy'}]}
+                suggestions={[{
+                    description: 'dummy',
+                    place_id: 'dummy',
+                    structured_formatting: {
+                        main_text: 'dummy',
+                        secondary_text: 'dummy'
+                    },
+                    terms: [],
+                    types: []
+                }]}
             />
         )
 
@@ -142,8 +173,16 @@ describe('AddressSuggestionDropdown', () => {
     it('should handle suggestions with missing secondaryText', () => {
         const suggestionsWithoutSecondary = [
             {
-                mainText: '123 Main Street',
-                secondaryText: null
+                description: '123 Main Street',
+                place_id: 'ChIJ1234567890',
+                structured_formatting: {
+                    main_text: '123 Main Street',
+                    secondary_text: null
+                },
+                terms: [
+                    {offset: 0, value: '123 Main Street'}
+                ],
+                types: ['street_address']
             }
         ]
 
