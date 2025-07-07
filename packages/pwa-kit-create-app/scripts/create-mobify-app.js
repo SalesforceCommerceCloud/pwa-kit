@@ -363,7 +363,10 @@ const runGenerator = (context, {outputDir, templateVersion, verbose}) => {
             }
             
             // Copy the contents of CURSOR_RULES_FROM_DIR to outputCursorRulesDir
-            sh.cp('-rf', p.join(CURSOR_RULES_FROM_DIR, '*'), outputCursorRulesDir)
+            const files = fs.readdirSync(CURSOR_RULES_FROM_DIR)
+            files.forEach(file => {
+                sh.cp('-rf', p.join(CURSOR_RULES_FROM_DIR, file), outputCursorRulesDir)
+            })
         }
     } else {
         console.log('Copying base template from package or npm: ', packagePath, outputDir)
