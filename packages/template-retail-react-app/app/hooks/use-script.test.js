@@ -43,7 +43,7 @@ describe('useScript hook', () => {
         const script = document.querySelector(`script[src="${src}"]`)
         expect(script).not.toBeNull()
         expect(script.src).toBe(src)
-        expect(script.async).toBe(true)
+        expect(script.defer).toBe(true)
     })
 
     test('should not create a script element when a script element already exists', () => {
