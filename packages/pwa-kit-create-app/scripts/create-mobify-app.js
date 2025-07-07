@@ -355,7 +355,6 @@ const runGenerator = (context, {outputDir, templateVersion, verbose}) => {
 
         // Copy the .cursor/rules directory if it exists
         if (sh.test('-e', CURSOR_RULES_DIR)) {
-            console.log('Copying .cursor/rules directory to output directory with outputDir: ', outputDir)
             sh.cp('-rf', CURSOR_RULES_DIR, outputDir)
         }
     } else {
