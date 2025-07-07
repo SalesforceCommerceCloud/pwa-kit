@@ -80,10 +80,13 @@ The `claude_desktop_config.json` file opens.
     "pwa-storefront-mcp": {
       "command": "{{path-to-node}}/node",
       "transport": "stdio",
-      "args": ["{{parent-dir-to-mcp}}}/pwa-storefront-mcp/dist/server/server.js"]
+      "args": ["{{parent-dir-to-mcp}}}/pwa-storefront-mcp/dist/server/server.js"],
+      "env": {
+        "PWA_STOREFRONT_APP_PATH": "{{path-to-app-directory}}"
+      }
     }
   }
-}
+}  
 ```
 
 After you modify the `claude_desktop_config.json` file, Claude will do these actions.
