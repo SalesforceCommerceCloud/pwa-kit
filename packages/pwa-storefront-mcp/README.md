@@ -13,15 +13,17 @@ The Model Context Protocol (MCP) is an open protocol that enables secure connect
 The PWA Storefront MCP Server provides these features.
 
 - `development_guidelines`: Helps developers understand and follow PWA Storefront developer guidelines and best practices.
-- `create_new_component`: Helps developers create a new PWA Storefront component. This feature guides developers through a few simple questions and then generates code for the component based on the commerce data model used, layouts, etc.
-- `submit_pwa_kit_project_answers`: Helps developers generate a new PWA Storefront project.
+- `create_new_sample_component`: Helps developers create a new sample PWA Storefront component. This feature guides developers through a few simple questions and then generates code for the component based on the commerce data model used, layouts, etc.
+- `create_app_guidelines`: Helps developers generate a new PWA Storefront project.
+- `run_site_test`: Run site performance or accessibility test for a given site URL (e.g. [https://pwa-kit.mobify-storefront.com](https://pwa-kit.mobify-storefront.com))
 
 ## Setup
 
-Install dependencies:
+Install dependencies and build under `pwa-kit` root directory:
 
 ```bash
-npm install
+cd {{pwa-kit root directory}}
+npm ci
 ```
 
 ## Run the MCP Server
@@ -45,7 +47,7 @@ The `mcp.json` file opens. Add this definition to your `mcp.json` file.
   "mcpServers": {
 
     "pwa-storefront-mcp": {
-      "command": "node {{parent-dir-to-mcp}}/pwa-storefront-mcp/src/server/server.js",
+      "command": "node {{parent-dir-to-mcp}}/pwa-storefront-mcp/dist/server/server.js",
       "transport": "stdio",
       "args": []
     }
@@ -78,7 +80,7 @@ The `claude_desktop_config.json` file opens.
     "pwa-storefront-mcp": {
       "command": "{{path-to-node}}/node",
       "transport": "stdio",
-      "args": ["{{parent-dir-to-mcp}}}/pwa-storefront-mcp/src/server/server.js"]
+      "args": ["{{parent-dir-to-mcp}}}/pwa-storefront-mcp/dist/server/server.js"]
     }
   }
 }
@@ -104,7 +106,7 @@ You can also manually start the server from command line and sending JSON-RPC me
 ```bash
 cd {{dir-to-mcp}}
 # Start the server
-node src/server/server.js
+npm run start
 
 # Then send JSON-RPC requests to stdin:
 {"jsonrpc": "2.0", "id": 1, "method": "tools/list", "params": {}}
@@ -114,7 +116,6 @@ node src/server/server.js
 ## Files
 
 - `server.js` - Main MCP server implementation
-- `test-mcp.js` - Automated test script
 - `mcp.json` - MCP configuration file for clients
 - `package.json` - Node.js dependencies and scripts
 

@@ -58,7 +58,7 @@ If the user requests a project using a **template**:
 `
 
 export default {
-    name: 'create-app_guidelines',
+    name: 'create_app_guidelines',
     description: `This tool is used to provide the agent with the instructions on how to use the @salesforce/pwa-kit-create-app CLI tool to create a new PWA Kit projects. Do not attempt to create a project without using this tool first.`,
     inputSchema: EmptyJsonSchema,
     fn: async () => ({
