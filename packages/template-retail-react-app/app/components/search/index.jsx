@@ -196,7 +196,7 @@ const Search = (props) => {
     return (
         <Box>
             <Popover isOpen={isOpen} isLazy initialFocusRef={searchInputRef}>
-                <PopoverTrigger>
+                <PopoverTrigger asChild>
                     <form onSubmit={onSubmitSearch}>
                         <HStack>
                             <InputGroup>
