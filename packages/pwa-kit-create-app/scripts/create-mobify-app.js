@@ -357,13 +357,16 @@ const runGenerator = (context, {outputDir, templateVersion, verbose}) => {
         sh.cp('-rf', packagePath, outputDir)
 
         // Copy template specific assets over.
-        const assetsDir = p.join(ASSETS_TEMPLATES_DIR, id)
+        const assetsDir = p.join(ASSETS_TEMPLATES_DIR, source.name || id)
         if (sh.test('-e', assetsDir)) {
             getFiles(assetsDir)
                 .map((file) => file.replace(assetsDir, ''))
                 .forEach((relFilePath) =>
                     processTemplate(relFilePath, assetsDir, outputDir, context)
                 )
+        } else {
+            console.error(`Error: failed to copy template files because the directory ${assetsDir} does NOT exist`)
+            process.exit(1)
         }
 
         // Update the generated projects version. NOTE: For bootstrapped projects this
