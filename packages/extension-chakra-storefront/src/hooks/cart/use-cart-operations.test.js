@@ -1,7 +1,12 @@
+/*
+ * Copyright (c) 2025, Salesforce, Inc.
+ * All rights reserved.
+ * SPDX-License-Identifier: BSD-3-Clause
+ * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
+ */
 import {renderHook, act} from '@testing-library/react'
 import {useCartOperations} from './use-cart-operations'
 import {useShopperBasketsMutation} from '@salesforce/commerce-sdk-react'
-import {renderWithProviders} from '../../utils/test-utils'
 
 // Mock the commerce SDK hooks
 jest.mock('@salesforce/commerce-sdk-react', () => ({
@@ -66,17 +71,17 @@ describe('useCartOperations', () => {
 
     beforeEach(() => {
         mockShowError = jest.fn()
-        
+
         mockUpdateItemInBasketMutation = {
             mutateAsync: jest.fn(),
             isLoading: false
         }
-        
+
         mockUpdateItemsInBasketMutation = {
             mutateAsync: jest.fn(),
             isLoading: false
         }
-        
+
         mockRemoveItemFromBasketMutation = {
             mutateAsync: jest.fn(),
             isLoading: false
@@ -102,7 +107,7 @@ describe('useCartOperations', () => {
 
     describe('handleUpdateCart', () => {
         it('should update item quantity when same variant with different quantity', async () => {
-            const {result} = renderHook(() => 
+            const {result} = renderHook(() =>
                 useCartOperations(mockBasket, mockProductsByItemId, mockShowError)
             )
 
@@ -119,20 +124,23 @@ describe('useCartOperations', () => {
                 result.current.changeItemQuantity.flush()
             })
 
-            expect(mockUpdateItemInBasketMutation.mutateAsync).toHaveBeenCalledWith({
-                parameters: {
-                    basketId: 'test-basket-id',
-                    itemId: 'item-1'
+            expect(mockUpdateItemInBasketMutation.mutateAsync).toHaveBeenCalledWith(
+                {
+                    parameters: {
+                        basketId: 'test-basket-id',
+                        itemId: 'item-1'
+                    },
+                    body: {
+                        productId: 'product-1',
+                        quantity: 3
+                    }
                 },
-                body: {
-                    productId: 'product-1',
-                    quantity: 3,
-                }
-            }, expect.any(Object))
+                expect.any(Object)
+            )
         })
 
         it('should add new variant to basket when variant does not exist', async () => {
-            const {result} = renderHook(() => 
+            const {result} = renderHook(() =>
                 useCartOperations(mockBasket, mockProductsByItemId, mockShowError)
             )
 
@@ -162,7 +170,7 @@ describe('useCartOperations', () => {
         })
 
         it('should remove existing item and update quantity when variant already exists', async () => {
-            const {result} = renderHook(() => 
+            const {result} = renderHook(() =>
                 useCartOperations(mockBasket, mockProductsByItemId, mockShowError)
             )
 
@@ -186,23 +194,26 @@ describe('useCartOperations', () => {
                 }
             })
 
-            expect(mockUpdateItemInBasketMutation.mutateAsync).toHaveBeenCalledWith({
-                parameters: {
-                    basketId: 'test-basket-id',
-                    itemId: 'item-2'
+            expect(mockUpdateItemInBasketMutation.mutateAsync).toHaveBeenCalledWith(
+                {
+                    parameters: {
+                        basketId: 'test-basket-id',
+                        itemId: 'item-2'
+                    },
+                    body: {
+                        productId: 'product-2',
+                        quantity: 3 // 1 existing + 2 new
+                    }
                 },
-                body: {
-                    productId: 'product-2',
-                    quantity: 3, // 1 existing + 2 new
-                }
-            }, expect.any(Object))
+                expect.any(Object)
+            )
         })
 
         it('should call showError when mutation fails', async () => {
             // Mock the mutation to reject AND call the onError callback if it uses callbacks
             mockUpdateItemInBasketMutation.mutateAsync.mockRejectedValue(new Error('API Error'))
 
-            const {result} = renderHook(() => 
+            const {result} = renderHook(() =>
                 useCartOperations(mockBasket, mockProductsByItemId, mockShowError)
             )
 
@@ -221,7 +232,7 @@ describe('useCartOperations', () => {
 
     describe('handleUpdateBundle', () => {
         it('should update bundle with child products', async () => {
-            const {result} = renderHook(() => 
+            const {result} = renderHook(() =>
                 useCartOperations(mockBasket, mockProductsByItemId, mockShowError)
             )
 
@@ -246,7 +257,7 @@ describe('useCartOperations', () => {
             // Mock the mutation to reject AND call the onError callback if it uses callbacks
             mockUpdateItemsInBasketMutation.mutateAsync.mockRejectedValue(new Error('API Error'))
 
-            const {result} = renderHook(() => 
+            const {result} = renderHook(() =>
                 useCartOperations(mockBasket, mockProductsByItemId, mockShowError)
             )
 
@@ -255,9 +266,7 @@ describe('useCartOperations', () => {
                 price: 99.99
             }
             const bundleQuantity = 2
-            const childProducts = [
-                {productId: 'child-1', quantity: 1}
-            ]
+            const childProducts = [{productId: 'child-1', quantity: 1}]
 
             await act(async () => {
                 await result.current.handleUpdateBundle(bundle, bundleQuantity, childProducts)
@@ -269,7 +278,7 @@ describe('useCartOperations', () => {
 
     describe('changeItemQuantity', () => {
         it('should update item quantity successfully', async () => {
-            const {result} = renderHook(() => 
+            const {result} = renderHook(() =>
                 useCartOperations(mockBasket, mockProductsByItemId, mockShowError)
             )
 
@@ -281,20 +290,23 @@ describe('useCartOperations', () => {
                 result.current.changeItemQuantity.flush()
             })
 
-            expect(mockUpdateItemInBasketMutation.mutateAsync).toHaveBeenCalledWith({
-                parameters: {
-                    basketId: 'test-basket-id',
-                    itemId: 'item-1'
+            expect(mockUpdateItemInBasketMutation.mutateAsync).toHaveBeenCalledWith(
+                {
+                    parameters: {
+                        basketId: 'test-basket-id',
+                        itemId: 'item-1'
+                    },
+                    body: {
+                        productId: 'product-1',
+                        quantity: 5
+                    }
                 },
-                body: {
-                    productId: 'product-1',
-                    quantity: 5
-                }
-            }, expect.any(Object))
+                expect.any(Object)
+            )
         })
 
         it('should handle quantity update to 0', async () => {
-            const {result} = renderHook(() => 
+            const {result} = renderHook(() =>
                 useCartOperations(mockBasket, mockProductsByItemId, mockShowError)
             )
 
@@ -302,13 +314,16 @@ describe('useCartOperations', () => {
             const newQuantity = 0
 
             await act(async () => {
-                const changeResult = await result.current.handleChangeItemQuantity(item, newQuantity)
+                const changeResult = await result.current.handleChangeItemQuantity(
+                    item,
+                    newQuantity
+                )
                 expect(changeResult).toBe(false)
             })
         })
 
         it('should handle quantity update to 1', async () => {
-            const {result} = renderHook(() => 
+            const {result} = renderHook(() =>
                 useCartOperations(mockBasket, mockProductsByItemId, mockShowError)
             )
 
@@ -316,7 +331,10 @@ describe('useCartOperations', () => {
             const newQuantity = 1
 
             await act(async () => {
-                const changeResult = await result.current.handleChangeItemQuantity(item, newQuantity)
+                const changeResult = await result.current.handleChangeItemQuantity(
+                    item,
+                    newQuantity
+                )
                 expect(changeResult).toBe(true)
             })
         })
@@ -327,7 +345,7 @@ describe('useCartOperations', () => {
                 options.onError()
             })
 
-            const {result} = renderHook(() => 
+            const {result} = renderHook(() =>
                 useCartOperations(mockBasket, mockProductsByItemId, mockShowError)
             )
 

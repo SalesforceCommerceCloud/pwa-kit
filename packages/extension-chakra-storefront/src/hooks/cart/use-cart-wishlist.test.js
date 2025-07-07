@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) 2025, Salesforce, Inc.
+ * All rights reserved.
+ * SPDX-License-Identifier: BSD-3-Clause
+ * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
+ */
 import {renderHook, act} from '@testing-library/react'
 import {useCartWishlist} from './use-cart-wishlist'
 import React from 'react'
@@ -71,7 +77,7 @@ jest.mock('../../constants', () => ({
         defaultMessage: 'View Wishlist'
     },
     TOAST_MESSAGE_ADDED_TO_WISHLIST: {
-        id: 'toast.message.added_to_wishlist', 
+        id: 'toast.message.added_to_wishlist',
         defaultMessage: 'Product added to wishlist'
     },
     TOAST_MESSAGE_ALREADY_IN_WISHLIST: {
@@ -104,7 +110,7 @@ describe('useCartWishlist', () => {
         // Reset specific mocks without clearing their implementations
         mockCreateCustomerProductListItem.mutateAsync.mockClear()
         mockToast.mockClear()
-        
+
         // Set default mock implementation
         mockUseWishList.mockReturnValue({
             data: mockWishlist
@@ -116,9 +122,7 @@ describe('useCartWishlist', () => {
     })
 
     it('should add wishlist item to cart successfully', async () => {
-        const {result} = renderHook(() => 
-            useCartWishlist(mockShowError)
-        )
+        const {result} = renderHook(() => useCartWishlist(mockShowError))
 
         await act(async () => {
             await result.current.handleAddToWishlist({
@@ -141,7 +145,7 @@ describe('useCartWishlist', () => {
                 type: 'product'
             }
         })
-        
+
         expect(mockToast).toHaveBeenCalledWith({
             title: 'Product added to wishlist',
             type: 'success',
@@ -152,9 +156,7 @@ describe('useCartWishlist', () => {
     it('should call showError when adding wishlist item fails', async () => {
         mockCreateCustomerProductListItem.mutateAsync.mockRejectedValue(new Error('API Error'))
 
-        const {result} = renderHook(() => 
-            useCartWishlist(mockShowError)
-        )
+        const {result} = renderHook(() => useCartWishlist(mockShowError))
 
         await act(async () => {
             await result.current.handleAddToWishlist({
@@ -168,9 +170,7 @@ describe('useCartWishlist', () => {
     })
 
     it('should handle adding item already in wishlist', async () => {
-        const {result} = renderHook(() => 
-            useCartWishlist(mockShowError)
-        )
+        const {result} = renderHook(() => useCartWishlist(mockShowError))
 
         await act(async () => {
             await result.current.handleAddToWishlist({
@@ -191,9 +191,7 @@ describe('useCartWishlist', () => {
 
     it('should return early if customer is not logged in', async () => {
         mockCustomer.customerId = null
-        const {result} = renderHook(() => 
-            useCartWishlist(mockShowError)
-        )
+        const {result} = renderHook(() => useCartWishlist(mockShowError))
         await act(async () => {
             await result.current.handleAddToWishlist({
                 id: 'product-3',
@@ -204,17 +202,15 @@ describe('useCartWishlist', () => {
 
         expect(mockCreateCustomerProductListItem.mutateAsync).not.toHaveBeenCalled()
         expect(mockToast).not.toHaveBeenCalled()
-    })  
+    })
 
     it('should return early if wishlist is not found', async () => {
         // Override the mock for this specific test
         mockUseWishList.mockReturnValue({
             data: null
         })
-        
-        const {result} = renderHook(() => 
-            useCartWishlist(mockShowError)
-        )
+
+        const {result} = renderHook(() => useCartWishlist(mockShowError))
         await act(async () => {
             await result.current.handleAddToWishlist({
                 id: 'product-3',
