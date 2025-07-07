@@ -1,1 +1,0 @@
-import AddressSuggestionDropdown from '@salesforce/retail-react-app/app/components/address-suggestion-dropdown' 
