@@ -116,7 +116,7 @@ const ShopperAgentWindow = ({commerceAgentConfiguration, locale, basketId}) => {
                 Locale: locale,
                 OrganizationId: commerceOrgId,
                 UsId: usid,
-                IsCartMgmtSupported: true
+                IsCartMgmtSupported: 'true'
             })
         }
 
