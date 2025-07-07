@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React from 'react'
+import React, {useCallback} from 'react'
 import PropTypes from 'prop-types'
 import {FormattedMessage} from 'react-intl'
 import {Button, Stack, Text, SimpleGrid, Field} from '@chakra-ui/react'
@@ -23,6 +23,11 @@ const CCRadioGroup = ({
 }) => {
     const {data: customer} = useCurrentCustomer()
 
+    const handleValueChange = useCallback((selected) => {
+        // Chakra v3 radio returns the selected id in an object with a value property
+        onPaymentIdChange(selected.value)
+    }, [onPaymentIdChange])
+
     return (
         <Field.Root
             id="paymentInstrumentId"
@@ -30,20 +35,17 @@ const CCRadioGroup = ({
             isRequired={!isEditingPayment}
         >
             {form.formState.errors.paymentInstrumentId && (
-                <Field.ErrorText marginTop={0} marginBottom={4}>
+                <Field.ErrorText marginTop="0" marginBottom="4">
                     {form.formState.errors.paymentInstrumentId.message}
                 </Field.ErrorText>
             )}
 
             <RadioCardGroup
                 value={value}
-                onValueChange={(selected) => {
-                    // Chakra v3 radio returns the selected id in an object with a value property
-                    onPaymentIdChange(selected.value)
-                }}
+                onValueChange={handleValueChange}
             >
                 <Stack gap={4}>
-                    <SimpleGrid columns={[1, 1, 2]} gap={4}>
+                    <SimpleGrid columns={[1, 1, 2]} gap="4">
                         {customer.paymentInstruments?.map((payment, index) => {
                             const CardIcon = getCreditCardIcon(payment.paymentCard?.cardType)
                             return (
@@ -59,7 +61,7 @@ const CCRadioGroup = ({
                                             border="none"
                                             onRemove={() => {}}
                                             data-testid={`sf-checkout-payment-option-${index}`}
-                                            removeBtnLabel={'cc_radio_group.action.remove'}
+                                            removeBtnLabel={'Remove payment option'}
                                         >
                                             <Text>{payment.paymentCard?.cardType}</Text>
                                             <Stack direction="row">
@@ -91,7 +93,7 @@ const CCRadioGroup = ({
                                 fontWeight="medium"
                                 onClick={togglePaymentEdit}
                             >
-                                <PlusIcon boxSize={'15px'} />
+                                <PlusIcon boxSize="15px" />
                                 <FormattedMessage
                                     defaultMessage="Add New Card"
                                     id="cc_radio_group.button.add_new_card"
