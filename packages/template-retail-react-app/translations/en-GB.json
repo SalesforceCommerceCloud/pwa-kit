@@ -1280,7 +1280,7 @@
     "defaultMessage": "Delivery:"
   },
   "product_view.label.pickup_in_select_store_prefix": {
-    "defaultMessage": "Pick Up in"
+    "defaultMessage": "Pick up in"
   },
   "product_view.label.pickup_in_store": {
     "defaultMessage": "Pick Up in Store"

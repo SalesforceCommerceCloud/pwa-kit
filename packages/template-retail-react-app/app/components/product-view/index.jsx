@@ -789,7 +789,7 @@ const ProductView = forwardRef(
                                                         data-testid="pickup-select-store-msg"
                                                     >
                                                         <FormattedMessage
-                                                            defaultMessage="Pick Up in "
+                                                            defaultMessage="Pick up in "
                                                             id="product_view.label.pickup_in_select_store_prefix"
                                                         />{' '}
                                                         <Link

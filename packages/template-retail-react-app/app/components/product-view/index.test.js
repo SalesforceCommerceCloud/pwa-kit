@@ -445,7 +445,7 @@ test('Pick up in store radio is disabled when inventoryId is present but product
     expect(pickupRadio).not.toBeChecked()
 })
 
-test('shows "Pick Up in Select Store" label when pickup is disabled due to no store/inventoryId', async () => {
+test('shows "Pick up in Select Store" label when pickup is disabled due to no store/inventoryId', async () => {
     useSelectedStore.mockReturnValue({
         selectedStore: null,
         isLoading: false,
@@ -457,7 +457,7 @@ test('shows "Pick Up in Select Store" label when pickup is disabled due to no st
 
     const label = await screen.findByTestId('pickup-select-store-msg')
     expect(label).toBeInTheDocument()
-    expect(label).toHaveTextContent(/Pick Up in/i)
+    expect(label).toHaveTextContent(/Pick up in/i)
     const button = label.querySelector('button')
     expect(button).toBeInTheDocument()
     expect(button).toHaveTextContent(/Select Store/i)
