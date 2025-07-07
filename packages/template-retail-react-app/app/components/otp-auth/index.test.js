@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
-import {screen, fireEvent, waitFor, act} from '@testing-library/react'
+import {screen, fireEvent, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import OtpAuth from '@salesforce/retail-react-app/app/components/otp-auth/index'
 import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
@@ -46,29 +46,25 @@ jest.mock('@salesforce/retail-react-app/app/hooks/use-current-customer', () => (
 
 const WrapperComponent = ({...props}) => {
     const form = useForm()
-    const mockOnClose = jest.fn()
+    const mockSetShowOtpView = jest.fn()
     const mockHandleSendEmailOtp = jest.fn()
-    const mockHandleOtpVerification = jest.fn()
-
+    
     return (
         <OtpAuth
-            isOpen={true}
-            onClose={mockOnClose}
             form={form}
+            setShowOtpView={mockSetShowOtpView}
             handleSendEmailOtp={mockHandleSendEmailOtp}
-            handleOtpVerification={mockHandleOtpVerification}
             {...props}
         />
     )
 }
 
 describe('OtpAuth', () => {
-    let mockOnClose, mockHandleSendEmailOtp, mockHandleOtpVerification, mockForm
+    let mockSetShowOtpView, mockHandleSendEmailOtp, mockForm
 
     beforeEach(() => {
-        mockOnClose = jest.fn()
+        mockSetShowOtpView = jest.fn()
         mockHandleSendEmailOtp = jest.fn()
-        mockHandleOtpVerification = jest.fn()
         mockForm = {
             setValue: jest.fn(),
             getValues: jest.fn((field) => {
@@ -86,11 +82,6 @@ describe('OtpAuth', () => {
         })
 
         jest.clearAllMocks()
-
-        // Set up mock implementation after clearAllMocks
-        mockHandleOtpVerification.mockResolvedValue({
-            success: true
-        })
     })
 
     describe('Component Rendering', () => {
@@ -98,11 +89,7 @@ describe('OtpAuth', () => {
             renderWithProviders(<WrapperComponent />)
 
             expect(screen.getByText("Confirm it's you")).toBeInTheDocument()
-            expect(
-                screen.getByText(
-                    'To use your account information enter the code sent to your email.'
-                )
-            ).toBeInTheDocument()
+            expect(screen.getByText('To use your account information enter the code sent to your email.')).toBeInTheDocument()
             expect(screen.getByText('Checkout as a guest')).toBeInTheDocument()
             expect(screen.getByText('Resend code')).toBeInTheDocument()
         })
@@ -126,7 +113,7 @@ describe('OtpAuth', () => {
 
             const guestButton = screen.getByText('Checkout as a guest')
             const resendButton = screen.getByText('Resend code')
-
+            
             expect(guestButton).toBeInTheDocument()
             expect(resendButton).toBeInTheDocument()
         })
@@ -138,7 +125,7 @@ describe('OtpAuth', () => {
             renderWithProviders(<WrapperComponent />)
 
             const otpInputs = screen.getAllByRole('textbox')
-
+            
             await user.type(otpInputs[0], '1')
             expect(otpInputs[0]).toHaveValue('1')
         })
@@ -148,7 +135,7 @@ describe('OtpAuth', () => {
             renderWithProviders(<WrapperComponent />)
 
             const otpInputs = screen.getAllByRole('textbox')
-
+            
             await user.type(otpInputs[0], 'abc')
             expect(otpInputs[0]).toHaveValue('')
         })
@@ -158,7 +145,7 @@ describe('OtpAuth', () => {
             renderWithProviders(<WrapperComponent />)
 
             const otpInputs = screen.getAllByRole('textbox')
-
+            
             await user.type(otpInputs[0], '123')
             expect(otpInputs[0]).toHaveValue('1')
         })
@@ -168,7 +155,7 @@ describe('OtpAuth', () => {
             renderWithProviders(<WrapperComponent />)
 
             const otpInputs = screen.getAllByRole('textbox')
-
+            
             await user.type(otpInputs[0], '1')
             expect(otpInputs[1]).toHaveFocus()
         })
@@ -197,18 +184,10 @@ describe('OtpAuth', () => {
             renderWithProviders(<WrapperComponent />)
 
             const otpInputs = screen.getAllByRole('textbox')
-
-            // Type a value in the first input to establish focus chain
-            await user.click(otpInputs[0])
-            await user.type(otpInputs[0], '1')
-
-            // Now the focus should be on second input (auto-focus)
-            expect(otpInputs[1]).toHaveFocus()
-
-            // Press backspace on empty second input - should go back to first
+            
+            // Focus second input and press backspace
+            otpInputs[1].focus()
             await user.keyboard('{Backspace}')
-
-            // The previous input should now have focus
             expect(otpInputs[0]).toHaveFocus()
         })
 
@@ -235,15 +214,9 @@ describe('OtpAuth', () => {
             renderWithProviders(<WrapperComponent />)
 
             const otpInputs = screen.getAllByRole('textbox')
-
-            // Click on first input to focus it
-            await user.click(otpInputs[0])
-            expect(otpInputs[0]).toHaveFocus()
-
-            // Press backspace on first input - should stay on first input
+            
+            otpInputs[0].focus()
             await user.keyboard('{Backspace}')
-
-            // Should still be on first input (can't go backwards from index 0)
             expect(otpInputs[0]).toHaveFocus()
         })
     })
@@ -253,7 +226,7 @@ describe('OtpAuth', () => {
             renderWithProviders(<WrapperComponent />)
 
             const otpInputs = screen.getAllByRole('textbox')
-
+            
             fireEvent.paste(otpInputs[0], {
                 clipboardData: {
                     getData: () => '12345678'
@@ -274,7 +247,7 @@ describe('OtpAuth', () => {
             renderWithProviders(<WrapperComponent />)
 
             const otpInputs = screen.getAllByRole('textbox')
-
+            
             fireEvent.paste(otpInputs[0], {
                 clipboardData: {
                     getData: () => '1a2b3c4d5e6f7g8h'
@@ -295,7 +268,7 @@ describe('OtpAuth', () => {
             renderWithProviders(<WrapperComponent />)
 
             const otpInputs = screen.getAllByRole('textbox')
-
+            
             fireEvent.paste(otpInputs[0], {
                 clipboardData: {
                     getData: () => '123'
@@ -311,7 +284,7 @@ describe('OtpAuth', () => {
             renderWithProviders(<WrapperComponent />)
 
             const otpInputs = screen.getAllByRole('textbox')
-
+            
             fireEvent.paste(otpInputs[0], {
                 clipboardData: {
                     getData: () => '12345678'
@@ -326,16 +299,10 @@ describe('OtpAuth', () => {
         test('updates form value when OTP changes', async () => {
             const TestComponent = () => {
                 const form = useForm()
-                const mockHandleOtpVerificationSuccess = jest.fn().mockResolvedValue({
-                    success: true
-                })
-
                 return (
                     <OtpAuth
-                        isOpen={true}
-                        onClose={mockOnClose}
                         form={form}
-                        handleOtpVerification={mockHandleOtpVerificationSuccess}
+                        setShowOtpView={mockSetShowOtpView}
                         handleSendEmailOtp={mockHandleSendEmailOtp}
                     />
                 )
@@ -345,7 +312,7 @@ describe('OtpAuth', () => {
             renderWithProviders(<TestComponent />)
 
             const otpInputs = screen.getAllByRole('textbox')
-
+            
             await user.type(otpInputs[0], '1')
             await user.type(otpInputs[1], '2')
             await user.type(otpInputs[2], '3')
@@ -363,10 +330,8 @@ describe('OtpAuth', () => {
             const user = userEvent.setup()
             renderWithProviders(
                 <OtpAuth
-                    isOpen={true}
-                    onClose={mockOnClose}
                     form={mockForm}
-                    handleOtpVerification={mockHandleOtpVerification}
+                    setShowOtpView={mockSetShowOtpView}
                     handleSendEmailOtp={mockHandleSendEmailOtp}
                 />
             )
@@ -374,7 +339,7 @@ describe('OtpAuth', () => {
             const guestButton = screen.getByText('Checkout as a guest')
             await user.click(guestButton)
 
-            expect(mockOnClose).toHaveBeenCalled()
+            expect(mockSetShowOtpView).toHaveBeenCalledWith(false)
         })
 
         test('clicking "Checkout as a guest" calls onCheckoutAsGuest when provided', async () => {
@@ -402,10 +367,8 @@ describe('OtpAuth', () => {
             const user = userEvent.setup()
             renderWithProviders(
                 <OtpAuth
-                    isOpen={true}
-                    onClose={mockOnClose}
                     form={mockForm}
-                    handleOtpVerification={mockHandleOtpVerification}
+                    setShowOtpView={mockSetShowOtpView}
                     handleSendEmailOtp={mockHandleSendEmailOtp}
                 />
             )
@@ -416,14 +379,12 @@ describe('OtpAuth', () => {
             expect(mockHandleSendEmailOtp).toHaveBeenCalledWith('test@example.com')
         })
 
-        test.skip('resend button is disabled during countdown', async () => {
+        test('resend button is disabled during countdown', async () => {
             const user = userEvent.setup()
             renderWithProviders(
                 <OtpAuth
-                    isOpen={true}
-                    onClose={mockOnClose}
                     form={mockForm}
-                    handleOtpVerification={mockHandleOtpVerification}
+                    setShowOtpView={mockSetShowOtpView}
                     handleSendEmailOtp={mockHandleSendEmailOtp}
                 />
             )
@@ -437,14 +398,12 @@ describe('OtpAuth', () => {
             expect(disabledResendButton).toBeDisabled()
         })
 
-        test.skip('resend button becomes enabled after countdown', async () => {
+        test('resend button becomes enabled after countdown', async () => {
             const user = userEvent.setup()
             renderWithProviders(
                 <OtpAuth
-                    isOpen={true}
-                    onClose={mockOnClose}
                     form={mockForm}
-                    handleOtpVerification={mockHandleOtpVerification}
+                    setShowOtpView={mockSetShowOtpView}
                     handleSendEmailOtp={mockHandleSendEmailOtp}
                 />
             )
@@ -460,18 +419,16 @@ describe('OtpAuth', () => {
     })
 
     describe('Error Handling', () => {
-        test.skip('handles resend code error gracefully', async () => {
-            const mockHandleSendEmailOtpError = jest
-                .fn()
-                .mockRejectedValue(new Error('Network error'))
+        test('handles resend code error gracefully', async () => {
+            const mockHandleSendEmailOtpError = jest.fn().mockRejectedValue(new Error('Network error'))
             const user = userEvent.setup()
-
+            
             renderWithProviders(
                 <OtpAuth
                     isOpen={true}
                     onClose={mockOnClose}
                     form={mockForm}
-                    handleOtpVerification={mockHandleOtpVerification}
+                    setShowOtpView={mockSetShowOtpView}
                     handleSendEmailOtp={mockHandleSendEmailOtpError}
                 />
             )
@@ -489,8 +446,8 @@ describe('OtpAuth', () => {
             renderWithProviders(<WrapperComponent />)
 
             const otpInputs = screen.getAllByRole('textbox')
-
-            otpInputs.forEach((input) => {
+            
+            otpInputs.forEach(input => {
                 expect(input).toHaveAttribute('type', 'text')
                 expect(input).toHaveAttribute('inputMode', 'numeric')
                 expect(input).toHaveAttribute('maxLength', '1')
