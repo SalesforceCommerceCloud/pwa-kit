@@ -49,7 +49,10 @@ The `mcp.json` file opens. Add this definition to your `mcp.json` file.
     "pwa-storefront-mcp": {
       "command": "node {{parent-dir-to-mcp}}/pwa-storefront-mcp/dist/server/server.js",
       "transport": "stdio",
-      "args": []
+      "args": [],
+      "env": {
+        "PWA_STOREFRONT_APP_PATH": "{{path-to-app-directory}}"
+      }
     }
   }
 } 
