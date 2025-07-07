@@ -382,7 +382,9 @@ const runGenerator = (context, {outputDir, templateVersion, verbose}) => {
                     processTemplate(relFilePath, assetsDir, outputDir, context)
                 )
         } else {
-            console.error(`Error: failed to copy template files because the directory ${assetsDir} does NOT exist`)
+            console.error(
+                `Error: failed to copy template files because the directory ${assetsDir} does NOT exist`
+            )
             process.exit(1)
         }
 
