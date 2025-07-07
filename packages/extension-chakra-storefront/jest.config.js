@@ -54,6 +54,7 @@ module.exports = {
         // createTestGlob('pages/login'),  // TODO: enable after Account page has been migrated
         createTestGlob('pages/login-redirect'),
         createTestGlob('pages/social-login-redirect'),
+        createTestGlob('hooks/cart'),
         // createTestGlob('pages/registration'), // TODO: enable after Account page has been migrated
         '<rootDir>/src/pages/checkout/partials/contact-info.test.js',
         '<rootDir>/src/pages/checkout/partials/login-state.test.js',
