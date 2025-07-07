@@ -8,35 +8,17 @@
 import React, {useState, useRef, useEffect} from 'react'
 import PropTypes from 'prop-types'
 import {FormattedMessage} from 'react-intl'
-import {
-    Button,
-    Input,
-    SimpleGrid,
-    Stack,
-    Text,
-    Icon,
-    Flex,
-    HStack,
-    Modal,
-    ModalBody,
-    ModalCloseButton,
-    ModalContent,
-    ModalHeader,
-    ModalOverlay
-} from '../shared/ui'
+import {Button, Input, SimpleGrid, Stack, Text, Heading, Icon, Flex, HStack} from '../shared/ui'
 import {PhoneIcon} from '@chakra-ui/icons'
 
-const OtpAuth = ({isOpen, onClose, form, handleSendEmailOtp, handleOtpVerification}) => {
-    const OTP_LENGTH = 8
-    const [otpValues, setOtpValues] = useState(new Array(OTP_LENGTH).fill(''))
+const OtpAuth = ({form, setShowOtpView, handleSendEmailOtp}) => {
+    const [otpValues, setOtpValues] = useState(['', '', '', '', '', '', '', ''])
     const [resendTimer, setResendTimer] = useState(0)
-    const [isVerifying, setIsVerifying] = useState(false)
-    const [verificationError, setVerificationError] = useState('')
     const inputRefs = useRef([])
 
     // Initialize refs array
     useEffect(() => {
-        inputRefs.current = inputRefs.current.slice(0, OTP_LENGTH)
+        inputRefs.current = inputRefs.current.slice(0, 8)
     }, [])
 
     // Handle resend timer
@@ -47,49 +29,9 @@ const OtpAuth = ({isOpen, onClose, form, handleSendEmailOtp, handleOtpVerificati
         }
     }, [resendTimer])
 
-    // Focus first OTP input when modal opens and clear previous values
-    useEffect(() => {
-        if (isOpen) {
-            // Clear previous OTP values
-            setOtpValues(new Array(OTP_LENGTH).fill(''))
-            setVerificationError('')
-            form.setValue('otp', '')
-
-            // Small delay to ensure modal is fully rendered
-            const timer = setTimeout(() => {
-                inputRefs.current[0]?.focus()
-            }, 100)
-            return () => clearTimeout(timer)
-        }
-    }, [isOpen, form])
-
-    // Validation function to check if value contains only digits
-    const isNumericValue = (value) => {
-        return /^\d*$/.test(value)
-    }
-
-    // Function to verify OTP and handle the result
-    const verifyOtpCode = async (otpCode) => {
-        setIsVerifying(true)
-        const result = await handleOtpVerification(otpCode)
-        setIsVerifying(false)
-
-        if (result && !result.success) {
-            setVerificationError(result.error)
-            // Clear the OTP fields so user can try again
-            setOtpValues(new Array(OTP_LENGTH).fill(''))
-            form.setValue('otp', '')
-            // Focus first input
-            inputRefs.current[0]?.focus()
-        }
-    }
-
-    const handleOtpChange = async (index, value) => {
+    const handleOtpChange = (index, value) => {
         // Only allow digits
-        if (!isNumericValue(value)) return
-
-        // Clear any previous verification error
-        setVerificationError('')
+        if (!/^\d*$/.test(value)) return
 
         const newOtpValues = [...otpValues]
         newOtpValues[index] = value
@@ -100,13 +42,8 @@ const OtpAuth = ({isOpen, onClose, form, handleSendEmailOtp, handleOtpVerificati
         form.setValue('otp', otpString)
 
         // Auto-focus next input
-        if (value && index < OTP_LENGTH - 1) {
+        if (value && index < 7) {
             inputRefs.current[index + 1]?.focus()
-        }
-
-        // If all digits are entered, automatically verify OTP
-        if (otpString.length === OTP_LENGTH && !isVerifying) {
-            await verifyOtpCode(otpString)
         }
     }
 
@@ -117,22 +54,14 @@ const OtpAuth = ({isOpen, onClose, form, handleSendEmailOtp, handleOtpVerificati
         }
     }
 
-    const handlePaste = async (e) => {
+    const handlePaste = (e) => {
         e.preventDefault()
-        const pastedData = e.clipboardData.getData('text').replace(/\D/g, '').slice(0, OTP_LENGTH)
-        if (pastedData.length === OTP_LENGTH) {
-            // Clear any previous verification error
-            setVerificationError('')
-
+        const pastedData = e.clipboardData.getData('text').replace(/\D/g, '').slice(0, 8)
+        if (pastedData.length === 8) {
             const newOtpValues = pastedData.split('')
             setOtpValues(newOtpValues)
             form.setValue('otp', pastedData)
             inputRefs.current[7]?.focus()
-
-            // Automatically verify the pasted OTP
-            if (!isVerifying) {
-                await verifyOtpCode(pastedData)
-            }
         }
     }
 
@@ -146,149 +75,104 @@ const OtpAuth = ({isOpen, onClose, form, handleSendEmailOtp, handleOtpVerificati
         }
     }
 
-    const handleCheckoutAsGuest = () => {
-        onClose()
-    }
-
     return (
-        <Modal isOpen={isOpen} onClose={onClose} isCentered size="lg" closeOnOverlayClick={false}>
-            <ModalOverlay />
-            <ModalContent>
-                <ModalHeader>
+        <Stack spacing={8} paddingLeft={4} paddingRight={4} alignItems="center">
+            {/* Header with title */}
+            <Stack spacing={6} alignItems="center" textAlign="center">
+                <Heading fontSize="2xl" fontWeight="normal" color="gray.700">
                     <FormattedMessage
                         defaultMessage="Confirm it's you"
                         id="otp.title.confirm_its_you"
                     />
-                </ModalHeader>
-                <ModalCloseButton disabled={isVerifying} />
-                <ModalBody pb={6}>
-                    <Stack spacing={12} paddingLeft={4} paddingRight={4} alignItems="center">
-                        <Text fontSize="md" maxWidth="300px" textAlign="center">
-                            <FormattedMessage
-                                defaultMessage="To use your account information enter the code sent to your email."
-                                id="otp.message.enter_code_for_account"
-                            />
-                        </Text>
+                </Heading>
 
-                        {/* OTP Input with Phone Icon */}
-                        <Flex alignItems="center" spacing={4}>
-                            <Icon as={PhoneIcon} color="blue.500" boxSize={5} mr={4} />
-                            <SimpleGrid columns={OTP_LENGTH} spacing={3}>
-                                {otpValues.map((value, index) => (
-                                    <Input
-                                        key={index}
-                                        ref={(el) => (inputRefs.current[index] = el)}
-                                        value={value}
-                                        onChange={(e) => handleOtpChange(index, e.target.value)}
-                                        onKeyDown={(e) => handleKeyDown(index, e)}
-                                        onPaste={handlePaste}
-                                        type="text"
-                                        inputMode="numeric"
-                                        maxLength={1}
-                                        textAlign="center"
-                                        fontSize="lg"
-                                        fontWeight="bold"
-                                        size="lg"
-                                        width="48px"
-                                        height="56px"
-                                        borderRadius="md"
-                                        borderColor="gray.300"
-                                        borderWidth="2px"
-                                        disabled={isVerifying}
-                                        _focus={{
-                                            borderColor: 'blue.500',
-                                            boxShadow: '0 0 0 1px var(--chakra-colors-blue-500)'
-                                        }}
-                                        _hover={{
-                                            borderColor: 'gray.400'
-                                        }}
-                                    />
-                                ))}
-                            </SimpleGrid>
-                        </Flex>
+                <Text fontSize="md" color="gray.600" maxWidth="300px">
+                    <FormattedMessage
+                        defaultMessage="To use your account information enter the code sent to your email."
+                        id="otp.message.enter_code_for_account"
+                    />
+                </Text>
+            </Stack>
 
-                        {/* Loading indicator during verification */}
-                        {isVerifying && (
-                            <Text fontSize="sm" color="blue.500">
-                                <FormattedMessage
-                                    defaultMessage="Verifying code..."
-                                    id="otp.message.verifying"
-                                />
-                            </Text>
-                        )}
+            {/* OTP Input with Phone Icon */}
+            <Flex alignItems="center" spacing={4}>
+                <Icon as={PhoneIcon} color="blue.500" boxSize={5} mr={4} />
+                <SimpleGrid columns={8} spacing={3}>
+                    {otpValues.map((value, index) => (
+                        <Input
+                            key={index}
+                            ref={(el) => (inputRefs.current[index] = el)}
+                            value={value}
+                            onChange={(e) => handleOtpChange(index, e.target.value)}
+                            onKeyDown={(e) => handleKeyDown(index, e)}
+                            onPaste={handlePaste}
+                            type="text"
+                            inputMode="numeric"
+                            maxLength={1}
+                            textAlign="center"
+                            fontSize="lg"
+                            fontWeight="bold"
+                            size="lg"
+                            width="48px"
+                            height="56px"
+                            borderRadius="md"
+                            borderColor="gray.300"
+                            borderWidth="2px"
+                            _focus={{
+                                borderColor: 'blue.500',
+                                boxShadow: '0 0 0 1px var(--chakra-colors-blue-500)'
+                            }}
+                            _hover={{
+                                borderColor: 'gray.400'
+                            }}
+                        />
+                    ))}
+                </SimpleGrid>
+            </Flex>
 
-                        {/* Error message */}
-                        {verificationError && (
-                            <Text fontSize="sm" color="red.500" textAlign="center">
-                                {verificationError}
-                            </Text>
-                        )}
+            {/* Buttons */}
+            <HStack spacing={4} width="100%" justifyContent="center">
+                <Button
+                    onClick={() => setShowOtpView(false)}
+                    variant="outline"
+                    colorScheme="gray"
+                    size="lg"
+                    minWidth="160px"
+                >
+                    <FormattedMessage
+                        defaultMessage="Checkout as a guest"
+                        id="otp.button.checkout_as_guest"
+                    />
+                </Button>
 
-                        {/* Buttons */}
-                        <HStack spacing={4} width="100%" justifyContent="center">
-                            <Button
-                                onClick={handleCheckoutAsGuest}
-                                variant="outline"
-                                colorScheme="gray"
-                                size="lg"
-                                minWidth="160px"
-                                disabled={isVerifying}
-                                borderColor="gray.300"
-                                color="gray.600"
-                                _hover={{
-                                    backgroundColor: 'gray.50',
-                                    borderColor: 'gray.400'
-                                }}
-                            >
-                                <FormattedMessage
-                                    defaultMessage="Checkout as a guest"
-                                    id="otp.button.checkout_as_guest"
-                                />
-                            </Button>
-
-                            <Button
-                                onClick={handleResendCode}
-                                variant="solid"
-                                size="lg"
-                                colorScheme="blue"
-                                backgroundColor="blue.500"
-                                minWidth="160px"
-                                disabled={resendTimer > 0 || isVerifying}
-                                _hover={{
-                                    backgroundColor: 'blue.600'
-                                }}
-                                _disabled={{
-                                    backgroundColor: 'gray.300',
-                                    color: 'gray.500'
-                                }}
-                            >
-                                {resendTimer > 0 ? (
-                                    <FormattedMessage
-                                        defaultMessage="Resend code in {timer}s"
-                                        id="otp.button.resend_timer"
-                                        values={{timer: resendTimer}}
-                                    />
-                                ) : (
-                                    <FormattedMessage
-                                        defaultMessage="Resend code"
-                                        id="otp.button.resend_code"
-                                    />
-                                )}
-                            </Button>
-                        </HStack>
-                    </Stack>
-                </ModalBody>
-            </ModalContent>
-        </Modal>
+                <Button
+                    onClick={handleResendCode}
+                    colorScheme="blue"
+                    size="lg"
+                    isDisabled={resendTimer > 0}
+                    minWidth="160px"
+                >
+                    {resendTimer > 0 ? (
+                        <FormattedMessage
+                            defaultMessage="Resend code"
+                            id="otp.button.resend_timer"
+                        />
+                    ) : (
+                        <FormattedMessage
+                            defaultMessage="Resend code"
+                            id="otp.button.resend_code"
+                        />
+                    )}
+                </Button>
+            </HStack>
+        </Stack>
     )
 }
 
 OtpAuth.propTypes = {
-    isOpen: PropTypes.bool.isRequired,
-    onClose: PropTypes.func.isRequired,
     form: PropTypes.object.isRequired,
-    handleSendEmailOtp: PropTypes.func.isRequired,
-    handleOtpVerification: PropTypes.func.isRequired
+    setShowOtpView: PropTypes.func.isRequired,
+    handleSendEmailOtp: PropTypes.func.isRequired
 }
 
 export default OtpAuth
