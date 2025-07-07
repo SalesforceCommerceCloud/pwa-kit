@@ -23,10 +23,13 @@ const CCRadioGroup = ({
 }) => {
     const {data: customer} = useCurrentCustomer()
 
-    const handleValueChange = useCallback((selected) => {
-        // Chakra v3 radio returns the selected id in an object with a value property
-        onPaymentIdChange(selected.value)
-    }, [onPaymentIdChange])
+    const handleValueChange = useCallback(
+        (selected) => {
+            // Chakra v3 radio returns the selected id in an object with a value property
+            onPaymentIdChange(selected.value)
+        },
+        [onPaymentIdChange]
+    )
 
     return (
         <Field.Root
@@ -40,10 +43,7 @@ const CCRadioGroup = ({
                 </Field.ErrorText>
             )}
 
-            <RadioCardGroup
-                value={value}
-                onValueChange={handleValueChange}
-            >
+            <RadioCardGroup value={value} onValueChange={handleValueChange}>
                 <Stack gap={4}>
                     <SimpleGrid columns={[1, 1, 2]} gap="4">
                         {customer.paymentInstruments?.map((payment, index) => {
