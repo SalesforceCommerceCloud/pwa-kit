@@ -27,7 +27,7 @@ const useScript = (src) => {
         if (!scriptAlreadyOnPage) {
             const script = document.createElement('script')
             script.src = src
-            script.async = true
+            script.defer = true
             document.body.appendChild(script)
 
             const onScriptLoad = (event) => {
