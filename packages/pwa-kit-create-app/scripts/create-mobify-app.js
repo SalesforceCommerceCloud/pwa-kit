@@ -356,15 +356,15 @@ const runGenerator = (context, {outputDir, templateVersion, verbose}) => {
         // Copy the .cursor/rules directory if it exists
         if (sh.test('-e', CURSOR_RULES_FROM_DIR)) {
             const outputCursorRulesDir = p.join(outputDir, '.cursor', 'rules')
-            
+
             // Create the directory if it doesn't exist
             if (!sh.test('-e', outputCursorRulesDir)) {
-                fs.mkdirSync(outputCursorRulesDir, { recursive: true })
+                fs.mkdirSync(outputCursorRulesDir, {recursive: true})
             }
-            
+
             // Copy the contents of CURSOR_RULES_FROM_DIR to outputCursorRulesDir
             const files = fs.readdirSync(CURSOR_RULES_FROM_DIR)
-            files.forEach(file => {
+            files.forEach((file) => {
                 sh.cp('-rf', p.join(CURSOR_RULES_FROM_DIR, file), outputCursorRulesDir)
             })
         }
