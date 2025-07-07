@@ -1,6 +1,6 @@
 ---
-description: USE when generating components 
-globs: "**/components/**"
+description: 
+globs: 
 alwaysApply: false
 ---
 # Create and Generate React Components in PWA Kit
@@ -16,8 +16,8 @@ alwaysApply: false
 You need to create a new React component following established patterns and best practices.
 
 ### 1. Create the Component File
-First, create a new file for your component. A good practice is to place it in the `app/components` directory.
-For example, to create a new "User Profile" component, you would create the file `app/components/user-profile/index.jsx`:
+First, create a new file for your component. A good practice is to place it in the components directory `**/app/components` .
+For example, to create a new "User Profile" component, you would create the file `**/app/components/user-profile/index.jsx`:
 
 ```jsx
 import React from 'react'
@@ -68,10 +68,10 @@ app/components/
 Override components from the base template by creating files with the same name and path in your project's `overrides` directory.
 
 ### 1. Identify the Component to Override
-The component in the base template is located at `app/components/component-name/index.jsx`.
+The component in the base template is located at `**/app/components/component-name/index.jsx`.
 
 ### 2. Create the Overriding File
-To override this component, create a new file with the exact same path inside your `overrides` directory: `overrides/app/components/component-name/index.jsx`.
+To override this component, create a new file with the exact same path inside your `overrides` directory: `**/overrides/app/components/component-name/index.jsx`.
 
 ### 3. Customize the Component
 Now you can add your custom code to this new file. You can either copy the original content and modify it, extend the original component or create a new component from scratch.
