@@ -398,14 +398,17 @@ const ProductList = (props) => {
         navigate(newPath)
     }
 
-    // Create reusable StoreInventoryFilter component to avoid repetition
-    const storeInventoryFilterComponent = (
-        <StoreInventoryFilter
-            key="storeInventoryFilter"
-            toggleFilter={toggleFilter}
-            selectedFilters={productSearchResult?.selectedRefinements || {}}
-        />
-    )
+    // Helper function to create StoreInventoryFilter component
+    const createStoreInventoryFilter = () => {
+        if (!STORE_LOCATOR_IS_ENABLED) return null
+        return (
+            <StoreInventoryFilter
+                key="storeInventoryFilter"
+                toggleFilter={toggleFilter}
+                selectedFilters={productSearchResult?.selectedRefinements || {}}
+            />
+        )
+    }
 
     /**************** Einstein ****************/
     useEffect(() => {
@@ -572,13 +575,9 @@ const ProductList = (props) => {
                                                   category={category}
                                                   onSelect={onClose}
                                               />,
-                                              STORE_LOCATOR_IS_ENABLED &&
-                                                  storeInventoryFilterComponent
+                                              createStoreInventoryFilter()
                                           ].filter(Boolean)
-                                        : [
-                                              STORE_LOCATOR_IS_ENABLED &&
-                                                  storeInventoryFilterComponent
-                                          ].filter(Boolean)
+                                        : [createStoreInventoryFilter()].filter(Boolean)
                                 }
                                 isLoading={filtersLoading}
                                 toggleFilter={toggleFilter}
@@ -741,11 +740,9 @@ const ProductList = (props) => {
                                               category={category}
                                               onSelect={onClose}
                                           />,
-                                          STORE_LOCATOR_IS_ENABLED && storeInventoryFilterComponent
+                                          createStoreInventoryFilter()
                                       ].filter(Boolean)
-                                    : [
-                                          STORE_LOCATOR_IS_ENABLED && storeInventoryFilterComponent
-                                      ].filter(Boolean)
+                                    : [createStoreInventoryFilter()].filter(Boolean)
                             }
                             excludedFilters={['cgid']}
                         />

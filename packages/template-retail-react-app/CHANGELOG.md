@@ -10,8 +10,10 @@
 - Provide base image for convenient perf optimizations [#2642](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2642)
 - Support saving billing phone number on user registration from order confirmation [#2653](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2653)
 - Support saving default shipping address on user registration from order confirmation [#2706](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2706)
+- Minor updates to support BOPIS E2E tests [#2716](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2716)
 - Provide support for partial hydration [#2696](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2696)
 - Show Automatic Bonus Products on Cart Page [#2704](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2704)
+
 
 ## v6.1.0 (May 22, 2025)
 
