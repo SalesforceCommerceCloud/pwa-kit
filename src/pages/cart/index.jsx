@@ -14,7 +14,7 @@ import {useCartOperations} from '../../hooks/cart/use-cart-operations'
 import {useCartWishlist} from '../../hooks/cart/use-cart-wishlist'
 import {useCartGiftItems} from '../../hooks/cart/use-cart-gift-items'
 import {useCartShipping} from '../../hooks/cart/use-cart-shipping'
-import {useCartErrorHandler} from './utils/cartUtils'
+import {useCartErrorHandler} from './utils/cart-utils'
 
 // Cart Components
 import CartTitle from './partials/cart-title'
