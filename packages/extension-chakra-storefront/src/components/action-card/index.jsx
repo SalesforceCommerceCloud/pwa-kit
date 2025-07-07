@@ -38,18 +38,17 @@ const ActionCard = ({
 
     return (
         <Box
-            spacing={4}
             p={4}
             position="relative"
             border="1px solid"
             borderColor="gray.100"
-            borderRadius="base"
+            rounded="md"
             {...props}
         >
             {showLoading && <LoadingSpinner />}
-            <Stack spacing={3}>
+            <Stack gap={3}>
                 <Box>{children}</Box>
-                <Stack direction="row" spacing={4}>
+                <Stack direction="row" gap={4}>
                     {onEdit && (
                         <Button
                             onClick={onEdit}
