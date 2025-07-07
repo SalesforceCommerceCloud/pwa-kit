@@ -575,13 +575,9 @@ const ProductList = (props) => {
                                                   category={category}
                                                   onSelect={onClose}
                                               />,
-                                              STORE_LOCATOR_IS_ENABLED &&
-                                                  storeInventoryFilterComponent
+                                              createStoreInventoryFilter()
                                           ].filter(Boolean)
-                                        : [
-                                              STORE_LOCATOR_IS_ENABLED &&
-                                                  storeInventoryFilterComponent
-                                          ].filter(Boolean)
+                                        : [createStoreInventoryFilter()].filter(Boolean)
                                 }
                                 isLoading={filtersLoading}
                                 toggleFilter={toggleFilter}
