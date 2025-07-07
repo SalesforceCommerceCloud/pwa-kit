@@ -11,10 +11,10 @@ import useAddressFields from '../forms/useAddressFields'
 import {
     getAddressSuggestions,
     parseAddressSuggestion
-} from '@salesforce/retail-react-app/app/mocks/mockAddressService'
+} from '@salesforce/retail-react-app/app/utils/address-suggestions'
 
 // Mock the address service
-jest.mock('@salesforce/retail-react-app/app/mocks/mockAddressService')
+jest.mock('@salesforce/retail-react-app/app/utils/address-suggestions')
 jest.mock('react-intl', () => ({
     useIntl: () => ({
         formatMessage: jest.fn((message) => message.defaultMessage || message.id)

@@ -18,7 +18,7 @@ import useAddressFields from '@salesforce/retail-react-app/app/components/forms/
 import Field from '@salesforce/retail-react-app/app/components/field'
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
 import {MESSAGE_PROPTYPE} from '@salesforce/retail-react-app/app/utils/locale'
-import AddressSuggestionDropdown from '@salesforce/retail-react-app/app/components/address-suggestion-dropdown/address-suggestion-dropdown'
+import AddressSuggestionDropdown from '@salesforce/retail-react-app/app/components/address-suggestion-dropdown'
 
 const defaultFormTitleAriaLabel = defineMessage({
     defaultMessage: 'Address Form',
