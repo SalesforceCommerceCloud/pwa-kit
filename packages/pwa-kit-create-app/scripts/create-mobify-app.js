@@ -111,6 +111,7 @@ const TEMPLATE_SOURCE_BUNDLE = 'bundle'
 
 const BOOTSTRAP_DIR = p.join(__dirname, '..', 'assets', 'bootstrap', 'js')
 const ASSETS_TEMPLATES_DIR = p.join(__dirname, '..', 'assets', 'templates')
+const CURSOR_RULES_DIR = p.join(__dirname, '..', '.cursor')
 const PRIVATE_PRESET_NAMES = PRESETS.filter(({private}) => !!private).map(({id}) => id)
 const PUBLIC_PRESET_NAMES = PRESETS.filter(({private}) => !private).map(({id}) => id)
 const ALL_PRESET_NAMES = PRIVATE_PRESET_NAMES.concat(PUBLIC_PRESET_NAMES)
@@ -351,6 +352,12 @@ const runGenerator = (context, {outputDir, templateVersion, verbose}) => {
         assets.forEach((asset) => {
             sh.cp('-rf', p.join(packagePath, asset), outputDir)
         })
+
+        // Copy the .cursor/rules directory if it exists
+        if (sh.test('-e', CURSOR_RULES_DIR)) {
+            console.log('Copying .cursor/rules directory to output directory with outputDir: ', outputDir)
+            sh.cp('-rf', CURSOR_RULES_DIR, outputDir)
+        }
     } else {
         console.log('Copying base template from package or npm: ', packagePath, outputDir)
         // Copy the base template either from the package or npm.
