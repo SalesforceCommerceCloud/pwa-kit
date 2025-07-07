@@ -1,5 +1,5 @@
 import {renderHook, act} from '@testing-library/react'
-import {useCartOperations} from './useCartOperations'
+import {useCartOperations} from './use-cart-operations'
 import {useShopperBasketsMutation} from '@salesforce/commerce-sdk-react'
 import {renderWithProviders} from '../../utils/test-utils'
 

@@ -9,11 +9,11 @@ import {Box, Stack, Grid, GridItem, Container, useDisclosure} from '@chakra-ui/r
 import {useCurrentBasket, useCurrentCustomer} from '../../hooks/'
 
 // Custom Cart Hooks
-import {useCartProducts} from '../../hooks/cart/useCartProducts'
-import {useCartOperations} from '../../hooks/cart/useCartOperations'
-import {useCartWishlist} from '../../hooks/cart/useCartWishlist'
-import {useCartGiftItems} from '../../hooks/cart/useCartGiftItems'
-import {useCartShipping} from '../../hooks/cart/useCartShipping'
+import {useCartProducts} from '../../hooks/cart/use-cart-products'
+import {useCartOperations} from '../../hooks/cart/use-cart-operations'
+import {useCartWishlist} from '../../hooks/cart/use-cart-wishlist'
+import {useCartGiftItems} from '../../hooks/cart/use-cart-gift-items'
+import {useCartShipping} from '../../hooks/cart/use-cart-shipping'
 import {useCartErrorHandler} from './utils/cartUtils'
 
 // Cart Components
