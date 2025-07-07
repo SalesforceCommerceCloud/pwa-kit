@@ -349,7 +349,13 @@ const AccountAddresses = () => {
                                     removeBtnLabel={removeLabel}
                                 >
                                     {address.preferred && (
-                                        <Badge position="absolute" right={4} variant="default">
+                                        <Badge
+                                            position="absolute"
+                                            right={4}
+                                            variant="solid"
+                                            bg="gray.100"
+                                            color="gray.900"
+                                        >
                                             <FormattedMessage
                                                 defaultMessage="Default"
                                                 id="account_addresses.badge.default"
