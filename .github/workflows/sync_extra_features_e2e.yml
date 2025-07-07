@@ -1,4 +1,4 @@
-name: Sync More Logins E2E Branch with Develop
+name: Sync Extra Features E2E Branch with Develop
 
 on:
   # Trigger when develop branch is updated

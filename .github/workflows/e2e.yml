@@ -3,7 +3,6 @@ on:
   push:
     branches:
       - develop
-      - W-18685522-reset-and-passwordless-integration-test # Just testing
   workflow_dispatch:
   schedule:
     # Run every day at 12am (PST) - cron uses UTC times
@@ -134,13 +133,13 @@ jobs:
         with:
           mobify_user: ${{ secrets.MOBIFY_CLIENT_USER }}
           mobify_api_key: ${{ secrets.MOBIFY_CLIENT_API_KEY }}
-      # Just comment out for now because we don't want to push to MRT
-      # - name: Push Bundle to MRT (E2E Test PWA Kit)
-      #   uses: "./.github/actions/push_to_mrt"
-      #   with:
-      #     CWD: "../generated-projects/retail-app-no-ext"
-      #     TARGET: e2e-tests-pwa-kit
-      #     FLAGS: --wait
+
+      - name: Push Bundle to MRT (E2E Test PWA Kit)
+        uses: "./.github/actions/push_to_mrt"
+        with:
+          CWD: "../generated-projects/retail-app-no-ext"
+          TARGET: e2e-tests-pwa-kit
+          FLAGS: --wait
 
       - name: Install Playwright Browsers
         run: npx playwright install --with-deps
@@ -252,13 +251,12 @@ jobs:
           mobify_user: ${{ secrets.MOBIFY_CLIENT_USER }}
           mobify_api_key: ${{ secrets.MOBIFY_CLIENT_API_KEY }}
 
-      # Just comment out for now because we don't want to push to MRT
-      # - name: Push Bundle to MRT (E2E Test PWA Kit)
-      #   uses: "./.github/actions/push_to_mrt"
-      #   with:
-      #     CWD: "../generated-projects/retail-app-ext"
-      #     TARGET: e2e-tests-pwa-kit
-      #     FLAGS: --wait
+      - name: Push Bundle to MRT (E2E Test PWA Kit)
+        uses: "./.github/actions/push_to_mrt"
+        with:
+          CWD: "../generated-projects/retail-app-ext"
+          TARGET: e2e-tests-pwa-kit
+          FLAGS: --wait
 
       - name: Install Playwright Browsers
         run: npx playwright install --with-deps
@@ -368,13 +366,12 @@ jobs:
           mobify_user: ${{ secrets.MOBIFY_CLIENT_USER }}
           mobify_api_key: ${{ secrets.MOBIFY_CLIENT_API_KEY }}
 
-      # Just comment out for now because we don't want to push to MRT
-      # - name: Push Bundle to MRT
-      #   uses: "./.github/actions/push_to_mrt"
-      #   with:
-      #     CWD: "../generated-projects/retail-app-private-client"
-      #     TARGET: e2e-pwa-kit-private
-      #     FLAGS: --wait
+      - name: Push Bundle to MRT
+        uses: "./.github/actions/push_to_mrt"
+        with:
+          CWD: "../generated-projects/retail-app-private-client"
+          TARGET: e2e-pwa-kit-private
+          FLAGS: --wait
 
       - name: Set Retail App Private Client Home
         run: export RETAIL_APP_HOME=https://scaffold-pwa-e2e-pwa-kit-private.mobify-storefront.com/
@@ -418,7 +415,7 @@ jobs:
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
 
-  test-extra-features-login:
+  test-extra-features:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -434,7 +431,7 @@ jobs:
         run: npx playwright install --with-deps
       - name: Set PWA Kit E2E Test User
         run: export PWA_E2E_USER_EMAIL=e2e.pwa.kit@gmail.com PWA_E2E_USER_PASSWORD=hpv_pek-JZK_xkz0wzf
-      - name: Run extra features login tests
+      - name: Run extra features tests
         env:
           PWA_E2E_USER_EMAIL: e2e.pwa.kit@gmail.com
           PWA_E2E_USER_PASSWORD: hpv_pek-JZK_xkz0wzf
