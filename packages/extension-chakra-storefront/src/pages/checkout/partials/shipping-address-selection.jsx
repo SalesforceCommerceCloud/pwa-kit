@@ -366,9 +366,9 @@ const ShippingAddressSelection = ({
                                         height={['44px', '44px', '167px']}
                                         rounded="base"
                                         fontWeight="semibold"
-                                        leftIcon={<PlusIcon boxSize={'15px'} />}
                                         onClick={toggleAddressEdit}
                                     >
+                                        <PlusIcon boxSize={'15px'} />
                                         <FormattedMessage
                                             defaultMessage="Add New Address"
                                             id="shipping_address_selection.button.add_address"
