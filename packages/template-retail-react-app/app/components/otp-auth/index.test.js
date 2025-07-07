@@ -84,7 +84,6 @@ describe('OtpAuth', () => {
 
             const guestButton = screen.getByText('Checkout as a guest')
             const resendButton = screen.getByText('Resend code')
-
             expect(guestButton).toBeInTheDocument()
             expect(resendButton).toBeInTheDocument()
         })
@@ -96,7 +95,6 @@ describe('OtpAuth', () => {
             renderWithProviders(<WrapperComponent />)
 
             const otpInputs = screen.getAllByRole('textbox')
-
             await user.type(otpInputs[0], '1')
             expect(otpInputs[0]).toHaveValue('1')
         })
@@ -106,7 +104,6 @@ describe('OtpAuth', () => {
             renderWithProviders(<WrapperComponent />)
 
             const otpInputs = screen.getAllByRole('textbox')
-
             await user.type(otpInputs[0], 'abc')
             expect(otpInputs[0]).toHaveValue('')
         })
@@ -116,7 +113,6 @@ describe('OtpAuth', () => {
             renderWithProviders(<WrapperComponent />)
 
             const otpInputs = screen.getAllByRole('textbox')
-
             await user.type(otpInputs[0], '123')
             expect(otpInputs[0]).toHaveValue('1')
         })
@@ -126,7 +122,6 @@ describe('OtpAuth', () => {
             renderWithProviders(<WrapperComponent />)
 
             const otpInputs = screen.getAllByRole('textbox')
-
             await user.type(otpInputs[0], '1')
             expect(otpInputs[1]).toHaveFocus()
         })
@@ -136,7 +131,6 @@ describe('OtpAuth', () => {
             renderWithProviders(<WrapperComponent />)
 
             const otpInputs = screen.getAllByRole('textbox')
-
             otpInputs[7].focus()
             await user.type(otpInputs[7], '8')
             expect(otpInputs[7]).toHaveFocus()
@@ -169,7 +163,6 @@ describe('OtpAuth', () => {
             renderWithProviders(<WrapperComponent />)
 
             const otpInputs = screen.getAllByRole('textbox')
-
             // Enter value in second input and press backspace
             await user.type(otpInputs[1], '2')
             await user.keyboard('{Backspace}')
@@ -199,7 +192,6 @@ describe('OtpAuth', () => {
             renderWithProviders(<WrapperComponent />)
 
             const otpInputs = screen.getAllByRole('textbox')
-
             fireEvent.paste(otpInputs[0], {
                 clipboardData: {
                     getData: () => '12345678'
@@ -220,7 +212,6 @@ describe('OtpAuth', () => {
             renderWithProviders(<WrapperComponent />)
 
             const otpInputs = screen.getAllByRole('textbox')
-
             fireEvent.paste(otpInputs[0], {
                 clipboardData: {
                     getData: () => '1a2b3c4d5e6f7g8h'
@@ -241,7 +232,6 @@ describe('OtpAuth', () => {
             renderWithProviders(<WrapperComponent />)
 
             const otpInputs = screen.getAllByRole('textbox')
-
             fireEvent.paste(otpInputs[0], {
                 clipboardData: {
                     getData: () => '123'
@@ -257,7 +247,6 @@ describe('OtpAuth', () => {
             renderWithProviders(<WrapperComponent />)
 
             const otpInputs = screen.getAllByRole('textbox')
-
             fireEvent.paste(otpInputs[0], {
                 clipboardData: {
                     getData: () => '12345678'
@@ -291,7 +280,6 @@ describe('OtpAuth', () => {
             renderWithProviders(<TestComponent />)
 
             const otpInputs = screen.getAllByRole('textbox')
-
             await user.type(otpInputs[0], '1')
             await user.type(otpInputs[1], '2')
             await user.type(otpInputs[2], '3')
