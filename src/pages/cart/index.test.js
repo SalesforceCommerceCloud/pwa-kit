@@ -705,7 +705,7 @@ describe('Product bundles', () => {
             async () => {
                 productViewModal = screen.getByTestId('product-view-modal')
                 expect(productViewModal).toBeInTheDocument()
-            },
+             },
             {timeout: 10000}
         )
 

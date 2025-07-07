@@ -121,7 +121,7 @@ const Cart = () => {
                                 />
                             </GridItem>
                             <GridItem>
-                                <CartSummarySection basket={basket} />
+                                <CartSummarySection basket={basket} isDesktop={true} />
                             </GridItem>
                         </Grid>
 
