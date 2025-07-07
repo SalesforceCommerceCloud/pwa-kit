@@ -105,7 +105,7 @@ export const navigateToPDPMobile = async ({page}) => {
     const initialSrc = await productTileImg.getAttribute('src')
     await expect(productTile.getByText(/From \£50\.56/i)).toBeVisible()
 
-    await productTile.getByLabel(/Black/, {exact: true}).hover()
+    await productTile.getByLabel(/Black/, {exact: true}).click()
     // Make sure the image src has changed
     await expect(async () => {
         const newSrc = await productTileImg.getAttribute('src')
