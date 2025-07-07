@@ -1,4 +1,5 @@
 ## v3.11.0-dev.0 (May 23, 2025)
+- Introduce the pwa-storefront-mcp MCP Server [#2578] https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2578
 
 ## v3.10.0 (May 22, 2025)
 - Support source map for both client and server on MRT [#240](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2240)
