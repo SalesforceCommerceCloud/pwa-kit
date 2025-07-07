@@ -213,7 +213,7 @@ export const StoreLocatorForm = () => {
                     >
                         {intl.formatMessage({
                             id: 'store_locator.error.agree_to_share_your_location',
-                            defaultMessage: 'Please agree to share your location.'
+                            defaultMessage: 'To use your location, enable location sharing.'
                         })}
                     </FormErrorMessage>
                 </FormControl>

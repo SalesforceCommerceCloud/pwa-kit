@@ -1265,10 +1265,10 @@
     "defaultMessage": "No valid store or inventory found for pickup"
   },
   "product_view.error.select_pickup_in_store": {
-    "defaultMessage": "Select 'Pick Up in Store' to match the shipping method for your other items."
+    "defaultMessage": "Select 'Pick Up in Store' to match the delivery method for the items in your cart."
   },
   "product_view.error.select_ship_to_address": {
-    "defaultMessage": "Select 'Ship to Address' to match the shipping method for your other items."
+    "defaultMessage": "Select 'Ship to Address' to match the delivery method for the items in your cart."
   },
   "product_view.label.assistive_msg.quantity_decrement": {
     "defaultMessage": "Decrement Quantity for {productName}"
@@ -1307,7 +1307,7 @@
     "defaultMessage": "See full details"
   },
   "product_view.status.in_stock_at_store": {
-    "defaultMessage": "In Stock at {storeName}"
+    "defaultMessage": "In stock at {storeName}"
   },
   "product_view.status.out_of_stock_at_store": {
     "defaultMessage": "Out of Stock at {storeName}"
@@ -1479,7 +1479,7 @@
     "defaultMessage": "Filter Products by Store Availability at {storeName}"
   },
   "store_inventory_filter.checkbox.label": {
-    "defaultMessage": "In Stock at {storeName}"
+    "defaultMessage": "In stock at {storeName}"
   },
   "store_inventory_filter.heading.shop_by_availability": {
     "defaultMessage": "Shop by Availability"
@@ -1521,10 +1521,10 @@
     "defaultMessage": "Viewing stores near your location"
   },
   "store_locator.error.agree_to_share_your_location": {
-    "defaultMessage": "Please agree to share your location."
+    "defaultMessage": "To use your location, enable location sharing."
   },
   "store_locator.error.items_in_basket": {
-    "defaultMessage": "Sorry, you have items in your basket. Remove them to change the selected store."
+    "defaultMessage": "To change your selected store, remove all items from your cart."
   },
   "store_locator.error.please_enter_a_postal_code": {
     "defaultMessage": "Enter a postal code."

@@ -606,7 +606,7 @@ describe('Delivery Options Restrictions', () => {
         await waitFor(() => {
             expect(
                 screen.getByText(
-                    "Select 'Ship to Address' to match the shipping method for your other items."
+                    "Select 'Ship to Address' to match the delivery method for the items in your cart."
                 )
             ).toBeInTheDocument()
         })
@@ -722,7 +722,7 @@ describe('Delivery Options Restrictions', () => {
         await waitFor(() => {
             expect(
                 screen.getByText(
-                    "Select 'Ship to Address' to match the shipping method for your other items."
+                    "Select 'Ship to Address' to match the delivery method for the items in your cart."
                 )
             ).toBeInTheDocument()
         })
@@ -776,7 +776,7 @@ describe('Delivery Options Restrictions', () => {
         await waitFor(() => {
             expect(
                 screen.getByText(
-                    "Select 'Pick Up in Store' to match the shipping method for your other items."
+                    "Select 'Pick Up in Store' to match the delivery method for the items in your cart."
                 )
             ).toBeInTheDocument()
         })

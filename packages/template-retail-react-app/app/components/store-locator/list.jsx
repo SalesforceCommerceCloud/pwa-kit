@@ -50,8 +50,7 @@ export const StoreLocatorList = () => {
         if (hasItemsInBasket) {
             return intl.formatMessage({
                 id: 'store_locator.error.items_in_basket',
-                defaultMessage:
-                    'Sorry, you have items in your basket. Remove them to change the selected store.'
+                defaultMessage: 'To change your selected store, remove all items from your cart.'
             })
         }
 

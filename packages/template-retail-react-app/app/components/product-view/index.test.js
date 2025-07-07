@@ -466,14 +466,14 @@ test('shows "Pick Up in Select Store" label when pickup is disabled due to no st
 describe('ProductView stock status messages', () => {
     const storeName = 'Test Store'
 
-    test('shows "In Stock at {storeName}" when store has inventory', async () => {
+    test('shows "In stock at {storeName}" when store has inventory', async () => {
         const mockProduct = {
             ...mockProductDetail,
             inventories: [{id: mockStoreData.inventoryId, orderable: true, stockLevel: 10}],
             name: 'Test Product'
         }
         renderWithProviders(<MockComponent product={mockProduct} />)
-        const msg = await screen.findByText(/In Stock at/i)
+        const msg = await screen.findByText(/In stock at/i)
         expect(msg).toBeInTheDocument()
         expect(msg).toHaveTextContent(storeName)
         // Store name should be a button

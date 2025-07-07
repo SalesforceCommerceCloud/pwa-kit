@@ -739,7 +739,7 @@ const ProductView = forwardRef(
                                                                   {
                                                                       id: 'product_view.status.in_stock_at_store',
                                                                       defaultMessage:
-                                                                          'In Stock at {storeName}'
+                                                                          'In stock at {storeName}'
                                                                   },
                                                                   {
                                                                       storeName: (

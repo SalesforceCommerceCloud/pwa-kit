@@ -2964,13 +2964,13 @@
   "product_view.error.select_pickup_in_store": [
     {
       "type": 0,
-      "value": "Select 'Pick Up in Store' to match the shipping method for your other items."
+      "value": "Select 'Pick Up in Store' to match the delivery method for the items in your cart."
     }
   ],
   "product_view.error.select_ship_to_address": [
     {
       "type": 0,
-      "value": "Select 'Ship to Address' to match the shipping method for your other items."
+      "value": "Select 'Ship to Address' to match the delivery method for the items in your cart."
     }
   ],
   "product_view.label.assistive_msg.quantity_decrement": [
@@ -3056,7 +3056,7 @@
   "product_view.status.in_stock_at_store": [
     {
       "type": 0,
-      "value": "In Stock at "
+      "value": "In stock at "
     },
     {
       "type": 1,
@@ -3472,7 +3472,7 @@
   "store_inventory_filter.checkbox.label": [
     {
       "type": 0,
-      "value": "In Stock at "
+      "value": "In stock at "
     },
     {
       "type": 1,
@@ -3612,13 +3612,13 @@
   "store_locator.error.agree_to_share_your_location": [
     {
       "type": 0,
-      "value": "Please agree to share your location."
+      "value": "To use your location, enable location sharing."
     }
   ],
   "store_locator.error.items_in_basket": [
     {
       "type": 0,
-      "value": "Sorry, you have items in your basket. Remove them to change the selected store."
+      "value": "To change your selected store, remove all items from your cart."
     }
   ],
   "store_locator.error.please_enter_a_postal_code": [
