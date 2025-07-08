@@ -149,7 +149,7 @@ describe('passwordless enabled', () => {
     })
 
     test('allows passwordless login', async () => {
-        const mockLocation = jest.spyOn(window, 'location', 'get').mockReturnValue({
+        jest.spyOn(window, 'location', 'get').mockReturnValue({
             pathname: '/checkout',
             origin: 'https://example.com'
         })
@@ -161,7 +161,6 @@ describe('passwordless enabled', () => {
 
         // initiate passwordless login
         const passwordlessLoginButton = screen.getByText('Secure Link')
-        // Click the button twice as the isPasswordlessLoginClicked state doesn't change after the first click
         await user.click(passwordlessLoginButton)
         expect(
             mockAuthHelperFunctions[AuthHelpers.AuthorizePasswordless].mutateAsync
@@ -187,9 +186,6 @@ describe('passwordless enabled', () => {
             callbackURI:
                 'https://webhook.site/27761b71-50c1-4097-a600-21a3b89a546c?redirectUrl=/checkout'
         })
-
-        // Cleanup mocks
-        mockLocation.mockRestore()
     })
 
     test('allows login using password', async () => {
