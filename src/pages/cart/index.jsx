@@ -13,7 +13,7 @@ import {useCartProducts} from '../../hooks/cart/use-cart-products'
 import {useCartOperations} from '../../hooks/cart/use-cart-operations'
 import {useCartWishlist} from '../../hooks/cart/use-cart-wishlist'
 import {useCartGiftItems} from '../../hooks/cart/use-cart-gift-items'
-import {useCartShipping} from '../../hooks/cart/use-cart-shipping'
+import {useCartDefaultShipping} from '../../hooks/cart/use-cart-default-shipping'
 import {useCartErrorHandler} from './utils/cart-utils'
 
 // Cart Components
@@ -62,7 +62,7 @@ const Cart = () => {
     )
 
     // Shipping
-    useCartShipping(basket)
+    useCartDefaultShipping(basket)
 
     // Modal state
     const {open: isOpen, onOpen, onClose} = useDisclosure()
