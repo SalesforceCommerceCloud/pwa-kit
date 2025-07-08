@@ -72,6 +72,8 @@ describe('useCartOperations', () => {
     beforeEach(() => {
         mockShowError = jest.fn()
 
+        // Don't clear mockSetCartItemLoading since we want to check its calls
+
         mockUpdateItemInBasketMutation = {
             mutateAsync: jest.fn(),
             isLoading: false
@@ -303,6 +305,60 @@ describe('useCartOperations', () => {
                 },
                 expect.any(Object)
             )
+        })
+
+        it('should update item quantity successfully with onSettled callback', async () => {
+            let onSettledCalled = false
+
+            // Mock the mutation to call the onSettled callback
+            mockUpdateItemInBasketMutation.mutateAsync.mockImplementation((params, options) => {
+                if (options && options.onSettled) {
+                    onSettledCalled = true
+                    options.onSettled()
+                }
+                return Promise.resolve()
+            })
+
+            const {result} = renderHook(() =>
+                useCartOperations(mockBasket, mockProductsByItemId, mockShowError)
+            )
+
+            const item = mockBasket.productItems[0]
+            const newQuantity = 5
+
+            await act(async () => {
+                await result.current.changeItemQuantity(newQuantity, item)
+                result.current.changeItemQuantity.flush()
+            })
+
+            expect(onSettledCalled).toBe(true)
+        })
+
+        it('should update item quantity successfully with onSuccess callback', async () => {
+            let onSuccessCalled = false
+
+            // Mock the mutation to call the onSuccess callback
+            mockUpdateItemInBasketMutation.mutateAsync.mockImplementation((params, options) => {
+                if (options && options.onSuccess) {
+                    onSuccessCalled = true
+                    options.onSuccess()
+                }
+                return Promise.resolve()
+            })
+
+            const {result} = renderHook(() =>
+                useCartOperations(mockBasket, mockProductsByItemId, mockShowError)
+            )
+
+            const item = mockBasket.productItems[0]
+            const newQuantity = 5
+
+            await act(async () => {
+                await result.current.changeItemQuantity(newQuantity, item)
+                result.current.changeItemQuantity.flush()
+            })
+
+            expect(onSuccessCalled).toBe(true)
         })
 
         it('should handle quantity update to 0', async () => {

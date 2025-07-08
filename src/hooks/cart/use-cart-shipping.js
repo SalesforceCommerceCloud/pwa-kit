@@ -54,9 +54,4 @@ export const useCartShipping = (basket) => {
             }
         })
     }, [shippingMethodsQuery.isSuccess, shippingMethodsQuery.data])
-
-    return {
-        updateShippingMethodForShipmentsMutation,
-        shippingMethodsQuery
-    }
 }
