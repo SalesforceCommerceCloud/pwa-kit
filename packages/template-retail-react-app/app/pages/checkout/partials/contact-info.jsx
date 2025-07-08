@@ -166,6 +166,8 @@ const ContactInfo = ({isSocialEnabled = false, isPasswordlessEnabled = false, id
             e.preventDefault()
             e.stopPropagation()
         }
+        // since the pwless is no longer to through form submission flow,
+        // we need to manual validate the email value here
         const email = form.getValues().email
         if (!email) {
             form.setError('email', {
