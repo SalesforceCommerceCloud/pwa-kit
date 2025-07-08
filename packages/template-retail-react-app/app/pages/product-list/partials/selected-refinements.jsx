@@ -16,7 +16,10 @@ import {STORE_LOCATOR_IS_ENABLED} from '@salesforce/retail-react-app/app/constan
 
 const SelectedRefinements = ({toggleFilter, selectedFilterValues, filters, handleReset}) => {
     const {formatMessage} = useIntl()
-    const {selectedStore} = useSelectedStore()
+    
+    // Only call the hook if store locator is enabled
+    const {selectedStore} = STORE_LOCATOR_IS_ENABLED ? useSelectedStore() : {selectedStore: null}
+    
     const priceFilterValues = filters?.find((filter) => filter.attributeId === 'price')
     let selectedFilters = []
     for (const key in selectedFilterValues) {
