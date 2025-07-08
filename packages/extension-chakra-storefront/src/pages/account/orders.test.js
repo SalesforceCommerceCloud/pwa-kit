@@ -6,7 +6,7 @@
  */
 import React from 'react'
 import {Route, Switch} from 'react-router-dom'
-import {screen} from '@testing-library/react'
+import {act, screen} from '@testing-library/react'
 import {rest} from 'msw'
 import {renderWithProviders, createPathWithDefaults} from '../../utils/test-utils'
 import {mockCustomerBaskets, mockOrderHistory, mockOrderProducts} from '../../mocks/mock-data'
@@ -62,8 +62,10 @@ test('Renders order history and details', async () => {
             {timeout: 15000}
         )
     ).toHaveLength(3)
+    await act(async () => {
+        await user.click((await screen.findAllByText(/view details/i))[0])
+    })
 
-    await user.click((await screen.findAllByText(/view details/i))[0])
     expect(await screen.findByTestId('account-order-details-page')).toBeInTheDocument()
     expect(await screen.findByText(/order number: 00028011/i)).toBeInTheDocument()
     expect(

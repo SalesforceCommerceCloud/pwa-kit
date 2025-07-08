@@ -1,25 +1,22 @@
 /*
- * Copyright (c) 2021, salesforce.com, inc.
+ * Copyright (c) 2025, salesforce.com, inc.
  * All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {useRef, useState, useEffect} from 'react'
+import React, {useState} from 'react'
 import PropTypes from 'prop-types'
 import {useIntl} from 'react-intl'
 import {
-    Box,
-    Flex,
-    IconButton,
     Badge,
+    Box,
     Button,
+    Flex,
     Heading,
+    IconButton,
     List,
     Popover,
-    Portal,
     Text,
-    useDisclosure,
-    useMediaQuery,
     Separator,
     // hooks
     useSlotRecipe
@@ -51,7 +48,6 @@ import useNavigation from '../../hooks/use-navigation'
 import LoadingSpinner from '../../components/loading-spinner'
 import {HideOnDesktop, HideOnMobile} from '../responsive'
 import {noop} from '../../utils/utils'
-import {useLocation} from 'react-router-dom'
 
 const IconButtonWithRegistration = withRegistration(IconButton)
 
@@ -108,7 +104,6 @@ const Header = ({
     ...props
 }) => {
     const intl = useIntl()
-    const popoverTriggerRef = useRef(null)
     const {
         derivedData: {totalItems},
         data: basket
@@ -116,13 +111,6 @@ const Header = ({
     const {isRegistered} = useCustomerType()
     const logout = useAuthHelper(AuthHelpers.Logout)
     const navigate = useNavigation()
-    const {
-        open: isAccountMenuOpen = false,
-        onClose: onAccountMenuClose,
-        onOpen: onAccountMenuOpen
-    } = useDisclosure()
-    const location = useLocation()
-    const [isDesktop] = useMediaQuery('(min-width: 992px)')
     const storeLocatorExtension = useApplicationExtension(
         '@salesforce/extension-chakra-store-locator'
     )
@@ -132,9 +120,6 @@ const Header = ({
     })
 
     const [showLoading, setShowLoading] = useState(false)
-    // tracking if users enter the popover Content,
-    // so we can decide whether to close the menu when users leave account icons
-    const hasEnterPopoverContent = useRef()
 
     const recipe = useSlotRecipe({key: 'header'})
     const styles = recipe()
@@ -143,29 +128,6 @@ const Header = ({
         await logout.mutateAsync()
         navigate('/login')
         setShowLoading(false)
-    }
-
-    // close the menu on location change
-    // For some reason, Chakra v3 popover keeps focusing on the trigger after closing the content which
-    // cause the isMenuOpen state to be 'true' on location changed
-    useEffect(() => {
-        onAccountMenuClose()
-    }, [location.pathname])
-
-    const handleIconsMouseLeave = (e) => {
-        console.log('e', e)
-        // don't close the menu if users enter the popover content
-        setTimeout(() => {
-            if (!hasEnterPopoverContent.current) onAccountMenuClose()
-        }, 100)
-    }
-
-    const handleKeyDown = (event) => {
-        if (event.key === 'Tab' && event.shiftKey && isAccountMenuOpen) {
-            // Prevent default behavior to keep focus on the popup trigger
-            event.preventDefault()
-            popoverTriggerRef.current.focus()
-        }
     }
 
     return (
@@ -213,7 +175,6 @@ const Header = ({
                         variant="unstyled"
                         css={{...styles.iconButton, ...styles.accountIconButton}}
                         onClick={onMyAccountClick}
-                        onMouseOver={isDesktop ? onAccountMenuOpen : noop}
                     >
                         <AccountIcon boxSize="6" />
                     </IconButtonWithRegistration>
@@ -222,7 +183,6 @@ const Header = ({
                         <Popover.Root
                             lazyMount
                             unmountOnExit
-                            open={isAccountMenuOpen}
                             positioning={{placement: 'bottom-end'}}
                         >
                             <Popover.Trigger asChild>
@@ -234,10 +194,6 @@ const Header = ({
                                         defaultMessage: 'Open account menu'
                                     })}
                                     css={{...styles.iconButton, ...styles.arrowDownButton}}
-                                    onMouseOver={onAccountMenuOpen}
-                                    onMouseLeave={handleIconsMouseLeave}
-                                    ref={popoverTriggerRef}
-                                    onKeyDown={handleKeyDown}
                                 >
                                     <HideOnMobile>
                                         <ChevronDownIcon />
@@ -246,15 +202,7 @@ const Header = ({
                             </Popover.Trigger>
 
                             <Popover.Positioner>
-                                <Popover.Content
-                                    onMouseLeave={() => {
-                                        hasEnterPopoverContent.current = false
-                                        onAccountMenuClose()
-                                    }}
-                                    onMouseOver={() => {
-                                        hasEnterPopoverContent.current = true
-                                    }}
-                                >
+                                <Popover.Content>
                                     <Popover.Arrow />
                                     <Popover.Body css={styles.dropdownMenuBody}>
                                         <Popover.Header pb={1}>
@@ -274,7 +222,7 @@ const Header = ({
                                                     as="ul"
                                                     data-testid="account-detail-nav"
                                                 >
-                                                    {navLinks.map((link) => {
+                                                    {navLinks.map((link, index) => {
                                                         const LinkIcon = link.icon
                                                         return (
                                                             <List.Item key={link.name}>
