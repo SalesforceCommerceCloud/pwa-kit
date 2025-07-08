@@ -177,6 +177,12 @@
   "auth_modal.password_reset_success.title.password_reset": {
     "defaultMessage": "Password Reset"
   },
+  "bonus_product_item.label.quantity": {
+    "defaultMessage": "Quantity: {quantity}"
+  },
+  "bonus_products_title.title.num_of_items": {
+    "defaultMessage": "Bonus Products ({itemCount, plural, =0 {0 items} one {# item} other {# items}})"
+  },
   "carousel.button.scroll_left.assistive_msg": {
     "defaultMessage": "Scroll carousel left"
   },
@@ -190,7 +196,7 @@
     "defaultMessage": "Delivery"
   },
   "cart.order_type.pickup_in_store": {
-    "defaultMessage": "Pickup in Store ({storeName})"
+    "defaultMessage": "Pick Up in Store ({storeName})"
   },
   "cart.product_edit_modal.modal_label": {
     "defaultMessage": "Edit modal for {productName}"
@@ -314,7 +320,7 @@
     "description": "# item(s) in order"
   },
   "checkout_confirmation.message.store_info_unavailable": {
-    "defaultMessage": "Store information not available"
+    "defaultMessage": "Store information isn't available"
   },
   "checkout_confirmation.message.will_email_shortly": {
     "defaultMessage": "We will send an email to <b>{email}</b> with your confirmation number and receipt shortly."
@@ -811,6 +817,9 @@
   "icons.assistive_msg.lock": {
     "defaultMessage": "Secure"
   },
+  "item_attributes.label.bonus_product": {
+    "defaultMessage": "Bonus Product"
+  },
   "item_attributes.label.promotions": {
     "defaultMessage": "Promotions"
   },
@@ -1265,10 +1274,10 @@
     "defaultMessage": "No valid store or inventory found for pickup"
   },
   "product_view.error.select_pickup_in_store": {
-    "defaultMessage": "Please select 'Pickup in Store' to match the shipping method for your other items."
+    "defaultMessage": "Select 'Pick Up in Store' to match the delivery method for the items in your cart."
   },
   "product_view.error.select_ship_to_address": {
-    "defaultMessage": "Please select 'Ship to Address' to match the shipping method for your other items."
+    "defaultMessage": "Select 'Ship to Address' to match the delivery method for the items in your cart."
   },
   "product_view.label.assistive_msg.quantity_decrement": {
     "defaultMessage": "Decrement Quantity for {productName}"
@@ -1280,10 +1289,10 @@
     "defaultMessage": "Delivery:"
   },
   "product_view.label.pickup_in_select_store_prefix": {
-    "defaultMessage": "Pickup in"
+    "defaultMessage": "Pick up in"
   },
   "product_view.label.pickup_in_store": {
-    "defaultMessage": "Pickup in Store"
+    "defaultMessage": "Pick Up in Store"
   },
   "product_view.label.quantity": {
     "defaultMessage": "Quantity"
@@ -1307,7 +1316,7 @@
     "defaultMessage": "See full details"
   },
   "product_view.status.in_stock_at_store": {
-    "defaultMessage": "In Stock at {storeName}"
+    "defaultMessage": "In stock at {storeName}"
   },
   "product_view.status.out_of_stock_at_store": {
     "defaultMessage": "Out of Stock at {storeName}"
@@ -1479,7 +1488,7 @@
     "defaultMessage": "Filter Products by Store Availability at {storeName}"
   },
   "store_inventory_filter.checkbox.label": {
-    "defaultMessage": "In Stock at {storeName}"
+    "defaultMessage": "In stock at {storeName}"
   },
   "store_inventory_filter.heading.shop_by_availability": {
     "defaultMessage": "Shop by Availability"
@@ -1515,22 +1524,22 @@
     "defaultMessage": "Phone: {phone}"
   },
   "store_locator.description.viewing_near_postal_code": {
-    "defaultMessage": "Viewing stores within {distance}{distanceUnit} of {postalCode} in {countryName}"
+    "defaultMessage": "Viewing stores within {distance} {distanceUnit} of {postalCode} in {countryName}"
   },
   "store_locator.description.viewing_near_your_location": {
     "defaultMessage": "Viewing stores near your location"
   },
   "store_locator.error.agree_to_share_your_location": {
-    "defaultMessage": "Please agree to share your location"
+    "defaultMessage": "To use your location, enable location sharing."
   },
   "store_locator.error.items_in_basket": {
-    "defaultMessage": "Sorry, you have items in your basket. Please remove them to change the selected store."
+    "defaultMessage": "To change your selected store, remove all items from your cart."
   },
   "store_locator.error.please_enter_a_postal_code": {
-    "defaultMessage": "Please enter a postal code."
+    "defaultMessage": "Enter a postal code."
   },
   "store_locator.error.please_select_a_country": {
-    "defaultMessage": "Please select a country."
+    "defaultMessage": "Select a country."
   },
   "store_locator.field.placeholder.enter_postal_code": {
     "defaultMessage": "Enter postal code"

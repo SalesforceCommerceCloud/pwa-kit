@@ -627,8 +627,8 @@ describe('Delivery Options Restrictions', () => {
         await waitFor(() => {
             expect(screen.getByRole('link', {name: /mens/i})).toBeInTheDocument()
         })
-        // Select "Pickup in Store"
-        const pickupLabel = await screen.findByLabelText(/Pickup in Store/i)
+        // Select "Pick Up in Store"
+        const pickupLabel = await screen.findByLabelText(/Pick Up in Store/i)
         fireEvent.click(pickupLabel)
 
         // Click Add to Cart
@@ -638,7 +638,7 @@ describe('Delivery Options Restrictions', () => {
         await waitFor(() => {
             expect(
                 screen.getByText(
-                    "Please select 'Ship to Address' to match the shipping method for your other items."
+                    "Select 'Ship to Address' to match the delivery method for the items in your cart."
                 )
             ).toBeInTheDocument()
         })
@@ -743,8 +743,8 @@ describe('Delivery Options Restrictions', () => {
             expect(screen.getByRole('link', {name: /mens/i})).toBeInTheDocument()
         })
 
-        // Select "Pickup in Store"
-        const pickupLabel = await screen.findByLabelText(/Pickup in Store/i)
+        // Select "Pick Up in Store"
+        const pickupLabel = await screen.findByLabelText(/Pick Up in Store/i)
         fireEvent.click(pickupLabel)
 
         // Click Add to Cart
@@ -754,7 +754,7 @@ describe('Delivery Options Restrictions', () => {
         await waitFor(() => {
             expect(
                 screen.getByText(
-                    "Please select 'Ship to Address' to match the shipping method for your other items."
+                    "Select 'Ship to Address' to match the delivery method for the items in your cart."
                 )
             ).toBeInTheDocument()
         })
@@ -808,7 +808,7 @@ describe('Delivery Options Restrictions', () => {
         await waitFor(() => {
             expect(
                 screen.getByText(
-                    "Please select 'Pickup in Store' to match the shipping method for your other items."
+                    "Select 'Pick Up in Store' to match the delivery method for the items in your cart."
                 )
             ).toBeInTheDocument()
         })
@@ -845,7 +845,7 @@ test('fetches product with inventoryIds when store is selected', async () => {
     expect(inventoryIdsParam).toBe(inventoryId)
 })
 
-test('Add to Cart (Pickup in Store) includes inventoryId for the selected variant', async () => {
+test('Add to Cart (Pick Up in Store) includes inventoryId for the selected variant', async () => {
     // Mock useSelectedStore to return a store with inventoryId
     const inventoryId = 'inventory_m_store_store1'
     mockUseSelectedStore.mockImplementation(() => ({
@@ -890,8 +890,8 @@ test('Add to Cart (Pickup in Store) includes inventoryId for the selected varian
     // Wait for page to load
     expect(await screen.findByTestId('product-details-page')).toBeInTheDocument()
 
-    // Select "Pickup in Store"
-    const pickupLabel = await screen.findByLabelText(/Pickup in Store/i)
+    // Select "Pick Up in Store"
+    const pickupLabel = await screen.findByLabelText(/Pick Up in Store/i)
     fireEvent.click(pickupLabel)
 
     // Click Add to Cart

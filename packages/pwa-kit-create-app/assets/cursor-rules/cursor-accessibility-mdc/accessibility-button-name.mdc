@@ -1,0 +1,26 @@
+---
+description: When accessibility is checked. Check if Buttons must have a discernible name using text or aria attributes
+globs: 
+alwaysApply: false
+---
+
+# Rule: accessibility-button-name
+
+Buttons must have a discernible name using text or aria attributes
+
+## 🔍 Pattern
+
+```regex
+<button(?![^>]*\b(aria-label|aria-labelledby|title|name)=)
+```
+
+## 📍 Examples
+
+```tsx
+// ❌ Bad
+<button></button>
+// ✅ Good
+<button>Submit</button>
+// ✅ Good
+<button aria-label="Close dialog"><XIcon /></button>
+```

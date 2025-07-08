@@ -98,7 +98,7 @@ const StoreInventoryFilter = ({toggleFilter, selectedFilters}) => {
                     )}
                 >
                     <FormattedMessage
-                        defaultMessage="In Stock at {storeName}"
+                        defaultMessage="In stock at {storeName}"
                         id="store_inventory_filter.checkbox.label"
                         values={{
                             storeName: (
