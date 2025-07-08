@@ -713,7 +713,7 @@ const ProductView = forwardRef(
                                                             }
                                                         >
                                                             <FormattedMessage
-                                                                defaultMessage="Pickup in Store"
+                                                                defaultMessage="Pick Up in Store"
                                                                 id="product_view.label.pickup_in_store"
                                                             />
                                                         </Radio>
@@ -736,7 +736,7 @@ const ProductView = forwardRef(
                                                                   {
                                                                       id: 'product_view.status.in_stock_at_store',
                                                                       defaultMessage:
-                                                                          'In Stock at {storeName}'
+                                                                          'In stock at {storeName}'
                                                                   },
                                                                   {
                                                                       storeName: (
@@ -786,7 +786,7 @@ const ProductView = forwardRef(
                                                         data-testid="pickup-select-store-msg"
                                                     >
                                                         <FormattedMessage
-                                                            defaultMessage="Pickup in "
+                                                            defaultMessage="Pick up in "
                                                             id="product_view.label.pickup_in_select_store_prefix"
                                                         />{' '}
                                                         <Link

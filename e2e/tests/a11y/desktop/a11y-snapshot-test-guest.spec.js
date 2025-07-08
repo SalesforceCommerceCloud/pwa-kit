@@ -24,9 +24,6 @@ test.describe('Accessibility Tests with Snapshots for guest user', () => {
         // Handle the consent tracking form using the existing helper
         await answerConsentTrackingForm(page)
 
-        // wait until product tiles are fully load before analyzing
-        await expect(page.getByRole('link', {name: /Denim slim skirt/i})).toBeVisible()
-
         // Run the a11y test
         await runAccessibilityTest(page, ['guest', 'homepage-a11y-violations.json'])
     })
@@ -41,9 +38,9 @@ test.describe('Accessibility Tests with Snapshots for guest user', () => {
 
         await topsNav.click()
         const productTile = page.getByRole('link', {
-            name: /Cotton Turtleneck Sweater/i
+            name: /Belted Ribbed Boat Neck Sweater/i
         })
-        await expect(productTile.getByText(/From \$39\.99/i)).toBeVisible()
+        await expect(productTile.getByText(/From \£50\.56/i)).toBeVisible()
 
         // Run the a11y test
         await runAccessibilityTest(page, ['guest', 'plp-a11y-violations.json'])
@@ -53,7 +50,7 @@ test.describe('Accessibility Tests with Snapshots for guest user', () => {
         await navigateToPDPDesktop({page})
 
         const getProductPromise = page.waitForResponse(
-            '**/shopper-products/v1/organizations/**/products/25518241M**',
+            '**/shopper-products/v1/organizations/**/products/25589266M**',
             {timeout: 10000}
         )
 
@@ -61,8 +58,8 @@ test.describe('Accessibility Tests with Snapshots for guest user', () => {
         const getProductRes = await getProductPromise
         expect(getProductRes.status()).toBe(200)
         // ensure that the page is fully loaded before starting a11y scan
-        await expect(page.getByRole('heading', {name: /Cotton Turtleneck Sweater/i})).toBeVisible()
-        await expect(page.getByText(/From \$39\.99/i).nth(1)).toBeVisible()
+        await expect(page.getByRole('heading', {name: /Belted Ribbed Boat Neck Sweater/i})).toBeVisible()
+        await expect(page.getByText(/From \£50\.56/i).nth(1)).toBeVisible()
 
         const addToWishlistButton = page.getByRole('button', {name: /Add to Wishlist/i})
         await expect(addToWishlistButton).toBeVisible()
@@ -105,7 +102,7 @@ test.describe('Accessibility Tests with Snapshots for guest user', () => {
         await page.waitForLoadState()
 
         // make sure the cart is fully load
-        await expect(page.getByRole('link', {name: /Cotton Turtleneck Sweater/i})).toBeVisible()
+        await expect(page.getByRole('link', {name: /Belted Ribbed Boat Neck Sweater/i})).toBeVisible()
 
         // Run the a11y test
         await runAccessibilityTest(page, ['guest', 'cart-a11y-violations.json'])
@@ -119,7 +116,7 @@ test.describe('Accessibility Tests with Snapshots for guest user', () => {
         await page.waitForLoadState()
 
         // make sure the cart is fully load
-        await expect(page.getByRole('link', {name: /Cotton Turtleneck Sweater/i})).toBeVisible()
+        await expect(page.getByRole('link', {name: /Belted Ribbed Boat Neck Sweater/i})).toBeVisible()
 
         await checkoutProduct({
             page,
