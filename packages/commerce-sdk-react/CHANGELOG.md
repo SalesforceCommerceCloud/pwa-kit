@@ -5,6 +5,7 @@
 - Gracefully handle missing SDK Clients in CommerceApiProvider [#2539](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2539)
 - Refactor commerce-sdk-react to allow injecting ApiClients [#2519](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2519)
 
+
 ## v3.3.0 (May 22, 2025)
 
 - Fix inconsistency between dwsid and access token for guest login when hybrid authentication is enabled [#2397](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2397)
