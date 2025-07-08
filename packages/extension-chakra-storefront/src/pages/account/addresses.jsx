@@ -11,7 +11,6 @@ import PropTypes from 'prop-types'
 
 import {
     Alert,
-    AlertIcon,
     Badge,
     Box,
     Button,
@@ -42,8 +41,8 @@ const DEFAULT_SKELETON_COUNT = 3
 const BoxArrow = () => {
     return (
         <Box
-            width={3}
-            height={3}
+            width={4}
+            height={4}
             borderLeft="1px solid"
             borderTop="1px solid"
             borderColor="blue.600"
@@ -62,19 +61,19 @@ const ShippingAddressForm = ({form, hasAddresses, selectedAddressId, toggleEdit,
         <Box
             border="1px solid"
             borderColor="gray.200"
-            borderRadius="base"
+            rounded="md"
             position="relative"
             {...(hasAddresses && {
                 gridColumn: [1, 'span 2', 'span 2', 'span 2', 'span 3'],
-                paddingX: [4, 4, 6],
-                paddingY: 6,
-                rounded: 'base',
+                px: [4, 4, 6],
+                py: 6,
+                rounded: 'md',
                 border: '1px solid',
                 borderColor: 'blue.600'
             })}
         >
             {form.formState.isSubmitting && <LoadingSpinner />}
-            <Stack spacing={6} padding={6}>
+            <Stack gap={6} p={6}>
                 <Heading as="h3" size="sm">
                     {selectedAddressId ? (
                         <FormattedMessage
@@ -91,14 +90,16 @@ const ShippingAddressForm = ({form, hasAddresses, selectedAddressId, toggleEdit,
                 <Box>
                     <Container variant="form">
                         <form onSubmit={form.handleSubmit(submitForm)}>
-                            <Stack spacing={6}>
+                            <Stack gap={6}>
                                 {form.formState.errors?.global && (
-                                    <Alert status="error">
-                                        <AlertIcon color="red.600" boxSize={4} />
-                                        <Text fontSize="sm" ml={3}>
-                                            {form.formState.errors.global.message}
-                                        </Text>
-                                    </Alert>
+                                    <Alert.Root colorPalette="red">
+                                        <Alert.Indicator />
+                                        <Alert.Content>
+                                            <Text fontSize="sm">
+                                                {form.formState.errors.global.message}
+                                            </Text>
+                                        </Alert.Content>
+                                    </Alert.Root>
                                 )}
                                 <AddressFields form={form} />
                                 <FormActionButtons onCancel={toggleEdit} />
@@ -258,7 +259,7 @@ const AccountAddresses = () => {
     }
 
     return (
-        <Stack spacing={4} data-testid="account-addresses-page">
+        <Stack gap={4} data-testid="account-addresses-page">
             <Heading as="h1" fontSize="2xl" tabIndex="0" ref={headingRef}>
                 <FormattedMessage
                     defaultMessage="Addresses"
@@ -271,12 +272,12 @@ const AccountAddresses = () => {
                     {new Array(DEFAULT_SKELETON_COUNT).fill().map((_, index) => {
                         return (
                             <ActionCard key={index}>
-                                <Stack spacing={2} marginBottom={7}>
-                                    <Skeleton height="23px" width="120px" />
+                                <Stack gap={2} mb={7}>
+                                    <Skeleton height={6} width={30} />
 
-                                    <Skeleton height="23px" width="84px" />
+                                    <Skeleton height={6} width={21} />
 
-                                    <Skeleton height="23px" width="104px" />
+                                    <Skeleton height={6} width={26} />
                                 </Stack>
                             </ActionCard>
                         )
@@ -294,9 +295,9 @@ const AccountAddresses = () => {
                             color="blue.600"
                             height={{lg: 'full'}}
                             minHeight={11}
-                            rounded="base"
+                            rounded="md"
                             fontWeight="medium"
-                            leftIcon={<PlusIcon display="block" boxSize={'15px'} />}
+                            leftIcon={<PlusIcon display="block" boxSize={4} />}
                             onClick={() => toggleEdit()}
                         >
                             <FormattedMessage
@@ -350,7 +351,6 @@ const AccountAddresses = () => {
                                     {address.preferred && (
                                         <Badge
                                             position="absolute"
-                                            fontSize="xs"
                                             right={4}
                                             variant="solid"
                                             bg="gray.100"

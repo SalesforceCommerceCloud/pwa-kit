@@ -202,7 +202,7 @@ const Payment = () => {
                             onCheckedChange={(e) => setBillingSameAsShipping(e.checked)}
                         >
                             <Checkbox.HiddenInput />
-                            <Checkbox.Control />
+                            <Checkbox.Control colorPalette="blue" />
                             <Checkbox.Label>
                                 <Text fontSize="sm" color="gray.700">
                                     <FormattedMessage
