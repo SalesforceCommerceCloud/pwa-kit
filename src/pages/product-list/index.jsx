@@ -12,7 +12,6 @@ import {FormattedMessage, useIntl} from 'react-intl'
 import {keepPreviousData} from '@tanstack/react-query'
 import {
     useCategory,
-    useCustomerId,
     useProductSearch
 } from '@salesforce/commerce-sdk-react'
 import {useServerContext} from '@salesforce/pwa-kit-react-sdk/ssr/universal/hooks'
@@ -51,7 +50,6 @@ import {FilterIcon, ChevronDownIcon} from '../../components/icons'
 
 // Hooks
 import {usePageUrls, useSortUrls, useSearchParams, useExtensionConfig} from '../../hooks'
-import useToast from '../../hooks/use-toast'
 import SafePortal from '../../components/safe-portal'
 import useEinstein from '../../hooks/use-einstein'
 import useActiveData from '../../hooks/use-active-data'
@@ -86,12 +84,10 @@ const ProductList = (props) => {
     const history = useHistory()
     const params = useParams()
     const location = useLocation()
-    const toast = useToast()
     const einstein = useEinstein()
     const dataCloud = useDataCloud()
     const activeData = useActiveData()
     const {res} = useServerContext()
-    const customerId = useCustomerId()
     const [searchParams, {stringify: stringifySearchParams}] = useSearchParams()
     const {
         pages: {ProductList: productListConfig},
