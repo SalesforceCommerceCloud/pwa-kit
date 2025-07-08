@@ -7,6 +7,7 @@
 
 /**
  * Handles adding products to cart and sending data to Einstein.
+ * Refactoring and BOPIS support to be handled in W-18989389
  * @param {Array} productSelectionValues
  * @param {Function} addItemToNewOrExistingBasket
  * @param {Object} einstein
