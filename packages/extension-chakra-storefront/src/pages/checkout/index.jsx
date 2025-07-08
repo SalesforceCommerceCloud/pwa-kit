@@ -6,7 +6,7 @@
  */
 import React, {useEffect, useState} from 'react'
 import {FormattedMessage, useIntl} from 'react-intl'
-import {Alert, AlertIcon, Box, Button, Container, Grid, GridItem, Stack} from '@chakra-ui/react'
+import {Alert, Box, Button, Container, Grid, GridItem, Stack} from '@chakra-ui/react'
 import useNavigation from '../../hooks/use-navigation'
 import {CheckoutProvider, useCheckout} from '../../pages/checkout/util/checkout-context'
 import ContactInfo from '../../pages/checkout/partials/contact-info'
@@ -73,10 +73,14 @@ const Checkout = () => {
                     <GridItem>
                         <Stack gap={4}>
                             {error && (
-                                <Alert status="error" variant="left-accent">
-                                    <AlertIcon />
-                                    {error}
-                                </Alert>
+                                <Alert.Root colorPalette="red">
+                                    <Alert.Indicator />
+                                      <Alert.Content>
+                                            <Text fontSize="sm">
+                                                {error}
+                                            </Text>
+                                        </Alert.Content>
+                                </Alert.Root>
                             )}
 
                             <ContactInfo
