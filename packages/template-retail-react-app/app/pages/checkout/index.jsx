@@ -25,6 +25,7 @@ import ContactInfo from '@salesforce/retail-react-app/app/pages/checkout/partial
 import ShippingAddress from '@salesforce/retail-react-app/app/pages/checkout/partials/shipping-address'
 import ShippingOptions from '@salesforce/retail-react-app/app/pages/checkout/partials/shipping-options'
 import Payment from '@salesforce/retail-react-app/app/pages/checkout/partials/payment'
+import SFPaymentsSheet from '@salesforce/retail-react-app/app/pages/checkout/partials/salesforce-payments/payment-sheet'
 import OrderSummary from '@salesforce/retail-react-app/app/components/order-summary'
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
@@ -48,6 +49,7 @@ const Checkout = () => {
     const [isLoading, setIsLoading] = useState(false)
     const {mutateAsync: createOrder} = useShopperOrdersMutation('createOrder')
     const {passwordless = {}, social = {}} = getConfig().app.login || {}
+    const salesforcePaymentsEnabled = getConfig().app.checkout.SalesforcePaymentsEnabled
     const idps = social?.idps
     const isSocialEnabled = !!social?.enabled
     const isPasswordlessEnabled = !!passwordless?.enabled
@@ -101,7 +103,8 @@ const Checkout = () => {
                             />
                             <ShippingAddress />
                             <ShippingOptions />
-                            <Payment />
+                            {/* Conditional Payment Component */}
+                            {salesforcePaymentsEnabled ? <SFPaymentsSheet /> : <Payment />}
 
                             {step === 4 && (
                                 <Box pt={3} display={{base: 'none', lg: 'block'}}>

@@ -25,6 +25,11 @@ import {getRuntime} from '@salesforce/pwa-kit-runtime/ssr/server/express'
 import {defaultPwaKitSecurityHeaders} from '@salesforce/pwa-kit-runtime/utils/middleware'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {getAppOrigin} from '@salesforce/pwa-kit-react-sdk/utils/url'
+import https from 'https'  // ← Anitha Add this line
+
+
+// DEVELOPMENT ONLY - bypasses SSL verification globally
+//process.env["NODE_TLS_REJECT_UNAUTHORIZED"] = 0;
 
 const config = getConfig()
 
@@ -291,6 +296,16 @@ export async function jwksCaching(req, res, options) {
         res.status(400).json({error: `Error while fetching data: ${error.message}`})
     }
 }
+// ✅ anitha: Helper function to transform relative icon paths to absolute URLs
+function transformIconPaths(data, ecomServerHost) {
+    const baseUrl = `https://${ecomServerHost}/on/demandware.static/Sites-Site/-/-/internal`
+   
+
+    const dataStr = JSON.stringify(data)
+    // Replace all relative icon paths with absolute URLs
+    const transformedStr = dataStr.replace(/"src":\s*"\/icons\//g, `"src":"${baseUrl}/icons/`)
+    return JSON.parse(transformedStr)
+}
 
 const {handler} = runtime.createHandler(options, (app) => {
     app.use(express.json()) // To parse JSON payloads
@@ -305,17 +320,30 @@ const {handler} = runtime.createHandler(options, (app) => {
                 directives: {
                     'img-src': [
                         // Default source for product images - replace with your CDN
-                        '*.commercecloud.salesforce.com'
+                        '*.commercecloud.salesforce.com',
+                          // ✅ Allow localhost for SFP development
+                        'localhost:*',
+                        'https://localhost'
                     ],
                     'script-src': [
                         // Used by the service worker in /worker/main.js
-                        'storage.googleapis.com'
+                        'storage.googleapis.com',
+                        // ✅ Add payment script domains
+                        'js.stripe.com',
+                        '*.paypal.com',
+                        'www.paypal.com'
                     ],
                     'connect-src': [
                         // Connect to Einstein APIs
                         'api.cquotient.com',
                         // Connect to DataCloud APIs
                         '*.c360a.salesforce.com'
+                    ],
+                    // ✅ Add frame-src for Stripe iframes
+                    'frame-src': [
+                        'js.stripe.com',
+                        '*.stripe.com',
+                        '*.paypal.com'
                     ]
                 }
             }
@@ -366,6 +394,91 @@ const {handler} = runtime.createHandler(options, (app) => {
                 process.env.MARKETING_CLOUD_RESET_PASSWORD_TEMPLATE
             )
         })
+    })
+
+    app.get('/api/payment-metadata', async (req, res) => {
+        try {
+            console.log('📍 Proxying metadata request to ecom server')
+            
+            // Use Node's https module instead of fetch
+            const data = await new Promise((resolve, reject) => {
+                const options = {
+                    hostname: 'localhost',
+                    path: '/on/demandware.static/Sites-Site/-/-/internal/metadata/v1.json',
+                    method: 'GET',
+                    rejectUnauthorized: false, // This bypasses SSL verification
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                }
+                
+                const req = https.request(options, (response) => {
+                    let data = ''
+                    response.on('data', (chunk) => {
+                        data += chunk
+                    })
+                    response.on('end', () => {
+                        try {
+                            resolve(JSON.parse(data))
+                        } catch (e) {
+                            reject(e)
+                        }
+                    })
+                })
+                
+                req.on('error', reject)
+                req.end()
+            })
+            
+            // ✅ Transform relative icon paths to absolute URLs
+            // example: https://localhost/on/demandware.static/Sites-Site/-/-/internal/icons/credit_card.svg
+            // prod example: zzte-053.dx.commercecloud.salesforce.com instead of localhost
+            const transformedData = transformIconPaths(data, 'localhost')
+        
+
+            console.log('✅ Server fetch successful, transformed icon paths')
+            
+            res.setHeader('Access-Control-Allow-Origin', '*')
+            res.setHeader('Content-Type', 'application/json')
+            res.json(transformedData)
+            
+        } catch (error) {
+            console.error('❌ Proxy error:', error.message)
+            res.status(500).json({ 
+                error: 'Failed to fetch metadata',
+                details: error.message 
+            })
+        }
+    })
+       // Anitha: Add this route to handle the Commerce Cloud metadata request
+       app.get('/api/payment-metadata/old', async (req, res) => {
+        try {
+            console.log('📍 Proxying metadata request to ecom server')
+            
+            // Server-to-server request (no CORS issues)
+            const response = await fetch('https://localhost/on/demandware.static/Sites-Site/-/-/internal/metadata/v1.json', {
+                // Add any headers needed for your ecom server
+                headers: {
+                    'Accept': 'application/json'
+                },
+                agent: agent  // This is the key addition
+            })
+            
+            if (!response.ok) {
+                throw new Error(`Ecom server returned ${response.status}`)
+            }
+            
+            const data = await response.json()
+            
+            // Set CORS headers for your client
+            res.setHeader('Access-Control-Allow-Origin', '*')
+            res.setHeader('Content-Type', 'application/json')
+            res.json(data)
+            
+        } catch (error) {
+            console.error('❌ Proxy error:', error)
+            res.status(500).json({ error: 'Failed to fetch metadata' })
+        }
     })
 
     app.get('/robots.txt', runtime.serveStaticFile('static/robots.txt'))
