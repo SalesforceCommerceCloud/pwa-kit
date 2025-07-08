@@ -151,7 +151,7 @@ describe('passwordless enabled', () => {
     test('allows passwordless login', async () => {
         const mockLocation = jest.spyOn(window, 'location', 'get').mockReturnValue({
             pathname: '/checkout',
-            origin: 'https://webhook.site'
+            origin: 'https://example.com'
         })
 
         const {user} = renderWithProviders(<ContactInfo isPasswordlessEnabled={true} />)
