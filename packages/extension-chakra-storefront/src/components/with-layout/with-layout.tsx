@@ -33,6 +33,7 @@ import {
 
 // Local Project Components
 import {DrawerMenu} from '../drawer-menu'
+import {SkipNavLink, SkipNavContent} from '../skip-nav'
 import {getPathWithLocale} from '../../utils/url'
 import {HideOnDesktop, HideOnMobile} from '../responsive'
 import {ListMenu, ListMenuContent} from '../list-menu'
@@ -276,8 +277,7 @@ const withLayout = <P extends object>(WrappedComponent: React.ComponentType<P>) 
 
                 <ScrollToTop />
                 <Box id="app" display="flex" flexDirection="column" flex={1}>
-                    {/*TODO: recreating this component because @chakra-ui/skip-nav does not have V3 version*/}
-                    {/*<SkipNavLink zIndex="skipLink">Skip to Content</SkipNavLink>*/}
+                    <SkipNavLink zIndex="skipLink">Skip to Content</SkipNavLink>
                     <Box css={styles.headerWrapper}>
                         {!isCheckout ? (
                             <>
@@ -318,28 +318,27 @@ const withLayout = <P extends object>(WrappedComponent: React.ComponentType<P>) 
                     </Box>
                     {!isOnline && <OfflineBanner />}
                     <AddToCartModalProvider>
-                        {/*TODO: recreating this component because @chakra-ui/skip-nav does not have V3 version*/}
-                        {/*<SkipNavContent*/}
-                        {/*    style={{*/}
-                        {/*        display: 'flex',*/}
-                        {/*        flexDirection: 'column',*/}
-                        {/*        flex: 1,*/}
-                        {/*        outline: 0*/}
-                        {/*    }}*/}
-                        {/*>*/}
-                        <Box
-                            as="main"
-                            id="app-main"
-                            role="main"
-                            display="flex"
-                            flexDirection="column"
-                            flex="1"
+                        <SkipNavContent
+                            style={{
+                                display: 'flex',
+                                flexDirection: 'column',
+                                flex: 1,
+                                outline: 0
+                            }}
                         >
-                            <OfflineBoundary isOnline={isOnline}>
-                                <WrappedComponent {...(props as P)} />
-                            </OfflineBoundary>
-                        </Box>
-                        {/*</SkipNavContent>*/}
+                            <Box
+                                as="main"
+                                id="app-main"
+                                role="main"
+                                display="flex"
+                                flexDirection="column"
+                                flex="1"
+                            >
+                                <OfflineBoundary isOnline={isOnline}>
+                                    <WrappedComponent {...(props as P)} />
+                                </OfflineBoundary>
+                            </Box>
+                        </SkipNavContent>
 
                         {!isCheckout ? <Footer /> : <CheckoutFooter />}
                         <AuthModal {...(authModal as any)} />
