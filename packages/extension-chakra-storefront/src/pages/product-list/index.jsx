@@ -11,7 +11,6 @@ import {useHistory, useLocation, useParams} from 'react-router-dom'
 import {FormattedMessage, useIntl} from 'react-intl'
 import {keepPreviousData} from '@tanstack/react-query'
 import {useCategory, useProductSearch} from '@salesforce/commerce-sdk-react'
-import {useServerContext} from '@salesforce/pwa-kit-react-sdk/ssr/universal/hooks'
 
 // Components
 import {
@@ -84,12 +83,9 @@ const ProductList = (props) => {
     const einstein = useEinstein()
     const dataCloud = useDataCloud()
     const activeData = useActiveData()
-    const {res} = useServerContext()
     const [searchParams, {stringify: stringifySearchParams}] = useSearchParams()
     const {
-        pages: {ProductList: productListConfig},
-        maxCacheAge: MAX_CACHE_AGE,
-        staleWhileRevalidate: STALE_WHILE_REVALIDATE
+        pages: {ProductList: productListConfig}
     } = useExtensionConfig()
     /**************** Page State ****************/
     const [filtersLoading, setFiltersLoading] = useState(false)
@@ -166,14 +162,6 @@ const ProductList = (props) => {
             throw new HTTPNotFound('Category Not Found.')
         default:
             throw new HTTPError(errorStatus, `HTTP Error ${errorStatus} occurred.`)
-    }
-
-    /**************** Response Handling ****************/
-    if (res) {
-        res.set(
-            'Cache-Control',
-            `s-maxage=${MAX_CACHE_AGE}, stale-while-revalidate=${STALE_WHILE_REVALIDATE}`
-        )
     }
 
     // Reset scroll position when `isRefetching` becomes `true`.
