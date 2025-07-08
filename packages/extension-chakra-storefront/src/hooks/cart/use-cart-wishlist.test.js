@@ -6,7 +6,6 @@
  */
 import {renderHook, act} from '@testing-library/react'
 import {useCartWishlist} from './use-cart-wishlist'
-import React from 'react'
 import {useWishList} from '../use-wish-list'
 
 // Get reference to the mocked function
@@ -22,7 +21,22 @@ const mockCreateCustomerProductListItem = {
     mutateAsync: jest.fn()
 }
 
-const mockToast = jest.fn()
+const mockNavigate = jest.fn()
+
+let storedAction = null
+const mockToast = jest.fn().mockImplementation((toastParams) => {
+    storedAction = toastParams.action
+    return {
+        title: toastParams.title,
+        type: toastParams.type,
+        action: toastParams.action,
+        triggerAction: () => {
+            if (storedAction && storedAction.props && storedAction.props.onClick) {
+                storedAction.props.onClick()
+            }
+        }
+    }
+})
 
 jest.mock('@salesforce/commerce-sdk-react', () => ({
     __esModule: true,
@@ -53,7 +67,7 @@ jest.mock('react-intl', () => ({
 // Mock the navigation hook
 jest.mock('../use-navigation', () => ({
     __esModule: true,
-    default: jest.fn(() => jest.fn())
+    default: jest.fn(() => mockNavigate)
 }))
 
 // Mock the wishlist hook
@@ -110,6 +124,11 @@ describe('useCartWishlist', () => {
         // Reset specific mocks without clearing their implementations
         mockCreateCustomerProductListItem.mutateAsync.mockClear()
         mockToast.mockClear()
+        mockNavigate.mockClear()
+
+        // Reset mockCustomer to its default state
+        // mockCustomer.customerId = 'customer-1'
+        // mockCustomer.email = 'test@example.com'
 
         // Set default mock implementation
         mockUseWishList.mockReturnValue({
@@ -151,6 +170,45 @@ describe('useCartWishlist', () => {
             type: 'success',
             action: expect.any(Object)
         })
+    })
+
+    it('should navigate to wishlist page when toast action is clicked', async () => {
+        const {result} = renderHook(() => useCartWishlist(mockShowError))
+        await act(async () => {
+            await result.current.handleAddToWishlist({
+                id: 'product-3',
+                productId: 'product-3',
+                quantity: 1
+            })
+        })
+
+        // Get the return value from the toast call
+        const toastResult = mockToast.mock.results[0].value
+
+        // Trigger the action button click
+        act(() => {
+            toastResult.triggerAction()
+        })
+
+        expect(mockNavigate).toHaveBeenCalledWith('/account/wishlist')
+    })
+
+    it('should navigate to wishlist page when item is already in wishlist and toast action is clicked', async () => {
+        const {result} = renderHook(() => useCartWishlist(mockShowError))
+        await act(async () => {
+            await result.current.handleAddToWishlist({
+                id: 'product-1',
+                productId: 'product-1',
+                quantity: 1
+            })
+        })
+
+        const toastResult = mockToast.mock.results[0].value
+        act(() => {
+            toastResult.triggerAction()
+        })
+
+        expect(mockNavigate).toHaveBeenCalledWith('/account/wishlist')
     })
 
     it('should call showError when adding wishlist item fails', async () => {

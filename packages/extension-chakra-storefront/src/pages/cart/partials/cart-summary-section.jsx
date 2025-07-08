@@ -17,7 +17,7 @@ import CartCta from './cart-cta'
  * @param {boolean} props.isDesktop - Whether this is the desktop version
  * @returns {JSX.Element} The cart summary section component
  */
-const CartSummarySection = ({basket, isDesktop = true}) => {
+const CartSummarySection = ({basket, isDesktop}) => {
     if (isDesktop) {
         return (
             <Stack gap={4}>
