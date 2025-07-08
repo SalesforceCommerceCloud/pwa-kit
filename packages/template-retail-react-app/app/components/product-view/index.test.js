@@ -227,7 +227,7 @@ test('renders a product set properly - parent item', () => {
         .filter(
             (rg) =>
                 !rg.textContent.includes('Ship to Address') &&
-                !rg.textContent.includes('Pickup in Store')
+                !rg.textContent.includes('Pick Up in Store')
         )
     const quantityPicker = screen.queryByRole('spinbutton', {name: /quantity/i})
 
@@ -257,7 +257,7 @@ test('renders a product set properly - child item', () => {
         .filter(
             (rg) =>
                 !rg.textContent.includes('Ship to Address') &&
-                !rg.textContent.includes('Pickup in Store')
+                !rg.textContent.includes('Pick Up in Store')
         )
     const quantityPicker = screen.getByRole('spinbutton', {name: /quantity/i})
     const fromLabels = screen.queryAllByText(/from/i)
@@ -361,7 +361,7 @@ test('renders a product bundle properly - parent item', () => {
         .filter(
             (rg) =>
                 !rg.textContent.includes('Ship to Address') &&
-                !rg.textContent.includes('Pickup in Store')
+                !rg.textContent.includes('Pick Up in Store')
         )
 
     // What should exist:
@@ -392,7 +392,7 @@ test('renders a product bundle properly - child item', () => {
         .filter(
             (rg) =>
                 !rg.textContent.includes('Ship to Address') &&
-                !rg.textContent.includes('Pickup in Store')
+                !rg.textContent.includes('Pick Up in Store')
         )
     const quantityPicker = screen.queryByRole('spinbutton', {name: /quantity:/i})
 
@@ -405,7 +405,7 @@ test('renders a product bundle properly - child item', () => {
     expect(quantityPicker).toBeNull()
 })
 
-test('Pickup in store radio is enabled when selected store is set', async () => {
+test('Pick up in store radio is enabled when selected store is set', async () => {
     // Ensure the product has inventory data for the store and is in stock
     const mockProduct = {
         ...mockProductDetail,
@@ -415,19 +415,19 @@ test('Pickup in store radio is enabled when selected store is set', async () => 
     renderWithProviders(<MockComponent product={mockProduct} />)
 
     // Assert: Radio is enabled
-    const pickupRadio = await screen.findByRole('radio', {name: /pickup in store/i})
+    const pickupRadio = await screen.findByRole('radio', {name: /pick up in store/i})
     expect(pickupRadio).toBeEnabled()
 })
 
-test('Pickup in store radio is disabled when inventoryId is NOT present in localStorage', async () => {
+test('Pick up in store radio is disabled when inventoryId is NOT present in selected store', async () => {
     renderWithProviders(<MockComponent product={mockProductDetail} />)
 
     // Assert: Radio is disabled
-    const pickupRadio = await screen.findByRole('radio', {name: /pickup in store/i})
+    const pickupRadio = await screen.findByRole('radio', {name: /pick up in store/i})
     expect(pickupRadio).toBeDisabled()
 })
 
-test('Pickup in store radio is disabled when inventoryId is present but product is out of stock', async () => {
+test('Pick up in store radio is disabled when inventoryId is present but product is out of stock', async () => {
     const user = userEvent.setup()
 
     // Product inventory is not orderable
@@ -438,14 +438,14 @@ test('Pickup in store radio is disabled when inventoryId is present but product 
 
     renderWithProviders(<MockComponent product={mockProduct} />)
 
-    const pickupRadio = await screen.findByRole('radio', {name: /pickup in store/i})
+    const pickupRadio = await screen.findByRole('radio', {name: /pick up in store/i})
     // Chakra UI does not set a semantic disabled attribute, so we test for unclickability
     expect(pickupRadio).not.toBeChecked()
     await user.click(pickupRadio)
     expect(pickupRadio).not.toBeChecked()
 })
 
-test('shows "Pickup in Select Store" label when pickup is disabled due to no store/inventoryId', async () => {
+test('shows "Pick up in Select Store" label when pickup is disabled due to no store/inventoryId', async () => {
     useSelectedStore.mockReturnValue({
         selectedStore: null,
         isLoading: false,
@@ -457,7 +457,7 @@ test('shows "Pickup in Select Store" label when pickup is disabled due to no sto
 
     const label = await screen.findByTestId('pickup-select-store-msg')
     expect(label).toBeInTheDocument()
-    expect(label).toHaveTextContent(/Pickup in/i)
+    expect(label).toHaveTextContent(/Pick up in/i)
     const button = label.querySelector('button')
     expect(button).toBeInTheDocument()
     expect(button).toHaveTextContent(/Select Store/i)
@@ -466,14 +466,14 @@ test('shows "Pickup in Select Store" label when pickup is disabled due to no sto
 describe('ProductView stock status messages', () => {
     const storeName = 'Test Store'
 
-    test('shows "In Stock at {storeName}" when store has inventory', async () => {
+    test('shows "In stock at {storeName}" when store has inventory', async () => {
         const mockProduct = {
             ...mockProductDetail,
             inventories: [{id: mockStoreData.inventoryId, orderable: true, stockLevel: 10}],
             name: 'Test Product'
         }
         renderWithProviders(<MockComponent product={mockProduct} />)
-        const msg = await screen.findByText(/In Stock at/i)
+        const msg = await screen.findByText(/In stock at/i)
         expect(msg).toBeInTheDocument()
         expect(msg).toHaveTextContent(storeName)
         // Store name should be a button
@@ -508,7 +508,7 @@ describe('ProductView showDeliveryOptions property', () => {
         // Delivery options should be visible
         expect(screen.getByText(/Delivery:/i)).toBeInTheDocument()
         expect(screen.getByRole('radio', {name: /ship to address/i})).toBeInTheDocument()
-        expect(screen.getByRole('radio', {name: /pickup in store/i})).toBeInTheDocument()
+        expect(screen.getByRole('radio', {name: /pick up in store/i})).toBeInTheDocument()
     })
 
     test('hides delivery options when showDeliveryOptions is false', async () => {
@@ -519,7 +519,7 @@ describe('ProductView showDeliveryOptions property', () => {
         // Delivery options should not be visible
         expect(screen.queryByText(/Delivery:/i)).not.toBeInTheDocument()
         expect(screen.queryByRole('radio', {name: /ship to address/i})).not.toBeInTheDocument()
-        expect(screen.queryByRole('radio', {name: /pickup in store/i})).not.toBeInTheDocument()
+        expect(screen.queryByRole('radio', {name: /pick up in store/i})).not.toBeInTheDocument()
         expect(screen.queryByTestId('store-stock-status-msg')).not.toBeInTheDocument()
         expect(screen.queryByTestId('pickup-select-store-msg')).not.toBeInTheDocument()
     })
@@ -530,7 +530,7 @@ describe('ProductView showDeliveryOptions property', () => {
         // Delivery options should be visible by default
         expect(screen.getByText(/Delivery:/i)).toBeInTheDocument()
         expect(screen.getByRole('radio', {name: /ship to address/i})).toBeInTheDocument()
-        expect(screen.getByRole('radio', {name: /pickup in store/i})).toBeInTheDocument()
+        expect(screen.getByRole('radio', {name: /pick up in store/i})).toBeInTheDocument()
     })
 })
 test('renders "Add to Cart" and "Add to Wishlist" buttons in French', async () => {
