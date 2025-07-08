@@ -465,20 +465,12 @@ const ProductDetail = () => {
 
     /**************** Product Bundle Handlers ****************/
     // Top level bundle does not have variants
-    const handleProductBundleAddToCart = async (variantOrArray, selectedQuantity) => {
-        // Support both signatures: (variant, selectedQuantity) and ([{variant, quantity}])
-        let quantity
-        if (Array.isArray(variantOrArray)) {
-            quantity = variantOrArray[0]?.quantity
-        } else {
-            quantity = selectedQuantity
-        }
-
+    const handleProductBundleAddToCart = async (variant, selectedQuantity) => {
         try {
             const childProductSelections = Object.values(childProductSelection)
             // Check if any products have pickup selected (including main product and bundle items)
             const bundleSelectionValues = [
-                {product, variant: null, quantity},
+                {product, variant: null, selectedQuantity},
                 ...childProductSelections
             ]
             const hasAnyPickupSelected = hasPickupItems(
@@ -524,7 +516,7 @@ const ProductDetail = () => {
                 {
                     productId: product.id,
                     price: product.price,
-                    quantity: quantity,
+                    quantity: selectedQuantity,
                     // The add item endpoint in the shopper baskets API does not respect variant selections
                     // for bundle children, so we have to make a follow up call to update the basket
                     // with the chosen variant selections
@@ -704,7 +696,7 @@ const ProductDetail = () => {
                                                 }
                                                 addToCart={
                                                     isProductASet
-                                                        ? (product, variant, quantity) =>
+                                                        ? (variant, quantity) =>
                                                               handleAddToCart([
                                                                   {
                                                                       product: childProduct,
@@ -773,7 +765,9 @@ const ProductDetail = () => {
                             <ProductView
                                 product={product}
                                 category={primaryCategory?.parentCategoryTree || []}
-                                addToCart={handleAddToCart}
+                                addToCart={(variant, quantity) =>
+                                    handleAddToCart([{product, variant, quantity}])
+                                }
                                 addToWishlist={handleAddToWishlist}
                                 isProductLoading={isProductLoading}
                                 isBasketLoading={isBasketLoading}
