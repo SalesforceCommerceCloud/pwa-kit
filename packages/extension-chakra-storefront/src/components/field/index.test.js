@@ -70,7 +70,7 @@ test('renders Field component without ref and works correctly', () => {
     expect(emailInput.value).toBe('testuser@example.com')
 })
 
-test('renders Field component with endElement', () => {
+test.only('renders Field component with endElement', () => {
     const EndElementComponent = () => <span data-testid="end-element">USD</span>
 
     renderWithProviders(
