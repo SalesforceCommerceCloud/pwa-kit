@@ -21,7 +21,8 @@ interface SkipNavContentProps {
 }
 
 /**
- * SkipNavLink component - provides a skip link for keyboard navigation
+ * SkipNavLink component provides a skip link for keyboard navigation
+ * with initial state screen reader accessible but visually hidden
  */
 export const SkipNavLink: React.FC<SkipNavLinkProps> = ({
     children,
@@ -45,21 +46,21 @@ export const SkipNavLink: React.FC<SkipNavLinkProps> = ({
                     position: 'fixed !important',
                     top: '6px !important',
                     left: '6px !important',
+                    zIndex: 9999,
                     width: 'auto !important',
                     height: 'auto !important',
-                    padding: '8px !important',
-                    backgroundColor: 'white !important',
-                    color: 'black !important',
-                    textDecoration: 'none !important',
-                    border: '2px solid black !important',
-                    borderRadius: '4px !important',
-                    fontSize: '14px !important',
-                    fontWeight: 'bold !important',
-                    outline: 'none !important',
-                    boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1) !important',
-                    whiteSpace: 'nowrap !important',
                     overflow: 'visible !important',
-                    zIndex: 9999
+                    padding: '8px',
+                    backgroundColor: 'white',
+                    color: 'black',
+                    textDecoration: 'none',
+                    border: '2px solid black',
+                    borderRadius: '4px',
+                    fontSize: '14px',
+                    fontWeight: 'bold',
+                    outline: 'none',
+                    boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+                    whiteSpace: 'nowrap'
                 }
             }}
             {...props}
@@ -70,7 +71,7 @@ export const SkipNavLink: React.FC<SkipNavLinkProps> = ({
 }
 
 /**
- * SkipNavContent component - provides the target content area for skip navigation
+ * SkipNavContent component provides the target content area for skip navigation
  */
 export const SkipNavContent: React.FC<SkipNavContentProps> = ({
     children,
