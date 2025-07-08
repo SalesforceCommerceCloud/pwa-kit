@@ -10,10 +10,7 @@ import PropTypes from 'prop-types'
 import {useHistory, useLocation, useParams} from 'react-router-dom'
 import {FormattedMessage, useIntl} from 'react-intl'
 import {keepPreviousData} from '@tanstack/react-query'
-import {
-    useCategory,
-    useProductSearch
-} from '@salesforce/commerce-sdk-react'
+import {useCategory, useProductSearch} from '@salesforce/commerce-sdk-react'
 import {useServerContext} from '@salesforce/pwa-kit-react-sdk/ssr/universal/hooks'
 
 // Components
@@ -43,8 +40,8 @@ import EmptySearchResults from '../../pages/product-list/partials/empty-results'
 import PageHeader from '../../pages/product-list/partials/page-header'
 import AbovePageHeader from '../../pages/product-list/partials/above-page-header'
 import PageDesignerPromotionalBanner from '../../pages/product-list/partials/page-designer-promotional-banner'
-import Metadata from './page-metadata'
-
+import PageMetadata from './page-metadata'
+import PageCache from './page-cache'
 // Icons
 import {FilterIcon, ChevronDownIcon} from '../../components/icons'
 
@@ -294,388 +291,403 @@ const ProductList = (props) => {
     }, [productSearchResult])
 
     return (
-        <Box
-            className="sf-product-list-page"
-            data-testid="sf-product-list-page"
-            layerStyle="page"
-            paddingTop={{base: 6, lg: 8}}
-            {...rest}
-        >
-            <Metadata
+        <>
+            <PageCache />
+            <PageMetadata
                 category={category}
                 searchQuery={searchQuery}
                 productSearchResult={productSearchResult}
             />
-            {showNoResults ? (
-                <EmptySearchResults searchQuery={searchQuery} category={category} />
-            ) : (
-                <>
-                    <AbovePageHeader />
-
-                    <PageDesignerPromotionalBanner />
-                    {/* Header for Desktop */}
-                    <Stack
-                        display={{base: 'none', lg: 'flex'}}
-                        direction="row"
-                        justify="flex-start"
-                        align="flex-start"
-                        gap={4}
-                        marginBottom={6}
-                    >
-                        <Flex align="left" width="287px">
-                            <PageHeader
-                                searchQuery={searchQuery}
-                                category={category}
-                                productSearchResult={productSearchResult}
-                                isLoading={isLoading}
-                            />
-                        </Flex>
-
-                        <Box flex={1} paddingTop={'45px'}>
-                            <SelectedRefinements
-                                filters={productSearchResult?.refinements}
-                                toggleFilter={toggleFilter}
-                                handleReset={resetFilters}
-                                selectedFilterValues={productSearchResult?.selectedRefinements}
-                            />
-                        </Box>
-                        <Box paddingTop={'45px'}>
-                            <Sort
-                                sortUrls={sortUrls}
-                                productSearchResult={productSearchResult}
-                                basePath={basePath}
-                            />
-                        </Box>
-                    </Stack>
-
-                    {/* Filter Button for Mobile */}
-                    <HideOnDesktop>
-                        <Stack gap={6}>
-                            <PageHeader
-                                searchQuery={searchQuery}
-                                category={category}
-                                productSearchResult={productSearchResult}
-                                isLoading={isLoading}
-                            />
-                            <Stack
-                                display={{base: 'flex', md: 'none'}}
-                                direction="row"
-                                justify="flex-start"
-                                align="center"
-                                gap={1}
-                                height={12}
-                                borderColor="gray.100"
-                            >
-                                <Flex align="center">
-                                    {/* Modal for filter options on mobile */}
-                                    <Dialog.Root size="full" placement="center">
-                                        <Dialog.Trigger asChild>
-                                            <Button
-                                                fontSize="sm"
-                                                colorPalette="black"
-                                                variant="outline"
-                                                marginRight={2}
-                                                display="inline-flex"
-                                                color="black"
-                                            >
-                                                <FilterIcon boxSize={5} />
-                                                <FormattedMessage
-                                                    defaultMessage="Filter"
-                                                    id="product_list.button.filter"
-                                                />
-                                            </Button>
-                                        </Dialog.Trigger>
-                                        <SafePortal>
-                                            <Dialog.Backdrop />
-                                            <Dialog.Positioner>
-                                                <Dialog.Content
-                                                    display="flex"
-                                                    flexDirection="column"
-                                                    height="100vh"
-                                                >
-                                                    <Dialog.Header
-                                                        flexShrink={0}
-                                                        bg="white"
-                                                        borderBottom="1px solid"
-                                                        borderBottomColor="gray.100"
-                                                        p={4}
-                                                    >
-                                                        <Dialog.Title asChild>
-                                                            <Heading
-                                                                as="h1"
-                                                                fontWeight="bold"
-                                                                fontSize="2xl"
-                                                            >
-                                                                <FormattedMessage
-                                                                    defaultMessage="Filter"
-                                                                    id="product_list.modal.title.filter"
-                                                                />
-                                                            </Heading>
-                                                        </Dialog.Title>
-                                                        <Dialog.CloseTrigger asChild>
-                                                            <Button variant="ghost" size="sm">
-                                                                ✕
-                                                            </Button>
-                                                        </Dialog.CloseTrigger>
-                                                    </Dialog.Header>
-                                                    <Dialog.Body
-                                                        flex={1}
-                                                        overflowY="auto"
-                                                        px={4}
-                                                        py={4}
-                                                    >
-                                                        {filtersLoading && <LoadingSpinner />}
-                                                        <Refinements
-                                                            toggleFilter={toggleFilter}
-                                                            filters={
-                                                                productSearchResult?.refinements
-                                                            }
-                                                            selectedFilters={searchParams.refine}
-                                                            itemsBefore={
-                                                                category?.categories
-                                                                    ? [
-                                                                          <CategoryLinks
-                                                                              key="itemsBefore"
-                                                                              category={category}
-                                                                          />
-                                                                      ]
-                                                                    : undefined
-                                                            }
-                                                            excludedFilters={['cgid']}
-                                                        />
-                                                    </Dialog.Body>
-                                                    <Dialog.Footer
-                                                        flexShrink={0}
-                                                        bg="white"
-                                                        borderTop="1px solid"
-                                                        borderTopColor="gray.100"
-                                                        p={4}
-                                                    >
-                                                        <Stack
-                                                            direction="column"
-                                                            gap={3}
-                                                            width="full"
-                                                        >
-                                                            <Dialog.CloseTrigger asChild>
-                                                                <Button
-                                                                    width="full"
-                                                                    colorPalette="blue"
-                                                                    size="lg"
-                                                                    position="static"
-                                                                >
-                                                                    <FormattedMessage
-                                                                        defaultMessage="View {count} Items"
-                                                                        id="product_list.modal.btn.view_items"
-                                                                        values={{
-                                                                            count:
-                                                                                productSearchResult?.total ||
-                                                                                0
-                                                                        }}
-                                                                    />
-                                                                </Button>
-                                                            </Dialog.CloseTrigger>
-                                                            <Dialog.CloseTrigger asChild>
-                                                                <Button
-                                                                    width="full"
-                                                                    variant="outline"
-                                                                    size="lg"
-                                                                    position="static"
-                                                                    onClick={resetFilters}
-                                                                >
-                                                                    <FormattedMessage
-                                                                        defaultMessage="Clear Filters"
-                                                                        id="product_list.modal.btn.clear_filters"
-                                                                    />
-                                                                </Button>
-                                                            </Dialog.CloseTrigger>
-                                                        </Stack>
-                                                    </Dialog.Footer>
-                                                </Dialog.Content>
-                                            </Dialog.Positioner>
-                                        </SafePortal>
-                                    </Dialog.Root>
-                                </Flex>
-                                <Flex align="center">
-                                    <Button
-                                        maxWidth="245px"
-                                        fontSize="sm"
-                                        marginRight={2}
-                                        colorPalette="black"
-                                        variant="outline"
-                                        display="inline-flex"
-                                        color="black"
-                                        onClick={() => setSortOpen(true)}
-                                    >
-                                        {formatMessage(
-                                            {
-                                                id: 'product_list.button.sort_by',
-                                                defaultMessage: 'Sort By: {sortOption}'
-                                            },
-                                            {
-                                                sortOption: selectedSortingOptionLabel?.label
-                                            }
-                                        )}
-                                        <ChevronDownIcon boxSize={5} />
-                                    </Button>
-                                </Flex>
-                            </Stack>
-                        </Stack>
-                        <Box marginBottom={4}>
-                            <SelectedRefinements
-                                filters={productSearchResult?.refinements}
-                                toggleFilter={toggleFilter}
-                                handleReset={resetFilters}
-                                selectedFilterValues={productSearchResult?.selectedRefinements}
-                            />
-                        </Box>
-                    </HideOnDesktop>
-
-                    {/* Body  */}
-                    <Grid templateColumns={{base: '1fr', md: '280px 1fr'}} columnGap={6}>
-                        <Stack display={{base: 'none', md: 'flex'}}>
-                            <Refinements
-                                itemsBefore={
-                                    category?.categories
-                                        ? [<CategoryLinks key="itemsBefore" category={category} />]
-                                        : undefined
-                                }
-                                isLoading={filtersLoading}
-                                toggleFilter={toggleFilter}
-                                filters={productSearchResult?.refinements}
-                                excludedFilters={['cgid']}
-                                selectedFilters={searchParams.refine}
-                            />
-                        </Stack>
-                        <Box>
-                            <SimpleGrid
-                                columns={[2, 2, 3, 3]}
-                                columnGap={4}
-                                rowGap={{base: 12, lg: 16}}
-                            >
-                                {isHydrated() &&
-                                ((isRefetching && !isFetched) || !productSearchResult)
-                                    ? new Array(searchParams.limit)
-                                          .fill(0)
-                                          .map((value, index) => (
-                                              <ProductTileSkeleton key={index} />
-                                          ))
-                                    : productSearchResult?.hits?.map((productSearchItem) => {
-                                          const isInWishlist = isItemInWishlist(productSearchItem)
-
-                                          return (
-                                              <ProductTile
-                                                  data-testid={`sf-product-tile-${productSearchItem.productId}`}
-                                                  key={productSearchItem.productId}
-                                                  product={productSearchItem}
-                                                  enableFavourite={true}
-                                                  isFavourite={isInWishlist}
-                                                  isRefreshingData={isRefetching && isFetched}
-                                                  imageViewType={productListConfig.imageViewType}
-                                                  selectableAttributeId={
-                                                      productListConfig.selectableAttributeId
-                                                  }
-                                                  onClick={() => {
-                                                      if (searchQuery) {
-                                                          einstein.sendClickSearch(
-                                                              searchQuery,
-                                                              productSearchItem
-                                                          )
-                                                      } else if (category) {
-                                                          einstein.sendClickCategory(
-                                                              category,
-                                                              productSearchItem
-                                                          )
-                                                      }
-                                                  }}
-                                                  onFavouriteToggle={(toBeFavourite) => {
-                                                      const action = toBeFavourite
-                                                          ? addItem
-                                                          : removeItem
-                                                      return action(productSearchItem)
-                                                  }}
-                                                  dynamicImageProps={{
-                                                      widths: [
-                                                          '50vw',
-                                                          '50vw',
-                                                          '20vw',
-                                                          '20vw',
-                                                          '25vw'
-                                                      ]
-                                                  }}
-                                              />
-                                          )
-                                      })}
-                            </SimpleGrid>
-                            {/* Footer */}
-                            <Flex
-                                justifyContent={['center', 'center', 'flex-start']}
-                                paddingTop={8}
-                            >
-                                <Pagination currentURL={basePath} urls={pageUrls} />
-                            </Flex>
-                        </Box>
-                    </Grid>
-                </>
-            )}
-
-            {/* Sort Drawer */}
-            <Drawer.Root
-                open={sortOpen}
-                onOpenChange={(e) => !e.open && setSortOpen(false)}
-                placement="bottom"
-                size="sm"
+            <Box
+                className="sf-product-list-page"
+                data-testid="sf-product-list-page"
+                layerStyle="page"
+                paddingTop={{base: 6, lg: 8}}
+                {...rest}
             >
-                <SafePortal>
-                    <Drawer.Backdrop />
-                    <Drawer.Positioner>
-                        <Drawer.Content>
-                            <Drawer.Header>
-                                <Drawer.Title>
-                                    <Text fontWeight="bold" fontSize="2xl">
-                                        <FormattedMessage
-                                            defaultMessage="Sort By"
-                                            id="product_list.drawer.title.sort_by"
-                                        />
-                                    </Text>
-                                </Drawer.Title>
-                                <Drawer.CloseTrigger asChild>
-                                    <Button variant="ghost" size="sm">
-                                        ✕
-                                    </Button>
-                                </Drawer.CloseTrigger>
-                            </Drawer.Header>
-                            <Drawer.Body>
-                                {sortUrls.map((href, idx) => (
-                                    <Button
-                                        width="full"
-                                        onClick={() => {
-                                            setSortOpen(false)
-                                            history.push(href)
-                                        }}
-                                        fontSize={'md'}
-                                        key={idx}
-                                        marginTop={0}
-                                        variant="ghost"
-                                        justifyContent="flex-start"
-                                        mb={2}
-                                    >
-                                        <Text
-                                            as={
-                                                selectedSortingOptionLabel?.label ===
-                                                    productSearchResult?.sortingOptions[idx]
-                                                        ?.label && 'u'
-                                            }
+                {showNoResults ? (
+                    <EmptySearchResults searchQuery={searchQuery} category={category} />
+                ) : (
+                    <>
+                        <AbovePageHeader />
+
+                        <PageDesignerPromotionalBanner />
+                        {/* Header for Desktop */}
+                        <Stack
+                            display={{base: 'none', lg: 'flex'}}
+                            direction="row"
+                            justify="flex-start"
+                            align="flex-start"
+                            gap={4}
+                            marginBottom={6}
+                        >
+                            <Flex align="left" width="287px">
+                                <PageHeader
+                                    searchQuery={searchQuery}
+                                    category={category}
+                                    productSearchResult={productSearchResult}
+                                    isLoading={isLoading}
+                                />
+                            </Flex>
+
+                            <Box flex={1} paddingTop={'45px'}>
+                                <SelectedRefinements
+                                    filters={productSearchResult?.refinements}
+                                    toggleFilter={toggleFilter}
+                                    handleReset={resetFilters}
+                                    selectedFilterValues={productSearchResult?.selectedRefinements}
+                                />
+                            </Box>
+                            <Box paddingTop={'45px'}>
+                                <Sort
+                                    sortUrls={sortUrls}
+                                    productSearchResult={productSearchResult}
+                                    basePath={basePath}
+                                />
+                            </Box>
+                        </Stack>
+
+                        {/* Filter Button for Mobile */}
+                        <HideOnDesktop>
+                            <Stack gap={6}>
+                                <PageHeader
+                                    searchQuery={searchQuery}
+                                    category={category}
+                                    productSearchResult={productSearchResult}
+                                    isLoading={isLoading}
+                                />
+                                <Stack
+                                    display={{base: 'flex', md: 'none'}}
+                                    direction="row"
+                                    justify="flex-start"
+                                    align="center"
+                                    gap={1}
+                                    height={12}
+                                    borderColor="gray.100"
+                                >
+                                    <Flex align="center">
+                                        {/* Modal for filter options on mobile */}
+                                        <Dialog.Root size="full" placement="center">
+                                            <Dialog.Trigger asChild>
+                                                <Button
+                                                    fontSize="sm"
+                                                    colorPalette="black"
+                                                    variant="outline"
+                                                    marginRight={2}
+                                                    display="inline-flex"
+                                                    color="black"
+                                                >
+                                                    <FilterIcon boxSize={5} />
+                                                    <FormattedMessage
+                                                        defaultMessage="Filter"
+                                                        id="product_list.button.filter"
+                                                    />
+                                                </Button>
+                                            </Dialog.Trigger>
+                                            <SafePortal>
+                                                <Dialog.Backdrop />
+                                                <Dialog.Positioner>
+                                                    <Dialog.Content
+                                                        display="flex"
+                                                        flexDirection="column"
+                                                        height="100vh"
+                                                    >
+                                                        <Dialog.Header
+                                                            flexShrink={0}
+                                                            bg="white"
+                                                            borderBottom="1px solid"
+                                                            borderBottomColor="gray.100"
+                                                            p={4}
+                                                        >
+                                                            <Dialog.Title asChild>
+                                                                <Heading
+                                                                    as="h1"
+                                                                    fontWeight="bold"
+                                                                    fontSize="2xl"
+                                                                >
+                                                                    <FormattedMessage
+                                                                        defaultMessage="Filter"
+                                                                        id="product_list.modal.title.filter"
+                                                                    />
+                                                                </Heading>
+                                                            </Dialog.Title>
+                                                            <Dialog.CloseTrigger asChild>
+                                                                <Button variant="ghost" size="sm">
+                                                                    ✕
+                                                                </Button>
+                                                            </Dialog.CloseTrigger>
+                                                        </Dialog.Header>
+                                                        <Dialog.Body
+                                                            flex={1}
+                                                            overflowY="auto"
+                                                            px={4}
+                                                            py={4}
+                                                        >
+                                                            {filtersLoading && <LoadingSpinner />}
+                                                            <Refinements
+                                                                toggleFilter={toggleFilter}
+                                                                filters={
+                                                                    productSearchResult?.refinements
+                                                                }
+                                                                selectedFilters={
+                                                                    searchParams.refine
+                                                                }
+                                                                itemsBefore={
+                                                                    category?.categories
+                                                                        ? [
+                                                                              <CategoryLinks
+                                                                                  key="itemsBefore"
+                                                                                  category={
+                                                                                      category
+                                                                                  }
+                                                                              />
+                                                                          ]
+                                                                        : undefined
+                                                                }
+                                                                excludedFilters={['cgid']}
+                                                            />
+                                                        </Dialog.Body>
+                                                        <Dialog.Footer
+                                                            flexShrink={0}
+                                                            bg="white"
+                                                            borderTop="1px solid"
+                                                            borderTopColor="gray.100"
+                                                            p={4}
+                                                        >
+                                                            <Stack
+                                                                direction="column"
+                                                                gap={3}
+                                                                width="full"
+                                                            >
+                                                                <Dialog.CloseTrigger asChild>
+                                                                    <Button
+                                                                        width="full"
+                                                                        colorPalette="blue"
+                                                                        size="lg"
+                                                                        position="static"
+                                                                    >
+                                                                        <FormattedMessage
+                                                                            defaultMessage="View {count} Items"
+                                                                            id="product_list.modal.btn.view_items"
+                                                                            values={{
+                                                                                count:
+                                                                                    productSearchResult?.total ||
+                                                                                    0
+                                                                            }}
+                                                                        />
+                                                                    </Button>
+                                                                </Dialog.CloseTrigger>
+                                                                <Dialog.CloseTrigger asChild>
+                                                                    <Button
+                                                                        width="full"
+                                                                        variant="outline"
+                                                                        size="lg"
+                                                                        position="static"
+                                                                        onClick={resetFilters}
+                                                                    >
+                                                                        <FormattedMessage
+                                                                            defaultMessage="Clear Filters"
+                                                                            id="product_list.modal.btn.clear_filters"
+                                                                        />
+                                                                    </Button>
+                                                                </Dialog.CloseTrigger>
+                                                            </Stack>
+                                                        </Dialog.Footer>
+                                                    </Dialog.Content>
+                                                </Dialog.Positioner>
+                                            </SafePortal>
+                                        </Dialog.Root>
+                                    </Flex>
+                                    <Flex align="center">
+                                        <Button
+                                            maxWidth="245px"
+                                            fontSize="sm"
+                                            marginRight={2}
+                                            colorPalette="black"
+                                            variant="outline"
+                                            display="inline-flex"
+                                            color="black"
+                                            onClick={() => setSortOpen(true)}
                                         >
-                                            {productSearchResult?.sortingOptions[idx]?.label}
+                                            {formatMessage(
+                                                {
+                                                    id: 'product_list.button.sort_by',
+                                                    defaultMessage: 'Sort By: {sortOption}'
+                                                },
+                                                {
+                                                    sortOption: selectedSortingOptionLabel?.label
+                                                }
+                                            )}
+                                            <ChevronDownIcon boxSize={5} />
+                                        </Button>
+                                    </Flex>
+                                </Stack>
+                            </Stack>
+                            <Box marginBottom={4}>
+                                <SelectedRefinements
+                                    filters={productSearchResult?.refinements}
+                                    toggleFilter={toggleFilter}
+                                    handleReset={resetFilters}
+                                    selectedFilterValues={productSearchResult?.selectedRefinements}
+                                />
+                            </Box>
+                        </HideOnDesktop>
+
+                        {/* Body  */}
+                        <Grid templateColumns={{base: '1fr', md: '280px 1fr'}} columnGap={6}>
+                            <Stack display={{base: 'none', md: 'flex'}}>
+                                <Refinements
+                                    itemsBefore={
+                                        category?.categories
+                                            ? [
+                                                  <CategoryLinks
+                                                      key="itemsBefore"
+                                                      category={category}
+                                                  />
+                                              ]
+                                            : undefined
+                                    }
+                                    isLoading={filtersLoading}
+                                    toggleFilter={toggleFilter}
+                                    filters={productSearchResult?.refinements}
+                                    excludedFilters={['cgid']}
+                                    selectedFilters={searchParams.refine}
+                                />
+                            </Stack>
+                            <Box>
+                                <SimpleGrid
+                                    columns={[2, 2, 3, 3]}
+                                    columnGap={4}
+                                    rowGap={{base: 12, lg: 16}}
+                                >
+                                    {isHydrated() &&
+                                    ((isRefetching && !isFetched) || !productSearchResult)
+                                        ? new Array(searchParams.limit)
+                                              .fill(0)
+                                              .map((value, index) => (
+                                                  <ProductTileSkeleton key={index} />
+                                              ))
+                                        : productSearchResult?.hits?.map((productSearchItem) => {
+                                              const isInWishlist =
+                                                  isItemInWishlist(productSearchItem)
+
+                                              return (
+                                                  <ProductTile
+                                                      data-testid={`sf-product-tile-${productSearchItem.productId}`}
+                                                      key={productSearchItem.productId}
+                                                      product={productSearchItem}
+                                                      enableFavourite={true}
+                                                      isFavourite={isInWishlist}
+                                                      isRefreshingData={isRefetching && isFetched}
+                                                      imageViewType={
+                                                          productListConfig.imageViewType
+                                                      }
+                                                      selectableAttributeId={
+                                                          productListConfig.selectableAttributeId
+                                                      }
+                                                      onClick={() => {
+                                                          if (searchQuery) {
+                                                              einstein.sendClickSearch(
+                                                                  searchQuery,
+                                                                  productSearchItem
+                                                              )
+                                                          } else if (category) {
+                                                              einstein.sendClickCategory(
+                                                                  category,
+                                                                  productSearchItem
+                                                              )
+                                                          }
+                                                      }}
+                                                      onFavouriteToggle={(toBeFavourite) => {
+                                                          const action = toBeFavourite
+                                                              ? addItem
+                                                              : removeItem
+                                                          return action(productSearchItem)
+                                                      }}
+                                                      dynamicImageProps={{
+                                                          widths: [
+                                                              '50vw',
+                                                              '50vw',
+                                                              '20vw',
+                                                              '20vw',
+                                                              '25vw'
+                                                          ]
+                                                      }}
+                                                  />
+                                              )
+                                          })}
+                                </SimpleGrid>
+                                {/* Footer */}
+                                <Flex
+                                    justifyContent={['center', 'center', 'flex-start']}
+                                    paddingTop={8}
+                                >
+                                    <Pagination currentURL={basePath} urls={pageUrls} />
+                                </Flex>
+                            </Box>
+                        </Grid>
+                    </>
+                )}
+
+                {/* Sort Drawer */}
+                <Drawer.Root
+                    open={sortOpen}
+                    onOpenChange={(e) => !e.open && setSortOpen(false)}
+                    placement="bottom"
+                    size="sm"
+                >
+                    <SafePortal>
+                        <Drawer.Backdrop />
+                        <Drawer.Positioner>
+                            <Drawer.Content>
+                                <Drawer.Header>
+                                    <Drawer.Title>
+                                        <Text fontWeight="bold" fontSize="2xl">
+                                            <FormattedMessage
+                                                defaultMessage="Sort By"
+                                                id="product_list.drawer.title.sort_by"
+                                            />
                                         </Text>
-                                    </Button>
-                                ))}
-                            </Drawer.Body>
-                        </Drawer.Content>
-                    </Drawer.Positioner>
-                </SafePortal>
-            </Drawer.Root>
-        </Box>
+                                    </Drawer.Title>
+                                    <Drawer.CloseTrigger asChild>
+                                        <Button variant="ghost" size="sm">
+                                            ✕
+                                        </Button>
+                                    </Drawer.CloseTrigger>
+                                </Drawer.Header>
+                                <Drawer.Body>
+                                    {sortUrls.map((href, idx) => (
+                                        <Button
+                                            width="full"
+                                            onClick={() => {
+                                                setSortOpen(false)
+                                                history.push(href)
+                                            }}
+                                            fontSize={'md'}
+                                            key={idx}
+                                            marginTop={0}
+                                            variant="ghost"
+                                            justifyContent="flex-start"
+                                            mb={2}
+                                        >
+                                            <Text
+                                                as={
+                                                    selectedSortingOptionLabel?.label ===
+                                                        productSearchResult?.sortingOptions[idx]
+                                                            ?.label && 'u'
+                                                }
+                                            >
+                                                {productSearchResult?.sortingOptions[idx]?.label}
+                                            </Text>
+                                        </Button>
+                                    ))}
+                                </Drawer.Body>
+                            </Drawer.Content>
+                        </Drawer.Positioner>
+                    </SafePortal>
+                </Drawer.Root>
+            </Box>
+        </>
     )
 }
 
