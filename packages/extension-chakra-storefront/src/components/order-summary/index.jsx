@@ -121,7 +121,7 @@ const OrderSummary = ({
     const hasShippingPromos = shippingItem?.priceAdjustments?.length > 0
 
     return (
-        <Stack data-testid="sf-order-summary" gap={5}>
+        <Stack data-testid="sf-order-summary" gap="5">
             <Heading fontSize={fontSize} pt="1" id="order-summary-heading">
                 <FormattedMessage
                     defaultMessage="Order Summary"
@@ -248,7 +248,7 @@ const OrderSummary = ({
                 ) : (
                     <Separator w="full" />
                 )}
-                <Stack gap={4} w="full">
+                <Stack gap="4" w="full">
                     <Flex
                         w="full"
                         justifyContent="space-between"
