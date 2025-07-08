@@ -490,17 +490,17 @@ describe('Product Bundles', () => {
 
         renderWithProviders(<MockComponent product={mockProduct} />)
 
-        // Assert: Radio is enabled
-        const pickupRadio = await screen.findByRole('radio', {name: /pickup in store/i})
-        expect(pickupRadio).toBeEnabled()
+            // Assert: Radio is enabled
+    const pickupRadio = await screen.findByRole('radio', {name: /pick up in store/i})
+    expect(pickupRadio).toBeEnabled()
     })
 
     test('Pickup in store radio is disabled when inventoryId is NOT present in localStorage', async () => {
         renderWithProviders(<MockComponent product={mockProductDetail} />)
 
-        // Assert: Radio is disabled
-        const pickupRadio = await screen.findByRole('radio', {name: /pickup in store/i})
-        expect(pickupRadio).toBeDisabled()
+            // Assert: Radio is disabled
+    const pickupRadio = await screen.findByRole('radio', {name: /pick up in store/i})
+    expect(pickupRadio).toBeDisabled()
     })
 
     test('Pickup in store radio is disabled when inventoryId is present but product is out of stock', async () => {
@@ -514,7 +514,7 @@ describe('Product Bundles', () => {
 
         renderWithProviders(<MockComponent product={mockProduct} />)
 
-        const pickupRadio = await screen.findByRole('radio', {name: /pickup in store/i})
+        const pickupRadio = await screen.findByRole('radio', {name: /pick up in store/i})
         // Chakra UI does not set a semantic disabled attribute, so we test for unclickability
         expect(pickupRadio).not.toBeChecked()
         await user.click(pickupRadio)
@@ -533,7 +533,7 @@ describe('Product Bundles', () => {
 
         const label = await screen.findByTestId('pickup-select-store-msg')
         expect(label).toBeInTheDocument()
-        expect(label).toHaveTextContent(/Pickup in/i)
+        expect(label).toHaveTextContent(/Pick up in/i)
         const button = label.querySelector('button')
         expect(button).toBeInTheDocument()
         expect(button).toHaveTextContent(/Select Store/i)
@@ -584,7 +584,7 @@ describe('Product Bundles', () => {
             // Delivery options should be visible
             expect(screen.getByText(/Delivery:/i)).toBeInTheDocument()
             expect(screen.getByRole('radio', {name: /ship to address/i})).toBeInTheDocument()
-            expect(screen.getByRole('radio', {name: /pickup in store/i})).toBeInTheDocument()
+            expect(screen.getByRole('radio', {name: /pick up in store/i})).toBeInTheDocument()
         })
 
         test('hides delivery options when showDeliveryOptions is false', async () => {
@@ -595,7 +595,7 @@ describe('Product Bundles', () => {
             // Delivery options should not be visible
             expect(screen.queryByText(/Delivery:/i)).not.toBeInTheDocument()
             expect(screen.queryByRole('radio', {name: /ship to address/i})).not.toBeInTheDocument()
-            expect(screen.queryByRole('radio', {name: /pickup in store/i})).not.toBeInTheDocument()
+            expect(screen.queryByRole('radio', {name: /pick up in store/i})).not.toBeInTheDocument()
             expect(screen.queryByTestId('store-stock-status-msg')).not.toBeInTheDocument()
             expect(screen.queryByTestId('pickup-select-store-msg')).not.toBeInTheDocument()
         })
@@ -606,7 +606,7 @@ describe('Product Bundles', () => {
             // Delivery options should be visible by default
             expect(screen.getByText(/Delivery:/i)).toBeInTheDocument()
             expect(screen.getByRole('radio', {name: /ship to address/i})).toBeInTheDocument()
-            expect(screen.getByRole('radio', {name: /pickup in store/i})).toBeInTheDocument()
+            expect(screen.getByRole('radio', {name: /pick up in store/i})).toBeInTheDocument()
         })
     })
 })
