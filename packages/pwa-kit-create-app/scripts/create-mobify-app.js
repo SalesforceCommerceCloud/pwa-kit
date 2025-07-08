@@ -352,22 +352,6 @@ const runGenerator = (context, {outputDir, templateVersion, verbose}) => {
         assets.forEach((asset) => {
             sh.cp('-rf', p.join(packagePath, asset), outputDir)
         })
-
-        // Copy the .cursor/rules directory if it exists
-        if (sh.test('-e', CURSOR_RULES_FROM_DIR)) {
-            const outputCursorRulesDir = p.join(outputDir, '.cursor', 'rules')
-
-            // Create the directory if it doesn't exist
-            if (!sh.test('-e', outputCursorRulesDir)) {
-                fs.mkdirSync(outputCursorRulesDir, {recursive: true})
-            }
-
-            // Copy the contents of CURSOR_RULES_FROM_DIR to outputCursorRulesDir
-            const files = fs.readdirSync(CURSOR_RULES_FROM_DIR)
-            files.forEach((file) => {
-                sh.cp('-rf', p.join(CURSOR_RULES_FROM_DIR, file), outputCursorRulesDir)
-            })
-        }
     } else {
         console.log('Copying base template from package or npm: ', packagePath, outputDir)
         // Copy the base template either from the package or npm.
@@ -405,6 +389,22 @@ const runGenerator = (context, {outputDir, templateVersion, verbose}) => {
 
         // Clean up
         sh.rm('-rf', tmp)
+    }
+
+    // Copy the .cursor/rules directory if it exists
+    if (sh.test('-e', CURSOR_RULES_FROM_DIR)) {
+        const outputCursorRulesDir = p.join(outputDir, '.cursor', 'rules')
+
+        // Create the directory if it doesn't exist
+        if (!sh.test('-e', outputCursorRulesDir)) {
+            fs.mkdirSync(outputCursorRulesDir, {recursive: true})
+        }
+
+        // Copy the contents of CURSOR_RULES_FROM_DIR to outputCursorRulesDir
+        const files = fs.readdirSync(CURSOR_RULES_FROM_DIR)
+        files.forEach((file) => {
+            sh.cp('-rf', p.join(CURSOR_RULES_FROM_DIR, file), outputCursorRulesDir)
+        })
     }
 
     // Install dependencies for the newly minted project.
