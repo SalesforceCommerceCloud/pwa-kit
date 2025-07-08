@@ -43,7 +43,7 @@ import EmptySearchResults from '../../pages/product-list/partials/empty-results'
 import PageHeader from '../../pages/product-list/partials/page-header'
 import AbovePageHeader from '../../pages/product-list/partials/above-page-header'
 import PageDesignerPromotionalBanner from '../../pages/product-list/partials/page-designer-promotional-banner'
-import Metadata from './metadata'
+import Metadata from './page-metadata'
 
 // Icons
 import {FilterIcon, ChevronDownIcon} from '../../components/icons'
