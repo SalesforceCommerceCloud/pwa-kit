@@ -178,7 +178,6 @@ const ContactInfo = ({isSocialEnabled = false, isPasswordlessEnabled = false, id
             return
         }
 
-        // Validate email format
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
         if (!emailRegex.test(email)) {
             form.setError('email', {
@@ -191,7 +190,6 @@ const ContactInfo = ({isSocialEnabled = false, isPasswordlessEnabled = false, id
             return
         }
 
-        // Handle passwordless login directly
         await handlePasswordlessLogin(email)
     }
 
