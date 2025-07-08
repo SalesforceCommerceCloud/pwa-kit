@@ -11,11 +11,11 @@ import {
 } from '@salesforce/commerce-sdk-react'
 
 /**
- * Custom hook to handle shipping method management for cart
+ * Custom hook to handle shipping method management for cart when shipping method is undefined
  * @param {Object} basket - The current basket data
  * @returns {Object} Object containing shipping method mutations
  */
-export const useCartShipping = (basket) => {
+export const useCartDefaultShipping = (basket) => {
     const updateShippingMethodForShipmentsMutation = useShopperBasketsMutation(
         'updateShippingMethodForShipment'
     )
