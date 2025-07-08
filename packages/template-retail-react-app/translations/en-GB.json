@@ -177,6 +177,12 @@
   "auth_modal.password_reset_success.title.password_reset": {
     "defaultMessage": "Password Reset"
   },
+  "bonus_product_item.label.quantity": {
+    "defaultMessage": "Quantity: {quantity}"
+  },
+  "bonus_products_title.title.num_of_items": {
+    "defaultMessage": "Bonus Products ({itemCount, plural, =0 {0 items} one {# item} other {# items}})"
+  },
   "carousel.button.scroll_left.assistive_msg": {
     "defaultMessage": "Scroll carousel left"
   },
@@ -810,6 +816,9 @@
   },
   "icons.assistive_msg.lock": {
     "defaultMessage": "Secure"
+  },
+  "item_attributes.label.bonus_product": {
+    "defaultMessage": "Bonus Product"
   },
   "item_attributes.label.promotions": {
     "defaultMessage": "Promotions"

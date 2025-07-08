@@ -16,11 +16,16 @@ import {noop} from '@salesforce/retail-react-app/app/utils/utils'
 const MockedComponent = ({
     onAddToWishlistClick = noop,
     onEditClick = noop,
-    onRemoveItemClick = noop
+    onRemoveItemClick = noop,
+    isBonusProduct = false
 }) => {
-    const product = mockedCustomerProductListsDetails.data[0]
+    const product = {
+        ...mockedCustomerProductListsDetails.data[0],
+        productName: mockedCustomerProductListsDetails.data[0].name,
+        bonusProductLineItem: isBonusProduct
+    }
     return (
-        <ItemVariantProvider variant={{...product, productName: product.name}}>
+        <ItemVariantProvider variant={product}>
             <CartSecondaryButtonGroup
                 onAddToWishlistClick={onAddToWishlistClick}
                 onEditClick={onEditClick}
@@ -33,7 +38,8 @@ const MockedComponent = ({
 MockedComponent.propTypes = {
     onAddToWishlistClick: PropTypes.func,
     onEditClick: PropTypes.func,
-    onRemoveItemClick: PropTypes.func
+    onRemoveItemClick: PropTypes.func,
+    isBonusProduct: PropTypes.bool
 }
 
 beforeEach(() => {
@@ -100,4 +106,14 @@ test('renders secondary with event handlers', async () => {
     await user.click(confirmButton)
 
     expect(onRemoveItemClick).toHaveBeenCalledTimes(1)
+})
+
+test('hides remove, wishlist and gift checkbox for bonus product', async () => {
+    const {user} = renderWithProviders(<MockedComponent isBonusProduct={true} />)
+
+    expect(screen.getByRole('button', {name: /edit/i})).toBeInTheDocument()
+
+    expect(screen.queryByRole('button', {name: /remove/i})).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', {name: /add to wishlist/i})).not.toBeInTheDocument()
+    expect(screen.queryByRole('checkbox', {name: /this is a gift/i})).not.toBeInTheDocument()
 })
