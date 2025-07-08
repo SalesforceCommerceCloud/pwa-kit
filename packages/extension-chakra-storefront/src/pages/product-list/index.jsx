@@ -13,8 +13,7 @@ import {keepPreviousData} from '@tanstack/react-query'
 import {
     useCategory,
     useCustomerId,
-    useProductSearch,
-    useShopperCustomersMutation
+    useProductSearch
 } from '@salesforce/commerce-sdk-react'
 import {useServerContext} from '@salesforce/pwa-kit-react-sdk/ssr/universal/hooks'
 
@@ -57,21 +56,15 @@ import SafePortal from '../../components/safe-portal'
 import useEinstein from '../../hooks/use-einstein'
 import useActiveData from '../../hooks/use-active-data'
 import useDataCloud from '../../hooks/use-datacloud'
+import {useProductListWishlist} from './hooks/use-product-list-wishlist'
 
 // Others
 import {HTTPNotFound, HTTPError} from '@salesforce/pwa-kit-react-sdk/ssr/universal/errors'
 import logger from '../../utils/logger-instance'
 
 // Constants
-import {
-    API_ERROR_MESSAGE,
-    TOAST_ACTION_VIEW_WISHLIST,
-    TOAST_MESSAGE_ADDED_TO_WISHLIST,
-    TOAST_MESSAGE_REMOVED_FROM_WISHLIST
-} from '../../constants'
 import useNavigation from '../../hooks/use-navigation'
 import LoadingSpinner from '../../components/loading-spinner'
-import {useWishList} from '../../hooks/use-wish-list'
 import {isHydrated} from '../../utils/utils'
 
 // NOTE: You can ignore certain refinements on a template level by updating the below
@@ -107,8 +100,8 @@ const ProductList = (props) => {
     } = useExtensionConfig()
     /**************** Page State ****************/
     const [filtersLoading, setFiltersLoading] = useState(false)
-    const [wishlistLoading, setWishlistLoading] = useState([])
     const [sortOpen, setSortOpen] = useState(false)
+    const {addItem, removeItem, isItemInWishlist} = useProductListWishlist()
 
     const urlParams = new URLSearchParams(location.search)
     let searchQuery = urlParams.get('q')
@@ -119,12 +112,6 @@ const ProductList = (props) => {
     }
 
     /**************** Mutation Actions ****************/
-    const {mutateAsync: createCustomerProductListItem} = useShopperCustomersMutation(
-        'createCustomerProductListItem'
-    )
-    const {mutateAsync: deleteCustomerProductListItem} = useShopperCustomersMutation(
-        'deleteCustomerProductListItem'
-    )
 
     /**************** Query Actions ****************/
     // _refine is an invalid param for useProductSearch, we don't want to pass it to API call
@@ -216,81 +203,6 @@ const ProductList = (props) => {
     const sortUrls = useSortUrls({options: sortingOptions})
 
     /**************** Action Handlers ****************/
-    const {data: wishlist} = useWishList()
-    const addItemToWishlist = async (product) => {
-        setWishlistLoading([...wishlistLoading, product.productId])
-
-        // TODO: This wishlist object is from an old API, we need to replace it with the new one.
-        const listId = wishlist.id
-        await createCustomerProductListItem(
-            {
-                parameters: {customerId, listId},
-                body: {
-                    quantity: 1,
-                    public: false,
-                    priority: 1,
-                    type: 'product',
-                    productId: product.productId
-                }
-            },
-            {
-                onError: () => {
-                    toast({
-                        title: formatMessage(API_ERROR_MESSAGE),
-                        type: 'error'
-                    })
-                },
-                onSuccess: () => {
-                    toast({
-                        title: formatMessage(TOAST_MESSAGE_ADDED_TO_WISHLIST, {quantity: 1}),
-                        type: 'success',
-                        action: (
-                            <Button variant="link" onClick={() => navigate('/account/wishlist')}>
-                                {formatMessage(TOAST_ACTION_VIEW_WISHLIST)}
-                            </Button>
-                        )
-                    })
-                },
-                onSettled: () => {
-                    setWishlistLoading(wishlistLoading.filter((id) => id !== product.productId))
-                }
-            }
-        )
-    }
-
-    const removeItemFromWishlist = async (product) => {
-        setWishlistLoading([...wishlistLoading, product.productId])
-
-        const listId = wishlist.id
-        const itemId = wishlist.customerProductListItems.find(
-            (i) => i.productId === product.productId
-        ).id
-
-        await deleteCustomerProductListItem(
-            {
-                body: {},
-                parameters: {customerId, listId, itemId}
-            },
-            {
-                onError: () => {
-                    toast({
-                        title: formatMessage(API_ERROR_MESSAGE),
-                        type: 'error'
-                    })
-                },
-                onSuccess: () => {
-                    toast({
-                        title: formatMessage(TOAST_MESSAGE_REMOVED_FROM_WISHLIST),
-                        type: 'success'
-                    })
-                },
-                onSettled: () => {
-                    setWishlistLoading(wishlistLoading.filter((id) => id !== product.productId))
-                }
-            }
-        )
-    }
-
     // Toggles filter on and off
     const toggleFilter = (value, attributeId, selected, allowMultiple = true) => {
         const searchParamsCopy = {...searchParams}
@@ -652,11 +564,7 @@ const ProductList = (props) => {
                                               <ProductTileSkeleton key={index} />
                                           ))
                                     : productSearchResult?.hits?.map((productSearchItem) => {
-                                          const productId = productSearchItem.productId
-                                          const isInWishlist =
-                                              !!wishlist?.customerProductListItems?.find(
-                                                  (item) => item.productId === productId
-                                              )
+                                          const isInWishlist = isItemInWishlist(productSearchItem)
 
                                           return (
                                               <ProductTile
@@ -685,8 +593,8 @@ const ProductList = (props) => {
                                                   }}
                                                   onFavouriteToggle={(toBeFavourite) => {
                                                       const action = toBeFavourite
-                                                          ? addItemToWishlist
-                                                          : removeItemFromWishlist
+                                                          ? addItem
+                                                          : removeItem
                                                       return action(productSearchItem)
                                                   }}
                                                   dynamicImageProps={{
