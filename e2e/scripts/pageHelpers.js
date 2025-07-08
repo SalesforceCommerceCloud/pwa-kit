@@ -165,7 +165,7 @@ export const navigateToPDPDesktopSocial = async ({
     productColor,
     productPrice
 }) => {
-    await page.goto(config.SOCIAL_LOGIN_RETAIL_APP_HOME)
+    await page.goto(config.EXTRA_FEATURES_E2E_RETAIL_APP_HOME)
     await answerConsentTrackingForm(page)
 
     await page.getByRole('link', {name: 'Womens'}).hover()
@@ -373,7 +373,7 @@ export const loginShopper = async ({page, userCredentials}) => {
  */
 export const socialLoginShopper = async ({page}) => {
     try {
-        await page.goto(config.SOCIAL_LOGIN_RETAIL_APP_HOME + '/login')
+        await page.goto(config.EXTRA_FEATURES_E2E_RETAIL_APP_HOME + '/login')
 
         await page.getByText(/Google/i).click()
         await expect(page.getByText(/Sign in with Google/i)).toBeVisible({timeout: 10000})
