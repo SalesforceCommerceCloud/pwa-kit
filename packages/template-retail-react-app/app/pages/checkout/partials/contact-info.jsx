@@ -162,7 +162,6 @@ const ContactInfo = ({isSocialEnabled = false, isPasswordlessEnabled = false, id
     }, [showPasswordField])
 
     const onPasswordlessLoginClick = async (e) => {
-        // Prevent form submission
         if (e) {
             e.preventDefault()
             e.stopPropagation()
