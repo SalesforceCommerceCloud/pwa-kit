@@ -75,7 +75,7 @@ The `claude_desktop_config.json` file opens.
 
 <img src="./docs/images/claude-config.png" alt="Claude MCP Config Screenshot" width="50%" />
 
-2. Add this server definition to your `claude_desktop_config.json` and replace {{path-to-node}}, {{parent-dir-to-mcp}} and {{path-to-app-directory}}  placeholders with correct values.
+2. Add this server definition to your `claude_desktop_config.json` and replace {{path-to-node}}, {{parent-dir-to-mcp}} and {{path-to-app-directory}} placeholders with correct values.
 
 ```json
 {
