@@ -373,14 +373,23 @@ const runGenerator = (context, {outputDir, templateVersion, verbose}) => {
         // Copy the base template either from the package or npm.
         sh.cp('-rf', packagePath, outputDir)
 
-        // Copy template specific assets over.
-        const assetsDir = p.join(ASSETS_TEMPLATES_DIR, id)
+        // Copy template specific assets over, if they exist.
+        const assetsDir = p.join(ASSETS_TEMPLATES_DIR, source.name || id)
         if (sh.test('-e', assetsDir)) {
+            console.log(`Copying template-specific assets from ${assetsDir}`)
             getFiles(assetsDir)
                 .map((file) => file.replace(assetsDir, ''))
                 .forEach((relFilePath) =>
                     processTemplate(relFilePath, assetsDir, outputDir, context)
                 )
+        } else {
+            // However, we expected to see assetsDir for retail-react-app template
+            if (source.name === '@salesforce/retail-react-app') {
+                console.error(
+                    `Error: cannot find template-specific assets for retail-react-app in directory ${assetsDir}`
+                )
+                process.exit(1)
+            }
         }
 
         // Update the generated projects version. NOTE: For bootstrapped projects this
