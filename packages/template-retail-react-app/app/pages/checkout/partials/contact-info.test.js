@@ -48,6 +48,7 @@ jest.mock('../util/checkout-context', () => {
 
 afterEach(() => {
     jest.resetModules()
+    jest.restoreAllMocks()
 })
 
 describe('passwordless and social disabled', () => {
@@ -148,9 +149,11 @@ describe('passwordless enabled', () => {
     })
 
     test('allows passwordless login', async () => {
-        jest.spyOn(window, 'location', 'get').mockReturnValue({
-            pathname: '/checkout'
+        const mockLocation = jest.spyOn(window, 'location', 'get').mockReturnValue({
+            pathname: '/checkout',
+            origin: 'https://webhook.site'
         })
+
         const {user} = renderWithProviders(<ContactInfo isPasswordlessEnabled={true} />)
 
         // enter a valid email address
@@ -159,7 +162,6 @@ describe('passwordless enabled', () => {
         // initiate passwordless login
         const passwordlessLoginButton = screen.getByText('Secure Link')
         // Click the button twice as the isPasswordlessLoginClicked state doesn't change after the first click
-        await user.click(passwordlessLoginButton)
         await user.click(passwordlessLoginButton)
         expect(
             mockAuthHelperFunctions[AuthHelpers.AuthorizePasswordless].mutateAsync
@@ -177,7 +179,7 @@ describe('passwordless enabled', () => {
         })
 
         // resend the email
-        user.click(screen.getByText(/Resend Link/i))
+        await user.click(screen.getByText(/Resend Link/i))
         expect(
             mockAuthHelperFunctions[AuthHelpers.AuthorizePasswordless].mutateAsync
         ).toHaveBeenCalledWith({
@@ -185,6 +187,9 @@ describe('passwordless enabled', () => {
             callbackURI:
                 'https://webhook.site/27761b71-50c1-4097-a600-21a3b89a546c?redirectUrl=/checkout'
         })
+
+        // Cleanup mocks
+        mockLocation.mockRestore()
     })
 
     test('allows login using password', async () => {

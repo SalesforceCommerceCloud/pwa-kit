@@ -96,21 +96,22 @@ const SocialLogin = ({form, idps = []}) => {
                         const config = IDP_CONFIG[name.toLowerCase()]
                         const Icon = config?.icon
                         const message = formatMessage(config?.message)
-                        return (
-                            config && (
-                                <Button
-                                    onClick={() => {
-                                        onSocialLoginClick(name)
-                                    }}
-                                    borderColor="gray.500"
-                                    color="blue.600"
-                                    variant="outline"
-                                >
-                                    <Icon sx={{marginRight: 2}} />
-                                    {message}
-                                </Button>
-                            )
-                        )
+                                        return (
+                    config && (
+                        <Button
+                            key={name}
+                            onClick={() => {
+                                onSocialLoginClick(name)
+                            }}
+                            borderColor="gray.500"
+                            color="blue.600"
+                            variant="outline"
+                        >
+                            <Icon sx={{marginRight: 2}} />
+                            {message}
+                        </Button>
+                    )
+                )
                     })}
             </>
         )

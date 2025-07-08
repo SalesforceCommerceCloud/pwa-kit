@@ -107,11 +107,6 @@ const ContactInfo = ({isSocialEnabled = false, isPasswordlessEnabled = false, id
 
     const submitForm = async (data) => {
         setError(null)
-        if (isPasswordlessLoginClicked) {
-            handlePasswordlessLogin(data.email)
-            setIsPasswordlessLoginClicked(false)
-            return
-        }
         try {
             if (!data.password) {
                 await updateCustomerForBasket.mutateAsync({
@@ -166,8 +161,39 @@ const ContactInfo = ({isSocialEnabled = false, isPasswordlessEnabled = false, id
         }
     }, [showPasswordField])
 
-    const onPasswordlessLoginClick = async () => {
-        setIsPasswordlessLoginClicked(true)
+    const onPasswordlessLoginClick = async (e) => {
+        // Prevent form submission
+        if (e) {
+            e.preventDefault()
+            e.stopPropagation()
+        }
+        const email = form.getValues().email
+        if (!email) {
+            form.setError('email', {
+                type: 'manual',
+                message: formatMessage({
+                    defaultMessage: 'Please enter your email address.',
+                    id: 'contact_info.error.email_required'
+                })
+            })
+            return
+        }
+
+        // Validate email format
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+        if (!emailRegex.test(email)) {
+            form.setError('email', {
+                type: 'manual',
+                message: formatMessage({
+                    defaultMessage: 'Please enter a valid email address.',
+                    id: 'contact_info.error.email_invalid'
+                })
+            })
+            return
+        }
+
+        // Handle passwordless login directly
+        await handlePasswordlessLogin(email)
     }
 
     return (
