@@ -40,7 +40,7 @@ npm ci
 
 <img src="./docs/images/cursor-mcp-tools.png" alt="Cursor MCP Tools Screenshot" width="50%" />
 
-The `mcp.json` file opens. Add this definition to your `mcp.json` file and replace {{parent-dir-to-mcp}} and {{path-to-app-directory}} placeholders with correct values.
+The `mcp.json` file opens. Add this definition to your `mcp.json` file and replace {{parent-dir-to-mcp}} and {{path-to-app-directory}} and {{path-to-base-pwa-kit-monorepo}} placeholders with correct values.
 
 ```json
 {
@@ -51,7 +51,8 @@ The `mcp.json` file opens. Add this definition to your `mcp.json` file and repla
       "transport": "stdio",
       "args": [],
       "env": {
-        "PWA_STOREFRONT_APP_PATH": "{{path-to-app-directory}}"
+        "PWA_STOREFRONT_APP_PATH": "{{path-to-app-directory}}",
+        "WORKSPACE_FOLDER_PATHS": "{{path-to-base-pwa-kit-monorepo}}"
       }
     }
   }
@@ -75,7 +76,7 @@ The `claude_desktop_config.json` file opens.
 
 <img src="./docs/images/claude-config.png" alt="Claude MCP Config Screenshot" width="50%" />
 
-2. Add this server definition to your `claude_desktop_config.json` and replace {{path-to-node}}, {{parent-dir-to-mcp}} and {{path-to-app-directory}} placeholders with correct values.
+2. Add this server definition to your `claude_desktop_config.json` and replace {{path-to-node}}, {{parent-dir-to-mcp}} and {{path-to-app-directory}} and {{path-to-base-pwa-kit-monorepo}} placeholders with correct values.
 
 ```json
 {
@@ -85,7 +86,8 @@ The `claude_desktop_config.json` file opens.
       "transport": "stdio",
       "args": ["{{parent-dir-to-mcp}}/pwa-storefront-mcp/dist/server/server.js"],
       "env": {
-        "PWA_STOREFRONT_APP_PATH": "{{path-to-app-directory}}"
+        "PWA_STOREFRONT_APP_PATH": "{{path-to-app-directory}}",
+        "WORKSPACE_FOLDER_PATHS": "{{path-to-base-pwa-kit-monorepo}}"
       }
     }
   }
