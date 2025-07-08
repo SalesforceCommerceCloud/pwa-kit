@@ -28,7 +28,7 @@ import Seo from '../../components/seo'
 import Link from '../../components/link'
 import {ChevronDownIcon, SignoutIcon} from '../../components/icons'
 // import AccountDetail from '../../pages/account/profile'
-// import AccountAddresses from '../../pages/account/addresses'
+import AccountAddresses from '../../pages/account/addresses'
 import AccountOrders from '../../pages/account/orders'
 // import AccountWishlist from '../../pages/account/wishlist/index'
 
@@ -224,9 +224,9 @@ const Account = () => {
                     {/*<Route exact path={`${path}/wishlist`}>*/}
                     {/*    <AccountWishlist />*/}
                     {/*</Route>*/}
-                    {/*<Route exact path={`${path}/addresses`}>*/}
-                    {/*    <AccountAddresses />*/}
-                    {/*</Route>*/}
+                    <Route exact path={`${path}/addresses`}>
+                        <AccountAddresses />
+                    </Route>
                     <Route path={`${path}/orders`}>
                         <AccountOrders />
                     </Route>
