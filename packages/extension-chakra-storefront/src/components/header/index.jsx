@@ -332,8 +332,7 @@ const Header = ({
                         })}
                         variant="unstyled"
                         css={{...styles.iconButton, ...styles.wishlistIconButton}}
-                        // uncomment when we fix wishlist
-                        // onClick={onWishlistClick}
+                        onClick={onWishlistClick}
                     >
                         <HeartIcon boxSize={6} />
                     </IconButtonWithRegistration>
