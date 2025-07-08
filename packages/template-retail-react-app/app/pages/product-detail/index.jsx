@@ -61,7 +61,6 @@ import {rebuildPathWithParams} from '@salesforce/retail-react-app/app/utils/url'
 import {useHistory, useLocation, useParams} from 'react-router-dom'
 import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
 import {useWishList} from '@salesforce/retail-react-app/app/hooks/use-wish-list'
-import {useAddToCartModalContext} from '@salesforce/retail-react-app/app/hooks/use-add-to-cart-modal'
 import {useDisclosure} from '@salesforce/retail-react-app/app/components/shared/ui'
 
 const ProductDetail = () => {
@@ -327,8 +326,6 @@ const ProductDetail = () => {
         }))
     }
 
-    const addToCartModal = useAddToCartModalContext()
-
     const handleAddToCart = async (productSelectionValues = []) => {
         try {
             let productItems = productSelectionValues.map((item) => {
@@ -417,8 +414,6 @@ const ProductDetail = () => {
             )
             einstein.sendAddToCart(productItemsForEinstein)
 
-            // Open modal with itemsAdded
-            addToCartModal.onOpen({product, itemsAdded: productSelectionValues})
             return productSelectionValues
         } catch (error) {
             showError(error.message)
@@ -465,26 +460,17 @@ const ProductDetail = () => {
         // Get all the selected products, and pass them to the addToCart handler which
         // accepts an array.
         const productSelectionValues = Object.values(childProductSelection)
-        handleAddToCart(productSelectionValues)
-        // Modal will be opened in handleAddToCart
+        return handleAddToCart(productSelectionValues)
     }
 
     /**************** Product Bundle Handlers ****************/
     // Top level bundle does not have variants
-    const handleProductBundleAddToCart = async (variantOrArray, selectedQuantity) => {
-        // Support both signatures: (variant, selectedQuantity) and ([{variant, quantity}])
-        let quantity
-        if (Array.isArray(variantOrArray)) {
-            quantity = variantOrArray[0]?.quantity
-        } else {
-            quantity = selectedQuantity
-        }
-
+    const handleProductBundleAddToCart = async (variant, selectedQuantity) => {
         try {
             const childProductSelections = Object.values(childProductSelection)
             // Check if any products have pickup selected (including main product and bundle items)
             const bundleSelectionValues = [
-                {product, variant: null, quantity},
+                {product, variant: null, selectedQuantity},
                 ...childProductSelections
             ]
             const hasAnyPickupSelected = hasPickupItems(
@@ -530,7 +516,7 @@ const ProductDetail = () => {
                 {
                     productId: product.id,
                     price: product.price,
-                    quantity: quantity,
+                    quantity: selectedQuantity,
                     // The add item endpoint in the shopper baskets API does not respect variant selections
                     // for bundle children, so we have to make a follow up call to update the basket
                     // with the chosen variant selections
@@ -594,8 +580,7 @@ const ProductDetail = () => {
             )
 
             einstein.sendAddToCart(productItems)
-            // Open modal with itemsAdded and selectedQuantity for bundles
-            addToCartModal.onOpen({product, itemsAdded: childProductSelections, selectedQuantity})
+
             return childProductSelections
         } catch (error) {
             showError(error)
@@ -780,7 +765,9 @@ const ProductDetail = () => {
                             <ProductView
                                 product={product}
                                 category={primaryCategory?.parentCategoryTree || []}
-                                addToCart={handleAddToCart}
+                                addToCart={(variant, quantity) =>
+                                    handleAddToCart([{product, variant, quantity}])
+                                }
                                 addToWishlist={handleAddToWishlist}
                                 isProductLoading={isProductLoading}
                                 isBasketLoading={isBasketLoading}
