@@ -382,6 +382,12 @@ const runGenerator = (context, {outputDir, templateVersion, verbose}) => {
                 .forEach((relFilePath) =>
                     processTemplate(relFilePath, assetsDir, outputDir, context)
                 )
+        } else {
+            // However, we expected to see assetsDir for retail-react-app template
+            if (source.name === '@salesforce/retail-react-app') {
+                console.error(`Error: cannot find template-specific assets for retail-react-app in directory ${assetsDir}`)
+                process.exit(1)
+            }
         }
 
         // Update the generated projects version. NOTE: For bootstrapped projects this
