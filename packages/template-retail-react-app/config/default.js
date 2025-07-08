@@ -38,12 +38,17 @@ module.exports = {
             RefArchGlobal: 'global'
         },
         sites,
+        checkout: {
+            SalesforcePaymentsEnabled: true,
+        },
         commerceAPI: {
             proxyPath: `/mobify/proxy/api`,
             parameters: {
                 clientId: 'c9c45bfd-0ed3-4aa2-9971-40f88962b836',
                 organizationId: 'f_ecom_zzrf_001',
-                shortCode: '8o7m175y',
+                //shortCode: '8o7m175y',
+                organizationId: 'f_ecom_zzrf_001',
+                shortCode: 'kv7kzm78', // ✅ Match this with proxy host
                 siteId: 'RefArchGlobal'
             }
         },
