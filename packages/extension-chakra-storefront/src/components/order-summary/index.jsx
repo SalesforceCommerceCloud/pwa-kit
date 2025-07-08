@@ -45,8 +45,8 @@ const CartItems = ({basket}) => {
     return (
         <Accordion.Root w="full" collapsible>
             <Accordion.Item>
-                <Accordion.ItemTrigger px="0" py="4">
-                    <Box as="span" flex="1" textAlign="left" fontSize="md" fontWeight="bold">
+                <Accordion.ItemTrigger>
+                    <Box as="span" flex="1" textAlign="left" fontSize="md" color="blue.600">
                         <BasketIcon display="inline" mr={2} />
                         <FormattedMessage
                             id="order_summary.cart_items.action.num_of_items_in_cart"

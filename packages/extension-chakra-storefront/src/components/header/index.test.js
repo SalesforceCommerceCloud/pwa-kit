@@ -208,8 +208,7 @@ test('route to account page when an authenticated users click on account icon', 
     })
 })
 
-// unskip when wishlist page is converted to chakra v3
-test.skip('route to wishlist page when an authenticated users click on wishlist icon', async () => {
+test('route to wishlist page when an authenticated users click on wishlist icon', async () => {
     const history = createMemoryHistory()
     // mock push function
     history.push = jest.fn()

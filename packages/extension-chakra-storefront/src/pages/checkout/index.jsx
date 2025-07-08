@@ -109,12 +109,11 @@ const Checkout = () => {
                     </GridItem>
 
                     <GridItem py={6} px={[4, 4, 4, 0]}>
-                        {/* TODO: bring this back */}
-                        {/*     <OrderSummary */}
-                        {/*         basket={basket} */}
-                        {/*         showTaxEstimationForm={false} */}
-                        {/*         showCartItems={true} */}
-                        {/*     /> */}
+                        <OrderSummary
+                            basket={basket}
+                            showTaxEstimationForm={false}
+                            showCartItems={true}
+                        />
 
                         {step === 4 && (
                             <Box display={{base: 'none', lg: 'block'}} pt={2}>
@@ -205,11 +204,10 @@ const CheckoutContainer = () => {
             {isDeletingUnavailableItem && <LoadingSpinner wrapperStyles={{height: '100vh'}} />}
 
             <Checkout />
-            {/* TODO: bring this back */}
-            {/* <UnavailableProductConfirmationModal */}
-            {/*     productItems={basket?.productItems} */}
-            {/*     handleUnavailableProducts={handleUnavailableProducts} */}
-            {/* /> */}
+            <UnavailableProductConfirmationModal
+                productItems={basket?.productItems}
+                handleUnavailableProducts={handleUnavailableProducts}
+            />
         </CheckoutProvider>
     )
 }
