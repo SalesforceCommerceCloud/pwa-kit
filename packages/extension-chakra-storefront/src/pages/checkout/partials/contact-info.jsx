@@ -17,8 +17,7 @@ import {AlertIcon} from '../../../components/icons'
 import LoginState from '../../../pages/checkout/partials/login-state'
 import {AuthModal, EMAIL_VIEW, PASSWORD_VIEW, useAuthModal} from '../../../hooks/use-auth-modal'
 import useNavigation from '../../../hooks/use-navigation'
-import {useCurrentCustomer} from '../../../hooks/use-current-customer'
-import {useCurrentBasket} from '../../../hooks/use-current-basket'
+import {useCurrentCustomer, useCurrentBasket} from '../../../hooks'
 import {isAbsoluteURL} from '../../../page-designer/utils'
 import {useAppOrigin} from '../../../hooks/use-app-origin'
 import {AuthHelpers, useAuthHelper, useShopperBasketsMutation} from '@salesforce/commerce-sdk-react'
@@ -60,7 +59,6 @@ const ContactInfo = ({isSocialEnabled = false, isPasswordlessEnabled = false, id
 
     const [authModalView, setAuthModalView] = useState(PASSWORD_VIEW)
     const authModal = useAuthModal(authModalView)
-    const [isPasswordlessLoginClicked, setIsPasswordlessLoginClicked] = useState(false)
     const passwordlessConfigCallback = config.login?.passwordless?.callbackURI
     const callbackURL = isAbsoluteURL(passwordlessConfigCallback)
         ? passwordlessConfigCallback
@@ -87,11 +85,6 @@ const ContactInfo = ({isSocialEnabled = false, isPasswordlessEnabled = false, id
 
     const submitForm = async (data) => {
         setError(null)
-        if (isPasswordlessLoginClicked) {
-            handlePasswordlessLogin(data.email)
-            setIsPasswordlessLoginClicked(false)
-            return
-        }
         try {
             if (!data.password) {
                 await updateCustomerForBasket.mutateAsync({
@@ -146,8 +139,36 @@ const ContactInfo = ({isSocialEnabled = false, isPasswordlessEnabled = false, id
         }
     }, [showPasswordField])
 
-    const onPasswordlessLoginClick = async () => {
-        setIsPasswordlessLoginClicked(true)
+    const onPasswordlessLoginClick = async (e) => {
+        if (e) {
+            e.preventDefault()
+            e.stopPropagation()
+        }
+        const email = form.getValues().email
+        if (!email) {
+            form.setError('email', {
+                type: 'manual',
+                message: formatMessage({
+                    defaultMessage: 'Please enter your email address.',
+                    id: 'contact_info.error.email_required'
+                })
+            })
+            return
+        }
+
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+        if (!emailRegex.test(email)) {
+            form.setError('email', {
+                type: 'manual',
+                message: formatMessage({
+                    defaultMessage: 'Please enter a valid email address.',
+                    id: 'contact_info.error.email_invalid'
+                })
+            })
+            return
+        }
+
+        await handlePasswordlessLogin(email)
     }
 
     return (

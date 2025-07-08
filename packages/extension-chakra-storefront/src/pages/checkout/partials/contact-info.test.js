@@ -99,19 +99,30 @@ describe('passwordless and social disabled', () => {
         const trigger = screen.getByText(/Already have an account\? Log in/i)
         await act(async () => {
             await user.click(trigger)
+            // enter email address and password
+            await user.type(screen.getByLabelText('Email'), validEmail)
+            await user.type(screen.getByLabelText('Password'), password)
         })
-
-        // enter email address and password
-        await user.type(screen.getByLabelText('Email'), validEmail)
-        await user.type(screen.getByLabelText('Password'), password)
 
         const loginButton = screen.getByText('Log In')
         await act(async () => {
             await user.click(loginButton)
         })
-        expect(
-            mockAuthHelperFunctions[AuthHelpers.LoginRegisteredUserB2C].mutateAsync
-        ).toHaveBeenCalledWith({username: validEmail, password: password})
+
+        // Wait for the form submission to complete
+        await waitFor(() => {
+            expect(
+                mockAuthHelperFunctions[AuthHelpers.LoginRegisteredUserB2C].mutateAsync
+            ).toHaveBeenCalledWith({username: validEmail, password: password})
+        })
+
+        // Wait for any remaining async form state updates to complete
+        await waitFor(
+            () => {
+                expect(loginButton).not.toBeDisabled()
+            },
+            {timeout: 3000}
+        )
     })
 })
 
@@ -169,18 +180,21 @@ describe('passwordless enabled', () => {
 
     test('allows passwordless login', async () => {
         jest.spyOn(window, 'location', 'get').mockReturnValue({
-            pathname: '/checkout'
+            pathname: '/checkout',
+            origin: 'https://example.com'
         })
         const {user} = renderWithProviders(<ContactInfo isPasswordlessEnabled={true} />)
 
-        // enter a valid email address
-        await user.type(screen.getByLabelText('Email'), validEmail)
+        await act(async () => {
+            // enter a valid email address
+            await user.type(screen.getByLabelText('Email'), validEmail)
+        })
 
         // initiate passwordless login
         const passwordlessLoginButton = screen.getByText('Secure Link')
-        // Click the button twice as the isPasswordlessLoginClicked state doesn't change after the first click
-        await user.click(passwordlessLoginButton)
-        await user.click(passwordlessLoginButton)
+        await act(async () => {
+            await user.click(passwordlessLoginButton)
+        })
         expect(
             mockAuthHelperFunctions[AuthHelpers.AuthorizePasswordless].mutateAsync
         ).toHaveBeenCalledWith({
@@ -196,8 +210,10 @@ describe('passwordless enabled', () => {
             expect(withinForm.getByText(validEmail)).toBeInTheDocument()
         })
 
-        // resend the email
-        user.click(screen.getByText(/Resend Link/i))
+        await act(async () => {
+            // resend the email
+            await user.click(screen.getByText(/Resend Link/i))
+        })
         expect(
             mockAuthHelperFunctions[AuthHelpers.AuthorizePasswordless].mutateAsync
         ).toHaveBeenCalledWith({
@@ -210,18 +226,25 @@ describe('passwordless enabled', () => {
     test('allows login using password', async () => {
         const {user} = renderWithProviders(<ContactInfo isPasswordlessEnabled={true} />)
 
-        // enter a valid email address
-        await user.type(screen.getByLabelText('Email'), validEmail)
+        await act(async () => {
+            // enter a valid email address
+            await user.type(screen.getByLabelText('Email'), validEmail)
+        })
 
         // initiate login using password
         const passwordButton = screen.getByText('Password')
-        await user.click(passwordButton)
-
-        // enter a password
-        await user.type(screen.getByLabelText('Password'), password)
+        await act(async () => {
+            await user.click(passwordButton)
+        })
+        await act(async () => {
+            // enter a password
+            await user.type(screen.getByLabelText('Password'), password)
+        })
 
         const loginButton = screen.getByText('Log In')
-        await user.click(loginButton)
+        await act(async () => {
+            await user.click(loginButton)
+        })
         expect(
             mockAuthHelperFunctions[AuthHelpers.LoginRegisteredUserB2C].mutateAsync
         ).toHaveBeenCalledWith({username: validEmail, password: password})
@@ -251,11 +274,13 @@ describe('passwordless enabled', () => {
                 throw new Error(apiErrorMessage)
             })
             const {user} = renderWithProviders(<ContactInfo isPasswordlessEnabled={true} />)
-            await user.type(screen.getByLabelText('Email'), validEmail)
+            await act(async () => {
+                await user.type(screen.getByLabelText('Email'), validEmail)
+            })
             const passwordlessLoginButton = screen.getByText('Secure Link')
-            // Click the button twice as the isPasswordlessLoginClicked state doesn't change after the first click
-            await user.click(passwordlessLoginButton)
-            await user.click(passwordlessLoginButton)
+            await act(async () => {
+                await user.click(passwordlessLoginButton)
+            })
             await waitFor(() => {
                 expect(screen.getByText(expectedMessage)).toBeInTheDocument()
             })
