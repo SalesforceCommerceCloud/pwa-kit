@@ -183,6 +183,7 @@ const Header = ({
                         <Popover.Root
                             lazyMount
                             unmountOnExit
+                            defaultOpen={false}
                             positioning={{placement: 'bottom-end'}}
                         >
                             <Popover.Trigger asChild>
