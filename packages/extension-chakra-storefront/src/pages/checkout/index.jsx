@@ -78,9 +78,7 @@ const Checkout = () => {
                                     <Alert.Indicator>
                                         <AlertIcon color="red.500" boxSize={4} />
                                     </Alert.Indicator>
-                                    <Alert.Description>
-                                        {error}
-                                    </Alert.Description>
+                                    <Alert.Description>{error}</Alert.Description>
                                 </Alert.Root>
                             )}
 
