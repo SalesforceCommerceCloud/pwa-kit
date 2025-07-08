@@ -6,17 +6,9 @@
  */
 import React from 'react'
 import PropTypes from 'prop-types'
-import {FormattedMessage, useIntl} from 'react-intl'
 
 // Chakra Components
-import {
-    Box,
-    Fade,
-    Flex,
-    Stack,
-    Text,
-    VisuallyHidden
-} from '@salesforce/retail-react-app/app/components/shared/ui'
+import {Box, Fade, Flex, Stack, Text} from '@salesforce/retail-react-app/app/components/shared/ui'
 
 // Project Components
 import {HideOnDesktop, HideOnMobile} from '@salesforce/retail-react-app/app/components/responsive'
@@ -26,7 +18,8 @@ import CartItemVariantName from '@salesforce/retail-react-app/app/components/ite
 import CartItemVariantAttributes from '@salesforce/retail-react-app/app/components/item-variant/item-attributes'
 import CartItemVariantPrice from '@salesforce/retail-react-app/app/components/item-variant/item-price'
 import LoadingSpinner from '@salesforce/retail-react-app/app/components/loading-spinner'
-import QuantityPicker from '@salesforce/retail-react-app/app/components/quantity-picker'
+import BonusProductQuantity from '@salesforce/retail-react-app/app/components/product-item/bonus-product-quantity'
+import ProductQuantityPicker from '@salesforce/retail-react-app/app/components/product-item/product-quantity-picker'
 
 // Utilities
 import {noop} from '@salesforce/retail-react-app/app/utils/utils'
@@ -53,7 +46,6 @@ const ProductItem = ({
     const {stepQuantity, showInventoryMessage, inventoryMessage, quantity, setQuantity} =
         useDerivedProduct(product)
     const {currency: activeCurrency} = useCurrency()
-    const intl = useIntl()
     return (
         <Box
             position="relative"
@@ -67,7 +59,7 @@ const ProductItem = ({
                         <Stack spacing={3} flex={1}>
                             <Stack spacing={1}>
                                 <CartItemVariantName />
-                                <CartItemVariantAttributes />
+                                <CartItemVariantAttributes excludeBonusLabel />
                                 <HideOnDesktop>
                                     <Box marginTop={2}>
                                         <CartItemVariantPrice
@@ -80,67 +72,17 @@ const ProductItem = ({
 
                             <Flex align="flex-end" justify="space-between">
                                 <Stack spacing={1}>
-                                    <Text
-                                        fontSize="sm"
-                                        color="gray.700"
-                                        aria-label={intl.formatMessage(
-                                            {
-                                                id: 'item_variant.quantity.label',
-                                                defaultMessage:
-                                                    'Quantity selector for {productName}. Selected quantity is {quantity}'
-                                            },
-                                            {
-                                                quantity: product?.quantity,
-                                                productName: product?.name
-                                            }
-                                        )}
-                                    >
-                                        <FormattedMessage
-                                            defaultMessage="Quantity:"
-                                            id="product_item.label.quantity"
+                                    {product.bonusProductLineItem ? (
+                                        <BonusProductQuantity product={product} />
+                                    ) : (
+                                        <ProductQuantityPicker
+                                            product={product}
+                                            onItemQuantityChange={onItemQuantityChange}
+                                            stepQuantity={stepQuantity}
+                                            quantity={quantity}
+                                            setQuantity={setQuantity}
                                         />
-                                    </Text>
-                                    <QuantityPicker
-                                        step={stepQuantity}
-                                        value={quantity}
-                                        min={0}
-                                        clampValueOnBlur={false}
-                                        onBlur={(e) => {
-                                            // Default to last known quantity if a user leaves the box with an invalid value
-                                            const {value} = e.target
-
-                                            if (!value) {
-                                                setQuantity(product.quantity)
-                                            }
-                                        }}
-                                        onChange={(stringValue, numberValue) => {
-                                            // Set the Quantity of product to value of input if value number
-                                            if (numberValue >= 0) {
-                                                // Call handler
-                                                onItemQuantityChange(numberValue).then(
-                                                    (isValidChange) =>
-                                                        isValidChange && setQuantity(numberValue)
-                                                )
-                                            } else if (stringValue === '') {
-                                                // We want to allow the use to clear the input to start a new input so here we set the quantity to '' so NAN is not displayed
-                                                // User will not be able to add '' quantity to the cart due to the add to cart button enablement rules
-                                                setQuantity(stringValue)
-                                            }
-                                        }}
-                                        productName={product?.name}
-                                    />
-                                    <VisuallyHidden role="status">
-                                        {product?.name}
-                                        {intl.formatMessage(
-                                            {
-                                                id: 'item_variant.assistive_msg.quantity',
-                                                defaultMessage: 'Quantity {quantity}'
-                                            },
-                                            {
-                                                quantity: product?.quantity
-                                            }
-                                        )}
-                                    </VisuallyHidden>
+                                    )}
                                 </Stack>
                                 <Stack>
                                     <HideOnMobile>
