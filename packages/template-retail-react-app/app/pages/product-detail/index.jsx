@@ -721,14 +721,10 @@ const ProductDetail = () => {
                                                 }
                                                 addToCart={
                                                     isProductASet
-                                                        ? (variant, quantity) =>
-                                                              handleAddToCart([
-                                                                  {
-                                                                      product: childProduct,
-                                                                      variant,
-                                                                      quantity
-                                                                  }
-                                                              ])
+                                                        ? (productSelectionValues) =>
+                                                              handleAddToCart(
+                                                                  productSelectionValues
+                                                              )
                                                         : null
                                                 }
                                                 addToWishlist={
