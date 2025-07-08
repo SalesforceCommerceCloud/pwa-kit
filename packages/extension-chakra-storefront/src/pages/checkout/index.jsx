@@ -23,6 +23,7 @@ import {API_ERROR_MESSAGE, TOAST_MESSAGE_REMOVED_ITEM_FROM_CART} from '../../con
 import useToast from '../../hooks/use-toast'
 import {useExtensionConfig} from '../../hooks'
 import LoadingSpinner from '../../components/loading-spinner'
+import {AlertIcon} from '../../components/icons'
 
 const Checkout = () => {
     const {formatMessage} = useIntl()
@@ -73,13 +74,13 @@ const Checkout = () => {
                     <GridItem>
                         <Stack gap={4}>
                             {error && (
-                                <Alert.Root colorPalette="red">
-                                    <Alert.Indicator />
-                                      <Alert.Content>
-                                            <Text fontSize="sm">
-                                                {error}
-                                            </Text>
-                                        </Alert.Content>
+                                <Alert.Root status="error" colorPalette="red">
+                                    <Alert.Indicator>
+                                        <AlertIcon color="red.500" boxSize={4} />
+                                    </Alert.Indicator>
+                                    <Alert.Description>
+                                        {error}
+                                    </Alert.Description>
                                 </Alert.Root>
                             )}
 
