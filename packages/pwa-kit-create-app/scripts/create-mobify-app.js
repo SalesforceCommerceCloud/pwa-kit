@@ -376,6 +376,7 @@ const runGenerator = (context, {outputDir, templateVersion, verbose}) => {
         // Copy template specific assets over.
         const assetsDir = p.join(ASSETS_TEMPLATES_DIR, id)
         if (sh.test('-e', assetsDir)) {
+            console.log(`Copying template-specific assets from ${assetsDir}`)
             getFiles(assetsDir)
                 .map((file) => file.replace(assetsDir, ''))
                 .forEach((relFilePath) =>
