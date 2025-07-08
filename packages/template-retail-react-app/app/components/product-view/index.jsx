@@ -292,17 +292,14 @@ const ProductView = forwardRef(
                     return
                 }
                 try {
-                    const itemsAdded = await addToCart([{variant, quantity}])
+                    const itemsAdded = await addToCart(variant, quantity)
                     // Open modal only when `addToCart` returns some data
                     // It's possible that the item has been added to cart, but we don't want to open the modal.
                     // See wishlist_primary_action for example.
                     if (itemsAdded) {
                         onAddToCartModalOpen({
                             product,
-                            itemsAdded: itemsAdded.map((item) => ({
-                                ...item,
-                                product // attach the full product object
-                            })),
+                            itemsAdded,
                             selectedQuantity: quantity
                         })
                     }
@@ -716,7 +713,7 @@ const ProductView = forwardRef(
                                                             }
                                                         >
                                                             <FormattedMessage
-                                                                defaultMessage="Pickup in Store"
+                                                                defaultMessage="Pick Up in Store"
                                                                 id="product_view.label.pickup_in_store"
                                                             />
                                                         </Radio>
@@ -739,7 +736,7 @@ const ProductView = forwardRef(
                                                                   {
                                                                       id: 'product_view.status.in_stock_at_store',
                                                                       defaultMessage:
-                                                                          'In Stock at {storeName}'
+                                                                          'In stock at {storeName}'
                                                                   },
                                                                   {
                                                                       storeName: (
@@ -789,7 +786,7 @@ const ProductView = forwardRef(
                                                         data-testid="pickup-select-store-msg"
                                                     >
                                                         <FormattedMessage
-                                                            defaultMessage="Pickup in "
+                                                            defaultMessage="Pick up in "
                                                             id="product_view.label.pickup_in_select_store_prefix"
                                                         />{' '}
                                                         <Link

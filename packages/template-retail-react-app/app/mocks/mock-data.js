@@ -5711,3 +5711,52 @@ export const mockPasswordUpdateFalure = {
     detail: 'The update password request is invalid. Customer\u0027s current password is not valid',
     errorMessage: 'Customer\u0027s current password is not valid'
 }
+
+export const mockBasketWithBonusProducts = {
+    baskets: [
+        {
+            ...mockCustomerBaskets.baskets[0],
+            productItems: [
+                {
+                    adjustedTax: 2.93,
+                    basePrice: 61.43,
+                    bonusProductLineItem: false,
+                    gift: false,
+                    itemId: '4a9af0a24fe46c3f6d8721b371',
+                    itemText: 'Belted Cardigan With Studs',
+                    price: 61.43,
+                    priceAfterItemDiscount: 61.43,
+                    priceAfterOrderDiscount: 61.43,
+                    productId: '701642889830M',
+                    productName: 'Belted Cardigan With Studs',
+                    quantity: 2,
+                    shipmentId: 'me',
+                    tax: 2.93,
+                    taxBasis: 61.43,
+                    taxClassId: 'standard',
+                    taxRate: 0.05
+                },
+                {
+                    adjustedTax: 0,
+                    basePrice: 0,
+                    bonusProductLineItem: true,
+                    gift: false,
+                    itemId: '5b1a03848f0807f99f37ea93e4',
+                    itemText: 'Free Gift with Purchase',
+                    price: 0,
+                    priceAfterItemDiscount: 0,
+                    priceAfterOrderDiscount: 0,
+                    productId: '013742335262M',
+                    productName: 'Free Gift with Purchase',
+                    quantity: 1,
+                    shipmentId: 'me',
+                    tax: 0,
+                    taxBasis: 0,
+                    taxClassId: 'standard',
+                    taxRate: 0.05
+                }
+            ]
+        }
+    ],
+    total: 1
+}

@@ -14,7 +14,8 @@ import {
     mockCustomerBaskets,
     mockEmptyBasket,
     mockCartVariant,
-    mockedCustomerProductLists
+    mockedCustomerProductLists,
+    mockBasketWithBonusProducts
 } from '@salesforce/retail-react-app/app/mocks/mock-data'
 import mockVariant from '@salesforce/retail-react-app/app/mocks/variant-750518699578M'
 import {rest} from 'msw'
@@ -1226,6 +1227,35 @@ describe('Product bundles', () => {
                 expect(screen.getByText(/women's clothing test bundle/i)).toBeInTheDocument()
             })
         })
+    })
+})
+
+describe('Bonus products', () => {
+    beforeEach(() => {
+        prependHandlersToServer([
+            {
+                path: '*/customers/:customerId/baskets',
+                method: 'get',
+                res: () => mockBasketWithBonusProducts
+            }
+        ])
+    })
+
+    test('renders bonus products in cart with correct styling and no quantity picker', async () => {
+        renderWithProviders(<Cart />)
+
+        // Wait for the cart to load
+        await waitFor(() => {
+            expect(screen.queryByTestId('sf-cart-skeleton')).not.toBeInTheDocument()
+        })
+
+        // Find products by their names
+        const regularProduct = screen.getByText('Belted Cardigan With Studs')
+        const bonusProduct = screen.getByText('Free Gift with Purchase')
+
+        expect(regularProduct).toBeInTheDocument()
+        expect(bonusProduct).toBeInTheDocument()
+        expect(within(bonusProduct).queryByTestId('quantity-picker')).not.toBeInTheDocument()
     })
 })
 

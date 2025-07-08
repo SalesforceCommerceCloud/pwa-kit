@@ -66,9 +66,10 @@ describe('StoreLocatorForm', () => {
         'store_locator.action.find': 'Find',
         'store_locator.description.or': 'Or',
         'store_locator.action.use_my_location': 'Use My Location',
-        'store_locator.error.please_enter_a_postal_code': 'Please enter a postal code.',
-        'store_locator.error.please_select_a_country': 'Please select a country.',
-        'store_locator.error.agree_to_share_your_location': 'Please agree to share your location'
+        'store_locator.error.please_enter_a_postal_code': 'Enter a postal code.',
+        'store_locator.error.please_select_a_country': 'Select a country.',
+        'store_locator.error.agree_to_share_your_location':
+            'To use your location, enable location sharing.'
     }
 
     const TestWrapper = ({children}) => (
@@ -164,7 +165,7 @@ describe('StoreLocatorForm', () => {
         await user.click(findButton)
 
         await waitFor(() => {
-            const errorMessage = screen.getByText('Please enter a postal code.')
+            const errorMessage = screen.getByText('Enter a postal code.')
             expect(errorMessage).toBeInTheDocument()
         })
     })
