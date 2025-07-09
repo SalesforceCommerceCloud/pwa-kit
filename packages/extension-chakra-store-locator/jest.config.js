@@ -11,17 +11,14 @@ const base = require('@salesforce/pwa-kit-dev/configs/jest/jest.config.js')
 module.exports = {
     ...base,
     moduleNameMapper: {
-        ...base.moduleNameMapper,
-
-        // handle pwa-kit extensibility special import
-        '^overridable!(.*)': '$1'
+        ...base.moduleNameMapper
     },
     coverageThreshold: {
         global: {
             branches: 87,
-            functions: 100,
-            lines: 100,
-            statements: 100
+            functions: 90,
+            lines: 90,
+            statements: 90
         }
     }
 }

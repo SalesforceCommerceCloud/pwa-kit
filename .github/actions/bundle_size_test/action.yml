@@ -1,8 +1,39 @@
-name: bundlesize
+name: bundle_size_test
+inputs:
+  cwd:
+    required: true
+  config:
+    required: true
 runs:
   using: composite
   steps:
-  - name: Check bundle size
+  - name: Analyze build
+    working-directory: ${{ inputs.cwd }}
     run: |-
-        npm run test:max-file-size
+        npm run analyze-build
+    shell: bash
+
+  - name: Check bundle sizes
+    working-directory: ${{ inputs.cwd }}
+    # NOTE: A bug prevented us from running bundlesize with a config file:
+    # npx bundlesize --scope ${{ github.action_path }}/bundlesize.config.json
+    # For more details, see https://github.com/siddharthkp/bundlesize/issues/326
+    run: |-
+        json_string='${{ inputs.config }}'
+
+        if ! echo "$json_string" | jq '.' > /dev/null 2>&1; then
+          echo "::error::Invalid JSON input provided: $json_string"
+          exit 1
+        fi
+
+        # Parse the given json string and build the command to run
+        echo "$json_string" | jq -r 'to_entries[] | "npx bundlesize -f \"" + .key + "\" -s " + .value' | while IFS= read -r command; do
+          echo "Executing: $command"
+          eval "$command"
+        done
+    shell: bash
+
+  - name: Report bundle sizes
+    run: |-
+        node ./scripts/report-bundle-size.js ${{ inputs.cwd }}/build
     shell: bash

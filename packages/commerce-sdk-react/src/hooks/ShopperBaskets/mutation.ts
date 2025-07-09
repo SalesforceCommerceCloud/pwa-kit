@@ -4,13 +4,9 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import {ApiClients, ApiMethod, Argument, CacheUpdateGetter, DataType, MergedOptions} from '../types'
-import {useMutation} from '../useMutation'
-import {UseMutationResult} from '@tanstack/react-query'
-import useCommerceApi from '../useCommerceApi'
+import {ApiClients} from '../types'
+import {createUseMutation, MethodsOf} from '../createUseMutation'
 import {cacheUpdateMatrix} from './cache'
-
-type Client = ApiClients['shopperBaskets']
 
 /**
  * Mutations available for Shopper Baskets.
@@ -163,34 +159,21 @@ export const ShopperBasketsMutations = {
 } as const
 
 /**
- * Type for Shopper Baskets Mutation.
+ * Mutation for Shopper Baskets.
  * @group ShopperBaskets
  * @category Mutation
  */
-export type ShopperBasketsMutation =
-    (typeof ShopperBasketsMutations)[keyof typeof ShopperBasketsMutations]
+export type ShopperBasketsMutation = MethodsOf<ApiClients['shopperBaskets']>
 
 /**
  * Mutation hook for Shopper Baskets.
  * @group ShopperBaskets
  * @category Mutation
  */
-export function useShopperBasketsMutation<Mutation extends ShopperBasketsMutation>(
-    mutation: Mutation
-): UseMutationResult<DataType<Client[Mutation]>, unknown, Argument<Client[Mutation]>> {
-    const getCacheUpdates = cacheUpdateMatrix[mutation]
-
-    // The `Options` and `Data` types for each mutation are similar, but distinct, and the union
-    // type generated from `Client[Mutation]` seems to be too complex for TypeScript to handle.
-    // I'm not sure if there's a way to avoid the type assertions in here for the methods that
-    // use them. However, I'm fairly confident that they are safe to do, as they seem to be simply
-    // re-asserting what we already have.
-    const {shopperBaskets: client} = useCommerceApi()
-    type Options = Argument<Client[Mutation]>
-    type Data = DataType<Client[Mutation]>
-    return useMutation({
-        client,
-        method: (opts: Options) => (client[mutation] as ApiMethod<Options, Data>)(opts),
-        getCacheUpdates: getCacheUpdates as CacheUpdateGetter<MergedOptions<Client, Options>, Data>
-    })
-}
+export const useShopperBasketsMutation = createUseMutation<
+    'shopperBaskets',
+    ShopperBasketsMutation
+>({
+    clientKey: 'shopperBaskets',
+    getCacheUpdates: (mutation) => cacheUpdateMatrix[mutation]
+})

@@ -10,9 +10,6 @@ import glob from 'glob'
 import {makeRegExp} from './utils'
 
 const projectDir = process.cwd()
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const pkg = require(resolve(projectDir, 'package.json'))
-
 const OVERRIDES_EXTENSIONS = '.+(js|jsx|ts|tsx)'
 
 const getOverridePath = (relativePath) => {
@@ -29,7 +26,7 @@ const getOverridePath = (relativePath) => {
               'pwa-kit-react-sdk',
               'ssr',
               'universal',
-              ...relativePath.filter((item) => item !== 'app')
+              ...relativePath.filter((item) => item !== 'src')
           )
 }
 
@@ -44,23 +41,23 @@ export const sdkReplacementPlugin = () => {
     const overridables = [
         {
             path: makeRegExp('pwa-kit-react-sdk(/dist)?/ssr/universal/components/_app-config$'),
-            newPath: getOverridePath(['app', 'components', '_app-config', 'index'])
+            newPath: getOverridePath(['src', 'components', '_app-config', 'index'])
         },
         {
             path: makeRegExp('pwa-kit-react-sdk(/dist)?/ssr/universal/components/_document$'),
-            newPath: getOverridePath(['app', 'components', '_document', 'index'])
+            newPath: getOverridePath(['src', 'components', '_document', 'index'])
         },
         {
             path: makeRegExp('pwa-kit-react-sdk(/dist)?/ssr/universal/components/_app$'),
-            newPath: getOverridePath(['app', 'components', '_app', 'index'])
+            newPath: getOverridePath(['src', 'components', '_app', 'index'])
         },
         {
             path: makeRegExp('pwa-kit-react-sdk(/dist)?/ssr/universal/components/_error$'),
-            newPath: getOverridePath(['app', 'components', '_error', 'index'])
+            newPath: getOverridePath(['src', 'components', '_error', 'index'])
         },
         {
             path: makeRegExp('pwa-kit-react-sdk(/dist)?/ssr/universal/routes$'),
-            newPath: getOverridePath(['app', 'routes'])
+            newPath: getOverridePath(['src', 'routes'])
         }
     ]
 

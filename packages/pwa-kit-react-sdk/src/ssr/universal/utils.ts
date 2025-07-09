@@ -18,12 +18,7 @@ import {bundleBasePath} from '@salesforce/pwa-kit-runtime/utils/ssr-namespace-pa
 
 const onClient = typeof window !== 'undefined'
 
-const EXTENIONS_NAMESPACE = '__extensions'
 const STATIC_FOLDER = 'static'
-
-type GetAssetUrlOptions = {
-    appExtensionPackageName?: string
-}
 
 /**
  * Get the URL that should be used to load an asset from the bundle.
@@ -43,33 +38,28 @@ export const getAssetUrl = (path: string) => {
 }
 
 // TODO: Once we establish that we have a new @salesforce/pwa-kit-extensibility package, we can move this utility to
-// it as to not have direct references to extensibilty in the sdk. This will also reduce duplicate code.
+// it as to not have direct references to extensibility in the sdk. This will also reduce duplicate code.
 /**
  * Get the URL that should be used to load a static asset from the bundle.
  *
  * @param {string} path - Relative path from the build directory to the asset.
- * @param {Object} opts - Options for generating the asset URL.
- * @param {string} [opts.appExtensionPackageName] - Optional package name for an application extension.
  * @function
  * @returns {string} The full URL to the static asset.
  */
-export const getStaticAssetUrl = (path: string, opts: GetAssetUrlOptions) => {
-    const {appExtensionPackageName = ''} = opts || {}
-
+export const getStaticAssetUrl = (path = '') => {
     /* istanbul ignore next */
-    const publicPath = onClient
-        ? // @ts-ignore
-          `${window.Progressive.buildOrigin as string}`
-        : `${bundleBasePath}/${process.env.BUNDLE_ID || 'development'}/`
+    let publicPath = getAssetUrl('')
 
     // Ensure all defined path arguments start with `/`.
     if (path && !path.startsWith('/')) {
         path = `/${path}`
     }
 
-    return `${publicPath}/${STATIC_FOLDER}${
-        appExtensionPackageName ? `/${EXTENIONS_NAMESPACE}/${appExtensionPackageName}` : ''
-    }${path ? path : ''}`
+    if (publicPath && !publicPath.endsWith('/')) {
+        publicPath = `${publicPath}/`
+    }
+
+    return `${publicPath}${STATIC_FOLDER}${path ? path : ''}`
 }
 
 /**

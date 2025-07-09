@@ -4,18 +4,22 @@ inputs:
     description: Project directory
     default: ${{ github.workspace }}
   TARGET:
-    description: MRT target
+    description: MRT target environment
   FLAGS:
     description: Push flags
+  PROJECT:
+    description: MRT target project
+    default: "scaffold-pwa"
+  MESSAGE:
+    description: Bundle message / name
+    default: "build ${{ github.run_id }} on ${{ github.ref }} (${{ github.sha }})"
 runs:
   using: composite
   steps:
     - name: Push Bundle to MRT
       run: |-
         cd ${{ inputs.CWD }}
-        project="scaffold-pwa"
-        build="build ${{ github.run_id }} on ${{ github.ref }} (${{ github.sha }})"
         if [[ ${{ inputs.TARGET }} ]]; then
-          npm run push -- -s $project --message "$build" --target ${{ inputs.TARGET }} ${{ inputs.FLAGS }}
+          npm run push -- -s ${{ inputs.PROJECT }} --message "${{ inputs.MESSAGE }}" --target ${{ inputs.TARGET }} ${{ inputs.FLAGS }}
         fi
       shell: bash

@@ -1,21 +1,33 @@
-## v3.2.0-extensibility-preview.4 (Feb 12, 2025)
+## v4.0.0-dev (Mar 07, 2025)
+- Migrate directory structure from `app/*` to `src/*` [#2693](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2693)
+- Upgrade `@tanstack/react-query` to v5 [#2303](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2303)
+- Refactor all API hooks to use the new `createUseQuery` and `createUseMutation` hook [#2353](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2353)
+
+## v3.3.0-extensibility-preview.4 (Feb 12, 2025)
 - Add `ServerContext` type for `useServerContext` hook [#2239](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2239)
 
-## v3.2.0-preview.3 (Feb 12, 2025)
-## v3.1.1-preview.3 (Dec 13, 2024)
-## v3.1.1-preview.3 (Dec 13, 2024)
-## v3.1.1-preview.2 (Dec 09, 2024)
-## v3.1.1-preview.1 (Dec 09, 2024)
-## v4.0.0-extensibility-preview.2 (Dec 09, 2024)
-## v3.1.1-preview.1 (Dec 09, 2024)
-## v3.1.1-preview.0 (Dec 02, 2024)
+## v3.3.0-dev.1 (Apr 30, 2025)
+- Fix inconsistency between dwsid and access token for guest login when hybrid authentication is enabled [#2397](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2397)
 
-## v3.2.0-dev (Oct 29, 2024)
+## v3.3.0-dev (Feb 18, 2025)
+- Invalidate cache instead of removing cache when triggering logout [#2323](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2323)
+- Fix dependencies vulnerabilities [#2338](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2338)
+- Allow custom parameters/body to be passed to SLAS authorize/authenticate calls via commerce-sdk-react auth helpers [#2358](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2358)
+
+## v3.2.1 (Mar 05, 2025)
+- Update PWA-Kit SDKs to v3.9.1 [#2301](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2301)
+
+## v3.2.0 (Feb 18, 2025)
+
 - Allow cookies for ShopperLogin API [#2190](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2190
 - Fix refresh token TTL warning from firing when override is not provided [#2114](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2114)
-
+- Readme updates for private clients [#2212](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2212)
 - Update CacheUpdateMatrix for mergeBasket mutation [#2138](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2092)
 - Clear auth state if session has been invalidated by a password change [#2092](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2092)
+- DNT interface improvement [#2203](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2203)
+- Support Node 22 [#2218](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2218)
+- Add `authorizeIDP`, `loginIDPUser`, `authorizePasswordless`, `getPasswordLessAccessToken`, `getPasswordResetToken`, and `resetPassword` wrapper functions to support Social Login, Passwordless Login, and Password Reset [#2079] (https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2079)
+
 
 ## v3.1.0 (Oct 28, 2024)
 

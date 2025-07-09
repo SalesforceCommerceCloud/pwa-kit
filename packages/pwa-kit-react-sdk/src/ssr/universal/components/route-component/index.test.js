@@ -7,7 +7,7 @@
 
 import React from 'react'
 import {render, screen, waitFor} from '@testing-library/react'
-import {getRoutes, routeComponent} from './index'
+import {getAllRoutes, routeComponent} from './index'
 // TODO: The way mocks are set up in this file is kinda weird...
 /* eslint-disable @typescript-eslint/no-var-requires */
 
@@ -285,9 +285,9 @@ describe('The routeComponent component', () => {
     })
 })
 
-describe('getRoutes', () => {
-    test('wraps components with the routeComponent HOC', () => {
-        const mappedRoutes = getRoutes()
+describe('getAllRoutes', () => {
+    test('wraps components with the routeComponent HOC', async () => {
+        const mappedRoutes = await getAllRoutes()
         expect(mappedRoutes).toHaveLength(3)
         const [first, second, third] = mappedRoutes
 

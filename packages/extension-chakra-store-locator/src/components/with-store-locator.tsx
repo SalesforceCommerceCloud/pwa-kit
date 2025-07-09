@@ -5,10 +5,10 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
-import {useExtensionStore} from '../hooks/use-extension-store'
 import {Config as StoreLocatorConfig} from '../types/config'
 import {StoreLocatorProvider} from './provider'
 import {StoreLocatorModal} from './modal'
+import {useStoreLocator} from './use-store-locator'
 
 /**
  * Higher-order component that wraps a component with the StoreLocatorProvider
@@ -20,13 +20,22 @@ export const withStoreLocator = <P extends object>(
     config: StoreLocatorConfig
 ): React.ComponentType<P> => {
     const WithConfig = (props: P) => {
-        const {isModalOpen, closeModal} = useExtensionStore()
-
         return (
             <StoreLocatorProvider config={config}>
+                <WithModalContent {...props} />
+            </StoreLocatorProvider>
+        )
+    }
+
+    // Inner component that has access to the context
+    const WithModalContent = (props: P) => {
+        const {isModalOpen, closeModal} = useStoreLocator()
+
+        return (
+            <>
                 <WrappedComponent {...props} />
                 <StoreLocatorModal isOpen={isModalOpen} onClose={closeModal} />
-            </StoreLocatorProvider>
+            </>
         )
     }
 

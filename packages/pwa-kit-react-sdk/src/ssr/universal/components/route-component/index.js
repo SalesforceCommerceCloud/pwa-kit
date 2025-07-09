@@ -11,7 +11,7 @@ import hoistNonReactStatic from 'hoist-non-react-statics'
 import {AppErrorContext} from '../../components/app-error-boundary'
 import Throw404 from '../../components/throw-404'
 import {getAppConfig} from '../../compatibility'
-import routes from '../../routes'
+import appRoutes from '../../routes'
 import {pages as pageEvents} from '../../events'
 import {withLegacyGetProps} from '../../components/with-legacy-get-props'
 import Refresh from '../refresh'
@@ -396,30 +396,34 @@ export const routeComponent = (Wrapped, isPage, locals) => {
 }
 
 /**
- * Wrap all the components found in the application's route config with the
- * route-component HOC so that they all support `getProps` methods server-side
- * and client-side in the same way.
+ * Get all of the routes, including those from the app itself, the app
+ * extensions, and the SDK's internal routes.
+ *
+ * Also, wrap each route's component with the route-component HOC so that
+ * they all support `getProps` methods server-side and client-side in the same way.
  *
  * @private
  */
-export const getRoutes = (locals = {}) => {
-    let _routes = routes
+export const getAllRoutes = async (locals = {}) => {
     const {applicationExtensions = []} = locals
-    if (typeof routes === 'function') {
-        _routes = routes()
-    }
-
-    // Call the `extendRoutes` function for all the Application Extensions.
-    applicationExtensions.forEach((applicationExtension) => {
-        _routes = applicationExtension.extendRoutes(_routes)
-    })
+    const extensionRoutes = (
+        await Promise.all(
+            applicationExtensions.map((extension) =>
+                typeof extension.getRoutesAsync === 'function'
+                    ? extension.getRoutesAsync({locals})
+                    : extension.getRoutes({locals})
+            )
+        )
+    ).flat()
 
     const allRoutes = [
         // NOTE: this route needs to be above _routes, in case _routes has a fallback route of `path: '*'`
         {path: '/__pwa-kit/refresh', component: Refresh},
-        ..._routes,
+        ...extensionRoutes,
+        ...(typeof appRoutes === 'function' ? appRoutes() : appRoutes),
         {path: '*', component: Throw404}
     ]
+
     return allRoutes.map(({component, ...rest}) => {
         return {
             component: component ? routeComponent(component, true, locals) : component,

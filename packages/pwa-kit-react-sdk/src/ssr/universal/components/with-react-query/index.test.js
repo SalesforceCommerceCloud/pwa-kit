@@ -8,6 +8,12 @@ import {withReactQuery} from './index'
 import {render, screen} from '@testing-library/react'
 import React from 'react'
 import logger from '../../../../utils/logger-instance'
+import {PERFORMANCE_MARKS} from '../../../../utils/performance'
+
+jest.mock('@tanstack/react-query', () => ({
+    ...jest.requireActual('@tanstack/react-query'),
+    dehydrate: jest.fn().mockReturnValue({})
+}))
 
 jest.mock('../../../../utils/logger-instance', () => {
     return {
@@ -90,5 +96,145 @@ describe('withReactQuery', function () {
     test(`Has working getHOCsInUse method`, () => {
         expect(withReactQuery({}).getHOCsInUse()).toHaveLength(1)
         expect(withReactQuery({getHOCsInUse: () => ['xyz']}).getHOCsInUse()).toHaveLength(2)
+    })
+
+    test('Performance markers use hyphen as delimiter for displayName', async () => {
+        const mockPerformanceTimer = {
+            mark: jest.fn()
+        }
+
+        const mockQueryMeta = {
+            displayName: 'TestQuery'
+        }
+
+        const mockQueryCache = {
+            getAll: jest.fn().mockReturnValue([
+                {
+                    options: {enabled: true},
+                    meta: mockQueryMeta,
+                    queryHash: 'test-hash',
+                    fetch: jest.fn().mockResolvedValue({})
+                }
+            ])
+        }
+
+        const mockQueryClient = {
+            getQueryCache: jest.fn().mockReturnValue(mockQueryCache)
+        }
+
+        const res = {
+            locals: {
+                __queryClient: mockQueryClient
+            },
+            __performanceTimer: mockPerformanceTimer
+        }
+
+        const Component = withReactQuery({})
+
+        await Component.doInitAppState({
+            res,
+            appJSX: <div>Test</div>
+        })
+
+        expect(mockPerformanceTimer.mark).toHaveBeenCalledWith(
+            `${PERFORMANCE_MARKS.reactQueryUseQuery}.TestQuery-0`,
+            'start'
+        )
+
+        expect(mockPerformanceTimer.mark).toHaveBeenCalledWith(
+            `${PERFORMANCE_MARKS.reactQueryUseQuery}.TestQuery-0`,
+            'end',
+            expect.objectContaining({
+                detail: 'test-hash'
+            })
+        )
+    })
+
+    test('Performance markers use index as displayName when meta.displayName is not available', async () => {
+        const mockPerformanceTimer = {
+            mark: jest.fn()
+        }
+
+        const mockQueryCache = {
+            getAll: jest.fn().mockReturnValue([
+                {
+                    options: {enabled: true},
+                    meta: {},
+                    queryHash: 'test-hash',
+                    fetch: jest.fn().mockResolvedValue({})
+                }
+            ])
+        }
+
+        const mockQueryClient = {
+            getQueryCache: jest.fn().mockReturnValue(mockQueryCache)
+        }
+
+        const res = {
+            locals: {
+                __queryClient: mockQueryClient
+            },
+            __performanceTimer: mockPerformanceTimer
+        }
+
+        const Component = withReactQuery({})
+
+        await Component.doInitAppState({
+            res,
+            appJSX: <div>Test</div>
+        })
+
+        // Verify the performance marker uses just the index when no displayName is available
+        expect(mockPerformanceTimer.mark).toHaveBeenCalledWith(
+            `${PERFORMANCE_MARKS.reactQueryUseQuery}.0`,
+            'start'
+        )
+
+        expect(mockPerformanceTimer.mark).toHaveBeenCalledWith(
+            `${PERFORMANCE_MARKS.reactQueryUseQuery}.0`,
+            'end',
+            expect.objectContaining({
+                detail: 'test-hash'
+            })
+        )
+    })
+
+    test('Performance markers for reactQueryPrerender are set correctly', async () => {
+        const mockPerformanceTimer = {
+            mark: jest.fn()
+        }
+
+        const mockQueryCache = {
+            getAll: jest.fn().mockReturnValue([])
+        }
+
+        const mockQueryClient = {
+            getQueryCache: jest.fn().mockReturnValue(mockQueryCache)
+        }
+
+        const res = {
+            locals: {
+                __queryClient: mockQueryClient
+            },
+            __performanceTimer: mockPerformanceTimer
+        }
+
+        const Component = withReactQuery({})
+
+        await Component.doInitAppState({
+            res,
+            appJSX: <div>Test</div>
+        })
+
+        // Verify the performance markers for reactQueryPrerender are set correctly
+        expect(mockPerformanceTimer.mark).toHaveBeenCalledWith(
+            PERFORMANCE_MARKS.reactQueryPrerender,
+            'start'
+        )
+
+        expect(mockPerformanceTimer.mark).toHaveBeenCalledWith(
+            PERFORMANCE_MARKS.reactQueryPrerender,
+            'end'
+        )
     })
 })

@@ -21,10 +21,16 @@ import {updateCache} from './utils'
  * @enum
  */
 export const AuthHelpers = {
+    AuthorizePasswordless: 'authorizePasswordless',
+    LoginPasswordlessUser: 'getPasswordLessAccessToken',
+    AuthorizeIDP: 'authorizeIDP',
+    GetPasswordResetToken: 'getPasswordResetToken',
+    LoginIDPUser: 'loginIDPUser',
     LoginGuestUser: 'loginGuestUser',
     LoginRegisteredUserB2C: 'loginRegisteredUserB2C',
     Logout: 'logout',
     Register: 'register',
+    ResetPassword: 'resetPassword',
     UpdateCustomerPassword: 'updateCustomerPassword'
 } as const
 /**
@@ -53,6 +59,8 @@ type CacheUpdateMatrix = {
  * For more, see https://github.com/SalesforceCommerceCloud/commerce-sdk-isomorphic/#public-client-shopper-login-helpers
  *
  * Avaliable helpers:
+ * - authorizeIDP
+ * - loginIDPUser
  * - loginRegisteredUserB2C
  * - loginGuestUser
  * - logout
@@ -82,7 +90,8 @@ export function useAuthHelper<Mutation extends AuthHelper>(
     type Data = PromisedData extends Promise<infer D> ? D : never
     type Variables = [] extends Parameters<Method> ? void : Parameters<Method>[0]
     const method = auth[mutation].bind(auth) as MutationFunction<Data, Variables>
-    return useMutation(auth.whenReady(method), {
+    return useMutation({
+        mutationFn: auth.whenReady(method),
         onSuccess(data, options) {
             const getCacheUpdates = cacheUpdateMatrix[mutation]
 
@@ -99,7 +108,7 @@ const cacheUpdateMatrix: CacheUpdateMatrix = {
     loginGuestUser: noop,
     logout() {
         return {
-            remove: [{queryKey: ['/commerce-sdk-react']}]
+            invalidate: [{queryKey: ['/commerce-sdk-react']}]
         }
     },
     register: noop,

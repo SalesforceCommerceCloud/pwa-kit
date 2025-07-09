@@ -7,7 +7,7 @@
 import React from 'react'
 import hoistNonReactStatic from 'hoist-non-react-statics'
 import ssrPrepass from 'react-ssr-prepass'
-import {dehydrate, Hydrate, QueryClient, QueryClientProvider} from '@tanstack/react-query'
+import {dehydrate, HydrationBoundary, QueryClient, QueryClientProvider} from '@tanstack/react-query'
 import {FetchStrategy} from '../fetch-strategy'
 import {PERFORMANCE_MARKS} from '../../../../utils/performance'
 import logger from '../../../../utils/logger-instance'
@@ -54,9 +54,9 @@ export const withReactQuery = (Wrapped, options = {}) => {
 
             return (
                 <QueryClientProvider client={this.props.locals.__queryClient}>
-                    <Hydrate state={preloadedState}>
+                    <HydrationBoundary state={preloadedState}>
                         <Wrapped {...this.props} />
-                    </Hydrate>
+                    </HydrationBoundary>
                 </QueryClientProvider>
             )
         }
@@ -77,16 +77,16 @@ export const withReactQuery = (Wrapped, options = {}) => {
             await Promise.all(
                 queries.map((q, i) => {
                     // always include the index to avoid duplicate entries
-                    const displayName = q.meta?.displayName ? `${q.meta?.displayName}:${i}` : `${i}`
+                    const displayName = q.meta?.displayName ? `${q.meta?.displayName}-${i}` : `${i}`
                     res.__performanceTimer.mark(
-                        `${PERFORMANCE_MARKS.reactQueryUseQuery}::${displayName}`,
+                        `${PERFORMANCE_MARKS.reactQueryUseQuery}.${displayName}`,
                         'start'
                     )
                     return q
                         .fetch()
                         .then((result) => {
                             res.__performanceTimer.mark(
-                                `${PERFORMANCE_MARKS.reactQueryUseQuery}::${displayName}`,
+                                `${PERFORMANCE_MARKS.reactQueryUseQuery}.${displayName}`,
                                 'end',
                                 {
                                     detail: q.queryHash

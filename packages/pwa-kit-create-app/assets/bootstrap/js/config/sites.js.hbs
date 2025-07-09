@@ -10,6 +10,59 @@
 module.exports = [
     {
         id: '{{answers.project.commerce.siteId}}',
+        {{#if answers.project.demo.enableDemoSettings}}
+        l10n: {
+            supportedCurrencies: ['USD', 'GBP', 'EUR', 'CNY', 'JPY'],
+            defaultCurrency: 'USD',
+            defaultLocale: 'en-US',
+            supportedLocales: [
+                {
+                    id: 'en-US',
+                    preferredCurrency: 'USD'
+                },
+                {
+                    id: 'en-GB',
+                    preferredCurrency: 'GBP'
+                },
+                {
+                    id: 'de-DE',
+                    preferredCurrency: 'EUR'
+                },
+                {
+                    id: 'es-MX',
+                    preferredCurrency: 'MXN'
+                },
+                {
+                    id: 'fr-FR',
+                    preferredCurrency: 'EUR'
+                },
+                {
+                    id: 'it-IT',
+                    preferredCurrency: 'EUR'
+                },
+                {
+                    id: 'ja-JP',
+                    preferredCurrency: 'JPY'
+                },
+                {
+                    id: 'ko-KR',
+                    preferredCurrency: 'KRW'
+                },
+                {
+                    id: 'pt-BR',
+                    preferredCurrency: 'BRL'
+                },
+                {
+                    id: 'zh-CN',
+                    preferredCurrency: 'CNY'
+                },
+                {
+                    id: 'zh-TW',
+                    preferredCurrency: 'TWD'
+                }
+            ]
+        }
+        {{else}}
         l10n: {
             supportedCurrencies: ['USD'],
             defaultCurrency: 'USD',
@@ -22,5 +75,6 @@ module.exports = [
                 }
             ]
         }
+        {{/if}}
     }
 ]

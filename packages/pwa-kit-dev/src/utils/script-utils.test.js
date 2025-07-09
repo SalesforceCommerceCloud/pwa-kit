@@ -168,7 +168,7 @@ describe('scriptUtils', () => {
                 '@salesforce/pwa-kit-react-sdk',
                 dependencyTreeMockData.differentMinorVersions
             )
-            expect(lowestVersion).toBe('1.9.0')
+            expect(lowestVersion).toBe('1.10.0')
         })
 
         test('should work when patch version is different', async () => {
@@ -232,7 +232,7 @@ describe('scriptUtils', () => {
             originalCwd = process.cwd()
         })
         afterEach(() => process.chdir(originalCwd))
-        test('works in retail-react-app', async () => {
+        test('works in chakra-storefront', async () => {
             expect(await scriptUtils.getProjectDependencyTree()).toMatchObject({
                 name: '@salesforce/pwa-kit-dev',
                 version: pkg.version,
@@ -351,7 +351,6 @@ describe('scriptUtils', () => {
             expect(bundle.ssr_only).toEqual(['ssr.js'])
             expect(bundle.ssr_shared).toEqual(['ssr.js', 'static/favicon.ico'])
             expect(bundle.bundle_metadata).toHaveProperty('dependencies')
-            expect(bundle.bundle_metadata).toHaveProperty('cc_overrides')
 
             // De-code and re-encode gives the same result, to show that it *is* b64 encoded
             expect(Buffer.from(bundle.data, 'base64').toString('base64')).toEqual(bundle.data)

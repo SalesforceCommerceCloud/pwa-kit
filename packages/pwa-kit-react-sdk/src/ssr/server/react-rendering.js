@@ -21,10 +21,6 @@ import sprite from 'svg-sprite-loader/runtime/sprite.build'
 import {isRemote} from '@salesforce/pwa-kit-runtime/utils/ssr-server'
 import {proxyConfigs} from '@salesforce/pwa-kit-runtime/utils/ssr-shared'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
-import {
-    getApplicationExtensions,
-    withApplicationExtensions
-} from '@salesforce/pwa-kit-extension-sdk/react'
 
 import {getAssetUrl} from '../universal/utils'
 import {ServerContext, CorrelationIdProvider} from '../universal/contexts'
@@ -34,7 +30,7 @@ import Document from '../universal/components/_document'
 import Throw404 from '../universal/components/throw-404'
 import {getAppConfig} from '../universal/compatibility'
 import Switch from '../universal/components/switch'
-import {getRoutes, routeComponent} from '../universal/components/route-component'
+import {getAllRoutes, routeComponent} from '../universal/components/route-component'
 import * as errors from '../universal/errors'
 import logger from '../../utils/logger-instance'
 import PerformanceTimer, {PERFORMANCE_MARKS} from '../../utils/performance'
@@ -131,15 +127,8 @@ export const render = async (req, res, next) => {
 
     AppConfig.restore(res.locals)
 
-    // Use locals to thread the application extensions through the rendering pipeline.
-    const applicationExtensions = await getApplicationExtensions()
-
-    const WrappedApp = withApplicationExtensions(routeComponent(App, false, res.locals), {
-        applicationExtensions,
-        locals: res.locals
-    })
-
-    let routes = getRoutes(res.locals)
+    const routes = await getAllRoutes(res.locals)
+    const WrappedApp = routeComponent(App, false, res.locals)
 
     const [pathname] = req.originalUrl.split('?')
 
@@ -151,12 +140,6 @@ export const render = async (req, res, next) => {
     }
 
     // Step 1 - Find the match.
-
-    // Call `beforeRouteMatch` application extension hook.
-    applicationExtensions.forEach((applicationExtension) => {
-        routes = applicationExtension.beforeRouteMatch(routes)
-    })
-
     res.__performanceTimer.mark(PERFORMANCE_MARKS.routeMatching, 'start')
     let route
     let match

@@ -18,7 +18,7 @@
 <br /><br />
 The PWA Kit is a storefront technology for headless commerce using Salesforce Commerce APIs and React. It provides front-end developers with a more flexible and agile approach to build and maintain modern shopping experiences.
 <br/><br/>
-<img alt="pwa-kit banner" src="https://raw.githubusercontent.com/SalesforceCommerceCloud/pwa-kit/develop/packages/template-retail-react-app/app/static/img/hero.png" style="width: 700px; height:auto;">
+<img alt="pwa-kit banner" src="https://raw.githubusercontent.com/SalesforceCommerceCloud/pwa-kit/develop/packages/template-chakra-storefront/static/img/hero.png" style="width: 700px; height:auto;">
 
 </div>
 
@@ -55,7 +55,7 @@ npm run push -- -m "Message to help you recognize this bundle"
 
 ## 🌍 Localization
 
-See the [Localization README.md](./packages/template-retail-react-app/translations/README.md) for important setup instructions for localization.
+See the [Localization README.md](./packages/template-chakra-storefront/static/translations/README.md) for important setup instructions for localization.
 
 ## ⚠️ License Information
 
@@ -85,7 +85,7 @@ The full documentation for PWA Kit and Managed Runtime is hosted on the [Salesfo
 -   [Configuration Options](https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/configuration-options.html)
 -   [Proxy Requests](https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/proxying-requests.html)
 -   [Push and Deploy Bundles](https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/pushing-and-deploying-bundles.html)
--   [The Retail React App](https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/retail-react-app.html)
+-   [The Chakra Storefront](https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/retail-react-app.html)
 -   [Rendering](https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/rendering.html)
 -   [Routing](https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/routing.html)
 -   [Phased Headless Rollouts](https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/phased-headless-rollouts.html)

@@ -1,12 +1,23 @@
 name: e2e_generate_app
 inputs:
   PROJECT_KEY:
-    description: Project key to specify project to generate ("retail-app-demo")
+    description: Project key to specify project to generate ("chakra-storefront-demo")
     required: true
     type: string
+
+  TEMPLATE_VERSION:
+    description: Version of the template to use for the project
+    required: false
+    type: string
+
 runs:
   using: composite
   steps:
   - name: Generate new project based on project-key
-    run: node e2e/scripts/generate-project.js --project-key ${{ inputs.PROJECT_KEY }}
+    run: |
+      COMMAND="node e2e/scripts/generate-project.js --project-key ${{ inputs.PROJECT_KEY }}"
+      if [[ -n "${{ inputs.TEMPLATE_VERSION }}" ]]; then
+        COMMAND="$COMMAND --templateVersion ${{ inputs.TEMPLATE_VERSION }}"
+      fi
+      $COMMAND
     shell: bash

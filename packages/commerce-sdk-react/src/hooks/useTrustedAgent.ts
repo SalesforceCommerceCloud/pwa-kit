@@ -129,9 +129,15 @@ const useTrustedAgent = (): UseTrustedAgent => {
     const [agentId, setAgentId] = useState('')
     const [loginId, setLoginId] = useState('')
 
-    const authorizeTrustedAgent = useMutation(auth.authorizeTrustedAgent.bind(auth))
-    const loginTrustedAgent = useMutation(auth.loginTrustedAgent.bind(auth))
-    const logoutTrustedAgent = useMutation(auth.logout.bind(auth))
+    const authorizeTrustedAgent = useMutation({
+        mutationFn: auth.authorizeTrustedAgent.bind(auth)
+    })
+    const loginTrustedAgent = useMutation({
+        mutationFn: auth.loginTrustedAgent.bind(auth)
+    })
+    const logoutTrustedAgent = useMutation({
+        mutationFn: auth.logout.bind(auth)
+    })
 
     const login = useCallback(
         async (loginId?: string, usid?: string, refresh = false): Promise<TokenResponse> => {

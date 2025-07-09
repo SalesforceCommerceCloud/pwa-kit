@@ -1,0 +1,50 @@
+[
+  {
+    "id": "aria-allowed-attr",
+    "impact": "critical",
+    "description": "Ensure an element's role supports its ARIA attributes",
+    "help": "Elements must only use supported ARIA attributes",
+    "helpUrl": "https://dequeuniversity.com/rules/axe/4.10/aria-allowed-attr?application=playwright",
+    "nodes": [
+      {
+        "html": "<form id=\"...\" aria-haspopup=\"dialog\" aria-expanded=\"false\" aria-controls=\"popover-content-:RdalaqeqlbpH1:\">",
+        "failureSummary": "Fix all of the following:\n  ARIA attribute is not allowed: aria-expanded=\"false\"",
+        "target": [
+          "#popover-trigger-\\:RdalaqeqlbpH1\\:"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "list",
+    "impact": "serious",
+    "description": "Ensure that lists are structured correctly",
+    "help": "<ul> and <ol> must only directly contain <li>, <script> or <template> elements",
+    "helpUrl": "https://dequeuniversity.com/rules/axe/4.10/list?application=playwright",
+    "nodes": [
+      {
+        "html": "<ul class=\"...\" >",
+        "failureSummary": "Fix all of the following:\n  List element has direct children that are not allowed: hr, button",
+        "target": [
+          ".css-165casq"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "region",
+    "impact": "moderate",
+    "description": "Ensure all page content is contained by landmarks",
+    "help": "All page content should be contained by landmarks",
+    "helpUrl": "https://dequeuniversity.com/rules/axe/4.10/region?application=playwright",
+    "nodes": [
+      {
+        "html": "<input autocomplete=\"off\" type=\"search\" aria-label=\"Search for products...\" placeholder=\"Search for products...\" id=\"...\" class=\"...\">",
+        "failureSummary": "Fix any of the following:\n  Some page content is not contained by landmarks",
+        "target": [
+          "#popover-trigger-\\:RdalaqeqlbpH1\\: > .css-1igwmid.chakra-stack > .chakra-input__group.css-1y0e7gb > .css-va76oz"
+        ]
+      }
+    ]
+  }
+]

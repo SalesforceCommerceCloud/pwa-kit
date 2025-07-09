@@ -12,7 +12,8 @@ import {
     SET_COOKIE,
     CACHE_CONTROL,
     NO_CACHE,
-    X_ENCODED_HEADERS
+    X_ENCODED_HEADERS,
+    CONTENT_SECURITY_POLICY
 } from './constants'
 import {
     catchAndLog,
@@ -51,7 +52,6 @@ import awsServerlessExpress from 'aws-serverless-express'
 import expressLogging from 'morgan'
 import logger from '../../utils/logger-instance'
 import {createProxyMiddleware} from 'http-proxy-middleware'
-import {applyApplicationExtensions} from '@salesforce/pwa-kit-extension-sdk/express'
 
 /**
  * An Array of mime-types (Content-Type values) that are considered
@@ -133,9 +133,10 @@ export const RemoteServerFactory = {
 
             // A regex for identifying which SLAS endpoints the custom SLAS private
             // client secret handler will inject an Authorization header.
-            // Do not modify unless a project wants to customize additional SLAS
-            // endpoints that we currently do not support (ie. /oauth2/passwordless/token)
-            applySLASPrivateClientToEndpoints: /\/oauth2\/token/
+            // To allow additional SLAS endpoints, users can override this value in
+            // their project's ssr.js.
+            applySLASPrivateClientToEndpoints:
+                /\/oauth2\/(token|passwordless\/(login|token)|password\/(reset|action))/
         }
 
         options = Object.assign({}, defaults, options)
@@ -387,6 +388,8 @@ export const RemoteServerFactory = {
         const mixin = {
             options,
 
+            // Forcing a GC is no longer necessary, and will be
+            // skipped by default (unless FORCE_GC env-var is set).
             _collectGarbage() {
                 // Do global.gc in a separate 'then' handler so
                 // that all major variables are out of scope and
@@ -713,8 +716,7 @@ export const RemoteServerFactory = {
                     })
 
                     // We pattern match and add client secrets only to endpoints that
-                    // match the regex specified by options.applySLASPrivateClientToEndpoints.
-                    // By default, this regex matches only calls to SLAS /oauth2/token
+                    // match the regex specified by options.applySLASPrivateClientToEndpoints
                     // (see option defaults at the top of this file).
                     // Other SLAS endpoints, ie. SLAS authenticate (/oauth2/login) and
                     // SLAS logout (/oauth2/logout), use the Authorization header for a different
@@ -778,10 +780,6 @@ export const RemoteServerFactory = {
         // to add in their projects, like in any regular Express app.
         app.use(ssrMiddleware)
         app.use(errorHandlerMiddleware)
-
-        // NOTE: Think about changing the name of this function to `applyApplicationExtensions`. First look into
-        // what a common pattern is for application enhancement.
-        applyApplicationExtensions(app)
 
         if (options?.encodeNonAsciiHttpHeaders) {
             app.use(encodeNonAsciiMiddleware)
@@ -916,8 +914,27 @@ export const RemoteServerFactory = {
 
         const content = fs.readFileSync(workerFilePath, {encoding: 'utf8'})
 
+        // If the service worker is not updated when content security policy headers inside
+        // ssr.js are changed, then service worker initiated requests will continue to use
+        // the old CSP headers.
+        //
+        // This is problematic in stacked CDN setups where an old service worker with
+        // old CSPs can remain cached if the content of the service worker itself is not changed.
+        //
+        // To ensure the service worker is refetched when CSPs are changed, we factor in
+        // the CSP headers when generating the Etag.
+        //
+        // See https://gus.lightning.force.com/lightning/r/ADM_Work__c/a07EE000025yeu9YAA/view
+        // and https://salesforce-internal.slack.com/archives/C01GLHLBPT5/p1730739370922629
+        // for more details.
+
+        const contentSecurityPolicyHeader = res.getHeaders()[CONTENT_SECURITY_POLICY] || ''
+
         // Serve the file, with a strong ETag
-        res.set('etag', getHashForString(content))
+        // For this to be a valid ETag, the string must be placed between  ""
+        // See https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/ETag#etag_value for
+        // more details
+        res.set('etag', `"${getHashForString(content + contentSecurityPolicyHeader)}"`)
         res.set(CONTENT_TYPE, 'application/javascript')
         res.send(content)
     },
@@ -1029,12 +1046,15 @@ export const RemoteServerFactory = {
             context.callbackWaitsForEmptyEventLoop = false
 
             if (lambdaContainerReused) {
-                // DESKTOP-434 If this Lambda container is being reused,
-                // clean up memory now, so that we start with low usage.
-                // These regular GC calls take about 80-100 mS each, as opposed
-                // to forced GC calls, which occur randomly and can take several
-                // hundred mS.
-                app._collectGarbage()
+                const forceGarbageCollection = process.env.FORCE_GC
+                if (forceGarbageCollection && forceGarbageCollection.toLowerCase() === 'true') {
+                    // DESKTOP-434 If this Lambda container is being reused,
+                    // clean up memory now, so that we start with low usage.
+                    // These regular GC calls take about 80-100 mS each, as opposed
+                    // to forced GC calls, which occur randomly and can take several
+                    // hundred mS.
+                    app._collectGarbage()
+                }
                 app.sendMetric('LambdaReused')
             } else {
                 // This is the first use of this container, so set the

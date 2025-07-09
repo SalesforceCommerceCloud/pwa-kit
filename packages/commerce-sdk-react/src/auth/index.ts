@@ -15,7 +15,15 @@ import {jwtDecode, JwtPayload} from 'jwt-decode'
 import {ApiClientConfigParams, Prettify, RemoveStringIndex} from '../hooks/types'
 import {BaseStorage, LocalStorage, CookieStorage, MemoryStorage, StorageType} from './storage'
 import {CustomerType} from '../hooks/useCustomerType'
-import {getParentOrigin, isOriginTrusted, onClient, getDefaultCookieAttributes} from '../utils'
+import {
+    getParentOrigin,
+    isOriginTrusted,
+    onClient,
+    getDefaultCookieAttributes,
+    isAbsoluteUrl,
+    stringToBase64,
+    extractCustomParameters
+} from '../utils'
 import {
     MOBIFY_PATH,
     SLAS_PRIVATE_PROXY_PATH,
@@ -42,6 +50,7 @@ interface AuthConfig extends ApiClientConfigParams {
     silenceWarnings?: boolean
     logger: Logger
     defaultDnt?: boolean
+    passwordlessLoginCallbackURI?: string
     refreshTokenRegisteredCookieTTL?: number
     refreshTokenGuestCookieTTL?: number
 }
@@ -55,6 +64,21 @@ interface SlasJwtPayload extends JwtPayload {
     sub: string
     isb: string
     dnt: string
+}
+
+type AuthorizeIDPParams = Parameters<Helpers['authorizeIDP']>[1]
+type LoginIDPUserParams = Parameters<Helpers['loginIDPUser']>[2]
+type AuthorizePasswordlessParams = Parameters<Helpers['authorizePasswordless']>[2]
+type LoginPasswordlessParams = Parameters<Helpers['getPasswordLessAccessToken']>[2]
+type LoginRegisteredUserB2CCredentials = Parameters<Helpers['loginRegisteredUserB2C']>[1]
+
+/**
+ * This is a temporary type until we can make a breaking change and modify the signature for
+ * loginRegisteredUserB2C so that it takes in a body rather than just credentials
+ *
+ */
+type LoginRegisteredUserCredentialsWithCustomParams = LoginRegisteredUserB2CCredentials & {
+    options?: {body: helpers.CustomRequestBody}
 }
 
 /**
@@ -78,6 +102,8 @@ type AuthDataKeys =
     | 'access_token_sfra'
     | typeof DNT_COOKIE_NAME
     | typeof DWSID_COOKIE_NAME
+    | 'code_verifier'
+    | 'uido'
 
 type AuthDataMap = Record<
     AuthDataKeys,
@@ -87,6 +113,9 @@ type AuthDataMap = Record<
         callback?: (storage: BaseStorage) => void
     }
 >
+type DntOptions = {
+    includeDefaults: boolean
+}
 
 const isParentTrusted = isOriginTrusted(getParentOrigin())
 
@@ -173,6 +202,14 @@ const DATA_MAP: AuthDataMap = {
     dwsid: {
         storageType: 'cookie',
         key: DWSID_COOKIE_NAME
+    },
+    code_verifier: {
+        storageType: 'local',
+        key: 'code_verifier'
+    },
+    uido: {
+        storageType: 'local',
+        key: 'uido'
     }
 }
 
@@ -198,6 +235,8 @@ class Auth {
     private silenceWarnings: boolean
     private logger: Logger
     private defaultDnt: boolean | undefined
+    private isPrivate: boolean
+    private passwordlessLoginCallbackURI: string
     private refreshTokenRegisteredCookieTTL: number | undefined
     private refreshTokenGuestCookieTTL: number | undefined
     private refreshTrustedAgentHandler:
@@ -291,6 +330,15 @@ class Auth {
               config.clientSecret || ''
 
         this.silenceWarnings = config.silenceWarnings || false
+
+        this.isPrivate = !!this.clientSecret
+
+        const passwordlessLoginCallbackURI = config.passwordlessLoginCallbackURI
+        this.passwordlessLoginCallbackURI = passwordlessLoginCallbackURI
+            ? isAbsoluteUrl(passwordlessLoginCallbackURI)
+                ? passwordlessLoginCallbackURI
+                : `${baseUrl}${passwordlessLoginCallbackURI}`
+            : ''
     }
 
     get(name: AuthDataKeys) {
@@ -312,9 +360,21 @@ class Auth {
         storage.delete(key)
     }
 
-    getDnt() {
+    /**
+     * Return the value of the DNT cookie or undefined if it is not set.
+     * The DNT cookie being undefined means that there is a necessity to
+     * get the user's input for consent tracking, but not that there is no
+     * DNT value to apply to analytics layers. DNT value will default to
+     * a certain value and this is reflected by effectiveDnt.
+     *
+     * If the cookie value is invalid, then it will be deleted in this function.
+     *
+     * If includeDefaults is true, then even if the cookie is not defined,
+     * defaultDnt will be returned, if it exists. If defaultDnt is not defined, then
+     * the SDK Default will return (false)
+     */
+    getDnt(options?: DntOptions) {
         const dntCookieVal = this.get(DNT_COOKIE_NAME)
-        // Only '1' or '0' are valid, and invalid values, lack of cookie, or value conflict with token must be an undefined DNT
         let dntCookieStatus = undefined
         const accessToken = this.getAccessToken()
         let isInSync = true
@@ -327,6 +387,23 @@ class Auth {
         } else {
             dntCookieStatus = Boolean(Number(dntCookieVal))
         }
+
+        if (options?.includeDefaults) {
+            const defaultDnt = this.defaultDnt
+
+            let effectiveDnt
+            const dntCookie = dntCookieVal === '1' ? true : dntCookieVal === '0' ? false : undefined
+            if (dntCookie !== undefined) {
+                effectiveDnt = dntCookie
+            } else {
+                // If the cookie is not set, read the defaultDnt preference.
+                // If defaultDnt doesn't exist, default to false, following SLAS default for dnt
+                effectiveDnt = defaultDnt !== undefined ? defaultDnt : false
+            }
+
+            return effectiveDnt
+        }
+
         return dntCookieStatus
     }
 
@@ -397,22 +474,6 @@ class Auth {
         const validTimeSeconds = exp - iat - 60
         const tokenAgeSeconds = Date.now() / 1000 - iat
         return validTimeSeconds <= tokenAgeSeconds
-    }
-
-    /**
-     * Gets the Do-Not-Track (DNT) preference from the `dw_dnt` cookie.
-     * If user has set their DNT preference, read the cookie, if not, use the default DNT pref. If the default DNT pref has not been set, default to false.
-     */
-    private getDntPreference(dw_dnt: string | undefined, defaultDnt: boolean | undefined) {
-        let dntPref
-        // Read `dw_dnt` cookie
-        const dntCookie = dw_dnt === '1' ? true : dw_dnt === '0' ? false : undefined
-        dntPref = dntCookie
-
-        // If the cookie is not set, read the default DNT preference.
-        if (dntCookie === undefined) dntPref = defaultDnt !== undefined ? defaultDnt : undefined
-
-        return dntPref
     }
 
     /**
@@ -530,6 +591,8 @@ class Auth {
      * store the data in storage.
      */
     private handleTokenResponse(res: TokenResponse, isGuest: boolean) {
+        // Delete the SFRA auth token cookie if it exists
+        this.clearSFRAAuthToken()
         this.set('access_token', res.access_token)
         this.set('customer_id', res.customer_id)
         this.set('enc_user_id', res.enc_user_id)
@@ -553,6 +616,10 @@ class Auth {
             responseValue,
             defaultValue
         )
+        if (res.access_token) {
+            const {uido} = this.parseSlasJWT(res.access_token)
+            this.set('uido', uido)
+        }
         const expiresDate = this.convertSecondsToDate(refreshTokenTTLValue)
         this.set('refresh_token_expires_in', refreshTokenTTLValue.toString())
         this.set(refreshTokenKey, res.refresh_token, {
@@ -561,7 +628,7 @@ class Auth {
     }
 
     async refreshAccessToken() {
-        const dntPref = this.getDntPreference(this.get(DNT_COOKIE_NAME), this.defaultDnt)
+        const dntPref = this.getDnt({includeDefaults: true})
         const refreshTokenRegistered = this.get('refresh_token_registered')
         const refreshTokenGuest = this.get('refresh_token_guest')
         const refreshToken = refreshTokenRegistered || refreshTokenGuest
@@ -573,7 +640,7 @@ class Auth {
                             this.client,
                             {
                                 refreshToken,
-                                ...(dntPref !== undefined && {dnt: dntPref})
+                                dnt: dntPref
                             },
                             {
                                 clientSecret: this.clientSecret
@@ -737,17 +804,17 @@ class Auth {
      * A wrapper method for commerce-sdk-isomorphic helper: loginGuestUser.
      *
      */
-    async loginGuestUser() {
+    async loginGuestUser(parameters?: helpers.CustomQueryParameters) {
         if (this.clientSecret && onClient() && this.clientSecret !== SLAS_SECRET_PLACEHOLDER) {
             this.logWarning(SLAS_SECRET_WARNING_MSG)
         }
         const usid = this.get('usid')
-        const dntPref = this.getDntPreference(this.get(DNT_COOKIE_NAME), this.defaultDnt)
+        const dntPref = this.getDnt({includeDefaults: true})
         const isGuest = true
         const guestPrivateArgs = [
             this.client,
             {
-                ...(dntPref !== undefined && {dnt: dntPref}),
+                dnt: dntPref,
                 ...(usid && {usid})
             },
             {clientSecret: this.clientSecret}
@@ -756,8 +823,10 @@ class Auth {
             this.client,
             {
                 redirectURI: this.redirectURI,
-                ...(dntPref !== undefined && {dnt: dntPref}),
-                ...(usid && {usid})
+                dnt: dntPref,
+                ...(usid && {usid}),
+                // custom parameters are sent only into the /authorize endpoint.
+                ...parameters
             }
         ] as const
         const callback = this.clientSecret
@@ -782,10 +851,9 @@ class Auth {
      *
      */
     async register(body: ShopperCustomersTypes.CustomerRegistration) {
-        const {
-            customer: {login},
-            password
-        } = body
+        const {customer, password, ...parameters} = body
+        const {login} = customer
+        const customParameters = extractCustomParameters(parameters)
 
         // login is optional field from isomorphic library
         // type CustomerRegistration
@@ -794,15 +862,23 @@ class Auth {
             throw new Error('Customer registration is missing login field.')
         }
 
+        // The registerCustomer endpoint currently does not support custom parameters
+        // so we make sure not to send any custom params here
         const res = await this.shopperCustomersClient.registerCustomer({
             headers: {
                 authorization: `Bearer ${this.get('access_token')}`
             },
-            body
+            body: {
+                customer,
+                password
+            }
         })
         await this.loginRegisteredUserB2C({
             username: login,
-            password
+            password,
+            options: {
+                body: customParameters
+            }
         })
         return res
     }
@@ -810,26 +886,34 @@ class Auth {
     /**
      * A wrapper method for commerce-sdk-isomorphic helper: loginRegisteredUserB2C.
      *
+     * Note: This uses the type LoginRegisteredUserCredentialsWithCustomParams rather than LoginRegisteredUserB2CCredentials
+     * as a workaround to allow custom parameters through because the login.mutateAsync hook will only pass through a single
+     * 'body' argument into this function.
+     *
+     * In the next major version release, we should modify this method so that it's input is a body containing credentials,
+     * similar to the input for the register function.
      */
-    async loginRegisteredUserB2C(credentials: Parameters<Helpers['loginRegisteredUserB2C']>[1]) {
+    async loginRegisteredUserB2C(credentials: LoginRegisteredUserCredentialsWithCustomParams) {
         if (this.clientSecret && onClient() && this.clientSecret !== SLAS_SECRET_PLACEHOLDER) {
             this.logWarning(SLAS_SECRET_WARNING_MSG)
         }
         const redirectURI = this.redirectURI
         const usid = this.get('usid')
-        const dntPref = this.getDntPreference(this.get(DNT_COOKIE_NAME), this.defaultDnt)
+        const dntPref = this.getDnt({includeDefaults: true})
         const isGuest = false
         const token = await helpers.loginRegisteredUserB2C(
             this.client,
             {
-                ...credentials,
+                username: credentials.username,
+                password: credentials.password,
                 clientSecret: this.clientSecret
             },
             {
                 redirectURI,
-                ...(dntPref !== undefined && {dnt: dntPref}),
+                dnt: dntPref,
                 ...(usid && {usid})
-            }
+            },
+            credentials.options
         )
         this.handleTokenResponse(token, isGuest)
         if (onClient()) {
@@ -1005,6 +1089,184 @@ class Auth {
     }
 
     /**
+     * A wrapper method for commerce-sdk-isomorphic helper: authorizeIDP.
+     *
+     */
+    async authorizeIDP(parameters: AuthorizeIDPParams) {
+        const redirectURI = parameters.redirectURI || this.redirectURI
+        const usid = this.get('usid')
+        const customParameters = extractCustomParameters(parameters)
+        const {url, codeVerifier} = await helpers.authorizeIDP(
+            this.client,
+            {
+                redirectURI,
+                hint: parameters.hint,
+                ...(usid && {usid}),
+                ...customParameters
+            },
+            this.isPrivate
+        )
+
+        if (onClient()) {
+            window.location.assign(url)
+        } else {
+            console.warn('Something went wrong, this client side method is invoked on the server.')
+        }
+        this.set('code_verifier', codeVerifier)
+    }
+
+    /**
+     * A wrapper method for commerce-sdk-isomorphic helper: loginIDPUser.
+     *
+     */
+    async loginIDPUser(parameters: LoginIDPUserParams) {
+        const codeVerifier = this.get('code_verifier')
+        const code = parameters.code
+        const usid = parameters.usid || this.get('usid')
+        const redirectURI = parameters.redirectURI || this.redirectURI
+        const dntPref = this.getDnt({includeDefaults: true})
+
+        const token = await helpers.loginIDPUser(
+            this.client,
+            {
+                codeVerifier,
+                clientSecret: this.clientSecret
+            },
+            {
+                redirectURI,
+                code,
+                dnt: dntPref,
+                ...(usid && {usid})
+            }
+        )
+        const isGuest = false
+        this.handleTokenResponse(token, isGuest)
+        // Delete the code verifier once the user has logged in
+        this.delete('code_verifier')
+        if (onClient()) {
+            void this.clearECOMSession()
+        }
+        return token
+    }
+
+    /**
+     * A wrapper method for commerce-sdk-isomorphic helper: authorizePasswordless.
+     */
+    async authorizePasswordless(parameters: AuthorizePasswordlessParams) {
+        const userid = parameters.userid
+        const callbackURI = parameters.callbackURI || this.passwordlessLoginCallbackURI
+        const usid = this.get('usid')
+        const mode = callbackURI ? 'callback' : 'sms'
+
+        const res = await helpers.authorizePasswordless(
+            this.client,
+            {
+                clientSecret: this.clientSecret
+            },
+            {
+                ...(callbackURI && {callbackURI: callbackURI}),
+                ...(usid && {usid}),
+                userid,
+                mode
+            }
+        )
+        if (res && res.status !== 200) {
+            const errorData = await res.json()
+            throw new Error(`${res.status} ${String(errorData.message)}`)
+        }
+        return res
+    }
+
+    /**
+     * A wrapper method for commerce-sdk-isomorphic helper: getPasswordLessAccessToken.
+     */
+    async getPasswordLessAccessToken(parameters: LoginPasswordlessParams) {
+        const pwdlessLoginToken = parameters.pwdlessLoginToken
+        const dntPref = this.getDnt({includeDefaults: true})
+        const token = await helpers.getPasswordLessAccessToken(
+            this.client,
+            {
+                clientSecret: this.clientSecret
+            },
+            {
+                pwdlessLoginToken,
+                dnt: dntPref !== undefined ? String(dntPref) : undefined
+            }
+        )
+        const isGuest = false
+        this.handleTokenResponse(token, isGuest)
+        if (onClient()) {
+            void this.clearECOMSession()
+        }
+        return token
+    }
+
+    /**
+     * A wrapper method for the SLAS endpoint: getPasswordResetToken.
+     *
+     */
+    async getPasswordResetToken(parameters: ShopperLoginTypes.PasswordActionRequest) {
+        const slasClient = this.client
+        const callbackURI = parameters.callback_uri
+
+        const options = {
+            headers: {
+                Authorization: ''
+            },
+            body: {
+                user_id: parameters.user_id,
+                mode: 'callback',
+                channel_id: slasClient.clientConfig.parameters.siteId,
+                client_id: slasClient.clientConfig.parameters.clientId,
+                callback_uri: callbackURI,
+                hint: 'cross_device'
+            }
+        }
+
+        // Only set authorization header if using private client
+        if (this.clientSecret) {
+            options.headers.Authorization = `Basic ${stringToBase64(
+                `${slasClient.clientConfig.parameters.clientId}:${this.clientSecret}`
+            )}`
+        }
+
+        const res = await slasClient.getPasswordResetToken(options)
+        return res
+    }
+
+    /**
+     * A wrapper method for the SLAS endpoint: resetPassword.
+     *
+     */
+    async resetPassword(parameters: ShopperLoginTypes.PasswordActionVerifyRequest) {
+        const slasClient = this.client
+        const options = {
+            headers: {
+                Authorization: ''
+            },
+            body: {
+                pwd_action_token: parameters.pwd_action_token,
+                channel_id: slasClient.clientConfig.parameters.siteId,
+                client_id: slasClient.clientConfig.parameters.clientId,
+                new_password: parameters.new_password,
+                user_id: parameters.user_id
+            }
+        }
+
+        // Only set authorization header if using private client
+        if (this.clientSecret) {
+            options.headers.Authorization = `Basic ${stringToBase64(
+                `${slasClient.clientConfig.parameters.clientId}:${this.clientSecret}`
+            )}`
+        }
+        // TODO: no code verifier needed with the fix blair has made, delete this when the fix has been merged to production
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        const res = await this.client.resetPassword(options)
+        return res
+    }
+
+    /**
      * Decode SLAS JWT and extract information such as customer id, usid, etc.
      *
      */
@@ -1019,6 +1281,7 @@ class Auth {
         // ISB format
         // 'uido:ecom::upn:Guest||xxxEmailxxx::uidn:FirstName LastName::gcid:xxxGuestCustomerIdxxx::rcid:xxxRegisteredCustomerIdxxx::chid:xxxSiteIdxxx',
         const isbParts = isb.split('::')
+        const uido = isbParts[0].split('uido:')[1]
         const isGuest = isbParts[1] === 'upn:Guest'
         const customerId = isGuest
             ? isbParts[3].replace('gcid:', '')
@@ -1039,7 +1302,8 @@ class Auth {
             dnt,
             loginId,
             isAgent,
-            agentId
+            agentId,
+            uido
         }
     }
 }

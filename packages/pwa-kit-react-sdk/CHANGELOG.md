@@ -1,16 +1,35 @@
+## v4.0.0-extensibility-preview.5 (Jul 02, 2025)
 ## v4.0.0-extensibility-preview.4 (Feb 12, 2025)
 - Replace `event-emitter` in favor of the native `EventTarget` [#2289](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2289)
+- Call app extension's new methods `getRoutes` and `getRoutesAsync` [#2308](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2308)
+- Call app extension's `beforeRouteMatch` method with updated parameters [#2308](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2308)
+- Enhanced SSR rendering by serializing application extension async routes [#2300](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2300)
 
 ## v4.0.0-extensibility-preview.3 (Dec 13, 2024)
+
 ## v4.0.0-extensibility-preview.2 (Dec 09, 2024)
+
 ## v4.0.0-extensibility-preview.1 (Dec 09, 2024)
+
 ## v4.0.0-extensibility-preview.0 (Nov 28, 2024)
 - Integrate Application Extensions Project. (#2099)[https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2099]
 - Add new `getStaticAssetUrl` utility to access assets specifically in the `/static` folder. (#2040)[https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2040]
 - Update Application Extensions import in `react-rendering.js` and `main.js` (#2004)[https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2004]
 - Define interface of the app extension's config [#2010](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2010)
-## v3.9.0-dev (Oct 29, 2024)
+
+## v3.10.0 (Feb 18, 2025)
+- Fix the performance logging util to use the correct delimiter for the server-timing header. [#2225](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2295)
+
+## v3.9.2 (Mar 07, 2025)
+- Update PWA-Kit SDKs to v3.9.2 [#2304](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2304)
+
+## v3.9.1 (Mar 05, 2025)
+- Update PWA-Kit SDKs to v3.9.1 [#2301](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2301)
+
+## v3.9.0 (Feb 18, 2025)
+- Fix the performance logging util to not round duration. [#2199](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2199)
 - Add RedirectWithStatus component, allowing finer grained control of rediriects and their status code [#2173](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2173)
+- Support Node 22 [#2218](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2218)
 
 ## v3.8.0 (Oct 28, 2024)
 - [Server Affinity] - Attach dwsid to SCAPI request headers [#2090](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2090)

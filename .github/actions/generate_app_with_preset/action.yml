@@ -1,0 +1,15 @@
+name: generate_app_with_preset
+inputs:
+  preset:
+    required: true
+  output_dir:
+    required: false
+    default: generated_pwa
+runs:
+  using: composite
+  steps:
+    - run: |-
+        node packages/pwa-kit-create-app/scripts/create-mobify-app-dev.js --outputDir ${{ inputs.output_dir }}
+      shell: bash
+      env:
+        GENERATOR_PRESET: ${{ inputs.preset }}

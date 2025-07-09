@@ -19,7 +19,7 @@ export const detectStorefrontPreview = () => {
 
 /**
  * Returns the URL to load the Storefront Preview client script from the parent origin.
- * The client script is served from Runtime Admin and is not a part of the PWA Retail React App bundle.
+ * The client script is served from Runtime Admin and is not a part of the PWA Chakra Storefront bundle.
  * @private
  */
 export const getClientScript = () => {

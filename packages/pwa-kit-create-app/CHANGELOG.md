@@ -1,8 +1,22 @@
-## v4.0.0-extensibility-preview.2 (Dec 09, 2024)
-## v4.0.0-extensibility-preview.1 (Dec 09, 2024)
-## v4.0.0-extensibility-preview.0 (Dec 02, 2024)
-- Fix build script execution on windows when spaces exists in users home path. [#2156](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2156)
-- Update assets/templated files after removing "Shared UI" support in Retail App [#2022](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2022)
+## 4.0.0-extensibility-preview.5
+- Migrate directory structure from `app/*` to `src/*` [#2693](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2693)
+- Deprecate V3 Extensibility and experimental V4 Extensibility (#2573)
+- Move extensibility logic to generator (#2573)
+- Apply prettier to trimmed files (#2688)
+
+## v3.10.0 (Feb 18, 2025)
+- Add Data Cloud API configuration to `default.js`. [#2318] (https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2229)
+- Fix dependencies vulnerabilities [#2338](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2338)
+
+## v3.9.1 (Mar 05, 2025)
+- Update PWA-Kit SDKs to v3.9.1 [#2301](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2301)
+
+## v3.9.0 (Feb 18, 2025)
+
+- Update `default.js` and `ssr.js` template to support new passwordless, social, and reset password flows. [#2263] (https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2263)
+- Support Node 22 [#2218](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2218)
+- Update `default.js` template to include new login configurations [#2079] (https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2079)
+- Handle import error when ssr.js imports from template retail react app [#2270](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2270)
 
 ## v3.8.0 (Oct 28, 2024)
 
