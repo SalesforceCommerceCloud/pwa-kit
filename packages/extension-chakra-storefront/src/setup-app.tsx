@@ -29,6 +29,7 @@ import {withReactIntl} from './components/with-react-intl'
 import {withStorefrontPreview} from './components/with-storefront-preview'
 import extensionMeta from '../extension-meta.json'
 
+import {useQuery} from '@tanstack/react-query'
 // Pages
 import * as Pages from './pages'
 
@@ -40,13 +41,13 @@ class ChakraStorefront extends ApplicationExtension<Config> {
     ): React.ComponentType<T> {
         // NOTE: The order of these HOCs is important!
         const requiredHOCs = [
-            withLayout,
+            // withLayout,
             withChakraUI,
-            withCurrency,
-            withReactIntl,
-            withMultiSite,
-            withStorefrontPreview,
-            withCommerceSdkReact
+            // withCurrency,
+            // withReactIntl,
+            // withMultiSite,
+            // withStorefrontPreview,
+            // withCommerceSdkReact
         ]
 
         return applyHOCs(App, requiredHOCs)
@@ -56,6 +57,11 @@ class ChakraStorefront extends ApplicationExtension<Config> {
         const config = this.getConfig()
 
         const extensionRoutes = [
+            {
+                path: '/test-page',
+                component: Pages.Test,
+                exact: true
+            },
             {
                 path: config.pages.Home && config.pages.Home.path,
                 component: Pages.Home,
@@ -125,11 +131,12 @@ class ChakraStorefront extends ApplicationExtension<Config> {
 
     // Called before the route with all the routes
     beforeRouteMatch({allRoutes}: BeforeRouteMatchParams): RouteProps[] {
-        const config = this.getConfig()
+        // const config = this.getConfig()
 
-        return configureRoutes(allRoutes, config, {
-            ignoredRoutes: ['/callback']
-        })
+        // return configureRoutes(allRoutes, config, {
+        //     ignoredRoutes: ['/callback']
+        // })
+        return allRoutes
     }
 }
 
