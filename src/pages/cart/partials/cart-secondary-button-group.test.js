@@ -53,12 +53,29 @@ MockedComponent.propTypes = {
     isAGift: PropTypes.bool
 }
 
+const MockComopnentWithoutProps = () => {
+    const product = mockedCustomerProductListsDetails.data[0]
+    return (
+        <ItemVariantProvider variant={{...product, productName: product.name}}>
+            <CartSecondaryButtonGroup />
+        </ItemVariantProvider>
+    )
+}
+
 beforeEach(() => {
     jest.resetModules()
 })
 
 afterEach(() => {
     jest.restoreAllMocks()
+})
+
+test('renders secondary action component without props', async () => {
+    renderWithProviders(<MockComopnentWithoutProps />)
+    const removeButton = screen.getByRole('button', {
+        name: /remove/i
+    })
+    expect(removeButton).toBeInTheDocument()
 })
 
 test('renders secondary action component', async () => {
