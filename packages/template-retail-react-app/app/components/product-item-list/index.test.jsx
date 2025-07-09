@@ -5,13 +5,14 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
-import PropTypes from 'prop-types'
 import {render, screen} from '@testing-library/react'
 import {IntlProvider} from 'react-intl'
 import ProductItemList from '@salesforce/retail-react-app/app/components/product-item-list'
 
 // Mock the ProductItem component
 jest.mock('@salesforce/retail-react-app/app/components/product-item', () => {
+    const PropTypes = require('prop-types')
+    
     const MockedProductItem = function ({product, onItemQuantityChange, showLoading}) {
         return (
             <div>
