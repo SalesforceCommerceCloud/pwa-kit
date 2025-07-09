@@ -64,16 +64,16 @@ const Home = () => {
     //     )
     // }
     //
-    // const {data: productSearchResult, isLoading} = useProductSearch({
-    //     parameters: {
-    //         allImages: true,
-    //         allVariationProperties: true,
-    //         expand: ['promotions', 'variations', 'prices', 'images', 'custom_properties'],
-    //         limit: homeConfig.productLimit,
-    //         perPricebook: true,
-    //         refine: [`cgid=${homeConfig.mainCategory}`, 'htype=master']
-    //     }
-    // })
+    const {data: productSearchResult, isLoading} = useProductSearch({
+        parameters: {
+            allImages: true,
+            allVariationProperties: true,
+            expand: ['promotions', 'variations', 'prices', 'images', 'custom_properties'],
+            limit: 10,
+            perPricebook: true,
+            refine: [`cgid=newarrivals`, 'htype=master']
+        }
+    })
     //
     /**************** Einstein ****************/
     useEffect(() => {
@@ -164,6 +164,8 @@ const Home = () => {
                     })}
                 </SimpleGrid>
             </Section>
+
+            <div>product search {isLoading ? 'is loading' : 'not loading'}</div>
 
             {/*{productSearchResult && (*/}
             {/*    <Section*/}

@@ -74,6 +74,8 @@ export const withReactQuery = (Wrapped, options = {}) => {
             res.__performanceTimer.mark(PERFORMANCE_MARKS.reactQueryPrerender, 'end')
             const queryCache = queryClient.getQueryCache()
             const queries = queryCache.getAll().filter((q) => q.options.enabled !== false)
+            // const queries = queryCache.getAll()
+            console.log('--- ssr queries', queryCache.getAll(), queries)
             await Promise.all(
                 queries.map((q, i) => {
                     // always include the index to avoid duplicate entries
