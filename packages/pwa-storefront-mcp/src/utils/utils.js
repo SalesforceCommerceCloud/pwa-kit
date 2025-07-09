@@ -9,6 +9,8 @@ import path from 'path'
 import {spawn} from 'cross-spawn'
 import {zodToJsonSchema} from 'zod-to-json-schema'
 import {z} from 'zod'
+import os from 'os'
+import {exec} from 'child_process'
 
 // Private schema used to generate the JSON schema
 const emptySchema = z.object({}).strict()
@@ -82,4 +84,30 @@ export const runCommand = async (command, args = [], options = {}) => {
 export function isMonoRepo() {
     const lernaPath = path.resolve(__dirname, '../../../..', 'lerna.json')
     return fs.existsSync(lernaPath)
+}
+
+/**
+ * Runs an NPX command and captures its output.
+ *
+ * @returns {Promise<string>} - Resolves with the command output.
+ */
+export async function runNpxCommand(NPX_COMMAND, CREATE_APP_COMMAND, DISPLAY_PROGRAM_COMMAND) {
+    return new Promise((resolve, reject) => {
+        const tempDir = os.tmpdir()
+        const outputFilePath = path.join(tempDir, 'npx-output.json')
+        const errorFilePath = path.join(tempDir, 'npx-error.log')
+        const command = `${NPX_COMMAND} ${CREATE_APP_COMMAND} ${DISPLAY_PROGRAM_COMMAND} > ${outputFilePath} 2> ${errorFilePath}`
+
+        exec(command, (error) => {
+            if (error) {
+                reject(error)
+                return
+            }
+
+            fs.promises
+                .readFile(outputFilePath, 'utf-8')
+                .then((data) => resolve(data))
+                .catch((err) => reject(err))
+        })
+    })
 }
