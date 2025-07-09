@@ -158,23 +158,27 @@ const ProductDetail = () => {
     const isProductASet = product?.type.set
     const isProductABundle = product?.type.bundle
 
-    let bundleChildVariantIds = ''
+    let bundleChildProductIds = ''
     if (isProductABundle)
-        bundleChildVariantIds = Object.keys(childProductSelection)
-            ?.map((key) => childProductSelection[key].variant.productId)
+        bundleChildProductIds = Object.keys(childProductSelection)
+            ?.map(
+                (key) =>
+                    childProductSelection[key].variant?.productId ||
+                    childProductSelection[key].product?.id
+            )
             .join(',')
 
     const {data: bundleChildrenData} = useProducts(
         {
             parameters: {
-                ids: bundleChildVariantIds,
+                ids: bundleChildProductIds,
                 allImages: false,
                 expand: ['availability', 'variations'],
                 select: '(data.(id,inventory,master))'
             }
         },
         {
-            enabled: bundleChildVariantIds?.length > 0,
+            enabled: bundleChildProductIds?.length > 0,
             keepPreviousData: true
         }
     )
@@ -183,7 +187,7 @@ const ProductDetail = () => {
         // Loop through the bundle children and update the inventory for variant selection
         product.bundledProducts.forEach(({product: childProduct}, index) => {
             const matchingChildProduct = bundleChildrenData.data.find(
-                (bundleChild) => bundleChild.master.masterId === childProduct.id
+                (bundleChild) => bundleChild?.master?.masterId === childProduct.id
             )
             if (matchingChildProduct) {
                 product.bundledProducts[index].product = {
@@ -311,8 +315,11 @@ const ProductDetail = () => {
     /**************** Add To Cart ****************/
     const showToast = useToast()
     const showError = (errorMessage) => {
+        const errorText =
+            typeof errorMessage === 'string' ? errorMessage : formatMessage(API_ERROR_MESSAGE)
+
         showToast({
-            title: errorMessage || formatMessage(API_ERROR_MESSAGE),
+            title: errorText,
             status: 'error'
         })
     }
@@ -333,8 +340,8 @@ const ProductDetail = () => {
                 // Use variant if present, otherwise use the main product
                 const prod = variant || item.product || product
                 return {
-                    productId: prod.productId || prod.id, // productId for variant, id for product
-                    price: prod.price,
+                    productId: prod?.productId || prod?.id, // productId for variant, id for product
+                    price: prod?.price,
                     quantity
                 }
             })
@@ -407,8 +414,8 @@ const ProductDetail = () => {
             const productItemsForEinstein = productSelectionValues.map(
                 ({product, variant, quantity}) => ({
                     product,
-                    productId: variant.productId,
-                    price: variant.price,
+                    productId: variant?.productId || product?.id,
+                    price: variant?.price || product?.price,
                     quantity
                 })
             )
@@ -429,10 +436,16 @@ const ProductDetail = () => {
         })
 
         // Using ot state for which child products are selected, scroll to the first
-        // one that isn't selected.
+        // one that isn't selected and requires a variant selection.
         const selectedProductIds = Object.keys(childProductSelection)
         const firstUnselectedProduct = comboProduct.childProducts?.find(
-            ({product: childProduct}) => !selectedProductIds.includes(childProduct.id)
+            ({product: childProduct}) => {
+                // Skip validation for standard products (no variations)
+                if (childProduct.type?.item) {
+                    return false
+                }
+                return !selectedProductIds.includes(childProduct.id)
+            }
         )?.product
 
         if (firstUnselectedProduct) {
@@ -465,7 +478,7 @@ const ProductDetail = () => {
 
     /**************** Product Bundle Handlers ****************/
     // Top level bundle does not have variants
-    const handleProductBundleAddToCart = async (variant, selectedQuantity) => {
+    const handleProductBundleAddToCart = async ([{quantity: selectedQuantity}]) => {
         try {
             const childProductSelections = Object.values(childProductSelection)
             // Check if any products have pickup selected (including main product and bundle items)
@@ -522,7 +535,7 @@ const ProductDetail = () => {
                     // with the chosen variant selections
                     bundledProductItems: childProductSelections.map((child) => {
                         return {
-                            productId: child.variant.productId,
+                            productId: child.variant?.productId || child.product?.id,
                             quantity: child.quantity
                         }
                     })
@@ -696,14 +709,10 @@ const ProductDetail = () => {
                                                 }
                                                 addToCart={
                                                     isProductASet
-                                                        ? (variant, quantity) =>
-                                                              handleAddToCart([
-                                                                  {
-                                                                      product: childProduct,
-                                                                      variant,
-                                                                      quantity
-                                                                  }
-                                                              ])
+                                                        ? (productSelectionValues) =>
+                                                              handleAddToCart(
+                                                                  productSelectionValues
+                                                              )
                                                         : null
                                                 }
                                                 addToWishlist={
@@ -765,9 +774,7 @@ const ProductDetail = () => {
                             <ProductView
                                 product={product}
                                 category={primaryCategory?.parentCategoryTree || []}
-                                addToCart={(variant, quantity) =>
-                                    handleAddToCart([{product, variant, quantity}])
-                                }
+                                addToCart={handleAddToCart}
                                 addToWishlist={handleAddToWishlist}
                                 isProductLoading={isProductLoading}
                                 isBasketLoading={isBasketLoading}

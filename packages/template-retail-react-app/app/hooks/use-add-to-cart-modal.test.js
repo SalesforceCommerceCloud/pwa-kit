@@ -15,9 +15,17 @@ import {rest} from 'msw'
 import {mockCustomerBaskets} from '@salesforce/retail-react-app/app/mocks/mock-data'
 import {
     mockProductBundle,
-    mockBundleItemsAdded
+    mockBundleItemsAdded,
+    mockBundleWithStandardProducts,
+    mockBundleItemsWithStandardProducts,
+    mockBasketWithStandardProducts
 } from '@salesforce/retail-react-app/app/mocks/product-bundle'
 import {getDisplayVariationValues} from '@salesforce/retail-react-app/app/utils/product-utils'
+import {useCurrentBasket as mockUseCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
+
+jest.mock('@salesforce/retail-react-app/app/hooks/use-current-basket', () => ({
+    useCurrentBasket: jest.fn()
+}))
 
 const MOCK_PRODUCT = {
     currency: 'USD',
@@ -570,6 +578,57 @@ const MOCK_PRODUCT = {
     c_size: '9LG',
     c_width: 'Z'
 }
+
+// Mock data for testing individual products with missing image data
+const MOCK_PRODUCT_NO_IMAGE_LINK = {
+    ...MOCK_PRODUCT,
+    price: 29.99,
+    currency: 'USD',
+    imageGroups: [
+        {
+            viewType: 'small',
+            images: [
+                {
+                    alt: 'Test product image',
+                    disBaseLink: 'https://example.com/image.jpg'
+                }
+            ]
+        }
+    ]
+}
+
+const MOCK_PRODUCT_NO_IMAGE_GROUPS = {
+    ...MOCK_PRODUCT,
+    price: 29.99,
+    currency: 'USD',
+    imageGroups: []
+}
+
+// Mock data for testing bundle products with missing image data
+const MOCK_BUNDLE_NO_IMAGE_LINK = {
+    ...mockProductBundle,
+    price: 59.99,
+    currency: 'USD',
+    imageGroups: [
+        {
+            viewType: 'small',
+            images: [
+                {
+                    alt: 'Bundle product image',
+                    disBaseLink: 'https://example.com/bundle-image.jpg'
+                }
+            ]
+        }
+    ]
+}
+
+const MOCK_BUNDLE_NO_IMAGE_GROUPS = {
+    ...mockProductBundle,
+    price: 59.99,
+    currency: 'USD',
+    imageGroups: []
+}
+
 beforeEach(() => {
     jest.resetModules()
     global.server.use(
@@ -577,6 +636,11 @@ beforeEach(() => {
             return res(ctx.delay(0), ctx.status(200), ctx.json(mockCustomerBaskets))
         })
     )
+    mockUseCurrentBasket.mockReturnValue({
+        data: {},
+        derivedData: {},
+        currency: 'USD'
+    })
 })
 
 test('Renders AddToCartModal with multiple products', () => {
@@ -669,4 +733,140 @@ test('renders product bundle', () => {
             expect(screen.getAllByText(`${name}: ${value}`)[0]).toBeInTheDocument()
         })
     })
+})
+
+test('renders individual product image correctly when there is no image link', async () => {
+    const MOCK_DATA_NO_IMAGE = {
+        product: MOCK_PRODUCT_NO_IMAGE_LINK,
+        itemsAdded: [
+            {
+                product: MOCK_PRODUCT_NO_IMAGE_LINK,
+                variant: MOCK_PRODUCT.variants[0], // Provide a variant to avoid undefined errors
+                quantity: 1
+            }
+        ],
+        selectedQuantity: 1
+    }
+
+    renderWithProviders(
+        <AddToCartModalContext.Provider
+            value={{
+                isOpen: true,
+                data: MOCK_DATA_NO_IMAGE
+            }}
+        >
+            <AddToCartModal />
+        </AddToCartModalContext.Provider>
+    )
+
+    expect(screen.getByRole('dialog')).toBeInTheDocument()
+    expect(screen.getByText(MOCK_PRODUCT.name)).toBeInTheDocument()
+})
+
+test('renders individual product image when image object is not provided', async () => {
+    const MOCK_DATA_NO_IMAGE_OBJECT = {
+        product: MOCK_PRODUCT_NO_IMAGE_GROUPS,
+        itemsAdded: [
+            {
+                product: MOCK_PRODUCT_NO_IMAGE_GROUPS,
+                variant: MOCK_PRODUCT.variants[0],
+                quantity: 1
+            }
+        ],
+        selectedQuantity: 1
+    }
+
+    renderWithProviders(
+        <AddToCartModalContext.Provider
+            value={{
+                isOpen: true,
+                data: MOCK_DATA_NO_IMAGE_OBJECT
+            }}
+        >
+            <AddToCartModal />
+        </AddToCartModalContext.Provider>
+    )
+
+    expect(screen.getByRole('dialog')).toBeInTheDocument()
+    expect(screen.getByText(MOCK_PRODUCT.name)).toBeInTheDocument()
+})
+
+test('renders bundle product image correctly when there is no image link', async () => {
+    const MOCK_BUNDLE_DATA_NO_IMAGE = {
+        product: MOCK_BUNDLE_NO_IMAGE_LINK,
+        itemsAdded: mockBundleItemsAdded,
+        selectedQuantity: 1
+    }
+
+    renderWithProviders(
+        <AddToCartModalContext.Provider
+            value={{
+                isOpen: true,
+                data: MOCK_BUNDLE_DATA_NO_IMAGE
+            }}
+        >
+            <AddToCartModal />
+        </AddToCartModalContext.Provider>
+    )
+
+    expect(screen.getByRole('dialog')).toBeInTheDocument()
+    expect(screen.getByText(mockProductBundle.name)).toBeInTheDocument()
+})
+
+test('renders bundle product image when image object is not provided', async () => {
+    const MOCK_BUNDLE_DATA_NO_IMAGE_OBJECT = {
+        product: MOCK_BUNDLE_NO_IMAGE_GROUPS,
+        itemsAdded: mockBundleItemsAdded,
+        selectedQuantity: 1
+    }
+
+    renderWithProviders(
+        <AddToCartModalContext.Provider
+            value={{
+                isOpen: true,
+                data: MOCK_BUNDLE_DATA_NO_IMAGE_OBJECT
+            }}
+        >
+            <AddToCartModal />
+        </AddToCartModalContext.Provider>
+    )
+
+    expect(screen.getByRole('dialog')).toBeInTheDocument()
+    expect(screen.getByText(mockProductBundle.name)).toBeInTheDocument()
+})
+
+test('displays standard products in bundle without variation attributes', async () => {
+    const modalData = {
+        product: mockBundleWithStandardProducts,
+        itemsAdded: mockBundleItemsWithStandardProducts,
+        selectedQuantity: 1
+    }
+
+    // Mock the basket data to include currency at the top level
+    const mockBasket = {
+        data: mockBasketWithStandardProducts,
+        derivedData: {
+            totalItems: 2
+        },
+        currency: 'USD'
+    }
+
+    mockUseCurrentBasket.mockReturnValue(mockBasket)
+
+    renderWithProviders(
+        <AddToCartModalContext.Provider
+            value={{
+                isOpen: true,
+                onClose: jest.fn(),
+                data: modalData
+            }}
+        >
+            <AddToCartModal />
+        </AddToCartModalContext.Provider>
+    )
+
+    expect(screen.getByText('Standard Product (2)')).toBeInTheDocument()
+
+    expect(screen.queryByText(/Color:/)).not.toBeInTheDocument()
+    expect(screen.queryByText(/Size:/)).not.toBeInTheDocument()
 })

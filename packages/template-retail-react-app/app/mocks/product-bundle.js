@@ -2371,3 +2371,372 @@ export const basketWithProductBundle = {
     taxation: 'gross',
     taxTotal: 4.27
 }
+
+// Mock data for bundle with standard products (no variants)
+export const mockBundleWithStandardProducts = {
+    id: 'bundle-standard-1',
+    name: 'Test Bundle with Standard Products',
+    type: {bundle: true},
+    price: 59.98,
+    currency: 'USD',
+    imageGroups: [
+        {
+            images: [
+                {
+                    alt: 'Bundle with Standard Products',
+                    link: 'https://example.com/bundle-standard.jpg'
+                }
+            ],
+            viewType: 'small'
+        }
+    ],
+    inventory: {
+        orderable: true,
+        stockLevel: 5
+    }
+}
+
+export const mockStandardProduct = {
+    id: 'standard-product-1',
+    name: 'Standard Product',
+    type: {item: true},
+    variationAttributes: [],
+    price: 29.99,
+    currency: 'USD',
+    imageGroups: [
+        {
+            images: [
+                {
+                    alt: 'Standard Product',
+                    link: 'https://example.com/standard-product.jpg'
+                }
+            ],
+            viewType: 'small'
+        }
+    ],
+    inventory: {
+        orderable: true,
+        stockLevel: 10
+    }
+}
+
+export const mockBundleItemsWithStandardProducts = [
+    {
+        product: mockStandardProduct,
+        variant: null,
+        quantity: 2
+    }
+]
+
+export const mockBasketWithStandardProducts = {
+    adjustedMerchandizeTotalTax: 2.99,
+    adjustedShippingTotalTax: 0.0,
+    agentBasket: false,
+    basketId: 'bundle-standard-basket-123',
+    channelType: 'storefront',
+    creationDate: '2024-01-01T00:00:00.000Z',
+    currency: 'USD',
+    customerInfo: {
+        customerId: 'test-customer-123',
+        email: 'test@example.com'
+    },
+    lastModified: '2024-01-01T00:00:00.000Z',
+    merchandizeTotalTax: 2.99,
+    notes: {},
+    orderTotal: 62.97,
+    productItems: [
+        {
+            adjustedTax: 2.99,
+            basePrice: 59.98,
+            bonusProductLineItem: false,
+            bundledProductItems: [
+                {
+                    adjustedTax: null,
+                    basePrice: null,
+                    bonusProductLineItem: false,
+                    gift: false,
+                    itemId: 'standard-item-1',
+                    itemText: 'Standard Product',
+                    price: null,
+                    priceAfterItemDiscount: null,
+                    priceAfterOrderDiscount: 0,
+                    productId: 'standard-product-1',
+                    productName: 'Standard Product',
+                    quantity: 2,
+                    shipmentId: 'me',
+                    tax: null,
+                    taxBasis: null,
+                    taxClassId: 'standard',
+                    taxRate: 0.05
+                }
+            ],
+            gift: false,
+            itemId: 'bundle-standard-item-1',
+            itemText: 'Test Bundle with Standard Products',
+            price: 59.98,
+            priceAfterItemDiscount: 59.98,
+            priceAfterOrderDiscount: 59.98,
+            productId: 'bundle-with-standard-1',
+            productName: 'Test Bundle with Standard Products',
+            quantity: 1,
+            shipmentId: 'me',
+            shippingItemId: 'shipping-1',
+            tax: 2.99,
+            taxBasis: 59.98,
+            taxClassId: 'standard',
+            taxRate: 0.05,
+            type: {bundle: true}
+        }
+    ],
+    productSubTotal: 59.98,
+    productTotal: 59.98,
+    shipments: [
+        {
+            adjustedMerchandizeTotalTax: 2.99,
+            adjustedShippingTotalTax: 0.0,
+            gift: false,
+            merchandizeTotalTax: 2.99,
+            productSubTotal: 59.98,
+            productTotal: 59.98,
+            shipmentId: 'me',
+            shipmentTotal: 62.97,
+            shippingMethod: {
+                description: 'Standard shipping',
+                id: 'STANDARD',
+                name: 'Standard',
+                price: 2.99,
+                c_estimatedArrivalTime: '3-5 Business Days'
+            },
+            shippingStatus: 'not_shipped',
+            shippingTotal: 2.99,
+            shippingTotalTax: 0.0,
+            taxTotal: 2.99
+        }
+    ],
+    shippingItems: [
+        {
+            adjustedTax: 0.0,
+            basePrice: 2.99,
+            itemId: 'shipping-1',
+            itemText: 'Shipping',
+            price: 2.99,
+            priceAfterItemDiscount: 2.99,
+            shipmentId: 'me',
+            tax: 0.0,
+            taxBasis: 2.99,
+            taxClassId: 'standard',
+            taxRate: 0.0
+        }
+    ],
+    shippingTotal: 2.99,
+    shippingTotalTax: 0.0,
+    taxation: 'gross',
+    taxTotal: 2.99
+}
+
+// Mock data for variant product
+export const mockVariantProduct = {
+    id: 'variant-product-1',
+    name: 'Variant Product',
+    type: {item: true},
+    variationAttributes: [
+        {
+            id: 'color',
+            name: 'Color',
+            values: [
+                {name: 'Red', value: 'red'},
+                {name: 'Blue', value: 'blue'}
+            ]
+        }
+    ],
+    price: 39.99,
+    currency: 'USD',
+    imageGroups: [
+        {
+            images: [
+                {
+                    alt: 'Variant Product',
+                    link: 'https://example.com/variant-product.jpg'
+                }
+            ],
+            viewType: 'small'
+        }
+    ],
+    inventory: {
+        orderable: true,
+        stockLevel: 15
+    }
+}
+
+// Mock data for bundle with mixed products (standard and variant products)
+export const mockBundleWithMixedProducts = {
+    id: 'bundle-mixed-1',
+    name: 'Test Bundle with Mixed Products',
+    type: {bundle: true},
+    price: 69.98,
+    currency: 'USD',
+    imageGroups: [
+        {
+            images: [
+                {
+                    alt: 'Bundle with Mixed Products',
+                    link: 'https://example.com/bundle-mixed.jpg'
+                }
+            ],
+            viewType: 'small'
+        }
+    ],
+    inventory: {
+        orderable: true,
+        stockLevel: 8
+    }
+}
+
+export const mockBundleItemsWithMixedProducts = [
+    {
+        product: {
+            ...mockStandardProduct,
+            id: 'standard-product-1'
+        },
+        variant: null,
+        quantity: 1
+    },
+    {
+        product: {
+            ...mockVariantProduct,
+            id: 'variant-1-id'
+        },
+        variant: {
+            productId: 'variant-2-id',
+            orderable: true,
+            price: 39.99,
+            currency: 'USD'
+        },
+        quantity: 2
+    }
+]
+
+export const mockBasketWithMixedProducts = {
+    adjustedMerchandizeTotalTax: 3.49,
+    adjustedShippingTotalTax: 0.0,
+    agentBasket: false,
+    basketId: 'bundle-mixed-basket-123',
+    channelType: 'storefront',
+    creationDate: '2024-01-01T00:00:00.000Z',
+    currency: 'USD',
+    customerInfo: {
+        customerId: 'test-customer-123',
+        email: 'test@example.com'
+    },
+    lastModified: '2024-01-01T00:00:00.000Z',
+    merchandizeTotalTax: 3.49,
+    notes: {},
+    orderTotal: 73.47,
+    productItems: [
+        {
+            adjustedTax: 3.49,
+            basePrice: 69.98,
+            bonusProductLineItem: false,
+            bundledProductItems: [
+                {
+                    adjustedTax: null,
+                    basePrice: null,
+                    bonusProductLineItem: false,
+                    gift: false,
+                    itemId: 'standard-item-1',
+                    itemText: 'Standard Product',
+                    price: null,
+                    priceAfterItemDiscount: null,
+                    priceAfterOrderDiscount: 0,
+                    productId: 'standard-product-1',
+                    productName: 'Standard Product',
+                    quantity: 1,
+                    shipmentId: 'me',
+                    tax: null,
+                    taxBasis: null,
+                    taxClassId: 'standard',
+                    taxRate: 0.05
+                },
+                {
+                    adjustedTax: null,
+                    basePrice: null,
+                    bonusProductLineItem: false,
+                    gift: false,
+                    itemId: 'variant-item-1',
+                    itemText: 'Variant Product',
+                    price: null,
+                    priceAfterItemDiscount: null,
+                    priceAfterOrderDiscount: 0,
+                    productId: 'variant-1-id',
+                    productName: 'Variant Product',
+                    quantity: 1,
+                    shipmentId: 'me',
+                    tax: null,
+                    taxBasis: null,
+                    taxClassId: 'standard',
+                    taxRate: 0.05
+                }
+            ],
+            gift: false,
+            itemId: 'bundle-mixed-item-1',
+            itemText: 'Test Bundle with Mixed Products',
+            price: 69.98,
+            priceAfterItemDiscount: 69.98,
+            priceAfterOrderDiscount: 69.98,
+            productId: 'bundle-mixed-1',
+            productName: 'Test Bundle with Mixed Products',
+            quantity: 1,
+            shipmentId: 'me',
+            shippingItemId: 'shipping-1',
+            tax: 3.49,
+            taxBasis: 69.98,
+            taxClassId: 'standard',
+            taxRate: 0.05,
+            type: {bundle: true}
+        }
+    ],
+    productSubTotal: 69.98,
+    productTotal: 69.98,
+    shipments: [
+        {
+            adjustedMerchandizeTotalTax: 3.49,
+            adjustedShippingTotalTax: 0.0,
+            gift: false,
+            merchandizeTotalTax: 3.49,
+            productSubTotal: 69.98,
+            productTotal: 69.98,
+            shipmentId: 'me',
+            shipmentTotal: 73.47,
+            shippingMethod: {
+                description: 'Standard shipping',
+                id: 'STANDARD',
+                name: 'Standard',
+                price: 3.49,
+                c_estimatedArrivalTime: '3-5 Business Days'
+            },
+            shippingStatus: 'not_shipped',
+            shippingTotal: 3.49,
+            shippingTotalTax: 0.0,
+            taxTotal: 3.49
+        }
+    ],
+    shippingItems: [
+        {
+            adjustedTax: 0.0,
+            basePrice: 3.49,
+            itemId: 'shipping-1',
+            itemText: 'Shipping',
+            price: 3.49,
+            priceAfterItemDiscount: 3.49,
+            shipmentId: 'me',
+            tax: 0.0,
+            taxBasis: 3.49,
+            taxClassId: 'standard',
+            taxRate: 0.0
+        }
+    ],
+    shippingTotal: 3.49,
+    shippingTotalTax: 0.0,
+    taxation: 'gross',
+    taxTotal: 3.49
+}

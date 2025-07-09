@@ -104,12 +104,16 @@ const CartSecondaryButtonGroup = ({
                             />
                         </Button>
                     )}
-                    <Button variant="link" size="sm" onClick={() => onEditClick(variant)}>
-                        <FormattedMessage
-                            defaultMessage="Edit"
-                            id="cart_secondary_button_group.action.edit"
-                        />
-                    </Button>
+                    {/* Only show edit button if it's not a standard product */}
+                    {variant.id &&
+                        !variant.type?.item && ( // the variant.id ensures complete product data. Without it, Edit button appears briefly
+                            <Button variant="link" size="sm" onClick={() => onEditClick(variant)}>
+                                <FormattedMessage
+                                    defaultMessage="Edit"
+                                    id="cart_secondary_button_group.action.edit"
+                                />
+                            </Button>
+                        )}
                 </ButtonGroup>
                 {!isBonusProduct && (
                     <Flex alignItems="center">
