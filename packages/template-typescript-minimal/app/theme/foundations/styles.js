@@ -1,0 +1,23 @@
+/*
+ * Copyright (c) 2021, salesforce.com, inc.
+ * All rights reserved.
+ * SPDX-License-Identifier: BSD-3-Clause
+ * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
+ */
+
+// this file is used for generic styles that are applied globally
+export default {
+    globalCss: {
+        'html, body': {
+            backgroundColor: 'white',
+            color: 'gray.900'
+        },
+        body: {
+            minHeight: '100vh'
+        },
+        '.react-target': {
+            display: 'flex',
+            minHeight: '100vh'
+        }
+    }
+}

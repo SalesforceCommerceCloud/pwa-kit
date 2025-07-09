@@ -228,6 +228,8 @@ export const render = async (req, res, next) => {
     // Step 5 - Determine what is going to happen, redirect, or send html with
     // the correct status code.
     const {html, routerContext, error} = renderResult
+    console.log('html', html)
+    console.log('error', error)
     const redirectUrl = routerContext.url
     const status = (error && error.status) || res.statusCode
 

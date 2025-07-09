@@ -18,6 +18,9 @@
   },
   "devDependencies": {
     "@loadable/component": "^5.15.3",
+    "@chakra-ui/react": "^3.22.0",
+    "@salesforce/commerce-sdk-react": "3.4.0-dev.0",
+    "@emotion/react": "^11.14.0",
     "@salesforce/pwa-kit-dev": "3.11.0-dev.0",
     "@salesforce/pwa-kit-react-sdk": "3.11.0-dev.0",
     "@salesforce/pwa-kit-runtime": "3.11.0-dev.0",
