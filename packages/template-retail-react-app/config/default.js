@@ -59,7 +59,7 @@ module.exports = {
             tenantId: 'mmydmztgh04dczjzmnsw0zd0g8.pc-rnd'
         },
         oneClickCheckout: {
-            enabled: true
+            enabled: false
         }
     },
     externals: [],
