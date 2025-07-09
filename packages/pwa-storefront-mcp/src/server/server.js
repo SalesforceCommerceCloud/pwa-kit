@@ -9,7 +9,7 @@ import {McpServer} from '@modelcontextprotocol/sdk/server/mcp.js'
 import {StdioServerTransport} from '@modelcontextprotocol/sdk/server/stdio.js'
 
 import {z} from 'zod'
-import {CreateAppGuidelinesTool, CreateNewComponentTool, DeveloperGuidelinesTool} from '../utils'
+import {CreateAppGuidelinesTool, CreateNewComponentTool, DeveloperGuidelinesTool, CreatePageTool} from '../utils'
 import {TestWithPlaywrightTool} from '../utils/run-site-test-tool'
 
 // NOTE: This is a workaround to import JSON files as ES modules.
@@ -82,6 +82,14 @@ class PwaStorefrontMCPServerHighLevel {
                 answer: z.string().optional().describe('User answer to the current question')
             },
             (args) => this.handleCreateNewSampleComponent(args)
+        )
+
+        // Register CreatePageTool
+        this.server.tool(
+            CreatePageTool.name,
+            CreatePageTool.description,
+            CreatePageTool.inputSchema,
+            (args) => CreatePageTool.fn(args, this)
         )
     }
 
