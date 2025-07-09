@@ -193,10 +193,10 @@
     "defaultMessage": "Item removed from cart"
   },
   "cart.order_type.delivery": {
-    "defaultMessage": "Delivery"
+    "defaultMessage": "Delivery - {itemsInShipment} out of {totalItemsInCart} items"
   },
   "cart.order_type.pickup_in_store": {
-    "defaultMessage": "Pick Up in Store ({storeName})"
+    "defaultMessage": "Pick Up in Store - {itemsInShipment} out of {totalItemsInCart} items"
   },
   "cart.product_edit_modal.modal_label": {
     "defaultMessage": "Edit modal for {productName}"
@@ -1163,6 +1163,15 @@
   },
   "pickup_address.title.store_information": {
     "defaultMessage": "Store Information"
+  },
+  "pickup_or_delivery.label.delivery": {
+    "defaultMessage": "Delivery:"
+  },
+  "pickup_or_delivery.label.pickup_in_store": {
+    "defaultMessage": "Pick Up in Store"
+  },
+  "pickup_or_delivery.label.ship_to_address": {
+    "defaultMessage": "Ship to Address"
   },
   "price_per_item.label.each": {
     "defaultMessage": "ea",

@@ -15,19 +15,19 @@ import {
     GridItem,
     Container,
     Button,
-    Text,
     useDisclosure
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 
 // Project Components
+import BonusProductsTitle from '@salesforce/retail-react-app/app/pages/cart/partials/bonus-products-title'
 import CartCta from '@salesforce/retail-react-app/app/pages/cart/partials/cart-cta'
 import CartSecondaryButtonGroup from '@salesforce/retail-react-app/app/pages/cart/partials/cart-secondary-button-group'
 import CartSkeleton from '@salesforce/retail-react-app/app/pages/cart/partials/cart-skeleton'
 import CartTitle from '@salesforce/retail-react-app/app/pages/cart/partials/cart-title'
-import BonusProductsTitle from '@salesforce/retail-react-app/app/pages/cart/partials/bonus-products-title'
 import ConfirmationModal from '@salesforce/retail-react-app/app/components/confirmation-modal'
 import EmptyCart from '@salesforce/retail-react-app/app/pages/cart/partials/empty-cart'
 import OrderSummary from '@salesforce/retail-react-app/app/components/order-summary'
+import OrderTypeDisplay from '@salesforce/retail-react-app/app/pages/cart/partials/order-type-display'
 import ProductItemList from '@salesforce/retail-react-app/app/components/product-item-list'
 import ProductViewModal from '@salesforce/retail-react-app/app/components/product-view-modal'
 import BundleProductViewModal from '@salesforce/retail-react-app/app/components/product-view-modal/bundle'
@@ -70,22 +70,24 @@ const DEBOUNCE_WAIT = 750
 const Cart = () => {
     const {data: basket, isLoading} = useCurrentBasket()
 
-    // Pickup in Store - only enabled if feature toggle is on
-    const isPickupOrder = STORE_LOCATOR_IS_ENABLED
-        ? basket?.shipments[0]?.shippingMethod?.c_storePickupEnabled === true
-        : false
-    const storeId = basket?.shipments?.[0]?.c_fromStoreId
+    // Pickup in Store - collect all unique store IDs from all shipments
+    const allStoreIds =
+        basket?.shipments
+            ?.map((shipment) => shipment.c_fromStoreId)
+            .filter(Boolean)
+            .filter((id, index, array) => array.indexOf(id) === index) // Remove duplicates
+            .join(',') || ''
+
     const {data: storeData} = useStores(
         {
             parameters: {
-                ids: storeId
+                ids: allStoreIds
             }
         },
         {
-            enabled: !!storeId && STORE_LOCATOR_IS_ENABLED
+            enabled: !!allStoreIds && STORE_LOCATOR_IS_ENABLED
         }
     )
-    const storeName = storeData?.data?.[0]?.name
 
     const {selectedStore} = useSelectedStore()
     const selectedInventoryId = selectedStore?.inventoryId || null
@@ -585,20 +587,83 @@ const Cart = () => {
         )
     }
 
-    // Categorize products into regular and bonus
-    const categorizedProducts = useMemo(() => {
-        return basket?.productItems?.reduce(
-            (acc, productItem) => {
-                if (productItem.bonusProductLineItem) {
-                    acc.bonusProducts.push(productItem)
-                } else {
-                    acc.regularProducts.push(productItem)
-                }
-                return acc
-            },
-            {regularProducts: [], bonusProducts: []}
-        )
-    }, [basket?.productItems])
+    // Create shipment-specific data, grouping delivery shipments together
+    const shipmentData = useMemo(() => {
+        if (!basket?.shipments?.length) return []
+
+        const pickupShipments = []
+        const deliveryShipments = []
+
+        // Separate pickup and delivery shipments
+        basket.shipments.forEach((shipment) => {
+            const isPickupOrder = STORE_LOCATOR_IS_ENABLED
+                ? shipment?.shippingMethod?.c_storePickupEnabled === true
+                : false
+            const storeId = shipment?.c_fromStoreId
+            const store = storeData?.data?.find((store) => store.id === storeId)
+
+            // Filter products for this shipment
+            const shipmentProducts =
+                basket.productItems?.filter(
+                    (productItem) => productItem.shipmentId === shipment.shipmentId
+                ) || []
+
+            // Categorize products into regular and bonus for this shipment
+            const categorizedProducts = shipmentProducts.reduce(
+                (acc, productItem) => {
+                    if (productItem.bonusProductLineItem) {
+                        acc.bonusProducts.push(productItem)
+                    } else {
+                        acc.regularProducts.push(productItem)
+                    }
+                    return acc
+                },
+                {regularProducts: [], bonusProducts: []}
+            )
+
+            const shipmentData = {
+                shipment,
+                isPickupOrder,
+                store,
+                categorizedProducts,
+                itemsInShipment:
+                    categorizedProducts.regularProducts.length +
+                    categorizedProducts.bonusProducts.length
+            }
+
+            if (isPickupOrder) {
+                pickupShipments.push(shipmentData)
+            } else {
+                deliveryShipments.push(shipmentData)
+            }
+        })
+
+        const result = [...pickupShipments]
+
+        // Combine all delivery shipments into a single group
+        if (deliveryShipments.length > 0) {
+            const combinedDeliveryProducts = deliveryShipments.reduce(
+                (acc, shipmentData) => {
+                    acc.regularProducts.push(...shipmentData.categorizedProducts.regularProducts)
+                    acc.bonusProducts.push(...shipmentData.categorizedProducts.bonusProducts)
+                    return acc
+                },
+                {regularProducts: [], bonusProducts: []}
+            )
+
+            result.push({
+                shipment: null, // No specific shipment for combined delivery
+                isPickupOrder: false,
+                store: null, // No specific store for combined delivery
+                categorizedProducts: combinedDeliveryProducts,
+                itemsInShipment:
+                    combinedDeliveryProducts.regularProducts.length +
+                    combinedDeliveryProducts.bonusProducts.length
+            })
+        }
+
+        return result
+    }, [basket?.shipments, basket?.productItems, storeData])
 
     // Function to render secondary actions for product items
     const renderSecondaryActions = ({productItem, isAGift}) => (
@@ -613,6 +678,15 @@ const Cart = () => {
             onRemoveItemClick={handleRemoveItem}
         />
     )
+
+    // Function to create deliveryActions
+    const createDeliveryActions = (isPickupOrder) => {
+        return {
+            showDeliveryOptions: STORE_LOCATOR_IS_ENABLED,
+            deliveryOption: isPickupOrder ? 'pickup' : 'ship',
+            onDeliveryOptionChange: () => {}
+        }
+    }
 
     /********* Rendering  UI **********/
     if (isLoading) {
@@ -639,52 +713,40 @@ const Cart = () => {
                             gap={{base: 10, xl: 20}}
                         >
                             <GridItem>
-                                <Stack spacing={4}>
-                                    {/* Order Type Display */}
-                                    {STORE_LOCATOR_IS_ENABLED && (
-                                        <Box layerStyle="cardBordered" p={3}>
-                                            {isPickupOrder ? (
-                                                <Text fontWeight="bold">
-                                                    <FormattedMessage
-                                                        defaultMessage="Pick Up in Store ({storeName})"
-                                                        id="cart.order_type.pickup_in_store"
-                                                        values={{
-                                                            storeName
-                                                        }}
-                                                    />
-                                                </Text>
-                                            ) : (
-                                                <Text fontWeight="bold">
-                                                    <FormattedMessage
-                                                        defaultMessage="Delivery"
-                                                        id="cart.order_type.delivery"
-                                                    />
-                                                </Text>
+                                <Stack spacing={6}>
+                                    {shipmentData.map((shipmentInfo) => (
+                                        <Box
+                                            key={
+                                                shipmentInfo.shipment?.shipmentId ||
+                                                'combined-delivery'
+                                            }
+                                            bg="white"
+                                            borderLeft="1px solid"
+                                            borderRight="1px solid"
+                                            borderBottom="1px solid"
+                                            borderColor="gray.200"
+                                            borderRadius="md"
+                                            borderTopRadius="none"
+                                            overflow="hidden"
+                                            boxShadow="sm"
+                                            p={4}
+                                        >
+                                            {/* Order Type Display */}
+                                            {STORE_LOCATOR_IS_ENABLED && (
+                                                <OrderTypeDisplay
+                                                    isPickupOrder={shipmentInfo.isPickupOrder}
+                                                    store={shipmentInfo.store}
+                                                    itemsInShipment={shipmentInfo.itemsInShipment}
+                                                    totalItemsInCart={
+                                                        basket?.productItems?.length || 0
+                                                    }
+                                                />
                                             )}
-                                        </Box>
-                                    )}
-                                    {/* Regular Products */}
-                                    <ProductItemList
-                                        productItems={categorizedProducts.regularProducts}
-                                        productsByItemId={productsByItemId}
-                                        isProductsLoading={isProductsLoading}
-                                        localQuantity={localQuantity}
-                                        localIsGiftItems={localIsGiftItems}
-                                        isCartItemLoading={isCartItemLoading}
-                                        selectedItem={selectedItem}
-                                        onItemQuantityChange={handleChangeItemQuantity}
-                                        onRemoveItemClick={handleRemoveItem}
-                                        renderSecondaryActions={renderSecondaryActions}
-                                    />
-
-                                    {/* Bonus Products */}
-                                    {categorizedProducts.bonusProducts.length > 0 && (
-                                        <>
-                                            <Box>
-                                                <BonusProductsTitle />
-                                            </Box>
+                                            {/* Regular Products */}
                                             <ProductItemList
-                                                productItems={categorizedProducts.bonusProducts}
+                                                productItems={
+                                                    shipmentInfo.categorizedProducts.regularProducts
+                                                }
                                                 productsByItemId={productsByItemId}
                                                 isProductsLoading={isProductsLoading}
                                                 localQuantity={localQuantity}
@@ -694,9 +756,41 @@ const Cart = () => {
                                                 onItemQuantityChange={handleChangeItemQuantity}
                                                 onRemoveItemClick={handleRemoveItem}
                                                 renderSecondaryActions={renderSecondaryActions}
+                                                deliveryActions={createDeliveryActions(
+                                                    shipmentInfo.isPickupOrder
+                                                )}
                                             />
-                                        </>
-                                    )}
+                                            {/* Bonus Products */}
+                                            {shipmentInfo.categorizedProducts.bonusProducts.length >
+                                                0 && (
+                                                <>
+                                                    <BonusProductsTitle />
+                                                    <ProductItemList
+                                                        productItems={
+                                                            shipmentInfo.categorizedProducts
+                                                                .bonusProducts
+                                                        }
+                                                        productsByItemId={productsByItemId}
+                                                        isProductsLoading={isProductsLoading}
+                                                        localQuantity={localQuantity}
+                                                        localIsGiftItems={localIsGiftItems}
+                                                        isCartItemLoading={isCartItemLoading}
+                                                        selectedItem={selectedItem}
+                                                        onItemQuantityChange={
+                                                            handleChangeItemQuantity
+                                                        }
+                                                        onRemoveItemClick={handleRemoveItem}
+                                                        renderSecondaryActions={
+                                                            renderSecondaryActions
+                                                        }
+                                                        deliveryActions={createDeliveryActions(
+                                                            shipmentInfo.isPickupOrder
+                                                        )}
+                                                    />
+                                                </>
+                                            )}
+                                        </Box>
+                                    ))}
                                 </Stack>
                                 <Box>
                                     {isOpen && !selectedItem.bundledProductItems && (
