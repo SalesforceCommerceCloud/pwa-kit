@@ -49,6 +49,7 @@ import Swatch from '@salesforce/retail-react-app/app/components/swatch-group/swa
 import SwatchGroup from '@salesforce/retail-react-app/app/components/swatch-group'
 import {getPriceData} from '@salesforce/retail-react-app/app/utils/product-utils'
 import PromoCallout from '@salesforce/retail-react-app/app/components/product-tile/promo-callout'
+import {ApplePayExpress} from '@salesforce/retail-react-app/app/components/apple-pay-express'
 
 const ProductViewHeader = ({
     name,
@@ -340,6 +341,15 @@ const ProductView = forwardRef(
                             ? buttonText.addBundleToCart
                             : buttonText.addToCart}
                     </Button>
+                )
+            }
+
+            // Add Apple Pay Express "Buy Now" button for single products (not sets/bundles)
+            if (!isProductPartOfBundle && !isProductASet && !isProductABundle && !updateCart) {
+                buttons.push(
+                    <Box key="apple-pay-express" width="100%" marginBottom={4}>
+                        <ApplePayExpress sku={variant?.productId || product?.id} />
+                    </Box>
                 )
             }
 

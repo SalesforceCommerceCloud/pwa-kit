@@ -5,6 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React, {useEffect, useState} from 'react'
+import {useLocation} from 'react-router-dom'
 
 import {useAccessToken, useCustomerId} from '@salesforce/commerce-sdk-react'
 import {AdyenExpressCheckoutProvider} from '@adyen/adyen-salesforce-pwa'
@@ -19,8 +20,13 @@ function Express() {
     const navigate = useNavigation()
     const {locale, site} = useMultiSite()
     const {data: basket} = useCurrentBasket()
+    const location = useLocation()
 
     const [authToken, setAuthToken] = useState()
+
+    // Extract SKU from URL parameters for "Buy Now" flow
+    const urlParams = new URLSearchParams(location.search)
+    const sku = urlParams.get('sku') || urlParams.get('productId')
 
     useEffect(() => {
         const getToken = async () => {
@@ -45,7 +51,7 @@ function Express() {
                 basket={basket}
                 navigate={navigate}
             >
-                <ApplePayExpress />
+                <ApplePayExpress sku={sku} />
             </AdyenExpressCheckoutProvider>
         </div>
     )

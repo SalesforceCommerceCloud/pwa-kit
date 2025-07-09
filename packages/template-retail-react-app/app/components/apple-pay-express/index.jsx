@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {useEffect, useRef} from 'react'
+import React, {useEffect, useRef, useState} from 'react'
 import AdyenCheckout from '@adyen/adyen-web'
 import '@adyen/adyen-web/dist/adyen.css'
 import PropTypes from 'prop-types'
@@ -13,6 +13,7 @@ import {getCurrencyValueForApi} from '@salesforce/retail-react-app/app/component
 import {AdyenShippingMethodsService} from '@salesforce/retail-react-app/app/components/apple-pay-express/utils/shipping-methods'
 import {AdyenShippingAddressService} from '@salesforce/retail-react-app/app/components/apple-pay-express/utils/shipping-address'
 import {AdyenPaymentsService} from '@salesforce/retail-react-app/app/components/apple-pay-express/utils/payments'
+import {createTemporaryBasket} from '@salesforce/retail-react-app/app/components/apple-pay-express/utils/temporary-basket'
 
 const PAYMENT_METHOD = 'applepay'
 const EXPRESS_PAYMENT_AVAILABLE = 'express.payment.available'
@@ -79,16 +80,21 @@ export const getAppleButtonConfig = (
     shippingMethods,
     applePayConfig,
     navigate,
-    fetchShippingMethods
+    fetchShippingMethods,
+    sku = null,
+    setTempBasket = null,
+    tempBasket = null
 ) => {
-    let applePayAmount = basket.orderTotal
+    // Use temporary basket if available, otherwise use main basket
+    const currentBasket = tempBasket || basket
+    let applePayAmount = currentBasket?.orderTotal || 0
     const buttonConfig = {
         showPayButton: true,
         isExpress: true,
         configuration: applePayConfig,
         amount: {
-            value: getCurrencyValueForApi(basket.orderTotal, basket.currency),
-            currency: basket.currency
+            value: getCurrencyValueForApi(currentBasket?.orderTotal || 0, currentBasket?.currency || 'USD'),
+            currency: currentBasket?.currency || 'USD'
         },
         requiredShippingContactFields: ['postalAddress', 'name', 'email', 'phone'],
         requiredBillingContactFields: ['postalAddress'],
@@ -98,6 +104,38 @@ export const getAppleButtonConfig = (
             identifier: sm.id,
             amount: `${sm.price}`
         })),
+        onClick: async (resolve, reject) => {
+            if (sku && setTempBasket) {
+                // "Buy Now" flow - create temporary basket
+                try {
+                    const tempBasketData = await createTemporaryBasket(sku, authToken, site)
+                    setTempBasket(tempBasketData)
+                    
+                    // Update the button config with the temporary basket data
+                    buttonConfig.amount = {
+                        value: getCurrencyValueForApi(tempBasketData.orderTotal, tempBasketData.currency),
+                        currency: tempBasketData.currency
+                    }
+                    applePayAmount = tempBasketData.orderTotal
+                    
+                    // Update the Apple Pay sheet with the new pricing
+                    const priceUpdate = {
+                        newTotal: {
+                            type: 'final',
+                            label: applePayConfig.merchantName,
+                            amount: `${tempBasketData.orderTotal}`
+                        }
+                    }
+                    resolve(priceUpdate)
+                } catch (error) {
+                    console.error('Error creating temporary basket:', error)
+                    reject()
+                }
+            } else {
+                // Regular checkout flow
+                resolve()
+            }
+        },
         onAuthorized: async (resolve, reject, event) => {
             try {
                 const {shippingContact, billingContact, token} = event.payment
@@ -112,14 +150,18 @@ export const getAppleButtonConfig = (
                         ...getCustomerShippingDetails(shippingContact)
                     }
                 }
+                
+                // Use temporary basket if available, otherwise use main basket
+                const currentBasket = tempBasket || basket
+                
                 const adyenPaymentService = new AdyenPaymentsService(authToken, site)
                 const paymentsResponse = await adyenPaymentService.submitPayment(
                     {
                         ...state.data,
                         origin: state.data.origin ? state.data.origin : window.location.origin
                     },
-                    basket?.basketId,
-                    basket?.customerInfo?.customerId
+                    currentBasket?.basketId,
+                    currentBasket?.customerInfo?.customerId
                 )
                 if (paymentsResponse?.isFinal && paymentsResponse?.isSuccessful) {
                     const finalPriceUpdate = {
@@ -154,15 +196,19 @@ export const getAppleButtonConfig = (
         onShippingContactSelected: async (resolve, reject, event) => {
             try {
                 const {shippingContact} = event
+                
+                // Use temporary basket if available, otherwise use main basket
+                const currentBasket = tempBasket || basket
+                
                 const adyenShippingAddressService = new AdyenShippingAddressService(authToken, site)
                 const adyenShippingMethodsService = new AdyenShippingMethodsService(authToken, site)
                 const customerShippingDetails = getCustomerShippingDetails(shippingContact)
                 await adyenShippingAddressService.updateShippingAddress(
-                    basket.basketId,
+                    currentBasket.basketId,
                     customerShippingDetails
                 )
                 const newShippingMethods = await fetchShippingMethods(
-                    basket?.basketId,
+                    currentBasket?.basketId,
                     site,
                     authToken
                 )
@@ -171,7 +217,7 @@ export const getAppleButtonConfig = (
                 } else {
                     const response = await adyenShippingMethodsService.updateShippingMethod(
                         newShippingMethods.applicableShippingMethods[0].id,
-                        basket.basketId
+                        currentBasket.basketId
                     )
                     buttonConfig.amount = {
                         value: getCurrencyValueForApi(response.orderTotal, response.currency),
@@ -202,10 +248,14 @@ export const getAppleButtonConfig = (
         onShippingMethodSelected: async (resolve, reject, event) => {
             try {
                 const {shippingMethod} = event
+                
+                // Use temporary basket if available, otherwise use main basket
+                const currentBasket = tempBasket || basket
+                
                 const adyenShippingMethodsService = new AdyenShippingMethodsService(authToken, site)
                 const response = await adyenShippingMethodsService.updateShippingMethod(
                     shippingMethod.identifier,
-                    basket.basketId
+                    currentBasket.basketId
                 )
                 if (response.error) {
                     reject()
@@ -243,7 +293,7 @@ export const getAppleButtonConfig = (
     return buttonConfig
 }
 
-export const ApplePayExpress = () => {
+export const ApplePayExpress = ({sku}) => {
     const {
         adyenEnvironment,
         adyenPaymentMethods,
@@ -256,12 +306,19 @@ export const ApplePayExpress = () => {
         fetchShippingMethods
     } = useAdyenExpressCheckout()
     const paymentContainer = useRef(null)
+    const [tempBasket, setTempBasket] = useState(null)
 
     useEffect(() => {
         let isCanceled = false
 
         const createCheckout = async () => {
             if (isCanceled) {
+                return
+            }
+
+            // For "Buy Now" flow, we don't need a basket initially
+            // For regular flow, we need a basket to continue
+            if (!sku && !basket) {
                 return
             }
 
@@ -297,7 +354,10 @@ export const ApplePayExpress = () => {
                     shippingMethods?.applicableShippingMethods,
                     applePaymentMethodConfig,
                     navigate,
-                    fetchShippingMethods
+                    fetchShippingMethods,
+                    sku,
+                    setTempBasket,
+                    tempBasket
                 )
 
                 let applePayButton
@@ -333,7 +393,11 @@ export const ApplePayExpress = () => {
                 const isMissingOrderTotalError =
                     err instanceof TypeError &&
                     err.message == "undefined is not an object (evaluating 'a.orderTotal')"
-                if (!isMissingOrderTotalError) {
+                
+                // For "Buy Now" flow, missing order total is expected initially
+                const isExpectedBuyNowError = sku && isMissingOrderTotalError && !tempBasket
+                
+                if (!isMissingOrderTotalError && !isExpectedBuyNowError) {
                     handleApplePayUnavailable()
                 }
             }
@@ -344,7 +408,7 @@ export const ApplePayExpress = () => {
         return () => {
             isCanceled = true
         }
-    }, [adyenEnvironment, adyenPaymentMethods])
+    }, [adyenEnvironment, adyenPaymentMethods, tempBasket, basket, shippingMethods])
 
     return (
         <>
@@ -354,5 +418,6 @@ export const ApplePayExpress = () => {
 }
 
 ApplePayExpress.propTypes = {
-    shippingMethods: PropTypes.array
+    shippingMethods: PropTypes.array,
+    sku: PropTypes.string
 }
