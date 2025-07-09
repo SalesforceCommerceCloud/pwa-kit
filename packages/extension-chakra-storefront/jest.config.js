@@ -57,6 +57,7 @@ module.exports = {
         createTestGlob('pages/social-login-redirect'),
         // createTestGlob('pages/registration'), // TODO: enable after Account page has been migrated
         '<rootDir>/src/pages/account/wishlist/partials/wishlist-secondary-button-group.test.js',
+        '<rootDir>/src/pages/account/wishlist/partials/wishlist-primary-action.test.js',
         '<rootDir>/src/pages/checkout/partials/contact-info.test.js',
         '<rootDir>/src/pages/checkout/partials/login-state.test.js',
         '<rootDir>/src/utils/responsive-image.test.js',

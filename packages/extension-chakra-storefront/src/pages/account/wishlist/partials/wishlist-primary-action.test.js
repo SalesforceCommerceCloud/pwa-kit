@@ -9,7 +9,7 @@ import {mockWishListDetails} from './wishlist-primary-action.mock'
 import ItemVariantProvider from '../../../../components/item-variant'
 import {renderWithProviders} from '../../../../utils/test-utils'
 import WishlistPrimaryAction from './wishlist-primary-action'
-import {screen, waitFor} from '@testing-library/react'
+import {screen, waitFor, act} from '@testing-library/react'
 import PropTypes from 'prop-types'
 import {rest} from 'msw'
 import {basketWithProductSet} from '../../../product-detail/index.mock'
@@ -50,12 +50,15 @@ beforeEach(() => {
 
 test('the Add To Cart button', async () => {
     const variant = mockWishListDetails.data[3]
+
     const {user} = renderWithProviders(<MockedComponent variant={variant} />)
 
     const addToCartButton = await screen.findByRole('button', {
         name: new RegExp(`Add ${variant.name} to cart`, 'i')
     })
-    await user.click(addToCartButton)
+    await act(async () => {
+        await user.click(addToCartButton)
+    })
 
     await waitFor(() => {
         expect(screen.getByText(/1 item added to cart/i)).toBeInTheDocument()
@@ -65,10 +68,12 @@ test('the Add To Cart button', async () => {
 test('the Add Set To Cart button', async () => {
     const productSetWithoutVariants = mockWishListDetails.data[1]
     const {user} = renderWithProviders(<MockedComponent variant={productSetWithoutVariants} />)
-    const button = await screen.findByRole('button', {
+    const addSetToCartButton = await screen.findByRole('button', {
         name: new RegExp(`Add ${productSetWithoutVariants.name} set to cart`, 'i')
     })
-    await user.click(button)
+    await act(async () => {
+        await user.click(addSetToCartButton)
+    })
 
     await waitFor(() => {
         expect(screen.getByText(/2 items added to cart/i)).toBeInTheDocument()
@@ -87,8 +92,10 @@ test('the View Options button', async () => {
     const masterProduct = mockWishListDetails.data[2]
     const {user} = renderWithProviders(<MockedComponent variant={masterProduct} />)
 
-    const button = await screen.findByRole('button', {name: /view options/i})
-    await user.click(button)
+    const viewOptionsButton = await screen.findByRole('button', {name: /view options/i})
+    await act(async () => {
+        await user.click(viewOptionsButton)
+    })
 
     await waitFor(
         () => {
