@@ -17,7 +17,7 @@ import ProductItem from '@salesforce/retail-react-app/app/components/product-ite
  * Component that renders a list of product items with consistent props and behavior.
  * Extracted from cart page to be reusable across different contexts.
  */
-const ProductList = ({
+const ProductItemList = ({
     productItems = [],
     renderSecondaryActions,
     onItemQuantityChange,
@@ -72,7 +72,7 @@ const ProductList = ({
     )
 }
 
-ProductList.propTypes = {
+ProductItemList.propTypes = {
     productItems: PropTypes.arrayOf(PropTypes.object),
     renderSecondaryActions: PropTypes.func,
     onItemQuantityChange: PropTypes.func.isRequired,
@@ -85,4 +85,4 @@ ProductList.propTypes = {
     selectedItem: PropTypes.object
 }
 
-export default ProductList
+export default ProductItemList

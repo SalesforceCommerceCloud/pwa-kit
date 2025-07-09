@@ -28,7 +28,7 @@ import BonusProductsTitle from '@salesforce/retail-react-app/app/pages/cart/part
 import ConfirmationModal from '@salesforce/retail-react-app/app/components/confirmation-modal'
 import EmptyCart from '@salesforce/retail-react-app/app/pages/cart/partials/empty-cart'
 import OrderSummary from '@salesforce/retail-react-app/app/components/order-summary'
-import ProductList from '@salesforce/retail-react-app/app/components/product-list'
+import ProductItemList from '@salesforce/retail-react-app/app/components/product-item-list'
 import ProductViewModal from '@salesforce/retail-react-app/app/components/product-view-modal'
 import BundleProductViewModal from '@salesforce/retail-react-app/app/components/product-view-modal/bundle'
 import RecommendedProducts from '@salesforce/retail-react-app/app/components/recommended-products'
@@ -664,7 +664,7 @@ const Cart = () => {
                                         </Box>
                                     )}
                                     {/* Regular Products */}
-                                    <ProductList
+                                    <ProductItemList
                                         productItems={categorizedProducts.regularProducts}
                                         productsByItemId={productsByItemId}
                                         isProductsLoading={isProductsLoading}
@@ -683,7 +683,7 @@ const Cart = () => {
                                             <Box>
                                                 <BonusProductsTitle />
                                             </Box>
-                                            <ProductList
+                                            <ProductItemList
                                                 productItems={categorizedProducts.bonusProducts}
                                                 productsByItemId={productsByItemId}
                                                 isProductsLoading={isProductsLoading}

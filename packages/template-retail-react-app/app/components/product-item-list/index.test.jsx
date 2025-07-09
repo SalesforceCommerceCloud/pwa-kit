@@ -5,13 +5,14 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
+import PropTypes from 'prop-types'
 import {render, screen} from '@testing-library/react'
 import {IntlProvider} from 'react-intl'
-import ProductList from '@salesforce/retail-react-app/app/components/product-list'
+import ProductItemList from '@salesforce/retail-react-app/app/components/product-item-list'
 
 // Mock the ProductItem component
 jest.mock('@salesforce/retail-react-app/app/components/product-item', () => {
-    return function MockedProductItem({product, onItemQuantityChange, showLoading}) {
+    const MockedProductItem = function ({product, onItemQuantityChange, showLoading}) {
         return (
             <div>
                 <span>{product.name}</span>
@@ -21,6 +22,18 @@ jest.mock('@salesforce/retail-react-app/app/components/product-item', () => {
             </div>
         )
     }
+
+    // Add PropTypes to silence linting errors
+    MockedProductItem.propTypes = {
+        product: PropTypes.shape({
+            name: PropTypes.string,
+            quantity: PropTypes.number
+        }),
+        onItemQuantityChange: PropTypes.func,
+        showLoading: PropTypes.bool
+    }
+
+    return MockedProductItem
 })
 
 const mockProductItems = [
@@ -74,20 +87,20 @@ const renderWithIntl = (component) =>
         </IntlProvider>
     )
 
-describe('ProductList Component', () => {
+describe('ProductItemList Component', () => {
     beforeEach(() => {
         jest.clearAllMocks()
     })
 
     test('renders all product items', () => {
-        renderWithIntl(<ProductList {...defaultProps} />)
+        renderWithIntl(<ProductItemList {...defaultProps} />)
 
         expect(screen.getByText('Test Product 1')).toBeInTheDocument()
         expect(screen.getByText('Test Product 2')).toBeInTheDocument()
     })
 
     test('renders empty list when no product items provided', () => {
-        renderWithIntl(<ProductList {...defaultProps} productItems={[]} />)
+        renderWithIntl(<ProductItemList {...defaultProps} productItems={[]} />)
 
         expect(screen.queryByText('Test Product 1')).not.toBeInTheDocument()
         expect(screen.queryByText('Test Product 2')).not.toBeInTheDocument()
@@ -100,7 +113,7 @@ describe('ProductList Component', () => {
             selectedItem: mockProductItems[0]
         }
 
-        renderWithIntl(<ProductList {...propsWithLoading} />)
+        renderWithIntl(<ProductItemList {...propsWithLoading} />)
 
         expect(screen.getByText('Loading...')).toBeInTheDocument()
     })
@@ -108,7 +121,7 @@ describe('ProductList Component', () => {
     test('calls onItemQuantityChange when quantity is changed', () => {
         const mockOnItemQuantityChange = jest.fn()
         renderWithIntl(
-            <ProductList {...defaultProps} onItemQuantityChange={mockOnItemQuantityChange} />
+            <ProductItemList {...defaultProps} onItemQuantityChange={mockOnItemQuantityChange} />
         )
 
         const changeButtons = screen.getAllByText('Change Quantity')
@@ -120,7 +133,10 @@ describe('ProductList Component', () => {
     test('renders with custom secondary actions', () => {
         const mockRenderSecondaryActions = jest.fn(() => <div>Custom Actions</div>)
         renderWithIntl(
-            <ProductList {...defaultProps} renderSecondaryActions={mockRenderSecondaryActions} />
+            <ProductItemList
+                {...defaultProps}
+                renderSecondaryActions={mockRenderSecondaryActions}
+            />
         )
 
         expect(mockRenderSecondaryActions).toHaveBeenCalledTimes(2)
@@ -141,7 +157,7 @@ describe('ProductList Component', () => {
             }
         ]
 
-        renderWithIntl(<ProductList {...defaultProps} productItems={bonusProductItems} />)
+        renderWithIntl(<ProductItemList {...defaultProps} productItems={bonusProductItems} />)
 
         expect(screen.getByText('Test Product 1')).toBeInTheDocument()
     })
@@ -151,7 +167,7 @@ describe('ProductList Component', () => {
             item1: 3
         }
 
-        renderWithIntl(<ProductList {...defaultProps} localQuantity={localQuantity} />)
+        renderWithIntl(<ProductItemList {...defaultProps} localQuantity={localQuantity} />)
 
         expect(screen.getByText('Quantity: 3')).toBeInTheDocument()
     })
@@ -163,7 +179,7 @@ describe('ProductList Component', () => {
 
         const mockRenderSecondaryActions = jest.fn(() => <div>Actions</div>)
         renderWithIntl(
-            <ProductList
+            <ProductItemList
                 {...defaultProps}
                 localIsGiftItems={localIsGiftItems}
                 renderSecondaryActions={mockRenderSecondaryActions}
