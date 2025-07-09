@@ -36,7 +36,7 @@ import SelectedRefinements from '../../pages/product-list/partials/selected-refi
 import EmptySearchResults from '../../pages/product-list/partials/empty-results'
 import PageHeader from './partials/product-list-title'
 import AbovePageHeader from '../../pages/product-list/partials/above-page-header'
-import PageDesignerPromotionalBanner from './partials/product-list-banner'
+import ProductListBanner from './partials/product-list-banner'
 import PageMetadata from './page-metadata'
 import PageCache from './page-cache'
 import Sort from './partials/sort'
@@ -298,7 +298,7 @@ const ProductList = (props) => {
                     <>
                         <AbovePageHeader />
 
-                        <PageDesignerPromotionalBanner />
+                        <ProductListBanner />
                         <ProductListHeader
                             searchQuery={searchQuery}
                             category={category}
