@@ -8,7 +8,7 @@ import React from 'react'
 import ItemVariantProvider from '../../../../components/item-variant'
 import {renderWithProviders} from '../../../../utils/test-utils'
 import WishlistSecondaryButtonGroup from '../partials/wishlist-secondary-button-group'
-import {screen, waitFor} from '@testing-library/react'
+import {screen, waitFor, within} from '@testing-library/react'
 import user from '@testing-library/user-event'
 import {rest} from 'msw'
 import {mockedProductLists, mockedWishListProducts} from '../index.mock'
@@ -371,6 +371,33 @@ beforeEach(() => {
 })
 
 test('can remove item', async () => {
+    const mockedHandler = jest.fn()
+    renderWithProviders(<MockedComponent onClick={mockedHandler} />)
+
+    const removeButton = await screen.findByRole('button', {
+        name: /remove/i
+    })
+    user.click(removeButton)
+
+    const confirmButton = await screen.findByRole('button', {name: /yes, remove item/i})
+    user.click(confirmButton)
+
+    await waitFor(() => {
+        expect(mockedHandler).toHaveBeenCalled()
+    })
+})
+
+test('shows error toast when remove item fails', async () => {
+    // Need to throw an error in the API call to show the error toast
+    global.server.use(
+        rest.delete(
+            '*/customers/:customerId/product-lists/:listId/items/:itemId',
+            (req, res, ctx) => {
+                return res(ctx.delay(0), ctx.status(500), ctx.json({error: 'Server error'}))
+            }
+        )
+    )
+
     const mockedHandler = jest.fn()
     renderWithProviders(<MockedComponent onClick={mockedHandler} />)
 
