@@ -84,7 +84,7 @@ const ProductListHeader = ({
             {/* Filter Button for Mobile */}
             <HideOnDesktop>
                 <Stack gap={6}>
-                    <PageHeader
+                    <PageTitle
                         searchQuery={searchQuery}
                         category={category}
                         productSearchResult={productSearchResult}
