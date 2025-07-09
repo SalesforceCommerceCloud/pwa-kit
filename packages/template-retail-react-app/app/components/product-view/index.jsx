@@ -125,8 +125,21 @@ const ProductView = forwardRef(
             setChildProductOrderability,
             isBasketLoading = false,
             onVariantSelected = () => {},
-            validateOrderability = (variant, quantity, stockLevel) =>
-                !isProductLoading && variant?.orderable && quantity > 0 && quantity <= stockLevel,
+            validateOrderability = (variant, product, quantity, stockLevel) => {
+                if (isProductLoading) return false
+
+                // If product has variations, a variant must be selected
+                if (product?.variationAttributes?.length > 0 && !variant) {
+                    return false
+                }
+
+                // Check if product (either variant or standard) is orderable and if quantity is valid
+                return (
+                    (variant?.orderable || product?.inventory?.orderable) &&
+                    quantity > 0 &&
+                    quantity <= stockLevel
+                )
+            },
             showImageGallery = true,
             setSelectedBundleQuantity = () => {},
             selectedBundleParentQuantity = 1,
@@ -169,8 +182,8 @@ const ProductView = forwardRef(
             return getPriceData(product, {quantity})
         }, [product, quantity])
         const canAddToWishlist = !isProductLoading
-        const isProductASet = product?.type.set
-        const isProductABundle = product?.type.bundle
+        const isProductASet = product?.type?.set
+        const isProductABundle = product?.type?.bundle
         const errorContainerRef = useRef(null)
         const [pickupEnabled, setPickupEnabled] = useState(false)
         const storeName = selectedStore?.name
@@ -223,7 +236,7 @@ const ProductView = forwardRef(
         const validateAndShowError = (opts = {}) => {
             const {scrollErrorIntoView = true} = opts
             // Validate that all attributes are selected before proceeding.
-            const hasValidSelection = validateOrderability(variant, quantity, stockLevel)
+            const hasValidSelection = validateOrderability(variant, product, quantity, stockLevel)
             const showError = !isProductASet && !isProductABundle && !hasValidSelection
             const scrollToError = showError && scrollErrorIntoView
 
@@ -292,7 +305,7 @@ const ProductView = forwardRef(
                     return
                 }
                 try {
-                    const itemsAdded = await addToCart(variant, quantity)
+                    const itemsAdded = await addToCart([{product, variant, quantity}])
                     // Open modal only when `addToCart` returns some data
                     // It's possible that the item has been added to cart, but we don't want to open the modal.
                     // See wishlist_primary_action for example.
@@ -390,7 +403,7 @@ const ProductView = forwardRef(
             if (
                 !isProductASet &&
                 !isProductABundle &&
-                validateOrderability(variant, quantity, stockLevel)
+                validateOrderability(variant, product, quantity, stockLevel)
             ) {
                 toggleShowOptionsMessage(false)
             }
@@ -401,6 +414,12 @@ const ProductView = forwardRef(
                 onVariantSelected(product, variant, quantity)
             }
         }, [variant?.productId, quantity])
+
+        useEffect(() => {
+            if ((isProductPartOfBundle || isProductPartOfSet) && product && product.type?.item) {
+                onVariantSelected(product, null, childOfBundleQuantity || quantity)
+            }
+        }, [product, childOfBundleQuantity, quantity, isProductPartOfBundle, isProductPartOfSet])
 
         useEffect(() => {
             if (isProductPartOfBundle || isProductPartOfSet) {

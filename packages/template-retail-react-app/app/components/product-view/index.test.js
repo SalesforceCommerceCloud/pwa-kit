@@ -11,6 +11,10 @@ import {fireEvent, screen, waitFor} from '@testing-library/react'
 import mockProductDetail from '@salesforce/retail-react-app/app/mocks/variant-750518699578M'
 import mockProductSet from '@salesforce/retail-react-app/app/mocks/product-set-winter-lookM'
 import {mockProductBundle} from '@salesforce/retail-react-app/app/mocks/product-bundle'
+import {
+    mockStandardProductOrderable,
+    mockStandardProductNotOrderable
+} from '@salesforce/retail-react-app/app/mocks/standard-product'
 import ProductView from '@salesforce/retail-react-app/app/components/product-view'
 import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
 import userEvent from '@testing-library/user-event'
@@ -90,105 +94,216 @@ test('ProductView Component renders properly', async () => {
     expect(screen.getAllByText(/add to cart/i)).toHaveLength(2)
 })
 
-test('ProductView Component renders with addToCart event handler', async () => {
-    const addToCart = jest.fn()
-    await renderWithProviders(<MockComponent product={mockProductDetail} addToCart={addToCart} />)
+describe('Event Handlers', () => {
+    test('calls addToCart when add to cart button is clicked', async () => {
+        const addToCart = jest.fn()
+        await renderWithProviders(
+            <MockComponent product={mockProductDetail} addToCart={addToCart} />
+        )
 
-    const addToCartButton = screen.getAllByText(/add to cart/i)[0]
-    fireEvent.click(addToCartButton)
+        const addToCartButton = screen.getAllByText(/add to cart/i)[0]
+        fireEvent.click(addToCartButton)
 
-    await waitFor(() => {
-        expect(addToCart).toHaveBeenCalledTimes(1)
+        await waitFor(() => {
+            expect(addToCart).toHaveBeenCalledTimes(1)
+        })
+    })
+
+    test('calls addToWishlist when add to wishlist button is clicked', async () => {
+        const addToWishlist = jest.fn()
+
+        await renderWithProviders(
+            <MockComponent product={mockProductDetail} addToWishlist={addToWishlist} />
+        )
+
+        await waitFor(() => {
+            expect(screen.getByText(/customer: registered/)).toBeInTheDocument()
+        })
+
+        await waitFor(() => {
+            const addToWishListButton = screen.getAllByText(/Add to wishlist/i)[0]
+
+            fireEvent.click(addToWishListButton)
+            expect(addToWishlist).toHaveBeenCalledTimes(1)
+        })
+    })
+
+    test('calls updateWishlist when update button is clicked', async () => {
+        const updateWishlist = jest.fn()
+
+        await renderWithProviders(
+            <MockComponent product={mockProductDetail} updateWishlist={updateWishlist} />
+        )
+
+        await waitFor(() => {
+            expect(screen.getByText(/customer: registered/)).toBeInTheDocument()
+        })
+
+        await waitFor(() => {
+            const updateWishlistButton = screen.getAllByText(/Update/i)[0]
+
+            fireEvent.click(updateWishlistButton)
+            expect(updateWishlist).toHaveBeenCalledTimes(1)
+        })
+    })
+
+    test('calls onVariantSelected after variant selection', async () => {
+        const user = userEvent.setup()
+        const onVariantSelected = jest.fn()
+        const child = mockProductSet.setProducts[0]
+
+        renderWithProviders(
+            <MockComponent
+                product={child}
+                onVariantSelected={onVariantSelected}
+                addToCart={() => {}}
+                addToWishlist={() => {}}
+            />
+        )
+
+        const size = screen.getByRole('radio', {name: /xl/i})
+        await user.click(size)
+
+        await waitFor(() => {
+            expect(onVariantSelected).toHaveBeenCalledTimes(1)
+        })
+    })
+
+    test('calls validateOrderability when adding a set to cart', async () => {
+        const user = userEvent.setup()
+        const parent = mockProductSet
+        const validateOrderability = jest.fn()
+
+        renderWithProviders(
+            <MockComponent
+                product={parent}
+                validateOrderability={validateOrderability}
+                addToCart={() => {}}
+                addToWishlist={() => {}}
+            />
+        )
+
+        const button = screen.getByRole('button', {name: /add set to cart/i})
+        await user.click(button)
+
+        await waitFor(() => {
+            expect(validateOrderability).toHaveBeenCalledTimes(1)
+        })
+    })
+
+    test('calls onVariantSelected for standard products in bundles', async () => {
+        const onVariantSelected = jest.fn()
+        const setChildProductOrderability = jest.fn()
+        const standardProduct = {
+            id: 'standard-product-1',
+            name: 'Standard Product',
+            type: {item: true},
+            variationAttributes: [],
+            inventory: {
+                orderable: true,
+                stockLevel: 10
+            }
+        }
+
+        renderWithProviders(
+            <MockComponent
+                product={standardProduct}
+                onVariantSelected={onVariantSelected}
+                setChildProductOrderability={setChildProductOrderability}
+                isProductPartOfBundle={true}
+                childOfBundleQuantity={2}
+                addToCart={() => {}}
+                addToWishlist={() => {}}
+            />
+        )
+
+        await waitFor(() => {
+            expect(onVariantSelected).toHaveBeenCalledWith(standardProduct, null, 2)
+        })
+    })
+
+    test('calls onVariantSelected for standard products in sets', async () => {
+        const onVariantSelected = jest.fn()
+        const setChildProductOrderability = jest.fn()
+        const standardProduct = {
+            id: 'standard-product-1',
+            name: 'Standard Product',
+            type: {item: true},
+            variationAttributes: [],
+            inventory: {
+                orderable: true,
+                stockLevel: 10
+            }
+        }
+
+        renderWithProviders(
+            <MockComponent
+                product={standardProduct}
+                onVariantSelected={onVariantSelected}
+                setChildProductOrderability={setChildProductOrderability}
+                isProductPartOfSet={true}
+                addToCart={() => {}}
+                addToWishlist={() => {}}
+            />
+        )
+
+        await waitFor(() => {
+            expect(onVariantSelected).toHaveBeenCalledWith(standardProduct, null, 1)
+        })
     })
 })
 
-test('ProductView Component renders with addToWishList event handler', async () => {
-    const addToWishlist = jest.fn()
+describe('Quantity Management', () => {
+    test('can update quantity through input field', async () => {
+        const user = userEvent.setup()
+        const addToCart = jest.fn()
+        await renderWithProviders(
+            <MockComponent product={mockProductDetail} addToCart={addToCart} />
+        )
 
-    await renderWithProviders(
-        <MockComponent product={mockProductDetail} addToWishlist={addToWishlist} />
-    )
+        let quantityBox
+        await waitFor(() => {
+            quantityBox = screen.getByRole('spinbutton')
+        })
 
-    await waitFor(() => {
-        expect(screen.getByText(/customer: registered/)).toBeInTheDocument()
+        await waitFor(() => {
+            expect(quantityBox).toHaveValue('1')
+        })
+
+        // update item quantity
+        await user.type(quantityBox, '{backspace}3')
+
+        await waitFor(() => {
+            expect(quantityBox).toHaveValue('3')
+        })
     })
 
-    await waitFor(() => {
-        const addToWishListButton = screen.getAllByText(/Add to wishlist/i)[0]
+    test('handles invalid quantity inputs by resetting to minimum', async () => {
+        const user = userEvent.setup()
 
-        fireEvent.click(addToWishListButton)
-        expect(addToWishlist).toHaveBeenCalledTimes(1)
-    })
-})
+        // Any invalid input should be reset to minOrderQuantity
+        await renderWithProviders(<MockComponent product={mockProductDetail} />)
 
-test('ProductView Component renders with updateWishlist event handler', async () => {
-    const updateWishlist = jest.fn()
+        const quantityInput = screen.getByRole('spinbutton', {name: /quantity/i})
+        const minQuantity = mockProductDetail.minOrderQuantity.toString()
 
-    await renderWithProviders(
-        <MockComponent product={mockProductDetail} updateWishlist={updateWishlist} />
-    )
+        // Quantity is empty
+        await user.clear(quantityInput)
+        await user.tab()
+        await waitFor(() => {
+            expect(quantityInput).toHaveValue(minQuantity)
+        })
 
-    await waitFor(() => {
-        expect(screen.getByText(/customer: registered/)).toBeInTheDocument()
-    })
-
-    await waitFor(() => {
-        const updateWishlistButton = screen.getAllByText(/Update/i)[0]
-
-        fireEvent.click(updateWishlistButton)
-        expect(updateWishlist).toHaveBeenCalledTimes(1)
-    })
-})
-
-test('Product View can update quantity', async () => {
-    const user = userEvent.setup()
-    const addToCart = jest.fn()
-    await renderWithProviders(<MockComponent product={mockProductDetail} addToCart={addToCart} />)
-
-    let quantityBox
-    await waitFor(() => {
-        quantityBox = screen.getByRole('spinbutton')
+        // Quantity is zero
+        await user.clear(quantityInput)
+        await user.type(quantityInput, '0')
+        await user.tab()
+        await waitFor(() => {
+            expect(quantityInput).toHaveValue(minQuantity)
+        })
     })
 
-    await waitFor(() => {
-        expect(quantityBox).toHaveValue('1')
-    })
-
-    // update item quantity
-    await user.type(quantityBox, '{backspace}3')
-
-    await waitFor(() => {
-        expect(quantityBox).toHaveValue('3')
-    })
-})
-
-test('Product View handles invalid quantity inputs', async () => {
-    const user = userEvent.setup()
-
-    // Any invalid input should be reset to minOrderQuantity
-    await renderWithProviders(<MockComponent product={mockProductDetail} />)
-
-    const quantityInput = screen.getByRole('spinbutton', {name: /quantity/i})
-    const minQuantity = mockProductDetail.minOrderQuantity.toString()
-
-    // Quantity is empty
-    await user.clear(quantityInput)
-    await user.tab()
-    await waitFor(() => {
-        expect(quantityInput).toHaveValue(minQuantity)
-    })
-
-    // Quantity is zero
-    await user.clear(quantityInput)
-    await user.type(quantityInput, '0')
-    await user.tab()
-    await waitFor(() => {
-        expect(quantityInput).toHaveValue(minQuantity)
-    })
-})
-
-describe('ProductView Component', () => {
-    test('increases quantity when increment button is clicked', async () => {
+    test('increases and decreases quantity with increment/decrement buttons', async () => {
         const user = userEvent.setup()
         renderWithProviders(<ProductView product={mockProductDetail} />)
 
@@ -210,117 +325,8 @@ describe('ProductView Component', () => {
     })
 })
 
-test('renders a product set properly - parent item', () => {
-    const parent = mockProductSet
-    renderWithProviders(
-        <MockComponent product={parent} addToCart={() => {}} addToWishlist={() => {}} />
-    )
-
-    // NOTE: there can be duplicates of the same element, due to mobile and desktop views
-    // (they're hidden with display:none style)
-
-    const fromAtLabel = screen.getAllByText(/from/i)[0]
-    const addSetToCartButton = screen.getAllByRole('button', {name: /add set to cart/i})[0]
-    const addSetToWishlistButton = screen.getAllByRole('button', {name: /add set to wishlist/i})[0]
-    const variationAttributes = screen
-        .getAllByRole('radiogroup')
-        .filter(
-            (rg) =>
-                !rg.textContent.includes('Ship to Address') &&
-                !rg.textContent.includes('Pick Up in Store')
-        )
-    const quantityPicker = screen.queryByRole('spinbutton', {name: /quantity/i})
-
-    // What should exist:
-    expect(fromAtLabel).toBeInTheDocument()
-    expect(addSetToCartButton).toBeInTheDocument()
-    expect(addSetToWishlistButton).toBeInTheDocument()
-
-    // What should _not_ exist:
-    expect(variationAttributes).toHaveLength(0)
-    expect(quantityPicker).toBeNull()
-})
-
-test('renders a product set properly - child item', () => {
-    const child = mockProductSet.setProducts[0]
-    renderWithProviders(
-        <MockComponent product={child} addToCart={() => {}} addToWishlist={() => {}} />
-    )
-
-    // NOTE: there can be duplicates of the same element, due to mobile and desktop views
-    // (they're hidden with display:none style)
-
-    const addToCartButton = screen.getAllByRole('button', {name: /add to cart/i})[0]
-    const addToWishlistButton = screen.getAllByRole('button', {name: /add to wishlist/i})[0]
-    const variationAttributes = screen
-        .getAllByRole('radiogroup')
-        .filter(
-            (rg) =>
-                !rg.textContent.includes('Ship to Address') &&
-                !rg.textContent.includes('Pick Up in Store')
-        )
-    const quantityPicker = screen.getByRole('spinbutton', {name: /quantity/i})
-    const fromLabels = screen.queryAllByText(/from/i)
-
-    // What should exist:
-    expect(addToCartButton).toBeInTheDocument()
-    expect(addToWishlistButton).toBeInTheDocument()
-    expect(variationAttributes).toHaveLength(2)
-    expect(quantityPicker).toBeInTheDocument()
-
-    // since setProducts are master products, as pricing now display From X (cross) Y where X Y are sale and lis price respectively
-    // of the variant that has lowest price (including promotional price)
-    expect(fromLabels).toHaveLength(4)
-})
-
-test('validateOrderability callback is called when adding a set to cart', async () => {
-    const user = userEvent.setup()
-
-    const parent = mockProductSet
-    const validateOrderability = jest.fn()
-
-    renderWithProviders(
-        <MockComponent
-            product={parent}
-            validateOrderability={validateOrderability}
-            addToCart={() => {}}
-            addToWishlist={() => {}}
-        />
-    )
-
-    const button = screen.getByRole('button', {name: /add set to cart/i})
-    await user.click(button)
-
-    await waitFor(() => {
-        expect(validateOrderability).toHaveBeenCalledTimes(1)
-    })
-})
-
-test('onVariantSelected callback is called after successfully selected a variant', async () => {
-    const user = userEvent.setup()
-
-    const onVariantSelected = jest.fn()
-    const child = mockProductSet.setProducts[0]
-
-    renderWithProviders(
-        <MockComponent
-            product={child}
-            onVariantSelected={onVariantSelected}
-            addToCart={() => {}}
-            addToWishlist={() => {}}
-        />
-    )
-
-    const size = screen.getByRole('radio', {name: /xl/i})
-    await user.click(size)
-
-    await waitFor(() => {
-        expect(onVariantSelected).toHaveBeenCalledTimes(1)
-    })
-})
-
-describe('add to cart button loading tests', () => {
-    test('add to cart button is disabled if isBasketLoading is true', async () => {
+describe('Loading States', () => {
+    test('disables add to cart button when basket is loading', async () => {
         renderWithProviders(
             <MockComponent
                 product={mockProductDetail}
@@ -331,7 +337,7 @@ describe('add to cart button loading tests', () => {
         expect(screen.getByRole('button', {name: /add to cart/i})).toBeDisabled()
     })
 
-    test('add to cart button is enabled if isBasketLoading is false', async () => {
+    test('enables add to cart button when basket is not loading', async () => {
         renderWithProviders(
             <MockComponent
                 product={mockProductDetail}
@@ -343,68 +349,269 @@ describe('add to cart button loading tests', () => {
     })
 })
 
-test('renders a product bundle properly - parent item', () => {
-    const parent = mockProductBundle
-    renderWithProviders(
-        <MockComponent product={parent} addToCart={() => {}} addToWishlist={() => {}} />
-    )
-
-    // NOTE: there can be duplicates of the same element, due to mobile and desktop views
-    // (they're hidden with display:none style)
-    const addBundleToCartButton = screen.getAllByRole('button', {name: /add bundle to cart/i})[0]
-    const addBundleToWishlistButton = screen.getAllByRole('button', {
-        name: /add bundle to wishlist/i
-    })[0]
-    const quantityPicker = screen.getByRole('spinbutton', {name: /quantity/i})
-    const variationAttributes = screen
-        .getAllByRole('radiogroup')
-        .filter(
-            (rg) =>
-                !rg.textContent.includes('Ship to Address') &&
-                !rg.textContent.includes('Pick Up in Store')
+describe('Product Sets', () => {
+    test('renders parent item correctly', () => {
+        const parent = mockProductSet
+        renderWithProviders(
+            <MockComponent product={parent} addToCart={() => {}} addToWishlist={() => {}} />
         )
 
-    // What should exist:
-    expect(addBundleToCartButton).toBeInTheDocument()
-    expect(addBundleToWishlistButton).toBeInTheDocument()
-    expect(quantityPicker).toBeInTheDocument()
+        // NOTE: there can be duplicates of the same element, due to mobile and desktop views
+        // (they're hidden with display:none style)
 
-    // What should _not_ exist:
-    expect(variationAttributes).toHaveLength(0)
-})
+        const fromAtLabel = screen.getAllByText(/from/i)[0]
+        const addSetToCartButton = screen.getAllByRole('button', {name: /add set to cart/i})[0]
+        const addSetToWishlistButton = screen.getAllByRole('button', {
+            name: /add set to wishlist/i
+        })[0]
+        const variationAttributes = screen
+            .getAllByRole('radiogroup')
+            .filter(
+                (rg) =>
+                    !rg.textContent.includes('Ship to Address') &&
+                    !rg.textContent.includes('Pickup in Store')
+            )
+        const quantityPicker = screen.queryByRole('spinbutton', {name: /quantity/i})
 
-test('renders a product bundle properly - child item', () => {
-    const child = mockProductBundle.bundledProducts[0].product
-    renderWithProviders(
-        <MockComponent
-            product={child}
-            addToCart={() => {}}
-            addToWishlist={() => {}}
-            isProductPartOfBundle={true}
-            setChildProductOrderability={() => {}}
-        />
-    )
+        // What should exist:
+        expect(fromAtLabel).toBeInTheDocument()
+        expect(addSetToCartButton).toBeInTheDocument()
+        expect(addSetToWishlistButton).toBeInTheDocument()
 
-    const addToCartButton = screen.queryByRole('button', {name: /add to cart/i})
-    const addToWishlistButton = screen.queryByRole('button', {name: /add to wishlist/i})
-    const variationAttributes = screen
-        .getAllByRole('radiogroup')
-        .filter(
-            (rg) =>
-                !rg.textContent.includes('Ship to Address') &&
-                !rg.textContent.includes('Pick Up in Store')
+        // What should _not_ exist:
+        expect(variationAttributes).toHaveLength(0)
+        expect(quantityPicker).toBeNull()
+    })
+
+    test('renders child item correctly', () => {
+        const child = mockProductSet.setProducts[0]
+        renderWithProviders(
+            <MockComponent product={child} addToCart={() => {}} addToWishlist={() => {}} />
         )
-    const quantityPicker = screen.queryByRole('spinbutton', {name: /quantity:/i})
 
-    // What should exist:
-    expect(variationAttributes).toHaveLength(2)
+        // NOTE: there can be duplicates of the same element, due to mobile and desktop views
+        // (they're hidden with display:none style)
 
-    // What should _not_ exist:
-    expect(addToCartButton).toBeNull()
-    expect(addToWishlistButton).toBeNull()
-    expect(quantityPicker).toBeNull()
+        const addToCartButton = screen.getAllByRole('button', {name: /add to cart/i})[0]
+        const addToWishlistButton = screen.getAllByRole('button', {name: /add to wishlist/i})[0]
+        const variationAttributes = screen
+            .getAllByRole('radiogroup')
+            .filter(
+                (rg) =>
+                    !rg.textContent.includes('Ship to Address') &&
+                    !rg.textContent.includes('Pickup in Store')
+            )
+        const quantityPicker = screen.getByRole('spinbutton', {name: /quantity/i})
+        const fromLabels = screen.queryAllByText(/from/i)
+
+        // What should exist:
+        expect(addToCartButton).toBeInTheDocument()
+        expect(addToWishlistButton).toBeInTheDocument()
+        expect(variationAttributes).toHaveLength(2)
+        expect(quantityPicker).toBeInTheDocument()
+
+        // since setProducts are master products, as pricing now display From X (cross) Y where X Y are sale and lis price respectively
+        // of the variant that has lowest price (including promotional price)
+        expect(fromLabels).toHaveLength(4)
+    })
 })
 
+describe('Product Bundles', () => {
+    test('renders parent item correctly', () => {
+        const parent = mockProductBundle
+        renderWithProviders(
+            <MockComponent product={parent} addToCart={() => {}} addToWishlist={() => {}} />
+        )
+
+        // NOTE: there can be duplicates of the same element, due to mobile and desktop views
+        // (they're hidden with display:none style)
+        const addBundleToCartButton = screen.getAllByRole('button', {
+            name: /add bundle to cart/i
+        })[0]
+        const addBundleToWishlistButton = screen.getAllByRole('button', {
+            name: /add bundle to wishlist/i
+        })[0]
+        const quantityPicker = screen.getByRole('spinbutton', {name: /quantity/i})
+        const variationAttributes = screen
+            .getAllByRole('radiogroup')
+            .filter(
+                (rg) =>
+                    !rg.textContent.includes('Ship to Address') &&
+                    !rg.textContent.includes('Pickup in Store')
+            )
+
+        // What should exist:
+        expect(addBundleToCartButton).toBeInTheDocument()
+        expect(addBundleToWishlistButton).toBeInTheDocument()
+        expect(quantityPicker).toBeInTheDocument()
+
+        // What should _not_ exist:
+        expect(variationAttributes).toHaveLength(0)
+    })
+
+    test('renders child item correctly', () => {
+        const child = mockProductBundle.bundledProducts[0].product
+        renderWithProviders(
+            <MockComponent
+                product={child}
+                addToCart={() => {}}
+                addToWishlist={() => {}}
+                isProductPartOfBundle={true}
+                setChildProductOrderability={() => {}}
+            />
+        )
+
+        const addToCartButton = screen.queryByRole('button', {name: /add to cart/i})
+        const addToWishlistButton = screen.queryByRole('button', {name: /add to wishlist/i})
+        const variationAttributes = screen
+            .getAllByRole('radiogroup')
+            .filter(
+                (rg) =>
+                    !rg.textContent.includes('Ship to Address') &&
+                    !rg.textContent.includes('Pickup in Store')
+            )
+        const quantityPicker = screen.queryByRole('spinbutton', {name: /quantity:/i})
+
+        // What should exist:
+        expect(variationAttributes).toHaveLength(2)
+
+        // What should _not_ exist:
+        expect(addToCartButton).toBeNull()
+        expect(addToWishlistButton).toBeNull()
+        expect(quantityPicker).toBeNull()
+    })
+
+    test('Pickup in store radio is enabled when selected store is set', async () => {
+        // Ensure the product has inventory data for the store and is in stock
+        const mockProduct = {
+            ...mockProductDetail,
+            inventories: [{id: mockStoreData.inventoryId, orderable: true, stockLevel: 10}]
+        }
+
+        renderWithProviders(<MockComponent product={mockProduct} />)
+
+        // Assert: Radio is enabled
+        const pickupRadio = await screen.findByRole('radio', {name: /pick up in store/i})
+        expect(pickupRadio).toBeEnabled()
+    })
+
+    test('Pickup in store radio is disabled when inventoryId is NOT present in localStorage', async () => {
+        renderWithProviders(<MockComponent product={mockProductDetail} />)
+
+        // Assert: Radio is disabled
+        const pickupRadio = await screen.findByRole('radio', {name: /pick up in store/i})
+        expect(pickupRadio).toBeDisabled()
+    })
+
+    test('Pickup in store radio is disabled when inventoryId is present but product is out of stock', async () => {
+        const user = userEvent.setup()
+
+        // Product inventory is not orderable
+        const mockProduct = {
+            ...mockProductDetail,
+            inventories: [{id: mockStoreData.inventoryId, orderable: false}]
+        }
+
+        renderWithProviders(<MockComponent product={mockProduct} />)
+
+        const pickupRadio = await screen.findByRole('radio', {name: /pick up in store/i})
+        // Chakra UI does not set a semantic disabled attribute, so we test for unclickability
+        expect(pickupRadio).not.toBeChecked()
+        await user.click(pickupRadio)
+        expect(pickupRadio).not.toBeChecked()
+    })
+
+    test('shows "Pickup in Select Store" label when pickup is disabled due to no store/inventoryId', async () => {
+        useSelectedStore.mockReturnValue({
+            selectedStore: null,
+            isLoading: false,
+            error: null,
+            hasSelectedStore: false
+        })
+
+        renderWithProviders(<MockComponent product={mockProductDetail} />)
+
+        const label = await screen.findByTestId('pickup-select-store-msg')
+        expect(label).toBeInTheDocument()
+        expect(label).toHaveTextContent(/Pick up in/i)
+        const button = label.querySelector('button')
+        expect(button).toBeInTheDocument()
+        expect(button).toHaveTextContent(/Select Store/i)
+    })
+
+    describe('ProductView stock status messages', () => {
+        const storeName = 'Test Store'
+
+        test('shows "In Stock at {storeName}" when store has inventory', async () => {
+            const mockProduct = {
+                ...mockProductDetail,
+                inventories: [{id: mockStoreData.inventoryId, orderable: true, stockLevel: 10}],
+                name: 'Test Product'
+            }
+            renderWithProviders(<MockComponent product={mockProduct} />)
+            const msg = await screen.findByText(/In Stock at/i)
+            expect(msg).toBeInTheDocument()
+            expect(msg).toHaveTextContent(storeName)
+            // Store name should be a button
+            const button = msg.querySelector('button')
+            expect(button).toBeInTheDocument()
+            expect(button).toHaveTextContent(storeName)
+        })
+
+        test('shows "Out of Stock at {storeName}" when store is out of inventory', async () => {
+            const mockProduct = {
+                ...mockProductDetail,
+                inventories: [{id: mockStoreData.inventoryId, orderable: false}],
+                name: 'Test Product'
+            }
+            renderWithProviders(<MockComponent product={mockProduct} />)
+            const msg = await screen.findByText(/Out of Stock at/i)
+            expect(msg).toBeInTheDocument()
+            expect(msg).toHaveTextContent(storeName)
+            // Store name should be a button
+            const button = msg.querySelector('button')
+            expect(button).toBeInTheDocument()
+            expect(button).toHaveTextContent(storeName)
+        })
+    })
+
+    describe('ProductView showDeliveryOptions property', () => {
+        test('shows delivery options when showDeliveryOptions is true (default)', async () => {
+            renderWithProviders(
+                <MockComponent product={mockProductDetail} showDeliveryOptions={true} />
+            )
+
+            // Delivery options should be visible
+            expect(screen.getByText(/Delivery:/i)).toBeInTheDocument()
+            expect(screen.getByRole('radio', {name: /ship to address/i})).toBeInTheDocument()
+            expect(screen.getByRole('radio', {name: /pick up in store/i})).toBeInTheDocument()
+        })
+
+        test('hides delivery options when showDeliveryOptions is false', async () => {
+            renderWithProviders(
+                <MockComponent product={mockProductDetail} showDeliveryOptions={false} />
+            )
+
+            // Delivery options should not be visible
+            expect(screen.queryByText(/Delivery:/i)).not.toBeInTheDocument()
+            expect(screen.queryByRole('radio', {name: /ship to address/i})).not.toBeInTheDocument()
+            expect(screen.queryByRole('radio', {name: /pick up in store/i})).not.toBeInTheDocument()
+            expect(screen.queryByTestId('store-stock-status-msg')).not.toBeInTheDocument()
+            expect(screen.queryByTestId('pickup-select-store-msg')).not.toBeInTheDocument()
+        })
+
+        test('shows delivery options when showDeliveryOptions is not provided (defaults to true)', async () => {
+            renderWithProviders(<MockComponent product={mockProductDetail} />)
+
+            // Delivery options should be visible by default
+            expect(screen.getByText(/Delivery:/i)).toBeInTheDocument()
+            expect(screen.getByRole('radio', {name: /ship to address/i})).toBeInTheDocument()
+            expect(screen.getByRole('radio', {name: /pick up in store/i})).toBeInTheDocument()
+        })
+    })
+})
+
+// Additional tests from develop branch
 test('Pick up in store radio is enabled when selected store is set', async () => {
     // Ensure the product has inventory data for the store and is in stock
     const mockProduct = {
@@ -463,76 +670,22 @@ test('shows "Pick up in Select Store" label when pickup is disabled due to no st
     expect(button).toHaveTextContent(/Select Store/i)
 })
 
-describe('ProductView stock status messages', () => {
-    const storeName = 'Test Store'
+test('shows "In stock at {storeName}" when store has inventory', async () => {
+    const mockProduct = {
+        ...mockProductDetail,
+        inventories: [{id: mockStoreData.inventoryId, orderable: true, stockLevel: 10}]
+    }
 
-    test('shows "In stock at {storeName}" when store has inventory', async () => {
-        const mockProduct = {
-            ...mockProductDetail,
-            inventories: [{id: mockStoreData.inventoryId, orderable: true, stockLevel: 10}],
-            name: 'Test Product'
-        }
-        renderWithProviders(<MockComponent product={mockProduct} />)
-        const msg = await screen.findByText(/In stock at/i)
-        expect(msg).toBeInTheDocument()
-        expect(msg).toHaveTextContent(storeName)
-        // Store name should be a button
-        const button = msg.querySelector('button')
-        expect(button).toBeInTheDocument()
-        expect(button).toHaveTextContent(storeName)
-    })
-
-    test('shows "Out of Stock at {storeName}" when store is out of inventory', async () => {
-        const mockProduct = {
-            ...mockProductDetail,
-            inventories: [{id: mockStoreData.inventoryId, orderable: false}],
-            name: 'Test Product'
-        }
-        renderWithProviders(<MockComponent product={mockProduct} />)
-        const msg = await screen.findByText(/Out of Stock at/i)
-        expect(msg).toBeInTheDocument()
-        expect(msg).toHaveTextContent(storeName)
-        // Store name should be a button
-        const button = msg.querySelector('button')
-        expect(button).toBeInTheDocument()
-        expect(button).toHaveTextContent(storeName)
-    })
+    renderWithProviders(<MockComponent product={mockProduct} />)
+    const msg = await screen.findByText(/In stock at/i)
+    expect(msg).toBeInTheDocument()
+    expect(msg).toHaveTextContent('Test Store')
+    // Store name should be a button
+    const button = msg.querySelector('button')
+    expect(button).toBeInTheDocument()
+    expect(button).toHaveTextContent('Test Store')
 })
 
-describe('ProductView showDeliveryOptions property', () => {
-    test('shows delivery options when showDeliveryOptions is true (default)', async () => {
-        renderWithProviders(
-            <MockComponent product={mockProductDetail} showDeliveryOptions={true} />
-        )
-
-        // Delivery options should be visible
-        expect(screen.getByText(/Delivery:/i)).toBeInTheDocument()
-        expect(screen.getByRole('radio', {name: /ship to address/i})).toBeInTheDocument()
-        expect(screen.getByRole('radio', {name: /pick up in store/i})).toBeInTheDocument()
-    })
-
-    test('hides delivery options when showDeliveryOptions is false', async () => {
-        renderWithProviders(
-            <MockComponent product={mockProductDetail} showDeliveryOptions={false} />
-        )
-
-        // Delivery options should not be visible
-        expect(screen.queryByText(/Delivery:/i)).not.toBeInTheDocument()
-        expect(screen.queryByRole('radio', {name: /ship to address/i})).not.toBeInTheDocument()
-        expect(screen.queryByRole('radio', {name: /pick up in store/i})).not.toBeInTheDocument()
-        expect(screen.queryByTestId('store-stock-status-msg')).not.toBeInTheDocument()
-        expect(screen.queryByTestId('pickup-select-store-msg')).not.toBeInTheDocument()
-    })
-
-    test('shows delivery options when showDeliveryOptions is not provided (defaults to true)', async () => {
-        renderWithProviders(<MockComponent product={mockProductDetail} />)
-
-        // Delivery options should be visible by default
-        expect(screen.getByText(/Delivery:/i)).toBeInTheDocument()
-        expect(screen.getByRole('radio', {name: /ship to address/i})).toBeInTheDocument()
-        expect(screen.getByRole('radio', {name: /pick up in store/i})).toBeInTheDocument()
-    })
-})
 test('renders "Add to Cart" and "Add to Wishlist" buttons in French', async () => {
     const addToCart = jest.fn()
     const addToWishlist = jest.fn()
@@ -553,4 +706,96 @@ test('renders "Add to Cart" and "Add to Wishlist" buttons in French', async () =
     expect(
         screen.getByRole('button', {name: /ajouter à la liste de souhaits/i})
     ).toBeInTheDocument()
+})
+
+describe('validateOrderability', () => {
+    test('returns true when variant is undefined but product is orderable', () => {
+        const validateOrderability = (variant, product, quantity, stockLevel) =>
+            (variant?.orderable || product?.inventory?.orderable) &&
+            quantity > 0 &&
+            quantity <= stockLevel
+
+        const variant = undefined
+        const product = mockStandardProductOrderable
+        const quantity = 1
+        const stockLevel = 999999
+
+        const result = validateOrderability(variant, product, quantity, stockLevel)
+        expect(result).toBe(true)
+    })
+
+    test('returns false when variant is undefined and product is not orderable', () => {
+        const validateOrderability = (variant, product, quantity, stockLevel) =>
+            (variant?.orderable || product?.inventory?.orderable) &&
+            quantity > 0 &&
+            quantity <= stockLevel
+
+        const variant = undefined
+        const product = mockStandardProductNotOrderable
+        const quantity = 1
+        const stockLevel = 0
+
+        const result = validateOrderability(variant, product, quantity, stockLevel)
+        expect(result).toBe(false)
+    })
+
+    test('returns true when variant is orderable regardless of product orderability', () => {
+        const validateOrderability = (variant, product, quantity, stockLevel) =>
+            (variant?.orderable || product?.inventory?.orderable) &&
+            quantity > 0 &&
+            quantity <= stockLevel
+
+        const variant = {orderable: true}
+        const product = mockStandardProductNotOrderable // product is not orderable
+        const quantity = 1
+        const stockLevel = 999999
+
+        const result = validateOrderability(variant, product, quantity, stockLevel)
+        expect(result).toBe(true)
+    })
+
+    test('returns false when both variant and product are not orderable', () => {
+        const validateOrderability = (variant, product, quantity, stockLevel) =>
+            (variant?.orderable || product?.inventory?.orderable) &&
+            quantity > 0 &&
+            quantity <= stockLevel
+
+        const variant = {orderable: false}
+        const product = mockStandardProductNotOrderable
+        const quantity = 1
+        const stockLevel = 0
+
+        const result = validateOrderability(variant, product, quantity, stockLevel)
+        expect(result).toBe(false)
+    })
+
+    test('returns false when quantity is invalid even if product/variant are orderable', () => {
+        const validateOrderability = (variant, product, quantity, stockLevel) =>
+            (variant?.orderable || product?.inventory?.orderable) &&
+            quantity > 0 &&
+            quantity <= stockLevel
+
+        const variant = undefined
+        const product = mockStandardProductOrderable
+        const quantity = 0 // invalid quantity
+        const stockLevel = 999999
+
+        const result = validateOrderability(variant, product, quantity, stockLevel)
+        expect(result).toBe(false)
+    })
+
+    test('returns false when quantity exceeds stock level', () => {
+        const validateOrderability = (variant, product, quantity, stockLevel) =>
+            (variant?.orderable || product?.inventory?.orderable) &&
+            quantity > 0 &&
+            quantity <= stockLevel
+
+        const variant = undefined
+        const product = mockStandardProductOrderable
+        const quantity = 1000000 // exceeds stock level
+        const stockLevel = 999999
+
+        const result = validateOrderability(variant, product, quantity, stockLevel)
+        expect(result).toBe(false)
+    })
 })

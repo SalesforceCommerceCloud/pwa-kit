@@ -39,6 +39,7 @@ export const useDerivedProduct = (
     const lowestStockLevelProductName = product?.inventory?.lowestStockLevelProductName
     const intl = useIntl()
     const variant = useVariant(product, isProductPartOfSet, isProductPartOfBundle)
+    const isStandardProduct = product?.type?.item
     const variationParams = useVariationParams(product, isProductPartOfSet, isProductPartOfBundle)
     const variationAttributes = useVariationAttributes(
         product,
@@ -64,6 +65,7 @@ export const useDerivedProduct = (
         !stockLevel ||
         (!isProductABundle &&
             !variant &&
+            !isStandardProduct &&
             Object.keys(variationParams).length === variationAttributes.length) ||
         (!isProductABundle && variant && !variant.orderable)
     const unfulfillable = stockLevel < quantity
@@ -90,7 +92,8 @@ export const useDerivedProduct = (
     }
 
     // showInventoryMessage controls if add to cart button is disabled
-    const showInventoryMessage = (variant || isProductABundle) && (isOutOfStock || unfulfillable)
+    const showInventoryMessage =
+        (variant || isProductABundle || isStandardProduct) && (isOutOfStock || unfulfillable)
     const inventoryMessage =
         (isOutOfStock && inventoryMessages[OUT_OF_STOCK]) ||
         (unfulfillable && inventoryMessages[UNFULFILLABLE])

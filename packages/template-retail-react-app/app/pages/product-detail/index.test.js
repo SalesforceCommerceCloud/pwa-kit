@@ -27,6 +27,7 @@ import {
     basketWithProductBundle,
     bundleProductItemsForPDP
 } from '@salesforce/retail-react-app/app/mocks/product-bundle'
+import {mockStandardProductOrderable} from '@salesforce/retail-react-app/app/mocks/standard-product'
 
 jest.setTimeout(60000)
 
@@ -45,6 +46,37 @@ jest.mock('@salesforce/commerce-sdk-react', () => {
             }
         }
     }
+})
+
+// Mock Einstein hook
+const mockSendAddToCart = jest.fn()
+const mockSendViewProduct = jest.fn()
+const mockGetRecommendations = jest.fn()
+jest.mock('@salesforce/retail-react-app/app/hooks/use-einstein', () => ({
+    __esModule: true,
+    default: () => ({
+        sendAddToCart: mockSendAddToCart,
+        sendViewProduct: mockSendViewProduct,
+        getRecommendations: mockGetRecommendations
+    })
+}))
+
+jest.mock('@salesforce/retail-react-app/app/components/recommended-products', () => {
+    const MockedRecommendedProducts = ({title}) => {
+        return (
+            <div data-testid="recommended-products">
+                <h2>{title}</h2>
+                <div>Summer Bomber Jacket</div>
+            </div>
+        )
+    }
+
+    MockedRecommendedProducts.propTypes = {
+        // eslint-disable-next-line @typescript-eslint/no-var-requires
+        title: require('prop-types').node
+    }
+
+    return MockedRecommendedProducts
 })
 
 jest.mock('@salesforce/retail-react-app/app/constants', () => {
@@ -869,5 +901,216 @@ test('Add to Cart (Pick Up in Store) includes inventoryId for the selected varia
     // Wait for the POST to be called and assertion to run
     await waitFor(() => {
         // The assertion is inside the mock POST handler above
+    })
+})
+
+describe('standard product', () => {
+    let mockAddToCart = jest.fn()
+
+    beforeEach(() => {
+        mockAddToCart = jest.fn()
+        global.server.use(
+            // Use standard product without variants
+            rest.get('*/products/:productId', (req, res, ctx) => {
+                return res(ctx.delay(0), ctx.status(200), ctx.json(mockStandardProductOrderable))
+            }),
+            // Mock the add to cart API call to capture the request
+            rest.post('*/baskets/:basketId/items', (req, res, ctx) => {
+                const requestBody = req.body
+                mockAddToCart(requestBody)
+                return res(
+                    ctx.json({
+                        basketId: 'test-basket-id',
+                        productItems: [
+                            {
+                                productId: requestBody[0].productId,
+                                price: requestBody[0].price,
+                                quantity: requestBody[0].quantity,
+                                itemId: 'test-item-id',
+                                productName: 'Test Product'
+                            }
+                        ],
+                        productSubTotal: requestBody[0].price * requestBody[0].quantity,
+                        productTotal: requestBody[0].price * requestBody[0].quantity,
+                        orderTotal: requestBody[0].price * requestBody[0].quantity,
+                        shipments: [
+                            {
+                                shippingMethod: {
+                                    id: '001',
+                                    name: 'Ground'
+                                }
+                            }
+                        ]
+                    })
+                )
+            }),
+            // Mock shipping methods API call
+            rest.get(
+                '*/baskets/:basketId/shipments/:shipmentId/shipping-methods',
+                (req, res, ctx) => {
+                    return res(
+                        ctx.json({
+                            applicableShippingMethods: [
+                                {
+                                    id: '001',
+                                    name: 'Ground',
+                                    price: 15.99
+                                }
+                            ],
+                            defaultShippingMethodId: '001'
+                        })
+                    )
+                }
+            ),
+            // Mock update shipment API call
+            rest.patch('*/baskets/:basketId/shipments/:shipmentId', (req, res, ctx) => {
+                return res(ctx.json({}))
+            })
+        )
+    })
+
+    test('should be successfully added to cart', async () => {
+        window.history.pushState({}, 'ProductDetail', '/uk/en-GB/product/a-standard-dress')
+
+        const initialBasket = {basketId: 'test-basket-id'}
+        renderWithProviders(<MockedComponent />, {wrapperProps: {initialBasket}})
+
+        await waitFor(() => {
+            expect(screen.getAllByText('White and Black Tone')[0]).toBeInTheDocument()
+            expect(screen.getByRole('button', {name: /add to cart/i})).toBeInTheDocument()
+        })
+
+        const addToCartButton = screen.getByRole('button', {name: /add to cart/i})
+        fireEvent.click(addToCartButton)
+
+        await waitFor(() => {
+            expect(mockAddToCart).toHaveBeenCalledWith([
+                {
+                    productId: mockStandardProductOrderable.id,
+                    price: mockStandardProductOrderable.price,
+                    quantity: 1
+                }
+            ])
+        })
+    })
+
+    test('should handle quantity change before adding to cart', async () => {
+        window.history.pushState({}, 'ProductDetail', '/uk/en-GB/product/a-standard-dress')
+
+        const initialBasket = {basketId: 'test-basket-id'}
+        renderWithProviders(<MockedComponent />, {wrapperProps: {initialBasket}})
+
+        await waitFor(() => {
+            expect(screen.getAllByText('White and Black Tone')[0]).toBeInTheDocument()
+            expect(screen.getByRole('spinbutton', {name: /quantity/i})).toBeInTheDocument()
+        })
+
+        // Change quantity to 3
+        const quantityInput = screen.getByRole('spinbutton', {name: /quantity/i})
+        fireEvent.change(quantityInput, {target: {value: '3'}})
+
+        const addToCartButton = screen.getByRole('button', {name: /add to cart/i})
+        fireEvent.click(addToCartButton)
+
+        await waitFor(() => {
+            // Verify that the correct quantity is passed when variant is undefined
+            expect(mockAddToCart).toHaveBeenCalledWith([
+                {
+                    productId: mockStandardProductOrderable.id,
+                    price: mockStandardProductOrderable.price,
+                    quantity: 3
+                }
+            ])
+        })
+    })
+
+    test('renders bundle containing standard products without errors when master property is not provided', async () => {
+        global.server.use(
+            // Mock bundle with standard products
+            rest.get('*/products/:productId', (req, res, ctx) => {
+                return res(ctx.json(mockProductBundle))
+            }),
+            rest.get('*/products', (req, res, ctx) => {
+                const ids = req.url.searchParams.get('ids')
+                if (ids) {
+                    const products = ids.split(',').map((id) => ({
+                        id,
+                        inventory: {
+                            stockLevel: 5,
+                            orderable: true
+                        }
+                    }))
+                    return res(ctx.json({data: products}))
+                }
+                return res(ctx.json({data: []}))
+            }),
+            // Add items to basket
+            rest.post('*/baskets/:basketId/items', (req, res, ctx) => {
+                return res(ctx.json(basketWithProductBundle))
+            }),
+            // Update basket items
+            rest.patch('*/baskets/:basketId/items', (req, res, ctx) => {
+                return res(ctx.json(basketWithProductBundle))
+            })
+        )
+
+        renderWithProviders(<MockedComponent />)
+
+        await waitFor(() => {
+            expect(screen.getByTestId('product-details-page')).toBeInTheDocument()
+        })
+
+        await waitFor(() => {
+            expect(screen.getAllByTestId('product-view')).toHaveLength(4) // 1 parent + 3 children
+        })
+    })
+
+    test('adding to cart should send einstein event', async () => {
+        window.history.pushState({}, 'ProductDetail', '/uk/en-GB/product/a-standard-dress')
+
+        const initialBasket = {basketId: 'test-basket-id'}
+        renderWithProviders(<MockedComponent />, {wrapperProps: {initialBasket}})
+
+        await waitFor(() => {
+            expect(screen.getAllByText('White and Black Tone')[0]).toBeInTheDocument()
+            expect(screen.getByRole('button', {name: /add to cart/i})).toBeInTheDocument()
+        })
+
+        const addToCartButton = screen.getByRole('button', {name: /Add to Cart/i})
+        fireEvent.click(addToCartButton)
+
+        await waitFor(() => {
+            expect(mockAddToCart).toHaveBeenCalledTimes(1)
+            expect(mockSendAddToCart).toHaveBeenCalledTimes(1)
+
+            const addToCartArgs = mockSendAddToCart.mock.calls[0][0]
+            expect(addToCartArgs).toHaveLength(1)
+            const item = addToCartArgs[0]
+
+            expect(item).toEqual(
+                expect.objectContaining({
+                    product: expect.objectContaining({
+                        id: mockStandardProductOrderable.id
+                    }),
+                    productId: mockStandardProductOrderable.id,
+                    price: mockStandardProductOrderable.price,
+                    quantity: 1
+                })
+            )
+
+            // Verify that all required properties are defined and have correct types
+            // These are the properties that _constructEinsteinItem expects
+            expect(item.productId).toBeDefined()
+            expect(item.price).toBeDefined()
+            expect(item.quantity).toBeDefined()
+            expect(typeof item.productId).toBe('string')
+            expect(typeof item.price).toBe('number')
+            expect(typeof item.quantity).toBe('number')
+
+            // Specifically verify the values match the standard product
+            expect(item.productId).toBe('a-standard-dress')
+            expect(item.price).toBe(4)
+            expect(item.quantity).toBe(1)
+        })
     })
 })
