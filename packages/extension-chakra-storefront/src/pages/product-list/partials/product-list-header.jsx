@@ -19,7 +19,7 @@ import {HideOnDesktop} from '../../../components/responsive'
 import Refinements from '../partials/refinements'
 import CategoryLinks from '../partials/category-links'
 import SelectedRefinements from '../partials/selected-refinements'
-import PageHeader from '../partials/page-header'
+import PageTitle from './product-list-title'
 import Sort from '../partials/sort'
 
 const ProductListHeader = ({
@@ -56,7 +56,7 @@ const ProductListHeader = ({
                 marginBottom={6}
             >
                 <Flex align="left" width="287px">
-                    <PageHeader
+                    <PageTitle
                         searchQuery={searchQuery}
                         category={category}
                         productSearchResult={productSearchResult}
