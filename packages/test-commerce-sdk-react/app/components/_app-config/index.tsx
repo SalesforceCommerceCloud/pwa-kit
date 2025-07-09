@@ -29,7 +29,7 @@ const AppConfig = (props: AppConfigProps): ReactElement => {
         <CommerceApiProvider
             siteId={siteId}
             shortCode="sandbox-001"
-            clientId="de07bc02-1abc-422d-b932-65e27c069e38"
+            clientId="6b996c35-61bd-4268-abde-4edc86159563"
             organizationId="f_ecom_bhbg_stg"
             redirectURI="http://localhost:3001/callback"
             proxy={`http://localhost:3001/${String(proxyBasePath)}/api`}

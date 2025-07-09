@@ -41,11 +41,17 @@ module.exports = {
         commerceAPI: {
             proxyPath: `/mobify/proxy/api`,
             parameters: {
-                clientId: '8b09852b-355a-4227-b17e-11afd42cab70',
-                organizationId: 'f_ecom_zzrf_001',
-                shortCode: '8o7m175y',
+                clientId: '6b996c35-61bd-4268-abde-4edc86159563',
+                organizationId: 'f_ecom_bhbg_stg',
+                shortCode: 'sandbox-001',
                 siteId: 'RefArchGlobal'
             }
+            // parameters: {
+            //     clientId: '8b09852b-355a-4227-b17e-11afd42cab70',
+            //     organizationId: 'f_ecom_zzrf_001',
+            //     shortCode: '8o7m175y',
+            //     siteId: 'RefArchGlobal'
+            // }
         },
         einsteinAPI: {
             host: 'https://api.cquotient.com',
@@ -74,11 +80,11 @@ module.exports = {
         ssrFunctionNodeVersion: '22.x',
         proxyConfigs: [
             {
-                host: 'kv7kzm78.api.commercecloud.salesforce.com',
+                host: 'sandbox-001.api.commercecloud.salesforce.com',
                 path: 'api'
             },
             {
-                host: 'zzrf-001.dx.commercecloud.salesforce.com',
+                host: 'bhbg_stg.dx.commercecloud.salesforce.com',
                 path: 'ocapi'
             }
         ]
