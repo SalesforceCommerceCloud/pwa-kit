@@ -12,11 +12,13 @@
 
 import {mockAddresses} from '@salesforce/retail-react-app/app/mocks/mock-address-suggestions'
 
+// Constants
+const API_DELAY_MS = 300
 /**
  * Simulates API delay similar to real Google Places API
  * @param {number} delay - Delay in milliseconds
  */
-const simulateDelay = (delay = 200) => {
+const simulateDelay = (delay = API_DELAY_MS) => {
     return new Promise((resolve) => setTimeout(resolve, delay))
 }
 
@@ -28,7 +30,7 @@ const simulateDelay = (delay = 200) => {
  */
 export const getAddressSuggestions = async (input, countryCode) => {
     // Simulate API delay
-    await simulateDelay(300)
+    await simulateDelay()
 
     // Convert input to lowercase for case-insensitive matching
     const searchTerm = input.toLowerCase().trim()
@@ -88,12 +90,14 @@ export const parseAddressSuggestion = (suggestion) => {
         return parsedFields
     }
 
-    // Parse secondary text to extract city, state, and postal code
-    // Format examples:
-    // "New York, NY 10001, USA"
-    // "Toronto, ON M5C 1W4, Canada"
-    // "London, UK NW1 6XE"
-    // "New York" (single part)
+    /*
+     * Parse secondary text to extract city, state, and postal code
+     * Format examples:
+     * "New York, NY 10001, USA"
+     * "Toronto, ON M5C 1W4, Canada"
+     * "London, UK NW1 6XE"
+     * "New York" (single part)
+     */
 
     const parts = secondary_text.split(',')
 

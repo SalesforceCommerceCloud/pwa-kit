@@ -6,13 +6,15 @@
  */
 import {UseQueryResult} from '@tanstack/react-query'
 import {ApiClients, ApiQueryOptions, Argument, DataType, NullableParameters} from '../types'
-import useCommerceApi from '../useCommerceApi'
 import {useQuery} from '../useQuery'
 import {mergeOptions, omitNullableParameters, pickValidParams} from '../utils'
 import * as queryKeyHelpers from './queryKeyHelpers'
 import {ShopperContexts} from 'commerce-sdk-isomorphic'
+import {CLIENT_KEYS} from '../../constant'
+import useCommerceApi from '../useCommerceApi'
 
-type Client = ApiClients['shopperContexts']
+const CLIENT_KEY = CLIENT_KEYS.SHOPPER_CONTEXTS
+type Client = NonNullable<ApiClients[typeof CLIENT_KEY]>
 
 /**
  * Gets the shopper's context based on the shopperJWT.
@@ -31,7 +33,7 @@ export const useShopperContext = (
 ): UseQueryResult<DataType<Client['getShopperContext']>> => {
     type Options = Argument<Client['getShopperContext']>
     type Data = DataType<Client['getShopperContext']>
-    const {shopperContexts: client} = useCommerceApi()
+    const client = useCommerceApi(CLIENT_KEY)
     const methodName = 'getShopperContext'
     const requiredParameters = ShopperContexts.paramKeys[`${methodName}Required`]
 

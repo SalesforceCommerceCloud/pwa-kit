@@ -101,7 +101,7 @@ describe('Storefront Preview utils', () => {
         test('proxy handlers applied to all client methods', async () => {
             const {result} = renderHookWithProviders(() => useCommerceApi())
             const clients = result.current
-            const shopperBaskets = clients.shopperBaskets
+            const shopperBaskets = clients.shopperBaskets!
             const handlers = {apply: jest.fn()}
 
             proxyRequests(clients, handlers)
