@@ -9,7 +9,7 @@ import {rest} from 'msw'
 import {screen} from '@testing-library/react'
 import {renderWithProviders} from '../../../utils/test-utils'
 import {mockImageWithText} from '../../../mocks/page-designer'
-import PageDesignerPromotionalBanner from '../../../pages/product-list/partials/page-designer-promotional-banner'
+import PageDesignerPromotionalBanner from './product-list-banner'
 import {useShopperContext} from '@salesforce/commerce-sdk-react'
 
 jest.mock('@salesforce/commerce-sdk-react', () => {
