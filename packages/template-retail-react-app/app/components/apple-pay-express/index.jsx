@@ -21,6 +21,19 @@ const EXPRESS_PAYMENT_SUCCESS = 'express.payment.success'
 const EXPRESS_PAYMENT_FAILURE = 'express.payment.failure'
 const EXPRESS_PAYMENT_CANCEL = 'express.payment.cancel'
 
+/**
+ * Cache for AdyenCheckout instances to avoid recreating them on every component mount.
+ * Key: environment-clientKey-locale
+ */
+const checkoutCache = new Map()
+
+/**
+ * Cache for Apple Pay availability checks with 5-minute TTL to reduce API calls.
+ * Key: availability-environment-clientKey-locale
+ */
+const availabilityCache = new Map()
+const AVAILABILITY_CACHE_TTL = 5 * 60 * 1000 // 5 minutes
+
 const sendExpressMessage = (type, payload = {}) => {
     window.parent.postMessage(
         {
@@ -29,6 +42,82 @@ const sendExpressMessage = (type, payload = {}) => {
         },
         '*'
     )
+}
+
+const getCheckoutCacheKey = (environment, clientKey, locale) => {
+    return `${environment}-${clientKey}-${locale}`
+}
+
+const getAvailabilityCacheKey = (environment, clientKey, locale) => {
+    return `availability-${environment}-${clientKey}-${locale}`
+}
+
+/**
+ * Creates or retrieves a cached AdyenCheckout instance.
+ * @param {string} environment - Adyen environment (test/live)
+ * @param {string} clientKey - Adyen client key
+ * @param {string} locale - Locale identifier
+ * @param {Object} applicationInfo - Application info for analytics
+ * @returns {Promise<Object>} AdyenCheckout instance
+ */
+const createCachedCheckout = async (environment, clientKey, locale, applicationInfo) => {
+    const cacheKey = getCheckoutCacheKey(environment, clientKey, locale)
+
+    if (checkoutCache.has(cacheKey)) {
+        return checkoutCache.get(cacheKey)
+    }
+
+    const checkout = await AdyenCheckout({
+        environment,
+        clientKey,
+        locale,
+        analytics: {
+            analyticsData: {
+                applicationInfo
+            }
+        }
+    })
+
+    checkoutCache.set(cacheKey, checkout)
+    return checkout
+}
+
+/**
+ * Checks Apple Pay availability with caching to reduce API calls.
+ * @param {Object} applePayButton - Apple Pay button instance
+ * @returns {Promise<boolean>} Whether Apple Pay is available
+ */
+const checkCachedAvailability = async (applePayButton) => {
+    const cacheKey = getAvailabilityCacheKey(
+        applePayButton.checkout.environment,
+        applePayButton.checkout.clientKey,
+        applePayButton.checkout.locale
+    )
+
+    const cached = availabilityCache.get(cacheKey)
+    if (cached && Date.now() - cached.timestamp < AVAILABILITY_CACHE_TTL) {
+        return cached.available
+    }
+
+    try {
+        const available = await applePayButton.isAvailable()
+        availabilityCache.set(cacheKey, {
+            available,
+            timestamp: Date.now()
+        })
+        return available
+    } catch (ex) {
+        availabilityCache.set(cacheKey, {
+            available: false,
+            timestamp: Date.now()
+        })
+        return false
+    }
+}
+
+export const clearAllCaches = () => {
+    checkoutCache.clear()
+    availabilityCache.clear()
 }
 
 export const getApplePaymentMethodConfig = (paymentMethodsResponse) => {
@@ -81,15 +170,15 @@ export const getAppleButtonConfig = (
     navigate,
     fetchShippingMethods
 ) => {
-    let applePayAmount = basket.orderTotal
+    // Use default values if basket/orderTotal/currency are missing
+    const orderTotal = basket && typeof basket.orderTotal !== 'undefined' ? basket.orderTotal : 0
+    const currency = basket && basket.currency ? basket.currency : 'USD'
+    let applePayAmount = orderTotal
     const buttonConfig = {
         showPayButton: true,
         isExpress: true,
-        configuration: applePayConfig,
-        amount: {
-            value: getCurrencyValueForApi(basket.orderTotal, basket.currency),
-            currency: basket.currency
-        },
+        configuration: applePayConfig || {},
+        amount: {value: applePayAmount, currency},
         requiredShippingContactFields: ['postalAddress', 'name', 'email', 'phone'],
         requiredBillingContactFields: ['postalAddress'],
         shippingMethods: shippingMethods?.map((sm) => ({
@@ -259,6 +348,9 @@ export const ApplePayExpress = () => {
 
     useEffect(() => {
         let isCanceled = false
+        let retryCount = 0
+        const maxRetries = 5
+        const retryDelay = 200 // 200ms
 
         const createCheckout = async () => {
             if (isCanceled) {
@@ -274,22 +366,19 @@ export const ApplePayExpress = () => {
             try {
                 let checkout
                 try {
-                    checkout = await AdyenCheckout({
-                        environment: adyenEnvironment?.ADYEN_ENVIRONMENT,
-                        clientKey: adyenEnvironment?.ADYEN_CLIENT_KEY,
-                        locale: locale.id,
-                        analytics: {
-                            analyticsData: {
-                                applicationInfo: adyenPaymentMethods?.applicationInfo
-                            }
-                        }
-                    })
+                    checkout = await createCachedCheckout(
+                        adyenEnvironment.ADYEN_ENVIRONMENT,
+                        adyenEnvironment.ADYEN_CLIENT_KEY,
+                        locale.id,
+                        adyenPaymentMethods.applicationInfo
+                    )
                 } catch (ex) {
                     handleApplePayUnavailable()
                     return
                 }
 
                 const applePaymentMethodConfig = getApplePaymentMethodConfig(adyenPaymentMethods)
+
                 const appleButtonConfig = getAppleButtonConfig(
                     authToken,
                     site,
@@ -310,7 +399,7 @@ export const ApplePayExpress = () => {
 
                 let isApplePayButtonAvailable = false
                 try {
-                    isApplePayButtonAvailable = await applePayButton.isAvailable()
+                    isApplePayButtonAvailable = await checkCachedAvailability(applePayButton)
                 } catch (ex) {
                     isApplePayButtonAvailable = false
                 }
@@ -339,12 +428,47 @@ export const ApplePayExpress = () => {
             }
         }
 
-        createCheckout()
+        const tryCreateCheckout = () => {
+            if (isCanceled) return
+
+            // Validation for all required data except orderTotal
+            if (
+                !adyenEnvironment?.ADYEN_ENVIRONMENT ||
+                !adyenEnvironment?.ADYEN_CLIENT_KEY ||
+                !locale?.id ||
+                !basket ||
+                !basket.currency ||
+                adyenPaymentMethods?.applicationInfo === undefined
+            ) {
+                sendExpressMessage(EXPRESS_PAYMENT_UNAVAILABLE, {
+                    PAYMENT_METHOD
+                })
+                return
+            }
+
+            // If orderTotal is undefined, retry up to maxRetries
+            if (typeof basket.orderTotal === 'undefined') {
+                if (retryCount < maxRetries) {
+                    retryCount++
+                    setTimeout(tryCreateCheckout, retryDelay)
+                } else {
+                    sendExpressMessage(EXPRESS_PAYMENT_UNAVAILABLE, {
+                        PAYMENT_METHOD
+                    })
+                }
+                return
+            }
+
+            createCheckout()
+        }
+
+        tryCreateCheckout()
 
         return () => {
             isCanceled = true
+            availabilityCache.clear()
         }
-    }, [adyenEnvironment, adyenPaymentMethods])
+    }, [adyenEnvironment, adyenPaymentMethods, basket?.basketId, site])
 
     return (
         <>

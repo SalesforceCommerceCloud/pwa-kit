@@ -6,10 +6,11 @@
  */
 import React from 'react'
 import {render, waitFor} from '@testing-library/react'
-import {ApplePayExpress} from '@salesforce/retail-react-app/app/components/apple-pay-express/index'
 import AdyenCheckout from '@adyen/adyen-web'
 import {useAdyenExpressCheckout} from '@adyen/adyen-salesforce-pwa'
 import {
+    ApplePayExpress,
+    clearAllCaches,
     getApplePaymentMethodConfig,
     getCustomerShippingDetails,
     getCustomerBillingDetails,
@@ -171,11 +172,25 @@ describe('ApplePayExpress', () => {
     })
 
     it('mounts Apple Pay button when available', async () => {
+        // Clear all caches before this test to ensure fresh AdyenCheckout call
+        clearAllCaches()
+
+        // Explicitly set the mock implementation for this test
+        AdyenCheckout.mockResolvedValue({
+            create: jest.fn().mockResolvedValue({
+                isAvailable: jest.fn().mockResolvedValue(true),
+                mount: jest.fn()
+            })
+        })
+
         render(<ApplePayExpress {...mockProps} />)
 
-        await waitFor(() => {
-            expect(AdyenCheckout).toHaveBeenCalled()
-        })
+        await waitFor(
+            () => {
+                expect(AdyenCheckout).toHaveBeenCalled()
+            },
+            {timeout: 2000}
+        )
     })
 })
 
@@ -674,9 +689,13 @@ describe('ApplePayExpress error and edge cases', () => {
             fetchShippingMethods: jest.fn()
         })
         render(<ApplePayExpress {...mockProps} />)
-        // Should call AdyenCheckout once when basket is undefined
+        // Should return early and not call AdyenCheckout when basket is undefined
         await waitFor(() => {
-            expect(AdyenCheckout).toHaveBeenCalledTimes(1)
+            expect(AdyenCheckout).not.toHaveBeenCalled()
+            expect(window.postMessage).toHaveBeenCalledWith(
+                expect.objectContaining({type: 'express.payment.unavailable'}),
+                '*'
+            )
         })
     })
     it('handles missing config', async () => {
@@ -691,15 +710,14 @@ describe('ApplePayExpress error and edge cases', () => {
             shippingMethods: {applicableShippingMethods: []},
             fetchShippingMethods: jest.fn()
         })
-        AdyenCheckout.mockResolvedValue({
-            create: jest.fn().mockResolvedValue({
-                isAvailable: jest.fn().mockResolvedValue(true),
-                mount: jest.fn()
-            })
-        })
         render(<ApplePayExpress {...mockProps} />)
+        // Should return early and not call AdyenCheckout when config is missing
         await waitFor(() => {
-            expect(AdyenCheckout).toHaveBeenCalled()
+            expect(AdyenCheckout).not.toHaveBeenCalled()
+            expect(window.postMessage).toHaveBeenCalledWith(
+                expect.objectContaining({type: 'express.payment.unavailable'}),
+                '*'
+            )
         })
     })
 })
