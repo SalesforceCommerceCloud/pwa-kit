@@ -11,14 +11,10 @@ import {useLocation} from 'react-router-dom'
 // Components
 import {
     Box,
-    Button,
     SimpleGrid,
     HStack,
-    VStack,
     Text,
     Flex,
-    Stack,
-    Container,
     Link
 } from '@chakra-ui/react'
 import {useQuery} from '@tanstack/react-query'
@@ -35,7 +31,6 @@ import HelloJS from '../../components/hello-javascript'
  * categories and products, data is from local file.
  */
 const Home = () => {
-    const {pathname} = useLocation()
     const query = useQuery(
         ['example-data'],
         () =>
@@ -57,7 +52,12 @@ const Home = () => {
         <Box data-testid="home-page" layerStyle="page">
             {query.data && query.data}
             <HelloJS />
-            {data && JSON.stringify(data, null, 2)}
+
+            <Text as='h2'>PAGE LEVEL DATA</Text>
+            <Box as='pre' color='red.500' height='300px' overflow='scroll'>{data && JSON.stringify(data, null, 2)}
+                {data && JSON.stringify(data, null, 2)}
+
+            </Box>
             <SimpleGrid
                 columns={{base: 1, md: 1, lg: 3}}
                 columnGap={{base: 1, md: 4}}

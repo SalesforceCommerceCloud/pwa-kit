@@ -6,7 +6,7 @@
  */
 import React from 'react'
 import {useProductSearch} from '@salesforce/commerce-sdk-react'
-import {Box} from '@chakra-ui/react'
+import {Box, Text} from '@chakra-ui/react'
 
 const HelloJS = () => {
     const {data} = useProductSearch({
@@ -14,8 +14,11 @@ const HelloJS = () => {
             q: 'dresses',
         }
     })
-    console.log('data-----', data)
-    return <Box as='pre' color='red.900' bg='yellow.100'>{data && JSON.stringify(data, null, 2)}</Box>
+
+    return <Box>
+        <Text as='h2'>HELLOJS data</Text>
+        <Box as='pre' color='red.900' bg='yellow.100' height='300px' overflow='scroll'>{data && JSON.stringify(data, null, 2)}</Box>
+    </Box>
 }
 
 export default HelloJS
