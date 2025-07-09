@@ -15,6 +15,7 @@ import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-curre
 import {useShopperBasketsMutation} from '@salesforce/commerce-sdk-react'
 import {useLocation, useHistory} from 'react-router-dom'
 import ShowcaseTopBar from '@salesforce/retail-react-app/app/components/shared/ShowcaseTopBar'
+import Home2 from '@salesforce/retail-react-app/app/pages/home2';
 
 const pages = [
     {name: 'Home', path: '/'},
@@ -26,7 +27,8 @@ const pages = [
     {name: 'Login', path: '/login'},
     {name: 'Registration', path: '/registration'},
     {name: 'Store Locator', path: '/store-locator'},
-    {name: 'Page Not Found', path: '/page-not-found'}
+    {name: 'Page Not Found', path: '/page-not-found'},
+    {name: 'Home2', path: '/home2'}
 ]
 
 const PageShowcase = () => {
@@ -67,9 +69,9 @@ const PageShowcase = () => {
 
 
     return (
-        <Box data-testid="page-showcase-page" layerStyle="page">
+        <Box data-testid="page-showcase-page" layerStyle="page" minHeight="200vh">
             <ShowcaseTopBar />
-            <Container maxW="container.xl" py={8}>
+            <Container maxW="container.2xl" py={8} minHeight="200vh">
                 <Flex direction={{base: 'column', md: 'row'}} gap={8} align="flex-start">
                     {/* Sidebar */}
                     <Box
@@ -133,7 +135,7 @@ const PageShowcase = () => {
                                     <iframe
                                         title={selectedPage.name}
                                         src={selectedPage.path}
-                                        style={{width: '100%', height: '900px', border: 'none'}}
+                                        style={{width: '100%', height: '1800px', border: 'none'}}
                                     />
                                 </Box>
                             </>

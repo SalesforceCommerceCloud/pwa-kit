@@ -65,6 +65,7 @@ const PageNotFound = loadable(() => import('./pages/page-not-found'))
 const ComponentBuilder = loadable(() => import('./pages/component-builder/index'), {
     fallback
 })
+const Home2 = loadable(() => import('./pages/home2'), {fallback})
 
 export const routes = [
     {
@@ -168,6 +169,11 @@ export const routes = [
     {
         path: '/_dev',
         component: PageShowcase,
+        exact: true
+    },
+    {
+        path: '/home2',
+        component: Home2,
         exact: true
     },
     {

@@ -6,10 +6,10 @@
  */
 
 import React, {useState, useEffect} from 'react'
+import PropTypes from 'prop-types'
 import {useIntl, FormattedMessage} from 'react-intl'
 import {useLocation, useHistory} from 'react-router-dom'
-
-// Components
+import {isServer} from '@salesforce/retail-react-app/app/utils/utils'
 import {
     Box,
     Button,
@@ -28,7 +28,15 @@ import {
     RadioGroup,
     Select,
     Divider,
-    Flex
+    Flex,
+    Modal,
+    ModalOverlay,
+    ModalContent,
+    ModalHeader,
+    ModalFooter,
+    ModalBody,
+    ModalCloseButton,
+    useDisclosure
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 
 // Project Components
@@ -70,6 +78,12 @@ import ProductViewModal from '@salesforce/retail-react-app/app/components/produc
 import {PlusIcon} from '@salesforce/retail-react-app/app/components/icons'
 import ShowcaseTopBar from '@salesforce/retail-react-app/app/components/shared/ShowcaseTopBar'
 import Hero from '@salesforce/retail-react-app/app/components/hero'
+import Hero2 from '@salesforce/retail-react-app/app/components/Hero3/index.jsx';
+import Hero3 from '@salesforce/retail-react-app/app/components/Hero2/index.jsx';
+import ShopCategory from '@salesforce/retail-react-app/app/components/ShopCategory';
+import ShopNowBar from '@salesforce/retail-react-app/app/components/ShopNowBar';
+import Carousel from '@salesforce/retail-react-app/app/page-designer/layouts/Carousel';
+import Carousel2 from '@salesforce/retail-react-app/app/components/Carousel2';
 
 const mockProducts = [
     {
@@ -475,43 +489,80 @@ const componentCategories = [
                 actions={null}
             />
         )
+    },
+    {
+        name: 'Hero2',
+        description: 'A hero section with images, title, and buttons.',
+        component: (
+            <Hero2 />
+        )
+    },
+    {
+        name: 'Hero3',
+        description: 'A hero section with multiple images and overlay text.',
+        component: (
+            <Hero3 />
+        )
+    },
+    {
+        name: 'ShopCategory',
+        description: 'A component with an image, text, and link.',
+        component: (
+            <ShopCategory categoryId="newarrivals-womens" />
+        )
+    },
+    {
+        name: 'ShopNowBar',
+        description: 'A bar with multiple ShopCategory components.',
+        component: (
+            <ShopNowBar />
+        )
+    },
+    {
+        name: 'Carousel',
+        description: 'A carousel component for showcasing items.',
+        component: (
+            <Carousel
+                textHeadline="Featured Products"
+                xsCarouselIndicators={true}
+                smCarouselIndicators={true}
+                mdCarouselIndicators={true}
+                xsCarouselControls={true}
+                smCarouselControls={true}
+                xsCarouselSlidesToDisplay={1}
+                smCarouselSlidesToDisplay={2}
+                mdCarouselSlidesToDisplay={3}
+                regions={[{ components: mockProducts.map(product => (
+                    <ProductTile
+                        key={product.id}
+                        product={product}
+                        enableFavourite={true}
+                        isFavourite={false}
+                    />
+                )) }]}
+            />
+        )
+    },
+    {
+        name: 'Carousel2',
+        description: 'A carousel component displaying text and image pairs.',
+        component: (
+            <Carousel2
+                items={[
+                    { text: 'Floral Shirt Dress', image: 'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw883b3b59/images/large/PG.10249590.JJ2RRXX.PZ.jpg?sw=1360&q=60' },
+                    { text: 'Taylor Classic Jacket', image: 'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dwa090742f/images/large/PG.10232148.JJC76A6.PZ.jpg?sw=1360&q=60' },
+                    { text: 'Dream Heels', image: 'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw5777f7f6/images/large/PG.CJZACCO.BLKBKPA.PZ.jpg?sw=1360&q=60' }
+                ]}
+            />
+        )
     }
 ].sort((a, b) => a.name.localeCompare(b.name))
 
 function DrawerMenuDemo() {
     const [isOpen, setIsOpen] = React.useState(false)
     const root = {
-        id: 'root',
-        items: [
-            {
-                id: 'cat1',
-                name: 'Category 1',
-                items: [
-                    {id: 'subcat1', name: 'Subcategory 1'},
-                    {id: 'subcat2', name: 'Subcategory 2'}
-                ]
-            },
-            {
-                id: 'cat2',
-                name: 'Category 2',
-                items: []
-            }
-        ]
+        // ... existing code ...
     }
-    return (
-        <Box>
-            <Button onClick={() => setIsOpen(true)} colorScheme="blue" mb={4}>
-                Open Drawer Menu
-            </Button>
-            <DrawerMenu
-                root={root}
-                itemsKey="items"
-                itemsCountKey="count"
-                isOpen={isOpen}
-                onClose={() => setIsOpen(false)}
-            />
-        </Box>
-    )
 }
 
 function ConfirmationModalDemo() {
@@ -566,12 +617,13 @@ function ProductViewModalDemo() {
     )
 }
 
-const ComponentShowcase = () => {
+const ComponentShowcase = ({componentList = []}) => {
     const intl = useIntl()
     const location = useLocation()
     const history = useHistory()
     const [searchTerm, setSearchTerm] = useState('')
     const [selectedIndex, setSelectedIndex] = useState(0)
+    const {isOpen, onOpen, onClose} = useDisclosure()
 
     // Support ?component=Component%20Name query param
     useEffect(() => {
@@ -606,7 +658,7 @@ const ComponentShowcase = () => {
     return (
         <Box data-testid="component-showcase-page" layerStyle="page">
             <ShowcaseTopBar />
-            <Container maxW="container.xl" py={8}>
+            <Container maxW="container.2xl" py={8}>
                 <Heading as="h1" size="2xl" color="blue.600" mb={8}>
                     Component Showcase
                 </Heading>
@@ -621,6 +673,14 @@ const ComponentShowcase = () => {
                         p={4}
                         shadow="sm"
                     >
+                        <Button
+                            onClick={onOpen}
+                            mb={4}
+                            w="full"
+                            colorScheme="blue"
+                        >
+                            Browse Component
+                        </Button>
                         <Input
                             mb={4}
                             placeholder="Search components..."
@@ -682,8 +742,52 @@ const ComponentShowcase = () => {
                     </Box>
                 </Flex>
             </Container>
+
+            <Modal isOpen={isOpen} onClose={onClose} size="xl">
+                <ModalOverlay />
+                <ModalContent>
+                    <ModalHeader>Browse Components</ModalHeader>
+                    <ModalCloseButton />
+                    <ModalBody>
+                        <SimpleGrid columns={{base: 2, md: 3}} spacing={4}>
+                            {componentList.map((name) => (
+                                <Button
+                                    key={name}
+                                    variant="outline"
+                                    onClick={() => {
+                                        history.push(`/_dev/component-showcase?component=${name}`)
+                                        onClose()
+                                    }}
+                                >
+                                    {name}
+                                </Button>
+                            ))}
+                        </SimpleGrid>
+                    </ModalBody>
+                    <ModalFooter>
+                        <Button onClick={onClose}>Close</Button>
+                    </ModalFooter>
+                </ModalContent>
+            </Modal>
         </Box>
     )
+}
+
+ComponentShowcase.getProps = async () => {
+    // This file is generated during the build process.
+    try {
+        const componentList = require('../../build/components.json')
+        return {componentList}
+    } catch (e) {
+        console.error('Could not load components.json', e)
+        // If the file doesn't exist, it's likely because the build script hasn't run.
+        // We'll return an empty list to prevent a crash.
+        return {componentList: []}
+    }
+}
+
+ComponentShowcase.propTypes = {
+    componentList: PropTypes.array
 }
 
 export default ComponentShowcase 

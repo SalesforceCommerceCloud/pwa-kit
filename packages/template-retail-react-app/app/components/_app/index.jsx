@@ -11,7 +11,9 @@ import {useHistory, useLocation} from 'react-router-dom'
 import {StorefrontPreview} from '@salesforce/commerce-sdk-react/components'
 import {getAssetUrl} from '@salesforce/pwa-kit-react-sdk/ssr/universal/utils'
 import useActiveData from '@salesforce/retail-react-app/app/hooks/use-active-data'
-import {useQuery} from '@tanstack/react-query'
+import {
+    
+} from '@tanstack/react-query'
 import {
     useAccessToken,
     useCategory,
@@ -124,6 +126,27 @@ const ListMenuContentWithData = withCommerceSdkReact(
     }
 )
 
+const useCategoryData = (categoryId) => {
+    const { data: categoriesTree } = useCategory({
+        parameters: { id: 'root', levels: 1 }
+    });
+    console.log('===========categoriesTree===========\n', categoriesTree);
+
+    const {
+        data: category,
+        isError: isCategoryError,
+        error: categoryError
+    } = useCategory({
+        parameters: {
+            id: categoryId,
+            levels: 1
+        }
+    });
+    console.log('===========category===========\n', category);
+
+    return category; // Return the category data
+};
+
 const App = (props) => {
     const {children} = props
     const {data: categoriesTree} = useCategory({
@@ -173,7 +196,8 @@ const App = (props) => {
     )
 
     // Fetch the translation message data using the target locale.
-    const {data: messages} = useQuery({
+    const {data: messages} = 
+    ({
         queryKey: ['app', 'translations', 'messages', targetLocale],
         queryFn: () => {
             if (is404ForMissingTranslationFile) {
