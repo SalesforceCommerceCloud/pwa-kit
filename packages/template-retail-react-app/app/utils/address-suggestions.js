@@ -80,8 +80,8 @@ export const parseAddressSuggestion = (suggestion) => {
     const countryTerm = terms[terms.length - 1]?.value || ''
     if (countryTerm === 'USA') {
         parsedFields.countryCode = 'US'
-    } else if (countryTerm === 'UK') {
-        parsedFields.countryCode = 'GB'
+    } else if (countryTerm === 'Canada') {
+        parsedFields.countryCode = 'CA'
     } else {
         parsedFields.countryCode = countryTerm
     }
@@ -107,6 +107,7 @@ export const parseAddressSuggestion = (suggestion) => {
 
         // Extract state and postal code (second part)
         const statePostalPart = parts[1].trim()
+        
         const statePostalMatch = statePostalPart.match(/^([A-Z]{2})\s+([A-Z0-9\s]+)$/)
 
         if (statePostalMatch) {

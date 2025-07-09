@@ -6,7 +6,6 @@
  */
 
 import {renderHook, act} from '@testing-library/react'
-import {useForm} from 'react-hook-form'
 import useAddressFields from '../forms/useAddressFields'
 import {
     getAddressSuggestions,
@@ -136,7 +135,7 @@ describe('useAddressFields', () => {
         expect(getAddressSuggestions).not.toHaveBeenCalled()
     })
 
-    it('should populate address1 field when suggestion is selected (city/state/zip in next PR)', () => {
+    it('should populate all address fields when suggestion is selected', () => {
         const {result} = renderHook(() => useAddressFields({form: mockForm}))
 
         const suggestion = {
@@ -151,11 +150,39 @@ describe('useAddressFields', () => {
 
         expect(parseAddressSuggestion).toHaveBeenCalledWith(suggestion)
         expect(mockSetValue).toHaveBeenCalledWith('address1', '123 Main Street')
-        // City, state, zip, and country population will be implemented in next PR
-        // expect(mockSetValue).toHaveBeenCalledWith('city', 'New York')
-        // expect(mockSetValue).toHaveBeenCalledWith('stateCode', 'NY')
-        // expect(mockSetValue).toHaveBeenCalledWith('postalCode', '10001')
-        // expect(mockSetValue).toHaveBeenCalledWith('countryCode', 'US')
+        expect(mockSetValue).toHaveBeenCalledWith('city', 'New York')
+        expect(mockSetValue).toHaveBeenCalledWith('stateCode', 'NY')
+        expect(mockSetValue).toHaveBeenCalledWith('postalCode', '10001')
+        expect(mockSetValue).toHaveBeenCalledWith('countryCode', 'US')
+    })
+
+    it('should handle partial address data when some fields are missing', () => {
+        const {result} = renderHook(() => useAddressFields({form: mockForm}))
+
+        // Mock parseAddressSuggestion to return partial data
+        parseAddressSuggestion.mockReturnValue({
+            address1: '456 Oak Avenue',
+            city: 'Toronto'
+            // Missing stateCode, postalCode, and countryCode
+        })
+
+        const suggestion = {
+            mainText: '456 Oak Avenue',
+            secondaryText: 'Toronto, Canada',
+            country: 'CA'
+        }
+
+        act(() => {
+            result.current.address1.autocomplete.onSelectSuggestion(suggestion)
+        })
+
+        expect(parseAddressSuggestion).toHaveBeenCalledWith(suggestion)
+        expect(mockSetValue).toHaveBeenCalledWith('address1', '456 Oak Avenue')
+        expect(mockSetValue).toHaveBeenCalledWith('city', 'Toronto')
+        // Should not call setValue for missing fields
+        expect(mockSetValue).not.toHaveBeenCalledWith('stateCode', expect.anything())
+        expect(mockSetValue).not.toHaveBeenCalledWith('postalCode', expect.anything())
+        expect(mockSetValue).not.toHaveBeenCalledWith('countryCode', expect.anything())
     })
 
     it('should handle address focus correctly', () => {
@@ -197,6 +224,7 @@ describe('useAddressFields', () => {
         // The close handler should set showDropdown to false and clear suggestions
         // This is tested by checking that the autocomplete props are available
         expect(result.current.address1.autocomplete).toBeDefined()
+        expect(result.current.address1.autocomplete.onClose).toBeDefined()
     })
 
     it('should handle country change and reset address fields', () => {
