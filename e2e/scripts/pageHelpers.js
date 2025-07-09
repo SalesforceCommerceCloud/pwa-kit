@@ -19,25 +19,35 @@ const {getCreditCardExpiry, runAccessibilityTest} = require('../scripts/utils.js
  */
 export const answerConsentTrackingForm = async (page, dnt = false) => {
     try {
-        const consentFormVisible = await page.locator('text=Tracking Consent').isVisible().catch(() => false)
+        const consentFormVisible = await page
+            .locator('text=Tracking Consent')
+            .isVisible()
+            .catch(() => false)
         if (!consentFormVisible) {
             return
         }
 
         const buttonText = dnt ? 'Decline' : 'Accept'
-        await page.getByRole('button', { name: new RegExp(buttonText, 'i') }).first().waitFor({ timeout: 3000 })
-        
+        await page
+            .getByRole('button', {name: new RegExp(buttonText, 'i')})
+            .first()
+            .waitFor({timeout: 3000})
+
         // Find and click consent buttons (handles both mobile and desktop versions existing in the DOM)
         const clickSuccess = await page.evaluate((targetText) => {
             // Try aria-label first, then fallback to text content
-            let buttons = Array.from(document.querySelectorAll(`button[aria-label="${targetText} tracking"]`))
-            
+            let buttons = Array.from(
+                document.querySelectorAll(`button[aria-label="${targetText} tracking"]`)
+            )
+
             if (buttons.length === 0) {
-                buttons = Array.from(document.querySelectorAll('button')).filter(btn => 
-                    btn.textContent && btn.textContent.trim().toLowerCase() === targetText.toLowerCase()
+                buttons = Array.from(document.querySelectorAll('button')).filter(
+                    (btn) =>
+                        btn.textContent &&
+                        btn.textContent.trim().toLowerCase() === targetText.toLowerCase()
                 )
             }
-            
+
             let clickedCount = 0
             buttons.forEach((button) => {
                 // Only click visible buttons
@@ -46,14 +56,17 @@ export const answerConsentTrackingForm = async (page, dnt = false) => {
                     clickedCount++
                 }
             })
-            
+
             return clickedCount
         }, buttonText)
 
         // after clicking an answering button, the tracking consent should not stay in the DOM
         if (clickSuccess > 0) {
             await page.waitForTimeout(2000)
-            await page.locator('text=Tracking Consent').isHidden({ timeout: 5000 }).catch(() => {})
+            await page
+                .locator('text=Tracking Consent')
+                .isHidden({timeout: 5000})
+                .catch(() => {})
         }
     } catch (error) {
         // Silently continue - consent form handling should not break tests
@@ -249,7 +262,7 @@ export const registerShopper = async ({page, userCredentials, isMobile = false})
 
     const registrationFormHeading = page.getByText(/Let's get started!/i)
     try {
-        await registrationFormHeading.waitFor({ timeout: 10000 })
+        await registrationFormHeading.waitFor({timeout: 10000})
     } catch (error) {
         // Check if user was redirected to account page during wait
         const urlAfterWait = page.url()
@@ -273,7 +286,7 @@ export const registerShopper = async ({page, userCredentials, isMobile = false})
     const tokenResponse = await tokenResponsePromise
     expect(tokenResponse.status()).toBe(200)
 
-    await page.waitForURL(/.*\/account.*/, { timeout: 10000 })
+    await page.waitForURL(/.*\/account.*/, {timeout: 10000})
 
     await expect(page.getByText(userCredentials.email)).toBeVisible()
 }
@@ -349,14 +362,14 @@ export const loginShopper = async ({page, userCredentials}) => {
             '**/shopper/auth/v1/organizations/**/oauth2/token'
         )
         await page.getByRole('button', {name: /Sign In/i}).click()
-        
+
         const loginResponse = await loginResponsePromise
         expect(loginResponse.status()).toBe(303) // Login returns a 303 redirect to /callback with authCode and usid
-        
+
         const tokenResponse = await tokenResponsePromise
         expect(tokenResponse.status()).toBe(200)
 
-        await page.waitForURL(/.*\/account.*/, { timeout: 10000 })
+        await page.waitForURL(/.*\/account.*/, {timeout: 10000})
 
         await expect(page.getByText(userCredentials.email)).toBeVisible()
         return true
@@ -531,7 +544,7 @@ export const registeredUserHappyPath = async ({page, registeredUserCredentials, 
     }
     await answerConsentTrackingForm(page)
     await page.waitForLoadState()
-    
+
     // Verify we're on account page and user is logged in
     const currentUrl = page.url()
     expect(currentUrl).toMatch(/\/account/)
@@ -643,7 +656,7 @@ export const registeredUserHappyPath = async ({page, registeredUserCredentials, 
 
 /**
  * Executes the wishlist flow for a registered user.
- * 
+ *
  * Includes robust authentication handling with fallback mechanisms.
  *
  * @param {Object} options.page - Playwright page object representing a browser tab/window
@@ -695,4 +708,87 @@ export const wishlistFlow = async ({page, registeredUserCredentials, a11y = {}})
 
     // wishlist
     await validateWishlist({page, a11y})
+}
+
+/**
+ * Navigates to a PLP and opens the store inventory filter to select a store.
+ *
+ * This helper function demonstrates the store inventory filtering functionality by:
+ * 1. Navigating to the Womens > Tops category PLP
+ * 2. Opening the store locator modal
+ * 3. Searching for stores by postal code
+ * 4. Returning the available store selection options
+ *
+ * This is useful for testing store inventory features and BOPIS (Buy Online, Pick Up In Store) functionality.
+ *
+ * @param {Object} options.page - Playwright page object representing a browser tab/window
+ */
+export const selectStoreFromPLP = async ({page}) => {
+    // Navigate to a product category (Womens > Tops)
+    await page.getByRole('link', {name: 'Womens'}).hover()
+    const topsNav = await page.getByRole('link', {name: 'Tops', exact: true})
+    await expect(topsNav).toBeVisible()
+    await topsNav.click()
+
+    // Verify we're on the PLP
+    await expect(page.getByRole('heading', {name: 'Tops'})).toBeVisible()
+    const productTile = page.getByRole('link', {
+        name: /Cotton Turtleneck Sweater/i
+    })
+    const productTileImg = productTile.locator('img')
+    await productTileImg.waitFor({state: 'visible'})
+
+    // Look for the store inventory filter component
+    const storeInventoryFilter = page.getByTestId('sf-store-inventory-filter')
+    await expect(storeInventoryFilter).toBeVisible()
+
+    // Verify the filter shows "Select Store" initially
+    await expect(page.getByText('Select Store')).toBeVisible()
+    await expect(page.getByText('Shop by Availability')).toBeVisible()
+
+    // Click on the store inventory filter checkbox to open store locator
+    const inventoryCheckbox = page.getByTestId('sf-store-inventory-filter-checkbox')
+    await inventoryCheckbox.click()
+
+    // Verify store locator modal opens and select a store
+    await expect(page.getByText('Find a Store')).toBeVisible()
+    await page.locator('select[name="countryCode"]').selectOption({label: 'United States'})
+    await page.locator('input[name="postalCode"]').fill('01803')
+    const searchStoreButton = page.getByRole('button', {name: 'Find'})
+    await expect(searchStoreButton).toBeVisible()
+
+    const storeSearchResponsePromise = page.waitForResponse(
+        (resp) =>
+            resp.url().includes('/shopper-stores/v1/organizations/') &&
+            resp.url().includes('/store-search')
+    )
+    await searchStoreButton.click()
+    const storeSearchResponse = await storeSearchResponsePromise
+
+    expect(storeSearchResponse.status()).toBe(200)
+
+    // Select the first available store (if any stores are available)
+    await expect(page.getByText(/Burlington Retail Store/i)).toBeVisible()
+
+    // Find and click the first available store label
+    const storeRadioLabels = page.locator(
+        'label.chakra-radio:has(input[aria-describedby^="store-info-"])'
+    )
+    const storeCount = await storeRadioLabels.count()
+
+    if (storeCount > 0) {
+        // Select the first store
+        await storeRadioLabels.first().click()
+
+        // Close the store locator modal
+        await page.locator('button[aria-label="Close"]').click()
+        await page.waitForLoadState()
+        await expect(page.getByText('Find a Store')).not.toBeVisible()
+    } else {
+        // If no stores are available, verify the appropriate message is shown
+        await expect(page.getByText('Sorry, there are no locations in this area.')).toBeVisible()
+
+        // Close the modal
+        await page.getByRole('button', {name: 'Close'}).click()
+    }
 }
