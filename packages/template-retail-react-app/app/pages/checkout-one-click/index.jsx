@@ -17,7 +17,9 @@ import {
     Stack
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
-import {useCheckout} from '@salesforce/retail-react-app/app/pages/checkout-container/util/checkout-context'
+import {
+    useCheckout
+} from '@salesforce/retail-react-app/app/pages/checkout-container/util/checkout-context'
 import ContactInfo from '@salesforce/retail-react-app/app/pages/checkout-one-click/partials/contact-info'
 import PickupAddress from '@salesforce/retail-react-app/app/pages/checkout-one-click/partials/pickup-address'
 import ShippingAddress from '@salesforce/retail-react-app/app/pages/checkout-one-click/partials/shipping-address'
