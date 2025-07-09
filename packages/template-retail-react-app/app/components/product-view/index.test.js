@@ -490,17 +490,17 @@ describe('Product Bundles', () => {
 
         renderWithProviders(<MockComponent product={mockProduct} />)
 
-            // Assert: Radio is enabled
-    const pickupRadio = await screen.findByRole('radio', {name: /pick up in store/i})
-    expect(pickupRadio).toBeEnabled()
+        // Assert: Radio is enabled
+        const pickupRadio = await screen.findByRole('radio', {name: /pick up in store/i})
+        expect(pickupRadio).toBeEnabled()
     })
 
     test('Pickup in store radio is disabled when inventoryId is NOT present in localStorage', async () => {
         renderWithProviders(<MockComponent product={mockProductDetail} />)
 
-            // Assert: Radio is disabled
-    const pickupRadio = await screen.findByRole('radio', {name: /pick up in store/i})
-    expect(pickupRadio).toBeDisabled()
+        // Assert: Radio is disabled
+        const pickupRadio = await screen.findByRole('radio', {name: /pick up in store/i})
+        expect(pickupRadio).toBeDisabled()
     })
 
     test('Pickup in store radio is disabled when inventoryId is present but product is out of stock', async () => {

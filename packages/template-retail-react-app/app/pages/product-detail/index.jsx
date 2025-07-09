@@ -475,7 +475,7 @@ const ProductDetail = () => {
 
     /**************** Product Bundle Handlers ****************/
     // Top level bundle does not have variants
-    const handleProductBundleAddToCart = async (variant, selectedQuantity) => {
+    const handleProductBundleAddToCart = async ([{quantity: selectedQuantity}]) => {
         try {
             const childProductSelections = Object.values(childProductSelection)
             // Check if any products have pickup selected (including main product and bundle items)
@@ -771,9 +771,7 @@ const ProductDetail = () => {
                             <ProductView
                                 product={product}
                                 category={primaryCategory?.parentCategoryTree || []}
-                                addToCart={(variant, quantity) =>
-                                    handleAddToCart([{product, variant, quantity}])
-                                }
+                                addToCart={handleAddToCart}
                                 addToWishlist={handleAddToWishlist}
                                 isProductLoading={isProductLoading}
                                 isBasketLoading={isBasketLoading}
