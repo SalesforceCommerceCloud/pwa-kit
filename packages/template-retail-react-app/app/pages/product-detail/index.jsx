@@ -315,8 +315,10 @@ const ProductDetail = () => {
     /**************** Add To Cart ****************/
     const showToast = useToast()
     const showError = (errorMessage) => {
+        const errorText = typeof errorMessage === 'string' ? errorMessage : formatMessage(API_ERROR_MESSAGE)
+        
         showToast({
-            title: errorMessage || formatMessage(API_ERROR_MESSAGE),
+            title: errorText,
             status: 'error'
         })
     }
