@@ -88,8 +88,6 @@ export const AuthModal = ({
     const register = useAuthHelper(AuthHelpers.Register)
     const appOrigin = useAppOrigin()
 
-    const [loginType, setLoginType] = useState(LOGIN_TYPES.PASSWORD)
-    const [passwordlessLoginEmail, setPasswordlessLoginEmail] = useState(initialEmail)
     const {getPasswordResetToken} = usePasswordReset()
     const authorizePasswordlessLogin = useAuthHelper(AuthHelpers.AuthorizePasswordless)
     const passwordlessConfigCallback = getConfig().app.login?.passwordless?.callbackURI
@@ -103,6 +101,58 @@ export const AuthModal = ({
     )
     const mergeBasket = useShopperBasketsMutation('mergeBasket')
 
+    const handlePasswordlessLogin = async (email) => {
+        try {
+            const redirectPath = window.location.pathname + window.location.search
+            await authorizePasswordlessLogin.mutateAsync({
+                userid: email,
+                callbackURI: `${callbackURL}?redirectUrl=${redirectPath}`
+            })
+            setCurrentView(EMAIL_VIEW)
+        } catch (error) {
+            const message = USER_NOT_FOUND_ERROR.test(error.message)
+                ? formatMessage(CREATE_ACCOUNT_FIRST_ERROR_MESSAGE)
+                : PASSWORDLESS_ERROR_MESSAGES.some((msg) => msg.test(error.message))
+                ? formatMessage(FEATURE_UNAVAILABLE_ERROR_MESSAGE)
+                : formatMessage(API_ERROR_MESSAGE)
+            form.setError('global', {type: 'manual', message})
+        }
+    }
+
+    const onPasswordlessLoginClick = async (e) => {
+        if (e) {
+            e.preventDefault()
+            e.stopPropagation()
+        }
+        
+        // Manual validation similar to contact-info component
+        const email = form.getValues().email
+        if (!email) {
+            form.setError('email', {
+                type: 'manual',
+                message: formatMessage({
+                    defaultMessage: 'Please enter your email address.',
+                    id: 'auth_modal.error.email_required'
+                })
+            })
+            return
+        }
+
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+        if (!emailRegex.test(email)) {
+            form.setError('email', {
+                type: 'manual',
+                message: formatMessage({
+                    defaultMessage: 'Please enter a valid email address.',
+                    id: 'auth_modal.error.email_invalid'
+                })
+            })
+            return
+        }
+
+        await handlePasswordlessLogin(email)
+    }
+
     const submitForm = async (data) => {
         form.clearErrors()
 
@@ -110,59 +160,36 @@ export const AuthModal = ({
             navigate('/account')
         }
 
-        const handlePasswordlessLogin = async (email) => {
-            try {
-                const redirectPath = window.location.pathname + window.location.search
-                await authorizePasswordlessLogin.mutateAsync({
-                    userid: email,
-                    callbackURI: `${callbackURL}?redirectUrl=${redirectPath}`
-                })
-                setCurrentView(EMAIL_VIEW)
-            } catch (error) {
-                const message = USER_NOT_FOUND_ERROR.test(error.message)
-                    ? formatMessage(CREATE_ACCOUNT_FIRST_ERROR_MESSAGE)
-                    : PASSWORDLESS_ERROR_MESSAGES.some((msg) => msg.test(error.message))
-                    ? formatMessage(FEATURE_UNAVAILABLE_ERROR_MESSAGE)
-                    : formatMessage(API_ERROR_MESSAGE)
-                form.setError('global', {type: 'manual', message})
-            }
-        }
-
         return {
             login: async (data) => {
-                if (loginType === LOGIN_TYPES.PASSWORD) {
-                    try {
-                        await login.mutateAsync({
-                            username: data.email,
-                            password: data.password
+                try {
+                    await login.mutateAsync({
+                        username: data.email,
+                        password: data.password
+                    })
+                    const hasBasketItem = baskets?.baskets?.[0]?.productItems?.length > 0
+                    // we only want to merge basket when the user is logged in as a recurring user
+                    // only recurring users trigger the login mutation, new user triggers register mutation
+                    // this logic needs to stay in this block because this is the only place that tells if a user is a recurring user
+                    // if you change logic here, also change it in login page
+                    const shouldMergeBasket = hasBasketItem && prevAuthType === 'guest'
+                    if (shouldMergeBasket) {
+                        mergeBasket.mutate({
+                            headers: {
+                                // This is not required since the request has no body
+                                // but CommerceAPI throws a '419 - Unsupported Media Type' error if this header is removed.
+                                'Content-Type': 'application/json'
+                            },
+                            parameters: {
+                                createDestinationBasket: true
+                            }
                         })
-                        const hasBasketItem = baskets?.baskets?.[0]?.productItems?.length > 0
-                        // we only want to merge basket when the user is logged in as a recurring user
-                        // only recurring users trigger the login mutation, new user triggers register mutation
-                        // this logic needs to stay in this block because this is the only place that tells if a user is a recurring user
-                        // if you change logic here, also change it in login page
-                        const shouldMergeBasket = hasBasketItem && prevAuthType === 'guest'
-                        if (shouldMergeBasket) {
-                            mergeBasket.mutate({
-                                headers: {
-                                    // This is not required since the request has no body
-                                    // but CommerceAPI throws a '419 - Unsupported Media Type' error if this header is removed.
-                                    'Content-Type': 'application/json'
-                                },
-                                parameters: {
-                                    createDestinationBasket: true
-                                }
-                            })
-                        }
-                    } catch (error) {
-                        const message = /Unauthorized/i.test(error.message)
-                            ? formatMessage(LOGIN_ERROR)
-                            : formatMessage(API_ERROR_MESSAGE)
-                        form.setError('global', {type: 'manual', message})
                     }
-                } else if (loginType === LOGIN_TYPES.PASSWORDLESS) {
-                    setPasswordlessLoginEmail(data.email)
-                    await handlePasswordlessLogin(data.email)
+                } catch (error) {
+                    const message = /Unauthorized/i.test(error.message)
+                        ? formatMessage(LOGIN_ERROR)
+                        : formatMessage(API_ERROR_MESSAGE)
+                    form.setError('global', {type: 'manual', message})
                 }
             },
             register: async (data) => {
@@ -198,7 +225,8 @@ export const AuthModal = ({
                 }
             },
             email: async () => {
-                await handlePasswordlessLogin(passwordlessLoginEmail)
+                const email = form.getValues().email || initialEmail
+                await handlePasswordlessLogin(email)
             }
         }[currentView](data)
     }
@@ -206,7 +234,6 @@ export const AuthModal = ({
     // Reset form and local state when opening the modal
     useEffect(() => {
         if (isOpen) {
-            setLoginType(LOGIN_TYPES.PASSWORD)
             setCurrentView(initialView)
             form.reset()
         }
@@ -227,10 +254,6 @@ export const AuthModal = ({
     useEffect(() => {
         form.reset()
     }, [currentView])
-
-    useEffect(() => {
-        setPasswordlessLoginEmail(initialEmail)
-    }, [initialEmail])
 
     useEffect(() => {
         // Lets determine if the user has either logged in, or registed.
@@ -304,14 +327,11 @@ export const AuthModal = ({
                             form={form}
                             submitForm={submitForm}
                             clickCreateAccount={() => setCurrentView(REGISTER_VIEW)}
-                            handlePasswordlessLoginClick={() =>
-                                setLoginType(LOGIN_TYPES.PASSWORDLESS)
-                            }
+                            handlePasswordlessLoginClick={onPasswordlessLoginClick}
                             handleForgotPasswordClick={() => setCurrentView(PASSWORD_VIEW)}
                             isPasswordlessEnabled={isPasswordlessEnabled}
                             isSocialEnabled={isSocialEnabled}
                             idps={idps}
-                            setLoginType={setLoginType}
                         />
                     )}
                     {!form.formState.isSubmitSuccessful && currentView === REGISTER_VIEW && (
@@ -332,7 +352,7 @@ export const AuthModal = ({
                         <PasswordlessEmailConfirmation
                             form={form}
                             submitForm={submitForm}
-                            email={passwordlessLoginEmail}
+                            email={form.getValues().email || initialEmail}
                         />
                     )}
                 </ModalBody>
