@@ -9,7 +9,7 @@
 
 // For more information on these settings, see https://webpack.js.org/configuration
 import {BundleAnalyzerPlugin} from 'webpack-bundle-analyzer'
-import path, {resolve} from 'path'
+import {resolve} from 'path'
 import fse from 'fs-extra'
 import webpack from 'webpack'
 
@@ -20,33 +20,17 @@ import ReactRefreshWebpackPlugin from '@pmmmwh/react-refresh-webpack-plugin'
 import SpeedMeasurePlugin from 'speed-measure-webpack-plugin'
 import WebpackNotifierPlugin from 'webpack-notifier'
 
-// PWA-Kit Plugins
-import ApplicationExtensionConfigPlugin from '@salesforce/pwa-kit-extension-sdk/configs/webpack/application-extensions-config-plugin'
-
 // Local Plugins
 import {sdkReplacementPlugin} from './plugins'
 
 // Constants
 import {CLIENT, SERVER, CLIENT_OPTIONAL, SSR, REQUEST_PROCESSOR} from './config-names'
 
-// Utilities
-import {
-    ruleForApplicationExtensibility,
-    ruleForOverrideResolver
-} from '@salesforce/pwa-kit-extension-sdk/configs/webpack'
-import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
-import {
-    buildAliases,
-    nameRegex,
-    getConfiguredExtensions
-} from '@salesforce/pwa-kit-extension-sdk/shared/utils'
-
 const projectDir = process.cwd()
 const pkg = fse.readJsonSync(resolve(projectDir, 'package.json'))
 const buildDir = process.env.PWA_KIT_BUILD_DIR
     ? resolve(process.env.PWA_KIT_BUILD_DIR)
     : resolve(projectDir, 'build')
-const isMonoRepo = fse.existsSync(resolve(projectDir, '..', '..', 'lerna.json'))
 const production = 'production'
 const development = 'development'
 const analyzeBundle = process.env.MOBIFY_ANALYZE === 'true'
@@ -55,8 +39,6 @@ const INSPECT = process.execArgv.some((arg) => /^--inspect(?:-brk)?(?:$|=)/.test
 const DEBUG = mode !== production && process.env.DEBUG === 'true'
 const CI = process.env.CI
 const disableHMR = process.env.HMR === 'false'
-
-export const EXTENIONS_NAMESPACE = '__extensions'
 
 if ([production, development].indexOf(mode) < 0) {
     throw new Error(`Invalid mode "${mode}"`)
@@ -110,9 +92,9 @@ const entryPointExists = (segments) => {
     return false
 }
 
-const getAppEntryPoint = () => './app/main'
+const getAppEntryPoint = () => './src/main'
 
-const getServerEntryPoint = () => './app/ssr.js'
+const getServerEntryPoint = () => './src/ssr.js'
 
 const getPublicPathEntryPoint = () => {
     return resolve(
@@ -196,39 +178,25 @@ const baseConfig = (target) => {
                             ...DEPS_TO_DEDUPE.map((dep) => ({
                                 [dep]: findDepInStack(dep)
                             }))
-                        ),
-                        // TODO: This alias is temporary. When we investigate turning the retail template into an application extension
-                        // we'll have to decide if we want to continue using an alias, or change back to using relative paths.
-                        '@salesforce/retail-react-app': projectDir,
-                        // Create alias's for "all" extensions, enabled or disabled, as they as they are being imported from the SDK package
-                        // and cannot be resolved from that location. We create alias's for all because we do not know which extensions
-                        // are configured at build time.
-                        ...buildAliases(
-                            Object.keys(pkg?.devDependencies || {}).filter((dependency) =>
-                                dependency.match(nameRegex)
-                            )
                         )
                     },
                     ...(target === 'web' ? {fallback: {crypto: false}} : {})
                 },
-                resolveLoader: {
-                    alias: {
-                        overridable: findDepInStack(
-                            '@salesforce/pwa-kit-extension-sdk/configs/webpack/overrides-resolver-loader.js'
-                        )
-                    }
-                },
+                // To add a new config for an extension, you can add a new element to the plugins array with the key and value as follows:
+                // The key should be the name of the plugin, and the value should be a boolean.
+                // The value should be true if the plugin is enabled, and false if it is disabled.
+                // The key should start with SFDC_EXT_, so that it's clear that it is an extension and not part of the core PWA Kit.
+                // For example, to add a new config for the Hello World extension, you can add the following:
+                // new webpack.DefinePlugin({
+                //     SFDC_EXT_HELLO_WORLD_ENABLED: true
+                // })
                 plugins: [
-                    new ApplicationExtensionConfigPlugin({
-                        extensions: getConfiguredExtensions(getConfig())
-                    }),
                     new webpack.DefinePlugin({
                         DEBUG,
                         NODE_ENV: `'${process.env.NODE_ENV}'`,
                         WEBPACK_TARGET: `'${target}'`,
                         ['global.GENTLY']: false
                     }),
-                    // new SharedStatePlugin(),
                     mode === development && new webpack.NoEmitOnErrorsPlugin(),
 
                     sdkReplacementPlugin(),
@@ -261,20 +229,7 @@ const baseConfig = (target) => {
                             use: {
                                 loader: findDepInStack('source-map-loader')
                             }
-                        },
-                        ruleForApplicationExtensibility({
-                            loaderOptions: {
-                                configured: getConfiguredExtensions(getConfig()),
-                                target: 'web'
-                            }
-                        }),
-                        ruleForApplicationExtensibility({
-                            loaderOptions: {
-                                configured: getConfiguredExtensions(getConfig()),
-                                target: 'node'
-                            }
-                        }),
-                        ruleForOverrideResolver({target, projectDir, isMonoRepo})
+                        }
                     ].filter(Boolean)
                 }
             }
@@ -320,18 +275,10 @@ const withChunking = (config) => {
 const staticFolderCopyPlugin = new CopyPlugin({
     patterns: [
         {
-            from: 'app/static/',
-            to: 'static/'
-        },
-        ...getConfiguredExtensions(getConfig()).map((extension) => {
-            const packageName = extension[0]
-            return {
-                from: `${projectDir}/node_modules/${packageName}/static`,
-                to: `static/${EXTENIONS_NAMESPACE}/${packageName}`,
-                // Add exclude for readme file.
-                noErrorOnMissing: true
-            }
-        })
+            from: 'static',
+            to: 'static/',
+            noErrorOnMissing: true
+        }
     ]
 })
 
@@ -339,12 +286,7 @@ const ruleForBabelLoader = (babelPlugins) => {
     return {
         id: 'babel-loader',
         test: /(\.js(x?)|\.ts(x?))$/,
-        // NOTE: Because our extensions are just folders containing source code, we need to ensure that the babel-loader processes them.
-        // This regex exclude everything in node_modules, but node_modules/extensions-*/ folders
-        exclude: new RegExp(
-            `node_modules\\${path.sep}(?!(@?[^\\${path.sep}]+\\${path.sep})?extension-).*`,
-            'i'
-        ),
+        exclude: /node_modules/,
         use: [
             {
                 loader: findDepInStack('thread-loader'),
@@ -414,7 +356,7 @@ const enableReactRefresh = (config) => {
 }
 
 const client =
-    entryPointExists(['app', 'main']) &&
+    entryPointExists(['src', 'main']) &&
     baseConfig('web')
         .extend(withChunking)
         .extend((config) => {
@@ -423,7 +365,10 @@ const client =
                 // Must be named "client". See - https://www.npmjs.com/package/webpack-hot-server-middleware#usage
                 name: CLIENT,
                 // use source map to make debugging easier
-                devtool: mode === development ? 'source-map' : false,
+                devtool:
+                    mode === development || process.env.PWA_KIT_SOURCE_MAP === 'true'
+                        ? 'source-map'
+                        : false,
                 entry: {
                     main: getAppEntryPoint()
                 },
@@ -432,7 +377,7 @@ const client =
                     new LoadablePlugin({writeToDisk: true}),
                     analyzeBundle && getBundleAnalyzerPlugin(CLIENT)
                 ].filter(Boolean),
-                // Hide the performance hints, since we already have a similar `bundlesize` check in `template-retail-react-app` package
+                // Hide the performance hints, since we already have a similar `bundlesize` check in `template-chakra-storefront` package
                 performance: {
                     hints: false
                 }
@@ -451,12 +396,15 @@ const clientOptional = baseConfig('web')
             ...config,
             name: CLIENT_OPTIONAL,
             entry: {
-                ...optional('loader', resolve(projectDir, 'app', 'loader.js')),
+                ...optional('loader', resolve(projectDir, 'src', 'loader.js')),
                 ...optional('worker', resolve(projectDir, 'worker', 'main.js')),
                 ...optional('fetch-polyfill', resolve(projectDir, 'node_modules', 'whatwg-fetch'))
             },
             // use source map to make debugging easier
-            devtool: mode === development ? 'source-map' : false,
+            devtool:
+                mode === development || process.env.PWA_KIT_SOURCE_MAP === 'true'
+                    ? 'source-map'
+                    : false,
             plugins: [
                 ...config.plugins,
                 analyzeBundle && getBundleAnalyzerPlugin(CLIENT_OPTIONAL)
@@ -475,7 +423,10 @@ const renderer =
                 name: SERVER,
                 entry: '@salesforce/pwa-kit-react-sdk/ssr/server/react-rendering.js',
                 // use eval-source-map for server-side debugging
-                devtool: mode === development && INSPECT ? 'eval-source-map' : false,
+                devtool:
+                    (mode === development && INSPECT) || process.env.PWA_KIT_SOURCE_MAP === 'true'
+                        ? 'eval-source-map'
+                        : false,
                 output: {
                     path: buildDir,
 
@@ -508,9 +459,7 @@ const ssr = (() => {
             .extend((config) => {
                 return {
                     ...config,
-                    ...(process.env.PWA_KIT_SSR_SOURCE_MAP === 'true'
-                        ? {devtool: 'source-map'}
-                        : {}),
+                    ...(process.env.PWA_KIT_SOURCE_MAP === 'true' ? {devtool: 'source-map'} : {}),
                     // Must *not* be named "server". See - https://www.npmjs.com/package/webpack-hot-server-middleware#usage
                     name: SSR,
                     entry: getServerEntryPoint(),
@@ -533,20 +482,23 @@ const ssr = (() => {
 })()
 
 const requestProcessor =
-    entryPointExists(['app', 'request-processor']) &&
+    entryPointExists(['src', 'request-processor']) &&
     baseConfig('node')
         .extend((config) => {
             return {
                 ...config,
                 name: REQUEST_PROCESSOR,
-                entry: './app/request-processor.js',
+                entry: './src/request-processor.js',
                 output: {
                     path: buildDir,
                     filename: 'request-processor.js',
                     libraryTarget: 'commonjs2'
                 },
                 // use eval-source-map for server-side debugging
-                devtool: mode === development && INSPECT ? 'eval-source-map' : false,
+                devtool:
+                    (mode === development && INSPECT) || process.env.PWA_KIT_SOURCE_MAP === 'true'
+                        ? 'eval-source-map'
+                        : false,
                 plugins: [
                     ...config.plugins,
                     analyzeBundle && getBundleAnalyzerPlugin(REQUEST_PROCESSOR)

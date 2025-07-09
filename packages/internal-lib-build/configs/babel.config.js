@@ -10,7 +10,8 @@ const config = {
             require('@babel/preset-env'),
             {
                 targets: {
-                    node: 18
+                    // The _minimum_ Node version supported. See https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/upgrade-node-version.html#supported-node-versions
+                    node: '18'
                 }
             }
         ],

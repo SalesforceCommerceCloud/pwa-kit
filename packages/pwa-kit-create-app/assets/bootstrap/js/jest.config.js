@@ -10,11 +10,9 @@ const base = require('@salesforce/pwa-kit-dev/configs/jest/jest.config.js')
 
 module.exports = {
     ...base,
-    // To support extensibility, jest needs to transform the underlying templates/extensions
-    transformIgnorePatterns: ['/node_modules/(?!@salesforce/retail-react-app/.*)'],
     moduleNameMapper: {
         ...base.moduleNameMapper,
-        // pulled from @salesforce/retail-react-app jest.config.js
+        // pulled from template-chakra-storefront jest.config.js
         // allows jest to resolve imports for these packages
         '^is-what$': '<rootDir>/node_modules/is-what/dist/cjs/index.cjs',
         '^copy-anything$': '<rootDir>/node_modules/copy-anything/dist/cjs/index.cjs'

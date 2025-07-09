@@ -15,6 +15,7 @@ type useCustomerType = {
     customerType: CustomerType
     isGuest: boolean
     isRegistered: boolean
+    isExternal: boolean
 }
 
 /**
@@ -50,10 +51,20 @@ const useCustomerType = (): useCustomerType => {
         customerType = null
     }
 
+    // The `uido` is a value within the `isb` claim of the SLAS access token that denotes the IDP origin of the user
+    // If `uido` is not equal to `slas` or `ecom`, the user is considered an external user
+    const uido: string | null = onClient
+        ? // eslint-disable-next-line react-hooks/rules-of-hooks
+          useLocalStorage(`uido_${config.siteId}`)
+        : auth.get('uido')
+
+    const isExternal: boolean = customerType === 'registered' && uido !== 'slas' && uido !== 'ecom'
+
     return {
         customerType,
         isGuest,
-        isRegistered
+        isRegistered,
+        isExternal
     }
 }
 

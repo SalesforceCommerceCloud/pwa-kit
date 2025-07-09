@@ -1,0 +1,135 @@
+/*
+ * Copyright (c) 2021, salesforce.com, inc.
+ * All rights reserved.
+ * SPDX-License-Identifier: BSD-3-Clause
+ * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
+ */
+import React from 'react'
+import PropTypes from 'prop-types'
+import {ChakraProvider} from '@chakra-ui/react'
+
+// Removes focus for non-keyboard interactions for the whole application
+import 'focus-visible/dist/focus-visible'
+
+import theme from '../../../src/theme'
+import {MultiSiteProvider} from '../../../src/contexts'
+import {useAppOrigin} from '../../../src/hooks/use-app-origin'
+import {
+    resolveSiteFromUrl,
+    resolveLocaleFromUrl
+} from '../../../src/utils/site-utils'
+import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
+import {proxyBasePath} from '@salesforce/pwa-kit-runtime/utils/ssr-namespace-paths'
+import {createUrlTemplate} from '../../../src/utils/url'
+import createLogger from '@salesforce/pwa-kit-runtime/utils/logger-factory'
+
+import {CommerceApiProvider, resetDehydratedStateTimeStamp} from '@salesforce/commerce-sdk-react'
+import {withReactQuery} from '@salesforce/pwa-kit-react-sdk/ssr/universal/components/with-react-query'
+import {useCorrelationId} from '@salesforce/pwa-kit-react-sdk/ssr/universal/hooks'
+import {ReactQueryDevtools} from '@tanstack/react-query-devtools'
+import {DEFAULT_DNT_STATE} from '../../../config/constants'
+
+/**
+ * Use the AppConfig component to inject extra arguments into the getProps
+ * methods for all Route Components in the app – typically you'd want to do this
+ * to inject a connector instance that can be used in all Pages.
+ *
+ * You can also use the AppConfig to configure a state-management library such
+ * as Redux, or Mobx, if you like.
+ */
+const AppConfig = ({children, locals = {}}) => {
+    const {correlationId} = useCorrelationId()
+    const headers = {
+        'correlation-id': correlationId
+    }
+
+    const commerceApiConfig = locals.appConfig.commerceAPI
+
+    const appOrigin = useAppOrigin()
+
+    const passwordlessCallback = locals.appConfig.login?.passwordless?.callbackURI
+
+    return (
+        <CommerceApiProvider
+            shortCode={commerceApiConfig.parameters.shortCode}
+            clientId={commerceApiConfig.parameters.clientId}
+            organizationId={commerceApiConfig.parameters.organizationId}
+            siteId={locals.site?.id}
+            locale={locals.locale?.id}
+            currency={locals.locale?.preferredCurrency}
+            redirectURI={`${appOrigin}/callback`}
+            proxy={`${appOrigin}${commerceApiConfig.proxyPath}`}
+            headers={headers}
+            defaultDnt={DEFAULT_DNT_STATE}
+            logger={createLogger({packageName: 'commerce-sdk-react'})}
+            passwordlessLoginCallbackURI={passwordlessCallback}
+            {{#if answers.project.commerce.isSlasPrivate}}
+            // Set 'enablePWAKitPrivateClient' to true use SLAS private client login flows.
+            // Make sure to also enable useSLASPrivateClient in ssr.js when enabling this setting.
+            enablePWAKitPrivateClient={true}
+            {{/if}}
+        >
+            <MultiSiteProvider site={locals.site} locale={locals.locale} buildUrl={locals.buildUrl}>
+                <ChakraProvider theme={theme}>{children}</ChakraProvider>
+            </MultiSiteProvider>
+            <ReactQueryDevtools />
+        </CommerceApiProvider>
+    )
+}
+
+AppConfig.restore = (locals = {}) => {
+    const path =
+        typeof window === 'undefined'
+            ? locals.originalUrl
+            : `${window.location.pathname}${window.location.search}`
+    const site = resolveSiteFromUrl(path)
+    const locale = resolveLocaleFromUrl(path)
+
+    const appConfig = getConfig()
+    const apiConfig = {
+        ...appConfig.commerceAPI,
+        einsteinConfig: appConfig.einsteinAPI
+    }
+
+    apiConfig.parameters.siteId = site.id
+
+    locals.buildUrl = createUrlTemplate(appConfig, site.alias || site.id, locale.id)
+    locals.site = site
+    locals.locale = locale
+    locals.appConfig = appConfig
+}
+
+AppConfig.freeze = () => undefined
+
+AppConfig.extraGetPropsArgs = (locals = {}) => {
+    return {
+        buildUrl: locals.buildUrl,
+        site: locals.site,
+        locale: locals.locale
+    }
+}
+
+AppConfig.propTypes = {
+    children: PropTypes.node,
+    locals: PropTypes.object
+}
+
+// Recommended settings for PWA-Kit usages.
+// NOTE: they will be applied on both server and client side.
+const options = {
+    queryClientConfig: {
+        defaultOptions: {
+            queries: {
+                retry: false,
+                refetchOnWindowFocus: false,
+                staleTime: 10 * 1000
+            },
+            mutations: {
+                retry: false
+            }
+        }
+    },
+    beforeHydrate: resetDehydratedStateTimeStamp
+}
+
+export default withReactQuery(AppConfig, options)

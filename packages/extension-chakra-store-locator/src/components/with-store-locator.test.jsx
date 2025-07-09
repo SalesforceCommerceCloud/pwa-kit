@@ -8,15 +8,10 @@ import React from 'react'
 import {render, screen} from '@testing-library/react'
 import {withStoreLocator} from './with-store-locator'
 import {useStoreLocator} from './use-store-locator'
-import {useExtensionStore} from '../hooks/use-extension-store'
 import PropTypes from 'prop-types'
 
 jest.mock('./use-store-locator', () => ({
     useStoreLocator: jest.fn()
-}))
-
-jest.mock('../hooks/use-extension-store', () => ({
-    useExtensionStore: jest.fn()
 }))
 
 // Mock the StoreLocatorModal component
@@ -41,18 +36,32 @@ describe('withStoreLocator', () => {
         supportedCountries: []
     }
 
-    const mockStore = {
-        isModalOpen: false,
-        closeModal: jest.fn()
-    }
-
     beforeEach(() => {
         useStoreLocator.mockReturnValue({
             searchStoresParams: {},
             setSearchStoresParams: jest.fn(),
-            config: mockConfig
+            config: mockConfig,
+            isModalOpen: false,
+            closeModal: jest.fn(),
+            openModal: jest.fn(),
+            mode: 'input',
+            formValues: {
+                countryCode: 'US',
+                postalCode: '94105'
+            },
+            deviceCoordinates: {
+                latitude: null,
+                longitude: null
+            },
+            data: undefined,
+            isLoading: false,
+            setFormValues: jest.fn(),
+            setDeviceCoordinates: jest.fn()
         })
-        useExtensionStore.mockReturnValue(mockStore)
+    })
+
+    afterEach(() => {
+        jest.clearAllMocks()
     })
 
     it('wraps component with StoreLocatorProvider', () => {
@@ -94,9 +103,26 @@ describe('withStoreLocator', () => {
         const TestComponent = () => <div>Test Component</div>
         const WrappedComponent = withStoreLocator(TestComponent, mockConfig)
 
-        useExtensionStore.mockReturnValue({
-            ...mockStore,
-            isModalOpen: true
+        useStoreLocator.mockReturnValue({
+            searchStoresParams: {},
+            setSearchStoresParams: jest.fn(),
+            config: mockConfig,
+            isModalOpen: true,
+            closeModal: jest.fn(),
+            openModal: jest.fn(),
+            mode: 'input',
+            formValues: {
+                countryCode: 'US',
+                postalCode: '94105'
+            },
+            deviceCoordinates: {
+                latitude: null,
+                longitude: null
+            },
+            data: undefined,
+            isLoading: false,
+            setFormValues: jest.fn(),
+            setDeviceCoordinates: jest.fn()
         })
 
         render(<WrappedComponent />)
@@ -107,9 +133,26 @@ describe('withStoreLocator', () => {
         const TestComponent = () => <div>Test Component</div>
         const WrappedComponent = withStoreLocator(TestComponent, mockConfig)
 
-        useExtensionStore.mockReturnValue({
-            ...mockStore,
-            isModalOpen: false
+        useStoreLocator.mockReturnValue({
+            searchStoresParams: {},
+            setSearchStoresParams: jest.fn(),
+            config: mockConfig,
+            isModalOpen: false,
+            closeModal: jest.fn(),
+            openModal: jest.fn(),
+            mode: 'input',
+            formValues: {
+                countryCode: 'US',
+                postalCode: '94105'
+            },
+            deviceCoordinates: {
+                latitude: null,
+                longitude: null
+            },
+            data: undefined,
+            isLoading: false,
+            setFormValues: jest.fn(),
+            setDeviceCoordinates: jest.fn()
         })
 
         render(<WrappedComponent />)
@@ -121,9 +164,26 @@ describe('withStoreLocator', () => {
         const WrappedComponent = withStoreLocator(TestComponent, mockConfig)
         const mockCloseModal = jest.fn()
 
-        useExtensionStore.mockReturnValue({
+        useStoreLocator.mockReturnValue({
+            searchStoresParams: {},
+            setSearchStoresParams: jest.fn(),
+            config: mockConfig,
             isModalOpen: true,
-            closeModal: mockCloseModal
+            closeModal: mockCloseModal,
+            openModal: jest.fn(),
+            mode: 'input',
+            formValues: {
+                countryCode: 'US',
+                postalCode: '94105'
+            },
+            deviceCoordinates: {
+                latitude: null,
+                longitude: null
+            },
+            data: undefined,
+            isLoading: false,
+            setFormValues: jest.fn(),
+            setDeviceCoordinates: jest.fn()
         })
 
         render(<WrappedComponent />)

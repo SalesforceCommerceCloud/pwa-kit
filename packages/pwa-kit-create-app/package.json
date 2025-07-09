@@ -1,7 +1,7 @@
 {
   "private": true,
   "name": "@salesforce/pwa-kit-create-app",
-  "version": "4.0.0-extensibility-preview.4",
+  "version": "4.0.0-extensibility-preview.5",
   "description": "Salesforce's project generator tool",
   "homepage": "https://github.com/SalesforceCommerceCloud/pwa-kit/tree/develop/packages/pwa-kit-create-app#readme",
   "bugs": {
@@ -18,7 +18,9 @@
   },
   "files": [
     "assets",
-    "templates"
+    "templates",
+    "scripts/trim-extensions.js",
+    "scripts/checksum.js"
   ],
   "scripts": {
     "format": "internal-lib-build format \"**/*.{js,jsx}\"",
@@ -29,22 +31,26 @@
     "test": "internal-lib-build test"
   },
   "dependencies": {
+    "@babel/generator": "^7.23.6",
+    "@babel/parser": "^7.23.6",
+    "@babel/traverse": "^7.23.6",
     "commander": "^9.5.0",
     "deepmerge": "2.2.1",
     "handlebars": "^4.7.7",
     "inquirer": "8.2.5",
     "semver": "^7.5.2",
-    "shelljs": "^0.8.5",
+    "shelljs": "^0.9.2",
     "slugify": "^1.6.5",
-    "tar": "^6.2.1"
+    "tar": "^6.2.1",
+    "validate-npm-package-name": "^6.0.0"
   },
   "devDependencies": {
-    "@salesforce/pwa-kit-dev": "4.0.0-extensibility-preview.4",
-    "internal-lib-build": "4.0.0-extensibility-preview.4",
+    "@salesforce/pwa-kit-dev": "4.0.0-extensibility-preview.5",
+    "internal-lib-build": "4.0.0-extensibility-preview.5",
     "verdaccio": "^5.22.1"
   },
   "engines": {
-    "node": "^16.11.0 || ^18.0.0 || ^20.0.0",
-    "npm": "^8.0.0 || ^9.0.0 || ^10.0.0"
+    "node": "^16.11.0 || ^18.0.0 || ^20.0.0 || ^22.0.0",
+    "npm": "^8.0.0 || ^9.0.0 || ^10.0.0 || ^11.0.0"
   }
 }

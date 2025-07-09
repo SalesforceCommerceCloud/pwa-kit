@@ -52,7 +52,11 @@ export class MetricsSender {
                 apiVersion: '2010-08-01',
                 // The AWS_REGION variable is defined by the Lambda
                 // environment.
-                region: process.env.AWS_REGION || 'us-east-1'
+                region: process.env.AWS_REGION || 'us-east-1',
+                // Setting maxRetries to 0 will prevent the SDK from retrying.
+                // This is necessary because under high load, there will be backpressure
+                // on the Lambda function, and causing severe performance issues (400-500ms latency)
+                maxRetries: 0
             })
         }
         return this._CW

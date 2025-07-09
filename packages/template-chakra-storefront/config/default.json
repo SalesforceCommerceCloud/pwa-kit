@@ -1,0 +1,217 @@
+{
+    "enabled": true,
+    "activeDataEnabled": false,
+    "categoryNav": {
+        "defaultNavSsrDepth": 1,
+        "defaultRootCategory": "root"
+    },
+    "commerceAPI": {
+        "proxyPath": "/mobify/proxy/api",
+        "parameters": {
+            "clientId": "c9c45bfd-0ed3-4aa2-9971-40f88962b836",
+            "organizationId": "f_ecom_zzrf_001",
+            "shortCode": "8o7m175y",
+            "siteId": "RefArchGlobal"
+        }
+    },
+    "mobify": {
+        "ssrEnabled": true,
+        "ssrOnly": [
+            "ssr.js",
+            "ssr.js.map",
+            "node_modules/**/*.*"
+        ],
+        "ssrShared": [
+            "static/favicon.ico",
+            "static/robots.txt",
+            "**/*.js",
+            "**/*.js.map",
+            "**/*.json"
+        ],
+        "ssrParameters": {
+        "ssrFunctionNodeVersion": "22.x",
+        "proxyConfigs": [
+            {
+            "host": "kv7kzm78.api.commercecloud.salesforce.com",
+            "path": "api"
+            },
+            {
+            "host": "zzrf-001.dx.commercecloud.salesforce.com",
+            "path": "ocapi"
+            }
+        ]
+        }
+    },
+    "defaultSite": "RefArchGlobal",
+    "defaultAppLocale": "en-US",
+    "defaultSiteTitle": "Chakra Storefront",
+    "pages": {
+        "account": {
+            "path": "/account",
+            "orderSearchParam": {"limit": 10, "offset": 0, "sort": "best-matches", "refine": []}
+        },
+        "cart": {
+            "path": "/cart"
+        },
+        "checkout": {
+            "path": "/checkout",
+            "shippingCountryCode": [
+                {"value": "CA", "label": "Canada"},
+                {"value": "US", "label": "United States"}
+            ]
+        },
+        "checkoutConfirmation": {
+            "path": "/checkout/confirmation/:orderNo"
+        },
+        "home": {
+            "path": "/",
+            "productLimit": 10,
+            "mainCategory": "newarrivals"
+        },
+        "login": {
+            "path": "/login"
+        },
+        "registration": {
+            "path": "/registration"
+        },
+        "resetPassword": {
+            "path": "/reset-password"
+        },
+        "resetPasswordLanding": {
+            "path": "/reset-password-landing"
+        },
+        "loginRedirect": {
+            "path": "/callback"
+        },
+        "passwordlessLoginLanding": {
+            "path": "/passwordless-login-landing"
+        },
+        "productDetail": {
+            "path": "/product/:productId"
+        },
+        "productList": {
+            "path": ["/search", "/category/:categoryId"],
+            "imageViewType": "large",
+            "selectableAttributeId": "color",
+            "filterAccordionSate": "filters-expanded-index"
+        },
+        "socialRedirect": {
+            "path": "/social-redirect"
+        }
+    },
+    "defaultDnt": true,
+    "einsteinAPI": {
+        "host": "https://api.cquotient.com",
+        "einsteinId": "1ea06c6e-c936-4324-bcf0-fada93f83bb1",
+        "siteId": "aaij-MobileFirst",
+        "isProduction": false
+    },
+    "dataCloudAPI": {
+        "appSourceId": "fb81edab-24c6-4b40-8684-b67334dfdf32",
+        "tenantId": "mmyw8zrxhfsg09lfmzrd1zjqmg"
+    },
+    "login": {
+        "passwordless": {
+            "enabled": false,
+            "callbackURI": "/passwordless-login-callback",
+            "landingPath": "/passwordless-login-landing"
+        },
+        "social": {
+            "enabled": false,
+            "idps": ["google", "apple"],
+            "redirectURI": "/social-callback"
+        },
+        "resetPassword": {
+            "landingPath": "/reset-password-landing"
+        }
+    },
+    "maxCacheAge": 900,
+    "search": {
+        "defaultLimitValues": [25, 50, 100],
+        "defaultSearchParams": {"limit": 25, "offset": 0, "sort": "best-matches", "refine": []},
+        "recentSearchKey": "recent-search-key",
+        "recentSearchLimit": 5,
+        "recentSearchMinLength": 3
+    },
+    "siteAliases": {
+        "RefArch": "us",
+        "RefArchGlobal": "global"
+    },
+    "sites": [
+        {
+            "id": "RefArch",
+            "l10n": {
+                "supportedCurrencies": ["USD"],
+                "defaultCurrency": "USD",
+                "defaultLocale": "en-US",
+                "supportedLocales": [
+                    {
+                        "id": "en-US",
+                        "preferredCurrency": "USD"
+                    },
+                    {
+                        "id": "en-CA",
+                        "preferredCurrency": "USD"
+                    }
+                ]
+            }
+        },
+        {
+            "id": "RefArchGlobal",
+            "l10n": {
+                "supportedCurrencies": ["GBP", "EUR", "CNY", "JPY"],
+                "defaultCurrency": "GBP",
+                "supportedLocales": [
+                    {
+                        "id": "de-DE",
+                        "preferredCurrency": "EUR"
+                    },
+                    {
+                        "id": "en-GB",
+                        "preferredCurrency": "GBP"
+                    },
+                    {
+                        "id": "es-MX",
+                        "preferredCurrency": "MXN"
+                    },
+                    {
+                        "id": "fr-FR",
+                        "preferredCurrency": "EUR"
+                    },
+                    {
+                        "id": "it-IT",
+                        "preferredCurrency": "EUR"
+                    },
+                    {
+                        "id": "ja-JP",
+                        "preferredCurrency": "JPY"
+                    },
+                    {
+                        "id": "ko-KR",
+                        "preferredCurrency": "KRW"
+                    },
+                    {
+                        "id": "pt-BR",
+                        "preferredCurrency": "BRL"
+                    },
+                    {
+                        "id": "zh-CN",
+                        "preferredCurrency": "CNY"
+                    },
+                    {
+                        "id": "zh-TW",
+                        "preferredCurrency": "TWD"
+                    }
+                ],
+                "defaultLocale": "en-GB"
+            }
+        }
+    ],
+    "staleWhileRevalidate": 900,
+    "url": {
+        "site": "path",
+        "locale": "path",
+        "showDefaults": true,
+        "interpretPlusSignAsSpace": false
+    }
+}

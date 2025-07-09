@@ -3,27 +3,46 @@ inputs:
   cwd:
     required: false
     default: ${{ github.workspace }}
+  node:
+    required: true
+    description: Major node version
+  npm:
+    required: false
+    description: Major npm version
+  update_npm:
+    required: false
+    default: false
 description: "Setup Ubuntu Machine"
 runs:
   using: composite
   steps:
+    - name: Setup Node
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ inputs.node }}
+        cache: npm
+
+    - name: Update NPM version
+      if: inputs.update_npm == 'true'
+      run: |-
+        npm install -g npm@${{ inputs.npm }}
+      shell: bash
+
+    - name: Verify node and npm versions
+      uses: ./.github/actions/verify_node_npm_major_versions
+      with:
+        node: ${{ inputs.node }}
+        npm: ${{ inputs.npm }}
+
     - name: Install Dependencies
       working-directory: ${{ inputs.cwd }}
       run: |-
         # Install node dependencies
         node ./scripts/gtime.js monorepo_install npm ci
 
-        # Build the PWA
-        npm run lerna -- run analyze-build --scope "@salesforce/retail-react-app"
-
-        # Report bundle sizes
-        node ./scripts/report-bundle-size.js
-
         # Install Snyk CLI
         # TODO: Ticket W-12425059. Revisit Snyk CLI integration to monitor manifest files on generated projects.
         # TODO: Latest Snyk CLI version is currently failing on npm i. We use the alternative Snyk GitHub integration.
         # sudo npm install -g snyk
 
-        # Install Lighthouse CI CLI
-        sudo npm install -g @lhci/cli
       shell: bash

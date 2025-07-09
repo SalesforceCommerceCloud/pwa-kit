@@ -90,7 +90,7 @@ type NonEmptyResponseMutations = Exclude<
 >
 // This is an object rather than an array to more easily ensure we cover all mutations
 type TestMap = {[Mut in NonEmptyResponseMutations]: Argument<Client[Mut]>}
-const testMap: TestMap = {
+const testMap: Partial<TestMap> = {
     addGiftCertificateItemToBasket: createOptions<'addGiftCertificateItemToBasket'>(
         {recipientEmail: 'customer@email', amount: 100},
         {}

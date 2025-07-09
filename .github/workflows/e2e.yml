@@ -11,18 +11,18 @@ jobs:
       fail-fast: false
       matrix:
         # Run all matrix env at once because we will not deploy demo app to MRT.
-        node: [16, 18, 20]
-        npm: [8, 9, 10]
-        exclude: # node 16 is not compatible with npm 10
-          - node: 16
-            npm: 10
+        node: [18, 20, 22]
+        npm: [8, 9, 10, 11]
+        exclude: # node 18 with npm 11 is not compatible
+          - node: 18
+            npm: 11
     runs-on: ubuntu-latest
     env:
       # The "default" npm is the one that ships with a given version of node.
       # For more: https://nodejs.org/en/download/releases/
       # (We also use this env var for making sure a step runs once for the current node version)
       # Note: For node 18, the default was npm 9 until v18.19.0, when it became npm 10
-      IS_DEFAULT_NPM: ${{ (matrix.node == 16 && matrix.npm == 8) || (matrix.node == 18 && matrix.npm == 10) || (matrix.node == 20 && matrix.npm == 10) }}
+      IS_DEFAULT_NPM: ${{ (matrix.node == 18 && matrix.npm == 10) || (matrix.node == 20 && matrix.npm == 10) || (matrix.node == 22 && matrix.npm == 10) }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -43,35 +43,42 @@ jobs:
           # Install node dependencies
           node ./scripts/gtime.js monorepo_install npm ci
 
+      - name: Check Playwright Versions
+        run: |-
+          # Check the installed version of playwright
+          echo "Playwright version: $(npm list playwright --depth=0)"
+
+          # Check the installed version of @playwright/test
+          echo "@playwright/test version: $(npm list @playwright/test --depth=0)"
+
       - name: Generate Retail App Demo
         uses: ./.github/actions/e2e_generate_app
         with:
-          PROJECT_KEY: "retail-app-demo"
+          PROJECT_KEY: "chakra-storefront-demo"
 
       - name: Validate Generated Retail App Demo
         uses: ./.github/actions/e2e_validate_generated_app
         with:
-          PROJECT_KEY: "retail-app-demo"
-
+          PROJECT_KEY: "chakra-storefront-demo"
   run-generator-private-client:
     strategy:
       fail-fast: false
       # Run one matrix env at a time because we need to deploy each app to MRT and run e2e tests there
       max-parallel: 1
       matrix:
-        # Run all matrix env at once because we will not deploy demo app to MRT.
-        node: [16, 18, 20]
-        npm: [8, 9, 10]
-        exclude: # node 16 is not compatible with npm 10
-          - node: 16
-            npm: 10
+          # Run all matrix env at once because we will not deploy demo app to MRT.
+          node: [18, 20, 22]
+          npm: [8, 9, 10, 11]
+          exclude: # node 18 with npm 11 is not compatible
+            - node: 18
+              npm: 11
     runs-on: ubuntu-latest
     env:
       # The "default" npm is the one that ships with a given version of node.
       # For more: https://nodejs.org/en/download/releases/
       # (We also use this env var for making sure a step runs once for the current node version)
       # Note: For node 18, the default was npm 9 until v18.19.0, when it became npm 10
-      IS_DEFAULT_NPM: ${{ (matrix.node == 16 && matrix.npm == 8) || (matrix.node == 18 && matrix.npm == 10) || (matrix.node == 20 && matrix.npm == 10) }}
+      IS_DEFAULT_NPM: ${{ (matrix.node == 18 && matrix.npm == 10) || (matrix.node == 20 && matrix.npm == 10) || (matrix.node == 22 && matrix.npm == 10) }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -91,10 +98,30 @@ jobs:
           # Install node dependencies
           node ./scripts/gtime.js monorepo_install npm ci
 
+      - name: Check Playwright Versions
+        run: |-
+          # Check the installed version of playwright
+          echo "Playwright version: $(npm list playwright --depth=0)"
+
+          # Check the installed version of @playwright/test
+          echo "@playwright/test version: $(npm list @playwright/test --depth=0)"
+
+      - name: Get Template Version
+        run: |-
+          version=`jq -r ".version" packages/template-chakra-storefront/package.json`
+          echo "retail_app_template_version=$version" >> "$GITHUB_ENV"
+
       - name: Generate Retail App Private Client
         uses: ./.github/actions/e2e_generate_app
         with:
-          PROJECT_KEY: "retail-app-private-client"
+          PROJECT_KEY: "chakra-storefront-private-client"
+          TEMPLATE_VERSION: ${{ env.retail_app_template_version }}
+
+      - name: Validate Generated Retail App Private Client
+        uses: ./.github/actions/e2e_validate_generated_app
+        with:
+          PROJECT_KEY: "chakra-storefront-private-client"
+          TEMPLATE_VERSION: ${{ env.retail_app_template_version }}
 
       - name: Create MRT credentials file
         uses: "./.github/actions/create_mrt"
@@ -105,16 +132,20 @@ jobs:
       - name: Push Bundle to MRT
         uses: "./.github/actions/push_to_mrt"
         with:
-          CWD: "../generated-projects/retail-app-private-client"
+          CWD: "../generated-projects/chakra-storefront-private-client"
           TARGET: e2e-pwa-kit-private
           FLAGS: --wait
 
       - name: Set Retail App Private Client Home
         run: export RETAIL_APP_HOME=https://scaffold-pwa-e2e-pwa-kit-private.mobify-storefront.com/
 
+      - name: Set PWA Kit E2E Test User
+        run: export PWA_E2E_USER_EMAIL=e2e.pwa.kit@gmail.com PWA_E2E_USER_PASSWORD=hpv_pek-JZK_xkz0wzf
+
       - name: Install Playwright Browsers
         run: npx playwright install --with-deps
 
+      # this will not include a11y tests
       - name: Run Playwright tests
         run: npm run test:e2e
 

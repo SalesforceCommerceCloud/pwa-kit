@@ -12,10 +12,10 @@ jobs:
       contents: write
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
-        
+
       - name: Get Timestamp
         run: |-
           echo "release_timestamp=$(date +'%Y%m%d%H%M%S')" >> "$GITHUB_ENV"
@@ -31,10 +31,10 @@ jobs:
       - name: Get nightly version
         run:  echo "nightly_version=${{ env.monorepo_version_base }}-nightly-${{ env.release_timestamp }}" >> "$GITHUB_ENV"
 
-      - name: Get retail-react-app version
+      - name: Get chakra-storefront version
         run: |-
-          version=`jq -r ".version" packages/template-retail-react-app/package.json | cut -d "-" -f 1`
-          echo "retail_app_version_base=$version" >> "$GITHUB_ENV"
+          version=`jq -r ".version" packages/template-chakra-storefront/package.json | cut -d "-" -f 1`
+          echo "chakra_storefront_version_base=$version" >> "$GITHUB_ENV"
 
       - name: Get commerce-sdk-react version
         run: |-
@@ -42,9 +42,9 @@ jobs:
           echo "commerce_sdk_react_version_base=$version" >> "$GITHUB_ENV"
 
       - name: Setup Node
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: 22
           cache: npm
 
       - name: Install Monorepo Dependencies
@@ -75,9 +75,9 @@ jobs:
         run: |-
           npm run bump-version -- "${{ env.nightly_version }}"
 
-      - name: Bump version (retail-react-app)
+      - name: Bump version (chakra-storefront)
         run: |-
-          npm run bump-version:retail-react-app -- "${{ env.retail_app_version_base }}-nightly-${{ env.release_timestamp }}"
+          npm run bump-version:chakra-storefront -- "${{ env.chakra_storefront_version_base }}-nightly-${{ env.release_timestamp }}"
 
       - name: Bump version (commerce-sdk-react)
         run: |-
@@ -87,9 +87,6 @@ jobs:
         run: |-
           git commit -am "Release ${{ env.nightly_version }}"
           git push --set-upstream origin nightly-releases
-
-      - name: Check Repository Clean
-        uses: "./.github/actions/check_clean"
 
       - name: Publish to NPM
         uses: "./.github/actions/publish_to_npm"

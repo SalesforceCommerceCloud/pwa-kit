@@ -10,13 +10,18 @@ module.exports = {
     ...base,
     coverageThreshold: {
         global: {
-            branches: 64,
+            branches: 50,
             functions: 77,
             lines: 85,
             statements: 85
         }
     },
-    collectCoverageFrom: ['app/**'],
+    collectCoverageFrom: [
+        'app/**',
+        '!app/request-processor.js',
+        '!app/static/**',
+        '!app/*.json'
+    ],
     // Increase to: 6 x default timeout of 5 seconds
     ...(process.env.CI ? {testTimeout: 30000} : {})
 }

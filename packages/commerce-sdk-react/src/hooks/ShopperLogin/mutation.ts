@@ -4,14 +4,9 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import {ApiClients, ApiMethod, Argument, CacheUpdateGetter, DataType, MergedOptions} from '../types'
-import {useMutation} from '../useMutation'
-import {UseMutationResult} from '@tanstack/react-query'
-import {NotImplementedError} from '../utils'
-import useCommerceApi from '../useCommerceApi'
+import {ApiClients} from '../types'
+import {createUseMutation, MethodsOf} from '../createUseMutation'
 import {cacheUpdateMatrix} from './cache'
-
-type Client = ApiClients['shopperLogin']
 
 /**
  * Mutations available for Shopper Login
@@ -103,32 +98,14 @@ The value of the `_sfdc_client_auth` header must be a Base64-encoded string. The
  * @group ShopperLogin
  * @category Mutation
  */
-export type ShopperLoginMutation =
-    (typeof ShopperLoginMutations)[keyof typeof ShopperLoginMutations]
+export type ShopperLoginMutation = MethodsOf<ApiClients['shopperLogin']>
 
 /**
  * Mutation hook for Shopper Login.
  * @group ShopperLogin
  * @category Mutation
  */
-export function useShopperLoginMutation<Mutation extends ShopperLoginMutation>(
-    mutation: Mutation
-): UseMutationResult<DataType<Client[Mutation]>, unknown, Argument<Client[Mutation]>> {
-    const getCacheUpdates = cacheUpdateMatrix[mutation]
-    // TODO: Remove this check when all mutations are implemented.
-    if (!getCacheUpdates) throw new NotImplementedError(`The '${mutation}' mutation`)
-
-    // The `Options` and `Data` types for each mutation are similar, but distinct, and the union
-    // type generated from `Client[Mutation]` seems to be too complex for TypeScript to handle.
-    // I'm not sure if there's a way to avoid the type assertions in here for the methods that
-    // use them. However, I'm fairly confident that they are safe to do, as they seem to be simply
-    // re-asserting what we already have.
-    const {shopperLogin: client} = useCommerceApi()
-    type Options = Argument<Client[Mutation]>
-    type Data = DataType<Client[Mutation]>
-    return useMutation({
-        client,
-        method: (opts: Options) => (client[mutation] as ApiMethod<Options, Data>)(opts),
-        getCacheUpdates: getCacheUpdates as CacheUpdateGetter<MergedOptions<Client, Options>, Data>
-    })
-}
+export const useShopperLoginMutation = createUseMutation<'shopperLogin', ShopperLoginMutation>({
+    clientKey: 'shopperLogin',
+    getCacheUpdates: (mutation) => cacheUpdateMatrix[mutation]
+})

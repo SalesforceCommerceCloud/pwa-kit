@@ -12,7 +12,7 @@ A [PWA Kit](https://github.com/SalesforceCommerceCloud/pwa-kit) extension that a
 ```sh
 npm install @salesforce/extension-chakra-store-locator
 
-# Also: 
+# Also:
 # - install the peer dependencies listed in the package.json
 # - see the Peer Dependancies section below for any other steps (e.g. make sure your app uses CommerceApiProvider component)
 ```
@@ -24,12 +24,12 @@ what peer dependencies are required when using it. Because this application exte
 Chakra UI via a page and components, it requires that the some peer dependencies are installed.
 
 Depending on what features your application extensions provides it's recommended you include any third-party
-packages as peer dependencies so that your base application doesn't end up having multiple versions of a 
+packages as peer dependencies so that your base application doesn't end up having multiple versions of a
 given package. See package.json for the full list of peer dependencies.
 
 ### `@Chakra-ui` Provider
 
-This extension uses the `@chakra-ui` package as the UI library. Your application should use the `ChakraProvider` in the React component tree. 
+This extension uses the `@chakra-ui` package as the UI library. Your application should use the `ChakraProvider` in the React component tree.
 
 If you want to use this without having to install `@chakra-ui` in your project, a `withOptionalChakraProvider` HOC is provided and is used in the extension.
 
@@ -87,16 +87,6 @@ The Store Locator extension is configured via the `mobify.app.extensions` proper
 ## System Diagram
 
 ![System Diagram](./diagram.png)
-
-
-## Overridable Files
-
-The following files in the extension can be overridden in your project:
-
-```
-/src/components/list-item.tsx
-/src/components/heading.tsx
-```
 
 ### Store Locator List Item
 

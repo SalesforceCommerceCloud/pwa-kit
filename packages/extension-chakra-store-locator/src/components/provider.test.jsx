@@ -30,6 +30,7 @@ describe('StoreLocatorProvider', () => {
         expect(contextValue).toBeTruthy()
         expect(contextValue?.state).toEqual({
             mode: 'input',
+            isModalOpen: false,
             formValues: {
                 countryCode: mockConfig.defaultCountryCode,
                 postalCode: mockConfig.defaultPostalCode

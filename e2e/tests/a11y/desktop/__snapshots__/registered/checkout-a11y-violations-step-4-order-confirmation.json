@@ -1,0 +1,50 @@
+[
+  {
+    "id": "aria-allowed-attr",
+    "impact": "critical",
+    "description": "Ensure an element's role supports its ARIA attributes",
+    "help": "Elements must only use supported ARIA attributes",
+    "helpUrl": "https://dequeuniversity.com/rules/axe/4.10/aria-allowed-attr?application=playwright",
+    "nodes": [
+      {
+        "html": "<form id=\"...\" aria-haspopup=\"dialog\" aria-expanded=\"false\" aria-controls=\"popover-content-:r3c:\">",
+        "failureSummary": "Fix all of the following:\n  ARIA attribute is not allowed: aria-expanded=\"false\"",
+        "target": [
+          "#popover-trigger-\\:r3c\\:"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "color-contrast",
+    "impact": "serious",
+    "description": "Ensure the contrast between foreground and background colors meets WCAG 2 AA minimum contrast ratio thresholds",
+    "help": "Elements must meet minimum color contrast ratio thresholds",
+    "helpUrl": "https://dequeuniversity.com/rules/axe/4.10/color-contrast?application=playwright",
+    "nodes": [
+      {
+        "html": "<a class=\"...\" href=\"/\">Continue Shopping</a>",
+        "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 4.17 (foreground color: #0176d3, background color: #f3f3f3, font size: 12.0pt (16px), font weight: normal). Expected contrast ratio of 4.5:1",
+        "target": [
+          ".css-a4jxtg"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "region",
+    "impact": "moderate",
+    "description": "Ensure all page content is contained by landmarks",
+    "help": "All page content should be contained by landmarks",
+    "helpUrl": "https://dequeuniversity.com/rules/axe/4.10/region?application=playwright",
+    "nodes": [
+      {
+        "html": "<input autocomplete=\"off\" type=\"search\" aria-label=\"Search for products...\" placeholder=\"Search for products...\" id=\"...\" class=\"...\">",
+        "failureSummary": "Fix any of the following:\n  Some page content is not contained by landmarks",
+        "target": [
+          "#popover-trigger-\\:r3c\\: > .css-1igwmid.chakra-stack > .chakra-input__group.css-1y0e7gb > .css-va76oz"
+        ]
+      }
+    ]
+  }
+]

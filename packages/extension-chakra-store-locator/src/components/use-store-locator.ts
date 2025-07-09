@@ -13,6 +13,8 @@ import type {StoreLocatorState, FormValues, DeviceCoordinates} from './provider'
 interface StoreLocatorActions {
     setFormValues: (formValues: FormValues) => void
     setDeviceCoordinates: (coordinates: DeviceCoordinates) => void
+    openModal: () => void
+    closeModal: () => void
 }
 
 type UseStoreLocatorReturn = StoreLocatorState &
@@ -65,7 +67,7 @@ export const useStoreLocator = (): UseStoreLocatorReturn => {
         throw new Error('useStoreLocator must be used within a StoreLocatorProvider')
     }
 
-    const {state, setState} = context
+    const {state, setState, openModal, closeModal} = context
     const {data, isLoading} = useStores(state)
 
     // There are two modes, input and device.
@@ -92,6 +94,8 @@ export const useStoreLocator = (): UseStoreLocatorReturn => {
         isLoading,
         // Actions
         setFormValues,
-        setDeviceCoordinates
+        setDeviceCoordinates,
+        openModal,
+        closeModal
     }
 }

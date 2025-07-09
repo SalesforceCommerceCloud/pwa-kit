@@ -3,10 +3,37 @@ inputs:
   cwd:
     required: false
     default: "${PWD}"
+  node:
+    required: true
+    description: Major node version
+  npm:
+    required: false
+    description: Major npm version
+  update_npm:
+    required: false
+    default: false
 description: "Setup Windows Machine"
 runs:
   using: composite
   steps:
+    - name: Setup Node
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ inputs.node }}
+        cache: npm
+
+    - name: Update NPM version
+      if: inputs.update_npm == 'true'
+      run: |-
+        npm install -g npm@${{ inputs.npm }}
+      shell: bash
+
+    - name: Verify node and npm versions
+      uses: ./.github/actions/verify_node_npm_major_versions
+      with:
+        node: ${{ inputs.node }}
+        npm: ${{ inputs.npm }}
+
     - name: Install Dependencies
       run: |-
         # Install node dependencies

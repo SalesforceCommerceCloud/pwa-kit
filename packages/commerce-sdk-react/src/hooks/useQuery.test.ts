@@ -55,6 +55,7 @@ describe('useCustomQuery', () => {
                 rawResponse: false
             })
         })
+
         await waitAndExpectSuccess(() => result.current)
         expect(result.current.data).toEqual(mockRes)
     })
@@ -90,6 +91,7 @@ describe('useCustomQuery', () => {
                 rawResponse: false
             })
         })
+
         await waitAndExpectError(() => result.current)
 
         // Validate that we get a `ResponseError` from commerce-sdk-isomorphic. Ideally, we could do
@@ -140,6 +142,7 @@ describe('useCustomQuery', () => {
                 rawResponse: false
             })
         })
+
         await waitAndExpectSuccess(() => result.current)
         expect(result.current.data).toEqual(mockRes)
     })

@@ -13,7 +13,15 @@ const childProc = require('child_process')
  * Send bundle size stats to Datadog
  */
 const main = () => {
-    const buildDir = path.resolve('packages', 'template-retail-react-app', 'build')
+    const inputDir = process.argv[2]
+    if (!inputDir) {
+        const scriptName = path.basename(__filename)
+        console.error('Please provide the build directory as an argument.')
+        console.error(`Example: node ./scripts/${scriptName} path/to/build/directory`)
+        process.exit(1)
+    }
+    const buildDir = path.resolve(inputDir)
+
     fs.promises
         .readdir(buildDir)
         .then((files) => {

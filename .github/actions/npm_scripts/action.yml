@@ -1,0 +1,12 @@
+name: npm_scripts
+inputs:
+  cwd:
+    required: true
+runs:
+  using: composite
+  steps:
+  - name: Smoke test the npm scripts
+    run: |-
+      # Basic smoke-tests for uncommonly run scripts in a project
+      node ./scripts/smoke-test-npm-scripts.js --dir "${{ inputs.cwd }}"
+    shell: bash

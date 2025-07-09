@@ -137,7 +137,7 @@ interface DependencyTree {
  * @returns A DependencyTree with the versions of all dependencies
  */
 export const getProjectDependencyTree = async (): Promise<DependencyTree | null> => {
-    // When executing this inside template-retail-react-app, the output of `npm ls` exceeds the
+    // When executing this inside template-chakra-storefont, the output of `npm ls` exceeds the
     // max buffer size that child_process can handle, so we can't use that directly. The max string
     // size is much larger, so writing/reading a temp file is a functional workaround.
     const tmpDir = await mkdtemp(path.join(os.tmpdir(), 'pwa-kit-dev-'))
@@ -439,7 +439,6 @@ export const createBundle = async ({
             .then(async () => {
                 const {dependencies = {}, devDependencies = {}} = await getProjectPkg()
 
-                const cc_overrides: string[] = []
                 const dependencyTree = await getProjectDependencyTree()
                 // If we can't load the dependency tree, pretend that it's empty.
                 // TODO: Should we report an error?
@@ -450,8 +449,7 @@ export const createBundle = async ({
                         ...dependencies,
                         ...devDependencies,
                         ...(pwaKitDeps ?? {})
-                    },
-                    cc_overrides: cc_overrides
+                    }
                 }
             })
             .then(() => readFile(destination))

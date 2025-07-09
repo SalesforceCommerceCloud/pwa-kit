@@ -1,6 +1,6 @@
 {
   "name": "internal-lib-build",
-  "version": "4.0.0-extensibility-preview.4",
+  "version": "4.0.0-extensibility-preview.5",
   "private": true,
   "description": "Build tools for *libraries* in the monorepo",
   "bugs": {
@@ -46,7 +46,7 @@
     "babel-jest": "^27.1.0",
     "babel-loader": "^8.3.0",
     "babel-plugin-dynamic-import-node-babel-7": "^2.0.7",
-    "babel-plugin-formatjs": "10.4.0",
+    "babel-plugin-formatjs": "10.5.36",
     "commander": "^9.5.0",
     "jest": "^27.1.0",
     "jest-environment-jsdom": "^27.1.0",
@@ -57,10 +57,10 @@
     "regenerator-runtime": "^0.13.11",
     "replace-in-file": "^6.3.5",
     "rimraf": "2.7.1",
-    "shelljs": "^0.8.5"
+    "shelljs": "^0.9.2"
   },
   "devDependencies": {
-    "@salesforce/pwa-kit-dev": "4.0.0-extensibility-preview.4",
+    "@salesforce/pwa-kit-dev": "4.0.0-extensibility-preview.5",
     "npm-packlist": "^4.0.0",
     "typescript": "4.9.5"
   },
@@ -73,7 +73,7 @@
     }
   },
   "engines": {
-    "node": "^16.11.0 || ^18.0.0 || ^20.0.0",
-    "npm": "^8.0.0 || ^9.0.0 || ^10.0.0"
+    "node": "^16.11.0 || ^18.0.0 || ^20.0.0 || ^22.0.0",
+    "npm": "^8.0.0 || ^9.0.0 || ^10.0.0 || ^11.0.0"
   }
 }

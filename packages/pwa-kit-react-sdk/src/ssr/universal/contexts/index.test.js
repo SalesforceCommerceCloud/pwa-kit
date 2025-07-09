@@ -10,8 +10,8 @@ import {render, screen} from '@testing-library/react'
 import {Router} from 'react-router-dom'
 import {createMemoryHistory} from 'history'
 
-import {CorrelationIdProvider} from './index'
-import {useCorrelationId} from '../hooks'
+import {CorrelationIdProvider, RoutesProvider} from './index'
+import {useCorrelationId, useRoutes} from '../hooks'
 import crypto from 'crypto'
 import PropTypes from 'prop-types'
 import userEvent from '@testing-library/user-event'
@@ -105,5 +105,35 @@ describe('CorrelationIdProvider', function () {
         const secondRenderedId = screen.getByTestId('correlation-id').innerHTML
         // expecting the provider to have a different correlation id when a page navigation happens
         expect(firstRenderedId).not.toEqual(secondRenderedId)
+    })
+})
+
+describe('RoutesProvider', () => {
+    it('provides routes via context', () => {
+        const testRoutes = [{path: '/home'}, {path: '/about'}]
+
+        const TestComponent = () => {
+            const {routes} = useRoutes()
+            return <div>{routes.map((route) => route.path).join(', ')}</div>
+        }
+
+        render(
+            <RoutesProvider routes={testRoutes}>
+                <TestComponent />
+            </RoutesProvider>
+        )
+
+        expect(screen.getByText('/home, /about')).toBeInTheDocument()
+    })
+
+    it('throws an error when useRoutes is used outside RoutesProvider', () => {
+        const TestComponent = () => {
+            useRoutes()
+            return null
+        }
+
+        expect(() => render(<TestComponent />)).toThrow(
+            'useRoutes must be used within a RoutesProvider'
+        )
     })
 })

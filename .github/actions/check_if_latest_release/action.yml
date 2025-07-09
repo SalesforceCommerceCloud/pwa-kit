@@ -1,0 +1,26 @@
+name: check_if_latest_release
+inputs:
+  token:
+    description: "Github API token"
+runs:
+  using: composite
+  steps:
+    - name: Check if latest release
+      run: |-
+        RELEASE_JSON=$(curl -s -H "Authorization: token ${{ inputs.token }}" \
+          "https://api.github.com/repos/${{ github.repository }}/releases/latest")
+
+        LATEST_TAG_NAME=$(echo "$RELEASE_JSON" | jq -r '.tag_name')
+        RELEASE_EVENT_TAG_NAME=$(echo ${{ github.event.release.tag_name }})
+
+        echo "Latest tag: $LATEST_TAG_NAME"
+        echo "Release event tag: $RELEASE_EVENT_TAG_NAME"
+
+        if [ "$LATEST_TAG_NAME" == "$RELEASE_EVENT_TAG_NAME" ]; then
+          echo "We are releasing the latest tag."
+          echo "IS_LATEST_RELEASE=true" >> $GITHUB_ENV
+        else
+          echo "We are not releasing the latest tag."
+          echo "IS_LATEST_RELEASE=false" >> $GITHUB_ENV
+        fi
+      shell: bash

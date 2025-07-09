@@ -1,8 +1,18 @@
 name: lighthouse_ci
+inputs:
+  project_dir:
+    required: true
+  config_filename:
+    required: true
 runs:
   using: composite
   steps:
-  - name: Run Lighthouse CI on the PWA
-    # This test is flaky, so let's try it three times!
-    run: npm run test:lighthouse --prefix packages/template-retail-react-app || npm run test:lighthouse --prefix packages/template-retail-react-app || npm run test:lighthouse --prefix packages/template-retail-react-app
+  - name: Run Lighthouse CI
+    working-directory: ${{ inputs.project_dir }}
+    run: |-
+      lighthouse_test="npx @lhci/cli autorun --config=${{ github.action_path }}/${{ inputs.config_filename }}"
+      # This test is flaky, so let's try it three times!
+      $lighthouse_test || $lighthouse_test || $lighthouse_test
     shell: bash
+    env:
+      NODE_ENV: production

@@ -7,7 +7,7 @@
 
 import React, {useEffect, useState} from 'react'
 import {Accordion, AccordionItem, Box, Button} from '@chakra-ui/react'
-import {StoreLocatorListItem} from 'overridable!./list-item'
+import {StoreLocatorListItem} from './list-item'
 import {useStoreLocator} from './use-store-locator'
 import {Stores, Store} from '../types/store'
 
@@ -29,7 +29,7 @@ export const StoreLocatorList: React.FC<StoreLocatorListProps> = () => {
         if (mode === 'input') {
             return `Viewing stores within ${String(config.radius)}${String(
                 String(config.radiusUnit)
-            )} of ${String(data?.data[0].postalCode)} in 
+            )} of ${String(data?.data[0].postalCode)} in
                 ${
                     config.supportedCountries.length !== 0
                         ? config.supportedCountries.find(

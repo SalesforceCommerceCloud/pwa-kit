@@ -9,7 +9,7 @@ runs:
   using: 'composite'
   steps:
     - name: Checkout code
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         fetch-depth: 0  # Fetch full history to access all commits
 
@@ -27,10 +27,19 @@ runs:
         fi
       shell: bash
 
+    - name: Get latest PR data
+      id: get_pr
+      uses: octokit/request-action@v2.x
+      with:
+        route: GET /repos/${{ github.repository }}/issues/${{ inputs.pr_number }}
+      env:
+        GITHUB_TOKEN: ${{ github.token }}
+
     - name: Check if 'skip changelog' label is present
       id: check_labels
       run: |
-        SKIP_CHANGELOG_LABEL="${{ contains(github.event.pull_request.labels.*.name, 'skip changelog') }}"
+        echo "PR labels: ${{ toJSON(fromJSON(steps.get_pr.outputs.data).labels.*.name) }}"
+        SKIP_CHANGELOG_LABEL="${{ contains(fromJSON(steps.get_pr.outputs.data).labels.*.name, 'skip changelog') }}"
         if [ "$SKIP_CHANGELOG_LABEL" = "true" ]; then
           echo "Skip changelog label is present. Skipping changelog check."
           echo "SKIP_CHANGELOG_CHECK=true" >> $GITHUB_ENV
@@ -55,7 +64,7 @@ runs:
         fi
         echo "Changed files: $CHANGED_FILES"
         
-        PUBLIC_PACKAGES=("commerce-sdk-react" "pwa-kit-create-app" "pwa-kit-dev" "pwa-kit-react-sdk" "pwa-kit-runtime" "template-retail-react-app")
+        PUBLIC_PACKAGES=("commerce-sdk-react" "pwa-kit-create-app" "pwa-kit-dev" "pwa-kit-react-sdk" "pwa-kit-runtime")
 
         for PACKAGE in "${PUBLIC_PACKAGES[@]}"; do
           if echo "$CHANGED_FILES" | grep -iq "^packages/$PACKAGE/"; then

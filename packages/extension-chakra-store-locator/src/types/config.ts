@@ -4,12 +4,14 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import type {ApplicationExtensionConfig} from '@salesforce/pwa-kit-extension-sdk/types'
 
 /**
  * This defines how your extension can be configured in the user's project. Please update it to your specific needs!
  */
-export interface UserConfig extends ApplicationExtensionConfig {
+
+// TODO: upgradeability
+// this extends the ApplicationExtensionConfig type, which is removed
+export interface UserConfig {
     path?: string
     radius?: number
     radiusUnit?: string

@@ -4,7 +4,13 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import {useQuery as useReactQuery, UseQueryOptions} from '@tanstack/react-query'
+import {
+    useQuery as useReactQuery,
+    UseQueryOptions,
+    UseQueryResult,
+    QueryKey,
+    DefaultError
+} from '@tanstack/react-query'
 import {helpers} from 'commerce-sdk-isomorphic'
 import {useAuthorizationHeader} from './useAuthorizationHeader'
 import useAuthContext from './useAuthContext'
@@ -13,7 +19,6 @@ import {
     ApiMethod,
     ApiOptions,
     ApiQueryKey,
-    ApiQueryOptions,
     MergedOptions,
     NullableParameters,
     OmitNullableParameters,
@@ -21,7 +26,6 @@ import {
 } from './types'
 import useConfig from './useConfig'
 import {hasAllKeys} from './utils'
-import {onClient} from '../utils'
 import {handleInvalidToken, generateCustomEndpointOptions} from './helpers'
 
 /**
@@ -31,18 +35,28 @@ import {handleInvalidToken, generateCustomEndpointOptions} from './helpers'
  * @param hookConfig - Config values that vary per API endpoint
  * @internal
  */
-export const useQuery = <Client extends ApiClient, Options extends ApiOptions, Data>(
+export const useQuery = <
+    Client extends ApiClient,
+    Options extends ApiOptions,
+    TQueryFnData = unknown,
+    TError = DefaultError,
+    TData = TQueryFnData,
+    TQueryKey extends QueryKey = ApiQueryKey<Partial<Options['parameters']>>
+>(
     // `OmitNullableParameters<NullableParameters<...>>` has the net result of marking parameters
     // as optional if they are required in `Options` and NOT required in `Client`.
     apiOptions: OmitNullableParameters<NullableParameters<MergedOptions<Client, Options>>>,
-    queryOptions: ApiQueryOptions<ApiMethod<Options, Data>>,
+    queryOptions: Omit<
+        UseQueryOptions<TQueryFnData, TError, TData, TQueryKey>,
+        'queryFn' | 'queryKey'
+    >,
     hookConfig: {
-        method: ApiMethod<Options, Data>
-        queryKey: ApiQueryKey<Partial<Options['parameters']>>
+        method: ApiMethod<Options, TQueryFnData>
+        queryKey: TQueryKey
         requiredParameters: ReadonlyArray<keyof NonNullable<Options['parameters']>>
         enabled?: boolean
     }
-) => {
+): UseQueryResult<TData, TError> => {
     const authenticatedMethod = useAuthorizationHeader(hookConfig.method)
     // This type assertion is NOT safe in all cases. However, we know that `requiredParameters` is
     // the list of parameters required by `Options`, and we know that in the default case (when
@@ -55,21 +69,17 @@ export const useQuery = <Client extends ApiClient, Options extends ApiOptions, D
     // for this case would add significantly more complexity.
     const wrappedMethod = async () => await authenticatedMethod(apiOptions as Options)
 
-    return useReactQuery(hookConfig.queryKey, wrappedMethod, {
-        enabled:
-            // Individual hooks can provide `enabled` checks that are done in ADDITION to
-            // the required parameter check
-            hookConfig.enabled !== false &&
-            // The default `enabled` is "has all required parameters"
-            hasAllKeys(apiOptions.parameters, hookConfig.requiredParameters),
-        // End users can always completely OVERRIDE the default `enabled` check
+    const enabled =
+        typeof queryOptions.enabled !== 'undefined'
+            ? queryOptions.enabled
+            : hookConfig.enabled !== false &&
+              hasAllKeys(apiOptions.parameters, hookConfig.requiredParameters)
 
-        ...queryOptions,
-        // never retry on server side because it hurts server side rendering performance
-        ...(queryOptions?.retry ? {retry: onClient() ? queryOptions?.retry : false} : {}),
-        ...(queryOptions?.retryOnMount
-            ? {retryOnMount: onClient() ? queryOptions?.retryOnMount : false}
-            : {})
+    return useReactQuery<TQueryFnData, TError, TData, TQueryKey>({
+        queryKey: hookConfig.queryKey,
+        queryFn: wrappedMethod,
+        enabled,
+        ...queryOptions
     })
 }
 
@@ -83,15 +93,23 @@ export const useQuery = <Client extends ApiClient, Options extends ApiOptions, D
  * @param queryOptions - Options passed through to @tanstack/react-query
  * @returns A TanStack Query query hook with data from the custom API endpoint.
  */
-export const useCustomQuery = (
+export const useCustomQuery = <
+    TQueryFnData = unknown,
+    TError = DefaultError,
+    TData = TQueryFnData,
+    TQueryKey extends QueryKey = QueryKey
+>(
     apiOptions: OptionalCustomEndpointClientConfig,
-    queryOptions?: UseQueryOptions<unknown, unknown, unknown, any>
-) => {
+    queryOptions?: Omit<
+        UseQueryOptions<TQueryFnData, TError, TData, TQueryKey>,
+        'queryKey' | 'queryFn'
+    >
+): UseQueryResult<TData, TError> => {
     const config = useConfig()
     const logger = config.logger || console
     const auth = useAuthContext()
     const callCustomEndpointWithAuth = (options: OptionalCustomEndpointClientConfig) => {
-        return async () => {
+        return async (): Promise<TQueryFnData> => {
             const {access_token} = await auth.ready()
             const customEndpointOptions = generateCustomEndpointOptions(
                 options,
@@ -99,7 +117,7 @@ export const useCustomQuery = (
                 access_token
             )
 
-            return await helpers.callCustomEndpoint(customEndpointOptions).catch(async (error) => {
+            return (await helpers.callCustomEndpoint(customEndpointOptions).catch(async (error) => {
                 const {access_token} = await handleInvalidToken(error, auth, logger)
 
                 // Retry again after resetting auth state
@@ -109,7 +127,7 @@ export const useCustomQuery = (
                     access_token
                 )
                 return await helpers.callCustomEndpoint(customEndpointOptions)
-            })
+            })) as TQueryFnData
         }
     }
 
@@ -133,7 +151,11 @@ export const useCustomQuery = (
         `/${apiOptions.options.customApiPathParameters.organizationId || config.organizationId}`,
         `/${apiOptions.options.customApiPathParameters.endpointPath}`,
         {...apiOptions.options.parameters}
-    ]
+    ] as unknown as TQueryKey
 
-    return useReactQuery(queryKey, callCustomEndpointWithAuth(apiOptions), queryOptions)
+    return useReactQuery<TQueryFnData, TError, TData, TQueryKey>({
+        queryKey,
+        queryFn: callCustomEndpointWithAuth(apiOptions),
+        ...queryOptions
+    })
 }

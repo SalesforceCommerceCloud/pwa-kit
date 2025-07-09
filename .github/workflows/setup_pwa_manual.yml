@@ -44,17 +44,17 @@ jobs:
         id: initialize
         run: |
           set -e
-          echo "PROJECT_DIR=my-retail-react-app" >> $GITHUB_ENV
+          echo "PROJECT_DIR=my-chakra-storefront" >> $GITHUB_ENV
 
       - name: Checkout
         id: checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Setup node
         id: setup_node
         uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: 22
           cache: "npm"
 
       - name: Setup PWA dependencies
