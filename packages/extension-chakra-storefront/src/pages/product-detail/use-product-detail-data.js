@@ -23,7 +23,7 @@ import useEinstein from '../../hooks/use-einstein'
 import {useProductDetailWishlist} from './use-product-detail-wishlist'
 
 import {normalizeSetBundleProduct, getUpdateBundleChildArray} from '../../utils/product-utils'
-import {useErrorHandler} from '../../utils/error-utils'
+import {useErrorHandler} from '../../hooks/use-errors'
 
 import {rebuildPathWithParams} from '../../utils/url'
 

@@ -7,12 +7,12 @@
 import React from 'react'
 import {renderHook} from '@testing-library/react'
 import {IntlProvider} from 'react-intl'
-import {useErrorHandler} from './error-utils'
+import {useErrorHandler} from './use-errors'
 import PropTypes from 'prop-types'
 
 // Mock the toast hook
 const mockToast = jest.fn()
-jest.mock('../hooks/use-toast', () => ({
+jest.mock('./use-toast', () => ({
     __esModule: true,
     default: () => mockToast
 }))
@@ -67,4 +67,4 @@ describe('useErrorHandler', () => {
             type: 'error'
         })
     })
-})
+}) 
