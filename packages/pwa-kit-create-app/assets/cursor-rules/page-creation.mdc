@@ -6,6 +6,7 @@ alwaysApply: false
 USE WHEN create a new page
 
 **Mandatory**
+- DO ask user to clarify page name and page route before proceed
 - ONLY Create a bare minimum page component
 - Do NOT include other project components or hooks unless specifically requested
 - Do NOT add extra styling, layout, or features unless explicitly asked
