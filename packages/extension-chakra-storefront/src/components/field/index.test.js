@@ -130,3 +130,47 @@ test('renders Field component with password type shows password toggle endElemen
     expect(passwordInput).toHaveAttribute('type', 'password')
     expect(screen.getByLabelText('Show password')).toBeInTheDocument()
 })
+
+test('renders select Field component with correct ref assignment for React Hook Form', () => {
+    renderWithProviders(
+        <TestComponent defaultValues={{country: ''}}>
+            {({control}) => (
+                <Field
+                    name="country"
+                    label="Country"
+                    type="select"
+                    control={control}
+                    defaultValue=""
+                    options={[
+                        {value: '', label: 'Select Country'},
+                        {value: 'US', label: 'United States'},
+                        {value: 'CA', label: 'Canada'},
+                        {value: 'UK', label: 'United Kingdom'}
+                    ]}
+                />
+            )}
+        </TestComponent>
+    )
+
+    const selectElement = screen.getByRole('combobox')
+    expect(selectElement).toBeInTheDocument()
+    expect(selectElement.tagName).toBe('SELECT')
+    expect(selectElement.value).toBe('')
+
+    fireEvent.change(selectElement, {target: {value: 'US'}})
+    expect(selectElement.value).toBe('US')
+
+    selectElement.focus()
+    expect(selectElement).toHaveFocus()
+
+    const options = screen.getAllByRole('option')
+    expect(options).toHaveLength(4)
+    expect(options[0]).toHaveValue('')
+    expect(options[0]).toHaveTextContent('Select Country')
+    expect(options[1]).toHaveValue('US')
+    expect(options[1]).toHaveTextContent('United States')
+    expect(options[2]).toHaveValue('CA')
+    expect(options[2]).toHaveTextContent('Canada')
+    expect(options[3]).toHaveValue('UK')
+    expect(options[3]).toHaveTextContent('United Kingdom')
+})

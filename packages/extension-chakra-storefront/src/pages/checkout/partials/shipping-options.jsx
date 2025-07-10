@@ -143,7 +143,7 @@ export default function ShippingOptions() {
                                                 (opt) => (
                                                     <RadioGroup.Item value={opt.id} key={opt.id}>
                                                         <RadioGroup.ItemHiddenInput />
-                                                        <RadioGroup.ItemIndicator />
+                                                        <RadioGroup.ItemIndicator colorPalette="blue" />
                                                         <Flex justify="space-between" w="full">
                                                             <HStack>
                                                                 <Box>
@@ -193,12 +193,12 @@ export default function ShippingOptions() {
                         )}
 
                         <Box>
-                            {/* TODO: Get the rightIcon to display */}
-                            <Button variant="link-blue" size="sm" rightIcon={<ChevronDownIcon />}>
+                            <Button variant="link-blue" size="sm">
                                 <FormattedMessage
                                     defaultMessage="Do you want to send this as a gift?"
                                     id="shipping_options.action.send_as_a_gift"
                                 />
+                                <ChevronDownIcon />
                             </Button>
                         </Box>
                         <Box>
