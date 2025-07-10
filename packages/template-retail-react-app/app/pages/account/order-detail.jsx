@@ -19,7 +19,15 @@ import {
     Divider,
     Grid,
     SimpleGrid,
-    Skeleton
+    Skeleton,
+    Modal,
+    ModalOverlay,
+    ModalContent,
+    ModalHeader,
+    ModalFooter,
+    ModalBody,
+    ModalCloseButton,
+    useDisclosure
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 import {getCreditCardIcon} from '@salesforce/retail-react-app/app/utils/cc-utils'
 import {useOrder, useProducts} from '@salesforce/commerce-sdk-react'
@@ -110,6 +118,9 @@ const AccountOrderDetail = () => {
     const history = useHistory()
     const {formatMessage, formatDate} = useIntl()
 
+    // Modal state for cancel order
+    const {isOpen: isCancelModalOpen, onOpen: onCancelModalOpen, onClose: onCancelModalClose} = useDisclosure()
+
     const {data: order, isLoading: isOrderLoading} = useOrder(
         {
             parameters: {orderNo: params.orderNo}
@@ -156,12 +167,25 @@ const AccountOrderDetail = () => {
                 </Box>
 
                 <Stack spacing={[1, 2]}>
-                    <Heading as="h1" fontSize={['lg', '2xl']} tabIndex="0" ref={headingRef}>
-                        <FormattedMessage
-                            defaultMessage="Order Details"
-                            id="account_order_detail.title.order_details"
-                        />
-                    </Heading>
+                    <Flex justify="space-between" align="center">
+                        <Heading as="h1" fontSize={['lg', '2xl']} tabIndex="0" ref={headingRef}>
+                            <FormattedMessage
+                                defaultMessage="Order Details"
+                                id="account_order_detail.title.order_details"
+                            />
+                        </Heading>
+                        {/* Cancel Order Button */}
+                        <Button
+                            variant="link"
+                            size="sm"
+                            onClick={onCancelModalOpen}
+                        >
+                            <FormattedMessage
+                                defaultMessage="Cancel order"
+                                id="account_order_detail.button.cancel_order"
+                            />
+                        </Button>
+                    </Flex>
 
                     {!isLoading ? (
                         <Stack
@@ -398,6 +422,36 @@ const AccountOrderDetail = () => {
                     )}
                 </Stack>
             </Stack>
+
+            {/* Cancel Order Modal */}
+            <Modal isOpen={isCancelModalOpen} onClose={onCancelModalClose} isCentered>
+                <ModalOverlay />
+                <ModalContent>
+                    <ModalHeader>
+                        <FormattedMessage
+                            defaultMessage="Request Cancellation"
+                            id="account_order_detail.modal.cancel_order_title"
+                        />
+                    </ModalHeader>
+                    <ModalCloseButton />
+                    <ModalBody>
+                        <Text>
+                            <FormattedMessage
+                                defaultMessage="This is a blank modal for canceling the order."
+                                id="account_order_detail.modal.cancel_order_content"
+                            />
+                        </Text>
+                    </ModalBody>
+                    <ModalFooter>
+                        <Button variant="solid" onClick={onCancelModalClose}>
+                            <FormattedMessage
+                                defaultMessage="Request Cancellation"
+                                id="account_order_detail.modal.confirm_cancel"
+                            />
+                        </Button>
+                    </ModalFooter>
+                </ModalContent>
+            </Modal>
         </Stack>
     )
 }
