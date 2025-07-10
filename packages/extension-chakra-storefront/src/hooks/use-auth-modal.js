@@ -275,6 +275,10 @@ export const AuthModal = ({
     const onBackToSignInClick = () =>
         initialView === PASSWORD_VIEW ? onClose() : setCurrentView(LOGIN_VIEW)
 
+    if (typeof window === 'undefined') {
+        return
+    }
+
     return (
         <Dialog.Root
             open={isOpen}
@@ -286,68 +290,63 @@ export const AuthModal = ({
             data-testid="sf-auth-modal"
             {...props}
         >
-            {typeof window !== 'undefined' && (
-                <Portal>
-                    <Dialog.Backdrop />
-                    <Dialog.Positioner>
-                        <Dialog.Content>
-                            <Dialog.CloseTrigger asChild>
-                                <CloseButton
-                                    aria-label={formatMessage({
-                                        id: 'auth_modal.button.close.assistive_msg',
-                                        defaultMessage: 'Close login form'
-                                    })}
+            <Portal>
+                <Dialog.Backdrop />
+                <Dialog.Positioner>
+                    <Dialog.Content>
+                        <Dialog.CloseTrigger asChild>
+                            <CloseButton
+                                aria-label={formatMessage({
+                                    id: 'auth_modal.button.close.assistive_msg',
+                                    defaultMessage: 'Close login form'
+                                })}
+                            />
+                        </Dialog.CloseTrigger>
+                        <Dialog.Body padding={8} bg="white" paddingBottom={14} marginTop={14}>
+                            {!form.formState.isSubmitSuccessful && currentView === LOGIN_VIEW && (
+                                <LoginForm
+                                    form={form}
+                                    submitForm={submitForm}
+                                    clickCreateAccount={() => setCurrentView(REGISTER_VIEW)}
+                                    handlePasswordlessLoginClick={() =>
+                                        setLoginType(LOGIN_TYPES.PASSWORDLESS)
+                                    }
+                                    handleForgotPasswordClick={() => setCurrentView(PASSWORD_VIEW)}
+                                    isPasswordlessEnabled={isPasswordlessEnabled}
+                                    isSocialEnabled={isSocialEnabled}
+                                    idps={idps}
+                                    setLoginType={setLoginType}
                                 />
-                            </Dialog.CloseTrigger>
-                            <Dialog.Body padding={8} bg="white" paddingBottom={14} marginTop={14}>
-                                {!form.formState.isSubmitSuccessful &&
-                                    currentView === LOGIN_VIEW && (
-                                        <LoginForm
-                                            form={form}
-                                            submitForm={submitForm}
-                                            clickCreateAccount={() => setCurrentView(REGISTER_VIEW)}
-                                            handlePasswordlessLoginClick={() =>
-                                                setLoginType(LOGIN_TYPES.PASSWORDLESS)
-                                            }
-                                            handleForgotPasswordClick={() =>
-                                                setCurrentView(PASSWORD_VIEW)
-                                            }
-                                            isPasswordlessEnabled={isPasswordlessEnabled}
-                                            isSocialEnabled={isSocialEnabled}
-                                            idps={idps}
-                                            setLoginType={setLoginType}
-                                        />
-                                    )}
+                            )}
 
-                                {!form.formState.isSubmitSuccessful &&
-                                    currentView === REGISTER_VIEW && (
-                                        <RegisterForm
-                                            form={form}
-                                            submitForm={submitForm}
-                                            clickSignIn={onBackToSignInClick}
-                                        />
-                                    )}
-
-                                {currentView === PASSWORD_VIEW && (
-                                    <ResetPasswordForm
+                            {!form.formState.isSubmitSuccessful &&
+                                currentView === REGISTER_VIEW && (
+                                    <RegisterForm
                                         form={form}
                                         submitForm={submitForm}
                                         clickSignIn={onBackToSignInClick}
                                     />
                                 )}
 
-                                {currentView === EMAIL_VIEW && (
-                                    <PasswordlessEmailConfirmation
-                                        form={form}
-                                        submitForm={submitForm}
-                                        email={passwordlessLoginEmail}
-                                    />
-                                )}
-                            </Dialog.Body>
-                        </Dialog.Content>
-                    </Dialog.Positioner>
-                </Portal>
-            )}
+                            {currentView === PASSWORD_VIEW && (
+                                <ResetPasswordForm
+                                    form={form}
+                                    submitForm={submitForm}
+                                    clickSignIn={onBackToSignInClick}
+                                />
+                            )}
+
+                            {currentView === EMAIL_VIEW && (
+                                <PasswordlessEmailConfirmation
+                                    form={form}
+                                    submitForm={submitForm}
+                                    email={passwordlessLoginEmail}
+                                />
+                            )}
+                        </Dialog.Body>
+                    </Dialog.Content>
+                </Dialog.Positioner>
+            </Portal>
         </Dialog.Root>
     )
 }
