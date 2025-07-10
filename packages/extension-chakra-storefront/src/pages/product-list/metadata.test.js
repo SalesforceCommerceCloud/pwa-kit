@@ -11,7 +11,18 @@ import Metadata from './metadata'
 
 jest.mock('../../components/seo', () => {
     return function MockSeo(props) {
-        return <div data-testid="seo" {...props} />
+        // Extract non-DOM props before spreading
+        const { metaTags, title, description, keywords, ...domProps } = props
+        
+        return (
+            <div 
+                data-testid="seo" 
+                title={title}
+                description={description} 
+                keywords={keywords}
+                {...domProps}
+            />
+        )
     }
 })
 

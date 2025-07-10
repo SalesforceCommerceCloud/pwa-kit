@@ -32,8 +32,12 @@ describe('SocialLogin', () => {
     })
     /* expect unknown IDPs to be skipped over */
     test('Load Unknown', async () => {
+        // to keep terminal clean
+        const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
         renderWithProviders(<SocialLogin idps={['Unknown']} />)
         const button = screen.queryByText('Unknown')
         expect(button).toBeNull()
+        expect(consoleSpy).toHaveBeenCalled()
+        consoleSpy.mockRestore()
     })
 })

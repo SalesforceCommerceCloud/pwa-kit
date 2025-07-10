@@ -5,7 +5,6 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
-import userEvent from '@testing-library/user-event'
 import useNavigation from './use-navigation'
 import mockConfig from '../mock-config'
 import {renderWithProviders} from '../utils/test-utils'
@@ -86,7 +85,7 @@ test('works for any history method and args', async () => {
     expect(mockHistoryReplace).toHaveBeenCalledWith('/uk/en-GB/page2', {})
 })
 
-test.only('if given the path to root or homepage, will not prepend the locale', async () => {
+test('if given the path to root or homepage, will not prepend the locale', async () => {
     const {getByTestId, user} = renderWithProviders(<TestComponent />, {
         wrapperProps: {siteAlias: 'us', locale: {id: 'en-US'}}
     })
