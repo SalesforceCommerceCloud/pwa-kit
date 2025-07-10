@@ -26,12 +26,12 @@ import {
     Flex,
     Heading,
     Spinner,
+    useDisclosure,
     useSlotRecipe,
     useToken
 } from '@chakra-ui/react'
 
 // Local Project Components
-import {useDisclosure} from '../../hooks/use-disclosure-safe'
 import {DrawerMenu} from '../drawer-menu'
 import {getPathWithLocale} from '../../utils/url'
 import {HideOnDesktop, HideOnMobile} from '../responsive'

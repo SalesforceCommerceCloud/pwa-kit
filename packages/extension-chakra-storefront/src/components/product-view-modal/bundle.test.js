@@ -10,7 +10,7 @@ import PropTypes from 'prop-types'
 import BundleProductViewModal from '../../components/product-view-modal/bundle'
 import {renderWithProviders} from '../../utils/test-utils'
 import {fireEvent, screen, waitFor, within} from '@testing-library/react'
-import {useDisclosure} from '../../hooks/use-disclosure-safe'
+import {useDisclosure} from '@chakra-ui/react'
 import {
     mockBundledProductItemsVariant,
     mockProductBundleWithVariants,

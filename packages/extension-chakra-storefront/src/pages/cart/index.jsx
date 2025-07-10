@@ -9,8 +9,7 @@ import {FormattedMessage, useIntl} from 'react-intl'
 import {keepPreviousData} from '@tanstack/react-query'
 
 // Chakra Components
-import {Box, Stack, Grid, GridItem, Container, Button, Flex} from '@chakra-ui/react'
-import {useDisclosure} from '../../hooks/use-disclosure-safe'
+import {Box, Stack, Grid, GridItem, Container, useDisclosure, Button, Flex} from '@chakra-ui/react'
 
 // Project Components
 import CartCta from '../../pages/cart/partials/cart-cta'

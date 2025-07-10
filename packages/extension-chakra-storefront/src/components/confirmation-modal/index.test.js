@@ -6,8 +6,7 @@
  */
 import React from 'react'
 import ConfirmationModal from '../../components/confirmation-modal/index'
-import {Box} from '@chakra-ui/react'
-import {useDisclosure} from '../../hooks/use-disclosure-safe'
+import {Box, useDisclosure} from '@chakra-ui/react'
 import {renderWithProviders} from '../../utils/test-utils'
 import userEvent from '@testing-library/user-event'
 import {screen} from '@testing-library/react'

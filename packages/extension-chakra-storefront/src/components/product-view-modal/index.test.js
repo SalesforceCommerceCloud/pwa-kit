@@ -10,7 +10,7 @@ import PropTypes from 'prop-types'
 import ProductViewModal from '../../components/product-view-modal/index'
 import {renderWithProviders} from '../../utils/test-utils'
 import {fireEvent, screen} from '@testing-library/react'
-import {useDisclosure} from '../../hooks/use-disclosure-safe'
+import {useDisclosure} from '@chakra-ui/react'
 import mockProductDetail from '../../mocks/variant-750518699578M'
 import {prependHandlersToServer} from '../../../jest-setup'
 

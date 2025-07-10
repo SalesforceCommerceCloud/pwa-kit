@@ -8,8 +8,7 @@ import React, {useEffect, useState} from 'react'
 import PropTypes from 'prop-types'
 import {defineMessage, useIntl} from 'react-intl'
 import {useForm} from 'react-hook-form'
-import {Dialog, Portal, CloseButton} from '@chakra-ui/react'
-import {useDisclosure} from './use-disclosure-safe'
+import {Dialog, Portal, CloseButton, useDisclosure} from '@chakra-ui/react'
 import {keepPreviousData} from '@tanstack/react-query'
 import {
     AuthHelpers,
