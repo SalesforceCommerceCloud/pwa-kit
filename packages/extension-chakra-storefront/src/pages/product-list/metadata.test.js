@@ -14,7 +14,7 @@ jest.mock('../../components/seo', () => {
         // eslint-disable-next-line react/prop-types
         const {metaTags, ...domProps} = props
 
-        return <div data-testid="seo" {...domProps} />
+        return <div data-testid="seo" metatags={metaTags} {...domProps} />
     }
 })
 
