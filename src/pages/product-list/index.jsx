@@ -14,15 +14,15 @@ import {useCategory, useProductSearch} from '@salesforce/commerce-sdk-react'
 import {Box, Grid, Stack} from '@chakra-ui/react'
 
 // Project Components
-import Refinements from '../../pages/product-list/partials/refinements'
-import CategoryLinks from '../../pages/product-list/partials/category-links'
-import EmptySearchResults from '../../pages/product-list/partials/empty-results'
-import ProductListBanner from './partials/product-list-banner'
 import PageMetadata from './page-metadata'
 import PageCache from './page-cache'
+import Refinements from './partials/refinements'
+import CategoryLinks from './partials/category-links'
+import EmptySearchResults from './partials/empty-results'
+import ProductListBanner from './partials/product-list-banner'
 import ProductListHeader from './partials/product-list-header'
-import ProductGrid from './partials/product-grid'
-import PaginationFooter from './partials/pagination-footer'
+import ProductListGrid from './partials/product-list-grid'
+import ProductListPagination from './partials/product-list-pagination'
 
 // Hooks
 import {usePageUrls, useSortUrls, useSearchParams, useExtensionConfig} from '../../hooks'
@@ -37,7 +37,6 @@ import logger from '../../utils/logger-instance'
 
 // Constants
 import useNavigation from '../../hooks/use-navigation'
-import {isHydrated} from '../../utils/utils'
 
 // NOTE: You can ignore certain refinements on a template level by updating the below
 // list of ignored refinements.
@@ -312,7 +311,7 @@ const ProductList = () => {
                                 />
                             </Stack>
                             <Box>
-                                <ProductGrid
+                                <ProductListGrid
                                     isFetched={isFetched}
                                     isRefetching={isRefetching}
                                     productSearchResult={productSearchResult}
@@ -322,7 +321,7 @@ const ProductList = () => {
                                     onClickProduct={handleProductClick}
                                     onFavouriteToggle={handleFavouriteToggle}
                                 />
-                                <PaginationFooter basePath={basePath} pageUrls={pageUrls} />
+                                <ProductListPagination basePath={basePath} pageUrls={pageUrls} />
                             </Box>
                         </Grid>
                     </>

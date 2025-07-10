@@ -10,7 +10,7 @@ import {SimpleGrid} from '@chakra-ui/react'
 import ProductTile, {Skeleton as ProductTileSkeleton} from '../../../components/product-tile'
 import {isHydrated} from '../../../utils/utils'
 
-const ProductGrid = ({
+const ProductListGrid = ({
     productSearchResult,
     isRefetching,
     isFetched,
@@ -57,7 +57,7 @@ const ProductGrid = ({
     )
 }
 
-ProductGrid.propTypes = {
+ProductListGrid.propTypes = {
     productSearchResult: PropTypes.object,
     isRefetching: PropTypes.bool,
     isFetched: PropTypes.bool,
@@ -68,4 +68,4 @@ ProductGrid.propTypes = {
     onClickProduct: PropTypes.func
 }
 
-export default ProductGrid 
+export default ProductListGrid 
