@@ -11,17 +11,9 @@ import {keepPreviousData} from '@tanstack/react-query'
 import {useCategory, useProductSearch} from '@salesforce/commerce-sdk-react'
 
 // Components
-import {
-    Box,
-    Flex,
-    SimpleGrid,
-    Grid,
-    Stack,
-} from '@chakra-ui/react'
+import {Box, Grid, Stack} from '@chakra-ui/react'
 
 // Project Components
-import Pagination from '../../components/pagination'
-import ProductTile, {Skeleton as ProductTileSkeleton} from '../../components/product-tile'
 import Refinements from '../../pages/product-list/partials/refinements'
 import CategoryLinks from '../../pages/product-list/partials/category-links'
 import EmptySearchResults from '../../pages/product-list/partials/empty-results'
@@ -29,6 +21,8 @@ import ProductListBanner from './partials/product-list-banner'
 import PageMetadata from './page-metadata'
 import PageCache from './page-cache'
 import ProductListHeader from './partials/product-list-header'
+import ProductGrid from './partials/product-grid'
+import PaginationFooter from './partials/pagination-footer'
 
 // Hooks
 import {usePageUrls, useSortUrls, useSearchParams, useExtensionConfig} from '../../hooks'
@@ -251,6 +245,19 @@ const ProductList = () => {
         }
     }, [productSearchResult])
 
+    const handleFavouriteToggle = (product, isFavourite) => {
+        const action = isFavourite ? addItem : removeItem
+        action(product)
+    }
+
+    const handleProductClick = (product) => {
+        if (searchQuery) {
+            einstein.sendClickSearch(searchQuery, product)
+        } else if (category) {
+            einstein.sendClickCategory(category, product)
+        }
+    }
+
     return (
         <>
             <PageCache />
@@ -305,75 +312,17 @@ const ProductList = () => {
                                 />
                             </Stack>
                             <Box>
-                                <SimpleGrid
-                                    columns={[2, 2, 3, 3]}
-                                    columnGap={4}
-                                    rowGap={{base: 12, lg: 16}}
-                                >
-                                    {isHydrated() &&
-                                    ((isRefetching && !isFetched) || !productSearchResult)
-                                        ? new Array(searchParams.limit)
-                                              .fill(0)
-                                              .map((value, index) => (
-                                                  <ProductTileSkeleton key={index} />
-                                              ))
-                                        : productSearchResult?.hits?.map((productSearchItem) => {
-                                              const isInWishlist =
-                                                  isItemInWishlist(productSearchItem)
-
-                                              return (
-                                                  <ProductTile
-                                                      data-testid={`sf-product-tile-${productSearchItem.productId}`}
-                                                      key={productSearchItem.productId}
-                                                      product={productSearchItem}
-                                                      enableFavourite={true}
-                                                      isFavourite={isInWishlist}
-                                                      isRefreshingData={isRefetching && isFetched}
-                                                      imageViewType={
-                                                          productListConfig.imageViewType
-                                                      }
-                                                      selectableAttributeId={
-                                                          productListConfig.selectableAttributeId
-                                                      }
-                                                      onClick={() => {
-                                                          if (searchQuery) {
-                                                              einstein.sendClickSearch(
-                                                                  searchQuery,
-                                                                  productSearchItem
-                                                              )
-                                                          } else if (category) {
-                                                              einstein.sendClickCategory(
-                                                                  category,
-                                                                  productSearchItem
-                                                              )
-                                                          }
-                                                      }}
-                                                      onFavouriteToggle={(toBeFavourite) => {
-                                                          const action = toBeFavourite
-                                                              ? addItem
-                                                              : removeItem
-                                                          return action(productSearchItem)
-                                                      }}
-                                                      dynamicImageProps={{
-                                                          widths: [
-                                                              '50vw',
-                                                              '50vw',
-                                                              '20vw',
-                                                              '20vw',
-                                                              '25vw'
-                                                          ]
-                                                      }}
-                                                  />
-                                              )
-                                          })}
-                                </SimpleGrid>
-                                {/* Footer */}
-                                <Flex
-                                    justifyContent={['center', 'center', 'flex-start']}
-                                    paddingTop={8}
-                                >
-                                    <Pagination currentURL={basePath} urls={pageUrls} />
-                                </Flex>
+                                <ProductGrid
+                                    isFetched={isFetched}
+                                    isRefetching={isRefetching}
+                                    productSearchResult={productSearchResult}
+                                    searchParams={searchParams}
+                                    productListConfig={productListConfig}
+                                    isItemInWishlist={isItemInWishlist}
+                                    onClickProduct={handleProductClick}
+                                    onFavouriteToggle={handleFavouriteToggle}
+                                />
+                                <PaginationFooter basePath={basePath} pageUrls={pageUrls} />
                             </Box>
                         </Grid>
                     </>
