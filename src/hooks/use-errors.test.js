@@ -67,4 +67,4 @@ describe('useErrorHandler', () => {
             type: 'error'
         })
     })
-}) 
+})
