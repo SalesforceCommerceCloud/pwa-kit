@@ -39,6 +39,8 @@ import * as errors from '../universal/errors'
 import logger from '../../utils/logger-instance'
 import PerformanceTimer, {PERFORMANCE_MARKS} from '../../utils/performance'
 
+React.useInsertionEffect = () => {} // no-op
+
 const CWD = process.cwd()
 const BUNDLES_PATH = path.resolve(CWD, 'build/loadable-stats.json')
 
