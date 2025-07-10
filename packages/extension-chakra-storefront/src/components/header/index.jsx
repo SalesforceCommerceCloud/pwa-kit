@@ -242,91 +242,87 @@ const Header = ({
                                 </IconButton>
                             </Popover.Trigger>
 
-                            {typeof window !== 'undefined' && (
-                                <Portal>
-                                    <Popover.Positioner>
-                                        <Popover.Content
-                                            onMouseLeave={() => {
-                                                hasEnterPopoverContent.current = false
-                                                onAccountMenuClose()
-                                            }}
-                                            onMouseOver={() => {
-                                                hasEnterPopoverContent.current = true
-                                            }}
-                                        >
-                                            <Popover.Arrow />
-                                            <Popover.Body css={styles.dropdownMenuBody}>
-                                                <Popover.Header pb={1}>
-                                                    <Popover.Title>
-                                                        <Heading as="h2" fontWeight={700} size="lg">
-                                                            {intl.formatMessage({
-                                                                defaultMessage: 'My Account',
-                                                                id: 'header.popover.title.my_account'
-                                                            })}
-                                                        </Heading>
-                                                    </Popover.Title>
-                                                </Popover.Header>
-                                                <Box asChild px={3}>
-                                                    <nav>
-                                                        <List.Root
-                                                            variant="plain"
-                                                            as="ul"
-                                                            data-testid="account-detail-nav"
-                                                        >
-                                                            {navLinks.map((link) => {
-                                                                const LinkIcon = link.icon
-                                                                return (
-                                                                    <List.Item
-                                                                        key={link.name}
-                                                                        value={link.name}
-                                                                    >
-                                                                        <Link
-                                                                            useNavLink={true}
-                                                                            to={`/account${link.path}`}
-                                                                            css={
-                                                                                styles.menuAccountLink
-                                                                            }
-                                                                        >
-                                                                            <LinkIcon
-                                                                                boxSize={5}
-                                                                                mr={3}
-                                                                            />
-                                                                            {intl.formatMessage(
-                                                                                messages[link.name]
-                                                                            )}
-                                                                        </Link>
-                                                                    </List.Item>
-                                                                )
-                                                            })}
-                                                        </List.Root>
-                                                    </nav>
-                                                </Box>
-                                                <Separator mx={3} my={2} />
-
-                                                <Popover.Footer px={3} py={0}>
-                                                    <Button
-                                                        variant="ghost"
-                                                        css={styles.signoutButton}
-                                                        onClick={onSignoutClick}
+                            <Portal>
+                                <Popover.Positioner>
+                                    <Popover.Content
+                                        onMouseLeave={() => {
+                                            hasEnterPopoverContent.current = false
+                                            onAccountMenuClose()
+                                        }}
+                                        onMouseOver={() => {
+                                            hasEnterPopoverContent.current = true
+                                        }}
+                                    >
+                                        <Popover.Arrow />
+                                        <Popover.Body css={styles.dropdownMenuBody}>
+                                            <Popover.Header pb={1}>
+                                                <Popover.Title>
+                                                    <Heading as="h2" fontWeight={700} size="lg">
+                                                        {intl.formatMessage({
+                                                            defaultMessage: 'My Account',
+                                                            id: 'header.popover.title.my_account'
+                                                        })}
+                                                    </Heading>
+                                                </Popover.Title>
+                                            </Popover.Header>
+                                            <Box asChild px={3}>
+                                                <nav>
+                                                    <List.Root
+                                                        variant="plain"
+                                                        as="ul"
+                                                        data-testid="account-detail-nav"
                                                     >
-                                                        <SignoutIcon
-                                                            aria-hidden={true}
-                                                            boxSize={5}
-                                                            css={styles.signoutIcon}
-                                                        />
-                                                        <Text as="span" css={styles.signoutText}>
-                                                            {intl.formatMessage({
-                                                                defaultMessage: 'Log out',
-                                                                id: 'header.popover.action.log_out'
-                                                            })}
-                                                        </Text>
-                                                    </Button>
-                                                </Popover.Footer>
-                                            </Popover.Body>
-                                        </Popover.Content>
-                                    </Popover.Positioner>
-                                </Portal>
-                            )}
+                                                        {navLinks.map((link) => {
+                                                            const LinkIcon = link.icon
+                                                            return (
+                                                                <List.Item
+                                                                    key={link.name}
+                                                                    value={link.name}
+                                                                >
+                                                                    <Link
+                                                                        useNavLink={true}
+                                                                        to={`/account${link.path}`}
+                                                                        css={styles.menuAccountLink}
+                                                                    >
+                                                                        <LinkIcon
+                                                                            boxSize={5}
+                                                                            mr={3}
+                                                                        />
+                                                                        {intl.formatMessage(
+                                                                            messages[link.name]
+                                                                        )}
+                                                                    </Link>
+                                                                </List.Item>
+                                                            )
+                                                        })}
+                                                    </List.Root>
+                                                </nav>
+                                            </Box>
+                                            <Separator mx={3} my={2} />
+
+                                            <Popover.Footer px={3} py={0}>
+                                                <Button
+                                                    variant="ghost"
+                                                    css={styles.signoutButton}
+                                                    onClick={onSignoutClick}
+                                                >
+                                                    <SignoutIcon
+                                                        aria-hidden={true}
+                                                        boxSize={5}
+                                                        css={styles.signoutIcon}
+                                                    />
+                                                    <Text as="span" css={styles.signoutText}>
+                                                        {intl.formatMessage({
+                                                            defaultMessage: 'Log out',
+                                                            id: 'header.popover.action.log_out'
+                                                        })}
+                                                    </Text>
+                                                </Button>
+                                            </Popover.Footer>
+                                        </Popover.Body>
+                                    </Popover.Content>
+                                </Popover.Positioner>
+                            </Portal>
                         </Popover.Root>
                     )}
                     <IconButtonWithRegistration
