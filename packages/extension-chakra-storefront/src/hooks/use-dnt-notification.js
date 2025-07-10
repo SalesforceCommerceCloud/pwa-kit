@@ -13,7 +13,6 @@ import {
     ModalContent,
     ModalBody,
     ModalCloseButton,
-    useDisclosure,
     Heading,
     Stack,
     Text,
@@ -21,6 +20,7 @@ import {
     Flex
 } from '@chakra-ui/react'
 import {HideOnDesktop, HideOnMobile} from '../components/responsive'
+import {useDisclosure} from './use-disclosure-safe'
 import {useDNT} from '@salesforce/commerce-sdk-react'
 import {useLocation} from 'react-router-dom'
 

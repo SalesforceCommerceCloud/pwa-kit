@@ -5,7 +5,8 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React, {useState} from 'react'
-import {Button, useDisclosure} from '@chakra-ui/react'
+import {Button} from '@chakra-ui/react'
+import {useDisclosure} from '../../../../hooks/use-disclosure-safe'
 import {FormattedMessage, useIntl} from 'react-intl'
 import {useItemVariant} from '../../../../components/item-variant'
 import ProductViewModal from '../../../../components/product-view-modal'

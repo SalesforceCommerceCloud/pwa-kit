@@ -26,12 +26,12 @@ import {
     Flex,
     Heading,
     Spinner,
-    useDisclosure,
     useSlotRecipe,
     useToken
 } from '@chakra-ui/react'
 
 // Local Project Components
+import {useDisclosure} from '../../hooks/use-disclosure-safe'
 import {DrawerMenu} from '../drawer-menu'
 import {getPathWithLocale} from '../../utils/url'
 import {HideOnDesktop, HideOnMobile} from '../responsive'
@@ -282,35 +282,35 @@ const withLayout = <P extends object>(WrappedComponent: React.ComponentType<P>) 
                         {!isCheckout ? (
                             <>
                                 <AboveHeader />
-                                <Header
-                                    onMenuClick={onOpen}
-                                    onLogoClick={onLogoClick}
-                                    onMyCartClick={onCartClick}
-                                    onMyAccountClick={onAccountClick}
-                                    onWishlistClick={onWishlistClick}
-                                >
-                                    {/* TODO: mobile menu */}
-                                    <HideOnDesktop>
-                                        <DrawerMenu
-                                            isOpen={open}
-                                            onClose={onClose}
-                                            onLogoClick={onLogoClick}
-                                            root={categories?.[CAT_MENU_DEFAULT_ROOT_CATEGORY]}
-                                            itemsKey="categories"
-                                            itemsCountKey="onlineSubCategoriesCount"
-                                            itemComponent={DrawerMenuItemWithData}
-                                        />
-                                    </HideOnDesktop>
-                                    {/*TODO: Fix menu to load children lazily.*/}
-                                    <HideOnMobile>
-                                        <ListMenu
-                                            root={categories?.[CAT_MENU_DEFAULT_ROOT_CATEGORY]}
-                                            itemsKey="categories"
-                                            itemsCountKey="onlineSubCategoriesCount"
-                                            contentComponent={ListMenuContentWithData}
-                                        />
-                                    </HideOnMobile>
-                                </Header>
+                                {/*<Header */}
+                                {/*    onMenuClick={onOpen} */}
+                                {/*    onLogoClick={onLogoClick} */}
+                                {/*    onMyCartClick={onCartClick} */}
+                                {/*    onMyAccountClick={onAccountClick} */}
+                                {/*    onWishlistClick={onWishlistClick} */}
+                                {/*> */}
+                                {/*    {/1* TODO: mobile menu *1/} */}
+                                {/*    <HideOnDesktop> */}
+                                {/*        <DrawerMenu */}
+                                {/*            isOpen={open} */}
+                                {/*            onClose={onClose} */}
+                                {/*            onLogoClick={onLogoClick} */}
+                                {/*            root={categories?.[CAT_MENU_DEFAULT_ROOT_CATEGORY]} */}
+                                {/*            itemsKey="categories" */}
+                                {/*            itemsCountKey="onlineSubCategoriesCount" */}
+                                {/*            itemComponent={DrawerMenuItemWithData} */}
+                                {/*        /> */}
+                                {/*    </HideOnDesktop> */}
+                                {/*    {/1*TODO: Fix menu to load children lazily.*/}
+                                {/*    <HideOnMobile> */}
+                                {/*        <ListMenu */}
+                                {/*            root={categories?.[CAT_MENU_DEFAULT_ROOT_CATEGORY]} */}
+                                {/*            itemsKey="categories" */}
+                                {/*            itemsCountKey="onlineSubCategoriesCount" */}
+                                {/*            contentComponent={ListMenuContentWithData} */}
+                                {/*        /> */}
+                                {/*    </HideOnMobile> */}
+                                {/*</Header> */}
                             </>
                         ) : (
                             <CheckoutHeader />

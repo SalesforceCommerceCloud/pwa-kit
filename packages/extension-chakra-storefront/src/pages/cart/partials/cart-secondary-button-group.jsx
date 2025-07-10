@@ -6,16 +6,9 @@
  */
 import React from 'react'
 import PropTypes from 'prop-types'
-import {
-    Button,
-    ButtonGroup,
-    Checkbox,
-    Separator,
-    Flex,
-    Stack,
-    useDisclosure
-} from '@chakra-ui/react'
+import {Button, ButtonGroup, Checkbox, Separator, Flex, Stack} from '@chakra-ui/react'
 import {defineMessage, FormattedMessage} from 'react-intl'
+import {useDisclosure} from '../../../hooks/use-disclosure-safe'
 import {useItemVariant} from '../../../components/item-variant'
 import ConfirmationModal from '../../../components/confirmation-modal/index'
 import {noop} from '../../../utils/utils'

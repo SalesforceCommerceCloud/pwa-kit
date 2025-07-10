@@ -18,7 +18,6 @@ import {
     Popover,
     Portal,
     Text,
-    useDisclosure,
     useMediaQuery,
     Separator,
     // hooks
@@ -31,6 +30,7 @@ import {
 } from '@salesforce/pwa-kit-extension-sdk/react'
 
 import {useCurrentBasket} from '../../hooks'
+import {useDisclosure} from '../../hooks/use-disclosure-safe'
 
 import Link from '../../components/link'
 import Search from '../../components/search'
