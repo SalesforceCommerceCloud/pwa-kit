@@ -30,7 +30,7 @@ jest.mock('@salesforce/commerce-sdk-react', () => {
     }
 })
 
-jest.mock('../util/checkout-context', () => {
+jest.mock('@salesforce/retail-react-app/app/pages/checkout-container/util/checkout-context', () => {
     return {
         useCheckout: jest.fn().mockReturnValue({
             customer: null,
