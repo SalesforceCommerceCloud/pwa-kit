@@ -27,7 +27,7 @@ const Error = (props) => {
 
     const title = "This page isn't working"
     return (
-        <Flex id="sf-app" flex={1} direction="column" minWidth={'375px'}>
+        <Flex id="sf-app" flex="1" direction="column" minWidth="375px">
             <Helmet>
                 <title>{title}</title>
             </Helmet>
@@ -36,17 +36,21 @@ const Error = (props) => {
                     maxWidth="container.xxxl"
                     marginLeft="auto"
                     marginRight="auto"
-                    px={[4, 4, 6, 8]}
-                    paddingTop={[1, 1, 2, 4]}
-                    paddingBottom={[3, 3, 2, 4]}
+                    px={['4', '4', '6', '8']}
+                    paddingTop={['1', '1', '2', '4']}
+                    paddingBottom={['3', '3', '2', '4']}
                 >
                     <IconButton
                         aria-label="logo"
-                        icon={<BrandLogo width={[8, 8, 8, 12]} height={[6, 6, 6, 8]} />}
-                        marginBottom={[1, 1, 2, 0]}
+                        marginBottom={['1', '1', '2', '0']}
                         variant="unstyled"
-                        onClick={() => history.push('/')}
-                    />
+                        // We need to use window.location.href here rather than history
+                        // as the application is in an error state. We need to force a
+                        // hard navigation to get back to the normal state.
+                        onClick={() => (window.location.href = '/')}
+                    >
+                        <BrandLogo width={{base: '8', lg: '12'}} height={{base: '6', lg: '8'}} />
+                    </IconButton>
                 </Box>
             </Box>
             <Box
@@ -54,21 +58,21 @@ const Error = (props) => {
                 id="app-main"
                 role="main"
                 layerStyle="page"
-                padding={{lg: 8, md: 6, sm: 0, base: 0}}
-                flex={1}
+                padding={{lg: '8', md: '6', sm: '0', base: '0'}}
+                flex="1"
             >
                 <Flex
                     direction={'column'}
                     justify="center"
-                    px={{base: 4, md: 6, lg: 50}}
-                    py={{base: 20, md: 24}}
+                    px={{base: '4', md: '6', lg: '50'}}
+                    py={{base: '20', md: '24'}}
                 >
                     <Flex align="center" direction="column">
-                        <FileIcon boxSize={['30px', '32px']} mb={8} />
-                        <Heading as="h2" fontSize={['xl', '2xl', '2xl', '3xl']} mb={2}>
+                        <FileIcon boxSize={['30px', '32px']} mb="8" />
+                        <Heading as="h2" fontSize={['xl', '2xl', '2xl', '3xl']} mb="2">
                             {title}
                         </Heading>
-                        <Box maxWidth="440px" marginBottom={8}>
+                        <Box maxWidth="440px" marginBottom="8">
                             <Text align="center">
                                 An error has occurred. Try refreshing the page or if you need
                                 immediate help please contact support.
@@ -76,20 +80,20 @@ const Error = (props) => {
                             {message && (
                                 <Box
                                     as="pre"
-                                    mt={4}
+                                    mt="4"
+                                    padding="4"
                                     fontSize="sm"
                                     background="gray.50"
                                     borderColor="gray.200"
                                     borderStyle="solid"
                                     borderWidth="1px"
                                     overflow="auto"
-                                    padding={4}
                                 >
                                     {message}
                                 </Box>
                             )}
                         </Box>
-                        <Stack direction={['column', 'row']} spacing={4} width={['100%', 'auto']}>
+                        <Stack direction={['column', 'row']} gap="4" width={['100%', 'auto']}>
                             <Button
                                 variant="outline"
                                 bg="white"
@@ -106,20 +110,20 @@ const Error = (props) => {
                         </Stack>
                     </Flex>
                     {stack && (
-                        <Box marginTop={20}>
+                        <Box marginTop="20">
                             <Text fontWeight="bold" fontSize="md">
                                 Stack Trace
                             </Text>
                             <Box
                                 as="pre"
-                                mt={4}
+                                mt="4"
                                 fontSize="sm"
                                 background="gray.50"
                                 borderColor="gray.200"
                                 borderStyle="solid"
                                 borderWidth="1px"
                                 overflow="auto"
-                                padding={4}
+                                padding="4"
                             >
                                 {stack}
                             </Box>
