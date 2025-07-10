@@ -51,7 +51,7 @@ const PasswordRequirements = ({value}) => {
     const pwValidations = validatePassword(value)
 
     return (
-        <Stack gap={2}>
+        <Stack spacing={2}>
             <PasswordRequirement isValid={pwValidations.hasMinChars}>
                 <FormattedMessage
                     id="password_requirements.error.eight_letter_minimum"

@@ -17,10 +17,10 @@ const PostCheckoutRegistrationFields = ({form, prefix = ''}) => {
 
     return (
         <Box>
-            <Stack gap={5}>
+            <Stack spacing={5}>
                 <Field {...fields.email} />
 
-                <Stack gap={3} paddingBottom={2}>
+                <Stack spacing={3} paddingBottom={2}>
                     <Field {...fields.password} />
                     <PasswordRequirements value={password} />
                 </Stack>

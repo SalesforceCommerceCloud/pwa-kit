@@ -16,12 +16,12 @@ const RegistrationFields = ({form, prefix = ''}) => {
     const password = form.watch('password')
 
     return (
-        <Stack gap={5}>
+        <Stack spacing={5}>
             <Field {...fields.firstName} />
             <Field {...fields.lastName} />
             <Field {...fields.email} />
 
-            <Stack gap={3} pb={2}>
+            <Stack spacing={3} pb={2}>
                 <Field {...fields.password} />
                 <PasswordRequirements value={password} />
             </Stack>

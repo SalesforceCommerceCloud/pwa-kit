@@ -20,7 +20,7 @@ const LoginFields = ({
 }) => {
     const fields = useLoginFields({form, prefix})
     return (
-        <Stack gap={5}>
+        <Stack spacing={5}>
             {!hideEmail && <Field {...fields.email} />}
             {!hidePassword && (
                 <Stack>
