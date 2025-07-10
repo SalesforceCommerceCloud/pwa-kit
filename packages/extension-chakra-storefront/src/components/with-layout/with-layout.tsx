@@ -117,17 +117,14 @@ const withLayout = <P extends object>(WrappedComponent: React.ComponentType<P>) 
         const activeData = useActiveData()
         const history = useHistory()
         const location = useLocation()
-        // const authModal = useAuthModal()
+        const authModal = useAuthModal()
         // const dntNotification = useDntNotification()
         const {site, locale, buildUrl} = useMultiSite()
         const [isOnline, setIsOnline] = useState<boolean>(true)
 
         // https://www.chakra-ui.com/docs/theming/overview#tokens-1
         const [themeColor] = useToken('colors.blue', '600')
-        // const {open, onOpen, onClose} = useDisclosure()
-        const [open, setOpen] = useState(false)
-        const onOpen = () => {}
-        const onClose = () => {}
+        const {open, onOpen, onClose} = useDisclosure()
 
         // Used to conditionally render header/footer for checkout page
         const isCheckout = /\/checkout$/.test(location?.pathname)
@@ -285,35 +282,35 @@ const withLayout = <P extends object>(WrappedComponent: React.ComponentType<P>) 
                         {!isCheckout ? (
                             <>
                                 <AboveHeader />
-                                {/*<Header */}
-                                {/*    onMenuClick={onOpen} */}
-                                {/*    onLogoClick={onLogoClick} */}
-                                {/*    onMyCartClick={onCartClick} */}
-                                {/*    onMyAccountClick={onAccountClick} */}
-                                {/*    onWishlistClick={onWishlistClick} */}
-                                {/*> */}
-                                {/*    {/1* TODO: mobile menu *1/} */}
-                                {/*    <HideOnDesktop> */}
-                                {/*        <DrawerMenu */}
-                                {/*            isOpen={open} */}
-                                {/*            onClose={onClose} */}
-                                {/*            onLogoClick={onLogoClick} */}
-                                {/*            root={categories?.[CAT_MENU_DEFAULT_ROOT_CATEGORY]} */}
-                                {/*            itemsKey="categories" */}
-                                {/*            itemsCountKey="onlineSubCategoriesCount" */}
-                                {/*            itemComponent={DrawerMenuItemWithData} */}
-                                {/*        /> */}
-                                {/*    </HideOnDesktop> */}
-                                {/*    {/1*TODO: Fix menu to load children lazily.*/}
-                                {/*    <HideOnMobile> */}
-                                {/*        <ListMenu */}
-                                {/*            root={categories?.[CAT_MENU_DEFAULT_ROOT_CATEGORY]} */}
-                                {/*            itemsKey="categories" */}
-                                {/*            itemsCountKey="onlineSubCategoriesCount" */}
-                                {/*            contentComponent={ListMenuContentWithData} */}
-                                {/*        /> */}
-                                {/*    </HideOnMobile> */}
-                                {/*</Header> */}
+                                <Header
+                                    onMenuClick={onOpen}
+                                    onLogoClick={onLogoClick}
+                                    onMyCartClick={onCartClick}
+                                    onMyAccountClick={onAccountClick}
+                                    onWishlistClick={onWishlistClick}
+                                >
+                                    {/* TODO: mobile menu */}
+                                    <HideOnDesktop>
+                                        <DrawerMenu
+                                            isOpen={open}
+                                            onClose={onClose}
+                                            onLogoClick={onLogoClick}
+                                            root={categories?.[CAT_MENU_DEFAULT_ROOT_CATEGORY]}
+                                            itemsKey="categories"
+                                            itemsCountKey="onlineSubCategoriesCount"
+                                            itemComponent={DrawerMenuItemWithData}
+                                        />
+                                    </HideOnDesktop>
+                                    {/*TODO: Fix menu to load children lazily.*/}
+                                    <HideOnMobile>
+                                        <ListMenu
+                                            root={categories?.[CAT_MENU_DEFAULT_ROOT_CATEGORY]}
+                                            itemsKey="categories"
+                                            itemsCountKey="onlineSubCategoriesCount"
+                                            contentComponent={ListMenuContentWithData}
+                                        />
+                                    </HideOnMobile>
+                                </Header>
                             </>
                         ) : (
                             <CheckoutHeader />
@@ -345,7 +342,7 @@ const withLayout = <P extends object>(WrappedComponent: React.ComponentType<P>) 
                         {/*</SkipNavContent>*/}
 
                         {!isCheckout ? <Footer /> : <CheckoutFooter />}
-                        {/* <AuthModal {...(authModal as any)} /> */}
+                        <AuthModal {...(authModal as any)} />
                         {/*<DntNotification {...dntNotification} />*/}
                     </AddToCartModalProvider>
                 </Box>
