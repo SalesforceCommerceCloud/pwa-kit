@@ -113,8 +113,9 @@ const Field = ({
 
                         {type === 'select' && (
                             <>
-                                <NativeSelect.Root ref={ref} value={value} {..._inputProps}>
+                                <NativeSelect.Root value={value} {..._inputProps}>
                                     <NativeSelect.Field
+                                        ref={ref}
                                         value={value || ''}
                                         onChange={onChange}
                                         placeholder={placeholder}

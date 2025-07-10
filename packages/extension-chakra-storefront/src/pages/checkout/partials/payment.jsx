@@ -92,10 +92,6 @@ const Payment = () => {
             return
         }
 
-        // TODO: This is added for testing, remove after billing address is migrated
-        return Promise.resolve({success: true}) // Mock successful response
-
-        /* Original code:
         const billingAddress = billingSameAsShipping
             ? selectedShippingAddress
             : billingAddressForm.getValues()
@@ -106,7 +102,6 @@ const Payment = () => {
             body: address,
             parameters: {basketId: basket.basketId}
         })
-        */
     }
     const onPaymentRemoval = async () => {
         try {
