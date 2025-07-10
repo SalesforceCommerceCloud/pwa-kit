@@ -24,6 +24,7 @@ module.exports = {
         createTestGlob('components/icons'),
         createTestGlob('components/image-gallery'),
         createTestGlob('components/drawer-menu'),
+        createTestGlob('components/error'),
         createTestGlob('components/header'),
         createTestGlob('components/links-list'),
         createTestGlob('components/locale-selector'),
