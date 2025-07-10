@@ -15,7 +15,10 @@ import CheckoutSkeleton from '@salesforce/retail-react-app/app/pages/checkout-co
 import Checkout from '@salesforce/retail-react-app/app/pages/checkout/index'
 import CheckoutOneClick from '@salesforce/retail-react-app/app/pages/checkout-one-click/index'
 import UnavailableProductConfirmationModal from '@salesforce/retail-react-app/app/components/unavailable-product-confirmation-modal'
-import {TOAST_MESSAGE_REMOVED_ITEM_FROM_CART, API_ERROR_MESSAGE} from '@salesforce/retail-react-app/app/constants'
+import {
+    TOAST_MESSAGE_REMOVED_ITEM_FROM_CART,
+    API_ERROR_MESSAGE
+} from '@salesforce/retail-react-app/app/constants'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 
 const CheckoutContainer = () => {
