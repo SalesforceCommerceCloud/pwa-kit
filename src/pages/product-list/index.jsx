@@ -6,9 +6,7 @@
  */
 
 import React, {useEffect, useState} from 'react'
-import PropTypes from 'prop-types'
-import {useHistory, useLocation, useParams} from 'react-router-dom'
-import {useIntl} from 'react-intl'
+import {useLocation, useParams} from 'react-router-dom'
 import {keepPreviousData} from '@tanstack/react-query'
 import {useCategory, useProductSearch} from '@salesforce/commerce-sdk-react'
 
