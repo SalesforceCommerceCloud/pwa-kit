@@ -10,6 +10,7 @@ import useEinstein from '@salesforce/retail-react-app/app/hooks/use-einstein'
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
 import {STORE_LOCATOR_IS_ENABLED} from '@salesforce/retail-react-app/app/constants'
+import {useShopperBasketsMutation} from '@salesforce/commerce-sdk-react'
 
 const CheckoutContext = React.createContext()
 
@@ -18,6 +19,7 @@ export const CheckoutProvider = ({children}) => {
     const {data: basket} = useCurrentBasket()
     const einstein = useEinstein()
     const [step, setStep] = useState()
+    const updateShippingAddressForShipment = useShopperBasketsMutation('updateShippingAddressForShipment')
 
     const CHECKOUT_STEPS_LIST = [
         'CONTACT_INFO',
@@ -36,17 +38,45 @@ export const CheckoutProvider = ({children}) => {
             return
         }
 
+        // TEMPORARY: Skip shipping address step for testing
+        const SKIP_SHIPPING_ADDRESS = true
+
+        // Auto-add dummy shipping address when skip flag is enabled and no address exists
+        if (SKIP_SHIPPING_ADDRESS && !basket.shipments[0]?.shippingAddress?.address1) {
+            const dummyAddress = {
+                address1: '123 Test Street',
+                city: 'Test City',
+                countryCode: 'US',
+                firstName: 'Test',
+                lastName: 'User',
+                phone: '555-123-4567',
+                postalCode: '12345',
+                stateCode: 'CA'
+            }
+
+            updateShippingAddressForShipment.mutateAsync({
+                parameters: {
+                    basketId: basket.basketId,
+                    shipmentId: 'me',
+                    useAsBilling: false
+                },
+                body: dummyAddress
+            }).catch(error => {
+                console.warn('Failed to add dummy shipping address:', error)
+            })
+        }
+
         let step = STEPS.REVIEW_ORDER
 
         if (customer.isGuest && !basket.customerInfo?.email) {
             step = STEPS.CONTACT_INFO
-        } else if (!basket.shipments[0]?.shippingAddress?.address1) {
+        } else if (!basket.shipments[0]?.shippingAddress?.address1 && !SKIP_SHIPPING_ADDRESS) {
             // Check if it's a pickup order - only if BOPIS is enabled
             const isPickupOrder =
                 STORE_LOCATOR_IS_ENABLED &&
                 basket?.shipments[0]?.shippingMethod?.c_storePickupEnabled === true
             step = isPickupOrder ? STEPS.PICKUP_ADDRESS : STEPS.SHIPPING_ADDRESS
-        } else if (!basket.shipments[0]?.shippingMethod) {
+        } else if (!basket.shipments[0]?.shippingMethod && !SKIP_SHIPPING_ADDRESS) {
             step = STEPS.SHIPPING_OPTIONS
         } else if (!basket.paymentInstruments || !basket.billingAddress) {
             step = STEPS.PAYMENT
@@ -78,14 +108,23 @@ export const CheckoutProvider = ({children}) => {
     }, [step])
 
     const goToNextStep = () => {
+        // TEMPORARY: Skip shipping address step for testing
+        const SKIP_SHIPPING_ADDRESS = true
+
         // Check if current step is CONTACT_INFO
         if (step === STEPS.CONTACT_INFO) {
             // Determine if it's a pickup order - only if BOPIS is enabled
             const isPickupOrder =
                 STORE_LOCATOR_IS_ENABLED &&
                 basket?.shipments[0]?.shippingMethod?.c_storePickupEnabled === true
-            // Skip to appropriate next step
-            setStep(isPickupOrder ? STEPS.PICKUP_ADDRESS : STEPS.SHIPPING_ADDRESS)
+            
+            if (SKIP_SHIPPING_ADDRESS) {
+                // Skip directly to shipping options
+                setStep(STEPS.SHIPPING_OPTIONS)
+            } else {
+                // Skip to appropriate next step
+                setStep(isPickupOrder ? STEPS.PICKUP_ADDRESS : STEPS.SHIPPING_ADDRESS)
+            }
         } else {
             setStep(step + 1)
         }

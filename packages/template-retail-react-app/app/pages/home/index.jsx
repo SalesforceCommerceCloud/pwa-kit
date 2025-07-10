@@ -117,6 +117,16 @@ const Home = () => {
                                 id="home.link.get_started"
                             />
                         </Button>
+                        <Button
+                            as={Link}
+                            href="/shipment-test"
+                            width={{base: 'full', md: 'inherit'}}
+                            paddingX={7}
+                            colorScheme="purple"
+                            _hover={{textDecoration: 'none'}}
+                        >
+                            Shipment API Test
+                        </Button>
                     </Stack>
                 }
             />

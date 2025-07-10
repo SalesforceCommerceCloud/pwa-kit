@@ -54,6 +54,9 @@ const StoreLocator = loadable(() => import('./pages/store-locator'), {
 const Wishlist = loadable(() => import('./pages/account/wishlist'), {
     fallback
 })
+const ShipmentTest = loadable(() => import('./pages/shipment-test'), {
+    fallback
+})
 const PageNotFound = loadable(() => import('./pages/page-not-found'))
 
 export const routes = [
@@ -134,6 +137,11 @@ export const routes = [
     {
         path: '/store-locator',
         component: StoreLocator
+    },
+    {
+        path: '/shipment-test',
+        component: ShipmentTest,
+        exact: true
     },
     {
         path: '*',
