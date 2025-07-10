@@ -29,7 +29,7 @@ const Login = loadable(() => import('overridable!./login'), {fallback})
 const Registration = loadable(() => import('overridable!./registration'), {
     fallback
 })
-// const ResetPassword = loadable(() => import('overridable!./reset-password'), {fallback})
+const ResetPassword = loadable(() => import('overridable!./reset-password'), {fallback})
 const LoginRedirect = loadable(() => import('overridable!./login-redirect'), {fallback})
 const ProductDetail = loadable(() => import('overridable!./product-detail'), {fallback})
 const ProductList = loadable(() => import('overridable!./product-list'), {
@@ -71,7 +71,7 @@ export {
     Home,
     Login,
     Registration,
-    // ResetPassword,
+    ResetPassword,
     LoginRedirect,
     ProductDetail,
     ProductList,
