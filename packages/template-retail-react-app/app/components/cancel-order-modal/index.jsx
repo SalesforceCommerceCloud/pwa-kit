@@ -23,7 +23,13 @@ import {
 /**
  * A Modal for requesting order cancellation
  */
-const CancelOrderModal = ({isOpen, onClose, order, onRequestCancellation, ...props}) => {
+const CancelOrderModal = ({
+    isOpen,
+    onClose,
+    order = null,
+    onRequestCancellation = null,
+    ...props
+}) => {
     const handleRequestCancellation = () => {
         if (onRequestCancellation) {
             onRequestCancellation(order)
@@ -43,6 +49,7 @@ const CancelOrderModal = ({isOpen, onClose, order, onRequestCancellation, ...pro
                 </ModalHeader>
                 <ModalCloseButton />
                 <ModalBody>
+					{/* TODO: Add order details here W-18998712 */}
                     <Text>
                         <FormattedMessage
                             defaultMessage="This is a blank modal for canceling the order."
@@ -80,11 +87,6 @@ CancelOrderModal.propTypes = {
      * Callback when user confirms cancellation request
      */
     onRequestCancellation: PropTypes.func
-}
-
-CancelOrderModal.defaultProps = {
-    order: null,
-    onRequestCancellation: null
 }
 
 export default CancelOrderModal

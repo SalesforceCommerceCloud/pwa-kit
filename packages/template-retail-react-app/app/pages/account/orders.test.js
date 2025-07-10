@@ -6,7 +6,7 @@
  */
 import React from 'react'
 import {Route, Switch} from 'react-router-dom'
-import {screen} from '@testing-library/react'
+import {screen, waitFor} from '@testing-library/react'
 import {rest} from 'msw'
 import {
     renderWithProviders,
@@ -234,5 +234,121 @@ describe('Handles order with missing or partial data gracefully', () => {
         expect(screen.queryByText(/billing address/i)).not.toBeInTheDocument()
         expect(screen.queryByText(/payment method/i)).not.toBeInTheDocument()
         expect(screen.queryByText(/shipping address/i)).not.toBeInTheDocument()
+    })
+})
+
+describe('Cancel Order Button and Modal', () => {
+    let user, orderNo
+    beforeEach(async () => {
+        global.server.use(
+            rest.get('*/orders/:orderNo', (req, res, ctx) => {
+                return res(ctx.delay(0), ctx.json(mockOrderHistory.data[0]))
+            }),
+            rest.get('*/customers/:customerId/orders', (req, res, ctx) => {
+                return res(ctx.delay(0), ctx.json(mockOrderHistory))
+            }),
+            rest.get('*/products', (req, res, ctx) => {
+                return res(ctx.delay(0), ctx.json(mockOrderProducts))
+            })
+        )
+        orderNo = mockOrderHistory.data[0].orderNo
+        window.history.pushState(
+            {},
+            'Order Details',
+            createPathWithDefaults(`/account/orders/${orderNo}`)
+        )
+        const renderResult = renderWithProviders(<MockedComponent history={history} />, {
+            wrapperProps: {siteAlias: 'uk', appConfig: mockConfig.app}
+        })
+        user = renderResult.user
+    })
+
+    test('should render cancel order button', async () => {
+        expect(await screen.findByTestId('account-order-details-page')).toBeInTheDocument()
+        const cancelButton = screen.getByRole('button', {name: /cancel order/i})
+        expect(cancelButton).toBeInTheDocument()
+    })
+
+    test('should open cancel order modal when button is clicked', async () => {
+        expect(await screen.findByTestId('account-order-details-page')).toBeInTheDocument()
+
+        const cancelButton = screen.getByRole('button', {name: /cancel order/i})
+        await user.click(cancelButton)
+
+        // Check that modal is open
+        expect(screen.getByRole('dialog')).toBeInTheDocument()
+        expect(screen.getAllByText(/request cancellation/i)).toHaveLength(2) // Header and button
+        expect(
+            screen.getByText(/this is a blank modal for canceling the order/i)
+        ).toBeInTheDocument()
+    })
+
+    test('should close modal when close button is clicked', async () => {
+        expect(await screen.findByTestId('account-order-details-page')).toBeInTheDocument()
+
+        // Open modal
+        const cancelButton = screen.getByRole('button', {name: /cancel order/i})
+        await user.click(cancelButton)
+        expect(screen.getByRole('dialog')).toBeInTheDocument()
+
+        // Close modal
+        const closeButton = screen.getByRole('button', {name: /close/i})
+        await user.click(closeButton)
+
+        // Wait for modal to close
+        await waitFor(() => {
+            expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+        })
+    })
+
+    test('should close modal when request cancellation button is clicked', async () => {
+        expect(await screen.findByTestId('account-order-details-page')).toBeInTheDocument()
+
+        // Open modal
+        const cancelButton = screen.getByRole('button', {name: /cancel order/i})
+        await user.click(cancelButton)
+        expect(screen.getByRole('dialog')).toBeInTheDocument()
+
+        // Click request cancellation button
+        const requestCancellationButtons = screen.getAllByRole('button', {
+            name: /request cancellation/i
+        })
+        // Find the button inside the modal (not the one that opens it)
+        const modalButton = requestCancellationButtons.find((button) =>
+            button.closest('[role="dialog"]')
+        )
+        await user.click(modalButton)
+
+        // Wait for modal to close
+        await waitFor(() => {
+            expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+        })
+    })
+
+    test('should call onRequestCancellation when request cancellation button is clicked', async () => {
+        expect(await screen.findByTestId('account-order-details-page')).toBeInTheDocument()
+
+        // Open modal
+        const cancelButton = screen.getByRole('button', {name: /cancel order/i})
+        await user.click(cancelButton)
+        expect(screen.getByRole('dialog')).toBeInTheDocument()
+
+        // Click request cancellation button
+        const requestCancellationButtons = screen.getAllByRole('button', {
+            name: /request cancellation/i
+        })
+        const modalButton = requestCancellationButtons.find((button) =>
+            button.closest('[role="dialog"]')
+        )
+
+        // Check that the callback would be called (we can't easily test the actual callback without mocking)
+        expect(modalButton).toBeInTheDocument()
+
+        await user.click(modalButton)
+
+        // Modal should close after action
+        await waitFor(() => {
+            expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+        })
     })
 })

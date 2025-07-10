@@ -113,7 +113,11 @@ const AccountOrderDetail = () => {
     const {formatMessage, formatDate} = useIntl()
 
     // Modal state for cancel order
-    const {isOpen: isCancelModalOpen, onOpen: onCancelModalOpen, onClose: onCancelModalClose} = useDisclosure()
+    const {
+        isOpen: isCancelModalOpen,
+        onOpen: onCancelModalOpen,
+        onClose: onCancelModalClose
+    } = useDisclosure()
 
     const {data: order, isLoading: isOrderLoading} = useOrder(
         {
@@ -169,11 +173,7 @@ const AccountOrderDetail = () => {
                             />
                         </Heading>
                         {/* Cancel Order Button */}
-                        <Button
-                            variant="link"
-                            size="sm"
-                            onClick={onCancelModalOpen}
-                        >
+                        <Button variant="link" size="sm" onClick={onCancelModalOpen}>
                             <FormattedMessage
                                 defaultMessage="Cancel order"
                                 id="account_order_detail.button.cancel_order"
