@@ -76,6 +76,15 @@ export const AddToCartModal = () => {
         viewType: 'small'
     })?.images?.[0]
 
+    const dialogTitleId = 'add-to-cart-modal-title'
+    const dialogTitle = intl.formatMessage(
+        {
+            defaultMessage: '{quantity} {quantity, plural, one {item} other {items}} added to cart',
+            id: 'add_to_cart_modal.info.added_to_cart'
+        },
+        {quantity: numberOfItemsAdded}
+    )
+
     return (
         <Dialog.Root
             size={size}
@@ -92,17 +101,11 @@ export const AddToCartModal = () => {
                         borderRadius={{base: 'none', md: 'base'}}
                         bgColor="gray.50"
                         data-testid="add-to-cart-modal"
+                        aria-labelledby={dialogTitleId}
                     >
                         <Dialog.Header paddingY="8" bgColor="white">
-                            <Heading as="h1" fontSize="2xl">
-                                {intl.formatMessage(
-                                    {
-                                        defaultMessage:
-                                            '{quantity} {quantity, plural, one {item} other {items}} added to cart',
-                                        id: 'add_to_cart_modal.info.added_to_cart'
-                                    },
-                                    {quantity: numberOfItemsAdded}
-                                )}
+                            <Heading as="h1" fontSize="2xl" id={dialogTitleId}>
+                                {dialogTitle}
                             </Heading>
                         </Dialog.Header>
                         <Dialog.Body bgColor="white" padding="0" marginBottom={{base: 40, lg: 0}}>
@@ -299,7 +302,7 @@ export const AddToCartModal = () => {
                                                         <DisplayPrice
                                                             priceData={priceData}
                                                             quantity={quantity}
-                                                            currency={currency}
+                                                            currency={currency || 'GBP'}
                                                         />
                                                     </Box>
                                                 </Flex>
