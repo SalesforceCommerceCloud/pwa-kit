@@ -304,7 +304,7 @@ const OrderSummary = ({
                                             <Button
                                                 variant="link-red"
                                                 size="sm"
-                                                colorPallete="red"
+                                                colorPalete="red"
                                                 onClick={() => removePromoCode(item.couponItemId)}
                                             >
                                                 <FormattedMessage
