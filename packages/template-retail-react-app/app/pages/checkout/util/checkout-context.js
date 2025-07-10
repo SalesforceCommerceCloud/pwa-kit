@@ -13,21 +13,21 @@ import {STORE_LOCATOR_IS_ENABLED} from '@salesforce/retail-react-app/app/constan
 
 const CheckoutContext = React.createContext()
 
+const CHECKOUT_STEPS_LIST = [
+    'CONTACT_INFO',
+    'PICKUP_ADDRESS',
+    'SHIPPING_ADDRESS',
+    'SHIPPING_OPTIONS',
+    'PAYMENT',
+    'REVIEW_ORDER'
+]
+export const STEPS = CHECKOUT_STEPS_LIST.reduce((acc, step, idx) => ({...acc, [step]: idx}), {})
+
 export const CheckoutProvider = ({children}) => {
     const {data: customer} = useCurrentCustomer()
     const {data: basket} = useCurrentBasket()
     const einstein = useEinstein()
     const [step, setStep] = useState()
-
-    const CHECKOUT_STEPS_LIST = [
-        'CONTACT_INFO',
-        'PICKUP_ADDRESS',
-        'SHIPPING_ADDRESS',
-        'SHIPPING_OPTIONS',
-        'PAYMENT',
-        'REVIEW_ORDER'
-    ]
-    const STEPS = CHECKOUT_STEPS_LIST.reduce((acc, step, idx) => ({...acc, [step]: idx}), {})
 
     const getCheckoutStepName = (step) => CHECKOUT_STEPS_LIST[step]
 
