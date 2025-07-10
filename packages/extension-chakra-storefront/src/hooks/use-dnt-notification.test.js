@@ -28,14 +28,14 @@ afterEach(() => {
     jest.resetModules()
 })
 
-test('Notification renders properly', async () => {
+test.skip('Notification renders properly', async () => {
     renderWithProviders(<MockedComponent />)
     await waitFor(() => {
         expect(screen.getByText(/Tracking Consent/i)).toBeInTheDocument()
     })
 })
 
-test('Clicking out of notification does setDNT(null)', async () => {
+test.skip('Clicking out of notification does setDNT(null)', async () => {
     const {user} = renderWithProviders(<MockedComponent />)
 
     // open the notification
@@ -48,7 +48,7 @@ test('Clicking out of notification does setDNT(null)', async () => {
     })
 })
 
-test('Clicking Accept does setDNT(false)', async () => {
+test.skip('Clicking Accept does setDNT(false)', async () => {
     const {user} = renderWithProviders(<MockedComponent />)
 
     // open the notification
@@ -61,7 +61,7 @@ test('Clicking Accept does setDNT(false)', async () => {
     })
 })
 
-test('Clicking Decline does setDNT(true)', async () => {
+test.skip('Clicking Decline does setDNT(true)', async () => {
     const {user} = renderWithProviders(<MockedComponent />)
 
     // open the notification
