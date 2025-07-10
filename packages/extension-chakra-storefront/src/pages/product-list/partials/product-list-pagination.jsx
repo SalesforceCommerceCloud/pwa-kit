@@ -9,7 +9,7 @@ import PropTypes from 'prop-types'
 import {Flex} from '@chakra-ui/react'
 import Pagination from '../../../components/pagination'
 
-const PaginationFooter = ({basePath, pageUrls}) => {
+const ProductListPagination = ({basePath, pageUrls}) => {
     if (!pageUrls || pageUrls.length < 2) {
         return null
     }
@@ -20,9 +20,9 @@ const PaginationFooter = ({basePath, pageUrls}) => {
     )
 }
 
-PaginationFooter.propTypes = {
+ProductListPagination.propTypes = {
     basePath: PropTypes.string,
     pageUrls: PropTypes.array
 }
 
-export default PaginationFooter
+export default ProductListPagination
