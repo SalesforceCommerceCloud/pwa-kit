@@ -27,7 +27,7 @@ describe('PWA Development Guidelines', () => {
                     {
                         type: 'text',
                         text: expect.stringContaining(
-                            'Salesforce Commerce Composable Storefront Development Guidelines'
+                            'Commerce Composable Storefront Development Guidelines'
                         )
                     }
                 ]
@@ -41,9 +41,8 @@ describe('PWA Development Guidelines', () => {
             const requiredSections = [
                 'Overview',
                 'Core Principles',
-                'Technical Stack',
-                'PWK Kit Architecture',
-                'Quality Standards'
+                'PWA Kit Essentials',
+                'Development Rules'
             ]
 
             requiredSections.forEach((section) => {

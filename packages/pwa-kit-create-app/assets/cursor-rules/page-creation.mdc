@@ -1,0 +1,15 @@
+---
+description: Page Creation Rule
+globs:
+alwaysApply: false
+---
+USE WHEN create a new page
+
+**Mandatory**
+- ONLY Create a bare minimum page component
+- Do NOT include other project components or hooks unless specifically requested
+- Do NOT add extra styling, layout, or features unless explicitly asked
+
+## Implementation Steps
+1. Create simple component in `app/pages/[page-name]/index.jsx`
+2. Add route to `app/routes.jsx`
