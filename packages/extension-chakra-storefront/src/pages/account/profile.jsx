@@ -41,7 +41,7 @@ import useToast from '../../hooks/use-toast'
  */
 // eslint-disable-next-line react/prop-types
 const Skeleton = forwardRef(({children, height, width, ...rest}, ref) => {
-    const {data: customer} = useCurrentCustomer()
+    const {data: customer, isLoading} = useCurrentCustomer()
     const {isRegistered} = customer
     const size = !isRegistered
         ? {
@@ -50,7 +50,7 @@ const Skeleton = forwardRef(({children, height, width, ...rest}, ref) => {
           }
         : {}
     return (
-        <ChakraSkeleton ref={ref} isLoaded={!customer.isLoading} {...rest} {...size}>
+        <ChakraSkeleton ref={ref} loading={isLoading} {...rest} {...size}>
             {children}
         </ChakraSkeleton>
     )
@@ -146,14 +146,18 @@ const ProfileCard = ({allowPasswordChange = false}) => {
             <ToggleCardEdit>
                 <Container variant="form">
                     <form onSubmit={form.handleSubmit(submit)}>
-                        <Stack spacing={6}>
+                        <Stack gap={6}>
                             {form.formState.errors?.global && (
-                                <Alert status="error">
-                                    <AlertIcon color="red.500" boxSize={4} />
-                                    <Text fontSize="sm" ml={3}>
-                                        {form.formState.errors.global.message}
-                                    </Text>
-                                </Alert>
+                                <Alert.Root status="error">
+                                    <Alert.Indicator>
+                                        <AlertIcon color="red.500" boxSize={4} />
+                                    </Alert.Indicator>
+                                    <Alert.Content>
+                                        <Text fontSize="sm">
+                                            {form.formState.errors.global.message}
+                                        </Text>
+                                    </Alert.Content>
+                                </Alert.Root>
                             )}
                             <ProfileFields form={form} />
                             <FormActionButtons
@@ -168,7 +172,7 @@ const ProfileCard = ({allowPasswordChange = false}) => {
                 </Container>
             </ToggleCardEdit>
             <ToggleCardSummary>
-                <SimpleGrid columns={{base: 1, lg: 3}} spacing={4}>
+                <SimpleGrid columns={{base: 1, lg: 3}} gap={4}>
                     <Box>
                         <Skeleton height="21px" width="84px" marginBottom={2}>
                             <Text fontSize="sm" fontWeight="bold">
@@ -285,14 +289,18 @@ const PasswordCard = () => {
             <ToggleCardEdit>
                 <Container variant="form">
                     <form onSubmit={form.handleSubmit(submit)}>
-                        <Stack spacing={6}>
+                        <Stack gap={6}>
                             {form.formState.errors?.root?.global && (
-                                <Alert data-testid="password-update-error" status="error">
-                                    <AlertIcon color="red.500" boxSize={4} />
-                                    <Text fontSize="sm" ml={3}>
-                                        {form.formState.errors.root.global.message}
-                                    </Text>
-                                </Alert>
+                                <Alert.Root data-testid="password-update-error" status="error">
+                                    <Alert.Indicator>
+                                        <AlertIcon color="red.500" boxSize={4} />
+                                    </Alert.Indicator>
+                                    <Alert.Content>
+                                        <Text fontSize="sm">
+                                            {form.formState.errors.root.global.message}
+                                        </Text>
+                                    </Alert.Content>
+                                </Alert.Root>
                             )}
                             <UpdatePasswordFields form={form} />
                             <FormActionButtons
@@ -307,7 +315,7 @@ const PasswordCard = () => {
                 </Container>
             </ToggleCardEdit>
             <ToggleCardSummary>
-                <SimpleGrid columns={{base: 1, lg: 3}} spacing={4}>
+                <SimpleGrid columns={{base: 1, lg: 3}} gap={4}>
                     <Box>
                         <Skeleton height="21px" width="84px" marginBottom={2}>
                             <Text fontSize="sm" fontWeight="bold">
@@ -340,7 +348,7 @@ const AccountDetail = () => {
     const {isExternal} = useCustomerType()
 
     return (
-        <Stack data-testid="account-detail-page" spacing={6}>
+        <Stack data-testid="account-detail-page" gap={6}>
             <Heading as="h1" fontSize="24px" tabIndex="0" ref={headingRef}>
                 <FormattedMessage
                     defaultMessage="Account Details"
@@ -348,7 +356,7 @@ const AccountDetail = () => {
                 />
             </Heading>
 
-            <Stack spacing={4}>
+            <Stack gap={4}>
                 <ProfileCard allowPasswordChange={!isExternal} />
                 {!isExternal && <PasswordCard />}
             </Stack>

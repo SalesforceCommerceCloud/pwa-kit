@@ -9,27 +9,14 @@ import React, {useEffect, useState} from 'react'
 import PropTypes from 'prop-types'
 import {FormattedMessage, useIntl} from 'react-intl'
 import {Route, Switch, Redirect, useLocation, useRouteMatch} from 'react-router-dom'
-import {
-    Accordion,
-    AccordionButton,
-    AccordionItem,
-    AccordionPanel,
-    Box,
-    Button,
-    Flex,
-    Grid,
-    Heading,
-    Stack,
-    Text,
-    Divider
-} from '@chakra-ui/react'
+import {Accordion, Box, Button, Flex, Grid, Heading, Stack, Text, Divider} from '@chakra-ui/react'
 import Seo from '../../components/seo'
 import Link from '../../components/link'
 import {ChevronDownIcon, ChevronUpIcon, SignoutIcon} from '../../components/icons'
 import AccountDetail from '../../pages/account/profile'
-import AccountAddresses from '../../pages/account/addresses'
-import AccountOrders from '../../pages/account/orders'
-import AccountWishlist from '../../pages/account/wishlist/index'
+// import AccountAddresses from '../../pages/account/addresses'
+// import AccountOrders from '../../pages/account/orders'
+// import AccountWishlist from '../../pages/account/wishlist/index'
 
 import {messages, navLinks} from '../../pages/account/constant'
 import useNavigation from '../../hooks/use-navigation'
@@ -42,7 +29,7 @@ import {useCurrentCustomer} from '../../hooks/use-current-customer'
 import {isHydrated} from '../../utils/utils'
 
 const onClient = typeof window !== 'undefined'
-const LogoutButton = ({onClick}) => {
+/* const LogoutButton = ({onClick}) => {
     const {formatMessage} = useIntl()
     return (
         <>
@@ -75,7 +62,8 @@ const LogoutButton = ({onClick}) => {
 
 LogoutButton.propTypes = {
     onClick: PropTypes.func.isRequired
-}
+} */
+
 const Account = () => {
     const {path} = useRouteMatch()
     const {formatMessage} = useIntl()
@@ -86,13 +74,17 @@ const Account = () => {
     const location = useLocation()
     const navigate = useNavigation()
 
-    const [mobileNavIndex, setMobileNavIndex] = useState(-1)
+    const [mobileNavExpanded, setMobileNavExpanded] = useState(false)
     const [showLoading, setShowLoading] = useState(false)
 
     const einstein = useEinstein()
     const dataCloud = useDataCloud()
 
     const {buildUrl} = useMultiSite()
+
+    // Filter navLinks to only show profile (Account Details)
+    const activeNavLinks = navLinks.filter(link => link.name === 'profile')
+
     /**************** Einstein ****************/
     useEffect(() => {
         einstein.sendViewPage(location.pathname)
@@ -122,75 +114,86 @@ const Account = () => {
             <Seo title="My Account" description="Customer Account Page" />
             <Grid templateColumns={{base: '1fr', lg: '320px 1fr'}} gap={{base: 10, lg: 24}}>
                 {/* small screen nav accordion */}
-                <Accordion
+                <Accordion.Root
                     display={{base: 'block', lg: 'none'}}
-                    allowToggle={true}
-                    reduceMotion={true}
-                    index={mobileNavIndex}
-                    onChange={setMobileNavIndex}
+                    collapsible
+                    value={mobileNavExpanded ? ['mobile-nav'] : []}
+                    onValueChange={(details) =>
+                        setMobileNavExpanded(details.value.includes('mobile-nav'))
+                    }
                 >
-                    <AccordionItem border="none" background="gray.50" borderRadius="base">
-                        {({isExpanded}) => (
-                            <>
-                                <AccordionButton
-                                    as={Button}
-                                    height={16}
-                                    paddingLeft={8}
-                                    variant="ghost"
-                                    color="black"
-                                    _active={{background: 'gray.100'}}
-                                    _expanded={{background: 'transparent'}}
-                                >
-                                    <Flex align="center" justify="center">
-                                        <Heading as="h2" fontSize="16px">
-                                            <FormattedMessage
-                                                defaultMessage="My Account"
-                                                id="account.accordion.button.my_account"
-                                            />
-                                        </Heading>
-                                        {isExpanded ? <ChevronUpIcon /> : <ChevronDownIcon />}
-                                    </Flex>
-                                </AccordionButton>
-                                <AccordionPanel px={4} paddingBottom={4}>
-                                    <Flex as="nav" spacing={0} direction="column">
-                                        <Stack spacing={0} as="ul" data-testid="account-nav">
-                                            {navLinks.map((link) => (
-                                                <Box
-                                                    align="center"
-                                                    key={link.name}
-                                                    as="li"
-                                                    listStyleType="none"
-                                                >
-                                                    <Button
-                                                        as={Link}
-                                                        to={`/account${link.path}`}
-                                                        useNavLink={true}
-                                                        variant="menu-link-mobile"
-                                                        justifyContent="center"
-                                                        fontSize="md"
-                                                        fontWeight="normal"
-                                                        width="100%"
-                                                        onClick={() => setMobileNavIndex(-1)}
-                                                    >
-                                                        {formatMessage(messages[link.name])}
-                                                    </Button>
-                                                </Box>
-                                            ))}
+                    <Accordion.Item
+                        value="mobile-nav"
+                        border="none"
+                        bg="gray.50"
+                        borderRadius="base"
+                    >
+                        <Accordion.ItemContext>
+                            {({expanded}) => (
+                                <>
+                                    <Accordion.ItemTrigger asChild>
+                                        <Button
+                                            height={16}
+                                            paddingLeft={8}
+                                            variant="ghost"
+                                            color="black"
+                                            _active={{background: 'gray.100'}}
+                                            _expanded={{background: 'transparent'}}
+                                        >
+                                            <Flex align="center" justify="center">
+                                                <Heading as="h2" fontSize="16px">
+                                                    <FormattedMessage
+                                                        defaultMessage="My Account"
+                                                        id="account.accordion.button.my_account"
+                                                    />
+                                                </Heading>
+                                                {expanded ? <ChevronUpIcon /> : <ChevronDownIcon />}
+                                            </Flex>
+                                        </Button>
+                                    </Accordion.ItemTrigger>
+                                    <Accordion.ItemContent px={4} paddingBottom={4}>
+                                        <Accordion.ItemBody>
+                                            <Flex as="nav" gap={0} direction="column">
+                                                <Stack gap={0} as="ul" data-testid="account-nav">
+                                                    {activeNavLinks.map((link) => (
+                                                        <Box
+                                                            align="center"
+                                                            key={link.name}
+                                                            as="li"
+                                                            listStyleType="none"
+                                                        >
+                                                            <Button
+                                                                as={Link}
+                                                                to={`/account${link.path}`}
+                                                                useNavLink={true}
+                                                                variant="menu-link-mobile"
+                                                                justifyContent="center"
+                                                                fontSize="md"
+                                                                fontWeight="normal"
+                                                                width="100%"
+                                                                onClick={() => setMobileNavExpanded(false)}
+                                                            >
+                                                                {formatMessage(messages[link.name])}
+                                                            </Button>
+                                                        </Box>
+                                                    ))}
 
-                                            <LogoutButton
-                                                justify="center"
-                                                onClick={onSignoutClick}
-                                            />
-                                        </Stack>
-                                    </Flex>
-                                </AccordionPanel>
-                            </>
-                        )}
-                    </AccordionItem>
-                </Accordion>
+                                                    {/* <LogoutButton
+                                                        justify="center"
+                                                        onClick={onSignoutClick}
+                                                    /> */}
+                                                </Stack>
+                                            </Flex>
+                                        </Accordion.ItemBody>
+                                    </Accordion.ItemContent>
+                                </>
+                            )}
+                        </Accordion.ItemContext>
+                    </Accordion.Item>
+                </Accordion.Root>
 
                 {/* large screen nav sidebar */}
-                <Stack display={{base: 'none', lg: 'flex'}} spacing={4}>
+                <Stack display={{base: 'none', lg: 'flex'}} gap={4}>
                     {showLoading && <LoadingSpinner wrapperStyles={{height: '100vh'}} />}
 
                     <Heading as="h2" fontSize="18px">
@@ -200,8 +203,8 @@ const Account = () => {
                         />
                     </Heading>
 
-                    <Flex spacing={0} as="nav" data-testid="account-detail-nav" direction="column">
-                        {navLinks.map((link) => {
+                    <Flex gap={0} as="nav" data-testid="account-detail-nav" direction="column">
+                        {activeNavLinks.map((link) => {
                             const LinkIcon = link.icon
                             return (
                                 <Button
@@ -216,7 +219,7 @@ const Account = () => {
                                 </Button>
                             )
                         })}
-                        <LogoutButton onClick={onSignoutClick} />
+                        {/* <LogoutButton onClick={onSignoutClick} /> */}
                     </Flex>
                 </Stack>
 
@@ -224,7 +227,8 @@ const Account = () => {
                     <Route exact path={path}>
                         <AccountDetail />
                     </Route>
-                    <Route exact path={`${path}/wishlist`}>
+                    {/* Commented out other routes during Chakra UI v3 migration */}
+                    {/* <Route exact path={`${path}/wishlist`}>
                         <AccountWishlist />
                     </Route>
                     <Route exact path={`${path}/addresses`}>
@@ -232,7 +236,7 @@ const Account = () => {
                     </Route>
                     <Route path={`${path}/orders`}>
                         <AccountOrders />
-                    </Route>
+                    </Route> */}
                 </Switch>
             </Grid>
         </Box>
