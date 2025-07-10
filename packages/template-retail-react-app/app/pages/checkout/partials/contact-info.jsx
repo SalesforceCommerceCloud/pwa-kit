@@ -161,37 +161,14 @@ const ContactInfo = ({isSocialEnabled = false, isPasswordlessEnabled = false, id
     }, [showPasswordField])
 
     const onPasswordlessLoginClick = async (e) => {
-        if (e) {
-            e.preventDefault()
-            e.stopPropagation()
+        const isValid = await form.trigger('email')
+        const domForm = e.target.closest('form')
+        if (isValid && domForm.checkValidity()) {
+            const email = form.getValues().email
+            await handlePasswordlessLogin(email)
+        } else {
+            domForm.reportValidity()
         }
-        // since the pwless is no longer to through form submission flow,
-        // we need to manual validate the email value here
-        const email = form.getValues().email
-        if (!email) {
-            form.setError('email', {
-                type: 'manual',
-                message: formatMessage({
-                    defaultMessage: 'Please enter your email address.',
-                    id: 'contact_info.error.email_required'
-                })
-            })
-            return
-        }
-
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-        if (!emailRegex.test(email)) {
-            form.setError('email', {
-                type: 'manual',
-                message: formatMessage({
-                    defaultMessage: 'Please enter a valid email address.',
-                    id: 'contact_info.error.email_invalid'
-                })
-            })
-            return
-        }
-
-        await handlePasswordlessLogin(email)
     }
 
     return (

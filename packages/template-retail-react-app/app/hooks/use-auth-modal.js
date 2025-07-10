@@ -35,7 +35,6 @@ import {
     API_ERROR_MESSAGE,
     CREATE_ACCOUNT_FIRST_ERROR_MESSAGE,
     FEATURE_UNAVAILABLE_ERROR_MESSAGE,
-    LOGIN_TYPES,
     PASSWORDLESS_ERROR_MESSAGES,
     USER_NOT_FOUND_ERROR
 } from '@salesforce/retail-react-app/app/constants'
@@ -103,7 +102,7 @@ export const AuthModal = ({
 
     const handlePasswordlessLogin = async (email) => {
         try {
-            const redirectPath = window.location.pathname + window.location.search
+            const redirectPath = window.location.pathname + (window.location.search || '')
             await authorizePasswordlessLogin.mutateAsync({
                 userid: email,
                 callbackURI: `${callbackURL}?redirectUrl=${redirectPath}`
@@ -120,37 +119,14 @@ export const AuthModal = ({
     }
 
     const onPasswordlessLoginClick = async (e) => {
-        if (e) {
-            e.preventDefault()
-            e.stopPropagation()
+        const isValid = await form.trigger('email')
+        const domForm = e.target.closest('form')
+        if (isValid && domForm.checkValidity()) {
+            const email = form.getValues().email
+            await handlePasswordlessLogin(email)
+        } else {
+            domForm.reportValidity()
         }
-        
-        // Manual validation similar to contact-info component
-        const email = form.getValues().email
-        if (!email) {
-            form.setError('email', {
-                type: 'manual',
-                message: formatMessage({
-                    defaultMessage: 'Please enter your email address.',
-                    id: 'auth_modal.error.email_required'
-                })
-            })
-            return
-        }
-
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-        if (!emailRegex.test(email)) {
-            form.setError('email', {
-                type: 'manual',
-                message: formatMessage({
-                    defaultMessage: 'Please enter a valid email address.',
-                    id: 'auth_modal.error.email_invalid'
-                })
-            })
-            return
-        }
-
-        await handlePasswordlessLogin(email)
     }
 
     const submitForm = async (data) => {
@@ -250,9 +226,12 @@ export const AuthModal = ({
         fieldsRef?.[initialField]?.ref.focus()
     }, [form.control?.fieldsRef?.current])
 
-    // Clear form state when changing views
     useEffect(() => {
-        form.reset()
+        // we don't want to reset the form on email view
+        // because we want to pass the email to PasswordlessEmailConfirmation
+        if (currentView !== EMAIL_VIEW) {
+            form.reset()
+        }
     }, [currentView])
 
     useEffect(() => {

@@ -12,20 +12,17 @@ import {Button, Divider, Stack, Text} from '@salesforce/retail-react-app/app/com
 import LoginFields from '@salesforce/retail-react-app/app/components/forms/login-fields'
 import StandardLogin from '@salesforce/retail-react-app/app/components/standard-login'
 import SocialLogin from '@salesforce/retail-react-app/app/components/social-login'
-import {LOGIN_TYPES} from '@salesforce/retail-react-app/app/constants'
 
 const PasswordlessLogin = ({
     form,
     handleForgotPasswordClick,
     handlePasswordlessLoginClick,
     isSocialEnabled = false,
-    idps = [],
-    setLoginType
+    idps = []
 }) => {
     const [showPasswordView, setShowPasswordView] = useState(false)
 
     const handlePasswordButton = async (e) => {
-        setLoginType(LOGIN_TYPES.PASSWORD)
         const isValid = await form.trigger()
         // Manually trigger the browser native form validations
         const domForm = e.target.closest('form')
@@ -47,9 +44,9 @@ const PasswordlessLogin = ({
                         handleForgotPasswordClick={handleForgotPasswordClick}
                     />
                     <Button
-                        type="submit"
-                        onClick={() => {
-                            handlePasswordlessLoginClick()
+                        type="button"
+                        onClick={(e) => {
+                            handlePasswordlessLoginClick(e)
                             form.clearErrors('global')
                         }}
                         isLoading={form.formState.isSubmitting}
@@ -102,8 +99,7 @@ PasswordlessLogin.propTypes = {
     handlePasswordlessLoginClick: PropTypes.func,
     isSocialEnabled: PropTypes.bool,
     idps: PropTypes.arrayOf(PropTypes.string),
-    hideEmail: PropTypes.bool,
-    setLoginType: PropTypes.func
+    hideEmail: PropTypes.bool
 }
 
 export default PasswordlessLogin
