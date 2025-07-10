@@ -49,7 +49,7 @@ const LogoutButton = ({onClick}) => {
     const {formatMessage} = useIntl()
     return (
         <>
-            <Separator colorScheme="gray" marginTop="3" />
+            <Separator colorPalette="gray" marginTop="3" />
             <Button variant="ghost" css={styles.signoutButton} onClick={onClick} gap="5">
                 <SignoutIcon aria-hidden={true} boxSize="5" css={styles.signoutIcon} />
                 <Text as="span" css={styles.signoutText}>

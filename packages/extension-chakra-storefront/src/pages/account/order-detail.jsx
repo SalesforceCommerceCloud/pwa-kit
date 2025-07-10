@@ -68,7 +68,7 @@ const OrderProducts = ({productItems, currency}) => {
                 variants?.map((variant, index) => {
                     return (
                         <Box
-                            p={[4, 6]}
+                            p={['4', '6']}
                             key={index}
                             border="1px solid"
                             borderColor="gray.100"
@@ -76,8 +76,8 @@ const OrderProducts = ({productItems, currency}) => {
                         >
                             <ItemVariantProvider variant={variant} currency={currency}>
                                 <Flex width="full" alignItems="flex-start">
-                                    <CartItemVariantImage width={['88px', 36]} mr="4" />
-                                    <Stack gap="1" marginTop="-3px" flex={1}>
+                                    <CartItemVariantImage width={['88px', '36']} mr="4" />
+                                    <Stack gap="1" marginTop="-3px" flex="1">
                                         <CartItemVariantName />
                                         <Flex
                                             width="full"
