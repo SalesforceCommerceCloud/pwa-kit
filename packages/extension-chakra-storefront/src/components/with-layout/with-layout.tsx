@@ -22,10 +22,9 @@ import {useCategory, useShopperBasketsMutation} from '@salesforce/commerce-sdk-r
 import {
     Box,
     Center,
-    Button,
-    Flex,
-    Heading,
     Spinner,
+
+    // hooks
     useDisclosure,
     useSlotRecipe,
     useToken

@@ -23,7 +23,6 @@ import {withChakraUI} from '../with-chakra-ui'
 
 const Error = (props) => {
     const {message, stack} = props
-    const history = useHistory()
 
     const title = "This page isn't working"
     return (
