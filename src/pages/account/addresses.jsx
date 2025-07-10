@@ -268,7 +268,7 @@ const AccountAddresses = () => {
             </Heading>
 
             {isLoading && (
-                <SimpleGrid columns={[1, 2, 2, 2, 3]} spacing={4}>
+                <SimpleGrid columns={[1, 2, 2, 2, 3]} gap={4}>
                     {new Array(DEFAULT_SKELETON_COUNT).fill().map((_, index) => {
                         return (
                             <ActionCard key={index}>
@@ -286,7 +286,7 @@ const AccountAddresses = () => {
             )}
 
             {hasAddresses && (
-                <SimpleGrid columns={[1, 2, 2, 2, 3]} spacing={4} gridAutoFlow="row dense">
+                <SimpleGrid columns={[1, 2, 2, 2, 3]} gap={4} gridAutoFlow="row dense">
                     {
                         <Button
                             variant="outline"
