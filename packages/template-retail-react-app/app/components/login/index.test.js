@@ -24,7 +24,13 @@ const WrapperComponentWithValidation = ({...props}) => {
         }
         props.handlePasswordlessLoginClick?.(e)
     }
-    return <LoginForm form={form} {...props} handlePasswordlessLoginClick={handlePasswordlessLoginClick} />
+    return (
+        <LoginForm
+            form={form}
+            {...props}
+            handlePasswordlessLoginClick={handlePasswordlessLoginClick}
+        />
+    )
 }
 
 describe('LoginForm', () => {
@@ -56,9 +62,7 @@ describe('LoginForm', () => {
         })
 
         test('renders form errors when "Password" button is clicked', async () => {
-            const {user} = renderWithProviders(
-                <WrapperComponent isPasswordlessEnabled={true} />
-            )
+            const {user} = renderWithProviders(<WrapperComponent isPasswordlessEnabled={true} />)
 
             await user.click(screen.getByRole('button', {name: 'Password'}))
             expect(screen.getByText(/Please enter your email address./)).toBeInTheDocument()
