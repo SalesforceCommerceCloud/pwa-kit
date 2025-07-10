@@ -37,6 +37,7 @@ jest.mock('@salesforce/retail-react-app/app/hooks/use-multi-site', () => ({
 const MockComponent = ({product}) => {
     const {
         inventoryMessage,
+        showInventoryMessage,
         quantity,
         variationParams,
         variant,
@@ -47,7 +48,9 @@ const MockComponent = ({product}) => {
     return (
         <div>
             <div>{`Quantity: ${quantity}`}</div>
-            <div>{inventoryMessage}</div>
+            <div>
+                {showInventoryMessage} ? {inventoryMessage} :{' '}
+            </div>
             <div>{JSON.stringify(variant)}</div>
             <div>{JSON.stringify(variationParams)}</div>
             <div>{`isStoreOutOfStock: ${isSelectedStoreOutOfStock}`}</div>
@@ -194,6 +197,46 @@ describe('useDerivedProduct hook', () => {
         renderWithProviders(<MockComponent product={mockBundleData} />)
 
         expect(screen.getByText(/Only 5 left!/)).toBeInTheDocument()
+    })
+
+    test('for standard product, inventory message should be shown when product out of stock', () => {
+        const product = {
+            id: 'new-standard-product',
+            inventory: {
+                ats: 0,
+                backorderable: false,
+                id: 'inventory_m',
+                orderable: false,
+                preorderable: false,
+                stockLevel: 0
+            },
+            minOrderQuantity: 1,
+            name: 'Standard Collar Shirt',
+            stepQuantity: 1,
+            type: {item: true}
+        }
+        renderWithProviders(<MockComponent product={product} />)
+        expect(screen.getByText(/Out of stock/i)).toBeInTheDocument()
+    })
+
+    test('for standard product, inventory message should NOT be shown when product in stock', () => {
+        const product = {
+            id: 'new-standard-product',
+            inventory: {
+                ats: 10,
+                backorderable: false,
+                id: 'inventory_m',
+                orderable: true,
+                preorderable: false,
+                stockLevel: 10
+            },
+            minOrderQuantity: 1,
+            name: 'Standard Collar Shirt',
+            stepQuantity: 1,
+            type: {item: true}
+        }
+        renderWithProviders(<MockComponent product={product} />)
+        expect(screen.queryByText(/Out of stock/i)).not.toBeInTheDocument()
     })
 
     describe('when store is selected', () => {

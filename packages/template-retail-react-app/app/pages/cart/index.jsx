@@ -28,7 +28,7 @@ import BonusProductsTitle from '@salesforce/retail-react-app/app/pages/cart/part
 import ConfirmationModal from '@salesforce/retail-react-app/app/components/confirmation-modal'
 import EmptyCart from '@salesforce/retail-react-app/app/pages/cart/partials/empty-cart'
 import OrderSummary from '@salesforce/retail-react-app/app/components/order-summary'
-import ProductItem from '@salesforce/retail-react-app/app/components/product-item'
+import ProductItemList from '@salesforce/retail-react-app/app/components/product-item-list'
 import ProductViewModal from '@salesforce/retail-react-app/app/components/product-view-modal'
 import BundleProductViewModal from '@salesforce/retail-react-app/app/components/product-view-modal/bundle'
 import RecommendedProducts from '@salesforce/retail-react-app/app/components/recommended-products'
@@ -600,40 +600,19 @@ const Cart = () => {
         )
     }, [basket?.productItems])
 
-    // Function to create product items
-    const createProductItemProps = (productItem, isBonusProduct = false) => ({
-        isBonusProduct,
-        secondaryActions: (
-            <CartSecondaryButtonGroup
-                isAGift={
-                    localIsGiftItems[productItem.itemId]
-                        ? localIsGiftItems[productItem.itemId]
-                        : productItem.gift
-                }
-                onIsAGiftChange={handleIsAGiftChange}
-                onAddToWishlistClick={handleAddToWishlist}
-                onEditClick={(product) => {
-                    setSelectedItem(product)
-                    onOpen()
-                }}
-                onRemoveItemClick={handleRemoveItem}
-            />
-        ),
-        product: {
-            ...productItem,
-            ...(productsByItemId && productsByItemId[productItem.itemId]),
-            isProductUnavailable: !isProductsLoading
-                ? !productsByItemId?.[productItem.itemId]
-                : undefined,
-            price: productItem.price,
-            quantity: localQuantity[productItem.itemId]
-                ? localQuantity[productItem.itemId]
-                : productItem.quantity
-        },
-        onItemQuantityChange: handleChangeItemQuantity.bind(this, productItem),
-        showLoading: isCartItemLoading && selectedItem?.itemId === productItem.itemId,
-        handleRemoveItem
-    })
+    // Function to render secondary actions for product items
+    const renderSecondaryActions = ({productItem, isAGift}) => (
+        <CartSecondaryButtonGroup
+            isAGift={isAGift}
+            onIsAGiftChange={handleIsAGiftChange}
+            onAddToWishlistClick={handleAddToWishlist}
+            onEditClick={(product) => {
+                setSelectedItem(product)
+                onOpen()
+            }}
+            onRemoveItemClick={handleRemoveItem}
+        />
+    )
 
     /********* Rendering  UI **********/
     if (isLoading) {
@@ -685,12 +664,18 @@ const Cart = () => {
                                         </Box>
                                     )}
                                     {/* Regular Products */}
-                                    {categorizedProducts.regularProducts.map((productItem) => (
-                                        <ProductItem
-                                            key={productItem.itemId}
-                                            {...createProductItemProps(productItem, false)}
-                                        />
-                                    ))}
+                                    <ProductItemList
+                                        productItems={categorizedProducts.regularProducts}
+                                        productsByItemId={productsByItemId}
+                                        isProductsLoading={isProductsLoading}
+                                        localQuantity={localQuantity}
+                                        localIsGiftItems={localIsGiftItems}
+                                        isCartItemLoading={isCartItemLoading}
+                                        selectedItem={selectedItem}
+                                        onItemQuantityChange={handleChangeItemQuantity}
+                                        onRemoveItemClick={handleRemoveItem}
+                                        renderSecondaryActions={renderSecondaryActions}
+                                    />
 
                                     {/* Bonus Products */}
                                     {categorizedProducts.bonusProducts.length > 0 && (
@@ -698,17 +683,18 @@ const Cart = () => {
                                             <Box>
                                                 <BonusProductsTitle />
                                             </Box>
-                                            {categorizedProducts.bonusProducts.map(
-                                                (productItem) => (
-                                                    <ProductItem
-                                                        key={productItem.itemId}
-                                                        {...createProductItemProps(
-                                                            productItem,
-                                                            true
-                                                        )}
-                                                    />
-                                                )
-                                            )}
+                                            <ProductItemList
+                                                productItems={categorizedProducts.bonusProducts}
+                                                productsByItemId={productsByItemId}
+                                                isProductsLoading={isProductsLoading}
+                                                localQuantity={localQuantity}
+                                                localIsGiftItems={localIsGiftItems}
+                                                isCartItemLoading={isCartItemLoading}
+                                                selectedItem={selectedItem}
+                                                onItemQuantityChange={handleChangeItemQuantity}
+                                                onRemoveItemClick={handleRemoveItem}
+                                                renderSecondaryActions={renderSecondaryActions}
+                                            />
                                         </>
                                     )}
                                 </Stack>
