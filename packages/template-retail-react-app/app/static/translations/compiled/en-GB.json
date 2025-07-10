@@ -685,28 +685,10 @@
       "value": "Place Order"
     }
   ],
-  "checkout.label.user_registration": [
-    {
-      "type": 0,
-      "value": "Create an account for a faster checkout"
-    }
-  ],
   "checkout.message.generic_error": [
     {
       "type": 0,
       "value": "An unexpected error occurred during checkout."
-    }
-  ],
-  "checkout.message.user_registration": [
-    {
-      "type": 0,
-      "value": "When you place your order, we create an account for you and save your payment information and other details for future purchases. During your next checkout, confirm your account using the code we'll send to you."
-    }
-  ],
-  "checkout.title.user_registration": [
-    {
-      "type": 0,
-      "value": "Save for Future Use"
     }
   ],
   "checkout_confirmation.button.create_account": [
@@ -925,24 +907,6 @@
       "value": " with your confirmation number and receipt shortly."
     }
   ],
-  "checkout_contact_info.action.edit": [
-    {
-      "type": 0,
-      "value": "Edit"
-    }
-  ],
-  "checkout_contact_info.action.sign_out": [
-    {
-      "type": 0,
-      "value": "Sign Out"
-    }
-  ],
-  "checkout_contact_info.title.contact_info": [
-    {
-      "type": 0,
-      "value": "Contact Info"
-    }
-  ],
   "checkout_footer.link.privacy_policy": [
     {
       "type": 0,
@@ -999,12 +963,6 @@
     {
       "type": 0,
       "value": "Remove"
-    }
-  ],
-  "checkout_payment.button.place_order": [
-    {
-      "type": 0,
-      "value": "Place Order"
     }
   ],
   "checkout_payment.button.review_order": [
@@ -1203,12 +1161,6 @@
     {
       "type": 0,
       "value": "Checkout as Guest"
-    }
-  ],
-  "contact_info.button.continue_to_shipping_address": [
-    {
-      "type": 0,
-      "value": "Continue to Shipping Address"
     }
   ],
   "contact_info.button.login": [
@@ -2646,21 +2598,7 @@
   "otp.button.resend_timer": [
     {
       "type": 0,
-      "value": "Resend code in "
-    },
-    {
-      "type": 1,
-      "value": "timer"
-    },
-    {
-      "type": 0,
-      "value": "s"
-    }
-  ],
-  "otp.error.invalid_code": [
-    {
-      "type": 0,
-      "value": "Invalid or expired code. Please try again."
+      "value": "Resend code"
     }
   ],
   "otp.message.enter_code_for_account": [
@@ -2669,16 +2607,16 @@
       "value": "To use your account information enter the code sent to your email."
     }
   ],
-  "otp.message.verifying": [
-    {
-      "type": 0,
-      "value": "Verifying code..."
-    }
-  ],
   "otp.title.confirm_its_you": [
     {
       "type": 0,
       "value": "Confirm it's you"
+    }
+  ],
+  "otp_page.error.invalid_code": [
+    {
+      "type": 0,
+      "value": "Invalid verification code. Please try again."
     }
   ],
   "page_not_found.action.go_back": [
