@@ -218,7 +218,7 @@ const Login = ({initialView = LOGIN_VIEW}) => {
                         idps={idps}
                     />
                 )}
-                {form.formState.isSubmitSuccessful && currentView === EMAIL_VIEW && (
+                {currentView === EMAIL_VIEW && (
                     <PasswordlessEmailConfirmation
                         form={form}
                         submitForm={submitForm}
