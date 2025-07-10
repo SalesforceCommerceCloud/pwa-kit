@@ -1181,18 +1181,6 @@
       "value": "Secure Link"
     }
   ],
-  "contact_info.error.email_invalid": [
-    {
-      "type": 0,
-      "value": "Please enter a valid email address."
-    }
-  ],
-  "contact_info.error.email_required": [
-    {
-      "type": 0,
-      "value": "Please enter your email address."
-    }
-  ],
   "contact_info.error.incorrect_username_or_password": [
     {
       "type": 0,

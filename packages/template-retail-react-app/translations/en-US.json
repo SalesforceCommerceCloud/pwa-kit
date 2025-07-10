@@ -454,12 +454,6 @@
   "contact_info.button.secure_link": {
     "defaultMessage": "Secure Link"
   },
-  "contact_info.error.email_invalid": {
-    "defaultMessage": "Please enter a valid email address."
-  },
-  "contact_info.error.email_required": {
-    "defaultMessage": "Please enter your email address."
-  },
   "contact_info.error.incorrect_username_or_password": {
     "defaultMessage": "Incorrect username or password, please try again."
   },
