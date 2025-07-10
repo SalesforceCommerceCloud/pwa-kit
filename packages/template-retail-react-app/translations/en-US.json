@@ -1084,6 +1084,24 @@
   "order_summary.label.tax": {
     "defaultMessage": "Tax"
   },
+  "otp.button.checkout_as_guest": {
+    "defaultMessage": "Checkout as a guest"
+  },
+  "otp.button.resend_code": {
+    "defaultMessage": "Resend code"
+  },
+  "otp.button.resend_timer": {
+    "defaultMessage": "Resend code"
+  },
+  "otp.message.enter_code_for_account": {
+    "defaultMessage": "To use your account information enter the code sent to your email."
+  },
+  "otp.title.confirm_its_you": {
+    "defaultMessage": "Confirm it's you"
+  },
+  "otp_page.error.invalid_code": {
+    "defaultMessage": "Invalid verification code. Please try again."
+  },
   "page_not_found.action.go_back": {
     "defaultMessage": "Back to previous page"
   },
