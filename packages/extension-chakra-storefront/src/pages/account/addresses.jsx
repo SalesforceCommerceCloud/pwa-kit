@@ -34,7 +34,7 @@ import PageActionPlaceHolder from '../../components/page-action-placeholder'
 import {useCurrentCustomer} from '../../hooks/use-current-customer'
 import {useShopperCustomersMutation} from '@salesforce/commerce-sdk-react'
 import {nanoid} from 'nanoid'
-import {API_ERROR_MESSAGE} from '../../constants'
+import {useErrorHandler} from '../../hooks/use-errors'
 
 const DEFAULT_SKELETON_COUNT = 3
 
@@ -147,6 +147,7 @@ const AccountAddresses = () => {
     const [selectedAddressId, setSelectedAddressId] = useState(false)
     const toast = useToast()
     const form = useForm()
+    const showError = useErrorHandler()
 
     const headingRef = useRef()
     useEffect(() => {
@@ -165,12 +166,6 @@ const AccountAddresses = () => {
     }, [addresses])
 
     const hasAddresses = addresses?.length > 0
-    const showError = () => {
-        toast({
-            title: formatMessage(API_ERROR_MESSAGE),
-            type: 'error'
-        })
-    }
     const submitForm = async (address) => {
         try {
             let data
