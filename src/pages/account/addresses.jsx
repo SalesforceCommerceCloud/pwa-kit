@@ -34,7 +34,7 @@ import PageActionPlaceHolder from '../../components/page-action-placeholder'
 import {useCurrentCustomer} from '../../hooks/use-current-customer'
 import {useShopperCustomersMutation} from '@salesforce/commerce-sdk-react'
 import {nanoid} from 'nanoid'
-import {useErrorHandler} from '../../utils/error-utils'
+import {useErrorHandler} from '../../hooks/use-errors'
 
 const DEFAULT_SKELETON_COUNT = 3
 

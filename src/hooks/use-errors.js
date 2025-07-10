@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import {useIntl} from 'react-intl'
-import useToast from '../hooks/use-toast'
+import useToast from './use-toast'
 import {API_ERROR_MESSAGE} from '../constants'
 
 /**
@@ -24,4 +24,4 @@ export const useErrorHandler = () => {
     }
 
     return showError
-}
+} 

@@ -12,7 +12,7 @@ import {useShopperCustomersMutation, useCustomerId} from '@salesforce/commerce-s
 import useNavigation from '../../hooks/use-navigation'
 import useToast from '../../hooks/use-toast'
 import {useWishList} from '../../hooks/use-wish-list'
-import {useErrorHandler} from '../../utils/error-utils'
+import {useErrorHandler} from '../../hooks/use-errors'
 import {
     TOAST_ACTION_VIEW_WISHLIST,
     TOAST_MESSAGE_ADDED_TO_WISHLIST,
