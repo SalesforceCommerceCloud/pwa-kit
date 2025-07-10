@@ -12,8 +12,8 @@ import {useShopperCustomersMutation, useCustomerId} from '@salesforce/commerce-s
 import useNavigation from '../../hooks/use-navigation'
 import useToast from '../../hooks/use-toast'
 import {useWishList} from '../../hooks/use-wish-list'
+import {useErrorHandler} from '../../hooks/use-errors'
 import {
-    API_ERROR_MESSAGE,
     TOAST_ACTION_VIEW_WISHLIST,
     TOAST_MESSAGE_ADDED_TO_WISHLIST,
     TOAST_MESSAGE_ALREADY_IN_WISHLIST
@@ -28,18 +28,12 @@ export const useProductDetailWishlist = () => {
     const navigate = useNavigation()
     const customerId = useCustomerId()
     const toast = useToast()
+    const showError = useErrorHandler()
 
     const {data: wishlist, isLoading: isWishlistLoading} = useWishList()
     const createCustomerProductListItem = useShopperCustomersMutation(
         'createCustomerProductListItem'
     )
-
-    const showError = () => {
-        toast({
-            title: formatMessage(API_ERROR_MESSAGE),
-            type: 'error'
-        })
-    }
 
     const handleAddToWishlist = (product, variant, quantity) => {
         const isItemInWishlist = wishlist?.customerProductListItems?.find(

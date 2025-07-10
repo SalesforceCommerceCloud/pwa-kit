@@ -7,18 +7,18 @@
 import React from 'react'
 import {renderHook} from '@testing-library/react'
 import {IntlProvider} from 'react-intl'
-import {useCartErrorHandler} from './cart-utils'
+import {useErrorHandler} from './use-errors'
 import PropTypes from 'prop-types'
 
 // Mock the toast hook
 const mockToast = jest.fn()
-jest.mock('../../../hooks/use-toast', () => ({
+jest.mock('./use-toast', () => ({
     __esModule: true,
     default: () => mockToast
 }))
 
 // Mock the constants
-jest.mock('../../../constants', () => ({
+jest.mock('../constants', () => ({
     API_ERROR_MESSAGE: {
         id: 'api.error.message',
         defaultMessage: 'Something went wrong. Please try again.'
@@ -37,13 +37,13 @@ const TestWrapper = ({children}) => {
     )
 }
 
-describe('useCartErrorHandler', () => {
+describe('useErrorHandler', () => {
     beforeEach(() => {
         mockToast.mockClear()
     })
 
     it('returns a showError function', () => {
-        const {result} = renderHook(() => useCartErrorHandler(), {
+        const {result} = renderHook(() => useErrorHandler(), {
             wrapper: TestWrapper
         })
 
@@ -51,7 +51,7 @@ describe('useCartErrorHandler', () => {
     })
 
     it('calls toast with correct parameters when showError is invoked', () => {
-        const {result} = renderHook(() => useCartErrorHandler(), {
+        const {result} = renderHook(() => useErrorHandler(), {
             wrapper: TestWrapper
         })
 
