@@ -64,7 +64,7 @@ export const ToggleCard = ({
                         >
                             {title}
                         </Heading>
-                        {!disabled && onEdit && !disableEdit && (
+                        {!editing && !disabled && onEdit && !disableEdit && (
                             <Button
                                 variant="link"
                                 size="sm"
