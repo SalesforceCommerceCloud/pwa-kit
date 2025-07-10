@@ -23,8 +23,7 @@ import withRegistration from '../../components/with-registration'
 import {Skeleton as ImageGallerySkeleton} from '../../components/image-gallery'
 import {HideOnDesktop, HideOnMobile} from '../../components/responsive'
 import QuantityPicker from '../../components/quantity-picker'
-import useToast from '../../hooks/use-toast'
-import {API_ERROR_MESSAGE} from '../../constants'
+import {useErrorHandler} from '../../utils/error-utils'
 import DisplayPrice from '../../components/display-price'
 import Swatch from '../../components/swatch-group/swatch'
 import SwatchGroup from '../../components/swatch-group'
@@ -114,7 +113,7 @@ const ProductView = forwardRef(
         ref
     ) => {
         const {currency: activeCurrency} = useCurrency()
-        const toast = useToast()
+        const showError = useErrorHandler()
         const intl = useIntl()
         const location = useLocation()
         const {
@@ -194,10 +193,10 @@ const ProductView = forwardRef(
             const {scrollErrorIntoView = true} = opts
             // Validate that all attributes are selected before proceeding.
             const hasValidSelection = validateOrderability(variant, quantity, stockLevel)
-            const showError = !isProductASet && !isProductABundle && !hasValidSelection
-            const scrollToError = showError && scrollErrorIntoView
+            const hasError = !isProductASet && !isProductABundle && !hasValidSelection
+            const scrollToError = hasError && scrollErrorIntoView
 
-            toggleShowOptionsMessage(showError)
+            toggleShowOptionsMessage(hasError)
 
             if (scrollToError) {
                 errorContainerRef.current.scrollIntoView({
@@ -239,13 +238,6 @@ const ProductView = forwardRef(
                 addBundleToWishlist: intl.formatMessage({
                     defaultMessage: 'Add Bundle to Wishlist',
                     id: 'product_view.button.add_bundle_to_wishlist'
-                })
-            }
-
-            const showError = () => {
-                toast({
-                    title: intl.formatMessage(API_ERROR_MESSAGE),
-                    type: 'error'
                 })
             }
 

@@ -14,7 +14,7 @@ import {useCartOperations} from '../../hooks/cart/use-cart-operations'
 import {useCartWishlist} from '../../hooks/cart/use-cart-wishlist'
 import {useCartGiftItems} from '../../hooks/cart/use-cart-gift-items'
 import {useCartDefaultShipping} from '../../hooks/cart/use-cart-default-shipping'
-import {useCartErrorHandler} from './utils/cart-utils'
+import {useErrorHandler} from '../../utils/error-utils'
 
 // Cart Components
 import CartTitle from './partials/cart-title'
@@ -31,7 +31,7 @@ const Cart = () => {
     const {isRegistered} = customer || {}
 
     // Error handling
-    const showError = useCartErrorHandler()
+    const showError = useErrorHandler()
 
     // Product data and processing
     const {isProductsPending, productsByItemId} = useCartProducts(basket)
