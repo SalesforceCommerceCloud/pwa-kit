@@ -124,6 +124,7 @@ const WishlistPrimaryAction = () => {
                     asChild
                     size="md"
                     variant="solid"
+                    _hover={{textDecoration: 'none'}}
                     aria-label={formatMessage(
                         {
                             id: 'wishlist_primary_action.button.viewFullDetails.label',
@@ -142,6 +143,7 @@ const WishlistPrimaryAction = () => {
                 asChild
                 size="md"
                 variant="solid"
+                _hover={{textDecoration: 'none'}}
                 aria-label={formatMessage(
                     {
                         id: 'wishlist_primary_action.button.viewFullDetails.label',
