@@ -19,13 +19,6 @@ Guidelines for Salesforce Commerce Composable Storefront development using PWA K
 
 ## PWA Kit Essentials
 
-### Key Files
-- \`config/default.js\` - Main configuration
-- \`app/routes.jsx\` - Route definitions
-- \`app/components/_app-config/\` - App-wide configuration
-- \`app/components/_app/\` - Layout components (header, footer)
-- \`app/components/_error/\` - Error handling
-
 ### Architecture
 - Server-side rendering (SSR) for initial loads
 - Client-side rendering (CSR) for interactions
@@ -44,13 +37,9 @@ Guidelines for Salesforce Commerce Composable Storefront development using PWA K
 - Create modular, reusable components
 - Use React Hooks for state management
 - Access data via commerce-sdk-react hooks
-- Write comprehensive tests
 - Ensure mobile-friendly and accessible components
-
-- Maintain consistent code formatting using project standards.
-- Write comprehensive test coverage.
-- Ensure components are accessible and mobile-friendly.
-- Follow security best practices for all code.
+- Maintain consistent code formatting using project standards
+- Write comprehensive test coverage
 `
 
 export default {
