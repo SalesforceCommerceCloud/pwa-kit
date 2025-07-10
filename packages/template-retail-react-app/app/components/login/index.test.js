@@ -15,6 +15,18 @@ const WrapperComponent = ({...props}) => {
     return <LoginForm form={form} {...props} />
 }
 
+const WrapperComponentWithValidation = ({...props}) => {
+    const form = useForm()
+    const handlePasswordlessLoginClick = async (e) => {
+        const isValid = await form.trigger('email')
+        if (!isValid) {
+            return
+        }
+        props.handlePasswordlessLoginClick?.(e)
+    }
+    return <LoginForm form={form} {...props} handlePasswordlessLoginClick={handlePasswordlessLoginClick} />
+}
+
 describe('LoginForm', () => {
     describe('isPasswordlessEnabled is enabled', () => {
         test('renders passwordless login form', () => {
@@ -33,7 +45,7 @@ describe('LoginForm', () => {
         test('renders form errors when "Continue Securely" button is clicked', async () => {
             const mockPasswordlessLoginClick = jest.fn()
             const {user} = renderWithProviders(
-                <WrapperComponent
+                <WrapperComponentWithValidation
                     isPasswordlessEnabled={true}
                     handlePasswordlessLoginClick={mockPasswordlessLoginClick}
                 />
@@ -44,9 +56,8 @@ describe('LoginForm', () => {
         })
 
         test('renders form errors when "Password" button is clicked', async () => {
-            const mockSetLoginType = jest.fn()
             const {user} = renderWithProviders(
-                <WrapperComponent isPasswordlessEnabled={true} setLoginType={mockSetLoginType} />
+                <WrapperComponent isPasswordlessEnabled={true} />
             )
 
             await user.click(screen.getByRole('button', {name: 'Password'}))
