@@ -20,13 +20,6 @@ import {
     Grid,
     SimpleGrid,
     Skeleton,
-    Modal,
-    ModalOverlay,
-    ModalContent,
-    ModalHeader,
-    ModalFooter,
-    ModalBody,
-    ModalCloseButton,
     useDisclosure
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 import {getCreditCardIcon} from '@salesforce/retail-react-app/app/utils/cc-utils'
@@ -39,6 +32,7 @@ import CartItemVariantImage from '@salesforce/retail-react-app/app/components/it
 import CartItemVariantName from '@salesforce/retail-react-app/app/components/item-variant/item-name'
 import CartItemVariantAttributes from '@salesforce/retail-react-app/app/components/item-variant/item-attributes'
 import CartItemVariantPrice from '@salesforce/retail-react-app/app/components/item-variant/item-price'
+import CancelOrderModal from '@salesforce/retail-react-app/app/components/cancel-order-modal'
 import PropTypes from 'prop-types'
 const onClient = typeof window !== 'undefined'
 
@@ -424,34 +418,15 @@ const AccountOrderDetail = () => {
             </Stack>
 
             {/* Cancel Order Modal */}
-            <Modal isOpen={isCancelModalOpen} onClose={onCancelModalClose} isCentered>
-                <ModalOverlay />
-                <ModalContent>
-                    <ModalHeader>
-                        <FormattedMessage
-                            defaultMessage="Request Cancellation"
-                            id="account_order_detail.modal.cancel_order_title"
-                        />
-                    </ModalHeader>
-                    <ModalCloseButton />
-                    <ModalBody>
-                        <Text>
-                            <FormattedMessage
-                                defaultMessage="This is a blank modal for canceling the order."
-                                id="account_order_detail.modal.cancel_order_content"
-                            />
-                        </Text>
-                    </ModalBody>
-                    <ModalFooter>
-                        <Button variant="solid" onClick={onCancelModalClose}>
-                            <FormattedMessage
-                                defaultMessage="Request Cancellation"
-                                id="account_order_detail.modal.confirm_cancel"
-                            />
-                        </Button>
-                    </ModalFooter>
-                </ModalContent>
-            </Modal>
+            <CancelOrderModal
+                isOpen={isCancelModalOpen}
+                onClose={onCancelModalClose}
+                order={order}
+                onRequestCancellation={(order) => {
+                    // TODO: Add cancellation logic here
+                    console.log('Requesting cancellation for order:', order?.orderNo)
+                }}
+            />
         </Stack>
     )
 }

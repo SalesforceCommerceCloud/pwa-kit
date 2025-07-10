@@ -20,7 +20,7 @@
 - Minor updates to support BOPIS E2E tests [#2716](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2716)
 - Provide support for partial hydration [#2696](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2696)
 - Show Automatic Bonus Products on Cart Page [#2704](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2704)
-
+- Add cancel button and modal @W-18998059 [#2775](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2775)
 
 ## v6.1.0 (May 22, 2025)
 
