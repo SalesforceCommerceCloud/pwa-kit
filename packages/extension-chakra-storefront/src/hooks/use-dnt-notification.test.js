@@ -28,14 +28,14 @@ afterEach(() => {
     jest.resetModules()
 })
 
-test.skip('Notification renders properly', async () => {
+test('Notification renders properly', async () => {
     renderWithProviders(<MockedComponent />)
     await waitFor(() => {
         expect(screen.getByText(/Tracking Consent/i)).toBeInTheDocument()
     })
 })
 
-test.skip('Clicking out of notification does setDNT(null)', async () => {
+test('Clicking out of notification does setDNT(null)', async () => {
     const {user} = renderWithProviders(<MockedComponent />)
     let closeButton
     // give some time for modal to show up
@@ -53,7 +53,7 @@ test.skip('Clicking out of notification does setDNT(null)', async () => {
     })
 })
 
-test.skip('Clicking Accept does setDNT(false)', async () => {
+test('Clicking Accept does setDNT(false)', async () => {
     const {user} = renderWithProviders(<MockedComponent />)
 
     let acceptButton
@@ -72,7 +72,7 @@ test.skip('Clicking Accept does setDNT(false)', async () => {
     })
 })
 
-test.skip('Clicking Decline does setDNT(true)', async () => {
+test('Clicking Decline does setDNT(true)', async () => {
     const {user} = renderWithProviders(<MockedComponent />)
     let declineButton
     // wait for modal to show up
