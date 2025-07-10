@@ -4,18 +4,18 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import {defineRecipe} from '@chakra-ui/react'
+import {defineSlotRecipe} from '@chakra-ui/react'
 
-export default defineRecipe({
+export default defineSlotRecipe({
     slots: [
         'accountIconButton',
-        'arrowDownIconButton',
+        'arrowDownButton',
         'bodyContainer',
         'container',
         'content',
         'dropdownMenuBody',
         'dropdownMenuTitle',
-        'icons',
+        'iconButton',
         'logo',
         'menuAccountLink',
         'searchContainer',
@@ -37,6 +37,7 @@ export default defineRecipe({
         },
         arrowDownButton: {
             height: 11,
+            justifyContent: 'flex-start',
             minWidth: 'auto',
             marginRight: 0,
             alignSelf: ['self-start', 'self-start', 'self-start', 'auto'],
@@ -84,26 +85,11 @@ export default defineRecipe({
             height: [6, 6, 6, 8]
         },
         menuAccountLink: {
-            borderRadius: 'sm',
-            colorPalette: 'blue',
-            px: 4,
-            fontWeight: 600,
-            display: 'flex',
-            height: 11,
-            width: '100%',
             fontSize: 'sm',
-            color: 'inherit',
-            textDecoration: 'none',
-            justifyContent: 'flex-start',
-            _hover: {
-                bg: 'gray.50'
-            },
-            '&.active': {
-                bg: 'gray.50',
-                borderLeft: 'solid',
-                borderLeftColor: 'gray.600',
-                borderLeftWidth: '4px'
-            }
+            fontWeight: 'semibold',
+            borderLeftWidth: '4px',
+            borderLeftStyle: 'solid',
+            borderLeftColor: 'transparent'
         },
         searchContainer: {
             order: [2, 2, 2, 'inherit'],

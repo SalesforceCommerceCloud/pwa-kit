@@ -13,7 +13,7 @@ export default defineRecipe({
             paddingRight: [4, 4, 6, 6],
             paddingBottom: 1,
             paddingLeft: [4, 4, 6, 6],
-            boxShadow: 'base'
+            boxShadow: 'sm'
         },
         body: {
             padding: [4, 4, 6, 6]

@@ -23,6 +23,7 @@ import checkbox from './components/base/checkbox'
 import container from './components/base/container'
 import drawer from './components/base/drawer'
 import formLabel from './components/base/formLabel'
+import heading from './components/base/heading'
 import icon from './components/base/icon'
 import input from './components/base/input'
 import modal from './components/base/modal'
@@ -91,6 +92,7 @@ export const overrides = defineConfig({
             button,
             container,
             formLabel,
+            heading,
             icon,
             input,
             modal,
