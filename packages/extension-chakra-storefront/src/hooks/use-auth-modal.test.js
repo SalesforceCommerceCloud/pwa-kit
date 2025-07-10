@@ -7,7 +7,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import {act, screen, within, waitFor} from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
 import {renderWithProviders, createPathWithDefaults, guestToken} from '../utils/test-utils'
 import {AuthModal, useAuthModal} from '../hooks/use-auth-modal'
 import {BrowserRouter as Router, Route} from 'react-router-dom'
@@ -58,6 +57,30 @@ jest.mock('@salesforce/commerce-sdk-react', () => {
             .mockImplementation((helperType) => mockAuthHelperFunctions[helperType])
     }
 })
+jest.mock('./use-datacloud', () => ({
+    __esModule: true,
+    default: jest.fn(() => ({
+        sendViewPage: jest.fn(),
+        sendViewProduct: jest.fn(),
+        sendViewCategory: jest.fn(),
+        sendViewSearchResults: jest.fn(),
+        sendViewRecommendations: jest.fn()
+    })),
+    DataCloudApi: jest.fn()
+}))
+
+// Also mock for other components that import with different paths (e.g., Account component)
+jest.mock('../../hooks/use-datacloud', () => ({
+    __esModule: true,
+    default: jest.fn(() => ({
+        sendViewPage: jest.fn(),
+        sendViewProduct: jest.fn(),
+        sendViewCategory: jest.fn(),
+        sendViewSearchResults: jest.fn(),
+        sendViewRecommendations: jest.fn()
+    })),
+    DataCloudApi: jest.fn()
+}))
 
 let authModal = undefined
 const MockedComponent = (props) => {
@@ -170,13 +193,13 @@ test.skip('Renders check email modal on email mode', async () => {
 
 describe.skip('Passwordless enabled', () => {
     test('Renders passwordless login when enabled', async () => {
-        const user = userEvent.setup()
-
-        renderWithProviders(<MockedComponent isPasswordlessEnabled={true} />)
+        const {user} = renderWithProviders(<MockedComponent isPasswordlessEnabled={true} />)
 
         // open the modal
         const trigger = screen.getByText(/open modal/i)
-        await user.click(trigger)
+        await act(async () => {
+            await user.click(trigger)
+        })
 
         await waitFor(() => {
             expect(screen.getByText(/continue securely/i)).toBeInTheDocument()
@@ -204,9 +227,11 @@ describe.skip('Passwordless enabled', () => {
 
         // initiate passwordless login
         const passwordlessLoginButton = screen.getByText(/continue securely/i)
-        // Click the button twice as the isPasswordlessLoginClicked state doesn't change after the first click
-        await user.click(passwordlessLoginButton)
-        await user.click(passwordlessLoginButton)
+        await act(async () => {
+            // Click the button twice as the isPasswordlessLoginClicked state doesn't change after the first click
+            await user.click(passwordlessLoginButton)
+            await user.click(passwordlessLoginButton)
+        })
 
         expect(
             mockAuthHelperFunctions[AuthHelpers.AuthorizePasswordless].mutateAsync
@@ -222,8 +247,10 @@ describe.skip('Passwordless enabled', () => {
             expect(withinForm.getByText(validEmail)).toBeInTheDocument()
         })
 
-        // resend the email
-        user.click(screen.getByText(/Resend Link/i))
+        await act(async () => {
+            // resend the email
+            await user.click(screen.getByText(/Resend Link/i))
+        })
         expect(
             mockAuthHelperFunctions[AuthHelpers.AuthorizePasswordless].mutateAsync
         ).toHaveBeenCalledWith({
@@ -281,8 +308,7 @@ test.skip('Renders error when given incorrect log in credentials', async () => {
     )
 })
 
-test.skip('Allows customer to create an account', async () => {
-    // render our test component
+test('Allows customer to create an account', async () => {
     const {user} = renderWithProviders(<MockedComponent />, {
         wrapperProps: {
             bypassAuth: true
@@ -371,10 +397,8 @@ test.skip('Allows customer to create an account', async () => {
 // TODO: investingate why this test is failing when running with other tests
 // eslint-disable-next-line jest/no-disabled-tests
 test.skip('Allows customer to sign in to their account', async () => {
-    const user = userEvent.setup()
-
     // render our test component
-    renderWithProviders(<MockedComponent />, {
+    const {user} = renderWithProviders(<MockedComponent />, {
         wrapperProps: {
             bypassAuth: false
         }
@@ -382,11 +406,13 @@ test.skip('Allows customer to sign in to their account', async () => {
 
     // open the modal
     const trigger = screen.getByText(/open modal/i)
-    await user.click(trigger)
+    await act(async () => {
+        await user.click(trigger)
 
-    // enter credentials and submit
-    await user.type(screen.getByLabelText('Email'), 'customer@test.com')
-    await user.type(screen.getByLabelText('Password'), 'Password!1')
+        // enter credentials and submit
+        await user.type(screen.getByLabelText('Email'), 'customer@test.com')
+        await user.type(screen.getByLabelText('Password'), 'Password!1')
+    })
 
     // login with credentials
     global.server.use(
@@ -405,7 +431,9 @@ test.skip('Allows customer to sign in to their account', async () => {
             )
         )
     )
-    await user.click(screen.getByText(/sign in/i))
+    await act(async () => {
+        await user.click(screen.getByText(/sign in/i))
+    })
 
     // allow time to transition to account page
     await waitFor(
@@ -429,10 +457,8 @@ describe.skip('Reset password', function () {
     // TODO: Fix flaky/broken test
     // eslint-disable-next-line jest/no-disabled-tests
     test.skip('Allows customer to generate password token', async () => {
-        const user = userEvent.setup()
-
         // render our test component
-        renderWithProviders(<MockedComponent initialView="password" />, {
+        const {user} = renderWithProviders(<MockedComponent initialView="password" />, {
             wrapperProps: {
                 bypassAuth: false
             }
@@ -440,7 +466,9 @@ describe.skip('Reset password', function () {
 
         // open the modal
         const trigger = screen.getByText(/open modal/i)
-        await user.click(trigger)
+        await act(async () => {
+            await user.click(trigger)
+        })
         expect(authModal.isOpen).toBe(true)
 
         // enter credentials and submit
@@ -449,8 +477,10 @@ describe.skip('Reset password', function () {
         let resetPwForm = await screen.findByTestId('sf-auth-modal-form-reset-pw')
         expect(resetPwForm).toBeInTheDocument()
         const withinForm = within(resetPwForm)
-        await user.type(withinForm.getByLabelText('Email'), 'foo@test.com')
-        await user.click(withinForm.getByText(/reset password/i))
+        await act(async () => {
+            await user.type(withinForm.getByLabelText('Email'), 'foo@test.com')
+            await user.click(withinForm.getByText(/reset password/i))
+        })
 
         // wait for success state
         await waitFor(() => {
@@ -462,14 +492,14 @@ describe.skip('Reset password', function () {
     // TODO: Fix flaky/broken test
     // eslint-disable-next-line jest/no-disabled-tests
     test.skip('Allows customer to open generate password token modal from everywhere', async () => {
-        const user = userEvent.setup()
-
         // render our test component
-        renderWithProviders(<MockedComponent initialView="password" />)
+        const {user} = renderWithProviders(<MockedComponent initialView="password" />)
 
         // open the modal
         const trigger = screen.getByText(/open modal/i)
-        await user.click(trigger)
+        await act(async () => {
+            await user.click(trigger)
+        })
         expect(authModal.isOpen).toBe(true)
 
         const withinForm = within(screen.getByTestId('sf-auth-modal-form'))
