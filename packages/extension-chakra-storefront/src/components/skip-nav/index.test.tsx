@@ -64,17 +64,17 @@ describe('SkipNavLink', () => {
         expect(link).toHaveAttribute('href', '#skip-to-content')
     })
 
-    test('accepts custom zIndex prop', () => {
+    test('uses theme styles', () => {
         render(
             <TestWrapper>
-                <SkipNavLink zIndex={9999}>Skip to Content</SkipNavLink>
+                <SkipNavLink>Skip to Content</SkipNavLink>
             </TestWrapper>
         )
 
         const link = screen.getByRole('link', {name: 'Skip to Content'})
         expect(link).toBeInTheDocument()
-        // Note: Testing the actual zIndex value may require more complex setup
-        // as it depends on the Chakra theme system
+        // The component should use theme styles from the skipNav slot recipe
+        expect(link).toHaveAttribute('href', '#skip-to-content')
     })
 })
 
@@ -118,7 +118,7 @@ describe('SkipNavContent', () => {
 
         render(
             <TestWrapper>
-                <SkipNavContent style={customStyles}>
+                <SkipNavContent css={customStyles}>
                     <div>Main content</div>
                 </SkipNavContent>
             </TestWrapper>

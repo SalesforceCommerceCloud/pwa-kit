@@ -6,17 +6,16 @@
  */
 
 import React from 'react'
-import {Box, Link} from '@chakra-ui/react'
+import {Box, Link, useSlotRecipe} from '@chakra-ui/react'
 
 interface SkipNavLinkProps {
     children: React.ReactNode
-    zIndex?: string | number
     href?: string
 }
 
 interface SkipNavContentProps {
     children: React.ReactNode
-    style?: React.CSSProperties
+    css?: any
     id?: string
 }
 
@@ -26,45 +25,14 @@ interface SkipNavContentProps {
  */
 export const SkipNavLink: React.FC<SkipNavLinkProps> = ({
     children,
-    zIndex = 'skipLink',
     href = '#skip-to-content',
     ...props
 }) => {
+    const recipe = useSlotRecipe({key: 'skipNav'})
+    const styles = recipe()
+
     return (
-        <Link
-            href={href}
-            position="absolute"
-            zIndex={zIndex}
-            css={{
-                position: 'absolute',
-                left: '-10000px',
-                top: 'auto',
-                width: '1px',
-                height: '1px',
-                overflow: 'hidden',
-                '&:focus, &:focus-visible': {
-                    position: 'fixed !important',
-                    top: '6px !important',
-                    left: '6px !important',
-                    zIndex: 9999,
-                    width: 'auto !important',
-                    height: 'auto !important',
-                    overflow: 'visible !important',
-                    padding: '8px',
-                    backgroundColor: 'white',
-                    color: 'black',
-                    textDecoration: 'none',
-                    border: '2px solid black',
-                    borderRadius: '4px',
-                    fontSize: '14px',
-                    fontWeight: 'bold',
-                    outline: 'none',
-                    boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
-                    whiteSpace: 'nowrap'
-                }
-            }}
-            {...props}
-        >
+        <Link href={href} css={styles.link} {...props}>
             {children}
         </Link>
     )
@@ -75,12 +43,15 @@ export const SkipNavLink: React.FC<SkipNavLinkProps> = ({
  */
 export const SkipNavContent: React.FC<SkipNavContentProps> = ({
     children,
-    style,
+    css,
     id = 'skip-to-content',
     ...props
 }) => {
+    const recipe = useSlotRecipe({key: 'skipNav'})
+    const styles = recipe()
+
     return (
-        <Box id={id} style={style} tabIndex={-1} {...props}>
+        <Box id={id} css={[styles.content, css]} tabIndex={-1} {...props}>
             {children}
         </Box>
     )
