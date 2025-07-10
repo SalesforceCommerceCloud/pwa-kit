@@ -27,7 +27,6 @@ import ProductTile, {Skeleton as ProductTileSkeleton} from '../../components/pro
 import Refinements from '../../pages/product-list/partials/refinements'
 import CategoryLinks from '../../pages/product-list/partials/category-links'
 import EmptySearchResults from '../../pages/product-list/partials/empty-results'
-import AbovePageHeader from '../../pages/product-list/partials/above-page-header'
 import ProductListBanner from './partials/product-list-banner'
 import PageMetadata from './page-metadata'
 import PageCache from './page-cache'
@@ -272,8 +271,6 @@ const ProductList = () => {
                     <EmptySearchResults searchQuery={searchQuery} category={category} />
                 ) : (
                     <>
-                        <AbovePageHeader />
-
                         <ProductListBanner />
                         <ProductListHeader
                             searchQuery={searchQuery}
