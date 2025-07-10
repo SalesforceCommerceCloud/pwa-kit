@@ -57,6 +57,7 @@ module.exports = {
         createTestGlob('pages/social-login-redirect'),
         createTestGlob('hooks/cart'),
         // createTestGlob('pages/registration'), // TODO: enable after Account page has been migrated
+        '<rootDir>/src/pages/checkout/confirmation.test.js',
         '<rootDir>/src/pages/checkout/partials/contact-info.test.js',
         '<rootDir>/src/pages/checkout/partials/login-state.test.js',
         '<rootDir>/src/utils/responsive-image.test.js',

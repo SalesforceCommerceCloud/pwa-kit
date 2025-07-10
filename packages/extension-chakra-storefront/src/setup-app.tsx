@@ -91,10 +91,10 @@ class ChakraStorefront extends ApplicationExtension<Config> {
                 component: Pages.Checkout,
                 exact: true
             },
-            // {
-            //     path: config.pages.CheckoutConfirmation && config.pages.CheckoutConfirmation.path,
-            //     component: Pages.CheckoutConfirmation
-            // },
+            {
+                path: config.pages.CheckoutConfirmation && config.pages.CheckoutConfirmation.path,
+                component: Pages.CheckoutConfirmation
+            },
             {
                 path: config.pages.LoginRedirect && config.pages.LoginRedirect.path,
                 component: Pages.LoginRedirect,

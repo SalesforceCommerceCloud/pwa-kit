@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, salesforce.com, inc.
+ * Copyright (c) 2025, salesforce.com, inc.
  * All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
@@ -17,7 +17,6 @@ import {
     Stack,
     Text,
     Alert,
-    AlertIcon,
     Divider
 } from '@chakra-ui/react'
 import {useForm} from 'react-hook-form'
@@ -37,6 +36,7 @@ import CartItemVariantPrice from '../../components/item-variant/item-price'
 import {useCurrentCustomer} from '../../hooks/use-current-customer'
 import {API_ERROR_MESSAGE} from '../../constants'
 import {useCurrency} from '../../hooks'
+import {AlertIcon} from '../../components/icons'
 
 const onClient = typeof window !== 'undefined'
 
@@ -130,7 +130,7 @@ const CheckoutConfirmation = () => {
                 <Stack spacing={4}>
                     <Box layerStyle="card" rounded={[0, 0, 'base']} px={[4, 4, 6]} py={[6, 6, 8]}>
                         <Stack spacing={6}>
-                            <Heading align="center" fontSize={['2xl']}>
+                            <Heading textAlign="center" fontSize={['2xl']}>
                                 <FormattedMessage
                                     defaultMessage="Thank you for your order!"
                                     id="checkout_confirmation.heading.thank_you_for_order"
@@ -140,7 +140,7 @@ const CheckoutConfirmation = () => {
                             <Box>
                                 <Container variant="form">
                                     <Stack spacing={3}>
-                                        <Text align="center">
+                                        <Text textAlign="center">
                                             <FormattedMessage
                                                 defaultMessage="Order Number"
                                                 id="checkout_confirmation.label.order_number"
@@ -150,7 +150,7 @@ const CheckoutConfirmation = () => {
                                                 {order.orderNo}
                                             </Text>
                                         </Text>
-                                        <Text align="center">
+                                        <Text textAlign="center">
                                             <FormattedMessage
                                                 defaultMessage="We will send an email to <b>{email}</b> with your confirmation number and receipt shortly."
                                                 id="checkout_confirmation.message.will_email_shortly"
@@ -193,10 +193,14 @@ const CheckoutConfirmation = () => {
                                 <form onSubmit={form.handleSubmit(submitForm)}>
                                     <Stack spacing={4}>
                                         {form.formState.errors?.global && (
-                                            <Alert status="error">
-                                                <AlertIcon />
-                                                {form.formState.errors.global.message}
-                                            </Alert>
+                                            <Alert.Root status="error" role="alert">
+                                                <Alert.Indicator>
+                                                    <AlertIcon />
+                                                </Alert.Indicator>
+                                                <Alert.Description>
+                                                    {form.formState.errors.global.message}
+                                                </Alert.Description>
+                                            </Alert.Root>
                                         )}
 
                                         <PostCheckoutRegistrationFields form={form} />
@@ -285,10 +289,10 @@ const CheckoutConfirmation = () => {
                                         />
                                     </Text>
 
-                                    <Stack spacing={5} align="flex-start">
+                                    <Stack spacing={5} alignItems="flex-start">
                                         <Stack
                                             spacing={5}
-                                            align="flex-start"
+                                            alignItems="flex-start"
                                             width="full"
                                             divider={<Divider />}
                                         >
