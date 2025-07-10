@@ -60,11 +60,13 @@ module.exports = {
         // createTestGlob('pages/registration'), // TODO: enable after Account page has been migrated
         '<rootDir>/src/pages/checkout/partials/contact-info.test.js',
         '<rootDir>/src/pages/checkout/partials/login-state.test.js',
+        '<rootDir>/src/pages/account/orders.test.js',
         '<rootDir>/src/utils/responsive-image.test.js',
         '<rootDir>/src/hooks/use-toast.test.js',
         '<rootDir>/src/pages/product-detail/metadata.test.js',
         '<rootDir>/src/pages/product-list/metadata.test.js',
-        '<rootDir>/src/hooks/use-toast.test.js'
+        '<rootDir>/src/hooks/use-toast.test.js',
+        '<rootDir>/src/hooks/use-dnt-notification.test.js'
         // '<rootDir>/src/hooks/use-auth-modal.test.js' // TODO: enable after Account page has been migrated
     ],
     moduleNameMapper: {
