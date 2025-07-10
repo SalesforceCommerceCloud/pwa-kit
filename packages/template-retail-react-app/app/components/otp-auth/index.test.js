@@ -48,7 +48,7 @@ const WrapperComponent = ({...props}) => {
     const form = useForm()
     const mockSetShowOtpView = jest.fn()
     const mockHandleSendEmailOtp = jest.fn()
-    
+
     return (
         <OtpAuth
             form={form}
@@ -89,7 +89,11 @@ describe('OtpAuth', () => {
             renderWithProviders(<WrapperComponent />)
 
             expect(screen.getByText("Confirm it's you")).toBeInTheDocument()
-            expect(screen.getByText('To use your account information enter the code sent to your email.')).toBeInTheDocument()
+            expect(
+                screen.getByText(
+                    'To use your account information enter the code sent to your email.'
+                )
+            ).toBeInTheDocument()
             expect(screen.getByText('Checkout as a guest')).toBeInTheDocument()
             expect(screen.getByText('Resend code')).toBeInTheDocument()
         })
@@ -113,7 +117,7 @@ describe('OtpAuth', () => {
 
             const guestButton = screen.getByText('Checkout as a guest')
             const resendButton = screen.getByText('Resend code')
-            
+
             expect(guestButton).toBeInTheDocument()
             expect(resendButton).toBeInTheDocument()
         })
@@ -125,7 +129,7 @@ describe('OtpAuth', () => {
             renderWithProviders(<WrapperComponent />)
 
             const otpInputs = screen.getAllByRole('textbox')
-            
+
             await user.type(otpInputs[0], '1')
             expect(otpInputs[0]).toHaveValue('1')
         })
@@ -135,7 +139,7 @@ describe('OtpAuth', () => {
             renderWithProviders(<WrapperComponent />)
 
             const otpInputs = screen.getAllByRole('textbox')
-            
+
             await user.type(otpInputs[0], 'abc')
             expect(otpInputs[0]).toHaveValue('')
         })
@@ -145,7 +149,7 @@ describe('OtpAuth', () => {
             renderWithProviders(<WrapperComponent />)
 
             const otpInputs = screen.getAllByRole('textbox')
-            
+
             await user.type(otpInputs[0], '123')
             expect(otpInputs[0]).toHaveValue('1')
         })
@@ -155,7 +159,7 @@ describe('OtpAuth', () => {
             renderWithProviders(<WrapperComponent />)
 
             const otpInputs = screen.getAllByRole('textbox')
-            
+
             await user.type(otpInputs[0], '1')
             expect(otpInputs[1]).toHaveFocus()
         })
@@ -184,7 +188,7 @@ describe('OtpAuth', () => {
             renderWithProviders(<WrapperComponent />)
 
             const otpInputs = screen.getAllByRole('textbox')
-            
+
             // Focus second input and press backspace
             otpInputs[1].focus()
             await user.keyboard('{Backspace}')
@@ -214,7 +218,7 @@ describe('OtpAuth', () => {
             renderWithProviders(<WrapperComponent />)
 
             const otpInputs = screen.getAllByRole('textbox')
-            
+
             otpInputs[0].focus()
             await user.keyboard('{Backspace}')
             expect(otpInputs[0]).toHaveFocus()
@@ -226,7 +230,7 @@ describe('OtpAuth', () => {
             renderWithProviders(<WrapperComponent />)
 
             const otpInputs = screen.getAllByRole('textbox')
-            
+
             fireEvent.paste(otpInputs[0], {
                 clipboardData: {
                     getData: () => '12345678'
@@ -247,7 +251,7 @@ describe('OtpAuth', () => {
             renderWithProviders(<WrapperComponent />)
 
             const otpInputs = screen.getAllByRole('textbox')
-            
+
             fireEvent.paste(otpInputs[0], {
                 clipboardData: {
                     getData: () => '1a2b3c4d5e6f7g8h'
@@ -268,7 +272,7 @@ describe('OtpAuth', () => {
             renderWithProviders(<WrapperComponent />)
 
             const otpInputs = screen.getAllByRole('textbox')
-            
+
             fireEvent.paste(otpInputs[0], {
                 clipboardData: {
                     getData: () => '123'
@@ -284,7 +288,7 @@ describe('OtpAuth', () => {
             renderWithProviders(<WrapperComponent />)
 
             const otpInputs = screen.getAllByRole('textbox')
-            
+
             fireEvent.paste(otpInputs[0], {
                 clipboardData: {
                     getData: () => '12345678'
@@ -312,7 +316,7 @@ describe('OtpAuth', () => {
             renderWithProviders(<TestComponent />)
 
             const otpInputs = screen.getAllByRole('textbox')
-            
+
             await user.type(otpInputs[0], '1')
             await user.type(otpInputs[1], '2')
             await user.type(otpInputs[2], '3')
@@ -420,9 +424,11 @@ describe('OtpAuth', () => {
 
     describe('Error Handling', () => {
         test('handles resend code error gracefully', async () => {
-            const mockHandleSendEmailOtpError = jest.fn().mockRejectedValue(new Error('Network error'))
+            const mockHandleSendEmailOtpError = jest
+                .fn()
+                .mockRejectedValue(new Error('Network error'))
             const user = userEvent.setup()
-            
+
             renderWithProviders(
                 <OtpAuth
                     isOpen={true}
@@ -446,8 +452,8 @@ describe('OtpAuth', () => {
             renderWithProviders(<WrapperComponent />)
 
             const otpInputs = screen.getAllByRole('textbox')
-            
-            otpInputs.forEach(input => {
+
+            otpInputs.forEach((input) => {
                 expect(input).toHaveAttribute('type', 'text')
                 expect(input).toHaveAttribute('inputMode', 'numeric')
                 expect(input).toHaveAttribute('maxLength', '1')
