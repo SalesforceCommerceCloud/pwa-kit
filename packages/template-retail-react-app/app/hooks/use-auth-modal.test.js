@@ -215,11 +215,14 @@ describe('Passwordless enabled', () => {
         })
 
         // check that check email modal is open
-        await waitFor(() => {
-            const withinForm = within(screen.getByTestId('sf-form-resend-passwordless-email'))
-            expect(withinForm.getByText(/Check Your Email/i)).toBeInTheDocument()
-            expect(withinForm.getByText(validEmail)).toBeInTheDocument()
-        }, {timeout: 5000})
+        await waitFor(
+            () => {
+                const withinForm = within(screen.getByTestId('sf-form-resend-passwordless-email'))
+                expect(withinForm.getByText(/Check Your Email/i)).toBeInTheDocument()
+                expect(withinForm.getByText(validEmail)).toBeInTheDocument()
+            },
+            {timeout: 5000}
+        )
 
         // resend the email
         await user.click(screen.getByText(/Resend Link/i))
@@ -278,7 +281,6 @@ test.skip('Renders error when given incorrect log in credentials', async () => {
 })
 
 test('Allows customer to create an account', async () => {
-
     // render our test component
     const {user} = renderWithProviders(<MockedComponent />, {
         wrapperProps: {
