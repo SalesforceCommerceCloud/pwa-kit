@@ -9,6 +9,7 @@ import {screen} from '@testing-library/react'
 import LoginForm from '@salesforce/retail-react-app/app/components/login/index'
 import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
 import {useForm} from 'react-hook-form'
+import PropTypes from 'prop-types'
 
 const WrapperComponent = ({...props}) => {
     const form = useForm()
@@ -31,6 +32,9 @@ const WrapperComponentWithValidation = ({...props}) => {
             handlePasswordlessLoginClick={handlePasswordlessLoginClick}
         />
     )
+}
+WrapperComponentWithValidation.propTypes = {
+    handlePasswordlessLoginClick: PropTypes.func
 }
 
 describe('LoginForm', () => {
