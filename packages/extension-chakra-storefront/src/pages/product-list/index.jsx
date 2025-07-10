@@ -8,7 +8,7 @@
 import React, {useEffect, useState} from 'react'
 import PropTypes from 'prop-types'
 import {useHistory, useLocation, useParams} from 'react-router-dom'
-import {FormattedMessage, useIntl} from 'react-intl'
+import {useIntl} from 'react-intl'
 import {keepPreviousData} from '@tanstack/react-query'
 import {useCategory, useProductSearch} from '@salesforce/commerce-sdk-react'
 
@@ -18,35 +18,23 @@ import {
     Flex,
     SimpleGrid,
     Grid,
-    Heading,
-    Text,
     Stack,
-    Button,
-    Dialog,
-    Drawer
 } from '@chakra-ui/react'
 
 // Project Components
 import Pagination from '../../components/pagination'
 import ProductTile, {Skeleton as ProductTileSkeleton} from '../../components/product-tile'
-import {HideOnDesktop} from '../../components/responsive'
 import Refinements from '../../pages/product-list/partials/refinements'
 import CategoryLinks from '../../pages/product-list/partials/category-links'
-import SelectedRefinements from '../../pages/product-list/partials/selected-refinements'
 import EmptySearchResults from '../../pages/product-list/partials/empty-results'
-import PageHeader from './partials/product-list-title'
 import AbovePageHeader from '../../pages/product-list/partials/above-page-header'
 import ProductListBanner from './partials/product-list-banner'
 import PageMetadata from './page-metadata'
 import PageCache from './page-cache'
-import Sort from './partials/sort'
 import ProductListHeader from './partials/product-list-header'
-// Icons
-import {FilterIcon, ChevronDownIcon} from '../../components/icons'
 
 // Hooks
 import {usePageUrls, useSortUrls, useSearchParams, useExtensionConfig} from '../../hooks'
-import SafePortal from '../../components/safe-portal'
 import useEinstein from '../../hooks/use-einstein'
 import useActiveData from '../../hooks/use-active-data'
 import useDataCloud from '../../hooks/use-datacloud'
@@ -58,7 +46,6 @@ import logger from '../../utils/logger-instance'
 
 // Constants
 import useNavigation from '../../hooks/use-navigation'
-import LoadingSpinner from '../../components/loading-spinner'
 import {isHydrated} from '../../utils/utils'
 
 // NOTE: You can ignore certain refinements on a template level by updating the below
@@ -70,14 +57,8 @@ const REFINEMENT_DISALLOW_LIST = ['c_isNew']
  * of product hit objects. Allowing for sorting and filtering based on the
  * allowable filters and sort refinements.
  */
-const ProductList = (props) => {
-    // Using destructuring to omit properties; we must rename `isLoading` because we use a different
-    // `isLoading` later in this function.
-    // eslint-disable-next-line react/prop-types, @typescript-eslint/no-unused-vars
-    const {isLoading: _unusedIsLoading, staticContext, ...rest} = props
-    const {formatMessage} = useIntl()
+const ProductList = () => {
     const navigate = useNavigation()
-    const history = useHistory()
     const params = useParams()
     const location = useLocation()
     const einstein = useEinstein()
@@ -173,10 +154,6 @@ const ProductList = (props) => {
     const basePath = `${location.pathname}${location.search}`
     const showNoResults = !isLoading && productSearchResult && !productSearchResult?.hits
     const {total, sortingOptions} = productSearchResult || {}
-    const selectedSortingOptionLabel =
-        sortingOptions?.find(
-            (option) => option.id === productSearchResult?.selectedSortingOption
-        ) ?? sortingOptions?.[0]
 
     // Get urls to be used for pagination, page size changes, and sorting.
     const pageUrls = usePageUrls({total})
@@ -290,7 +267,6 @@ const ProductList = (props) => {
                 data-testid="sf-product-list-page"
                 layerStyle="page"
                 paddingTop={{base: 6, lg: 8}}
-                {...rest}
             >
                 {showNoResults ? (
                     <EmptySearchResults searchQuery={searchQuery} category={category} />
@@ -414,10 +390,6 @@ const ProductList = (props) => {
 
 ProductList.getTemplateName = () => 'product-list'
 
-ProductList.propTypes = {
-    onAddToWishlistClick: PropTypes.func,
-    onRemoveWishlistClick: PropTypes.func,
-    category: PropTypes.object
-}
+ProductList.propTypes = {}
 
 export default ProductList
