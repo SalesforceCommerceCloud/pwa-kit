@@ -20,8 +20,6 @@ describe('PWA Development Guidelines', () => {
         })
 
         it('should return guidelines content when executed', async () => {
-            // NOTE: THIS TEST IS SIMPLY A SANITY CHECK TO ENSURE THE TOOL IS WORKING.
-            // IT DOES NOT TEST THE CONTENT OF THE GUIDELINES IN ITS ENTIRETY.
             const result = await DeveloperGuidelinesTool.fn()
 
             expect(result).toEqual({

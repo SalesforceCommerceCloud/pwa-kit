@@ -31,7 +31,9 @@ describe('PWA Create App Guidelines', () => {
             })
         })
 
-        it('should', async () => {
+        it('should return guidelines content when executed', async () => {
+            // NOTE: THIS TEST IS SIMPLY A SANITY CHECK TO ENSURE THE TOOL IS WORKING.
+            // IT DOES NOT TEST THE CONTENT OF THE GUIDELINES IN ITS ENTIRETY.
             const result = await CreateAppGuidelineTool.fn()
 
             expect(result).toEqual({
