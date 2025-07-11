@@ -208,7 +208,7 @@ const AccountOrderDetail = () => {
                 </Stack>
             </Stack>
 
-            <ProgressTracker currentStep="Ordered" />
+            <ProgressTracker currentStepLabel="Out for delivery" />
 
             <Box layerStyle="cardBordered">
                 <Grid templateColumns={{base: '1fr', xl: '60% 1fr'}} gap={{base: 6, xl: 2}}>
