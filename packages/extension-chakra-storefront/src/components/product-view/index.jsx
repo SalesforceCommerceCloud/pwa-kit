@@ -41,12 +41,9 @@ const ProductViewHeader = ({
 }) => {
     return (
         <VStack mr={4} gap={2} align="flex-start" marginBottom={[4, 4, 4, 0, 0]}>
-            {/* TODO: remove this category check.. currently the skeleton will never be rendered */}
-            {category && (
-                <Skeleton loading={!category} minWidth={64}>
-                    <Breadcrumb categories={category} />
-                </Skeleton>
-            )}
+            <Skeleton loading={!category} minWidth={64}>
+                <Breadcrumb categories={category} />
+            </Skeleton>
 
             {/* Title */}
             <Skeleton loading={!name}>
