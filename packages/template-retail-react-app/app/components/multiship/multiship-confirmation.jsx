@@ -1,0 +1,195 @@
+/*
+ * Copyright (c) 2025, salesforce.com, inc.
+ * All rights reserved.
+ * SPDX-License-Identifier: BSD-3-Clause
+ * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
+ */
+import React from 'react'
+import {FormattedMessage} from 'react-intl'
+import {
+    Box,
+    Container,
+    Heading,
+    SimpleGrid,
+    Stack,
+    Text,
+    Divider
+} from '@salesforce/retail-react-app/app/components/shared/ui'
+import {useStores} from '@salesforce/commerce-sdk-react'
+import AddressDisplay from '@salesforce/retail-react-app/app/components/address-display'
+import StoreDisplay from '@salesforce/retail-react-app/app/components/store-display'
+import {
+    STORE_LOCATOR_IS_ENABLED
+} from '@salesforce/retail-react-app/app/constants'
+
+const onClient = typeof window !== 'undefined'
+
+const MultiShipmentConfirmation = ({order}) => {
+    if (!order?.shipments || order.shipments.length === 0) {
+        return null
+    }
+
+    // Group shipments by type (pickup vs delivery)
+    const pickupShipments = []
+    const deliveryShipments = []
+
+    order.shipments.forEach((shipment) => {
+        const isPickup = STORE_LOCATOR_IS_ENABLED && 
+            shipment.shippingMethod?.c_storePickupEnabled === true
+        
+        if (isPickup) {
+            pickupShipments.push(shipment)
+        } else {
+            deliveryShipments.push(shipment)
+        }
+    })
+
+    // Get unique store IDs for pickup shipments
+    const storeIds = [...new Set(pickupShipments.map(shipment => shipment.c_fromStoreId).filter(Boolean))]
+    
+    // Fetch store data for pickup shipments
+    const {data: storeData} = useStores(
+        {
+            parameters: {
+                ids: storeIds.join(',')
+            }
+        },
+        {
+            enabled: storeIds.length > 0 && onClient
+        }
+    )
+
+    const storesMap = storeData?.data?.reduce((map, store) => ({...map, [store.id]: store}), {}) || {}
+
+    return (
+        <Box layerStyle="card" rounded={[0, 0, 'base']} px={[4, 4, 6]} py={[6, 6, 8]}>
+            <Container variant="form">
+                <Stack spacing={6}>
+                    {/* Pickup Details */}
+                    {pickupShipments.length > 0 && (
+                        <>
+                            <Heading fontSize="lg">
+                                <FormattedMessage
+                                    defaultMessage="Pickup Details"
+                                    id="checkout_confirmation.heading.pickup_details"
+                                />
+                            </Heading>
+
+                            <Stack spacing={4}>
+                                {pickupShipments.map((shipment, index) => {
+                                    const store = storesMap[shipment.c_fromStoreId]
+                                    
+                                    return (
+                                        <Box key={`pickup-${index}`}>
+                                            {pickupShipments.length > 1 && (
+                                                <Heading as="h3" fontSize="md" mb={3}>
+                                                    <FormattedMessage
+                                                        defaultMessage="Pickup Location {number}"
+                                                        id="checkout_confirmation.heading.pickup_location_number"
+                                                        values={{number: index + 1}}
+                                                    />
+                                                </Heading>
+                                            )}
+                                            
+                                            <Stack spacing={2}>
+                                                <Heading as="h3" fontSize="sm">
+                                                    <FormattedMessage
+                                                        defaultMessage="Pickup Address"
+                                                        id="checkout_confirmation.heading.pickup_address"
+                                                    />
+                                                </Heading>
+                                                {store ? (
+                                                    <StoreDisplay
+                                                        store={store}
+                                                        showDistance={false}
+                                                        showEmail={true}
+                                                        showPhone={true}
+                                                        showStoreHours={true}
+                                                    />
+                                                ) : (
+                                                    <Text>
+                                                        <FormattedMessage
+                                                            defaultMessage="Store information not available"
+                                                            id="checkout_confirmation.message.store_info_unavailable"
+                                                        />
+                                                    </Text>
+                                                )}
+                                            </Stack>
+
+                                            {index < pickupShipments.length - 1 && <Divider my={4} />}
+                                        </Box>
+                                    )
+                                })}
+                            </Stack>
+                        </>
+                    )}
+
+                    {/* Delivery Details */}
+                    {deliveryShipments.length > 0 && (
+                        <>
+                            {pickupShipments.length > 0 && <Divider my={6} />}
+                            
+                            <Heading fontSize="lg">
+                                <FormattedMessage
+                                    defaultMessage="Delivery Details"
+                                    id="checkout_confirmation.heading.delivery_details"
+                                />
+                            </Heading>
+
+                            <Stack spacing={4}>
+                                {deliveryShipments.map((shipment, index) => (
+                                    <Box key={`delivery-${index}`}>
+                                        {deliveryShipments.length > 1 && (
+                                            <Heading as="h3" fontSize="md" mb={3}>
+                                                <FormattedMessage
+                                                    defaultMessage="Delivery {number}"
+                                                    id="checkout_confirmation.heading.delivery_number"
+                                                    values={{number: index + 1}}
+                                                />
+                                            </Heading>
+                                        )}
+
+                                        <SimpleGrid columns={[1, 1, 2]} spacing={6}>
+                                            <Stack spacing={1}>
+                                                <Heading as="h3" fontSize="sm">
+                                                    <FormattedMessage
+                                                        defaultMessage="Shipping Address"
+                                                        id="checkout_confirmation.heading.shipping_address"
+                                                    />
+                                                </Heading>
+                                                <AddressDisplay
+                                                    address={shipment.shippingAddress}
+                                                />
+                                            </Stack>
+
+                                            <Stack spacing={1}>
+                                                <Heading as="h3" fontSize="sm">
+                                                    <FormattedMessage
+                                                        defaultMessage="Shipping Method"
+                                                        id="checkout_confirmation.heading.shipping_method"
+                                                    />
+                                                </Heading>
+                                                <Box>
+                                                    <Text>
+                                                        {shipment.shippingMethod.name}
+                                                    </Text>
+                                                    <Text>
+                                                        {shipment.shippingMethod.description}
+                                                    </Text>
+                                                </Box>
+                                            </Stack>
+                                        </SimpleGrid>
+
+                                        {index < deliveryShipments.length - 1 && <Divider my={4} />}
+                                    </Box>
+                                ))}
+                            </Stack>
+                        </>
+                    )}
+                </Stack>
+            </Container>
+        </Box>
+    )
+}
+
+export default MultiShipmentConfirmation 
