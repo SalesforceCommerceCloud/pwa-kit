@@ -77,6 +77,12 @@
       "value": "Account Details"
     }
   ],
+  "account_order_detail.button.cancel_order": [
+    {
+      "type": 0,
+      "value": "Cancel order"
+    }
+  ],
   "account_order_detail.heading.billing_address": [
     {
       "type": 0,
@@ -509,6 +515,24 @@
     {
       "type": 0,
       "value": ")"
+    }
+  ],
+  "cancel_order_modal.button.confirm": [
+    {
+      "type": 0,
+      "value": "Request Cancellation"
+    }
+  ],
+  "cancel_order_modal.content.placeholder": [
+    {
+      "type": 0,
+      "value": "This is a blank modal for canceling the order."
+    }
+  ],
+  "cancel_order_modal.title.request_cancellation": [
+    {
+      "type": 0,
+      "value": "Request Cancellation"
     }
   ],
   "carousel.button.scroll_left.assistive_msg": [
