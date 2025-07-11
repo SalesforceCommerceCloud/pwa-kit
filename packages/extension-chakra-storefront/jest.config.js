@@ -24,6 +24,7 @@ module.exports = {
         createTestGlob('components/icons'),
         createTestGlob('components/image-gallery'),
         createTestGlob('components/drawer-menu'),
+        createTestGlob('components/error'),
         createTestGlob('components/header'),
         createTestGlob('components/links-list'),
         createTestGlob('components/locale-selector'),
@@ -55,14 +56,18 @@ module.exports = {
         // createTestGlob('pages/login'),  // TODO: enable after Account page has been migrated
         createTestGlob('pages/login-redirect'),
         createTestGlob('pages/social-login-redirect'),
+        createTestGlob('hooks/cart'),
         // createTestGlob('pages/registration'), // TODO: enable after Account page has been migrated
         '<rootDir>/src/pages/checkout/partials/contact-info.test.js',
         '<rootDir>/src/pages/checkout/partials/login-state.test.js',
+        '<rootDir>/src/pages/account/orders.test.js',
         '<rootDir>/src/utils/responsive-image.test.js',
+        '<rootDir>/src/hooks/use-errors.test.js',
         '<rootDir>/src/hooks/use-toast.test.js',
         '<rootDir>/src/pages/product-detail/metadata.test.js',
         '<rootDir>/src/pages/product-list/metadata.test.js',
-        '<rootDir>/src/hooks/use-toast.test.js'
+        '<rootDir>/src/hooks/use-toast.test.js',
+        '<rootDir>/src/hooks/use-dnt-notification.test.js'
         // '<rootDir>/src/hooks/use-auth-modal.test.js' // TODO: enable after Account page has been migrated
     ],
     moduleNameMapper: {

@@ -109,8 +109,7 @@ const ProductList = (props) => {
     const {
         pages: {ProductList: productListConfig},
         maxCacheAge: MAX_CACHE_AGE,
-        staleWhileRevalidate: STALE_WHILE_REVALIDATE,
-        search: searchConfig
+        staleWhileRevalidate: STALE_WHILE_REVALIDATE
     } = useExtensionConfig()
     /**************** Page State ****************/
     const [filtersLoading, setFiltersLoading] = useState(false)
@@ -221,7 +220,6 @@ const ProductList = (props) => {
     // Get urls to be used for pagination, page size changes, and sorting.
     const pageUrls = usePageUrls({total})
     const sortUrls = useSortUrls({options: sortingOptions})
-    const limitUrls = useLimitUrls()
 
     /**************** Action Handlers ****************/
     const {data: wishlist} = useWishList()
