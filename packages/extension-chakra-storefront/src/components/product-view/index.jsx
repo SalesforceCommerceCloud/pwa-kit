@@ -41,7 +41,7 @@ const ProductViewHeader = ({
     return (
         <VStack mr={4} gap={2} align="flex-start" marginBottom={[4, 4, 4, 0, 0]}>
             <Skeleton loading={!category} minWidth={64}>
-                <Breadcrumb categories={category} />
+                {category && <Breadcrumb categories={category} />}
             </Skeleton>
 
             {/* Title */}
