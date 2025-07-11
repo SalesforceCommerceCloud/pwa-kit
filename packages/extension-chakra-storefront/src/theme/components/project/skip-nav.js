@@ -11,7 +11,7 @@ export default defineSlotRecipe({
     base: {
         link: {
             position: 'absolute',
-            zIndex: 1600,
+            zIndex: 'skipNav',
             left: '-10000px',
             top: 'auto',
             width: '1px',
@@ -24,7 +24,7 @@ export default defineSlotRecipe({
                 width: 'auto !important',
                 height: 'auto !important',
                 overflow: 'visible !important',
-                zIndex: 1600,
+                zIndex: 'skipNav',
                 padding: '8px',
                 backgroundColor: 'white',
                 color: 'black',
@@ -44,7 +44,7 @@ export default defineSlotRecipe({
                 width: 'auto !important',
                 height: 'auto !important',
                 overflow: 'visible !important',
-                zIndex: 1600,
+                zIndex: 'skipNav',
                 padding: '8px',
                 backgroundColor: 'white',
                 color: 'black',
