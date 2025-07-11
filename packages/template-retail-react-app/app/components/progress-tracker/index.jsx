@@ -33,7 +33,7 @@ export const NotchedBox = () => {
   `;
   return (
     <svg width={size} height={size} style={{ display: "block" }}>
-      <path d={path} fill={theme.colors.blue[900]} />
+      <path d={path} fill={theme.colors.blue[900]} stroke="white" strokeWidth="2" />
     </svg>
   );
 };
@@ -64,7 +64,7 @@ export const RoundedChevronStep = ({
   return (
     <Box position="relative" width={`${width}px`} height={`${height}px`}>
       <svg width={width} height={height} style={{ display: "block" }}>
-        <path d={path} fill={color} />
+        <path d={path} fill={color} stroke="white" strokeWidth="2" />
       </svg>
       <Box
         position="absolute"
@@ -110,7 +110,7 @@ export const DoubleChevronStep = ({
   return (
     <Box position="relative" width={`${width}px`} height={`${height}px`}>
       <svg width={width} height={height} style={{ display: "block" }}>
-        <path d={path} fill={color} />
+        <path d={path} fill={color} stroke="white" strokeWidth="2" />
       </svg>
       <Box
         position="absolute"
@@ -157,7 +157,7 @@ export const ChevronRoundedEndStep = ({
   return (
     <Box position="relative" width={`${width}px`} height={`${height}px`}>
       <svg width={width} height={height} style={{ display: "block" }}>
-        <path d={path} fill={color} />
+        <path d={path} fill={color} stroke="white" strokeWidth="2" />
       </svg>
       <Box
         position="absolute"
@@ -240,7 +240,7 @@ const ProgressTracker = () => {
         fill = theme.colors.gray[200];
       }
       shapes.push(
-        <path key={i} d={path} fill={fill} />
+        <path key={i} d={path} fill={fill} stroke="white" strokeWidth="2" />
       );
     }
     return shapes;
