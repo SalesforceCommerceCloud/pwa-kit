@@ -4,5 +4,6 @@
 - Send PWA Kit events to Data Cloud [#318] (https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2229)
 - Fix dependencies vulnerabilities [#2338](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2338)
 - Fix accessibility issues [#2375](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2375)
+- Fix data-fetching regression with SSR rendering [#2785](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2785)
 
 For historical changelog, look for the original `retail-react-app` in the [release notes](https://github.com/SalesforceCommerceCloud/pwa-kit/releases).
