@@ -11,7 +11,6 @@ import {dehydrate, HydrationBoundary, QueryClient, QueryClientProvider} from '@t
 import {FetchStrategy} from '../fetch-strategy'
 import {PERFORMANCE_MARKS} from '../../../../utils/performance'
 import logger from '../../../../utils/logger-instance'
-import ReactDOMServer from 'react-dom/server'
 
 const STATE_KEY = '__reactQuery'
 const passthrough = (input) => input
@@ -66,27 +65,15 @@ export const withReactQuery = (Wrapped, options = {}) => {
          * @private
          */
         static async doInitAppState({res, appJSX}) {
-            // TODO: when un-commented, this code fixes the regression for some reason. Why?
-            // let appJSXHtml
-            // try {
-            //     appJSXHtml = ReactDOMServer.renderToString(appJSX)
-            //     console.log('--- withReactQuery appJSX HTML:', appJSXHtml)
-            // } catch (e) {
-            //     console.error('Failed to render appJSX to HTML:', e)
-            // }
             const queryClient = (res.locals.__queryClient =
                 res.locals.__queryClient || new QueryClient(queryClientConfig))
 
             res.__performanceTimer.mark(PERFORMANCE_MARKS.reactQueryPrerender, 'start')
             // Use `ssrPrepass` to collect all uses of `useQuery`.
-            // TODO
-            // - is prepass lib version changed?
-            // - try running this prepass earlier
             await ssrPrepass(appJSX)
             res.__performanceTimer.mark(PERFORMANCE_MARKS.reactQueryPrerender, 'end')
             const queryCache = queryClient.getQueryCache()
             const queries = queryCache.getAll().filter((q) => q.options.enabled !== false)
-            console.log('--- withReactQuery queries', queries, queryCache.getAll())
             await Promise.all(
                 queries.map((q, i) => {
                     // always include the index to avoid duplicate entries
@@ -114,9 +101,7 @@ export const withReactQuery = (Wrapped, options = {}) => {
                 })
             )
 
-            const result = {[STATE_KEY]: dehydrate(queryClient)}
-            console.log('--- withReactQuery doInitAppState', result)
-            return result
+            return {[STATE_KEY]: dehydrate(queryClient)}
         }
 
         /**

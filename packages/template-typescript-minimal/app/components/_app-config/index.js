@@ -8,8 +8,6 @@ import {withLegacyGetProps} from '@salesforce/pwa-kit-react-sdk/ssr/universal/co
 import {withReactQuery} from '@salesforce/pwa-kit-react-sdk/ssr/universal/components/with-react-query'
 import AppConfig from '@salesforce/pwa-kit-react-sdk/ssr/universal/components/_app-config'
 
-// TODO
-
 const isServerSide = typeof window === 'undefined'
 
 // Recommended settings for PWA-Kit usages.

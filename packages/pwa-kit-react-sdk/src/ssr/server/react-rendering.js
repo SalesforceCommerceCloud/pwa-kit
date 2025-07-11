@@ -39,6 +39,10 @@ import * as errors from '../universal/errors'
 import logger from '../../utils/logger-instance'
 import PerformanceTimer, {PERFORMANCE_MARKS} from '../../utils/performance'
 
+// Workaround for react-ssr-prepass lack of no-op for the React hook `useInsertionEffect`.
+// (see https://github.com/FormidableLabs/react-ssr-prepass/issues/84)
+// - Why useInsertionEffect? Chakra v3 hooks (like useDisclosure, useBreakpointValue, useMediaQuery, useCallbackRef) rely on it for rendering optimization.
+// - Why no-op? useInsertionEffect is meant for client side only. So on the server, we wanted prepass to ignore it.
 React.useInsertionEffect = () => {} // no-op
 
 const CWD = process.cwd()
@@ -209,7 +213,6 @@ export const render = async (req, res, next) => {
         appStateError = new errors.HTTPNotFound('Not found')
     } else {
         res.__performanceTimer.mark(PERFORMANCE_MARKS.fetchStrategies, 'start')
-        // TODO
         const ret = await AppConfig.initAppState({
             App: WrappedApp,
             component,
@@ -224,7 +227,6 @@ export const render = async (req, res, next) => {
             ...ret.appState,
             __STATE_MANAGEMENT_LIBRARY: AppConfig.freeze(res.locals)
         }
-        console.log('--- react-rendering appState', appState)
         appStateError = ret.error
         res.__performanceTimer.mark(PERFORMANCE_MARKS.fetchStrategies, 'end')
     }
