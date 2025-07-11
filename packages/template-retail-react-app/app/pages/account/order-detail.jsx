@@ -32,6 +32,8 @@ import CartItemVariantName from '@salesforce/retail-react-app/app/components/ite
 import CartItemVariantAttributes from '@salesforce/retail-react-app/app/components/item-variant/item-attributes'
 import CartItemVariantPrice from '@salesforce/retail-react-app/app/components/item-variant/item-price'
 import PropTypes from 'prop-types'
+import ProgressTracker from '@salesforce/retail-react-app/app/components/progress-tracker'
+
 const onClient = typeof window !== 'undefined'
 
 const OrderProducts = ({productItems, currency}) => {
@@ -205,6 +207,8 @@ const AccountOrderDetail = () => {
                     )}
                 </Stack>
             </Stack>
+
+            <ProgressTracker currentStep="Ordered" />
 
             <Box layerStyle="cardBordered">
                 <Grid templateColumns={{base: '1fr', xl: '60% 1fr'}} gap={{base: 6, xl: 2}}>
