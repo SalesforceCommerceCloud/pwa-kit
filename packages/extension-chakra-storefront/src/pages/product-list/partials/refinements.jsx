@@ -6,7 +6,7 @@
  */
 
 import React from 'react'
-import {Heading, Stack, Separator, Accordion} from '@chakra-ui/react'
+import {Heading, Stack, Accordion} from '@chakra-ui/react'
 import PropTypes from 'prop-types'
 import ColorRefinements from '../../../pages/product-list/partials/color-refinements'
 import SizeRefinements from '../../../pages/product-list/partials/size-refinements'

@@ -74,18 +74,18 @@ class ChakraStorefront extends ApplicationExtension<Config> {
                 component: Pages.Registration,
                 exact: true
             },
-            // {
-            //     path: [
-            //         config.pages.ResetPassword && config.pages.ResetPassword.path,
-            //         config.login.resetPassword && config.login.resetPassword.landingPath
-            //     ].filter(Boolean),
-            //     component: Pages.ResetPassword,
-            //     exact: true
-            // },
-            // {
-            //     path: config.pages.Account && config.pages.Account.path,
-            //     component: Pages.Account
-            // },
+            {
+                path: [
+                    config.pages.ResetPassword && config.pages.ResetPassword.path,
+                    config.login.resetPassword && config.login.resetPassword.landingPath
+                ].filter(Boolean),
+                component: Pages.ResetPassword,
+                exact: true
+            },
+            {
+                path: config.pages.Account && config.pages.Account.path,
+                component: Pages.Account
+            },
             {
                 path: config.pages.Checkout && config.pages.Checkout.path,
                 component: Pages.Checkout,
