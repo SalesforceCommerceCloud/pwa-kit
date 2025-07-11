@@ -277,7 +277,7 @@ const withLayout = <P extends object>(WrappedComponent: React.ComponentType<P>) 
 
                 <ScrollToTop />
                 <Box id="app" display="flex" flexDirection="column" flex={1}>
-                    <SkipNavLink zIndex="skipLink">Skip to Content</SkipNavLink>
+                    <SkipNavLink>Skip to Content</SkipNavLink>
                     <Box css={styles.headerWrapper}>
                         {!isCheckout ? (
                             <>
@@ -319,7 +319,7 @@ const withLayout = <P extends object>(WrappedComponent: React.ComponentType<P>) 
                     {!isOnline && <OfflineBanner />}
                     <AddToCartModalProvider>
                         <SkipNavContent
-                            style={{
+                            css={{
                                 display: 'flex',
                                 flexDirection: 'column',
                                 flex: 1,

@@ -9,25 +9,23 @@ import React from 'react'
 import {Box, Link, useSlotRecipe} from '@chakra-ui/react'
 
 interface SkipNavLinkProps {
-    children: React.ReactNode
+    children: any
     href?: string
+    [key: string]: any
 }
 
 interface SkipNavContentProps {
-    children: React.ReactNode
+    children: any
     css?: any
     id?: string
+    [key: string]: any
 }
 
 /**
  * SkipNavLink component provides a skip link for keyboard navigation
  * with initial state screen reader accessible but visually hidden
  */
-export const SkipNavLink: React.FC<SkipNavLinkProps> = ({
-    children,
-    href = '#skip-to-content',
-    ...props
-}) => {
+export const SkipNavLink = ({children, href = '#skip-to-content', ...props}: SkipNavLinkProps) => {
     const recipe = useSlotRecipe({key: 'skipNav'})
     const styles = recipe()
 
@@ -41,12 +39,12 @@ export const SkipNavLink: React.FC<SkipNavLinkProps> = ({
 /**
  * SkipNavContent component provides the target content area for skip navigation
  */
-export const SkipNavContent: React.FC<SkipNavContentProps> = ({
+export const SkipNavContent = ({
     children,
     css,
     id = 'skip-to-content',
     ...props
-}) => {
+}: SkipNavContentProps) => {
     const recipe = useSlotRecipe({key: 'skipNav'})
     const styles = recipe()
 
