@@ -5525,20 +5525,6 @@
       "value": "]"
     }
   ],
-  "otp_page.error.invalid_code": [
-    {
-      "type": 0,
-      "value": "["
-    },
-    {
-      "type": 0,
-      "value": "Īƞṽȧȧŀīḓ ṽḗḗřīƒīƈȧȧŧīǿǿƞ ƈǿǿḓḗḗ. Ƥŀḗḗȧȧşḗḗ ŧřẏ ȧȧɠȧȧīƞ."
-    },
-    {
-      "type": 0,
-      "value": "]"
-    }
-  ],
   "page_not_found.action.go_back": [
     {
       "type": 0,

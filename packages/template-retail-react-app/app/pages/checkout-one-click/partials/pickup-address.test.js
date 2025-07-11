@@ -6,7 +6,7 @@
  */
 import React from 'react'
 import {screen, waitFor, cleanup} from '@testing-library/react'
-import PickupAddress from '@salesforce/retail-react-app/app/pages/checkout/partials/pickup-address'
+import PickupAddress from '@salesforce/retail-react-app/app/pages/checkout-one-click/partials/pickup-address'
 import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
 
 // Mock useShopperBasketsMutation
