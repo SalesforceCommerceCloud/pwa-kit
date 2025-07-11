@@ -1,3 +1,6 @@
+## v3.4.0-preview.0 (Jul 11, 2025)
+## v3.4.0-dev.0 (Jul 11, 2025)
+## v3.11.0-preview.0 (Jul 11, 2025)
 ## v3.4.0-dev.0 (May 23, 2025)
 
 - Optionally disable auth init in CommerceApiProvider [#2629](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2629)
