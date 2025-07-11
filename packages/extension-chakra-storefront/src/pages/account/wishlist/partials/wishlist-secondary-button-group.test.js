@@ -8,7 +8,7 @@ import React from 'react'
 import ItemVariantProvider from '../../../../components/item-variant'
 import {renderWithProviders} from '../../../../utils/test-utils'
 import WishlistSecondaryButtonGroup from '../partials/wishlist-secondary-button-group'
-import {screen, waitFor} from '@testing-library/react'
+import {screen, waitFor, act} from '@testing-library/react'
 import user from '@testing-library/user-event'
 import {mockedProductLists, mockedWishListProducts} from '../index.mock'
 import {prependHandlersToServer} from '../../../../../jest-setup'
@@ -380,10 +380,14 @@ test('can remove item', async () => {
     const removeButton = await screen.findByRole('button', {
         name: /remove/i
     })
-    user.click(removeButton)
+    await act(async () => {
+        await user.click(removeButton)
+    })
 
     const confirmButton = await screen.findByRole('button', {name: /yes, remove item/i})
-    user.click(confirmButton)
+    await act(async () => {
+        await user.click(confirmButton)
+    })
 
     await waitFor(() => {
         expect(mockedHandler).toHaveBeenCalled()
@@ -407,10 +411,14 @@ test('shows error toast when remove item fails', async () => {
     const removeButton = await screen.findByRole('button', {
         name: /remove/i
     })
-    user.click(removeButton)
+    await act(async () => {
+        await user.click(removeButton)
+    })
 
     const confirmButton = await screen.findByRole('button', {name: /yes, remove item/i})
-    user.click(confirmButton)
+    await act(async () => {
+        await user.click(confirmButton)
+    })
 
     await waitFor(() => {
         expect(mockedHandler).toHaveBeenCalled()
