@@ -46,7 +46,6 @@ describe('QuantityPicker', () => {
     })
 
     test('keydown enter/space on plus increments value', async () => {
-        const user = userEvent.setup()
         renderWithProviders(<MockComponent />)
         const input = screen.getByRole('spinbutton')
         const button = screen.getByText('+')
@@ -68,7 +67,6 @@ describe('QuantityPicker', () => {
     })
 
     test('keydown enter/space on minus decrements value', async () => {
-        const user = userEvent.setup()
         renderWithProviders(<MockComponent />)
         const input = screen.getByRole('spinbutton')
         const button = screen.getByText(MINUS)

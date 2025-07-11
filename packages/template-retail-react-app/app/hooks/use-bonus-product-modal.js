@@ -93,9 +93,13 @@ export const useBonusState = (basket) => {
                 isOpen: false,
                 data: {}
             }))
-            
+
             // If there's data with product, itemsAdded, and selectedQuantity, call onAddToCartModalOpen
-            if (currentData?.product && currentData?.itemsAdded !== undefined && currentData?.selectedQuantity !== undefined) {
+            if (
+                currentData?.product &&
+                currentData?.itemsAdded !== undefined &&
+                currentData?.selectedQuantity !== undefined
+            ) {
                 onAddToCartModalOpen({
                     product: currentData.product,
                     itemsAdded: currentData.itemsAdded,

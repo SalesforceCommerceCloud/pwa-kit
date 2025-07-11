@@ -109,7 +109,7 @@ test('renders secondary with event handlers', async () => {
 })
 
 test('hides wishlist and gift checkbox for bonus product', async () => {
-    const {user} = renderWithProviders(<MockedComponent isBonusProduct={true} />)
+    renderWithProviders(<MockedComponent isBonusProduct={true} />)
 
     expect(screen.getByRole('button', {name: /remove/i})).toBeInTheDocument()
     expect(screen.getByRole('button', {name: /edit/i})).toBeInTheDocument()

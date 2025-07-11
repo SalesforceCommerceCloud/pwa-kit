@@ -118,7 +118,6 @@ describe('Bonus Products Selection', () => {
             shipments: [{shipmentId: 'me', shippingMethod: {id: 'some-shipping-method'}}]
         }
 
-        const user = userEvent.setup()
         render(<BonusProductsSelection basket={mockBasketWithMultiplePromos} />)
 
         // There should be two bonus buttons
@@ -202,7 +201,6 @@ describe('Bonus Products Selection', () => {
             shipments: [{shipmentId: 'me', shippingMethod: {id: 'some-shipping-method'}}]
         }
 
-        const user = userEvent.setup()
         render(<BonusProductsSelection basket={mockBasketWithMixedBonus} />)
 
         // Only the second offer will have a button rendered
@@ -216,6 +214,7 @@ describe('Bonus Products Selection', () => {
 
         const bonusButtons = screen.getAllByRole('button', {name: /Select Bonus Products/i})
         expect(bonusButtons.length).toBeGreaterThan(0)
+        const user = userEvent.setup()
         await user.click(bonusButtons[0])
 
         expect(mockOnOpen).toHaveBeenCalledTimes(1)

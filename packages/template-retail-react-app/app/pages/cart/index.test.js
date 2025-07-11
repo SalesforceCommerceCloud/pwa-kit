@@ -24,11 +24,7 @@ import {
     mockGetBundleChildrenProducts,
     basketWithProductBundle
 } from '@salesforce/retail-react-app/app/mocks/product-bundle'
-import {prependHandlersToServer} from '@salesforce/retail-react-app/jest-setup'
-import {
-    baskets as mockBaskets,
-    products as mockProducts
-} from '@salesforce/retail-react-app/app/pages/cart/cart.mock'
+import {baskets as mockBaskets} from '@salesforce/retail-react-app/app/pages/cart/cart.mock'
 import userEvent from '@testing-library/user-event'
 
 const mockProduct = {
