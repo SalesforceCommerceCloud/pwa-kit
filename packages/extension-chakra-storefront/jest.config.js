@@ -61,6 +61,7 @@ module.exports = {
         '<rootDir>/src/pages/checkout/partials/contact-info.test.js',
         '<rootDir>/src/pages/checkout/partials/login-state.test.js',
         '<rootDir>/src/pages/account/orders.test.js',
+        '<rootDir>/src/pages/account/profile.test.js',
         '<rootDir>/src/utils/responsive-image.test.js',
         '<rootDir>/src/hooks/use-errors.test.js',
         '<rootDir>/src/hooks/use-toast.test.js',
