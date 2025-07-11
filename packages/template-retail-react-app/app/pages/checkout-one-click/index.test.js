@@ -20,35 +20,10 @@ import {
     mockedCustomerProductLists
 } from '@salesforce/retail-react-app/app/mocks/mock-data'
 import mockConfig from '@salesforce/retail-react-app/config/mocks/default'
-import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 
 // This is a flaky test file!
 jest.retryTimes(5)
 jest.setTimeout(40_000)
-
-mockConfig.app.oneClickCheckout.enabled = true
-
-jest.mock('@salesforce/pwa-kit-runtime/utils/ssr-config', () => {
-    return {
-        getConfig: jest.fn()
-    }
-})
-
-const mockUseAuthHelper = jest.fn()
-mockUseAuthHelper.mockResolvedValue({customerId: 'test-customer-id'})
-const mockUseShopperCustomersMutation = jest.fn()
-jest.mock('@salesforce/commerce-sdk-react', () => {
-    const originalModule = jest.requireActual('@salesforce/commerce-sdk-react')
-    return {
-        ...originalModule,
-        useAuthHelper: () => ({
-            mutateAsync: mockUseAuthHelper
-        }),
-        useShopperCustomersMutation: () => ({
-            mutateAsync: mockUseShopperCustomersMutation
-        })
-    }
-})
 
 // Minimal subset of `ocapiOrderResponse` in app/mocks/mock-data.js
 const scapiOrderResponse = {
@@ -209,28 +184,7 @@ beforeEach(() => {
                 ...currentBasket,
                 ...scapiOrderResponse,
                 customerInfo: {...scapiOrderResponse.customerInfo, email: 'customer@test.com'},
-                status: 'created',
-                shipments: [
-                    {
-                        shippingAddress: {
-                            address1: '123 Main St',
-                            city: 'Tampa',
-                            countryCode: 'US',
-                            firstName: 'Test',
-                            fullName: 'Test McTester',
-                            id: '047b18d4aaaf4138f693a4b931',
-                            lastName: 'McTester',
-                            phone: '(727) 555-1234',
-                            postalCode: '33712',
-                            stateCode: 'FL'
-                        }
-                    }
-                ],
-                billingAddress: {
-                    firstName: 'John',
-                    lastName: 'Smith',
-                    phone: '(727) 555-1234'
-                }
+                status: 'created'
             }
             return res(ctx.json(response))
         }),
@@ -243,12 +197,9 @@ beforeEach(() => {
             return res(ctx.json(baskets))
         })
     )
-
-    getConfig.mockImplementation(() => mockConfig)
 })
 afterEach(() => {
     jest.resetModules()
-    jest.clearAllMocks()
     localStorage.clear()
 })
 
@@ -260,11 +211,6 @@ test('Renders skeleton until customer and basket are loaded', () => {
 })
 
 test('Can proceed through checkout steps as guest', async () => {
-    // Mock authorizePasswordlessLogin to fail with 404 (unregistered user)
-    mockUseAuthHelper.mockRejectedValueOnce({
-        response: {status: 404}
-    })
-
     // Keep a *deep* copy of the initial mocked basket. Our mocked fetch responses will continuously
     // update this object, which essentially mimics a saved basket on the backend.
     let currentBasket = JSON.parse(JSON.stringify(scapiBasketWithItem))
@@ -367,30 +313,31 @@ test('Can proceed through checkout steps as guest', async () => {
     // Set the initial browser router path and render our component tree.
     window.history.pushState({}, 'Checkout', createPathWithDefaults('/checkout'))
     const {user} = renderWithProviders(<WrappedCheckout history={history} />, {
-        wrapperProps: {
-            isGuest: true,
-            siteAlias: 'uk',
-            appConfig: mockConfig.app
-        }
+        wrapperProps: {isGuest: true, siteAlias: 'uk', appConfig: mockConfig.app}
     })
 
     // Wait for checkout to load and display first step
-    await screen.findByText(/contact info/i)
+    await screen.findByText(/checkout as guest/i)
 
     // Verify cart products display
     await user.click(screen.getByText(/2 items in cart/i))
     expect(await screen.findByText(/Long Sleeve Crew Neck$/i)).toBeInTheDocument()
 
+    // Verify password field is reset if customer toggles login form
+    const loginToggleButton = screen.getByText(/Already have an account\? Log in/i)
+    await user.click(loginToggleButton)
     // Provide customer email and submit
-    const emailInput = await screen.findByLabelText(/email/i)
+    const passwordInput = document.querySelector('input[type="password"]')
+    await user.type(passwordInput, 'Password1!')
+
+    const checkoutAsGuestButton = screen.getByText(/Checkout as guest/i)
+    await user.click(checkoutAsGuestButton)
+
+    // Provide customer email and submit
+    const emailInput = screen.getByLabelText(/email/i)
+    const submitBtn = screen.getByText(/checkout as guest/i)
     await user.type(emailInput, 'test@test.com')
-
-    // Blur the email field to trigger the authorizePasswordlessLogin call
-    await user.tab()
-
-    // Wait for the continue button to appear after the 404 response
-    const continueBtn = await screen.findByText(/continue to shipping address/i)
-    await user.click(continueBtn)
+    await user.click(submitBtn)
 
     // Wait for next step to render
     await waitFor(() => {
@@ -438,16 +385,11 @@ test('Can proceed through checkout steps as guest', async () => {
 
     // Wait for next step to render
     await waitFor(() => {
-        expect(screen.getByTestId('sf-toggle-card-step-2-content')).not.toBeEmptyDOMElement()
+        expect(screen.getByTestId('sf-toggle-card-step-3-content')).not.toBeEmptyDOMElement()
     })
 
     // Applied shipping method should be displayed in previous step summary
     expect(screen.getByText(defaultShippingMethod.name)).toBeInTheDocument()
-
-    // Wait for next step to render
-    await waitFor(() => {
-        expect(screen.getByTestId('sf-toggle-card-step-3-content')).not.toBeEmptyDOMElement()
-    })
 
     // Fill out credit card payment form
     await user.type(screen.getByLabelText(/card number/i), '4111111111111111')
@@ -458,20 +400,29 @@ test('Can proceed through checkout steps as guest', async () => {
     // Same as shipping checkbox selected by default
     expect(screen.getByLabelText(/same as shipping address/i)).toBeChecked()
 
-    // Expect UserRegistration component to be visible
-    expect(screen.getByTestId('sf-user-registration-content')).toBeInTheDocument()
-    const userRegistrationForm = within(screen.getByTestId('sf-user-registration-content'))
-    expect(userRegistrationForm.getByText(/save for future use/i)).toBeInTheDocument()
-    expect(
-        userRegistrationForm.getByLabelText(/create an account for a faster checkout/i)
-    ).not.toBeChecked()
-    expect(userRegistrationForm.queryByText(/when you place your order/i)).not.toBeInTheDocument()
+    // Should display billing address that matches shipping address
+    const step3Content = within(screen.getByTestId('sf-toggle-card-step-3-content'))
+    expect(step3Content.getByText('Tester McTesting')).toBeInTheDocument()
+    expect(step3Content.getByText('123 Main St')).toBeInTheDocument()
+    expect(step3Content.getByText('Tampa, FL 33610')).toBeInTheDocument()
+    expect(step3Content.getByText('US')).toBeInTheDocument()
 
     // Move to final review step
+    await user.click(screen.getByText(/review order/i))
 
-    const placeOrderBtn = await screen.findByTestId('place-order-button', undefined, {
+    const placeOrderBtn = await screen.findByTestId('sf-checkout-place-order-btn', undefined, {
         timeout: 5000
     })
+
+    // Verify applied payment and billing address
+    expect(step3Content.getByText('Visa')).toBeInTheDocument()
+    expect(step3Content.getByText('•••• 1111')).toBeInTheDocument()
+    expect(step3Content.getByText('1/2040')).toBeInTheDocument()
+
+    expect(step3Content.getByText('Tester McTesting')).toBeInTheDocument()
+    expect(step3Content.getByText('123 Main St')).toBeInTheDocument()
+    expect(step3Content.getByText('Tampa, FL 33610')).toBeInTheDocument()
+    expect(step3Content.getByText('US')).toBeInTheDocument()
     // Place the order
     await user.click(placeOrderBtn)
 
@@ -516,6 +467,11 @@ test('Can proceed through checkout as registered customer', async () => {
 
     // Default shipping option should be selected
     const shippingOptionsForm = screen.getByTestId('sf-checkout-shipping-options-form')
+    await waitFor(() =>
+        expect(shippingOptionsForm).toHaveFormValues({
+            'shipping-options-radiogroup': mockShippingMethods.defaultShippingMethodId
+        })
+    )
 
     // Submit selected shipping method
     await user.click(screen.getByText(/continue to payment/i))
@@ -555,11 +511,23 @@ test('Can proceed through checkout as registered customer', async () => {
     await user.type(firstNameInput, 'John')
     await user.type(lastNameInput, 'Smith')
 
-    // Expect UserRegistration component to be hidden
-    expect(screen.queryByTestId('sf-user-registration-content')).not.toBeInTheDocument()
-
     // Move to final review step
-    await user.click(screen.getByText(/place order/i))
+    await user.click(screen.getByText(/review order/i))
+
+    const placeOrderBtn = await screen.findByTestId('sf-checkout-place-order-btn', undefined, {
+        timeout: 5000
+    })
+
+    // Verify applied payment and billing address
+    expect(step3Content.getByText('Master Card')).toBeInTheDocument()
+    expect(step3Content.getByText('•••• 5454')).toBeInTheDocument()
+    expect(step3Content.getByText('1/2040')).toBeInTheDocument()
+
+    expect(step3Content.getByText('John Smith')).toBeInTheDocument()
+    expect(step3Content.getByText('123 Main St')).toBeInTheDocument()
+
+    // Place the order
+    await user.click(placeOrderBtn)
 
     // Should now be on our mocked confirmation route/page
     expect(await screen.findByText(/success/i)).toBeInTheDocument()
@@ -584,21 +552,29 @@ test('Can edit address during checkout as a registered customer', async () => {
         expect(screen.getByTestId('sf-checkout-shipping-address-0')).toBeInTheDocument()
     })
 
-    // Click the "Edit 123 Main St" button to edit the specific address
-    const editButton = screen.getByRole('button', {name: /edit 123 main st/i})
-    await user.click(editButton)
+    const firstAddress = screen.getByTestId('sf-checkout-shipping-address-0')
+    await user.click(within(firstAddress).getByText(/edit/i))
 
-    await waitFor(() => {
-        const nameElements = screen.getAllByText('Test McTester')
-        const addressElements = screen.getAllByText('123 Main St')
-        expect(nameElements.length).toBeGreaterThan(0)
-        expect(addressElements.length).toBeGreaterThan(0)
-    })
+    // Wait for the edit address form to render
+    await waitFor(() =>
+        expect(screen.getByTestId('sf-shipping-address-edit-form')).not.toBeEmptyDOMElement()
+    )
+
+    // Shipping Address Form must be present
+    expect(screen.getByLabelText('Shipping Address Form')).toBeInTheDocument()
+    expect(screen.getByLabelText(/first name/i)).toBeInTheDocument()
+
+    // Edit and save the address
+    await user.clear(screen.getByLabelText('Address'))
+    await user.type(screen.getByLabelText('Address'), '369 Main Street')
+    await user.click(screen.getByText(/save & continue to shipping method/i))
 
     // Wait for next step to render
     await waitFor(() => {
         expect(screen.getByTestId('sf-toggle-card-step-2-content')).not.toBeEmptyDOMElement()
     })
+
+    expect(screen.getByText('369 Main Street')).toBeInTheDocument()
 })
 
 test('Can add address during checkout as a registered customer', async () => {
@@ -615,262 +591,35 @@ test('Can add address during checkout as a registered customer', async () => {
         }
     })
 
-    await waitFor(() => {
-        expect(screen.getByTestId('sf-checkout-shipping-address-0')).toBeInTheDocument()
-    })
+    global.server.use(
+        rest.post('*/customers/:customerId/addresses', (req, res, ctx) => {
+            return res(ctx.delay(0), ctx.status(200), ctx.json(req.body))
+        })
+    )
 
+    await waitFor(() => {
+        expect(screen.getByText(/add new address/i)).toBeInTheDocument()
+    })
     // Add address
     await user.click(screen.getByText(/add new address/i))
 
-    // Wait for the shipping address section to load with the saved address
-    await waitFor(() => {
-        const addressElements = screen.getAllByText('Test McTester')
-        expect(addressElements.length).toBeGreaterThan(0)
-    })
+    // Shipping Address Form must be present
+    expect(screen.getByLabelText('Shipping Address Form')).toBeInTheDocument()
 
-    // Verify the saved address is displayed (automatically selected in one-click checkout)
-    const addressElements = screen.getAllByText('123 Main St')
-    expect(addressElements.length).toBeGreaterThan(0)
-
-    // Verify the shipping options step is available (checkout progressed automatically)
-    await waitFor(() => {
-        expect(screen.getByTestId('sf-toggle-card-step-2-content')).not.toBeEmptyDOMElement()
-    })
-})
-
-test('Can register account during checkout as a guest', async () => {
-    // Mock authorizePasswordlessLogin to fail with 404 (unregistered user)
-    mockUseAuthHelper.mockRejectedValueOnce({
-        response: {status: 404}
-    })
-
-    // Set the initial browser router path and render our component tree.
-    window.history.pushState({}, 'Checkout', createPathWithDefaults('/checkout'))
-    const {user} = renderWithProviders(<WrappedCheckout history={history} />, {
-        wrapperProps: {
-            isGuest: true,
-            siteAlias: 'uk',
-            locale: {id: 'en-GB'},
-            appConfig: mockConfig.app
-        }
-    })
-
-    await screen.findByText(/contact info/i)
-
-    const emailInput = await screen.findByLabelText(/email/i)
-    await user.type(emailInput, 'test@test.com')
-
-    // Blur the email field to trigger the authorizePasswordlessLogin call
-    await user.tab()
-
-    // Wait for the continue button to appear after the 404 response
-    const continueBtn = await screen.findByText(/continue to shipping address/i)
-    await user.click(continueBtn)
-    await waitFor(() => {
-        expect(screen.getByTestId('sf-toggle-card-step-1-content')).not.toBeEmptyDOMElement()
-    })
-
-    await user.type(screen.getByLabelText(/first name/i), 'Tester')
-    await user.type(screen.getByLabelText(/last name/i), 'McTesting')
-    await user.type(screen.getByLabelText(/phone/i), '(727) 555-1234')
-    await user.type(screen.getAllByLabelText(/address/i)[0], '123 Main St')
+    const firstName = await screen.findByLabelText(/first name/i)
+    await user.type(firstName, 'Test2')
+    await user.type(screen.getByLabelText(/last name/i), 'McTester')
+    await user.type(screen.getByLabelText(/phone/i), '7275551234')
+    await user.selectOptions(screen.getByLabelText(/country/i), ['US'])
+    await user.type(screen.getAllByLabelText(/address/i)[0], 'Tropicana Field')
     await user.type(screen.getByLabelText(/city/i), 'Tampa')
     await user.selectOptions(screen.getByLabelText(/state/i), ['FL'])
-    await user.type(screen.getByLabelText(/zip code/i), '33610')
-    await user.click(screen.getByText(/continue to shipping method/i))
+    await user.type(screen.getByLabelText(/zip code/i), '33712')
 
+    await user.click(screen.getByText(/save & continue to shipping method/i))
+
+    // Wait for next step to render
     await waitFor(() => {
         expect(screen.getByTestId('sf-toggle-card-step-2-content')).not.toBeEmptyDOMElement()
     })
-
-    await user.click(screen.getByText(/continue to payment/i))
-
-    await waitFor(() => {
-        expect(screen.getByTestId('sf-toggle-card-step-3-content')).not.toBeEmptyDOMElement()
-    })
-
-    await user.type(screen.getByLabelText(/card number/i), '4111111111111111')
-    await user.type(screen.getByLabelText(/name on card/i), 'Testy McTester')
-    await user.type(screen.getByLabelText(/expiration date/i), '0140')
-    await user.type(screen.getByLabelText(/^security code$/i /* not "security code info" */), '123')
-
-    // Check the checkbox to create an account
-    await user.click(screen.getByLabelText(/create an account for a faster checkout/i))
-    const userRegistrationForm = within(screen.getByTestId('sf-user-registration-content'))
-    expect(userRegistrationForm.getByText(/when you place your order/i)).toBeInTheDocument()
-
-    const placeOrderBtn = await screen.findByTestId('place-order-button', undefined, {
-        timeout: 5000
-    })
-
-    await user.click(placeOrderBtn)
-    await screen.findByText(/success/i)
-
-    // Check that user registration was called
-    expect(mockUseAuthHelper).toHaveBeenCalledWith({
-        customer: {
-            firstName: 'John',
-            lastName: 'Smith',
-            email: 'customer@test.com',
-            login: 'customer@test.com',
-            phoneHome: '(727) 555-1234'
-        },
-        password: expect.any(String)
-    })
-
-    // Check that the shipping address is saved
-    expect(mockUseShopperCustomersMutation).toHaveBeenCalledWith({
-        body: {
-            addressId: expect.any(String),
-            address1: '123 Main St',
-            city: 'Tampa',
-            countryCode: 'US',
-            firstName: 'Test',
-            fullName: 'Test McTester',
-            lastName: 'McTester',
-            phone: '(727) 555-1234',
-            postalCode: '33712',
-            stateCode: 'FL'
-        },
-        parameters: {
-            customerId: 'test-customer-id'
-        }
-    })
-})
-
-test('Place Order button is disabled when payment form is invalid', async () => {
-    // Mock authorizePasswordlessLogin to fail with 404 (unregistered user)
-    mockUseAuthHelper.mockRejectedValueOnce({
-        response: {status: 404}
-    })
-
-    // Set the initial browser router path and render our component tree.
-    window.history.pushState({}, 'Checkout', createPathWithDefaults('/checkout'))
-    const {user} = renderWithProviders(<WrappedCheckout history={history} />, {
-        wrapperProps: {
-            isGuest: true,
-            siteAlias: 'uk',
-            locale: {id: 'en-GB'},
-            appConfig: mockConfig.app
-        }
-    })
-
-    // Wait for checkout to load
-    await screen.findByText(/contact info/i)
-
-    // Fill out contact info
-    const emailInput = await screen.findByLabelText(/email/i)
-    await user.type(emailInput, 'test@test.com')
-    await user.tab()
-
-    const continueBtn = await screen.findByText(/continue to shipping address/i)
-    await user.click(continueBtn)
-
-    // Fill out shipping address
-    await waitFor(() => {
-        expect(screen.getByTestId('sf-toggle-card-step-1-content')).not.toBeEmptyDOMElement()
-    })
-
-    await user.type(screen.getByLabelText(/first name/i), 'Tester')
-    await user.type(screen.getByLabelText(/last name/i), 'McTesting')
-    await user.type(screen.getByLabelText(/phone/i), '(727) 555-1234')
-    await user.type(screen.getAllByLabelText(/address/i)[0], '123 Main St')
-    await user.type(screen.getByLabelText(/city/i), 'Tampa')
-    await user.selectOptions(screen.getByLabelText(/state/i), ['FL'])
-    await user.type(screen.getByLabelText(/zip code/i), '33610')
-    await user.click(screen.getByText(/continue to shipping method/i))
-
-    // Fill out shipping options
-    await waitFor(() => {
-        expect(screen.getByTestId('sf-toggle-card-step-2-content')).not.toBeEmptyDOMElement()
-    })
-    await user.click(screen.getByText(/continue to payment/i))
-
-    // Wait for payment step to load
-    await waitFor(() => {
-        expect(screen.getByTestId('sf-toggle-card-step-3-content')).not.toBeEmptyDOMElement()
-    })
-
-    // Check that Place Order button is disabled when payment form is empty
-    const placeOrderBtn = await screen.findByTestId('place-order-button')
-    expect(placeOrderBtn).toBeDisabled()
-
-    // Fill out payment form with valid data
-    await user.type(screen.getByLabelText(/card number/i), '4111111111111111')
-    await user.type(screen.getByLabelText(/name on card/i), 'Testy McTester')
-    await user.type(screen.getByLabelText(/expiration date/i), '0140')
-    await user.type(screen.getByLabelText(/^security code$/i), '123')
-
-    // Check that Place Order button is now enabled
-    await waitFor(() => {
-        expect(placeOrderBtn).toBeEnabled()
-    })
-})
-
-test('Place Order button does not display on steps 2 or 3', async () => {
-    // Mock authorizePasswordlessLogin to fail with 404 (unregistered user)
-    mockUseAuthHelper.mockRejectedValueOnce({
-        response: {status: 404}
-    })
-
-    // Set the initial browser router path and render our component tree.
-    window.history.pushState({}, 'Checkout', createPathWithDefaults('/checkout'))
-    const {user} = renderWithProviders(<WrappedCheckout history={history} />, {
-        wrapperProps: {
-            isGuest: true,
-            siteAlias: 'uk',
-            locale: {id: 'en-GB'},
-            appConfig: mockConfig.app
-        }
-    })
-
-    // Wait for checkout to load
-    await screen.findByText(/contact info/i)
-
-    // Fill out contact info
-    const emailInput = await screen.findByLabelText(/email/i)
-    await user.type(emailInput, 'test@test.com')
-    await user.tab()
-
-    const continueBtn = await screen.findByText(/continue to shipping address/i)
-    await user.click(continueBtn)
-
-    // Step 2: Shipping Address - Check that Place Order button is NOT present
-    await waitFor(() => {
-        expect(screen.getByTestId('sf-toggle-card-step-1-content')).not.toBeEmptyDOMElement()
-    })
-
-    // Verify Place Order button is not displayed on step 2
-    expect(screen.queryByTestId('place-order-button')).not.toBeInTheDocument()
-
-    // Fill out shipping address
-    await user.type(screen.getByLabelText(/first name/i), 'Tester')
-    await user.type(screen.getByLabelText(/last name/i), 'McTesting')
-    await user.type(screen.getByLabelText(/phone/i), '(727) 555-1234')
-    await user.type(screen.getAllByLabelText(/address/i)[0], '123 Main St')
-    await user.type(screen.getByLabelText(/city/i), 'Tampa')
-    await user.selectOptions(screen.getByLabelText(/state/i), ['FL'])
-    await user.type(screen.getByLabelText(/zip code/i), '33610')
-    await user.click(screen.getByText(/continue to shipping method/i))
-
-    // Step 3: Shipping Options - Check that Place Order button is NOT present
-    await waitFor(() => {
-        expect(screen.getByTestId('sf-toggle-card-step-2-content')).not.toBeEmptyDOMElement()
-    })
-
-    // Verify Place Order button is not displayed on step 3
-    expect(screen.queryByTestId('place-order-button')).not.toBeInTheDocument()
-
-    // Continue to payment step
-    await user.click(screen.getByText(/continue to payment/i))
-
-    // Step 4: Payment - Now the Place Order button should appear
-    await waitFor(() => {
-        expect(screen.getByTestId('sf-toggle-card-step-3-content')).not.toBeEmptyDOMElement()
-    })
-
-    // Verify Place Order button is now displayed on step 4
-    const placeOrderBtn = await screen.findByTestId('place-order-button')
-    expect(placeOrderBtn).toBeInTheDocument()
-    expect(placeOrderBtn).toBeDisabled() // Should be disabled until payment form is filled
 })
