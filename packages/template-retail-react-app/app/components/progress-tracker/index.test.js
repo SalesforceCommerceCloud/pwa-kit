@@ -14,7 +14,7 @@ describe('ProgressTracker', () => {
 
     test('renders all step labels', () => {
         renderWithProviders(<ProgressTracker />)
-        
+
         expect(screen.getByText('Ordered')).toBeInTheDocument()
         expect(screen.getByText('Dispatched')).toBeInTheDocument()
         expect(screen.getByText('Out for delivery')).toBeInTheDocument()
@@ -23,7 +23,7 @@ describe('ProgressTracker', () => {
 
     test('renders step labels with responsive font sizes', () => {
         renderWithProviders(<ProgressTracker />)
-        
+
         const labels = screen.getAllByText(/Ordered|Dispatched|Out for delivery|Delivered/)
         labels.forEach((label) => {
             // Check that fontSize is an array (responsive values)
@@ -36,7 +36,7 @@ describe('ProgressTracker', () => {
 
     test('renders SVG element', () => {
         renderWithProviders(<ProgressTracker />)
-        
+
         const svg = document.querySelector('svg')
         expect(svg).toBeInTheDocument()
         expect(svg).toHaveAttribute('viewBox', '0 0 1080 50')
@@ -46,7 +46,7 @@ describe('ProgressTracker', () => {
 
     test('renders all step paths in SVG', () => {
         renderWithProviders(<ProgressTracker />)
-        
+
         const svg = document.querySelector('svg')
         const paths = svg.querySelectorAll('path')
         expect(paths).toHaveLength(4) // Should have 4 paths for 4 steps
@@ -56,11 +56,11 @@ describe('ProgressTracker', () => {
         // Test with valid step label
         const {rerender} = renderWithProviders(<ProgressTracker currentStepLabel="Dispatched" />)
         expect(screen.getByText('Dispatched')).toBeInTheDocument()
-        
+
         // Test with invalid step label (should default to first step)
         rerender(<ProgressTracker currentStepLabel="Invalid Step" />)
         expect(screen.getByText('Ordered')).toBeInTheDocument()
-        
+
         // Test with empty string
         rerender(<ProgressTracker currentStepLabel="" />)
         expect(screen.getByText('Ordered')).toBeInTheDocument()
