@@ -1,3 +1,6 @@
+## v3.12.0-dev.0
+- Add development guidelines and create page Cursor rules for generated project
+
 ## v3.11.0-dev.0 (May 23, 2025)
 - Add `--initGit` to automate git repo creation for the generated project [#2817](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2817)
 - Fix the demo instance details in `program.json`[#2800](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2800)
