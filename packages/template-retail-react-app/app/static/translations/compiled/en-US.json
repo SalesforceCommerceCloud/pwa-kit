@@ -2613,12 +2613,6 @@
       "value": "Confirm it's you"
     }
   ],
-  "otp_page.error.invalid_code": [
-    {
-      "type": 0,
-      "value": "Invalid verification code. Please try again."
-    }
-  ],
   "page_not_found.action.go_back": [
     {
       "type": 0,
