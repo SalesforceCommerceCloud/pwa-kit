@@ -18,6 +18,10 @@ jest.mock('react-intl', () => ({
 
 beforeEach(() => {
     jest.clearAllMocks()
+    // Provide a proper mock implementation for useIntl
+    useIntl.mockReturnValue({
+        formatMessage: jest.fn((message) => message.defaultMessage || message.id || 'Mock message')
+    })
 })
 
 test('renders svg icons with Chakra Icon component', () => {
