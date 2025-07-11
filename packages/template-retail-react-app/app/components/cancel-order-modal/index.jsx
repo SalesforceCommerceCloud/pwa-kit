@@ -18,7 +18,7 @@ import {
     ModalCloseButton,
     Button,
     Text
-} from '@salesforce/retail-react-app/app/components/shared/ui'
+} from '@chakra-ui/react'
 
 /**
  * A Modal for requesting order cancellation
