@@ -37,14 +37,20 @@ module.exports = defineConfig({
         {
             name: 'chromium',
             use: {...devices['Desktop Chrome']},
-            testIgnore: ['**/a11y/**', '**/mobile/**']
+            testIgnore: [
+                'e2e/tests/desktop/extra-features.spec.js',
+                'e2e/tests/mobile/extra-features.spec.js'
+            ]
         },
 
         /* Test against mobile viewports. */
         {
             name: 'mobile-chrome',
             use: {...devices['Pixel 5']},
-            testIgnore: ['**/a11y/**', '**/desktop/**']
+            testIgnore: [
+                'e2e/tests/desktop/extra-features.spec.js',
+                'e2e/tests/mobile/extra-features.spec.js'
+            ]
         },
         {
             name: 'a11y-mobile',
@@ -55,6 +61,20 @@ module.exports = defineConfig({
             name: 'a11y-desktop',
             use: {...devices['Desktop Chrome']},
             testDir: './e2e/tests/a11y/desktop'
+        },
+        {
+            name: 'extra-features-desktop',
+            testMatch: [
+                'e2e/tests/desktop/extra-features.spec.js'
+            ],
+            use: { ...devices['Desktop Chrome'] }
+        },
+        {
+            name: 'extra-features-mobile',
+            testMatch: [
+                'e2e/tests/mobile/extra-features.spec.js'
+            ],
+            use: { ...devices['Pixel 5'] }
         }
     ]
 })

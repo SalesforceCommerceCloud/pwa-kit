@@ -42,6 +42,7 @@ import RecommendedProducts from '@salesforce/retail-react-app/app/components/rec
 import ProductView from '@salesforce/retail-react-app/app/components/product-view'
 import InformationAccordion from '@salesforce/retail-react-app/app/pages/product-detail/partials/information-accordion'
 import {StoreLocatorModal} from '@salesforce/retail-react-app/app/components/store-locator'
+import Island from '@salesforce/retail-react-app/app/components/island'
 
 import {HTTPNotFound, HTTPError} from '@salesforce/pwa-kit-react-sdk/ssr/universal/errors'
 import logger from '@salesforce/retail-react-app/app/utils/logger-instance'
@@ -60,7 +61,6 @@ import {rebuildPathWithParams} from '@salesforce/retail-react-app/app/utils/url'
 import {useHistory, useLocation, useParams} from 'react-router-dom'
 import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
 import {useWishList} from '@salesforce/retail-react-app/app/hooks/use-wish-list'
-import {useAddToCartModalContext} from '@salesforce/retail-react-app/app/hooks/use-add-to-cart-modal'
 import {useDisclosure} from '@salesforce/retail-react-app/app/components/shared/ui'
 
 const ProductDetail = () => {
@@ -158,23 +158,27 @@ const ProductDetail = () => {
     const isProductASet = product?.type.set
     const isProductABundle = product?.type.bundle
 
-    let bundleChildVariantIds = ''
+    let bundleChildProductIds = ''
     if (isProductABundle)
-        bundleChildVariantIds = Object.keys(childProductSelection)
-            ?.map((key) => childProductSelection[key].variant.productId)
+        bundleChildProductIds = Object.keys(childProductSelection)
+            ?.map(
+                (key) =>
+                    childProductSelection[key].variant?.productId ||
+                    childProductSelection[key].product?.id
+            )
             .join(',')
 
     const {data: bundleChildrenData} = useProducts(
         {
             parameters: {
-                ids: bundleChildVariantIds,
+                ids: bundleChildProductIds,
                 allImages: false,
                 expand: ['availability', 'variations'],
                 select: '(data.(id,inventory,master))'
             }
         },
         {
-            enabled: bundleChildVariantIds?.length > 0,
+            enabled: bundleChildProductIds?.length > 0,
             keepPreviousData: true
         }
     )
@@ -183,7 +187,7 @@ const ProductDetail = () => {
         // Loop through the bundle children and update the inventory for variant selection
         product.bundledProducts.forEach(({product: childProduct}, index) => {
             const matchingChildProduct = bundleChildrenData.data.find(
-                (bundleChild) => bundleChild.master.masterId === childProduct.id
+                (bundleChild) => bundleChild?.master?.masterId === childProduct.id
             )
             if (matchingChildProduct) {
                 product.bundledProducts[index].product = {
@@ -311,8 +315,11 @@ const ProductDetail = () => {
     /**************** Add To Cart ****************/
     const showToast = useToast()
     const showError = (errorMessage) => {
+        const errorText =
+            typeof errorMessage === 'string' ? errorMessage : formatMessage(API_ERROR_MESSAGE)
+
         showToast({
-            title: errorMessage || formatMessage(API_ERROR_MESSAGE),
+            title: errorText,
             status: 'error'
         })
     }
@@ -326,8 +333,6 @@ const ProductDetail = () => {
         }))
     }
 
-    const addToCartModal = useAddToCartModalContext()
-
     const handleAddToCart = async (productSelectionValues = []) => {
         try {
             let productItems = productSelectionValues.map((item) => {
@@ -335,8 +340,8 @@ const ProductDetail = () => {
                 // Use variant if present, otherwise use the main product
                 const prod = variant || item.product || product
                 return {
-                    productId: prod.productId || prod.id, // productId for variant, id for product
-                    price: prod.price,
+                    productId: prod?.productId || prod?.id, // productId for variant, id for product
+                    price: prod?.price,
                     quantity
                 }
             })
@@ -381,7 +386,7 @@ const ProductDetail = () => {
                         formatMessage({
                             id: 'product_view.error.select_ship_to_address',
                             defaultMessage:
-                                "Please select 'Ship to Address' to match the shipping method for your other items."
+                                "Select 'Ship to Address' to match the delivery method for the items in your cart."
                         })
                     )
                 }
@@ -390,7 +395,7 @@ const ProductDetail = () => {
                         formatMessage({
                             id: 'product_view.error.select_pickup_in_store',
                             defaultMessage:
-                                "Please select 'Pickup in Store' to match the shipping method for your other items."
+                                "Select 'Pick Up in Store' to match the delivery method for the items in your cart."
                         })
                     )
                 }
@@ -409,15 +414,13 @@ const ProductDetail = () => {
             const productItemsForEinstein = productSelectionValues.map(
                 ({product, variant, quantity}) => ({
                     product,
-                    productId: variant.productId,
-                    price: variant.price,
+                    productId: variant?.productId || product?.id,
+                    price: variant?.price || product?.price,
                     quantity
                 })
             )
             einstein.sendAddToCart(productItemsForEinstein)
 
-            // Open modal with itemsAdded
-            addToCartModal.onOpen({product, itemsAdded: productSelectionValues})
             return productSelectionValues
         } catch (error) {
             showError(error.message)
@@ -433,10 +436,16 @@ const ProductDetail = () => {
         })
 
         // Using ot state for which child products are selected, scroll to the first
-        // one that isn't selected.
+        // one that isn't selected and requires a variant selection.
         const selectedProductIds = Object.keys(childProductSelection)
         const firstUnselectedProduct = comboProduct.childProducts?.find(
-            ({product: childProduct}) => !selectedProductIds.includes(childProduct.id)
+            ({product: childProduct}) => {
+                // Skip validation for standard products (no variations)
+                if (childProduct.type?.item) {
+                    return false
+                }
+                return !selectedProductIds.includes(childProduct.id)
+            }
         )?.product
 
         if (firstUnselectedProduct) {
@@ -464,26 +473,17 @@ const ProductDetail = () => {
         // Get all the selected products, and pass them to the addToCart handler which
         // accepts an array.
         const productSelectionValues = Object.values(childProductSelection)
-        handleAddToCart(productSelectionValues)
-        // Modal will be opened in handleAddToCart
+        return handleAddToCart(productSelectionValues)
     }
 
     /**************** Product Bundle Handlers ****************/
     // Top level bundle does not have variants
-    const handleProductBundleAddToCart = async (variantOrArray, selectedQuantity) => {
-        // Support both signatures: (variant, selectedQuantity) and ([{variant, quantity}])
-        let quantity
-        if (Array.isArray(variantOrArray)) {
-            quantity = variantOrArray[0]?.quantity
-        } else {
-            quantity = selectedQuantity
-        }
-
+    const handleProductBundleAddToCart = async ([{quantity: selectedQuantity}]) => {
         try {
             const childProductSelections = Object.values(childProductSelection)
             // Check if any products have pickup selected (including main product and bundle items)
             const bundleSelectionValues = [
-                {product, variant: null, quantity},
+                {product, variant: null, selectedQuantity},
                 ...childProductSelections
             ]
             const hasAnyPickupSelected = hasPickupItems(
@@ -507,7 +507,7 @@ const ProductDetail = () => {
                         formatMessage({
                             id: 'product_view.error.select_ship_to_address',
                             defaultMessage:
-                                "Please select 'Ship to Address' to match the shipping method for your other items."
+                                "Select 'Ship to Address' to match the delivery method for the items in your cart."
                         })
                     )
                 } else if (
@@ -519,7 +519,7 @@ const ProductDetail = () => {
                         formatMessage({
                             id: 'product_view.error.select_pickup_in_store',
                             defaultMessage:
-                                "Please select 'Pickup in Store' to match the shipping method for your other items."
+                                "Select 'Pick Up in Store' to match the delivery method for the items in your cart."
                         })
                     )
                 }
@@ -529,13 +529,13 @@ const ProductDetail = () => {
                 {
                     productId: product.id,
                     price: product.price,
-                    quantity: quantity,
+                    quantity: selectedQuantity,
                     // The add item endpoint in the shopper baskets API does not respect variant selections
                     // for bundle children, so we have to make a follow up call to update the basket
                     // with the chosen variant selections
                     bundledProductItems: childProductSelections.map((child) => {
                         return {
-                            productId: child.variant.productId,
+                            productId: child.variant?.productId || child.product?.id,
                             quantity: child.quantity
                         }
                     })
@@ -593,8 +593,7 @@ const ProductDetail = () => {
             )
 
             einstein.sendAddToCart(productItems)
-            // Open modal with itemsAdded and selectedQuantity for bundles
-            addToCartModal.onOpen({product, itemsAdded: childProductSelections, selectedQuantity})
+
             return childProductSelections
         } catch (error) {
             showError(error)
@@ -655,29 +654,31 @@ const ProductDetail = () => {
             <Stack spacing={16}>
                 {isProductASet || isProductABundle ? (
                     <Fragment>
-                        <ProductView
-                            product={product}
-                            category={primaryCategory?.parentCategoryTree || []}
-                            addToCart={
-                                isProductASet
-                                    ? handleProductSetAddToCart
-                                    : handleProductBundleAddToCart
-                            }
-                            addToWishlist={handleAddToWishlist}
-                            isProductLoading={isProductLoading}
-                            isBasketLoading={isBasketLoading}
-                            isWishlistLoading={isWishlistLoading}
-                            validateOrderability={handleChildProductValidation}
-                            childProductOrderability={childProductOrderability}
-                            setSelectedBundleQuantity={setSelectedBundleQuantity}
-                            selectedBundleParentQuantity={selectedBundleQuantity}
-                            pickupInStore={!!pickupInStoreMap[product?.id]}
-                            setPickupInStore={(checked) =>
-                                product && handlePickupInStoreChange(product.id, checked)
-                            }
-                            onOpenStoreLocator={onOpenStoreLocator}
-                            showDeliveryOptions={STORE_LOCATOR_IS_ENABLED}
-                        />
+                        <Island hydrateOn={'visible'}>
+                            <ProductView
+                                product={product}
+                                category={primaryCategory?.parentCategoryTree || []}
+                                addToCart={
+                                    isProductASet
+                                        ? handleProductSetAddToCart
+                                        : handleProductBundleAddToCart
+                                }
+                                addToWishlist={handleAddToWishlist}
+                                isProductLoading={isProductLoading}
+                                isBasketLoading={isBasketLoading}
+                                isWishlistLoading={isWishlistLoading}
+                                validateOrderability={handleChildProductValidation}
+                                childProductOrderability={childProductOrderability}
+                                setSelectedBundleQuantity={setSelectedBundleQuantity}
+                                selectedBundleParentQuantity={selectedBundleQuantity}
+                                pickupInStore={!!pickupInStoreMap[product?.id]}
+                                setPickupInStore={(checked) =>
+                                    product && handlePickupInStoreChange(product.id, checked)
+                                }
+                                onOpenStoreLocator={onOpenStoreLocator}
+                                showDeliveryOptions={STORE_LOCATOR_IS_ENABLED}
+                            />
+                        </Island>
 
                         <hr />
 
@@ -686,146 +687,162 @@ const ProductDetail = () => {
                             // Render the child products
                             comboProduct.childProducts.map(
                                 ({product: childProduct, quantity: childQuantity}) => (
-                                    <Box key={childProduct.id} data-testid="child-product">
-                                        <ProductView
-                                            // Do not use an arrow function as we are manipulating the functions scope.
-                                            ref={function (ref) {
-                                                // Assign the "set" scope of the ref, this is how we access the internal
-                                                // validation.
-                                                childProductRefs.current[childProduct.id] = {
-                                                    ref,
-                                                    validateOrderability: this.validateOrderability
+                                    <Island hydrateOn={'visible'} key={childProduct.id}>
+                                        <Box data-testid="child-product">
+                                            <ProductView
+                                                // Do not use an arrow function as we are manipulating the functions scope.
+                                                ref={function (ref) {
+                                                    // Assign the "set" scope of the ref, this is how we access the internal
+                                                    // validation.
+                                                    childProductRefs.current[childProduct.id] = {
+                                                        ref,
+                                                        validateOrderability:
+                                                            this.validateOrderability
+                                                    }
+                                                }}
+                                                product={childProduct}
+                                                isProductPartOfSet={isProductASet}
+                                                isProductPartOfBundle={isProductABundle}
+                                                childOfBundleQuantity={childQuantity}
+                                                selectedBundleParentQuantity={
+                                                    selectedBundleQuantity
                                                 }
-                                            }}
-                                            product={childProduct}
-                                            isProductPartOfSet={isProductASet}
-                                            isProductPartOfBundle={isProductABundle}
-                                            childOfBundleQuantity={childQuantity}
-                                            selectedBundleParentQuantity={selectedBundleQuantity}
-                                            addToCart={
-                                                isProductASet
-                                                    ? (variant, quantity) =>
-                                                          handleAddToCart([
-                                                              {
-                                                                  product: childProduct,
-                                                                  variant,
-                                                                  quantity
-                                                              }
-                                                          ])
-                                                    : null
-                                            }
-                                            addToWishlist={
-                                                isProductASet ? handleAddToWishlist : null
-                                            }
-                                            onVariantSelected={(product, variant, quantity) => {
-                                                if (quantity) {
-                                                    setChildProductSelection((previousState) => ({
-                                                        ...previousState,
-                                                        [product.id]: {
-                                                            product,
-                                                            variant,
-                                                            quantity: isProductABundle
-                                                                ? childQuantity
-                                                                : quantity
+                                                addToCart={
+                                                    isProductASet
+                                                        ? (productSelectionValues) =>
+                                                              handleAddToCart(
+                                                                  productSelectionValues
+                                                              )
+                                                        : null
+                                                }
+                                                addToWishlist={
+                                                    isProductASet ? handleAddToWishlist : null
+                                                }
+                                                onVariantSelected={(product, variant, quantity) => {
+                                                    if (quantity) {
+                                                        setChildProductSelection(
+                                                            (previousState) => ({
+                                                                ...previousState,
+                                                                [product.id]: {
+                                                                    product,
+                                                                    variant,
+                                                                    quantity: isProductABundle
+                                                                        ? childQuantity
+                                                                        : quantity
+                                                                }
+                                                            })
+                                                        )
+                                                    } else {
+                                                        const selections = {
+                                                            ...childProductSelection
                                                         }
-                                                    }))
-                                                } else {
-                                                    const selections = {...childProductSelection}
-                                                    delete selections[product.id]
-                                                    setChildProductSelection(selections)
+                                                        delete selections[product.id]
+                                                        setChildProductSelection(selections)
+                                                    }
+                                                }}
+                                                isProductLoading={isProductLoading}
+                                                isBasketLoading={isBasketLoading}
+                                                isWishlistLoading={isWishlistLoading}
+                                                setChildProductOrderability={
+                                                    setChildProductOrderability
                                                 }
-                                            }}
-                                            isProductLoading={isProductLoading}
-                                            isBasketLoading={isBasketLoading}
-                                            isWishlistLoading={isWishlistLoading}
-                                            setChildProductOrderability={
-                                                setChildProductOrderability
-                                            }
-                                            pickupInStore={!!pickupInStoreMap[childProduct?.id]}
-                                            setPickupInStore={(checked) =>
-                                                childProduct &&
-                                                handlePickupInStoreChange(childProduct.id, checked)
-                                            }
-                                            onOpenStoreLocator={onOpenStoreLocator}
-                                            showDeliveryOptions={STORE_LOCATOR_IS_ENABLED}
-                                        />
-                                        <InformationAccordion product={childProduct} />
+                                                pickupInStore={!!pickupInStoreMap[childProduct?.id]}
+                                                setPickupInStore={(checked) =>
+                                                    childProduct &&
+                                                    handlePickupInStoreChange(
+                                                        childProduct.id,
+                                                        checked
+                                                    )
+                                                }
+                                                onOpenStoreLocator={onOpenStoreLocator}
+                                                showDeliveryOptions={STORE_LOCATOR_IS_ENABLED}
+                                            />
+                                            <InformationAccordion product={childProduct} />
 
-                                        <Box display={['none', 'none', 'none', 'block']}>
-                                            <hr />
+                                            <Box display={['none', 'none', 'none', 'block']}>
+                                                <hr />
+                                            </Box>
                                         </Box>
-                                    </Box>
+                                    </Island>
                                 )
                             )
                         }
                     </Fragment>
                 ) : (
                     <Fragment>
-                        <ProductView
-                            product={product}
-                            category={primaryCategory?.parentCategoryTree || []}
-                            addToCart={handleAddToCart}
-                            addToWishlist={handleAddToWishlist}
-                            isProductLoading={isProductLoading}
-                            isBasketLoading={isBasketLoading}
-                            isWishlistLoading={isWishlistLoading}
-                            childProductOrderability={childProductOrderability}
-                            setChildProductOrderability={setChildProductOrderability}
-                            setSelectedBundleQuantity={setSelectedBundleQuantity}
-                            selectedBundleParentQuantity={selectedBundleQuantity}
-                            pickupInStore={!!pickupInStoreMap[product?.id]}
-                            setPickupInStore={(checked) =>
-                                product && handlePickupInStoreChange(product.id, checked)
-                            }
-                            onOpenStoreLocator={onOpenStoreLocator}
-                            showDeliveryOptions={STORE_LOCATOR_IS_ENABLED}
-                        />
-                        <InformationAccordion product={product} />
+                        <Island hydrateOn={'visible'}>
+                            <ProductView
+                                product={product}
+                                category={primaryCategory?.parentCategoryTree || []}
+                                addToCart={handleAddToCart}
+                                addToWishlist={handleAddToWishlist}
+                                isProductLoading={isProductLoading}
+                                isBasketLoading={isBasketLoading}
+                                isWishlistLoading={isWishlistLoading}
+                                childProductOrderability={childProductOrderability}
+                                setChildProductOrderability={setChildProductOrderability}
+                                setSelectedBundleQuantity={setSelectedBundleQuantity}
+                                selectedBundleParentQuantity={selectedBundleQuantity}
+                                pickupInStore={!!pickupInStoreMap[product?.id]}
+                                setPickupInStore={(checked) =>
+                                    product && handlePickupInStoreChange(product.id, checked)
+                                }
+                                onOpenStoreLocator={onOpenStoreLocator}
+                                showDeliveryOptions={STORE_LOCATOR_IS_ENABLED}
+                            />
+                            <InformationAccordion product={product} />
+                        </Island>
                     </Fragment>
                 )}
 
                 {/* Product Recommendations */}
                 <Stack spacing={16}>
                     {!isProductASet && (
+                        <Island hydrateOn={'visible'}>
+                            <RecommendedProducts
+                                title={
+                                    <FormattedMessage
+                                        defaultMessage="Complete the Set"
+                                        id="product_detail.recommended_products.title.complete_set"
+                                    />
+                                }
+                                recommender={EINSTEIN_RECOMMENDERS.PDP_COMPLETE_SET}
+                                products={[product]}
+                                mx={{base: -4, md: -8, lg: 0}}
+                                shouldFetch={() => product?.id}
+                            />
+                        </Island>
+                    )}
+                    <Island hydrateOn={'visible'}>
                         <RecommendedProducts
                             title={
                                 <FormattedMessage
-                                    defaultMessage="Complete the Set"
-                                    id="product_detail.recommended_products.title.complete_set"
+                                    defaultMessage="You might also like"
+                                    id="product_detail.recommended_products.title.might_also_like"
                                 />
                             }
-                            recommender={EINSTEIN_RECOMMENDERS.PDP_COMPLETE_SET}
+                            recommender={EINSTEIN_RECOMMENDERS.PDP_MIGHT_ALSO_LIKE}
                             products={[product]}
                             mx={{base: -4, md: -8, lg: 0}}
                             shouldFetch={() => product?.id}
                         />
-                    )}
-                    <RecommendedProducts
-                        title={
-                            <FormattedMessage
-                                defaultMessage="You might also like"
-                                id="product_detail.recommended_products.title.might_also_like"
-                            />
-                        }
-                        recommender={EINSTEIN_RECOMMENDERS.PDP_MIGHT_ALSO_LIKE}
-                        products={[product]}
-                        mx={{base: -4, md: -8, lg: 0}}
-                        shouldFetch={() => product?.id}
-                    />
+                    </Island>
 
-                    <RecommendedProducts
-                        // The Recently Viewed recommender doesn't use `products`, so instead we
-                        // provide a key to update the recommendations on navigation.
-                        key={location.key}
-                        title={
-                            <FormattedMessage
-                                defaultMessage="Recently Viewed"
-                                id="product_detail.recommended_products.title.recently_viewed"
-                            />
-                        }
-                        recommender={EINSTEIN_RECOMMENDERS.PDP_RECENTLY_VIEWED}
-                        mx={{base: -4, md: -8, lg: 0}}
-                    />
+                    <Island hydrateOn={'visible'}>
+                        <RecommendedProducts
+                            // The Recently Viewed recommender doesn't use `products`, so instead we
+                            // provide a key to update the recommendations on navigation.
+                            key={location.key}
+                            title={
+                                <FormattedMessage
+                                    defaultMessage="Recently Viewed"
+                                    id="product_detail.recommended_products.title.recently_viewed"
+                                />
+                            }
+                            recommender={EINSTEIN_RECOMMENDERS.PDP_RECENTLY_VIEWED}
+                            mx={{base: -4, md: -8, lg: 0}}
+                        />
+                    </Island>
                 </Stack>
             </Stack>
             {STORE_LOCATOR_IS_ENABLED && (

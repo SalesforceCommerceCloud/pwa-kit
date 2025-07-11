@@ -96,7 +96,7 @@ export const StoreLocatorForm = () => {
                             rules={{
                                 required: intl.formatMessage({
                                     id: 'store_locator.error.please_select_a_country',
-                                    defaultMessage: 'Please select a country.'
+                                    defaultMessage: 'Select a country.'
                                 })
                             }}
                             render={({field}) => {
@@ -145,7 +145,7 @@ export const StoreLocatorForm = () => {
                         rules={{
                             required: intl.formatMessage({
                                 id: 'store_locator.error.please_enter_a_postal_code',
-                                defaultMessage: 'Please enter a postal code.'
+                                defaultMessage: 'Enter a postal code.'
                             })
                         }}
                         render={({field}) => {
@@ -213,7 +213,7 @@ export const StoreLocatorForm = () => {
                     >
                         {intl.formatMessage({
                             id: 'store_locator.error.agree_to_share_your_location',
-                            defaultMessage: 'Please agree to share your location'
+                            defaultMessage: 'To use your location, enable location sharing.'
                         })}
                     </FormErrorMessage>
                 </FormControl>

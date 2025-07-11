@@ -115,7 +115,8 @@ const CheckoutConfirmation = () => {
                     firstName: data.firstName,
                     lastName: data.lastName,
                     email: data.email,
-                    login: data.email
+                    login: data.email,
+                    phoneHome: order.billingAddress.phone
                 },
                 password: data.password
             }
@@ -270,7 +271,6 @@ const CheckoutConfirmation = () => {
                                                     id="checkout_confirmation.heading.pickup_details"
                                                 />
                                             </Heading>
-
                                             <Stack spacing={2}>
                                                 <Heading as="h3" fontSize="md">
                                                     <FormattedMessage

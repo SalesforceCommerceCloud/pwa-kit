@@ -24,10 +24,11 @@ import CartCta from '@salesforce/retail-react-app/app/pages/cart/partials/cart-c
 import CartSecondaryButtonGroup from '@salesforce/retail-react-app/app/pages/cart/partials/cart-secondary-button-group'
 import CartSkeleton from '@salesforce/retail-react-app/app/pages/cart/partials/cart-skeleton'
 import CartTitle from '@salesforce/retail-react-app/app/pages/cart/partials/cart-title'
+import BonusProductsTitle from '@salesforce/retail-react-app/app/pages/cart/partials/bonus-products-title'
 import ConfirmationModal from '@salesforce/retail-react-app/app/components/confirmation-modal'
 import EmptyCart from '@salesforce/retail-react-app/app/pages/cart/partials/empty-cart'
 import OrderSummary from '@salesforce/retail-react-app/app/components/order-summary'
-import ProductItem from '@salesforce/retail-react-app/app/components/product-item'
+import ProductItemList from '@salesforce/retail-react-app/app/components/product-item-list'
 import ProductViewModal from '@salesforce/retail-react-app/app/components/product-view-modal'
 import BundleProductViewModal from '@salesforce/retail-react-app/app/components/product-view-modal/bundle'
 import RecommendedProducts from '@salesforce/retail-react-app/app/components/recommended-products'
@@ -584,6 +585,35 @@ const Cart = () => {
         )
     }
 
+    // Categorize products into regular and bonus
+    const categorizedProducts = useMemo(() => {
+        return basket?.productItems?.reduce(
+            (acc, productItem) => {
+                if (productItem.bonusProductLineItem) {
+                    acc.bonusProducts.push(productItem)
+                } else {
+                    acc.regularProducts.push(productItem)
+                }
+                return acc
+            },
+            {regularProducts: [], bonusProducts: []}
+        )
+    }, [basket?.productItems])
+
+    // Function to render secondary actions for product items
+    const renderSecondaryActions = ({productItem, isAGift}) => (
+        <CartSecondaryButtonGroup
+            isAGift={isAGift}
+            onIsAGiftChange={handleIsAGiftChange}
+            onAddToWishlistClick={handleAddToWishlist}
+            onEditClick={(product) => {
+                setSelectedItem(product)
+                onOpen()
+            }}
+            onRemoveItemClick={handleRemoveItem}
+        />
+    )
+
     /********* Rendering  UI **********/
     if (isLoading) {
         return <CartSkeleton />
@@ -592,6 +622,7 @@ const Cart = () => {
     if (!isLoading && !basket?.productItems?.length) {
         return <EmptyCart isRegistered={isRegistered} />
     }
+
     return (
         <Box background="gray.50" flex="1" data-testid="sf-cart-container">
             <Container
@@ -615,7 +646,7 @@ const Cart = () => {
                                             {isPickupOrder ? (
                                                 <Text fontWeight="bold">
                                                     <FormattedMessage
-                                                        defaultMessage="Pickup in Store ({storeName})"
+                                                        defaultMessage="Pick Up in Store ({storeName})"
                                                         id="cart.order_type.pickup_in_store"
                                                         values={{
                                                             storeName
@@ -632,53 +663,40 @@ const Cart = () => {
                                             )}
                                         </Box>
                                     )}
-                                    {basket.productItems?.map((productItem, idx) => {
-                                        return (
-                                            <ProductItem
-                                                key={productItem.itemId}
-                                                index={idx}
-                                                secondaryActions={
-                                                    <CartSecondaryButtonGroup
-                                                        isAGift={
-                                                            localIsGiftItems[productItem.itemId]
-                                                                ? localIsGiftItems[
-                                                                      productItem.itemId
-                                                                  ]
-                                                                : productItem.gift
-                                                        }
-                                                        onIsAGiftChange={handleIsAGiftChange}
-                                                        onAddToWishlistClick={handleAddToWishlist}
-                                                        onEditClick={(product) => {
-                                                            setSelectedItem(product)
-                                                            onOpen()
-                                                        }}
-                                                        onRemoveItemClick={handleRemoveItem}
-                                                    />
-                                                }
-                                                product={{
-                                                    ...productItem,
-                                                    ...(productsByItemId &&
-                                                        productsByItemId[productItem.itemId]),
-                                                    isProductUnavailable: !isProductsLoading
-                                                        ? !productsByItemId?.[productItem.itemId]
-                                                        : undefined,
-                                                    price: productItem.price,
-                                                    quantity: localQuantity[productItem.itemId]
-                                                        ? localQuantity[productItem.itemId]
-                                                        : productItem.quantity
-                                                }}
-                                                onItemQuantityChange={handleChangeItemQuantity.bind(
-                                                    this,
-                                                    productItem
-                                                )}
-                                                showLoading={
-                                                    isCartItemLoading &&
-                                                    selectedItem?.itemId === productItem.itemId
-                                                }
-                                                handleRemoveItem={handleRemoveItem}
+                                    {/* Regular Products */}
+                                    <ProductItemList
+                                        productItems={categorizedProducts.regularProducts}
+                                        productsByItemId={productsByItemId}
+                                        isProductsLoading={isProductsLoading}
+                                        localQuantity={localQuantity}
+                                        localIsGiftItems={localIsGiftItems}
+                                        isCartItemLoading={isCartItemLoading}
+                                        selectedItem={selectedItem}
+                                        onItemQuantityChange={handleChangeItemQuantity}
+                                        onRemoveItemClick={handleRemoveItem}
+                                        renderSecondaryActions={renderSecondaryActions}
+                                    />
+
+                                    {/* Bonus Products */}
+                                    {categorizedProducts.bonusProducts.length > 0 && (
+                                        <>
+                                            <Box>
+                                                <BonusProductsTitle />
+                                            </Box>
+                                            <ProductItemList
+                                                productItems={categorizedProducts.bonusProducts}
+                                                productsByItemId={productsByItemId}
+                                                isProductsLoading={isProductsLoading}
+                                                localQuantity={localQuantity}
+                                                localIsGiftItems={localIsGiftItems}
+                                                isCartItemLoading={isCartItemLoading}
+                                                selectedItem={selectedItem}
+                                                onItemQuantityChange={handleChangeItemQuantity}
+                                                onRemoveItemClick={handleRemoveItem}
+                                                renderSecondaryActions={renderSecondaryActions}
                                             />
-                                        )
-                                    })}
+                                        </>
+                                    )}
                                 </Stack>
                                 <Box>
                                     {isOpen && !selectedItem.bundledProductItems && (

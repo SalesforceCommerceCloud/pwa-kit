@@ -39,7 +39,7 @@ const SelectedRefinements = ({toggleFilter, selectedFilterValues, filters, handl
                     uiLabel = formatMessage(
                         {
                             id: 'store_inventory_filter.checkbox.label',
-                            defaultMessage: 'In Stock at {storeName}'
+                            defaultMessage: 'In stock at {storeName}'
                         },
                         {
                             storeName: selectedStore.name
