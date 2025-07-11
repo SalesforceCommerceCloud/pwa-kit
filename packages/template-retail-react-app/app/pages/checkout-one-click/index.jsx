@@ -18,18 +18,18 @@ import {
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
 import {useCheckout} from '@salesforce/retail-react-app/app/pages/checkout-container/util/checkout-context'
-import ContactInfo from '@salesforce/retail-react-app/app/pages/checkout/partials/contact-info'
-import PickupAddress from '@salesforce/retail-react-app/app/pages/checkout/partials/pickup-address'
-import ShippingAddress from '@salesforce/retail-react-app/app/pages/checkout/partials/shipping-address'
-import ShippingOptions from '@salesforce/retail-react-app/app/pages/checkout/partials/shipping-options'
-import Payment from '@salesforce/retail-react-app/app/pages/checkout/partials/payment'
+import ContactInfo from '@salesforce/retail-react-app/app/pages/checkout-one-click/partials/contact-info'
+import PickupAddress from '@salesforce/retail-react-app/app/pages/checkout-one-click/partials/pickup-address'
+import ShippingAddress from '@salesforce/retail-react-app/app/pages/checkout-one-click/partials/shipping-address'
+import ShippingOptions from '@salesforce/retail-react-app/app/pages/checkout-one-click/partials/shipping-options'
+import Payment from '@salesforce/retail-react-app/app/pages/checkout-one-click/partials/payment'
 import OrderSummary from '@salesforce/retail-react-app/app/components/order-summary'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
 import {useShopperOrdersMutation} from '@salesforce/commerce-sdk-react'
 import {STORE_LOCATOR_IS_ENABLED} from '@salesforce/retail-react-app/app/constants'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 
-const Checkout = () => {
+const CheckoutOneClick = () => {
     const {formatMessage} = useIntl()
     const navigate = useNavigation()
     const {step} = useCheckout()
@@ -165,4 +165,4 @@ const Checkout = () => {
     )
 }
 
-export default Checkout
+export default CheckoutOneClick

@@ -6,7 +6,7 @@
  */
 import React from 'react'
 import {screen, waitFor, within} from '@testing-library/react'
-import ContactInfo from '@salesforce/retail-react-app/app/pages/checkout/partials/contact-info'
+import ContactInfo from '@salesforce/retail-react-app/app/pages/checkout-one-click/partials/contact-info'
 import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
 import {rest} from 'msw'
 import {scapiBasketWithItem} from '@salesforce/retail-react-app/app/mocks/mock-data'

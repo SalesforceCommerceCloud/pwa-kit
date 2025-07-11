@@ -31,7 +31,7 @@ import {
     ToggleCardSummary
 } from '@salesforce/retail-react-app/app/components/toggle-card'
 import Field from '@salesforce/retail-react-app/app/components/field'
-import LoginState from '@salesforce/retail-react-app/app/pages/checkout/partials/login-state'
+import LoginState from '@salesforce/retail-react-app/app/pages/checkout-one-click/partials/login-state'
 import {
     AuthModal,
     EMAIL_VIEW,
