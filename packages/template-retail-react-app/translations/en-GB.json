@@ -1099,9 +1099,6 @@
   "otp.title.confirm_its_you": {
     "defaultMessage": "Confirm it's you"
   },
-  "otp_page.error.invalid_code": {
-    "defaultMessage": "Invalid verification code. Please try again."
-  },
   "page_not_found.action.go_back": {
     "defaultMessage": "Back to previous page"
   },
