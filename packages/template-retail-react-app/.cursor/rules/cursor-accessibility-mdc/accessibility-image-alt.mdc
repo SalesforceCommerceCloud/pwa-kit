@@ -1,0 +1,24 @@
+---
+description: When accessibility is checked. Ensure all <img> tags include descriptive alt attributes
+globs: 
+alwaysApply: false
+---
+
+# Rule: accessibility-image-alt
+
+Ensure all <img> tags include descriptive alt attributes
+
+## 🔍 Pattern
+
+```regex
+<img(?![^>]*\balt=)
+```
+
+## 📍 Examples
+
+```tsx
+// ❌ Bad
+<img src="photo.jpg" />
+// ✅ Good
+<img src="photo.jpg" alt="Company logo" />
+```
