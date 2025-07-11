@@ -33,6 +33,7 @@ const MockedComponent = () => {
     const match = {
         params: {pageName: 'profile'}
     }
+
     return (
         <Router>
             <Login />
@@ -209,8 +210,8 @@ describe('Logging in tests', function () {
             expect(window.location.pathname).toBe('/uk/en-GB/account')
             expect(screen.getByText(/My Profile/i)).toBeInTheDocument()
         })
-          })
-  })
+    })
+})
 
 describe('Error while logging in', function () {
     beforeEach(() => {

@@ -313,7 +313,8 @@ export const AuthModal = ({
                         <LoginForm
                             form={form}
                             submitForm={(data) => {
-                                const shouldUsePasswordless = isPasswordlessEnabled && !data.password
+                                const shouldUsePasswordless =
+                                    isPasswordlessEnabled && !data.password
                                 return submitForm(data, shouldUsePasswordless)
                             }}
                             clickCreateAccount={() => setCurrentView(REGISTER_VIEW)}
