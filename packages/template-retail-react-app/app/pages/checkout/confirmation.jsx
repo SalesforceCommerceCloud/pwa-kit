@@ -76,6 +76,20 @@ const CheckoutConfirmation = () => {
     const hasMultipleShipments = order?.shipments && order.shipments.length > 1
     const isPickupOrder = STORE_LOCATOR_IS_ENABLED && order?.shipments?.[0]?.shippingMethod?.c_storePickupEnabled === true
 
+    // Fetch store data for single pickup orders
+    const storeId = order?.shipments?.[0]?.c_fromStoreId
+    const {data: storeData} = useStores(
+        {
+            parameters: {
+                ids: storeId
+            }
+        },
+        {
+            enabled: !!storeId && isPickupOrder && onClient
+        }
+    )
+    const store = storeData?.data?.[0]
+
     useEffect(() => {
         form.reset({
             email: order?.customerInfo?.email || '',
@@ -278,9 +292,9 @@ const CheckoutConfirmation = () => {
                                                         id="checkout_confirmation.heading.pickup_address"
                                                     />
                                                 </Heading>
-                                                {order?.shipments?.[0]?.c_fromStoreId ? (
+                                                {store ? (
                                                     <StoreDisplay
-                                                        store={order?.shipments?.[0]?.c_fromStoreId}
+                                                        store={store}
                                                         showDistance={false}
                                                         showEmail={true}
                                                         showPhone={true}
