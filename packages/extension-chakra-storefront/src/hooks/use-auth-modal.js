@@ -276,6 +276,8 @@ export const AuthModal = ({
         initialView === PASSWORD_VIEW ? onClose() : setCurrentView(LOGIN_VIEW)
 
     if (typeof window === 'undefined') {
+        // Render nothing on the server side. Otherwise, the Portal component would break SSR and its data fetching.
+        // Portal would call Ark UI's useEnvironmentContext hook, which tries to access `document` that doesn't exist on the server.
         return
     }
 
