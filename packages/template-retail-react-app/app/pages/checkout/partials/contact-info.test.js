@@ -242,6 +242,42 @@ describe('passwordless enabled', () => {
             })
         }
     )
+
+    test('allows guest checkout via Enter key', async () => {
+        const {user} = renderWithProviders(<ContactInfo isPasswordlessEnabled={true} />)
+
+        // enter a valid email address
+        await user.type(screen.getByLabelText('Email'), validEmail)
+
+        // submit via Enter key - should trigger guest checkout
+        await user.keyboard('{Enter}')
+
+        // should update customer info for basket (guest checkout)
+        await waitFor(() => {
+            expect(currentBasket.customerInfo.email).toBe(validEmail)
+        })
+    })
+
+    test('allows login via Enter key when password is provided', async () => {
+        const {user} = renderWithProviders(<ContactInfo isPasswordlessEnabled={true} />)
+
+        // enter a valid email address
+        await user.type(screen.getByLabelText('Email'), validEmail)
+
+        // switch to password mode
+        const passwordButton = screen.getByText('Password')
+        await user.click(passwordButton)
+
+        // enter password
+        await user.type(screen.getByLabelText('Password'), password)
+
+        // submit via Enter key - should trigger login
+        await user.keyboard('{Enter}')
+
+        expect(
+            mockAuthHelperFunctions[AuthHelpers.LoginRegisteredUserB2C].mutateAsync
+        ).toHaveBeenCalledWith({username: validEmail, password: password})
+    })
 })
 
 describe('social login enabled', () => {

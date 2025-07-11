@@ -50,7 +50,8 @@ const mockRegisteredCustomer = {
 
 const mockAuthHelperFunctions = {
     [AuthHelpers.AuthorizePasswordless]: {mutateAsync: jest.fn()},
-    [AuthHelpers.Register]: {mutateAsync: jest.fn()}
+    [AuthHelpers.Register]: {mutateAsync: jest.fn()},
+    [AuthHelpers.LoginRegisteredUserB2C]: {mutateAsync: jest.fn()}
 }
 
 jest.mock('@salesforce/commerce-sdk-react', () => {
@@ -172,6 +173,38 @@ test('Renders check email modal on email mode', async () => {
     mockUseForm.mockRestore()
 })
 
+test('allows regular login via Enter key in password mode', async () => {
+    const {user} = renderWithProviders(<MockedComponent isPasswordlessEnabled={true} />)
+    const validEmail = 'test@salesforce.com'
+    const validPassword = 'Password123!'
+
+    // open the modal
+    const trigger = screen.getByText(/open modal/i)
+    await user.click(trigger)
+
+    await waitFor(() => {
+        expect(screen.getByText(/continue securely/i)).toBeInTheDocument()
+    })
+
+    // enter email and switch to password mode
+    await user.type(screen.getByLabelText('Email'), validEmail)
+    await user.click(screen.getByText(/password/i))
+
+    // enter password
+    await user.type(screen.getByLabelText('Password'), validPassword)
+
+    // simulate Enter key press in password field
+    await user.keyboard('{Enter}')
+
+    // should trigger regular login
+    expect(
+        mockAuthHelperFunctions[AuthHelpers.LoginRegisteredUserB2C].mutateAsync
+    ).toHaveBeenCalledWith({
+        username: validEmail,
+        password: validPassword
+    })
+})
+
 describe('Passwordless enabled', () => {
     test('Renders passwordless login when enabled', async () => {
         const {user} = renderWithProviders(<MockedComponent isPasswordlessEnabled={true} />)
@@ -232,6 +265,47 @@ describe('Passwordless enabled', () => {
             userid: validEmail,
             callbackURI: 'https://webhook.site/27761b71-50c1-4097-a600-21a3b89a546c?redirectUrl=/'
         })
+    })
+
+    test('allows passwordless login via Enter key', async () => {
+        jest.spyOn(window, 'location', 'get').mockReturnValue({
+            pathname: '/',
+            origin: 'https://example.com'
+        })
+        const {user} = renderWithProviders(<MockedComponent isPasswordlessEnabled={true} />)
+        const validEmail = 'test@salesforce.com'
+
+        // open the modal
+        const trigger = screen.getByText(/open modal/i)
+        await user.click(trigger)
+
+        await waitFor(() => {
+            expect(screen.getByText(/continue securely/i)).toBeInTheDocument()
+        })
+
+        // enter a valid email address
+        await user.type(screen.getByLabelText('Email'), validEmail)
+
+        // simulate Enter key press in email field
+        await user.keyboard('{Enter}')
+
+        // should trigger passwordless login
+        expect(
+            mockAuthHelperFunctions[AuthHelpers.AuthorizePasswordless].mutateAsync
+        ).toHaveBeenCalledWith({
+            userid: validEmail,
+            callbackURI: 'https://webhook.site/27761b71-50c1-4097-a600-21a3b89a546c?redirectUrl=/'
+        })
+
+        // check that check email modal is open
+        await waitFor(
+            () => {
+                const withinForm = within(screen.getByTestId('sf-form-resend-passwordless-email'))
+                expect(withinForm.getByText(/Check Your Email/i)).toBeInTheDocument()
+                expect(withinForm.getByText(validEmail)).toBeInTheDocument()
+            },
+            {timeout: 5000}
+        )
     })
 })
 

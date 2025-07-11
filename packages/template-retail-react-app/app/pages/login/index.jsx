@@ -121,21 +121,29 @@ const Login = ({initialView = LOGIN_VIEW}) => {
     }
 
     const handlePasswordlessLoginClick = async (e) => {
+        e.stopPropagation()
+        e.preventDefault()
         const isValid = await form.trigger('email')
         const domForm = e.target.closest('form')
         if (isValid && domForm.checkValidity()) {
-            const email = form.getValues().email
-            await handlePasswordlessLogin(email)
+            const formData = form.getValues()
+            await submitForm(formData, true)
         } else {
             domForm.reportValidity()
         }
     }
 
-    const submitForm = async (data) => {
+    const submitForm = async (data, isPasswordless = false) => {
         form.clearErrors()
 
         return {
             login: async (data) => {
+                if (isPasswordless) {
+                    const email = data.email
+                    await handlePasswordlessLogin(email)
+                    return
+                }
+
                 try {
                     await login.mutateAsync({username: data.email, password: data.password})
                 } catch (error) {
@@ -209,7 +217,10 @@ const Login = ({initialView = LOGIN_VIEW}) => {
                 {!form.formState.isSubmitSuccessful && currentView === LOGIN_VIEW && (
                     <LoginForm
                         form={form}
-                        submitForm={submitForm}
+                        submitForm={(data) => {
+                            const shouldUsePasswordless = isPasswordlessEnabled && !data.password
+                            return submitForm(data, shouldUsePasswordless)
+                        }}
                         clickCreateAccount={() => navigate('/registration')}
                         handlePasswordlessLoginClick={handlePasswordlessLoginClick}
                         handleForgotPasswordClick={() => navigate('/reset-password')}

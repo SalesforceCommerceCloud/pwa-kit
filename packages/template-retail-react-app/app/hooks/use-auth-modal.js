@@ -119,17 +119,19 @@ export const AuthModal = ({
     }
 
     const onPasswordlessLoginClick = async (e) => {
+        e.stopPropagation()
+        e.preventDefault()
         const isValid = await form.trigger('email')
         const domForm = e.target.closest('form')
         if (isValid && domForm.checkValidity()) {
-            const email = form.getValues().email
-            await handlePasswordlessLogin(email)
+            const formData = form.getValues()
+            await submitForm(formData, true)
         } else {
             domForm.reportValidity()
         }
     }
 
-    const submitForm = async (data) => {
+    const submitForm = async (data, isPasswordless = false) => {
         form.clearErrors()
 
         const onLoginSuccess = () => {
@@ -138,6 +140,12 @@ export const AuthModal = ({
 
         return {
             login: async (data) => {
+                if (isPasswordless) {
+                    const email = data.email
+                    await handlePasswordlessLogin(email)
+                    return
+                }
+
                 try {
                     await login.mutateAsync({
                         username: data.email,
@@ -304,7 +312,10 @@ export const AuthModal = ({
                     {!form.formState.isSubmitSuccessful && currentView === LOGIN_VIEW && (
                         <LoginForm
                             form={form}
-                            submitForm={submitForm}
+                            submitForm={(data) => {
+                                const shouldUsePasswordless = isPasswordlessEnabled && !data.password
+                                return submitForm(data, shouldUsePasswordless)
+                            }}
                             clickCreateAccount={() => setCurrentView(REGISTER_VIEW)}
                             handlePasswordlessLoginClick={onPasswordlessLoginClick}
                             handleForgotPasswordClick={() => setCurrentView(PASSWORD_VIEW)}
