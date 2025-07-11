@@ -10,12 +10,28 @@ import {render} from '@testing-library/react'
 import Metadata from './metadata'
 
 jest.mock('../../components/seo', () => {
-    return function MockSeo(props) {
-        // eslint-disable-next-line react/prop-types
+    // Import PropTypes inside the mock factory to avoid scope issues
+    const PropTypes = require('prop-types')
+    
+    function MockSeo(props) {
         const {metaTags, ...domProps} = props
 
-        return <div data-testid="seo" metatags={metaTags} {...domProps} />
+        return <div data-testid="seo" {...domProps} />
     }
+    
+    MockSeo.propTypes = {
+        title: PropTypes.string,
+        description: PropTypes.string,
+        keywords: PropTypes.string,
+        metaTags: PropTypes.arrayOf(
+            PropTypes.shape({
+                id: PropTypes.string.isRequired,
+                value: PropTypes.string.isRequired
+            })
+        )
+    }
+    
+    return MockSeo
 })
 
 describe('Metadata', () => {
