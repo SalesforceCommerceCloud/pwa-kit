@@ -33,6 +33,7 @@ import {SkipNavLink, SkipNavContent} from '@chakra-ui/skip-nav'
 
 // Contexts
 import {CurrencyProvider} from '@salesforce/retail-react-app/app/contexts'
+import {BonusProductModalProvider} from '@salesforce/retail-react-app/app/hooks/use-bonus-product-modal'
 
 // Local Project Components
 import Header from '@salesforce/retail-react-app/app/components/header'
@@ -47,8 +48,6 @@ import {ListMenu, ListMenuContent} from '@salesforce/retail-react-app/app/compon
 import {HideOnDesktop, HideOnMobile} from '@salesforce/retail-react-app/app/components/responsive'
 import AboveHeader from '@salesforce/retail-react-app/app/components/_app/partials/above-header'
 import {StoreLocatorModal} from '@salesforce/retail-react-app/app/components/store-locator'
-import Island from '@salesforce/retail-react-app/app/components/island'
-
 // Hooks
 import {AuthModal, useAuthModal} from '@salesforce/retail-react-app/app/hooks/use-auth-modal'
 import {
@@ -76,8 +75,7 @@ import {
     THEME_COLOR,
     CAT_MENU_DEFAULT_NAV_SSR_DEPTH,
     CAT_MENU_DEFAULT_ROOT_CATEGORY,
-    DEFAULT_LOCALE,
-    STORE_LOCATOR_IS_ENABLED
+    DEFAULT_LOCALE
 } from '@salesforce/retail-react-app/app/constants'
 
 import Seo from '@salesforce/retail-react-app/app/components/seo'
@@ -357,90 +355,80 @@ const App = (props) => {
 
                         <Box id="app" display="flex" flexDirection="column" flex={1}>
                             <SkipNavLink zIndex="skipLink">Skip to Content</SkipNavLink>
-                            {STORE_LOCATOR_IS_ENABLED && (
-                                <StoreLocatorModal
-                                    isOpen={isOpenStoreLocator}
-                                    onClose={onCloseStoreLocator}
-                                />
-                            )}
-                            <Island hydrateOn={'visible'}>
-                                <Box {...styles.headerWrapper}>
-                                    {!isCheckout ? (
-                                        <>
-                                            <AboveHeader />
-                                            <Header
-                                                onMenuClick={onOpen}
-                                                onLogoClick={onLogoClick}
-                                                onMyCartClick={onCartClick}
-                                                onMyAccountClick={onAccountClick}
-                                                onWishlistClick={onWishlistClick}
-                                                onStoreLocatorClick={onOpenStoreLocator}
-                                            >
-                                                <HideOnDesktop>
-                                                    <DrawerMenu
-                                                        isOpen={isOpen}
-                                                        onClose={onClose}
-                                                        onLogoClick={onLogoClick}
-                                                        root={
-                                                            categories?.[
-                                                                CAT_MENU_DEFAULT_ROOT_CATEGORY
-                                                            ]
-                                                        }
-                                                        itemsKey="categories"
-                                                        itemsCountKey="onlineSubCategoriesCount"
-                                                        itemComponent={DrawerMenuItemWithData}
-                                                    />
-                                                </HideOnDesktop>
+                            <StoreLocatorModal
+                                isOpen={isOpenStoreLocator}
+                                onClose={onCloseStoreLocator}
+                            />
+                            <Box {...styles.headerWrapper}>
+                                {!isCheckout ? (
+                                    <>
+                                        <AboveHeader />
+                                        <Header
+                                            onMenuClick={onOpen}
+                                            onLogoClick={onLogoClick}
+                                            onMyCartClick={onCartClick}
+                                            onMyAccountClick={onAccountClick}
+                                            onWishlistClick={onWishlistClick}
+                                            onStoreLocatorClick={onOpenStoreLocator}
+                                        >
+                                            <HideOnDesktop>
+                                                <DrawerMenu
+                                                    isOpen={isOpen}
+                                                    onClose={onClose}
+                                                    onLogoClick={onLogoClick}
+                                                    root={
+                                                        categories?.[CAT_MENU_DEFAULT_ROOT_CATEGORY]
+                                                    }
+                                                    itemsKey="categories"
+                                                    itemsCountKey="onlineSubCategoriesCount"
+                                                    itemComponent={DrawerMenuItemWithData}
+                                                />
+                                            </HideOnDesktop>
 
-                                                <HideOnMobile>
-                                                    <ListMenu
-                                                        root={
-                                                            categories?.[
-                                                                CAT_MENU_DEFAULT_ROOT_CATEGORY
-                                                            ]
-                                                        }
-                                                        itemsKey="categories"
-                                                        itemsCountKey="onlineSubCategoriesCount"
-                                                        contentComponent={ListMenuContentWithData}
-                                                    />
-                                                </HideOnMobile>
-                                            </Header>
-                                        </>
-                                    ) : (
-                                        <CheckoutHeader />
-                                    )}
-                                </Box>
-                            </Island>
+                                            <HideOnMobile>
+                                                <ListMenu
+                                                    root={
+                                                        categories?.[CAT_MENU_DEFAULT_ROOT_CATEGORY]
+                                                    }
+                                                    itemsKey="categories"
+                                                    itemsCountKey="onlineSubCategoriesCount"
+                                                    contentComponent={ListMenuContentWithData}
+                                                />
+                                            </HideOnMobile>
+                                        </Header>
+                                    </>
+                                ) : (
+                                    <CheckoutHeader />
+                                )}
+                            </Box>
                             {!isOnline && <OfflineBanner />}
                             <AddToCartModalProvider>
-                                <SkipNavContent
-                                    style={{
-                                        display: 'flex',
-                                        flexDirection: 'column',
-                                        flex: 1,
-                                        outline: 0
-                                    }}
-                                >
-                                    <Box
-                                        as="main"
-                                        id="app-main"
-                                        role="main"
-                                        display="flex"
-                                        flexDirection="column"
-                                        flex="1"
+                                <BonusProductModalProvider>
+                                    <SkipNavContent
+                                        style={{
+                                            display: 'flex',
+                                            flexDirection: 'column',
+                                            flex: 1,
+                                            outline: 0
+                                        }}
                                     >
-                                        <OfflineBoundary isOnline={false}>
-                                            {children}
-                                        </OfflineBoundary>
-                                    </Box>
-                                </SkipNavContent>
-
-                                <Island hydrateOn={'visible'}>
+                                        <Box
+                                            as="main"
+                                            id="app-main"
+                                            role="main"
+                                            display="flex"
+                                            flexDirection="column"
+                                            flex="1"
+                                        >
+                                            <OfflineBoundary isOnline={false}>
+                                                {children}
+                                            </OfflineBoundary>
+                                        </Box>
+                                    </SkipNavContent>
                                     {!isCheckout ? <Footer /> : <CheckoutFooter />}
-                                </Island>
-
-                                <AuthModal {...authModal} />
-                                <DntNotification {...dntNotification} />
+                                    <AuthModal {...authModal} />
+                                    <DntNotification {...dntNotification} />
+                                </BonusProductModalProvider>
                             </AddToCartModalProvider>
                         </Box>
                     </CurrencyProvider>
