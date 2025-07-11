@@ -270,8 +270,6 @@ describe('Cancel Order Button and Modal', () => {
     })
 
     test('should open cancel order modal when button is clicked', async () => {
-        expect(await screen.findByTestId('account-order-details-page')).toBeInTheDocument()
-
         const cancelButton = screen.getByRole('button', {name: /cancel order/i})
         await user.click(cancelButton)
 
@@ -284,8 +282,6 @@ describe('Cancel Order Button and Modal', () => {
     })
 
     test('should close modal when close button is clicked', async () => {
-        expect(await screen.findByTestId('account-order-details-page')).toBeInTheDocument()
-
         // Open modal
         const cancelButton = screen.getByRole('button', {name: /cancel order/i})
         await user.click(cancelButton)
@@ -302,8 +298,6 @@ describe('Cancel Order Button and Modal', () => {
     })
 
     test('should close modal when request cancellation button is clicked', async () => {
-        expect(await screen.findByTestId('account-order-details-page')).toBeInTheDocument()
-
         // Open modal
         const cancelButton = screen.getByRole('button', {name: /cancel order/i})
         await user.click(cancelButton)
@@ -313,7 +307,6 @@ describe('Cancel Order Button and Modal', () => {
         const requestCancellationButtons = screen.getAllByRole('button', {
             name: /request cancellation/i
         })
-        // Find the button inside the modal (not the one that opens it)
         const modalButton = requestCancellationButtons.find((button) =>
             button.closest('[role="dialog"]')
         )
@@ -326,8 +319,6 @@ describe('Cancel Order Button and Modal', () => {
     })
 
     test('should call onRequestCancellation when request cancellation button is clicked', async () => {
-        expect(await screen.findByTestId('account-order-details-page')).toBeInTheDocument()
-
         // Open modal
         const cancelButton = screen.getByRole('button', {name: /cancel order/i})
         await user.click(cancelButton)
@@ -340,10 +331,7 @@ describe('Cancel Order Button and Modal', () => {
         const modalButton = requestCancellationButtons.find((button) =>
             button.closest('[role="dialog"]')
         )
-
-        // Check that the callback would be called (we can't easily test the actual callback without mocking)
         expect(modalButton).toBeInTheDocument()
-
         await user.click(modalButton)
 
         // Modal should close after action

@@ -49,7 +49,7 @@ const CancelOrderModal = ({
                 </ModalHeader>
                 <ModalCloseButton />
                 <ModalBody>
-					{/* TODO: Add order details here W-18998712 */}
+                    {/* TODO: Add order details here W-18998712 */}
                     <Text>
                         <FormattedMessage
                             defaultMessage="This is a blank modal for canceling the order."

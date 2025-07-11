@@ -42,32 +42,25 @@ afterEach(() => {
 
 test('renders cancel order modal when open', async () => {
     renderWithProviders(<CancelOrderModal isOpen={true} onClose={jest.fn()} order={mockOrder} />)
-
-    // Check modal content
     expect(screen.getByRole('dialog')).toBeInTheDocument()
     expect(screen.getAllByText(/request cancellation/i)).toHaveLength(2)
 })
 
 test('does not render modal when closed', () => {
     renderWithProviders(<MockedComponent order={mockOrder} />)
-
-    // Modal should not be visible initially
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
     expect(screen.queryByText(/request cancellation/i)).not.toBeInTheDocument()
 })
 
 test('renders modal with correct header text', async () => {
     renderWithProviders(<CancelOrderModal isOpen={true} onClose={jest.fn()} order={mockOrder} />)
-
-    // Check header text specifically - look for the modal header within the dialog
     const dialog = screen.getByRole('dialog')
     expect(dialog).toBeInTheDocument()
-    expect(screen.getAllByText(/request cancellation/i)).toHaveLength(2) // Header and button
+    expect(screen.getAllByText(/request cancellation/i)).toHaveLength(2)
 })
 
 test('renders modal with correct body content', async () => {
     const user = userEvent.setup()
-
     renderWithProviders(<MockedComponent order={mockOrder} />)
 
     // Open the modal
@@ -80,7 +73,6 @@ test('renders modal with correct body content', async () => {
 
 test('renders request cancellation button', async () => {
     const user = userEvent.setup()
-
     renderWithProviders(<MockedComponent order={mockOrder} />)
 
     // Open the modal
@@ -94,14 +86,13 @@ test('renders request cancellation button', async () => {
 
 test('renders close button (X)', async () => {
     const user = userEvent.setup()
-
     renderWithProviders(<MockedComponent order={mockOrder} />)
 
     // Open the modal
     const trigger = screen.getByText(/open cancel modal/i)
     await user.click(trigger)
 
-    // Check for close button (usually has aria-label or is recognizable by role)
+    // Check for close button
     const closeButton = screen.getByRole('button', {name: /close/i})
     expect(closeButton).toBeInTheDocument()
 })
@@ -109,10 +100,9 @@ test('renders close button (X)', async () => {
 test('calls onClose when close button is clicked', async () => {
     const user = userEvent.setup()
     const onClose = jest.fn()
-
     renderWithProviders(<MockedComponent order={mockOrder} onClose={onClose} />)
 
-    // Open the modal manually by setting isOpen to true
+    // Open the modal
     renderWithProviders(<CancelOrderModal isOpen={true} onClose={onClose} order={mockOrder} />)
 
     // Click close button
