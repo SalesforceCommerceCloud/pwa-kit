@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {useState, useMemo} from 'react'
+import React, {useState, useMemo, useEffect} from 'react'
 import {FormattedMessage, useIntl} from 'react-intl'
 
 // Chakra Components
@@ -32,6 +32,7 @@ import ProductItemList from '@salesforce/retail-react-app/app/components/product
 import ProductViewModal from '@salesforce/retail-react-app/app/components/product-view-modal'
 import BundleProductViewModal from '@salesforce/retail-react-app/app/components/product-view-modal/bundle'
 import RecommendedProducts from '@salesforce/retail-react-app/app/components/recommended-products'
+import {DELIVERY_OPTIONS} from '@salesforce/retail-react-app/app/components/pickup-or-delivery'
 
 // Hooks
 import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
@@ -42,6 +43,7 @@ import {useWishList} from '@salesforce/retail-react-app/app/hooks/use-wish-list'
 import {
     API_ERROR_MESSAGE,
     EINSTEIN_RECOMMENDERS,
+    MULTISHIP_IS_ENABLED,
     TOAST_ACTION_VIEW_WISHLIST,
     TOAST_MESSAGE_ADDED_TO_WISHLIST,
     TOAST_MESSAGE_REMOVED_ITEM_FROM_CART,
@@ -55,7 +57,6 @@ import debounce from 'lodash/debounce'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
 import {
     useShopperBasketsMutation,
-    useShippingMethodsForShipment,
     useProducts,
     useShopperCustomersMutation,
     useStores
@@ -64,6 +65,7 @@ import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-cur
 import UnavailableProductConfirmationModal from '@salesforce/retail-react-app/app/components/unavailable-product-confirmation-modal'
 import {getUpdateBundleChildArray} from '@salesforce/retail-react-app/app/utils/product-utils'
 import {useSelectedStore} from '@salesforce/retail-react-app/app/hooks/use-selected-store'
+import {useMultiship} from '@salesforce/retail-react-app/app/hooks/use-multiship'
 
 const DEBOUNCE_WAIT = 750
 
@@ -91,6 +93,8 @@ const Cart = () => {
 
     const {selectedStore} = useSelectedStore()
     const selectedInventoryId = selectedStore?.inventoryId || null
+    const {handleDeliveryOptionChange, assignDefaultShippingMethodsToShipments} =
+        useMultiship(basket)
     const productIds = basket?.productItems?.map(({productId}) => productId).join(',') ?? ''
     const {data: products, isLoading: isProductsLoading} = useProducts(
         {
@@ -232,15 +236,13 @@ const Cart = () => {
     const updateItemInBasketMutation = useShopperBasketsMutation('updateItemInBasket')
     const updateItemsInBasketMutation = useShopperBasketsMutation('updateItemsInBasket')
     const removeItemFromBasketMutation = useShopperBasketsMutation('removeItemFromBasket')
-    const updateShippingMethodForShipmentsMutation = useShopperBasketsMutation(
-        'updateShippingMethodForShipment'
-    )
     /*****************Basket Mutation************************/
 
     const [selectedItem, setSelectedItem] = useState(undefined)
     const [localQuantity, setLocalQuantity] = useState({})
     const [localIsGiftItems, setLocalIsGiftItems] = useState({})
     const [isCartItemLoading, setCartItemLoading] = useState(false)
+    const [isProcessingShippingMethods, setIsProcessingShippingMethods] = useState(false)
 
     const {isOpen, onOpen, onClose} = useDisclosure()
     const {formatMessage} = useIntl()
@@ -248,35 +250,36 @@ const Cart = () => {
     const navigate = useNavigation()
     const modalProps = useDisclosure()
 
-    /******************* Shipping Methods for basket shipment *******************/
-    // do this action only if the basket shipping method is not defined
-    // we need to fetch the shippment methods to get the default value before we can add it to the basket
-    useShippingMethodsForShipment(
-        {
-            parameters: {
-                basketId: basket?.basketId,
-                shipmentId: 'me'
+    /******************* Assign Default Shipping Methods to Shipments *******************/
+    // Assign default shipping methods to any shipments that don't have one
+    // This runs when the basket is first loaded and whenever shipments change
+    useEffect(() => {
+        const assignDefaultShippingMethods = async () => {
+            if (isProcessingShippingMethods || !basket?.basketId) {
+                return
             }
-        },
-        {
-            // only fetch if basket is has no shipping method in the first shipment
-            enabled:
-                !!basket?.basketId &&
-                basket.shipments.length > 0 &&
-                !basket.shipments[0].shippingMethod,
-            onSuccess: (data) => {
-                updateShippingMethodForShipmentsMutation.mutate({
-                    parameters: {
-                        basketId: basket?.basketId,
-                        shipmentId: 'me'
-                    },
-                    body: {
-                        id: data.defaultShippingMethodId
-                    }
-                })
+
+            // Check if any shipments need shipping methods to avoid unnecessary processing
+            const hasShipmentsWithoutMethod = basket.shipments?.some(
+                (shipment) => !shipment.shippingMethod
+            )
+
+            if (!hasShipmentsWithoutMethod) {
+                return
+            }
+
+            setIsProcessingShippingMethods(true)
+            try {
+                await assignDefaultShippingMethodsToShipments()
+            } catch (error) {
+                console.error('Failed to assign default shipping methods:', error)
+            } finally {
+                setIsProcessingShippingMethods(false)
             }
         }
-    )
+
+        assignDefaultShippingMethods()
+    }, [basket?.basketId, basket?.shipments?.length, isProcessingShippingMethods])
 
     /************************* Error handling ***********************/
     const showError = () => {
@@ -682,9 +685,27 @@ const Cart = () => {
     // Function to create deliveryActions
     const createDeliveryActions = (isPickupOrder) => {
         return {
-            showDeliveryOptions: STORE_LOCATOR_IS_ENABLED,
-            deliveryOption: isPickupOrder ? 'pickup' : 'ship',
-            onDeliveryOptionChange: () => {}
+            showDeliveryOptions: STORE_LOCATOR_IS_ENABLED && MULTISHIP_IS_ENABLED,
+            deliveryOption: isPickupOrder ? DELIVERY_OPTIONS.PICKUP : DELIVERY_OPTIONS.SHIP,
+            //
+            // TODO: Maybe instead of disabling we should pop open the store locator modal?
+            //
+            isPickupDisabled: !selectedStore && !isPickupOrder,
+            onDeliveryOptionChange: async (productItem, selectedDeliveryOption) => {
+                try {
+                    setCartItemLoading(true)
+                    setSelectedItem(productItem)
+
+                    const selectedPickup = selectedDeliveryOption === DELIVERY_OPTIONS.PICKUP
+                    await handleDeliveryOptionChange(productItem, selectedPickup, selectedStore)
+                } catch (error) {
+                    console.error('Error changing delivery option:', error)
+                    showError()
+                } finally {
+                    setCartItemLoading(false)
+                    setSelectedItem(undefined)
+                }
+            }
         }
     }
 
@@ -883,6 +904,7 @@ const Cart = () => {
                 {...modalProps}
             />
 
+            {/* TODO: This is not working as expected, it does not account for store inventory. */}
             <UnavailableProductConfirmationModal
                 productItems={basket?.productItems}
                 handleUnavailableProducts={handleUnavailableProducts}

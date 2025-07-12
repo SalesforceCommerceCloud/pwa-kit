@@ -75,8 +75,14 @@ const ProductItem = ({
                                 {deliveryActions?.showDeliveryOptions && (
                                     <HideOnMobile>
                                         <PickupOrDelivery
+                                            isPickupDisabled={deliveryActions.isPickupDisabled}
                                             value={deliveryActions.deliveryOption}
-                                            onChange={deliveryActions.onDeliveryOptionChange}
+                                            onChange={(selectedValue) =>
+                                                deliveryActions.onDeliveryOptionChange(
+                                                    product,
+                                                    selectedValue
+                                                )
+                                            }
                                         />
                                     </HideOnMobile>
                                 )}
@@ -85,8 +91,14 @@ const ProductItem = ({
                             {deliveryActions?.showDeliveryOptions && (
                                 <HideOnDesktop>
                                     <PickupOrDelivery
+                                        isPickupDisabled={deliveryActions.isPickupDisabled}
                                         value={deliveryActions.deliveryOption}
-                                        onChange={deliveryActions.onDeliveryOptionChange}
+                                        onChange={(selectedValue) =>
+                                            deliveryActions.onDeliveryOptionChange(
+                                                product,
+                                                selectedValue
+                                            )
+                                        }
                                     />
                                 </HideOnDesktop>
                             )}
@@ -148,6 +160,7 @@ ProductItem.propTypes = {
     secondaryActions: PropTypes.node,
     deliveryActions: PropTypes.shape({
         showDeliveryOptions: PropTypes.bool,
+        isPickupDisabled: PropTypes.bool,
         deliveryOption: PropTypes.string,
         onDeliveryOptionChange: PropTypes.func
     })
