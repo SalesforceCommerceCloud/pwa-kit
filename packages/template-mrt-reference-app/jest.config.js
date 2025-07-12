@@ -16,7 +16,12 @@ module.exports = {
             statements: 85
         }
     },
-    collectCoverageFrom: ['app/**', '!app/request-processor.js', '!app/static/**', '!app/*.json'],
+    collectCoverageFrom: [
+        'app/**',
+        '!app/request-processor.js',
+        '!app/static/**',
+        '!app/*.json'
+    ],
     // Increase to: 6 x default timeout of 5 seconds
     ...(process.env.CI ? {testTimeout: 30000} : {})
 }

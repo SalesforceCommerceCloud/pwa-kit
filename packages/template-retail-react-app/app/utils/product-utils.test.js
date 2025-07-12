@@ -28,15 +28,8 @@ import productSetWinterLookM from '@salesforce/retail-react-app/app/mocks/produc
 import {mockProductSearch} from '@salesforce/retail-react-app/app/mocks/mock-data'
 import {
     mockProductBundle,
-    mockBundleItemsAdded,
-    mockBundledProductItemsVariant,
-    mockStandardProduct,
-    mockBundleItemsWithStandardProducts,
-    mockBasketWithStandardProducts,
-    mockBundleWithMixedProducts,
-    mockBundleItemsWithMixedProducts,
-    mockBasketWithMixedProducts
-} from '@salesforce/retail-react-app/app/mocks/product-bundle'
+    mockBundledProductItemsVariant
+} from '@salesforce/retail-react-app/app/mocks/product-bundle.js'
 
 const imageGroups = [
     {
@@ -798,15 +791,6 @@ describe('getDisplayVariationValues', function () {
             Width: 'M'
         })
     })
-
-    test('returns empty object when variationAttributes are not provided', () => {
-        const selectedValues = {
-            color: 'TAUPETX',
-            size: '065'
-        }
-        const result = getDisplayVariationValues(undefined, selectedValues)
-        expect(result).toEqual({})
-    })
 })
 
 describe('getPriceData', function () {
@@ -1020,23 +1004,5 @@ describe('getUpdateBundleChildArray', () => {
             modifiedChildProductSelections
         )
         expect(result).toEqual([])
-    })
-
-    test('handles mixed bundle with standard and variant products', () => {
-        const mixedProductSelections = mockBundleItemsWithMixedProducts
-
-        const bundleWithMixedProducts = {
-            bundledProductItems: mockBasketWithMixedProducts.productItems[0].bundledProductItems
-        }
-
-        const result = getUpdateBundleChildArray(bundleWithMixedProducts, mixedProductSelections)
-
-        expect(result).toEqual([
-            {
-                itemId: 'variant-item-1',
-                productId: 'variant-2-id',
-                quantity: 2
-            }
-        ])
     })
 })

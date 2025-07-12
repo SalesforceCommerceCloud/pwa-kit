@@ -83,7 +83,7 @@ const SwatchGroup = (props) => {
     // Whenever the selected index changes ensure that we call the change handler.
     useEffect(() => {
         const childrenArray = Children.toArray(children)
-        const newValue = childrenArray[selectedIndex].props.value
+        const newValue = childrenArray[selectedIndex]?.props?.value
 
         handleChange(newValue)
     }, [selectedIndex])
@@ -105,7 +105,7 @@ const SwatchGroup = (props) => {
                 )}
                 <Flex ref={wrapperRef} {...styles.swatchesWrapper}>
                     {Children.toArray(children).map((child, index) => {
-                        const selected = child.props.value === value
+                        const selected = child.props?.value === value
                         return React.cloneElement(child, {
                             handleSelect: handleChange,
                             selected,

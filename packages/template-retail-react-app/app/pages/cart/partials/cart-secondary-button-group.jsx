@@ -84,14 +84,12 @@ const CartSecondaryButtonGroup = ({
                 divider={<Divider display={{base: 'block', lg: 'none'}} />}
             >
                 <ButtonGroup spacing="6">
-                    {!isBonusProduct && (
-                        <Button variant="link" size="sm" onClick={showRemoveItemConfirmation}>
-                            <FormattedMessage
-                                defaultMessage="Remove"
-                                id="cart_secondary_button_group.action.remove"
-                            />
-                        </Button>
-                    )}
+                    <Button variant="link" size="sm" onClick={showRemoveItemConfirmation}>
+                        <FormattedMessage
+                            defaultMessage="Remove"
+                            id="cart_secondary_button_group.action.remove"
+                        />
+                    </Button>
                     {customer.isRegistered && !isBonusProduct && (
                         <Button
                             variant="link"
@@ -104,16 +102,12 @@ const CartSecondaryButtonGroup = ({
                             />
                         </Button>
                     )}
-                    {/* Only show edit button if it's not a standard product */}
-                    {variant.id &&
-                        !variant.type?.item && ( // the variant.id ensures complete product data. Without it, Edit button appears briefly
-                            <Button variant="link" size="sm" onClick={() => onEditClick(variant)}>
-                                <FormattedMessage
-                                    defaultMessage="Edit"
-                                    id="cart_secondary_button_group.action.edit"
-                                />
-                            </Button>
-                        )}
+                    <Button variant="link" size="sm" onClick={() => onEditClick(variant)}>
+                        <FormattedMessage
+                            defaultMessage="Edit"
+                            id="cart_secondary_button_group.action.edit"
+                        />
+                    </Button>
                 </ButtonGroup>
                 {!isBonusProduct && (
                     <Flex alignItems="center">

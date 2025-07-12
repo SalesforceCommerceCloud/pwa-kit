@@ -19,20 +19,11 @@ import {
     Text,
     VStack,
     Fade,
-    Stack,
-    Radio,
-    RadioGroup,
     useTheme
 } from '@salesforce/retail-react-app/app/components/shared/ui'
-
-// Constants
-const DELIVERY_OPTIONS = {
-    SHIP: 'ship',
-    PICKUP: 'pickup'
-}
 import {useCurrency, useDerivedProduct} from '@salesforce/retail-react-app/app/hooks'
 import {useAddToCartModalContext} from '@salesforce/retail-react-app/app/hooks/use-add-to-cart-modal'
-import {STORE_LOCATOR_IS_ENABLED} from '@salesforce/retail-react-app/app/constants'
+import {useBonusProductModalContext} from '@salesforce/retail-react-app/app/hooks/use-bonus-product-modal'
 
 // project components
 import ImageGallery from '@salesforce/retail-react-app/app/components/image-gallery'
@@ -94,8 +85,7 @@ ProductViewHeader.propTypes = {
     category: PropTypes.array,
     priceData: PropTypes.object,
     product: PropTypes.object,
-    isProductPartOfBundle: PropTypes.bool,
-    showDeliveryOptions: PropTypes.bool
+    isProductPartOfBundle: PropTypes.bool
 }
 
 const ButtonWithRegistration = withRegistration(Button)
@@ -125,28 +115,11 @@ const ProductView = forwardRef(
             setChildProductOrderability,
             isBasketLoading = false,
             onVariantSelected = () => {},
-            validateOrderability = (variant, product, quantity, stockLevel) => {
-                if (isProductLoading) return false
-
-                // If product has variations, a variant must be selected
-                if (product?.variationAttributes?.length > 0 && !variant) {
-                    return false
-                }
-
-                // Check if product (either variant or standard) is orderable and if quantity is valid
-                return (
-                    (variant?.orderable || product?.inventory?.orderable) &&
-                    quantity > 0 &&
-                    quantity <= stockLevel
-                )
-            },
+            validateOrderability = (variant, quantity, stockLevel) =>
+                !isProductLoading && variant?.orderable && quantity > 0 && quantity <= stockLevel,
             showImageGallery = true,
             setSelectedBundleQuantity = () => {},
-            selectedBundleParentQuantity = 1,
-            pickupInStore = false,
-            setPickupInStore = () => {},
-            onOpenStoreLocator = () => {},
-            showDeliveryOptions = true
+            selectedBundleParentQuantity = 1
         },
         ref
     ) => {
@@ -159,6 +132,13 @@ const ProductView = forwardRef(
             onOpen: onAddToCartModalOpen,
             onClose: onAddToCartModalClose
         } = useAddToCartModalContext()
+        const {
+            isOpen: isBonusProductModalOpen,
+            onOpen: onBonusProductModalOpen,
+            onClose: onBonusProductModalClose,
+            bonusProducts,
+            addBonusProducts
+        } = useBonusProductModalContext()
         const theme = useTheme()
         const [showOptionsMessage, toggleShowOptionsMessage] = useState(false)
         const {
@@ -174,9 +154,7 @@ const ProductView = forwardRef(
             stockLevel,
             stepQuantity,
             isOutOfStock,
-            unfulfillable,
-            isSelectedStoreOutOfStock,
-            selectedStore
+            unfulfillable
         } = useDerivedProduct(product, isProductPartOfSet, isProductPartOfBundle)
         const priceData = useMemo(() => {
             return getPriceData(product, {quantity})
@@ -185,9 +163,6 @@ const ProductView = forwardRef(
         const isProductASet = product?.type?.set
         const isProductABundle = product?.type?.bundle
         const errorContainerRef = useRef(null)
-        const [pickupEnabled, setPickupEnabled] = useState(false)
-        const storeName = selectedStore?.name
-        const inventoryId = selectedStore?.inventoryId
 
         const {disableButton, customInventoryMessage} = useMemo(() => {
             let shouldDisableButton = showInventoryMessage
@@ -236,7 +211,7 @@ const ProductView = forwardRef(
         const validateAndShowError = (opts = {}) => {
             const {scrollErrorIntoView = true} = opts
             // Validate that all attributes are selected before proceeding.
-            const hasValidSelection = validateOrderability(variant, product, quantity, stockLevel)
+            const hasValidSelection = validateOrderability(variant, quantity, stockLevel)
             const showError = !isProductASet && !isProductABundle && !hasValidSelection
             const scrollToError = showError && scrollErrorIntoView
 
@@ -305,16 +280,52 @@ const ProductView = forwardRef(
                     return
                 }
                 try {
-                    const itemsAdded = await addToCart([{product, variant, quantity}])
+                    const addToCartResponse = await addToCart(variant, quantity)
+
+                    // For regular products: addToCartResponse has productSelectionValues and possibly bonusDiscountLineItems
+                    // For product bundles: addToCartResponse is just the childProductSelections array
+                    const itemsAdded =
+                        addToCartResponse?.productSelectionValues || addToCartResponse
+                    const isValidResponse =
+                        itemsAdded && (Array.isArray(itemsAdded) || itemsAdded.length > 0)
+
+                    // Compare existing bonus products with new bonus discount line items
+                    // Only regular products (not bundles) can have bonusDiscountLineItems
+                    const newBonusItems =
+                        addToCartResponse?.bonusDiscountLineItems?.filter(
+                            (newItem) =>
+                                !bonusProducts.some(
+                                    (existingItem) => existingItem.id === newItem.id
+                                )
+                        ) || []
+
                     // Open modal only when `addToCart` returns some data
                     // It's possible that the item has been added to cart, but we don't want to open the modal.
                     // See wishlist_primary_action for example.
-                    if (itemsAdded) {
-                        onAddToCartModalOpen({
-                            product,
-                            itemsAdded,
-                            selectedQuantity: quantity
-                        })
+                    if (isValidResponse) {
+                        // Show bonus product modal first if there are bonus items
+                        // TODO: Rule based promotions are not supported yet
+                        if (
+                            newBonusItems?.length > 0 &&
+                            newBonusItems.some((item) => item.bonusProducts)
+                        ) {
+                            // Update bonusProducts list with the new bonus items
+                            addBonusProducts(newBonusItems)
+                            onBonusProductModalOpen({
+                                newBonusItems,
+                                allBonusItems: addToCartResponse.bonusDiscountLineItems,
+                                product,
+                                itemsAdded,
+                                selectedQuantity: quantity
+                            })
+                        } else {
+                            // If no bonus items, just show add to cart modal
+                            onAddToCartModalOpen({
+                                product,
+                                itemsAdded,
+                                selectedQuantity: quantity
+                            })
+                        }
                     }
                 } catch (e) {
                     showError()
@@ -397,13 +408,16 @@ const ProductView = forwardRef(
             if (isAddToCartModalOpen) {
                 onAddToCartModalClose()
             }
+            if (isBonusProductModalOpen) {
+                onBonusProductModalClose()
+            }
         }, [location.pathname])
 
         useEffect(() => {
             if (
                 !isProductASet &&
                 !isProductABundle &&
-                validateOrderability(variant, product, quantity, stockLevel)
+                validateOrderability(variant, quantity, stockLevel)
             ) {
                 toggleShowOptionsMessage(false)
             }
@@ -414,12 +428,6 @@ const ProductView = forwardRef(
                 onVariantSelected(product, variant, quantity)
             }
         }, [variant?.productId, quantity])
-
-        useEffect(() => {
-            if ((isProductPartOfBundle || isProductPartOfSet) && product && product.type?.item) {
-                onVariantSelected(product, null, childOfBundleQuantity || quantity)
-            }
-        }, [product, childOfBundleQuantity, quantity, isProductPartOfBundle, isProductPartOfSet])
 
         useEffect(() => {
             if (isProductPartOfBundle || isProductPartOfSet) {
@@ -437,18 +445,6 @@ const ProductView = forwardRef(
                 }))
             }
         }, [showInventoryMessage, inventoryMessage])
-
-        // Auto-switch off pickup in store when product becomes unavailable at selected store
-        useEffect(() => {
-            setPickupEnabled(!!selectedStore?.inventoryId)
-            if (pickupInStore && isSelectedStoreOutOfStock) {
-                setPickupInStore(false)
-            }
-        }, [selectedStore])
-
-        const handleDeliveryOptionChange = (value) => {
-            setPickupInStore(value === DELIVERY_OPTIONS.PICKUP)
-        }
 
         return (
             <Flex direction={'column'} data-testid="product-view" ref={ref}>
@@ -477,7 +473,7 @@ const ProductView = forwardRef(
                                     <HideOnMobile>
                                         {showFullLink && product && (
                                             <Link
-                                                to={`/product/${product.master.masterId}`}
+                                                to={`/product/${product.master?.masterId}`}
                                                 color="blue.600"
                                             >
                                                 <FormattedMessage
@@ -536,7 +532,7 @@ const ProductView = forwardRef(
                                     <Skeleton height={20} width={64} />
                                 </>
                             ) : (
-                                variationAttributes.map(({id, name, selectedValue, values}) => {
+                                variationAttributes?.map(({id, name, selectedValue, values}) => {
                                     const swatches = values.map(
                                         ({href, name, image, value, orderable}, index) => {
                                             const content = image ? (
@@ -664,7 +660,7 @@ const ProductView = forwardRef(
                             <HideOnDesktop>
                                 {showFullLink && product && (
                                     <Link
-                                        to={`/product/${product.master.masterId}`}
+                                        to={`/product/${product.master?.masterId}`}
                                         color="blue.600"
                                     >
                                         <FormattedMessage
@@ -692,148 +688,12 @@ const ProductView = forwardRef(
                                     </Text>
                                 </Fade>
                             )}
-                            <Box>
-                                {showDeliveryOptions && (
-                                    <>
-                                        <Box mb={4}>
-                                            <Text fontWeight={600} mb={3}>
-                                                <FormattedMessage
-                                                    defaultMessage="Delivery:"
-                                                    id="product_view.label.delivery"
-                                                />
-                                            </Text>
-                                            <RadioGroup
-                                                value={
-                                                    pickupInStore
-                                                        ? DELIVERY_OPTIONS.PICKUP
-                                                        : DELIVERY_OPTIONS.SHIP
-                                                }
-                                                onChange={handleDeliveryOptionChange}
-                                                mb={1}
-                                            >
-                                                <Stack direction="column" spacing={2}>
-                                                    <Radio
-                                                        value={DELIVERY_OPTIONS.SHIP}
-                                                        isDisabled={disableButton}
-                                                    >
-                                                        <FormattedMessage
-                                                            defaultMessage="Ship to Address"
-                                                            id="product_view.label.ship_to_address"
-                                                        />
-                                                    </Radio>
-                                                    {STORE_LOCATOR_IS_ENABLED && (
-                                                        <Radio
-                                                            value={DELIVERY_OPTIONS.PICKUP}
-                                                            isDisabled={
-                                                                !pickupEnabled ||
-                                                                (storeName &&
-                                                                    inventoryId &&
-                                                                    isSelectedStoreOutOfStock)
-                                                            }
-                                                        >
-                                                            <FormattedMessage
-                                                                defaultMessage="Pick Up in Store"
-                                                                id="product_view.label.pickup_in_store"
-                                                            />
-                                                        </Radio>
-                                                    )}
-                                                </Stack>
-                                            </RadioGroup>
-                                        </Box>
-
-                                        {STORE_LOCATOR_IS_ENABLED && (
-                                            <>
-                                                {storeName && inventoryId && (
-                                                    <Text
-                                                        color="black"
-                                                        fontWeight={600}
-                                                        mb={2}
-                                                        data-testid="store-stock-status-msg"
-                                                    >
-                                                        {!isSelectedStoreOutOfStock
-                                                            ? intl.formatMessage(
-                                                                  {
-                                                                      id: 'product_view.status.in_stock_at_store',
-                                                                      defaultMessage:
-                                                                          'In stock at {storeName}'
-                                                                  },
-                                                                  {
-                                                                      storeName: (
-                                                                          <Link
-                                                                              as="button"
-                                                                              color="blue.600"
-                                                                              textDecoration="underline"
-                                                                              onClick={
-                                                                                  onOpenStoreLocator
-                                                                              }
-                                                                          >
-                                                                              {storeName}
-                                                                          </Link>
-                                                                      )
-                                                                  }
-                                                              )
-                                                            : intl.formatMessage(
-                                                                  {
-                                                                      id: 'product_view.status.out_of_stock_at_store',
-                                                                      defaultMessage:
-                                                                          'Out of Stock at {storeName}'
-                                                                  },
-                                                                  {
-                                                                      storeName: (
-                                                                          <Link
-                                                                              as="button"
-                                                                              color="blue.600"
-                                                                              textDecoration="underline"
-                                                                              onClick={
-                                                                                  onOpenStoreLocator
-                                                                              }
-                                                                          >
-                                                                              {storeName}
-                                                                          </Link>
-                                                                      )
-                                                                  }
-                                                              )}
-                                                    </Text>
-                                                )}
-
-                                                {/* Show label if pickup is disabled due to no store/inventoryId */}
-                                                {!pickupEnabled && !storeName && !inventoryId && (
-                                                    <Text
-                                                        color="black"
-                                                        fontWeight={600}
-                                                        mb={3}
-                                                        data-testid="pickup-select-store-msg"
-                                                    >
-                                                        <FormattedMessage
-                                                            defaultMessage="Pick up in "
-                                                            id="product_view.label.pickup_in_select_store_prefix"
-                                                        />{' '}
-                                                        <Link
-                                                            as="button"
-                                                            color="blue.600"
-                                                            textDecoration="underline"
-                                                            onClick={onOpenStoreLocator}
-                                                        >
-                                                            <FormattedMessage
-                                                                defaultMessage="Select Store"
-                                                                id="product_view.label.select_store_link"
-                                                            />
-                                                        </Link>
-                                                    </Text>
-                                                )}
-                                            </>
-                                        )}
-                                    </>
-                                )}
-                                <Box
-                                    display={
-                                        isProductPartOfSet
-                                            ? 'block'
-                                            : ['none', 'none', 'none', 'block']
-                                    }
-                                >
-                                    {renderActionButtons()}
-                                </Box>
+                            <Box
+                                display={
+                                    isProductPartOfSet ? 'block' : ['none', 'none', 'none', 'block']
+                                }
+                            >
+                                {renderActionButtons()}
                             </Box>
                         </Box>
                     </VStack>
@@ -885,11 +745,7 @@ ProductView.propTypes = {
     validateOrderability: PropTypes.func,
     showImageGallery: PropTypes.bool,
     setSelectedBundleQuantity: PropTypes.func,
-    selectedBundleParentQuantity: PropTypes.number,
-    pickupInStore: PropTypes.bool,
-    setPickupInStore: PropTypes.func,
-    onOpenStoreLocator: PropTypes.func,
-    showDeliveryOptions: PropTypes.bool
+    selectedBundleParentQuantity: PropTypes.number
 }
 
 export default ProductView
