@@ -14,7 +14,23 @@ The PWA Storefront MCP Server provides these features.
 
 - `development_guidelines`: Helps developers understand and follow PWA Storefront developer guidelines and best practices.
 - `create_new_sample_component`: Helps developers create a new sample PWA Storefront component. This feature guides developers through a few simple questions and then generates code for the component based on the commerce data model used, layouts, etc.
-- `create_app_guidelines`: Helps developers generate a new PWA Storefront project.
+- `create_app_guidelines`: This tool provides all the information an agent needs to correctly scaffold a new PWA Kit app using the `@salesforce/pwa-kit-create-app` CLI. 
+
+  It returns:
+    - Project creation guidelines for agent behavior
+    - CLI description and available options
+    - Input schemas for presets or templates
+
+    The output enables agents to ask the right questions and use the CLI correctly without ever mixing unsupported options.
+
+    **Example Triggers**
+
+    This tool is automatically used when the user expresses intent to create a project, such as:
+
+    - "Create a new PWA Kit app"
+    - "Start a new storefront using a preset"
+    - "What templates are available for PWA Kit?"
+    - "What PWA-Kit presets are available?"
 - `run_site_test`: Run site performance or accessibility test for a given site URL (e.g. [https://pwa-kit.mobify-storefront.com](https://pwa-kit.mobify-storefront.com))
 
 ## Setup

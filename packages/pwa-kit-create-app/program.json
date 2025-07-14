@@ -722,6 +722,10 @@
             {
                 "name": "--displayProgram",
                 "description": "Display the program.json file detailing the program schema/data and exit"
+            },
+            {
+                "name": "--initGit",
+                "description": "Includes a `.gitignore` files in the generated project and initializes a new git repository"
             }
         ],
         "examples": [
