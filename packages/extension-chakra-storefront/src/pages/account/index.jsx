@@ -26,7 +26,7 @@ import {
 import Seo from '../../components/seo'
 import Link from '../../components/link'
 import {ChevronDownIcon, SignoutIcon} from '../../components/icons'
-// import AccountDetail from '../../pages/account/profile'
+import AccountDetail from '../../pages/account/profile'
 import AccountAddresses from '../../pages/account/addresses'
 import AccountOrders from '../../pages/account/orders'
 import AccountWishlist from '../../pages/account/wishlist/index'
@@ -217,9 +217,9 @@ const Account = () => {
                     </Flex>
                 </Stack>
                 <Switch>
-                    {/*<Route exact path={path}>*/}
-                    {/*    <AccountDetail />*/}
-                    {/*</Route>*/}
+                    <Route exact path={path}>
+                        <AccountDetail />
+                    </Route>
                     <Route exact path={`${path}/wishlist`}>
                         <AccountWishlist />
                     </Route>
