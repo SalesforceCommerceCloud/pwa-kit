@@ -32,6 +32,7 @@ import {
     useCustomerType
 } from '@salesforce/commerce-sdk-react'
 import {useCurrentCustomer} from '../../hooks'
+import {MarketingConsentCard} from './marketingconsent/shopper-consent-preferences.jsx'
 
 /**
  * This is a specialized Skeleton component that which uses the customers authtype as the
@@ -331,23 +332,6 @@ const PasswordCard = () => {
         </ToggleCard>
     )
 }
-
-const MarketingConsentCard = () => {
-    const headingRef = useRef(null)
-    return (
-        <Box layerStyle="cardBordered" p={6}>
-            <Skeleton ref={headingRef} tabIndex="-1" height="30px" width="200px" marginBottom={6}>
-                <Heading as="h3" fontSize="lg">
-                    <FormattedMessage
-                        defaultMessage="Messaging Preferences"
-                        id="consent_card.title.my_communications"
-                    />
-                </Heading>
-            </Skeleton>
-        </Box>
-    )
-}
-
 const AccountDetail = () => {
     const headingRef = useRef()
     useEffect(() => {
