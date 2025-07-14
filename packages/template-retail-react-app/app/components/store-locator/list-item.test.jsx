@@ -32,21 +32,10 @@ describe('StoreLocatorListItem', () => {
 
         expect(screen.getByText('Test Store')).toBeTruthy()
         expect(screen.getByText('123 Test St')).toBeTruthy()
-        // Use getAllByText to get all elements containing 'San Francisco' and check one contains the full address
-        const addressElements = screen.getAllByText((content, element) =>
-            element.textContent.includes('San Francisco')
-        )
-        expect(
-            addressElements.some(
-                (el) =>
-                    el.textContent.includes('San Francisco') &&
-                    el.textContent.includes('CA') &&
-                    el.textContent.includes('94105')
-            )
-        ).toBe(true)
+        expect(screen.getByText(/San Francisco, CA 94105/)).toBeTruthy()
         expect(screen.getByText('0.5 mi away')).toBeTruthy()
         expect(screen.getByText('Phone: 555-1234')).toBeTruthy()
-        expect(screen.getByText('Store Hours')).toBeTruthy()
+        expect(screen.getByText('View More')).toBeTruthy()
     })
 
     it('handles missing optional fields', () => {
@@ -64,6 +53,6 @@ describe('StoreLocatorListItem', () => {
         expect(screen.getByText(/Simple City/)).toBeTruthy()
         expect(screen.queryByText(/away/)).toBeNull()
         expect(screen.queryByText(/Phone:/)).toBeNull()
-        expect(screen.queryByText('Store Hours')).toBeNull()
+        expect(screen.queryByText('View More')).toBeNull()
     })
 })

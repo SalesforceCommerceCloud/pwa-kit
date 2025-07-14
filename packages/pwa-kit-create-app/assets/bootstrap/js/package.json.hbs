@@ -7,11 +7,11 @@
     "npm": "^9.0.0 || ^10.0.0 || ^11.0.0"
   },
   "ccExtensibility": {
-    "extends": "{{template.source.name}}",
+    "extends": "{{preset.templateSource.id}}",
     "overridesDir": "overrides"
   },
   "devDependencies": {
-    "{{template.source.name}}": "{{answers.general.packageJSON.version}}"
+    "{{preset.templateSource.id}}": "{{answers.general.packageJSON.version}}"
   },
   "scripts": {
     {{#each answers.general.packageJSON.scripts}}

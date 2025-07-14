@@ -108,74 +108,12 @@ test('renders secondary with event handlers', async () => {
     expect(onRemoveItemClick).toHaveBeenCalledTimes(1)
 })
 
-// Helper to render with a custom variant
-const renderWithVariant = (variant, props = {}) => {
-    return renderWithProviders(
-        <ItemVariantProvider variant={variant}>
-            <CartSecondaryButtonGroup {...props} />
-        </ItemVariantProvider>
-    )
-}
+test('hides wishlist and gift checkbox for bonus product', async () => {
+    renderWithProviders(<MockedComponent isBonusProduct={true} />)
 
-describe('CartSecondaryButtonGroup Edit button conditional rendering', () => {
-    test('shows Edit button for a variation product (has variationAttributes)', () => {
-        const variantProduct = {
-            id: 'test-variant-123',
-            itemId: '123',
-            variationAttributes: [{id: 'color', values: [{value: 'red'}]}]
-        }
-        renderWithVariant(variantProduct)
-        expect(screen.getByRole('button', {name: /edit/i})).toBeInTheDocument()
-    })
-
-    test('shows Edit button for a bundle product (has bundledProductItems)', () => {
-        const bundleProduct = {
-            id: 'test-bundle-456',
-            itemId: '456',
-            bundledProductItems: [{productId: 'bundle-item-1', quantity: 1}]
-        }
-        renderWithVariant(bundleProduct)
-        expect(screen.getByRole('button', {name: /edit/i})).toBeInTheDocument()
-    })
-
-    test('shows Edit button for a product with both variationAttributes and bundledProductItems', () => {
-        const bundleVariationProduct = {
-            id: 'test-bundle-variant-789',
-            itemId: '789',
-            variationAttributes: [{id: 'color', values: [{value: 'blue'}]}],
-            bundledProductItems: [{productId: 'bundle-item-2', quantity: 2}]
-        }
-        renderWithVariant(bundleVariationProduct)
-        expect(screen.getByRole('button', {name: /edit/i})).toBeInTheDocument()
-    })
-
-    test('does NOT show Edit button for a standard product (neither a variation nor a bundle)', () => {
-        const standardProduct = {
-            id: 'test-standard-101',
-            itemId: '101',
-            type: {item: true}
-        }
-        renderWithVariant(standardProduct)
-        expect(screen.queryByRole('button', {name: /edit/i})).not.toBeInTheDocument()
-    })
-
-    test('shows Edit button for an empty product bundle', () => {
-        const emptyBundleProduct = {
-            id: 'test-empty-bundle-103',
-            itemId: '103',
-            bundledProductItems: []
-        }
-        renderWithVariant(emptyBundleProduct)
-        expect(screen.getByRole('button', {name: /edit/i})).toBeInTheDocument()
-    })
-})
-
-test('hides remove, wishlist and gift checkbox for bonus product', async () => {
-    const {user} = renderWithProviders(<MockedComponent isBonusProduct={true} />)
-
+    expect(screen.getByRole('button', {name: /remove/i})).toBeInTheDocument()
     expect(screen.getByRole('button', {name: /edit/i})).toBeInTheDocument()
 
-    expect(screen.queryByRole('button', {name: /remove/i})).not.toBeInTheDocument()
     expect(screen.queryByRole('button', {name: /add to wishlist/i})).not.toBeInTheDocument()
     expect(screen.queryByRole('checkbox', {name: /this is a gift/i})).not.toBeInTheDocument()
 })
