@@ -6,7 +6,7 @@
  */
 import React from 'react'
 import {screen, waitFor} from '@testing-library/react'
-import ContactInfo from '@salesforce/retail-react-app/app/pages/checkout-one-click/partials/contact-info'
+import ContactInfo from '@salesforce/retail-react-app/app/pages/checkout-one-click/partials/one-click-contact-info'
 import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
 import {rest} from 'msw'
 import {AuthHelpers} from '@salesforce/commerce-sdk-react'
