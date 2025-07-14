@@ -3329,6 +3329,12 @@
       "value": "In Stock"
     }
   ],
+  "shipping_address.button.add_new_address": [
+    {
+      "type": 0,
+      "value": "Add New Address"
+    }
+  ],
   "shipping_address.button.continue_to_shipping": [
     {
       "type": 0,
@@ -3359,6 +3365,18 @@
     {
       "type": 0,
       "value": "Shipping Address Form"
+    }
+  ],
+  "shipping_address.link.deliver_to_multiple_addresses": [
+    {
+      "type": 0,
+      "value": "Deliver to Multiple Addresses"
+    }
+  ],
+  "shipping_address.link.ship_items_to_one_address": [
+    {
+      "type": 0,
+      "value": "Ship items to one address"
     }
   ],
   "shipping_address.title.shipping_address": [

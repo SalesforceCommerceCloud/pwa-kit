@@ -5,10 +5,12 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
-import {render, screen, fireEvent, waitFor} from '@testing-library/react'
+import {render, screen, fireEvent} from '@testing-library/react'
 import {IntlProvider} from 'react-intl'
-import MultiShipping from './shipping-multi-address'
+import MultiShipping from '@salesforce/retail-react-app/app/pages/checkout/partials/shipping-multi-address'
 import {useProducts} from '@salesforce/commerce-sdk-react'
+import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
+import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
 
 // Mock the commerce-sdk-react hooks
 jest.mock('@salesforce/commerce-sdk-react', () => ({
@@ -26,12 +28,18 @@ jest.mock('@salesforce/retail-react-app/app/hooks/use-current-basket', () => ({
 
 // Mock the image groups utility
 jest.mock('@salesforce/retail-react-app/app/utils/image-groups-utils', () => ({
-    findImageGroupBy: jest.fn((imageGroups, {viewType, selectedVariationAttributes}) => {
+    findImageGroupBy: jest.fn((imageGroups) => {
         // Return different images based on the productId in the test
-        if (imageGroups && imageGroups[0]?.images?.[0]?.disBaseLink === 'https://test-image-1.jpg') {
+        if (
+            imageGroups &&
+            imageGroups[0]?.images?.[0]?.disBaseLink === 'https://test-image-1.jpg'
+        ) {
             return {images: [{disBaseLink: 'https://test-image-1.jpg'}]}
         }
-        if (imageGroups && imageGroups[0]?.images?.[0]?.disBaseLink === 'https://test-image-2.jpg') {
+        if (
+            imageGroups &&
+            imageGroups[0]?.images?.[0]?.disBaseLink === 'https://test-image-2.jpg'
+        ) {
             return {images: [{disBaseLink: 'https://test-image-2.jpg'}]}
         }
         return {images: [{disBaseLink: 'https://test-image.jpg'}]}
@@ -40,9 +48,11 @@ jest.mock('@salesforce/retail-react-app/app/utils/image-groups-utils', () => ({
 
 // Mock the item variant provider
 jest.mock('@salesforce/retail-react-app/app/components/item-variant', () => {
-    return function MockItemVariantProvider({children}) {
+    // eslint-disable-next-line react/prop-types
+    function MockItemVariantProvider({children}) {
         return <div data-testid="item-variant-provider">{children}</div>
     }
+    return MockItemVariantProvider
 })
 
 const mockBasket = {
@@ -152,11 +162,7 @@ const defaultProps = {
 }
 
 const renderWithIntl = (component) => {
-    return render(
-        <IntlProvider locale="en">
-            {component}
-        </IntlProvider>
-    )
+    return render(<IntlProvider locale="en">{component}</IntlProvider>)
 }
 
 describe('MultiShipping', () => {
@@ -164,15 +170,9 @@ describe('MultiShipping', () => {
         useProducts.mockReturnValue({
             data: mockProducts
         })
-        
-        // Mock the hooks that the component uses
-        const {useCurrentCustomer} = require('@salesforce/retail-react-app/app/hooks/use-current-customer')
-        const {useCurrentBasket} = require('@salesforce/retail-react-app/app/hooks/use-current-basket')
-        
         useCurrentCustomer.mockReturnValue({
             data: mockCustomer
         })
-        
         useCurrentBasket.mockReturnValue({
             data: mockBasket
         })
@@ -185,13 +185,13 @@ describe('MultiShipping', () => {
     it('should render empty state when no items in basket', () => {
         const emptyBasket = {...mockBasket, productItems: []}
         renderWithIntl(<MultiShipping {...defaultProps} basket={emptyBasket} />)
-        
+
         expect(screen.getByText('No items in basket.')).toBeInTheDocument()
     })
 
     it('should render product items with correct information', () => {
         renderWithIntl(<MultiShipping {...defaultProps} />)
-        
+
         expect(screen.getByText('Test Product 1')).toBeInTheDocument()
         expect(screen.getByText('Test Product 2')).toBeInTheDocument()
         expect(screen.getByText('Quantity: 2')).toBeInTheDocument()
@@ -200,14 +200,14 @@ describe('MultiShipping', () => {
 
     it('should render delivery address sections for each product', () => {
         renderWithIntl(<MultiShipping {...defaultProps} />)
-        
+
         const deliveryAddressLabels = screen.getAllByText('Delivery Address')
         expect(deliveryAddressLabels).toHaveLength(2)
     })
 
     it('should render product images', () => {
         renderWithIntl(<MultiShipping {...defaultProps} />)
-        
+
         const images = screen.getAllByAltText('Test Product 1')
         expect(images).toHaveLength(1)
         expect(images[0]).toHaveAttribute('src', 'https://test-image-1.jpg')
@@ -215,7 +215,7 @@ describe('MultiShipping', () => {
 
     it('should render variation attributes', () => {
         renderWithIntl(<MultiShipping {...defaultProps} />)
-        
+
         expect(screen.getByText('Color: Red')).toBeInTheDocument()
         expect(screen.getByText('Size: Medium')).toBeInTheDocument()
         expect(screen.getByText('Color: Blue')).toBeInTheDocument()
@@ -224,28 +224,28 @@ describe('MultiShipping', () => {
 
     it('should render product prices', () => {
         renderWithIntl(<MultiShipping {...defaultProps} />)
-        
+
         expect(screen.getByText('$29.99')).toBeInTheDocument()
         expect(screen.getByText('$19.99')).toBeInTheDocument()
     })
 
     it('should render continue button', () => {
         renderWithIntl(<MultiShipping {...defaultProps} />)
-        
+
         expect(screen.getByText('Continue')).toBeInTheDocument()
     })
 
     it('should call onSubmit when continue button is clicked', () => {
         const mockOnSubmit = jest.fn()
         renderWithIntl(<MultiShipping {...defaultProps} onSubmit={mockOnSubmit} />)
-        
+
         fireEvent.click(screen.getByText('Continue'))
         expect(mockOnSubmit).toHaveBeenCalledTimes(1)
     })
 
     it('should render address dropdowns', () => {
         renderWithIntl(<MultiShipping {...defaultProps} />)
-        
+
         // The dropdowns should be present but collapsed initially
         const dropdowns = screen.getAllByRole('button', {hidden: true})
         expect(dropdowns.length).toBeGreaterThan(0)
@@ -255,9 +255,9 @@ describe('MultiShipping', () => {
         useProducts.mockReturnValue({
             data: null
         })
-        
+
         renderWithIntl(<MultiShipping {...defaultProps} />)
-        
+
         // Should still render the products even without detailed product data
         expect(screen.getByText('Test Product 1')).toBeInTheDocument()
         expect(screen.getByText('Test Product 2')).toBeInTheDocument()
@@ -271,9 +271,9 @@ describe('MultiShipping', () => {
                 id: 'checkout.button.proceed_to_shipping'
             }
         }
-        
+
         renderWithIntl(<MultiShipping {...customProps} />)
-        
+
         expect(screen.getByText('Proceed to Shipping')).toBeInTheDocument()
     })
 
@@ -285,18 +285,20 @@ describe('MultiShipping', () => {
                 id: 'checkout.button.add_another_address'
             }
         }
-        
+
         renderWithIntl(<MultiShipping {...customProps} />)
-        
+
         // Find and click the dropdown trigger (it's a div, not a button)
         const dropdownTriggers = screen.getAllByText((content, element) => {
-            return element.tagName === 'DIV' && 
-                   element.style.cursor === 'pointer' &&
-                   element.textContent.includes('John Doe')
+            return (
+                element.tagName === 'DIV' &&
+                element.style.cursor === 'pointer' &&
+                element.textContent.includes('John Doe')
+            )
         })
-        
+
         fireEvent.click(dropdownTriggers[0])
-        
+
         // The add new address option should be available in dropdowns
         expect(screen.getByText('Add Another Address')).toBeInTheDocument()
     })
@@ -304,14 +306,14 @@ describe('MultiShipping', () => {
     describe('Accessibility', () => {
         it('should have proper alt text for images', () => {
             renderWithIntl(<MultiShipping {...defaultProps} />)
-            
+
             const images = screen.getAllByAltText(/Test Product/)
             expect(images).toHaveLength(2)
         })
 
         it('should have proper button roles', () => {
             renderWithIntl(<MultiShipping {...defaultProps} />)
-            
+
             const continueButton = screen.getByText('Continue')
             expect(continueButton).toBeInTheDocument()
         })
@@ -320,10 +322,10 @@ describe('MultiShipping', () => {
     describe('Responsive Design', () => {
         it('should apply responsive CSS classes', () => {
             renderWithIntl(<MultiShipping {...defaultProps} />)
-            
+
             // Check that the component has the expected CSS classes for responsive design
             const multiShippingCards = document.querySelectorAll('.multi-shipping-card')
-            expect(multiShippingCards.length).toBe(2)
+            expect(multiShippingCards).toHaveLength(2)
         })
     })
-}) 
+})

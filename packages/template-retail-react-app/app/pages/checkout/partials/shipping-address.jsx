@@ -21,7 +21,7 @@ import {
 } from '@salesforce/commerce-sdk-react'
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
-import MultiShipping from './shipping-multi-address'
+import MultiShipping from '@salesforce/retail-react-app/app/pages/checkout/partials/shipping-multi-address'
 
 const submitButtonMessage = defineMessage({
     defaultMessage: 'Continue to Shipping Method',
@@ -44,7 +44,7 @@ export default function ShippingAddress() {
     const {data: basket} = useCurrentBasket()
     const selectedShippingAddress = basket?.shipments && basket?.shipments[0]?.shippingAddress
     const isAddressFilled = selectedShippingAddress?.address1 && selectedShippingAddress?.city
-    const {step, STEPS, goToStep, goToNextStep} = useCheckout()
+    const {step, STEPS, goToStep} = useCheckout()
     const createCustomerAddress = useShopperCustomersMutation('createCustomerAddress')
     const updateCustomerAddress = useShopperCustomersMutation('updateCustomerAddress')
     const updateShippingAddressForShipment = useShopperBasketsMutation(
@@ -168,7 +168,12 @@ export default function ShippingAddress() {
                     <style>{`
                         .multi-shipping-card .chakra-stack > .chakra-flex { display: none !important; }
                     `}</style>
-                    <MultiShipping basket={basket} onSubmit={submitAndContinue} submitButtonLabel={submitButtonMessage} addNewAddressLabel={addNewAddressLabel} />
+                    <MultiShipping
+                        basket={basket}
+                        onSubmit={submitAndContinue}
+                        submitButtonLabel={submitButtonMessage}
+                        addNewAddressLabel={addNewAddressLabel}
+                    />
                 </>
             ) : (
                 <>

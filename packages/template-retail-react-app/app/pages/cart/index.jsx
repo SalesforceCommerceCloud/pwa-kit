@@ -601,7 +601,7 @@ const Cart = () => {
     }, [basket?.productItems])
 
     // Function to render secondary actions for product items
-    const renderSecondaryActions = ({productItem, isAGift}) => (
+    const renderSecondaryActions = ({isAGift}) => (
         <CartSecondaryButtonGroup
             isAGift={isAGift}
             onIsAGiftChange={handleIsAGiftChange}

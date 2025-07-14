@@ -21,7 +21,7 @@ import {Route, Switch} from 'react-router-dom'
 import mockConfig from '@salesforce/retail-react-app/config/mocks/default'
 import * as sdk from '@salesforce/commerce-sdk-react'
 
-let mockCustomer = {}
+// Removed unused mockCustomer variable
 
 const MockedComponent = () => {
     return (
