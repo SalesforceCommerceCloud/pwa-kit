@@ -227,6 +227,7 @@
                     },
                     "message": {
                         "type": "string",
+                        "description": "The error message to display if validation fails.",
                         "_ai": {
                             "instruction": "When validation fails, use this message to inform the user what went wrong.",
                             "expectedUse": "For validation error feedback."
