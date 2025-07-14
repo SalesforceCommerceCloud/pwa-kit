@@ -304,11 +304,12 @@ const ProductView = forwardRef(
                     // See wishlist_primary_action for example.
                     if (isValidResponse) {
                         // Show bonus product modal first if there are bonus items
-                        // TODO: Rule based promotions are not supported yet todo:update
+                        // TODO: Rule based promotions are not supported yet todo:update these comments
                         if (
                             newBonusItems?.length > 0 &&
-                            newBonusItems.some((item) => item.bonusProducts)//todo: does the condition need updating?
+                            newBonusItems.some((item) => item.bonusProducts)//todo: does if clause cnodition need updating?
                         ) {
+                            console.log('addToCartResponse.bonusDiscountLineItems:', addToCartResponse.bonusDiscountLineItems)
                             // todo: explain this
                             onAddToCartModalOpen({
                                 product,
@@ -318,12 +319,11 @@ const ProductView = forwardRef(
                                 bonusAvailable: true
                             })
                         } else {
-                            // If no bonus items, just show add to cart modal
+                            // todo: explain this
                             onAddToCartModalOpen({
                                 product,
                                 itemsAdded,
                                 selectedQuantity: quantity,
-                                bonusDiscountLineItems: addToCartResponse.bonusDiscountLineItems
                             })
                         }
                     }
