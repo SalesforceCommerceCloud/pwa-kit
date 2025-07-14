@@ -8,15 +8,19 @@
 import React from 'react'
 import {render} from '@testing-library/react'
 import Metadata from './metadata'
+import Box from '@chakra-ui/react'
 
 jest.mock('../../components/seo', () => {
+    // Since we are mocking a component, we can't import propType at global scope
+    // jest will complain and fail when running all tests
     // Import PropTypes inside the mock factory to avoid scope issues
+    /* eslint-disable @typescript-eslint/no-var-requires */
     const PropTypes = require('prop-types')
 
     function MockSeo(props) {
         const {metaTags, ...domProps} = props
 
-        return <div data-testid="seo" {...domProps} />
+        return <Box data-testid="seo" {...domProps} metaTags={metaTags} />
     }
 
     MockSeo.propTypes = {
