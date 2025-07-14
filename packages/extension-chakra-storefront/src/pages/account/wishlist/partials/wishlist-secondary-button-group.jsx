@@ -105,7 +105,7 @@ const WishlistSecondaryButtonGroup = ({
         <>
             <ButtonGroup spacing="6">
                 <Button
-                    variant="link"
+                    variant="link-blue"
                     size="sm"
                     onClick={showRemoveItemConfirmation}
                     data-testid={`sf-wishlist-remove-${productListItemId}`}
