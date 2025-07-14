@@ -30,7 +30,7 @@ export const useProductDetailWishlist = () => {
     const toast = useToast()
     const showError = useErrorHandler()
 
-    const {data: wishlist, isLoading: isWishlistLoading} = useWishList()
+    const {data: wishlist, isPending: isWishlistLoading} = useWishList()
     const createCustomerProductListItem = useShopperCustomersMutation(
         'createCustomerProductListItem'
     )

@@ -39,7 +39,7 @@ const AccountWishlist = () => {
     const [selectedItem, setSelectedItem] = useState(undefined)
     const [isWishlistItemLoading, setWishlistItemLoading] = useState(false)
 
-    const {data: wishListData, isLoading: isWishListLoading} = useWishList()
+    const {data: wishListData, isPending: isWishListLoading} = useWishList()
     const productIds = wishListData?.customerProductListItems?.map((item) => item.productId)
 
     const {data: productsData, isLoading: isProductsLoading} = useProducts(
