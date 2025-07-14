@@ -234,6 +234,12 @@ export const SHOPPER_CONTEXT_SEARCH_PARAMS = {
     }
 }
 
+export const LOGIN_TYPES = {	
+    PASSWORD: 'password',	
+    PASSWORDLESS: 'passwordless',	
+    SOCIAL: 'social'	
+}
+
 // Constants for Password Reset
 export const RESET_PASSWORD_LANDING_PATH = '/reset-password-landing'
 
