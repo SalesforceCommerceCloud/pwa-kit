@@ -904,7 +904,6 @@ const Cart = () => {
                 {...modalProps}
             />
 
-            {/* TODO: This is not working as expected, it does not account for store inventory. */}
             <UnavailableProductConfirmationModal
                 productItems={basket?.productItems}
                 handleUnavailableProducts={handleUnavailableProducts}

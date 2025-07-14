@@ -69,11 +69,6 @@ export const useMultiship = (basket) => {
             const {data: shippingMethods} = await refetchMeShippingMethods()
             const defaultShippingMethodId = getDefaultShippingMethodId(shippingMethods)
 
-            // if (!defaultShippingMethodId) {
-            //     console.warn('No default shipping method found')
-            //     return
-            // }
-
             // Update each shipment that doesn't have a shipping method
             const updatePromises = shipmentsWithoutMethod.map(async (shipment) => {
                 try {
