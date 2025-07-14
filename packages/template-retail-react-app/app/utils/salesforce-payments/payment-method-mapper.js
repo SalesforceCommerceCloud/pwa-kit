@@ -114,6 +114,13 @@ export const createPaymentRequestInfo = (basket, locale = 'en-US') => {
                 'US',
         locale: locale
     }
+   /*//anitha temp fix
+   return {
+    amount: basket?.orderTotal || basket?.productTotal || 0,
+    currency: 'USD',
+    country:'US',
+    locale: 'en-US'
+   }*/
 }
 
 /**
