@@ -12,13 +12,13 @@ import Metadata from './metadata'
 jest.mock('../../components/seo', () => {
     // Import PropTypes inside the mock factory to avoid scope issues
     const PropTypes = require('prop-types')
-    
+
     function MockSeo(props) {
         const {metaTags, ...domProps} = props
 
         return <div data-testid="seo" {...domProps} />
     }
-    
+
     MockSeo.propTypes = {
         title: PropTypes.string,
         description: PropTypes.string,
@@ -30,7 +30,7 @@ jest.mock('../../components/seo', () => {
             })
         )
     }
-    
+
     return MockSeo
 })
 
