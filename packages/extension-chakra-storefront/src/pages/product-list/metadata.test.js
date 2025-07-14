@@ -8,7 +8,6 @@
 import React from 'react'
 import {render} from '@testing-library/react'
 import Metadata from './metadata'
-import Box from '@chakra-ui/react'
 
 jest.mock('../../components/seo', () => {
     // Since we are mocking a component, we can't import propType at global scope
@@ -18,9 +17,14 @@ jest.mock('../../components/seo', () => {
     const PropTypes = require('prop-types')
 
     function MockSeo(props) {
+        // NOTE: since we over simplify the SEO component mock here,
+        // linting is complaining about invalid props being pass to native DOM element.
+        // We broke it down and not passing it because it is not important for this component tests
+        // but eslint complains about unused vars, so we disable it here
+        /* eslint-disable @typescript-eslint/no-unused-vars */
         const {metaTags, ...domProps} = props
 
-        return <Box data-testid="seo" {...domProps} metaTags={metaTags} />
+        return <div data-testid="seo" {...domProps} />
     }
 
     MockSeo.propTypes = {
