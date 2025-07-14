@@ -37,7 +37,7 @@ import {
     USER_NOT_FOUND_ERROR
 } from '@salesforce/retail-react-app/app/constants'
 import {usePrevious} from '@salesforce/retail-react-app/app/hooks/use-previous'
-import {isServer} from '@salesforce/retail-react-app/app/utils/utils'
+import {isServer, noop} from '@salesforce/retail-react-app/app/utils/utils'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 
 const LOGIN_ERROR_MESSAGE = defineMessage({
@@ -117,19 +117,6 @@ const Login = ({initialView = LOGIN_VIEW}) => {
                 ? formatMessage(FEATURE_UNAVAILABLE_ERROR_MESSAGE)
                 : formatMessage(API_ERROR_MESSAGE)
             form.setError('global', {type: 'manual', message})
-        }
-    }
-
-    const handlePasswordlessLoginClick = async (e) => {
-        e.stopPropagation()
-        e.preventDefault()
-        const isValid = await form.trigger('email')
-        const domForm = e.target.closest('form')
-        if (isValid && domForm.checkValidity()) {
-            const formData = form.getValues()
-            await submitForm(formData, true)
-        } else {
-            domForm.reportValidity()
         }
     }
 
@@ -222,7 +209,7 @@ const Login = ({initialView = LOGIN_VIEW}) => {
                             return submitForm(data, shouldUsePasswordless)
                         }}
                         clickCreateAccount={() => navigate('/registration')}
-                        handlePasswordlessLoginClick={handlePasswordlessLoginClick}
+                        handlePasswordlessLoginClick={noop}
                         handleForgotPasswordClick={() => navigate('/reset-password')}
                         isPasswordlessEnabled={isPasswordlessEnabled}
                         isSocialEnabled={isSocialEnabled}

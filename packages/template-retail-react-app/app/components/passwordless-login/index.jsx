@@ -44,7 +44,7 @@ const PasswordlessLogin = ({
                         handleForgotPasswordClick={handleForgotPasswordClick}
                     />
                     <Button
-                        type="button"
+                        type="submit"
                         onClick={(e) => {
                             handlePasswordlessLoginClick(e)
                             form.clearErrors('global')

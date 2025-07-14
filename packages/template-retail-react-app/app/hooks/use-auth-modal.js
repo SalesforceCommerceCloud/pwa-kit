@@ -118,19 +118,6 @@ export const AuthModal = ({
         }
     }
 
-    const onPasswordlessLoginClick = async (e) => {
-        e.stopPropagation()
-        e.preventDefault()
-        const isValid = await form.trigger('email')
-        const domForm = e.target.closest('form')
-        if (isValid && domForm.checkValidity()) {
-            const formData = form.getValues()
-            await submitForm(formData, true)
-        } else {
-            domForm.reportValidity()
-        }
-    }
-
     const submitForm = async (data, isPasswordless = false) => {
         form.clearErrors()
 
@@ -318,7 +305,9 @@ export const AuthModal = ({
                                 return submitForm(data, shouldUsePasswordless)
                             }}
                             clickCreateAccount={() => setCurrentView(REGISTER_VIEW)}
-                            handlePasswordlessLoginClick={onPasswordlessLoginClick}
+                            //TODO: potentially remove this prop in the next major release since
+                            // we don't need to use this props anymore
+                            handlePasswordlessLoginClick={noop}
                             handleForgotPasswordClick={() => setCurrentView(PASSWORD_VIEW)}
                             isPasswordlessEnabled={isPasswordlessEnabled}
                             isSocialEnabled={isSocialEnabled}
