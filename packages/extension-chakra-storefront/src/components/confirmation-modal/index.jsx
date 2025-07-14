@@ -46,7 +46,9 @@ const ConfirmationModal = ({
             <Dialog.Backdrop />
             <Dialog.Positioner>
                 <Dialog.Content>
-                    <Dialog.Header>{formatMessage(dialogTitle)}</Dialog.Header>
+                    <Dialog.Header>
+                        <Dialog.Title>{formatMessage(dialogTitle)}</Dialog.Title>
+                    </Dialog.Header>
                     <Dialog.Body>
                         <Text>{formatMessage(confirmationMessage)}</Text>
                     </Dialog.Body>
