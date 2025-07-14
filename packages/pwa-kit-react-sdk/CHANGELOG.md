@@ -1,5 +1,5 @@
 ## v4.0.0-extensibility-preview.5 (May 06, 2025)
-- Fix data-fetching regression with SSR rendering [#2785](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2785)
+- SSR rendering: implement workaround for react-ssr-prepass to ignore React's useInsertionEffect [#2785](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2785)
 
 ## v4.0.0-extensibility-preview.4 (Feb 12, 2025)
 - Replace `event-emitter` in favor of the native `EventTarget` [#2289](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2289)
