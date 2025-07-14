@@ -51,6 +51,7 @@ module.exports = {
         createTestGlob('pages/home'),
         createTestGlob('pages/cart'),
         createTestGlob('pages/product-list'),
+        createTestGlob('page-designer'),
         createTestGlob('components/offline-banner'),
         createTestGlob('components/offline-boundary'),
         createTestGlob('pages/login'),
