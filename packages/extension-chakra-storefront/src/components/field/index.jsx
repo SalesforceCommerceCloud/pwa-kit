@@ -60,6 +60,8 @@ const Field = ({
                 const _inputProps =
                     typeof inputProps === 'function' ? inputProps({value, onChange}) : inputProps
 
+                const {endElement, ...restOfInputProps} = _inputProps || {}
+
                 return (
                     <ChakraField.Root id={name} invalid={!!error}>
                         {!['checkbox', 'radio', 'hidden'].includes(type) &&
@@ -77,7 +79,7 @@ const Field = ({
                                             <PasswordIcon color="gray.500" boxSize={6} />
                                         </IconButton>
                                     ) : (
-                                        _inputProps?.endElement
+                                        endElement
                                     )
                                 }
                             >
@@ -92,7 +94,7 @@ const Field = ({
                                         type={inputType}
                                         placeholder={placeholder}
                                         autoComplete={autoComplete}
-                                        {..._inputProps}
+                                        {...restOfInputProps}
                                     />
                                     {children}
                                 </>
@@ -111,8 +113,9 @@ const Field = ({
 
                         {type === 'select' && (
                             <>
-                                <NativeSelect.Root ref={ref} value={value} {..._inputProps}>
+                                <NativeSelect.Root value={value} {..._inputProps}>
                                     <NativeSelect.Field
+                                        ref={ref}
                                         value={value || ''}
                                         onChange={onChange}
                                         placeholder={placeholder}

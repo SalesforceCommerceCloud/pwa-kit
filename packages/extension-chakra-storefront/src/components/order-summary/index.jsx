@@ -57,8 +57,8 @@ const CartItems = ({basket}) => {
                     </Box>
                     <Accordion.ItemIndicator />
                 </Accordion.ItemTrigger>
-                <Accordion.ItemContent px={0} py={4}>
-                    <Stack gap={5} align="flex-start" separator={<Separator />}>
+                <Accordion.ItemContent px="0" py="4">
+                    <Stack gap="5" alignItems="flex-start" separator={<Separator w="full" />}>
                         {basket.productItems?.map((product, idx) => {
                             const variant = {
                                 ...product,
@@ -72,8 +72,8 @@ const CartItems = ({basket}) => {
                                     variant={variant}
                                 >
                                     <Flex width="full" alignItems="flex-start">
-                                        <CartItemVariantImage width="80px" mr={2} />
-                                        <Stack width="full" gap={1} marginTop="-3px">
+                                        <CartItemVariantImage width="80px" mr="2" />
+                                        <Stack width="full" gap="1" marginTop="-3px">
                                             <CartItemVariantName />
                                             <CartItemVariantAttributes includeQuantity />
                                             <CartItemVariantPrice
@@ -86,11 +86,13 @@ const CartItems = ({basket}) => {
                             )
                         })}
 
-                        <Button as={Link} to="/cart" variant="link-blue" width="full">
-                            <FormattedMessage
-                                defaultMessage="Edit cart"
-                                id="order_summary.cart_items.link.edit_cart"
-                            />
+                        <Button asChild to="/cart" variant="link-blue" width="full">
+                            <Link>
+                                <FormattedMessage
+                                    defaultMessage="Edit cart"
+                                    id="order_summary.cart_items.link.edit_cart"
+                                />
+                            </Link>
                         </Button>
                     </Stack>
                 </Accordion.ItemContent>
@@ -119,17 +121,15 @@ const OrderSummary = ({
     const hasShippingPromos = shippingItem?.priceAdjustments?.length > 0
 
     return (
-        <Stack data-testid="sf-order-summary" gap={5}>
-            <Heading fontSize={fontSize} pt={1} id="order-summary-heading">
+        <Stack data-testid="sf-order-summary" gap="5">
+            <Heading fontSize={fontSize} pt="1" id="order-summary-heading">
                 <FormattedMessage
                     defaultMessage="Order Summary"
                     id="order_summary.heading.order_summary"
                 />
             </Heading>
-
-            <Stack gap={4} align="flex-start" role="region" aria-labelledby="order-summary-heading">
+            <Stack gap="4" align="flex-start" role="region" aria-labelledby="order-summary-heading">
                 {showCartItems && <CartItems basket={basket} />}
-
                 <Stack w="full">
                     <Flex justifyContent="space-between" aria-live="polite" aria-atomic="true">
                         <Text fontWeight="bold" fontSize={fontSize}>
@@ -246,10 +246,9 @@ const OrderSummary = ({
                         <PromoCode {...promoCodeProps} />
                     </Box>
                 ) : (
-                    <Separator />
+                    <Separator w="full" />
                 )}
-
-                <Stack gap={4} w="full">
+                <Stack gap="4" w="full">
                     <Flex
                         w="full"
                         justifyContent="space-between"
@@ -282,7 +281,7 @@ const OrderSummary = ({
 
                     {basket.couponItems?.length > 0 && (
                         <Stack
-                            p={4}
+                            p="4"
                             border="1px solid"
                             borderColor="gray.100"
                             borderRadius="base"
@@ -305,7 +304,7 @@ const OrderSummary = ({
                                             <Button
                                                 variant="link-red"
                                                 size="sm"
-                                                colorPallete="red"
+                                                colorPalete="red"
                                                 onClick={() => removePromoCode(item.couponItemId)}
                                             >
                                                 <FormattedMessage

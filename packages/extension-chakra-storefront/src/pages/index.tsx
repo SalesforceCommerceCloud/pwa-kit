@@ -16,7 +16,7 @@ import {Skeleton} from '@chakra-ui/react'
 const fallback = <Skeleton height="75vh" width="100%" />
 
 // Page Loadables
-// const Account = loadable(() => import('overridable!./account'), {fallback})
+const Account = loadable(() => import('overridable!./account'), {fallback})
 const Cart = loadable(() => import('overridable!./cart'), {fallback})
 const Checkout = loadable(() => import('overridable!./checkout'), {
     fallback
@@ -29,7 +29,7 @@ const Login = loadable(() => import('overridable!./login'), {fallback})
 const Registration = loadable(() => import('overridable!./registration'), {
     fallback
 })
-// const ResetPassword = loadable(() => import('overridable!./reset-password'), {fallback})
+const ResetPassword = loadable(() => import('overridable!./reset-password'), {fallback})
 const LoginRedirect = loadable(() => import('overridable!./login-redirect'), {fallback})
 const ProductDetail = loadable(() => import('overridable!./product-detail'), {fallback})
 const ProductList = loadable(() => import('overridable!./product-list'), {
@@ -49,7 +49,7 @@ const PageNotFound = loadable(() => import('overridable!./page-not-found'), {
 // NOTE: Apply "displayName" for easy filtering. This is a widely use pattern to allow filtering without
 // triggering the loadable logic. Please note that we want to keep these in aligned with name in the
 // component itself.
-// Account.displayName = 'Account'
+Account.displayName = 'Account'
 // Cart.displayName = 'Cart'
 Checkout.displayName = 'Checkout'
 // CheckoutConfirmation.displayName = 'CheckoutConfirmation'
@@ -64,14 +64,14 @@ SocialLoginRedirect.displayName = 'SocialLoginRedirect'
 PageNotFound.displayName = 'PageNotFound'
 
 export {
-    // Account,
+    Account,
     Cart,
     Checkout,
     // CheckoutConfirmation,
     Home,
     Login,
     Registration,
-    // ResetPassword,
+    ResetPassword,
     LoginRedirect,
     ProductDetail,
     ProductList,

@@ -22,10 +22,9 @@ import {useCategory, useShopperBasketsMutation} from '@salesforce/commerce-sdk-r
 import {
     Box,
     Center,
-    Button,
-    Flex,
-    Heading,
     Spinner,
+
+    // hooks
     useDisclosure,
     useSlotRecipe,
     useToken
@@ -55,7 +54,7 @@ import {useExtensionConfig, useCurrentCustomer, useCurrentBasket} from '../../ho
 import {watchOnlineStatus, flatten} from '../../utils/utils'
 import useActiveData from '../../hooks/use-active-data'
 import useMultiSite from '../../hooks/use-multi-site'
-// import {DntNotification, useDntNotification} from '../../hooks/use-dnt-notification'
+import {DntNotification, useDntNotification} from '../../hooks/use-dnt-notification'
 
 import {UserConfig} from '../../types/config'
 
@@ -118,13 +117,17 @@ const withLayout = <P extends object>(WrappedComponent: React.ComponentType<P>) 
         const history = useHistory()
         const location = useLocation()
         const authModal = useAuthModal()
-        // const dntNotification = useDntNotification()
+        const dntNotification = useDntNotification()
         const {site, locale, buildUrl} = useMultiSite()
         const [isOnline, setIsOnline] = useState<boolean>(true)
 
         // https://www.chakra-ui.com/docs/theming/overview#tokens-1
         const [themeColor] = useToken('colors.blue', '600')
-        const {open, onOpen, onClose} = useDisclosure()
+        const {
+            open: isDrawerMenuOpen,
+            onOpen: onDrawerMenuOpen,
+            onClose: onDrawerMenuClose
+        } = useDisclosure()
 
         // Used to conditionally render header/footer for checkout page
         const isCheckout = /\/checkout$/.test(location?.pathname)
@@ -179,7 +182,7 @@ const withLayout = <P extends object>(WrappedComponent: React.ComponentType<P>) 
         useEffect(() => {
             // Lets automatically close the mobile navigation when the
             // location path is changed.
-            onClose()
+            onDrawerMenuClose()
         }, [location])
 
         const onLogoClick = () => {
@@ -191,7 +194,7 @@ const withLayout = <P extends object>(WrappedComponent: React.ComponentType<P>) 
             history.push(path)
 
             // Close the drawer.
-            onClose()
+            onDrawerMenuClose()
         }
 
         const onCartClick = () => {
@@ -199,7 +202,7 @@ const withLayout = <P extends object>(WrappedComponent: React.ComponentType<P>) 
             history.push(path)
 
             // Close the drawer.
-            onClose()
+            onDrawerMenuClose()
         }
 
         const onAccountClick = () => {
@@ -283,7 +286,7 @@ const withLayout = <P extends object>(WrappedComponent: React.ComponentType<P>) 
                             <>
                                 <AboveHeader />
                                 <Header
-                                    onMenuClick={onOpen}
+                                    onMenuClick={onDrawerMenuOpen}
                                     onLogoClick={onLogoClick}
                                     onMyCartClick={onCartClick}
                                     onMyAccountClick={onAccountClick}
@@ -292,8 +295,8 @@ const withLayout = <P extends object>(WrappedComponent: React.ComponentType<P>) 
                                     {/* TODO: mobile menu */}
                                     <HideOnDesktop>
                                         <DrawerMenu
-                                            isOpen={open}
-                                            onClose={onClose}
+                                            isOpen={isDrawerMenuOpen}
+                                            onClose={onDrawerMenuClose}
                                             onLogoClick={onLogoClick}
                                             root={categories?.[CAT_MENU_DEFAULT_ROOT_CATEGORY]}
                                             itemsKey="categories"
@@ -343,7 +346,7 @@ const withLayout = <P extends object>(WrappedComponent: React.ComponentType<P>) 
 
                         {!isCheckout ? <Footer /> : <CheckoutFooter />}
                         <AuthModal {...(authModal as any)} />
-                        {/*<DntNotification {...dntNotification} />*/}
+                        <DntNotification {...dntNotification} />
                     </AddToCartModalProvider>
                 </Box>
                 {(config.activeDataEnabled as boolean) && (

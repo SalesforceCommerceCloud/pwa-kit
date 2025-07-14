@@ -9,7 +9,6 @@ import PropTypes from 'prop-types'
 import {defineMessage, FormattedMessage, useIntl} from 'react-intl'
 import {Box, Button, Checkbox, Container, Heading, Stack, Text, Separator} from '@chakra-ui/react'
 import {useForm} from 'react-hook-form'
-import useToast from '../../../hooks/use-toast'
 import {useShopperBasketsMutation} from '@salesforce/commerce-sdk-react'
 import {useCurrentBasket} from '../../../hooks/use-current-basket'
 import {useCheckout} from '../../../pages/checkout/util/checkout-context'
@@ -23,7 +22,7 @@ import PaymentForm from '../../../pages/checkout/partials/payment-form'
 import ShippingAddressSelection from '../../../pages/checkout/partials/shipping-address-selection'
 import AddressDisplay from '../../../components/address-display'
 import {PromoCode, usePromoCode} from '../../../components/promo-code'
-import {API_ERROR_MESSAGE} from '../../../constants'
+import {useErrorHandler} from '../../../hooks/use-errors'
 
 const Payment = () => {
     const {formatMessage} = useIntl()
@@ -42,13 +41,7 @@ const Payment = () => {
     const {mutateAsync: removePaymentInstrumentFromBasket} = useShopperBasketsMutation(
         'removePaymentInstrumentFromBasket'
     )
-    const toast = useToast()
-    const showError = () => {
-        toast({
-            title: formatMessage(API_ERROR_MESSAGE),
-            type: 'error'
-        })
-    }
+    const showError = useErrorHandler()
 
     const {step, STEPS, goToStep, goToNextStep} = useCheckout()
 
@@ -92,10 +85,6 @@ const Payment = () => {
             return
         }
 
-        // TODO: This is added for testing, remove after billing address is migrated
-        return Promise.resolve({success: true}) // Mock successful response
-
-        /* Original code:
         const billingAddress = billingSameAsShipping
             ? selectedShippingAddress
             : billingAddressForm.getValues()
@@ -106,7 +95,6 @@ const Payment = () => {
             body: address,
             parameters: {basketId: basket.basketId}
         })
-        */
     }
     const onPaymentRemoval = async () => {
         try {
