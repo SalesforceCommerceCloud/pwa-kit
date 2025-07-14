@@ -60,6 +60,7 @@ const button = defineRecipe({
                 color: 'blue.600'
             },
             'menu-link': {
+                width: '100%',
                 color: 'black',
                 justifyContent: 'flex-start',
                 fontSize: 'sm',
@@ -68,7 +69,7 @@ const button = defineRecipe({
                     textDecoration: 'underline',
                     textDecorationColor: 'gray.900'
                 },
-                _activeLink: {
+                '&.active': {
                     bg: 'gray.50',
                     borderLeft: 'solid',
                     borderLeftColor: 'gray.600',
@@ -76,6 +77,7 @@ const button = defineRecipe({
                 }
             },
             'menu-link-mobile': {
+                width: '100%',
                 color: 'black',
                 justifyContent: 'flex-start',
                 fontSize: 'sm',
@@ -84,7 +86,7 @@ const button = defineRecipe({
                     textDecoration: 'underline',
                     textDecorationColor: 'gray.900'
                 },
-                _activeLink: {
+                '&.active': {
                     bg: 'gray.100',
                     border: 'solid',
                     borderColor: 'gray.600',

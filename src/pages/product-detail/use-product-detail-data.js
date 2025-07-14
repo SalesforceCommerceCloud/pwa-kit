@@ -6,7 +6,6 @@
  */
 
 import React, {useCallback, useEffect, useState} from 'react'
-import {useIntl} from 'react-intl'
 import {keepPreviousData} from '@tanstack/react-query'
 import {HTTPNotFound, HTTPError} from '@salesforce/pwa-kit-react-sdk/ssr/universal/errors'
 
@@ -21,20 +20,18 @@ import {useHistory, useLocation, useParams} from 'react-router-dom'
 
 import {useCurrentBasket, useVariant} from '../../hooks'
 import useEinstein from '../../hooks/use-einstein'
-import useToast from '../../hooks/use-toast'
 import {useProductDetailWishlist} from './use-product-detail-wishlist'
 
 import {normalizeSetBundleProduct, getUpdateBundleChildArray} from '../../utils/product-utils'
+import {useErrorHandler} from '../../hooks/use-errors'
 
-import {API_ERROR_MESSAGE} from '../../constants'
 import {rebuildPathWithParams} from '../../utils/url'
 
 export const useProductDetailData = () => {
-    const {formatMessage} = useIntl()
     const history = useHistory()
     const location = useLocation()
     const einstein = useEinstein()
-    const toast = useToast()
+    const showError = useErrorHandler()
     const {handleAddToWishlist, isWishlistLoading} = useProductDetailWishlist()
 
     /****************************** Basket *********************************/
@@ -183,12 +180,6 @@ export const useProductDetailData = () => {
     }, [variant])
 
     /**************** Add To Cart ****************/
-    const showError = () => {
-        toast({
-            title: formatMessage(API_ERROR_MESSAGE),
-            type: 'error'
-        })
-    }
 
     const handleAddToCart = async (productSelectionValues) => {
         try {

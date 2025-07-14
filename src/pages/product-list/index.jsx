@@ -52,13 +52,7 @@ import Metadata from './metadata'
 import {FilterIcon, ChevronDownIcon} from '../../components/icons'
 
 // Hooks
-import {
-    useLimitUrls,
-    usePageUrls,
-    useSortUrls,
-    useSearchParams,
-    useExtensionConfig
-} from '../../hooks'
+import {usePageUrls, useSortUrls, useSearchParams, useExtensionConfig} from '../../hooks'
 import useToast from '../../hooks/use-toast'
 import useEinstein from '../../hooks/use-einstein'
 import useActiveData from '../../hooks/use-active-data'
@@ -109,8 +103,7 @@ const ProductList = (props) => {
     const {
         pages: {ProductList: productListConfig},
         maxCacheAge: MAX_CACHE_AGE,
-        staleWhileRevalidate: STALE_WHILE_REVALIDATE,
-        search: searchConfig
+        staleWhileRevalidate: STALE_WHILE_REVALIDATE
     } = useExtensionConfig()
     /**************** Page State ****************/
     const [filtersLoading, setFiltersLoading] = useState(false)
@@ -221,7 +214,6 @@ const ProductList = (props) => {
     // Get urls to be used for pagination, page size changes, and sorting.
     const pageUrls = usePageUrls({total})
     const sortUrls = useSortUrls({options: sortingOptions})
-    const limitUrls = useLimitUrls()
 
     /**************** Action Handlers ****************/
     const {data: wishlist} = useWishList()

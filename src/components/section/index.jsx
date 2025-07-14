@@ -20,7 +20,7 @@ const Section = ({title, subtitle, actions, maxWidth, children, ...props}) => {
         <Box as="section" paddingBottom="16" {...props}>
             <Stack gap={6} as={Container} maxW={sectionMaxWidth} textAlign="center">
                 {title && (
-                    <Heading as="h2" fontSize={40} textAlign="center" fontWeight="bold">
+                    <Heading as="h2" fontSize={40} textAlign="center">
                         {title}
                     </Heading>
                 )}

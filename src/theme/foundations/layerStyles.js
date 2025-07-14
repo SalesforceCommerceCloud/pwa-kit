@@ -13,7 +13,7 @@ const card = {
         px: 4,
         backgroundColor: 'white',
         rounded: 'base',
-        boxShadow: 'base'
+        boxShadow: 'xs'
     }
 }
 
