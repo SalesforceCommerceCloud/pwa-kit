@@ -312,6 +312,7 @@ export const AuthModal = ({
                             isPasswordlessEnabled={isPasswordlessEnabled}
                             isSocialEnabled={isSocialEnabled}
                             idps={idps}
+                            setLoginType={noop}
                         />
                     )}
                     {!form.formState.isSubmitSuccessful && currentView === REGISTER_VIEW && (

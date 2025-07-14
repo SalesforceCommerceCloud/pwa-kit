@@ -22,7 +22,8 @@ const LoginForm = ({
     form,
     isPasswordlessEnabled = false,
     isSocialEnabled = false,
-    idps = []
+    idps = [],
+    setLoginType
 }) => {
     return (
         <Fragment>
@@ -56,6 +57,7 @@ const LoginForm = ({
                             handlePasswordlessLoginClick={handlePasswordlessLoginClick}
                             isSocialEnabled={isSocialEnabled}
                             idps={idps}
+                            setLoginType={setLoginType}
                         />
                     ) : (
                         <StandardLogin
