@@ -127,9 +127,9 @@ const CheckoutConfirmation = () => {
                 px={{base: 0, md: 4}}
                 data-testid="sf-checkout-confirmation-container"
             >
-                <Stack spacing={4}>
+                <Stack gap="4">
                     <Box layerStyle="card" rounded={[0, 0, 'base']} px={[4, 4, 6]} py={[6, 6, 8]}>
-                        <Stack spacing={6}>
+                        <Stack gap="6">
                             <Heading textAlign="center" fontSize={['2xl']}>
                                 <FormattedMessage
                                     defaultMessage="Thank you for your order!"
@@ -139,7 +139,7 @@ const CheckoutConfirmation = () => {
 
                             <Box>
                                 <Container variant="form">
-                                    <Stack spacing={3}>
+                                    <Stack gap="3">
                                         <Text textAlign="center">
                                             <FormattedMessage
                                                 defaultMessage="Order Number"
@@ -191,7 +191,7 @@ const CheckoutConfirmation = () => {
                                 </Heading>
 
                                 <form onSubmit={form.handleSubmit(submitForm)}>
-                                    <Stack spacing={4}>
+                                    <Stack gap="4">
                                         {form.formState.errors?.global && (
                                             <Alert.Root status="error" role="alert">
                                                 <Alert.Indicator>
@@ -224,7 +224,7 @@ const CheckoutConfirmation = () => {
 
                     <Box layerStyle="card" rounded={[0, 0, 'base']} px={[4, 4, 6]} py={[6, 6, 8]}>
                         <Container variant="form">
-                            <Stack spacing={6}>
+                            <Stack gap="6">
                                 <Heading fontSize="lg">
                                     <FormattedMessage
                                         defaultMessage="Delivery Details"
@@ -232,8 +232,8 @@ const CheckoutConfirmation = () => {
                                     />
                                 </Heading>
 
-                                <SimpleGrid columns={[1, 1, 2]} spacing={6}>
-                                    <Stack spacing={1}>
+                                <SimpleGrid columns={[1, 1, 2]} gap="6">
+                                    <Stack gap="1">
                                         <Heading as="h3" fontSize="sm">
                                             <FormattedMessage
                                                 defaultMessage="Shipping Address"
@@ -245,7 +245,7 @@ const CheckoutConfirmation = () => {
                                         />
                                     </Stack>
 
-                                    <Stack spacing={1}>
+                                    <Stack gap="1">
                                         <Heading as="h3" fontSize="sm">
                                             <FormattedMessage
                                                 defaultMessage="Shipping Method"
@@ -266,7 +266,7 @@ const CheckoutConfirmation = () => {
 
                     <Box layerStyle="card" rounded={[0, 0, 'base']} px={[4, 4, 6]} py={[6, 6, 8]}>
                         <Container variant="form">
-                            <Stack spacing={6}>
+                            <Stack gap="6">
                                 <Heading fontSize="lg">
                                     <FormattedMessage
                                         defaultMessage="Order Summary"
@@ -274,7 +274,7 @@ const CheckoutConfirmation = () => {
                                     />
                                 </Heading>
 
-                                <Stack spacing={4}>
+                                <Stack gap="4">
                                     <Text>
                                         <FormattedMessage
                                             description="# item(s) in order"
@@ -289,10 +289,9 @@ const CheckoutConfirmation = () => {
                                         />
                                     </Text>
 
-                                    <Stack gap={5} alignItems="flex-start">
+                                    <Stack gap="5" alignItems="flex-start">
                                         <Stack
-                                            spacing={5}
-                                            gap={5}
+                                            gap="5"
                                             alignItems="flex-start"
                                             width="full"
                                             divider={<Divider />}
@@ -318,7 +317,7 @@ const CheckoutConfirmation = () => {
                                                                 mr={2}
                                                             />
                                                             <Stack
-                                                                spacing={1}
+                                                                gap="1"
                                                                 marginTop="-3px"
                                                                 flex={1}
                                                             >
@@ -477,7 +476,7 @@ const CheckoutConfirmation = () => {
 
                     <Box layerStyle="card" rounded={[0, 0, 'base']} px={[4, 4, 6]} py={[6, 6, 8]}>
                         <Container variant="form">
-                            <Stack spacing={6}>
+                            <Stack gap="6">
                                 <Heading fontSize="lg">
                                     <FormattedMessage
                                         defaultMessage="Payment Details"
@@ -485,8 +484,8 @@ const CheckoutConfirmation = () => {
                                     />
                                 </Heading>
 
-                                <SimpleGrid columns={[1, 1, 2]} spacing={6}>
-                                    <Stack spacing={1}>
+                                <SimpleGrid columns={[1, 1, 2]} gap="6">
+                                    <Stack gap="1">
                                         <Heading as="h3" fontSize="sm">
                                             <FormattedMessage
                                                 defaultMessage="Billing Address"
@@ -496,7 +495,7 @@ const CheckoutConfirmation = () => {
                                         <AddressDisplay address={order.billingAddress} />
                                     </Stack>
 
-                                    <Stack spacing={1}>
+                                    <Stack gap="1">
                                         <Heading as="h3" fontSize="sm">
                                             <FormattedMessage
                                                 defaultMessage="Credit Card"
