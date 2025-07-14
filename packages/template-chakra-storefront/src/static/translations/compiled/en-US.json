@@ -2775,6 +2775,12 @@
       "value": "My Profile"
     }
   ],
+  "consent_card.title.my_communications": [
+    {
+      "type": 0,
+      "value": "Messaging Preferences"
+    }
+  ],
   "promo_code_fields.button.apply": [
     {
       "type": 0,
