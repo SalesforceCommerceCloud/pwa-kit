@@ -158,7 +158,6 @@ const AccountWishlist = () => {
                         >
                             <Flex w="full" align="flex-start">
                                 <Skeleton boxSize={['88', '36']} mr="4" />
-
                                     <Stack gap="2">
                                     <Skeleton h="20px" w="112px" />
                                     <Skeleton h="20px" w="84px" />
