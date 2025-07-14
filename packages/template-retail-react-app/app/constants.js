@@ -234,6 +234,7 @@ export const SHOPPER_CONTEXT_SEARCH_PARAMS = {
     }
 }
 
+// Constants for Login
 export const LOGIN_TYPES = {
     PASSWORD: 'password',
     PASSWORDLESS: 'passwordless',
