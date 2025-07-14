@@ -30,7 +30,6 @@ import {
     Button,
     Field,
     Dialog,
-    Portal,
     Drawer,
     NativeSelect
 } from '@chakra-ui/react'
@@ -60,6 +59,7 @@ import {
     useExtensionConfig
 } from '../../hooks'
 import useToast from '../../hooks/use-toast'
+import SafePortal from '../../components/safe-portal'
 import useEinstein from '../../hooks/use-einstein'
 import useActiveData from '../../hooks/use-active-data'
 import useDataCloud from '../../hooks/use-datacloud'
@@ -483,7 +483,7 @@ const ProductList = (props) => {
                                                 />
                                             </Button>
                                         </Dialog.Trigger>
-                                        <Portal>
+                                        <SafePortal>
                                             <Dialog.Backdrop />
                                             <Dialog.Positioner>
                                                 <Dialog.Content
@@ -590,7 +590,7 @@ const ProductList = (props) => {
                                                     </Dialog.Footer>
                                                 </Dialog.Content>
                                             </Dialog.Positioner>
-                                        </Portal>
+                                        </SafePortal>
                                     </Dialog.Root>
                                 </Flex>
                                 <Flex align="center">
@@ -727,7 +727,7 @@ const ProductList = (props) => {
                 placement="bottom"
                 size="sm"
             >
-                <Portal>
+                <SafePortal>
                     <Drawer.Backdrop />
                     <Drawer.Positioner>
                         <Drawer.Content>
@@ -775,7 +775,7 @@ const ProductList = (props) => {
                             </Drawer.Body>
                         </Drawer.Content>
                     </Drawer.Positioner>
-                </Portal>
+                </SafePortal>
             </Drawer.Root>
         </Box>
     )

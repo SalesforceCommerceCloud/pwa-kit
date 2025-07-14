@@ -8,7 +8,7 @@ import React, {useEffect, useState} from 'react'
 import PropTypes from 'prop-types'
 import {defineMessage, useIntl} from 'react-intl'
 import {useForm} from 'react-hook-form'
-import {Dialog, Portal, CloseButton, useDisclosure} from '@chakra-ui/react'
+import {Dialog, CloseButton, useDisclosure} from '@chakra-ui/react'
 import {keepPreviousData} from '@tanstack/react-query'
 import {
     AuthHelpers,
@@ -40,6 +40,7 @@ import {isServer} from '../utils/utils'
 import {isAbsoluteURL} from '../page-designer/utils'
 import {useAppOrigin} from './use-app-origin'
 import {useExtensionConfig} from './use-extension-config'
+import SafePortal from '../components/safe-portal'
 
 export const LOGIN_VIEW = 'login'
 export const REGISTER_VIEW = 'register'
@@ -275,12 +276,6 @@ export const AuthModal = ({
     const onBackToSignInClick = () =>
         initialView === PASSWORD_VIEW ? onClose() : setCurrentView(LOGIN_VIEW)
 
-    if (typeof window === 'undefined') {
-        // Render nothing on the server side. Otherwise, the Portal component would break SSR and its data fetching.
-        // Portal would call Ark UI's useEnvironmentContext hook, which tries to access `document` that doesn't exist on the server.
-        return
-    }
-
     return (
         <Dialog.Root
             open={isOpen}
@@ -292,7 +287,7 @@ export const AuthModal = ({
             data-testid="sf-auth-modal"
             {...props}
         >
-            <Portal>
+            <SafePortal>
                 <Dialog.Backdrop />
                 <Dialog.Positioner>
                     <Dialog.Content>
@@ -348,7 +343,7 @@ export const AuthModal = ({
                         </Dialog.Body>
                     </Dialog.Content>
                 </Dialog.Positioner>
-            </Portal>
+            </SafePortal>
         </Dialog.Root>
     )
 }

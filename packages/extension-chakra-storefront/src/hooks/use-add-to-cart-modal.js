@@ -16,7 +16,6 @@ import {
     Dialog,
     Flex,
     Heading,
-    Portal,
     Text,
     Stack,
     useBreakpointValue
@@ -29,6 +28,7 @@ import {findImageGroupBy} from '../utils/image-groups-utils'
 import {getPriceData, getDisplayVariationValues} from '../utils/product-utils'
 import {EINSTEIN_RECOMMENDERS} from '../constants'
 import DisplayPrice from '../components/display-price'
+import SafePortal from '../components/safe-portal'
 
 /**
  * This is the context for managing the AddToCartModal.
@@ -84,7 +84,7 @@ export const AddToCartModal = () => {
             scrollBehavior="inside"
             placement="center"
         >
-            <Portal>
+            <SafePortal>
                 <Dialog.Backdrop />
                 <Dialog.Positioner>
                     <Dialog.Content
@@ -422,7 +422,7 @@ export const AddToCartModal = () => {
                         </Dialog.CloseTrigger>
                     </Dialog.Content>
                 </Dialog.Positioner>
-            </Portal>
+            </SafePortal>
         </Dialog.Root>
     )
 }

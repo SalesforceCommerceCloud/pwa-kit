@@ -6,7 +6,8 @@
  */
 import React from 'react'
 import PropTypes from 'prop-types'
-import {Toaster as ChakraToaster, Portal, Stack, Toast, createToaster} from '@chakra-ui/react'
+import {Toaster as ChakraToaster, Stack, Toast, createToaster} from '@chakra-ui/react'
+import SafePortal from '../safe-portal'
 
 // A toaster is a shared global instance that can be used to create and manage toasts.
 export const toaster = createToaster({
@@ -15,7 +16,7 @@ export const toaster = createToaster({
 
 export default function Toaster({toaster}) {
     return (
-        <Portal>
+        <SafePortal>
             <ChakraToaster toaster={toaster} insetInline={{mdDown: '4'}}>
                 {(toast) => (
                     <Toast.Root width={{md: 'sm'}}>
@@ -33,7 +34,7 @@ export default function Toaster({toaster}) {
                     </Toast.Root>
                 )}
             </ChakraToaster>
-        </Portal>
+        </SafePortal>
     )
 }
 
