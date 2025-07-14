@@ -11,7 +11,7 @@ import {useIntl} from 'react-intl'
 import {RadioGroup, Stack} from '@chakra-ui/react'
 import {ADD_FILTER, REMOVE_FILTER} from '../../../pages/product-list/partials/refinements-utils'
 
-const RadioRefinement = ({filter, value, toggleFilter, isSelected}) => {
+const RadioRefinement = ({value, isSelected}) => {
     const {formatMessage} = useIntl()
     // Because choosing a refinement is equivalent to a form submission, the best semantic choice
     // for the refinement is a button or a link, rather than a radio input. The radio element here

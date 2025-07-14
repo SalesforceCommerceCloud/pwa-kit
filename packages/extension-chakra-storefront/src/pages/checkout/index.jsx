@@ -6,7 +6,7 @@
  */
 import React, {useEffect, useState} from 'react'
 import {FormattedMessage, useIntl} from 'react-intl'
-import {Alert, AlertIcon, Box, Button, Container, Grid, GridItem, Stack} from '@chakra-ui/react'
+import {Alert, Box, Button, Container, Grid, GridItem, Stack} from '@chakra-ui/react'
 import useNavigation from '../../hooks/use-navigation'
 import {CheckoutProvider, useCheckout} from '../../pages/checkout/util/checkout-context'
 import ContactInfo from '../../pages/checkout/partials/contact-info'
@@ -23,6 +23,7 @@ import {API_ERROR_MESSAGE, TOAST_MESSAGE_REMOVED_ITEM_FROM_CART} from '../../con
 import useToast from '../../hooks/use-toast'
 import {useExtensionConfig} from '../../hooks'
 import LoadingSpinner from '../../components/loading-spinner'
+import {AlertIcon} from '../../components/icons'
 
 const Checkout = () => {
     const {formatMessage} = useIntl()
@@ -73,10 +74,12 @@ const Checkout = () => {
                     <GridItem>
                         <Stack gap={4}>
                             {error && (
-                                <Alert status="error" variant="left-accent">
-                                    <AlertIcon />
-                                    {error}
-                                </Alert>
+                                <Alert.Root status="error" colorPalette="red">
+                                    <Alert.Indicator>
+                                        <AlertIcon color="red.500" boxSize={4} />
+                                    </Alert.Indicator>
+                                    <Alert.Description>{error}</Alert.Description>
+                                </Alert.Root>
                             )}
 
                             <ContactInfo
