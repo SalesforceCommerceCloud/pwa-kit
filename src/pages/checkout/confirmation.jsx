@@ -292,6 +292,7 @@ const CheckoutConfirmation = () => {
                                     <Stack gap={5} alignItems="flex-start">
                                         <Stack
                                             spacing={5}
+                                            gap={5}
                                             alignItems="flex-start"
                                             width="full"
                                             divider={<Divider />}
