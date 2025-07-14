@@ -42,7 +42,9 @@ import PerformanceTimer, {PERFORMANCE_MARKS} from '../../utils/performance'
 // Workaround for react-ssr-prepass lack of no-op for the React hook `useInsertionEffect`.
 // (see https://github.com/FormidableLabs/react-ssr-prepass/issues/84)
 // - Why useInsertionEffect? Chakra v3 hooks (like useDisclosure, useBreakpointValue, useMediaQuery, useCallbackRef) rely on it for rendering optimization.
+//   * see https://github.com/chakra-ui/chakra-ui/blob/c83e7f5acff2751ee3722bf22d89a5fe581fd72c/packages/react/src/hooks/use-callback-ref.ts#L17-L19
 // - Why no-op? useInsertionEffect is meant for client side only. So on the server, we wanted prepass to ignore it.
+// - Is it safe? Yes, we're not breaking the original behaviour. As React doc explains, the hook is for client side only: https://react.dev/reference/react/useInsertionEffect
 React.useInsertionEffect = () => {} // no-op
 
 const CWD = process.cwd()
