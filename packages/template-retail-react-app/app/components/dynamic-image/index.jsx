@@ -45,7 +45,7 @@ import {isServer} from '@salesforce/retail-react-app/app/components/image/utils'
  * @see {@link https://developer.mozilla.org/en-US/docs/Web/HTML/Guides/Responsive_images}
  * @see {@link https://help.salesforce.com/s/articleView?id=cc.b2c_image_transformation_service.htm&type=5}
  */
-const DynamicImage = ({src, widths, densities, imageProps, as, ...rest}) => {
+const DynamicImage = ({src, widths, imageProps, as, ...rest}) => {
     const Component = as ? as : Img
     const theme = useTheme()
 
@@ -53,7 +53,6 @@ const DynamicImage = ({src, widths, densities, imageProps, as, ...rest}) => {
         const responsiveImageProps = getResponsivePictureAttributes({
             src,
             widths,
-            densities,
             breakpoints: theme.breakpoints
         })
         const effectiveImageProps = getImageAttributes(imageProps)
@@ -85,26 +84,16 @@ const DynamicImage = ({src, widths, densities, imageProps, as, ...rest}) => {
             effectiveImageProps,
             responsiveLinks
         ]
-    }, [src, widths, densities, theme.breakpoints])
+    }, [src, widths, theme.breakpoints])
 
     return (
         <Box {...rest}>
             {numSources > 0 ? (
                 <picture>
-                    {responsiveImageProps.sources.map(({srcSet, sizes, media}, idx) => {
-                        if (idx < numSources - 1) {
-                            return <source key={idx} media={media} sizes={sizes} srcSet={srcSet} />
-                        }
-                        return (
-                            <Component
-                                key={idx}
-                                {...effectiveImageProps}
-                                sizes={sizes}
-                                srcSet={srcSet}
-                                src={responsiveImageProps.src}
-                            />
-                        )
-                    })}
+                    {responsiveImageProps.sources.map(({srcSet, sizes, media}, idx) => (
+                        <source key={idx} media={media} sizes={sizes} srcSet={srcSet} />
+                    ))}
+                    <Component {...effectiveImageProps} src={responsiveImageProps.src} />
                 </picture>
             ) : (
                 <Component {...effectiveImageProps} src={responsiveImageProps.src} />
@@ -131,10 +120,6 @@ DynamicImage.propTypes = {
      * Image widths relative to the breakpoints, whose units can either be px or vw or unit-less. They will be mapped to the corresponding `sizes` and `srcSet`.
      */
     widths: PropTypes.oneOfType([PropTypes.array, PropTypes.object]),
-    /**
-     * Image density factors to apply relative to the breakpoints. Will be mapped to the corresponding `srcSet`.
-     */
-    densities: PropTypes.oneOfType([PropTypes.array, PropTypes.object]),
     /**
      * Props to pass to the inner image component
      */

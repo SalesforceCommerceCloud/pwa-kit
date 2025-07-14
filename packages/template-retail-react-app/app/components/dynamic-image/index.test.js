@@ -139,16 +139,14 @@ describe('Dynamic Image Component', () => {
             expect(elements[0]).toHaveAttribute('src', src)
             expect(elements[0]).toHaveAttribute('loading', 'lazy')
             expect(elements[0]).toHaveAttribute('decoding', 'async')
-            expect(elements[0]).toHaveAttribute('sizes', '50vw')
-            expect(elements[0]).toHaveAttribute(
-                'srcset',
-                [240, 480].map((width) => `${src} ${width}w`).join(', ')
-            )
+            expect(elements[0]).not.toHaveAttribute('sizes')
+            expect(elements[0]).not.toHaveAttribute('srcset')
+
             expect(wrapper.firstElementChild).not.toBe(elements[0])
             expect(wrapper.firstElementChild.tagName.toLowerCase()).toBe('picture')
 
             const sourceElements = Array.from(wrapper.querySelectorAll('source'))
-            expect(sourceElements).toHaveLength(4)
+            expect(sourceElements).toHaveLength(5)
             expect(sourceElements[0]).toHaveAttribute('media', '(min-width: 80em)')
             expect(sourceElements[0]).toHaveAttribute('sizes', '25vw')
             expect(sourceElements[0]).toHaveAttribute(
@@ -172,6 +170,12 @@ describe('Dynamic Image Component', () => {
             expect(sourceElements[3]).toHaveAttribute(
                 'srcset',
                 [384, 768].map((width) => `${src} ${width}w`).join(', ')
+            )
+            expect(sourceElements[4]).not.toHaveAttribute('media')
+            expect(sourceElements[4]).toHaveAttribute('sizes', '50vw')
+            expect(sourceElements[4]).toHaveAttribute(
+                'srcset',
+                [240, 480].map((width) => `${src} ${width}w`).join(', ')
             )
 
             expect(Helmet.peek()?.linkTags ?? []).toStrictEqual([])
@@ -198,16 +202,14 @@ describe('Dynamic Image Component', () => {
             expect(elements[0]).toHaveAttribute('src', src)
             expect(elements[0]).toHaveAttribute('loading', 'eager')
             expect(elements[0]).toHaveAttribute('fetchpriority', 'high')
-            expect(elements[0]).toHaveAttribute('sizes', '50vw')
-            expect(elements[0]).toHaveAttribute(
-                'srcset',
-                [240, 480].map((width) => `${src} ${width}w`).join(', ')
-            )
+            expect(elements[0]).not.toHaveAttribute('sizes')
+            expect(elements[0]).not.toHaveAttribute('srcset')
+
             expect(wrapper.firstElementChild).not.toBe(elements[0])
             expect(wrapper.firstElementChild.tagName.toLowerCase()).toBe('picture')
 
             const sourceElements = Array.from(wrapper.querySelectorAll('source'))
-            expect(sourceElements).toHaveLength(4)
+            expect(sourceElements).toHaveLength(5)
             expect(sourceElements[0]).toHaveAttribute('media', '(min-width: 80em)')
             expect(sourceElements[0]).toHaveAttribute('sizes', '25vw')
             expect(sourceElements[0]).toHaveAttribute(
@@ -231,6 +233,12 @@ describe('Dynamic Image Component', () => {
             expect(sourceElements[3]).toHaveAttribute(
                 'srcset',
                 [384, 768].map((width) => `${src} ${width}w`).join(', ')
+            )
+            expect(sourceElements[4]).not.toHaveAttribute('media')
+            expect(sourceElements[4]).toHaveAttribute('sizes', '50vw')
+            expect(sourceElements[4]).toHaveAttribute(
+                'srcset',
+                [240, 480].map((width) => `${src} ${width}w`).join(', ')
             )
 
             const helmet = Helmet.peek()

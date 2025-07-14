@@ -78,7 +78,7 @@ export const Skeleton = () => {
 
 /**
  * The ProductTile is a simple visual representation of a
- * product object. It will show it's default image, name and price.
+ * product object. It will show its default image, name and price.
  * It also supports favourite products, controlled by a heart icon.
  */
 const ProductTile = (props) => {
@@ -195,7 +195,6 @@ const ProductTile = (props) => {
                                 product?.image?.link
                             }[?sw={width}&q=60]`}
                             widths={dynamicImageProps?.widths}
-                            densities={dynamicImageProps?.densities}
                             imageProps={{
                                 // treat img as a decorative item, we don't need to pass `image.alt`
                                 // since it is the same as product name

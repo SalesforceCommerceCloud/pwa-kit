@@ -8,44 +8,21 @@ import theme from '@salesforce/retail-react-app/app/components/shared/theme'
 import logger from '@salesforce/retail-react-app/app/utils/logger-instance'
 
 /**
- * An array of numbers, numeric tuples, or objects with breakpoint keys and values
- * that can either be numbers, numeric tuples, or arrays of numeric tuples.
- * @typedef {(number[] | [number, number][] | {base?: number | [number, number] | [number, number][], sm?: number | [number, number] | [number, number][], md?: number | [number, number] | [number, number][], lg?: number | [number, number] | [number, number][], xm?: number | [number, number] | [number, number][], '2xl'?: number | [number, number] | [number, number][]})} Densities
- */
-
-/**
  * @param {Object} breakpoints
  * @return {string[]} Breakpoint labels ordered from smallest. For example: ['base', 'sm', 'md', 'lg', 'xl', '2xl']
  */
-function getBreakpointLabels(breakpoints) {
-    return Object.entries(breakpoints)
+const getBreakpointLabels = (breakpoints) =>
+    Object.entries(breakpoints)
         .sort((a, b) => parseFloat(a[1]) - parseFloat(b[1]))
         .map(([key]) => key)
-}
-
-function getEffectiveDensities(breakpoints, factors) {
-    return Object.entries(breakpoints)
-        .sort((a, b) => parseFloat(a[1]) - parseFloat(b[1]))
-        .map(() => factors)
-}
 
 const vwValue = /^\d+vw$/
 const pxValue = /^\d+px$/
 const emValue = /^\d+em$/
 
 const {breakpoints: defaultBreakpoints} = theme
-const defaultDensityFactors = [
-    [1, 1],
-    [2, 2]
-]
-
 let themeBreakpoints = defaultBreakpoints
 let breakpointLabels = getBreakpointLabels(themeBreakpoints)
-let effectiveDefaultDensities = getEffectiveDensities(defaultBreakpoints, defaultDensityFactors)
-
-// Init densities cache
-const densitiesCache = new WeakMap()
-densitiesCache.set(themeBreakpoints, new WeakMap())
 
 /**
  * Helper to create very specific `media` attributes for responsive preload purposes.
@@ -53,7 +30,7 @@ densitiesCache.set(themeBreakpoints, new WeakMap())
  * @return {({min?: string, max?: string} | undefined)}
  * @see {@link https://web.dev/articles/preload-responsive-images#picture}
  */
-function obtainImageLinkMedia(breakpointIndex) {
+const obtainImageLinkMedia = (breakpointIndex) => {
     const toMediaValue = (bp, type) => {
         const val = themeBreakpoints[bp]
         if (emValue.test(val)) {
@@ -79,160 +56,21 @@ function obtainImageLinkMedia(breakpointIndex) {
 }
 
 /**
- * Ensures the mapping of various supported `densities` input types to
- * a unified internal output/representation that allows influencing an
- * image's effectively requested size as well as its display width.
- * The resulting data shape contains an array of numeric tuples, where
- * each tuple entry represents conversion factors to apply for certain
- * targeted theme breakpoints.
- *
- * At the end, the `densities` work in conjunction with the `widths`
- * property passed to the {@link getResponsivePictureAttributes} method
- * as well. While the `widths` define the visual space/size an image should
- * consume on the screen when a certain breakpoint matches, the `densities`
- * allow fine-granular control each image's properties.
- *
- * Per breakpoint, it's possible to define multiple density factor tuples.
- * In this way, several images can be defined per breakpoint, optimized to
- * be loaded by devices with different matching resolutions.
- *
- * The computation per theme breakpoint works as follows. Example for breakpoint
- * `lg` (80em):
- * 1. The related `widths` entry (e.g. `50vm`) is used to compute a `px` value.
- *    Example: 80 * 16 * 50vm = 1280 / 2 = 640 (`px`)
- * 2. The related `densities` factor entry (e.g. `[0.75, 1.5]`) is used to compute the final image dimensions.
- *    Example: display width = 640 * 0.75 = 480; DIS size = 640 * 2 = 960
- * 3. The resulting image definition then looks like `http://example.com/image.jpg?sw=960&q=60 480w`
- * @example Array of numeric values
- *   mapDensities([1, 2]) = [
- *       [[1, 1]], // base
- *       [[2, 2]], // sm
- *       [[2, 2]], // md
- *       [[2, 2]], // lg
- *       [[2, 2]], // xl
- *       [[2, 2]], // 2xl
- *   ]
- * @example Object with breakpoint keys and numeric values
- *   mapDensities({
- *       base: 1,
- *       sm: 2,
- *   }) = [
- *       [[1, 1]], // base
- *       [[2, 2]], // sm
- *       [[2, 2]], // md
- *       [[2, 2]], // lg
- *       [[2, 2]], // xl
- *       [[2, 2]], // 2xl
- *   ]
- * @example Array of tuple (and simple numeric) values
- *   mapDensities([[1, 0.5], 2, [2, 2.5], [2, 1.5]]) = [
- *       [[1, 0.5]], // base
- *       [[2, 2]], // sm
- *       [[2, 2.5]], // md
- *       [[2, 1.5]], // lg
- *       [[2, 1.5]], // xl
- *       [[2, 1.5]], // 2xl
- *   ]
- * @example Object with breakpoint keys and tuple (and simple numeric) values
- *   mapDensities({
- *       base: [1, 0.5],
- *       sm: 2,
- *       md: [2, 2.5],
- *       lg: [2, 1.5],
- *   }) = [
- *       [[1, 0.5]], // base
- *       [[2, 2]], // sm
- *       [[2, 2.5]], // md
- *       [[2, 1.5]], // lg
- *       [[2, 1.5]], // xl
- *       [[2, 1.5]], // 2xl
- *   ]
- * @example Object of tuple arrays
- *   mapDensities({
- *       base: [[1, 1], [2, 2]],
- *       xl: [[1, 0.75], [2, 1.5]],
- *   }) = [
- *       [[1, 1], [2, 2]], // base
- *       [[1, 1], [2, 2]], // sm
- *       [[1, 1], [2, 2]], // md
- *       [[1, 1], [2, 2]], // lg
- *       [[1, 0.75], [2, 1.5]], // xl
- *       [[1, 0.75], [2, 1.5]], // 2xl
- *   ]
- * @param {Densities} densities
- * @param {[number, number][][]} [collector]
- * @returns {[number, number][][]}
- * @see {@link getResponsivePictureAttributes}
- */
-function mapDensities(densities, collector) {
-    const flat = Array.isArray(collector)
-    return densities.reduce(
-        (acc, entry) => {
-            if (!flat && Array.isArray(entry) && Array.isArray(entry.at(0))) {
-                acc.push(mapDensities(entry, []))
-            } else if (
-                Array.isArray(entry) &&
-                typeof entry.at(0) === 'number' &&
-                !Number.isNaN(entry.at(0))
-            ) {
-                const w = entry.at(0)
-                const f = entry.at(1)
-                const result = [w, typeof f === 'number' && !Number.isNaN(f) ? f : w]
-                acc.push(flat ? result : [result])
-            } else if (typeof entry === 'number' && !Number.isNaN(entry)) {
-                const result = [entry, entry]
-                acc.push(flat ? result : [result])
-            } else if (flat) {
-                acc.push(...defaultDensityFactors)
-            } else {
-                acc.push(defaultDensityFactors)
-            }
-            return acc
-        },
-        flat ? collector : []
-    )
-}
-
-/**
- * @param {Densities} densities
- * @returns {[number, number][][]}
- * @see {@link mapDensities}
- */
-function getDensities(densities) {
-    const cache = densitiesCache.get(themeBreakpoints)
-    if (cache?.has(densities)) {
-        return densitiesCache.get(themeBreakpoints).get(densities)
-    } else if (isObject(densities)) {
-        const _densities = mapDensities(padArray(mapWidthsToSizes(densities)))
-        cache?.set(densities, _densities)
-        return _densities
-    } else if (Array.isArray(densities)) {
-        const _densities = mapDensities(padArray(densities))
-        cache?.set(densities, _densities)
-        return _densities
-    }
-    return effectiveDefaultDensities
-}
-
-/**
  * @param {(number[]|string[])} widths
  */
-function withUnit(widths) {
+const withUnit = (widths) =>
     // By default, unitless value is interpreted as px
-    return widths.map((width) => (typeof width === 'number' ? `${width}px` : width))
-}
+    widths.map((width) => (typeof width === 'number' ? `${width}px` : width))
 
-function isObject(o) {
-    return o?.constructor === Object
-}
+const isObject = (o) => o?.constructor === Object
 
 /**
  * @param {Object} widths
  * @example
  * // returns the array [10, 10, 10, 50]
- * mapWidthsToSizes({base: 10, lg: 50})
+ * widthsAsArray({base: 10, lg: 50})
  */
-function mapWidthsToSizes(widths) {
+const widthsAsArray = (widths) => {
     const biggestBreakpoint = breakpointLabels.filter((bp) => Boolean(widths[bp])).pop()
     let mostRecent
     return breakpointLabels.slice(0, breakpointLabels.indexOf(biggestBreakpoint) + 1).map((bp) => {
@@ -248,15 +86,13 @@ function mapWidthsToSizes(widths) {
  * @param {number} em
  * @param {number} [browserDefaultFontSize]
  */
-function emToPx(em, browserDefaultFontSize = 16) {
-    return Math.round(em * browserDefaultFontSize)
-}
+const emToPx = (em, browserDefaultFontSize = 16) => Math.round(em * browserDefaultFontSize)
 
 /**
  * @param {number} vw
  * @param {string} breakpoint
  */
-function vwToPx(vw, breakpoint) {
+const vwToPx = (vw, breakpoint) => {
     const result = (vw / 100) * parseFloat(themeBreakpoints[breakpoint])
     const breakpointsDefinedInPx = Object.values(themeBreakpoints).some((val) => pxValue.test(val))
 
@@ -273,7 +109,7 @@ function vwToPx(vw, breakpoint) {
  * // returns https://example.com/image_720.jpg
  * getSrc('https://example.com/image[_{width}].jpg', 720)
  */
-export function getSrc(dynamicSrc, imageWidth) {
+export const getSrc = (dynamicSrc, imageWidth) => {
     // 1. remove the surrounding []
     // 2. replace {...} with imageWidth
     return dynamicSrc.replace(/\[([^\]]+)\]/g, '$1').replace(/\{[^}]+\}/g, imageWidth)
@@ -285,12 +121,9 @@ export function getSrc(dynamicSrc, imageWidth) {
  * // Returns 'https://example.com/image.jpg'
  * getSrcWithoutOptionalParams('https://example.com/image.jpg[?sw={width}]')
  */
-function getSrcWithoutOptionalParams(dynamicSrc) {
-    const optionalParams = /\[[^\]]+\]/g
-    return dynamicSrc.replace(optionalParams, '')
-}
+const getSrcWithoutOptionalParams = (dynamicSrc) => dynamicSrc.replace(/\[[^\]]+\]/g, '')
 
-function padArray(arr) {
+const padArray = (arr) => {
     const l1 = arr.length
     const l2 = breakpointLabels.length
     if (l1 < l2) {
@@ -305,8 +138,8 @@ function padArray(arr) {
  * @param {string[]|number[]} widths
  * @return {number[]}
  */
-function convertToPxNumbers(widths) {
-    return widths
+const convertToPxNumbers = (widths) =>
+    widths
         .map((width, i) => {
             if (typeof width === 'number') {
                 return width
@@ -334,7 +167,6 @@ function convertToPxNumbers(widths) {
             }
         })
         .filter((width) => width !== undefined)
-}
 
 /**
  * Transforms an array of preload link objects by converting the raw `media`
@@ -343,8 +175,8 @@ function convertToPxNumbers(widths) {
  * @param {{srcSet: string, sizes: string, media: {min?: string, max?: string}}[]} links
  * @return {{srcSet: string, sizes: string, media: string}[]}
  */
-function convertImageLinksMedia(links) {
-    return links.map((link) => {
+const convertImageLinksMedia = (links) =>
+    links.map((link) => {
         const {
             media: {min, max}
         } = link
@@ -357,17 +189,15 @@ function convertImageLinksMedia(links) {
         }
         return {...link, media: acc.join(' and ')}
     })
-}
 
 /**
  * Determines the data required for the responsive `<source>` and `<link rel="preload">
  * portions/elements.
  * @param {string} src
  * @param {(number[]|string[])} widths
- * @param {Densities} densities
  * @returns {{sources: {srcSet: string, sizes: string, media: string}[], links: {srcSet: string, sizes: string, media: string}[]}}
  */
-function getResponsiveSourcesAndLinks(src, widths, densities) {
+const getResponsiveSourcesAndLinks = (src, widths) => {
     const sizesWidths = withUnit(widths)
     const l = sizesWidths.length
     const _sizes = breakpointLabels.map((bp, i) => {
@@ -386,23 +216,20 @@ function getResponsiveSourcesAndLinks(src, widths, densities) {
 
     const sourcesWidths = convertToPxNumbers(padArray(widths))
     const sourcesLength = sourcesWidths.length
-    const _densities = getDensities(densities)
     const {sources, links} = breakpointLabels.reduce(
         (acc, bp, idx) => {
-            // Request images using given or default density factors. By default, images are requested with factors 1 and 2.
+            // To support higher-density devices, request all images in 1x and 2x widths
             const width = sourcesWidths.at(idx >= sourcesLength ? sourcesLength - 1 : idx)
-            const densityFactors = _densities.at(idx)
             const {sizes, media, mediaLink} = _sizes.at(idx)
             const lastSource = acc.sources.at(-1)
             const lastLink = acc.links.at(-1)
-            const srcSet = Array.from(
-                densityFactors.reduce((factors, [factorWidth, factorSize]) => {
-                    const effectiveWidth = Math.round(width * factorWidth)
-                    const effectiveSize = Math.round(width * factorSize)
-                    factors.add(`${getSrc(src, effectiveSize)} ${effectiveWidth}w`)
-                    return factors
-                }, new Set())
-            ).join(', ')
+            const srcSet = [1, 2]
+                .map((factor) => {
+                    const effectiveWidth = Math.round(width * factor)
+                    const effectiveSize = Math.round(width * factor)
+                    return `${getSrc(src, effectiveSize)} ${effectiveWidth}w`
+                })
+                .join(', ')
 
             if (
                 idx < sourcesLength &&
@@ -431,18 +258,11 @@ function getResponsiveSourcesAndLinks(src, widths, densities) {
  * @param {Object} props
  * @param {string} props.src - Dynamic src having an optional param that can vary with widths. For example: `image[_{width}].jpg` or `image.jpg[?sw={width}&q=60]`
  * @param {(number[] |string[] |Object)} [props.widths] - Image widths relative to the breakpoints, whose units can either be px or vw or unit-less. They will be mapped to the corresponding `sizes` and `srcSet`.
- * @param {Densities} [props.densities] - Image density factors to apply relative to the breakpoints. Will be mapped to the corresponding `srcSet`.
  * @param {Object} [props.breakpoints] - The current theme's breakpoints. If not given, Chakra's default breakpoints will be used.
  * @return {Object} src, sizes, srcSet, media props for your image component
  * @see {@link DynamicImage}
- * @see {@link mapDensities} for more information about `densities`
  */
-export function getResponsivePictureAttributes({
-    src,
-    widths,
-    densities,
-    breakpoints = defaultBreakpoints
-}) {
+export const getResponsivePictureAttributes = ({src, widths, breakpoints = defaultBreakpoints}) => {
     if (!widths) {
         return {
             sources: [],
@@ -454,12 +274,10 @@ export function getResponsivePictureAttributes({
     if (breakpoints !== themeBreakpoints) {
         themeBreakpoints = breakpoints
         breakpointLabels = getBreakpointLabels(themeBreakpoints)
-        !densitiesCache.has(themeBreakpoints) && densitiesCache.set(themeBreakpoints, new WeakMap())
-        effectiveDefaultDensities = getEffectiveDensities(themeBreakpoints, defaultDensityFactors)
     }
 
-    const _widths = isObject(widths) ? mapWidthsToSizes(widths) : widths.slice(0)
-    const {sources, links} = getResponsiveSourcesAndLinks(src, _widths, densities)
+    const _widths = isObject(widths) ? widthsAsArray(widths) : widths.slice(0)
+    const {sources, links} = getResponsiveSourcesAndLinks(src, _widths)
     return {
         sources,
         links,
