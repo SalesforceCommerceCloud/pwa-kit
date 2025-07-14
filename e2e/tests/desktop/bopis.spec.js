@@ -37,18 +37,18 @@ test('Adding a product via Pickup in Store to Cart shows pickup address in Check
 
     // Go to Men's PLP
     await page.getByRole('link', {name: 'Mens', exact: true}).hover()
-    const pantsNav = await page.getByRole('link', {name: 'Pants', exact: true})
+    const pantsNav = page.getByRole('link', {name: 'Pants', exact: true})
     await expect(pantsNav).toBeVisible()
     await pantsNav.click()
 
     // Navigate to PDP
     const productTile = page.getByRole('link', {
-        name: /Refined Denim Pants/i
+        name: /Casual To Dressy Trousers/i
     })
     await productTile.click()
 
     // Select size and Pickup in Store option
-    await expect(page.getByRole('heading', {name: /Refined Denim Pants/i})).toBeVisible()
+    await expect(page.getByRole('heading', {name: /Casual To Dressy Trousers/i})).toBeVisible()
     await page.getByRole('radio', {name: '30'}).click()
     await page.waitForLoadState()
     
