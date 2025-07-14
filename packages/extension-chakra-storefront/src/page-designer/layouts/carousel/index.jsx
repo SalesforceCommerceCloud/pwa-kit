@@ -126,7 +126,7 @@ export const Carousel = (props = {}) => {
 
     return (
         <Box className={'carousel'} sx={style} position="relative" data-testid="carousel">
-            <Stack className={'carousel-container'} data-testid="carousel-container" spacing={6}>
+            <Stack className={'carousel-container'} data-testid="carousel-container" gap="6">
                 {textHeadline && (
                     <Heading as="h2" fontSize="xl" textAlign="center">
                         {textHeadline}
@@ -138,7 +138,7 @@ export const Carousel = (props = {}) => {
                     className={'carousel-container-items scroll-indicator'}
                     data-testid="carousel-container-items"
                     direction="row"
-                    spacing={itemSpacing}
+                    gap={itemSpacing}
                     wrap="nowrap"
                     overflowX="scroll"
                     sx={{
@@ -168,7 +168,7 @@ export const Carousel = (props = {}) => {
                     display={controlDisplay}
                     position="absolute"
                     top="50%"
-                    left={{base: 1, lg: 4}}
+                    left={{base: '1', lg: '4'}}
                     transform="translateY(-50%)"
                 >
                     {/* boxShadow requires !important --> https://github.com/chakra-ui/chakra-ui/issues/3553 */}
@@ -190,7 +190,7 @@ export const Carousel = (props = {}) => {
                     display={controlDisplay}
                     position="absolute"
                     top="50%"
-                    right={{base: 1, lg: 4}}
+                    right={{base: '1', lg: '4'}}
                     transform="translateY(-50%)"
                 >
                     {/* boxShadow requires !important --> https://github.com/chakra-ui/chakra-ui/issues/3553 */}

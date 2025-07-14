@@ -20,7 +20,8 @@ import {
     Flex,
     Stack,
     Container,
-    Link
+    Link,
+    useBreakpoint
 } from '@chakra-ui/react'
 
 // Project Components
@@ -53,6 +54,8 @@ const Home = () => {
     const einstein = useEinstein()
     const dataCloud = useDataCloud()
     const {pathname} = useLocation()
+    const breakpoint = useBreakpoint()
+    console.log('breakpoint', breakpoint)
     const {
         pages: {Home: homeConfig},
         maxCacheAge: MAX_CACHE_AGE,
