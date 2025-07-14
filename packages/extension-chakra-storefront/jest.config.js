@@ -56,8 +56,11 @@ module.exports = {
         createTestGlob('pages/login'),
         createTestGlob('pages/login-redirect'),
         createTestGlob('pages/social-login-redirect'),
-        createTestGlob('hooks/'),
+        createTestGlob('hooks'),
         createTestGlob('pages/registration'),
+        '<rootDir>/src/pages/account/wishlist/partials/wishlist-secondary-button-group.test.js',
+        '<rootDir>/src/pages/account/wishlist/partials/wishlist-primary-action.test.js',
+        // TODO: renable when pwless bug is fixed
         // '<rootDir>/src/pages/checkout/partials/contact-info.test.js',
         '<rootDir>/src/pages/checkout/partials/login-state.test.js',
         '<rootDir>/src/pages/account/orders.test.js',
@@ -67,7 +70,8 @@ module.exports = {
         '<rootDir>/src/pages/product-detail/metadata.test.js',
         '<rootDir>/src/pages/product-list/metadata.test.js',
         '<rootDir>/src/hooks/use-toast.test.js',
-        '<rootDir>/src/hooks/use-dnt-notification.test.js'
+        '<rootDir>/src/hooks/use-dnt-notification.test.js',
+        '<rootDir>/src/hooks/use-auth-modal.test.js'
     ],
     moduleNameMapper: {
         ...base.moduleNameMapper,
