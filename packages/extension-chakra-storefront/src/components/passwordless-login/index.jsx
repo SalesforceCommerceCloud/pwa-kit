@@ -96,8 +96,7 @@ PasswordlessLogin.propTypes = {
     handleForgotPasswordClick: PropTypes.func,
     isSocialEnabled: PropTypes.bool,
     idps: PropTypes.arrayOf(PropTypes.string),
-    hideEmail: PropTypes.bool,
-    setLoginType: PropTypes.func
+    hideEmail: PropTypes.bool
 }
 
 export default PasswordlessLogin
