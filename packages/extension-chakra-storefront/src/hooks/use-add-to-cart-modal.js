@@ -335,8 +335,8 @@ export const AddToCartModal = () => {
                                         </Text>
                                     </Flex>
                                     <Stack gap="4">
-                                        <Button asChild>
-                                            <Link to="/cart" width="100%" variant="solid">
+                                        <Button asChild variant="solid">
+                                            <Link to="/cart" width="100%">
                                                 {intl.formatMessage({
                                                     defaultMessage: 'View Cart',
                                                     id: 'add_to_cart_modal.link.view_cart'
@@ -344,8 +344,8 @@ export const AddToCartModal = () => {
                                             </Link>
                                         </Button>
 
-                                        <Button asChild>
-                                            <Link to="/checkout" width="100%" variant="outline">
+                                        <Button asChild variant="outline">
+                                            <Link to="/checkout" width="100%">
                                                 {intl.formatMessage({
                                                     defaultMessage: 'Proceed to Checkout',
                                                     id: 'add_to_cart_modal.link.checkout'
@@ -400,8 +400,8 @@ export const AddToCartModal = () => {
                                 </Text>
                             </Flex>
                             <Stack gap="4">
-                                <Button asChild>
-                                    <Link to="/cart" width="100%" variant="solid">
+                                <Button asChild variant="solid">
+                                    <Link to="/cart" width="100%">
                                         {intl.formatMessage({
                                             defaultMessage: 'View Cart',
                                             id: 'add_to_cart_modal.link.view_cart'
@@ -409,8 +409,8 @@ export const AddToCartModal = () => {
                                     </Link>
                                 </Button>
 
-                                <Button asChild>
-                                    <Link to="/checkout" width="100%" variant="outline">
+                                <Button asChild variant="outline">
+                                    <Link to="/checkout" width="100%">
                                         {intl.formatMessage({
                                             defaultMessage: 'Proceed to Checkout',
                                             id: 'add_to_cart_modal.link.checkout'

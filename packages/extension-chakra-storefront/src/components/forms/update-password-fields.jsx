@@ -7,7 +7,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import {FormattedMessage} from 'react-intl'
-import {Box, Button, Stack, StackDivider} from '@chakra-ui/react'
+import {Box, Button, Stack, StackSeparator} from '@chakra-ui/react'
 import useUpdatePasswordFields from '../../components/forms/useUpdatePasswordFields'
 import Field from '../../components/field'
 import PasswordRequirements from '../../components/forms/password-requirements'
@@ -17,7 +17,7 @@ const UpdatePasswordFields = ({form, prefix = ''}) => {
     const password = form.watch('password')
 
     return (
-        <Stack gap={5} divider={<StackDivider borderColor="gray.100" />}>
+        <Stack gap={5} separator={<StackSeparator borderColor="gray.100" />}>
             <Stack>
                 <Field {...fields.currentPassword} />
                 <Box>

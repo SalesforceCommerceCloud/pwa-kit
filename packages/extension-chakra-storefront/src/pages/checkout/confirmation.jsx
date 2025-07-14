@@ -17,7 +17,7 @@ import {
     Stack,
     Text,
     Alert,
-    Divider
+    StackSeparator
 } from '@chakra-ui/react'
 import {useForm} from 'react-hook-form'
 import {useParams} from 'react-router-dom'
@@ -289,13 +289,12 @@ const CheckoutConfirmation = () => {
                                         />
                                     </Text>
 
-                                    <Stack gap="5" alignItems="flex-start">
-                                        <Stack
-                                            gap="5"
-                                            alignItems="flex-start"
-                                            width="full"
-                                            divider={<Divider />}
-                                        >
+                                    <Stack
+                                        gap="5"
+                                        alignItems="flex-start"
+                                        separator={<StackSeparator width="full" />}
+                                    >
+                                        <Stack gap="5" alignItems="flex-start" width="full">
                                             {order.productItems?.map((product, idx) => {
                                                 const productDetail =
                                                     productItemsMap?.[product.productId] || {}
