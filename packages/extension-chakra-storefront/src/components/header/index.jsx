@@ -223,7 +223,7 @@ const Header = ({
                                                     as="ul"
                                                     data-testid="account-detail-nav"
                                                 >
-                                                    {navLinks.map((link, index) => {
+                                                    {navLinks.map((link) => {
                                                         const LinkIcon = link.icon
                                                         return (
                                                             <List.Item key={link.name}>

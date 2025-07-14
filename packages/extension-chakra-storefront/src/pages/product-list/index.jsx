@@ -52,13 +52,7 @@ import Metadata from './metadata'
 import {FilterIcon, ChevronDownIcon} from '../../components/icons'
 
 // Hooks
-import {
-    useLimitUrls,
-    usePageUrls,
-    useSortUrls,
-    useSearchParams,
-    useExtensionConfig
-} from '../../hooks'
+import {usePageUrls, useSortUrls, useSearchParams, useExtensionConfig} from '../../hooks'
 import useToast from '../../hooks/use-toast'
 import useEinstein from '../../hooks/use-einstein'
 import useActiveData from '../../hooks/use-active-data'

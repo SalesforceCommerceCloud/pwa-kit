@@ -61,13 +61,13 @@ jest.mock('../../../components/product-view-modal', () => {
 })
 
 jest.mock('../../../components/product-view-modal/bundle', () => {
-    return function MockBundleProductViewModal(props) {
+    return function MockBundleProductViewModal() {
         return <div data-testid="bundle-product-view-modal" role="dialog" />
     }
 })
 
 jest.mock('../../../components/unavailable-product-confirmation-modal', () => {
-    return function MockUnavailableProductConfirmationModal(props) {
+    return function MockUnavailableProductConfirmationModal() {
         return <div data-testid="unavailable-product-confirmation-modal" />
     }
 })
