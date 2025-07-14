@@ -28,7 +28,7 @@ const WishlistPrimaryAction = () => {
     const isProductABundle = variant?.type?.bundle
     const toast = useToast()
     const [isLoading, setIsLoading] = useState(false)
-    const {isOpen, onOpen, onClose} = useDisclosure()
+    const {open, onOpen, onClose} = useDisclosure()
 
     const handleAddToCart = async (item, quantity) => {
         setIsLoading(true)
@@ -103,10 +103,10 @@ const WishlistPrimaryAction = () => {
         if (variant.setProducts?.every((child) => !hasVariants(child))) {
             return (
                 <Button
-                    variant={'solid'}
+                    variant="solid"
                     onClick={() => handleAddToCart(variant, variant.quantity)}
-                    w={'full'}
-                    isLoading={isLoading}
+                    size="md"
+                    loading={isLoading}
                     aria-label={formatMessage(
                         {
                             id: 'wishlist_primary_action.button.addSetToCart.label',
@@ -121,10 +121,9 @@ const WishlistPrimaryAction = () => {
         } else {
             return (
                 <Button
-                    as={Link}
-                    href={`/product/${variant.id}`}
-                    w={'full'}
-                    variant={'solid'}
+                    asChild
+                    size="md"
+                    variant="solid"
                     _hover={{textDecoration: 'none'}}
                     aria-label={formatMessage(
                         {
@@ -134,17 +133,16 @@ const WishlistPrimaryAction = () => {
                         {productName: variant.name}
                     )}
                 >
-                    {buttonText.viewFullDetails}
+                    <Link href={`/product/${variant.id}`}>{buttonText.viewFullDetails}</Link>
                 </Button>
             )
         }
     } else if (isProductABundle) {
         return (
             <Button
-                as={Link}
-                href={`/product/${variant.id}`}
-                w={'full'}
-                variant={'solid'}
+                asChild
+                size="md"
+                variant="solid"
                 _hover={{textDecoration: 'none'}}
                 aria-label={formatMessage(
                     {
@@ -154,7 +152,7 @@ const WishlistPrimaryAction = () => {
                     {productName: variant.name}
                 )}
             >
-                {buttonText.viewFullDetails}
+                <Link href={`/product/${variant.id}`}>{buttonText.viewFullDetails}</Link>
             </Button>
         )
     } else {
@@ -169,15 +167,17 @@ const WishlistPrimaryAction = () => {
                             },
                             {productName: variant.name}
                         )}
-                        w={'full'}
-                        variant={'solid'}
-                        onClick={onOpen}
+                        size="md"
+                        variant="solid"
+                        onClick={() => {
+                            onOpen()
+                        }}
                     >
                         {buttonText.viewOptions}
                     </Button>
-                    {isOpen && (
+                    {open && (
                         <ProductViewModal
-                            isOpen={isOpen}
+                            isOpen={open}
                             onOpen={onOpen}
                             onClose={onClose}
                             product={variant}
@@ -189,10 +189,10 @@ const WishlistPrimaryAction = () => {
         } else {
             return (
                 <Button
-                    variant={'solid'}
+                    variant="solid"
                     onClick={() => handleAddToCart(variant, variant.quantity)}
-                    w={'full'}
-                    isLoading={isLoading}
+                    size="md"
+                    loading={isLoading}
                     aria-label={formatMessage(
                         {
                             id: 'wishlist_primary_action.button.addToCart.label',
