@@ -289,7 +289,7 @@ const CheckoutConfirmation = () => {
                                         />
                                     </Text>
 
-                                    <Stack spacing={5} alignItems="flex-start">
+                                    <Stack gap={5} alignItems="flex-start">
                                         <Stack
                                             spacing={5}
                                             alignItems="flex-start"
