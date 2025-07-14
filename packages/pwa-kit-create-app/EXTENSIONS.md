@@ -395,10 +395,6 @@ For issues and questions:
 -   MCP Server Issues: [PWA MCP Issues](https://github.com/kzheng-sfdc/pwa-mcp/issues)
 -   Documentation: [PWA Kit Documentation](https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/)
 
-## Author
-
--   bfeister@salesforce.com
-
 ---
 
 **Note**: This system is designed for Salesforce Commerce Cloud PWA Kit projects. Ensure your project is compatible before installing extensions.
