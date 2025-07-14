@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, salesforce.com, inc.
+ * Copyright (c) 2025, salesforce.com, inc.
  * All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
@@ -20,6 +20,7 @@ import CartItemVariantPrice from '@salesforce/retail-react-app/app/components/it
 import LoadingSpinner from '@salesforce/retail-react-app/app/components/loading-spinner'
 import BonusProductQuantity from '@salesforce/retail-react-app/app/components/product-item/bonus-product-quantity'
 import ProductQuantityPicker from '@salesforce/retail-react-app/app/components/product-item/product-quantity-picker'
+import PickupOrDelivery from '@salesforce/retail-react-app/app/components/pickup-or-delivery'
 
 // Utilities
 import {noop} from '@salesforce/retail-react-app/app/utils/utils'
@@ -41,7 +42,8 @@ const ProductItem = ({
     primaryAction,
     secondaryActions,
     onItemQuantityChange = noop,
-    showLoading = false
+    showLoading = false,
+    deliveryActions
 }) => {
     const {stepQuantity, showInventoryMessage, inventoryMessage, quantity, setQuantity} =
         useDerivedProduct(product)
@@ -57,18 +59,49 @@ const ProductItem = ({
                     <Flex width="full" alignItems="flex-start" backgroundColor="white">
                         <CartItemVariantImage width={['88px', '136px']} mr={4} />
                         <Stack spacing={3} flex={1}>
-                            <Stack spacing={1}>
-                                <CartItemVariantName />
-                                <CartItemVariantAttributes excludeBonusLabel />
-                                <HideOnDesktop>
-                                    <Box marginTop={2}>
-                                        <CartItemVariantPrice
-                                            align="left"
-                                            currency={activeCurrency}
+                            <Flex align="flex-end" justify="space-between">
+                                <Stack spacing={1}>
+                                    <CartItemVariantName />
+                                    <CartItemVariantAttributes excludeBonusLabel />
+                                    <HideOnDesktop>
+                                        <Box marginTop={2}>
+                                            <CartItemVariantPrice
+                                                align="left"
+                                                currency={activeCurrency}
+                                            />
+                                        </Box>
+                                    </HideOnDesktop>
+                                </Stack>
+                                {deliveryActions?.showDeliveryOptions && (
+                                    <HideOnMobile>
+                                        <PickupOrDelivery
+                                            isPickupDisabled={deliveryActions.isPickupDisabled}
+                                            value={deliveryActions.deliveryOption}
+                                            onChange={(selectedValue) =>
+                                                deliveryActions.onDeliveryOptionChange(
+                                                    product,
+                                                    selectedValue
+                                                )
+                                            }
                                         />
-                                    </Box>
+                                    </HideOnMobile>
+                                )}
+                            </Flex>
+
+                            {deliveryActions?.showDeliveryOptions && (
+                                <HideOnDesktop>
+                                    <PickupOrDelivery
+                                        isPickupDisabled={deliveryActions.isPickupDisabled}
+                                        value={deliveryActions.deliveryOption}
+                                        onChange={(selectedValue) =>
+                                            deliveryActions.onDeliveryOptionChange(
+                                                product,
+                                                selectedValue
+                                            )
+                                        }
+                                    />
                                 </HideOnDesktop>
-                            </Stack>
+                            )}
 
                             <Flex align="flex-end" justify="space-between">
                                 <Stack spacing={1}>
@@ -124,7 +157,13 @@ ProductItem.propTypes = {
     showLoading: PropTypes.bool,
     isWishlistItem: PropTypes.bool,
     primaryAction: PropTypes.node,
-    secondaryActions: PropTypes.node
+    secondaryActions: PropTypes.node,
+    deliveryActions: PropTypes.shape({
+        showDeliveryOptions: PropTypes.bool,
+        isPickupDisabled: PropTypes.bool,
+        deliveryOption: PropTypes.string,
+        onDeliveryOptionChange: PropTypes.func
+    })
 }
 
 export default ProductItem
