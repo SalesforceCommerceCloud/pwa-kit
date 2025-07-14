@@ -142,6 +142,12 @@ const ContactInfo = ({isSocialEnabled = false, idps = []}) => {
                                     isSocialEnabled={isSocialEnabled}
                                     idps={idps}
                                 />
+                                <Button type="submit">
+                                    <FormattedMessage
+                                        defaultMessage="Continue to Shipping Address"
+                                        id="contact_info.button.continue_to_shipping_address"
+                                    />
+                                </Button>
                             </Stack>
                         </Stack>
                     </form>
