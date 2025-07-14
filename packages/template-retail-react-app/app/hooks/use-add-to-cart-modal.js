@@ -61,7 +61,9 @@ AddToCartModalProvider.propTypes = {
  */
 export const AddToCartModal = () => {
     const {isOpen, onClose, data} = useAddToCartModalContext()
-    const {product, itemsAdded = [], selectedQuantity} = data || {}
+    const {product, itemsAdded = [], selectedQuantity, bonusDiscountLineItems = [], bonusAvailable} = data || {}
+    console.log('AddToCartModal bonusAvailable:', bonusAvailable) //todo: remove this
+    console.log('bonusDiscountLineItems:', bonusDiscountLineItems) //todo: remove this
     const isProductABundle = product?.type.bundle
 
     const intl = useIntl()
@@ -278,6 +280,11 @@ export const AddToCartModal = () => {
                                         </Flex>
                                     )
                                 })}
+                            {bonusAvailable && (
+                                <Box my={4} p={2} bg="green.100" borderRadius="md">
+                                    test3
+                                </Box>
+                            )}
                         </Box>
                         <Box
                             display={['none', 'none', 'none', 'block']}

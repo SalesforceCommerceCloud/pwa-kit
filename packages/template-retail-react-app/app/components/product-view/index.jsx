@@ -304,26 +304,26 @@ const ProductView = forwardRef(
                     // See wishlist_primary_action for example.
                     if (isValidResponse) {
                         // Show bonus product modal first if there are bonus items
-                        // TODO: Rule based promotions are not supported yet
+                        // TODO: Rule based promotions are not supported yet todo:update
                         if (
                             newBonusItems?.length > 0 &&
-                            newBonusItems.some((item) => item.bonusProducts)
+                            newBonusItems.some((item) => item.bonusProducts)//todo: does the condition need updating?
                         ) {
-                            // Update bonusProducts list with the new bonus items
-                            addBonusProducts(newBonusItems)
-                            onBonusProductModalOpen({
-                                newBonusItems,
-                                allBonusItems: addToCartResponse.bonusDiscountLineItems,
+                            // todo: explain this
+                            onAddToCartModalOpen({
                                 product,
                                 itemsAdded,
-                                selectedQuantity: quantity
+                                selectedQuantity: quantity,
+                                bonusDiscountLineItems: addToCartResponse.bonusDiscountLineItems,
+                                bonusAvailable: true
                             })
                         } else {
                             // If no bonus items, just show add to cart modal
                             onAddToCartModalOpen({
                                 product,
                                 itemsAdded,
-                                selectedQuantity: quantity
+                                selectedQuantity: quantity,
+                                bonusDiscountLineItems: addToCartResponse.bonusDiscountLineItems
                             })
                         }
                     }
