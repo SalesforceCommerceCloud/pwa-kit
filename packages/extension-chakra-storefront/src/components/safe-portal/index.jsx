@@ -10,6 +10,7 @@ import {Portal} from '@chakra-ui/react'
 /**
  * A safe version of Portal that only renders on the client side.
  * This prevents SSR issues where Portal tries to access the DOM during server rendering.
+ * (Portal would call Ark UI's useEnvironmentContext hook, which tries to access `document` that doesn't exist on the server)
  *
  * @param {Object} props - Props to pass to the Portal component
  * @returns {React.Element|null} Portal component or null if on server
