@@ -508,8 +508,18 @@ class Auth {
             const {isGuest, customerId, usid} = this.parseSlasJWT(sfraAuthToken)
             this.set('access_token', sfraAuthToken)
             this.set('customer_id', customerId)
-            this.set('usid', usid)
             this.set('customer_type', isGuest ? 'guest' : 'registered')
+            
+            // Set usid cookie with refresh token expiry to prevent refresh token failures
+            const refreshTokenExpiresIn = this.get('refresh_token_expires_in')
+            if (refreshTokenExpiresIn) {
+                const expiresDate = this.convertSecondsToDate(Number(refreshTokenExpiresIn))
+                this.set('usid', usid, {
+                    expires: expiresDate
+                })
+            } else {
+                this.set('usid', usid)
+            }
 
             accessToken = sfraAuthToken
             // SFRA -> PWA access token cookie handoff is successful so we clear the SFRA made cookies.
@@ -600,7 +610,6 @@ class Auth {
         this.set('id_token', res.id_token)
         this.set('idp_access_token', res.idp_access_token)
         this.set('token_type', res.token_type)
-        this.set('usid', res.usid)
         this.set('customer_type', isGuest ? 'guest' : 'registered')
 
         const refreshTokenKey = isGuest ? 'refresh_token_guest' : 'refresh_token_registered'
@@ -622,6 +631,12 @@ class Auth {
         }
         const expiresDate = this.convertSecondsToDate(refreshTokenTTLValue)
         this.set('refresh_token_expires_in', refreshTokenTTLValue.toString())
+        
+        // Set usid cookie with the same expiry as refresh token to prevent refresh token failures
+        this.set('usid', res.usid, {
+            expires: expiresDate
+        })
+        
         this.set(refreshTokenKey, res.refresh_token, {
             expires: expiresDate
         })
@@ -770,8 +785,19 @@ class Auth {
             const {isGuest, customerId, usid} = this.parseSlasJWT(this.fetchedToken)
             this.set('access_token', this.fetchedToken)
             this.set('customer_id', customerId)
-            this.set('usid', usid)
             this.set('customer_type', isGuest ? 'guest' : 'registered')
+            
+            // Set usid cookie with refresh token expiry to prevent refresh token failures
+            const refreshTokenExpiresIn = this.get('refresh_token_expires_in')
+            if (refreshTokenExpiresIn) {
+                const expiresDate = this.convertSecondsToDate(Number(refreshTokenExpiresIn))
+                this.set('usid', usid, {
+                    expires: expiresDate
+                })
+            } else {
+                this.set('usid', usid)
+            }
+            
             return this.data
         }
         if (this.pendingToken) {
