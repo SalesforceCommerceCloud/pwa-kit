@@ -173,8 +173,20 @@ export default function useAddressFields({
             // Parse the address suggestion to extract individual fields
             const parsedFields = parseAddressSuggestion(suggestion)
 
-            // Populate address field only (city/state/zip population in next PR)
+            // Populate all address fields
             setValue(`${prefix}address1`, parsedFields.address1)
+            if (parsedFields.city) {
+                setValue(`${prefix}city`, parsedFields.city)
+            }
+            if (parsedFields.stateCode) {
+                setValue(`${prefix}stateCode`, parsedFields.stateCode)
+            }
+            if (parsedFields.postalCode) {
+                setValue(`${prefix}postalCode`, parsedFields.postalCode)
+            }
+            if (parsedFields.countryCode) {
+                setValue(`${prefix}countryCode`, parsedFields.countryCode)
+            }
             setShowDropdown(false)
             setIsDismissed(true)
             setSuggestions([])
