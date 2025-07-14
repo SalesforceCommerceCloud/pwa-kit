@@ -16,12 +16,6 @@ import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-cur
 export class DataCloudApi {
     constructor({siteId, appSourceId, tenantId, dnt}) {
         this.siteId = siteId
-
-        // Return early if Data Cloud API configuration is not available
-        if (!appSourceId || !tenantId) {
-            console.error('DataCloud API Configuration is missing.')
-            return
-        }
         this.sdk = initDataCloudSdk(tenantId, appSourceId)
         this.dnt = dnt
     }
@@ -145,11 +139,8 @@ export class DataCloudApi {
             events: [...(!this.dnt ? [identityProfile] : []), userEngagement]
         }
 
-        try {
-            this.sdk.webEventsAppSourceIdPost(interaction)
-        } catch (err) {
-            logger.error('Error sending DataCloud event', err)
-        }
+        this.sdk.webEventsAppSourceIdPost(interaction)
+            .catch((err) => this._handleApiError(err))
     }
 
     /**
@@ -201,11 +192,8 @@ export class DataCloudApi {
             ]
         }
 
-        try {
-            this.sdk.webEventsAppSourceIdPost(interaction)
-        } catch (err) {
-            logger.error('Error sending DataCloud event', err)
-        }
+        this.sdk.webEventsAppSourceIdPost(interaction)
+            .catch((err) => this._handleApiError(err))
     }
 
     /**
@@ -268,11 +256,8 @@ export class DataCloudApi {
             ]
         }
 
-        try {
-            this.sdk.webEventsAppSourceIdPost(interaction)
-        } catch (err) {
-            logger.error('Error sending DataCloud event', err)
-        }
+        this.sdk.webEventsAppSourceIdPost(interaction)
+            .catch((err) => this._handleApiError(err))
     }
 
     /**
@@ -335,11 +320,8 @@ export class DataCloudApi {
             ]
         }
 
-        try {
-            this.sdk.webEventsAppSourceIdPost(interaction)
-        } catch (err) {
-            logger.error('Error sending DataCloud event', err)
-        }
+        this.sdk.webEventsAppSourceIdPost(interaction)
+            .catch((err) => this._handleApiError(err))
     }
 
     /**
@@ -396,10 +378,23 @@ export class DataCloudApi {
             ]
         }
 
-        try {
-            this.sdk.webEventsAppSourceIdPost(interaction)
-        } catch (err) {
-            logger.error('Error sending DataCloud event', err)
+        this.sdk.webEventsAppSourceIdPost(interaction)
+            .catch((err) => this._handleApiError(err))
+    }
+
+    _handleApiError(err) {
+        if (err?.response?.status === 400) {
+            logger.warn(
+                '[DataCloudApi] 400 Bad Request: Check your Data Cloud configuration (appSourceId, tenantId) and event payload.',
+                {
+                    url: err?.response?.url,
+                    status: err?.response?.status,
+                    statusText: err?.response?.statusText,
+                    data: err?.response?.data // if available
+                }
+            )
+        } else {
+            logger.error('[DataCloudApi] Error sending Data Cloud event', err)
         }
     }
 }
@@ -436,12 +431,24 @@ const useDataCloud = () => {
         }
     }
 
-    // Grab Data Cloud configuration values and intialize the sdk
+    // Grab Data Cloud configuration values. Only initialize the SDK if config is present.
     const {
-        app: {dataCloudAPI: config}
+        app: {dataCloudAPI: config = {}}
     } = getConfig()
 
     const {appSourceId, tenantId} = config
+
+    // If Data Cloud config is missing, return no-op async functions for all event methods (SDK will not be initialized)
+    if (!appSourceId || !tenantId) {
+        const noop = async () => {}
+        return {
+            sendViewPage: noop,
+            sendViewProduct: noop,
+            sendViewCategory: noop,
+            sendViewSearchResults: noop,
+            sendViewRecommendations: noop
+        }
+    }
 
     const dataCloud = useMemo(
         () =>
