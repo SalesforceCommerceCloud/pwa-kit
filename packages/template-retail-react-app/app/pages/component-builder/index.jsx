@@ -22,6 +22,10 @@ import {
     PhotoIcon
 } from '@chakra-ui/icons'
 import Hero from '@salesforce/retail-react-app/app/components/hero'
+import { Radio, RadioGroup } from '@chakra-ui/react';
+import ShopNowBar from '@salesforce/retail-react-app/app/components/ShopNowBar'
+import Hero2 from '@salesforce/retail-react-app/app/components/Hero2'
+import Carousel2 from '@salesforce/retail-react-app/app/components/Carousel2'
 const mockAddress = mockedRegisteredCustomer.addresses[0]
 
 const DEFAULT_CODE = `function Demo() {
@@ -63,6 +67,7 @@ const ComponentBuilder = () => {
     const toast = typeof window !== 'undefined' ? useToast() : null
     let idCounter = 0
     const getId = () => `comp_${idCounter++}_${Date.now()}`
+    const [action, setAction] = useState('createComponent');
 
     // Drag handlers
     const handleDragStart = (e, type) => {
@@ -73,7 +78,8 @@ const ComponentBuilder = () => {
         e.preventDefault()
         const type = e.dataTransfer.getData('componentType')
         if (type === 'Box' || type === 'Text' || type === 'ProductTile' || type === 'AddressDisplay' || 
-            type === 'VStack' || type === 'HStack' || type === 'SimpleGrid' || type === 'Image' || type === 'Hero') {
+            type === 'VStack' || type === 'HStack' || type === 'SimpleGrid' || type === 'Image' || type === 'Hero' || 
+            type === 'ShopNowBar' || type === 'Hero2' || type === 'Carousel2') {
             const newNode = { 
                 id: getId(), 
                 type, 
@@ -473,6 +479,97 @@ const ComponentBuilder = () => {
                     </Box>
                 )
             }
+            if (node.type === 'ShopNowBar') {
+                return (
+                    <Box key={node.id}
+                        borderColor={hoveredId === node.id ? 'blue.500' : 'gray.200'}
+                        borderWidth={1}
+                        borderRadius="md"
+                        onMouseEnter={() => setHoveredId(node.id)}
+                        onMouseLeave={() => setHoveredId(null)}
+                        position="relative"
+                        p={2}
+                        mb={2}
+                    >
+                        {hoveredId === node.id && (
+                            <CloseButton
+                                size="sm"
+                                position="absolute"
+                                top={1}
+                                right={1}
+                                zIndex={2}
+                                onClick={e => {
+                                    e.stopPropagation();
+                                    setDroppedComponents(tree => removeNodeById(tree, node.id))
+                                }}
+                            />
+                        )}
+                        <ShopNowBar />
+                    </Box>
+                )
+            }
+            if (node.type === 'Hero2') {
+                return (
+                    <Box key={node.id}
+                        borderColor={hoveredId === node.id ? 'blue.500' : 'gray.200'}
+                        borderWidth={1}
+                        borderRadius="md"
+                        onMouseEnter={() => setHoveredId(node.id)}
+                        onMouseLeave={() => setHoveredId(null)}
+                        position="relative"
+                        p={2}
+                        mb={2}
+                    >
+                        {hoveredId === node.id && (
+                            <CloseButton
+                                size="sm"
+                                position="absolute"
+                                top={1}
+                                right={1}
+                                zIndex={2}
+                                onClick={e => {
+                                    e.stopPropagation();
+                                    setDroppedComponents(tree => removeNodeById(tree, node.id))
+                                }}
+                            />
+                        )}
+                        <Hero2 />
+                    </Box>
+                )
+            }
+            if (node.type === 'Carousel2') {
+                return (
+                    <Box key={node.id}
+                        borderColor={hoveredId === node.id ? 'blue.500' : 'gray.200'}
+                        borderWidth={1}
+                        borderRadius="md"
+                        onMouseEnter={() => setHoveredId(node.id)}
+                        onMouseLeave={() => setHoveredId(null)}
+                        position="relative"
+                        p={2}
+                        mb={2}
+                    >
+                        {hoveredId === node.id && (
+                            <CloseButton
+                                size="sm"
+                                position="absolute"
+                                top={1}
+                                right={1}
+                                zIndex={2}
+                                onClick={e => {
+                                    e.stopPropagation();
+                                    setDroppedComponents(tree => removeNodeById(tree, node.id))
+                                }}
+                            />
+                        )}
+                        <Carousel2 items={[
+                    { text: 'Floral Shirt Dress', image: 'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw883b3b59/images/large/PG.10249590.JJ2RRXX.PZ.jpg?sw=1360&q=60' },
+                    { text: 'Taylor Classic Jacket', image: 'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dwa090742f/images/large/PG.10232148.JJC76A6.PZ.jpg?sw=1360&q=60' },
+                    { text: 'Dream Heels', image: 'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw5777f7f6/images/large/PG.CJZACCO.BLKBKPA.PZ.jpg?sw=1360&q=60' }
+                ]}/>
+                    </Box>
+                )
+            }
             return null
         })
     }
@@ -544,6 +641,18 @@ const ComponentBuilder = () => {
                 used.Hero = true
                 return `${pad}<Hero title=\"${node.title}\" img={{src: '${node.img.src}', alt: '${node.img.alt}'}} />`
             }
+            if (node.type === 'Hero2') {
+                used.Hero2 = true;
+                return `${pad}<Hero2 />`;
+            }
+            if (node.type === 'ShopNowBar') {
+                used.ShopNowBar = true;
+                return `${pad}<ShopNowBar />`;
+            }
+            if (node.type === 'Carousel2') {
+                used.Carousel2 = true;
+                return `${pad}<Carousel2 />`;
+            }
             return ''
         }).join('\n')
     }
@@ -606,7 +715,7 @@ export default ${name}
     return (
         <Box data-testid="component-builder-page" layerStyle="page">
             <ShowcaseTopBar />
-            <Flex maxW="container.xl" mx="auto" py={8} px={4} gap={8} direction={{base: 'column', md: 'row'}}>
+            <Flex maxW="container.3xl" mx="auto" py={8} px={4} gap={8} direction={{base: 'column', md: 'row'}}>
                 {/* Left Pane: Components */}
                 <Box flexBasis="220px" flexShrink={0} minW="180px" maxW="260px" borderWidth={1} borderRadius="md" p={4} bg="gray.50" mb={{base: 4, md: 0}} minH="600px">
                     <Heading as="h3" size="sm" mb={3}>Components</Heading>
@@ -687,12 +796,41 @@ export default ${name}
                                 <Text>Hero</Text>
                             </Flex>
                         </Box>
+                        <Box as="li" mb={2} draggable onDragStart={e => handleDragStart(e, 'ShopNowBar')} cursor="grab">
+                            <Flex align="center" gap={2}>
+                                <Box as="span" boxSize={4} borderWidth={1} borderRadius="sm" bg="purple.100" />
+                                <Text>ShopNowBar</Text>
+                            </Flex>
+                        </Box>
+                        <Box as="li" mb={2} draggable onDragStart={e => handleDragStart(e, 'Hero2')} cursor="grab">
+                            <Flex align="center" gap={2}>
+                                <Box as="span" boxSize={4} borderWidth={1} borderRadius="sm" bg="orange.100" />
+                                <Text>Hero2</Text>
+                            </Flex>
+                        </Box>
+                        <Box as="li" mb={2} draggable onDragStart={e => handleDragStart(e, 'Carousel2')} cursor="grab">
+                            <Flex align="center" gap={2}>
+                                <Box as="span" boxSize={4} borderWidth={1} borderRadius="sm" bg="green.100" />
+                                <Text>Carousel2</Text>
+                            </Flex>
+                        </Box>
                     </Box>
                 </Box>
                 {/* Middle Pane: Drop Target and Rendered Components */}
-                <Box flex={1} minW={0} mx="auto">
+                <Box flex={3} minW={0} mx="auto">
+                    <FormControl as="fieldset" mb={4}>
+                        <FormLabel as="legend">Select Action</FormLabel>
+                        <RadioGroup defaultValue="createComponent" onChange={setAction}>
+                            <HStack spacing="24px">
+                                <Radio value="createComponent">Create a new component</Radio>
+                                <Radio value="createPage">Create a new page</Radio>
+                                <Radio value="updateComponent">Update existing component</Radio>
+                                <Radio value="updatePage">Update existing page</Radio>
+                            </HStack>
+                        </RadioGroup>
+                    </FormControl>
                     <FormControl mb={4}>
-                        <FormLabel htmlFor="component-name">Component Name</FormLabel>
+                        <FormLabel htmlFor="component-name">Component/Page Name</FormLabel>
                         <Flex gap={2}>
                             <Input
                                 id="component-name"
@@ -709,7 +847,7 @@ export default ${name}
                                     }
                                 }}
                             >
-                                Create
+                                {action === 'updateComponent' || action === 'updatePage' ? 'Load existing' : 'Create'}
                             </Button>
                         </Flex>
                     </FormControl>

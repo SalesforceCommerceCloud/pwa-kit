@@ -13,34 +13,41 @@ const Carousel2 = ({ items, interval = 2000 }) => {
     }, [items.length, interval]);
 
     return (
-        <AspectRatio ratio={1}>
-            <Box position="relative" width="50%" height="50%" display="flex" justifyContent="center" alignItems="center">
+        <AspectRatio ratio={1} w="100%">
+            <Box position="relative" w="100%" h="100%" overflow="hidden">
                 {items.map((item, index) => (
                     <Box
-                    key={index}
-                    position="absolute"
-                    top={0}
-                    left="50%"
-                    transform="translateX(-50%)"
-                    width="50%"
-                    height="50%"
-                    opacity={index === currentIndex ? 1 : 0}
-                    transition="opacity 0.2s ease-in-out"
-                >
-                        <Image src={item.image} alt={item.text} width="100%" height="100%" objectFit="cover" />
+                        key={index}
+                        position="absolute"
+                        top={0}
+                        left="50%"
+                        transform="translateX(-50%)"
+                        w="100%"
+                        h="100%"
+                        opacity={index === currentIndex ? 1 : 0}
+                        transition="opacity 0.1s ease-in-out"
+                    >
+                        <Image
+                            src={item.image}
+                            alt={item.text}
+                            w="100%"
+                            h="100%"
+                            objectFit="cover"
+                        />
                         <Text
-    position="absolute"
-    bottom="4"
-    left="50%"
-    transform="translateX(-50%)"
-    color="white"
-    fontSize="xl"
-    bg="rgba(0, 0, 0, 0.3)"
-    p={2}
-    borderRadius="md"
->
-    {item.text}
-</Text>
+                            position="absolute"
+                            bottom="4"
+                            left="50%"
+                            transform="translateX(-50%)"
+                            color="white"
+                            fontSize="xl"
+                            bg="rgba(0, 0, 0, 0.4)"
+                            px={4}
+                            py={2}
+                            borderRadius="md"
+                        >
+                            {item.text}
+                        </Text>
                     </Box>
                 ))}
             </Box>
@@ -58,4 +65,4 @@ Carousel2.propTypes = {
     interval: PropTypes.number
 };
 
-export default Carousel2; 
+export default Carousel2;

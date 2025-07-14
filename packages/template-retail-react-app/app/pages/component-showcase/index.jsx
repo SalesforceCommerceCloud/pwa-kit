@@ -36,7 +36,8 @@ import {
     ModalFooter,
     ModalBody,
     ModalCloseButton,
-    useDisclosure
+    useDisclosure,
+    useToast
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 
 // Project Components
@@ -44,6 +45,7 @@ import Seo from '@salesforce/retail-react-app/app/components/seo'
 import ProductView from '@salesforce/retail-react-app/app/components/product-view'
 import mockProductDetail from '../../mocks/master-25517823M.js'
 import ProductTile from '@salesforce/retail-react-app/app/components/product-tile'
+import ProductTile2 from '@salesforce/retail-react-app/app/components/product-tile2'
 import ProductScroller from '@salesforce/retail-react-app/app/components/product-scroller'
 import ActionCard from '@salesforce/retail-react-app/app/components/action-card'
 import AddressDisplay from '@salesforce/retail-react-app/app/components/address-display'
@@ -196,6 +198,42 @@ const demoBasket = {
     ]
 }
 
+function ProductTile2Demo() {
+    const [isFavorite, setIsFavorite] = useState(false)
+    const [isAddingToCart, setIsAddingToCart] = useState(false)
+    const toast = useToast()
+
+    const handleAddToCart = (product) => {
+        setIsAddingToCart(true)
+        // Simulate API call
+        setTimeout(() => {
+            setIsAddingToCart(false)
+            toast({
+                title: `Added ${product.productName} to Cart`,
+                description: product.variants?.[0]?.variationValues?.color 
+                    ? `Selected color: ${product.variants[0].variationValues.color}`
+                    : undefined,
+                status: 'success',
+                duration: 3000,
+                isClosable: true
+            })
+        }, 1000)
+    }
+
+    return (
+        <Box maxW="300px">
+            <ProductTile2 
+                product={mockProductDetail}
+                enableFavourite={true}
+                isFavourite={isFavorite}
+                onFavouriteToggle={(newValue) => setIsFavorite(newValue)}
+                onAddToCart={handleAddToCart}
+                isAddingToCart={isAddingToCart}
+            />
+        </Box>
+    )
+}
+
 const componentCategories = [
     {
         name: 'Button',
@@ -338,7 +376,7 @@ const componentCategories = [
     },
     {
         name: 'Recommended Products',
-        description: 'A product scroller showing recommended products, typically powered by Einstein or a recommender.',
+        description: 'A product scroller showing recommended products.',
         component: (
             <Box maxW="900px">
                 <RecommendedProducts
@@ -349,9 +387,9 @@ const componentCategories = [
                         />
                     }
                     recommender={'products-in-all-categories'}
-                    mx={{base: -4, md: -8, lg: 0}} />
+                    mx={{base: -4, md: -8, lg: 0}}
+                />
             </Box>
-
         )
     },
     {
@@ -365,7 +403,7 @@ const componentCategories = [
     },
     {
         name: 'Basic Tile',
-        description: 'A simple tile with an image and a title, used for category or promo links.',
+        description: 'A simple tile with an image and a title.',
         component: (
             <Box maxW="200px">
                 <BasicTile
@@ -555,7 +593,12 @@ const componentCategories = [
                 ]}
             />
         )
-    }
+    },
+    {
+        name: 'Product Tile 2',
+        description: 'A clone of the original ProductTile component.',
+        component: <ProductTile2Demo />
+    },
 ].sort((a, b) => a.name.localeCompare(b.name))
 
 function DrawerMenuDemo() {

@@ -21,8 +21,10 @@ const Hero = ({title, img, actions, ...props}) => {
     return (
         <Box
             marginBottom={{base: 0, md: 10}}
-            height={{lg: 'xl'}}
+            height={{lg: '2xl'}}  // Increased height
+            width={{lg: '100%'}}  // Added width
             position={{lg: 'relative'}}
+            padding={4}           // Added padding
             {...props}
         >
             <Stack

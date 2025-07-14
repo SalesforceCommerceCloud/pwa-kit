@@ -126,27 +126,6 @@ const ListMenuContentWithData = withCommerceSdkReact(
     }
 )
 
-const useCategoryData = (categoryId) => {
-    const { data: categoriesTree } = useCategory({
-        parameters: { id: 'root', levels: 1 }
-    });
-    console.log('===========categoriesTree===========\n', categoriesTree);
-
-    const {
-        data: category,
-        isError: isCategoryError,
-        error: categoryError
-    } = useCategory({
-        parameters: {
-            id: categoryId,
-            levels: 1
-        }
-    });
-    console.log('===========category===========\n', category);
-
-    return category; // Return the category data
-};
-
 const App = (props) => {
     const {children} = props
     const {data: categoriesTree} = useCategory({

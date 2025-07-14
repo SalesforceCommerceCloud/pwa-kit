@@ -9,6 +9,8 @@ const ShowcaseTopBar = () => {
     const goToComponentShowcase = () => history.push('/_dev/component-showcase')
     const goToHooksShowcase = () => history.push('/_dev/hooks-showcase')
     const goToComponentBuilder = () => history.push('/_dev/component-builder')
+    const goToFeatureHub = () => history.push('/_dev/feature-hub')
+    const goToStoreConfig = () => history.push('/_dev/store-config')
 
     return (
         <Flex bg="gray.100" py={2} px={4} mb={4} align="center" gap={2}>
@@ -38,7 +40,21 @@ const ShowcaseTopBar = () => {
                 colorScheme={location.pathname === '/_dev/component-builder' ? 'blue' : 'gray'}
                 onClick={goToComponentBuilder}
             >
-                Component Builder
+                Composable Builder
+            </Button>
+            <Button
+                variant={location.pathname === '/_dev/feature-hub' ? 'solid' : 'ghost'}
+                colorScheme={location.pathname === '/_dev/feature-hub' ? 'blue' : 'gray'}
+                onClick={goToFeatureHub}
+            >
+                Feature Hub
+            </Button>
+            <Button
+                variant={location.pathname === '/_dev/store-config' ? 'solid' : 'ghost'}
+                colorScheme={location.pathname === '/_dev/store-config' ? 'blue' : 'gray'}
+                onClick={goToStoreConfig}
+            >
+                Storefront Config
             </Button>
         </Flex>
     )

@@ -7,7 +7,7 @@ const ShopNowBar = () => {
     console.log('===========ShopNowBar===========\n');
     return (
         <Box>
-        <Box bg="gray.100" p={10} textAlign="center" fontWeight="bold" fontSize="2xl">
+        <Box  p={10} textAlign="center" fontWeight="bold" fontSize="2xl">
     Discover Amazing Deals! Shop Now and Save Big!
 </Box>
         <HStack spacing={4} align="stretch">

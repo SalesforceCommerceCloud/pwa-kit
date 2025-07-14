@@ -66,6 +66,8 @@ const ComponentBuilder = loadable(() => import('./pages/component-builder/index'
     fallback
 })
 const Home2 = loadable(() => import('./pages/home2'), {fallback})
+const FeatureHub = loadable(() => import('./pages/feature-hub'), {fallback})
+const StoreConfig = loadable(() => import('./pages/store-config'), {fallback})
 
 export const routes = [
     {
@@ -164,6 +166,16 @@ export const routes = [
     {
         path: '/_dev/component-builder',
         component: ComponentBuilder,
+        exact: true
+    },
+    {
+        path: '/_dev/feature-hub',
+        component: FeatureHub,
+        exact: true
+    },
+    {
+        path: '/_dev/store-config',
+        component: StoreConfig,
         exact: true
     },
     {
