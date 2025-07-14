@@ -11,7 +11,7 @@ import Header from '../../components/header/index'
 import {renderWithProviders, createPathWithDefaults} from '../../utils/test-utils'
 import {rest} from 'msw'
 import {createMemoryHistory} from 'history'
-import {mockCustomerBaskets, mockedRegisteredCustomer} from '../../mocks/mock-data'
+import {mockCustomerBaskets} from '../../mocks/mock-data'
 
 jest.mock('@chakra-ui/react', () => {
     const originalModule = jest.requireActual('@chakra-ui/react')
@@ -102,9 +102,8 @@ test('renders Header with event handlers', async () => {
     })
     const menu = screen.getByLabelText('Menu')
     const logo = screen.getByLabelText('Logo')
-    const account = screen.getByLabelText(/Open account menu/i)
+    const account = screen.getByLabelText(/My Account/i)
     const cart = screen.getByLabelText(/My cart, number of items: 2/)
-
     await act(async () => {
         fireEvent.click(menu)
     })
@@ -121,13 +120,7 @@ test('renders Header with event handlers', async () => {
     expect(onMyCartClick).toHaveBeenCalledTimes(1)
 
     await act(async () => {
-        fireEvent.mouseEnter(account)
-    })
-    // The onClick handler is on the AccountIcon inside the button,
-    // so we need to find and click that
-    const accountIcon = account.querySelector('svg[aria-label="account"]')
-    await act(async () => {
-        fireEvent.click(accountIcon)
+        fireEvent.click(account)
     })
     expect(onMyAccountClick).toHaveBeenCalledTimes(1)
 })
@@ -174,34 +167,18 @@ test('renders cart badge when basket is loaded', async () => {
 test('route to account page when an authenticated users click on account icon', async () => {
     const history = createMemoryHistory()
     history.push = jest.fn()
-    renderWithProviders(<MockedComponent history={history} />)
+    const {user} = renderWithProviders(<MockedComponent history={history} />)
 
     await waitFor(() => {
         // Look for account button
-        const accountTrigger = screen.getByLabelText(/Open account menu/)
+        const accountTrigger = screen.getByLabelText(/My account/)
         expect(accountTrigger).toBeInTheDocument()
     })
 
-    const accountButton = screen.getByLabelText(/Open account menu/)
+    const accountButton = screen.getByLabelText(/My account/)
 
     await act(async () => {
-        // Use mouseEnter to open the popover, then click on the AccountIcon inside
-        fireEvent.mouseEnter(accountButton)
-    })
-
-    // The onClick handler is on the AccountIcon inside the button,
-    // so we need to find and click that
-    const accountIcon = accountButton.querySelector('svg[aria-label="account"]')
-    await act(async () => {
-        fireEvent.click(accountIcon)
-    })
-    await waitFor(() => {
-        expect(history.push).toHaveBeenCalledWith(createPathWithDefaults('/account'))
-    })
-
-    // Test keyDown on the AccountIcon
-    await act(async () => {
-        fireEvent.keyDown(accountIcon, {key: 'Enter', code: 'Enter'})
+        await user.click(accountButton)
     })
     await waitFor(() => {
         expect(history.push).toHaveBeenCalledWith(createPathWithDefaults('/account'))
@@ -226,43 +203,5 @@ test('route to wishlist page when an authenticated users click on wishlist icon'
     })
     await waitFor(() => {
         expect(history.push).toHaveBeenCalledWith(createPathWithDefaults('/account/wishlist'))
-    })
-})
-
-test('shows dropdown menu when an authenticated users hover on the account icon', async () => {
-    global.server.use(
-        rest.post('*/customers/action/login', (req, res, ctx) => {
-            return res(ctx.delay(0), ctx.status(200), ctx.json(mockedRegisteredCustomer))
-        })
-    )
-    const history = createMemoryHistory()
-    history.push = jest.fn()
-
-    await act(async () => {
-        renderWithProviders(<MockedComponent history={history} />)
-    })
-
-    await waitFor(() => {
-        // Look for account button
-        const accountTrigger = screen.getByLabelText(/Open account menu/i)
-        expect(accountTrigger).toBeInTheDocument()
-    })
-
-    const accountButton = screen.getByLabelText(/Open account menu/i)
-
-    // Use mouseEnter to open the popover/dropdown
-    await act(async () => {
-        fireEvent.mouseEnter(accountButton)
-    })
-
-    // Now check that the dropdown menu items are visible
-    await waitFor(() => {
-        expect(screen.getByText(/account details/i)).toBeInTheDocument()
-        expect(screen.getByText(/addresses/i)).toBeInTheDocument()
-        expect(screen.getByText(/wishlist/i)).toBeInTheDocument()
-        expect(screen.getByText(/order history/i)).toBeInTheDocument()
-        const logOutIcon = screen.getByLabelText('signout')
-        expect(logOutIcon).toBeInTheDocument()
-        expect(logOutIcon).toHaveAttribute('aria-hidden', 'true')
     })
 })

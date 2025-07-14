@@ -27,7 +27,7 @@ jest.mock('../../../components/confirmation-modal', () => {
     const PropTypes = jest.requireActual('prop-types')
     const MockConfirmationModal = (props) => {
         return (
-            <div data-testid="confirmation-modal" {...props}>
+            <div data-testid="confirmation-modal">
                 <button
                     data-testid="confirmation-modal-primary-action"
                     onClick={() => props.onPrimaryAction()}
@@ -47,7 +47,7 @@ jest.mock('../../../components/product-view-modal', () => {
     const PropTypes = jest.requireActual('prop-types')
     const MockProductViewModal = (props) => {
         return (
-            <div data-testid="product-view-modal" role="dialog" {...props}>
+            <div data-testid="product-view-modal" role="dialog">
                 <button data-testid="update-cart-button" onClick={() => props.updateCart()}>
                     Update Cart
                 </button>
@@ -61,14 +61,14 @@ jest.mock('../../../components/product-view-modal', () => {
 })
 
 jest.mock('../../../components/product-view-modal/bundle', () => {
-    return function MockBundleProductViewModal(props) {
-        return <div data-testid="bundle-product-view-modal" role="dialog" {...props} />
+    return function MockBundleProductViewModal() {
+        return <div data-testid="bundle-product-view-modal" role="dialog" />
     }
 })
 
 jest.mock('../../../components/unavailable-product-confirmation-modal', () => {
-    return function MockUnavailableProductConfirmationModal(props) {
-        return <div data-testid="unavailable-product-confirmation-modal" {...props} />
+    return function MockUnavailableProductConfirmationModal() {
+        return <div data-testid="unavailable-product-confirmation-modal" />
     }
 })
 

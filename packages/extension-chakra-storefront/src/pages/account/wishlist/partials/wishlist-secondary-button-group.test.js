@@ -8,10 +8,10 @@ import React from 'react'
 import ItemVariantProvider from '../../../../components/item-variant'
 import {renderWithProviders} from '../../../../utils/test-utils'
 import WishlistSecondaryButtonGroup from '../partials/wishlist-secondary-button-group'
-import {screen, waitFor} from '@testing-library/react'
+import {screen, waitFor, act} from '@testing-library/react'
 import user from '@testing-library/user-event'
-import {rest} from 'msw'
 import {mockedProductLists, mockedWishListProducts} from '../index.mock'
+import {prependHandlersToServer} from '../../../../../jest-setup'
 
 const mockData = {
     creationDate: '2021-09-13T23:29:23.396Z',
@@ -353,21 +353,24 @@ const MockedComponent = (props) => {
 beforeEach(() => {
     jest.resetModules()
 
-    global.server.use(
-        // For `useWishList`
-        rest.get('*/products', (req, res, ctx) => {
-            return res(ctx.delay(0), ctx.status(200), ctx.json(mockedWishListProducts))
-        }),
-        rest.get('*/customers/:customerId/product-lists', (req, res, ctx) => {
-            return res(ctx.delay(0), ctx.status(200), ctx.json(mockedProductLists))
-        }),
-        rest.delete(
-            '*/customers/:customerId/product-lists/:listId/items/:itemId',
-            (req, res, ctx) => {
-                return res(ctx.delay(0), ctx.status(204))
-            }
-        )
-    )
+    // Setup handlers for useWishList and delete operations
+    prependHandlersToServer([
+        {
+            path: '*/products',
+            method: 'get',
+            res: () => mockedWishListProducts
+        },
+        {
+            path: '*/customers/:customerId/product-lists',
+            method: 'get',
+            res: () => mockedProductLists
+        },
+        {
+            path: '*/customers/:customerId/product-lists/:listId/items/:itemId',
+            method: 'delete',
+            status: 204
+        }
+    ])
 })
 
 test('can remove item', async () => {
@@ -377,10 +380,45 @@ test('can remove item', async () => {
     const removeButton = await screen.findByRole('button', {
         name: /remove/i
     })
-    user.click(removeButton)
+    await act(async () => {
+        await user.click(removeButton)
+    })
 
     const confirmButton = await screen.findByRole('button', {name: /yes, remove item/i})
-    user.click(confirmButton)
+    await act(async () => {
+        await user.click(confirmButton)
+    })
+
+    await waitFor(() => {
+        expect(mockedHandler).toHaveBeenCalled()
+    })
+})
+
+test('shows error toast when remove item fails', async () => {
+    // Override the delete handler to return an error
+    prependHandlersToServer([
+        {
+            path: '*/customers/:customerId/product-lists/:listId/items/:itemId',
+            method: 'delete',
+            status: 500,
+            res: () => ({error: 'Server error'})
+        }
+    ])
+
+    const mockedHandler = jest.fn()
+    renderWithProviders(<MockedComponent onClick={mockedHandler} />)
+
+    const removeButton = await screen.findByRole('button', {
+        name: /remove/i
+    })
+    await act(async () => {
+        await user.click(removeButton)
+    })
+
+    const confirmButton = await screen.findByRole('button', {name: /yes, remove item/i})
+    await act(async () => {
+        await user.click(confirmButton)
+    })
 
     await waitFor(() => {
         expect(mockedHandler).toHaveBeenCalled()

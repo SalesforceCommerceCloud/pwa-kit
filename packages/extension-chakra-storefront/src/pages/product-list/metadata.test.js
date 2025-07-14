@@ -10,9 +10,36 @@ import {render} from '@testing-library/react'
 import Metadata from './metadata'
 
 jest.mock('../../components/seo', () => {
-    return function MockSeo(props) {
-        return <div data-testid="seo" {...props} />
+    // Since we are mocking a component, we can't import propType at global scope
+    // jest will complain and fail when running all tests
+    // Import PropTypes inside the mock factory to avoid scope issues
+    /* eslint-disable @typescript-eslint/no-var-requires */
+    const PropTypes = require('prop-types')
+
+    function MockSeo(props) {
+        // NOTE: since we over simplify the SEO component mock here,
+        // linting is complaining about invalid props being pass to native DOM element.
+        // We broke it down and not passing it because it is not important for this component tests
+        // but eslint complains about unused vars, so we disable it here
+        /* eslint-disable @typescript-eslint/no-unused-vars */
+        const {metaTags, ...domProps} = props
+
+        return <div data-testid="seo" {...domProps} />
     }
+
+    MockSeo.propTypes = {
+        title: PropTypes.string,
+        description: PropTypes.string,
+        keywords: PropTypes.string,
+        metaTags: PropTypes.arrayOf(
+            PropTypes.shape({
+                id: PropTypes.string.isRequired,
+                value: PropTypes.string.isRequired
+            })
+        )
+    }
+
+    return MockSeo
 })
 
 describe('Metadata', () => {
