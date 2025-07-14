@@ -14,6 +14,7 @@ import {CheckoutProvider} from '@salesforce/retail-react-app/app/pages/checkout-
 import CheckoutSkeleton from '@salesforce/retail-react-app/app/pages/checkout-container/partials/checkout-skeleton'
 import Checkout from '@salesforce/retail-react-app/app/pages/checkout/index'
 import CheckoutOneClick from '@salesforce/retail-react-app/app/pages/checkout-one-click/index'
+import LoadingSpinner from '@salesforce/retail-react-app/app/components/loading-spinner'
 import UnavailableProductConfirmationModal from '@salesforce/retail-react-app/app/components/unavailable-product-confirmation-modal'
 import {
     TOAST_MESSAGE_REMOVED_ITEM_FROM_CART,
