@@ -9,32 +9,10 @@ import {screen} from '@testing-library/react'
 import LoginForm from '@salesforce/retail-react-app/app/components/login/index'
 import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
 import {useForm} from 'react-hook-form'
-import PropTypes from 'prop-types'
 
 const WrapperComponent = ({...props}) => {
     const form = useForm()
     return <LoginForm form={form} {...props} />
-}
-
-const WrapperComponentWithValidation = ({...props}) => {
-    const form = useForm()
-    const handlePasswordlessLoginClick = async (e) => {
-        const isValid = await form.trigger('email')
-        if (!isValid) {
-            return
-        }
-        props.handlePasswordlessLoginClick?.(e)
-    }
-    return (
-        <LoginForm
-            form={form}
-            {...props}
-            handlePasswordlessLoginClick={handlePasswordlessLoginClick}
-        />
-    )
-}
-WrapperComponentWithValidation.propTypes = {
-    handlePasswordlessLoginClick: PropTypes.func
 }
 
 describe('LoginForm', () => {
@@ -55,7 +33,7 @@ describe('LoginForm', () => {
         test('renders form errors when "Continue Securely" button is clicked', async () => {
             const mockPasswordlessLoginClick = jest.fn()
             const {user} = renderWithProviders(
-                <WrapperComponentWithValidation
+                <WrapperComponent
                     isPasswordlessEnabled={true}
                     handlePasswordlessLoginClick={mockPasswordlessLoginClick}
                 />
@@ -66,7 +44,10 @@ describe('LoginForm', () => {
         })
 
         test('renders form errors when "Password" button is clicked', async () => {
-            const {user} = renderWithProviders(<WrapperComponent isPasswordlessEnabled={true} />)
+            const mockSetLoginType = jest.fn()
+            const {user} = renderWithProviders(
+                <WrapperComponent isPasswordlessEnabled={true} setLoginType={mockSetLoginType} />
+            )
 
             await user.click(screen.getByRole('button', {name: 'Password'}))
             expect(screen.getByText(/Please enter your email address./)).toBeInTheDocument()
