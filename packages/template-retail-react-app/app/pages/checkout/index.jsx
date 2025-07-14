@@ -40,6 +40,9 @@ import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
 import LoadingSpinner from '@salesforce/retail-react-app/app/components/loading-spinner'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 
+//we will be importing the submission call from payment sheet here
+import {usePaymentSheetSubmission} from '@salesforce/retail-react-app/app/pages/checkout/partials/salesforce-payments/payment-sheet'
+
 const Checkout = () => {
     const {formatMessage} = useIntl()
     const navigate = useNavigation()
@@ -49,7 +52,12 @@ const Checkout = () => {
     const [isLoading, setIsLoading] = useState(false)
     const {mutateAsync: createOrder} = useShopperOrdersMutation('createOrder')
     const {passwordless = {}, social = {}} = getConfig().app.login || {}
+    
+    // check feature toggle
     const salesforcePaymentsEnabled = getConfig().app.checkout.SalesforcePaymentsEnabled
+    // ✅ Import payment processing from payment-sheet
+    const {submitPaymentSheetOrder, isProcessing} = usePaymentSheetSubmission()
+
     const idps = social?.idps
     const isSocialEnabled = !!social?.enabled
     const isPasswordlessEnabled = !!passwordless?.enabled
@@ -63,9 +71,20 @@ const Checkout = () => {
     const submitOrder = async () => {
         setIsLoading(true)
         try {
-            const order = await createOrder({
-                body: {basketId: basket.basketId}
-            })
+            // ✅ Anitha: Process payment first if SFP is enabled
+            if (salesforcePaymentsEnabled) {
+                console.log('🚀 Processing SFP payment before order creation...')
+                await submitPaymentSheetOrder()
+                console.log('✅ Payment processed, now creating order...')
+                const order = await createOrder({
+                    body: {basketId: basket.basketId}
+                })
+                navigate(`/checkout/confirmation/${order.orderNo}`)
+            } else {
+                const order = await createOrder({
+                    body: {basketId: basket.basketId}
+                })
+            }
             navigate(`/checkout/confirmation/${order.orderNo}`)
         } catch (error) {
             const message = formatMessage({
