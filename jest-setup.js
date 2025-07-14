@@ -229,7 +229,7 @@ const prepareHandlers = (handlerConfig = []) => {
     return handlerConfig.map((config) => {
         return rest[config.method?.toLowerCase() || 'get'](config.path, (req, res, ctx) => {
             return res(
-                ctx.delay(0),
+                ctx.delay(config.delay || 0),
                 ctx.status(config.status || 200),
                 config.res && ctx.json(config.res(req, res, ctx))
             )

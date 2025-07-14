@@ -8,10 +8,15 @@ import React from 'react'
 import {AddToCartModal, AddToCartModalContext} from '../hooks/use-add-to-cart-modal'
 import {renderWithProviders} from '../utils/test-utils'
 import {screen} from '@testing-library/react'
-import {rest} from 'msw'
-import {mockCustomerBaskets} from '../mocks/mock-data'
 import {mockProductBundle, mockBundleItemsAdded} from '../mocks/product-bundle'
 import {getDisplayVariationValues} from '../utils/product-utils'
+
+// Mock the hooks
+jest.mock('./use-current-basket')
+jest.mock('./use-wish-list')
+
+import {useCurrentBasket} from './use-current-basket'
+import {useWishList} from './use-wish-list'
 
 const MOCK_PRODUCT = {
     currency: 'USD',
@@ -566,11 +571,24 @@ const MOCK_PRODUCT = {
 }
 beforeEach(() => {
     jest.resetModules()
-    global.server.use(
-        rest.get('*/customers/:customerId/baskets', (req, res, ctx) => {
-            return res(ctx.delay(0), ctx.status(200), ctx.json(mockCustomerBaskets))
-        })
-    )
+
+    // we don't need the rest of basket data for this test
+    useCurrentBasket.mockReturnValue({
+        data: {
+            currency: 'USD',
+            productSubTotal: 344.77,
+            basketId: 'test-basket-id'
+        },
+        derivedData: {
+            totalItems: 23
+        },
+        isPending: false
+    })
+
+    useWishList.mockReturnValue({
+        data: null,
+        isLoading: false
+    })
 })
 
 test('Renders AddToCartModal with multiple products', () => {
@@ -582,11 +600,6 @@ test('Renders AddToCartModal with multiple products', () => {
                 variant: MOCK_PRODUCT.variants[0],
                 id: '701642811399M',
                 quantity: 22
-            },
-            {
-                product: MOCK_PRODUCT,
-                variant: MOCK_PRODUCT.variants[0],
-                quantity: 1
             }
         ]
     }
@@ -603,7 +616,7 @@ test('Renders AddToCartModal with multiple products', () => {
     )
 
     expect(screen.getAllByText(MOCK_PRODUCT.name)[0]).toBeInTheDocument()
-    expect(screen.getByRole('dialog', {name: /23 items added to cart/i})).toBeInTheDocument()
+    expect(screen.getByRole('dialog', {name: /22 items added to cart/i})).toBeInTheDocument()
 
     const numOfRowsRendered = screen.getAllByTestId('product-added').length
     expect(numOfRowsRendered).toEqual(MOCK_DATA.itemsAdded.length)

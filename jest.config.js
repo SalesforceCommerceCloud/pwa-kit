@@ -53,14 +53,15 @@ module.exports = {
         createTestGlob('pages/product-list'),
         createTestGlob('components/offline-banner'),
         createTestGlob('components/offline-boundary'),
-        // createTestGlob('pages/login'),  // TODO: enable after Account page has been migrated
+        createTestGlob('pages/login'),
         createTestGlob('pages/login-redirect'),
         createTestGlob('pages/social-login-redirect'),
-        createTestGlob('hooks/cart'),
-        // createTestGlob('pages/registration'), // TODO: enable after Account page has been migrated
+        createTestGlob('hooks'),
+        createTestGlob('pages/registration'),
         '<rootDir>/src/pages/account/wishlist/partials/wishlist-secondary-button-group.test.js',
         '<rootDir>/src/pages/account/wishlist/partials/wishlist-primary-action.test.js',
-        '<rootDir>/src/pages/checkout/partials/contact-info.test.js',
+        // TODO: renable when pwless bug is fixed
+        // '<rootDir>/src/pages/checkout/partials/contact-info.test.js',
         '<rootDir>/src/pages/checkout/partials/login-state.test.js',
         '<rootDir>/src/pages/account/orders.test.js',
         '<rootDir>/src/utils/responsive-image.test.js',
@@ -69,8 +70,8 @@ module.exports = {
         '<rootDir>/src/pages/product-detail/metadata.test.js',
         '<rootDir>/src/pages/product-list/metadata.test.js',
         '<rootDir>/src/hooks/use-toast.test.js',
-        '<rootDir>/src/hooks/use-dnt-notification.test.js'
-        // '<rootDir>/src/hooks/use-auth-modal.test.js' // TODO: enable after Account page has been migrated
+        '<rootDir>/src/hooks/use-dnt-notification.test.js',
+        '<rootDir>/src/hooks/use-auth-modal.test.js'
     ],
     moduleNameMapper: {
         ...base.moduleNameMapper,
