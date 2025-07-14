@@ -15,7 +15,7 @@ const PageActionPlaceHolder = ({heading, text, icon, buttonText, buttonProps, on
         <Stack gap={2} py={12} px={4} alignItems="center" rounded="md" background="gray.50">
             <Box>{icon}</Box>
             <Stack gap={6} alignItems="center">
-                <Box>
+                <Box display="flex" flexDirection="column" alignItems="center">
                     <Text align="center" fontSize="lg" fontWeight="bold">
                         {heading}
                     </Text>
