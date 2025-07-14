@@ -16,7 +16,6 @@ import SocialLogin from '../social-login'
 const PasswordlessLogin = ({
     form,
     handleForgotPasswordClick,
-    handlePasswordlessLoginClick,
     isSocialEnabled = false,
     idps = []
 }) => {
@@ -45,8 +44,7 @@ const PasswordlessLogin = ({
                     />
                     <Button
                         type="submit"
-                        onClick={(e) => {
-                            handlePasswordlessLoginClick(e)
+                        onClick={() => {
                             form.clearErrors('global')
                         }}
                         isLoading={form.formState.isSubmitting}
@@ -96,7 +94,6 @@ const PasswordlessLogin = ({
 PasswordlessLogin.propTypes = {
     form: PropTypes.object,
     handleForgotPasswordClick: PropTypes.func,
-    handlePasswordlessLoginClick: PropTypes.func,
     isSocialEnabled: PropTypes.bool,
     idps: PropTypes.arrayOf(PropTypes.string),
     hideEmail: PropTypes.bool,
