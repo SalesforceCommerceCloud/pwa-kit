@@ -1425,7 +1425,7 @@
     "defaultMessage": "Deliver to Multiple Addresses"
   },
   "shipping_address.link.ship_items_to_one_address": {
-    "defaultMessage": "Ship items to one address"
+    "defaultMessage": "Ship Items to One Address"
   },
   "shipping_address.title.shipping_address": {
     "defaultMessage": "Shipping Address"
