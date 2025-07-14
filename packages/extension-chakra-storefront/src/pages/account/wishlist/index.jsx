@@ -140,7 +140,7 @@ const AccountWishlist = () => {
     const isPageLoading = hasWishlistItems ? isProductsLoading : isWishListLoading
 
     return (
-        <Stack spacing={4} data-testid="account-wishlist-page">
+        <Stack gap={4} data-testid="account-wishlist-page">
             <Heading as="h1" fontSize="2xl" tabIndex="0" ref={headingRef}>
                 <FormattedMessage defaultMessage="Wishlist" id="account_wishlist.title.wishlist" />
             </Heading>
@@ -150,16 +150,16 @@ const AccountWishlist = () => {
                     {new Array(numberOfSkeletonItems).fill(0).map((i, idx) => (
                         <Box
                             key={idx}
-                            p={[4, 6]}
-                            my={4}
+                            p={['4', '6']}
+                            my="4"
                             border="1px solid"
                             borderColor="gray.100"
                             borderRadius="base"
                         >
-                            <Flex width="full" align="flex-start">
-                                <Skeleton boxSize={['88px', 36]} mr={4} />
+                            <Flex w="full" align="flex-start">
+                                <Skeleton boxSize={['88', '36']} mr="4" />
 
-                                <Stack spacing={2}>
+                                <Stack gap={2}>
                                     <Skeleton h="20px" w="112px" />
                                     <Skeleton h="20px" w="84px" />
                                     <Skeleton h="20px" w="140px" />

@@ -20,7 +20,6 @@ import {
     Separator,
     Stack,
     Text,
-
     // hooks
     useSlotRecipe
 } from '@chakra-ui/react'
@@ -30,7 +29,7 @@ import {ChevronDownIcon, SignoutIcon} from '../../components/icons'
 // import AccountDetail from '../../pages/account/profile'
 import AccountAddresses from '../../pages/account/addresses'
 import AccountOrders from '../../pages/account/orders'
-// import AccountWishlist from '../../pages/account/wishlist/index'
+import AccountWishlist from '../../pages/account/wishlist/index'
 
 import {messages, navLinks} from '../../pages/account/constant'
 import useNavigation from '../../hooks/use-navigation'
@@ -221,9 +220,9 @@ const Account = () => {
                     {/*<Route exact path={path}>*/}
                     {/*    <AccountDetail />*/}
                     {/*</Route>*/}
-                    {/*<Route exact path={`${path}/wishlist`}>*/}
-                    {/*    <AccountWishlist />*/}
-                    {/*</Route>*/}
+                    <Route exact path={`${path}/wishlist`}>
+                        <AccountWishlist />
+                    </Route>
                     <Route exact path={`${path}/addresses`}>
                         <AccountAddresses />
                     </Route>
