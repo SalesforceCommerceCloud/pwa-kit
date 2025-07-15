@@ -28,7 +28,8 @@ const ProductItemList = ({
     localQuantity = {},
     localIsGiftItems = {},
     isCartItemLoading = false,
-    selectedItem = null
+    selectedItem = null,
+    deliveryActions = null
 }) => {
     return (
         <Stack spacing={4}>
@@ -49,6 +50,7 @@ const ProductItemList = ({
                                   })
                                 : null
                         }
+                        deliveryActions={deliveryActions}
                         product={{
                             ...productItem,
                             ...(productsByItemId && productsByItemId[productItem.itemId]),
@@ -75,6 +77,7 @@ const ProductItemList = ({
 ProductItemList.propTypes = {
     productItems: PropTypes.arrayOf(PropTypes.object),
     renderSecondaryActions: PropTypes.func,
+    deliveryActions: PropTypes.object,
     onItemQuantityChange: PropTypes.func.isRequired,
     onRemoveItemClick: PropTypes.func,
     productsByItemId: PropTypes.object,

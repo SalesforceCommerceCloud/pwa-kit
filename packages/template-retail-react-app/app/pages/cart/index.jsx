@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {useState, useMemo} from 'react'
+import React, {useState, useMemo, useEffect} from 'react'
 import {FormattedMessage, useIntl} from 'react-intl'
 
 // Chakra Components
@@ -15,23 +15,24 @@ import {
     GridItem,
     Container,
     Button,
-    Text,
     useDisclosure
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 
 // Project Components
+import BonusProductsTitle from '@salesforce/retail-react-app/app/pages/cart/partials/bonus-products-title'
 import CartCta from '@salesforce/retail-react-app/app/pages/cart/partials/cart-cta'
 import CartSecondaryButtonGroup from '@salesforce/retail-react-app/app/pages/cart/partials/cart-secondary-button-group'
 import CartSkeleton from '@salesforce/retail-react-app/app/pages/cart/partials/cart-skeleton'
 import CartTitle from '@salesforce/retail-react-app/app/pages/cart/partials/cart-title'
-import BonusProductsTitle from '@salesforce/retail-react-app/app/pages/cart/partials/bonus-products-title'
 import ConfirmationModal from '@salesforce/retail-react-app/app/components/confirmation-modal'
 import EmptyCart from '@salesforce/retail-react-app/app/pages/cart/partials/empty-cart'
 import OrderSummary from '@salesforce/retail-react-app/app/components/order-summary'
+import OrderTypeDisplay from '@salesforce/retail-react-app/app/pages/cart/partials/order-type-display'
 import ProductItemList from '@salesforce/retail-react-app/app/components/product-item-list'
 import ProductViewModal from '@salesforce/retail-react-app/app/components/product-view-modal'
 import BundleProductViewModal from '@salesforce/retail-react-app/app/components/product-view-modal/bundle'
 import RecommendedProducts from '@salesforce/retail-react-app/app/components/recommended-products'
+import {DELIVERY_OPTIONS} from '@salesforce/retail-react-app/app/components/pickup-or-delivery'
 
 // Hooks
 import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
@@ -42,6 +43,7 @@ import {useWishList} from '@salesforce/retail-react-app/app/hooks/use-wish-list'
 import {
     API_ERROR_MESSAGE,
     EINSTEIN_RECOMMENDERS,
+    MULTISHIP_IS_ENABLED,
     TOAST_ACTION_VIEW_WISHLIST,
     TOAST_MESSAGE_ADDED_TO_WISHLIST,
     TOAST_MESSAGE_REMOVED_ITEM_FROM_CART,
@@ -55,7 +57,6 @@ import debounce from 'lodash/debounce'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
 import {
     useShopperBasketsMutation,
-    useShippingMethodsForShipment,
     useProducts,
     useShopperCustomersMutation,
     useStores
@@ -64,31 +65,36 @@ import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-cur
 import UnavailableProductConfirmationModal from '@salesforce/retail-react-app/app/components/unavailable-product-confirmation-modal'
 import {getUpdateBundleChildArray} from '@salesforce/retail-react-app/app/utils/product-utils'
 import {useSelectedStore} from '@salesforce/retail-react-app/app/hooks/use-selected-store'
+import {useMultiship} from '@salesforce/retail-react-app/app/hooks/use-multiship'
 
 const DEBOUNCE_WAIT = 750
 
 const Cart = () => {
     const {data: basket, isLoading} = useCurrentBasket()
 
-    // Pickup in Store - only enabled if feature toggle is on
-    const isPickupOrder = STORE_LOCATOR_IS_ENABLED
-        ? basket?.shipments[0]?.shippingMethod?.c_storePickupEnabled === true
-        : false
-    const storeId = basket?.shipments?.[0]?.c_fromStoreId
+    // Pickup in Store - collect all unique store IDs from all shipments
+    const allStoreIds =
+        basket?.shipments
+            ?.map((shipment) => shipment.c_fromStoreId)
+            .filter(Boolean)
+            .filter((id, index, array) => array.indexOf(id) === index) // Remove duplicates
+            .join(',') || ''
+
     const {data: storeData} = useStores(
         {
             parameters: {
-                ids: storeId
+                ids: allStoreIds
             }
         },
         {
-            enabled: !!storeId && STORE_LOCATOR_IS_ENABLED
+            enabled: !!allStoreIds && STORE_LOCATOR_IS_ENABLED
         }
     )
-    const storeName = storeData?.data?.[0]?.name
 
     const {selectedStore} = useSelectedStore()
     const selectedInventoryId = selectedStore?.inventoryId || null
+    const {handleDeliveryOptionChange, assignDefaultShippingMethodsToShipments} =
+        useMultiship(basket)
     const productIds = basket?.productItems?.map(({productId}) => productId).join(',') ?? ''
     const {data: products, isLoading: isProductsLoading} = useProducts(
         {
@@ -230,15 +236,13 @@ const Cart = () => {
     const updateItemInBasketMutation = useShopperBasketsMutation('updateItemInBasket')
     const updateItemsInBasketMutation = useShopperBasketsMutation('updateItemsInBasket')
     const removeItemFromBasketMutation = useShopperBasketsMutation('removeItemFromBasket')
-    const updateShippingMethodForShipmentsMutation = useShopperBasketsMutation(
-        'updateShippingMethodForShipment'
-    )
     /*****************Basket Mutation************************/
 
     const [selectedItem, setSelectedItem] = useState(undefined)
     const [localQuantity, setLocalQuantity] = useState({})
     const [localIsGiftItems, setLocalIsGiftItems] = useState({})
     const [isCartItemLoading, setCartItemLoading] = useState(false)
+    const [isProcessingShippingMethods, setIsProcessingShippingMethods] = useState(false)
 
     const {isOpen, onOpen, onClose} = useDisclosure()
     const {formatMessage} = useIntl()
@@ -246,35 +250,36 @@ const Cart = () => {
     const navigate = useNavigation()
     const modalProps = useDisclosure()
 
-    /******************* Shipping Methods for basket shipment *******************/
-    // do this action only if the basket shipping method is not defined
-    // we need to fetch the shippment methods to get the default value before we can add it to the basket
-    useShippingMethodsForShipment(
-        {
-            parameters: {
-                basketId: basket?.basketId,
-                shipmentId: 'me'
+    /******************* Assign Default Shipping Methods to Shipments *******************/
+    // Assign default shipping methods to any shipments that don't have one
+    // This runs when the basket is first loaded and whenever shipments change
+    useEffect(() => {
+        const assignDefaultShippingMethods = async () => {
+            if (isProcessingShippingMethods || !basket?.basketId) {
+                return
             }
-        },
-        {
-            // only fetch if basket is has no shipping method in the first shipment
-            enabled:
-                !!basket?.basketId &&
-                basket.shipments.length > 0 &&
-                !basket.shipments[0].shippingMethod,
-            onSuccess: (data) => {
-                updateShippingMethodForShipmentsMutation.mutate({
-                    parameters: {
-                        basketId: basket?.basketId,
-                        shipmentId: 'me'
-                    },
-                    body: {
-                        id: data.defaultShippingMethodId
-                    }
-                })
+
+            // Check if any shipments need shipping methods to avoid unnecessary processing
+            const hasShipmentsWithoutMethod = basket.shipments?.some(
+                (shipment) => !shipment.shippingMethod
+            )
+
+            if (!hasShipmentsWithoutMethod) {
+                return
+            }
+
+            setIsProcessingShippingMethods(true)
+            try {
+                await assignDefaultShippingMethodsToShipments()
+            } catch (error) {
+                console.error('Failed to assign default shipping methods:', error)
+            } finally {
+                setIsProcessingShippingMethods(false)
             }
         }
-    )
+
+        assignDefaultShippingMethods()
+    }, [basket?.basketId, basket?.shipments?.length, isProcessingShippingMethods])
 
     /************************* Error handling ***********************/
     const showError = () => {
@@ -585,20 +590,83 @@ const Cart = () => {
         )
     }
 
-    // Categorize products into regular and bonus
-    const categorizedProducts = useMemo(() => {
-        return basket?.productItems?.reduce(
-            (acc, productItem) => {
-                if (productItem.bonusProductLineItem) {
-                    acc.bonusProducts.push(productItem)
-                } else {
-                    acc.regularProducts.push(productItem)
-                }
-                return acc
-            },
-            {regularProducts: [], bonusProducts: []}
-        )
-    }, [basket?.productItems])
+    // Create shipment-specific data, grouping delivery shipments together
+    const shipmentData = useMemo(() => {
+        if (!basket?.shipments?.length) return []
+
+        const pickupShipments = []
+        const deliveryShipments = []
+
+        // Separate pickup and delivery shipments
+        basket.shipments.forEach((shipment) => {
+            const isPickupOrder = STORE_LOCATOR_IS_ENABLED
+                ? shipment?.shippingMethod?.c_storePickupEnabled === true
+                : false
+            const storeId = shipment?.c_fromStoreId
+            const store = storeData?.data?.find((store) => store.id === storeId)
+
+            // Filter products for this shipment
+            const shipmentProducts =
+                basket.productItems?.filter(
+                    (productItem) => productItem.shipmentId === shipment.shipmentId
+                ) || []
+
+            // Categorize products into regular and bonus for this shipment
+            const categorizedProducts = shipmentProducts.reduce(
+                (acc, productItem) => {
+                    if (productItem.bonusProductLineItem) {
+                        acc.bonusProducts.push(productItem)
+                    } else {
+                        acc.regularProducts.push(productItem)
+                    }
+                    return acc
+                },
+                {regularProducts: [], bonusProducts: []}
+            )
+
+            const shipmentData = {
+                shipment,
+                isPickupOrder,
+                store,
+                categorizedProducts,
+                itemsInShipment:
+                    categorizedProducts.regularProducts.length +
+                    categorizedProducts.bonusProducts.length
+            }
+
+            if (isPickupOrder) {
+                pickupShipments.push(shipmentData)
+            } else {
+                deliveryShipments.push(shipmentData)
+            }
+        })
+
+        const result = [...pickupShipments]
+
+        // Combine all delivery shipments into a single group
+        if (deliveryShipments.length > 0) {
+            const combinedDeliveryProducts = deliveryShipments.reduce(
+                (acc, shipmentData) => {
+                    acc.regularProducts.push(...shipmentData.categorizedProducts.regularProducts)
+                    acc.bonusProducts.push(...shipmentData.categorizedProducts.bonusProducts)
+                    return acc
+                },
+                {regularProducts: [], bonusProducts: []}
+            )
+
+            result.push({
+                shipment: null, // No specific shipment for combined delivery
+                isPickupOrder: false,
+                store: null, // No specific store for combined delivery
+                categorizedProducts: combinedDeliveryProducts,
+                itemsInShipment:
+                    combinedDeliveryProducts.regularProducts.length +
+                    combinedDeliveryProducts.bonusProducts.length
+            })
+        }
+
+        return result
+    }, [basket?.shipments, basket?.productItems, storeData])
 
     // Function to render secondary actions for product items
     const renderSecondaryActions = ({productItem, isAGift}) => (
@@ -613,6 +681,33 @@ const Cart = () => {
             onRemoveItemClick={handleRemoveItem}
         />
     )
+
+    // Function to create deliveryActions
+    const createDeliveryActions = (isPickupOrder) => {
+        return {
+            showDeliveryOptions: STORE_LOCATOR_IS_ENABLED && MULTISHIP_IS_ENABLED,
+            deliveryOption: isPickupOrder ? DELIVERY_OPTIONS.PICKUP : DELIVERY_OPTIONS.SHIP,
+            //
+            // TODO: Maybe instead of disabling we should pop open the store locator modal?
+            //
+            isPickupDisabled: !selectedStore && !isPickupOrder,
+            onDeliveryOptionChange: async (productItem, selectedDeliveryOption) => {
+                try {
+                    setCartItemLoading(true)
+                    setSelectedItem(productItem)
+
+                    const selectedPickup = selectedDeliveryOption === DELIVERY_OPTIONS.PICKUP
+                    await handleDeliveryOptionChange(productItem, selectedPickup, selectedStore)
+                } catch (error) {
+                    console.error('Error changing delivery option:', error)
+                    showError()
+                } finally {
+                    setCartItemLoading(false)
+                    setSelectedItem(undefined)
+                }
+            }
+        }
+    }
 
     /********* Rendering  UI **********/
     if (isLoading) {
@@ -639,52 +734,40 @@ const Cart = () => {
                             gap={{base: 10, xl: 20}}
                         >
                             <GridItem>
-                                <Stack spacing={4}>
-                                    {/* Order Type Display */}
-                                    {STORE_LOCATOR_IS_ENABLED && (
-                                        <Box layerStyle="cardBordered" p={3}>
-                                            {isPickupOrder ? (
-                                                <Text fontWeight="bold">
-                                                    <FormattedMessage
-                                                        defaultMessage="Pick Up in Store ({storeName})"
-                                                        id="cart.order_type.pickup_in_store"
-                                                        values={{
-                                                            storeName
-                                                        }}
-                                                    />
-                                                </Text>
-                                            ) : (
-                                                <Text fontWeight="bold">
-                                                    <FormattedMessage
-                                                        defaultMessage="Delivery"
-                                                        id="cart.order_type.delivery"
-                                                    />
-                                                </Text>
+                                <Stack spacing={6}>
+                                    {shipmentData.map((shipmentInfo) => (
+                                        <Box
+                                            key={
+                                                shipmentInfo.shipment?.shipmentId ||
+                                                'combined-delivery'
+                                            }
+                                            bg="white"
+                                            borderLeft="1px solid"
+                                            borderRight="1px solid"
+                                            borderBottom="1px solid"
+                                            borderColor="gray.200"
+                                            borderRadius="md"
+                                            borderTopRadius="none"
+                                            overflow="hidden"
+                                            boxShadow="sm"
+                                            p={4}
+                                        >
+                                            {/* Order Type Display */}
+                                            {STORE_LOCATOR_IS_ENABLED && (
+                                                <OrderTypeDisplay
+                                                    isPickupOrder={shipmentInfo.isPickupOrder}
+                                                    store={shipmentInfo.store}
+                                                    itemsInShipment={shipmentInfo.itemsInShipment}
+                                                    totalItemsInCart={
+                                                        basket?.productItems?.length || 0
+                                                    }
+                                                />
                                             )}
-                                        </Box>
-                                    )}
-                                    {/* Regular Products */}
-                                    <ProductItemList
-                                        productItems={categorizedProducts.regularProducts}
-                                        productsByItemId={productsByItemId}
-                                        isProductsLoading={isProductsLoading}
-                                        localQuantity={localQuantity}
-                                        localIsGiftItems={localIsGiftItems}
-                                        isCartItemLoading={isCartItemLoading}
-                                        selectedItem={selectedItem}
-                                        onItemQuantityChange={handleChangeItemQuantity}
-                                        onRemoveItemClick={handleRemoveItem}
-                                        renderSecondaryActions={renderSecondaryActions}
-                                    />
-
-                                    {/* Bonus Products */}
-                                    {categorizedProducts.bonusProducts.length > 0 && (
-                                        <>
-                                            <Box>
-                                                <BonusProductsTitle />
-                                            </Box>
+                                            {/* Regular Products */}
                                             <ProductItemList
-                                                productItems={categorizedProducts.bonusProducts}
+                                                productItems={
+                                                    shipmentInfo.categorizedProducts.regularProducts
+                                                }
                                                 productsByItemId={productsByItemId}
                                                 isProductsLoading={isProductsLoading}
                                                 localQuantity={localQuantity}
@@ -694,9 +777,41 @@ const Cart = () => {
                                                 onItemQuantityChange={handleChangeItemQuantity}
                                                 onRemoveItemClick={handleRemoveItem}
                                                 renderSecondaryActions={renderSecondaryActions}
+                                                deliveryActions={createDeliveryActions(
+                                                    shipmentInfo.isPickupOrder
+                                                )}
                                             />
-                                        </>
-                                    )}
+                                            {/* Bonus Products */}
+                                            {shipmentInfo.categorizedProducts.bonusProducts.length >
+                                                0 && (
+                                                <>
+                                                    <BonusProductsTitle />
+                                                    <ProductItemList
+                                                        productItems={
+                                                            shipmentInfo.categorizedProducts
+                                                                .bonusProducts
+                                                        }
+                                                        productsByItemId={productsByItemId}
+                                                        isProductsLoading={isProductsLoading}
+                                                        localQuantity={localQuantity}
+                                                        localIsGiftItems={localIsGiftItems}
+                                                        isCartItemLoading={isCartItemLoading}
+                                                        selectedItem={selectedItem}
+                                                        onItemQuantityChange={
+                                                            handleChangeItemQuantity
+                                                        }
+                                                        onRemoveItemClick={handleRemoveItem}
+                                                        renderSecondaryActions={
+                                                            renderSecondaryActions
+                                                        }
+                                                        deliveryActions={createDeliveryActions(
+                                                            shipmentInfo.isPickupOrder
+                                                        )}
+                                                    />
+                                                </>
+                                            )}
+                                        </Box>
+                                    ))}
                                 </Stack>
                                 <Box>
                                     {isOpen && !selectedItem.bundledProductItems && (

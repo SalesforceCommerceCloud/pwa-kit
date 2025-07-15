@@ -532,21 +532,45 @@
   "cart.order_type.delivery": [
     {
       "type": 0,
-      "value": "Delivery"
+      "value": "Delivery - "
+    },
+    {
+      "type": 1,
+      "value": "itemsInShipment"
+    },
+    {
+      "type": 0,
+      "value": " out of "
+    },
+    {
+      "type": 1,
+      "value": "totalItemsInCart"
+    },
+    {
+      "type": 0,
+      "value": " items"
     }
   ],
   "cart.order_type.pickup_in_store": [
     {
       "type": 0,
-      "value": "Pick Up in Store ("
+      "value": "Pick Up in Store - "
     },
     {
       "type": 1,
-      "value": "storeName"
+      "value": "itemsInShipment"
     },
     {
       "type": 0,
-      "value": ")"
+      "value": " out of "
+    },
+    {
+      "type": 1,
+      "value": "totalItemsInCart"
+    },
+    {
+      "type": 0,
+      "value": " items"
     }
   ],
   "cart.product_edit_modal.modal_label": [
@@ -2735,6 +2759,24 @@
     {
       "type": 0,
       "value": "Store Information"
+    }
+  ],
+  "pickup_or_delivery.label.delivery": [
+    {
+      "type": 0,
+      "value": "Delivery:"
+    }
+  ],
+  "pickup_or_delivery.label.pickup_in_store": [
+    {
+      "type": 0,
+      "value": "Pick Up in Store"
+    }
+  ],
+  "pickup_or_delivery.label.ship_to_address": [
+    {
+      "type": 0,
+      "value": "Ship to Address"
     }
   ],
   "price_per_item.label.each": [
