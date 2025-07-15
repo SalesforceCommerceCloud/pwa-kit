@@ -9,13 +9,13 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import ProductViewModal from '../../components/product-view-modal/index'
 import {renderWithProviders} from '../../utils/test-utils'
-import {fireEvent, screen} from '@testing-library/react'
+import {act, fireEvent, screen} from '@testing-library/react'
 import {useDisclosure} from '@chakra-ui/react'
 import mockProductDetail from '../../mocks/variant-750518699578M'
 import {prependHandlersToServer} from '../../../jest-setup'
 
 const MockComponent = ({updateCart}) => {
-    const {isOpen, onOpen, onClose} = useDisclosure()
+    const {open, onOpen, onClose} = useDisclosure()
 
     return (
         <div>
@@ -24,7 +24,7 @@ const MockComponent = ({updateCart}) => {
                 updateCart={updateCart}
                 onOpen={onOpen}
                 onClose={onClose}
-                isOpen={isOpen}
+                isOpen={open}
                 product={mockProductDetail}
             />
         </div>
@@ -46,27 +46,33 @@ beforeEach(() => {
     ])
 })
 
-test('renders product view modal by default', () => {
-    renderWithProviders(<MockComponent />)
+test('renders product view modal by default', async () => {
+    const {user} = renderWithProviders(<MockComponent />)
 
     // open the modal
     const trigger = screen.getByText(/open modal/i)
-    fireEvent.click(trigger)
+    await act(async () => {
+        await user.click(trigger)
+    })
 
     expect(screen.getAllByText(/Black Single Pleat Athletic Fit Wool Suit/i)).toHaveLength(2)
 })
 
-test('renders product view modal with handleUpdateCart handler', () => {
+test('renders product view modal with handleUpdateCart handler', async () => {
     const handleUpdateCart = jest.fn()
-    renderWithProviders(<MockComponent updateCart={handleUpdateCart} />)
+    const {user} = renderWithProviders(<MockComponent updateCart={handleUpdateCart} />)
 
     // open the modal
     const trigger = screen.getByText(/open modal/i)
-    fireEvent.click(trigger)
+    await act(async () => {
+        await user.click(trigger)
+    })
 
     // click on update
     const updateButton = screen.getAllByText(/Update/)[0]
-    fireEvent.click(updateButton)
+    await act(async () => {
+        await user.click(updateButton)
+    })
 
     expect(handleUpdateCart).toHaveBeenCalledTimes(1)
 })
