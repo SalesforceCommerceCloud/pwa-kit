@@ -298,7 +298,7 @@ const processTemplate = (relFile, inputDir, outputDir, context) => {
  * @param {*} answers
  * @param {*} param2
  */
-const runGenerator = (context, {outputDir, templateVersion, verbose}) => {
+const runGenerator = (context, {initGit, outputDir, templateVersion, verbose}) => {
     const {answers, template} = context
     const {id, source} = template
     const {extend = false} = answers.project
@@ -407,6 +407,11 @@ const runGenerator = (context, {outputDir, templateVersion, verbose}) => {
         })
     }
 
+    // Initialize a git repository if the --initGit flag is provided.
+    if (initGit) {
+        initGitRepo(outputDir)
+    }
+
     // Install dependencies for the newly minted project.
     npmInstall(outputDir, {verbose})
 }
@@ -417,8 +422,10 @@ const runGenerator = (context, {outputDir, templateVersion, verbose}) => {
  */
 const initGitRepo = (outputDir) => {
     if (!sh.which('git')) {
-        console.error('Error: git is not installed or not found in PATH. Please install git to initialize a repository.');
-        process.exit(1);
+        console.error(
+            'Error: git is not installed or not found in PATH. Please install git to initialize a repository.'
+        )
+        process.exit(1)
     }
     sh.exec(`git init`, {cwd: outputDir})
     sh.exec(`git add .`, {cwd: outputDir})
@@ -657,12 +664,8 @@ const main = async (opts) => {
     }
 
     // Generate the project.
-    runGenerator(context, {outputDir, templateVersion, verbose})
+    runGenerator(context, {initGit, outputDir, templateVersion, verbose})
 
-    if (initGit) {
-        initGitRepo(outputDir)
-    }
-        
     // Return the folder in which the project was generated in.
     return outputDir
 }
