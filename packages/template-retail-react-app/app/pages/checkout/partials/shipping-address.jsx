@@ -22,6 +22,7 @@ import {
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
 import MultiShipping from '@salesforce/retail-react-app/app/pages/checkout/partials/shipping-multi-address'
+import {MULTISHIP_IS_ENABLED} from '@salesforce/retail-react-app/app/constants'
 
 const submitButtonMessage = defineMessage({
     defaultMessage: 'Continue to Shipping Method',
@@ -124,7 +125,8 @@ export default function ShippingAddress() {
     const isEditingShippingAddress = step === STEPS.SHIPPING_ADDRESS
     const isRegisteredUser = customer?.isRegistered
     const hasExistingAddresses = customer?.addresses && customer.addresses.length > 0
-    const canUseMultiShipping = hasMultipleItems && isRegisteredUser && hasExistingAddresses
+    const canUseMultiShipping =
+        hasMultipleItems && isRegisteredUser && hasExistingAddresses && MULTISHIP_IS_ENABLED
 
     // Update editLabel and onEdit logic
     let editLabel
@@ -154,47 +156,47 @@ export default function ShippingAddress() {
     }
 
     return (
-            <ToggleCard
-                id="step-1"
-                title={formatMessage({
-                    defaultMessage: 'Shipping Address',
-                    id: 'shipping_address.title.shipping_address'
-                })}
-                editing={isEditingShippingAddress}
-                isLoading={isLoading}
-                disabled={step === STEPS.CONTACT_INFO && !selectedShippingAddress}
-                onEdit={onEdit}
-                editLabel={editLabel}
-            >
-                {isMultiShipping ? (
-                    <>
-                        <style>{`
+        <ToggleCard
+            id="step-1"
+            title={formatMessage({
+                defaultMessage: 'Shipping Address',
+                id: 'shipping_address.title.shipping_address'
+            })}
+            editing={isEditingShippingAddress}
+            isLoading={isLoading}
+            disabled={step === STEPS.CONTACT_INFO && !selectedShippingAddress}
+            onEdit={onEdit}
+            editLabel={editLabel}
+        >
+            {isMultiShipping ? (
+                <>
+                    <style>{`
                         .multi-shipping-card .chakra-stack > .chakra-flex { display: none !important; }
                     `}</style>
-                        <MultiShipping
-                            basket={basket}
-                            onSubmit={submitAndContinue}
+                    <MultiShipping
+                        basket={basket}
+                        onSubmit={submitAndContinue}
+                        submitButtonLabel={submitButtonMessage}
+                        addNewAddressLabel={addNewAddressLabel}
+                    />
+                </>
+            ) : (
+                <>
+                    <ToggleCardEdit>
+                        <ShippingAddressSelection
+                            selectedAddress={selectedShippingAddress}
                             submitButtonLabel={submitButtonMessage}
-                            addNewAddressLabel={addNewAddressLabel}
+                            onSubmit={submitAndContinue}
+                            formTitleAriaLabel={shippingAddressAriaLabel}
                         />
-                    </>
-                ) : (
-                    <>
-                        <ToggleCardEdit>
-                            <ShippingAddressSelection
-                                selectedAddress={selectedShippingAddress}
-                                submitButtonLabel={submitButtonMessage}
-                                onSubmit={submitAndContinue}
-                                formTitleAriaLabel={shippingAddressAriaLabel}
-                            />
-                        </ToggleCardEdit>
-                        {isAddressFilled && (
-                            <ToggleCardSummary>
-                                <AddressDisplay address={selectedShippingAddress} />
-                            </ToggleCardSummary>
-                        )}
-                    </>
-                )}
-            </ToggleCard>
+                    </ToggleCardEdit>
+                    {isAddressFilled && (
+                        <ToggleCardSummary>
+                            <AddressDisplay address={selectedShippingAddress} />
+                        </ToggleCardSummary>
+                    )}
+                </>
+            )}
+        </ToggleCard>
     )
 }
