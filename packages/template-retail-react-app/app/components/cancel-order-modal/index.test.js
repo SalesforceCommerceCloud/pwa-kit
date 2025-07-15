@@ -154,3 +154,68 @@ test('calls onClose when request cancellation button is clicked', async () => {
 
     expect(onClose).toHaveBeenCalledTimes(1)
 })
+
+test('component works correctly with all required props provided', async () => {
+    const onRequestCancellation = jest.fn()
+    const onClose = jest.fn()
+
+    renderWithProviders(
+        <CancelOrderModal
+            isOpen={true}
+            onClose={onClose}
+            order={mockOrder}
+            onRequestCancellation={onRequestCancellation}
+        />
+    )
+
+    expect(screen.getByRole('dialog')).toBeInTheDocument()
+    expect(screen.getByRole('button', {name: /request cancellation/i})).toBeInTheDocument()
+})
+
+test('onRequestCancellation is called with correct order parameter', async () => {
+    const user = userEvent.setup()
+    const onRequestCancellation = jest.fn()
+    const onClose = jest.fn()
+
+    renderWithProviders(
+        <CancelOrderModal
+            isOpen={true}
+            onClose={onClose}
+            order={mockOrder}
+            onRequestCancellation={onRequestCancellation}
+        />
+    )
+
+    const requestButton = screen.getByRole('button', {name: /request cancellation/i})
+    await user.click(requestButton)
+
+    // Verify the callback is called with the exact order object
+    expect(onRequestCancellation).toHaveBeenCalledWith(mockOrder)
+    expect(onRequestCancellation).toHaveBeenCalledTimes(1)
+})
+
+test('both onRequestCancellation and onClose are called in correct order', async () => {
+    const user = userEvent.setup()
+    const onRequestCancellation = jest.fn()
+    const onClose = jest.fn()
+    const callOrder = []
+
+    // Track call order
+    onRequestCancellation.mockImplementation(() => callOrder.push('onRequestCancellation'))
+    onClose.mockImplementation(() => callOrder.push('onClose'))
+
+    renderWithProviders(
+        <CancelOrderModal
+            isOpen={true}
+            onClose={onClose}
+            order={mockOrder}
+            onRequestCancellation={onRequestCancellation}
+        />
+    )
+
+    const requestButton = screen.getByRole('button', {name: /request cancellation/i})
+    await user.click(requestButton)
+
+    // Verify both functions are called and in the correct order
+    expect(callOrder).toEqual(['onRequestCancellation', 'onClose'])
+})

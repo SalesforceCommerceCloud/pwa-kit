@@ -171,6 +171,7 @@ const AccountOrderDetail = () => {
                                 id="account_order_detail.title.order_details"
                             />
                         </Heading>
+                        {/* TODO: addcancel order elligibility logic */}
                         <Button variant="link" size="sm" onClick={onCancelModalOpen}>
                             <FormattedMessage
                                 defaultMessage="Cancel order"

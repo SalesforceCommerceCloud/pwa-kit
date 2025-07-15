@@ -23,17 +23,14 @@ import {
 /**
  * A Modal for requesting order cancellation
  */
-const CancelOrderModal = ({
-    isOpen,
-    onClose,
-    order = null,
-    onRequestCancellation = null,
-    ...props
-}) => {
-    const handleRequestCancellation = () => {
-        if (onRequestCancellation) {
-            onRequestCancellation(order)
+const CancelOrderModal = ({isOpen, onClose, order, onRequestCancellation, ...props}) => {
+    const handleCancelOrder = () => {
+        if (!onRequestCancellation) {
+            console.error('Cancel order modal: onRequestCancellation is required')
+            return
         }
+
+        onRequestCancellation(order)
         onClose()
     }
 
@@ -58,7 +55,7 @@ const CancelOrderModal = ({
                     </Text>
                 </ModalBody>
                 <ModalFooter>
-                    <Button variant="solid" onClick={handleRequestCancellation}>
+                    <Button variant="solid" onClick={handleCancelOrder}>
                         <FormattedMessage
                             defaultMessage="Request Cancellation"
                             id="cancel_order_modal.button.confirm"
@@ -82,11 +79,11 @@ CancelOrderModal.propTypes = {
     /**
      * Order object for cancellation
      */
-    order: PropTypes.object,
+    order: PropTypes.object.isRequired,
     /**
      * Callback when user confirms cancellation request
      */
-    onRequestCancellation: PropTypes.func
+    onRequestCancellation: PropTypes.func.isRequired
 }
 
 export default CancelOrderModal
