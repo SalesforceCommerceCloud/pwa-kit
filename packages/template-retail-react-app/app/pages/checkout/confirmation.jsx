@@ -45,7 +45,7 @@ import CartItemVariantName from '@salesforce/retail-react-app/app/components/ite
 import CartItemVariantAttributes from '@salesforce/retail-react-app/app/components/item-variant/item-attributes'
 import CartItemVariantPrice from '@salesforce/retail-react-app/app/components/item-variant/item-price'
 import MultiShipOrderSummary from '@salesforce/retail-react-app/app/components/multiship/multiship-order-summary'
-import MultiShipConfirmation from '@salesforce/retail-react-app/app/components/multiship/multiship-confirmation'
+import ShipmentDetails from '@salesforce/retail-react-app/app/pages/checkout/partials/shipment-details'
 
 // Hooks
 import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
@@ -280,98 +280,7 @@ const CheckoutConfirmation = () => {
                     )}
 
                     {/* Shipment Details */}
-                    {hasMultipleShipments ? (
-                        <MultiShipConfirmation shipments={order.shipments} />
-                    ) : (
-                        <Box
-                            layerStyle="card"
-                            rounded={[0, 0, 'base']}
-                            px={[4, 4, 6]}
-                            py={[6, 6, 8]}
-                        >
-                            <Container variant="form">
-                                <Stack spacing={6}>
-                                    {isPickupOrder ? (
-                                        <>
-                                            <Heading fontSize="lg">
-                                                <FormattedMessage
-                                                    defaultMessage="Pickup Details"
-                                                    id="checkout_confirmation.heading.pickup_details"
-                                                />
-                                            </Heading>
-                                            <Stack spacing={2}>
-                                                <Heading as="h3" fontSize="md">
-                                                    <FormattedMessage
-                                                        defaultMessage="Pickup Address"
-                                                        id="checkout_confirmation.heading.pickup_address"
-                                                    />
-                                                </Heading>
-                                                {store ? (
-                                                    <StoreDisplay
-                                                        store={store}
-                                                        showDistance={false}
-                                                        showEmail={true}
-                                                        showPhone={true}
-                                                        showStoreHours={true}
-                                                    />
-                                                ) : (
-                                                    <Text>
-                                                        <FormattedMessage
-                                                            defaultMessage="Store information isn't available"
-                                                            id="checkout_confirmation.message.store_info_unavailable"
-                                                        />
-                                                    </Text>
-                                                )}
-                                            </Stack>
-                                        </>
-                                    ) : (
-                                        <>
-                                            <Heading fontSize="lg">
-                                                <FormattedMessage
-                                                    defaultMessage="Delivery Details"
-                                                    id="checkout_confirmation.heading.delivery_details"
-                                                />
-                                            </Heading>
-
-                                            <SimpleGrid columns={[1, 1, 2]} spacing={6}>
-                                                <Stack spacing={1}>
-                                                    <Heading as="h3" fontSize="sm">
-                                                        <FormattedMessage
-                                                            defaultMessage="Shipping Address"
-                                                            id="checkout_confirmation.heading.shipping_address"
-                                                        />
-                                                    </Heading>
-                                                    <AddressDisplay
-                                                        address={order.shipments[0].shippingAddress}
-                                                    />
-                                                </Stack>
-
-                                                <Stack spacing={1}>
-                                                    <Heading as="h3" fontSize="sm">
-                                                        <FormattedMessage
-                                                            defaultMessage="Shipping Method"
-                                                            id="checkout_confirmation.heading.shipping_method"
-                                                        />
-                                                    </Heading>
-                                                    <Box>
-                                                        <Text>
-                                                            {order.shipments[0].shippingMethod.name}
-                                                        </Text>
-                                                        <Text>
-                                                            {
-                                                                order.shipments[0].shippingMethod
-                                                                    .description
-                                                            }
-                                                        </Text>
-                                                    </Box>
-                                                </Stack>
-                                            </SimpleGrid>
-                                        </>
-                                    )}
-                                </Stack>
-                            </Container>
-                        </Box>
-                    )}
+                    <ShipmentDetails shipments={order.shipments} />
 
                     <Box layerStyle="card" rounded={[0, 0, 'base']} px={[4, 4, 6]} py={[6, 6, 8]}>
                         <Container variant="form">
