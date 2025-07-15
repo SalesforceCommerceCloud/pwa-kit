@@ -7,7 +7,7 @@
 
 import React from 'react'
 import {screen} from '@testing-library/react'
-import MultiShipOrderSummary from './multiship-order-summary'
+import MultiShipOrderSummary from '@salesforce/retail-react-app/app/components/multiship/multiship-order-summary'
 import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
 
 describe('MultiShipOrderSummary', () => {
@@ -63,7 +63,7 @@ describe('MultiShipOrderSummary', () => {
 
     test('renders component with pickup and delivery items', () => {
         renderWithProviders(<MultiShipOrderSummary {...defaultProps} />)
-        
+
         // Check that pickup and delivery sections are rendered
         expect(screen.getByText('Pickup Items')).toBeInTheDocument()
         expect(screen.getByText('Delivery Items')).toBeInTheDocument()
@@ -87,12 +87,7 @@ describe('MultiShipOrderSummary', () => {
             ]
         }
 
-        renderWithProviders(
-            <MultiShipOrderSummary 
-                {...defaultProps} 
-                order={orderWithNoPickups} 
-            />
-        )
+        renderWithProviders(<MultiShipOrderSummary {...defaultProps} order={orderWithNoPickups} />)
 
         expect(screen.queryByText('Pickup Items')).not.toBeInTheDocument()
         expect(screen.getByText('Delivery Items')).toBeInTheDocument()
@@ -117,10 +112,7 @@ describe('MultiShipOrderSummary', () => {
         }
 
         renderWithProviders(
-            <MultiShipOrderSummary 
-                {...defaultProps} 
-                order={orderWithNoDeliveries} 
-            />
+            <MultiShipOrderSummary {...defaultProps} order={orderWithNoDeliveries} />
         )
 
         expect(screen.getByText('Pickup Items')).toBeInTheDocument()

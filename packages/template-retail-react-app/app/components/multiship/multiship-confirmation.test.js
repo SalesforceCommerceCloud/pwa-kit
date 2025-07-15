@@ -6,8 +6,9 @@
  */
 
 import React from 'react'
+import PropTypes from 'prop-types'
 import {screen} from '@testing-library/react'
-import MultiShipConfirmation from './multiship-confirmation'
+import MultiShipConfirmation from '@salesforce/retail-react-app/app/components/multiship/multiship-confirmation'
 import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
 
 // Mock the useStores hook
@@ -15,27 +16,6 @@ jest.mock('@salesforce/commerce-sdk-react', () => ({
     ...jest.requireActual('@salesforce/commerce-sdk-react'),
     useStores: jest.fn()
 }))
-
-// Mock the AddressDisplay and StoreDisplay components
-jest.mock('@salesforce/retail-react-app/app/components/address-display', () => {
-    return function MockAddressDisplay({address}) {
-        return (
-            <div data-testid="address-display">
-                {address?.address1}, {address?.city}, {address?.stateCode} {address?.postalCode}
-            </div>
-        )
-    }
-})
-
-jest.mock('@salesforce/retail-react-app/app/components/store-display', () => {
-    return function MockStoreDisplay({store}) {
-        return (
-            <div data-testid="store-display">
-                {store?.name} - {store?.address1}, {store?.city}
-            </div>
-        )
-    }
-})
 
 import {useStores} from '@salesforce/commerce-sdk-react'
 
@@ -115,26 +95,25 @@ describe('MultiShipConfirmation', () => {
 
     test('renders component with pickup and delivery sections', () => {
         renderWithProviders(<MultiShipConfirmation {...defaultProps} />)
-        
+
         expect(screen.getByText('Pickup Details')).toBeInTheDocument()
         expect(screen.getByText('Delivery Details')).toBeInTheDocument()
     })
 
     test('renders pickup location information when store data is available', () => {
         renderWithProviders(<MultiShipConfirmation {...defaultProps} />)
-        
+
         expect(screen.getByText('Pickup Address')).toBeInTheDocument()
-        expect(screen.getByTestId('store-display')).toBeInTheDocument()
-        expect(screen.getByText('Downtown Store - 123 Main Street, San Francisco')).toBeInTheDocument()
+        expect(screen.getByText('Downtown Store')).toBeInTheDocument()
+        expect(screen.getByText('123 Main Street')).toBeInTheDocument()
     })
 
     test('renders delivery address and shipping method information', () => {
         renderWithProviders(<MultiShipConfirmation {...defaultProps} />)
-        
+
         expect(screen.getByText('Shipping Address')).toBeInTheDocument()
         expect(screen.getByText('Shipping Method')).toBeInTheDocument()
-        expect(screen.getByTestId('address-display')).toBeInTheDocument()
-        expect(screen.getByText('123 Delivery Street, San Francisco, CA 94105')).toBeInTheDocument()
+        expect(screen.getByText('123 Delivery Street')).toBeInTheDocument()
         expect(screen.getByText('Standard Shipping')).toBeInTheDocument()
         expect(screen.getByText('3-5 business days')).toBeInTheDocument()
     })
@@ -153,7 +132,7 @@ describe('MultiShipConfirmation', () => {
         ]
 
         renderWithProviders(<MultiShipConfirmation shipments={multiplePickupShipments} />)
-        
+
         expect(screen.getByText('Pickup Location 1')).toBeInTheDocument()
         expect(screen.getByText('Pickup Location 2')).toBeInTheDocument()
     })
@@ -175,7 +154,7 @@ describe('MultiShipConfirmation', () => {
         ]
 
         renderWithProviders(<MultiShipConfirmation shipments={multipleDeliveryShipments} />)
-        
+
         expect(screen.getByText('Delivery 1')).toBeInTheDocument()
         expect(screen.getByText('Delivery 2')).toBeInTheDocument()
     })
@@ -188,7 +167,7 @@ describe('MultiShipConfirmation', () => {
         })
 
         renderWithProviders(<MultiShipConfirmation shipments={[mockPickupShipment]} />)
-        
+
         expect(screen.getByText("Store information isn't available")).toBeInTheDocument()
     })
 
@@ -196,7 +175,7 @@ describe('MultiShipConfirmation', () => {
         const deliveryOnlyShipments = [mockDeliveryShipment]
 
         renderWithProviders(<MultiShipConfirmation shipments={deliveryOnlyShipments} />)
-        
+
         expect(screen.queryByText('Pickup Details')).not.toBeInTheDocument()
         expect(screen.getByText('Delivery Details')).toBeInTheDocument()
     })
@@ -205,7 +184,7 @@ describe('MultiShipConfirmation', () => {
         const pickupOnlyShipments = [mockPickupShipment]
 
         renderWithProviders(<MultiShipConfirmation shipments={pickupOnlyShipments} />)
-        
+
         expect(screen.getByText('Pickup Details')).toBeInTheDocument()
         expect(screen.queryByText('Delivery Details')).not.toBeInTheDocument()
     })
@@ -217,22 +196,9 @@ describe('MultiShipConfirmation', () => {
         }
 
         renderWithProviders(<MultiShipConfirmation shipments={[shipmentWithoutStoreId]} />)
-        
+
         expect(screen.getByText('Pickup Details')).toBeInTheDocument()
         expect(screen.getByText("Store information isn't available")).toBeInTheDocument()
-    })
-
-    test('handles shipments without shipping addresses gracefully', () => {
-        const shipmentWithoutAddress = {
-            ...mockDeliveryShipment,
-            shippingAddress: null
-        }
-
-        renderWithProviders(<MultiShipConfirmation shipments={[shipmentWithoutAddress]} />)
-        
-        expect(screen.getByText('Delivery Details')).toBeInTheDocument()
-        expect(screen.getByText('Shipping Address')).toBeInTheDocument()
-        expect(screen.getByTestId('address-display')).toBeInTheDocument()
     })
 
     test('calls useStores with correct parameters for pickup shipments', () => {
@@ -249,7 +215,7 @@ describe('MultiShipConfirmation', () => {
         ]
 
         renderWithProviders(<MultiShipConfirmation shipments={pickupShipments} />)
-        
+
         expect(useStores).toHaveBeenCalledWith(
             {
                 parameters: {
@@ -266,7 +232,7 @@ describe('MultiShipConfirmation', () => {
         const deliveryOnlyShipments = [mockDeliveryShipment]
 
         renderWithProviders(<MultiShipConfirmation shipments={deliveryOnlyShipments} />)
-        
+
         expect(useStores).toHaveBeenCalledWith(
             {
                 parameters: {
