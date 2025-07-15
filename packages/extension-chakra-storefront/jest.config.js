@@ -35,10 +35,6 @@ module.exports = {
             '<rootDir>/node_modules/@chakra-ui/react/dist/cjs/$1/index.cjs',
             '<rootDir>/node_modules/@chakra-ui/react/dist/cjs/index.cjs'
         ],
-        '^@chakra-ui/skip-nav/(.*)$': [
-            '<rootDir>/node_modules/@chakra-ui/skip-nav/dist/index.js',
-            '<rootDir>/node_modules/@chakra-ui/skip-nav/dist/$1.js'
-        ],
         '^proxy-compare$': '<rootDir>/node_modules/proxy-compare/dist/cjs/index.js',
         '^uqr$': '<rootDir>/node_modules/uqr/dist/index.cjs',
         // handle pwa-kit extensibility special import

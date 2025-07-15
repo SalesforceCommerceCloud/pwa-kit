@@ -53,6 +53,7 @@ import quantityPicker from './components/project/quantity-picker'
 import search from './components/project/search'
 import socialIcons from './components/project/social-icons'
 import swatchGroup from './components/project/swatch-group'
+import skipNav from './components/project/skip-nav'
 
 // Please refer to the Chakra-Ui theme customization docs found
 // here https://chakra-ui.com/docs/theming/customize-theme to learn
@@ -81,6 +82,7 @@ export const overrides = defineConfig({
                 body: `-apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"`,
                 mono: `SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace`
             },
+
             breakpoints
         },
         semanticTokens: {
@@ -128,7 +130,8 @@ export const overrides = defineConfig({
             quantityPicker,
             socialIcons,
             swatchGroup,
-            search
+            search,
+            skipNav
         }
         // keep these here for reference til we finish the components
         // components: {
