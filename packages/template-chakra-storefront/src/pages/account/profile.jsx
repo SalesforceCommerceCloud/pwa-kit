@@ -32,7 +32,7 @@ import {
     useCustomerType
 } from '@salesforce/commerce-sdk-react'
 import {useCurrentCustomer} from '../../hooks'
-import {MarketingConsentCard} from './marketingconsent/shopper-consent-preferences.jsx'
+import {MarketingConsentCard} from '../../components/marketing-consent-card'
 
 /**
  * This is a specialized Skeleton component that which uses the customers authtype as the

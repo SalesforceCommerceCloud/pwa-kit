@@ -7,26 +7,14 @@
 import React, {forwardRef, useRef} from 'react'
 import {Box, Heading, Skeleton as ChakraSkeleton} from '@chakra-ui/react'
 import {FormattedMessage} from 'react-intl'
-import {useCurrentCustomer} from '../../../hooks'
+import {useCurrentCustomer} from '../../hooks'
 
-/**
- * This is a specialized Skeleton component that which uses the customers authtype as the
- * `isLoaded` state. It also will revert it's provided size (height, width) when the loaded
- * state changes. This allows you to have skeletons of a specific size, but onece loaded
- * the bounding element will affect the contents size.
- */
 // eslint-disable-next-line react/prop-types
-const Skeleton = forwardRef(({children, height, width, ...rest}, ref) => {
-    const {data: customer} = useCurrentCustomer()
-    const {isRegistered} = customer
-    const size = !isRegistered
-        ? {
-              height,
-              width
-          }
-        : {}
+const Skeleton = forwardRef(({children, ...rest}, ref) => {
+    const {isLoading} = useCurrentCustomer()
     return (
-        <ChakraSkeleton ref={ref} isLoaded={!customer.isLoading} {...rest} {...size}>
+        // todo: switch this from `customer.isLoading` to shopper-consent query in-progress.
+        <ChakraSkeleton ref={ref} isLoaded={!isLoading} {...rest}>
             {children}
         </ChakraSkeleton>
     )
