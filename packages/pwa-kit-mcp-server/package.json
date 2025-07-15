@@ -36,6 +36,9 @@
     "composable storefront"
   ],
   "author": "Spark Team",
+  "bin": {
+    "pwa-kit-mcp-server": "dist/server/server.js"
+  },
   "license": "ISC",
   "dependencies": {
     "@babel/runtime": "^7.21.0",
