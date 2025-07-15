@@ -139,7 +139,6 @@ export default ${pascalComponentName};
         const componentDir = path.join(location, kebabDirName)
         await fs.mkdir(componentDir, {recursive: true})
         const componentFilePath = path.join(componentDir, 'index.jsx')
-        const fields = Object.keys(dataModel)
         let code = ''
 
         // Special logic for product entity
