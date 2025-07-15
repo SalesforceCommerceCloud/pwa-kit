@@ -1857,5 +1857,14 @@
   },
   "with_registration.info.please_sign_in": {
     "defaultMessage": "Please sign in to continue!"
+  },
+  "search.suggestions.products": { 
+    "defaultMessage": "Products" 
+  },
+  "search.suggestions.categories": { 
+    "defaultMessage": "Categories" 
+  },
+  "search.suggestions.brands": { 
+    "defaultMessage": "Brands" 
   }
 }

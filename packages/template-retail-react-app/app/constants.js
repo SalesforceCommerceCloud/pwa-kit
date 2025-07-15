@@ -62,6 +62,8 @@ export const PRODUCT_BADGE_DETAILS = [
     }
 ]
 
+export const SEARCH_SUGGESTIONS_INCLUDE_CUSTOM_PRODUCT_PROPERTIES = 'c_product_badge'
+
 export const cssColorGroups = {
     beige: '#d3bca9',
     black: '#000000',

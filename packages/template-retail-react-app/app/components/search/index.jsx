@@ -34,13 +34,17 @@ import debounce from 'lodash/debounce'
 import {
     RECENT_SEARCH_KEY,
     RECENT_SEARCH_LIMIT,
-    RECENT_SEARCH_MIN_LENGTH
+    RECENT_SEARCH_MIN_LENGTH,
+    SEARCH_SUGGESTIONS_INCLUDE_CUSTOM_PRODUCT_PROPERTIES
 } from '@salesforce/retail-react-app/app/constants'
 import {
     productUrlBuilder,
     searchUrlBuilder,
     categoryUrlBuilder
 } from '@salesforce/retail-react-app/app/utils/url'
+
+// Utility to capitalize each word
+const initCap = (str) => str.replace(/\b\w/g, (c) => c.toUpperCase())
 
 const formatSuggestions = (searchSuggestions, input) => {
     return {
@@ -50,7 +54,9 @@ const formatSuggestions = (searchSuggestions, input) => {
                     type: 'category',
                     id: suggestion.id,
                     link: categoryUrlBuilder({id: suggestion.id}),
-                    name: boldString(suggestion.name, capitalize(input))
+                    name: boldString(suggestion.name, capitalize(input)),
+                    image: suggestion.image?.disBaseLink, // Add image if available
+                    parentCategoryName: suggestion.parentCategoryName // Add parent category if available
                 }
             }
         ),
@@ -61,7 +67,17 @@ const formatSuggestions = (searchSuggestions, input) => {
                 price: product.price,
                 productId: product.productId,
                 name: boldString(product.productName, capitalize(input)),
-                link: productUrlBuilder({id: product.productId})
+                link: productUrlBuilder({id: product.productId}),
+                image: product.image?.disBaseLink // Add image if available
+            }
+        }),
+        brandSuggestions: searchSuggestions?.brandSuggestions?.suggestedTerms?.map((brand) => {
+            // Init cap the brand name
+            const brandName = initCap(brand.originalTerm)
+            return {
+                type: 'brand',
+                name: boldString(brandName, capitalize(input)),
+                link: searchUrlBuilder(brand.originalTerm)
             }
         }),
         phraseSuggestions: searchSuggestions?.categorySuggestions?.suggestedPhrases?.map(
@@ -91,7 +107,10 @@ const Search = (props) => {
     const searchSuggestion = useSearchSuggestions(
         {
             parameters: {
-                q: searchQuery
+                q: searchQuery,
+                expand: 'images,prices,custom_product_properties',
+                includedCustomProductProperties:
+                    SEARCH_SUGGESTIONS_INCLUDE_CUSTOM_PRODUCT_PROPERTIES
             }
         },
         {
