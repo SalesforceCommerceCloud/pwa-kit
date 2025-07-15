@@ -6,6 +6,7 @@
  */
 import React from 'react'
 import {FormattedMessage} from 'react-intl'
+import PropTypes from 'prop-types'
 import {
     Box,
     Container,
@@ -18,14 +19,12 @@ import {
 import {useStores} from '@salesforce/commerce-sdk-react'
 import AddressDisplay from '@salesforce/retail-react-app/app/components/address-display'
 import StoreDisplay from '@salesforce/retail-react-app/app/components/store-display'
-import {
-    STORE_LOCATOR_IS_ENABLED
-} from '@salesforce/retail-react-app/app/constants'
+import {STORE_LOCATOR_IS_ENABLED} from '@salesforce/retail-react-app/app/constants'
 
 const onClient = typeof window !== 'undefined'
 
-const MultiShipmentConfirmation = ({order}) => {
-    if (!order?.shipments || order.shipments.length === 0) {
+const MultiShipConfirmation = ({shipments  }) => {
+    if (!shipments || shipments.length === 0) {
         return null
     }
 
@@ -33,10 +32,10 @@ const MultiShipmentConfirmation = ({order}) => {
     const pickupShipments = []
     const deliveryShipments = []
 
-    order.shipments.forEach((shipment) => {
-        const isPickup = STORE_LOCATOR_IS_ENABLED && 
-            shipment.shippingMethod?.c_storePickupEnabled === true
-        
+    shipments.forEach((shipment) => {
+        const isPickup =
+            STORE_LOCATOR_IS_ENABLED && shipment.shippingMethod?.c_storePickupEnabled === true
+
         if (isPickup) {
             pickupShipments.push(shipment)
         } else {
@@ -44,10 +43,12 @@ const MultiShipmentConfirmation = ({order}) => {
         }
     })
 
-    // Get unique store IDs for pickup shipments
-    const storeIds = [...new Set(pickupShipments.map(shipment => shipment.c_fromStoreId).filter(Boolean))]
-    
-    // Fetch store data for pickup shipments
+    // Get all unique store IDs from pickup shipments
+    const storeIds = pickupShipments
+        .map(shipment => shipment.c_fromStoreId)
+        .filter(Boolean)
+
+    // Fetch store data for all pickup shipments
     const {data: storeData} = useStores(
         {
             parameters: {
@@ -59,7 +60,10 @@ const MultiShipmentConfirmation = ({order}) => {
         }
     )
 
-    const storesMap = storeData?.data?.reduce((map, store) => ({...map, [store.id]: store}), {}) || {}
+    const getStoreData = (storeId) => {
+        if (!storeData?.data) return null
+        return storeData.data.find(store => store.id === storeId)
+    }
 
     return (
         <Box layerStyle="card" rounded={[0, 0, 'base']} px={[4, 4, 6]} py={[6, 6, 8]}>
@@ -77,8 +81,8 @@ const MultiShipmentConfirmation = ({order}) => {
 
                             <Stack spacing={4}>
                                 {pickupShipments.map((shipment, index) => {
-                                    const store = storesMap[shipment.c_fromStoreId]
-                                    
+                                    const store = getStoreData(shipment.c_fromStoreId)
+
                                     return (
                                         <Box key={`pickup-${index}`}>
                                             {pickupShipments.length > 1 && (
@@ -90,7 +94,7 @@ const MultiShipmentConfirmation = ({order}) => {
                                                     />
                                                 </Heading>
                                             )}
-                                            
+
                                             <Stack spacing={2}>
                                                 <Heading as="h3" fontSize="sm">
                                                     <FormattedMessage
@@ -116,7 +120,9 @@ const MultiShipmentConfirmation = ({order}) => {
                                                 )}
                                             </Stack>
 
-                                            {index < pickupShipments.length - 1 && <Divider my={4} />}
+                                            {index < pickupShipments.length - 1 && (
+                                                <Divider my={4} />
+                                            )}
                                         </Box>
                                     )
                                 })}
@@ -128,7 +134,7 @@ const MultiShipmentConfirmation = ({order}) => {
                     {deliveryShipments.length > 0 && (
                         <>
                             {pickupShipments.length > 0 && <Divider my={6} />}
-                            
+
                             <Heading fontSize="lg">
                                 <FormattedMessage
                                     defaultMessage="Delivery Details"
@@ -170,9 +176,7 @@ const MultiShipmentConfirmation = ({order}) => {
                                                     />
                                                 </Heading>
                                                 <Box>
-                                                    <Text>
-                                                        {shipment.shippingMethod.name}
-                                                    </Text>
+                                                    <Text>{shipment.shippingMethod.name}</Text>
                                                     <Text>
                                                         {shipment.shippingMethod.description}
                                                     </Text>
@@ -192,4 +196,8 @@ const MultiShipmentConfirmation = ({order}) => {
     )
 }
 
-export default MultiShipmentConfirmation 
+MultiShipConfirmation.propTypes = {
+    shipments: PropTypes.array.isRequired
+}
+
+export default MultiShipConfirmation

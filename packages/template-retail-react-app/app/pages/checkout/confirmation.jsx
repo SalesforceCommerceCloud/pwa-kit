@@ -42,7 +42,7 @@ import CartItemVariantImage from '@salesforce/retail-react-app/app/components/it
 import CartItemVariantName from '@salesforce/retail-react-app/app/components/item-variant/item-name'
 import CartItemVariantAttributes from '@salesforce/retail-react-app/app/components/item-variant/item-attributes'
 import CartItemVariantPrice from '@salesforce/retail-react-app/app/components/item-variant/item-price'
-import MultiShipmentConfirmation from '@salesforce/retail-react-app/app/components/multiship/multiship-confirmation'
+import MultiShipConfirmation from '@salesforce/retail-react-app/app/components/multiship/multiship-confirmation'
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
 import {
     API_ERROR_MESSAGE,
@@ -74,7 +74,9 @@ const CheckoutConfirmation = () => {
     const form = useForm()
 
     const hasMultipleShipments = order?.shipments && order.shipments.length > 1
-    const isPickupOrder = STORE_LOCATOR_IS_ENABLED && order?.shipments?.[0]?.shippingMethod?.c_storePickupEnabled === true
+    const isPickupOrder =
+        STORE_LOCATOR_IS_ENABLED &&
+        order?.shipments?.[0]?.shippingMethod?.c_storePickupEnabled === true
 
     // Fetch store data for single pickup orders
     const storeId = order?.shipments?.[0]?.c_fromStoreId
@@ -272,9 +274,14 @@ const CheckoutConfirmation = () => {
 
                     {/* Shipment Details */}
                     {hasMultipleShipments ? (
-                        <MultiShipmentConfirmation order={order} />
+                        <MultiShipConfirmation shipments={order.shipments} />
                     ) : (
-                        <Box layerStyle="card" rounded={[0, 0, 'base']} px={[4, 4, 6]} py={[6, 6, 8]}>
+                        <Box
+                            layerStyle="card"
+                            rounded={[0, 0, 'base']}
+                            px={[4, 4, 6]}
+                            py={[6, 6, 8]}
+                        >
                             <Container variant="form">
                                 <Stack spacing={6}>
                                     {isPickupOrder ? (
@@ -344,7 +351,10 @@ const CheckoutConfirmation = () => {
                                                             {order.shipments[0].shippingMethod.name}
                                                         </Text>
                                                         <Text>
-                                                            {order.shipments[0].shippingMethod.description}
+                                                            {
+                                                                order.shipments[0].shippingMethod
+                                                                    .description
+                                                            }
                                                         </Text>
                                                     </Box>
                                                 </Stack>
