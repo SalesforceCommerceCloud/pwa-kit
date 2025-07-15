@@ -5,12 +5,9 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-const {test, expect, waitFor} = require('@playwright/test')
+const {test, expect} = require('@playwright/test')
 const config = require('../../config.js')
-const {generateUserCredentials} = require('../../scripts/utils.js')
-const {registerShopper, answerConsentTrackingForm, addProductToCart, checkoutProduct, selectStoreFromPLP} = require('../../scripts/pageHelpers.js')
-
-
+const {answerConsentTrackingForm, selectStoreFromPLP} = require('../../scripts/pageHelpers.js')
 
 /**
  * Test that selecting a store from the store locator sets the PLP filter
@@ -40,18 +37,18 @@ test('Adding a product via Pickup in Store to Cart shows pickup address in Check
 
     // Go to Men's PLP
     await page.getByRole('link', {name: 'Mens', exact: true}).hover()
-    const pantsNav = await page.getByRole('link', {name: 'Pants', exact: true})
+    const pantsNav = page.getByRole('link', {name: 'Pants', exact: true})
     await expect(pantsNav).toBeVisible()
     await pantsNav.click()
 
     // Navigate to PDP
     const productTile = page.getByRole('link', {
-        name: /Refined Denim Pants/i
-    })
+        name: /Casual To Dressy Trousers/i
+    }).first()
     await productTile.click()
 
     // Select size and Pickup in Store option
-    await expect(page.getByRole('heading', {name: /Refined Denim Pants/i})).toBeVisible()
+    await expect(page.getByRole('heading', {name: /Casual To Dressy Trousers/i}).first()).toBeVisible()
     await page.getByRole('radio', {name: '30'}).click()
     await page.waitForLoadState()
     
@@ -74,9 +71,6 @@ test('Adding a product via Pickup in Store to Cart shows pickup address in Check
     await page.getByRole('link', {name: 'View Cart'}).click()
     await expect(page.getByText(/Order Summary/i)).toBeVisible()
 
-//     // Verify the Pickup in Store header is displayed in Cart
-//     await expect(page.getByText(/Pickup in Store/i)).toBeVisible()
-
     // Proceed to checkout
     const checkoutButton = page.getByRole('link', {name: 'Proceed to Checkout'})
     await expect(checkoutButton).toBeVisible()
@@ -90,7 +84,4 @@ test('Adding a product via Pickup in Store to Cart shows pickup address in Check
     // Confirm the email input toggles to show edit button on clicking "Checkout as guest"
     const step0Card = page.locator("div[data-testid='sf-toggle-card-step-0']")
     await expect(step0Card.getByRole('button', {name: /Edit/i})).toBeVisible()
-
-//     // Verify the pickup address is displayed
-//     await expect(page.getByText(/Burlington Retail Store/i)).toBeVisible()
 })
