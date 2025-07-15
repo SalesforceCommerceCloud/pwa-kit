@@ -28,13 +28,6 @@
         "target": [
           ".css-1k2aozt"
         ]
-      },
-      {
-        "html": "<div class=\"...\">",
-        "failureSummary": "Fix any of the following:\n  Some page content is not contained by landmarks",
-        "target": [
-          ".chakra-portal:nth-child(10)"
-        ]
       }
     ]
   }
