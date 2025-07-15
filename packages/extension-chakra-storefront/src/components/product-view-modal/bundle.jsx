@@ -7,10 +7,11 @@
 
 import React, {useState, useRef} from 'react'
 import PropTypes from 'prop-types'
-import {Dialog, Portal, Flex, Box, VStack, useBreakpointValue} from '@chakra-ui/react'
+import {Dialog, Flex, Box, VStack, useBreakpointValue} from '@chakra-ui/react'
 import {keepPreviousData} from '@tanstack/react-query'
 import ProductView from '../../components/product-view'
 import {useProductViewModal} from '../../hooks/use-product-view-modal'
+import SafePortal from '../safe-portal'
 import {useProducts} from '@salesforce/commerce-sdk-react'
 import ImageGallery, {Skeleton as ImageGallerySkeleton} from '../../components/image-gallery'
 import {useDerivedProduct} from '../../hooks'
@@ -62,7 +63,7 @@ const BundleProductViewModal = ({product: bundle, isOpen, onClose, updateCart, .
             size="4xl"
             closeOnInteractOutside={false}
         >
-            <Portal>
+            <SafePortal>
                 <Dialog.Backdrop />
                 <Dialog.Positioner>
                     <Dialog.Content data-testid="product-view-modal" aria-label={label}>
@@ -170,7 +171,7 @@ const BundleProductViewModal = ({product: bundle, isOpen, onClose, updateCart, .
                         </Dialog.Body>
                     </Dialog.Content>
                 </Dialog.Positioner>
-            </Portal>
+            </SafePortal>
         </Dialog.Root>
     )
 }
