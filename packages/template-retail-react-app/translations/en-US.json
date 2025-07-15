@@ -326,7 +326,7 @@
     "description": "# item(s) in order"
   },
   "checkout_confirmation.message.store_info_unavailable": {
-    "defaultMessage": "Store information not available"
+    "defaultMessage": "Store information isn't available"
   },
   "checkout_confirmation.message.will_email_shortly": {
     "defaultMessage": "We will send an email to <b>{email}</b> with your confirmation number and receipt shortly."

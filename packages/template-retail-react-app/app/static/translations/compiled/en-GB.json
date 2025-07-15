@@ -928,7 +928,7 @@
   "checkout_confirmation.message.store_info_unavailable": [
     {
       "type": 0,
-      "value": "Store information not available"
+      "value": "Store information isn't available"
     }
   ],
   "checkout_confirmation.message.will_email_shortly": [
