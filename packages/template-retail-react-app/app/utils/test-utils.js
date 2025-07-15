@@ -11,8 +11,8 @@ import {ChakraProvider} from '@salesforce/retail-react-app/app/components/shared
 import PropTypes from 'prop-types'
 
 import theme from '@salesforce/retail-react-app/app/theme'
-import {AddToCartModalProvider} from '@salesforce/retail-react-app/app/hooks/use-add-to-cart-modal'
-import {BonusProductModalProvider} from '@salesforce/retail-react-app/app/hooks/use-bonus-product-modal'
+import {AddToCartModalProvider, useAddToCartModalContext} from '@salesforce/retail-react-app/app/hooks/use-add-to-cart-modal'
+import {BonusProductModalProvider, useBonusProductModalContext} from '@salesforce/retail-react-app/app/hooks/use-bonus-product-modal'
 import {ServerContext} from '@salesforce/pwa-kit-react-sdk/ssr/universal/contexts'
 import {IntlProvider} from 'react-intl'
 import {CommerceApiProvider} from '@salesforce/commerce-sdk-react'
@@ -91,6 +91,21 @@ export const SUPPORTED_LOCALES = [
 ]
 export const DEFAULT_SITE = 'global'
 
+// Wrapper component that manages the bonus product modal callback for tests
+const ModalProviders = ({children}) => {
+    const {onOpen: openBonusProductModal} = useBonusProductModalContext()
+    
+    const handleSelectBonusProductsClick = () => {
+        openBonusProductModal()
+    }
+    
+    return (
+        <AddToCartModalProvider onSelectBonusProductsClick={handleSelectBonusProductsClick}>
+            {children}
+        </AddToCartModalProvider>
+    )
+}
+
 export const renderWithReactIntl = (node, locale = DEFAULT_LOCALE) => {
     return render(
         <IntlProvider locale={locale} defaultLocale={locale}>
@@ -162,11 +177,11 @@ export const TestProviders = ({
                             <StoreLocatorProvider config={storeLocatorConfig}>
                                 <Router>
                                     <ChakraProvider theme={theme}>
-                                        <AddToCartModalProvider>
-                                            <BonusProductModalProvider>
+                                        <BonusProductModalProvider>
+                                            <ModalProviders>
                                                 {children}
-                                            </BonusProductModalProvider>
-                                        </AddToCartModalProvider>
+                                            </ModalProviders>
+                                        </BonusProductModalProvider>
                                     </ChakraProvider>
                                 </Router>
                             </StoreLocatorProvider>

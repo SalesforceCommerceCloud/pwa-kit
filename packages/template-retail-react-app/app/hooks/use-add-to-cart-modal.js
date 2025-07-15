@@ -44,23 +44,24 @@ import {usePromotions} from '@salesforce/commerce-sdk-react'
  */
 export const AddToCartModalContext = React.createContext()
 export const useAddToCartModalContext = () => useContext(AddToCartModalContext)
-export const AddToCartModalProvider = ({children}) => {
+export const AddToCartModalProvider = ({children, onSelectBonusProductsClick}) => {
     const addToCartModal = useAddToCartModal()
     return (
-        <AddToCartModalContext.Provider value={addToCartModal}>
+        <AddToCartModalContext.Provider value={{...addToCartModal, onSelectBonusProductsClick}}>
             {children}
-            <AddToCartModal />
+            <AddToCartModal onSelectBonusProductsClick={onSelectBonusProductsClick} />
         </AddToCartModalContext.Provider>
     )
 }
 AddToCartModalProvider.propTypes = {
-    children: PropTypes.node.isRequired
+    children: PropTypes.node.isRequired,
+    onSelectBonusProductsClick: PropTypes.func
 }
 
 /**
  * Visual feedback (a modal) for adding item to the cart.
  */
-export const AddToCartModal = () => {
+export const AddToCartModal = ({ onSelectBonusProductsClick }) => {
     const {isOpen, onClose, data} = useAddToCartModalContext()
     const {product, itemsAdded = [], selectedQuantity, bonusDiscountLineItems = []} = data || {}
         // Extract unique promotion IDs
@@ -299,7 +300,11 @@ export const AddToCartModal = () => {
                                         {promotionText || 'Bonus products available!'}
                                     </Text>
                                 )}
-                                <Button as={Link} to="/checkout" width="100%" variant="outline"                                    >
+                                <Button 
+                                    onClick={onSelectBonusProductsClick} 
+                                    width="100%" 
+                                    variant="outline"
+                                >
                                     Select Bonus Products
                                 </Button>
                                 </Box>

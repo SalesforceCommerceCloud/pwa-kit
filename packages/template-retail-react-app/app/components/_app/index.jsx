@@ -33,7 +33,7 @@ import {SkipNavLink, SkipNavContent} from '@chakra-ui/skip-nav'
 
 // Contexts
 import {CurrencyProvider} from '@salesforce/retail-react-app/app/contexts'
-import {BonusProductModalProvider} from '@salesforce/retail-react-app/app/hooks/use-bonus-product-modal'
+import {BonusProductModalProvider, useBonusProductModalContext} from '@salesforce/retail-react-app/app/hooks/use-bonus-product-modal'
 
 // Local Project Components
 import Header from '@salesforce/retail-react-app/app/components/header'
@@ -54,7 +54,7 @@ import {
     DntNotification,
     useDntNotification
 } from '@salesforce/retail-react-app/app/hooks/use-dnt-notification'
-import {AddToCartModalProvider} from '@salesforce/retail-react-app/app/hooks/use-add-to-cart-modal'
+import {AddToCartModalProvider, useAddToCartModalContext} from '@salesforce/retail-react-app/app/hooks/use-add-to-cart-modal'
 import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
@@ -121,6 +121,21 @@ const ListMenuContentWithData = withCommerceSdkReact(
         placeholder: PlaceholderComponent
     }
 )
+
+// Wrapper component that manages the bonus product modal callback
+const ModalProviders = ({children}) => {
+    const {onOpen: openBonusProductModal} = useBonusProductModalContext()
+    
+    const handleSelectBonusProductsClick = () => {
+        openBonusProductModal()
+    }
+    
+    return (
+        <AddToCartModalProvider onSelectBonusProductsClick={handleSelectBonusProductsClick}>
+            {children}
+        </AddToCartModalProvider>
+    )
+}
 
 const App = (props) => {
     const {children} = props
