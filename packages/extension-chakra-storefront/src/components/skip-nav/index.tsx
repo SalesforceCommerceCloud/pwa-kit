@@ -49,7 +49,7 @@ export const SkipNavContent = ({
     const styles = recipe()
 
     return (
-        <Box id={id} css={[styles.content, css]} tabIndex={-1} {...props}>
+        <Box id={id} css={{...styles.content, ...css}} tabIndex={-1} {...props}>
             {children}
         </Box>
     )

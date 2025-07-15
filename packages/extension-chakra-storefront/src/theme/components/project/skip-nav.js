@@ -18,6 +18,7 @@ export default defineSlotRecipe({
             height: '1px',
             overflow: 'hidden',
             _focusVisible: {
+                // !important needed to override the default hidden positioning (absolute + left: -10000px)
                 position: 'fixed !important',
                 top: '6px !important',
                 left: '6px !important',
@@ -38,6 +39,7 @@ export default defineSlotRecipe({
                 whiteSpace: 'nowrap'
             },
             _focus: {
+                // !important needed to override the default hidden positioning (absolute + left: -10000px)
                 position: 'fixed !important',
                 top: '6px !important',
                 left: '6px !important',
@@ -58,8 +60,6 @@ export default defineSlotRecipe({
                 whiteSpace: 'nowrap'
             }
         },
-        content: {
-            // tabIndex needs to be set as a prop, not a style
-        }
+        content: {}
     }
 })
