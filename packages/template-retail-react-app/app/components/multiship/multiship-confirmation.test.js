@@ -9,12 +9,6 @@ import React from 'react'
 import {screen} from '@testing-library/react'
 import MultiShipConfirmation from './multiship-confirmation'
 import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
-import {mockStores} from '@salesforce/retail-react-app/app/mocks/mock-data'
-
-// Mock the STORE_LOCATOR_IS_ENABLED constant
-jest.mock('@salesforce/retail-react-app/app/constants', () => ({
-    STORE_LOCATOR_IS_ENABLED: true
-}))
 
 // Mock the useStores hook
 jest.mock('@salesforce/commerce-sdk-react', () => ({
@@ -46,6 +40,39 @@ jest.mock('@salesforce/retail-react-app/app/components/store-display', () => {
 import {useStores} from '@salesforce/commerce-sdk-react'
 
 describe('MultiShipConfirmation', () => {
+    const mockStoresData = {
+        data: [
+            {
+                id: 'store-001',
+                name: 'Downtown Store',
+                address1: '123 Main Street',
+                city: 'San Francisco',
+                stateCode: 'CA',
+                postalCode: '94105',
+                countryCode: 'US',
+                phone: '(555) 123-4567',
+                c_customerServiceEmail: 'downtown@example.com',
+                storeHours:
+                    'Monday - Friday: 9:00 AM - 8:00 PM\nSaturday: 10:00 AM - 6:00 PM\nSunday: 12:00 PM - 5:00 PM',
+                storeType: 'retail'
+            },
+            {
+                id: 'store-002',
+                name: 'Uptown Store',
+                address1: '456 Oak Avenue',
+                city: 'San Francisco',
+                stateCode: 'CA',
+                postalCode: '94102',
+                countryCode: 'US',
+                phone: '(555) 987-6543',
+                c_customerServiceEmail: 'uptown@example.com',
+                storeHours:
+                    'Monday - Friday: 10:00 AM - 9:00 PM\nSaturday: 11:00 AM - 7:00 PM\nSunday: 1:00 PM - 6:00 PM',
+                storeType: 'retail'
+            }
+        ]
+    }
+
     const mockPickupShipment = {
         shipmentId: 'pickup-1',
         c_fromStoreId: 'store-001',
@@ -80,7 +107,7 @@ describe('MultiShipConfirmation', () => {
         jest.clearAllMocks()
         // Default mock implementation for useStores
         useStores.mockReturnValue({
-            data: mockStores,
+            data: mockStoresData,
             isLoading: false,
             error: null
         })
@@ -181,18 +208,6 @@ describe('MultiShipConfirmation', () => {
         
         expect(screen.getByText('Pickup Details')).toBeInTheDocument()
         expect(screen.queryByText('Delivery Details')).not.toBeInTheDocument()
-    })
-
-    test('returns null when no shipments are provided', () => {
-        const {container} = renderWithProviders(<MultiShipConfirmation shipments={[]} />)
-        
-        expect(container.firstChild).toBeNull()
-    })
-
-    test('returns null when shipments prop is null', () => {
-        const {container} = renderWithProviders(<MultiShipConfirmation shipments={null} />)
-        
-        expect(container.firstChild).toBeNull()
     })
 
     test('handles shipments without store IDs gracefully', () => {

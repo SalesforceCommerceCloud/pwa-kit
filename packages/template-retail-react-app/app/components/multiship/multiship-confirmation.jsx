@@ -23,7 +23,7 @@ import {STORE_LOCATOR_IS_ENABLED} from '@salesforce/retail-react-app/app/constan
 
 const onClient = typeof window !== 'undefined'
 
-const MultiShipConfirmation = ({shipments}) => {
+const MultiShipConfirmation = ({shipments = []}) => {
     // Get all unique store IDs from pickup shipments
     const storeIds =
         shipments
@@ -205,7 +205,7 @@ const MultiShipConfirmation = ({shipments}) => {
 }
 
 MultiShipConfirmation.propTypes = {
-    shipments: PropTypes.array.isRequired
+    shipments: PropTypes.array
 }
 
 export default MultiShipConfirmation

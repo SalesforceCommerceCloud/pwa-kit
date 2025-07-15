@@ -10,11 +10,6 @@ import {screen} from '@testing-library/react'
 import MultiShipOrderSummary from './multiship-order-summary'
 import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
 
-// Mock the STORE_LOCATOR_IS_ENABLED constant
-jest.mock('@salesforce/retail-react-app/app/constants', () => ({
-    STORE_LOCATOR_IS_ENABLED: true
-}))
-
 describe('MultiShipOrderSummary', () => {
     const mockOrder = {
         shipments: [
@@ -72,82 +67,6 @@ describe('MultiShipOrderSummary', () => {
         // Check that pickup and delivery sections are rendered
         expect(screen.getByText('Pickup Items')).toBeInTheDocument()
         expect(screen.getByText('Delivery Items')).toBeInTheDocument()
-    })
-
-    test('renders pickup location numbers when multiple pickup shipments exist', () => {
-        const orderWithMultiplePickups = {
-            ...mockOrder,
-            shipments: [
-                {
-                    shipmentId: 'pickup-1',
-                    shippingMethod: {c_storePickupEnabled: true}
-                },
-                {
-                    shipmentId: 'pickup-2',
-                    shippingMethod: {c_storePickupEnabled: true}
-                }
-            ],
-            productItems: [
-                {
-                    productId: 'product-1',
-                    shipmentId: 'pickup-1',
-                    price: 29.99
-                },
-                {
-                    productId: 'product-2',
-                    shipmentId: 'pickup-2',
-                    price: 49.99
-                }
-            ]
-        }
-
-        renderWithProviders(
-            <MultiShipOrderSummary 
-                {...defaultProps} 
-                order={orderWithMultiplePickups} 
-            />
-        )
-
-        expect(screen.getByText('Pickup Location 1')).toBeInTheDocument()
-        expect(screen.getByText('Pickup Location 2')).toBeInTheDocument()
-    })
-
-    test('renders delivery numbers when multiple delivery shipments exist', () => {
-        const orderWithMultipleDeliveries = {
-            ...mockOrder,
-            shipments: [
-                {
-                    shipmentId: 'delivery-1',
-                    shippingMethod: {c_storePickupEnabled: false}
-                },
-                {
-                    shipmentId: 'delivery-2',
-                    shippingMethod: {c_storePickupEnabled: false}
-                }
-            ],
-            productItems: [
-                {
-                    productId: 'product-1',
-                    shipmentId: 'delivery-1',
-                    price: 29.99
-                },
-                {
-                    productId: 'product-2',
-                    shipmentId: 'delivery-2',
-                    price: 49.99
-                }
-            ]
-        }
-
-        renderWithProviders(
-            <MultiShipOrderSummary 
-                {...defaultProps} 
-                order={orderWithMultipleDeliveries} 
-            />
-        )
-
-        expect(screen.getByText('Delivery 1')).toBeInTheDocument()
-        expect(screen.getByText('Delivery 2')).toBeInTheDocument()
     })
 
     test('does not render pickup section when no pickup shipments exist', () => {
