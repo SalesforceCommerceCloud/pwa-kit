@@ -167,6 +167,7 @@ export default function ShippingAddress() {
             disabled={step === STEPS.CONTACT_INFO && !selectedShippingAddress}
             onEdit={onEdit}
             editLabel={editLabel}
+            enableEditAction={isMultiShipping || (isEditingShippingAddress && canUseMultiShipping)}
         >
             {isMultiShipping ? (
                 <>

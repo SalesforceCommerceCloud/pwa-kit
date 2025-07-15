@@ -199,8 +199,8 @@ const MultiShipping = ({basket, onSubmit, submitButtonLabel, addNewAddressLabel}
                                                 background: '#f5f5f5'
                                             }}
                                         />
-                                        {/* Split Items Link: only show if quantity > 1, aligned under image */}
-                                        {variant.quantity > 1 && (
+                                        {/* Split Items Link: hidden per user request */}
+                                        {/* {variant.quantity > 1 && (
                                             <Button
                                                 variant="link"
                                                 size="sm"
@@ -211,7 +211,7 @@ const MultiShipping = ({basket, onSubmit, submitButtonLabel, addNewAddressLabel}
                                             >
                                                 Split items
                                             </Button>
-                                        )}
+                                        )} */}
                                     </div>
                                     <ItemVariantProvider variant={variant}>
                                         <div

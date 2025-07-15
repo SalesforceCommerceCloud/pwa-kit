@@ -31,6 +31,7 @@ export const ToggleCard = ({
     disableEdit,
     onEdit,
     editLabel,
+    enableEditAction = false,
     isLoading,
     children,
     ...props
@@ -64,7 +65,7 @@ export const ToggleCard = ({
                         >
                             {title}
                         </Heading>
-                        {!disabled && onEdit && !disableEdit && (
+                        {(!editing || enableEditAction) && !disabled && onEdit && !disableEdit && (
                             <Button
                                 variant="link"
                                 size="sm"
@@ -108,6 +109,7 @@ ToggleCard.propTypes = {
     disabled: PropTypes.bool,
     disableEdit: PropTypes.bool,
     onEdit: PropTypes.func,
+    enableEditAction: PropTypes.bool,
     children: PropTypes.any
 }
 
