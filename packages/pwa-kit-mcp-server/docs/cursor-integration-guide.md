@@ -10,9 +10,9 @@ This guide shows different methods to programmatically insert code blocks in fil
    // Add to your Cursor MCP configuration
    {
      "mcpServers": {
-       "pwa-storefront-mcp": {
+       "pwa-kit-mcp-server": {
          "command": "node",
-         "args": ["pwa-storefront-mcp/server.js"]
+         "args": ["pwa-kit-mcp-server/server.js"]
        }
      }
    }
