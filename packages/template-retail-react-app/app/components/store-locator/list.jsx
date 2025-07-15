@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024, salesforce.com, inc.
+ * Copyright (c) 2025, salesforce.com, inc.
  * All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
@@ -12,6 +12,7 @@ import {StoreLocatorListItem} from '@salesforce/retail-react-app/app/components/
 import {useStoreLocator} from '@salesforce/retail-react-app/app/hooks/use-store-locator'
 import {useSelectedStore} from '@salesforce/retail-react-app/app/hooks/use-selected-store'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
+import {MULTISHIP_IS_ENABLED} from '@salesforce/retail-react-app/app/constants'
 
 export const StoreLocatorList = () => {
     const intl = useIntl()
@@ -23,6 +24,7 @@ export const StoreLocatorList = () => {
     const [initialSelectedStoreId, setInitialSelectedStoreId] = useState(selectedStoreId)
 
     const hasItemsInBasket = derivedData?.totalItems > 0
+    const storeSelectionDisabled = MULTISHIP_IS_ENABLED ? false : hasItemsInBasket
 
     useEffect(() => {
         setPage(1)
@@ -31,7 +33,7 @@ export const StoreLocatorList = () => {
     }, [data])
 
     const handleChange = (selectedStoreId) => {
-        if (!hasItemsInBasket) {
+        if (!storeSelectionDisabled) {
             setSelectedStoreId(selectedStoreId)
         }
     }
@@ -47,7 +49,7 @@ export const StoreLocatorList = () => {
                 id: 'store_locator.description.no_locations',
                 defaultMessage: 'Sorry, there are no locations in this area.'
             })
-        if (hasItemsInBasket) {
+        if (storeSelectionDisabled && hasItemsInBasket) {
             return intl.formatMessage({
                 id: 'store_locator.error.items_in_basket',
                 defaultMessage: 'To change your selected store, remove all items from your cart.'
@@ -145,7 +147,7 @@ export const StoreLocatorList = () => {
                                         value: store.id,
                                         isChecked: selectedStoreId === store.id,
                                         'aria-describedby': `store-info-${store.id}`,
-                                        isDisabled: !store.inventoryId || hasItemsInBasket
+                                        isDisabled: !store.inventoryId || storeSelectionDisabled
                                     }}
                                 />
                             ))}

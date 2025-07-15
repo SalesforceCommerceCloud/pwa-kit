@@ -1048,7 +1048,23 @@
     },
     {
       "type": 0,
-      "value": "Ḓḗḗŀīṽḗḗřẏ"
+      "value": "Ḓḗḗŀīṽḗḗřẏ - "
+    },
+    {
+      "type": 1,
+      "value": "itemsInShipment"
+    },
+    {
+      "type": 0,
+      "value": " ǿǿŭŭŧ ǿǿƒ "
+    },
+    {
+      "type": 1,
+      "value": "totalItemsInCart"
+    },
+    {
+      "type": 0,
+      "value": " īŧḗḗḿş"
     },
     {
       "type": 0,
@@ -1062,15 +1078,23 @@
     },
     {
       "type": 0,
-      "value": "Ƥīƈķ Ŭƥ īƞ Şŧǿǿřḗḗ ("
+      "value": "Ƥīƈķ Ŭƥ īƞ Şŧǿǿřḗḗ - "
     },
     {
       "type": 1,
-      "value": "storeName"
+      "value": "itemsInShipment"
     },
     {
       "type": 0,
-      "value": ")"
+      "value": " ǿǿŭŭŧ ǿǿƒ "
+    },
+    {
+      "type": 1,
+      "value": "totalItemsInCart"
+    },
+    {
+      "type": 0,
+      "value": " īŧḗḗḿş"
     },
     {
       "type": 0,
@@ -5803,6 +5827,48 @@
     {
       "type": 0,
       "value": "Şŧǿǿřḗḗ Īƞƒǿǿřḿȧȧŧīǿǿƞ"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "pickup_or_delivery.label.delivery": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ḓḗḗŀīṽḗḗřẏ:"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "pickup_or_delivery.label.pickup_in_store": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ƥīƈķ Ŭƥ īƞ Şŧǿǿřḗḗ"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "pickup_or_delivery.label.ship_to_address": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Şħīƥ ŧǿǿ Ȧḓḓřḗḗşş"
     },
     {
       "type": 0,
