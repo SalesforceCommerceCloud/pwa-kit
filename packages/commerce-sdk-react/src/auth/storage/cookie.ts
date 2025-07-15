@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import Cookies from 'js-cookie'
-import {getDefaultCookieAttributes} from '../../utils'
+import {getDefaultCookieAttributes, getExternalApiCookieAttributes} from '../../utils'
 import {BaseStorage, BaseStorageOptions} from './base'
 import {EXCLUDE_COOKIE_SUFFIX} from '../../constant'
 
@@ -23,10 +23,28 @@ export class CookieStorage extends BaseStorage {
         }
         super(options)
     }
+
+    /**
+     * Determines if a cookie needs external API cookie attributes
+     * @param key - The cookie key
+     * @returns true if the cookie needs external API attributes
+     */
+    private needsExternalApiAttributes(key: string): boolean {
+        // Cookies that need to work with external APIs (like SFCC payments)
+        const externalApiCookies = ['usid', 'cc-nx', 'cc-nx-g', 'cc-nx-iframe', 'cc-nx-g-iframe']
+        return externalApiCookies.includes(key)
+    }
+
     set(key: string, value: string, options?: Cookies.CookieAttributes) {
         const suffixedKey = EXCLUDE_COOKIE_SUFFIX.includes(key) ? key : this.getSuffixedKey(key)
+        
+        // Use external API cookie attributes for cookies that need to work with external APIs
+        const baseAttributes = this.needsExternalApiAttributes(suffixedKey) 
+            ? getExternalApiCookieAttributes() 
+            : getDefaultCookieAttributes()
+        
         Cookies.set(suffixedKey, value, {
-            ...getDefaultCookieAttributes(),
+            ...baseAttributes,
             ...options
         })
     }
@@ -51,8 +69,13 @@ export class CookieStorage extends BaseStorage {
     delete(key: string, options?: Cookies.CookieAttributes) {
         const suffixedKey = EXCLUDE_COOKIE_SUFFIX.includes(key) ? key : this.getSuffixedKey(key)
 
+        // Use external API cookie attributes for cookies that need to work with external APIs
+        const baseAttributes = this.needsExternalApiAttributes(suffixedKey) 
+            ? getExternalApiCookieAttributes() 
+            : getDefaultCookieAttributes()
+
         Cookies.remove(suffixedKey, {
-            ...getDefaultCookieAttributes(),
+            ...baseAttributes,
             ...options
         })
 
@@ -63,7 +86,7 @@ export class CookieStorage extends BaseStorage {
         let additionalPart = Cookies.get(`${suffixedKey}_${chunk}`)
         while (additionalPart) {
             Cookies.remove(`${suffixedKey}_${chunk}`, {
-                ...getDefaultCookieAttributes(),
+                ...baseAttributes,
                 ...options
             })
             chunk++

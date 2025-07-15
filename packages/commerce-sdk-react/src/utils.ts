@@ -62,6 +62,17 @@ export const getCookieSameSiteAttribute = () => {
 }
 
 /**
+ * Gets the value to use for the `sameSite` cookie attribute for cookies that need to work with external APIs.
+ * @returns `"none"` for cookies that need to be sent to external APIs, otherwise uses the default logic
+ */
+export const getExternalApiCookieSameSiteAttribute = () => {
+    if (!onClient()) return
+    // For cookies that need to work with external APIs (like SFCC payments), 
+    // we need SameSite=None to allow cross-site requests
+    return 'none'
+}
+
+/**
  * Gets the default cookie attributes. Sets the secure flag unless running on localhost in Safari.
  * Sets the sameSite attribute to `"none"` when running in a trusted iframe.
  */
@@ -77,6 +88,19 @@ export const getDefaultCookieAttributes = (): CookieAttributes => {
         // list. Outside of iframe, we want to keep most browser default value (Chrome or Firefox uses Lax)
         // https://web.dev/samesite-cookie-recipes/
         sameSite: getCookieSameSiteAttribute()
+    }
+}
+
+/**
+ * Gets cookie attributes for cookies that need to work with external APIs.
+ * These cookies use SameSite=None to ensure they are sent with cross-site requests.
+ */
+export const getExternalApiCookieAttributes = (): CookieAttributes => {
+    return {
+        // External API cookies must be secure when using SameSite=None
+        secure: true,
+        // Use SameSite=None for cookies that need to be sent to external APIs
+        sameSite: getExternalApiCookieSameSiteAttribute()
     }
 }
 
