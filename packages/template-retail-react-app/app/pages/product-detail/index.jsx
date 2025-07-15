@@ -174,7 +174,8 @@ const ProductDetail = () => {
                 ids: bundleChildProductIds,
                 allImages: false,
                 expand: ['availability', 'variations'],
-                select: '(data.(id,inventory,master))'
+                select: '(data.(id,inventories,inventory,master))',
+                ...(selectedInventoryId ? {inventoryIds: selectedInventoryId} : {})
             }
         },
         {
@@ -755,7 +756,9 @@ const ProductDetail = () => {
                                                     )
                                                 }
                                                 onOpenStoreLocator={onOpenStoreLocator}
-                                                showDeliveryOptions={STORE_LOCATOR_IS_ENABLED}
+                                                showDeliveryOptions={
+                                                    STORE_LOCATOR_IS_ENABLED && !isProductABundle
+                                                }
                                             />
                                             <InformationAccordion product={childProduct} />
 
