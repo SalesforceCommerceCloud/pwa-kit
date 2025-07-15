@@ -22,8 +22,7 @@ const ProductListGrid = ({
 }) => {
     // Skeletons are shown when we are yet to receive search results, or when we are
     // fetching a new page (and the `keepPreviousData` option is not enabled).
-    const showSkeletons =
-        isHydrated() && ((isRefetching && !isFetched) || !productSearchResult)
+    const showSkeletons = isHydrated() && ((isRefetching && !isFetched) || !productSearchResult)
 
     return (
         <SimpleGrid columns={[2, 2, 3, 3]} columnGap={4} rowGap={{base: 12, lg: 16}}>
@@ -68,4 +67,4 @@ ProductListGrid.propTypes = {
     onClickProduct: PropTypes.func
 }
 
-export default ProductListGrid 
+export default ProductListGrid

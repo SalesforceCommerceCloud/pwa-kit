@@ -83,4 +83,4 @@ Sort.propTypes = {
     basePath: PropTypes.string
 }
 
-export default Sort 
+export default Sort
