@@ -24,6 +24,29 @@ import {STORE_LOCATOR_IS_ENABLED} from '@salesforce/retail-react-app/app/constan
 const onClient = typeof window !== 'undefined'
 
 const MultiShipConfirmation = ({shipments}) => {
+    // Get all unique store IDs from pickup shipments
+    const storeIds =
+        shipments
+            ?.filter(
+                (shipment) =>
+                    STORE_LOCATOR_IS_ENABLED &&
+                    shipment.shippingMethod?.c_storePickupEnabled === true
+            )
+            .map((shipment) => shipment.c_fromStoreId)
+            .filter(Boolean) || []
+
+    // Fetch store data for all pickup shipments
+    const {data: storeData} = useStores(
+        {
+            parameters: {
+                ids: storeIds.join(',')
+            }
+        },
+        {
+            enabled: storeIds.length > 0 && onClient
+        }
+    )
+
     if (!shipments || shipments.length === 0) {
         return null
     }
@@ -43,26 +66,9 @@ const MultiShipConfirmation = ({shipments}) => {
         }
     })
 
-    // Get all unique store IDs from pickup shipments
-    const storeIds = pickupShipments
-        .map(shipment => shipment.c_fromStoreId)
-        .filter(Boolean)
-
-    // Fetch store data for all pickup shipments
-    const {data: storeData} = useStores(
-        {
-            parameters: {
-                ids: storeIds.join(',')
-            }
-        },
-        {
-            enabled: storeIds.length > 0 && onClient
-        }
-    )
-
     const getStoreData = (storeId) => {
         if (!storeData?.data) return null
-        return storeData.data.find(store => store.id === storeId)
+        return storeData.data.find((store) => store.id === storeId)
     }
 
     return (

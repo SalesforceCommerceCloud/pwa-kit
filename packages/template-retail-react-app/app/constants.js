@@ -205,7 +205,6 @@ export const STORE_LOCATOR_NUM_STORES_PER_REQUEST_API_MAX = 200 // This is an AP
 
 export const MULTISHIP_IS_ENABLED = true
 
-
 export const DEFAULT_DNT_STATE = true
 // Constants for shopper context
 // Supported non-string field types used in SHOPPER_CONTEXT_SEARCH_PARAMS below.
