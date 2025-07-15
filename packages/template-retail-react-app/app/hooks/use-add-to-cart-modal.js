@@ -36,6 +36,7 @@ import {
 } from '@salesforce/retail-react-app/app/utils/product-utils'
 import {EINSTEIN_RECOMMENDERS} from '@salesforce/retail-react-app/app/constants'
 import DisplayPrice from '@salesforce/retail-react-app/app/components/display-price'
+import {usePromotions} from '@salesforce/commerce-sdk-react'
 
 /**
  * This is the context for managing the AddToCartModal.
@@ -61,7 +62,18 @@ AddToCartModalProvider.propTypes = {
  */
 export const AddToCartModal = () => {
     const {isOpen, onClose, data} = useAddToCartModalContext()
-    const {product, itemsAdded = [], selectedQuantity} = data || {}
+    const {product, itemsAdded = [], selectedQuantity, bonusDiscountLineItems = []} = data || {}
+        // Extract unique promotion IDs
+        const promotionIds = [...new Set(
+            bonusDiscountLineItems.map(item => item.promotionId).filter(Boolean)
+        )];
+        // Fetch promotion details
+        const { data: promotions, isLoading: isPromotionsLoading } = usePromotions(
+            { parameters: { ids: promotionIds.join(',') } },
+            { enabled: promotionIds.length > 0 }
+        );
+        // Get the first promotion's details (for now)
+        const promotionText = promotions?.data?.[0]?.details || '';
     const isProductABundle = product?.type.bundle
 
     const intl = useIntl()
@@ -278,6 +290,20 @@ export const AddToCartModal = () => {
                                         </Flex>
                                     )
                                 })}
+                            {bonusDiscountLineItems && bonusDiscountLineItems.length > 0 && (
+                                <Box my={4} px={4}>
+                                {isPromotionsLoading ? (
+                                    <Box mb={2} height="20px" bg="gray.100" borderRadius="md" />
+                                ) : (
+                                    <Text mb={2} fontSize="md" fontWeight="normal" textAlign="center">
+                                        {promotionText || 'Bonus products available!'}
+                                    </Text>
+                                )}
+                                <Button as={Link} to="/checkout" width="100%" variant="outline"                                    >
+                                    Select Bonus Products
+                                </Button>
+                                </Box>
+                            )}
                         </Box>
                         <Box
                             display={['none', 'none', 'none', 'block']}

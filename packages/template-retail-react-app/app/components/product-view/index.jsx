@@ -311,12 +311,18 @@ const ProductView = forwardRef(
                         ) {
                             // Update bonusProducts list with the new bonus items
                             addBonusProducts(newBonusItems)
-                            onBonusProductModalOpen({
-                                newBonusItems,
-                                allBonusItems: addToCartResponse.bonusDiscountLineItems,
+                            // onBonusProductModalOpen({
+                            //     newBonusItems,
+                            //     allBonusItems: addToCartResponse.bonusDiscountLineItems,
+                            //     product,
+                            //     itemsAdded,
+                            //     selectedQuantity: quantity
+                            // })
+                            onAddToCartModalOpen({
                                 product,
                                 itemsAdded,
-                                selectedQuantity: quantity
+                                selectedQuantity: quantity,
+                                bonusDiscountLineItems: addToCartResponse.bonusDiscountLineItems
                             })
                         } else {
                             // If no bonus items, just show add to cart modal
