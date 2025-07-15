@@ -5,9 +5,10 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React, {forwardRef, useRef} from 'react'
-import {Box, Heading, Skeleton as ChakraSkeleton} from '@chakra-ui/react'
+import {Skeleton as ChakraSkeleton} from '@chakra-ui/react'
 import {FormattedMessage} from 'react-intl'
 import {useCurrentCustomer} from '../../hooks'
+import {ToggleCard} from '../toggle-card'
 
 // eslint-disable-next-line react/prop-types
 const Skeleton = forwardRef(({children, ...rest}, ref) => {
@@ -25,15 +26,17 @@ Skeleton.displayName = 'Skeleton'
 export const MarketingConsentCard = () => {
     const headingRef = useRef(null)
     return (
-        <Box layerStyle="cardBordered" p={6}>
-            <Skeleton ref={headingRef} marginBottom={6}>
-                <Heading as="h3" fontSize="lg">
+        <ToggleCard
+            id="password"
+            title={
+                <Skeleton ref={headingRef}>
                     <FormattedMessage
                         defaultMessage="Messaging Preferences"
                         id="consent_card.title.my_communications"
                     />
-                </Heading>
-            </Skeleton>
-        </Box>
+                </Skeleton>
+            }
+            layerStyle="cardBordered"
+        />
     )
 }

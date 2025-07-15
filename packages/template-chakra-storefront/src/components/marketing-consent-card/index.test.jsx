@@ -41,7 +41,7 @@ describe('MarketingConsentCard', () => {
         expect(skeletonContainer).toHaveClass('chakra-skeleton')
 
         // The heading should be accessible normally
-        const heading = screen.getByRole('heading', {level: 3})
+        const heading = screen.getByRole('heading', {level: 2})
         expect(heading).toBeInTheDocument()
         expect(heading).toHaveTextContent(component_title)
 
