@@ -306,7 +306,7 @@ describe('Recommended Products', () => {
 // https://www.domain.com/mobify/proxy/api/product/shopper-products/v1/organizations/f_ecom_zzrf_001/products?ids=11736753M%2C22951021M%2C25592770M%2C25752986M&expand=availability%2Clinks%2Cpromotions%2Coptions%2Cimages%2Cprices%2Cvariations&locale=en-GB&allImages=true&perPricebook=true&siteId=site-1
 // console.error
 //     retail-react-app.useEinstein.fetchRecProductDetails ERROR Error fetching product details for recommendations {"error":{"response":{"size":0,"timeout":0}}}
-describe.only('product bundles', () => {
+describe('product bundles', () => {
     let hasUpdatedBundleChildren = false
     beforeEach(() => {
         hasUpdatedBundleChildren = false

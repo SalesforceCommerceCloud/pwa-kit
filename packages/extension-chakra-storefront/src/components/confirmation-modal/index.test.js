@@ -8,7 +8,6 @@ import React from 'react'
 import ConfirmationModal from '../../components/confirmation-modal/index'
 import {Box, useDisclosure} from '@chakra-ui/react'
 import {renderWithProviders} from '../../utils/test-utils'
-import userEvent from '@testing-library/user-event'
 import {act, screen} from '@testing-library/react'
 import {REMOVE_CART_ITEM_CONFIRMATION_DIALOG_CONFIG} from '../../pages/cart/partials/cart-secondary-button-group'
 
