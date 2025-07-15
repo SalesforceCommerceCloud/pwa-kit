@@ -106,9 +106,13 @@ export const useProductListWishlist = () => {
         )
     }
 
+    const toggleItem = (product) => {
+        const action = isItemInWishlist(product) ? removeItem : addItem
+        action(product)
+    }
+
     return {
-        addItem,
-        removeItem,
+        toggleItem,
         isItemInWishlist
     }
 }

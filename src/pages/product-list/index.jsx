@@ -33,7 +33,7 @@ const ProductList = () => {
     const {
         pages: {ProductList: productListConfig}
     } = useExtensionConfig()
-    const {addItem, removeItem, isItemInWishlist} = useProductListWishlist()
+    const {toggleItem, isItemInWishlist} = useProductListWishlist()
 
     const {
         basePath,
@@ -52,11 +52,6 @@ const ProductList = () => {
         sortUrls,
         toggleFilter
     } = useProductListData()
-
-    const handleFavouriteToggle = (product, isFavourite) => {
-        const action = isFavourite ? addItem : removeItem
-        action(product)
-    }
 
     return (
         <>
@@ -120,7 +115,7 @@ const ProductList = () => {
                                     productListConfig={productListConfig}
                                     isItemInWishlist={isItemInWishlist}
                                     onClickProduct={handleProductClick}
-                                    onFavouriteToggle={handleFavouriteToggle}
+                                    onFavouriteToggle={toggleItem}
                                 />
                                 <ProductListPagination basePath={basePath} pageUrls={pageUrls} />
                             </Box>
