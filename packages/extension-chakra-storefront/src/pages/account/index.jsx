@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, {useEffect, useState} from 'react'
+import React, {useState} from 'react'
 import PropTypes from 'prop-types'
 import {FormattedMessage, useIntl} from 'react-intl'
 import {Route, Switch, Redirect, useLocation, useRouteMatch} from 'react-router-dom'
@@ -35,9 +35,8 @@ import {messages, navLinks} from '../../pages/account/constant'
 import useNavigation from '../../hooks/use-navigation'
 import LoadingSpinner from '../../components/loading-spinner'
 import useMultiSite from '../../hooks/use-multi-site'
-import useEinstein from '../../hooks/use-einstein'
-import useDataCloud from '../../hooks/use-datacloud'
 import {useAuthHelper, AuthHelpers} from '@salesforce/commerce-sdk-react'
+import PageAnalyticsPageView from '../../components/page-analytics-page-view'
 import {useCurrentCustomer} from '../../hooks/'
 import {isHydrated} from '../../utils/utils'
 
@@ -82,15 +81,7 @@ const Account = () => {
     const [mobileNavOpen, setMobileNavOpen] = useState(false)
     const [showLoading, setShowLoading] = useState(false)
 
-    const einstein = useEinstein()
-    const dataCloud = useDataCloud()
-
     const {buildUrl} = useMultiSite()
-    /**************** Einstein ****************/
-    useEffect(() => {
-        einstein.sendViewPage(location.pathname)
-        dataCloud.sendViewPage(location.pathname)
-    }, [location])
 
     const onSignoutClick = async () => {
         setShowLoading(true)
@@ -113,6 +104,7 @@ const Account = () => {
             paddingTop={[4, 4, 12, 12, 16]}
         >
             <Seo title="My Account" description="Customer Account Page" />
+            <PageAnalyticsPageView pathname={location.pathname} />
             <Grid templateColumns={{base: '1fr', lg: '320px 1fr'}} gap={{base: 10, lg: 24}}>
                 {/* small screen nav accordion */}
                 <Accordion.Root

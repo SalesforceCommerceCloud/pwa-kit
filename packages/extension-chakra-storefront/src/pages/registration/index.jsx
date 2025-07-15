@@ -15,8 +15,7 @@ import {useLocation} from 'react-router-dom'
 import Seo from '../../components/seo'
 import RegisterForm from '../../components/register'
 import useNavigation from '../../hooks/use-navigation'
-import useEinstein from '../../hooks/use-einstein'
-import useDataCloud from '../../hooks/use-datacloud'
+import PageAnalyticsPageView from '../../components/page-analytics-page-view'
 import {API_ERROR_MESSAGE} from '../../constants'
 
 const Registration = () => {
@@ -24,8 +23,6 @@ const Registration = () => {
     const navigate = useNavigation()
     const {isRegistered} = useCustomerType()
     const form = useForm()
-    const einstein = useEinstein()
-    const dataCloud = useDataCloud()
     const {pathname} = useLocation()
     const register = useAuthHelper(AuthHelpers.Register)
 
@@ -53,15 +50,10 @@ const Registration = () => {
         }
     }, [isRegistered])
 
-    /**************** Einstein ****************/
-    useEffect(() => {
-        einstein.sendViewPage(pathname)
-        dataCloud.sendViewPage(pathname)
-    }, [])
-
     return (
         <Box data-testid="registration-page" bg="gray.50" py={[8, 16]}>
             <Seo title="Registration" description="Customer sign up" />
+            <PageAnalyticsPageView pathname={pathname} />
             <Container
                 paddingTop={16}
                 width={['100%', '407px']}

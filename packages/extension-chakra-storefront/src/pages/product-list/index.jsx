@@ -55,12 +55,10 @@ import {FilterIcon, ChevronDownIcon} from '../../components/icons'
 import {usePageUrls, useSortUrls, useSearchParams, useExtensionConfig} from '../../hooks'
 import useToast from '../../hooks/use-toast'
 import useEinstein from '../../hooks/use-einstein'
-import useActiveData from '../../hooks/use-active-data'
-import useDataCloud from '../../hooks/use-datacloud'
+import PageAnalytics from './page-analytics'
 
 // Others
 import {HTTPNotFound, HTTPError} from '@salesforce/pwa-kit-react-sdk/ssr/universal/errors'
-import logger from '../../utils/logger-instance'
 
 // Constants
 import {
@@ -95,8 +93,6 @@ const ProductList = (props) => {
     const location = useLocation()
     const toast = useToast()
     const einstein = useEinstein()
-    const dataCloud = useDataCloud()
-    const activeData = useActiveData()
     const {res} = useServerContext()
     const customerId = useCustomerId()
     const [searchParams, {stringify: stringifySearchParams}] = useSearchParams()
@@ -356,35 +352,6 @@ const ProductList = (props) => {
         navigate(newPath)
     }
 
-    /**************** Einstein ****************/
-    useEffect(() => {
-        if (productSearchResult) {
-            if (isSearch) {
-                try {
-                    einstein.sendViewSearch(searchQuery, productSearchResult)
-                } catch (err) {
-                    logger.error('Einstein sendViewSearch error', {
-                        namespace: 'ProductList.useEffect',
-                        additionalProperties: {error: err, searchQuery}
-                    })
-                }
-                dataCloud.sendViewSearchResults(searchParams, productSearchResult)
-                activeData.sendViewSearch(searchParams, productSearchResult)
-            } else {
-                try {
-                    einstein.sendViewCategory(category, productSearchResult)
-                } catch (err) {
-                    logger.error('Einstein sendViewCategory error', {
-                        namespace: 'ProductList.useEffect',
-                        additionalProperties: {error: err, category}
-                    })
-                }
-                dataCloud.sendViewCategory(searchParams, category, productSearchResult)
-                activeData.sendViewCategory(searchParams, category, productSearchResult)
-            }
-        }
-    }, [productSearchResult])
-
     return (
         <Box
             className="sf-product-list-page"
@@ -393,6 +360,13 @@ const ProductList = (props) => {
             paddingTop={{base: 6, lg: 8}}
             {...rest}
         >
+            <PageAnalytics
+                isSearch={isSearch}
+                searchQuery={searchQuery}
+                searchParams={searchParams}
+                category={category}
+                productSearchResult={productSearchResult}
+            />
             <Metadata
                 category={category}
                 searchQuery={searchQuery}

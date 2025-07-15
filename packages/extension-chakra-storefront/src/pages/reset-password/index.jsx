@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, {useEffect} from 'react'
+import React from 'react'
 import {useIntl} from 'react-intl'
 import PropTypes from 'prop-types'
 import {Box, Container} from '@chakra-ui/react'
@@ -14,8 +14,7 @@ import Seo from '../../components/seo'
 import ResetPasswordForm from '../../components/reset-password'
 import ResetPasswordLanding from '../../pages/reset-password/reset-password-landing'
 import useNavigation from '../../hooks/use-navigation'
-import useEinstein from '../../hooks/use-einstein'
-import useDataCloud from '../../hooks/use-datacloud'
+import PageAnalyticsPageView from '../../components/page-analytics-page-view'
 import {useLocation, useRouteMatch} from 'react-router-dom'
 import {usePasswordReset} from '../../hooks/use-password-reset'
 import {useExtensionConfig} from '../../hooks'
@@ -26,8 +25,6 @@ const ResetPassword = () => {
     const {formatMessage} = useIntl()
     const form = useForm()
     const navigate = useNavigation()
-    const einstein = useEinstein()
-    const dataCloud = useDataCloud()
     const {pathname} = useLocation()
     const {path} = useRouteMatch()
     const {getPasswordResetToken} = usePasswordReset()
@@ -45,15 +42,10 @@ const ResetPassword = () => {
         }
     }
 
-    /**************** Einstein ****************/
-    useEffect(() => {
-        einstein.sendViewPage(pathname)
-        dataCloud.sendViewPage(pathname)
-    }, [])
-
     return (
         <Box data-testid="reset-password-page" bg="gray.50" py={[8, 16]}>
             <Seo title="Reset password" description="Reset customer password" />
+            <PageAnalyticsPageView pathname={pathname} />
             <Container
                 paddingTop={16}
                 width={['100%', '407px']}

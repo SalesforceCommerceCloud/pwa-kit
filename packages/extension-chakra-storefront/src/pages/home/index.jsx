@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, {useEffect} from 'react'
+import React from 'react'
 import {useIntl, FormattedMessage} from 'react-intl'
 import {useLocation} from 'react-router-dom'
 
@@ -34,8 +34,7 @@ import {getStaticAssetUrl} from '@salesforce/pwa-kit-react-sdk/ssr/universal/uti
 import {heroFeatures, features} from '../../pages/home/data'
 
 //Hooks
-import useEinstein from '../../hooks/use-einstein'
-import useDataCloud from '../../hooks/use-datacloud'
+import PageAnalyticsPageView from '../../components/page-analytics-page-view'
 
 // Constants
 import {useServerContext} from '@salesforce/pwa-kit-react-sdk/ssr/universal/hooks'
@@ -50,8 +49,6 @@ import {useExtensionConfig} from '../../hooks'
  */
 const Home = () => {
     const intl = useIntl()
-    const einstein = useEinstein()
-    const dataCloud = useDataCloud()
     const {pathname} = useLocation()
     const {
         pages: {Home: homeConfig},
@@ -77,12 +74,6 @@ const Home = () => {
         }
     })
 
-    /**************** Einstein ****************/
-    useEffect(() => {
-        einstein.sendViewPage(pathname)
-        dataCloud.sendViewPage(pathname)
-    }, [])
-
     return (
         <Box data-testid="home-page" layerStyle="page">
             <Seo
@@ -90,6 +81,7 @@ const Home = () => {
                 description="Commerce Cloud Retail React App"
                 keywords="Commerce Cloud, Retail React App, React Storefront"
             />
+            <PageAnalyticsPageView pathname={pathname} />
 
             <Hero
                 title={intl.formatMessage({
