@@ -71,13 +71,13 @@ const formatSuggestions = (searchSuggestions, input) => {
                 image: product.image?.disBaseLink // Add image if available
             }
         }),
-        brandSuggestions: searchSuggestions?.brandSuggestions?.suggestedTerms?.map((brand) => {
+        brandSuggestions: searchSuggestions?.brandSuggestions?.suggestedPhrases?.map((brand) => {
             // Init cap the brand name
-            const brandName = initCap(brand.originalTerm)
+            const brandName = initCap(brand.phrase)
             return {
                 type: 'brand',
                 name: boldString(brandName, capitalize(input)),
-                link: searchUrlBuilder(brand.originalTerm)
+                link: searchUrlBuilder(brand.phrase)
             }
         }),
         phraseSuggestions: searchSuggestions?.categorySuggestions?.suggestedPhrases?.map(
