@@ -317,7 +317,7 @@ const CheckoutConfirmation = () => {
                                                 ) : (
                                                     <Text>
                                                         <FormattedMessage
-                                                            defaultMessage="Store information not available"
+                                                            defaultMessage="Store information isn't available"
                                                             id="checkout_confirmation.message.store_info_unavailable"
                                                         />
                                                     </Text>
