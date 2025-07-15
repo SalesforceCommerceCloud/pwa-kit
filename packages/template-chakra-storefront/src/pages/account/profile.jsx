@@ -353,7 +353,6 @@ const AccountDetail = () => {
             <Stack spacing={4}>
                 <ProfileCard allowPasswordChange={!isExternal} />
                 {!isExternal && <PasswordCard />}
-                {/* eslint-disable-next-line no-undef */}
                 {SFDC_EXT_MARKETING_CONSENT_ENABLED && <MarketingConsentCard />}
             </Stack>
         </Stack>
