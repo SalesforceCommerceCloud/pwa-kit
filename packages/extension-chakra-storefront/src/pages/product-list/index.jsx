@@ -18,6 +18,7 @@ import ProductListBanner from './partials/product-list-banner'
 import ProductListHeader from './partials/product-list-header'
 import ProductListGrid from './partials/product-list-grid'
 import ProductListPagination from './partials/product-list-pagination'
+import PageAnalytics from './page-analytics'
 
 // Hooks
 import {useExtensionConfig} from '../../hooks'
@@ -43,6 +44,7 @@ const ProductList = () => {
         isFetched,
         isLoading,
         isRefetching,
+        isSearch,
         pageUrls,
         productSearchResult,
         resetFilters,
@@ -56,6 +58,13 @@ const ProductList = () => {
     return (
         <>
             <PageCache />
+            <PageAnalytics
+                category={category}
+                searchQuery={searchQuery}
+                productSearchResult={productSearchResult}
+                isSearch={isSearch}
+                searchParams={searchParams}
+            />
             <PageMetadata
                 category={category}
                 searchQuery={searchQuery}

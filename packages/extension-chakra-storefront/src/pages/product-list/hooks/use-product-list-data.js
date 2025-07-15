@@ -169,34 +169,6 @@ export const useProductListData = () => {
         navigate(newPath)
     }
 
-    useEffect(() => {
-        if (productSearchResult) {
-            if (isSearch) {
-                try {
-                    einstein.sendViewSearch(searchQuery, productSearchResult)
-                } catch (err) {
-                    logger.error('Einstein sendViewSearch error', {
-                        namespace: 'ProductList.useEffect',
-                        additionalProperties: {error: err, searchQuery}
-                    })
-                }
-                dataCloud.sendViewSearchResults(searchParams, productSearchResult)
-                activeData.sendViewSearch(searchParams, productSearchResult)
-            } else {
-                try {
-                    einstein.sendViewCategory(category, productSearchResult)
-                } catch (err) {
-                    logger.error('Einstein sendViewCategory error', {
-                        namespace: 'ProductList.useEffect',
-                        additionalProperties: {error: err, category}
-                    })
-                }
-                dataCloud.sendViewCategory(searchParams, category, productSearchResult)
-                activeData.sendViewCategory(searchParams, category, productSearchResult)
-            }
-        }
-    }, [productSearchResult, isSearch, searchQuery, category, searchParams, einstein, dataCloud, activeData])
-
     const handleProductClick = (product) => {
         if (searchQuery) {
             einstein.sendClickSearch(searchQuery, product)
@@ -213,6 +185,7 @@ export const useProductListData = () => {
         isFetched,
         isLoading,
         isRefetching,
+        isSearch,
         pageUrls,
         productSearchResult,
         resetFilters,
