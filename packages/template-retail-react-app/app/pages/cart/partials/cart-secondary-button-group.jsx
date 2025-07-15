@@ -104,9 +104,10 @@ const CartSecondaryButtonGroup = ({
                             />
                         </Button>
                     )}
-                    {/* Only show edit button if it's not a standard product */}
+                    {/* Only show edit button if it's not a standard product and not a bonus product */}
                     {variant.id &&
-                        !variant.type?.item && ( // the variant.id ensures complete product data. Without it, Edit button appears briefly
+                        !variant.type?.item &&
+                        !isBonusProduct && ( // the variant.id ensures complete product data. Without it, Edit button appears briefly
                             <Button variant="link" size="sm" onClick={() => onEditClick(variant)}>
                                 <FormattedMessage
                                     defaultMessage="Edit"
