@@ -23,7 +23,7 @@ import {STORE_LOCATOR_IS_ENABLED} from '@salesforce/retail-react-app/app/constan
 
 const onClient = typeof window !== 'undefined'
 
-const MultiShipConfirmation = ({shipments  }) => {
+const MultiShipConfirmation = ({shipments}) => {
     if (!shipments || shipments.length === 0) {
         return null
     }
@@ -66,12 +66,12 @@ const MultiShipConfirmation = ({shipments  }) => {
     }
 
     return (
-        <Box layerStyle="card" rounded={[0, 0, 'base']} px={[4, 4, 6]} py={[6, 6, 8]}>
-            <Container variant="form">
-                <Stack spacing={6}>
-                    {/* Pickup Details */}
-                    {pickupShipments.length > 0 && (
-                        <>
+        <Stack spacing={4}>
+            {/* Pickup Details */}
+            {pickupShipments.length > 0 && (
+                <Box layerStyle="card" rounded={[0, 0, 'base']} px={[4, 4, 6]} py={[6, 6, 8]}>
+                    <Container variant="form">
+                        <Stack spacing={6}>
                             <Heading fontSize="lg">
                                 <FormattedMessage
                                     defaultMessage="Pickup Details"
@@ -127,14 +127,16 @@ const MultiShipConfirmation = ({shipments  }) => {
                                     )
                                 })}
                             </Stack>
-                        </>
-                    )}
+                        </Stack>
+                    </Container>
+                </Box>
+            )}
 
-                    {/* Delivery Details */}
-                    {deliveryShipments.length > 0 && (
-                        <>
-                            {pickupShipments.length > 0 && <Divider my={6} />}
-
+            {/* Delivery Details */}
+            {deliveryShipments.length > 0 && (
+                <Box layerStyle="card" rounded={[0, 0, 'base']} px={[4, 4, 6]} py={[6, 6, 8]}>
+                    <Container variant="form">
+                        <Stack spacing={6}>
                             <Heading fontSize="lg">
                                 <FormattedMessage
                                     defaultMessage="Delivery Details"
@@ -188,11 +190,11 @@ const MultiShipConfirmation = ({shipments  }) => {
                                     </Box>
                                 ))}
                             </Stack>
-                        </>
-                    )}
-                </Stack>
-            </Container>
-        </Box>
+                        </Stack>
+                    </Container>
+                </Box>
+            )}
+        </Stack>
     )
 }
 
