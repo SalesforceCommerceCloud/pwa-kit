@@ -15,7 +15,7 @@
 - Provide support for partial hydration [#2696](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2696)
 - Show Automatic Bonus Products on Cart Page [#2704](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2704)
 - Support Standard Products [2697](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2697)
-
+- Fix passwordless race conditions in form submission [#2758](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2758)
 
 ## v6.1.0 (May 22, 2025)
 

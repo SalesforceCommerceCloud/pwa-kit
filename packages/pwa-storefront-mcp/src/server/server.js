@@ -95,7 +95,7 @@ class PwaStorefrontMCPServerHighLevel {
             this.sessions[sessionId] = {step: 1, answers: {}}
         }
         const session = this.sessions[sessionId]
-        const {step, answers} = session
+        const {step} = session
         const answer = args.answer?.trim()
         switch (step) {
             case 1:
