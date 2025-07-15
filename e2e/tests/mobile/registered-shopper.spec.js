@@ -48,7 +48,7 @@ test('Registered shopper can checkout items', async ({page}) => {
 
     await answerConsentTrackingForm(page)
     await page.waitForLoadState()
-    
+
     // Verify user is logged in using URL and email verification
     const currentUrl = page.url()
     expect(currentUrl).toMatch(/\/account/)
@@ -60,7 +60,7 @@ test('Registered shopper can checkout items', async ({page}) => {
     // cart
     await page.getByLabel(/My cart/i).click()
 
-    await expect(page.getByRole('link', {name: /Belted Ribbed Boat Neck Sweater/i})).toBeVisible()
+    await expect(page.getByRole('link', {name: /Cotton Turtleneck Sweater/i})).toBeVisible()
 
     await page.getByRole('link', {name: 'Proceed to Checkout'}).click()
 
@@ -89,7 +89,7 @@ test('Registered shopper can checkout items', async ({page}) => {
     await expect(page.getByRole('heading', {name: /Shipping & Gift Options/i})).toBeVisible()
 
     await page.waitForLoadState()
-    
+
     // Handle optional shipping step - some checkout flows skip this step
     const continueToPayment = page.getByRole('button', {
         name: /Continue to Payment/i
@@ -136,7 +136,7 @@ test('Registered shopper can checkout items', async ({page}) => {
 
     await expect(page.getByRole('heading', {name: /Order Summary/i})).toBeVisible()
     await expect(page.getByText(/2 Items/i)).toBeVisible()
-    await expect(page.getByRole('link', {name: /Belted Ribbed Boat Neck Sweater/i})).toBeVisible()
+    await expect(page.getByRole('link', {name: /Cotton Turtleneck Sweater/i})).toBeVisible()
 
     // order history
     await validateOrderHistory({page})
@@ -160,7 +160,7 @@ test('Registered shopper can add item to wishlist', async ({page}) => {
     }
     await answerConsentTrackingForm(page)
     await page.waitForLoadState()
-    
+
     // Verify user is logged in using URL and email verification
     const currentUrl = page.url()
     expect(currentUrl).toMatch(/\/account/)
@@ -170,8 +170,8 @@ test('Registered shopper can add item to wishlist', async ({page}) => {
     await navigateToPDPMobile({page})
 
     // add product to wishlist
-    await expect(page.getByRole('heading', {name: /Belted Ribbed Boat Neck Sweater/i})).toBeVisible()
-    await page.getByRole('radio', {name: 'M', exact: true}).click()
+    await expect(page.getByRole('heading', {name: /Cotton Turtleneck Sweater/i})).toBeVisible()
+    await page.getByRole('radio', {name: 'L', exact: true}).click()
     await page.getByRole('button', {name: /Add to Wishlist/i}).click()
 
     // wishlist

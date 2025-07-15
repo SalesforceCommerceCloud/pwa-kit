@@ -37,20 +37,14 @@ module.exports = defineConfig({
         {
             name: 'chromium',
             use: {...devices['Desktop Chrome']},
-            testIgnore: [
-                'e2e/tests/desktop/extra-features.spec.js',
-                'e2e/tests/mobile/extra-features.spec.js'
-            ]
+            testIgnore: ['**/a11y/**', '**/mobile/**', '**/extra-features.spec.js']
         },
 
         /* Test against mobile viewports. */
         {
             name: 'mobile-chrome',
             use: {...devices['Pixel 5']},
-            testIgnore: [
-                'e2e/tests/desktop/extra-features.spec.js',
-                'e2e/tests/mobile/extra-features.spec.js'
-            ]
+            testIgnore: ['**/a11y/**', '**/desktop/**', '**/extra-features.spec.js']
         },
         {
             name: 'a11y-mobile',
