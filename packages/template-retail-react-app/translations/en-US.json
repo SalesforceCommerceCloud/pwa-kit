@@ -261,6 +261,9 @@
   "checkout_confirmation.heading.delivery_details": {
     "defaultMessage": "Delivery Details"
   },
+  "checkout_confirmation.heading.delivery_number": {
+    "defaultMessage": "Delivery {number}"
+  },
   "checkout_confirmation.heading.order_summary": {
     "defaultMessage": "Order Summary"
   },
@@ -272,6 +275,9 @@
   },
   "checkout_confirmation.heading.pickup_details": {
     "defaultMessage": "Pickup Details"
+  },
+  "checkout_confirmation.heading.pickup_location_number": {
+    "defaultMessage": "Pickup Location {number}"
   },
   "checkout_confirmation.heading.shipping_address": {
     "defaultMessage": "Shipping Address"
@@ -320,7 +326,7 @@
     "description": "# item(s) in order"
   },
   "checkout_confirmation.message.store_info_unavailable": {
-    "defaultMessage": "Store information isn't available"
+    "defaultMessage": "Store information not available"
   },
   "checkout_confirmation.message.will_email_shortly": {
     "defaultMessage": "We will send an email to <b>{email}</b> with your confirmation number and receipt shortly."

@@ -1441,6 +1441,24 @@
       "value": "]"
     }
   ],
+  "checkout_confirmation.heading.delivery_number": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ḓḗḗŀīṽḗḗřẏ "
+    },
+    {
+      "type": 1,
+      "value": "number"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
   "checkout_confirmation.heading.order_summary": [
     {
       "type": 0,
@@ -1491,6 +1509,24 @@
     {
       "type": 0,
       "value": "Ƥīƈķŭŭƥ Ḓḗḗŧȧȧīŀş"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "checkout_confirmation.heading.pickup_location_number": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ƥīƈķŭŭƥ Ŀǿǿƈȧȧŧīǿǿƞ "
+    },
+    {
+      "type": 1,
+      "value": "number"
     },
     {
       "type": 0,
@@ -1760,7 +1796,7 @@
     },
     {
       "type": 0,
-      "value": "Şŧǿǿřḗḗ īƞƒǿǿřḿȧȧŧīǿǿƞ īşƞ'ŧ ȧȧṽȧȧīŀȧȧƀŀḗḗ"
+      "value": "Şŧǿǿřḗḗ īƞƒǿǿřḿȧȧŧīǿǿƞ ƞǿǿŧ ȧȧṽȧȧīŀȧȧƀŀḗḗ"
     },
     {
       "type": 0,
