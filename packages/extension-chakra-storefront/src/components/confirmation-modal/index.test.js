@@ -9,7 +9,7 @@ import ConfirmationModal from '../../components/confirmation-modal/index'
 import {Box, useDisclosure} from '@chakra-ui/react'
 import {renderWithProviders} from '../../utils/test-utils'
 import userEvent from '@testing-library/user-event'
-import {screen} from '@testing-library/react'
+import {act, screen} from '@testing-library/react'
 import {REMOVE_CART_ITEM_CONFIRMATION_DIALOG_CONFIG} from '../../pages/cart/partials/cart-secondary-button-group'
 
 const MockedComponent = (props) => {
@@ -28,13 +28,13 @@ afterEach(() => {
 })
 
 test('Renders confirmation modal with default config', async () => {
-    const user = userEvent.setup()
-
-    renderWithProviders(<MockedComponent />)
+    const {user} = renderWithProviders(<MockedComponent />)
 
     // open the modal
     const trigger = screen.getByText(/open modal/i)
-    await user.click(trigger)
+    await act(async () => {
+        await user.click(trigger)
+    })
 
     expect(screen.getByText(/confirm action/i)).toBeInTheDocument()
     expect(screen.getByText(/are you sure you want to continue/i)).toBeInTheDocument()
@@ -43,13 +43,15 @@ test('Renders confirmation modal with default config', async () => {
 })
 
 test('Renders confirmation modal with the given config', async () => {
-    const user = userEvent.setup()
-
-    renderWithProviders(<MockedComponent {...REMOVE_CART_ITEM_CONFIRMATION_DIALOG_CONFIG} />)
+    const {user} = renderWithProviders(
+        <MockedComponent {...REMOVE_CART_ITEM_CONFIRMATION_DIALOG_CONFIG} />
+    )
 
     // open the modal
     const trigger = screen.getByText(/open modal/i)
-    await user.click(trigger)
+    await act(async () => {
+        await user.click(trigger)
+    })
 
     expect(screen.getByText(/confirm remove item/i)).toBeInTheDocument()
     expect(screen.getByText(/are you sure you want to remove this item/i)).toBeInTheDocument()
@@ -58,41 +60,43 @@ test('Renders confirmation modal with the given config', async () => {
 })
 
 test('Verify confirm action button click', async () => {
-    const user = userEvent.setup()
-
     const onPrimaryAction = jest.fn()
 
-    renderWithProviders(<MockedComponent onPrimaryAction={onPrimaryAction} />)
+    const {user} = renderWithProviders(<MockedComponent onPrimaryAction={onPrimaryAction} />)
 
     // open the modal
     const trigger = screen.getByText(/open modal/i)
-    await user.click(trigger)
+    await act(async () => {
+        await user.click(trigger)
+    })
 
     const onPrimaryActionTrigger = screen.getByText(/yes/i)
 
     expect(screen.getByText(/confirm action/i)).toBeInTheDocument()
     expect(onPrimaryActionTrigger).toBeInTheDocument()
-
-    await user.click(onPrimaryActionTrigger)
+    await act(async () => {
+        await user.click(onPrimaryActionTrigger)
+    })
     expect(onPrimaryAction).toHaveBeenCalledTimes(1)
 })
 
 test('Verify cancel action button click', async () => {
-    const user = userEvent.setup()
-
     const onAlternateAction = jest.fn()
 
-    renderWithProviders(<MockedComponent onAlternateAction={onAlternateAction} />)
+    const {user} = renderWithProviders(<MockedComponent onAlternateAction={onAlternateAction} />)
 
     // open the modal
     const trigger = screen.getByText(/open modal/i)
-    await user.click(trigger)
+    await act(async () => {
+        await user.click(trigger)
+    })
 
     const onAlternateActionTrigger = screen.getByText(/no/i)
 
     expect(screen.getByText(/confirm action/i)).toBeInTheDocument()
     expect(onAlternateActionTrigger).toBeInTheDocument()
-
-    await user.click(onAlternateActionTrigger)
+    await act(async () => {
+        await user.click(onAlternateActionTrigger)
+    })
     expect(onAlternateAction).toHaveBeenCalledTimes(1)
 })

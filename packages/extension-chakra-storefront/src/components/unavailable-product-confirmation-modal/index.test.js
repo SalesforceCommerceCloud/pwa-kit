@@ -8,7 +8,7 @@
 import React from 'react'
 import UnavailableProductConfirmationModal from '../../components/unavailable-product-confirmation-modal/index'
 import {renderWithProviders} from '../../utils/test-utils'
-import {waitFor} from '@testing-library/react'
+import {act, waitFor} from '@testing-library/react'
 import {prependHandlersToServer} from '../../../jest-setup'
 const mockProductsWithUnavailableProducts = {
     limit: 0,
@@ -94,7 +94,9 @@ describe('UnavailableProductConfirmationModal', () => {
         const removeBtn = queryByRole('button')
 
         expect(removeBtn).toBeInTheDocument()
-        await user.click(removeBtn)
+        await act(async () => {
+            await user.click(removeBtn)
+        })
         expect(mockFunc).toHaveBeenCalled()
         await waitFor(async () => {
             expect(queryByText(/Items Unavailable/i)).not.toBeInTheDocument()
@@ -138,7 +140,9 @@ describe('UnavailableProductConfirmationModal', () => {
         const removeBtn = queryByRole('button')
 
         expect(removeBtn).toBeInTheDocument()
-        await user.click(removeBtn)
+        await act(async () => {
+            await user.click(removeBtn)
+        })
         expect(mockFunc).toHaveBeenCalled()
         await waitFor(async () => {
             expect(queryByText(/Items Unavailable/i)).not.toBeInTheDocument()
