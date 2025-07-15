@@ -66,10 +66,10 @@ module.exports = {
     // TODO: Revert this threshold once we start adding tests back to the codebase
     coverageThreshold: {
         global: {
-            // statements: 73,
-            // branches: 60,
-            // functions: 65,
-            // lines: 74
+            statements: 73,
+            branches: 60,
+            functions: 65,
+            lines: 74
         }
     },
     // Increase to: 6 x default timeout of 5 seconds
