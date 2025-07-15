@@ -1,17 +1,14 @@
+/*
+ * Copyright (c) 2025, Salesforce, Inc.
+ * All rights reserved.
+ * SPDX-License-Identifier: BSD-3-Clause
+ * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
+ */
 import React, {useState} from 'react'
 import PropTypes from 'prop-types'
 import {useHistory} from 'react-router-dom'
 import {FormattedMessage, useIntl} from 'react-intl'
-import {
-    Box,
-    Button,
-    Dialog,
-    Drawer,
-    Flex,
-    Heading,
-    Stack,
-    Text
-} from '@chakra-ui/react'
+import {Box, Button, Dialog, Drawer, Flex, Heading, Stack, Text} from '@chakra-ui/react'
 import {FilterIcon, ChevronDownIcon} from '../../../components/icons'
 import SafePortal from '../../../components/safe-portal'
 import LoadingSpinner from '../../../components/loading-spinner'
@@ -151,18 +148,11 @@ const ProductListHeader = ({
                                                     </Button>
                                                 </Dialog.CloseTrigger>
                                             </Dialog.Header>
-                                            <Dialog.Body
-                                                flex={1}
-                                                overflowY="auto"
-                                                px={4}
-                                                py={4}
-                                            >
+                                            <Dialog.Body flex={1} overflowY="auto" px={4} py={4}>
                                                 {filtersLoading && <LoadingSpinner />}
                                                 <Refinements
                                                     toggleFilter={toggleFilter}
-                                                    filters={
-                                                        productSearchResult?.refinements
-                                                    }
+                                                    filters={productSearchResult?.refinements}
                                                     selectedFilters={searchParams.refine}
                                                     itemsBefore={
                                                         category?.categories
@@ -184,11 +174,7 @@ const ProductListHeader = ({
                                                 borderTopColor="gray.100"
                                                 p={4}
                                             >
-                                                <Stack
-                                                    direction="column"
-                                                    gap={3}
-                                                    width="full"
-                                                >
+                                                <Stack direction="column" gap={3} width="full">
                                                     <Dialog.CloseTrigger asChild>
                                                         <Button
                                                             width="full"
@@ -337,4 +323,4 @@ ProductListHeader.propTypes = {
     searchParams: PropTypes.object
 }
 
-export default ProductListHeader 
+export default ProductListHeader

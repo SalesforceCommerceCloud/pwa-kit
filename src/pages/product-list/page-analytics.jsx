@@ -57,4 +57,4 @@ PageAnalytics.propTypes = {
     searchParams: PropTypes.object
 }
 
-export default PageAnalytics 
+export default PageAnalytics

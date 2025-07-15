@@ -12,13 +12,10 @@ import {useCategory, useProductSearch} from '@salesforce/commerce-sdk-react'
 // Hooks
 import {usePageUrls, useSortUrls, useSearchParams} from '../../../hooks'
 import useEinstein from '../../../hooks/use-einstein'
-import useActiveData from '../../../hooks/use-active-data'
-import useDataCloud from '../../../hooks/use-datacloud'
 import useNavigation from '../../../hooks/use-navigation'
 
 // Others
 import {HTTPNotFound, HTTPError} from '@salesforce/pwa-kit-react-sdk/ssr/universal/errors'
-import logger from '../../../utils/logger-instance'
 
 // NOTE: You can ignore certain refinements on a template level by updating the below
 // list of ignored refinements.
@@ -29,8 +26,6 @@ export const useProductListData = () => {
     const params = useParams()
     const location = useLocation()
     const einstein = useEinstein()
-    const dataCloud = useDataCloud()
-    const activeData = useActiveData()
     const [searchParams, {stringify: stringifySearchParams}] = useSearchParams()
 
     const [filtersLoading, setFiltersLoading] = useState(false)
@@ -195,4 +190,4 @@ export const useProductListData = () => {
         sortUrls,
         toggleFilter
     }
-} 
+}
