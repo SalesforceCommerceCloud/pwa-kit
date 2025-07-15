@@ -44,11 +44,11 @@ test('Adding a product via Pickup in Store to Cart shows pickup address in Check
     // Navigate to PDP
     const productTile = page.getByRole('link', {
         name: /Casual To Dressy Trousers/i
-    })
+    }).first()
     await productTile.click()
 
     // Select size and Pickup in Store option
-    await expect(page.getByRole('heading', {name: /Casual To Dressy Trousers/i})).toBeVisible()
+    await expect(page.getByRole('heading', {name: /Casual To Dressy Trousers/i}).first()).toBeVisible()
     await page.getByRole('radio', {name: '30'}).click()
     await page.waitForLoadState()
     
