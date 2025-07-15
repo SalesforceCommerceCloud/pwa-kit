@@ -208,4 +208,4 @@ ShipmentDetails.propTypes = {
     shipments: PropTypes.array
 }
 
-export default ShipmentDetails 
+export default ShipmentDetails

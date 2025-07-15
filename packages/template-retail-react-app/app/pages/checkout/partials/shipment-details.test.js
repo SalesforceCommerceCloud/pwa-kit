@@ -6,7 +6,6 @@
  */
 
 import React from 'react'
-import PropTypes from 'prop-types'
 import {screen} from '@testing-library/react'
 import ShipmentDetails from '@salesforce/retail-react-app/app/pages/checkout/partials/shipment-details'
 import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
@@ -244,4 +243,4 @@ describe('ShipmentDetails', () => {
             }
         )
     })
-}) 
+})
