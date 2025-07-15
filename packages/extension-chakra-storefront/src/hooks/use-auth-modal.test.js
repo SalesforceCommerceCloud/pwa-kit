@@ -194,8 +194,7 @@ test('Renders check email modal on email mode', async () => {
     mockUseForm.mockRestore()
 })
 
-//TODO: there is a bug in this feature that is being addressed in PR 2758
-describe.skip('Passwordless enabled', () => {
+describe('Passwordless enabled', () => {
     test('Renders passwordless login when enabled', async () => {
         const {user} = renderWithProviders(<MockedComponent isPasswordlessEnabled={true} />)
 

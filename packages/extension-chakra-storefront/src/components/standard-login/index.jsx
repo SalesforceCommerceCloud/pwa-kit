@@ -55,7 +55,10 @@ const StandardLogin = ({
                 )}
                 {hideEmail && (
                     <Button
-                        onClick={() => setShowPasswordView(false)}
+                        onClick={() => {
+                            form.resetField('password')
+                            setShowPasswordView(false)
+                        }}
                         borderColor="gray.500"
                         color="blue.600"
                         variant="outline"

@@ -12,20 +12,16 @@ import {Button, Separator, Stack, Text} from '@chakra-ui/react'
 import LoginFields from '../forms/login-fields'
 import StandardLogin from '../standard-login'
 import SocialLogin from '../social-login'
-import {LOGIN_TYPES} from '../../constants'
 
 const PasswordlessLogin = ({
     form,
     handleForgotPasswordClick,
-    handlePasswordlessLoginClick,
     isSocialEnabled = false,
-    idps = [],
-    setLoginType
+    idps = []
 }) => {
     const [showPasswordView, setShowPasswordView] = useState(false)
 
     const handlePasswordButton = async (e) => {
-        setLoginType(LOGIN_TYPES.PASSWORD)
         const isValid = await form.trigger()
         // Manually trigger the browser native form validations
         const domForm = e.target.closest('form')
@@ -49,7 +45,6 @@ const PasswordlessLogin = ({
                     <Button
                         type="submit"
                         onClick={() => {
-                            handlePasswordlessLoginClick()
                             form.clearErrors('global')
                         }}
                         isLoading={form.formState.isSubmitting}
@@ -99,11 +94,9 @@ const PasswordlessLogin = ({
 PasswordlessLogin.propTypes = {
     form: PropTypes.object,
     handleForgotPasswordClick: PropTypes.func,
-    handlePasswordlessLoginClick: PropTypes.func,
     isSocialEnabled: PropTypes.bool,
     idps: PropTypes.arrayOf(PropTypes.string),
-    hideEmail: PropTypes.bool,
-    setLoginType: PropTypes.func
+    hideEmail: PropTypes.bool
 }
 
 export default PasswordlessLogin

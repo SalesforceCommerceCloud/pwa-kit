@@ -37,9 +37,9 @@ const LoginState = ({
                     <Button
                         variant="outline"
                         borderColor="gray.500"
-                        type="submit"
-                        onClick={() => {
-                            handlePasswordlessLoginClick()
+                        type="button"
+                        onClick={(e) => {
+                            handlePasswordlessLoginClick(e)
                         }}
                         isLoading={form.formState.isSubmitting}
                     >

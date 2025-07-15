@@ -63,8 +63,6 @@ module.exports = {
         '<rootDir>/src/pages/account/wishlist/partials/wishlist-primary-action.test.js',
         '<rootDir>/src/pages/checkout/confirmation.test.js',
         '<rootDir>/src/pages/checkout/partials/contact-info.test.js',
-        // TODO: renable when pwless bug is fixed
-        // '<rootDir>/src/pages/checkout/partials/contact-info.test.js',
         '<rootDir>/src/pages/checkout/partials/login-state.test.js',
         '<rootDir>/src/pages/account/orders.test.js',
         '<rootDir>/src/pages/account/wishlist/index.test.js',
