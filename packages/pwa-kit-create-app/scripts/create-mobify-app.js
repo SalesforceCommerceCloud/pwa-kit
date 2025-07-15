@@ -539,7 +539,6 @@ const main = async (opts) => {
     const OUTPUT_DIR_FLAG_ACTIVE = !!outputDir
     const presetId = preset || process.env.GENERATOR_PRESET
 
-    console.log('git: ', initGit)
     // Exit if the preset provided is not valid.
     if (displayProgram) {
         await printProgramJsonAndExit()

@@ -25,7 +25,17 @@ describe('PWA Create App Guidelines', () => {
         it('should have correct structure', () => {
             expect(CreateAppGuidelineTool).toMatchObject({
                 name: 'create_app_guidelines',
-                description: `This tool is used to provide the agent with the instructions on how to use the @salesforce/pwa-kit-create-app CLI tool to create a new PWA Kit projects. Do not attempt to create a project without using this tool first.`,
+                description: `
+    
+This tool is used to provide the agent with the instructions on how to use the @salesforce/pwa-kit-create-app CLI tool to create a new PWA Kit projects.
+
+Do not attempt to create a project without using this tool first.
+
+Example Triggers:
+- "Create a new PWA Kit app"
+- "Start a new storefront using a preset"
+- "What templates are available for PWA Kit?"
+- "What presets are available for PWA Kit?"`,
                 inputSchema: EmptyJsonSchema,
                 fn: expect.any(Function)
             })

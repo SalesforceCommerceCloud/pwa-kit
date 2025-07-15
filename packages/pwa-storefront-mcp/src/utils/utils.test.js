@@ -60,7 +60,7 @@ describe('Utils', () => {
         const originalEnv = process.env.WORKSPACE_FOLDER_PATHS
         const mockPath = '/mock/root'
         const mockScriptPath = `${mockPath}/packages/pwa-kit-create-app/scripts/create-mobify-app.js`
-        const CREATE_APP_VERSION = '3.11.0-nightly-20250710080214'
+        const CREATE_APP_VERSION = 'latest'
 
         beforeEach(() => {
             jest.clearAllMocks()
