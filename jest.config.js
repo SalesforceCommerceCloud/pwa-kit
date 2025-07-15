@@ -40,6 +40,7 @@ module.exports = {
         createTestGlob('components/swatch-group'),
         createTestGlob('components/toaster'),
         createTestGlob('components/list-menu'),
+        createTestGlob('components/skip-nav'),
         createTestGlob('components/login'),
         createTestGlob('components/register'),
         createTestGlob('components/email-confirmation'),
@@ -96,10 +97,6 @@ module.exports = {
         '^@chakra-ui/react/(.*)$': [
             '<rootDir>/node_modules/@chakra-ui/react/dist/cjs/$1/index.cjs',
             '<rootDir>/node_modules/@chakra-ui/react/dist/cjs/index.cjs'
-        ],
-        '^@chakra-ui/skip-nav/(.*)$': [
-            '<rootDir>/node_modules/@chakra-ui/skip-nav/dist/index.js',
-            '<rootDir>/node_modules/@chakra-ui/skip-nav/dist/$1.js'
         ],
         '^proxy-compare$': '<rootDir>/node_modules/proxy-compare/dist/cjs/index.js',
         '^uqr$': '<rootDir>/node_modules/uqr/dist/index.cjs',
