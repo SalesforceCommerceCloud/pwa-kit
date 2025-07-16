@@ -65,7 +65,6 @@ export default function ShippingOptions() {
         if (!selectedShippingMethod && !methodId && defaultMethodId) {
             form.reset({shippingMethodId: defaultMethodId})
         }
-
         if (selectedShippingMethod && methodId !== selectedShippingMethod.id) {
             form.reset({shippingMethodId: selectedShippingMethod.id})
         }

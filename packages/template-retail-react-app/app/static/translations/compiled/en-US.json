@@ -1163,6 +1163,12 @@
       "value": "Checkout as Guest"
     }
   ],
+  "contact_info.button.continue_to_shipping_address": [
+    {
+      "type": 0,
+      "value": "Continue to Shipping Address"
+    }
+  ],
   "contact_info.button.login": [
     {
       "type": 0,
