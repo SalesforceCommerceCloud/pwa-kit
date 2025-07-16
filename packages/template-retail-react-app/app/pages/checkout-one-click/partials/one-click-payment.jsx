@@ -32,8 +32,8 @@ import {
     ToggleCardEdit,
     ToggleCardSummary
 } from '@salesforce/retail-react-app/app/components/toggle-card'
-import PaymentForm from '@salesforce/retail-react-app/app/pages/checkout-one-click/partials/payment-form'
-import ShippingAddressSelection from '@salesforce/retail-react-app/app/pages/checkout-one-click/partials/shipping-address-selection'
+import PaymentForm from '@salesforce/retail-react-app/app/pages/checkout-one-click/partials/one-click-payment-form'
+import ShippingAddressSelection from '@salesforce/retail-react-app/app/pages/checkout-one-click/partials/one-click-shipping-address-selection'
 import AddressDisplay from '@salesforce/retail-react-app/app/components/address-display'
 import {PromoCode, usePromoCode} from '@salesforce/retail-react-app/app/components/promo-code'
 import {API_ERROR_MESSAGE} from '@salesforce/retail-react-app/app/constants'
