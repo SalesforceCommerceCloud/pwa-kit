@@ -6,13 +6,14 @@
  */
 import React, {useEffect, useRef, useState} from 'react'
 import PropTypes from 'prop-types'
-import {Alert, Box, Button, Container, Dialog, Portal, Stack, Text} from '@chakra-ui/react'
+import {Alert, Box, Button, Container, Dialog, Stack, Text} from '@chakra-ui/react'
 import {useForm} from 'react-hook-form'
 import {FormattedMessage, useIntl} from 'react-intl'
 import {useCheckout} from '../../../pages/checkout/util/checkout-context'
 import useLoginFields from '../../../components/forms/useLoginFields'
 import {ToggleCard, ToggleCardEdit, ToggleCardSummary} from '../../../components/toggle-card'
 import Field from '../../../components/field'
+import SafePortal from '../../../components/safe-portal'
 import {AlertIcon} from '../../../components/icons'
 import LoginState from '../../../pages/checkout/partials/login-state'
 import {AuthModal, EMAIL_VIEW, PASSWORD_VIEW, useAuthModal} from '../../../hooks/use-auth-modal'
@@ -275,7 +276,7 @@ const SignOutConfirmationDialog = ({isOpen, onConfirm, onClose}) => {
             open={isOpen}
             onOpenChange={(details) => !details.open && onClose()}
         >
-            <Portal>
+            <SafePortal>
                 <Dialog.Backdrop />
                 <Dialog.Positioner>
                     <Dialog.Content>
@@ -314,7 +315,7 @@ const SignOutConfirmationDialog = ({isOpen, onConfirm, onClose}) => {
                         </Dialog.Footer>
                     </Dialog.Content>
                 </Dialog.Positioner>
-            </Portal>
+            </SafePortal>
         </Dialog.Root>
     )
 }
