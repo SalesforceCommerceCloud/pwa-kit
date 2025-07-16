@@ -730,7 +730,7 @@
             },
             {
                 "name": "--initGit",
-                "description": "Includes a `.gitignore` files in the generated project and initializes a new git repository"
+                "description": "Initializes a git repository and stages the files in the generated project"
             }
         ],
         "examples": [
