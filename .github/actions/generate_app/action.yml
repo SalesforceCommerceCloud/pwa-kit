@@ -17,6 +17,8 @@ inputs:
     description: Site Id
   is_private_client:
     description: Is Private Client?
+  select_extension:
+    description: Select Extensions?
   setup_hybrid:
     description: Setup Phased Headless rollout?
   project_dir:
@@ -44,6 +46,12 @@ runs:
           is_private_client_value=2
         fi
         echo "IS_PRIVATE_CLIENT_VALUE=$is_private_client_value" >> $GITHUB_ENV
+        
+        select_extension_input="${{ inputs.select_extension }}"
+        if [ "$select_extension_input" = "true" ]; then
+         select_extension_value=1
+        fi
+        echo "SELECT_EXTENSION_VALUE=$select_extension_value" >> $GITHUB_ENV
         
         setup_hybrid_input="${{ inputs.setup_hybrid }}"
         if [ "$setup_hybrid_input" = "true" ]; then
@@ -95,6 +103,10 @@ runs:
             {
               "expectedPrompt": "What is your Commerce API short code in Business Manager?",
               "response": "${{ inputs.short_code }}\n"
+            },
+            {
+              "expectedPrompt": "Which extensions would you like to enable?",
+              "response": "${{ env.SELECT_EXTENSION_VALUE }}\n"
             },
             {
               "expectedPrompt": "Do you wish to set up a phased headless rollout?",
