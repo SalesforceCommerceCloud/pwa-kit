@@ -27,8 +27,8 @@ The PWA Storefront MCP Server provides these features.
 
     This tool is automatically used when the user expresses intent to create a project, such as:
 
-    - "Create a new PWA Kit app"
-    - "Start a new storefront using a preset"
+    - "Create a new PWA Kit app."
+    - "Start a new storefront using a preset."
     - "What templates are available for PWA Kit?"
     - "What PWA-Kit presets are available?"
     - "Create a PWA-Kit project using the `retail-react-app-demo` preset in the `~/test-project` directory."
