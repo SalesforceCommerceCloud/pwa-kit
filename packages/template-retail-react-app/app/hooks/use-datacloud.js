@@ -32,13 +32,20 @@ export class DataCloudApi {
             guestId: args.guestId,
             siteId: this.siteId,
             sessionId: args.sessionId,
-            deviceId: args.deviceId,
+            deviceId: args.customerId || args.guestId,
             dateTime: new Date().toISOString(),
             ...(args.customerId && {customerId: args.customerId}), // Can remove the conditionality after the hook -> Promise is changed in future PWA release
             ...(args.customerNo && {customerNo: args.customerNo})
         }
     }
 
+    /**
+     * Constructs a user details object for use in identity events.
+     * Includes information such as guest/registered status, first/last name, and other profile data.
+     *
+     * @param {object} args - The arguments containing user profile details (isGuest, firstName, lastName, etc.).
+     * @returns {object} - The user details object for identity events.
+     */
     _constructUserDetails(args) {
         return {
             isAnonymous: args.isGuest,
@@ -100,7 +107,33 @@ export class DataCloudApi {
         }
     }
 
+    /**
+     * Concatenates multiple event objects into a single object by merging their properties.
+     * Later objects in the argument list will override properties from earlier ones if there are conflicts.
+     *
+     * @param {...object} events - One or more event objects to be merged.
+     * @returns {object} - The merged event object containing all properties from the input objects.
+     */
     _concatenateEvents = (...events) => ({...events.reduce((acc, obj) => ({...acc, ...obj}), {})})
+
+    /**
+     * Constructs the party identification event object for a user.
+     * This includes identifiers and metadata for the user, such as guest or registered customer IDs.
+     *
+     * @param {object} args - The arguments containing user identification details (isGuest, guestId, customerId).
+     * @returns {object} - The party identification event object with required fields for the schema.
+     */
+    _constructPartyIdentification(args) {
+        return {
+            party: args.isGuest ? args.guestId : args.customerId,
+            userId: args.isGuest ? args.guestId : args.customerId,
+            IDName: args.isGuest ? 'CC_USID' : 'CC_REGISTERED_CUSTOMER_ID',
+            IDType: args.isGuest ? 'CC_USID' : 'CC_REGISTERED_CUSTOMER_ID',
+            partyIdentificationId: args.isGuest ? args.guestId : args.customerId,
+            internalOrganizationId: this.siteId,
+            creationEventId: crypto.randomUUID()
+        }
+    }
 
     /**
      * Sends a `page-view` event to Data Cloud.
@@ -126,6 +159,14 @@ export class DataCloudApi {
                   }
               )
 
+        const partyIdentification = this.dnt
+            ? {}
+            : this._concatenateEvents(
+                  baseEvent,
+                  this._generateEventDetails('partyIdentification', 'Profile'),
+                  this._constructPartyIdentification(args)
+              )
+
         const userEngagement = this._concatenateEvents(
             baseEvent,
             this._generateEventDetails('userEngagement', 'Engagement'),
@@ -136,11 +177,10 @@ export class DataCloudApi {
         )
 
         const interaction = {
-            events: [...(!this.dnt ? [identityProfile] : []), userEngagement]
+            events: [...(!this.dnt ? [identityProfile, partyIdentification] : []), userEngagement]
         }
 
-        this.sdk.webEventsAppSourceIdPost(interaction)
-            .catch((err) => this._handleApiError(err))
+        this.sdk.webEventsAppSourceIdPost(interaction).catch((err) => this._handleApiError(err))
     }
 
     /**
@@ -165,6 +205,14 @@ export class DataCloudApi {
                   userDetails
               )
 
+        const partyIdentification = this.dnt
+            ? {}
+            : this._concatenateEvents(
+                  baseEvent,
+                  this._generateEventDetails('partyIdentification', 'Profile'),
+                  this._constructPartyIdentification(args)
+              )
+
         let contactPointEmail = null
         if (args.email) {
             contactPointEmail = this._concatenateEvents(
@@ -186,14 +234,13 @@ export class DataCloudApi {
 
         const interaction = {
             events: [
-                ...(!this.dnt ? [identityProfile] : []),
+                ...(!this.dnt ? [identityProfile, partyIdentification] : []),
                 ...(contactPointEmail ? [contactPointEmail] : []),
                 catalog
             ]
         }
 
-        this.sdk.webEventsAppSourceIdPost(interaction)
-            .catch((err) => this._handleApiError(err))
+        this.sdk.webEventsAppSourceIdPost(interaction).catch((err) => this._handleApiError(err))
     }
 
     /**
@@ -240,6 +287,14 @@ export class DataCloudApi {
                   userDetails
               )
 
+        const partyIdentification = this.dnt
+            ? {}
+            : this._concatenateEvents(
+                  baseEvent,
+                  this._generateEventDetails('partyIdentification', 'Profile'),
+                  this._constructPartyIdentification(args)
+              )
+
         let contactPointEmail = null
         if (args.email) {
             contactPointEmail = this._concatenateEvents(
@@ -250,14 +305,13 @@ export class DataCloudApi {
 
         const interaction = {
             events: [
-                ...(!this.dnt ? [identityProfile] : []),
+                ...(!this.dnt ? [identityProfile, partyIdentification] : []),
                 ...(contactPointEmail ? [contactPointEmail] : []),
                 ...catalogObjects
             ]
         }
 
-        this.sdk.webEventsAppSourceIdPost(interaction)
-            .catch((err) => this._handleApiError(err))
+        this.sdk.webEventsAppSourceIdPost(interaction).catch((err) => this._handleApiError(err))
     }
 
     /**
@@ -304,6 +358,14 @@ export class DataCloudApi {
                   userDetails
               )
 
+        const partyIdentification = this.dnt
+            ? {}
+            : this._concatenateEvents(
+                  baseEvent,
+                  this._generateEventDetails('partyIdentification', 'Profile'),
+                  this._constructPartyIdentification(args)
+              )
+
         let contactPointEmail = null
         if (args.email) {
             contactPointEmail = this._concatenateEvents(
@@ -314,14 +376,13 @@ export class DataCloudApi {
 
         const interaction = {
             events: [
-                ...(!this.dnt ? [identityProfile] : []),
+                ...(!this.dnt ? [identityProfile, partyIdentification] : []),
                 ...(contactPointEmail ? [contactPointEmail] : []),
                 ...catalogObjects
             ]
         }
 
-        this.sdk.webEventsAppSourceIdPost(interaction)
-            .catch((err) => this._handleApiError(err))
+        this.sdk.webEventsAppSourceIdPost(interaction).catch((err) => this._handleApiError(err))
     }
 
     /**
@@ -362,6 +423,14 @@ export class DataCloudApi {
                   userDetails
               )
 
+        const partyIdentification = this.dnt
+            ? {}
+            : this._concatenateEvents(
+                  baseEvent,
+                  this._generateEventDetails('partyIdentification', 'Profile'),
+                  this._constructPartyIdentification(args)
+              )
+
         let contactPointEmail = null
         if (args.email) {
             contactPointEmail = this._concatenateEvents(
@@ -372,14 +441,13 @@ export class DataCloudApi {
 
         const interaction = {
             events: [
-                ...(!this.dnt ? [identityProfile] : []),
+                ...(identityProfile ? [identityProfile, partyIdentification] : []),
                 ...(contactPointEmail ? [contactPointEmail] : []),
                 ...catalogObjects
             ]
         }
 
-        this.sdk.webEventsAppSourceIdPost(interaction)
-            .catch((err) => this._handleApiError(err))
+        this.sdk.webEventsAppSourceIdPost(interaction).catch((err) => this._handleApiError(err))
     }
 
     _handleApiError(err) {
@@ -387,14 +455,15 @@ export class DataCloudApi {
             logger.warn(
                 '[DataCloudApi] 400 Bad Request: Check your Data Cloud configuration (appSourceId, tenantId) and event payload.',
                 {
-                    url: err?.response?.url,
-                    status: err?.response?.status,
-                    statusText: err?.response?.statusText,
-                    data: err?.response?.data // if available
+                    namespace: 'use-datacloud._handleApiError',
+                    additionalProperties: {error: err?.response}
                 }
             )
         } else {
-            logger.error('[DataCloudApi] Error sending Data Cloud event', err)
+            logger.error('[DataCloudApi] Error sending Data Cloud event', {
+                namespace: 'use-datacloud._handleApiError',
+                additionalProperties: {error: err?.response}
+            })
         }
     }
 }
@@ -423,7 +492,7 @@ const useDataCloud = () => {
             customerId: effectiveDnt ? '__DNT__' : customer?.customerId,
             customerNo: effectiveDnt ? '__DNT__' : customer?.customerNo,
             guestId: effectiveDnt ? '__DNT__' : usid,
-            deviceId: effectiveDnt ? '__DNT__' : usid,
+            deviceId: effectiveDnt ? '__DNT__' : customer?.customerId || usid,
             sessionId: effectiveDnt ? '__DNT__' : sessionId,
             firstName: customer?.firstName,
             lastName: customer?.lastName,
@@ -438,6 +507,16 @@ const useDataCloud = () => {
 
     const {appSourceId, tenantId} = config
 
+    const dataCloud = useMemo(() => {
+        if (!appSourceId || !tenantId) return null
+        return new DataCloudApi({
+            siteId: site.id,
+            appSourceId,
+            tenantId,
+            dnt: effectiveDnt
+        })
+    }, [site, appSourceId, tenantId, effectiveDnt])
+
     // If Data Cloud config is missing, return no-op async functions for all event methods (SDK will not be initialized)
     if (!appSourceId || !tenantId) {
         const noop = async () => {}
@@ -449,17 +528,6 @@ const useDataCloud = () => {
             sendViewRecommendations: noop
         }
     }
-
-    const dataCloud = useMemo(
-        () =>
-            new DataCloudApi({
-                siteId: site.id,
-                appSourceId: appSourceId,
-                tenantId: tenantId,
-                dnt: effectiveDnt
-            }),
-        [site]
-    )
 
     return {
         async sendViewPage(...args) {
