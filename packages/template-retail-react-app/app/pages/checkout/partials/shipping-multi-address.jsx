@@ -49,7 +49,7 @@ MultiShippingItemAttributes.propTypes = {
     includeQuantity: PropTypes.bool
 }
 
-const MultiShipping = ({
+const ShippingMultiAddress = ({
     basket,
     onSubmit,
     submitButtonLabel,
@@ -510,7 +510,7 @@ const MultiShipping = ({
     )
 }
 
-MultiShipping.propTypes = {
+ShippingMultiAddress.propTypes = {
     basket: PropTypes.object.isRequired,
     onSubmit: PropTypes.func.isRequired,
     submitButtonLabel: PropTypes.object.isRequired,
@@ -518,4 +518,4 @@ MultiShipping.propTypes = {
     noItemsInBasketMessage: PropTypes.object.isRequired
 }
 
-export default MultiShipping
+export default ShippingMultiAddress

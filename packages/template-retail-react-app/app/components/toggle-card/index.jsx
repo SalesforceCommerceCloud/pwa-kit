@@ -31,7 +31,7 @@ export const ToggleCard = ({
     disableEdit,
     onEdit,
     editLabel,
-    enableEditAction = false,
+    enableEditAction,
     isLoading,
     children,
     ...props

@@ -92,7 +92,7 @@ jest.mock(
 // Mock the multi-shipping component
 jest.mock('@salesforce/retail-react-app/app/pages/checkout/partials/shipping-multi-address', () => {
     // eslint-disable-next-line react/prop-types
-    function MockMultiShipping({onSubmit}) {
+    function MockShippingMultiAddress({onSubmit}) {
         const mockAddresses = [
             {
                 addressId: 'addr-1',
@@ -115,7 +115,7 @@ jest.mock('@salesforce/retail-react-app/app/pages/checkout/partials/shipping-mul
             </div>
         )
     }
-    return MockMultiShipping
+    return MockShippingMultiAddress
 })
 
 const mockCustomer = {

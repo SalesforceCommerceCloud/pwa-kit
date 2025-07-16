@@ -7,7 +7,7 @@
 import React from 'react'
 import {render, screen, fireEvent} from '@testing-library/react'
 import {IntlProvider} from 'react-intl'
-import MultiShipping from '@salesforce/retail-react-app/app/pages/checkout/partials/shipping-multi-address'
+import ShippingMultiAddress from '@salesforce/retail-react-app/app/pages/checkout/partials/shipping-multi-address'
 import {useProducts} from '@salesforce/commerce-sdk-react'
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
@@ -17,7 +17,7 @@ jest.mock('@salesforce/commerce-sdk-react', () => ({
     useProducts: jest.fn()
 }))
 
-// Mock the hooks that MultiShipping component uses
+// Mock the hooks that ShippingMultiAddress component uses
 jest.mock('@salesforce/retail-react-app/app/hooks/use-current-customer', () => ({
     useCurrentCustomer: jest.fn()
 }))
@@ -169,7 +169,7 @@ const renderWithIntl = (component) => {
     return render(<IntlProvider locale="en">{component}</IntlProvider>)
 }
 
-describe('MultiShipping', () => {
+describe('ShippingMultiAddress', () => {
     beforeEach(() => {
         useProducts.mockReturnValue({
             data: mockProducts
@@ -188,13 +188,13 @@ describe('MultiShipping', () => {
 
     it('should render empty state when no items in basket', () => {
         const emptyBasket = {...mockBasket, productItems: []}
-        renderWithIntl(<MultiShipping {...defaultProps} basket={emptyBasket} />)
+        renderWithIntl(<ShippingMultiAddress {...defaultProps} basket={emptyBasket} />)
 
         expect(screen.getByText('No items in basket.')).toBeInTheDocument()
     })
 
     it('should render product items with correct information', () => {
-        renderWithIntl(<MultiShipping {...defaultProps} />)
+        renderWithIntl(<ShippingMultiAddress {...defaultProps} />)
 
         expect(screen.getByText('Test Product 1')).toBeInTheDocument()
         expect(screen.getByText('Test Product 2')).toBeInTheDocument()
@@ -203,14 +203,14 @@ describe('MultiShipping', () => {
     })
 
     it('should render delivery address sections for each product', () => {
-        renderWithIntl(<MultiShipping {...defaultProps} />)
+        renderWithIntl(<ShippingMultiAddress {...defaultProps} />)
 
         const deliveryAddressLabels = screen.getAllByText('Delivery Address')
         expect(deliveryAddressLabels).toHaveLength(2)
     })
 
     it('should render product images', () => {
-        renderWithIntl(<MultiShipping {...defaultProps} />)
+        renderWithIntl(<ShippingMultiAddress {...defaultProps} />)
 
         const images = screen.getAllByAltText('Test Product 1')
         expect(images).toHaveLength(1)
@@ -218,7 +218,7 @@ describe('MultiShipping', () => {
     })
 
     it('should render variation attributes', () => {
-        renderWithIntl(<MultiShipping {...defaultProps} />)
+        renderWithIntl(<ShippingMultiAddress {...defaultProps} />)
 
         expect(screen.getByText('Color: Red')).toBeInTheDocument()
         expect(screen.getByText('Size: Medium')).toBeInTheDocument()
@@ -227,28 +227,28 @@ describe('MultiShipping', () => {
     })
 
     it('should render product prices', () => {
-        renderWithIntl(<MultiShipping {...defaultProps} />)
+        renderWithIntl(<ShippingMultiAddress {...defaultProps} />)
 
         expect(screen.getByText('$29.99')).toBeInTheDocument()
         expect(screen.getByText('$19.99')).toBeInTheDocument()
     })
 
     it('should render continue button', () => {
-        renderWithIntl(<MultiShipping {...defaultProps} />)
+        renderWithIntl(<ShippingMultiAddress {...defaultProps} />)
 
         expect(screen.getByText('Continue')).toBeInTheDocument()
     })
 
     it('should call onSubmit when continue button is clicked', () => {
         const mockOnSubmit = jest.fn()
-        renderWithIntl(<MultiShipping {...defaultProps} onSubmit={mockOnSubmit} />)
+        renderWithIntl(<ShippingMultiAddress {...defaultProps} onSubmit={mockOnSubmit} />)
 
         fireEvent.click(screen.getByText('Continue'))
         expect(mockOnSubmit).toHaveBeenCalledTimes(1)
     })
 
     it('should render address dropdowns', () => {
-        renderWithIntl(<MultiShipping {...defaultProps} />)
+        renderWithIntl(<ShippingMultiAddress {...defaultProps} />)
 
         // The dropdowns should be present but collapsed initially
         const dropdowns = screen.getAllByRole('button', {hidden: true})
@@ -260,7 +260,7 @@ describe('MultiShipping', () => {
             data: null
         })
 
-        renderWithIntl(<MultiShipping {...defaultProps} />)
+        renderWithIntl(<ShippingMultiAddress {...defaultProps} />)
 
         // Should still render the products even without detailed product data
         expect(screen.getByText('Test Product 1')).toBeInTheDocument()
@@ -276,7 +276,7 @@ describe('MultiShipping', () => {
             }
         }
 
-        renderWithIntl(<MultiShipping {...customProps} />)
+        renderWithIntl(<ShippingMultiAddress {...customProps} />)
 
         expect(screen.getByText('Proceed to Shipping')).toBeInTheDocument()
     })
@@ -290,7 +290,7 @@ describe('MultiShipping', () => {
             }
         }
 
-        renderWithIntl(<MultiShipping {...customProps} />)
+        renderWithIntl(<ShippingMultiAddress {...customProps} />)
 
         // Find and click the dropdown trigger (it's a div, not a button)
         const dropdownTriggers = screen.getAllByText((content, element) => {
@@ -309,14 +309,14 @@ describe('MultiShipping', () => {
 
     describe('Accessibility', () => {
         it('should have proper alt text for images', () => {
-            renderWithIntl(<MultiShipping {...defaultProps} />)
+            renderWithIntl(<ShippingMultiAddress {...defaultProps} />)
 
             const images = screen.getAllByAltText(/Test Product/)
             expect(images).toHaveLength(2)
         })
 
         it('should have proper button roles', () => {
-            renderWithIntl(<MultiShipping {...defaultProps} />)
+            renderWithIntl(<ShippingMultiAddress {...defaultProps} />)
 
             const continueButton = screen.getByText('Continue')
             expect(continueButton).toBeInTheDocument()
@@ -325,7 +325,7 @@ describe('MultiShipping', () => {
 
     describe('Responsive Design', () => {
         it('should apply responsive CSS classes', () => {
-            renderWithIntl(<MultiShipping {...defaultProps} />)
+            renderWithIntl(<ShippingMultiAddress {...defaultProps} />)
 
             // Check that the component has the expected CSS classes for responsive design
             const multiShippingCards = document.querySelectorAll('.multi-shipping-card')

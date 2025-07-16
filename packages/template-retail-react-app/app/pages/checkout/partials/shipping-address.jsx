@@ -21,7 +21,7 @@ import {
 } from '@salesforce/commerce-sdk-react'
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
-import MultiShipping from '@salesforce/retail-react-app/app/pages/checkout/partials/shipping-multi-address'
+import ShippingMultiAddress from '@salesforce/retail-react-app/app/pages/checkout/partials/shipping-multi-address'
 import {MULTISHIP_IS_ENABLED} from '@salesforce/retail-react-app/app/constants'
 
 const submitButtonMessage = defineMessage({
@@ -178,7 +178,7 @@ export default function ShippingAddress() {
                     <style>{`
                         .multi-shipping-card .chakra-stack > .chakra-flex { display: none !important; }
                     `}</style>
-                    <MultiShipping
+                    <ShippingMultiAddress
                         basket={basket}
                         onSubmit={submitAndContinue}
                         submitButtonLabel={submitButtonMessage}
