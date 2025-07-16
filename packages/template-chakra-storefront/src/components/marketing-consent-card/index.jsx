@@ -23,7 +23,7 @@ const Skeleton = forwardRef(({children, ...rest}, ref) => {
 
 Skeleton.displayName = 'Skeleton'
 
-export const MarketingConsentCard = () => {
+const MarketingConsentCard = () => {
     const headingRef = useRef(null)
     return (
         <ToggleCard
@@ -40,3 +40,5 @@ export const MarketingConsentCard = () => {
         />
     )
 }
+
+export default MarketingConsentCard
