@@ -10,9 +10,8 @@ import {keepPreviousData} from '@tanstack/react-query'
 import {useCategory, useProductSearch} from '@salesforce/commerce-sdk-react'
 
 // Hooks
-import {usePageUrls, useSortUrls, useSearchParams} from '../../../hooks'
+import {useSearchParams} from '../../../hooks'
 import useEinstein from '../../../hooks/use-einstein'
-import useNavigation from '../../../hooks/use-navigation'
 
 // Others
 import {HTTPNotFound, HTTPError} from '@salesforce/pwa-kit-react-sdk/ssr/universal/errors'
@@ -22,11 +21,10 @@ import {HTTPNotFound, HTTPError} from '@salesforce/pwa-kit-react-sdk/ssr/univers
 const REFINEMENT_DISALLOW_LIST = ['c_isNew']
 
 export const useProductListData = () => {
-    const navigate = useNavigation()
     const params = useParams()
     const location = useLocation()
     const einstein = useEinstein()
-    const [searchParams, {stringify: stringifySearchParams}] = useSearchParams()
+    const [searchParams] = useSearchParams()
 
     const [filtersLoading, setFiltersLoading] = useState(false)
 
@@ -38,7 +36,6 @@ export const useProductListData = () => {
         searchParams._refine.push(`cgid=${params.categoryId}`)
     }
 
-    // _refine is an invalid param for useProductSearch, we don't want to pass it to API call
     const {_refine, ...restOfParams} = searchParams
 
     const {
@@ -103,66 +100,7 @@ export const useProductListData = () => {
         setFiltersLoading(isRefetching)
     }, [isRefetching])
 
-    const basePath = `${location.pathname}${location.search}`
     const showNoResults = !isLoading && productSearchResult && !productSearchResult?.hits
-    const {total, sortingOptions} = productSearchResult || {}
-
-    const pageUrls = usePageUrls({total})
-    const sortUrls = useSortUrls({options: sortingOptions})
-
-    const toggleFilter = (value, attributeId, selected, allowMultiple = true) => {
-        const searchParamsCopy = {...searchParams}
-
-        delete searchParamsCopy.offset
-
-        if (!allowMultiple) {
-            const previousValue = searchParamsCopy.refine[attributeId]
-            delete searchParamsCopy.refine[attributeId]
-
-            // Note the loose comparison, for "string != number" checks.
-            if (!selected && value.value != previousValue) {
-                searchParamsCopy.refine[attributeId] = value.value
-            }
-        } else {
-            let attributeValue = searchParamsCopy.refine[attributeId] || []
-
-            if (typeof attributeValue === 'string') {
-                attributeValue = attributeValue.split('|')
-            } else if (typeof attributeValue === 'number') {
-                attributeValue = [attributeValue]
-            }
-
-            if (!selected) {
-                attributeValue.push(value.value)
-            } else {
-                attributeValue = attributeValue?.filter((v) => v != value.value)
-            }
-
-            searchParamsCopy.refine[attributeId] = attributeValue
-
-            if (searchParamsCopy.refine[attributeId].length === 0) {
-                delete searchParamsCopy.refine[attributeId]
-            }
-        }
-
-        if (isSearch) {
-            navigate(`/search?${stringifySearchParams(searchParamsCopy)}`)
-        } else {
-            navigate(`/category/${params.categoryId}?${stringifySearchParams(searchParamsCopy)}`)
-        }
-    }
-
-    const resetFilters = () => {
-        const newSearchParams = {
-            ...searchParams,
-            refine: []
-        }
-        const newPath = isSearch
-            ? `/search?${stringifySearchParams(newSearchParams)}`
-            : `/category/${params.categoryId}?${stringifySearchParams(newSearchParams)}`
-
-        navigate(newPath)
-    }
 
     const handleProductClick = (product) => {
         if (searchQuery) {
@@ -173,7 +111,6 @@ export const useProductListData = () => {
     }
 
     return {
-        basePath,
         category,
         filtersLoading,
         handleProductClick,
@@ -181,13 +118,8 @@ export const useProductListData = () => {
         isLoading,
         isRefetching,
         isSearch,
-        pageUrls,
         productSearchResult,
-        resetFilters,
         searchQuery,
-        searchParams,
-        showNoResults,
-        sortUrls,
-        toggleFilter
+        showNoResults
     }
 }
