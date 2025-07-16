@@ -750,7 +750,8 @@ describe('usePickupShipment', () => {
                 body: {
                     shippingMethod: {
                         id: 'standard-shipping'
-                    }
+                    },
+                    c_fromStoreId: null 
                 }
             })
         })
@@ -931,7 +932,8 @@ describe('usePickupShipment', () => {
                 body: {
                     shippingMethod: {
                         id: null
-                    }
+                    },
+                    c_fromStoreId: null 
                 }
             })
         })

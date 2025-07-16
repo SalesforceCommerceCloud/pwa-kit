@@ -83,7 +83,8 @@ jest.mock('@salesforce/retail-react-app/app/constants', () => {
     const originalModule = jest.requireActual('@salesforce/retail-react-app/app/constants')
     return {
         ...originalModule,
-        DEFAULT_DNT_STATE: false
+        DEFAULT_DNT_STATE: false,
+        MULTISHIP_IS_ENABLED: false
     }
 })
 

@@ -173,7 +173,11 @@ export const useMultiship = (basket) => {
      */
     const findOrCreatePickupShipment = async (storeInfo) => {
         if (!storeInfo?.id) {
-            throw new Error('Store information is required for pickup shipment')
+            throw new Error('No store selected for pickup')
+        }
+
+        if (!storeInfo.inventoryId) {
+            throw new Error('Selected store does not have an inventory ID')
         }
 
         // Check if there's an existing pickup shipment for this store

@@ -36,6 +36,7 @@ describe('useMultiship', () => {
     const mockIsCurrentShippingMethodPickup = jest.fn()
     const mockGetDefaultShippingMethodId = jest.fn()
     const mockGetPickupShippingMethodId = jest.fn()
+    const mockConfigureDefaultShipmentIfNeeded = jest.fn()
 
     // Mock basket data
     const mockBasket = {
@@ -110,7 +111,8 @@ describe('useMultiship', () => {
         usePickupShipment.mockReturnValue({
             isCurrentShippingMethodPickup: mockIsCurrentShippingMethodPickup,
             getDefaultShippingMethodId: mockGetDefaultShippingMethodId,
-            getPickupShippingMethodId: mockGetPickupShippingMethodId
+            getPickupShippingMethodId: mockGetPickupShippingMethodId,
+            configureDefaultShipmentIfNeeded: mockConfigureDefaultShipmentIfNeeded
         })
 
         // Default mock return values
@@ -118,6 +120,7 @@ describe('useMultiship', () => {
         mockGetDefaultShippingMethodId.mockReturnValue('default-shipping-method')
         mockGetPickupShippingMethodId.mockReturnValue('pickup-shipping-method')
         mockIsCurrentShippingMethodPickup.mockReturnValue(false)
+        mockConfigureDefaultShipmentIfNeeded.mockResolvedValue()
     })
 
     describe('initialization', () => {
