@@ -84,7 +84,7 @@ jest.mock('@salesforce/retail-react-app/app/hooks/use-current-customer', () => (
 jest.mock('js-cookie', () => ({
     get: jest.fn(() => 'mockCookieValue')
 }))
-const mockWebEventsAppSourceIdPost = jest.fn()
+const mockWebEventsAppSourceIdPost = jest.fn(() => Promise.resolve())
 jest.mock('@salesforce/cc-datacloud-typescript', () => {
     return {
         initDataCloudSdk: () => {
