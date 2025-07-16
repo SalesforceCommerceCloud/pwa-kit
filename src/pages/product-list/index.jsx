@@ -24,6 +24,7 @@ import PageAnalytics from './page-analytics'
 import {useExtensionConfig} from '../../hooks'
 import {useProductListWishlist} from './hooks/use-product-list-wishlist'
 import {useProductListData} from './hooks/use-product-list-data'
+import {useProductListControls} from './hooks/use-product-list-controls'
 
 /*
  * This is a simple product listing page. It displays a paginated list
@@ -37,7 +38,6 @@ const ProductList = () => {
     const {toggleItem, isItemInWishlist} = useProductListWishlist()
 
     const {
-        basePath,
         category,
         filtersLoading,
         handleProductClick,
@@ -45,15 +45,13 @@ const ProductList = () => {
         isLoading,
         isRefetching,
         isSearch,
-        pageUrls,
         productSearchResult,
-        resetFilters,
         searchQuery,
-        searchParams,
-        showNoResults,
-        sortUrls,
-        toggleFilter
+        showNoResults
     } = useProductListData()
+
+    const {basePath, pageUrls, sortUrls, toggleFilter, resetFilters, searchParams} =
+        useProductListControls({productSearchResult, isSearch})
 
     return (
         <>
