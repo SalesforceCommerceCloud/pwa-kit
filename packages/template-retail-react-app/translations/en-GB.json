@@ -1427,6 +1427,9 @@
   "shipping_address.link.ship_items_to_one_address": {
     "defaultMessage": "Ship Items to One Address"
   },
+  "shipping_address.message.no_items_in_basket": {
+    "defaultMessage": "No items in basket."
+  },
   "shipping_address.title.shipping_address": {
     "defaultMessage": "Shipping Address"
   },

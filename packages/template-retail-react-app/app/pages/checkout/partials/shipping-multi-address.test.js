@@ -158,6 +158,10 @@ const defaultProps = {
     addNewAddressLabel: {
         defaultMessage: 'Add New Address',
         id: 'checkout.button.add_new_address'
+    },
+    noItemsInBasketMessage: {
+        defaultMessage: 'No items in basket.',
+        id: 'shipping_address.message.no_items_in_basket'
     }
 }
 

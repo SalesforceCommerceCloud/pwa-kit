@@ -49,7 +49,13 @@ MultiShippingItemAttributes.propTypes = {
     includeQuantity: PropTypes.bool
 }
 
-const MultiShipping = ({basket, onSubmit, submitButtonLabel, addNewAddressLabel}) => {
+const MultiShipping = ({
+    basket,
+    onSubmit,
+    submitButtonLabel,
+    addNewAddressLabel,
+    noItemsInBasketMessage
+}) => {
     const {formatMessage} = useIntl()
     // Move all hooks to the top
     const productIds = basket?.productItems?.map((item) => item.productId).join(',')
@@ -82,7 +88,9 @@ const MultiShipping = ({basket, onSubmit, submitButtonLabel, addNewAddressLabel}
     // Early return after hooks
     if (!basket?.productItems?.length) {
         return (
-            <div style={{padding: 32, textAlign: 'center', color: '#888'}}>No items in basket.</div>
+            <div style={{padding: 32, textAlign: 'center', color: '#888'}}>
+                {formatMessage(noItemsInBasketMessage)}
+            </div>
         )
     }
     // Handler for Add New Address (placeholder)
@@ -506,7 +514,8 @@ MultiShipping.propTypes = {
     basket: PropTypes.object.isRequired,
     onSubmit: PropTypes.func.isRequired,
     submitButtonLabel: PropTypes.object.isRequired,
-    addNewAddressLabel: PropTypes.object.isRequired
+    addNewAddressLabel: PropTypes.object.isRequired,
+    noItemsInBasketMessage: PropTypes.object.isRequired
 }
 
 export default MultiShipping

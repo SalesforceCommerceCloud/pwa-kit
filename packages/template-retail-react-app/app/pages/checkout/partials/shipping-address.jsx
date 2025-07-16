@@ -36,6 +36,10 @@ const addNewAddressLabel = defineMessage({
     defaultMessage: 'Add New Address',
     id: 'shipping_address.button.add_new_address'
 })
+const noItemsInBasketMessage = defineMessage({
+    defaultMessage: 'No items in basket.',
+    id: 'shipping_address.message.no_items_in_basket'
+})
 
 export default function ShippingAddress() {
     const {formatMessage} = useIntl()
@@ -179,6 +183,7 @@ export default function ShippingAddress() {
                         onSubmit={submitAndContinue}
                         submitButtonLabel={submitButtonMessage}
                         addNewAddressLabel={addNewAddressLabel}
+                        noItemsInBasketMessage={noItemsInBasketMessage}
                     />
                 </>
             ) : (

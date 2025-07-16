@@ -1043,7 +1043,7 @@ describe('getUpdateBundleChildArray', () => {
         expect(result).toEqual([
             {
                 itemId: 'variant-item-1',
-                productId: 'variant-2-id', // Updated to variant product ID
+                productId: 'variant-2-id',
                 quantity: 2
             }
         ])

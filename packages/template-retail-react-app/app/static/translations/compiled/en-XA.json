@@ -7147,6 +7147,20 @@
       "value": "]"
     }
   ],
+  "shipping_address.message.no_items_in_basket": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ƞǿǿ īŧḗḗḿş īƞ ƀȧȧşķḗḗŧ."
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
   "shipping_address.title.shipping_address": [
     {
       "type": 0,
