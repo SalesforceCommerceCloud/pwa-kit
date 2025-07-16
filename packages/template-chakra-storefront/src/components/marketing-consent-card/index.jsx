@@ -27,7 +27,7 @@ export const MarketingConsentCard = () => {
     const headingRef = useRef(null)
     return (
         <ToggleCard
-            id="password"
+            id="marketing-consent"
             title={
                 <Skeleton ref={headingRef}>
                     <FormattedMessage
