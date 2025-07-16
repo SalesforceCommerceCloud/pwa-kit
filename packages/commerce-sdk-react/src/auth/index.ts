@@ -509,17 +509,6 @@ class Auth {
             this.set('access_token', sfraAuthToken)
             this.set('customer_id', customerId)
             this.set('customer_type', isGuest ? 'guest' : 'registered')
-            
-            // Set usid cookie with refresh token expiry to prevent refresh token failures
-            const refreshTokenExpiresIn = this.get('refresh_token_expires_in')
-            if (refreshTokenExpiresIn) {
-                const expiresDate = this.convertSecondsToDate(Number(refreshTokenExpiresIn))
-                this.set('usid', usid, {
-                    expires: expiresDate
-                })
-            } else {
-                this.set('usid', usid)
-            }
 
             accessToken = sfraAuthToken
             // SFRA -> PWA access token cookie handoff is successful so we clear the SFRA made cookies.
@@ -631,7 +620,7 @@ class Auth {
         }
         const expiresDate = this.convertSecondsToDate(refreshTokenTTLValue)
         this.set('refresh_token_expires_in', refreshTokenTTLValue.toString())
-        
+
         // Set usid cookie with the same expiry as refresh token to prevent refresh token failures
         this.set('usid', res.usid, {
             expires: expiresDate
@@ -786,18 +775,6 @@ class Auth {
             this.set('access_token', this.fetchedToken)
             this.set('customer_id', customerId)
             this.set('customer_type', isGuest ? 'guest' : 'registered')
-            
-            // Set usid cookie with refresh token expiry to prevent refresh token failures
-            const refreshTokenExpiresIn = this.get('refresh_token_expires_in')
-            if (refreshTokenExpiresIn) {
-                const expiresDate = this.convertSecondsToDate(Number(refreshTokenExpiresIn))
-                this.set('usid', usid, {
-                    expires: expiresDate
-                })
-            } else {
-                this.set('usid', usid)
-            }
-            
             return this.data
         }
         if (this.pendingToken) {

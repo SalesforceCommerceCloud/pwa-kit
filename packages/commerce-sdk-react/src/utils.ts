@@ -58,7 +58,7 @@ export const getCookieSameSiteAttribute = () => {
     if (!onClient()) return
     const isLocalHost = window.location.hostname === 'localhost'
     const parentOrigin = getParentOrigin()
-    return !isLocalHost && isOriginTrusted(parentOrigin) ? 'none' : 'Lax'
+    return !isLocalHost && isOriginTrusted(parentOrigin) ? 'None' : 'Lax'
 }
 
 /**
@@ -69,7 +69,7 @@ export const getExternalApiCookieSameSiteAttribute = () => {
     if (!onClient()) return
     // For cookies that need to work with external APIs (like SFCC payments), 
     // we need SameSite=None to allow cross-site requests
-    return 'none'
+    return 'None'
 }
 
 /**
