@@ -61,14 +61,16 @@ const trimExtensions = require('./trim-extensions')
 
 describe('trim-extensions', () => {
     beforeEach(() => {
+        jest.resetAllMocks()
         fs.readdirSync.mockReturnValue([
             '/src/components/featureComponent.jsx',
             '/src/components/featureAComponent/index.jsx',
-            '/src/components/featureBComponent/index.jsx'
+            '/src/components/featureBComponent/index.jsx',
+            '/src/pages/featureBPage/index.jsx',
         ])
         fs.statSync.mockReturnValue({isDirectory: () => false})
         fs.existsSync.mockImplementation((filePath) => {
-            if (filePath.includes('featureAComponent') || filePath.includes('featureBComponent')) {
+            if (filePath.includes('featureAComponent') || filePath.includes('featureBComponent') || filePath.includes('featureBPage')) {
                 if (
                     filePath.endsWith('.jsx') ||
                     filePath.endsWith('.tsx') ||
@@ -85,6 +87,32 @@ describe('trim-extensions', () => {
         })
         fs.unlinkSync.mockReturnValue(true)
         execSync.mockReturnValue(true)
+    })
+
+    it('leaves code untouched if no plugins are referenced', () => {
+        const code = `
+        const test = () => {
+            const featureA = SFDC_EXT_featureA && 'Feature A';
+            const categories = flatten(categoriesTree || {}, 'categories');
+            const currency = locale.preferredCurrency || l10n.defaultCurrency;
+            return [locale?.id || appConfig.defaultAppLocale];
+        };
+        `
+
+        const expected = `
+        const test = () => {
+            const categories = flatten(categoriesTree || {}, 'categories');
+            const currency = locale.preferredCurrency || l10n.defaultCurrency;
+            return [locale?.id || appConfig.defaultAppLocale];
+        };
+        `
+        fs.readFileSync.mockReturnValue(code)
+
+        trimExtensions('/mock/dir', {SFDC_EXT_featureA: false})
+        expect(fs.writeFileSync).toHaveBeenCalledWith(
+            expect.any(String),
+            expect.toEqualTrimmedLines(expected)
+        )
     })
 
     it('handles OR operator correctly', () => {
@@ -307,6 +335,9 @@ describe('trim-extensions', () => {
         const featureBComponentCode = `
             export const FeatureB = 'FeatureB'
         `
+        const featureBPageCode = `
+            export const FeatureBPage = 'FeatureBPage'
+        `
         fs.readFileSync.mockImplementation((filePath) => {
             if (filePath.includes('featureComponent.jsx')) {
                 return code
@@ -314,6 +345,8 @@ describe('trim-extensions', () => {
                 return featureAComponentCode
             } else if (filePath.includes('featureBComponent')) {
                 return featureBComponentCode
+            } else if (filePath.includes('featureBPage')) {
+                return featureBPageCode
             } else {
                 console.error('Unhandled file', filePath)
             }
@@ -343,7 +376,9 @@ describe('trim-extensions', () => {
         const componentBCode = `
             export default ComponentB
         `
-
+        const featureBPageCode = `
+            export const FeatureAPage = 'FeatureAPage'
+        `
         let trimExtensionsCalled = false
         fs.readFileSync.mockImplementation((filePath) => {
             if (filePath.includes('featureComponent.jsx')) {
@@ -357,6 +392,8 @@ describe('trim-extensions', () => {
                 return componentACode
             } else if (filePath.includes('featureBComponent')) {
                 return componentBCode
+            } else if (filePath.includes('featureBPage')) {
+                return featureBPageCode
             } else {
                 console.error('Unhandled file', filePath)
             }
@@ -376,7 +413,7 @@ describe('trim-extensions', () => {
                 throw error
             }
         })
-        console.log = jest.fn()
+        jest.spyOn(console, 'log').mockImplementation(() => jest.fn())
 
         const code = `
             import loadable from '@loadable/component'
@@ -394,7 +431,9 @@ describe('trim-extensions', () => {
         const componentBCode = `
             export default ComponentB
         `
-
+        const featureBPageCode = `
+            export const FeatureBPage = 'FeatureBPage'
+        `
         let trimExtensionsCalled = false
         fs.readFileSync.mockImplementation((filePath) => {
             if (filePath.includes('featureComponent.jsx')) {
@@ -408,6 +447,8 @@ describe('trim-extensions', () => {
                 return componentACode
             } else if (filePath.includes('featureBComponent')) {
                 return componentBCode
+            } else if (filePath.includes('featureBPage')) {
+                return featureBPageCode
             } else {
                 console.error('Unhandled file', filePath)
             }
@@ -422,5 +463,77 @@ describe('trim-extensions', () => {
                 '✗ Permission denied - cannot delete. You may need to run with sudo or check permissions.'
             )
         )
+        console.log.mockRestore()
+    })
+
+    /**
+     * This test mimicks the scenario where two unused components are referencing each other from different directories.
+     * The test ensures that the unused directories are removed when no "outside" references exist
+     */
+    it('removes separate unused directories when the only references are from each other', () => {
+        const code = `
+            import loadable from '@loadable/component'
+            const ComponentA = SFDC_EXT_featureA && loadable(() => import('./featureAComponent'))
+            const ComponentB = SFDC_EXT_featureB && loadable(() => import('./featureBComponent'))
+        `
+
+        const trimmedCode = `
+            import loadable from '@loadable/component'
+            const ComponentA = loadable(() => import('./featureAComponent'))
+        `
+        const componentACode = `
+            export default ComponentA
+        `
+        const componentBCode = `
+            const pageB = SFDC_EXT_featureB && loadable(() => import('../../pages/featureBPage'))
+            export default ComponentB
+        `
+        const trimmedComponentBCode = `
+            export default ComponentB
+        `
+        const featureBPageCode = `
+            const ComponentB = SFDC_EXT_featureB && loadable(() => import('../../components/featureBComponent'))
+            export const FeatureBPage = 'FeatureBPage'
+        `
+        const trimmedFeatureBPageCode = `
+            export const FeatureBPage = 'FeatureBPage'
+        `
+        let componentTrimmed = false
+        let componentBTrimmed = false
+        let pageBTrimmed = false
+        fs.readFileSync.mockImplementation((filePath) => {
+            if (filePath.includes('featureComponent.jsx')) {
+                if (!componentTrimmed) {
+                    componentTrimmed = true
+                    return code
+                } else {
+                    return trimmedCode
+                }
+            } else if (filePath.includes('featureAComponent')) {
+                return componentACode
+            } else if (filePath.includes('featureBComponent')) {
+                if (!componentBTrimmed) {
+                    componentBTrimmed = true
+                    return componentBCode
+                } else {
+                    return trimmedComponentBCode
+                }
+            } else if (filePath.includes('featureBPage')) {
+                if (!pageBTrimmed) {
+                    pageBTrimmed = true
+                    return featureBPageCode
+                } else {
+                    return trimmedFeatureBPageCode
+                }
+            } else {
+                console.error('Unhandled file', filePath)
+            }
+        })
+
+        trimExtensions('/mock/dir', {SFDC_EXT_featureA: true, SFDC_EXT_featureB: false})
+
+        expect(fs.unlinkSync).not.toHaveBeenCalledWith(expect.stringContaining('featureAComponent'))
+        expect(fs.unlinkSync).toHaveBeenCalledWith(expect.stringContaining('featureBComponent'))
+        expect(fs.unlinkSync).toHaveBeenCalledWith(expect.stringContaining('featureBPage'))
     })
 })

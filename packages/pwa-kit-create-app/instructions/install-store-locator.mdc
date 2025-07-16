@@ -1,0 +1,42 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+These are the steps to upgrade an existing store front application (currently opened project) with the "Store Locator" extension by installing the necessary code to the destination application.
+  
+  # Prerequisites: First make sure the current project has all the necessary files:
+  <Prerequisites>
+  - The file `src/components/_app/index.jsx` exists
+  - The file `src/components/header/index.jsx` exists
+  - The file `src/routes.tsx` exists
+  </Prerequisites>
+  
+  # Preparations: Clone the pwa-kit repo for the specific branch into the tmp folder
+  <Preparations>
+  - Run `mkdir pwa-kit-tmp` from temp folder
+  - Run `git clone -b feature/next https://github.com/SalesforceCommerceCloud/pwa-kit /tmp/pwa-kit-tmp`
+  </Preparations>
+  
+  # Copy: 
+  <Copy>
+  - From the cloned pwa-kit folder, copy `packages/template-chakra-storefront/components/store-locator` folder into the current directory's `src/components` folder.
+  - From the cloned pwa-kit folder, copy `packages/template-chakra-storefront/pages/store-locator` folder into the current directory's `src/pages` folder.
+  </Copy>
+  
+  # Merge. Apply the following code changes to pages/home/index.jsx. Skip a step if the code change has already been applied.
+  <Merge>
+  - Insert the following line at the end of the import block:
+  `import loadable from '@loadable/component'`
+  
+  - Insert the following lines at the end of the const declaration block:
+  `const StoreLocator = loadable(() => import('../components/store-locator'))`
+  
+  - Insert the following line in the JSX element return statement, beween the <Seo> and the <Hero> components.
+  `<StoreLocator />`
+  </Merge>
+  
+  # Cleanup: Delete the `pwa-kit-tmp` folder and its contents.
+  <Cleanup>
+  # Step 5. From under the temp folder, delete the `pwa-kit-tmp` folder and its contents.
+  </Cleanup>

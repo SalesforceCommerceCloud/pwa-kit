@@ -97,13 +97,15 @@ const SearchBar = (props) => {
  * @param   {func} props.onMyCartClick click event handler for my cart button
  * @return  {React.ReactElement} - Header component
  */
+
 const Header = ({
     children,
-    onMenuClick = noop,
-    onMyAccountClick = noop,
-    onLogoClick = noop,
-    onMyCartClick = noop,
-    onWishlistClick = noop,
+    onMenuClick,
+    onMyAccountClick,
+    onLogoClick,
+    onMyCartClick,
+    onWishlistClick,
+    onStoreLocatorClick,
     ...props
 }) => {
     const intl = useIntl()
@@ -123,15 +125,6 @@ const Header = ({
         onOpen: onAccountMenuOpen
     } = useDisclosure()
     const [isDesktop] = useMediaQuery('(min-width: 992px)')
-    // TODO: unwire this from upgradeability, it was calling `useApplicationExtension`
-    const storeLocatorExtension = {
-        isEnabled: false
-    }
-    const isStoreLocatorEnabled = !!storeLocatorExtension && storeLocatorExtension.isEnabled
-    const openModal = () => {
-        // TODO: unwire this from upgradeability zustand store slice
-        console.log('openModal')
-    }
 
     const [showLoading, setShowLoading] = useState(false)
     // tracking if users enter the popover Content,
@@ -317,7 +310,7 @@ const Header = ({
                         {...styles.wishlistIcon}
                         onClick={onWishlistClick}
                     />
-                    {isStoreLocatorEnabled && (
+                    {SFDC_EXT_STORE_LOCATOR_ENABLED && (
                         <IconButton
                             aria-label={intl.formatMessage({
                                 defaultMessage: 'Store Locator',
@@ -326,9 +319,7 @@ const Header = ({
                             icon={<StoreIcon />}
                             {...styles.icons}
                             variant="unstyled"
-                            onClick={() => {
-                                openModal()
-                            }}
+                            onClick={onStoreLocatorClick}
                         />
                     )}
                     <IconButton

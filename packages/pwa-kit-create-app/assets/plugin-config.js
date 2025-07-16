@@ -17,5 +17,8 @@ module.exports = {
         // SFDC_EXT_HELLO_WORLD_ENABLED: {
         //     description: 'The Hello World Extension'
         // },
+        SFDC_EXT_STORE_LOCATOR_ENABLED: {
+            description: 'The Store Locator Extension'
+        }
     }
 }

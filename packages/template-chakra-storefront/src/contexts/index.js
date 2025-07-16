@@ -90,3 +90,8 @@ CurrencyProvider.propTypes = {
     children: PropTypes.node.isRequired,
     currency: PropTypes.string
 }
+
+export {
+    StoreLocatorContext,
+    StoreLocatorProvider
+} from './store-locator-provider'

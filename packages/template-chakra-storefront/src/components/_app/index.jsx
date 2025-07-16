@@ -7,6 +7,7 @@
 
 import React, {useState, useEffect, useMemo, createContext, useContext} from 'react'
 import PropTypes from 'prop-types'
+import loadable from '@loadable/component'
 import {useHistory, useLocation} from 'react-router-dom'
 import {StorefrontPreview} from '@salesforce/commerce-sdk-react/components'
 import {getAssetUrl} from '@salesforce/pwa-kit-react-sdk/ssr/universal/utils'
@@ -39,7 +40,7 @@ import CheckoutFooter from '../../../src/pages/checkout/partials/checkout-footer
 import {DrawerMenu} from '../../../src/components/drawer-menu'
 import {ListMenu, ListMenuContent} from '../../../src/components/list-menu'
 import {HideOnDesktop, HideOnMobile} from '../../../src/components/responsive'
-import StoreLocatorModal from '../../../src/components/store-locator-modal'
+const StoreLocatorModal = SFDC_EXT_STORE_LOCATOR_ENABLED && loadable(() => import('../../../src/components/store-locator'))
 // Hooks
 import {AuthModal, useAuthModal} from '../../../src/hooks/use-auth-modal'
 import {DntNotification, useDntNotification} from '../../../src/hooks/use-dnt-notification'
@@ -134,7 +135,7 @@ const App = (props) => {
         isOpen: isOpenStoreLocator,
         onOpen: onOpenStoreLocator,
         onClose: onCloseStoreLocator
-    } = useDisclosure()
+    } = SFDC_EXT_STORE_LOCATOR_ENABLED && useDisclosure() 
 
     const targetLocale = getTargetLocale({
         getUserPreferredLocales: () => {
@@ -270,6 +271,16 @@ const App = (props) => {
         trackPage()
     }, [location])
 
+    const headerProps = {
+        onMenuClick: onOpen,
+        onLogoClick: onLogoClick,
+        onMyCartClick: onCartClick,
+        onMyAccountClick: onAccountClick,
+        onWishlistClick: onWishlistClick,
+    }
+
+    SFDC_EXT_STORE_LOCATOR_ENABLED && (headerProps.onStoreLocatorClick = onOpenStoreLocator)
+
     return (
         <Box className="sf-app" {...styles.container}>
             <StorefrontPreview getToken={getTokenWhenReady}>
@@ -357,21 +368,16 @@ const App = (props) => {
 
                         <Box id="app" display="flex" flexDirection="column" flex={1}>
                             <SkipNavLink zIndex="skipLink">Skip to Content</SkipNavLink>
-                            <StoreLocatorModal
-                                isOpen={isOpenStoreLocator}
-                                onClose={onCloseStoreLocator}
-                            />
+                            {SFDC_EXT_STORE_LOCATOR_ENABLED && (
+                                <StoreLocatorModal
+                                    isOpen={isOpenStoreLocator}
+                                    onClose={onCloseStoreLocator}
+                                />
+                            )}
                             <Box {...styles.headerWrapper}>
                                 {!isCheckout ? (
                                     <>
-                                        <Header
-                                            onMenuClick={onOpen}
-                                            onLogoClick={onLogoClick}
-                                            onMyCartClick={onCartClick}
-                                            onMyAccountClick={onAccountClick}
-                                            onWishlistClick={onWishlistClick}
-                                            onStoreLocatorClick={onOpenStoreLocator}
-                                        >
+                                        <Header {...headerProps}>
                                             <HideOnDesktop>
                                                 <DrawerMenu
                                                     isOpen={isOpen}

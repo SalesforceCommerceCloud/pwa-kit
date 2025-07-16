@@ -46,7 +46,7 @@ const ProductDetail = loadable(() => import('../src/pages/product-detail'), {fal
 const ProductList = loadable(() => import('../src/pages/product-list'), {
     fallback
 })
-const StoreLocator = loadable(() => import('../src/pages/store-locator'), {
+const StoreLocator = SFDC_EXT_STORE_LOCATOR_ENABLED && loadable(() => import('../src/pages/store-locator'), {
     fallback
 })
 const Wishlist = loadable(() => import('../src/pages/account/wishlist'), {
@@ -54,7 +54,7 @@ const Wishlist = loadable(() => import('../src/pages/account/wishlist'), {
 })
 const PageNotFound = loadable(() => import('../src/pages/page-not-found'))
 
-export const routes = [
+const routes = [
     {
         path: '/',
         component: Home,
@@ -130,14 +130,17 @@ export const routes = [
         component: Wishlist
     },
     {
-        path: '/store-locator',
-        component: StoreLocator
-    },
-    {
         path: '*',
         component: PageNotFound
     }
 ]
+
+SFDC_EXT_STORE_LOCATOR_ENABLED && routes.push({
+    path: '/store-locator',
+    component: StoreLocator
+})
+
+export {routes}
 
 export default () => {
     const config = getConfig()
