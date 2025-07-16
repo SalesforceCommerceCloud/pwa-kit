@@ -19,8 +19,9 @@ import {
     Divider,
     Grid,
     SimpleGrid,
-    Skeleton
-} from '@salesforce/retail-react-app/app/components/shared/ui'
+    Skeleton,
+    useDisclosure
+} from '@chakra-ui/react'
 import {getCreditCardIcon} from '@salesforce/retail-react-app/app/utils/cc-utils'
 import {useOrder, useProducts} from '@salesforce/commerce-sdk-react'
 import Link from '@salesforce/retail-react-app/app/components/link'
@@ -31,6 +32,7 @@ import CartItemVariantImage from '@salesforce/retail-react-app/app/components/it
 import CartItemVariantName from '@salesforce/retail-react-app/app/components/item-variant/item-name'
 import CartItemVariantAttributes from '@salesforce/retail-react-app/app/components/item-variant/item-attributes'
 import CartItemVariantPrice from '@salesforce/retail-react-app/app/components/item-variant/item-price'
+import CancelOrderModal from '@salesforce/retail-react-app/app/components/cancel-order-modal'
 import PropTypes from 'prop-types'
 const onClient = typeof window !== 'undefined'
 
@@ -110,6 +112,12 @@ const AccountOrderDetail = () => {
     const history = useHistory()
     const {formatMessage, formatDate} = useIntl()
 
+    const {
+        isOpen: isCancelModalOpen,
+        onOpen: onCancelModalOpen,
+        onClose: onCancelModalClose
+    } = useDisclosure()
+
     const {data: order, isLoading: isOrderLoading} = useOrder(
         {
             parameters: {orderNo: params.orderNo}
@@ -156,12 +164,21 @@ const AccountOrderDetail = () => {
                 </Box>
 
                 <Stack spacing={[1, 2]}>
-                    <Heading as="h1" fontSize={['lg', '2xl']} tabIndex="0" ref={headingRef}>
-                        <FormattedMessage
-                            defaultMessage="Order Details"
-                            id="account_order_detail.title.order_details"
-                        />
-                    </Heading>
+                    <Flex justify="space-between" align="center">
+                        <Heading as="h1" fontSize={['lg', '2xl']} tabIndex="0" ref={headingRef}>
+                            <FormattedMessage
+                                defaultMessage="Order Details"
+                                id="account_order_detail.title.order_details"
+                            />
+                        </Heading>
+                        {/* TODO: addcancel order elligibility logic */}
+                        <Button variant="link" size="sm" onClick={onCancelModalOpen}>
+                            <FormattedMessage
+                                defaultMessage="Cancel order"
+                                id="account_order_detail.button.cancel_order"
+                            />
+                        </Button>
+                    </Flex>
 
                     {!isLoading ? (
                         <Stack
@@ -398,6 +415,16 @@ const AccountOrderDetail = () => {
                     )}
                 </Stack>
             </Stack>
+
+            <CancelOrderModal
+                isOpen={isCancelModalOpen}
+                onClose={onCancelModalClose}
+                order={order}
+                onRequestCancellation={(order) => {
+                    // TODO: Add cancellation logic here
+                    console.log('Requesting cancellation for order:', order?.orderNo)
+                }}
+            />
         </Stack>
     )
 }
