@@ -78,7 +78,7 @@ export const Skeleton = () => {
 
 /**
  * The ProductTile is a simple visual representation of a
- * product object. It will show it's default image, name and price.
+ * product object. It will show its default image, name and price.
  * It also supports favourite products, controlled by a heart icon.
  */
 const ProductTile = (props) => {

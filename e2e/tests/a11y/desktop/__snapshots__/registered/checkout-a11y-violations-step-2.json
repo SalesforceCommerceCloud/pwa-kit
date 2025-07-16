@@ -23,7 +23,7 @@
     "helpUrl": "https://dequeuniversity.com/rules/axe/4.10/region?application=playwright",
     "nodes": [
       {
-        "html": "<a class=\"...\" aria-label=\"Back to cart, number of items: 2\" href=\"/global/en-GB/cart\">",
+        "html": "<a class=\"...\" aria-label=\"Back to cart, number of items: 2\" href=\"/cart\">",
         "failureSummary": "Fix any of the following:\n  Some page content is not contained by landmarks",
         "target": [
           ".css-1k2aozt"
