@@ -8,7 +8,6 @@
 import React from 'react'
 import {renderHook, waitFor} from '@testing-library/react'
 import useDataCloud from '@salesforce/retail-react-app/app/hooks/use-datacloud'
-import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
 import {useDNT} from '@salesforce/commerce-sdk-react'
 import {
     mockLoginViewPageEvent,
@@ -20,7 +19,9 @@ import {
     mockGloveSearchResult,
     mockCategorySearchParams,
     mockRecommendationIds,
-    mockLoginViewPageEventDNT
+    mockLoginViewPageEventDNT,
+    mockPartyIdentificationRegisteredEvent,
+    mockPartyIdentificationGuestEvent
 } from '@salesforce/retail-react-app/app/mocks/datacloud-mock-data'
 import {
     mockProduct,
@@ -28,6 +29,9 @@ import {
     mockSearchResults,
     mockRecommenderDetails
 } from '@salesforce/retail-react-app/app/hooks/einstein-mock-data'
+import {getConfig as getConfigOriginal} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
+import {useCustomerType as useCustomerTypeOriginal} from '@salesforce/commerce-sdk-react'
+import {useCurrentCustomer as useCurrentCustomerOriginal} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
 
 const dataCloudConfig = {
     app: {
@@ -98,6 +102,97 @@ describe('useDataCloud', function () {
         jest.clearAllMocks()
     })
 
+    test('returns noop functions if dataCloudConfig has empty strings', async () => {
+        const emptyConfig = {
+            app: {
+                dataCloudAPI: {
+                    appSourceId: '',
+                    tenantId: ''
+                },
+                defaultSite: 'test-site'
+            }
+        }
+        getConfigOriginal.mockReturnValueOnce(emptyConfig)
+        const {result} = renderHook(() => useDataCloud())
+        expect(result.current.sendViewPage).toBeInstanceOf(Function)
+        expect(result.current.sendViewProduct).toBeInstanceOf(Function)
+        expect(result.current.sendViewCategory).toBeInstanceOf(Function)
+        expect(result.current.sendViewSearchResults).toBeInstanceOf(Function)
+        expect(result.current.sendViewRecommendations).toBeInstanceOf(Function)
+        // Should be noop async functions
+        await Promise.all([
+            expect(result.current.sendViewPage()).resolves.toBeUndefined(),
+            expect(result.current.sendViewProduct()).resolves.toBeUndefined(),
+            expect(result.current.sendViewCategory()).resolves.toBeUndefined(),
+            expect(result.current.sendViewSearchResults()).resolves.toBeUndefined(),
+            expect(result.current.sendViewRecommendations()).resolves.toBeUndefined()
+        ])
+    })
+
+    test('returns noop functions if dataCloudConfig does not exist', async () => {
+        const noConfig = {app: {}}
+        getConfigOriginal.mockReturnValueOnce(noConfig)
+        const {result} = renderHook(() => useDataCloud())
+        expect(result.current.sendViewPage).toBeInstanceOf(Function)
+        expect(result.current.sendViewProduct).toBeInstanceOf(Function)
+        expect(result.current.sendViewCategory).toBeInstanceOf(Function)
+        expect(result.current.sendViewSearchResults).toBeInstanceOf(Function)
+        expect(result.current.sendViewRecommendations).toBeInstanceOf(Function)
+        await Promise.all([
+            expect(result.current.sendViewPage()).resolves.toBeUndefined(),
+            expect(result.current.sendViewProduct()).resolves.toBeUndefined(),
+            expect(result.current.sendViewCategory()).resolves.toBeUndefined(),
+            expect(result.current.sendViewSearchResults()).resolves.toBeUndefined(),
+            expect(result.current.sendViewRecommendations()).resolves.toBeUndefined()
+        ])
+    })
+
+    test('sends partyIdentification event for registered user', async () => {
+        // Registered user: isRegistered true, customerId present
+        const {result} = renderHook(() => useDataCloud())
+        await waitFor(() => {
+            result.current.sendViewPage('/login')
+            expect(mockWebEventsAppSourceIdPost).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    events: expect.arrayContaining([
+                        expect.objectContaining({eventType: 'partyIdentification'})
+                    ])
+                })
+            )
+        })
+        // Optionally, check full structure
+        await waitFor(() => {
+            result.current.sendViewPage('/login')
+            expect(mockWebEventsAppSourceIdPost).toHaveBeenCalledWith(
+                expect.objectContaining(mockPartyIdentificationRegisteredEvent)
+            )
+        })
+    })
+
+    test('sends partyIdentification event for guest user', async () => {
+        // Guest user: isRegistered false, customerId undefined
+        useCustomerTypeOriginal.mockReturnValueOnce({isRegistered: false})
+        useCurrentCustomerOriginal.mockReturnValueOnce({data: {}})
+        const {result} = renderHook(() => useDataCloud())
+        await waitFor(() => {
+            result.current.sendViewPage('/login')
+            expect(mockWebEventsAppSourceIdPost).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    events: expect.arrayContaining([
+                        expect.objectContaining({eventType: 'partyIdentification'})
+                    ])
+                })
+            )
+        })
+        // Optionally, check full structure
+        await waitFor(() => {
+            result.current.sendViewPage('/login')
+            expect(mockWebEventsAppSourceIdPost).toHaveBeenCalledWith(
+                expect.objectContaining(mockPartyIdentificationGuestEvent)
+            )
+        })
+    })
+
     test('sendViewPage', async () => {
         const {result} = renderHook(() => useDataCloud())
         expect(result.current).toBeDefined()
@@ -129,7 +224,7 @@ describe('useDataCloud', function () {
     })
 
     test('sendViewCategory with no email', async () => {
-        useCurrentCustomer.mockReturnValue({
+        useCurrentCustomerOriginal.mockReturnValue({
             data: {
                 customerId: 1234567890,
                 firstName: 'John',
