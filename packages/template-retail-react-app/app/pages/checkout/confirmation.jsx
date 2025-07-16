@@ -108,9 +108,10 @@ const CheckoutConfirmation = () => {
         const saveShippingAddress = async (customerId) => {
             try {
                 const shippingAddress = order.shipments[0].shippingAddress
+                let {id, ...shippingAddressWithoutId} = shippingAddress
                 const bodyShippingAddress = {
                     addressId: nanoid(),
-                    ...shippingAddress
+                    ...shippingAddressWithoutId
                 }
                 await createCustomerAddress.mutateAsync({
                     body: bodyShippingAddress,
