@@ -18,9 +18,7 @@
     "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
-    "@chakra-ui/react": "^2.8.2",
-    "@emotion/react": "^11.13.3",
-    "@emotion/styled": "^11.13.0",
+    "@chakra-ui/react": "^3.22.0",
     "@loadable/component": "^5.15.3",
     "@salesforce/pwa-kit-dev": "4.0.0-extensibility-preview.5",
     "@salesforce/pwa-kit-react-sdk": "4.0.0-extensibility-preview.5",
