@@ -61,3 +61,32 @@ export function getImageAttributes(props) {
     }
     return ensureFetchPriority(imageProps, priority)
 }
+
+/**
+ * Utility to return the attributes for a `<link preload>` element that's related to
+ * an `<img>` element with the given `props`.
+ * @param {{[key: string]: any}} props Image properties
+ * @param {('lazy' | 'eager')} [props.loading] Loading strategy
+ * @param {('high' | 'low' | 'auto')} [props.fetchPriority] Fetch priority
+ * @param {string} [props.sizes] Layout width of the image
+ * @param {string} [props.srcSet] One or more image candidate strings, separated using commas
+ * @param {string} [props.media] Media query for responsive preloading
+ * @param {string} [props.type] MIME type of the resource the element points to
+ * @returns {({rel: string, as: string, href: string, fetchPriority?: ('high' | 'low' | 'auto'), media?: string, type?: string, imageSizes?: string, imageSrcSet?: string} | undefined)}
+ */
+export function getImageLinkAttributes(props) {
+    const loadingStrategy = props?.loading?.toLowerCase?.()
+    const fetchPriority = props?.fetchPriority?.toLowerCase?.()
+    return fetchPriority === 'high' && (!loadingStrategy || loadingStrategy === 'eager')
+        ? {
+              rel: 'preload',
+              as: 'image',
+              href: props.src,
+              fetchPriority,
+              ...(props.type ? {type: props.type} : {}),
+              ...(props.media ? {media: props.media} : {}),
+              ...(props.sizes ? {imageSizes: props.sizes} : {}),
+              ...(props.srcSet ? {imageSrcSet: props.srcSet} : {})
+          }
+        : undefined
+}
