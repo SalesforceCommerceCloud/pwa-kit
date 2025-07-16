@@ -40,9 +40,9 @@ test.describe('Accessibility Tests with Snapshots for guest user', () => {
 
         // PLP
         const productTile = page.getByRole('link', {
-            name: /Belted Ribbed Boat Neck Sweater/i
+            name: /Cotton Turtleneck Sweater/i
         })
-        await expect(productTile.getByText(/From \£50\.56/i)).toBeVisible()
+        await expect(productTile.getByText(/From \$39\.99/i)).toBeVisible()
 
         // open the filter which has mobile version
         page.getByRole('button', {name: 'Filter'}).click()

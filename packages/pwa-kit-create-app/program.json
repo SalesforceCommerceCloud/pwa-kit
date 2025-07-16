@@ -1,4 +1,8 @@
 {
+    "_ai": {
+        "instruction": "This file defines the CLI behavior for generating React projects using templates and presets. AI agents can use this to guide interactive or programmatic project creation.",
+        "expectedUse": "Provides schema and data for decision making during app generation."
+    },
     "$schema": "http://json-schema.org/draft-07/schema#",
     "metadata": {
         "name": "pwa-kit-create-app",
@@ -22,13 +26,21 @@
                 ],
                 "properties": {
                     "name": {
-                        "type": "string"
+                        "type": "string",
+                        "_ai": {
+                            "instruction": "This value maps directly to the key in the answers object.",
+                            "expectedUse": "Use this to store or retrieve the corresponding answer."
+                        }
                     },
                     "message": {
                         "type": "string"
                     },
                     "type": {
-                        "type": "string"
+                        "type": "string",
+                        "_ai": {
+                            "instruction": "This defines the prompt type (e.g., list, input, confirm). Determines how to display the question.",
+                            "expectedUse": "Configure the appropriate UI for asking the question."
+                        }
                     },
                     "choices": {
                         "type": "array",
@@ -44,10 +56,18 @@
                                 },
                                 "value": {}
                             }
+                        },
+                        "_ai": {
+                            "instruction": "Only used when type is 'list', 'rawlist', 'checkbox', or similar. These are the selectable options.",
+                            "expectedUse": "Render multiple choice options to the user."
                         }
                     }
                 },
                 "additionalProperties": true
+            },
+            "_ai": {
+                "instruction": "Defines the questions to be asked to the user or AI agent to gather required input for project generation.",
+                "expectedUse": "Used to drive interactive or programmatic question-and-answer flows."
             }
         },
         "presets": {
@@ -80,12 +100,16 @@
                     },
                     "answers": {
                         "type": "object",
-                        "additionalProperties": {}
+                        "additionalProperties": {},
+                        "_ai": {
+                            "instruction": "These are default answers pre-filled when this preset is selected. They should be merged with user-supplied answers, where user-supplied values take precedence.",
+                            "expectedUse": "Auto-filling answers to questions without prompting the user unless a value is missing or overridden."
+                        }
                     },
                     "private": {
                         "type": "boolean",
                         "_ai": {
-                            "instruction": "This property is used to filter what presets are shown to the user. If the preset is private, should NOT be shown to the user in a list of selectable presets. This equates to the 'when' property Inquirer question schema.",
+                            "instruction": "This property is used to filter what presets are shown to the user. If the preset is private, it should NOT be shown to the user in a list of selectable presets.",
                             "expectedUse": "Hiding presets from the user."
                         }
                     }
@@ -142,7 +166,11 @@
                         },
                         "required": [
                             "type"
-                        ]
+                        ],
+                        "_ai": {
+                            "instruction": "This defines how the template is sourced. If 'npm', then 'name' must be the NPM package name. If 'bundle', the template is included directly in the CLI.",
+                            "expectedUse": "Used to determine how to fetch and prepare the template for project creation."
+                        }
                     },
                     "questions": {
                         "$ref": "questions.json",
@@ -159,7 +187,11 @@
                     },
                     "answers": {
                         "type": "object",
-                        "additionalProperties": {}
+                        "additionalProperties": {},
+                        "_ai": {
+                            "instruction": "These are default answers pre-filled when this template is selected. They should be merged with user-supplied answers, where user-supplied values take precedence.",
+                            "expectedUse": "Auto-filling answers to questions without prompting the user unless a value is missing or overridden."
+                        }
                     },
                     "private": {
                         "type": "boolean",
@@ -217,6 +249,10 @@
                     "message",
                     "regex"
                 ]
+            },
+            "_ai": {
+                "instruction": "These validators can be applied to template questions to ensure valid input. Each validator has a unique `id` that is referenced from questions.",
+                "expectedUse": "Validating user input for questions during project creation."
             }
         },
         "options": {
@@ -237,7 +273,15 @@
                 "required": [
                     "name",
                     "description"
-                ]
+                ],
+                "_ai": {
+                    "instruction": "This option modifies the behavior of the CLI tool. Use `defaultValue` if the option is not provided.",
+                    "expectedUse": "Determine which CLI flags can be included when generating the command."
+                }
+            },
+            "_ai": {
+                "instruction": "These are the options/arguments that can be passed to the @salesforce/pwa-kit-create-app CLI tool. Do not use options that aren't listed here.",
+                "expectedUse": "Instruct agent on how to use the @salesforce/pwa-kit-create-app CLI tool to create a new PWA Kit project."
             }
         },
         "examples": {
@@ -255,7 +299,11 @@
                 "required": [
                     "description",
                     "command"
-                ]
+                ],
+                "_ai": {
+                    "instruction": "Each example shows how to use the CLI tool with real command-line input.",
+                    "expectedUse": "Show examples in documentation or when the agent is generating usage examples."
+                }
             }
         }
     },

@@ -31,8 +31,7 @@ describe('PasswordlessLogin component', () => {
     })
 
     test('renders password input after "Password" button is clicked', async () => {
-        const mockSetLoginType = jest.fn()
-        const {user} = renderWithProviders(<WrapperComponent setLoginType={mockSetLoginType} />)
+        const {user} = renderWithProviders(<WrapperComponent />)
 
         await user.type(screen.getByLabelText('Email'), 'myemail@test.com')
         await user.click(screen.getByRole('button', {name: 'Password'}))
@@ -42,8 +41,7 @@ describe('PasswordlessLogin component', () => {
     })
 
     test('stays on page when email field has form validation errors after the "Password" button is clicked', async () => {
-        const mockSetLoginType = jest.fn()
-        const {user} = renderWithProviders(<WrapperComponent setLoginType={mockSetLoginType} />)
+        const {user} = renderWithProviders(<WrapperComponent />)
 
         await user.type(screen.getByLabelText('Email'), 'badEmail')
         await user.click(screen.getByRole('button', {name: 'Password'}))
