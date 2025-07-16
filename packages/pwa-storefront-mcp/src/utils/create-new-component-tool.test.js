@@ -6,7 +6,6 @@
  */
 import CreateNewComponentTool from './create-new-component-tool.js'
 import * as fs from 'fs/promises'
-import path from 'path'
 
 // Mock fs/promises to avoid actual file operations
 jest.mock('fs/promises', () => ({
