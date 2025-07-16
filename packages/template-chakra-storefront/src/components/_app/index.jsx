@@ -5,12 +5,14 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, {useState, useEffect, useMemo, createContext, useContext} from 'react'
+import React, {useState, useEffect} from 'react'
 import PropTypes from 'prop-types'
 import {useHistory, useLocation} from 'react-router-dom'
 import {StorefrontPreview} from '@salesforce/commerce-sdk-react/components'
 import {getAssetUrl} from '@salesforce/pwa-kit-react-sdk/ssr/universal/utils'
 import useActiveData from '../../../src/hooks/use-active-data'
+import useEinstein from '../../../src/hooks/use-einstein'
+import useDataCloud from '../../../src/hooks/use-datacloud'
 import {useQuery} from '@tanstack/react-query'
 import {
     useAccessToken,
@@ -119,6 +121,8 @@ const App = (props) => {
     const {getTokenWhenReady} = useAccessToken()
     const appOrigin = useAppOrigin()
     const activeData = useActiveData()
+    const einstein = useEinstein()
+    const dataCloud = useDataCloud()
     const history = useHistory()
     const location = useLocation()
     const authModal = useAuthModal()
@@ -264,6 +268,8 @@ const App = (props) => {
 
     const trackPage = () => {
         activeData.trackPage(site.id, locale.id, currency)
+        einstein.sendViewPage(location.pathname)
+        dataCloud.sendViewPage(location.pathname)
     }
 
     useEffect(() => {
