@@ -19,7 +19,8 @@ const COMPONENT_SCAN_PATHS = [
     `${SEPARATOR}src${SEPARATOR}components${SEPARATOR}`,
     `${SEPARATOR}src${SEPARATOR}pages${SEPARATOR}`,
     `${SEPARATOR}src${SEPARATOR}hooks${SEPARATOR}`,
-    `${SEPARATOR}src${SEPARATOR}routes.tsx`
+    `${SEPARATOR}src${SEPARATOR}routes.tsx`,
+    `${SEPARATOR}config${SEPARATOR}constants.js`
 ]
 
 /**
@@ -50,10 +51,12 @@ function trimExtensions(directory, generatedPlugins) {
             const filePath = path.join(dir, file)
             const stats = fs.statSync(filePath)
 
-            if (stats.isDirectory() && !filePath.includes('node_modules')) {
-                processDirectory(filePath)
-            } else if (file.endsWith('.jsx') || file.endsWith('.tsx')) {
-                processFile(filePath, plugins)
+            if (!filePath.includes('node_modules')) {
+                if (stats.isDirectory()) {
+                    processDirectory(filePath)
+                } else if (file.endsWith('.jsx') || file.endsWith('.tsx') || file.endsWith('.js') || file.endsWith('.ts')) {
+                    processFile(filePath, plugins)
+                }
             }
         })
     }
@@ -229,7 +232,6 @@ function processFile(filePath, plugins) {
                 retainLines: true,
                 compact: false
             }).code
-            fs.copyFileSync(filePath, `${filePath}.bak`)
             // Replace the original file with the trimmed version
             fs.writeFileSync(filePath, output)
             // prettify the file

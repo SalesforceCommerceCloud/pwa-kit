@@ -5,35 +5,105 @@ alwaysApply: false
 ---
 These are the steps to upgrade an existing store front application (currently opened project) with the "Store Locator" extension by installing the necessary code to the destination application.
   
-  # Prerequisites: First make sure the current project has all the necessary files:
+  # Prerequisites: First make sure the current project has all the necessary files. If any requirement in the prerequisite is not met, abort the rest of this instruction.
   <Prerequisites>
   - The file `src/components/_app/index.jsx` exists
   - The file `src/components/header/index.jsx` exists
   - The file `src/routes.tsx` exists
+  - The file `src/config/constants.js` exists
   </Prerequisites>
   
   # Preparations: Clone the pwa-kit repo for the specific branch into the tmp folder
   <Preparations>
   - Run `mkdir pwa-kit-tmp` from temp folder
-  - Run `git clone -b feature/next https://github.com/SalesforceCommerceCloud/pwa-kit /tmp/pwa-kit-tmp`
+  - Run `git clone -b u/kzheng/fold-store-locator-extension https://github.com/SalesforceCommerceCloud/pwa-kit /tmp/pwa-kit-tmp`
   </Preparations>
   
   # Copy: 
   <Copy>
-  - From the cloned pwa-kit folder, copy `packages/template-chakra-storefront/components/store-locator` folder into the current directory's `src/components` folder.
-  - From the cloned pwa-kit folder, copy `packages/template-chakra-storefront/pages/store-locator` folder into the current directory's `src/pages` folder.
+  - From the cloned pwa-kit folder, copy `packages/template-chakra-storefront/src/components/store-locator` folder into the current directory's `src/components` folder.
+  - From the cloned pwa-kit folder, copy `packages/template-chakra-storefront/src/pages/store-locator` folder into the current directory's `src/pages` folder.
+  - From the cloned pwa-kit folder, copy `packages/template-chakra-storefront/src/hooks/store-locator` folder into the current directory's `src/hooks` folder.
   </Copy>
   
-  # Merge. Apply the following code changes to pages/home/index.jsx. Skip a step if the code change has already been applied.
+  # Merge. Apply the following code changes to the files specified. Skip a step if the code change has already been applied.
   <Merge>
-  - Insert the following line at the end of the import block:
-  `import loadable from '@loadable/component'`
+  - In `src/config/constants.js`, append the following code to the end of the file:
+  ```
+    export const STORE_LOCATOR_SUPPORTED_COUNTRIES = [
+        {
+            countryCode: 'US',
+            countryName: 'United States'
+        },
+        {
+            countryCode: 'DE',
+            countryName: 'Germany'
+        }
+    ]
+
+    export const STORE_LOCATOR_DEFAULT_POSTAL_CODE = '10178'
+    export const STORE_LOCATOR_RADIUS = 100
+    export const STORE_LOCATOR_RADIUS_UNIT = 'km'
+    export const STORE_LOCATOR_DEFAULT_COUNTRY = 'DE'
+    export const STORE_LOCATOR_DEFAULT_COUNTRY_CODE = 'DE'
+    export const STORE_LOCATOR_DEFAULT_PAGE_SIZE = 10
+    export const STORE_LOCATOR_NUM_STORES_PER_REQUEST_API_MAX = 200 // This is an API limit and is therefore not configurable
+
+    export const DEFAULT_DNT_STATE = true
+  ```
   
-  - Insert the following lines at the end of the const declaration block:
-  `const StoreLocator = loadable(() => import('../components/store-locator'))`
+  - In `src/components/_app/index.jsx`, make the following changes:
+  1. Add the following code to the end of last import statement:
+  ```
+const StoreLocatorModal = loadable(() => import('../../../src/components/store-locator'))  
+const {
+    isOpen: isOpenStoreLocator,
+    onOpen: onOpenStoreLocator,
+    onClose: onCloseStoreLocator
+} = useDisclosure() 
+  ```
+  2. Insert the following line to the declaration of `headerProps`:
+  ```
+onStoreLocatorClick: onOpenStoreLocator
+  ```
+  3. In the returning JSX element, add the following to below the `<SkipNavLink>` element:
+  ```
+<StoreLocatorModal
+    isOpen={isOpenStoreLocator}
+    onClose={onCloseStoreLocator}
+/>                          
+  ```
   
-  - Insert the following line in the JSX element return statement, beween the <Seo> and the <Hero> components.
-  `<StoreLocator />`
+  - In `src/components/header/index.jsx`, make the following changes:
+  1. In the returning JSX element, add the following to below the `<IconButtonWithRegistration>` element:
+  ```
+  <IconButton
+    aria-label={intl.formatMessage({
+        defaultMessage: 'Store Locator',
+        id: 'header.button.assistive_msg.store_locator'
+    })}
+    icon={<StoreIcon />}
+    {...styles.icons}
+    variant="unstyled"
+    onClick={onStoreLocatorClick}
+/>
+  ```
+
+  - In `/src/routes.tsx`, make the following changes:
+  1. Add the following before the `const routes` declaration:
+  ```
+const StoreLocator = loadable(() => import('../src/pages/store-locator'), {
+    fallback
+})
+  ```
+  2. Add the following as the last element of the `const routes` array declaration:
+  ```
+{
+    path: '/store-locator',
+    component: StoreLocator
+}
+  ```
+
   </Merge>
   
   # Cleanup: Delete the `pwa-kit-tmp` folder and its contents.
