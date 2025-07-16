@@ -1041,7 +1041,35 @@
       "value": "]"
     }
   ],
-  "cancel_order_modal.button.confirm": [
+  "cancel_order_modal.button.close": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ƈŀǿǿşḗḗ"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "cancel_order_modal.dropdown.select_reason": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Şḗḗŀḗḗƈŧ ȧȧ ƈȧȧƞƈḗḗŀŀȧȧŧīǿǿƞ řḗḗȧȧşǿǿƞ"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "cancel_order_modal.heading.request_cancellation": [
     {
       "type": 0,
       "value": "["
@@ -1055,28 +1083,140 @@
       "value": "]"
     }
   ],
-  "cancel_order_modal.content.placeholder": [
+  "cancel_order_modal.message.no_order_provided": [
     {
       "type": 0,
       "value": "["
     },
     {
       "type": 0,
-      "value": "Ŧħīş īş ȧȧ ƀŀȧȧƞķ ḿǿǿḓȧȧŀ ƒǿǿř ƈȧȧƞƈḗḗŀīƞɠ ŧħḗḗ ǿǿřḓḗḗř."
+      "value": "Ƞǿǿ ǿǿřḓḗḗř ƥřǿǿṽīḓḗḗḓ"
     },
     {
       "type": 0,
       "value": "]"
     }
   ],
-  "cancel_order_modal.title.request_cancellation": [
+  "cancel_order_modal.reason.changed_mind": [
     {
       "type": 0,
       "value": "["
     },
     {
       "type": 0,
-      "value": "Řḗḗɋŭŭḗḗşŧ Ƈȧȧƞƈḗḗŀŀȧȧŧīǿǿƞ"
+      "value": "Ƈħȧȧƞɠḗḗḓ ḿẏ ḿīƞḓ"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "cancel_order_modal.reason.financial_reasons": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ƒīƞȧȧƞƈīȧȧŀ řḗḗȧȧşǿǿƞş"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "cancel_order_modal.reason.item_not_arrive_on_time": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Īŧḗḗḿ(ş) ẇǿǿŭŭŀḓ ƞǿǿŧ ȧȧřřīṽḗḗ ǿǿƞ ŧīḿḗḗ"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "cancel_order_modal.reason.item_price_too_high": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Īŧḗḗḿ ƥřīƈḗḗ ŧǿǿǿǿ ħīɠħ"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "cancel_order_modal.reason.no_longer_needed": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ƞǿǿ ŀǿǿƞɠḗḗř ƞḗḗḗḗḓḗḗḓ"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "cancel_order_modal.reason.order_created_by_mistake": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ǿřḓḗḗř ƈřḗḗȧȧŧḗḗḓ ƀẏ ḿīşŧȧȧķḗḗ"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "cancel_order_modal.reason.other": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ǿŧħḗḗř"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "cancel_order_modal.reason.shipping_cost_too_high": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Şħīƥƥīƞɠ ƈǿǿşŧ ŧǿǿǿǿ ħīɠħ"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "cancel_order_modal.text.confirmation": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ẇḗḗ'ŀŀ şḗḗƞḓ ẏǿǿŭŭ ȧȧƞ ḗḗḿȧȧīŀ ƈǿǿƞƒīřḿȧȧŧīǿǿƞ ǿǿƞƈḗḗ ẏǿǿŭŭř ƈȧȧƞƈḗḗŀŀȧȧŧīǿǿƞ řḗḗɋŭŭḗḗşŧ ħȧȧş ƀḗḗḗḗƞ ƥřǿǿƈḗḗşşḗḗḓ."
     },
     {
       "type": 0,

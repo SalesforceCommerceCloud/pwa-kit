@@ -27,89 +27,13 @@ import {useOrder, useProducts} from '@salesforce/commerce-sdk-react'
 import Link from '@salesforce/retail-react-app/app/components/link'
 import {ChevronLeftIcon} from '@salesforce/retail-react-app/app/components/icons'
 import OrderSummary from '@salesforce/retail-react-app/app/components/order-summary'
-import ItemVariantProvider from '@salesforce/retail-react-app/app/components/item-variant'
-import CartItemVariantImage from '@salesforce/retail-react-app/app/components/item-variant/item-image'
-import CartItemVariantName from '@salesforce/retail-react-app/app/components/item-variant/item-name'
-import CartItemVariantAttributes from '@salesforce/retail-react-app/app/components/item-variant/item-attributes'
-import CartItemVariantPrice from '@salesforce/retail-react-app/app/components/item-variant/item-price'
+import ProductList from '@salesforce/retail-react-app/app/components/product-list'
 import CancelOrderModal from '@salesforce/retail-react-app/app/components/cancel-order-modal'
-import PropTypes from 'prop-types'
 import OrderStatusBar from '@salesforce/retail-react-app/app/components/order-status-bar/index'
 import {getOrderStatusColorScheme} from '@salesforce/retail-react-app/app/pages/account/order-history'
 import {getLocalizedOrderStatus} from '@salesforce/retail-react-app/app/pages/account/order-history'
 
 const onClient = typeof window !== 'undefined'
-
-const OrderProducts = ({productItems, currency}) => {
-    const orderProductIds = productItems.map((product) => product.productId)
-    const {data: products, isLoading} = useProducts(
-        {
-            parameters: {
-                ids: orderProductIds
-            }
-        },
-        {
-            enabled: !!orderProductIds && onClient,
-            select: (result) => {
-                return result?.data?.reduce((result, item) => {
-                    const key = item.id
-                    result[key] = item
-                    return result
-                }, {})
-            }
-        }
-    )
-    const variants = productItems?.map((item) => {
-        const product = products?.[item.productId]
-        return {
-            ...(product ? product : {}),
-            isProductUnavailable: !product,
-            ...item
-        }
-    })
-
-    return (
-        <>
-            {!isLoading &&
-                variants?.map((variant, index) => {
-                    return (
-                        <Box
-                            p={[4, 6]}
-                            key={index}
-                            border="1px solid"
-                            borderColor="gray.100"
-                            borderRadius="base"
-                        >
-                            <ItemVariantProvider variant={variant} currency={currency}>
-                                <Flex width="full" alignItems="flex-start">
-                                    <CartItemVariantImage width={['88px', 36]} mr={4} />
-                                    <Stack spacing={1} marginTop="-3px" flex={1}>
-                                        <CartItemVariantName />
-                                        <Flex
-                                            width="full"
-                                            justifyContent="space-between"
-                                            alignItems="flex-end"
-                                        >
-                                            <CartItemVariantAttributes
-                                                includeQuantity
-                                                currency={currency}
-                                            />
-                                            <CartItemVariantPrice currency={currency} />
-                                        </Flex>
-                                    </Stack>
-                                </Flex>
-                            </ItemVariantProvider>
-                        </Box>
-                    )
-                })}
-        </>
-    )
-}
-
-OrderProducts.propTypes = {
-    productItems: PropTypes.array.isRequired,
-    currency: PropTypes.string
-}
 
 const AccountOrderDetail = () => {
     const {params} = useRouteMatch()
@@ -136,6 +60,38 @@ const AccountOrderDetail = () => {
     const paymentCard = order?.paymentInstruments[0]?.paymentCard
     const CardIcon = getCreditCardIcon(paymentCard?.cardType)
     const itemCount = order?.productItems.reduce((count, item) => item.quantity + count, 0) || 0
+
+    // Fetch product data for order items
+    const productIds = order?.productItems?.map((product) => product.productId) || []
+    const {data: products, isLoading: isProductsLoading} = useProducts(
+        {
+            parameters: {
+                ids: productIds.join(','),
+                allImages: true
+            }
+        },
+        {
+            enabled: !!productIds.length && onClient,
+            select: (result) => {
+                return result?.data?.reduce((result, item) => {
+                    const key = item.id
+                    result[key] = item
+                    return result
+                }, {})
+            }
+        }
+    )
+
+    // Merge product data with order items
+    const variants =
+        order?.productItems?.map((item) => {
+            const product = products?.[item.productId]
+            return {
+                ...(product ? product : {}),
+                isProductUnavailable: !product,
+                ...item
+            }
+        }) || []
 
     const headingRef = useRef()
     useEffect(() => {
@@ -419,11 +375,29 @@ const AccountOrderDetail = () => {
                                 </Flex>
                             </Box>
                         ))
+                    ) : !isProductsLoading ? (
+                        <ProductList variants={variants} currency={order.currency} spacing={2} />
                     ) : (
-                        <OrderProducts
-                            productItems={order.productItems}
-                            currency={order.currency}
-                        />
+                        <Stack spacing={2}>
+                            {Array.from({length: 3}).map((_, index) => (
+                                <Box
+                                    key={index}
+                                    p={4}
+                                    border="1px solid"
+                                    borderColor="gray.100"
+                                    borderRadius="base"
+                                >
+                                    <Flex alignItems="flex-start">
+                                        <Skeleton w="20" h="20" mr={4} />
+                                        <Stack spacing={1} flex={1}>
+                                            <Skeleton h="20px" w="60%" />
+                                            <Skeleton h="16px" w="40%" />
+                                            <Skeleton h="16px" w="30%" />
+                                        </Stack>
+                                    </Flex>
+                                </Box>
+                            ))}
+                        </Stack>
                     )}
                 </Stack>
             </Stack>
@@ -432,9 +406,13 @@ const AccountOrderDetail = () => {
                 isOpen={isCancelModalOpen}
                 onClose={onCancelModalClose}
                 order={order}
-                onRequestCancellation={(order) => {
+                onCancel={(order, selectedReason) => {
                     // TODO: Add cancellation logic here
                     console.log('Requesting cancellation for order:', order?.orderNo)
+                    console.log('Requesting cancellation for email:', order?.customerInfo?.email)
+                    console.log('Customer last name:', order?.billingAddress?.lastName)
+                    console.log('Customer zip code:', order?.billingAddress?.postalCode)
+                    console.log('Cancellation reason:', selectedReason)
                 }}
             />
         </Stack>

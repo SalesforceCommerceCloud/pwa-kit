@@ -192,14 +192,44 @@
   "bonus_products_title.title.num_of_items": {
     "defaultMessage": "Bonus Products ({itemCount, plural, =0 {0 items} one {# item} other {# items}})"
   },
-  "cancel_order_modal.button.confirm": {
+  "cancel_order_modal.button.close": {
+    "defaultMessage": "Close"
+  },
+  "cancel_order_modal.dropdown.select_reason": {
+    "defaultMessage": "Select a cancellation reason"
+  },
+  "cancel_order_modal.heading.request_cancellation": {
     "defaultMessage": "Request Cancellation"
   },
-  "cancel_order_modal.content.placeholder": {
-    "defaultMessage": "This is a blank modal for canceling the order."
+  "cancel_order_modal.message.no_order_provided": {
+    "defaultMessage": "No order provided"
   },
-  "cancel_order_modal.title.request_cancellation": {
-    "defaultMessage": "Request Cancellation"
+  "cancel_order_modal.reason.changed_mind": {
+    "defaultMessage": "Changed my mind"
+  },
+  "cancel_order_modal.reason.financial_reasons": {
+    "defaultMessage": "Financial reasons"
+  },
+  "cancel_order_modal.reason.item_not_arrive_on_time": {
+    "defaultMessage": "Item(s) would not arrive on time"
+  },
+  "cancel_order_modal.reason.item_price_too_high": {
+    "defaultMessage": "Item price too high"
+  },
+  "cancel_order_modal.reason.no_longer_needed": {
+    "defaultMessage": "No longer needed"
+  },
+  "cancel_order_modal.reason.order_created_by_mistake": {
+    "defaultMessage": "Order created by mistake"
+  },
+  "cancel_order_modal.reason.other": {
+    "defaultMessage": "Other"
+  },
+  "cancel_order_modal.reason.shipping_cost_too_high": {
+    "defaultMessage": "Shipping cost too high"
+  },
+  "cancel_order_modal.text.confirmation": {
+    "defaultMessage": "We'll send you an email confirmation once your cancellation request has been processed."
   },
   "carousel.button.scroll_left.assistive_msg": {
     "defaultMessage": "Scroll carousel left"

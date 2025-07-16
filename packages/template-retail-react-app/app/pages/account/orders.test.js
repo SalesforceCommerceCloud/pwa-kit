@@ -276,9 +276,6 @@ describe('Cancel Order Button and Modal', () => {
         // Check that modal is open
         expect(screen.getByRole('dialog')).toBeInTheDocument()
         expect(screen.getAllByText(/request cancellation/i)).toHaveLength(2) // Header and button
-        expect(
-            screen.getByText(/this is a blank modal for canceling the order/i)
-        ).toBeInTheDocument()
     })
 
     test('should close modal when close button is clicked', async () => {

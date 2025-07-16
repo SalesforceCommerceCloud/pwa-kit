@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, salesforce.com, inc.
+ * Copyright (c) 2025, salesforce.com, inc.
  * All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
@@ -11,6 +11,14 @@ import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-u
 import userEvent from '@testing-library/user-event'
 import {screen} from '@testing-library/react'
 
+// Mock the useProducts hook
+jest.mock('@salesforce/commerce-sdk-react', () => ({
+    ...jest.requireActual('@salesforce/commerce-sdk-react'),
+    useProducts: jest.fn()
+}))
+
+import {useProducts} from '@salesforce/commerce-sdk-react'
+
 const mockOrder = {
     orderNo: '00028011',
     status: 'completed',
@@ -20,7 +28,10 @@ const mockOrder = {
         {
             productId: 'test-product-1',
             quantity: 2,
-            name: 'Test Product 1'
+            productName: 'Test Product 1',
+            price: 25.0,
+            priceAfterItemDiscount: 25.0,
+            itemId: 'item-1'
         }
     ]
 }
@@ -31,47 +42,45 @@ const MockedComponent = (props) => {
     return (
         <Box>
             <button onClick={modalProps.onOpen}>Open Cancel Modal</button>
-            <CancelOrderModal {...modalProps} {...props} />
+            <CancelOrderModal {...modalProps} onCancel={jest.fn()} {...props} />
         </Box>
     )
 }
 
-afterEach(() => {
-    jest.resetModules()
+beforeEach(() => {
+    // Mock useProducts to return empty data by default
+    useProducts.mockReturnValue({
+        data: undefined, // Return undefined instead of empty object to avoid map errors
+        isLoading: false,
+        error: null
+    })
 })
 
-test('renders cancel order modal when open', async () => {
-    renderWithProviders(<CancelOrderModal isOpen={true} onClose={jest.fn()} order={mockOrder} />)
+afterEach(() => {
+    jest.resetModules()
+    jest.clearAllMocks()
+})
+
+test('displays cancellation modal when opened', async () => {
+    renderWithProviders(
+        <CancelOrderModal
+            isOpen={true}
+            onClose={jest.fn()}
+            order={mockOrder}
+            onCancel={jest.fn()}
+        />
+    )
     expect(screen.getByRole('dialog')).toBeInTheDocument()
     expect(screen.getAllByText(/request cancellation/i)).toHaveLength(2)
 })
 
-test('does not render modal when closed', () => {
+test('does not display modal by default', () => {
     renderWithProviders(<MockedComponent order={mockOrder} />)
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
     expect(screen.queryByText(/request cancellation/i)).not.toBeInTheDocument()
 })
 
-test('renders modal with correct header text', async () => {
-    renderWithProviders(<CancelOrderModal isOpen={true} onClose={jest.fn()} order={mockOrder} />)
-    const dialog = screen.getByRole('dialog')
-    expect(dialog).toBeInTheDocument()
-    expect(screen.getAllByText(/request cancellation/i)).toHaveLength(2)
-})
-
-test('renders modal with correct body content', async () => {
-    const user = userEvent.setup()
-    renderWithProviders(<MockedComponent order={mockOrder} />)
-
-    // Open the modal
-    const trigger = screen.getByText(/open cancel modal/i)
-    await user.click(trigger)
-
-    // Check body content
-    expect(screen.getByText(/this is a blank modal for canceling the order/i)).toBeInTheDocument()
-})
-
-test('renders request cancellation button', async () => {
+test('display the request cancellation button', async () => {
     const user = userEvent.setup()
     renderWithProviders(<MockedComponent order={mockOrder} />)
 
@@ -84,7 +93,7 @@ test('renders request cancellation button', async () => {
     expect(requestButton).toBeInTheDocument()
 })
 
-test('renders close button (X)', async () => {
+test('displays the close modal button', async () => {
     const user = userEvent.setup()
     renderWithProviders(<MockedComponent order={mockOrder} />)
 
@@ -97,13 +106,15 @@ test('renders close button (X)', async () => {
     expect(closeButton).toBeInTheDocument()
 })
 
-test('calls onClose when close button is clicked', async () => {
+test('closes modal when user clicks close button', async () => {
     const user = userEvent.setup()
     const onClose = jest.fn()
     renderWithProviders(<MockedComponent order={mockOrder} onClose={onClose} />)
 
     // Open the modal
-    renderWithProviders(<CancelOrderModal isOpen={true} onClose={onClose} order={mockOrder} />)
+    renderWithProviders(
+        <CancelOrderModal isOpen={true} onClose={onClose} order={mockOrder} onCancel={jest.fn()} />
+    )
 
     // Click close button
     const closeButton = screen.getByRole('button', {name: /close/i})
@@ -112,40 +123,30 @@ test('calls onClose when close button is clicked', async () => {
     expect(onClose).toHaveBeenCalledTimes(1)
 })
 
-test('calls onRequestCancellation when request cancellation button is clicked', async () => {
+test('triggers cancellation request when user confirms', async () => {
     const user = userEvent.setup()
-    const onRequestCancellation = jest.fn()
+    const onCancel = jest.fn()
     const onClose = jest.fn()
 
     renderWithProviders(
-        <CancelOrderModal
-            isOpen={true}
-            onClose={onClose}
-            order={mockOrder}
-            onRequestCancellation={onRequestCancellation}
-        />
+        <CancelOrderModal isOpen={true} onClose={onClose} order={mockOrder} onCancel={onCancel} />
     )
 
     // Click request cancellation button
     const requestButton = screen.getByRole('button', {name: /request cancellation/i})
     await user.click(requestButton)
 
-    expect(onRequestCancellation).toHaveBeenCalledTimes(1)
-    expect(onRequestCancellation).toHaveBeenCalledWith(mockOrder)
+    expect(onCancel).toHaveBeenCalledTimes(1)
+    expect(onCancel).toHaveBeenCalledWith(mockOrder, '')
 })
 
-test('calls onClose when request cancellation button is clicked', async () => {
+test('closes modal after cancellation request', async () => {
     const user = userEvent.setup()
-    const onRequestCancellation = jest.fn()
+    const onCancel = jest.fn()
     const onClose = jest.fn()
 
     renderWithProviders(
-        <CancelOrderModal
-            isOpen={true}
-            onClose={onClose}
-            order={mockOrder}
-            onRequestCancellation={onRequestCancellation}
-        />
+        <CancelOrderModal isOpen={true} onClose={onClose} order={mockOrder} onCancel={onCancel} />
     )
 
     // Click request cancellation button
@@ -155,67 +156,228 @@ test('calls onClose when request cancellation button is clicked', async () => {
     expect(onClose).toHaveBeenCalledTimes(1)
 })
 
-test('component works correctly with all required props provided', async () => {
-    const onRequestCancellation = jest.fn()
-    const onClose = jest.fn()
-
-    renderWithProviders(
-        <CancelOrderModal
-            isOpen={true}
-            onClose={onClose}
-            order={mockOrder}
-            onRequestCancellation={onRequestCancellation}
-        />
-    )
-
-    expect(screen.getByRole('dialog')).toBeInTheDocument()
-    expect(screen.getByRole('button', {name: /request cancellation/i})).toBeInTheDocument()
-})
-
-test('onRequestCancellation is called with correct order parameter', async () => {
+test('passes order details when requesting cancellation', async () => {
     const user = userEvent.setup()
-    const onRequestCancellation = jest.fn()
+    const onCancel = jest.fn()
     const onClose = jest.fn()
 
     renderWithProviders(
-        <CancelOrderModal
-            isOpen={true}
-            onClose={onClose}
-            order={mockOrder}
-            onRequestCancellation={onRequestCancellation}
-        />
+        <CancelOrderModal isOpen={true} onClose={onClose} order={mockOrder} onCancel={onCancel} />
     )
 
     const requestButton = screen.getByRole('button', {name: /request cancellation/i})
     await user.click(requestButton)
 
     // Verify the callback is called with the exact order object
-    expect(onRequestCancellation).toHaveBeenCalledWith(mockOrder)
-    expect(onRequestCancellation).toHaveBeenCalledTimes(1)
+    expect(onCancel).toHaveBeenCalledWith(mockOrder, '')
+    expect(onCancel).toHaveBeenCalledTimes(1)
 })
 
-test('both onRequestCancellation and onClose are called in correct order', async () => {
-    const user = userEvent.setup()
-    const onRequestCancellation = jest.fn()
-    const onClose = jest.fn()
-    const callOrder = []
+describe('Cancellation Reason Dropdown', () => {
+    test('displays default cancellation reason', async () => {
+        renderWithProviders(
+            <CancelOrderModal
+                isOpen={true}
+                onClose={jest.fn()}
+                order={mockOrder}
+                onCancel={jest.fn()}
+            />
+        )
 
-    // Track call order
-    onRequestCancellation.mockImplementation(() => callOrder.push('onRequestCancellation'))
-    onClose.mockImplementation(() => callOrder.push('onClose'))
+        const menuButton = screen.getByRole('button', {name: /select a cancellation reason/i})
+        expect(menuButton).toBeInTheDocument()
+    })
 
-    renderWithProviders(
-        <CancelOrderModal
-            isOpen={true}
-            onClose={onClose}
-            order={mockOrder}
-            onRequestCancellation={onRequestCancellation}
-        />
-    )
+    test('opens dropdown menu when clicked', async () => {
+        const user = userEvent.setup()
+        renderWithProviders(
+            <CancelOrderModal
+                isOpen={true}
+                onClose={jest.fn()}
+                order={mockOrder}
+                onCancel={jest.fn()}
+            />
+        )
 
-    const requestButton = screen.getByRole('button', {name: /request cancellation/i})
-    await user.click(requestButton)
+        const menuButton = screen.getByRole('button', {name: /select a cancellation reason/i})
+        await user.click(menuButton)
 
-    // Verify both functions are called and in the correct order
-    expect(callOrder).toEqual(['onRequestCancellation', 'onClose'])
+        expect(screen.getByRole('menu')).toBeInTheDocument()
+    })
+
+    test('displays all available cancellation reasons in dropdown', async () => {
+        const user = userEvent.setup()
+        renderWithProviders(
+            <CancelOrderModal
+                isOpen={true}
+                onClose={jest.fn()}
+                order={mockOrder}
+                onCancel={jest.fn()}
+            />
+        )
+
+        const menuButton = screen.getByRole('button', {name: /select a cancellation reason/i})
+        await user.click(menuButton)
+
+        // Check for expected cancellation reasons
+        expect(
+            screen.getByRole('menuitem', {name: /select a cancellation reason/i})
+        ).toBeInTheDocument()
+        expect(screen.getByRole('menuitem', {name: /item price too high/i})).toBeInTheDocument()
+        expect(screen.getByRole('menuitem', {name: /shipping cost too high/i})).toBeInTheDocument()
+        expect(
+            screen.getByRole('menuitem', {name: /item\(s\) would not arrive on time/i})
+        ).toBeInTheDocument()
+        expect(
+            screen.getByRole('menuitem', {name: /order created by mistake/i})
+        ).toBeInTheDocument()
+        expect(screen.getByRole('menuitem', {name: /changed my mind/i})).toBeInTheDocument()
+        expect(screen.getByRole('menuitem', {name: /no longer needed/i})).toBeInTheDocument()
+        expect(screen.getByRole('menuitem', {name: /financial reasons/i})).toBeInTheDocument()
+        expect(screen.getByRole('menuitem', {name: /other/i})).toBeInTheDocument()
+    })
+
+    test('passes selected reason when cancellation is requested', async () => {
+        const user = userEvent.setup()
+        const onCancel = jest.fn()
+        renderWithProviders(
+            <CancelOrderModal
+                isOpen={true}
+                onClose={jest.fn()}
+                order={mockOrder}
+                onCancel={onCancel}
+            />
+        )
+
+        // Select a different reason
+        const menuButton = screen.getByRole('button', {name: /select a cancellation reason/i})
+        await user.click(menuButton)
+
+        const financialReasonsOption = screen.getByRole('menuitem', {name: /financial reasons/i})
+        await user.click(financialReasonsOption)
+
+        // Request cancellation
+        const requestButton = screen.getByRole('button', {name: /request cancellation/i})
+        await user.click(requestButton)
+
+        expect(onCancel).toHaveBeenCalledWith(mockOrder, 'financial_reasons')
+    })
+
+    test('passes empty string when cancellation is requested and no reason is explicitly selected', async () => {
+        const user = userEvent.setup()
+        const onCancel = jest.fn()
+
+        renderWithProviders(
+            <CancelOrderModal
+                isOpen={true}
+                onClose={jest.fn()}
+                order={mockOrder}
+                onCancel={onCancel}
+            />
+        )
+
+        const requestButton = screen.getByRole('button', {name: /request cancellation/i})
+        await user.click(requestButton)
+        expect(onCancel).toHaveBeenCalledWith(mockOrder, '')
+    })
+})
+
+describe('Order Items Display', () => {
+    const enhancedMockOrder = {
+        ...mockOrder,
+        productItems: [
+            {
+                productId: 'test-product-1',
+                quantity: 2,
+                productName: 'Test Product 1',
+                price: 50.0,
+                priceAfterItemDiscount: 50.0,
+                itemId: 'item-1'
+            },
+            {
+                productId: 'test-product-2',
+                quantity: 1,
+                productName: 'Test Product 2',
+                price: 75.99,
+                priceAfterItemDiscount: 75.99,
+                itemId: 'item-2'
+            }
+        ]
+    }
+
+    test('displays all order items', async () => {
+        renderWithProviders(
+            <CancelOrderModal
+                isOpen={true}
+                onClose={jest.fn()}
+                order={enhancedMockOrder}
+                onCancel={jest.fn()}
+            />
+        )
+
+        expect(screen.getByText('Test Product 1')).toBeInTheDocument()
+        expect(screen.getByText('Test Product 2')).toBeInTheDocument()
+    })
+
+    test('displays product quantities and prices correctly', async () => {
+        renderWithProviders(
+            <CancelOrderModal
+                isOpen={true}
+                onClose={jest.fn()}
+                order={enhancedMockOrder}
+                onCancel={jest.fn()}
+            />
+        )
+
+        expect(screen.getByLabelText(/current price US\$50\.00/i)).toBeInTheDocument()
+        expect(screen.getByLabelText(/current price US\$75\.99/i)).toBeInTheDocument()
+        expect(screen.getByText(/quantity:\s*2/i)).toBeInTheDocument()
+        expect(screen.getByText(/quantity:\s*1/i)).toBeInTheDocument()
+    })
+
+    test('calculates total price correctly for multiple quantities', async () => {
+        const orderWithMultipleQuantities = {
+            ...mockOrder,
+            productItems: [
+                {
+                    productId: 'bulk-product',
+                    quantity: 5,
+                    productName: 'Bulk Product',
+                    price: 12.5,
+                    priceAfterItemDiscount: 12.5,
+                    itemId: 'bulk-item'
+                }
+            ]
+        }
+
+        renderWithProviders(
+            <CancelOrderModal
+                isOpen={true}
+                onClose={jest.fn()}
+                order={orderWithMultipleQuantities}
+                onCancel={jest.fn()}
+            />
+        )
+        expect(screen.getByLabelText(/current price US\$12\.50/i)).toBeInTheDocument()
+        expect(screen.getByText(/quantity:\s*5/i)).toBeInTheDocument()
+    })
+
+    test('shows modal when there are no product items', async () => {
+        const orderWithNoItems = {
+            ...mockOrder,
+            productItems: []
+        }
+
+        renderWithProviders(
+            <CancelOrderModal
+                isOpen={true}
+                onClose={jest.fn()}
+                order={orderWithNoItems}
+                onCancel={jest.fn()}
+            />
+        )
+
+        expect(screen.getByRole('dialog')).toBeInTheDocument()
+        expect(screen.queryByText(/total:/i)).not.toBeInTheDocument()
+    })
 })
