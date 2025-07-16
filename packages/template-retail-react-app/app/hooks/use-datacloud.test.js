@@ -10,18 +10,11 @@ import {renderHook, waitFor} from '@testing-library/react'
 import useDataCloud from '@salesforce/retail-react-app/app/hooks/use-datacloud'
 import {useDNT} from '@salesforce/commerce-sdk-react'
 import {
-    mockLoginViewPageEvent,
-    mockViewProductEvent,
-    mockViewCategoryEvent,
-    mockViewSearchResultsEvent,
-    mockViewRecommendationsEvent,
+    mockLoginViewPageEventDNT,
     mockSearchParam,
     mockGloveSearchResult,
     mockCategorySearchParams,
-    mockRecommendationIds,
-    mockLoginViewPageEventDNT,
-    mockPartyIdentificationRegisteredEvent,
-    mockPartyIdentificationGuestEvent
+    mockRecommendationIds
 } from '@salesforce/retail-react-app/app/mocks/datacloud-mock-data'
 import {
     mockProduct,
@@ -153,7 +146,7 @@ describe('useDataCloud', function () {
         result.current.sendViewPage('/login')
         await waitFor(() => {
             const call = mockWebEventsAppSourceIdPost.mock.calls[0][0]
-            const partyEvent = call.events.find(e => e.eventType === 'partyIdentification')
+            const partyEvent = call.events.find((e) => e.eventType === 'partyIdentification')
             expect(partyEvent).toEqual(
                 expect.objectContaining({
                     IDName: 'CC_REGISTERED_CUSTOMER_ID',
@@ -185,7 +178,7 @@ describe('useDataCloud', function () {
         result.current.sendViewPage('/login')
         await waitFor(() => {
             const call = mockWebEventsAppSourceIdPost.mock.calls[0][0]
-            const partyEvent = call.events.find(e => e.eventType === 'partyIdentification')
+            const partyEvent = call.events.find((e) => e.eventType === 'partyIdentification')
             expect(partyEvent).toEqual(
                 expect.objectContaining({
                     IDName: 'CC_USID',
