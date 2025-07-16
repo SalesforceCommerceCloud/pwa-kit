@@ -14,11 +14,11 @@ import {Link as RouteLink, useHistory} from 'react-router-dom'
 import {
     Button,
     Flex,
-    Select,
+    NativeSelect,
     Text,
 
-    // Hooks
-    useStyleConfig
+    //Hooks
+    useSlotRecipe
 } from '@chakra-ui/react'
 
 // Icons
@@ -34,7 +34,6 @@ const SELECT_ID = 'pagination'
  */
 const Pagination = (props) => {
     const intl = useIntl()
-    const styles = useStyleConfig('Pagination')
     const history = useHistory()
     const {urls, currentURL, ...rest} = props
 
@@ -42,12 +41,20 @@ const Pagination = (props) => {
     const prev = urls[currentIndex - 1]
     const next = urls[currentIndex + 1]
 
+    const recipe = useSlotRecipe({key: 'pagination'})
+    const styles = recipe()
+
     // Determine the current page index.
     return (
-        <Flex data-testid="sf-pagination" className="sf-pagination" {...styles.container} {...rest}>
+        <Flex
+            data-testid="sf-pagination"
+            className="sf-pagination"
+            css={styles.container}
+            {...rest}
+        >
             {/* Previous Button */}
             <Button
-                {...styles.button}
+                css={styles.button}
                 as={RouteLink}
                 // Because we are using a button component as a link, the isDisabled flag isn't working
                 // as intended, the workaround is to use the current url when its disabled.
@@ -59,9 +66,10 @@ const Pagination = (props) => {
                 })}
                 aria-disabled={!prev}
                 variant="link"
+                isDisabled={!prev}
             >
-                <ChevronLeftIcon />
-                <Text>
+                <ChevronLeftIcon boxSize={4} color="black" />
+                <Text css={styles.text}>
                     {intl.formatMessage({
                         id: 'pagination.link.prev',
                         defaultMessage: 'Prev'
@@ -70,27 +78,29 @@ const Pagination = (props) => {
             </Button>
 
             {/* Direct Page Selection */}
-            <Flex paddingLeft={4} paddingRight={4}>
-                <Select
-                    id={SELECT_ID}
-                    onChange={(e) => {
-                        history.push(e.target.value)
-                    }}
-                    value={currentURL}
-                    height={11}
-                    aria-label={intl.formatMessage({
-                        id: 'pagination.field.page_number_select',
-                        defaultMessage: 'Select page number'
-                    })}
-                >
-                    {urls.map((href, index) => (
-                        <option key={index} value={href}>
-                            {index + 1}
-                        </option>
-                    ))}
-                </Select>
-
-                <Text {...styles.text}>
+            <Flex alignItems="center" css={styles.select}>
+                <NativeSelect.Root>
+                    <NativeSelect.Field
+                        css={styles.selectField}
+                        id={SELECT_ID}
+                        onChange={(e) => {
+                            history.push(e.target.value)
+                        }}
+                        value={currentURL}
+                        aria-label={intl.formatMessage({
+                            id: 'pagination.field.page_number_select',
+                            defaultMessage: 'Select page number'
+                        })}
+                    >
+                        {urls.map((href, index) => (
+                            <option key={index} value={href}>
+                                {index + 1}
+                            </option>
+                        ))}
+                    </NativeSelect.Field>
+                    <NativeSelect.Indicator css={styles.selectIndicator} />
+                </NativeSelect.Root>
+                <Text css={styles.text} ml={2}>
                     {intl.formatMessage(
                         {
                             id: 'pagination.field.num_of_pages',
@@ -103,7 +113,7 @@ const Pagination = (props) => {
 
             {/* Next Button */}
             <Button
-                {...styles.button}
+                css={styles.button}
                 as={RouteLink}
                 // Because we are using a button component as a link, the isDisabled flag isn't working
                 // as intended, the workaround is to use the current url when its disabled.
@@ -115,14 +125,15 @@ const Pagination = (props) => {
                 })}
                 aria-disabled={!next}
                 variant="link"
+                isDisabled={!next}
             >
-                <Text>
+                <Text css={styles.text}>
                     {intl.formatMessage({
                         id: 'pagination.link.next',
                         defaultMessage: 'Next'
                     })}
                 </Text>
-                <ChevronRightIcon />
+                <ChevronRightIcon boxSize={4} color="black" />
             </Button>
         </Flex>
     )

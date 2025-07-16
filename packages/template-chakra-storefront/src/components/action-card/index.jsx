@@ -8,7 +8,7 @@ import React, {useState} from 'react'
 import PropTypes from 'prop-types'
 import {Stack, Box, Button} from '@chakra-ui/react'
 import {FormattedMessage} from 'react-intl'
-import LoadingSpinner from '../loading-spinner'
+import LoadingSpinner from '../../components/loading-spinner'
 
 /**
  * Renders a card-style box with optional edit and remove buttons. Used for
@@ -38,22 +38,21 @@ const ActionCard = ({
 
     return (
         <Box
-            spacing={4}
-            p={4}
+            p="4"
             position="relative"
             border="1px solid"
             borderColor="gray.100"
-            borderRadius="base"
+            rounded="md"
             {...props}
         >
             {showLoading && <LoadingSpinner />}
-            <Stack spacing={3}>
+            <Stack gap="3">
                 <Box>{children}</Box>
-                <Stack direction="row" spacing={4}>
+                <Stack direction="row" gap="4">
                     {onEdit && (
                         <Button
                             onClick={onEdit}
-                            variant="link"
+                            variant="link-blue"
                             size="sm"
                             ref={editBtnRef}
                             aria-label={editBtnLabel}
@@ -63,11 +62,9 @@ const ActionCard = ({
                     )}
                     {onRemove && (
                         <Button
-                            variant="link"
+                            variant="link-red"
                             size="sm"
-                            colorScheme="red"
                             onClick={handleRemove}
-                            color="red.600"
                             aria-label={removeBtnLabel}
                         >
                             <FormattedMessage

@@ -12,8 +12,8 @@ import {createMemoryHistory} from 'history'
 import {
     useShopperContextSearchParams,
     getShopperContextFromSearchParams
-} from './use-shopper-context-search-params'
-import {SHOPPER_CONTEXT_FIELD_TYPES, SHOPPER_CONTEXT_SEARCH_PARAMS} from '../../config/constants'
+} from '../hooks/use-shopper-context-search-params'
+import {SHOPPER_CONTEXT_FIELD_TYPES, SHOPPER_CONTEXT_SEARCH_PARAMS} from '../constants'
 
 afterEach(() => {
     jest.clearAllMocks()

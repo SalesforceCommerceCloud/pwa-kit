@@ -8,9 +8,9 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import {FormattedMessage} from 'react-intl'
-import {Button, Divider, Stack, Text} from '@chakra-ui/react'
-import LoginFields from '../forms/login-fields'
-import SocialLogin from '../social-login'
+import {Button, Separator, Stack, Text} from '@chakra-ui/react'
+import LoginFields from '../../components/forms/login-fields'
+import SocialLogin from '../../components/social-login'
 
 const StandardLogin = ({
     form,
@@ -21,7 +21,7 @@ const StandardLogin = ({
     idps = []
 }) => {
     return (
-        <Stack spacing={8} paddingLeft={4} paddingRight={4}>
+        <Stack gap={8} paddingLeft={4} paddingRight={4}>
             <Stack>
                 <LoginFields
                     form={form}
@@ -29,7 +29,7 @@ const StandardLogin = ({
                     handleForgotPasswordClick={handleForgotPasswordClick}
                 />
             </Stack>
-            <Stack spacing={4}>
+            <Stack gap={4}>
                 <Button
                     type="submit"
                     onClick={() => {
@@ -41,8 +41,8 @@ const StandardLogin = ({
                 </Button>
                 {isSocialEnabled && idps.length > 0 && (
                     <>
-                        <Stack spacing={6} paddingTop={2} paddingBottom={2}>
-                            <Divider />
+                        <Stack gap={6} paddingTop={2} paddingBottom={2}>
+                            <Separator />
                             <Text align="center" fontSize="sm">
                                 <FormattedMessage
                                     defaultMessage="Or Login With"
@@ -55,7 +55,10 @@ const StandardLogin = ({
                 )}
                 {hideEmail && (
                     <Button
-                        onClick={() => setShowPasswordView(false)}
+                        onClick={() => {
+                            form.resetField('password')
+                            setShowPasswordView(false)
+                        }}
                         borderColor="gray.500"
                         color="blue.600"
                         variant="outline"

@@ -20,7 +20,7 @@ import {Region, regionPropType} from '@salesforce/commerce-sdk-react/components'
  * @returns {React.ReactElement} - Grid component.
  */
 export const MobileGrid3r1c = ({regions}) => (
-    <SimpleGrid className="mobile-3r-1c" columns={{base: 1, sm: 3}} gridGap={4}>
+    <SimpleGrid className="mobile-3r-1c" columns={{base: 1, sm: 3}} gap={4}>
         {regions.map((region) => (
             <Region key={region.id} region={region} />
         ))}

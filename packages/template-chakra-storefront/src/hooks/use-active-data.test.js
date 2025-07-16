@@ -41,7 +41,7 @@ const MockComponent = ({action, args}) => {
 
 MockComponent.propTypes = {
     action: PropTypes.string.isRequired,
-    args: PropTypes.arrayOf[PropTypes.any]
+    args: PropTypes.arrayOf(PropTypes.any)
 }
 
 beforeAll(() => {

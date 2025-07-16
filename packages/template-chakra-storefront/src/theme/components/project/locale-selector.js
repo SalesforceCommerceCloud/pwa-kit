@@ -4,8 +4,18 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-export default {
-    baseStyle: {
+import {defineSlotRecipe} from '@chakra-ui/react'
+
+export default defineSlotRecipe({
+    slots: [
+        'accordion',
+        'container',
+        'selectedButton',
+        'selectedText',
+        'optionButton',
+        'optionText'
+    ],
+    base: {
         accordion: {},
         container: {},
         selectedButtonIcon: {
@@ -30,13 +40,5 @@ export default {
             paddingRight: 4,
             textAlign: 'left'
         }
-    },
-    parts: [
-        'accordion',
-        'container',
-        'selectedButton',
-        'selectedText',
-        'optionButton',
-        'optionText'
-    ]
-}
+    }
+})

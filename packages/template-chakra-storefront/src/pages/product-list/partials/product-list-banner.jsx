@@ -27,7 +27,7 @@ const PAGEDESIGNER_TO_COMPONENT = {
     'commerce_layouts.mobileGrid1r1c': MobileGrid1r1c
 }
 
-const PageDesignerPromotionalBanner = () => {
+const ProductListBanner = () => {
     const {site} = useMultiSite()
     const {usid} = useUsid()
     const {data: shopperContext} = useShopperContext(
@@ -76,6 +76,6 @@ const PageDesignerPromotionalBanner = () => {
     )
 }
 
-PageDesignerPromotionalBanner.propTypes = {}
+ProductListBanner.propTypes = {}
 
-export default PageDesignerPromotionalBanner
+export default ProductListBanner

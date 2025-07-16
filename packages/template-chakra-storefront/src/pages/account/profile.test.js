@@ -5,27 +5,40 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
-import {screen, waitFor, within} from '@testing-library/react'
+import {act, screen, waitFor, within} from '@testing-library/react'
 import {createPathWithDefaults, renderWithProviders} from '../../utils/test-utils'
 import {rest} from 'msw'
-import AccountDetail from './profile'
-import {
-    mockedRegisteredCustomerWithNoNumber,
-    mockedRegisteredCustomer
-} from '../../../mocks/mock-data'
+import AccountDetail from '../../pages/account/profile'
+import {mockedRegisteredCustomerWithNoNumber, mockedRegisteredCustomer} from '../../mocks/mock-data'
+import Toaster, {toaster} from '../../components/toaster'
+
 import {Route, Switch} from 'react-router-dom'
-import mockConfig from '../../../mock-config'
+import mockConfig from '../../mock-config'
 import * as sdk from '@salesforce/commerce-sdk-react'
 
 const MockedComponent = () => {
     return (
-        <Switch>
-            <Route path={createPathWithDefaults('/account')}>
-                <AccountDetail />
-            </Route>
-        </Switch>
+        <>
+            <Switch>
+                <Route path={createPathWithDefaults('/account')}>
+                    <AccountDetail />
+                </Route>
+            </Switch>
+            <Toaster toaster={toaster} />
+        </>
     )
 }
+
+jest.mock('../../hooks/use-datacloud', () => ({
+    __esModule: true,
+    default: jest.fn(() => ({
+        sendViewPage: jest.fn(),
+        sendViewProduct: jest.fn(),
+        sendViewCategory: jest.fn(),
+        sendViewSearchResults: jest.fn(),
+        sendViewRecommendations: jest.fn()
+    }))
+}))
 
 jest.mock('@salesforce/commerce-sdk-react', () => ({
     ...jest.requireActual('@salesforce/commerce-sdk-react'),
@@ -67,23 +80,29 @@ test('Allows customer to edit phone number', async () => {
     })
 
     const profileCard = screen.getByTestId('sf-toggle-card-my-profile')
-    // Change phone number
-    await user.click(within(profileCard).getByText(/edit/i))
+    await act(async () => {
+        // Change phone number
+        await user.click(within(profileCard).getByText(/edit/i))
+    })
 
     // Profile Form must be present
     expect(screen.getByLabelText('Profile Form')).toBeInTheDocument()
 
-    await user.type(screen.getByLabelText('Phone Number'), '7275551234')
-
+    await act(async () => {
+        await user.type(screen.getByLabelText('Phone Number'), '7275551234')
+    })
     global.server.use(
         rest.get('*/customers/:customerId', (req, res, ctx) =>
             res(ctx.delay(0), ctx.status(200), ctx.json(mockedRegisteredCustomer))
         )
     )
-    await user.click(screen.getByText(/^Save$/i))
 
+    await act(async () => {
+        await user.click(screen.getByText(/^Save$/i))
+    })
     await waitFor(() => {
-        expect(screen.getByText(/Profile updated/i)).toBeInTheDocument()
+        // Toast messages are rendered in a portal, so we need to search within document.body
+        expect(within(document.body).getByText(/Profile updated/i)).toBeInTheDocument()
         expect(screen.getByText(/555-1234/i)).toBeInTheDocument()
     })
 })

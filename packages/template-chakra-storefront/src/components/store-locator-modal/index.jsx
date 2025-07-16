@@ -16,14 +16,14 @@ import {
     ModalContent,
     useBreakpointValue
 } from '@chakra-ui/react'
-import StoreLocatorContent from './store-locator-content'
+import StoreLocatorContent from '../../components/store-locator-modal/store-locator-content'
 
 // Others
 import {
     DEFAULT_STORE_LOCATOR_COUNTRY,
     DEFAULT_STORE_LOCATOR_POSTAL_CODE,
     STORE_LOCATOR_NUM_STORES_PER_LOAD
-} from '../../../config/constants'
+} from '../../constants'
 
 export const StoreLocatorContext = createContext()
 export const useStoreLocator = () => {

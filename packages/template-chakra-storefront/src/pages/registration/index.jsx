@@ -17,7 +17,7 @@ import RegisterForm from '../../components/register'
 import useNavigation from '../../hooks/use-navigation'
 import useEinstein from '../../hooks/use-einstein'
 import useDataCloud from '../../hooks/use-datacloud'
-import {API_ERROR_MESSAGE} from '../../../config/constants'
+import {API_ERROR_MESSAGE} from '../../constants'
 
 const Registration = () => {
     const {formatMessage} = useIntl()

@@ -12,15 +12,15 @@ import {Box, Container} from '@chakra-ui/react'
 import {useForm} from 'react-hook-form'
 import Seo from '../../components/seo'
 import ResetPasswordForm from '../../components/reset-password'
-import ResetPasswordLanding from './reset-password-landing'
+import ResetPasswordLanding from '../../pages/reset-password/reset-password-landing'
 import useNavigation from '../../hooks/use-navigation'
 import useEinstein from '../../hooks/use-einstein'
 import useDataCloud from '../../hooks/use-datacloud'
 import {useLocation, useRouteMatch} from 'react-router-dom'
 import {usePasswordReset} from '../../hooks/use-password-reset'
-import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
+import {useExtensionConfig} from '../../hooks'
 
-import {API_ERROR_MESSAGE, FEATURE_UNAVAILABLE_ERROR_MESSAGE} from '../../../config/constants'
+import {API_ERROR_MESSAGE, FEATURE_UNAVAILABLE_ERROR_MESSAGE} from '../../constants'
 
 const ResetPassword = () => {
     const {formatMessage} = useIntl()
@@ -31,7 +31,7 @@ const ResetPassword = () => {
     const {pathname} = useLocation()
     const {path} = useRouteMatch()
     const {getPasswordResetToken} = usePasswordReset()
-    const {login: loginConfig} = getConfig()
+    const {login: loginConfig} = useExtensionConfig()
 
     const submitForm = async ({email}) => {
         try {

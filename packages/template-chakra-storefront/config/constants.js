@@ -6,7 +6,11 @@
  */
 
 import {defineMessage} from 'react-intl'
+<<<<<<<< HEAD:packages/template-chakra-storefront/config/constants.js
 import {noop} from '../src/utils/utils'
+========
+import {noop} from './utils/utils'
+>>>>>>>> e4b9d54d342d40c97f14f6777c8c9dc16d8d3be1:packages/template-chakra-storefront/src/constants.js
 
 // Default details of badge labels and the corresponding product custom properties that enable badges.
 export const PRODUCT_BADGE_DETAILS = [
@@ -180,6 +184,7 @@ export const SHOPPER_CONTEXT_SEARCH_PARAMS = {
     }
 }
 
+<<<<<<<< HEAD:packages/template-chakra-storefront/config/constants.js
 // Constants for Login
 export const LOGIN_TYPES = {
     PASSWORD: 'password',
@@ -187,6 +192,8 @@ export const LOGIN_TYPES = {
     SOCIAL: 'social'
 }
 
+========
+>>>>>>>> e4b9d54d342d40c97f14f6777c8c9dc16d8d3be1:packages/template-chakra-storefront/src/constants.js
 export const PASSWORDLESS_ERROR_MESSAGES = [
     /callback_uri doesn't match/i,
     /passwordless permissions error/i,

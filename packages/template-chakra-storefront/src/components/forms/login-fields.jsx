@@ -7,9 +7,9 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import {FormattedMessage} from 'react-intl'
-import {Stack, Box, Button} from '@chakra-ui/react'
-import useLoginFields from './useLoginFields'
-import Field from '../field'
+import {Stack, Flex, Button} from '@chakra-ui/react'
+import useLoginFields from '../../components/forms/useLoginFields'
+import Field from '../../components/field'
 
 const LoginFields = ({
     form,
@@ -20,20 +20,24 @@ const LoginFields = ({
 }) => {
     const fields = useLoginFields({form, prefix})
     return (
-        <Stack spacing={5}>
+        <Stack gap={5}>
             {!hideEmail && <Field {...fields.email} />}
             {!hidePassword && (
                 <Stack>
                     <Field {...fields.password} />
                     {handleForgotPasswordClick && (
-                        <Box>
-                            <Button variant="link" size="sm" onClick={handleForgotPasswordClick}>
+                        <Flex>
+                            <Button
+                                variant="link-blue"
+                                size="sm"
+                                onClick={handleForgotPasswordClick}
+                            >
                                 <FormattedMessage
                                     defaultMessage="Forgot password?"
                                     id="login_form.link.forgot_password"
                                 />
                             </Button>
-                        </Box>
+                        </Flex>
                     )}
                 </Stack>
             )}

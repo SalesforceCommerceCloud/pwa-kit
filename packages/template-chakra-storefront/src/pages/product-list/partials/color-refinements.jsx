@@ -6,31 +6,23 @@
  */
 
 import React from 'react'
-import {
-    Box,
-    SimpleGrid,
-    HStack,
-    Text,
-    Button,
-    Center,
-    useMultiStyleConfig,
-    useTheme
-} from '@chakra-ui/react'
+import {Box, SimpleGrid, HStack, Text, Button, Center, useSlotRecipe} from '@chakra-ui/react'
 import PropTypes from 'prop-types'
 import {useIntl} from 'react-intl'
-import {ADD_FILTER_HIT_COUNT, REMOVE_FILTER_HIT_COUNT} from './refinements-utils'
+import {
+    ADD_FILTER_HIT_COUNT,
+    REMOVE_FILTER_HIT_COUNT
+} from '../../../pages/product-list/partials/refinements-utils'
 
 const ColorRefinements = ({filter, toggleFilter, selectedFilters}) => {
     const intl = useIntl()
-    const styles = useMultiStyleConfig('SwatchGroup', {
-        variant: 'circle',
-        disabled: false
+    const recipe = useSlotRecipe({
+        key: 'swatchGroup',
+        variant: 'circle'
     })
-    const theme = useTheme()
-    const cssColorGroups = theme.colors.cssColorGroups
 
     return (
-        <SimpleGrid columns={2} spacing={2} mt={1}>
+        <SimpleGrid columns={2} gap={2} mt={1}>
             {filter.values.map((value, idx) => {
                 const isSelected = selectedFilters.includes(value.value)
 
@@ -38,29 +30,31 @@ const ColorRefinements = ({filter, toggleFilter, selectedFilters}) => {
                 // many refinements
                 if (value.hitCount === 0 && !isSelected) return
 
+                const styles = recipe({variant: 'circle', selected: isSelected})
+
                 return (
                     <Box key={idx}>
-                        <HStack
-                            onClick={() => toggleFilter(value, filter.attributeId, isSelected)}
-                            spacing={1}
-                            cursor="pointer"
-                        >
+                        <HStack gap={1} cursor="pointer">
                             <Button
-                                {...styles.swatch}
-                                color={isSelected ? 'black' : 'gray.200'}
-                                border={isSelected ? '1px' : '0'}
-                                aria-checked={isSelected}
-                                role="checkbox"
-                                variant="outline"
-                                marginRight={0}
-                                marginBottom="-1px"
+                                css={styles.swatch}
                                 aria-label={intl.formatMessage(
                                     isSelected ? REMOVE_FILTER_HIT_COUNT : ADD_FILTER_HIT_COUNT,
                                     value
                                 )}
+                                aria-checked={isSelected}
+                                data-state={isSelected ? 'selected' : undefined}
+                                variant="outline"
+                                role="checkbox"
+                                tabIndex={0}
+                                marginRight={0}
+                                marginBottom={0}
+                                onClick={(e) => {
+                                    e.preventDefault()
+                                    toggleFilter(value, filter.attributeId, isSelected)
+                                }}
                             >
                                 <Center
-                                    {...styles.swatchButton}
+                                    css={styles.swatchButton}
                                     marginRight={0}
                                     border="1px solid black"
                                 >
@@ -71,13 +65,11 @@ const ColorRefinements = ({filter, toggleFilter, selectedFilters}) => {
                                         minWidth="32px"
                                         backgroundRepeat="no-repeat"
                                         backgroundSize="cover"
-                                        backgroundColor={
-                                            cssColorGroups[value.presentationId.toLowerCase()]
-                                        }
+                                        backgroundColor={`cssColorGroups.${value.presentationId?.toLowerCase()}`}
                                         background={
-                                            value.presentationId.toLowerCase() ===
-                                                'miscellaneous' &&
-                                            cssColorGroups[value.presentationId.toLowerCase()]
+                                            value.presentationId?.toLowerCase() === 'miscellaneous'
+                                                ? `cssColorGroups.${value.presentationId?.toLowerCase()}`
+                                                : undefined
                                         }
                                     />
                                 </Center>
@@ -87,6 +79,8 @@ const ColorRefinements = ({filter, toggleFilter, selectedFilters}) => {
                                 alignItems="center"
                                 fontSize="sm"
                                 marginBottom="1px"
+                                onClick={() => toggleFilter(value, filter.attributeId, isSelected)}
+                                cursor="pointer"
                                 aria-hidden="true" // avoid redundant readout since swatch has aria label
                             >
                                 {intl.formatMessage(

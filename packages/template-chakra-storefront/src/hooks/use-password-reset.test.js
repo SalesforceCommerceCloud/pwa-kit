@@ -9,7 +9,6 @@ import {fireEvent, screen, waitFor} from '@testing-library/react'
 import {useAuthHelper, AuthHelpers} from '@salesforce/commerce-sdk-react'
 import {renderWithProviders} from '../utils/test-utils'
 import {usePasswordReset} from './use-password-reset'
-import mockConfig from '../../mock-config'
 
 const mockEmail = 'test@email.com'
 const mockToken = '123456'
@@ -70,7 +69,7 @@ describe('usePasswordReset', () => {
             expect(getPasswordResetToken.mutateAsync).toHaveBeenCalled()
             expect(getPasswordResetToken.mutateAsync).toHaveBeenCalledWith({
                 user_id: mockEmail,
-                callback_uri: mockConfig.login.resetPassword.callbackURI
+                callback_uri: 'https://www.domain.com/reset-password-callback'
             })
         })
     })

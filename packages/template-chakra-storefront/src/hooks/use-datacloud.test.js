@@ -23,13 +23,13 @@ import {
     mockCategorySearchParams,
     mockRecommendationIds,
     mockLoginViewPageEventDNT
-} from '../../mocks/datacloud-mock-data'
+} from '../mocks/datacloud-mock-data'
 import {
     mockProduct,
     mockCategory,
     mockSearchResults,
     mockRecommenderDetails
-} from './einstein-mock-data'
+} from '../hooks/einstein-mock-data'
 import {renderWithProviders} from '../utils/test-utils'
 
 jest.mock('@salesforce/commerce-sdk-react', () => {

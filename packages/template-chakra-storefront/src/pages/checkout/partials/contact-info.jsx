@@ -6,28 +6,16 @@
  */
 import React, {useEffect, useRef, useState} from 'react'
 import PropTypes from 'prop-types'
-import {
-    Alert,
-    AlertDialog,
-    AlertDialogBody,
-    AlertDialogContent,
-    AlertDialogFooter,
-    AlertDialogHeader,
-    AlertDialogOverlay,
-    AlertIcon,
-    Box,
-    Button,
-    Container,
-    Stack,
-    Text
-} from '@chakra-ui/react'
+import {Alert, Box, Button, Container, Dialog, Stack, Text} from '@chakra-ui/react'
 import {useForm} from 'react-hook-form'
 import {FormattedMessage, useIntl} from 'react-intl'
-import {useCheckout} from '../util/checkout-context'
+import {useCheckout} from '../../../pages/checkout/util/checkout-context'
 import useLoginFields from '../../../components/forms/useLoginFields'
 import {ToggleCard, ToggleCardEdit, ToggleCardSummary} from '../../../components/toggle-card'
 import Field from '../../../components/field'
-import LoginState from './login-state'
+import SafePortal from '../../../components/safe-portal'
+import {AlertIcon} from '../../../components/icons'
+import LoginState from '../../../pages/checkout/partials/login-state'
 import {AuthModal, EMAIL_VIEW, PASSWORD_VIEW, useAuthModal} from '../../../hooks/use-auth-modal'
 import useNavigation from '../../../hooks/use-navigation'
 import {useCurrentCustomer} from '../../../hooks/use-current-customer'
@@ -35,7 +23,7 @@ import {useCurrentBasket} from '../../../hooks/use-current-basket'
 import {isAbsoluteURL} from '../../../page-designer/utils'
 import {useAppOrigin} from '../../../hooks/use-app-origin'
 import {AuthHelpers, useAuthHelper, useShopperBasketsMutation} from '@salesforce/commerce-sdk-react'
-import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
+import {useExtensionConfig} from '../../../hooks/use-extension-config'
 
 import {
     API_ERROR_MESSAGE,
@@ -43,7 +31,7 @@ import {
     CREATE_ACCOUNT_FIRST_ERROR_MESSAGE,
     PASSWORDLESS_ERROR_MESSAGES,
     USER_NOT_FOUND_ERROR
-} from '../../../../config/constants'
+} from '../../../constants'
 
 const ContactInfo = ({isSocialEnabled = false, isPasswordlessEnabled = false, idps = []}) => {
     const {formatMessage} = useIntl()
@@ -51,7 +39,7 @@ const ContactInfo = ({isSocialEnabled = false, isPasswordlessEnabled = false, id
     const {data: customer} = useCurrentCustomer()
     const {data: basket} = useCurrentBasket()
     const appOrigin = useAppOrigin()
-    const config = getConfig()
+    const config = useExtensionConfig()
     const login = useAuthHelper(AuthHelpers.LoginRegisteredUserB2C)
     const logout = useAuthHelper(AuthHelpers.Logout)
     const authorizePasswordlessLogin = useAuthHelper(AuthHelpers.AuthorizePasswordless)
@@ -73,7 +61,6 @@ const ContactInfo = ({isSocialEnabled = false, isPasswordlessEnabled = false, id
 
     const [authModalView, setAuthModalView] = useState(PASSWORD_VIEW)
     const authModal = useAuthModal(authModalView)
-    const [isPasswordlessLoginClicked, setIsPasswordlessLoginClicked] = useState(false)
     const passwordlessConfigCallback = config.login?.passwordless?.callbackURI
     const callbackURL = isAbsoluteURL(passwordlessConfigCallback)
         ? passwordlessConfigCallback
@@ -100,11 +87,6 @@ const ContactInfo = ({isSocialEnabled = false, isPasswordlessEnabled = false, id
 
     const submitForm = async (data) => {
         setError(null)
-        if (isPasswordlessLoginClicked) {
-            handlePasswordlessLogin(data.email)
-            setIsPasswordlessLoginClicked(false)
-            return
-        }
         try {
             if (!data.password) {
                 await updateCustomerForBasket.mutateAsync({
@@ -159,8 +141,15 @@ const ContactInfo = ({isSocialEnabled = false, isPasswordlessEnabled = false, id
         }
     }, [showPasswordField])
 
-    const onPasswordlessLoginClick = async () => {
-        setIsPasswordlessLoginClicked(true)
+    const onPasswordlessLoginClick = async (e) => {
+        const isValid = await form.trigger('email')
+        const domForm = e.target.closest('form')
+        if (isValid && domForm.checkValidity()) {
+            const email = form.getValues().email
+            await handlePasswordlessLogin(email)
+        } else {
+            domForm.reportValidity()
+        }
     }
 
     return (
@@ -194,15 +183,17 @@ const ContactInfo = ({isSocialEnabled = false, isPasswordlessEnabled = false, id
             <ToggleCardEdit>
                 <Container variant="form">
                     <form onSubmit={form.handleSubmit(submitForm)}>
-                        <Stack spacing={6}>
+                        <Stack gap={6}>
                             {error && (
-                                <Alert status="error">
-                                    <AlertIcon />
-                                    {error}
-                                </Alert>
+                                <Alert.Root status="error">
+                                    <Alert.Indicator>
+                                        <AlertIcon color="red.500" boxSize="4" />
+                                    </Alert.Indicator>
+                                    <Alert.Title>{error}</Alert.Title>
+                                </Alert.Root>
                             )}
 
-                            <Stack spacing={5} position="relative">
+                            <Stack gap={5} position="relative">
                                 <Field {...fields.email} inputRef={emailRef} />
                                 {showPasswordField && (
                                     <Stack>
@@ -223,7 +214,7 @@ const ContactInfo = ({isSocialEnabled = false, isPasswordlessEnabled = false, id
                                 )}
                             </Stack>
 
-                            <Stack spacing={3}>
+                            <Stack gap={3}>
                                 <Button type="submit">
                                     {!showPasswordField ? (
                                         <FormattedMessage
@@ -279,41 +270,53 @@ const SignOutConfirmationDialog = ({isOpen, onConfirm, onClose}) => {
     const cancelRef = useRef()
 
     return (
-        <AlertDialog isOpen={isOpen} leastDestructiveRef={cancelRef} onClose={onClose}>
-            <AlertDialogOverlay>
-                <AlertDialogContent>
-                    <AlertDialogHeader fontSize="lg" fontWeight="bold">
-                        <FormattedMessage
-                            defaultMessage="Sign Out"
-                            id="signout_confirmation_dialog.heading.sign_out"
-                        />
-                    </AlertDialogHeader>
+        <Dialog.Root
+            role="alertdialog"
+            initialFocusEl={cancelRef}
+            open={isOpen}
+            onOpenChange={(details) => !details.open && onClose()}
+        >
+            <SafePortal>
+                <Dialog.Backdrop />
+                <Dialog.Positioner>
+                    <Dialog.Content>
+                        <Dialog.Header>
+                            <Dialog.Title fontSize="lg" fontWeight="bold">
+                                <FormattedMessage
+                                    defaultMessage="Sign Out"
+                                    id="signout_confirmation_dialog.heading.sign_out"
+                                />
+                            </Dialog.Title>
+                        </Dialog.Header>
 
-                    <AlertDialogBody>
-                        <FormattedMessage
-                            defaultMessage="Are you sure you want to sign out? You will need to sign back in to proceed
-                        with your current order."
-                            id="signout_confirmation_dialog.message.sure_to_sign_out"
-                        />
-                    </AlertDialogBody>
+                        <Dialog.Body>
+                            <FormattedMessage
+                                defaultMessage="Are you sure you want to sign out? You will need to sign back in to proceed
+                            with your current order."
+                                id="signout_confirmation_dialog.message.sure_to_sign_out"
+                            />
+                        </Dialog.Body>
 
-                    <AlertDialogFooter>
-                        <Button ref={cancelRef} variant="outline" onClick={onClose}>
-                            <FormattedMessage
-                                defaultMessage="Cancel"
-                                id="signout_confirmation_dialog.button.cancel"
-                            />
-                        </Button>
-                        <Button colorScheme="red" onClick={onConfirm} ml={3}>
-                            <FormattedMessage
-                                defaultMessage="Sign Out"
-                                id="signout_confirmation_dialog.button.sign_out"
-                            />
-                        </Button>
-                    </AlertDialogFooter>
-                </AlertDialogContent>
-            </AlertDialogOverlay>
-        </AlertDialog>
+                        <Dialog.Footer>
+                            <Dialog.ActionTrigger asChild>
+                                <Button ref={cancelRef} variant="outline">
+                                    <FormattedMessage
+                                        defaultMessage="Cancel"
+                                        id="signout_confirmation_dialog.button.cancel"
+                                    />
+                                </Button>
+                            </Dialog.ActionTrigger>
+                            <Button colorPalette="red" onClick={onConfirm} ml={3}>
+                                <FormattedMessage
+                                    defaultMessage="Sign Out"
+                                    id="signout_confirmation_dialog.button.sign_out"
+                                />
+                            </Button>
+                        </Dialog.Footer>
+                    </Dialog.Content>
+                </Dialog.Positioner>
+            </SafePortal>
+        </Dialog.Root>
     )
 }
 

@@ -22,7 +22,7 @@ const FormActionButtons = ({
     onCancel = () => {}
 }) => {
     return (
-        <Stack direction={{base: 'column', lg: 'row-reverse'}} spacing={4}>
+        <Stack direction={{base: 'column', lg: 'row-reverse'}} gap={4}>
             <Button type="submit" minWidth={28} {...saveButtonProps}>
                 {saveButtonLabel ? (
                     <FormattedMessage {...saveButtonLabel} />

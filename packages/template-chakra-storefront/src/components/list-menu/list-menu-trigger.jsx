@@ -5,37 +5,20 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, {forwardRef} from 'react'
+import React from 'react'
 import PropTypes from 'prop-types'
 import {Link as RouteLink} from 'react-router-dom'
 
-// Components
-import {
-    Box,
-    PopoverTrigger,
+import {Box, useSlotRecipe} from '@chakra-ui/react'
 
-    // Hooks
-    useTheme
-} from '@chakra-ui/react'
+import Link from '../../components/link'
+import {ChevronDownIcon} from '../../components/icons'
 
-// Project Components
-import Link from '../link'
-
-// Others
 import {categoryUrlBuilder} from '../../utils/url'
-import {ChevronDownIcon} from '../icons'
-
-const ChevronIconTrigger = forwardRef(function ChevronIconTrigger(props, ref) {
-    return (
-        <Box {...props} ref={ref}>
-            <ChevronDownIcon />
-        </Box>
-    )
-})
 
 const ListMenuTrigger = ({item, name, isOpen, onOpen, onClose}) => {
-    const theme = useTheme()
-    const {baseStyle} = theme.components.ListMenu
+    const recipe = useSlotRecipe({key: 'listMenu'})
+    const styles = recipe()
 
     const keyMap = {
         Escape: () => onClose(),
@@ -43,31 +26,29 @@ const ListMenuTrigger = ({item, name, isOpen, onOpen, onClose}) => {
     }
 
     return (
-        <Box {...baseStyle.listMenuTriggerContainer}>
+        <Box css={styles.listMenuTriggerContainer}>
             <Link
                 as={RouteLink}
                 to={categoryUrlBuilder(item)}
                 onMouseOver={onOpen}
-                {...baseStyle.listMenuTriggerLink}
+                css={styles.listMenuTriggerLink}
                 {...{name: name + ' __'}}
-                {...(isOpen ? baseStyle.listMenuTriggerLinkActive : {})}
+                {...(isOpen ? {css: styles.listMenuTriggerLinkActive} : {})}
             >
                 {name}
             </Link>
 
-            <PopoverTrigger>
-                <Link
-                    as={RouteLink}
-                    to={'#'}
-                    onMouseOver={onOpen}
-                    onKeyDown={(e) => {
-                        keyMap[e.key]?.(e)
-                    }}
-                    {...baseStyle.listMenuTriggerLinkIcon}
-                >
-                    <ChevronIconTrigger {...baseStyle.selectedButtonIcon} />
-                </Link>
-            </PopoverTrigger>
+            <Link
+                as={RouteLink}
+                to={'#'}
+                onMouseOver={onOpen}
+                onKeyDown={(e) => {
+                    keyMap[e.key]?.(e)
+                }}
+                css={styles.listMenuTriggerLinkIcon}
+            >
+                <ChevronDownIcon />
+            </Link>
         </Box>
     )
 }

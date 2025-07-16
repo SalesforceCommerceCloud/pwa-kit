@@ -12,7 +12,7 @@ import Link from '../../../components/link'
 
 const LinkRefinements = ({filter}) => {
     return (
-        <Stack spacing={1}>
+        <Stack gap={1}>
             {filter.values.map((value) => {
                 return (
                     <Link

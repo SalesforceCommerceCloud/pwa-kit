@@ -33,12 +33,11 @@ import {
     INVALID_TOKEN_ERROR,
     INVALID_TOKEN_ERROR_MESSAGE,
     FEATURE_UNAVAILABLE_ERROR_MESSAGE,
-    LOGIN_TYPES,
     PASSWORDLESS_ERROR_MESSAGES,
     USER_NOT_FOUND_ERROR
-} from '../../../config/constants'
+} from '../../constants'
 import {usePrevious} from '../../hooks/use-previous'
-import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
+import {useExtensionConfig} from '../../hooks'
 import {isServer} from '../../utils/utils'
 
 const LOGIN_ERROR_MESSAGE = defineMessage({
@@ -58,7 +57,7 @@ const Login = ({initialView = LOGIN_VIEW}) => {
     const {path} = useRouteMatch()
     const einstein = useEinstein()
     const dataCloud = useDataCloud()
-    const {login: loginConfig} = getConfig()
+    const {login: loginConfig} = useExtensionConfig()
     const {isRegistered, customerType} = useCustomerType()
     const login = useAuthHelper(AuthHelpers.LoginRegisteredUserB2C)
     const loginPasswordless = useAuthHelper(AuthHelpers.LoginPasswordlessUser)
@@ -80,7 +79,6 @@ const Login = ({initialView = LOGIN_VIEW}) => {
     const mergeBasket = useShopperBasketsMutation('mergeBasket')
     const [currentView, setCurrentView] = useState(initialView)
     const [passwordlessLoginEmail, setPasswordlessLoginEmail] = useState('')
-    const [loginType, setLoginType] = useState(LOGIN_TYPES.PASSWORD)
     const [redirectPath, setRedirectPath] = useState('')
 
     const handleMergeBasket = () => {
@@ -111,39 +109,41 @@ const Login = ({initialView = LOGIN_VIEW}) => {
         }
     }
 
-    const submitForm = async (data) => {
-        form.clearErrors()
-
-        const handlePasswordlessLogin = async (email) => {
-            try {
-                await authorizePasswordlessLogin.mutateAsync({userid: email})
-                setCurrentView(EMAIL_VIEW)
-            } catch (error) {
-                const message = USER_NOT_FOUND_ERROR.test(error.message)
-                    ? formatMessage(CREATE_ACCOUNT_FIRST_ERROR_MESSAGE)
-                    : PASSWORDLESS_ERROR_MESSAGES.some((msg) => msg.test(error.message))
-                    ? formatMessage(FEATURE_UNAVAILABLE_ERROR_MESSAGE)
-                    : formatMessage(API_ERROR_MESSAGE)
-                form.setError('global', {type: 'manual', message})
-            }
+    const handlePasswordlessLogin = async (email) => {
+        try {
+            await authorizePasswordlessLogin.mutateAsync({userid: email})
+            setPasswordlessLoginEmail(email)
+            setCurrentView(EMAIL_VIEW)
+        } catch (error) {
+            const message = USER_NOT_FOUND_ERROR.test(error.message)
+                ? formatMessage(CREATE_ACCOUNT_FIRST_ERROR_MESSAGE)
+                : PASSWORDLESS_ERROR_MESSAGES.some((msg) => msg.test(error.message))
+                ? formatMessage(FEATURE_UNAVAILABLE_ERROR_MESSAGE)
+                : formatMessage(API_ERROR_MESSAGE)
+            form.setError('global', {type: 'manual', message})
         }
+    }
+
+    const submitForm = async (data, isPasswordless = false) => {
+        form.clearErrors()
 
         return {
             login: async (data) => {
-                if (loginType === LOGIN_TYPES.PASSWORD) {
-                    try {
-                        await login.mutateAsync({username: data.email, password: data.password})
-                    } catch (error) {
-                        const message = /Unauthorized/i.test(error.message)
-                            ? formatMessage(LOGIN_ERROR_MESSAGE)
-                            : formatMessage(API_ERROR_MESSAGE)
-                        form.setError('global', {type: 'manual', message})
-                    }
-                    handleMergeBasket()
-                } else if (loginType === LOGIN_TYPES.PASSWORDLESS) {
-                    setPasswordlessLoginEmail(data.email)
-                    await handlePasswordlessLogin(data.email)
+                if (isPasswordless) {
+                    const email = data.email
+                    await handlePasswordlessLogin(email)
+                    return
                 }
+
+                try {
+                    await login.mutateAsync({username: data.email, password: data.password})
+                } catch (error) {
+                    const message = /Unauthorized/i.test(error.message)
+                        ? formatMessage(LOGIN_ERROR_MESSAGE)
+                        : formatMessage(API_ERROR_MESSAGE)
+                    form.setError('global', {type: 'manual', message})
+                }
+                handleMergeBasket()
             },
             email: async () => {
                 await handlePasswordlessLogin(passwordlessLoginEmail)
@@ -208,19 +208,18 @@ const Login = ({initialView = LOGIN_VIEW}) => {
                 {!form.formState.isSubmitSuccessful && currentView === LOGIN_VIEW && (
                     <LoginForm
                         form={form}
-                        submitForm={submitForm}
-                        clickCreateAccount={() => navigate('/registration')}
-                        handlePasswordlessLoginClick={() => {
-                            setLoginType(LOGIN_TYPES.PASSWORDLESS)
+                        submitForm={(data) => {
+                            const shouldUsePasswordless = isPasswordlessEnabled && !data.password
+                            return submitForm(data, shouldUsePasswordless)
                         }}
+                        clickCreateAccount={() => navigate('/registration')}
                         handleForgotPasswordClick={() => navigate('/reset-password')}
                         isPasswordlessEnabled={isPasswordlessEnabled}
                         isSocialEnabled={isSocialEnabled}
                         idps={idps}
-                        setLoginType={setLoginType}
                     />
                 )}
-                {form.formState.isSubmitSuccessful && currentView === EMAIL_VIEW && (
+                {currentView === EMAIL_VIEW && (
                     <PasswordlessEmailConfirmation
                         form={form}
                         submitForm={submitForm}

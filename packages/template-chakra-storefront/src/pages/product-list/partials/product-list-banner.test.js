@@ -8,8 +8,13 @@ import React from 'react'
 import {rest} from 'msw'
 import {screen} from '@testing-library/react'
 import {renderWithProviders} from '../../../utils/test-utils'
+<<<<<<<< HEAD:packages/template-chakra-storefront/src/pages/product-list/partials/page-designer-promotional-banner.test.js
 import {mockImageWithText} from '../../../../mocks/page-designer'
 import PageDesignerPromotionalBanner from './page-designer-promotional-banner'
+========
+import {mockImageWithText} from '../../../mocks/page-designer'
+import PageDesignerPromotionalBanner from './product-list-banner'
+>>>>>>>> e4b9d54d342d40c97f14f6777c8c9dc16d8d3be1:packages/template-chakra-storefront/src/pages/product-list/partials/product-list-banner.test.js
 import {useShopperContext} from '@salesforce/commerce-sdk-react'
 
 jest.mock('@salesforce/commerce-sdk-react', () => {

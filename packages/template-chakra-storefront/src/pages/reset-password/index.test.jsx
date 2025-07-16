@@ -5,18 +5,12 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
-import {screen, waitFor, within} from '@testing-library/react'
+import {act, screen, waitFor, within} from '@testing-library/react'
 import {rest} from 'msw'
 import {createPathWithDefaults, renderWithProviders} from '../../utils/test-utils'
 import ResetPassword from '.'
-import mockConfig from '../../../mock-config'
-jest.mock('@salesforce/pwa-kit-runtime/utils/ssr-config', () => {
-    const original = jest.requireActual('@salesforce/pwa-kit-runtime/utils/ssr-config')
-    return {
-        ...original,
-        getConfig: jest.fn(() => require('../../../mock-config'))
-    }
-})
+import mockConfig from '../../mock-config'
+
 const MockedComponent = () => {
     return (
         <div>
@@ -44,8 +38,9 @@ test('Allows customer to go to sign in page', async () => {
     const {user} = renderWithProviders(<MockedComponent />, {
         wrapperProps: {siteAlias: 'uk', appConfig: mockConfig.app}
     })
-
-    await user.click(await screen.findByText('Sign in'))
+    await act(async () => {
+        await user.click(await screen.findByText('Sign in'))
+    })
 
     await waitFor(() => {
         expect(window.location.pathname).toBe('/uk/en-GB/login')
@@ -61,19 +56,22 @@ test('Allows customer to generate password token', async () => {
         wrapperProps: {siteAlias: 'uk', appConfig: mockConfig.app}
     })
 
-    // enter credentials and submit
-    await user.type(await screen.findByLabelText('Email'), 'foo@test.com')
-    await user.click(
-        within(await screen.findByTestId('sf-auth-modal-form')).getByText(/reset password/i)
-    )
+    await act(async () => {
+        // enter credentials and submit
+        await user.type(await screen.findByLabelText('Email'), 'foo@test.com')
+        await user.click(
+            within(await screen.findByTestId('sf-auth-modal-form')).getByText(/reset password/i)
+        )
+    })
 
     await waitFor(() => {
         expect(screen.getByText(/you will receive an email/i)).toBeInTheDocument()
         expect(screen.getByText(/foo@test.com/i)).toBeInTheDocument()
     })
 
-    await user.click(screen.getByText('Back to Sign In'))
-
+    await act(async () => {
+        await user.click(screen.getByText('Back to Sign In'))
+    })
     await waitFor(() => {
         expect(window.location.pathname).toBe('/uk/en-GB/login')
     })

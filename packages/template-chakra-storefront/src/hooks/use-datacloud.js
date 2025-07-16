@@ -9,9 +9,9 @@ import Cookies from 'js-cookie'
 import logger from '../utils/logger-instance'
 import {initDataCloudSdk} from '@salesforce/cc-datacloud-typescript'
 import {useUsid, useCustomerType, useDNT} from '@salesforce/commerce-sdk-react'
-import useMultiSite from './use-multi-site'
-import {useCurrentCustomer} from './use-current-customer'
-import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
+import useMultiSite from '../hooks/use-multi-site'
+import {useCurrentCustomer} from '../hooks/use-current-customer'
+import {useExtensionConfig} from '../hooks/use-extension-config'
 
 export class DataCloudApi {
     constructor({siteId, appSourceId, tenantId, dnt}) {
@@ -437,7 +437,7 @@ const useDataCloud = () => {
     }
 
     // Grab Data Cloud configuration values and initialize the sdk
-    const {dataCloudAPI: config} = getConfig()
+    const {dataCloudAPI: config} = useExtensionConfig()
 
     const {appSourceId, tenantId} = config
 

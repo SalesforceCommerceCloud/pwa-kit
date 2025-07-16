@@ -7,23 +7,22 @@
 import React, {useState} from 'react'
 import PropTypes from 'prop-types'
 import {defineMessage, FormattedMessage, useIntl} from 'react-intl'
-import {Box, Button, Checkbox, Container, Heading, Stack, Text, Divider} from '@chakra-ui/react'
+import {Box, Button, Checkbox, Container, Heading, Stack, Text, Separator} from '@chakra-ui/react'
 import {useForm} from 'react-hook-form'
-import {useToast} from '../../../hooks/use-toast'
 import {useShopperBasketsMutation} from '@salesforce/commerce-sdk-react'
 import {useCurrentBasket} from '../../../hooks/use-current-basket'
-import {useCheckout} from '../util/checkout-context'
+import {useCheckout} from '../../../pages/checkout/util/checkout-context'
 import {
     getPaymentInstrumentCardType,
     getMaskCreditCardNumber,
     getCreditCardIcon
 } from '../../../utils/cc-utils'
 import {ToggleCard, ToggleCardEdit, ToggleCardSummary} from '../../../components/toggle-card'
-import PaymentForm from './payment-form'
-import ShippingAddressSelection from './shipping-address-selection'
+import PaymentForm from '../../../pages/checkout/partials/payment-form'
+import ShippingAddressSelection from '../../../pages/checkout/partials/shipping-address-selection'
 import AddressDisplay from '../../../components/address-display'
 import {PromoCode, usePromoCode} from '../../../components/promo-code'
-import {API_ERROR_MESSAGE} from '../../../../config/constants'
+import {useErrorHandler} from '../../../hooks/use-errors'
 
 const Payment = () => {
     const {formatMessage} = useIntl()
@@ -31,6 +30,7 @@ const Payment = () => {
     const selectedShippingAddress = basket?.shipments && basket?.shipments[0]?.shippingAddress
     const selectedBillingAddress = basket?.billingAddress
     const appliedPayment = basket?.paymentInstruments && basket?.paymentInstruments[0]
+
     const [billingSameAsShipping, setBillingSameAsShipping] = useState(true) // By default, have billing addr to be the same as shipping
     const {mutateAsync: addPaymentInstrumentToBasket} = useShopperBasketsMutation(
         'addPaymentInstrumentToBasket'
@@ -41,13 +41,7 @@ const Payment = () => {
     const {mutateAsync: removePaymentInstrumentFromBasket} = useShopperBasketsMutation(
         'removePaymentInstrumentFromBasket'
     )
-    const showToast = useToast()
-    const showError = () => {
-        showToast({
-            title: formatMessage(API_ERROR_MESSAGE),
-            status: 'error'
-        })
-    }
+    const showError = useErrorHandler()
 
     const {step, STEPS, goToStep, goToNextStep} = useCheckout()
 
@@ -90,6 +84,7 @@ const Payment = () => {
         if (!isFormValid) {
             return
         }
+
         const billingAddress = billingSameAsShipping
             ? selectedShippingAddress
             : billingAddressForm.getValues()
@@ -143,7 +138,9 @@ const Payment = () => {
                 billingAddressForm.formState.isSubmitting
             }
             disabled={appliedPayment == null}
-            onEdit={() => goToStep(STEPS.PAYMENT)}
+            onEdit={() => {
+                goToStep(STEPS.PAYMENT)
+            }}
             editLabel={formatMessage({
                 defaultMessage: 'Edit Payment Info',
                 id: 'toggle_card.action.editPaymentInfo'
@@ -154,23 +151,23 @@ const Payment = () => {
                     <PromoCode {...promoCodeProps} itemProps={{border: 'none'}} />
                 </Box>
 
-                <Stack spacing={6}>
+                <Stack gap={6}>
                     {!appliedPayment?.paymentCard ? (
                         <PaymentForm form={paymentMethodForm} onSubmit={onPaymentSubmit} />
                     ) : (
-                        <Stack spacing={3}>
+                        <Stack gap={3}>
                             <Heading as="h3" fontSize="md">
                                 <FormattedMessage
                                     defaultMessage="Credit Card"
                                     id="checkout_payment.heading.credit_card"
                                 />
                             </Heading>
-                            <Stack direction="row" spacing={4}>
+                            <Stack direction="row" gap={4}>
                                 <PaymentCardSummary payment={appliedPayment} />
                                 <Button
-                                    variant="link"
+                                    variant="link-red"
                                     size="sm"
-                                    colorScheme="red"
+                                    colorPalette="red"
                                     onClick={onPaymentRemoval}
                                 >
                                     <FormattedMessage
@@ -182,9 +179,9 @@ const Payment = () => {
                         </Stack>
                     )}
 
-                    <Divider borderColor="gray.100" />
+                    <Separator borderColor="gray.100" />
 
-                    <Stack spacing={2}>
+                    <Stack gap={2}>
                         <Heading as="h3" fontSize="md">
                             <FormattedMessage
                                 defaultMessage="Billing Address"
@@ -192,18 +189,22 @@ const Payment = () => {
                             />
                         </Heading>
 
-                        <Checkbox
+                        <Checkbox.Root
                             name="billingSameAsShipping"
-                            isChecked={billingSameAsShipping}
-                            onChange={(e) => setBillingSameAsShipping(e.target.checked)}
+                            checked={billingSameAsShipping}
+                            onCheckedChange={(e) => setBillingSameAsShipping(e.checked)}
                         >
-                            <Text fontSize="sm" color="gray.700">
-                                <FormattedMessage
-                                    defaultMessage="Same as shipping address"
-                                    id="checkout_payment.label.same_as_shipping"
-                                />
-                            </Text>
-                        </Checkbox>
+                            <Checkbox.HiddenInput />
+                            <Checkbox.Control colorPalette="blue" />
+                            <Checkbox.Label>
+                                <Text fontSize="sm" color="gray.700">
+                                    <FormattedMessage
+                                        defaultMessage="Same as shipping address"
+                                        id="checkout_payment.label.same_as_shipping"
+                                    />
+                                </Text>
+                            </Checkbox.Label>
+                        </Checkbox.Root>
 
                         {billingSameAsShipping && selectedShippingAddress && (
                             <Box pl={7}>
@@ -236,9 +237,9 @@ const Payment = () => {
             </ToggleCardEdit>
 
             <ToggleCardSummary>
-                <Stack spacing={6}>
+                <Stack gap={6}>
                     {appliedPayment && (
-                        <Stack spacing={3}>
+                        <Stack gap={3}>
                             <Heading as="h3" fontSize="md">
                                 <FormattedMessage
                                     defaultMessage="Credit Card"
@@ -249,10 +250,10 @@ const Payment = () => {
                         </Stack>
                     )}
 
-                    <Divider borderColor="gray.100" />
+                    <Separator borderColor="gray.100" />
 
                     {selectedBillingAddress && (
-                        <Stack spacing={2}>
+                        <Stack gap={2}>
                             <Heading as="h3" fontSize="md">
                                 <FormattedMessage
                                     defaultMessage="Billing Address"
@@ -271,7 +272,7 @@ const Payment = () => {
 const PaymentCardSummary = ({payment}) => {
     const CardIcon = getCreditCardIcon(payment?.paymentCard?.cardType)
     return (
-        <Stack direction="row" alignItems="center" spacing={3}>
+        <Stack direction="row" alignItems="center" gap={3}>
             {CardIcon && <CardIcon layerStyle="ccIcon" />}
 
             <Stack direction="row">
