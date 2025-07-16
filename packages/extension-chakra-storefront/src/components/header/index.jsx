@@ -90,7 +90,7 @@ const SearchBar = (props) => {
  * @param   {object} props.searchInputRef reference of the search input
  * @param   {func} props.onMyAccountClick click event handler for my account button
  * @param   {func} props.onMyCartClick click event handler for my cart button
- * @param   {func} props.onWishlistClick click event handler for with list button
+ * @param   {func} props.onWishlistClick click event handler for wish list button
  * @param   {React.ReactElement} props.children - React Node to be rendered inside Header
  * @return  {React.ReactElement} - Header component
  */
