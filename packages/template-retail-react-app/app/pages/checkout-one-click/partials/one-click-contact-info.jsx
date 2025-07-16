@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {useEffect, useRef, useState} from 'react'
+import React, {useRef, useState} from 'react'
 import PropTypes from 'prop-types'
 import {
     Alert,
@@ -15,7 +15,6 @@ import {
     AlertDialogHeader,
     AlertDialogOverlay,
     AlertIcon,
-    Box,
     Button,
     Container,
     Stack,
@@ -31,37 +30,19 @@ import {
     ToggleCardSummary
 } from '@salesforce/retail-react-app/app/components/toggle-card'
 import Field from '@salesforce/retail-react-app/app/components/field'
-import LoginState from '@salesforce/retail-react-app/app/pages/checkout-one-click/partials/login-state'
-import {
-    AuthModal,
-    EMAIL_VIEW,
-    PASSWORD_VIEW,
-    useAuthModal
-} from '@salesforce/retail-react-app/app/hooks/use-auth-modal'
+import LoginState from '@salesforce/retail-react-app/app/pages/checkout-one-click/partials/one-click-login-state'
 import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
-import {isAbsoluteURL} from '@salesforce/retail-react-app/app/page-designer/utils'
-import {useAppOrigin} from '@salesforce/retail-react-app/app/hooks/use-app-origin'
 import {AuthHelpers, useAuthHelper, useShopperBasketsMutation} from '@salesforce/commerce-sdk-react'
-import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
-import {
-    API_ERROR_MESSAGE,
-    FEATURE_UNAVAILABLE_ERROR_MESSAGE,
-    CREATE_ACCOUNT_FIRST_ERROR_MESSAGE,
-    PASSWORDLESS_ERROR_MESSAGES,
-    USER_NOT_FOUND_ERROR
-} from '@salesforce/retail-react-app/app/constants'
 
-const ContactInfo = ({isSocialEnabled = false, isPasswordlessEnabled = false, idps = []}) => {
+const ContactInfo = ({isSocialEnabled = false, idps = []}) => {
     const {formatMessage} = useIntl()
     const navigate = useNavigation()
     const {data: customer} = useCurrentCustomer()
     const {data: basket} = useCurrentBasket()
-    const appOrigin = useAppOrigin()
     const login = useAuthHelper(AuthHelpers.LoginRegisteredUserB2C)
     const logout = useAuthHelper(AuthHelpers.Logout)
-    const authorizePasswordlessLogin = useAuthHelper(AuthHelpers.AuthorizePasswordless)
     const updateCustomerForBasket = useShopperBasketsMutation('updateCustomerForBasket')
     const mergeBasket = useShopperBasketsMutation('mergeBasket')
 
@@ -75,43 +56,10 @@ const ContactInfo = ({isSocialEnabled = false, isPasswordlessEnabled = false, id
     const emailRef = useRef()
 
     const [error, setError] = useState(null)
-    const [showPasswordField, setShowPasswordField] = useState(false)
     const [signOutConfirmDialogIsOpen, setSignOutConfirmDialogIsOpen] = useState(false)
-
-    const [authModalView, setAuthModalView] = useState(PASSWORD_VIEW)
-    const authModal = useAuthModal(authModalView)
-    const [isPasswordlessLoginClicked, setIsPasswordlessLoginClicked] = useState(false)
-    const passwordlessConfigCallback = getConfig().app.login?.passwordless?.callbackURI
-    const callbackURL = isAbsoluteURL(passwordlessConfigCallback)
-        ? passwordlessConfigCallback
-        : `${appOrigin}${passwordlessConfigCallback}`
-
-    const handlePasswordlessLogin = async (email) => {
-        try {
-            const redirectPath = window.location.pathname + (window.location.search || '')
-            await authorizePasswordlessLogin.mutateAsync({
-                userid: email,
-                callbackURI: `${callbackURL}?redirectUrl=${redirectPath}`
-            })
-            setAuthModalView(EMAIL_VIEW)
-            authModal.onOpen()
-        } catch (error) {
-            const message = USER_NOT_FOUND_ERROR.test(error.message)
-                ? formatMessage(CREATE_ACCOUNT_FIRST_ERROR_MESSAGE)
-                : PASSWORDLESS_ERROR_MESSAGES.some((msg) => msg.test(error.message))
-                ? formatMessage(FEATURE_UNAVAILABLE_ERROR_MESSAGE)
-                : formatMessage(API_ERROR_MESSAGE)
-            setError(message)
-        }
-    }
 
     const submitForm = async (data) => {
         setError(null)
-        if (isPasswordlessLoginClicked) {
-            handlePasswordlessLogin(data.email)
-            setIsPasswordlessLoginClicked(false)
-            return
-        }
         try {
             if (!data.password) {
                 await updateCustomerForBasket.mutateAsync({
@@ -143,31 +91,6 @@ const ContactInfo = ({isSocialEnabled = false, isPasswordlessEnabled = false, id
                 setError(error.message)
             }
         }
-    }
-
-    const togglePasswordField = () => {
-        if (error) {
-            setError(null)
-        }
-        setShowPasswordField(!showPasswordField)
-        if (emailRef.current) {
-            emailRef.current.focus()
-        }
-    }
-
-    const onForgotPasswordClick = () => {
-        setAuthModalView(PASSWORD_VIEW)
-        authModal.onOpen()
-    }
-
-    useEffect(() => {
-        if (!showPasswordField) {
-            form.unregister('password')
-        }
-    }, [showPasswordField])
-
-    const onPasswordlessLoginClick = async () => {
-        setIsPasswordlessLoginClicked(true)
     }
 
     return (
@@ -211,53 +134,24 @@ const ContactInfo = ({isSocialEnabled = false, isPasswordlessEnabled = false, id
 
                             <Stack spacing={5} position="relative">
                                 <Field {...fields.email} inputRef={emailRef} />
-                                {showPasswordField && (
-                                    <Stack>
-                                        <Field {...fields.password} />
-                                        <Box>
-                                            <Button
-                                                variant="link"
-                                                size="sm"
-                                                onClick={onForgotPasswordClick}
-                                            >
-                                                <FormattedMessage
-                                                    defaultMessage="Forgot password?"
-                                                    id="contact_info.link.forgot_password"
-                                                />
-                                            </Button>
-                                        </Box>
-                                    </Stack>
-                                )}
                             </Stack>
 
                             <Stack spacing={3}>
-                                <Button type="submit">
-                                    {!showPasswordField ? (
-                                        <FormattedMessage
-                                            defaultMessage="Checkout as Guest"
-                                            id="contact_info.button.checkout_as_guest"
-                                        />
-                                    ) : (
-                                        <FormattedMessage
-                                            defaultMessage="Log In"
-                                            id="contact_info.button.login"
-                                        />
-                                    )}
-                                </Button>
                                 <LoginState
                                     form={form}
                                     isSocialEnabled={isSocialEnabled}
-                                    isPasswordlessEnabled={isPasswordlessEnabled}
                                     idps={idps}
-                                    showPasswordField={showPasswordField}
-                                    togglePasswordField={togglePasswordField}
-                                    handlePasswordlessLoginClick={onPasswordlessLoginClick}
                                 />
+                                <Button type="submit">
+                                    <FormattedMessage
+                                        defaultMessage="Continue to Shipping Address"
+                                        id="contact_info.button.continue_to_shipping_address"
+                                    />
+                                </Button>
                             </Stack>
                         </Stack>
                     </form>
                 </Container>
-                <AuthModal {...authModal} initialEmail={form.getValues().email} />
             </ToggleCardEdit>
             <ToggleCardSummary>
                 <Text>{basket?.customerInfo?.email || customer?.email}</Text>
