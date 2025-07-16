@@ -14,7 +14,7 @@ import Fade from '../../../components/fade'
 // Project Components
 import Breadcrumb from '../../../components/breadcrumb'
 
-const PageHeader = ({category, productSearchResult, isLoading, searchQuery, ...otherProps}) => {
+const PageTitle = ({category, productSearchResult, isLoading, searchQuery, ...otherProps}) => {
     return (
         <Box {...otherProps} data-testid="sf-product-list-breadcrumb">
             {/* Breadcrumb */}
@@ -33,11 +33,11 @@ const PageHeader = ({category, productSearchResult, isLoading, searchQuery, ...o
     )
 }
 
-PageHeader.propTypes = {
+PageTitle.propTypes = {
     category: PropTypes.object,
     productSearchResult: PropTypes.object,
     isLoading: PropTypes.bool,
     searchQuery: PropTypes.string
 }
 
-export default PageHeader
+export default PageTitle
