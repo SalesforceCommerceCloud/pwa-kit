@@ -402,3 +402,51 @@ export const mockViewRecommendationsEvent = {
         })
     ]
 }
+
+export const mockPartyIdentificationRegisteredEvent = {
+    events: [
+        expect.objectContaining({
+            eventId: expect.any(String),
+            dateTime: expect.any(String),
+            category: 'Profile',
+            sessionId: expect.any(String),
+            eventType: 'partyIdentification',
+            siteId: 'RefArch',
+            party: expect.any(String), // deviceId
+            deviceId: 1234567890, // customerId
+            userId: 1234567890, // customerId
+            IDName: 'CC_REGISTERED_CUSTOMER_ID',
+            IDType: 'CC_REGISTERED_CUSTOMER_ID',
+            partyIdentificationId: 1234567890, // customerId
+            internalOrganizationId: 'RefArch',
+            creationEventId: expect.any(String),
+            guestId: 'guest-usid',
+            customerId: 1234567890,
+            customerNo: expect.anything()
+        })
+    ]
+}
+
+export const mockPartyIdentificationGuestEvent = {
+    events: [
+        expect.objectContaining({
+            eventId: expect.any(String),
+            dateTime: expect.any(String),
+            category: 'Profile',
+            sessionId: expect.any(String),
+            eventType: 'partyIdentification',
+            siteId: 'RefArch',
+            party: expect.any(String), // deviceId
+            deviceId: 'guest-usid', // usid
+            userId: 'guest-usid', // guestId
+            IDName: 'CC_USID',
+            IDType: 'CC_USID',
+            partyIdentificationId: 'guest-usid', // guestId
+            internalOrganizationId: 'RefArch',
+            creationEventId: expect.any(String),
+            guestId: 'guest-usid',
+            customerId: 1234567890,
+            customerNo: expect.anything()
+        })
+    ]
+}
