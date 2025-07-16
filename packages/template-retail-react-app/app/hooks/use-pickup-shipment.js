@@ -136,7 +136,8 @@ export const usePickupShipment = (basket) => {
                 body: {
                     shippingMethod: {
                         id: shippingMethodId
-                    }
+                    },
+                    c_fromStoreId: null 
                 }
             })
         } catch (error) {
@@ -195,20 +196,23 @@ export const usePickupShipment = (basket) => {
     }
 
     /**
-     * Configure shipping method based on pickup selection
+     * Configure shipping method based on pickup selection for default shipment
      * @param {Object} basketResponse - The basket response from adding items
+     * @param {string} targetShipmentId - The target shipment ID
      * @param {Array} productItems - Array of product items that were added
      * @param {boolean} hasAnyPickupSelected - Whether any items have pickup selected
      * @param {Object} selectedStore - The selected store information
      * @returns {Promise<void>}
      */
-    const updateShippingMethodIfNeeded = async (
+    const configureDefaultShipmentIfNeeded = async (
         basketResponse,
+        targetShipmentId,
         productItems,
         hasAnyPickupSelected,
         selectedStore
     ) => {
-        if (!basketResponse?.basketId || !basketResponse.shipments.length) {
+        // Only needed for reconfiguring default shipment
+        if (!basketResponse?.basketId || !basketResponse?.shipments?.length || targetShipmentId !== 'me') { 
             return
         }
 
@@ -251,7 +255,7 @@ export const usePickupShipment = (basket) => {
     return {
         updatePickupShipment,
         updateRegularShippingMethod,
-        updateShippingMethodIfNeeded,
+        configureDefaultShipmentIfNeeded,
         hasPickupItems,
         addInventoryIdsToPickupItems,
         getPickupShippingMethodId,

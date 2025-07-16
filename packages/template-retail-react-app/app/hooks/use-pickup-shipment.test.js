@@ -611,7 +611,7 @@ describe('usePickupShipment', () => {
         })
     })
 
-    describe('updateShippingMethodIfNeeded', () => {
+    describe('configureDefaultShipmentIfNeeded', () => {
         let mockMutateAsync
         let mockRefetchShippingMethods
 
@@ -659,11 +659,13 @@ describe('usePickupShipment', () => {
                 ]
             }
             const productItems = [{productId: 'product-1', inventoryId: 'inv-1', quantity: 1}]
+            const targetShipmentId = 'me'
             const hasAnyPickupSelected = true
             const selectedStore = {id: 'store-1', inventoryId: 'inv-1'}
 
-            await result.current.updateShippingMethodIfNeeded(
+            await result.current.configureDefaultShipmentIfNeeded(
                 basketResponse,
+                targetShipmentId,
                 productItems,
                 hasAnyPickupSelected,
                 selectedStore
@@ -713,11 +715,13 @@ describe('usePickupShipment', () => {
                 ]
             }
             const productItems = [{productId: 'product-1', quantity: 1}]
+            const targetShipmentId = 'me'
             const hasAnyPickupSelected = false
             const selectedStore = {id: 'store-1', inventoryId: 'inv-1'}
 
-            await result.current.updateShippingMethodIfNeeded(
+            await result.current.configureDefaultShipmentIfNeeded(
                 basketResponse,
+                targetShipmentId,
                 productItems,
                 hasAnyPickupSelected,
                 selectedStore
@@ -766,11 +770,13 @@ describe('usePickupShipment', () => {
                 ]
             }
             const productItems = [{productId: 'product-1', quantity: 1}]
+            const targetShipmentId = 'me'
             const hasAnyPickupSelected = true // Pickup selected and current method is pickup
             const selectedStore = {id: 'store-1', inventoryId: 'inv-1'}
 
-            await result.current.updateShippingMethodIfNeeded(
+            await result.current.configureDefaultShipmentIfNeeded(
                 basketResponse,
+                targetShipmentId,
                 productItems,
                 hasAnyPickupSelected,
                 selectedStore
@@ -795,11 +801,13 @@ describe('usePickupShipment', () => {
                 ]
             }
             const productItems = [{productId: 'product-1', quantity: 1}]
+            const targetShipmentId = 'me'
             const hasAnyPickupSelected = false // No pickup selected and current method is not pickup
             const selectedStore = {id: 'store-1', inventoryId: 'inv-1'}
 
-            await result.current.updateShippingMethodIfNeeded(
+            await result.current.configureDefaultShipmentIfNeeded(
                 basketResponse,
+                targetShipmentId,
                 productItems,
                 hasAnyPickupSelected,
                 selectedStore
@@ -836,11 +844,13 @@ describe('usePickupShipment', () => {
                 ]
             }
             const productItems = [{productId: 'product-1', inventoryId: 'inv-1', quantity: 1}]
+            const targetShipmentId = 'me'
             const hasAnyPickupSelected = true
             const selectedStore = {id: 'store-1', inventoryId: 'inv-1'}
 
-            await result.current.updateShippingMethodIfNeeded(
+            await result.current.configureDefaultShipmentIfNeeded(
                 basketResponse,
+                targetShipmentId,
                 productItems,
                 hasAnyPickupSelected,
                 selectedStore
@@ -900,11 +910,13 @@ describe('usePickupShipment', () => {
                 ]
             }
             const productItems = [{productId: 'product-1', quantity: 1}]
+            const targetShipmentId = 'me'
             const hasAnyPickupSelected = false
             const selectedStore = {id: 'store-1', inventoryId: 'inv-1'}
 
-            await result.current.updateShippingMethodIfNeeded(
+            await result.current.configureDefaultShipmentIfNeeded(
                 basketResponse,
+                targetShipmentId,
                 productItems,
                 hasAnyPickupSelected,
                 selectedStore
