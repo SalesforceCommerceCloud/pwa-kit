@@ -32,6 +32,7 @@ test('Home Page renders without errors', async () => {
     expect(helmet.linkTags[0]).toStrictEqual({
         as: 'image',
         href: '/mobify/bundle/development/static/img/hero.png',
-        rel: 'preload'
+        rel: 'preload',
+        fetchPriority: 'high'
     })
 })
