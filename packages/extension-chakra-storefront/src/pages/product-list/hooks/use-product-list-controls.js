@@ -93,4 +93,4 @@ export const useProductListControls = ({productSearchResult, isSearch}) => {
         resetFilters,
         searchParams
     }
-} 
+}

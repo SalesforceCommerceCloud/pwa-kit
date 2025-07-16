@@ -37,4 +37,4 @@ describe('ProductListPagination', () => {
         expect(screen.getByText('2')).toBeInTheDocument()
         expect(screen.getByText('3')).toBeInTheDocument()
     })
-}) 
+})
