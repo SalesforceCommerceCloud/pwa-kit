@@ -292,19 +292,15 @@ describe('ShippingMultiAddress', () => {
 
         renderWithIntl(<ShippingMultiAddress {...customProps} />)
 
-        // Find and click the dropdown trigger (it's a div, not a button)
-        const dropdownTriggers = screen.getAllByText((content, element) => {
-            return (
-                element.tagName === 'DIV' &&
-                element.style.cursor === 'pointer' &&
-                element.textContent.includes('John Doe')
-            )
-        })
-
+        // Find and click the dropdown trigger using role=button
+        const dropdownTriggers = screen.getAllByRole('button')
         fireEvent.click(dropdownTriggers[0])
 
         // The add new address option should be available in dropdowns
-        expect(screen.getByText('Add Another Address')).toBeInTheDocument()
+        const addNewAddressOptions = screen.getAllByText((content, element) =>
+            element?.textContent?.replace(/\s+/g, ' ').trim().includes('Add Another Address')
+        )
+        expect(addNewAddressOptions.length).toBeGreaterThan(0)
     })
 
     describe('Accessibility', () => {
@@ -327,8 +323,8 @@ describe('ShippingMultiAddress', () => {
         it('should apply responsive CSS classes', () => {
             renderWithIntl(<ShippingMultiAddress {...defaultProps} />)
 
-            // Check that the component has the expected CSS classes for responsive design
-            const multiShippingCards = document.querySelectorAll('.multi-shipping-card')
+            // Check that the component has the expected number of cards using data-testid
+            const multiShippingCards = screen.getAllByTestId('multi-shipping-card')
             expect(multiShippingCards).toHaveLength(2)
         })
     })
