@@ -9,8 +9,10 @@ import path from 'path'
 import {spawn} from 'cross-spawn'
 import {zodToJsonSchema} from 'zod-to-json-schema'
 import {z} from 'zod'
-import os from 'os'
-import {exec} from 'child_process'
+
+// CONSTANTS
+// const CREATE_APP_VERSION = 'latest'
+const CREATE_APP_VERSION = '3.11.0-nightly-20250710080214'
 
 // Private schema used to generate the JSON schema
 const emptySchema = z.object({}).strict()
@@ -79,35 +81,26 @@ export const runCommand = async (command, args = [], options = {}) => {
 /**
  * Checks if the project is a monorepo by verifying the existence of lerna.json in the root directory.
  *
- * @returns {boolean} True if lerna.json exists in the '../../../..' folder, false otherwise.
+ * @returns {boolean} True if lerna.json exists in the current workspace, false otherwise.
  */
 export function isMonoRepo() {
-    const lernaPath = path.resolve(__dirname, '../../../..', 'lerna.json')
+    const lernaPath = path.resolve(process.env.WORKSPACE_FOLDER_PATHS, 'lerna.json')
     return fs.existsSync(lernaPath)
 }
 
 /**
- * Runs an NPX command and captures its output.
+ * Returns the command or path to use for creating a new PWA Kit app.
  *
- * @returns {Promise<string>} - Resolves with the command output.
+ * If the project is a monorepo (detected by the presence of lerna.json),
+ * it returns the absolute path to the local create-mobify-app.js script.
+ * Otherwise, it returns the npm package name with a specific version.
+ *
+ * @returns {string} The command or path to use for app creation.
  */
-export async function runNpxCommand(NPX_COMMAND, CREATE_APP_COMMAND, DISPLAY_PROGRAM_COMMAND) {
-    return new Promise((resolve, reject) => {
-        const tempDir = os.tmpdir()
-        const outputFilePath = path.join(tempDir, 'npx-output.json')
-        const errorFilePath = path.join(tempDir, 'npx-error.log')
-        const command = `${NPX_COMMAND} ${CREATE_APP_COMMAND} ${DISPLAY_PROGRAM_COMMAND} > ${outputFilePath} 2> ${errorFilePath}`
-
-        exec(command, (error) => {
-            if (error) {
-                reject(error)
-                return
-            }
-
-            fs.promises
-                .readFile(outputFilePath, 'utf-8')
-                .then((data) => resolve(data))
-                .catch((err) => reject(err))
-        })
-    })
+export const getCreateAppCommand = () => {
+    return isMonoRepo()
+        ? path.resolve(
+              `${process.env.WORKSPACE_FOLDER_PATHS}/packages/pwa-kit-create-app/scripts/create-mobify-app.js`
+          )
+        : `@salesforce/pwa-kit-create-app@${CREATE_APP_VERSION}`
 }

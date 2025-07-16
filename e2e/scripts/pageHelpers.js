@@ -19,25 +19,35 @@ const {getCreditCardExpiry, runAccessibilityTest} = require('../scripts/utils.js
  */
 export const answerConsentTrackingForm = async (page, dnt = false) => {
     try {
-        const consentFormVisible = await page.locator('text=Tracking Consent').isVisible().catch(() => false)
+        const consentFormVisible = await page
+            .locator('text=Tracking Consent')
+            .isVisible()
+            .catch(() => false)
         if (!consentFormVisible) {
             return
         }
 
         const buttonText = dnt ? 'Decline' : 'Accept'
-        await page.getByRole('button', { name: new RegExp(buttonText, 'i') }).first().waitFor({ timeout: 3000 })
-        
+        await page
+            .getByRole('button', {name: new RegExp(buttonText, 'i')})
+            .first()
+            .waitFor({timeout: 3000})
+
         // Find and click consent buttons (handles both mobile and desktop versions existing in the DOM)
         const clickSuccess = await page.evaluate((targetText) => {
             // Try aria-label first, then fallback to text content
-            let buttons = Array.from(document.querySelectorAll(`button[aria-label="${targetText} tracking"]`))
-            
+            let buttons = Array.from(
+                document.querySelectorAll(`button[aria-label="${targetText} tracking"]`)
+            )
+
             if (buttons.length === 0) {
-                buttons = Array.from(document.querySelectorAll('button')).filter(btn => 
-                    btn.textContent && btn.textContent.trim().toLowerCase() === targetText.toLowerCase()
+                buttons = Array.from(document.querySelectorAll('button')).filter(
+                    (btn) =>
+                        btn.textContent &&
+                        btn.textContent.trim().toLowerCase() === targetText.toLowerCase()
                 )
             }
-            
+
             let clickedCount = 0
             buttons.forEach((button) => {
                 // Only click visible buttons
@@ -46,14 +56,17 @@ export const answerConsentTrackingForm = async (page, dnt = false) => {
                     clickedCount++
                 }
             })
-            
+
             return clickedCount
         }, buttonText)
 
         // after clicking an answering button, the tracking consent should not stay in the DOM
         if (clickSuccess > 0) {
             await page.waitForTimeout(2000)
-            await page.locator('text=Tracking Consent').isHidden({ timeout: 5000 }).catch(() => {})
+            await page
+                .locator('text=Tracking Consent')
+                .isHidden({timeout: 5000})
+                .catch(() => {})
         }
     } catch (error) {
         // Silently continue - consent form handling should not break tests
@@ -61,8 +74,8 @@ export const answerConsentTrackingForm = async (page, dnt = false) => {
 }
 
 /**
- * Navigates to the `Belted Ribbed Boat Neck Sweater` PDP (Product Detail Page) on mobile
- * with the Black variant selected
+ * Navigates to the `Cotton Turtleneck Sweater` PDP (Product Detail Page) on mobile
+ * with the black variant selected
  *
  * @param {Object} options.page - Object that represents a tab/window in the browser provided by playwright
  */
@@ -96,29 +109,28 @@ export const navigateToPDPMobile = async ({page}) => {
 
     // PLP
     const productTile = page.getByRole('link', {
-        name: /Belted Ribbed Boat Neck Sweater/i
+        name: /Cotton Turtleneck Sweater/i
     })
     await productTile.scrollIntoViewIfNeeded()
     // selecting swatch
     const productTileImg = productTile.locator('img')
     await productTileImg.waitFor({state: 'visible'})
     const initialSrc = await productTileImg.getAttribute('src')
-    await expect(productTile.getByText(/From \£50\.56/i)).toBeVisible()
+    await expect(productTile.getByText(/From \$39\.99/i)).toBeVisible()
 
-    await productTile.getByLabel(/Black/, {exact: true}).hover()
+    await productTile.getByLabel(/Black/, {exact: true}).click()
     // Make sure the image src has changed
     await expect(async () => {
         const newSrc = await productTileImg.getAttribute('src')
         expect(newSrc).not.toBe(initialSrc)
     }).toPass()
-    await expect(productTile.getByText(/From \£50\.56/i)).toBeVisible()
-
+    await expect(productTile.getByText(/From \$39\.99/i)).toBeVisible()
     await productTile.click()
 }
 
 /**
- * Navigates to the `Belted Ribbed Boat Neck Sweater` PDP (Product Detail Page) on Desktop
- * with the Black variant selected.
+ * Navigates to the `Cotton Turtleneck Sweater` PDP (Product Detail Page) on Desktop
+ * with the black variant selected.
  *
  * @param {Object} options.page - Object that represents a tab/window in the browser provided by playwright
  */
@@ -134,13 +146,13 @@ export const navigateToPDPDesktop = async ({page}) => {
 
     // PLP
     const productTile = page.getByRole('link', {
-        name: /Belted Ribbed Boat Neck Sweater/i
+        name: /Cotton Turtleneck Sweater/i
     })
     // selecting swatch
     const productTileImg = productTile.locator('img')
     await productTileImg.waitFor({state: 'visible'})
     const initialSrc = await productTileImg.getAttribute('src')
-    await expect(productTile.getByText(/From \£50\.56/i)).toBeVisible()
+    await expect(productTile.getByText(/From \$39\.99/i)).toBeVisible()
 
     await productTile.getByLabel(/Black/, {exact: true}).hover()
     // Make sure the image src has changed
@@ -148,14 +160,14 @@ export const navigateToPDPDesktop = async ({page}) => {
         const newSrc = await productTileImg.getAttribute('src')
         expect(newSrc).not.toBe(initialSrc)
     }).toPass()
-    await expect(productTile.getByText(/From \£50\.56/i)).toBeVisible()
+    await expect(productTile.getByText(/From \$39\.99/i)).toBeVisible()
 
     await productTile.click()
 }
 
 /**
- * Navigates to the `Belted Ribbed Boat Neck Sweater` PDP (Product Detail Page) on Desktop
- * with the Black variant selected.
+ * Navigates to the `Cotton Turtleneck Sweater` PDP (Product Detail Page) on Desktop
+ * with the black variant selected.
  *
  * @param {Object} options.page - Object that represents a tab/window in the browser provided by playwright
  */
@@ -188,15 +200,15 @@ export const navigateToPDPDesktopSocial = async ({
 }
 
 /**
- * Adds the `Belted Ribbed Boat Neck Sweater` product to the cart with the variant:
- * Colour: Black
- * Size: M
+ * Adds the `Cotton Turtleneck Sweater` product to the cart with the variant:
+ * Color: Black
+ * Size: L
  *
  * @param {Object} options.page - Object that represents a tab/window in the browser provided by playwright
  * @param {Boolean} options.isMobile - Flag to indicate if device type is mobile or not, defaulted to false
  */
 export const addProductToCart = async ({page, isMobile = false}) => {
-    // Navigate to Belted Ribbed Boat Neck Sweater with Black color variant selected
+    // Navigate to Cotton Turtleneck Sweater with Black color variant selected
     if (isMobile) {
         await navigateToPDPMobile({page})
     } else {
@@ -204,8 +216,8 @@ export const addProductToCart = async ({page, isMobile = false}) => {
     }
 
     // PDP
-    await expect(page.getByRole('heading', {name: /Belted Ribbed Boat Neck Sweater/i})).toBeVisible()
-    await page.getByRole('radio', {name: 'M', exact: true}).click()
+    await expect(page.getByRole('heading', {name: /Cotton Turtleneck Sweater/i})).toBeVisible()
+    await page.getByRole('radio', {name: 'L', exact: true}).click()
 
     await page.locator("button[data-testid='quantity-increment']").click()
 
@@ -213,8 +225,8 @@ export const addProductToCart = async ({page, isMobile = false}) => {
     // So we need to look at the page URL to verify selected variants
     const updatedPageURL = await page.url()
     const params = updatedPageURL.split('?')[1]
-    expect(params).toMatch(/size=9MD/i)
-    expect(params).toMatch(/color=JJ3WCXX&/i)
+    expect(params).toMatch(/size=9LG/i)
+    expect(params).toMatch(/color=JJ169XX/i)
     await page.getByRole('button', {name: /Add to Cart/i}).click()
 
     const addedToCartModal = page.getByText(/2 items added to cart/i)
@@ -250,7 +262,7 @@ export const registerShopper = async ({page, userCredentials, isMobile = false})
 
     const registrationFormHeading = page.getByText(/Let's get started!/i)
     try {
-        await registrationFormHeading.waitFor({ timeout: 10000 })
+        await registrationFormHeading.waitFor({timeout: 10000})
     } catch (error) {
         // Check if user was redirected to account page during wait
         const urlAfterWait = page.url()
@@ -274,13 +286,13 @@ export const registerShopper = async ({page, userCredentials, isMobile = false})
     const tokenResponse = await tokenResponsePromise
     expect(tokenResponse.status()).toBe(200)
 
-    await page.waitForURL(/.*\/account.*/, { timeout: 10000 })
+    await page.waitForURL(/.*\/account.*/, {timeout: 10000})
 
     await expect(page.getByText(userCredentials.email)).toBeVisible()
 }
 
 /**
- * Validates that the `Belted Ribbed Boat Neck Sweater` product appears in the Order History page
+ * Validates that the `Cotton Turtleneck Sweater` product appears in the Order History page
  *
  * @param {Object} options.page - Object that represents a tab/window in the browser provided by playwright
  */
@@ -294,15 +306,16 @@ export const validateOrderHistory = async ({page, a11y = {}}) => {
     await page.getByRole('link', {name: 'View details'}).click()
 
     await expect(page.getByRole('heading', {name: /Order Details/i})).toBeVisible()
-    await expect(page.getByRole('heading', {name: /Belted Ribbed Boat Neck Sweater/i})).toBeVisible()
-    await expect(page.getByText(/Size: M/i)).toBeVisible()
+    await expect(page.getByRole('heading', {name: /Cotton Turtleneck Sweater/i})).toBeVisible()
+    await expect(page.getByText(/Color: Black/i)).toBeVisible()
+    await expect(page.getByText(/Size: L/i)).toBeVisible()
     if (checkA11y) {
         await runAccessibilityTest(page, [snapShotName, 'order-history-a11y-violations.json'])
     }
 }
 
 /**
- * Validates that the `Belted Ribbed Boat Neck Sweater` product appears in the Wishlist page
+ * Validates that the `Cotton Turtleneck Sweater` product appears in the Wishlist page
  *
  * @param {Object} options.page - Object that represents a tab/window in the browser provided by playwright
  */
@@ -314,9 +327,9 @@ export const validateWishlist = async ({page, a11y = {}}) => {
 
     await expect(page.getByRole('heading', {name: /Wishlist/i})).toBeVisible()
 
-    await expect(page.getByRole('heading', {name: /Belted Ribbed Boat Neck Sweater/i})).toBeVisible()
-    await expect(page.getByText(/Colour: Black/i)).toBeVisible()
-    await expect(page.getByText(/Size: M/i)).toBeVisible()
+    await expect(page.getByRole('heading', {name: /Cotton Turtleneck Sweater/i})).toBeVisible()
+    await expect(page.getByText(/Color: Black/i)).toBeVisible()
+    await expect(page.getByText(/Size: L/i)).toBeVisible()
     if (checkA11y) {
         await runAccessibilityTest(page, [snapShotName, 'wishlist-violations.json'])
     }
@@ -349,14 +362,14 @@ export const loginShopper = async ({page, userCredentials}) => {
             '**/shopper/auth/v1/organizations/**/oauth2/token'
         )
         await page.getByRole('button', {name: /Sign In/i}).click()
-        
+
         const loginResponse = await loginResponsePromise
         expect(loginResponse.status()).toBe(303) // Login returns a 303 redirect to /callback with authCode and usid
-        
+
         const tokenResponse = await tokenResponsePromise
         expect(tokenResponse.status()).toBe(200)
 
-        await page.waitForURL(/.*\/account.*/, { timeout: 10000 })
+        await page.waitForURL(/.*\/account.*/, {timeout: 10000})
 
         await expect(page.getByText(userCredentials.email)).toBeVisible()
         return true
@@ -531,7 +544,7 @@ export const registeredUserHappyPath = async ({page, registeredUserCredentials, 
     }
     await answerConsentTrackingForm(page)
     await page.waitForLoadState()
-    
+
     // Verify we're on account page and user is logged in
     const currentUrl = page.url()
     expect(currentUrl).toMatch(/\/account/)
@@ -543,7 +556,7 @@ export const registeredUserHappyPath = async ({page, registeredUserCredentials, 
     // cart
     await page.getByLabel(/My cart/i).click()
 
-    await expect(page.getByRole('link', {name: 'Belted Ribbed Boat Neck Sweater'})).toBeVisible()
+    await expect(page.getByRole('link', {name: /Cotton Turtleneck Sweater/i})).toBeVisible()
 
     await page.getByRole('link', {name: 'Proceed to Checkout'}).click()
 
@@ -630,7 +643,7 @@ export const registeredUserHappyPath = async ({page, registeredUserCredentials, 
 
     await expect(page.getByRole('heading', {name: /Order Summary/i})).toBeVisible()
     await expect(page.getByText(/2 Items/i)).toBeVisible()
-    await expect(page.getByRole('link', {name: /Belted Ribbed Boat Neck Sweater/i})).toBeVisible()
+    await expect(page.getByRole('link', {name: /Cotton Turtleneck Sweater/i})).toBeVisible()
     if (checkA11y) {
         await runAccessibilityTest(page, [
             'registered',
@@ -643,7 +656,7 @@ export const registeredUserHappyPath = async ({page, registeredUserCredentials, 
 
 /**
  * Executes the wishlist flow for a registered user.
- * 
+ *
  * Includes robust authentication handling with fallback mechanisms.
  *
  * @param {Object} options.page - Playwright page object representing a browser tab/window
@@ -688,9 +701,9 @@ export const wishlistFlow = async ({page, registeredUserCredentials, a11y = {}})
     await navigateToPDPDesktop({page})
 
     // add product to wishlist
-    await expect(page.getByRole('heading', {name: /Belted Ribbed Boat Neck Sweater/i})).toBeVisible()
+    await expect(page.getByRole('heading', {name: /Cotton Turtleneck Sweater/i})).toBeVisible()
 
-    await page.getByRole('radio', {name: 'M', exact: true}).click()
+    await page.getByRole('radio', {name: 'L', exact: true}).click()
     await page.getByRole('button', {name: /Add to Wishlist/i}).click()
 
     // wishlist
@@ -699,13 +712,13 @@ export const wishlistFlow = async ({page, registeredUserCredentials, a11y = {}})
 
 /**
  * Navigates to a PLP and opens the store inventory filter to select a store.
- * 
+ *
  * This helper function demonstrates the store inventory filtering functionality by:
  * 1. Navigating to the Womens > Tops category PLP
  * 2. Opening the store locator modal
  * 3. Searching for stores by postal code
  * 4. Returning the available store selection options
- * 
+ *
  * This is useful for testing store inventory features and BOPIS (Buy Online, Pick Up In Store) functionality.
  *
  * @param {Object} options.page - Playwright page object representing a browser tab/window
@@ -720,11 +733,11 @@ export const selectStoreFromPLP = async ({page}) => {
     // Verify we're on the PLP
     await expect(page.getByRole('heading', {name: 'Tops'})).toBeVisible()
     const productTile = page.getByRole('link', {
-        name: /Belted Ribbed Boat Neck Sweater/i
+        name: /Cotton Turtleneck Sweater/i
     })
     const productTileImg = productTile.locator('img')
     await productTileImg.waitFor({state: 'visible'})
-    
+
     // Look for the store inventory filter component
     const storeInventoryFilter = page.getByTestId('sf-store-inventory-filter')
     await expect(storeInventoryFilter).toBeVisible()
@@ -741,24 +754,32 @@ export const selectStoreFromPLP = async ({page}) => {
     await expect(page.getByText('Find a Store')).toBeVisible()
     await page.locator('select[name="countryCode"]').selectOption({label: 'United States'})
     await page.locator('input[name="postalCode"]').fill('01803')
-    const findButton = page.getByRole('button', {name: 'Find'})
-    await expect(findButton).toBeVisible()
-    await findButton.click()
+    const searchStoreButton = page.getByRole('button', {name: 'Find'})
+    await expect(searchStoreButton).toBeVisible()
 
-    // Wait for stores to load in the modal
-    await page.waitForLoadState()
+    const storeSearchResponsePromise = page.waitForResponse(
+        (resp) =>
+            resp.url().includes('/shopper-stores/v1/organizations/') &&
+            resp.url().includes('/store-search')
+    )
+    await searchStoreButton.click()
+    const storeSearchResponse = await storeSearchResponsePromise
+
+    expect(storeSearchResponse.status()).toBe(200)
 
     // Select the first available store (if any stores are available)
     await expect(page.getByText(/Burlington Retail Store/i)).toBeVisible()
-    
+
     // Find and click the first available store label
-    const storeRadioLabels = page.locator('label.chakra-radio:has(input[aria-describedby^="store-info-"])')
+    const storeRadioLabels = page.locator(
+        'label.chakra-radio:has(input[aria-describedby^="store-info-"])'
+    )
     const storeCount = await storeRadioLabels.count()
 
     if (storeCount > 0) {
         // Select the first store
         await storeRadioLabels.first().click()
-        
+
         // Close the store locator modal
         await page.locator('button[aria-label="Close"]').click()
         await page.waitForLoadState()
@@ -766,7 +787,7 @@ export const selectStoreFromPLP = async ({page}) => {
     } else {
         // If no stores are available, verify the appropriate message is shown
         await expect(page.getByText('Sorry, there are no locations in this area.')).toBeVisible()
-        
+
         // Close the modal
         await page.getByRole('button', {name: 'Close'}).click()
     }

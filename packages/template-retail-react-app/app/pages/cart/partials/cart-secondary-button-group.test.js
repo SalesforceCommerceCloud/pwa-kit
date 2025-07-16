@@ -170,11 +170,10 @@ describe('CartSecondaryButtonGroup Edit button conditional rendering', () => {
     })
 })
 
-test('hides remove, wishlist and gift checkbox for bonus product', async () => {
+test('hides remove, wishlist, edit button and gift checkbox for bonus product', async () => {
     const {user} = renderWithProviders(<MockedComponent isBonusProduct={true} />)
 
-    expect(screen.getByRole('button', {name: /edit/i})).toBeInTheDocument()
-
+    expect(screen.queryByRole('button', {name: /edit/i})).not.toBeInTheDocument()
     expect(screen.queryByRole('button', {name: /remove/i})).not.toBeInTheDocument()
     expect(screen.queryByRole('button', {name: /add to wishlist/i})).not.toBeInTheDocument()
     expect(screen.queryByRole('checkbox', {name: /this is a gift/i})).not.toBeInTheDocument()

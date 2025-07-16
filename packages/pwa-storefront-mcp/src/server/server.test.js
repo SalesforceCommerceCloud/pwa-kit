@@ -37,7 +37,12 @@ describe('PwaStorefrontMCPServerHighLevel integration', () => {
     it('should list registered tools via stdio', async () => {
         const child = spawn(BABEL_NODE_PATH, ['src/server/server.js'], {
             cwd: process.cwd(),
-            stdio: ['pipe', 'pipe', 'inherit']
+            stdio: ['pipe', 'pipe', 'inherit'],
+            env: {
+                ...process.env,
+                // NOTE: THIS ENV VAR IS  USUALLY SET BY CURSOR OR THE MCP SERVER?
+                WORKSPACE_FOLDER_PATHS: path.resolve(process.cwd(), '..', '..')
+            }
         })
 
         // Wait a moment for the server to start

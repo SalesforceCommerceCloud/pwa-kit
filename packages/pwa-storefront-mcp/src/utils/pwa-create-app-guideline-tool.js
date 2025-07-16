@@ -4,19 +4,13 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import os from 'os'
-import path from 'path'
-import {exec} from 'child_process'
-import fs from 'fs/promises'
 
 // Project dependencies
-import {EmptyJsonSchema, runNpxCommand} from './utils'
+import {EmptyJsonSchema, getCreateAppCommand, isMonoRepo, runCommand} from './utils'
 
-//const CREATE_APP_VERSION = 'latest'
-//const CREATE_APP_VERSION = '3.11.0-nightly-20250630080227'
-const CREATE_APP_COMMAND = '@salesforce/pwa-kit-create-app@3.11.0-nightly-20250630080227'
-const DISPLAY_PROGRAM_COMMAND = '--displayProgram'
-const NPX_COMMAND = 'npx'
+const CREATE_APP_COMMAND = getCreateAppCommand()
+const DISPLAY_PROGRAM_FLAG = '--displayProgram'
+const COMMAND_RUNNER = isMonoRepo() ? 'node' : 'npx'
 
 const guidelinesText = `
 # PWA Kit Create App — Agent Usage Guidelines
@@ -63,7 +57,8 @@ If the user requests a project using a **template**:
 - Never attempt to create a project without using this tool.
 - When gathering answers for a template, ask questions one at a time to maintain clarity.
 - Presets and templates are mutually exclusive paths. Do not offer both options unless explicitly requested.
-- Use the \`${NPX_COMMAND}\` command to run the \`${CREATE_APP_COMMAND}\` CLI tool when creating a new project.
+- Do not pass any flags to the \`${CREATE_APP_COMMAND}\` CLI tool that are not listed in the program.json options".
+- Use the \`${COMMAND_RUNNER}\` command to run the \`${CREATE_APP_COMMAND}\` CLI tool when creating a new project.
 `
 
 export default {
@@ -71,18 +66,12 @@ export default {
     description: `This tool is used to provide the agent with the instructions on how to use the @salesforce/pwa-kit-create-app CLI tool to create a new PWA Kit projects. Do not attempt to create a project without using this tool first.`,
     inputSchema: EmptyJsonSchema,
     fn: async () => {
-        let programOutput = ''
-
         // Run the display program and get the output.
-        try {
-            programOutput = await runNpxCommand(
-                NPX_COMMAND,
-                CREATE_APP_COMMAND,
-                DISPLAY_PROGRAM_COMMAND
-            )
-        } catch (err) {
-            console.error('Failed to run display program:', err)
-        }
+        const programOutput = await runCommand(COMMAND_RUNNER, [
+            ...(COMMAND_RUNNER === 'npx' ? ['--yes'] : []),
+            CREATE_APP_COMMAND,
+            DISPLAY_PROGRAM_FLAG
+        ])
 
         // Parse the output and get the data, metadata, and schemas.
         const {
