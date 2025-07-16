@@ -41,7 +41,7 @@ export const usePaymentSheetSubmission = () => {
     const createPaymentIntent = async (paymentData) => {
         console.log('🔄 createPaymentIntent callback called with:', paymentData)
         
-        const basketId = "adc4a3a9ded0f59a34accc6638" // TODO: use basket.basketId
+        const basketId = "9ab3e52d9fa346a83c819ced37" // TODO: use basket.basketId
         
         try {
             const paymentResult = await processPayment({
@@ -54,7 +54,9 @@ export const usePaymentSheetSubmission = () => {
             
             console.log('✅ Payment intent created:', paymentResult)
             return {
-                client_secret: paymentResult.payment_info.client_secret
+                client_secret: paymentResult.payment_info.client_secret,
+                id: paymentResult.payment_info.payment_intent_id,
+                customer: paymentResult.payment_info.customer_id
             }
         } catch (error) {
             console.error('❌ Payment intent creation failed:', error)
@@ -82,7 +84,7 @@ export const usePaymentSheetSubmission = () => {
                         const respData = resp.data
                         console.log('✅ SFP payment confirmed:', respData)
                         
-                        if (respData.responseCode === 0) {
+                        if (resp.responseCode === 0) {
                             resolve(respData)
                         } else {
                             console.log('❌ SFP payment failed:', respData)
