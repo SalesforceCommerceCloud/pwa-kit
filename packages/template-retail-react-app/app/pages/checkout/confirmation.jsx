@@ -30,7 +30,11 @@ import {
     useStores,
     useShopperCustomersMutation
 } from '@salesforce/commerce-sdk-react'
-import {getCreditCardIcon} from '@salesforce/retail-react-app/app/utils/cc-utils'
+import {
+    getCreditCardIcon,
+    getMaskCreditCardNumber,
+    getPaymentInstrumentCardType
+} from '@salesforce/retail-react-app/app/utils/cc-utils'
 import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
 import Link from '@salesforce/retail-react-app/app/components/link'
 import AddressDisplay from '@salesforce/retail-react-app/app/components/address-display'
@@ -58,6 +62,7 @@ const CheckoutConfirmation = () => {
     const {data: customer} = useCurrentCustomer()
     const register = useAuthHelper(AuthHelpers.Register)
     const createCustomerAddress = useShopperCustomersMutation('createCustomerAddress')
+    const createCustomerPaymentInstruments = useShopperCustomersMutation('createCustomerPaymentInstrument')
     const {data: order} = useOrder(
         {
             parameters: {orderNo}
@@ -122,6 +127,30 @@ const CheckoutConfirmation = () => {
             }
         }
 
+        const savePaymentInstrument = async (customerId) => {
+            try {
+                const paymentInstrument = {
+                    paymentMethodId: order.paymentInstruments[0].paymentMethodId,
+                    paymentCard: {
+                        holder: order.paymentInstruments[0].paymentCard.holder,
+                        number: '424242424242',
+                        cardType: order.paymentInstruments[0].paymentCard.cardType,
+                        expirationMonth: order.paymentInstruments[0].paymentCard.expirationMonth,
+                        expirationYear: order.paymentInstruments[0].paymentCardexpirationYear
+                    }
+                }
+
+                console.log('**** Got this payment instrument to save on customer profile:', paymentInstrument)
+
+                await createCustomerPaymentInstruments.mutateAsync({
+                    body: paymentInstrument,
+                    parameters: {customerId: customerId}
+                })
+            } catch (error) {
+                // Fail silently
+            }
+        }
+
         try {
             const body = {
                 customer: {
@@ -137,6 +166,10 @@ const CheckoutConfirmation = () => {
 
             // Save the shipping address from this order, should not block account creation
             await saveShippingAddress(registerData.customerId)
+
+            console.log('*** Saving payment instrument to save on customer profile:', registerData.customerId);
+            // Save the payment instrument
+            await savePaymentInstrument(registerData.customerId)
 
             navigate(`/account`)
         } catch (error) {

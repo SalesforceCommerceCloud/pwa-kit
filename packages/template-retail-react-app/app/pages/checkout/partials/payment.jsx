@@ -12,10 +12,10 @@ import {
     Button,
     Checkbox,
     Container,
+    Divider,
     Heading,
     Stack,
-    Text,
-    Divider
+    Text
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 import {useForm} from 'react-hook-form'
 import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
@@ -23,20 +23,18 @@ import {useShopperBasketsMutation} from '@salesforce/commerce-sdk-react'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
 import {useCheckout} from '@salesforce/retail-react-app/app/pages/checkout/util/checkout-context'
 import {
-    getPaymentInstrumentCardType,
+    getCreditCardIcon,
     getMaskCreditCardNumber,
-    getCreditCardIcon
+    getPaymentInstrumentCardType
 } from '@salesforce/retail-react-app/app/utils/cc-utils'
-import {
-    ToggleCard,
-    ToggleCardEdit,
-    ToggleCardSummary
-} from '@salesforce/retail-react-app/app/components/toggle-card'
+import {ToggleCard, ToggleCardEdit, ToggleCardSummary} from '@salesforce/retail-react-app/app/components/toggle-card'
 import PaymentForm from '@salesforce/retail-react-app/app/pages/checkout/partials/payment-form'
-import ShippingAddressSelection from '@salesforce/retail-react-app/app/pages/checkout/partials/shipping-address-selection'
+import ShippingAddressSelection
+    from '@salesforce/retail-react-app/app/pages/checkout/partials/shipping-address-selection'
 import AddressDisplay from '@salesforce/retail-react-app/app/components/address-display'
 import {PromoCode, usePromoCode} from '@salesforce/retail-react-app/app/components/promo-code'
 import {API_ERROR_MESSAGE} from '@salesforce/retail-react-app/app/constants'
+import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
 
 const Payment = () => {
     const {formatMessage} = useIntl()
@@ -44,6 +42,8 @@ const Payment = () => {
     const selectedShippingAddress = basket?.shipments && basket?.shipments[0]?.shippingAddress
     const selectedBillingAddress = basket?.billingAddress
     const appliedPayment = basket?.paymentInstruments && basket?.paymentInstruments[0]
+
+    const {data: customer} = useCurrentCustomer()
 
     const isPickupOrder = basket?.shipments[0]?.shippingMethod?.c_storePickupEnabled === true
     const [billingSameAsShipping, setBillingSameAsShipping] = useState(!isPickupOrder)
@@ -83,21 +83,36 @@ const Payment = () => {
         // month and year to submit them as individual fields.
         const [expirationMonth, expirationYear] = formValue.expiry.split('/')
 
-        const paymentInstrument = {
-            paymentMethodId: 'CREDIT_CARD',
-            paymentCard: {
-                holder: formValue.holder,
-                maskedNumber: getMaskCreditCardNumber(formValue.number),
-                cardType: getPaymentInstrumentCardType(formValue.cardType),
-                expirationMonth: parseInt(expirationMonth),
-                expirationYear: parseInt(`20${expirationYear}`)
+        console.log('****** payment instrument', customer.paymentInstruments)
+
+        if(customer.paymentInstruments) {
+            const paymentInstrument = {
+                paymentMethodId: 'CREDIT_CARD',
+                customerPaymentInstrumentId: customer.paymentInstruments[0].paymentInstrumentId //'d21e16e79f86b365c9bf411a2f'
             }
+            return addPaymentInstrumentToBasket({
+                parameters: {basketId: basket?.basketId},
+                body: paymentInstrument
+            })
+        }
+        else {
+            const paymentInstrument = {
+                paymentMethodId: 'CREDIT_CARD',
+
+                paymentCard: {
+                    holder: formValue.holder,
+                    maskedNumber: getMaskCreditCardNumber(formValue.number),
+                    cardType: getPaymentInstrumentCardType(formValue.cardType),
+                    expirationMonth: parseInt(expirationMonth),
+                    expirationYear: parseInt(`20${expirationYear}`)
+                }
+            }
+            return addPaymentInstrumentToBasket({
+                parameters: {basketId: basket?.basketId},
+                body: paymentInstrument
+            })
         }
 
-        return addPaymentInstrumentToBasket({
-            parameters: {basketId: basket?.basketId},
-            body: paymentInstrument
-        })
     }
     const onBillingSubmit = async () => {
         const isFormValid = await billingAddressForm.trigger()
