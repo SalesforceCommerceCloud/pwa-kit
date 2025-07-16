@@ -745,6 +745,16 @@
       "value": "Delivery Details"
     }
   ],
+  "checkout_confirmation.heading.delivery_number": [
+    {
+      "type": 0,
+      "value": "Delivery "
+    },
+    {
+      "type": 1,
+      "value": "number"
+    }
+  ],
   "checkout_confirmation.heading.order_summary": [
     {
       "type": 0,
@@ -767,6 +777,16 @@
     {
       "type": 0,
       "value": "Pickup Details"
+    }
+  ],
+  "checkout_confirmation.heading.pickup_location_number": [
+    {
+      "type": 0,
+      "value": "Pickup Location "
+    },
+    {
+      "type": 1,
+      "value": "number"
     }
   ],
   "checkout_confirmation.heading.shipping_address": [
