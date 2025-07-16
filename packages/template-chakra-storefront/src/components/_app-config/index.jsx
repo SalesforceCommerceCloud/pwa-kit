@@ -34,7 +34,7 @@ import {
     STORE_LOCATOR_DEFAULT_POSTAL_CODE,
     STORE_LOCATOR_DEFAULT_PAGE_SIZE,
     STORE_LOCATOR_SUPPORTED_COUNTRIES
-} from '../../../config/constants'
+} from '../../../src/config/constants'
 
 /**
  * Use the AppConfig component to inject extra arguments into the getProps
