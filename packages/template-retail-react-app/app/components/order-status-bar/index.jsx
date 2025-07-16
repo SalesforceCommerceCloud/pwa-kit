@@ -15,7 +15,6 @@ const OrderStatusBar = ({currentStepLabel}) => {
     const theme = useTheme()
     const intl = useIntl()
 
-    // Helper function to get localized message
     const getLocalizedMessage = (status) => {
         switch (status) {
             case 'Ordered':
@@ -37,7 +36,6 @@ const OrderStatusBar = ({currentStepLabel}) => {
         }
     }
 
-    // Layout constants
     const n = steps.length
     const svgWidth = 1080
     const svgHeight = 50
@@ -47,7 +45,6 @@ const OrderStatusBar = ({currentStepLabel}) => {
     // Dynamically calculate step width so all steps + chevrons fit in svgWidth
     const stepWidth = (svgWidth + (n - 1) * chevronWidth) / n
 
-    // Find the index of the current step label (case-insensitive, trim whitespace)
     let currentStep = steps.findIndex((step) => step === currentStepLabel)
 
     if (currentStep === -1) currentStep = 0
@@ -92,13 +89,10 @@ const OrderStatusBar = ({currentStepLabel}) => {
             }
             // Color logic: completed steps = light teal, current step = dark blue, future steps = gray
             if (i < currentStep) {
-                // Completed steps - light teal
-                stepFill = theme.colors.teal[100] // light blue/teal color
+                stepFill = theme.colors.teal[100]
             } else if (i === currentStep) {
-                // Current step - dark blue
                 stepFill = theme.colors.blue[900]
             } else {
-                // Future steps - gray
                 stepFill = theme.colors.gray[200]
             }
             shapes.push(<path key={i} d={path} fill={stepFill} stroke="white" strokeWidth="2" />)
@@ -114,13 +108,10 @@ const OrderStatusBar = ({currentStepLabel}) => {
             // Text color logic: completed steps = dark text, current step = white, future steps = dark text
             let labelColor
             if (i < currentStep) {
-                // Completed steps - dark text for better contrast on light teal
                 labelColor = theme.colors.black[600]
             } else if (i === currentStep) {
-                // Current step - white text on dark blue
                 labelColor = 'white'
             } else {
-                // Future steps - dark text on gray
                 labelColor = theme.colors.black[600]
             }
             labels.push(

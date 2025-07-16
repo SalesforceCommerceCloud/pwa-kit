@@ -28,8 +28,6 @@ describe('OrderStatusBar', () => {
         labels.forEach((label) => {
             // Check that the component renders without errors
             expect(label).toBeInTheDocument()
-            // Note: Chakra UI styles may not be directly accessible in tests
-            // but we can verify the component renders without errors
         })
     })
 
@@ -53,31 +51,24 @@ describe('OrderStatusBar', () => {
     })
 
     test('renders with different currentStepLabel props and updates colors accordingly', () => {
-        // Test with first step (Ordered) - should have dark blue background and white text
         const {rerender} = renderWithProviders(<OrderStatusBar currentStepLabel="Ordered" />)
         expect(screen.getByText('Ordered')).toBeInTheDocument()
 
-        // Test with middle step (Dispatched) - should have light teal for completed, dark blue for current, gray for future
         rerender(<OrderStatusBar currentStepLabel="Dispatched" />)
         expect(screen.getByText('Dispatched')).toBeInTheDocument()
 
-        // Test with last step (Delivered) - should have light teal for all completed steps, dark blue for current
         rerender(<OrderStatusBar currentStepLabel="Delivered" />)
         expect(screen.getByText('Delivered')).toBeInTheDocument()
 
-        // Test with invalid step label (should default to first step)
         rerender(<OrderStatusBar currentStepLabel="Invalid Step" />)
         expect(screen.getByText('Ordered')).toBeInTheDocument()
 
-        // Test with empty string (should default to first step)
         rerender(<OrderStatusBar currentStepLabel="" />)
         expect(screen.getByText('Ordered')).toBeInTheDocument()
 
-        // Test with undefined value (should default to first step)
         rerender(<OrderStatusBar currentStepLabel={undefined} />)
         expect(screen.getByText('Ordered')).toBeInTheDocument()
 
-        // Test with array of values (should default to first step)
         rerender(<OrderStatusBar currentStepLabel={['Ordered', 'Dispatched']} />)
         expect(screen.getByText('Ordered')).toBeInTheDocument()
     })
@@ -99,8 +90,6 @@ describe('OrderStatusBar', () => {
         labels.forEach((label) => {
             // Check that labels are rendered
             expect(label).toBeInTheDocument()
-            // Note: Chakra UI styles may not be directly accessible in tests
-            // but we can verify the component renders without errors
         })
     })
 
