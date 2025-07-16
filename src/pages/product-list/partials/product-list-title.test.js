@@ -17,7 +17,10 @@ jest.mock('../../../components/breadcrumb', () => {
 describe('PageTitle', () => {
     const mockCategory = {
         name: 'Womens',
-        parentCategoryTree: [{id: 'root', name: 'Root'}, {id: 'womens', name: 'Womens'}]
+        parentCategoryTree: [
+            {id: 'root', name: 'Root'},
+            {id: 'womens', name: 'Womens'}
+        ]
     }
     const mockProductSearchResult = {
         total: 100
@@ -72,4 +75,4 @@ describe('PageTitle', () => {
         // The second heading is the product count.
         expect(screen.getByText('(100)')).toBeInTheDocument()
     })
-}) 
+})

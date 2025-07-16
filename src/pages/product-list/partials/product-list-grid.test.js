@@ -107,4 +107,4 @@ describe('ProductListGrid', () => {
             true
         )
     })
-}) 
+})

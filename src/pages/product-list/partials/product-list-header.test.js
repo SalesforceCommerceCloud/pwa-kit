@@ -80,7 +80,7 @@ describe('ProductListHeader', () => {
         renderWithProviders(<ProductListHeader {...defaultProps} />)
         // Check for desktop components
         expect(screen.getAllByTestId('page-title-mock')).toHaveLength(2)
-        expect(screen.getAllByTestId('selected-refinements-mock').length).toBe(2)
+        expect(screen.getAllByTestId('selected-refinements-mock')).toHaveLength(2)
         expect(screen.getByTestId('sort-mock')).toBeInTheDocument()
 
         // Check for mobile components
@@ -163,4 +163,4 @@ describe('ProductListHeader', () => {
 
         expect(await screen.findByTestId('loading')).toBeInTheDocument()
     })
-}) 
+})
