@@ -269,14 +269,7 @@ const ProductTile = (props) => {
                 )}
             </Link>
             {enableFavourite && (
-                <Box
-                    onClick={(e) => {
-                        // stop click event from bubbling
-                        // to avoid user from clicking the underlying
-                        // product while the favourite icon is disabled
-                        e.preventDefault()
-                    }}
-                >
+                <Box>
                     <IconButtonWithRegistration
                         data-testid="wishlist-button"
                         aria-label={
