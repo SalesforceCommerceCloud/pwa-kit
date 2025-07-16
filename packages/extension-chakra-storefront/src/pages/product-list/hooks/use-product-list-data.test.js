@@ -174,10 +174,13 @@ describe('useProductListData', () => {
     describe('Refetching behavior', () => {
         test('scrolls to top and sets filters loading on refetch', async () => {
             const initialProps = {isRefetching: false}
-            const {result, rerender} = renderHook(({isRefetching}) => {
-                useProductSearch.mockReturnValue({isRefetching})
-                return useProductListData()
-            }, {initialProps})
+            const {result, rerender} = renderHook(
+                ({isRefetching}) => {
+                    useProductSearch.mockReturnValue({isRefetching})
+                    return useProductListData()
+                },
+                {initialProps}
+            )
 
             rerender({isRefetching: true})
 
@@ -185,4 +188,4 @@ describe('useProductListData', () => {
             await waitFor(() => expect(window.scrollTo).toHaveBeenCalledWith(0, 0))
         })
     })
-}) 
+})
