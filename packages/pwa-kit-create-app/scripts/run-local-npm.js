@@ -62,7 +62,9 @@ const main = () => {
     verdaccioServerProcess.on('exit', (code, signal) => {
         console.log(`Child process exited with code ${code} and signal ${signal}`)
         cleanup()
-        process.exit(code) // Exit the main process when the child process exits
+        // Ensure code is a number - if it's a string or null, default to 1
+        const exitCode = typeof code === 'number' ? code : 1
+        process.exit(exitCode) // Exit the main process when the child process exits
     })
     verdaccioServerProcess.on('error', (err) => {
         console.error('Child process error:', err)

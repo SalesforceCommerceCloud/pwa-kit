@@ -88,7 +88,9 @@ const publishPackages = (packages = [], isNightly = false) => {
     }
 
     if (stderr) {
-        process.exit(code)
+        // Ensure code is a number - if it's not a number, default to 1
+        const exitCode = typeof code === 'number' ? code : 1
+        process.exit(exitCode)
     }
 }
 

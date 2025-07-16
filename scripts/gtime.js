@@ -34,7 +34,9 @@ const main = () => {
         childProc.spawnSync('dog', ['metric', 'post', metric, value])
         console.log(`dog metric post ${metric} ${value}`)
     })
-    process.exit(status)
+    // Ensure status is a number - if it's not a number, default to 1
+    const exitCode = typeof status === 'number' ? status : 1
+    process.exit(exitCode)
 }
 
 main()
