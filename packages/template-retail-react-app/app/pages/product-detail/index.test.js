@@ -657,7 +657,7 @@ describe('Delivery Options Restrictions', () => {
             hasSelectedStore: true
         }))
 
-        // Track shipment update request
+        // Track if updatePickupShipment was called
         let updatePickupShipmentCalled = false
         let shipmentUpdateRequest = null
 
