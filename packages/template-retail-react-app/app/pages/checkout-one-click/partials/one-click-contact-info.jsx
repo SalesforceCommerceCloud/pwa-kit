@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {useRef, useState, useEffect} from 'react'
+import React, {useRef, useState} from 'react'
 import PropTypes from 'prop-types'
 import {
     Alert,
@@ -17,12 +17,8 @@ import {
     AlertIcon,
     Button,
     Container,
-    InputGroup,
-    InputRightElement,
-    Spinner,
     Stack,
-    Text,
-    useDisclosure
+    Text
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 import {useForm} from 'react-hook-form'
 import {FormattedMessage, useIntl} from 'react-intl'
@@ -35,319 +31,148 @@ import {
 } from '@salesforce/retail-react-app/app/components/toggle-card'
 import Field from '@salesforce/retail-react-app/app/components/field'
 import LoginState from '@salesforce/retail-react-app/app/pages/checkout-one-click/partials/one-click-login-state'
-import OtpAuth from '@salesforce/retail-react-app/app/components/otp-auth'
 import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
-import {
-    AuthHelpers,
-    useAuthHelper,
-    useShopperBasketsMutation,
-    useCustomerType,
-    useConfig
-} from '@salesforce/commerce-sdk-react'
-import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
-import {isAbsoluteURL} from '@salesforce/retail-react-app/app/page-designer/utils'
-import {useAppOrigin} from '@salesforce/retail-react-app/app/hooks/use-app-origin'
-import {API_ERROR_MESSAGE} from '@salesforce/retail-react-app/app/constants'
+import {AuthHelpers, useAuthHelper, useShopperBasketsMutation} from '@salesforce/commerce-sdk-react'
 
 const ContactInfo = ({isSocialEnabled = false, idps = []}) => {
     const {formatMessage} = useIntl()
     const navigate = useNavigation()
-    const appOrigin = useAppOrigin()
     const {data: customer} = useCurrentCustomer()
-    const currentBasketQuery = useCurrentBasket()
-    const {data: basket} = currentBasketQuery
-    const {isRegistered} = useCustomerType()
-    const config = useConfig()
-
+    const {data: basket} = useCurrentBasket()
     const login = useAuthHelper(AuthHelpers.LoginRegisteredUserB2C)
     const logout = useAuthHelper(AuthHelpers.Logout)
     const updateCustomerForBasket = useShopperBasketsMutation('updateCustomerForBasket')
     const mergeBasket = useShopperBasketsMutation('mergeBasket')
-    const authorizePasswordlessLogin = useAuthHelper(AuthHelpers.AuthorizePasswordless)
-    const loginPasswordless = useAuthHelper(AuthHelpers.LoginPasswordlessUser)
 
     const {step, STEPS, goToStep, goToNextStep} = useCheckout()
 
     const form = useForm({
-        defaultValues: {
-            email: customer?.email || basket?.customerInfo?.email || '',
-            password: '',
-            otp: ''
-        }
+        defaultValues: {email: customer?.email || basket?.customerInfo?.email || '', password: ''}
     })
 
     const fields = useLoginFields({form})
     const emailRef = useRef()
 
-    const [error, setError] = useState()
+    const [error, setError] = useState(null)
     const [signOutConfirmDialogIsOpen, setSignOutConfirmDialogIsOpen] = useState(false)
-    const [showContinueButton, setShowContinueButton] = useState(false)
-    const [isCheckingEmail, setIsCheckingEmail] = useState(false)
-
-    const passwordlessConfigCallback = getConfig().app.login?.passwordless?.callbackURI
-    const callbackURL = isAbsoluteURL(passwordlessConfigCallback)
-        ? passwordlessConfigCallback
-        : `${appOrigin}${passwordlessConfigCallback}`
-
-    // Modal controls for OtpAuth
-    const {
-        isOpen: isOtpModalOpen,
-        onOpen: onOtpModalOpen,
-        onClose: onOtpModalClose
-    } = useDisclosure()
-
-    // Handle email field blur/focus events
-    const handleEmailBlur = async (e) => {
-        // Call original React Hook Form blur handler if it exists
-        if (fields.email.onBlur) {
-            fields.email.onBlur(e)
-        }
-
-        const email = form.getValues('email')
-        const isValid = await form.trigger()
-        // Manually trigger the browser native form validations
-        if (isValid) {
-            // Try to send OTP first, only open modal if successful
-            await handleSendEmailOtp(email)
-        } else {
-            form.reportValidity()
-        }
-    }
-
-    const handleEmailFocus = (e) => {
-        // Call original React Hook Form focus handler if it exists
-        if (fields.email.onFocus) {
-            fields.email.onFocus(e)
-        }
-
-        // Close modal if user returns to email field
-        if (isOtpModalOpen) {
-            onOtpModalClose()
-        }
-
-        // Hide continue button when user focuses back on email
-        setShowContinueButton(false)
-
-        // Clear email checking state
-        setIsCheckingEmail(false)
-    }
-
-    // Handle sending OTP email
-    const handleSendEmailOtp = async (email) => {
-        form.clearErrors('global')
-        setIsCheckingEmail(true)
-        try {
-            await authorizePasswordlessLogin.mutateAsync({
-                userid: email,
-                callbackURI: `${callbackURL}?mode=otp_email`
-            })
-            // Only open modal if API call succeeds
-            onOtpModalOpen()
-            // Hide continue button since user will use OTP flow
-            setShowContinueButton(false)
-        } catch (error) {
-            // Show continue button when email is not found
-            setShowContinueButton(true)
-        } finally {
-            setIsCheckingEmail(false)
-        }
-    }
-
-    // Handle OTP modal close
-    const handleOtpModalClose = () => {
-        onOtpModalClose()
-    }
-
-    // Handle OTP verification
-    const handleOtpVerification = async (otpCode) => {
-        try {
-            await loginPasswordless.mutateAsync({pwdlessLoginToken: otpCode})
-
-            // Successful OTP verification - user is now logged in
-            const hasBasketItem = basket.productItems?.length > 0
-            if (hasBasketItem) {
-                mergeBasket.mutate({
-                    parameters: {
-                        createDestinationBasket: true
-                    }
-                })
-            }
-
-            // Close modal
-            handleOtpModalClose()
-
-            goToNextStep()
-
-            // Return success
-            return {success: true}
-        } catch (error) {
-            // Handle 401 Unauthorized - invalid or expired OTP code
-            const message =
-                error.response?.status === 401
-                    ? formatMessage({
-                          defaultMessage: 'Invalid or expired code. Please try again.',
-                          id: 'otp.error.invalid_code'
-                      })
-                    : formatMessage(API_ERROR_MESSAGE)
-
-            // Return error for OTP component to handle
-            return {success: false, error: message}
-        }
-    }
 
     const submitForm = async (data) => {
         setError(null)
+        try {
+            if (!data.password) {
+                await updateCustomerForBasket.mutateAsync({
+                    parameters: {basketId: basket.basketId},
+                    body: {email: data.email}
+                })
+            } else {
+                await login.mutateAsync({username: data.email, password: data.password})
 
-        // If continue button is showing, this means it's a guest checkout
-        // Go directly to next step without OTP
-        if (showContinueButton) {
-            await updateCustomerForBasket.mutateAsync({
-                parameters: {basketId: basket.basketId},
-                body: {email: data.email}
-            })
-            setShowContinueButton(false)
+                const hasBasketItem = basket.productItems?.length > 0
+                if (hasBasketItem) {
+                    mergeBasket.mutate({
+                        parameters: {
+                            createDestinationBasket: true
+                        }
+                    })
+                }
+            }
             goToNextStep()
-            return
-        }
-
-        // Otherwise, this is form submission (Enter key) - trigger OTP flow
-        const email = form.getValues('email')
-        const isValid = await form.trigger()
-
-        // Manually trigger the browser native form validations
-        if (isValid) {
-            // Try to send OTP first, only open modal if successful
-            await handleSendEmailOtp(email)
-        } else {
-            form.reportValidity()
+        } catch (error) {
+            if (/Unauthorized/i.test(error.message)) {
+                setError(
+                    formatMessage({
+                        defaultMessage: 'Incorrect username or password, please try again.',
+                        id: 'contact_info.error.incorrect_username_or_password'
+                    })
+                )
+            } else {
+                setError(error.message)
+            }
         }
     }
 
     return (
-        <>
-            <ToggleCard
-                id="step-0"
-                title={formatMessage({
-                    defaultMessage: 'Contact Info',
-                    id: 'checkout_contact_info.title.contact_info'
-                })}
-                editing={step === STEPS.CONTACT_INFO}
-                onEdit={() => {
-                    if (isRegistered) {
-                        setSignOutConfirmDialogIsOpen(true)
-                    } else {
-                        goToStep(STEPS.CONTACT_INFO)
-                    }
-                }}
-                editLabel={
-                    isRegistered
-                        ? formatMessage({
-                              defaultMessage: 'Sign Out',
-                              id: 'checkout_contact_info.action.sign_out'
-                          })
-                        : formatMessage({
-                              defaultMessage: 'Edit',
-                              id: 'checkout_contact_info.action.edit'
-                          })
+        <ToggleCard
+            id="step-0"
+            title={formatMessage({
+                defaultMessage: 'Contact Info',
+                id: 'contact_info.title.contact_info'
+            })}
+            editing={step === STEPS.CONTACT_INFO}
+            isLoading={form.formState.isSubmitting}
+            onEdit={() => {
+                if (customer.isRegistered) {
+                    setSignOutConfirmDialogIsOpen(true)
+                } else {
+                    goToStep(STEPS.CONTACT_INFO)
                 }
-            >
-                <ToggleCardEdit>
-                    <Container variant="form">
-                        <form onSubmit={form.handleSubmit(submitForm)}>
-                            <Stack spacing={6}>
-                                {error && (
-                                    <Alert status="error">
-                                        <AlertIcon />
-                                        {error}
-                                    </Alert>
-                                )}
+            }}
+            editLabel={
+                customer.isRegistered
+                    ? formatMessage({
+                          defaultMessage: 'Sign Out',
+                          id: 'contact_info.action.sign_out'
+                      })
+                    : formatMessage({
+                          defaultMessage: 'Edit Contact Info',
+                          id: 'toggle_card.action.editContactInfo'
+                      })
+            }
+        >
+            <ToggleCardEdit>
+                <Container variant="form">
+                    <form onSubmit={form.handleSubmit(submitForm)}>
+                        <Stack spacing={6}>
+                            {error && (
+                                <Alert status="error">
+                                    <AlertIcon />
+                                    {error}
+                                </Alert>
+                            )}
 
-                                <Stack spacing={5}>
-                                    <InputGroup>
-                                        <Field
-                                            {...fields.email}
-                                            inputRef={emailRef}
-                                            inputProps={{
-                                                onBlur: handleEmailBlur,
-                                                onFocus: handleEmailFocus,
-                                                paddingRight: isCheckingEmail
-                                                    ? '2.5rem'
-                                                    : undefined,
-                                                ...fields.email.inputProps
-                                            }}
-                                        />
-                                        {isCheckingEmail && (
-                                            <InputRightElement
-                                                height="100%"
-                                                display="flex"
-                                                alignItems="center"
-                                                justifyContent="center"
-                                                paddingTop="25px"
-                                            >
-                                                <Spinner
-                                                    size="md"
-                                                    color="blue.500"
-                                                    borderWidth="2px"
-                                                />
-                                            </InputRightElement>
-                                        )}
-                                    </InputGroup>
-                                </Stack>
-
-                                <Stack spacing={3}>
-                                    <LoginState
-                                        form={form}
-                                        isSocialEnabled={isSocialEnabled}
-                                        idps={idps}
-                                    />
-                                    {showContinueButton && step === STEPS.CONTACT_INFO && (
-                                        <Button type="submit">
-                                            <FormattedMessage
-                                                defaultMessage="Continue to Shipping Address"
-                                                id="contact_info.button.continue_to_shipping_address"
-                                            />
-                                        </Button>
-                                    )}
-                                </Stack>
+                            <Stack spacing={5} position="relative">
+                                <Field {...fields.email} inputRef={emailRef} />
                             </Stack>
 
-                            {/* OTP Auth Modal */}
-                            <OtpAuth
-                                isOpen={isOtpModalOpen}
-                                onClose={handleOtpModalClose}
-                                form={form}
-                                handleSendEmailOtp={handleSendEmailOtp}
-                                handleOtpVerification={handleOtpVerification}
-                            />
-                        </form>
-                    </Container>
-                </ToggleCardEdit>
+                            <Stack spacing={3}>
+                                <LoginState
+                                    form={form}
+                                    isSocialEnabled={isSocialEnabled}
+                                    idps={idps}
+                                />
+                                <Button type="submit">
+                                    <FormattedMessage
+                                        defaultMessage="Continue to Shipping Address"
+                                        id="contact_info.button.continue_to_shipping_address"
+                                    />
+                                </Button>
+                            </Stack>
+                        </Stack>
+                    </form>
+                </Container>
+            </ToggleCardEdit>
+            <ToggleCardSummary>
+                <Text>{basket?.customerInfo?.email || customer?.email}</Text>
 
-                {(customer?.email || form.getValues('email')) && (
-                    <ToggleCardSummary>
-                        <Text>{customer?.email || form.getValues('email')}</Text>
-                    </ToggleCardSummary>
-                )}
-            </ToggleCard>
-
-            {/* Sign Out Confirmation Dialog */}
-            <SignOutConfirmationDialog
-                isOpen={signOutConfirmDialogIsOpen}
-                onClose={() => setSignOutConfirmDialogIsOpen(false)}
-                onConfirm={async () => {
-                    await logout.mutateAsync()
-                    setSignOutConfirmDialogIsOpen(false)
-                    navigate('/')
-                }}
-            />
-        </>
+                <SignOutConfirmationDialog
+                    isOpen={signOutConfirmDialogIsOpen}
+                    onClose={() => setSignOutConfirmDialogIsOpen(false)}
+                    onConfirm={async () => {
+                        await logout.mutateAsync()
+                        navigate('/login')
+                        setSignOutConfirmDialogIsOpen(false)
+                    }}
+                />
+            </ToggleCardSummary>
+        </ToggleCard>
     )
 }
 
 ContactInfo.propTypes = {
     isSocialEnabled: PropTypes.bool,
+    isPasswordlessEnabled: PropTypes.bool,
     idps: PropTypes.arrayOf(PropTypes.string)
 }
 
