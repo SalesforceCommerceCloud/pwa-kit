@@ -36,7 +36,6 @@ export default function ShippingAddress() {
     const {formatMessage} = useIntl()
     const toast = useToast()
     const [isLoading, setIsLoading] = useState()
-    const [hasAutoSelected, setHasAutoSelected] = useState(false)
     const {data: customer} = useCurrentCustomer()
     const {data: basket} = useCurrentBasket()
     const selectedShippingAddress = basket?.shipments && basket?.shipments[0]?.shippingAddress
@@ -52,9 +51,24 @@ export default function ShippingAddress() {
 
     const submitAndContinue = async (address) => {
         setIsLoading(true)
-        try {
-            const {
-                addressId,
+        const {
+            addressId,
+            address1,
+            city,
+            countryCode,
+            firstName,
+            lastName,
+            phone,
+            postalCode,
+            stateCode
+        } = address
+        await updateShippingAddressForShipment.mutateAsync({
+            parameters: {
+                basketId: basket.basketId,
+                shipmentId: 'me',
+                useAsBilling: false
+            },
+            body: {
                 address1,
                 city,
                 countryCode,
@@ -63,22 +77,33 @@ export default function ShippingAddress() {
                 phone,
                 postalCode,
                 stateCode
-            } = address
-            await updateShippingAddressForShipment.mutateAsync({
+            }
+        })
+
+        if (customer.isRegistered && !addressId) {
+            const body = {
+                address1,
+                city,
+                countryCode,
+                firstName,
+                lastName,
+                phone,
+                postalCode,
+                stateCode,
+                addressId: nanoid()
+            }
+            await createCustomerAddress.mutateAsync({
+                body,
+                parameters: {customerId: customer.customerId}
+            })
+        }
+
+        if (customer.isRegistered && addressId) {
+            await updateCustomerAddress.mutateAsync({
+                body: address,
                 parameters: {
-                    basketId: basket.basketId,
-                    shipmentId: 'me',
-                    useAsBilling: false
-                },
-                body: {
-                    address1,
-                    city,
-                    countryCode,
-                    firstName,
-                    lastName,
-                    phone,
-                    postalCode,
-                    stateCode
+                    customerId: customer.customerId,
+                    addressName: addressId
                 }
             })
 
