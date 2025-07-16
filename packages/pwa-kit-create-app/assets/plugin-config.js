@@ -17,5 +17,8 @@ module.exports = {
         // SFDC_EXT_HELLO_WORLD_ENABLED: {
         //     description: 'The Hello World Extension'
         // },
+        SFDC_EXT_MARKETING_CONSENT_ENABLED: {
+            description: 'Shopper Marketing Consent Extension (uses Marketing and Data Cloud)'
+        }
     }
 }

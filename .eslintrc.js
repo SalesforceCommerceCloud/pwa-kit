@@ -1,6 +1,10 @@
 module.exports = {
     root: true,
     plugins: ['header'],
+    globals: {
+        // This is injected by webpack at runtime
+        SFDC_EXT_MARKETING_CONSENT_ENABLED: 'readonly'
+    },
     rules: {
         'header/header': [
             2,
