@@ -445,6 +445,9 @@
   "contact_info.button.checkout_as_guest": {
     "defaultMessage": "Checkout as Guest"
   },
+  "contact_info.button.continue_to_shipping_address": {
+    "defaultMessage": "Continue to Shipping Address"
+  },
   "contact_info.button.login": {
     "defaultMessage": "Log In"
   },
