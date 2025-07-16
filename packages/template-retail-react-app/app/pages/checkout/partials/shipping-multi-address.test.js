@@ -328,4 +328,68 @@ describe('ShippingMultiAddress', () => {
             expect(multiShippingCards).toHaveLength(2)
         })
     })
+
+    describe('Internationalization', () => {
+        it('should use proper i18n for address formatting', () => {
+            renderWithIntl(<ShippingMultiAddress {...defaultProps} />)
+
+            // Verify that the address is displayed in two separate lines
+            // First line: just the street address
+            expect(screen.getAllByText('123 Test St')).toHaveLength(2)
+
+            // Second line: formatted city, state, postal code using i18n
+            expect(screen.getAllByText('Test City, CA 12345')).toHaveLength(2)
+        })
+
+        it('should handle missing state code in address formatting', () => {
+            const customerWithMissingState = {
+                ...mockCustomer,
+                addresses: [
+                    {
+                        ...mockCustomer.addresses[0],
+                        stateCode: null
+                    }
+                ]
+            }
+
+            useCurrentCustomer.mockReturnValue({
+                data: customerWithMissingState
+            })
+
+            renderWithIntl(<ShippingMultiAddress {...defaultProps} />)
+
+            // Verify that the address is still displayed correctly even with missing stateCode
+            expect(screen.getAllByText('123 Test St')).toHaveLength(2)
+
+            // The formatted address should show "Test City, 12345" (empty stateCode, ignore whitespace)
+            expect(
+                screen.getAllByText(
+                    (content) => content.replace(/\s+/g, ' ').trim() === 'Test City, 12345'
+                )
+            ).toHaveLength(2)
+        })
+
+        it('should display address in two separate lines', () => {
+            renderWithIntl(<ShippingMultiAddress {...defaultProps} />)
+
+            // Verify that address1 is displayed separately
+            expect(screen.getAllByText('123 Test St')).toHaveLength(2)
+
+            // Verify that the formatted city, state, postal code is displayed
+            expect(screen.getAllByText('Test City, CA 12345')).toHaveLength(2)
+        })
+
+        it('should not use hardcoded address formatting', () => {
+            renderWithIntl(<ShippingMultiAddress {...defaultProps} />)
+
+            // Verify that the old hardcoded format is NOT present
+            // The old format would be: "123 Test St, Test City, CA 12345" in one line
+            const hardcodedFormat = screen.queryByText('123 Test St, Test City, CA 12345')
+            expect(hardcodedFormat).not.toBeInTheDocument()
+
+            // Instead, verify that the address is split into two lines
+            expect(screen.getAllByText('123 Test St')).toHaveLength(2)
+            expect(screen.getAllByText('Test City, CA 12345')).toHaveLength(2)
+        })
+    })
 })

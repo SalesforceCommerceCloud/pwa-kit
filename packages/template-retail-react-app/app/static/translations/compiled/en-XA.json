@@ -7273,6 +7273,36 @@
       "value": "]"
     }
   ],
+  "shipping_multi_address.format.address_line_2": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 1,
+      "value": "city"
+    },
+    {
+      "type": 0,
+      "value": ", "
+    },
+    {
+      "type": 1,
+      "value": "stateCode"
+    },
+    {
+      "type": 0,
+      "value": " "
+    },
+    {
+      "type": 1,
+      "value": "postalCode"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
   "shipping_options.action.send_as_a_gift": [
     {
       "type": 0,

@@ -1454,6 +1454,9 @@
   "shipping_address_selection.title.edit_shipping": {
     "defaultMessage": "Edit Shipping Address"
   },
+  "shipping_multi_address.format.address_line_2": {
+    "defaultMessage": "{city}, {stateCode} {postalCode}"
+  },
   "shipping_options.action.send_as_a_gift": {
     "defaultMessage": "Do you want to send this as a gift?"
   },

@@ -261,10 +261,32 @@ const ShippingMultiAddress = ({
                                                             whiteSpace="nowrap"
                                                             flex={1}
                                                         >
-                                                            {selectedAddress.address1},{' '}
-                                                            {selectedAddress.city},{' '}
-                                                            {selectedAddress.stateCode}{' '}
-                                                            {selectedAddress.postalCode}
+                                                            {selectedAddress.address1}
+                                                        </Text>
+                                                        <Text
+                                                            fontWeight="normal"
+                                                            overflow="hidden"
+                                                            textOverflow="ellipsis"
+                                                            whiteSpace="nowrap"
+                                                            flex={1}
+                                                            fontSize="sm"
+                                                            color="gray.600"
+                                                        >
+                                                            {formatMessage(
+                                                                {
+                                                                    id: 'shipping_multi_address.format.address_line_2',
+                                                                    defaultMessage:
+                                                                        '{city}, {stateCode} {postalCode}'
+                                                                },
+                                                                {
+                                                                    city: selectedAddress.city,
+                                                                    stateCode:
+                                                                        selectedAddress.stateCode ||
+                                                                        '',
+                                                                    postalCode:
+                                                                        selectedAddress.postalCode
+                                                                }
+                                                            )}
                                                         </Text>
                                                     </HStack>
                                                     <Text ml={2} fontSize="lg" color="gray.500">
@@ -347,10 +369,28 @@ const ShippingMultiAddress = ({
                                                                             color="gray.600"
                                                                             fontSize="sm"
                                                                         >
-                                                                            {addr.address1},{' '}
-                                                                            {addr.city},{' '}
-                                                                            {addr.stateCode}{' '}
-                                                                            {addr.postalCode}
+                                                                            {addr.address1}
+                                                                        </Text>
+                                                                        <Text
+                                                                            fontWeight="normal"
+                                                                            color="gray.600"
+                                                                            fontSize="sm"
+                                                                        >
+                                                                            {formatMessage(
+                                                                                {
+                                                                                    id: 'shipping_multi_address.format.address_line_2',
+                                                                                    defaultMessage:
+                                                                                        '{city}, {stateCode} {postalCode}'
+                                                                                },
+                                                                                {
+                                                                                    city: addr.city,
+                                                                                    stateCode:
+                                                                                        addr.stateCode ||
+                                                                                        '',
+                                                                                    postalCode:
+                                                                                        addr.postalCode
+                                                                                }
+                                                                            )}
                                                                         </Text>
                                                                     </VStack>
                                                                 </ListItem>
