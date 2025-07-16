@@ -61,7 +61,6 @@ import {rebuildPathWithParams} from '@salesforce/retail-react-app/app/utils/url'
 import {useHistory, useLocation, useParams} from 'react-router-dom'
 import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
 import {useWishList} from '@salesforce/retail-react-app/app/hooks/use-wish-list'
-import {useAddToCartModalContext} from '@salesforce/retail-react-app/app/hooks/use-add-to-cart-modal'
 import {useDisclosure} from '@salesforce/retail-react-app/app/components/shared/ui'
 
 const ProductDetail = () => {
@@ -159,23 +158,27 @@ const ProductDetail = () => {
     const isProductASet = product?.type.set
     const isProductABundle = product?.type.bundle
 
-    let bundleChildVariantIds = ''
+    let bundleChildProductIds = ''
     if (isProductABundle)
-        bundleChildVariantIds = Object.keys(childProductSelection)
-            ?.map((key) => childProductSelection[key].variant.productId)
+        bundleChildProductIds = Object.keys(childProductSelection)
+            ?.map(
+                (key) =>
+                    childProductSelection[key].variant?.productId ||
+                    childProductSelection[key].product?.id
+            )
             .join(',')
 
     const {data: bundleChildrenData} = useProducts(
         {
             parameters: {
-                ids: bundleChildVariantIds,
+                ids: bundleChildProductIds,
                 allImages: false,
                 expand: ['availability', 'variations'],
                 select: '(data.(id,inventory,master))'
             }
         },
         {
-            enabled: bundleChildVariantIds?.length > 0,
+            enabled: bundleChildProductIds?.length > 0,
             keepPreviousData: true
         }
     )
@@ -184,7 +187,7 @@ const ProductDetail = () => {
         // Loop through the bundle children and update the inventory for variant selection
         product.bundledProducts.forEach(({product: childProduct}, index) => {
             const matchingChildProduct = bundleChildrenData.data.find(
-                (bundleChild) => bundleChild.master.masterId === childProduct.id
+                (bundleChild) => bundleChild?.master?.masterId === childProduct.id
             )
             if (matchingChildProduct) {
                 product.bundledProducts[index].product = {
@@ -312,8 +315,11 @@ const ProductDetail = () => {
     /**************** Add To Cart ****************/
     const showToast = useToast()
     const showError = (errorMessage) => {
+        const errorText =
+            typeof errorMessage === 'string' ? errorMessage : formatMessage(API_ERROR_MESSAGE)
+
         showToast({
-            title: errorMessage || formatMessage(API_ERROR_MESSAGE),
+            title: errorText,
             status: 'error'
         })
     }
@@ -327,8 +333,6 @@ const ProductDetail = () => {
         }))
     }
 
-    const addToCartModal = useAddToCartModalContext()
-
     const handleAddToCart = async (productSelectionValues = []) => {
         try {
             let productItems = productSelectionValues.map((item) => {
@@ -336,8 +340,8 @@ const ProductDetail = () => {
                 // Use variant if present, otherwise use the main product
                 const prod = variant || item.product || product
                 return {
-                    productId: prod.productId || prod.id, // productId for variant, id for product
-                    price: prod.price,
+                    productId: prod?.productId || prod?.id, // productId for variant, id for product
+                    price: prod?.price,
                     quantity
                 }
             })
@@ -382,7 +386,7 @@ const ProductDetail = () => {
                         formatMessage({
                             id: 'product_view.error.select_ship_to_address',
                             defaultMessage:
-                                "Please select 'Ship to Address' to match the shipping method for your other items."
+                                "Select 'Ship to Address' to match the delivery method for the items in your cart."
                         })
                     )
                 }
@@ -391,7 +395,7 @@ const ProductDetail = () => {
                         formatMessage({
                             id: 'product_view.error.select_pickup_in_store',
                             defaultMessage:
-                                "Please select 'Pickup in Store' to match the shipping method for your other items."
+                                "Select 'Pick Up in Store' to match the delivery method for the items in your cart."
                         })
                     )
                 }
@@ -410,15 +414,13 @@ const ProductDetail = () => {
             const productItemsForEinstein = productSelectionValues.map(
                 ({product, variant, quantity}) => ({
                     product,
-                    productId: variant.productId,
-                    price: variant.price,
+                    productId: variant?.productId || product?.id,
+                    price: variant?.price || product?.price,
                     quantity
                 })
             )
             einstein.sendAddToCart(productItemsForEinstein)
 
-            // Open modal with itemsAdded
-            addToCartModal.onOpen({product, itemsAdded: productSelectionValues})
             return productSelectionValues
         } catch (error) {
             showError(error.message)
@@ -434,10 +436,16 @@ const ProductDetail = () => {
         })
 
         // Using ot state for which child products are selected, scroll to the first
-        // one that isn't selected.
+        // one that isn't selected and requires a variant selection.
         const selectedProductIds = Object.keys(childProductSelection)
         const firstUnselectedProduct = comboProduct.childProducts?.find(
-            ({product: childProduct}) => !selectedProductIds.includes(childProduct.id)
+            ({product: childProduct}) => {
+                // Skip validation for standard products (no variations)
+                if (childProduct.type?.item) {
+                    return false
+                }
+                return !selectedProductIds.includes(childProduct.id)
+            }
         )?.product
 
         if (firstUnselectedProduct) {
@@ -465,26 +473,17 @@ const ProductDetail = () => {
         // Get all the selected products, and pass them to the addToCart handler which
         // accepts an array.
         const productSelectionValues = Object.values(childProductSelection)
-        handleAddToCart(productSelectionValues)
-        // Modal will be opened in handleAddToCart
+        return handleAddToCart(productSelectionValues)
     }
 
     /**************** Product Bundle Handlers ****************/
     // Top level bundle does not have variants
-    const handleProductBundleAddToCart = async (variantOrArray, selectedQuantity) => {
-        // Support both signatures: (variant, selectedQuantity) and ([{variant, quantity}])
-        let quantity
-        if (Array.isArray(variantOrArray)) {
-            quantity = variantOrArray[0]?.quantity
-        } else {
-            quantity = selectedQuantity
-        }
-
+    const handleProductBundleAddToCart = async ([{quantity: selectedQuantity}]) => {
         try {
             const childProductSelections = Object.values(childProductSelection)
             // Check if any products have pickup selected (including main product and bundle items)
             const bundleSelectionValues = [
-                {product, variant: null, quantity},
+                {product, variant: null, selectedQuantity},
                 ...childProductSelections
             ]
             const hasAnyPickupSelected = hasPickupItems(
@@ -508,7 +507,7 @@ const ProductDetail = () => {
                         formatMessage({
                             id: 'product_view.error.select_ship_to_address',
                             defaultMessage:
-                                "Please select 'Ship to Address' to match the shipping method for your other items."
+                                "Select 'Ship to Address' to match the delivery method for the items in your cart."
                         })
                     )
                 } else if (
@@ -520,7 +519,7 @@ const ProductDetail = () => {
                         formatMessage({
                             id: 'product_view.error.select_pickup_in_store',
                             defaultMessage:
-                                "Please select 'Pickup in Store' to match the shipping method for your other items."
+                                "Select 'Pick Up in Store' to match the delivery method for the items in your cart."
                         })
                     )
                 }
@@ -530,13 +529,13 @@ const ProductDetail = () => {
                 {
                     productId: product.id,
                     price: product.price,
-                    quantity: quantity,
+                    quantity: selectedQuantity,
                     // The add item endpoint in the shopper baskets API does not respect variant selections
                     // for bundle children, so we have to make a follow up call to update the basket
                     // with the chosen variant selections
                     bundledProductItems: childProductSelections.map((child) => {
                         return {
-                            productId: child.variant.productId,
+                            productId: child.variant?.productId || child.product?.id,
                             quantity: child.quantity
                         }
                     })
@@ -594,8 +593,7 @@ const ProductDetail = () => {
             )
 
             einstein.sendAddToCart(productItems)
-            // Open modal with itemsAdded and selectedQuantity for bundles
-            addToCartModal.onOpen({product, itemsAdded: childProductSelections, selectedQuantity})
+
             return childProductSelections
         } catch (error) {
             showError(error)
@@ -711,14 +709,10 @@ const ProductDetail = () => {
                                                 }
                                                 addToCart={
                                                     isProductASet
-                                                        ? (variant, quantity) =>
-                                                              handleAddToCart([
-                                                                  {
-                                                                      product: childProduct,
-                                                                      variant,
-                                                                      quantity
-                                                                  }
-                                                              ])
+                                                        ? (productSelectionValues) =>
+                                                              handleAddToCart(
+                                                                  productSelectionValues
+                                                              )
                                                         : null
                                                 }
                                                 addToWishlist={

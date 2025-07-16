@@ -50,8 +50,7 @@ export const StoreLocatorList = () => {
         if (hasItemsInBasket) {
             return intl.formatMessage({
                 id: 'store_locator.error.items_in_basket',
-                defaultMessage:
-                    'Sorry, you have items in your basket. Please remove them to change the selected store.'
+                defaultMessage: 'To change your selected store, remove all items from your cart.'
             })
         }
 
@@ -68,7 +67,7 @@ export const StoreLocatorList = () => {
                 {
                     id: 'store_locator.description.viewing_near_postal_code',
                     defaultMessage:
-                        'Viewing stores within {distance}{distanceUnit} of {postalCode} in {countryName}'
+                        'Viewing stores within {distance} {distanceUnit} of {postalCode} in {countryName}'
                 },
                 {
                     distance: config.radius,

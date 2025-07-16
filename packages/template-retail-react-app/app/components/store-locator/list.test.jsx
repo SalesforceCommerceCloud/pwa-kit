@@ -127,7 +127,7 @@ describe('StoreLocatorList', () => {
 
         renderWithProviders(<StoreLocatorList />)
         expect(
-            screen.getByText(/Viewing stores within 10mi of 02108 in United States/)
+            screen.getByText(/Viewing stores within 10 mi of 02108 in United States/)
         ).toBeTruthy()
     })
 

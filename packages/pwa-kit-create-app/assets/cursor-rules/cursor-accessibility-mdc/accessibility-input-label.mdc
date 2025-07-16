@@ -1,0 +1,27 @@
+---
+description: When accessibility is checked. Check if Input fields must have a label or aria-label for screen readers
+globs: 
+alwaysApply: false
+---
+
+# Rule: accessibility-input-label
+
+Input fields must have a label or aria-label for screen readers
+
+## 🔍 Pattern
+
+```regex
+<input(?![^>]*(aria-label|aria-labelledby|id=))
+```
+
+## 📍 Examples
+
+```tsx
+// ❌ Bad
+<input type="text" />
+// ✅ Good
+<input aria-label="Search" />
+// ✅ Good with label
+<label htmlFor="email">Email</label>
+<input id="email" type="text" />
+```

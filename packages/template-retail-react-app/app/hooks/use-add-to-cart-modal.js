@@ -133,7 +133,11 @@ export const AddToCartModal = () => {
                                     <Flex gridGap="4">
                                         <Box w="24" flex="none">
                                             <AspectRatio ratio="1">
-                                                <img src={bundleImage.link} alt={bundleImage.alt} />
+                                                {/* TODO: remove empty string fallback and use a placeholder image */}
+                                                <img
+                                                    src={bundleImage?.link || ''}
+                                                    alt={bundleImage?.alt || ''}
+                                                />
                                             </AspectRatio>
                                         </Box>
 
@@ -156,10 +160,11 @@ export const AddToCartModal = () => {
                                             >
                                                 {itemsAdded.map(({product, variant, quantity}) => {
                                                     const variationAttributeValues =
-                                                        variant && product.variationAttributes
+                                                        product.variationAttributes?.length &&
+                                                        variant?.variationValues
                                                             ? getDisplayVariationValues(
                                                                   product.variationAttributes,
-                                                                  variant.variationValues
+                                                                  variant?.variationValues
                                                               )
                                                             : {}
                                                     return (
@@ -169,26 +174,29 @@ export const AddToCartModal = () => {
                                                                 fontWeight="700"
                                                                 fontSize="sm"
                                                             >
-                                                                {(variant.name || product.name) +
+                                                                {(variant?.name || product.name) +
                                                                     (quantity > 1
                                                                         ? ` (${quantity})`
                                                                         : '')}
                                                             </Text>
-                                                            <Box
-                                                                color="gray.600"
-                                                                fontSize="sm"
-                                                                fontWeight="500"
-                                                            >
-                                                                {Object.entries(
-                                                                    variationAttributeValues
-                                                                ).map(([name, value]) => {
-                                                                    return (
-                                                                        <Text key={value}>
-                                                                            {name}: {value}
-                                                                        </Text>
-                                                                    )
-                                                                })}
-                                                            </Box>
+                                                            {Object.keys(variationAttributeValues)
+                                                                .length > 0 && (
+                                                                <Box
+                                                                    color="gray.600"
+                                                                    fontSize="sm"
+                                                                    fontWeight="500"
+                                                                >
+                                                                    {Object.entries(
+                                                                        variationAttributeValues
+                                                                    ).map(([name, value]) => {
+                                                                        return (
+                                                                            <Text key={value}>
+                                                                                {name}: {value}
+                                                                            </Text>
+                                                                        )
+                                                                    })}
+                                                                </Box>
+                                                            )}
                                                         </Box>
                                                     )
                                                 })}
@@ -217,7 +225,7 @@ export const AddToCartModal = () => {
                                         variant && product.variationAttributes
                                             ? getDisplayVariationValues(
                                                   product.variationAttributes,
-                                                  variant.variationValues
+                                                  variant?.variationValues
                                               )
                                             : {}
 
@@ -239,7 +247,10 @@ export const AddToCartModal = () => {
                                             <Flex gridGap="4">
                                                 <Box w="24" flex="none">
                                                     <AspectRatio ratio="1">
-                                                        <img src={image?.link} alt={image?.alt} />
+                                                        <img
+                                                            src={image?.link || ''}
+                                                            alt={image?.alt || ''}
+                                                        />
                                                     </AspectRatio>
                                                 </Box>
 
