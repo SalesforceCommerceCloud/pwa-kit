@@ -33,9 +33,9 @@ import {
 } from '@salesforce/commerce-sdk-react'
 import {useCurrentCustomer} from '../../hooks'
 import loadable from '@loadable/component'
-const MarketingConsentCard = SFDC_EXT_MARKETING_CONSENT_ENABLED
-    ? loadable(() => import('../../components/marketing-consent-card'))
-    : null
+const MarketingConsentCard =
+    SFDC_EXT_MARKETING_CONSENT_ENABLED &&
+    loadable(() => import('../../components/marketing-consent-card'))
 
 /**
  * This is a specialized Skeleton component that which uses the customers authtype as the
