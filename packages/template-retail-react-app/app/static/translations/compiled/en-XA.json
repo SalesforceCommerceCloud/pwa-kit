@@ -7357,6 +7357,62 @@
       "value": "]"
     }
   ],
+  "status_bar.delivered": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ḓḗḗŀīṽḗḗřḗḗḓ"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "status_bar.dispatched": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ḓīşƥȧȧŧƈħḗḗḓ"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "status_bar.ordered": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ǿřḓḗḗřḗḗḓ"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "status_bar.out_for_delivery": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ǿŭŭŧ ƒǿǿř ḓḗḗŀīṽḗḗřẏ"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
   "store_display.format.address_line_2": [
     {
       "type": 0,

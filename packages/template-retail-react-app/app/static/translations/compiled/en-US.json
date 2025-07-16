@@ -3477,6 +3477,30 @@
       "value": " to proceed."
     }
   ],
+  "status_bar.delivered": [
+    {
+      "type": 0,
+      "value": "Delivered"
+    }
+  ],
+  "status_bar.dispatched": [
+    {
+      "type": 0,
+      "value": "Dispatched"
+    }
+  ],
+  "status_bar.ordered": [
+    {
+      "type": 0,
+      "value": "Ordered"
+    }
+  ],
+  "status_bar.out_for_delivery": [
+    {
+      "type": 0,
+      "value": "Out for delivery"
+    }
+  ],
   "store_display.format.address_line_2": [
     {
       "type": 1,

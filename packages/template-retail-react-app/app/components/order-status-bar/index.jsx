@@ -7,11 +7,36 @@
 import React from 'react'
 import {Box, useTheme, Text} from '@chakra-ui/react'
 import PropTypes from 'prop-types'
+import {useIntl} from 'react-intl'
 
 const steps = ['Ordered', 'Dispatched', 'Out for delivery', 'Delivered']
 
-const ProgressTracker = ({currentStepLabel}) => {
+const OrderStatusBar = ({currentStepLabel}) => {
     const theme = useTheme()
+    const intl = useIntl()
+
+    // Helper function to get localized message
+    const getLocalizedMessage = (status) => {
+        switch (status) {
+            case 'Ordered':
+                return intl.formatMessage({id: 'status_bar.ordered', defaultMessage: 'Ordered'})
+            case 'Dispatched':
+                return intl.formatMessage({
+                    id: 'status_bar.dispatched',
+                    defaultMessage: 'Dispatched'
+                })
+            case 'Out for delivery':
+                return intl.formatMessage({
+                    id: 'status_bar.out_for_delivery',
+                    defaultMessage: 'Out for delivery'
+                })
+            case 'Delivered':
+                return intl.formatMessage({id: 'status_bar.delivered', defaultMessage: 'Delivered'})
+            default:
+                return status
+        }
+    }
+
     // Layout constants
     const n = steps.length
     const svgWidth = 1080
@@ -23,9 +48,8 @@ const ProgressTracker = ({currentStepLabel}) => {
     const stepWidth = (svgWidth + (n - 1) * chevronWidth) / n
 
     // Find the index of the current step label (case-insensitive, trim whitespace)
-    let currentStep = steps.findIndex(
-        (step) => step.trim().toLowerCase() === (currentStepLabel || '').trim().toLowerCase()
-    )
+    let currentStep = steps.findIndex((step) => step === currentStepLabel)
+
     if (currentStep === -1) currentStep = 0
 
     // Helper to get the x offset for each step (overlap chevrons)
@@ -36,7 +60,7 @@ const ProgressTracker = ({currentStepLabel}) => {
         const shapes = []
         for (let i = 0; i < n; i++) {
             const x = getStepOffset(i)
-            let path, fill
+            let path, stepFill
             if (i === 0) {
                 // First: rounded left, chevron right (chevron tip overlaps next step)
                 path = `M ${x + radius},0
@@ -66,8 +90,18 @@ const ProgressTracker = ({currentStepLabel}) => {
           L ${x + chevronWidth},${svgHeight / 2}
           Z`
             }
-            fill = i <= currentStep ? theme.colors.blue[900] : theme.colors.gray[200]
-            shapes.push(<path key={i} d={path} fill={fill} stroke="white" strokeWidth="2" />)
+            // Color logic: completed steps = light teal, current step = dark blue, future steps = gray
+            if (i < currentStep) {
+                // Completed steps - light teal
+                stepFill = theme.colors.teal[100] // light blue/teal color
+            } else if (i === currentStep) {
+                // Current step - dark blue
+                stepFill = theme.colors.blue[900]
+            } else {
+                // Future steps - gray
+                stepFill = theme.colors.gray[200]
+            }
+            shapes.push(<path key={i} d={path} fill={stepFill} stroke="white" strokeWidth="2" />)
         }
         return shapes
     }
@@ -77,7 +111,18 @@ const ProgressTracker = ({currentStepLabel}) => {
         const labels = []
         for (let i = 0; i < n; i++) {
             const x = getStepOffset(i)
-            const labelColor = i <= currentStep ? 'white' : theme.colors.blue[900]
+            // Text color logic: completed steps = dark text, current step = white, future steps = dark text
+            let labelColor
+            if (i < currentStep) {
+                // Completed steps - dark text for better contrast on light teal
+                labelColor = theme.colors.black[600]
+            } else if (i === currentStep) {
+                // Current step - white text on dark blue
+                labelColor = 'white'
+            } else {
+                // Future steps - dark text on gray
+                labelColor = theme.colors.black[600]
+            }
             labels.push(
                 <Box
                     key={i}
@@ -102,7 +147,7 @@ const ProgressTracker = ({currentStepLabel}) => {
                         hyphens="auto"
                         maxW="100%"
                     >
-                        {steps[i]}
+                        {getLocalizedMessage(steps[i])}
                     </Text>
                 </Box>
             )
@@ -126,8 +171,8 @@ const ProgressTracker = ({currentStepLabel}) => {
     )
 }
 
-ProgressTracker.propTypes = {
+OrderStatusBar.propTypes = {
     currentStepLabel: PropTypes.string
 }
 
-export default ProgressTracker
+export default OrderStatusBar
