@@ -15,8 +15,9 @@ import {
     Text,
     Divider
 } from '@salesforce/retail-react-app/app/components/shared/ui'
+import {useForm} from 'react-hook-form'
 import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
-import {useShopperBasketsMutation, useCustomerType} from '@salesforce/commerce-sdk-react'
+import {useShopperBasketsMutation} from '@salesforce/commerce-sdk-react'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
 import {useCheckout} from '@salesforce/retail-react-app/app/pages/checkout-container/util/checkout-context'
@@ -164,7 +165,6 @@ const Payment = ({
 
     const isPickupOrder = basket?.shipments[0]?.shippingMethod?.c_storePickupEnabled === true
     const [billingSameAsShipping, setBillingSameAsShipping] = useState(!isPickupOrder)
-
     const {mutateAsync: addPaymentInstrumentToBasket} = useShopperBasketsMutation(
         'addPaymentInstrumentToBasket'
     )
@@ -174,16 +174,21 @@ const Payment = ({
     const {mutateAsync: removePaymentInstrumentFromBasket} = useShopperBasketsMutation(
         'removePaymentInstrumentFromBasket'
     )
-
     const showToast = useToast()
-    const showError = (message) => {
+    const showError = () => {
         showToast({
-            title: message || formatMessage(API_ERROR_MESSAGE),
+            title: formatMessage(API_ERROR_MESSAGE),
             status: 'error'
         })
     }
 
-    const {step, STEPS, goToStep} = useCheckout()
+    const {step, STEPS, goToStep, goToNextStep} = useCheckout()
+
+    const billingAddressForm = useForm({
+        mode: 'onChange',
+        shouldUnregister: false,
+        defaultValues: {...selectedBillingAddress}
+    })
 
     // Using destructuring to remove properties from the object...
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -349,7 +354,6 @@ const Payment = ({
             parameters: {basketId: activeBasketIdRef.current || basket.basketId}
         })
     }
-
     const onPaymentRemoval = async () => {
         try {
             await removePaymentInstrumentFromBasket({
@@ -601,13 +605,6 @@ Payment.propTypes = {
     paymentMethodForm: PropTypes.object.isRequired,
     /** Billing address form */
     billingAddressForm: PropTypes.object.isRequired
-}
-
-Payment.propTypes = {
-    /** Whether user registration is enabled */
-    enableUserRegistration: PropTypes.bool,
-    /** Callback to set user registration state */
-    setEnableUserRegistration: PropTypes.func
 }
 
 const PaymentCardSummary = ({payment}) => {
