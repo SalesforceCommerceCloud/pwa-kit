@@ -37,7 +37,10 @@ import {useServerContext} from '@salesforce/pwa-kit-react-sdk/ssr/universal/hook
 import usePickupShipment from '@salesforce/retail-react-app/app/hooks/use-pickup-shipment'
 import {useSelectedStore} from '@salesforce/retail-react-app/app/hooks/use-selected-store'
 import {useMultiship} from '@salesforce/retail-react-app/app/hooks/use-multiship'
-import {STORE_LOCATOR_IS_ENABLED, MULTISHIP_IS_ENABLED} from '@salesforce/retail-react-app/app/constants'
+import {
+    STORE_LOCATOR_IS_ENABLED,
+    MULTISHIP_IS_ENABLED
+} from '@salesforce/retail-react-app/app/constants'
 // Project Components
 import RecommendedProducts from '@salesforce/retail-react-app/app/components/recommended-products'
 import ProductView from '@salesforce/retail-react-app/app/components/product-view'
@@ -414,9 +417,10 @@ const ProductDetail = () => {
 
             // Find the newly added items from the basket response
             // TODO: This doesnt work for adding same product multiple times since items are combined on backend
-            const newlyAddedItems = basketResponse.productItems?.filter(item => 
-                productItems.some(productItem => 
-                    productItem.productId === item.productId && item.shipmentId === 'me'
+            const newlyAddedItems = basketResponse.productItems?.filter((item) =>
+                productItems.some(
+                    (productItem) =>
+                        productItem.productId === item.productId && item.shipmentId === 'me'
                 )
             )
 
@@ -429,23 +433,31 @@ const ProductDetail = () => {
                     targetShipmentId = await findOrCreatePickupShipment(selectedStore)
 
                     // Only filter for items that need to be moved
-                    const itemsToMove = newlyAddedItems.filter(item => item.shipmentId !== targetShipmentId)    
+                    const itemsToMove = newlyAddedItems.filter(
+                        (item) => item.shipmentId !== targetShipmentId
+                    )
 
                     if (itemsToMove.length > 0) {
-                        await moveItemsToPickupShipment(itemsToMove, targetShipmentId, selectedStore?.inventoryId)
+                        await moveItemsToPickupShipment(
+                            itemsToMove,
+                            targetShipmentId,
+                            selectedStore?.inventoryId
+                        )
                     }
                 } else {
                     // For delivery items, ensure delivery shipment exists
                     targetShipmentId = await findOrCreateDeliveryShipment()
-                    
+
                     // Only filter for items that need to be moved
-                    const itemsToMove = newlyAddedItems.filter(item => item.shipmentId !== targetShipmentId)
+                    const itemsToMove = newlyAddedItems.filter(
+                        (item) => item.shipmentId !== targetShipmentId
+                    )
 
                     if (itemsToMove.length > 0) {
                         await moveItemsToDeliveryShipment(itemsToMove, targetShipmentId)
                     }
                 }
-            } 
+            }
 
             // Configure shipping method for default shipment based on pickup selection
             await configureDefaultShipmentIfNeeded(

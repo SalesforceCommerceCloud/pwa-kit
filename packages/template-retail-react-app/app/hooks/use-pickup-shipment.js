@@ -137,7 +137,7 @@ export const usePickupShipment = (basket) => {
                     shippingMethod: {
                         id: shippingMethodId
                     },
-                    c_fromStoreId: null 
+                    c_fromStoreId: null
                 }
             })
         } catch (error) {
@@ -212,7 +212,11 @@ export const usePickupShipment = (basket) => {
         selectedStore
     ) => {
         // Only needed for reconfiguring default shipment
-        if (!basketResponse?.basketId || !basketResponse?.shipments?.length || targetShipmentId !== 'me') { 
+        if (
+            !basketResponse?.basketId ||
+            !basketResponse?.shipments?.length ||
+            targetShipmentId !== 'me'
+        ) {
             return
         }
 
