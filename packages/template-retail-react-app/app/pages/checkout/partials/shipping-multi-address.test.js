@@ -162,6 +162,10 @@ const defaultProps = {
     noItemsInBasketMessage: {
         defaultMessage: 'No items in basket.',
         id: 'shipping_address.message.no_items_in_basket'
+    },
+    deliveryAddressLabel: {
+        defaultMessage: 'Delivery Address',
+        id: 'shipping_address.label.delivery_address'
     }
 }
 

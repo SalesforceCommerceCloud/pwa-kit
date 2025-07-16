@@ -60,7 +60,8 @@ const ShippingMultiAddress = ({
     onSubmit,
     submitButtonLabel,
     addNewAddressLabel,
-    noItemsInBasketMessage
+    noItemsInBasketMessage,
+    deliveryAddressLabel
 }) => {
     const {formatMessage} = useIntl()
     // Move all hooks to the top
@@ -157,10 +158,7 @@ const ShippingMultiAddress = ({
                                     <Flex direction="row" align="flex-start" flex={1} minW={0}>
                                         <VStack align="center" minW="90px" mr={0} spacing={2}>
                                             <Image
-                                                src={
-                                                    imageUrl ||
-                                                    'https://via.placeholder.com/90x120?text=No+Image'
-                                                }
+                                                src={imageUrl}
                                                 alt={item.productName}
                                                 w="90px"
                                                 h="120px"
@@ -198,7 +196,7 @@ const ShippingMultiAddress = ({
                                         overflow="visible"
                                     >
                                         <Text fontWeight="medium" fontSize="sm" mb={2}>
-                                            Delivery Address
+                                            {formatMessage(deliveryAddressLabel)}
                                         </Text>
 
                                         {/* Address Dropdown */}
@@ -478,7 +476,8 @@ ShippingMultiAddress.propTypes = {
     onSubmit: PropTypes.func.isRequired,
     submitButtonLabel: PropTypes.object.isRequired,
     addNewAddressLabel: PropTypes.object.isRequired,
-    noItemsInBasketMessage: PropTypes.object.isRequired
+    noItemsInBasketMessage: PropTypes.object.isRequired,
+    deliveryAddressLabel: PropTypes.object.isRequired
 }
 
 export default ShippingMultiAddress

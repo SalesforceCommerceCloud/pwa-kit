@@ -1412,6 +1412,9 @@
   "shipping_address.button.continue_to_shipping": {
     "defaultMessage": "Continue to Shipping Method"
   },
+  "shipping_address.label.delivery_address": {
+    "defaultMessage": "Delivery Address"
+  },
   "shipping_address.label.edit_button": {
     "defaultMessage": "Edit {address}"
   },

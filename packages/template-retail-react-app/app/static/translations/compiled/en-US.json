@@ -3341,6 +3341,12 @@
       "value": "Continue to Shipping Method"
     }
   ],
+  "shipping_address.label.delivery_address": [
+    {
+      "type": 0,
+      "value": "Delivery Address"
+    }
+  ],
   "shipping_address.label.edit_button": [
     {
       "type": 0,
