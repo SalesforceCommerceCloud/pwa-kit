@@ -37,7 +37,11 @@ export const useProductListControls = ({productSearchResult, isSearch}) => {
         delete searchParamsCopy.offset
 
         if (!allowMultiple) {
-            const previousValue = searchParamsCopy.refine[attributeId]
+            const previousValue = searchParamsCopy.refine?.[attributeId]
+            // We initialize refine here, so we can safely delete/set the attributeId.
+            if (!searchParamsCopy.refine) {
+                searchParamsCopy.refine = {}
+            }
             delete searchParamsCopy.refine[attributeId]
 
             // Note the loose comparison, for "string != number" checks.
@@ -45,7 +49,7 @@ export const useProductListControls = ({productSearchResult, isSearch}) => {
                 searchParamsCopy.refine[attributeId] = value.value
             }
         } else {
-            let attributeValue = searchParamsCopy.refine[attributeId] || []
+            let attributeValue = searchParamsCopy.refine?.[attributeId] || []
 
             if (typeof attributeValue === 'string') {
                 attributeValue = attributeValue.split('|')
@@ -59,6 +63,9 @@ export const useProductListControls = ({productSearchResult, isSearch}) => {
                 attributeValue = attributeValue?.filter((v) => v != value.value)
             }
 
+            if (!searchParamsCopy.refine) {
+                searchParamsCopy.refine = {}
+            }
             searchParamsCopy.refine[attributeId] = attributeValue
 
             if (searchParamsCopy.refine[attributeId].length === 0) {
