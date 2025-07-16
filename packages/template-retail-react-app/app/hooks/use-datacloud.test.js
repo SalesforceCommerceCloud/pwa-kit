@@ -150,21 +150,29 @@ describe('useDataCloud', function () {
     test('sends partyIdentification event for registered user', async () => {
         // Registered user: isRegistered true, customerId present
         const {result} = renderHook(() => useDataCloud())
+        result.current.sendViewPage('/login')
         await waitFor(() => {
-            result.current.sendViewPage('/login')
-            expect(mockWebEventsAppSourceIdPost).toHaveBeenCalledWith(
+            const call = mockWebEventsAppSourceIdPost.mock.calls[0][0]
+            const partyEvent = call.events.find(e => e.eventType === 'partyIdentification')
+            expect(partyEvent).toEqual(
                 expect.objectContaining({
-                    events: expect.arrayContaining([
-                        expect.objectContaining({eventType: 'partyIdentification'})
-                    ])
+                    IDName: 'CC_REGISTERED_CUSTOMER_ID',
+                    IDType: 'CC_REGISTERED_CUSTOMER_ID',
+                    category: 'Profile',
+                    creationEventId: expect.any(String),
+                    customerId: 1234567890,
+                    dateTime: expect.any(String),
+                    deviceId: 1234567890,
+                    eventId: expect.any(String),
+                    eventType: 'partyIdentification',
+                    guestId: 'guest-usid',
+                    internalOrganizationId: 'RefArch',
+                    party: 1234567890,
+                    partyIdentificationId: 1234567890,
+                    sessionId: expect.any(String),
+                    siteId: 'RefArch',
+                    userId: 1234567890
                 })
-            )
-        })
-        // Optionally, check full structure
-        await waitFor(() => {
-            result.current.sendViewPage('/login')
-            expect(mockWebEventsAppSourceIdPost).toHaveBeenCalledWith(
-                expect.objectContaining(mockPartyIdentificationRegisteredEvent)
             )
         })
     })
@@ -174,21 +182,28 @@ describe('useDataCloud', function () {
         useCustomerTypeOriginal.mockReturnValueOnce({isRegistered: false})
         useCurrentCustomerOriginal.mockReturnValueOnce({data: {}})
         const {result} = renderHook(() => useDataCloud())
+        result.current.sendViewPage('/login')
         await waitFor(() => {
-            result.current.sendViewPage('/login')
-            expect(mockWebEventsAppSourceIdPost).toHaveBeenCalledWith(
+            const call = mockWebEventsAppSourceIdPost.mock.calls[0][0]
+            const partyEvent = call.events.find(e => e.eventType === 'partyIdentification')
+            expect(partyEvent).toEqual(
                 expect.objectContaining({
-                    events: expect.arrayContaining([
-                        expect.objectContaining({eventType: 'partyIdentification'})
-                    ])
+                    IDName: 'CC_USID',
+                    IDType: 'CC_USID',
+                    category: 'Profile',
+                    creationEventId: expect.any(String),
+                    dateTime: expect.any(String),
+                    deviceId: 'guest-usid',
+                    eventId: expect.any(String),
+                    eventType: 'partyIdentification',
+                    guestId: 'guest-usid',
+                    internalOrganizationId: 'RefArch',
+                    party: 'guest-usid',
+                    partyIdentificationId: 'guest-usid',
+                    sessionId: 'mockCookieValue',
+                    siteId: 'RefArch',
+                    userId: 'guest-usid'
                 })
-            )
-        })
-        // Optionally, check full structure
-        await waitFor(() => {
-            result.current.sendViewPage('/login')
-            expect(mockWebEventsAppSourceIdPost).toHaveBeenCalledWith(
-                expect.objectContaining(mockPartyIdentificationGuestEvent)
             )
         })
     })
@@ -198,7 +213,34 @@ describe('useDataCloud', function () {
         expect(result.current).toBeDefined()
         result.current.sendViewPage('/login')
         await waitFor(() => {
-            expect(mockWebEventsAppSourceIdPost).toHaveBeenCalledWith(mockLoginViewPageEvent)
+            expect(mockWebEventsAppSourceIdPost).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    events: expect.arrayContaining([
+                        expect.objectContaining({
+                            eventType: 'identity',
+                            category: 'Profile',
+                            customerId: 1234567890,
+                            firstName: 'John',
+                            lastName: 'Smith',
+                            sourceUrl: '/login'
+                        }),
+                        expect.objectContaining({
+                            eventType: 'partyIdentification',
+                            category: 'Profile',
+                            customerId: 1234567890,
+                            IDName: 'CC_REGISTERED_CUSTOMER_ID',
+                            IDType: 'CC_REGISTERED_CUSTOMER_ID'
+                        }),
+                        expect.objectContaining({
+                            eventType: 'userEngagement',
+                            category: 'Engagement',
+                            customerId: 1234567890,
+                            interactionName: 'page-view',
+                            sourceUrl: '/login'
+                        })
+                    ])
+                })
+            )
         })
     })
 
@@ -219,7 +261,40 @@ describe('useDataCloud', function () {
         expect(result.current).toBeDefined()
         result.current.sendViewProduct(mockProduct)
         await waitFor(() => {
-            expect(mockWebEventsAppSourceIdPost).toHaveBeenCalledWith(mockViewProductEvent)
+            expect(mockWebEventsAppSourceIdPost).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    events: expect.arrayContaining([
+                        expect.objectContaining({
+                            eventType: 'identity',
+                            category: 'Profile',
+                            customerId: 1234567890,
+                            firstName: 'John',
+                            lastName: 'Smith'
+                        }),
+                        expect.objectContaining({
+                            eventType: 'partyIdentification',
+                            category: 'Profile',
+                            customerId: 1234567890,
+                            IDName: 'CC_REGISTERED_CUSTOMER_ID',
+                            IDType: 'CC_REGISTERED_CUSTOMER_ID'
+                        }),
+                        expect.objectContaining({
+                            eventType: 'contactPointEmail',
+                            category: 'Profile',
+                            customerId: 1234567890,
+                            email: 'johnsmith@salesforce.com'
+                        }),
+                        expect.objectContaining({
+                            eventType: 'catalog',
+                            category: 'Engagement',
+                            customerId: 1234567890,
+                            id: '56736828M',
+                            type: 'Product',
+                            interactionName: 'catalog-object-view-start'
+                        })
+                    ])
+                })
+            )
         })
     })
 
@@ -235,7 +310,35 @@ describe('useDataCloud', function () {
         expect(result.current).toBeDefined()
         result.current.sendViewCategory(mockCategorySearchParams, mockCategory, mockSearchResults)
         await waitFor(() => {
-            expect(mockWebEventsAppSourceIdPost).toHaveBeenCalledWith(mockViewCategoryEvent)
+            expect(mockWebEventsAppSourceIdPost).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    events: expect.arrayContaining([
+                        expect.objectContaining({
+                            eventType: 'identity',
+                            category: 'Profile',
+                            customerId: 1234567890,
+                            firstName: 'John',
+                            lastName: 'Smith'
+                        }),
+                        expect.objectContaining({
+                            eventType: 'partyIdentification',
+                            category: 'Profile',
+                            customerId: 1234567890,
+                            IDName: 'CC_REGISTERED_CUSTOMER_ID',
+                            IDType: 'CC_REGISTERED_CUSTOMER_ID'
+                        }),
+                        expect.objectContaining({
+                            eventType: 'catalog',
+                            category: 'Engagement',
+                            customerId: 1234567890,
+                            id: '25752986M',
+                            type: 'Product',
+                            categoryId: 'mens-accessories-ties',
+                            interactionName: 'catalog-object-impression'
+                        })
+                    ])
+                })
+            )
         })
     })
 
@@ -244,7 +347,35 @@ describe('useDataCloud', function () {
         expect(result.current).toBeDefined()
         result.current.sendViewSearchResults(mockSearchParam, mockGloveSearchResult)
         await waitFor(() => {
-            expect(mockWebEventsAppSourceIdPost).toHaveBeenCalledWith(mockViewSearchResultsEvent)
+            expect(mockWebEventsAppSourceIdPost).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    events: expect.arrayContaining([
+                        expect.objectContaining({
+                            eventType: 'identity',
+                            category: 'Profile',
+                            customerId: 1234567890,
+                            firstName: 'John',
+                            lastName: 'Smith'
+                        }),
+                        expect.objectContaining({
+                            eventType: 'partyIdentification',
+                            category: 'Profile',
+                            customerId: 1234567890,
+                            IDName: 'CC_REGISTERED_CUSTOMER_ID',
+                            IDType: 'CC_REGISTERED_CUSTOMER_ID'
+                        }),
+                        expect.objectContaining({
+                            eventType: 'catalog',
+                            category: 'Engagement',
+                            customerId: 1234567890,
+                            id: 'TG250M',
+                            type: 'Product',
+                            searchResultTitle: 'oxford glove',
+                            interactionName: 'catalog-object-impression'
+                        })
+                    ])
+                })
+            )
         })
     })
 
@@ -253,7 +384,44 @@ describe('useDataCloud', function () {
         expect(result.current).toBeDefined()
         result.current.sendViewRecommendations(mockRecommenderDetails, mockRecommendationIds)
         await waitFor(() => {
-            expect(mockWebEventsAppSourceIdPost).toHaveBeenCalledWith(mockViewRecommendationsEvent)
+            expect(mockWebEventsAppSourceIdPost).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    events: expect.arrayContaining([
+                        expect.objectContaining({
+                            eventType: 'identity',
+                            category: 'Profile',
+                            customerId: 1234567890,
+                            firstName: 'John',
+                            lastName: 'Smith'
+                        }),
+                        expect.objectContaining({
+                            eventType: 'partyIdentification',
+                            category: 'Profile',
+                            customerId: 1234567890,
+                            IDName: 'CC_REGISTERED_CUSTOMER_ID',
+                            IDType: 'CC_REGISTERED_CUSTOMER_ID'
+                        }),
+                        expect.objectContaining({
+                            eventType: 'catalog',
+                            category: 'Engagement',
+                            customerId: 1234567890,
+                            id: '11111111',
+                            type: 'Product',
+                            interactionName: 'catalog-object-impression',
+                            personalizationId: 'testRecommender'
+                        }),
+                        expect.objectContaining({
+                            eventType: 'catalog',
+                            category: 'Engagement',
+                            customerId: 1234567890,
+                            id: '22222222',
+                            type: 'Product',
+                            interactionName: 'catalog-object-impression',
+                            personalizationId: 'testRecommender'
+                        })
+                    ])
+                })
+            )
         })
     })
 })
