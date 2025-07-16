@@ -7,7 +7,7 @@
 
 import React from 'react'
 import {render} from '@testing-library/react'
-import Metadata from './metadata'
+import Metadata from './page-metadata'
 
 jest.mock('../../components/seo', () => {
     // Since we are mocking a component, we can't import propType at global scope
