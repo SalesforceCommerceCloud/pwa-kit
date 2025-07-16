@@ -11,6 +11,7 @@ import PageTitle from './product-list-title'
 import {renderWithProviders} from '../../../utils/test-utils'
 
 jest.mock('../../../components/breadcrumb', () => {
+    // eslint-disable-next-line react/display-name
     return () => <div data-testid="breadcrumb-mock" />
 })
 

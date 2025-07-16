@@ -19,10 +19,16 @@ jest.mock('../../../utils/utils', () => {
 })
 
 jest.mock('../../../components/product-tile', () => {
-    const productTile = jest.fn((props) => {
+    const productTile = jest.fn(function ProductTile(props) {
         const {product, onFavouriteToggle, onClick} = props
         return (
-            <div data-testid={`sf-product-tile-${product.productId}`} onClick={onClick}>
+            <div
+                data-testid={`sf-product-tile-${product.productId}`}
+                onClick={onClick}
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => e.key === 'Enter' && onClick()}
+            >
                 <h1>{product.productName}</h1>
                 <button
                     data-testid="tile-wishlist-btn"
@@ -31,7 +37,9 @@ jest.mock('../../../components/product-tile', () => {
             </div>
         )
     })
-    productTile.Skeleton = () => <div data-testid="sf-product-tile-skeleton"></div>
+    productTile.Skeleton = function Skeleton() {
+        return <div data-testid="sf-product-tile-skeleton"></div>
+    }
     return productTile
 })
 

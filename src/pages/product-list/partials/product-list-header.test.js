@@ -12,12 +12,26 @@ import {useHistory} from 'react-router-dom'
 import {renderWithProviders} from '../../../utils/test-utils'
 
 // Mock child components to isolate the component under test
-jest.mock('../partials/refinements', () => () => <div data-testid="refinements-mock" />)
-jest.mock('../partials/category-links', () => () => <div data-testid="category-links-mock" />)
-jest.mock('../partials/selected-refinements', () => () => (
-    <div data-testid="selected-refinements-mock" />
-))
-jest.mock('./product-list-title', () => () => <div data-testid="page-title-mock" />)
+jest.mock('../partials/refinements', () =>
+    // eslint-disable-next-line react/display-name
+    () => <div data-testid="refinements-mock" />
+)
+jest.mock(
+    '../partials/category-links',
+    // eslint-disable-next-line react/display-name
+    () => () => <div data-testid="category-links-mock" />
+)
+jest.mock(
+    '../partials/selected-refinements',
+    // eslint-disable-next-line react/display-name
+    () => () => <div data-testid="selected-refinements-mock" />
+)
+jest.mock(
+    './product-list-title',
+    // eslint-disable-next-line react/display-name
+    () => () => <div data-testid="page-title-mock" />
+)
+// eslint-disable-next-line react/display-name
 jest.mock('../partials/sort', () => () => <div data-testid="sort-mock" />)
 
 // Mock react-router-dom's useHistory
