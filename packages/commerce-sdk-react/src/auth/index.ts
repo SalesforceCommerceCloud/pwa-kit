@@ -508,6 +508,7 @@ class Auth {
             const {isGuest, customerId, usid} = this.parseSlasJWT(sfraAuthToken)
             this.set('access_token', sfraAuthToken)
             this.set('customer_id', customerId)
+            this.set('usid', usid)
             this.set('customer_type', isGuest ? 'guest' : 'registered')
 
             accessToken = sfraAuthToken
@@ -774,6 +775,7 @@ class Auth {
             const {isGuest, customerId, usid} = this.parseSlasJWT(this.fetchedToken)
             this.set('access_token', this.fetchedToken)
             this.set('customer_id', customerId)
+            this.set('usid', usid)
             this.set('customer_type', isGuest ? 'guest' : 'registered')
             return this.data
         }
