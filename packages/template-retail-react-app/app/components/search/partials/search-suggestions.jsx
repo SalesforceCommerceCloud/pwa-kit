@@ -21,9 +21,9 @@ const SECTION_HEADER_STYLE = {
     lineHeight: 1.2
 }
 const SearchSuggestions = ({recentSearches, searchSuggestions, closeAndNavigate}) => {
-    const hasCategories = searchSuggestions && searchSuggestions?.categorySuggestions?.length
-    const hasProducts = searchSuggestions && searchSuggestions?.productSuggestions?.length
-    const hasBrands = searchSuggestions && searchSuggestions?.brandSuggestions?.length
+    const hasCategories = searchSuggestions?.categorySuggestions?.length
+    const hasProducts = searchSuggestions?.productSuggestions?.length
+    const hasBrands = searchSuggestions?.brandSuggestions?.length
     const hasSuggestions = hasCategories || hasProducts || hasBrands
     return (
         <Stack padding={6} spacing={0}>

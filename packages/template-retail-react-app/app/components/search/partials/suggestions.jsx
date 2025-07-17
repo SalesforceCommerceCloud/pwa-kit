@@ -62,8 +62,9 @@ const Suggestions = ({suggestions, closeAndNavigate}) => {
                                 <Text
                                     fontWeight={suggestion.type === 'brand' ? '700' : '500'}
                                     as="span"
-                                    dangerouslySetInnerHTML={{__html: suggestion.name}}
-                                />
+                                >
+                                    {suggestion.name}
+                                </Text>
                                 {/* For categories, show parentCategoryName if present */}
                                 {suggestion.type === 'category' &&
                                     suggestion.parentCategoryName && (

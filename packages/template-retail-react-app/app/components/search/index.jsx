@@ -23,7 +23,6 @@ import SearchSuggestions from '@salesforce/retail-react-app/app/components/searc
 import {SearchIcon} from '@salesforce/retail-react-app/app/components/icons'
 import {
     capitalize,
-    boldString,
     getSessionJSONItem,
     setSessionJSONItem
 } from '@salesforce/retail-react-app/app/utils/utils'
@@ -43,9 +42,6 @@ import {
     categoryUrlBuilder
 } from '@salesforce/retail-react-app/app/utils/url'
 
-// Utility to capitalize each word
-const initCap = (str) => str.replace(/\b\w/g, (c) => c.toUpperCase())
-
 const formatSuggestions = (searchSuggestions, input) => {
     return {
         categorySuggestions: searchSuggestions?.categorySuggestions?.categories?.map(
@@ -54,7 +50,7 @@ const formatSuggestions = (searchSuggestions, input) => {
                     type: 'category',
                     id: suggestion.id,
                     link: categoryUrlBuilder({id: suggestion.id}),
-                    name: boldString(suggestion.name, capitalize(input)),
+                    name: capitalize(suggestion.name),
                     image: suggestion.image?.disBaseLink, // Add image if available
                     parentCategoryName: suggestion.parentCategoryName // Add parent category if available
                 }
@@ -66,17 +62,16 @@ const formatSuggestions = (searchSuggestions, input) => {
                 currency: product.currency,
                 price: product.price,
                 productId: product.productId,
-                name: boldString(product.productName, capitalize(input)),
+                name: capitalize(product.productName),
                 link: productUrlBuilder({id: product.productId}),
                 image: product.image?.disBaseLink // Add image if available
             }
         }),
         brandSuggestions: searchSuggestions?.brandSuggestions?.suggestedPhrases?.map((brand) => {
             // Init cap the brand name
-            const brandName = initCap(brand.phrase)
             return {
                 type: 'brand',
-                name: boldString(brandName, capitalize(input)),
+                name: capitalize(brand.phrase),
                 link: searchUrlBuilder(brand.phrase)
             }
         }),
@@ -84,7 +79,7 @@ const formatSuggestions = (searchSuggestions, input) => {
             (phrase) => {
                 return {
                     type: 'phrase',
-                    name: boldString(phrase.phrase, capitalize(input)),
+                    name: capitalize(phrase.phrase),
                     link: searchUrlBuilder(phrase.phrase)
                 }
             }
