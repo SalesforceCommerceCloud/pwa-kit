@@ -237,7 +237,7 @@ describe('ShippingMultiAddress', () => {
         // Both desktop and mobile versions are rendered, so we get multiple instances of each price
         const price29Elements = screen.getAllByText('$29.99')
         const price19Elements = screen.getAllByText('$19.99')
-        
+
         // Each price should appear twice (desktop + mobile versions)
         expect(price29Elements).toHaveLength(2)
         expect(price19Elements).toHaveLength(2)
@@ -261,7 +261,7 @@ describe('ShippingMultiAddress', () => {
         renderWithIntl(<ShippingMultiAddress {...defaultProps} />)
 
         // The dropdowns should be present but collapsed initially
-        const dropdowns = screen.getAllByRole('button', {hidden: true})
+        const dropdowns = screen.getAllByRole('combobox', {hidden: true})
         expect(dropdowns.length).toBeGreaterThan(0)
     })
 
@@ -302,8 +302,8 @@ describe('ShippingMultiAddress', () => {
 
         renderWithIntl(<ShippingMultiAddress {...customProps} />)
 
-        // Find and click the dropdown trigger using role=button
-        const dropdownTriggers = screen.getAllByRole('button')
+        // Find and click the dropdown trigger using role=combobox
+        const dropdownTriggers = screen.getAllByRole('combobox')
         fireEvent.click(dropdownTriggers[0])
 
         // The add new address option should be available in dropdowns
@@ -374,7 +374,8 @@ describe('ShippingMultiAddress', () => {
             // The formatted address should show "123 Test St, Test City, 12345" (empty stateCode)
             expect(
                 screen.getAllByText(
-                    (content) => content.replace(/\s+/g, ' ').trim() === '123 Test St, Test City, 12345'
+                    (content) =>
+                        content.replace(/\s+/g, ' ').trim() === '123 Test St, Test City, 12345'
                 )
             ).toHaveLength(4)
         })

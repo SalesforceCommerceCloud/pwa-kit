@@ -20,7 +20,8 @@ import {
     HStack,
     Image,
     List,
-    ListItem
+    ListItem,
+    VisuallyHidden
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 import {useIntl} from 'react-intl'
 import PropTypes from 'prop-types'
@@ -30,19 +31,35 @@ const MultiShippingItemAttributes = ({variant, includeQuantity = true}) => {
     const variationAttributes = variant?.variationAttributes || []
     const variationValues = variant?.variationValues || {}
     return (
-        <Stack spacing={1.5} flex={1}>
+        <Stack 
+            spacing={1.5} 
+            flex={1}
+            role="list"
+            aria-label="Product attributes"
+        >
             {variationAttributes &&
                 variationAttributes.length > 0 &&
                 variationAttributes.map((attr) => {
                     const value = attr.values?.find((v) => v.value === variationValues[attr.id])
                     return (
-                        <Text lineHeight={1} color="gray.700" fontSize="sm" key={attr.id}>
+                        <Text 
+                            lineHeight={1} 
+                            color="gray.700" 
+                            fontSize="sm" 
+                            key={attr.id}
+                            role="listitem"
+                        >
                             {attr.name || attr.id}: {value?.name || value?.value || ''}
                         </Text>
                     )
                 })}
             {includeQuantity && (
-                <Text lineHeight={1} color="gray.700" fontSize="sm">
+                <Text 
+                    lineHeight={1} 
+                    color="gray.700" 
+                    fontSize="sm"
+                    role="listitem"
+                >
                     Quantity: {variant.quantity}
                 </Text>
             )}
@@ -66,7 +83,7 @@ const ShippingMultiAddress = ({
     const {formatMessage} = useIntl()
     // Move all hooks to the top
     const productIds = basket?.productItems?.map((item) => item.productId).join(',')
-    const {data: products} = useProducts(
+    const {data: products, isLoading: productsLoading, error: productsError} = useProducts(
         {parameters: {ids: productIds, allImages: true}},
         {enabled: Boolean(productIds)}
     )
@@ -80,6 +97,7 @@ const ShippingMultiAddress = ({
     const [selectedAddresses, setSelectedAddresses] = useState({})
     const [openDropdown, setOpenDropdown] = useState(null)
     const dropdownRefs = useRef({})
+    const [focusedIndex, setFocusedIndex] = useState(-1)
 
     useEffect(() => {
         function handleClickOutside(event) {
@@ -87,6 +105,7 @@ const ShippingMultiAddress = ({
                 const ref = dropdownRefs.current[openDropdown]
                 if (ref && !ref.contains(event.target)) {
                     setOpenDropdown(null)
+                    setFocusedIndex(-1)
                 }
             }
         }
@@ -94,11 +113,72 @@ const ShippingMultiAddress = ({
         return () => document.removeEventListener('mousedown', handleClickOutside)
     }, [openDropdown])
 
+    // Reset focused index when dropdown closes
+    useEffect(() => {
+        if (openDropdown === null) {
+            setFocusedIndex(-1)
+        }
+    }, [openDropdown])
+
     // Early return after hooks
     if (!basket?.productItems?.length) {
         return (
-            <Box p={8} textAlign="center" color="gray.500">
+            <Box 
+                p={8} 
+                textAlign="center" 
+                color="gray.500"
+                role="status"
+                aria-live="polite"
+                aria-label={formatMessage({
+                    id: 'shipping_multi_address.empty.label',
+                    defaultMessage: 'No items in basket'
+                })}
+            >
                 {formatMessage(noItemsInBasketMessage)}
+            </Box>
+        )
+    }
+
+    // Loading state
+    if (productsLoading) {
+        return (
+            <Box 
+                p={8} 
+                textAlign="center" 
+                color="gray.500"
+                role="status"
+                aria-live="polite"
+                aria-label={formatMessage({
+                    id: 'shipping_multi_address.loading.label',
+                    defaultMessage: 'Loading products'
+                })}
+            >
+                {formatMessage({
+                    id: 'shipping_multi_address.loading.message',
+                    defaultMessage: 'Loading products...'
+                })}
+            </Box>
+        )
+    }
+
+    // Error state
+    if (productsError) {
+        return (
+            <Box 
+                p={8} 
+                textAlign="center" 
+                color="red.500"
+                role="alert"
+                aria-live="assertive"
+                aria-label={formatMessage({
+                    id: 'shipping_multi_address.error.label',
+                    defaultMessage: 'Error loading products'
+                })}
+            >
+                {formatMessage({
+                    id: 'shipping_multi_address.error.message',
+                    defaultMessage: 'Error loading products. Please try again.'
+                })}
             </Box>
         )
     }
@@ -109,16 +189,82 @@ const ShippingMultiAddress = ({
         alert('Add New Address clicked!')
     }
 
+    // Keyboard navigation handler
+    const handleDropdownKeyDown = (e, addressKey, isMobile = false) => {
+        const dropdownKey = isMobile ? addressKey + '-mobile' : addressKey
+        const isOpen = openDropdown === dropdownKey
+        const totalOptions = addresses.length + 1 // +1 for "Add New Address"
+
+        if (!isOpen) {
+            if (e.key === 'Enter' || e.key === ' ' || e.key === 'ArrowDown') {
+                e.preventDefault()
+                setOpenDropdown(dropdownKey)
+                setFocusedIndex(0)
+            }
+        } else {
+            switch (e.key) {
+                case 'Escape':
+                    e.preventDefault()
+                    setOpenDropdown(null)
+                    setFocusedIndex(-1)
+                    break
+                case 'ArrowDown':
+                    e.preventDefault()
+                    setFocusedIndex((prev) => (prev + 1) % totalOptions)
+                    break
+                case 'ArrowUp':
+                    e.preventDefault()
+                    setFocusedIndex((prev) => (prev - 1 + totalOptions) % totalOptions)
+                    break
+                case 'Enter':
+                case ' ':
+                    e.preventDefault()
+                    if (focusedIndex === addresses.length) {
+                        // "Add New Address" option
+                        setOpenDropdown(null)
+                        setFocusedIndex(-1)
+                        onAddNewAddress()
+                    } else if (focusedIndex >= 0 && focusedIndex < addresses.length) {
+                        // Address option
+                        setSelectedAddresses((prev) => ({
+                            ...prev,
+                            [addressKey]: addresses[focusedIndex].addressId
+                        }))
+                        setOpenDropdown(null)
+                        setFocusedIndex(-1)
+                    }
+                    break
+                case 'Tab':
+                    setOpenDropdown(null)
+                    setFocusedIndex(-1)
+                    break
+            }
+        }
+    }
+
     return (
-        <VStack spacing={0}>
-            <Box
-                border="1px solid"
-                borderColor="gray.200"
-                borderRadius="md"
-                bg="white"
-                p={2}
-                w="100%"
-            >
+        <Box
+            as="main"
+            role="main"
+            aria-label={formatMessage({
+                id: 'shipping_multi_address.main.label',
+                defaultMessage: 'Multi-shipping address selection'
+            })}
+        >
+            <VStack spacing={0}>
+                <Box
+                    border="1px solid"
+                    borderColor="gray.200"
+                    borderRadius="md"
+                    bg="white"
+                    p={2}
+                    w="100%"
+                    role="region"
+                    aria-label={formatMessage({
+                        id: 'shipping_multi_address.products.region',
+                        defaultMessage: 'Products and delivery addresses'
+                    })}
+                >
                 <VStack spacing={2}>
                     {basket.productItems.map((item, idx) => {
                         // Merge product details into item
@@ -148,6 +294,9 @@ const ShippingMultiAddress = ({
                                 w="100%"
                                 data-testid="multi-shipping-card"
                                 overflow="visible"
+                                role="article"
+                                aria-labelledby={`product-title-${addressKey}`}
+                                aria-describedby={`product-description-${addressKey}`}
                             >
                                 <Flex
                                     direction={{base: 'column', md: 'row'}}
@@ -160,7 +309,12 @@ const ShippingMultiAddress = ({
                                         <HStack align="flex-start" spacing={3} w="100%">
                                             <Image
                                                 src={imageUrl}
-                                                alt={item.productName}
+                                                alt={formatMessage({
+                                                    id: 'shipping_multi_address.image.alt',
+                                                    defaultMessage: 'Product image for {productName}'
+                                                }, {
+                                                    productName: item.productName
+                                                })}
                                                 w={{base: '60px', md: '90px'}}
                                                 h={{base: '80px', md: '120px'}}
                                                 objectFit="cover"
@@ -177,6 +331,7 @@ const ShippingMultiAddress = ({
                                                     align="flex-start"
                                                 >
                                                     <Text
+                                                        id={`product-title-${addressKey}`}
                                                         fontWeight="medium"
                                                         fontSize={{base: 'sm', md: 'md'}}
                                                         mb={1}
@@ -185,10 +340,12 @@ const ShippingMultiAddress = ({
                                                     >
                                                         {item.productName}
                                                     </Text>
-                                                    <MultiShippingItemAttributes
-                                                        variant={variant}
-                                                        includeQuantity
-                                                    />
+                                                    <Box id={`product-description-${addressKey}`}>
+                                                        <MultiShippingItemAttributes
+                                                            variant={variant}
+                                                            includeQuantity
+                                                        />
+                                                    </Box>
                                                 </VStack>
                                             </ItemVariantProvider>
                                         </HStack>
@@ -201,8 +358,15 @@ const ShippingMultiAddress = ({
                                         flexShrink={0}
                                         display={{base: 'none', md: 'flex'}}
                                         pt={0}
+                                        role="group"
+                                        aria-labelledby={`delivery-address-label-${addressKey}`}
                                     >
-                                        <Text fontWeight="medium" fontSize="sm" mb={2}>
+                                        <Text 
+                                            id={`delivery-address-label-${addressKey}`}
+                                            fontWeight="medium" 
+                                            fontSize="sm" 
+                                            mb={2}
+                                        >
                                             {formatMessage(deliveryAddressLabel)}
                                         </Text>
 
@@ -216,7 +380,10 @@ const ShippingMultiAddress = ({
                                         >
                                             <Box position="relative">
                                                 <Box
-                                                    role="button"
+                                                    role="combobox"
+                                                    aria-expanded={openDropdown === addressKey}
+                                                    aria-haspopup="listbox"
+                                                    aria-labelledby={`delivery-address-label-${addressKey}`}
                                                     tabIndex={0}
                                                     border="1px solid"
                                                     borderColor="gray.300"
@@ -231,6 +398,11 @@ const ShippingMultiAddress = ({
                                                     justifyContent="space-between"
                                                     fontWeight="normal"
                                                     _hover={{bg: 'gray.50'}}
+                                                    _focus={{
+                                                        outline: '2px solid',
+                                                        outlineColor: 'blue.500',
+                                                        outlineOffset: '2px'
+                                                    }}
                                                     onClick={() =>
                                                         setOpenDropdown(
                                                             openDropdown === addressKey
@@ -238,15 +410,9 @@ const ShippingMultiAddress = ({
                                                                 : addressKey
                                                         )
                                                     }
-                                                    onKeyDown={(e) => {
-                                                        if (e.key === 'Enter' || e.key === ' ') {
-                                                            setOpenDropdown(
-                                                                openDropdown === addressKey
-                                                                    ? null
-                                                                    : addressKey
-                                                            )
-                                                        }
-                                                    }}
+                                                    onKeyDown={(e) =>
+                                                        handleDropdownKeyDown(e, addressKey)
+                                                    }
                                                 >
                                                     <HStack
                                                         align="center"
@@ -295,7 +461,12 @@ const ShippingMultiAddress = ({
                                                             </Text>
                                                         </Box>
                                                     </HStack>
-                                                    <Text ml={2} fontSize="lg" color="gray.500">
+                                                    <Text 
+                                                        ml={2} 
+                                                        fontSize="lg" 
+                                                        color="gray.500"
+                                                        aria-hidden="true"
+                                                    >
                                                         ▼
                                                     </Text>
                                                 </Box>
@@ -303,6 +474,12 @@ const ShippingMultiAddress = ({
                                                 {/* Custom Dropdown */}
                                                 {openDropdown === addressKey && (
                                                     <Box
+                                                        role="listbox"
+                                                        aria-label={formatMessage({
+                                                            id: 'shipping_multi_address.dropdown.label',
+                                                            defaultMessage:
+                                                                'Delivery address options'
+                                                        })}
                                                         position="absolute"
                                                         top="100%"
                                                         left={0}
@@ -320,6 +497,17 @@ const ShippingMultiAddress = ({
                                                             {addresses.map((addr, index) => (
                                                                 <ListItem
                                                                     key={addr.addressId}
+                                                                    role="option"
+                                                                    aria-selected={
+                                                                        addr.addressId ===
+                                                                        selectedAddressId
+                                                                    }
+                                                                    aria-describedby={`address-${addr.addressId}-description-mobile`}
+                                                                    tabIndex={
+                                                                        focusedIndex === index
+                                                                            ? 0
+                                                                            : -1
+                                                                    }
                                                                     p={3}
                                                                     cursor="pointer"
                                                                     fontSize="md"
@@ -336,6 +524,12 @@ const ShippingMultiAddress = ({
                                                                     }
                                                                     borderColor="gray.100"
                                                                     _hover={{bg: 'gray.50'}}
+                                                                    _focus={{
+                                                                        outline: '2px solid',
+                                                                        outlineColor: 'blue.500',
+                                                                        outlineOffset: '2px',
+                                                                        bg: 'gray.50'
+                                                                    }}
                                                                     onClick={() => {
                                                                         setSelectedAddresses(
                                                                             (prev) => ({
@@ -345,6 +539,7 @@ const ShippingMultiAddress = ({
                                                                             })
                                                                         )
                                                                         setOpenDropdown(null)
+                                                                        setFocusedIndex(-1)
                                                                     }}
                                                                     onKeyDown={(e) => {
                                                                         if (
@@ -359,6 +554,7 @@ const ShippingMultiAddress = ({
                                                                                 })
                                                                             )
                                                                             setOpenDropdown(null)
+                                                                            setFocusedIndex(-1)
                                                                         }
                                                                     }}
                                                                 >
@@ -367,6 +563,40 @@ const ShippingMultiAddress = ({
                                                                         spacing={1}
                                                                         w="100%"
                                                                     >
+                                                                        <VisuallyHidden
+                                                                            id={`address-${addr.addressId}-description-mobile`}
+                                                                        >
+                                                                            {formatMessage(
+                                                                                {
+                                                                                    id: 'shipping_multi_address.address.description',
+                                                                                    defaultMessage:
+                                                                                        'Address for {firstName} {lastName}'
+                                                                                },
+                                                                                {
+                                                                                    firstName:
+                                                                                        addr.firstName,
+                                                                                    lastName:
+                                                                                        addr.lastName
+                                                                                }
+                                                                            )}
+                                                                        </VisuallyHidden>
+                                                                        <VisuallyHidden
+                                                                            id={`address-${addr.addressId}-description`}
+                                                                        >
+                                                                            {formatMessage(
+                                                                                {
+                                                                                    id: 'shipping_multi_address.address.description',
+                                                                                    defaultMessage:
+                                                                                        'Address for {firstName} {lastName}'
+                                                                                },
+                                                                                {
+                                                                                    firstName:
+                                                                                        addr.firstName,
+                                                                                    lastName:
+                                                                                        addr.lastName
+                                                                                }
+                                                                            )}
+                                                                        </VisuallyHidden>
                                                                         <Text
                                                                             fontWeight="bold"
                                                                             fontSize={{
@@ -408,6 +638,14 @@ const ShippingMultiAddress = ({
                                                             ))}
                                                             {/* Add New Address option */}
                                                             <ListItem
+                                                                role="option"
+                                                                aria-describedby="add-new-address-description"
+                                                                tabIndex={
+                                                                    focusedIndex ===
+                                                                    addresses.length
+                                                                        ? 0
+                                                                        : -1
+                                                                }
                                                                 p={3}
                                                                 cursor="pointer"
                                                                 fontSize="md"
@@ -415,8 +653,15 @@ const ShippingMultiAddress = ({
                                                                 borderTop="1px solid"
                                                                 borderColor="gray.200"
                                                                 _hover={{bg: 'blue.50'}}
+                                                                _focus={{
+                                                                    outline: '2px solid',
+                                                                    outlineColor: 'blue.500',
+                                                                    outlineOffset: '2px',
+                                                                    bg: 'blue.50'
+                                                                }}
                                                                 onClick={() => {
                                                                     setOpenDropdown(null)
+                                                                    setFocusedIndex(-1)
                                                                     onAddNewAddress()
                                                                 }}
                                                                 onKeyDown={(e) => {
@@ -425,14 +670,30 @@ const ShippingMultiAddress = ({
                                                                         e.key === ' '
                                                                     ) {
                                                                         setOpenDropdown(null)
+                                                                        setFocusedIndex(-1)
                                                                         onAddNewAddress()
                                                                     }
                                                                 }}
                                                             >
+                                                                <VisuallyHidden id="add-new-address-description">
+                                                                    {formatMessage({
+                                                                        id: 'shipping_multi_address.add_new.description',
+                                                                        defaultMessage:
+                                                                            'Add a new delivery address'
+                                                                    })}
+                                                                </VisuallyHidden>
+                                                                <VisuallyHidden id="add-new-address-description-mobile">
+                                                                    {formatMessage({
+                                                                        id: 'shipping_multi_address.add_new.description',
+                                                                        defaultMessage:
+                                                                            'Add a new delivery address'
+                                                                    })}
+                                                                </VisuallyHidden>
                                                                 <HStack spacing={2}>
                                                                     <Text
                                                                         fontWeight="bold"
                                                                         fontSize="lg"
+                                                                        aria-hidden="true"
                                                                     >
                                                                         +
                                                                     </Text>
@@ -456,6 +717,11 @@ const ShippingMultiAddress = ({
                                             color="gray.900"
                                             alignSelf="flex-end"
                                             mt="auto"
+                                            role="text"
+                                            aria-label={formatMessage({
+                                                id: 'shipping_multi_address.price.label',
+                                                defaultMessage: 'Product price'
+                                            })}
                                         >
                                             {typeof variant.priceAfterItemDiscount === 'number' && (
                                                 <Text>
@@ -481,8 +747,15 @@ const ShippingMultiAddress = ({
                                     maxW="100%"
                                     overflowX="hidden"
                                     minH={openDropdown === mobileAddressKey ? '300px' : 'auto'}
+                                    role="group"
+                                    aria-labelledby={`delivery-address-label-${mobileAddressKey}`}
                                 >
-                                    <Text fontWeight="medium" fontSize="sm" mb={2}>
+                                    <Text 
+                                        id={`delivery-address-label-${mobileAddressKey}`}
+                                        fontWeight="medium" 
+                                        fontSize="sm" 
+                                        mb={2}
+                                    >
                                         {formatMessage(deliveryAddressLabel)}
                                     </Text>
 
@@ -504,7 +777,10 @@ const ShippingMultiAddress = ({
                                             overflow="visible"
                                         >
                                             <Box
-                                                role="button"
+                                                role="combobox"
+                                                aria-expanded={openDropdown === mobileAddressKey}
+                                                aria-haspopup="listbox"
+                                                aria-labelledby={`delivery-address-label-${mobileAddressKey}`}
                                                 tabIndex={0}
                                                 border="1px solid"
                                                 borderColor="gray.300"
@@ -519,6 +795,11 @@ const ShippingMultiAddress = ({
                                                 justifyContent="space-between"
                                                 fontWeight="normal"
                                                 _hover={{bg: 'gray.50'}}
+                                                _focus={{
+                                                    outline: '2px solid',
+                                                    outlineColor: 'blue.500',
+                                                    outlineOffset: '2px'
+                                                }}
                                                 onClick={() =>
                                                     setOpenDropdown(
                                                         openDropdown === mobileAddressKey
@@ -526,15 +807,9 @@ const ShippingMultiAddress = ({
                                                             : mobileAddressKey
                                                     )
                                                 }
-                                                onKeyDown={(e) => {
-                                                    if (e.key === 'Enter' || e.key === ' ') {
-                                                        setOpenDropdown(
-                                                            openDropdown === mobileAddressKey
-                                                                ? null
-                                                                : mobileAddressKey
-                                                        )
-                                                    }
-                                                }}
+                                                onKeyDown={(e) =>
+                                                    handleDropdownKeyDown(e, addressKey, true)
+                                                }
                                                 overflow="hidden"
                                                 minW={0}
                                                 maxW="100%"
@@ -599,6 +874,7 @@ const ShippingMultiAddress = ({
                                                     fontSize="lg"
                                                     color="gray.500"
                                                     flexShrink={0}
+                                                    aria-hidden="true"
                                                 >
                                                     ▼
                                                 </Text>
@@ -607,6 +883,11 @@ const ShippingMultiAddress = ({
                                             {/* Custom Dropdown */}
                                             {openDropdown === mobileAddressKey && (
                                                 <Box
+                                                    role="listbox"
+                                                    aria-label={formatMessage({
+                                                        id: 'shipping_multi_address.dropdown.label',
+                                                        defaultMessage: 'Delivery address options'
+                                                    })}
                                                     position="absolute"
                                                     top="100%"
                                                     left={0}
@@ -631,6 +912,15 @@ const ShippingMultiAddress = ({
                                                         {addresses.map((addr, index) => (
                                                             <ListItem
                                                                 key={addr.addressId}
+                                                                role="option"
+                                                                aria-selected={
+                                                                    addr.addressId ===
+                                                                    selectedAddressId
+                                                                }
+                                                                aria-describedby={`address-${addr.addressId}-description`}
+                                                                tabIndex={
+                                                                    focusedIndex === index ? 0 : -1
+                                                                }
                                                                 p={3}
                                                                 cursor="pointer"
                                                                 fontSize="md"
@@ -647,6 +937,12 @@ const ShippingMultiAddress = ({
                                                                 }
                                                                 borderColor="gray.100"
                                                                 _hover={{bg: 'gray.50'}}
+                                                                _focus={{
+                                                                    outline: '2px solid',
+                                                                    outlineColor: 'blue.500',
+                                                                    outlineOffset: '2px',
+                                                                    bg: 'gray.50'
+                                                                }}
                                                                 onClick={() => {
                                                                     setSelectedAddresses(
                                                                         (prev) => ({
@@ -656,6 +952,7 @@ const ShippingMultiAddress = ({
                                                                         })
                                                                     )
                                                                     setOpenDropdown(null)
+                                                                    setFocusedIndex(-1)
                                                                 }}
                                                                 onKeyDown={(e) => {
                                                                     if (
@@ -670,6 +967,7 @@ const ShippingMultiAddress = ({
                                                                             })
                                                                         )
                                                                         setOpenDropdown(null)
+                                                                        setFocusedIndex(-1)
                                                                     }
                                                                 }}
                                                             >
@@ -719,6 +1017,13 @@ const ShippingMultiAddress = ({
                                                         ))}
                                                         {/* Add New Address option */}
                                                         <ListItem
+                                                            role="option"
+                                                            aria-describedby="add-new-address-description-mobile"
+                                                            tabIndex={
+                                                                focusedIndex === addresses.length
+                                                                    ? 0
+                                                                    : -1
+                                                            }
                                                             p={3}
                                                             cursor="pointer"
                                                             fontSize="md"
@@ -726,8 +1031,15 @@ const ShippingMultiAddress = ({
                                                             borderTop="1px solid"
                                                             borderColor="gray.200"
                                                             _hover={{bg: 'blue.50'}}
+                                                            _focus={{
+                                                                outline: '2px solid',
+                                                                outlineColor: 'blue.500',
+                                                                outlineOffset: '2px',
+                                                                bg: 'blue.50'
+                                                            }}
                                                             onClick={() => {
                                                                 setOpenDropdown(null)
+                                                                setFocusedIndex(-1)
                                                                 onAddNewAddress()
                                                             }}
                                                             onKeyDown={(e) => {
@@ -736,6 +1048,7 @@ const ShippingMultiAddress = ({
                                                                     e.key === ' '
                                                                 ) {
                                                                     setOpenDropdown(null)
+                                                                    setFocusedIndex(-1)
                                                                     onAddNewAddress()
                                                                 }
                                                             }}
@@ -744,6 +1057,7 @@ const ShippingMultiAddress = ({
                                                                 <Text
                                                                     fontWeight="bold"
                                                                     fontSize="lg"
+                                                                    aria-hidden="true"
                                                                 >
                                                                     +
                                                                 </Text>
@@ -767,6 +1081,11 @@ const ShippingMultiAddress = ({
                                         color="gray.900"
                                         alignSelf="flex-end"
                                         mt="auto"
+                                        role="text"
+                                        aria-label={formatMessage({
+                                            id: 'shipping_multi_address.price.label',
+                                            defaultMessage: 'Product price'
+                                        })}
                                     >
                                         {typeof variant.priceAfterItemDiscount === 'number' && (
                                             <Text>
@@ -783,14 +1102,34 @@ const ShippingMultiAddress = ({
                     })}
                 </VStack>
             </Box>
-            <Box pt={2} w="100%">
+            <Box 
+                pt={2} 
+                w="100%"
+                role="region"
+                aria-label={formatMessage({
+                    id: 'shipping_multi_address.actions.region',
+                    defaultMessage: 'Checkout actions'
+                })}
+            >
                 <Container variant="form">
-                    <Button type="button" width="full" onClick={onSubmit}>
+                    <Button 
+                        type="button" 
+                        width="full" 
+                        onClick={onSubmit}
+                        aria-describedby="submit-button-description"
+                    >
                         {formatMessage(submitButtonLabel)}
                     </Button>
+                    <VisuallyHidden id="submit-button-description">
+                        {formatMessage({
+                            id: 'shipping_multi_address.submit.description',
+                            defaultMessage: 'Continue to next step with selected delivery addresses'
+                        })}
+                    </VisuallyHidden>
                 </Container>
             </Box>
         </VStack>
+        </Box>
     )
 }
 
