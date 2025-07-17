@@ -80,7 +80,7 @@ module.exports = {
                 {value: 'US', label: 'United States'}
             ]
         },
-        CheckoutConfirmation: {
+        checkoutConfirmation: {
             path: '/checkout/confirmation/:orderNo'
         },
         home: {
@@ -91,16 +91,16 @@ module.exports = {
         login: {
             path: '/login'
         },
-        Registration: {
+        registration: {
             path: '/registration'
         },
-        ResetPassword: {
+        resetPassword: {
             path: '/reset-password'
         },
-        LoginRedirect: {
+        loginRedirect: {
             path: '/callback'
         },
-        ProductDetail: {
+        productDetail: {
             path: '/product/:productId'
         },
         productList: {
