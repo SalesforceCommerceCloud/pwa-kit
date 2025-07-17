@@ -1,4 +1,4 @@
-import React, {useState, useCallback, useEffect, useRef} from 'react'
+import React, {useState, useEffect, useRef} from 'react'
 import {FormattedMessage, useIntl} from 'react-intl'
 import {
     ToggleCard,
@@ -21,27 +21,23 @@ import PropTypes from 'prop-types'
 
 import {usePaymentScripts} from '../../../../hooks/salesforce-payments/use-payment-scripts'
 import {useSalesforcePayments} from '../../../../hooks/salesforce-payments/use-salesforce-payments'
-import {usePaymentConfig} from '../../../../hooks/salesforce-payments/use-payment-config'
 import {useCheckout} from '@salesforce/retail-react-app/app/pages/checkout/util/checkout-context'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
-import {createCheckoutParameters} from '../../../../utils/salesforce-payments/payment-method-mapper'
+import {createCheckoutParameters, createPaymentRequestInfo} from '../../../../utils/salesforce-payments/payment-method-mapper'
 import {useShopperBasketsMutation} from '@salesforce/commerce-sdk-react'
 import ShippingAddressSelection from '@salesforce/retail-react-app/app/pages/checkout/partials/shipping-address-selection'
 import {usePaymentProcessing} from '../../../../hooks/salesforce-payments/use-payment-processing'
 import {getAddressDetails} from '../../../../utils/salesforce-payments/address-mapper'
 
-// ✅ Module-level storage for paymentSheet (private to this file)
+// Module-level storage for paymentSheet
 let paymentSheetInstance = null
 
-// ✅ Export the payment processing function for checkout page to use
 export const usePaymentSheetSubmission = () => {
     const {processPayment, isProcessing} = usePaymentProcessing()
     const {data: basket} = useCurrentBasket()
     
     const createPaymentIntent = async (paymentData) => {
-        console.log('🔄 createPaymentIntent callback called with:', paymentData)
-        
-        const basketId = "9ab3e52d9fa346a83c819ced37" // TODO: use basket.basketId
+        const basketId = "4cc1463610b01710f3240ee65f" // TODO: use basket.basketId
         
         try {
             const paymentResult = await processPayment({
@@ -52,21 +48,18 @@ export const usePaymentSheetSubmission = () => {
                 currency: paymentData?.currency || 'USD',
             })
             
-            console.log('✅ Payment intent created:', paymentResult)
             return {
                 client_secret: paymentResult.payment_info.client_secret,
                 id: paymentResult.payment_info.payment_intent_id,
                 customer: paymentResult.payment_info.customer_id
             }
         } catch (error) {
-            console.error('❌ Payment intent creation failed:', error)
+            console.error('Payment intent creation failed:', error)
             throw error
         }
     }
     
     const submitPaymentSheetOrder = async () => {
-        console.log('🚀 Processing SFP payment before order submission...')
-        
         if (!paymentSheetInstance) {
             throw new Error('Payment sheet not ready. Please wait for payment component to load.')
         }
@@ -75,46 +68,39 @@ export const usePaymentSheetSubmission = () => {
             const {billing, shipping} = getAddressDetails(basket)
             
             return new Promise((resolve, reject) => {
-                billing.email = "test@test.com" //looks like email is needed but not seeing it in basket
+                billing.email = "test@test.com"
                 billing.address.country = "US"
                 
-                //TODO:  my backend was setting the shipping (need to remove that)
                 paymentSheetInstance.confirm(createPaymentIntent, billing, {})
                     .then(function (resp) {
                         const respData = resp.data
-                        console.log('✅ SFP payment confirmed:', respData)
                         
                         if (resp.responseCode === 0) {
                             resolve(respData)
                         } else {
-                            console.log('❌ SFP payment failed:', respData)
                             reject(new Error('Payment failed'))
                         }
                     })
                     .catch(function (err) {
-                        console.log('❌ SFP payment failed:', err)
-                        //reject(err)
-                         // Simulate a "successful" test flow for now
-                      
+                        // Simulate success for testing
                         resolve({
-                            responseCode: 0, // Simulates `ResponseCode.SUCCESS`
+                            responseCode: 0,
                             data: {
-                            paymentData: {
-                                id: 'pi_test_fake_123',
-                                uuid: 'test-guid-456', // optional: use real one if available
-                                paymentGatewayId: 'test-gateway-id',
-                                gatewayCustomerId: 'test-customer-id',
-                            },
-                            paymentToken: 'pi_test_fake_123',
-                            billingDetails: billing, // reuse the billing object you passed in
-                            testOverride: true, // optional: flag this as a fake for downstream logic
+                                paymentData: {
+                                    id: 'pi_test_fake_123',
+                                    uuid: 'test-guid-456',
+                                    paymentGatewayId: 'test-gateway-id',
+                                    gatewayCustomerId: 'test-customer-id',
+                                },
+                                paymentToken: 'pi_test_fake_123',
+                                billingDetails: billing,
+                                testOverride: true,
                             },
                         });
-
                     })
             })
         } catch (error) {
-            console.error('❌ SFP payment processing failed:', error)
+            console.error('SFP payment processing failed:', error)
             throw error
         }
     }
@@ -125,29 +111,34 @@ export const usePaymentSheetSubmission = () => {
     }
 }
 
-const SFPaymentsSheet = () => {
+const SFPaymentsSheet = ({paymentState}) => {
+    const {
+        paymentConfig,
+        metadata,
+        paymentConfigLoading,
+        isSFPEnabled
+    } = paymentState
+
+    const isReady = !paymentConfigLoading && paymentConfig && metadata
     const intl = useIntl()
     
-    // ✅ Load scripts and SFP
+    // Load scripts and SFP
     const {scriptsLoaded, loading, hasSFP} = usePaymentScripts(['stripe', 'paypal', 'sfp'])
     const {sfpInstance} = useSalesforcePayments(scriptsLoaded, hasSFP)
-    const {usePaymentConfiguration, usePaymentMetadata} = usePaymentConfig()
-    const {data: metadata, isLoading: metadataLoading} = usePaymentMetadata()
-    const {data: paymentConfig, isLoading: configLoading} = usePaymentConfiguration({})
     
-    // ✅ Checkout context
+    // Checkout context
     const {step, STEPS, goToStep, goToNextStep} = useCheckout()
     const {data: basket} = useCurrentBasket()
     
-    // ✅ State
+    // State
     const [sfpComponentCreated, setSfpComponentCreated] = useState(false)
     const [billingSameAsShipping, setBillingSameAsShipping] = useState(true)
     
-    // ✅ Refs for DOM elements
+    // Refs for DOM elements
     const editContainerRef = useRef(null)
     const paymentElementRef = useRef(null)
     
-    // ✅ Form and mutations
+    // Form and mutations
     const selectedShippingAddress = basket?.shipments?.[0]?.shippingAddress
     const selectedBillingAddress = basket?.billingAddress
     const appliedPayment = basket?.paymentInstruments?.[0]
@@ -160,95 +151,62 @@ const SFPaymentsSheet = () => {
     const {mutateAsync: addPaymentInstrumentToBasket} = useShopperBasketsMutation('addPaymentInstrumentToBasket')
     const {mutateAsync: updateBillingAddressForBasket} = useShopperBasketsMutation('updateBillingAddressForBasket')
     
-    // ✅ Computed values
-    const isReady = scriptsLoaded && paymentConfig && metadata && !loading && !configLoading && !metadataLoading
-    
-    // ✅ Create SFP component (once only)
-    const createComponent = useCallback(async () => {
-        if (!paymentElementRef.current || sfpComponentCreated || !sfpInstance || !paymentConfig || !metadata) {
-            return
-        }
-        
-        console.log('✅ Creating SFP component...')
-
-        // ✅ Check if element is actually in DOM
-        const elementInDOM = document.getElementById('salesforce-payments-element')
-        if (!elementInDOM) {
-            console.log('❌ Element not in DOM yet, skipping creation')
-            return
-        }
-        
-        try {
-            const checkoutParams = createCheckoutParameters(
-                sfpInstance,
-                metadata,
-                paymentConfig,
-                basket,
-                {
-                    locale: intl.locale,
-                    paymentFlow: 'checkout',
-                    elementId: 'salesforce-payments-element',
-                    customTheme: {
-                        'color-primary': '#007bff'
-                    }
+    // Create SFP component with fresh values (no stale closure)
+    useEffect(() => {
+        if (step === STEPS.PAYMENT && editContainerRef.current && isReady && !sfpComponentCreated) {
+            // Create element if it doesn't exist
+            if (!paymentElementRef.current) {
+                const element = document.createElement('div')
+                element.id = 'salesforce-payments-element'
+                element.style.width = '100%'
+                element.style.minHeight = '300px'
+                paymentElementRef.current = element
+            }
+            
+            // Add element to container if not already there
+            if (!editContainerRef.current.contains(paymentElementRef.current)) {
+                editContainerRef.current.appendChild(paymentElementRef.current)
+            }
+            
+            // Create SFP component with fresh values
+            if (sfpInstance && paymentConfig && metadata) {
+                const elementInDOM = document.getElementById('salesforce-payments-element')
+                if (!elementInDOM) return
+                
+                try {
+                    const checkoutParams = createCheckoutParameters(
+                        sfpInstance,
+                        metadata,
+                        paymentConfig,
+                        basket,
+                        {
+                            locale: intl.locale,
+                            paymentFlow: 'checkout',
+                            elementId: 'salesforce-payments-element',
+                            customTheme: {
+                                'color-primary': '#007bff'
+                            }
+                        }
+                    )
+                    
+                    const paymentSheet = sfpInstance.checkout(
+                        checkoutParams.metadata,
+                        checkoutParams.paymentMethodSetForCheckout,
+                        checkoutParams.config,
+                        checkoutParams.paymentRequestInfo,
+                        paymentElementRef.current
+                    )
+                    
+                    paymentSheetInstance = paymentSheet
+                    setSfpComponentCreated(true)
+                } catch (error) {
+                    console.error('Failed to create SFP component:', error)
                 }
-            )
-            
-            const paymentSheet = sfpInstance.checkout(
-                checkoutParams.metadata,
-                checkoutParams.paymentMethodSetForCheckout,
-                checkoutParams.config,
-                checkoutParams.paymentRequestInfo,
-                paymentElementRef.current
-            )
-            
-            paymentSheetInstance = paymentSheet
-            setSfpComponentCreated(true)
-            console.log('✅ SFP component created successfully')
-        } catch (error) {
-            console.error('❌ Failed to create SFP component:', error)
+            }
         }
-    }, [sfpInstance, paymentConfig, metadata, sfpComponentCreated, basket, intl.locale])
+    }, [step, isReady, sfpComponentCreated, sfpInstance, paymentConfig, metadata, basket, intl.locale])
     
-// ✅ REPLACE the useEffect around line 185 with this corrected version
-useEffect(() => {
-    console.log('🔍 Single useEffect running:', {
-        step,
-        isPaymentStep: step === STEPS.PAYMENT,
-        editContainerRef: !!editContainerRef.current,
-        paymentElementRef: !!paymentElementRef.current,
-        isReady,
-        sfpComponentCreated
-    })
-    
-    // ✅ Only run when we're actually on the payment step
-    if (step === STEPS.PAYMENT && editContainerRef.current && isReady && !sfpComponentCreated) {
-        // Create element if it doesn't exist
-        if (!paymentElementRef.current) {
-            console.log('Creating payment element...')
-            const element = document.createElement('div')
-            element.id = 'salesforce-payments-element'
-            element.style.width = '100%'
-            element.style.minHeight = '300px'
-            
-            paymentElementRef.current = element
-            console.log('✅ Payment element created')
-        }
-        
-        // Add element to container if not already there
-        if (!editContainerRef.current.contains(paymentElementRef.current)) {
-            console.log('Adding element to container...')
-            editContainerRef.current.appendChild(paymentElementRef.current)
-            console.log('✅ Payment element added to container')
-        }
-        
-        // Trigger SFP component creation
-        console.log('✅ All ready, triggering component creation...')
-        createComponent()
-    }
-}, [step, isReady, sfpComponentCreated]) // ✅ Include step in dependencies
-
-    // ✅ Cleanup on unmount
+    // Cleanup on unmount
     useEffect(() => {
         return () => {
             paymentSheetInstance = null
@@ -256,7 +214,7 @@ useEffect(() => {
         }
     }, [])
     
-    // ✅ Event handlers
+    // Event handlers
     const onBillingSubmit = async () => {
         const isFormValid = await billingAddressForm.trigger()
         if (!isFormValid) return
@@ -299,8 +257,7 @@ useEffect(() => {
     
     return (
         <Box>
-
-            {/* ✅ Payment container - only shows in edit mode */}
+            {/* Payment container - only shows in edit mode */}
             <Box
                 ref={editContainerRef}
                 display={step === STEPS.PAYMENT ? "block" : "none"}
@@ -325,8 +282,6 @@ useEffect(() => {
             >
                 <ToggleCardEdit>
                     <Stack spacing={6}>
-                        {/* ✅ Note: Payment element is rendered above, outside this component */}
-                        {/* ✅ NO BOX HERE - payment is above */}
                         <Text fontSize="sm" color="gray.500" fontStyle="italic">
                             Payment form is above
                         </Text>
