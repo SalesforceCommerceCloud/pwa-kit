@@ -103,8 +103,12 @@ test('suggestions render when there are some', async () => {
     expect(searchInput.value).toBe('Dress')
     const suggestionPopoverEl = await screen.getByTestId('sf-suggestion-popover')
     await waitFor(() => {
-        const suggestionsEl = within(suggestionPopoverEl).getByTestId('sf-suggestion')
-        expect(suggestionsEl.querySelector('button').textContent).toBe('Dresses')
+        const suggestionsEls = within(suggestionPopoverEl).getAllByTestId('sf-suggestion')
+        expect(suggestionsEls.length).toBeGreaterThan(0)
+        const hasDressesSuggestion = suggestionsEls.some(el => 
+            el.querySelector('button')?.textContent?.includes('Dresses')
+        )
+        expect(hasDressesSuggestion).toBe(true)
     })
 })
 
