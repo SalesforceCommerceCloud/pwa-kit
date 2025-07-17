@@ -37,12 +37,12 @@ export class CookieStorage extends BaseStorage {
 
     set(key: string, value: string, options?: Cookies.CookieAttributes) {
         const suffixedKey = EXCLUDE_COOKIE_SUFFIX.includes(key) ? key : this.getSuffixedKey(key)
-        
+
         // Use external API cookie attributes for cookies that need to work with external APIs
-        const baseAttributes = this.needsExternalApiAttributes(suffixedKey) 
-            ? getExternalApiCookieAttributes() 
+        const baseAttributes = this.needsExternalApiAttributes(suffixedKey)
+            ? getExternalApiCookieAttributes()
             : getDefaultCookieAttributes()
-        
+
         Cookies.set(suffixedKey, value, {
             ...baseAttributes,
             ...options
@@ -70,8 +70,8 @@ export class CookieStorage extends BaseStorage {
         const suffixedKey = EXCLUDE_COOKIE_SUFFIX.includes(key) ? key : this.getSuffixedKey(key)
 
         // Use external API cookie attributes for cookies that need to work with external APIs
-        const baseAttributes = this.needsExternalApiAttributes(suffixedKey) 
-            ? getExternalApiCookieAttributes() 
+        const baseAttributes = this.needsExternalApiAttributes(suffixedKey)
+            ? getExternalApiCookieAttributes()
             : getDefaultCookieAttributes()
 
         Cookies.remove(suffixedKey, {

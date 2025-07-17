@@ -626,7 +626,7 @@ class Auth {
         this.set('usid', res.usid, {
             expires: expiresDate
         })
-        
+
         this.set(refreshTokenKey, res.refresh_token, {
             expires: expiresDate
         })
