@@ -36,6 +36,28 @@ const OrderStatusBar = ({currentStepLabel}) => {
         }
     }
 
+    // Helper to get step fill color based on current step
+    const getStepFillColor = (stepIndex) => {
+        if (stepIndex < currentStep) {
+            return theme.colors.teal[100] // completed steps
+        } else if (stepIndex === currentStep) {
+            return theme.colors.blue[900] // current step
+        } else {
+            return theme.colors.gray[200] // future steps
+        }
+    }
+
+    // Helper to get label text color based on current step
+    const getLabelColor = (stepIndex) => {
+        if (stepIndex < currentStep) {
+            return theme.colors.black[600] // completed steps
+        } else if (stepIndex === currentStep) {
+            return 'white' // current step
+        } else {
+            return theme.colors.black[600] // future steps
+        }
+    }
+
     const n = steps.length
     const svgWidth = 1080
     const svgHeight = 50
@@ -54,10 +76,10 @@ const OrderStatusBar = ({currentStepLabel}) => {
 
     // Generate polygons/paths for each step
     const renderStepShapes = () => {
-        const shapes = []
-        for (let i = 0; i < n; i++) {
+        return Array.from({length: n}, (_, i) => {
             const x = getStepOffset(i)
-            let path, stepFill
+            let path
+
             if (i === 0) {
                 // First: rounded left, chevron right (chevron tip overlaps next step)
                 path = `M ${x + radius},0
@@ -87,17 +109,11 @@ const OrderStatusBar = ({currentStepLabel}) => {
           L ${x + chevronWidth},${svgHeight / 2}
           Z`
             }
-            // Color logic: completed steps = light teal, current step = dark blue, future steps = gray
-            if (i < currentStep) {
-                stepFill = theme.colors.teal[100]
-            } else if (i === currentStep) {
-                stepFill = theme.colors.blue[900]
-            } else {
-                stepFill = theme.colors.gray[200]
-            }
-            shapes.push(<path key={i} d={path} fill={stepFill} stroke="white" strokeWidth="2" />)
-        }
-        return shapes
+
+            return (
+                <path key={i} d={path} fill={getStepFillColor(i)} stroke="white" strokeWidth="2" />
+            )
+        })
     }
 
     // Overlay text for each step (shift overlays for overlap)
@@ -105,15 +121,6 @@ const OrderStatusBar = ({currentStepLabel}) => {
         const labels = []
         for (let i = 0; i < n; i++) {
             const x = getStepOffset(i)
-            // Text color logic: completed steps = dark text, current step = white, future steps = dark text
-            let labelColor
-            if (i < currentStep) {
-                labelColor = theme.colors.black[600]
-            } else if (i === currentStep) {
-                labelColor = 'white'
-            } else {
-                labelColor = theme.colors.black[600]
-            }
             labels.push(
                 <Box
                     key={i}
@@ -129,7 +136,7 @@ const OrderStatusBar = ({currentStepLabel}) => {
                     px={[1, 2]} // Add horizontal padding for text
                 >
                     <Text
-                        color={labelColor}
+                        color={getLabelColor(i)}
                         fontWeight="medium"
                         fontSize={['xs', 'sm', 'md', 'lg']}
                         textAlign="center"
