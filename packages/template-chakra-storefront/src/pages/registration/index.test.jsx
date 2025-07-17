@@ -10,9 +10,9 @@ import {guestToken, registerUserToken, renderWithProviders} from '../../utils/te
 import Registration from '.'
 import {BrowserRouter as Router, Route} from 'react-router-dom'
 import Account from '../account'
-import mockConfig from '../../mock-config'
+import mockConfig from '../../../config/mocks/mock-config'
 import {rest} from 'msw'
-import {mockedRegisteredCustomer} from '../../mocks/mock-data'
+import {mockedRegisteredCustomer} from '../../../mocks/mock-data'
 jest.mock('../../hooks/use-datacloud', () => ({
     __esModule: true,
     default: jest.fn(() => ({
