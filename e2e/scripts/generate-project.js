@@ -42,7 +42,7 @@ const main = async (opts) => {
         let generateAppCommand = `${config.GENERATOR_CMD} ${outputDir}`
         // TODO: Update script to setup local verdaccio npm repo to allow running 'npx @salesforce/pwa-kit-create-app' to generate apps
         if (preset) {
-            generateAppCommand = `${config.GENERATOR_CMD} ${outputDir} --preset ${preset}`
+            generateAppCommand = `${config.GENERATOR_CMD} ${outputDir} --preset ${preset} --initGit`
         }
 
         if (templateVersion) {

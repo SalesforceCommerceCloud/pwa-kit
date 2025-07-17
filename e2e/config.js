@@ -112,6 +112,7 @@ module.exports = {
   },
   EXPECTED_GENERATED_ARTIFACTS: {
     "retail-app-demo": [
+      ".git",
       ".eslintignore",
       ".eslintrc.js",
       ".prettierrc.yaml",
