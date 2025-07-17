@@ -1,7 +1,7 @@
 {
   "name": "@salesforce/pwa-kit-mcp",
   "version": "0.1.0-preview.1",
-  "private": true,
+  "private": false,
   "description": "MCP server that helps you build Salesforce Commerce Cloud PWA Kit Composable Storefront",
   "main": "dist/server/server.js",
   "files": [
