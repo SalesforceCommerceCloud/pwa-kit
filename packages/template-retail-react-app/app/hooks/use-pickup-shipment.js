@@ -247,13 +247,21 @@ export const usePickupShipment = (basket) => {
             if (hasAnyPickupSelected && !isCurrentlyPickup) {
                 // Configure pickup shipment if pickup is selected but current method is not pickup
                 const pickupShippingMethodId = getPickupShippingMethodId(fetchedShippingMethods)
-                return await updatePickupShipment(basketResponse.basketId, productItems, selectedStore, {
-                    pickupShippingMethodId
-                })
+                return await updatePickupShipment(
+                    basketResponse.basketId,
+                    productItems,
+                    selectedStore,
+                    {
+                        pickupShippingMethodId
+                    }
+                )
             } else if (!hasAnyPickupSelected && isCurrentlyPickup) {
                 // Configure regular shipping if pickup is not selected but current method is pickup
                 const defaultShippingMethodId = getDefaultShippingMethodId(fetchedShippingMethods)
-                return await updateRegularShippingMethod(basketResponse.basketId, defaultShippingMethodId)
+                return await updateRegularShippingMethod(
+                    basketResponse.basketId,
+                    defaultShippingMethodId
+                )
             }
         }
     }
