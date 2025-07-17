@@ -12,7 +12,7 @@ import {BrowserRouter} from 'react-router-dom'
 import AppFooter from './app-footer'
 
 // Mock Footer component
-jest.mock('../../../footer', () => {
+jest.mock('../../footer', () => {
     return function MockFooter() {
         return <div data-testid="footer">Footer Content</div>
     }

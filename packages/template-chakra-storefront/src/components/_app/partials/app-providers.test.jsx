@@ -7,9 +7,6 @@
 
 import React from 'react'
 import {render, screen} from '@testing-library/react'
-import {IntlProvider} from 'react-intl'
-import {ChakraProvider} from '@chakra-ui/react'
-import {BrowserRouter} from 'react-router-dom'
 import {CommerceProvider} from '@salesforce/commerce-sdk-react'
 import AppProviders from './app-providers'
 

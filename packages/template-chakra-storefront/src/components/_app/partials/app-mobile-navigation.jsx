@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, {useMemo, createContext, useContext} from 'react'
+import React, {useMemo} from 'react'
 import PropTypes from 'prop-types'
 import {useCategory} from '@salesforce/commerce-sdk-react'
 import {Center, Spinner} from '@chakra-ui/react'

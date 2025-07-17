@@ -119,7 +119,7 @@ const App = (props) => {
     const modalProps = {
         authModal,
         dntNotification
-        // Uncomment when store locator is enabled
+        // Store locator modal will be added when enabled:
         // isOpenStoreLocator,
         // onCloseStoreLocator
     }

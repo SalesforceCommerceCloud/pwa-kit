@@ -12,7 +12,7 @@ import {BrowserRouter} from 'react-router-dom'
 import AppHeader from './app-header'
 
 // Mock Header component
-jest.mock('../../../header', () => {
+jest.mock('../../header', () => {
     return function MockHeader(props) {
         return (
             <div data-testid="header">
@@ -23,7 +23,7 @@ jest.mock('../../../header', () => {
 })
 
 // Mock MobileNavigation component
-jest.mock('../../../mobile-navigation', () => {
+jest.mock('../../mobile-navigation', () => {
     return function MockMobileNavigation(props) {
         return (
             <div data-testid="mobile-navigation">

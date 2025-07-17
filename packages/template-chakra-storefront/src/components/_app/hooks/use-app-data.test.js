@@ -5,6 +5,8 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
+/* eslint-disable @typescript-eslint/no-var-requires */
+
 import {renderHook} from '@testing-library/react'
 import {useAppData} from './use-app-data'
 

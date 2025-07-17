@@ -5,6 +5,8 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
+/* eslint-disable @typescript-eslint/no-var-requires */
+
 import React from 'react'
 import {render, screen} from '@testing-library/react'
 import {createPortal} from 'react-dom'
@@ -20,24 +22,32 @@ jest.mock('react-dom', () => ({
 
 // Mock AuthModal component
 jest.mock('../../../auth-modal', () => {
-    return function MockAuthModal(props) {
+    const MockAuthModal = (props) => {
         return props.authModal ? (
             <div data-testid="auth-modal">
                 <div data-testid="auth-modal-props">{JSON.stringify(props.authModal)}</div>
             </div>
         ) : null
     }
+    MockAuthModal.propTypes = {
+        authModal: require('prop-types').object
+    }
+    return MockAuthModal
 })
 
 // Mock DNTNotification component
 jest.mock('../../../dnt-notification', () => {
-    return function MockDNTNotification(props) {
+    const MockDNTNotification = (props) => {
         return props.dntNotification ? (
             <div data-testid="dnt-notification">
                 <div data-testid="dnt-props">{JSON.stringify(props.dntNotification)}</div>
             </div>
         ) : null
     }
+    MockDNTNotification.propTypes = {
+        dntNotification: require('prop-types').object
+    }
+    return MockDNTNotification
 })
 
 describe('AppModals', () => {
