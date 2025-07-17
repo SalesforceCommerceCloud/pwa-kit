@@ -8,7 +8,10 @@ import React, {useMemo} from 'react'
 import {Helmet} from 'react-helmet'
 import PropTypes from 'prop-types'
 import {Img} from '@salesforce/retail-react-app/app/components/shared/ui'
-import {getImageAttributes} from '@salesforce/retail-react-app/app/utils/image'
+import {
+    getImageAttributes,
+    getImageLinkAttributes
+} from '@salesforce/retail-react-app/app/utils/image'
 import {isServer} from '@salesforce/retail-react-app/app/components/image/utils'
 
 /**
@@ -24,18 +27,7 @@ const Image = (props) => {
     const Component = as ? as : Img
     const [effectiveImageProps, effectiveLinkProps] = useMemo(() => {
         const imageProps = getImageAttributes(rest)
-        const loadingStrategy = imageProps?.loading?.toLowerCase?.()
-        const fetchPriority = imageProps?.fetchPriority?.toLowerCase?.()
-        const linkProps =
-            fetchPriority === 'high' && (!loadingStrategy || loadingStrategy === 'eager')
-                ? {
-                      rel: 'preload',
-                      as: 'image',
-                      href: imageProps.src,
-                      ...(imageProps.sizes ? {imageSizes: imageProps.sizes} : {}),
-                      ...(imageProps.srcSet ? {imageSrcSet: imageProps.srcSet} : {})
-                  }
-                : undefined
+        const linkProps = getImageLinkAttributes(imageProps)
         return [imageProps, linkProps]
     }, [rest])
 

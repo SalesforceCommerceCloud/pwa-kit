@@ -38,6 +38,9 @@
   "account_detail.title.account_details": {
     "defaultMessage": "Account Details"
   },
+  "account_order_detail.button.cancel_order": {
+    "defaultMessage": "Cancel order"
+  },
   "account_order_detail.heading.billing_address": {
     "defaultMessage": "Billing Address"
   },
@@ -182,6 +185,15 @@
   },
   "bonus_products_title.title.num_of_items": {
     "defaultMessage": "Bonus Products ({itemCount, plural, =0 {0 items} one {# item} other {# items}})"
+  },
+  "cancel_order_modal.button.confirm": {
+    "defaultMessage": "Request Cancellation"
+  },
+  "cancel_order_modal.content.placeholder": {
+    "defaultMessage": "This is a blank modal for canceling the order."
+  },
+  "cancel_order_modal.title.request_cancellation": {
+    "defaultMessage": "Request Cancellation"
   },
   "carousel.button.scroll_left.assistive_msg": {
     "defaultMessage": "Scroll carousel left"

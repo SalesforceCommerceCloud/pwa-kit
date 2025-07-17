@@ -181,6 +181,20 @@
       "value": "]"
     }
   ],
+  "account_order_detail.button.cancel_order": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ƈȧȧƞƈḗḗŀ ǿǿřḓḗḗř"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
   "account_order_detail.heading.billing_address": [
     {
       "type": 0,
@@ -993,6 +1007,48 @@
     {
       "type": 0,
       "value": ")"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "cancel_order_modal.button.confirm": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Řḗḗɋŭŭḗḗşŧ Ƈȧȧƞƈḗḗŀŀȧȧŧīǿǿƞ"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "cancel_order_modal.content.placeholder": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ŧħīş īş ȧȧ ƀŀȧȧƞķ ḿǿǿḓȧȧŀ ƒǿǿř ƈȧȧƞƈḗḗŀīƞɠ ŧħḗḗ ǿǿřḓḗḗř."
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "cancel_order_modal.title.request_cancellation": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Řḗḗɋŭŭḗḗşŧ Ƈȧȧƞƈḗḗŀŀȧȧŧīǿǿƞ"
     },
     {
       "type": 0,
