@@ -51,16 +51,17 @@ module.exports = {
     login: {
         passwordless: {
             enabled: false,
-            callbackURI: 'https://webhook.site/27761b71-50c1-4097-a600-21a3b89a546c',
+            callbackURI:
+                process.env.PASSWORDLESS_LOGIN_CALLBACK_URI || '/passwordless-login-callback',
             landingPath: '/passwordless-login-landing'
         },
         social: {
             enabled: false,
             idps: ['google', 'apple'],
-            redirectURI: '/social-callback'
+            redirectURI: process.env.SOCIAL_LOGIN_REDIRECT_URI || '/social-callback'
         },
         resetPassword: {
-            callbackURI: 'https://webhook.site/27761b71-50c1-4097-a600-21a3b89a546c',
+            callbackURI: process.env.RESET_PASSWORD_CALLBACK_URI || '/reset-password-callback',
             landingPath: '/reset-password-landing'
         }
     },
