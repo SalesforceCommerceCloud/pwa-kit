@@ -989,7 +989,8 @@ describe('standard product', () => {
                 {
                     productId: mockStandardProductOrderable.id,
                     price: mockStandardProductOrderable.price,
-                    quantity: 1
+                    quantity: 1,
+                    shipmentId: 'me'
                 }
             ])
         })
@@ -1019,7 +1020,8 @@ describe('standard product', () => {
                 {
                     productId: mockStandardProductOrderable.id,
                     price: mockStandardProductOrderable.price,
-                    quantity: 3
+                    quantity: 3,
+                    shipmentId: 'me'
                 }
             ])
         })

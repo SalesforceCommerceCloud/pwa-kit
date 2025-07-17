@@ -109,35 +109,47 @@ export const useMultiship = (basket) => {
         if (!basket?.shipments) return null
 
         return basket.shipments.find(
-            (shipment) =>
-                // Return the default shipment if its empty
-                (shipment.shipmentId === 'me' &&
-                    !basket.productItems?.some((item) => item.shipmentId === 'me')) ||
-                // Or a delivery shipment
-                !isCurrentShippingMethodPickup(shipment.shippingMethod)
+            (shipment) => !isCurrentShippingMethodPickup(shipment.shippingMethod)
         )
     }
 
     /**
-     * Creates a new delivery shipment without a shipping method
+     * Creates a new delivery shipment without a shipping method, or configures and returns the default shipment for delivery if it's empty
      * The default shipping method will be assigned later by assignDefaultShippingMethodsToShipments
-     * @param {string} basketId - The basket ID
+     * @param {Object} basket - The basket object
+     * @param {Array} productItems - Array of product items
+     * @param {Object} storeInfo - Store information object
      * @returns {Promise<Object>} The created shipment response
      */
-    const createNewDeliveryShipment = async (basketId) => {
-        // Create a new shipment without a shipping method
+    const createNewDeliveryShipment = async (basket, productItems, storeInfo) => {
+        // If default shipment is empty, configure it for delivery and return
+        const defaultShipment = basket.shipments?.find((shipment) => shipment.shipmentId === 'me')
+        const isDefaultShipmentEmpty =
+            defaultShipment && !basket.productItems?.some((item) => item.shipmentId === 'me')
+
+        if (isDefaultShipmentEmpty) {
+            // Configure the existing default shipment for delivery
+            const response = await configureDefaultShipmentIfNeeded(
+                basket,
+                'me',
+                productItems,
+                false,
+                storeInfo
+            )
+            return response
+        }
+
+        // Otherwise, create a new shipment without a shipping method
         // The assignDefaultShippingMethodsToShipments function will handle setting the default shipping method
-        const response = await createShipmentForBasketMutation.mutateAsync({
+        return await createShipmentForBasketMutation.mutateAsync({
             parameters: {
-                basketId
+                basketId: basket.basketId
             },
             body: {
                 // Note: c_fromStoreId is omitted since this is a delivery shipment
                 // shippingMethod is also omitted - will be set by assignDefaultShippingMethodsToShipments
             }
         })
-
-        return response
     }
 
     /**
@@ -145,33 +157,34 @@ export const useMultiship = (basket) => {
      * Creates a new delivery shipment if none exists
      * @returns {Promise<string>} The delivery shipment ID
      */
-    const findOrCreateDeliveryShipment = async () => {
+    const findOrCreateDeliveryShipment = async (productItems, storeInfo) => {
         // Check if there's an existing delivery shipment
         let existingDeliveryShipment = findExistingDeliveryShipment(basket)
 
         if (!existingDeliveryShipment) {
             // Create a new delivery shipment
-            const newShipmentResponse = await createNewDeliveryShipment(basket.basketId)
-            // Use the newly created shipment from the response
-            existingDeliveryShipment = newShipmentResponse.shipments?.find(
+            const newShipmentResponse = await createNewDeliveryShipment(
+                basket,
+                productItems,
+                storeInfo
+            )
+            // Use the new shipment from the response
+            existingDeliveryShipment = newShipmentResponse?.shipments?.find(
                 (shipment) => !isCurrentShippingMethodPickup(shipment.shippingMethod)
             )
         }
 
-        if (!existingDeliveryShipment?.shipmentId) {
-            throw new Error('Failed to create or find delivery shipment')
-        }
-
-        return existingDeliveryShipment.shipmentId
+        return existingDeliveryShipment?.shipmentId
     }
 
     /**
      * Ensures a pickup shipment exists for the specified store and returns it
      * Creates a new pickup shipment if none exists for the store
+     * @param {Array} productItems - Array of product items
      * @param {Object} storeInfo - The store object containing id and inventoryId
      * @returns {Promise<string>} The pickup shipment ID
      */
-    const findOrCreatePickupShipment = async (storeInfo) => {
+    const findOrCreatePickupShipment = async (productItems, storeInfo) => {
         if (!storeInfo?.id) {
             throw new Error('No store selected for pickup')
         }
@@ -185,20 +198,20 @@ export const useMultiship = (basket) => {
 
         if (!existingPickupShipment) {
             // Create a new pickup shipment for this store
-            const newShipmentResponse = await createNewPickupShipment(basket.basketId, storeInfo)
+            const newShipmentResponse = await createNewPickupShipment(
+                basket,
+                productItems,
+                storeInfo
+            )
             // Find the newly created pickup shipment
-            existingPickupShipment = newShipmentResponse.shipments?.find(
+            existingPickupShipment = newShipmentResponse?.shipments?.find(
                 (shipment) =>
                     isCurrentShippingMethodPickup(shipment.shippingMethod) &&
                     shipment.c_fromStoreId === storeInfo.id
             )
         }
 
-        if (!existingPickupShipment) {
-            throw new Error('Failed to create or find pickup shipment')
-        }
-
-        return existingPickupShipment.shipmentId
+        return existingPickupShipment?.shipmentId
     }
 
     /**
@@ -212,22 +225,36 @@ export const useMultiship = (basket) => {
 
         return basket.shipments.find(
             (shipment) =>
-                // Return the default shipment if it's empty
-                (shipment.shipmentId === 'me' &&
-                    !basket.productItems?.some((item) => item.shipmentId === 'me')) ||
-                // Or a pickup shipment for currently selected store
-                (isCurrentShippingMethodPickup(shipment.shippingMethod) &&
-                    shipment.c_fromStoreId === storeId)
+                isCurrentShippingMethodPickup(shipment.shippingMethod) &&
+                shipment.c_fromStoreId === storeId
         )
     }
 
     /**
-     * Creates a new pickup shipment for the specified store
-     * @param {string} basketId - The basket ID
+     * Creates a new pickup shipment for the specified store, or configures and returns the default shipment for pickup if it's empty
+     * @param {Object} basket - The basket object
+     * @param {Array} productItems - Array of product items
      * @param {Object} storeInfo - The store object containing id and inventoryId
      * @returns {Promise<Object>} The created shipment response
      */
-    const createNewPickupShipment = async (basketId, storeInfo) => {
+    const createNewPickupShipment = async (basket, productItems, storeInfo) => {
+        // If default shipment is empty, configure it for pickup and return
+        const defaultShipment = basket.shipments?.find((shipment) => shipment.shipmentId === 'me')
+        const isDefaultShipmentEmpty =
+            defaultShipment && !basket.productItems?.some((item) => item.shipmentId === 'me')
+
+        if (isDefaultShipmentEmpty) {
+            // Configure the existing default shipment for pickup
+            const response = await configureDefaultShipmentIfNeeded(
+                basket,
+                'me',
+                productItems,
+                true,
+                storeInfo
+            )
+            return response
+        }
+
         // Get shipping methods to determine the pickup shipping method ID
         const {data: shippingMethods} = await refetchMeShippingMethods()
         const pickupShippingMethodId = getPickupShippingMethodId(shippingMethods)
@@ -239,7 +266,7 @@ export const useMultiship = (basket) => {
         // Create a new shipment with pickup configuration
         const response = await createShipmentForBasketMutation.mutateAsync({
             parameters: {
-                basketId
+                basketId: basket.basketId
             },
             body: {
                 shippingMethod: {
@@ -337,7 +364,7 @@ export const useMultiship = (basket) => {
             productId: productItem.productId,
             quantity: productItem.quantity,
             shipmentId: targetShipmentId,
-            // Remove inventoryId if it exists (for pickup items) by setting it to null (needs fixing)
+            // TODO: API does not support removing inventoryId currently, so set to global inventory as a workaround
             ...(productItem.inventoryId && {inventoryId: null})
         }))
 
@@ -414,13 +441,21 @@ export const useMultiship = (basket) => {
         let targetShipmentId = 'me'
         // Handle change from pickup to delivery
         if (!selectedPickup && isCurrentlyPickup) {
-            targetShipmentId = await findOrCreateDeliveryShipment()
+            targetShipmentId = await findOrCreateDeliveryShipment([productItem], storeInfo)
+
+            if (!targetShipmentId) {
+                throw new Error('Failed to find or create shipment')
+            }
 
             updatedBasket = await moveItemToDeliveryShipment(productItem, targetShipmentId)
         }
         // Handle change from delivery to pickup
         else if (selectedPickup && !isCurrentlyPickup) {
-            targetShipmentId = await findOrCreatePickupShipment(storeInfo)
+            targetShipmentId = await findOrCreatePickupShipment([productItem], storeInfo)
+
+            if (!targetShipmentId) {
+                throw new Error('Failed to find or create shipment')
+            }
 
             // Move the item to the pickup shipment
             updatedBasket = await moveItemToPickupShipment(

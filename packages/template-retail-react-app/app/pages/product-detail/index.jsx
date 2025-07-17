@@ -413,51 +413,31 @@ const ProductDetail = () => {
                 }
             }
 
-            const basketResponse = await addItemToNewOrExistingBasket(productItems)
-
-            // Find the newly added items from the basket response
-            // TODO: This doesnt work for adding same product multiple times since items are combined on backend
-            const newlyAddedItems = basketResponse.productItems?.filter((item) =>
-                productItems.some(
-                    (productItem) =>
-                        productItem.productId === item.productId && item.shipmentId === 'me'
-                )
-            )
-
             // Set target to default shipment
             let targetShipmentId = 'me'
 
-            if (MULTISHIP_IS_ENABLED) {
+            if (basket) {
+                // Ensure a suitable shipment exists
                 if (hasAnyPickupSelected) {
-                    // For pickup items, ensure pickup shipment exists
-                    targetShipmentId = await findOrCreatePickupShipment(selectedStore)
-
-                    // Only filter for items that need to be moved
-                    const itemsToMove = newlyAddedItems.filter(
-                        (item) => item.shipmentId !== targetShipmentId
-                    )
-
-                    if (itemsToMove.length > 0) {
-                        await moveItemsToPickupShipment(
-                            itemsToMove,
-                            targetShipmentId,
-                            selectedStore?.inventoryId
-                        )
-                    }
+                    targetShipmentId = await findOrCreatePickupShipment(productItems, selectedStore)
                 } else {
-                    // For delivery items, ensure delivery shipment exists
-                    targetShipmentId = await findOrCreateDeliveryShipment()
-
-                    // Only filter for items that need to be moved
-                    const itemsToMove = newlyAddedItems.filter(
-                        (item) => item.shipmentId !== targetShipmentId
+                    targetShipmentId = await findOrCreateDeliveryShipment(
+                        productItems,
+                        selectedStore
                     )
-
-                    if (itemsToMove.length > 0) {
-                        await moveItemsToDeliveryShipment(itemsToMove, targetShipmentId)
-                    }
                 }
+
+                if (!targetShipmentId) {
+                    throw new Error('Failed to find or create shipment')
+                }
+
+                productItems = productItems.map((item) => ({
+                    ...item,
+                    shipmentId: targetShipmentId
+                }))
             }
+
+            const basketResponse = await addItemToNewOrExistingBasket(productItems)
 
             // Configure shipping method for default shipment based on pickup selection
             await configureDefaultShipmentIfNeeded(
