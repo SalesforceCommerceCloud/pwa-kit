@@ -139,7 +139,7 @@ export class DataCloudApi {
     }
 
     /**
-     * Creates standard events (identity, party identification, contact point email) 
+     * Creates standard events (identity, party identification, contact point email)
      * that are common across all send methods
      */
     _createStandardEvents(args, additionalIdentityProps = {}) {
@@ -149,26 +149,28 @@ export class DataCloudApi {
         const identityProfile = this.dnt
             ? {}
             : this._concatenateEvents(
-                baseEvent,
-                this._generateEventDetails('identity', 'Profile'),
-                userDetails,
-                additionalIdentityProps
-            )
+                  baseEvent,
+                  this._generateEventDetails('identity', 'Profile'),
+                  userDetails,
+                  additionalIdentityProps
+              )
 
         const partyIdentification = this.dnt
             ? {}
             : this._concatenateEvents(
-                baseEvent,
-                this._generateEventDetails('partyIdentification', 'Profile'),
-                this._constructPartyIdentification(args)
-            )
+                  baseEvent,
+                  this._generateEventDetails('partyIdentification', 'Profile'),
+                  this._constructPartyIdentification(args)
+              )
 
-        const contactPointEmail = args.email ? this._concatenateEvents(
-            baseEvent,
-            this._generateEventDetails('contactPointEmail', 'Profile', args.email)
-        ) : null
+        const contactPointEmail = args.email
+            ? this._concatenateEvents(
+                  baseEvent,
+                  this._generateEventDetails('contactPointEmail', 'Profile', args.email)
+              )
+            : null
 
-        return { baseEvent, identityProfile, partyIdentification, contactPointEmail }
+        return {baseEvent, identityProfile, partyIdentification, contactPointEmail}
     }
 
     _handleApiError(err) {
@@ -177,13 +179,13 @@ export class DataCloudApi {
                 '[DataCloudApi] 400 Bad Request: Check your Data Cloud configuration (appSourceId, tenantId) and event payload.',
                 {
                     namespace: 'use-datacloud._handleApiError',
-                    additionalProperties: { error: err?.response }
+                    additionalProperties: {error: err?.response}
                 }
             )
         } else {
             logger.error('[DataCloudApi] Error sending Data Cloud event', {
                 namespace: 'use-datacloud._handleApiError',
-                additionalProperties: { error: err?.response }
+                additionalProperties: {error: err?.response}
             })
         }
     }
@@ -192,7 +194,7 @@ export class DataCloudApi {
      * Constructs the interaction object and sends it to Data Cloud
      */
     _sendInteraction(standardEvents, specificEvents) {
-        const { identityProfile, partyIdentification, contactPointEmail } = standardEvents
+        const {identityProfile, partyIdentification, contactPointEmail} = standardEvents
 
         const interaction = {
             events: [
@@ -202,7 +204,9 @@ export class DataCloudApi {
             ]
         }
 
-        return this.sdk.webEventsAppSourceIdPost(interaction).catch((err) => this._handleApiError(err))
+        return this.sdk
+            .webEventsAppSourceIdPost(interaction)
+            .catch((err) => this._handleApiError(err))
     }
 
     /**
@@ -222,7 +226,7 @@ export class DataCloudApi {
      */
     async sendViewPage(path, args) {
         // 1. Create standard events (identity, party, email)
-        const standardEvents = this._createStandardEvents(args, { sourceUrl: path })
+        const standardEvents = this._createStandardEvents(args, {sourceUrl: path})
 
         // 2. Create method-specific events using standardEvents.baseEvent
         const specificEvents = [
