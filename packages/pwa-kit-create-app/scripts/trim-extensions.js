@@ -252,7 +252,6 @@ function processFile(filePath, plugins) {
                 compact: false
             }).code
             // Replace the original file with the trimmed version
-            fs.copyFileSync(filePath, `${filePath}.bak`)
             fs.writeFileSync(filePath, output)
             // prettify the file
             execSync(`npx prettier --write ${filePath}`)
@@ -356,7 +355,7 @@ function removeUnusedComponents(directory) {
                             }
                             // If this import matches any exported file and it's not from one of the component candidates, remove it from the set
                             const isCandidate = Array.from(removeComponentCandidates).find(
-                                (candidate) => candidate.includes(path.dirname(filePath))
+                                (candidate) => candidate === path.dirname(filePath)
                             )
                             if (exportedFiles.has(absoluteImportPath) && !isCandidate) {
                                 exportedFiles.delete(absoluteImportPath)
