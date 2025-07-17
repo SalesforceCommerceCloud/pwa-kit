@@ -1,5 +1,5 @@
 {
-  "name": "typescript-minimal",
+  "name": "@salesforce/retail-react-app",
   "version": "4.0.0-extensibility-preview.5",
   "private": true,
   "scripts": {
