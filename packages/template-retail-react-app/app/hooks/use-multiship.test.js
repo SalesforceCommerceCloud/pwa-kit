@@ -524,7 +524,7 @@ describe('useMultiship', () => {
                 basketWithEmptyDefault,
                 'me',
                 [],
-                true, 
+                true,
                 mockStoreInfo
             )
         })
