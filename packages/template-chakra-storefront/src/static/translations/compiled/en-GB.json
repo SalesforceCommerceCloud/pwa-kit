@@ -361,6 +361,40 @@
       "value": "Close login form"
     }
   ],
+  "auth_modal.check_email.button.resend_link": [
+    {
+      "type": 0,
+      "value": "Resend Link"
+    }
+  ],
+  "auth_modal.check_email.description.check_spam_folder": [
+    {
+      "type": 0,
+      "value": "The link may take a few minutes to arrive, check your spam folder if you're having trouble finding it"
+    }
+  ],
+  "auth_modal.check_email.description.just_sent": [
+    {
+      "type": 0,
+      "value": "We just sent a login link to "
+    },
+    {
+      "children": [
+        {
+          "type": 1,
+          "value": "email"
+        }
+      ],
+      "type": 8,
+      "value": "b"
+    }
+  ],
+  "auth_modal.check_email.title.check_your_email": [
+    {
+      "type": 0,
+      "value": "Check Your Email"
+    }
+  ],
   "auth_modal.description.now_signed_in": [
     {
       "type": 0,
@@ -553,12 +587,6 @@
     {
       "type": 0,
       "value": "Categories"
-    }
-  ],
-  "cc_radio_group.action.remove": [
-    {
-      "type": 0,
-      "value": "Remove"
     }
   ],
   "cc_radio_group.button.add_new_card": [
@@ -1021,6 +1049,12 @@
       "value": "Already have an account? Log in"
     }
   ],
+  "contact_info.button.back_to_sign_in_options": [
+    {
+      "type": 0,
+      "value": "Back to Sign In Options"
+    }
+  ],
   "contact_info.button.checkout_as_guest": [
     {
       "type": 0,
@@ -1033,6 +1067,18 @@
       "value": "Log In"
     }
   ],
+  "contact_info.button.password": [
+    {
+      "type": 0,
+      "value": "Password"
+    }
+  ],
+  "contact_info.button.secure_link": [
+    {
+      "type": 0,
+      "value": "Secure Link"
+    }
+  ],
   "contact_info.error.incorrect_username_or_password": [
     {
       "type": 0,
@@ -1043,6 +1089,12 @@
     {
       "type": 0,
       "value": "Forgot password?"
+    }
+  ],
+  "contact_info.message.or_login_with": [
+    {
+      "type": 0,
+      "value": "Or Login With"
     }
   ],
   "contact_info.title.contact_info": [
@@ -1119,6 +1171,48 @@
       "value": "currentPrice"
     }
   ],
+  "dnt_notification.button.accept": [
+    {
+      "type": 0,
+      "value": "Accept"
+    }
+  ],
+  "dnt_notification.button.assistive_msg.accept": [
+    {
+      "type": 0,
+      "value": "Accept tracking"
+    }
+  ],
+  "dnt_notification.button.assistive_msg.close": [
+    {
+      "type": 0,
+      "value": "Close consent tracking form"
+    }
+  ],
+  "dnt_notification.button.assistive_msg.decline": [
+    {
+      "type": 0,
+      "value": "Decline tracking"
+    }
+  ],
+  "dnt_notification.button.decline": [
+    {
+      "type": 0,
+      "value": "Decline"
+    }
+  ],
+  "dnt_notification.description": [
+    {
+      "type": 0,
+      "value": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur."
+    }
+  ],
+  "dnt_notification.title": [
+    {
+      "type": 0,
+      "value": "Tracking Consent"
+    }
+  ],
   "drawer_menu.button.account_details": [
     {
       "type": 0,
@@ -1147,6 +1241,12 @@
     {
       "type": 0,
       "value": "Order History"
+    }
+  ],
+  "drawer_menu.header.assistive_msg.title": [
+    {
+      "type": 0,
+      "value": "Menu Drawer"
     }
   ],
   "drawer_menu.link.about_us": [
@@ -1463,6 +1563,24 @@
       "value": "Wishlist"
     }
   ],
+  "global.error.create_account": [
+    {
+      "type": 0,
+      "value": "This feature is not currently available. You must create an account to access this feature."
+    }
+  ],
+  "global.error.feature_unavailable": [
+    {
+      "type": 0,
+      "value": "This feature is not currently available."
+    }
+  ],
+  "global.error.invalid_token": [
+    {
+      "type": 0,
+      "value": "Invalid token, please try again."
+    }
+  ],
   "global.error.something_went_wrong": [
     {
       "type": 0,
@@ -1525,6 +1643,12 @@
       "value": "View"
     }
   ],
+  "header.button.assistive_msg.clear_search": [
+    {
+      "type": 0,
+      "value": "Clear Search"
+    }
+  ],
   "header.button.assistive_msg.logo": [
     {
       "type": 0,
@@ -1546,7 +1670,7 @@
   "header.button.assistive_msg.my_account": [
     {
       "type": 0,
-      "value": "My account"
+      "value": "My Account"
     }
   ],
   "header.button.assistive_msg.my_account_menu": [
@@ -1563,6 +1687,12 @@
     {
       "type": 1,
       "value": "numItems"
+    }
+  ],
+  "header.button.assistive_msg.store_locator": [
+    {
+      "type": 0,
+      "value": "Store Locator"
     }
   ],
   "header.button.assistive_msg.wishlist": [
@@ -1797,6 +1927,24 @@
     {
       "type": 0,
       "value": "Quantity "
+    },
+    {
+      "type": 1,
+      "value": "quantity"
+    }
+  ],
+  "item_variant.quantity.label": [
+    {
+      "type": 0,
+      "value": "Quantity selector for "
+    },
+    {
+      "type": 1,
+      "value": "productName"
+    },
+    {
+      "type": 0,
+      "value": ". Selected quantity is "
     },
     {
       "type": 1,
@@ -2139,6 +2287,36 @@
       "value": "Create account"
     }
   ],
+  "login_form.button.apple": [
+    {
+      "type": 0,
+      "value": "Apple"
+    }
+  ],
+  "login_form.button.back": [
+    {
+      "type": 0,
+      "value": "Back to Sign In Options"
+    }
+  ],
+  "login_form.button.continue_securely": [
+    {
+      "type": 0,
+      "value": "Continue Securely"
+    }
+  ],
+  "login_form.button.google": [
+    {
+      "type": 0,
+      "value": "Google"
+    }
+  ],
+  "login_form.button.password": [
+    {
+      "type": 0,
+      "value": "Password"
+    }
+  ],
   "login_form.button.sign_in": [
     {
       "type": 0,
@@ -2155,6 +2333,12 @@
     {
       "type": 0,
       "value": "Don't have an account?"
+    }
+  ],
+  "login_form.message.or_login_with": [
+    {
+      "type": 0,
+      "value": "Or Login With"
     }
   ],
   "login_form.message.welcome_back": [
@@ -2397,6 +2581,12 @@
       "value": "1 uppercase letter"
     }
   ],
+  "password_reset_success.toast": [
+    {
+      "type": 0,
+      "value": "Password Reset Success"
+    }
+  ],
   "payment_selection.heading.credit_card": [
     {
       "type": 0,
@@ -2497,24 +2687,24 @@
       "value": "Sort By"
     }
   ],
-  "product_list.modal.button.clear_filters": [
+  "product_list.modal.btn.clear_filters": [
     {
       "type": 0,
       "value": "Clear Filters"
     }
   ],
-  "product_list.modal.button.view_items": [
+  "product_list.modal.btn.view_items": [
     {
       "type": 0,
       "value": "View "
     },
     {
       "type": 1,
-      "value": "prroductCount"
+      "value": "count"
     },
     {
       "type": 0,
-      "value": " items"
+      "value": " Items"
     }
   ],
   "product_list.modal.title.filter": [
@@ -2700,13 +2890,21 @@
   "product_view.label.assistive_msg.quantity_decrement": [
     {
       "type": 0,
-      "value": "Decrement Quantity"
+      "value": "Decrement Quantity for "
+    },
+    {
+      "type": 1,
+      "value": "productName"
     }
   ],
   "product_view.label.assistive_msg.quantity_increment": [
     {
       "type": 0,
-      "value": "Increment Quantity"
+      "value": "Increment Quantity for "
+    },
+    {
+      "type": 1,
+      "value": "productName"
     }
   ],
   "product_view.label.quantity": [
@@ -2773,6 +2971,12 @@
     {
       "type": 0,
       "value": "My Profile"
+    }
+  ],
+  "profile_fields.label.profile_form": [
+    {
+      "type": 0,
+      "value": "Profile Form"
     }
   ],
   "promo_code_fields.button.apply": [
@@ -2871,38 +3075,6 @@
       "value": "Create an account and get first access to the very best products, inspiration and community."
     }
   ],
-  "reset_password.button.back_to_sign_in": [
-    {
-      "type": 0,
-      "value": "Back to Sign In"
-    }
-  ],
-  "reset_password.info.receive_email_shortly": [
-    {
-      "type": 0,
-      "value": "You will receive an email at "
-    },
-    {
-      "children": [
-        {
-          "type": 1,
-          "value": "email"
-        }
-      ],
-      "type": 8,
-      "value": "b"
-    },
-    {
-      "type": 0,
-      "value": " with a link to reset your password shortly."
-    }
-  ],
-  "reset_password.title.password_reset": [
-    {
-      "type": 0,
-      "value": "Password Reset"
-    }
-  ],
   "reset_password_form.action.sign_in": [
     {
       "type": 0,
@@ -2955,6 +3127,26 @@
     {
       "type": 0,
       "value": "Continue to Shipping Method"
+    }
+  ],
+  "shipping_address.label.edit_button": [
+    {
+      "type": 0,
+      "value": "Edit "
+    },
+    {
+      "type": 1,
+      "value": "address"
+    }
+  ],
+  "shipping_address.label.remove_button": [
+    {
+      "type": 0,
+      "value": "Remove "
+    },
+    {
+      "type": 1,
+      "value": "address"
     }
   ],
   "shipping_address.label.shipping_address_form": [
@@ -3051,6 +3243,166 @@
     {
       "type": 0,
       "value": "Are you sure you want to sign out? You will need to sign back in to proceed with your current order."
+    }
+  ],
+  "social_login_redirect.message.authenticating": [
+    {
+      "type": 0,
+      "value": "Authenticating..."
+    }
+  ],
+  "social_login_redirect.message.redirect_link": [
+    {
+      "type": 0,
+      "value": "If you are not automatically redirected, click "
+    },
+    {
+      "children": [
+        {
+          "type": 0,
+          "value": "this link"
+        }
+      ],
+      "type": 8,
+      "value": "link"
+    },
+    {
+      "type": 0,
+      "value": " to proceed."
+    }
+  ],
+  "store_locator.action.find": [
+    {
+      "type": 0,
+      "value": "Find"
+    }
+  ],
+  "store_locator.action.select_a_country": [
+    {
+      "type": 0,
+      "value": "Select a country"
+    }
+  ],
+  "store_locator.action.use_my_location": [
+    {
+      "type": 0,
+      "value": "Use My Location"
+    }
+  ],
+  "store_locator.action.viewMore": [
+    {
+      "type": 0,
+      "value": "View More"
+    }
+  ],
+  "store_locator.description.away": [
+    {
+      "type": 0,
+      "value": "away"
+    }
+  ],
+  "store_locator.description.loading_locations": [
+    {
+      "type": 0,
+      "value": "Loading locations..."
+    }
+  ],
+  "store_locator.description.no_locations": [
+    {
+      "type": 0,
+      "value": "Sorry, there are no locations in this area"
+    }
+  ],
+  "store_locator.description.or": [
+    {
+      "type": 0,
+      "value": "Or"
+    }
+  ],
+  "store_locator.description.phone": [
+    {
+      "type": 0,
+      "value": "Phone:"
+    }
+  ],
+  "store_locator.description.viewing_near_postal_code": [
+    {
+      "type": 0,
+      "value": "Viewing stores within "
+    },
+    {
+      "type": 1,
+      "value": "distance"
+    },
+    {
+      "type": 1,
+      "value": "distanceUnit"
+    },
+    {
+      "type": 0,
+      "value": " of "
+    },
+    {
+      "type": 1,
+      "value": "postalCode"
+    },
+    {
+      "type": 0,
+      "value": " in"
+    }
+  ],
+  "store_locator.description.viewing_near_your_location": [
+    {
+      "type": 0,
+      "value": "Viewing stores near your location"
+    }
+  ],
+  "store_locator.dropdown.germany": [
+    {
+      "type": 0,
+      "value": "Germany"
+    }
+  ],
+  "store_locator.dropdown.united_states": [
+    {
+      "type": 0,
+      "value": "United States"
+    }
+  ],
+  "store_locator.error.agree_to_share_your_location": [
+    {
+      "type": 0,
+      "value": "Please agree to share your location"
+    }
+  ],
+  "store_locator.error.please_enter_a_postal_code": [
+    {
+      "type": 0,
+      "value": "Please enter a postal code."
+    }
+  ],
+  "store_locator.error.please_select_a_country": [
+    {
+      "type": 0,
+      "value": "Please select a country."
+    }
+  ],
+  "store_locator.field.placeholder.enter_postal_code": [
+    {
+      "type": 0,
+      "value": "Enter postal code"
+    }
+  ],
+  "store_locator.pagination.load_more": [
+    {
+      "type": 0,
+      "value": "Load More"
+    }
+  ],
+  "store_locator.title": [
+    {
+      "type": 0,
+      "value": "Find a Store"
     }
   ],
   "swatch_group.selected.label": [
@@ -3637,6 +3989,34 @@
       "value": "New Password"
     }
   ],
+  "wishlist_primary_action.button.addSetToCart.label": [
+    {
+      "type": 0,
+      "value": "Add "
+    },
+    {
+      "type": 1,
+      "value": "productName"
+    },
+    {
+      "type": 0,
+      "value": " set to cart"
+    }
+  ],
+  "wishlist_primary_action.button.addToCart.label": [
+    {
+      "type": 0,
+      "value": "Add "
+    },
+    {
+      "type": 1,
+      "value": "productName"
+    },
+    {
+      "type": 0,
+      "value": " to cart"
+    }
+  ],
   "wishlist_primary_action.button.add_set_to_cart": [
     {
       "type": 0,
@@ -3649,6 +4029,16 @@
       "value": "Add to Cart"
     }
   ],
+  "wishlist_primary_action.button.viewFullDetails.label": [
+    {
+      "type": 0,
+      "value": "View full details for "
+    },
+    {
+      "type": 1,
+      "value": "productName"
+    }
+  ],
   "wishlist_primary_action.button.view_full_details": [
     {
       "type": 0,
@@ -3659,6 +4049,16 @@
     {
       "type": 0,
       "value": "View Options"
+    }
+  ],
+  "wishlist_primary_action.button.view_options.label": [
+    {
+      "type": 0,
+      "value": "View Options for "
+    },
+    {
+      "type": 1,
+      "value": "productName"
     }
   ],
   "wishlist_primary_action.info.added_to_cart": [
@@ -3703,6 +4103,16 @@
     {
       "type": 0,
       "value": "Remove"
+    }
+  ],
+  "wishlist_secondary_button_group.info.item.remove.label": [
+    {
+      "type": 0,
+      "value": "Remove "
+    },
+    {
+      "type": 1,
+      "value": "productName"
     }
   ],
   "wishlist_secondary_button_group.info.item_removed": [
