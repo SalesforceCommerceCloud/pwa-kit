@@ -12,7 +12,7 @@ import {BrowserRouter} from 'react-router-dom'
 import AppMobileNavigation from './app-mobile-navigation'
 
 // Mock MobileNavigation component
-jest.mock('../../../mobile-navigation', () => {
+jest.mock('../../mobile-navigation', () => {
     return function MockMobileNavigation(props) {
         return (
             <div data-testid="mobile-navigation">

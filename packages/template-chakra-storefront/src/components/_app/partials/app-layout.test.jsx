@@ -12,7 +12,7 @@ import {BrowserRouter} from 'react-router-dom'
 import AppLayout from './app-layout'
 
 // Mock OfflineNotification component
-jest.mock('../../../offline-notification', () => {
+jest.mock('../../offline-notification', () => {
     return function MockOfflineNotification() {
         return <div data-testid="offline-notification">You are offline</div>
     }

@@ -11,7 +11,7 @@ import {renderHook} from '@testing-library/react'
 import {useAppAnalytics} from './use-app-analytics'
 
 // Mock analytics dependencies
-jest.mock('@salesforce/retail-react-app/app/utils/analytics', () => ({
+jest.mock('../../../utils/analytics', () => ({
     setAnalyticsConfig: jest.fn(),
     trackPageView: jest.fn()
 }))
@@ -34,7 +34,7 @@ describe('useAppAnalytics', () => {
     })
 
     it('sets up analytics configuration on mount', () => {
-        const {setAnalyticsConfig} = require('@salesforce/retail-react-app/app/utils/analytics')
+        const {setAnalyticsConfig} = require('../../../utils/analytics')
 
         renderHook(() => useAppAnalytics(mockSiteId, mockLocaleId, mockCurrency))
 
@@ -46,7 +46,7 @@ describe('useAppAnalytics', () => {
     })
 
     it('tracks page view on location change', () => {
-        const {trackPageView} = require('@salesforce/retail-react-app/app/utils/analytics')
+        const {trackPageView} = require('../../../utils/analytics')
         const {useLocation} = require('react-router-dom')
 
         const {rerender} = renderHook(() => useAppAnalytics(mockSiteId, mockLocaleId, mockCurrency))
@@ -65,7 +65,7 @@ describe('useAppAnalytics', () => {
 
     it('handles missing analytics dependencies gracefully', () => {
         // Mock missing analytics functions
-        jest.doMock('@salesforce/retail-react-app/app/utils/analytics', () => ({}))
+        jest.doMock('../../../utils/analytics', () => ({}))
 
         expect(() => {
             renderHook(() => useAppAnalytics(mockSiteId, mockLocaleId, mockCurrency))
@@ -73,7 +73,7 @@ describe('useAppAnalytics', () => {
     })
 
     it('updates config when parameters change', () => {
-        const {setAnalyticsConfig} = require('@salesforce/retail-react-app/app/utils/analytics')
+        const {setAnalyticsConfig} = require('../../../utils/analytics')
 
         const {rerender} = renderHook(
             ({siteId, localeId, currency}) => useAppAnalytics(siteId, localeId, currency),
@@ -101,7 +101,7 @@ describe('useAppAnalytics', () => {
     })
 
     it('handles undefined parameters', () => {
-        const {setAnalyticsConfig} = require('@salesforce/retail-react-app/app/utils/analytics')
+        const {setAnalyticsConfig} = require('../../../utils/analytics')
 
         renderHook(() => useAppAnalytics(undefined, undefined, undefined))
 
@@ -113,7 +113,7 @@ describe('useAppAnalytics', () => {
     })
 
     it('tracks multiple page views', () => {
-        const {trackPageView} = require('@salesforce/retail-react-app/app/utils/analytics')
+        const {trackPageView} = require('../../../utils/analytics')
         const {useLocation} = require('react-router-dom')
 
         const {rerender} = renderHook(() => useAppAnalytics(mockSiteId, mockLocaleId, mockCurrency))

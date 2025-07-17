@@ -11,29 +11,29 @@ import {renderHook} from '@testing-library/react'
 import {useAppLocalization} from './use-app-localization'
 
 // Mock dependencies
-jest.mock('@salesforce/retail-react-app/app/utils/locale', () => ({
+jest.mock('../../../utils/locale', () => ({
     getTargetLocale: jest.fn(() => 'en-US')
 }))
 
-jest.mock('@salesforce/retail-react-app/app/utils/utils', () => ({
+jest.mock('../../../utils/utils', () => ({
     buildUrlWithAppOrigin: jest.fn((origin, href, site, locale) => `${origin}/${locale}${href}`)
 }))
 
-jest.mock('@salesforce/retail-react-app/app/hooks/use-site', () => ({
+jest.mock('../../../hooks/use-site', () => ({
     useSite: jest.fn(() => ({
         id: 'RefArch',
         alias: 'test-site'
     }))
 }))
 
-jest.mock('@salesforce/retail-react-app/app/hooks/use-locale', () => ({
+jest.mock('../../../hooks/use-locale', () => ({
     useLocale: jest.fn(() => ({
         id: 'en-US',
         alias: 'en_US'
     }))
 }))
 
-jest.mock('@salesforce/retail-react-app/app/hooks/use-shopper-customers-query', () => ({
+jest.mock('@salesforce/commerce-sdk-react', () => ({
     useShopperCustomersQuery: jest.fn(() => ({
         locale: 'en-US',
         currency: 'USD'
@@ -72,7 +72,7 @@ describe('useAppLocalization', () => {
     })
 
     it('builds URLs correctly', () => {
-        const {buildUrlWithAppOrigin} = require('@salesforce/retail-react-app/app/utils/utils')
+        const {buildUrlWithAppOrigin} = require('../../../utils/utils')
         const {result} = renderHook(() => useAppLocalization())
 
         const testHref = '/test-page'
@@ -100,7 +100,7 @@ describe('useAppLocalization', () => {
     })
 
     it('uses correct target locale', () => {
-        const {getTargetLocale} = require('@salesforce/retail-react-app/app/utils/locale')
+        const {getTargetLocale} = require('../../../utils/locale')
         getTargetLocale.mockReturnValue('fr-FR')
 
         const {result} = renderHook(() => useAppLocalization())
@@ -111,7 +111,7 @@ describe('useAppLocalization', () => {
     it('handles different currencies', () => {
         const {
             useShopperCustomersQuery
-        } = require('@salesforce/retail-react-app/app/hooks/use-shopper-customers-query')
+        } = require('@salesforce/commerce-sdk-react')
         useShopperCustomersQuery.mockReturnValue({
             locale: 'en-US',
             currency: 'EUR'

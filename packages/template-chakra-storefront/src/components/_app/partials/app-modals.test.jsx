@@ -21,7 +21,7 @@ jest.mock('react-dom', () => ({
 }))
 
 // Mock AuthModal component
-jest.mock('../../../auth-modal', () => {
+jest.mock('../../auth-modal', () => {
     const MockAuthModal = (props) => {
         return props.authModal ? (
             <div data-testid="auth-modal">
@@ -36,7 +36,7 @@ jest.mock('../../../auth-modal', () => {
 })
 
 // Mock DNTNotification component
-jest.mock('../../../dnt-notification', () => {
+jest.mock('../../dnt-notification', () => {
     const MockDNTNotification = (props) => {
         return props.dntNotification ? (
             <div data-testid="dnt-notification">
