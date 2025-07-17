@@ -128,15 +128,13 @@ export const useMultiship = (basket) => {
             defaultShipment && !basket.productItems?.some((item) => item.shipmentId === 'me')
 
         if (isDefaultShipmentEmpty) {
-            // Configure the existing default shipment for delivery
-            const response = await configureDefaultShipmentIfNeeded(
+            return await configureDefaultShipmentIfNeeded(
                 basket,
                 'me',
                 productItems,
                 false,
                 storeInfo
             )
-            return response
         }
 
         // Otherwise, create a new shipment without a shipping method
@@ -244,15 +242,13 @@ export const useMultiship = (basket) => {
             defaultShipment && !basket.productItems?.some((item) => item.shipmentId === 'me')
 
         if (isDefaultShipmentEmpty) {
-            // Configure the existing default shipment for pickup
-            const response = await configureDefaultShipmentIfNeeded(
+            return await configureDefaultShipmentIfNeeded(
                 basket,
                 'me',
                 productItems,
                 true,
                 storeInfo
             )
-            return response
         }
 
         // Get shipping methods to determine the pickup shipping method ID
@@ -264,7 +260,7 @@ export const useMultiship = (basket) => {
         }
 
         // Create a new shipment with pickup configuration
-        const response = await createShipmentForBasketMutation.mutateAsync({
+        return await createShipmentForBasketMutation.mutateAsync({
             parameters: {
                 basketId: basket.basketId
             },
@@ -275,8 +271,6 @@ export const useMultiship = (basket) => {
                 c_fromStoreId: storeInfo.id
             }
         })
-
-        return response
     }
 
     /**
@@ -299,15 +293,13 @@ export const useMultiship = (basket) => {
             inventoryId: inventoryId
         }
 
-        const response = await updateItemInBasketMutation.mutateAsync({
+        return await updateItemInBasketMutation.mutateAsync({
             parameters: {
                 basketId: basket.basketId,
                 itemId: productItem.itemId
             },
             body: updateData
         })
-
-        return response
     }
 
     /**
@@ -336,15 +328,13 @@ export const useMultiship = (basket) => {
             updateData.inventoryId = null
         }
 
-        const response = await updateItemInBasketMutation.mutateAsync({
+        return await updateItemInBasketMutation.mutateAsync({
             parameters: {
                 basketId: basket.basketId,
                 itemId: productItem.itemId
             },
             body: updateData
         })
-
-        return response
     }
 
     /**
@@ -369,14 +359,12 @@ export const useMultiship = (basket) => {
         }))
 
         try {
-            const response = await updateItemsInBasketMutation.mutateAsync({
+            return await updateItemsInBasketMutation.mutateAsync({
                 parameters: {
                     basketId: basket.basketId
                 },
                 body: updateData
             })
-
-            return response
         } catch (error) {
             console.error('Failed to move items to delivery shipment:', error)
             return error
@@ -464,15 +452,6 @@ export const useMultiship = (basket) => {
                 storeInfo.inventoryId
             )
         }
-
-        // In case default shipment shipping method has to be updated
-        await configureDefaultShipmentIfNeeded(
-            updatedBasket,
-            targetShipmentId,
-            [productItem],
-            selectedPickup,
-            storeInfo
-        )
 
         // Check if the source shipment is now empty and remove it if necessary
         // Use the updated basket from the move operation
