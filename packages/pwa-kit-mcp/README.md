@@ -98,9 +98,8 @@ The `claude_desktop_config.json` file opens.
 {
   "mcpServers": {
     "pwa-kit-mcp": {
-      "command": "{{path-to-node}}/node",
-      "transport": "stdio",
-      "args": ["{{parent-dir-to-mcp}}/pwa-kit-mcp/dist/server/server.js"],
+      "command": "npx",
+      "args": ["-y", "@salesforce/pwa-kit-mcp-server@0.1.0-preview.0"],
       "env": {
         "PWA_STOREFRONT_APP_PATH": "{{path-to-app-directory}}"
       }
