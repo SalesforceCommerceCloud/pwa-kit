@@ -5,10 +5,9 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
-import {screen, fireEvent, act} from '@testing-library/react'
+import {screen, act} from '@testing-library/react'
 import {renderWithProviders} from '../../../utils/test-utils'
 import ProductListGrid from './product-list-grid'
-import userEvent from '@testing-library/user-event'
 
 jest.mock('../../../utils/utils', () => {
     const original = jest.requireActual('../../../utils/utils')
