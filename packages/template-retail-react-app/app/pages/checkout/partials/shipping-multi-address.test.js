@@ -217,7 +217,7 @@ describe('ShippingMultiAddress', () => {
     it('should render product images', () => {
         renderWithIntl(<ShippingMultiAddress {...defaultProps} />)
 
-        const images = screen.getAllByAltText('Test Product 1')
+        const images = screen.getAllByAltText('Product image for Test Product 1')
         expect(images).toHaveLength(1)
         expect(images[0]).toHaveAttribute('src', 'https://test-image-1.jpg')
     })
@@ -317,7 +317,7 @@ describe('ShippingMultiAddress', () => {
         it('should have proper alt text for images', () => {
             renderWithIntl(<ShippingMultiAddress {...defaultProps} />)
 
-            const images = screen.getAllByAltText(/Test Product/)
+            const images = screen.getAllByAltText(/Product image for Test Product/)
             expect(images).toHaveLength(2)
         })
 
