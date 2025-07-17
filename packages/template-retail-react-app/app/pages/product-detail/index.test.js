@@ -905,11 +905,6 @@ test('Add to Cart (Pick Up in Store) includes inventoryId for the selected varia
 })
 
 test('transfers pickup state when variant changes with store inventory, falls back to delivery when no inventory', async () => {
-    // Since the current implementation transfers state between different product IDs,
-    // and our test creates fresh components each time, let's test the logic more directly.
-    // This test verifies that the useEffect correctly handles product ID changes within
-    // the same component instance when a real variant change occurs.
-
     const inventoryId = 'inventory_m_store_store1'
     const storeId = 'store-123'
 
@@ -925,113 +920,127 @@ test('transfers pickup state when variant changes with store inventory, falls ba
         hasSelectedStore: true
     }))
 
-    // Create products that will be returned by our mock API
     const masterProductId = '25517823M'
     const variantWithInventoryId = '701642811398M'
     const variantWithoutInventoryId = '701642841227M'
 
-    const baseProduct = {
-        ...masterProduct,
-        currency: 'GBP',
-        price: 48.0
-    }
+    let currentProductData = null
 
-    const products = {
-        [masterProductId]: {
-            ...baseProduct,
-            id: masterProductId,
-            inventories: [
-                {
-                    id: inventoryId,
-                    orderable: true,
-                    ats: 10,
-                    stockLevel: 10
-                }
-            ]
-        },
-        [variantWithInventoryId]: {
-            ...baseProduct,
-            id: variantWithInventoryId,
-            inventories: [
-                {
-                    id: inventoryId,
-                    orderable: true,
-                    ats: 5,
-                    stockLevel: 5
-                }
-            ]
-        },
-        [variantWithoutInventoryId]: {
-            ...baseProduct,
-            id: variantWithoutInventoryId,
-            inventories: [
-                {
-                    id: inventoryId,
-                    orderable: false,
-                    ats: 0,
-                    stockLevel: 0
-                }
-            ]
-        }
-    }
-
-    // Mock API that returns different products based on the query parameter
+    // Mock API that returns different products based on the pid parameter
     global.server.use(
         rest.get('*/products/:productId', (req, res, ctx) => {
             const url = new URL(req.url)
             const pidParam = url.searchParams.get('pid')
             const requestedId = pidParam || req.params.productId
 
-            const productToReturn = products[requestedId] || products[masterProductId]
-            return res(ctx.json(productToReturn))
+            if (requestedId === variantWithInventoryId) {
+                currentProductData = {
+                    ...masterProduct,
+                    id: variantWithInventoryId,
+                    name: 'Long Sleeve Crew Neck - Fire Red',
+                    inventories: [
+                        {
+                            id: inventoryId,
+                            orderable: true,
+                            ats: 5,
+                            stockLevel: 5
+                        }
+                    ]
+                }
+            } else if (requestedId === variantWithoutInventoryId) {
+                currentProductData = {
+                    ...masterProduct,
+                    id: variantWithoutInventoryId,
+                    name: 'Long Sleeve Crew Neck - Out of Stock',
+                    inventories: [
+                        {
+                            id: inventoryId,
+                            orderable: false,
+                            ats: 0,
+                            stockLevel: 0
+                        }
+                    ]
+                }
+            } else {
+                currentProductData = {
+                    ...masterProduct,
+                    id: masterProductId,
+                    inventories: [
+                        {
+                            id: inventoryId,
+                            orderable: true,
+                            ats: 10,
+                            stockLevel: 10
+                        }
+                    ]
+                }
+            }
+
+            return res(ctx.json(currentProductData))
         }),
         rest.get('*/customers/:customerId/baskets', (req, res, ctx) => {
             return res(ctx.json(mockCustomerBaskets))
         })
     )
 
-    // Start with master product URL
+    // Start with master product
     window.history.pushState({}, 'ProductDetail', `/uk/en-GB/product/${masterProductId}`)
     renderWithProviders(<MockedComponent />)
 
-    // Wait for initial load and select pickup
+    // Wait for initial load
     expect(await screen.findByTestId('product-details-page')).toBeInTheDocument()
     await waitFor(() => {
         expect(screen.getByRole('link', {name: /mens/i})).toBeInTheDocument()
     })
 
+    // Select pickup
     const pickupLabel = await screen.findByLabelText(/Pick Up in Store/i)
     fireEvent.click(pickupLabel)
     expect(pickupLabel).toBeChecked()
 
-    // Simulate navigation to variant with inventory by changing URL
-    // This simulates what happens when a user clicks a variant option
-    act(() => {
+    // Navigate to variant with inventory (simulate variant selection)
+    await act(async () => {
         window.history.pushState(
             {},
             'ProductDetail',
             `/uk/en-GB/product/${masterProductId}?pid=${variantWithInventoryId}`
         )
-        // In a real app, this would trigger the router to update the location
-        // For our test, we simulate this by manually triggering a location change
-        Object.defineProperty(window, 'location', {
-            value: {...window.location, search: `?pid=${variantWithInventoryId}`},
-            writable: true
-        })
+        // Trigger location change event
+        window.dispatchEvent(new PopStateEvent('popstate'))
     })
 
-    // The real test of our implementation would be to trigger a re-render with
-    // the new product data. Since this is complex to simulate properly in our test
-    // environment, we'll verify the implementation works by checking that when
-    // the page renders again, the correct product data is used.
+    // Wait for the variant with inventory to load and verify pickup state is preserved
+    await waitFor(
+        () => {
+            // The pickup option should still be checked since this variant has inventory
+            const pickupStillSelected = screen.getByLabelText(/Pick Up in Store/i)
+            expect(pickupStillSelected).toBeChecked()
+            // And pickup should not be disabled
+            expect(pickupStillSelected).not.toBeDisabled()
+        },
+        {timeout: 3000}
+    )
 
-    // For now, let's test that the basic functionality works by ensuring
-    // pickup can be selected and persists within the same session
-    await waitFor(() => {
-        const pickupStillSelected = screen.getByLabelText(/Pick Up in Store/i)
-        // At minimum, pickup should remain selectable
-        expect(pickupStillSelected).toBeInTheDocument()
+    // Navigate to variant without inventory
+    await act(async () => {
+        window.history.pushState(
+            {},
+            'ProductDetail',
+            `/uk/en-GB/product/${masterProductId}?pid=${variantWithoutInventoryId}`
+        )
+        // Trigger location change event
+        window.dispatchEvent(new PopStateEvent('popstate'))
     })
+
+    // Wait for the variant without inventory to load and verify pickup state is cleared
+    await waitFor(
+        () => {
+            // The delivery option should now be selected since the variant has no store inventory
+            const shipToAddressLabel = screen.getByLabelText(/Ship to Address/i)
+            expect(shipToAddressLabel).toBeChecked()
+        },
+        {timeout: 3000}
+    )
 })
 
 describe('standard product', () => {

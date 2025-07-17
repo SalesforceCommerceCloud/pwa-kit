@@ -335,37 +335,34 @@ const ProductDetail = () => {
         }))
     }
 
-    // Transfer pickup state when variant changes
+    // Transfer pickup state when variant changes if inventory available, otherwise clear
     useEffect(() => {
-        if (!product?.id || !selectedInventoryId) return
+        if (!product?.id || !selectedInventoryId) {
+            return
+        }
 
         const currentProductId = product.id
         const prevProductId = prevProductIdRef.current
 
-        // Update ref for next time
         prevProductIdRef.current = currentProductId
 
-        // Check if product ID changed (variant selection)
         if (prevProductId && prevProductId !== currentProductId) {
-            // Use callback to get current pickup state
             setPickupInStoreMap((prev) => {
                 const prevHadPickup = prev[prevProductId]
 
                 if (prevHadPickup) {
-                    // Check if current variant has store inventory
                     const hasStoreInventory = product.inventories?.some(
                         (inv) => inv.id === selectedInventoryId && inv.orderable
                     )
 
-                    // Transfer pickup state if inventory available, otherwise clear
                     return {
                         ...prev,
-                        [prevProductId]: false, // Clear previous selection
-                        [currentProductId]: hasStoreInventory // Set new selection based on inventory
+                        [prevProductId]: false,
+                        [currentProductId]: hasStoreInventory
                     }
                 }
 
-                return prev // No changes needed
+                return prev
             })
         }
     }, [product?.id, selectedInventoryId])
