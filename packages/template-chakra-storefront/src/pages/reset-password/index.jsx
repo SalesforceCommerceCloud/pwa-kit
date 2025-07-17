@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, {useEffect} from 'react'
+import React from 'react'
 import {useIntl} from 'react-intl'
 import PropTypes from 'prop-types'
 import {Box, Container} from '@chakra-ui/react'
@@ -14,9 +14,7 @@ import Seo from '../../components/seo'
 import ResetPasswordForm from '../../components/reset-password'
 import ResetPasswordLanding from '../../pages/reset-password/reset-password-landing'
 import useNavigation from '../../hooks/use-navigation'
-import useEinstein from '../../hooks/use-einstein'
-import useDataCloud from '../../hooks/use-datacloud'
-import {useLocation, useRouteMatch} from 'react-router-dom'
+import {useRouteMatch} from 'react-router-dom'
 import {usePasswordReset} from '../../hooks/use-password-reset'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 
@@ -26,9 +24,6 @@ const ResetPassword = () => {
     const {formatMessage} = useIntl()
     const form = useForm()
     const navigate = useNavigation()
-    const einstein = useEinstein()
-    const dataCloud = useDataCloud()
-    const {pathname} = useLocation()
     const {path} = useRouteMatch()
     const {getPasswordResetToken} = usePasswordReset()
     const {login: loginConfig} = getConfig()
@@ -44,12 +39,6 @@ const ResetPassword = () => {
             form.setError('global', {type: 'manual', message})
         }
     }
-
-    /**************** Einstein ****************/
-    useEffect(() => {
-        einstein.sendViewPage(pathname)
-        dataCloud.sendViewPage(pathname)
-    }, [])
 
     return (
         <Box data-testid="reset-password-page" bg="gray.50" py={[8, 16]}>

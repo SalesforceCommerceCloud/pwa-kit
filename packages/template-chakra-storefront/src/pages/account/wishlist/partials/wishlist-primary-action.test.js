@@ -13,7 +13,7 @@ import {screen, waitFor, act} from '@testing-library/react'
 import PropTypes from 'prop-types'
 import {rest} from 'msw'
 import {basketWithProductSet} from '../../../product-detail/index.mock'
-import {mockProductBundle} from '../../../../mocks/product-bundle'
+import {mockProductBundle} from '../../../../../mocks/product-bundle'
 
 const MockedComponent = ({variant}) => {
     return (

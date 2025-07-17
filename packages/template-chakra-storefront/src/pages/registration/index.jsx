@@ -11,12 +11,9 @@ import {useIntl} from 'react-intl'
 import {Box, Container} from '@chakra-ui/react'
 import {AuthHelpers, useAuthHelper, useCustomerType} from '@salesforce/commerce-sdk-react'
 import {useForm} from 'react-hook-form'
-import {useLocation} from 'react-router-dom'
 import Seo from '../../components/seo'
 import RegisterForm from '../../components/register'
 import useNavigation from '../../hooks/use-navigation'
-import useEinstein from '../../hooks/use-einstein'
-import useDataCloud from '../../hooks/use-datacloud'
 import {API_ERROR_MESSAGE} from '../../../config/constants'
 
 const Registration = () => {
@@ -24,9 +21,6 @@ const Registration = () => {
     const navigate = useNavigation()
     const {isRegistered} = useCustomerType()
     const form = useForm()
-    const einstein = useEinstein()
-    const dataCloud = useDataCloud()
-    const {pathname} = useLocation()
     const register = useAuthHelper(AuthHelpers.Register)
 
     const submitForm = async (data) => {
@@ -52,12 +46,6 @@ const Registration = () => {
             navigate('/account')
         }
     }, [isRegistered])
-
-    /**************** Einstein ****************/
-    useEffect(() => {
-        einstein.sendViewPage(pathname)
-        dataCloud.sendViewPage(pathname)
-    }, [])
 
     return (
         <Box data-testid="registration-page" bg="gray.50" py={[8, 16]}>

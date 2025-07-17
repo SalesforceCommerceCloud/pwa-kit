@@ -14,8 +14,6 @@
 const {exec} = require('child_process')
 const fs = require('fs')
 const path = require('path')
-const packagePath = path.join(process.cwd(), 'package.json')
-const pkgJSON = JSON.parse(fs.readFileSync(packagePath))
 
 const getAllFilesByExtensions = (dirPath, arrayOfFiles = [], extensions = []) => {
     const files = fs.readdirSync(dirPath, {withFileTypes: true})
@@ -35,7 +33,7 @@ const getAllFilesByExtensions = (dirPath, arrayOfFiles = [], extensions = []) =>
 function extract(locale) {
     // `extends` is a reserved word (`class A extends B {}`)
     const command = [
-        'formatjs extract "app/**/*.{js,jsx,ts,tsx}"',
+        'formatjs extract "src/**/*.{js,jsx,ts,tsx}"',
         `--out-file translations/${locale}.json`,
         '--id-interpolation-pattern [sha512:contenthash:base64:6]'
     ].join(' ')

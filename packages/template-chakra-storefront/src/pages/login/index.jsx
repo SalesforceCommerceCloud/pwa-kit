@@ -23,8 +23,6 @@ import Seo from '../../components/seo'
 import {useForm} from 'react-hook-form'
 import {useRouteMatch} from 'react-router-dom'
 import {useLocation} from 'react-router-dom'
-import useEinstein from '../../hooks/use-einstein'
-import useDataCloud from '../../hooks/use-datacloud'
 import LoginForm from '../../components/login'
 import PasswordlessEmailConfirmation from '../../components/email-confirmation/index'
 import {
@@ -55,8 +53,6 @@ const Login = ({initialView = LOGIN_VIEW}) => {
     const location = useLocation()
     const queryParams = new URLSearchParams(location.search)
     const {path} = useRouteMatch()
-    const einstein = useEinstein()
-    const dataCloud = useDataCloud()
     const {login: loginConfig} = getConfig()
     const {isRegistered, customerType} = useCustomerType()
     const login = useAuthHelper(AuthHelpers.LoginRegisteredUserB2C)
@@ -186,12 +182,6 @@ const Login = ({initialView = LOGIN_VIEW}) => {
             navigate(redirectTo)
         }
     }, [isRegistered, redirectPath])
-
-    /**************** Einstein ****************/
-    useEffect(() => {
-        einstein.sendViewPage(location.pathname)
-        dataCloud.sendViewPage(location.pathname)
-    }, [])
 
     return (
         <Box data-testid="login-page" bg="gray.50" py={[8, 16]}>

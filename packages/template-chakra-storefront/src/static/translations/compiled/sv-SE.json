@@ -1,0 +1,4150 @@
+{
+  "account.accordion.button.my_account": [
+    {
+      "type": 0,
+      "value": "Mitt konto"
+    }
+  ],
+  "account.heading.my_account": [
+    {
+      "type": 0,
+      "value": "Mitt konto"
+    }
+  ],
+  "account.logout_button.button.log_out": [
+    {
+      "type": 0,
+      "value": "Logga ut"
+    }
+  ],
+  "account_addresses.badge.default": [
+    {
+      "type": 0,
+      "value": "Standard"
+    }
+  ],
+  "account_addresses.button.add_address": [
+    {
+      "type": 0,
+      "value": "Lägg till adress"
+    }
+  ],
+  "account_addresses.info.address_removed": [
+    {
+      "type": 0,
+      "value": "Adressen har tagits bort"
+    }
+  ],
+  "account_addresses.info.address_updated": [
+    {
+      "type": 0,
+      "value": "Adressen har uppdaterats"
+    }
+  ],
+  "account_addresses.info.new_address_saved": [
+    {
+      "type": 0,
+      "value": "En ny adress har sparats"
+    }
+  ],
+  "account_addresses.page_action_placeholder.button.add_address": [
+    {
+      "type": 0,
+      "value": "Lägg till adress"
+    }
+  ],
+  "account_addresses.page_action_placeholder.heading.no_saved_addresses": [
+    {
+      "type": 0,
+      "value": "Inga sparade adresser"
+    }
+  ],
+  "account_addresses.page_action_placeholder.message.add_new_address": [
+    {
+      "type": 0,
+      "value": "Lägg till en ny adressmetod för snabbare betalning."
+    }
+  ],
+  "account_addresses.title.addresses": [
+    {
+      "type": 0,
+      "value": "Adresser"
+    }
+  ],
+  "account_detail.title.account_details": [
+    {
+      "type": 0,
+      "value": "Kontouppgifter"
+    }
+  ],
+  "account_order_detail.heading.billing_address": [
+    {
+      "type": 0,
+      "value": "Faktureringsadress"
+    }
+  ],
+  "account_order_detail.heading.num_of_items": [
+    {
+      "type": 1,
+      "value": "count"
+    },
+    {
+      "type": 0,
+      "value": " artiklar"
+    }
+  ],
+  "account_order_detail.heading.payment_method": [
+    {
+      "type": 0,
+      "value": "Betalningsmetod"
+    }
+  ],
+  "account_order_detail.heading.shipping_address": [
+    {
+      "type": 0,
+      "value": "Fraktadress"
+    }
+  ],
+  "account_order_detail.heading.shipping_method": [
+    {
+      "type": 0,
+      "value": "Fraktmetod"
+    }
+  ],
+  "account_order_detail.label.order_number": [
+    {
+      "type": 0,
+      "value": "Beställningsnummer: "
+    },
+    {
+      "type": 1,
+      "value": "orderNumber"
+    }
+  ],
+  "account_order_detail.label.ordered_date": [
+    {
+      "type": 0,
+      "value": "Beställdes: "
+    },
+    {
+      "type": 1,
+      "value": "date"
+    }
+  ],
+  "account_order_detail.label.pending_tracking_number": [
+    {
+      "type": 0,
+      "value": "Väntande"
+    }
+  ],
+  "account_order_detail.label.tracking_number": [
+    {
+      "type": 0,
+      "value": "Spårningsnummer"
+    }
+  ],
+  "account_order_detail.link.back_to_history": [
+    {
+      "type": 0,
+      "value": "Tillbaka till beställningshistorik"
+    }
+  ],
+  "account_order_detail.shipping_status.not_shipped": [
+    {
+      "type": 0,
+      "value": "Har inte skickats"
+    }
+  ],
+  "account_order_detail.shipping_status.part_shipped": [
+    {
+      "type": 0,
+      "value": "Har delvis skickats"
+    }
+  ],
+  "account_order_detail.shipping_status.shipped": [
+    {
+      "type": 0,
+      "value": "Har skickats"
+    }
+  ],
+  "account_order_detail.title.order_details": [
+    {
+      "type": 0,
+      "value": "Beställningsinformation"
+    }
+  ],
+  "account_order_history.button.continue_shopping": [
+    {
+      "type": 0,
+      "value": "Fortsätt handla"
+    }
+  ],
+  "account_order_history.description.once_you_place_order": [
+    {
+      "type": 0,
+      "value": "När du har gjort en beställning kommer informationen att visas här."
+    }
+  ],
+  "account_order_history.heading.no_order_yet": [
+    {
+      "type": 0,
+      "value": "Du har gjort någon beställning ännu."
+    }
+  ],
+  "account_order_history.label.num_of_items": [
+    {
+      "type": 1,
+      "value": "count"
+    },
+    {
+      "type": 0,
+      "value": " artiklar"
+    }
+  ],
+  "account_order_history.label.order_number": [
+    {
+      "type": 0,
+      "value": "Beställningsnummer: "
+    },
+    {
+      "type": 1,
+      "value": "orderNumber"
+    }
+  ],
+  "account_order_history.label.ordered_date": [
+    {
+      "type": 0,
+      "value": "Beställdes: "
+    },
+    {
+      "type": 1,
+      "value": "date"
+    }
+  ],
+  "account_order_history.label.shipped_to": [
+    {
+      "type": 0,
+      "value": "Skickas till: "
+    },
+    {
+      "type": 1,
+      "value": "name"
+    }
+  ],
+  "account_order_history.link.view_details": [
+    {
+      "type": 0,
+      "value": "Visa detaljerad information"
+    }
+  ],
+  "account_order_history.title.order_history": [
+    {
+      "type": 0,
+      "value": "Beställningshistorik"
+    }
+  ],
+  "account_wishlist.button.continue_shopping": [
+    {
+      "type": 0,
+      "value": "Fortsätt handla"
+    }
+  ],
+  "account_wishlist.description.continue_shopping": [
+    {
+      "type": 0,
+      "value": "Fortsätt handla och lägg till produkter i din önskelista."
+    }
+  ],
+  "account_wishlist.heading.no_wishlist": [
+    {
+      "type": 0,
+      "value": "Inga produkter i önskelistan"
+    }
+  ],
+  "account_wishlist.title.wishlist": [
+    {
+      "type": 0,
+      "value": "Önskelista"
+    }
+  ],
+  "action_card.action.edit": [
+    {
+      "type": 0,
+      "value": "Redigera"
+    }
+  ],
+  "action_card.action.remove": [
+    {
+      "type": 0,
+      "value": "Ta bort"
+    }
+  ],
+  "add_to_cart_modal.info.added_to_cart": [
+    {
+      "type": 1,
+      "value": "quantity"
+    },
+    {
+      "type": 0,
+      "value": " "
+    },
+    {
+      "offset": 0,
+      "options": {
+        "one": {
+          "value": [
+            {
+              "type": 0,
+              "value": "artikel"
+            }
+          ]
+        },
+        "other": {
+          "value": [
+            {
+              "type": 0,
+              "value": "artiklar"
+            }
+          ]
+        }
+      },
+      "pluralType": "cardinal",
+      "type": 6,
+      "value": "quantity"
+    },
+    {
+      "type": 0,
+      "value": " har lagts till i kundvagnen"
+    }
+  ],
+  "add_to_cart_modal.label.cart_subtotal": [
+    {
+      "type": 0,
+      "value": "Delsumma för kundvagnen ("
+    },
+    {
+      "type": 1,
+      "value": "itemAccumulatedCount"
+    },
+    {
+      "type": 0,
+      "value": " artikel)"
+    }
+  ],
+  "add_to_cart_modal.label.quantity": [
+    {
+      "type": 0,
+      "value": "Antal"
+    }
+  ],
+  "add_to_cart_modal.link.checkout": [
+    {
+      "type": 0,
+      "value": "Fortsätt till kassan"
+    }
+  ],
+  "add_to_cart_modal.link.view_cart": [
+    {
+      "type": 0,
+      "value": "Visa kundvagn"
+    }
+  ],
+  "add_to_cart_modal.recommended_products.title.might_also_like": [
+    {
+      "type": 0,
+      "value": "Du kanske också skulle gilla"
+    }
+  ],
+  "auth_modal.button.close.assistive_msg": [
+    {
+      "type": 0,
+      "value": "Stäng inloggningsformulär"
+    }
+  ],
+  "auth_modal.check_email.button.resend_link": [
+    {
+      "type": 0,
+      "value": "Skicka länk på nytt"
+    }
+  ],
+  "auth_modal.check_email.description.check_spam_folder": [
+    {
+      "type": 0,
+      "value": "Det kan ta några minuter innan länken kommer fram. Kontrollera din skräppostmapp om du har problem att hitta den."
+    }
+  ],
+  "auth_modal.check_email.description.just_sent": [
+    {
+      "type": 0,
+      "value": "Vi har skickat en inloggningslänk till "
+    },
+    {
+      "children": [
+        {
+          "type": 1,
+          "value": "email"
+        }
+      ],
+      "type": 8,
+      "value": "b"
+    }
+  ],
+  "auth_modal.check_email.title.check_your_email": [
+    {
+      "type": 0,
+      "value": "Kontrollera din e-post"
+    }
+  ],
+  "auth_modal.description.now_signed_in": [
+    {
+      "type": 0,
+      "value": "Du är nu inloggad."
+    }
+  ],
+  "auth_modal.error.incorrect_email_or_password": [
+    {
+      "type": 0,
+      "value": "Det är något som inte stämmer med din e-postadress eller ditt lösenord. Försök igen."
+    }
+  ],
+  "auth_modal.info.welcome_user": [
+    {
+      "type": 0,
+      "value": "Välkommen "
+    },
+    {
+      "type": 1,
+      "value": "name"
+    },
+    {
+      "type": 0,
+      "value": "!"
+    }
+  ],
+  "auth_modal.password_reset_success.button.back_to_sign_in": [
+    {
+      "type": 0,
+      "value": "Tillbaka till inloggning"
+    }
+  ],
+  "auth_modal.password_reset_success.info.will_email_shortly": [
+    {
+      "type": 0,
+      "value": "Inom kort får du ett e-postmeddelande på adressen "
+    },
+    {
+      "children": [
+        {
+          "type": 1,
+          "value": "email"
+        }
+      ],
+      "type": 8,
+      "value": "b"
+    },
+    {
+      "type": 0,
+      "value": " med en länk för att återställa ditt lösenord."
+    }
+  ],
+  "auth_modal.password_reset_success.title.password_reset": [
+    {
+      "type": 0,
+      "value": "Återställning av lösenord"
+    }
+  ],
+  "carousel.button.scroll_left.assistive_msg": [
+    {
+      "type": 0,
+      "value": "Bläddra till vänster i karusellen"
+    }
+  ],
+  "carousel.button.scroll_right.assistive_msg": [
+    {
+      "type": 0,
+      "value": "Bläddra till höger i karusellen"
+    }
+  ],
+  "cart.info.removed_from_cart": [
+    {
+      "type": 0,
+      "value": "Artikeln har tagits bort från kundvagnen"
+    }
+  ],
+  "cart.product_edit_modal.modal_label": [
+    {
+      "type": 0,
+      "value": "Redigera modal för "
+    },
+    {
+      "type": 1,
+      "value": "productName"
+    }
+  ],
+  "cart.recommended_products.title.may_also_like": [
+    {
+      "type": 0,
+      "value": "Du kanske också skulle gilla"
+    }
+  ],
+  "cart.recommended_products.title.recently_viewed": [
+    {
+      "type": 0,
+      "value": "Senast visade"
+    }
+  ],
+  "cart_cta.link.checkout": [
+    {
+      "type": 0,
+      "value": "Fortsätt till kassan"
+    }
+  ],
+  "cart_secondary_button_group.action.added_to_wishlist": [
+    {
+      "type": 0,
+      "value": "Lägg till i önskelistan"
+    }
+  ],
+  "cart_secondary_button_group.action.edit": [
+    {
+      "type": 0,
+      "value": "Redigera"
+    }
+  ],
+  "cart_secondary_button_group.action.remove": [
+    {
+      "type": 0,
+      "value": "Ta bort"
+    }
+  ],
+  "cart_secondary_button_group.label.this_is_gift": [
+    {
+      "type": 0,
+      "value": "Det här är en present."
+    }
+  ],
+  "cart_skeleton.heading.order_summary": [
+    {
+      "type": 0,
+      "value": "Beställningssammanfattning"
+    }
+  ],
+  "cart_skeleton.title.cart": [
+    {
+      "type": 0,
+      "value": "Kundvagn"
+    }
+  ],
+  "cart_title.title.cart_num_of_items": [
+    {
+      "type": 0,
+      "value": "Kundvagn ("
+    },
+    {
+      "offset": 0,
+      "options": {
+        "=0": {
+          "value": [
+            {
+              "type": 0,
+              "value": "0 artiklar"
+            }
+          ]
+        },
+        "one": {
+          "value": [
+            {
+              "type": 7
+            },
+            {
+              "type": 0,
+              "value": " artikel"
+            }
+          ]
+        },
+        "other": {
+          "value": [
+            {
+              "type": 7
+            },
+            {
+              "type": 0,
+              "value": " artiklar"
+            }
+          ]
+        }
+      },
+      "pluralType": "cardinal",
+      "type": 6,
+      "value": "itemCount"
+    },
+    {
+      "type": 0,
+      "value": ")"
+    }
+  ],
+  "category_links.button_text": [
+    {
+      "type": 0,
+      "value": "Kategorier"
+    }
+  ],
+  "cc_radio_group.action.remove": [
+    {
+      "type": 0,
+      "value": "Ta bort"
+    }
+  ],
+  "cc_radio_group.button.add_new_card": [
+    {
+      "type": 0,
+      "value": "Lägg till nytt kort"
+    }
+  ],
+  "checkout.button.place_order": [
+    {
+      "type": 0,
+      "value": "Slutför beställning"
+    }
+  ],
+  "checkout.message.generic_error": [
+    {
+      "type": 0,
+      "value": "Ett oväntat fel inträffade vid betalning."
+    }
+  ],
+  "checkout_confirmation.button.create_account": [
+    {
+      "type": 0,
+      "value": "Skapa konto"
+    }
+  ],
+  "checkout_confirmation.heading.billing_address": [
+    {
+      "type": 0,
+      "value": "Faktureringsadress"
+    }
+  ],
+  "checkout_confirmation.heading.create_account": [
+    {
+      "type": 0,
+      "value": "Skapa ett konto för snabbare betalning"
+    }
+  ],
+  "checkout_confirmation.heading.credit_card": [
+    {
+      "type": 0,
+      "value": "Kreditkort"
+    }
+  ],
+  "checkout_confirmation.heading.delivery_details": [
+    {
+      "type": 0,
+      "value": "Leveransinformation"
+    }
+  ],
+  "checkout_confirmation.heading.order_summary": [
+    {
+      "type": 0,
+      "value": "Beställningssammanfattning"
+    }
+  ],
+  "checkout_confirmation.heading.payment_details": [
+    {
+      "type": 0,
+      "value": "Betalningsinformation"
+    }
+  ],
+  "checkout_confirmation.heading.shipping_address": [
+    {
+      "type": 0,
+      "value": "Fraktadress"
+    }
+  ],
+  "checkout_confirmation.heading.shipping_method": [
+    {
+      "type": 0,
+      "value": "Fraktmetod"
+    }
+  ],
+  "checkout_confirmation.heading.thank_you_for_order": [
+    {
+      "type": 0,
+      "value": "Tack för din beställning!"
+    }
+  ],
+  "checkout_confirmation.label.free": [
+    {
+      "type": 0,
+      "value": "Gratis"
+    }
+  ],
+  "checkout_confirmation.label.order_number": [
+    {
+      "type": 0,
+      "value": "Beställningsnummer"
+    }
+  ],
+  "checkout_confirmation.label.order_total": [
+    {
+      "type": 0,
+      "value": "Beställning totalt"
+    }
+  ],
+  "checkout_confirmation.label.promo_applied": [
+    {
+      "type": 0,
+      "value": "kampanjerbjudande tillämpat"
+    }
+  ],
+  "checkout_confirmation.label.shipping": [
+    {
+      "type": 0,
+      "value": "Frakt"
+    }
+  ],
+  "checkout_confirmation.label.shipping.strikethrough.price": [
+    {
+      "type": 0,
+      "value": "Ursprungligt pris "
+    },
+    {
+      "type": 1,
+      "value": "originalPrice"
+    },
+    {
+      "type": 0,
+      "value": ", nu "
+    },
+    {
+      "type": 1,
+      "value": "newPrice"
+    }
+  ],
+  "checkout_confirmation.label.subtotal": [
+    {
+      "type": 0,
+      "value": "Delsumma"
+    }
+  ],
+  "checkout_confirmation.label.tax": [
+    {
+      "type": 0,
+      "value": "Skatt"
+    }
+  ],
+  "checkout_confirmation.link.continue_shopping": [
+    {
+      "type": 0,
+      "value": "Fortsätt handla"
+    }
+  ],
+  "checkout_confirmation.link.login": [
+    {
+      "type": 0,
+      "value": "Logga in här"
+    }
+  ],
+  "checkout_confirmation.message.already_has_account": [
+    {
+      "type": 0,
+      "value": "Det finns redan ett konto med den här e-postadressen."
+    }
+  ],
+  "checkout_confirmation.message.num_of_items_in_order": [
+    {
+      "offset": 0,
+      "options": {
+        "=0": {
+          "value": [
+            {
+              "type": 0,
+              "value": "0 artiklar"
+            }
+          ]
+        },
+        "one": {
+          "value": [
+            {
+              "type": 7
+            },
+            {
+              "type": 0,
+              "value": " artikel"
+            }
+          ]
+        },
+        "other": {
+          "value": [
+            {
+              "type": 7
+            },
+            {
+              "type": 0,
+              "value": " artiklar"
+            }
+          ]
+        }
+      },
+      "pluralType": "cardinal",
+      "type": 6,
+      "value": "itemCount"
+    }
+  ],
+  "checkout_confirmation.message.will_email_shortly": [
+    {
+      "type": 0,
+      "value": "Vi kommer inom kort att skicka ett e-postmeddelande till "
+    },
+    {
+      "children": [
+        {
+          "type": 1,
+          "value": "email"
+        }
+      ],
+      "type": 8,
+      "value": "b"
+    },
+    {
+      "type": 0,
+      "value": " med ditt bekräftelsenummer och kvitto."
+    }
+  ],
+  "checkout_footer.link.privacy_policy": [
+    {
+      "type": 0,
+      "value": "Sekretesspolicy"
+    }
+  ],
+  "checkout_footer.link.returns_exchanges": [
+    {
+      "type": 0,
+      "value": "Returer och byten"
+    }
+  ],
+  "checkout_footer.link.shipping": [
+    {
+      "type": 0,
+      "value": "Frakt"
+    }
+  ],
+  "checkout_footer.link.site_map": [
+    {
+      "type": 0,
+      "value": "Webbplatskarta"
+    }
+  ],
+  "checkout_footer.link.terms_conditions": [
+    {
+      "type": 0,
+      "value": "Villkor"
+    }
+  ],
+  "checkout_footer.message.copyright": [
+    {
+      "type": 0,
+      "value": "Salesforce eller dess närstående bolag. Alla rättigheter förbehållna. Detta är endast en demobutik. Gjorda beställningar kommer INTE att behandlas."
+    }
+  ],
+  "checkout_header.link.assistive_msg.cart": [
+    {
+      "type": 0,
+      "value": "Tillbaka till kundvagnen, antal artiklar: "
+    },
+    {
+      "type": 1,
+      "value": "numItems"
+    }
+  ],
+  "checkout_header.link.cart": [
+    {
+      "type": 0,
+      "value": "Tillbaka till kundvagnen"
+    }
+  ],
+  "checkout_payment.action.remove": [
+    {
+      "type": 0,
+      "value": "Ta bort"
+    }
+  ],
+  "checkout_payment.button.review_order": [
+    {
+      "type": 0,
+      "value": "Granska beställning"
+    }
+  ],
+  "checkout_payment.heading.billing_address": [
+    {
+      "type": 0,
+      "value": "Faktureringsadress"
+    }
+  ],
+  "checkout_payment.heading.credit_card": [
+    {
+      "type": 0,
+      "value": "Kreditkort"
+    }
+  ],
+  "checkout_payment.label.billing_address_form": [
+    {
+      "type": 0,
+      "value": "Formulär för faktureringsadress"
+    }
+  ],
+  "checkout_payment.label.same_as_shipping": [
+    {
+      "type": 0,
+      "value": "Samma som fraktadress"
+    }
+  ],
+  "checkout_payment.title.payment": [
+    {
+      "type": 0,
+      "value": "Betalning"
+    }
+  ],
+  "colorRefinements.label.hitCount": [
+    {
+      "type": 1,
+      "value": "colorLabel"
+    },
+    {
+      "type": 0,
+      "value": " ("
+    },
+    {
+      "type": 1,
+      "value": "colorHitCount"
+    },
+    {
+      "type": 0,
+      "value": ")"
+    }
+  ],
+  "confirmation_modal.default.action.no": [
+    {
+      "type": 0,
+      "value": "Nej"
+    }
+  ],
+  "confirmation_modal.default.action.yes": [
+    {
+      "type": 0,
+      "value": "Ja"
+    }
+  ],
+  "confirmation_modal.default.assistive_msg.no": [
+    {
+      "type": 0,
+      "value": "Nej, avbryt åtgärden"
+    }
+  ],
+  "confirmation_modal.default.assistive_msg.yes": [
+    {
+      "type": 0,
+      "value": "Ja, bekräfta åtgärden"
+    }
+  ],
+  "confirmation_modal.default.message.you_want_to_continue": [
+    {
+      "type": 0,
+      "value": "Är du säker på att du vill fortsätta?"
+    }
+  ],
+  "confirmation_modal.default.title.confirm_action": [
+    {
+      "type": 0,
+      "value": "Bekräfta åtgärden"
+    }
+  ],
+  "confirmation_modal.remove_cart_item.action.no": [
+    {
+      "type": 0,
+      "value": "Nej, behåll artikeln"
+    }
+  ],
+  "confirmation_modal.remove_cart_item.action.remove": [
+    {
+      "type": 0,
+      "value": "Ta bort"
+    }
+  ],
+  "confirmation_modal.remove_cart_item.action.yes": [
+    {
+      "type": 0,
+      "value": "Ja, ta bort artikeln"
+    }
+  ],
+  "confirmation_modal.remove_cart_item.assistive_msg.no": [
+    {
+      "type": 0,
+      "value": "Nej, behåll artikeln"
+    }
+  ],
+  "confirmation_modal.remove_cart_item.assistive_msg.remove": [
+    {
+      "type": 0,
+      "value": "Ta bort otillgängliga produkter"
+    }
+  ],
+  "confirmation_modal.remove_cart_item.assistive_msg.yes": [
+    {
+      "type": 0,
+      "value": "Ja, ta bort artikeln"
+    }
+  ],
+  "confirmation_modal.remove_cart_item.message.need_to_remove_due_to_unavailability": [
+    {
+      "type": 0,
+      "value": "Vissa artiklar är inte längre tillgängliga online och kommer att tas bort från din kundvagn."
+    }
+  ],
+  "confirmation_modal.remove_cart_item.message.sure_to_remove": [
+    {
+      "type": 0,
+      "value": "Är du säker på att du vill ta bort den här artikeln från din kundvagn?"
+    }
+  ],
+  "confirmation_modal.remove_cart_item.title.confirm_remove": [
+    {
+      "type": 0,
+      "value": "Bekräfta att du vill ta bort artikeln"
+    }
+  ],
+  "confirmation_modal.remove_cart_item.title.items_unavailable": [
+    {
+      "type": 0,
+      "value": "Otillgängliga artiklar"
+    }
+  ],
+  "confirmation_modal.remove_wishlist_item.action.no": [
+    {
+      "type": 0,
+      "value": "Nej, behåll artikeln"
+    }
+  ],
+  "confirmation_modal.remove_wishlist_item.action.yes": [
+    {
+      "type": 0,
+      "value": "Ja, ta bort artikeln"
+    }
+  ],
+  "confirmation_modal.remove_wishlist_item.message.sure_to_remove": [
+    {
+      "type": 0,
+      "value": "Är du säker på att du vill ta bort den här artikeln från din önskelista?"
+    }
+  ],
+  "confirmation_modal.remove_wishlist_item.title.confirm_remove": [
+    {
+      "type": 0,
+      "value": "Bekräfta att du vill ta bort artikeln"
+    }
+  ],
+  "contact_info.action.sign_out": [
+    {
+      "type": 0,
+      "value": "Logga ut"
+    }
+  ],
+  "contact_info.button.already_have_account": [
+    {
+      "type": 0,
+      "value": "Har du redan ett konto? Logga in"
+    }
+  ],
+  "contact_info.button.back_to_sign_in_options": [
+    {
+      "type": 0,
+      "value": "Tillbaka till inloggningsalternativ"
+    }
+  ],
+  "contact_info.button.checkout_as_guest": [
+    {
+      "type": 0,
+      "value": "Betala som gäst"
+    }
+  ],
+  "contact_info.button.login": [
+    {
+      "type": 0,
+      "value": "Logga in"
+    }
+  ],
+  "contact_info.button.password": [
+    {
+      "type": 0,
+      "value": "Lösenord"
+    }
+  ],
+  "contact_info.button.secure_link": [
+    {
+      "type": 0,
+      "value": "Säker länk"
+    }
+  ],
+  "contact_info.error.incorrect_username_or_password": [
+    {
+      "type": 0,
+      "value": "Felaktigt användarnamn eller lösenord, försök igen."
+    }
+  ],
+  "contact_info.link.forgot_password": [
+    {
+      "type": 0,
+      "value": "Har du glömt lösenordet?"
+    }
+  ],
+  "contact_info.message.or_login_with": [
+    {
+      "type": 0,
+      "value": "Eller logga in med"
+    }
+  ],
+  "contact_info.title.contact_info": [
+    {
+      "type": 0,
+      "value": "Kontaktuppgifter"
+    }
+  ],
+  "credit_card_fields.tool_tip.security_code": [
+    {
+      "type": 0,
+      "value": "Denna tresiffriga kod finns på baksidan av ditt kort."
+    }
+  ],
+  "credit_card_fields.tool_tip.security_code.american_express": [
+    {
+      "type": 0,
+      "value": "Denna fyrsiffriga kod finns på framsidan av ditt kort."
+    }
+  ],
+  "credit_card_fields.tool_tip.security_code_aria_label": [
+    {
+      "type": 0,
+      "value": "Information om säkerhetskod"
+    }
+  ],
+  "display_price.assistive_msg.current_price": [
+    {
+      "type": 0,
+      "value": "aktuellt pris "
+    },
+    {
+      "type": 1,
+      "value": "currentPrice"
+    }
+  ],
+  "display_price.assistive_msg.current_price_with_range": [
+    {
+      "type": 0,
+      "value": "Från aktuellt pris "
+    },
+    {
+      "type": 1,
+      "value": "currentPrice"
+    }
+  ],
+  "display_price.assistive_msg.strikethrough_price": [
+    {
+      "type": 0,
+      "value": "ursprungligt pris "
+    },
+    {
+      "type": 1,
+      "value": "listPrice"
+    }
+  ],
+  "display_price.assistive_msg.strikethrough_price_with_range": [
+    {
+      "type": 0,
+      "value": "Från ursprungligt pris "
+    },
+    {
+      "type": 1,
+      "value": "listPrice"
+    }
+  ],
+  "display_price.label.current_price_with_range": [
+    {
+      "type": 0,
+      "value": "Från "
+    },
+    {
+      "type": 1,
+      "value": "currentPrice"
+    }
+  ],
+  "dnt_notification.button.accept": [
+    {
+      "type": 0,
+      "value": "Acceptera"
+    }
+  ],
+  "dnt_notification.button.assistive_msg.accept": [
+    {
+      "type": 0,
+      "value": "Acceptera spårning"
+    }
+  ],
+  "dnt_notification.button.assistive_msg.close": [
+    {
+      "type": 0,
+      "value": "Stäng samtyckesformulär för spårning"
+    }
+  ],
+  "dnt_notification.button.assistive_msg.decline": [
+    {
+      "type": 0,
+      "value": "Neka spårning"
+    }
+  ],
+  "dnt_notification.button.decline": [
+    {
+      "type": 0,
+      "value": "Neka"
+    }
+  ],
+  "dnt_notification.description": [
+    {
+      "type": 0,
+      "value": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur."
+    }
+  ],
+  "dnt_notification.title": [
+    {
+      "type": 0,
+      "value": "Samtycke till spårning"
+    }
+  ],
+  "drawer_menu.button.account_details": [
+    {
+      "type": 0,
+      "value": "Kontouppgifter"
+    }
+  ],
+  "drawer_menu.button.addresses": [
+    {
+      "type": 0,
+      "value": "Adresser"
+    }
+  ],
+  "drawer_menu.button.log_out": [
+    {
+      "type": 0,
+      "value": "Logga ut"
+    }
+  ],
+  "drawer_menu.button.my_account": [
+    {
+      "type": 0,
+      "value": "Mitt konto"
+    }
+  ],
+  "drawer_menu.button.order_history": [
+    {
+      "type": 0,
+      "value": "Beställningshistorik"
+    }
+  ],
+  "drawer_menu.header.assistive_msg.title": [
+    {
+      "type": 0,
+      "value": "Menyfönster"
+    }
+  ],
+  "drawer_menu.link.about_us": [
+    {
+      "type": 0,
+      "value": "Om oss"
+    }
+  ],
+  "drawer_menu.link.customer_support": [
+    {
+      "type": 0,
+      "value": "Kundsupport"
+    }
+  ],
+  "drawer_menu.link.customer_support.contact_us": [
+    {
+      "type": 0,
+      "value": "Kontakta oss"
+    }
+  ],
+  "drawer_menu.link.customer_support.shipping_and_returns": [
+    {
+      "type": 0,
+      "value": "Frakt och returer"
+    }
+  ],
+  "drawer_menu.link.our_company": [
+    {
+      "type": 0,
+      "value": "Vårt företag"
+    }
+  ],
+  "drawer_menu.link.privacy_and_security": [
+    {
+      "type": 0,
+      "value": "Sekretess och säkerhet"
+    }
+  ],
+  "drawer_menu.link.privacy_policy": [
+    {
+      "type": 0,
+      "value": "Sekretesspolicy"
+    }
+  ],
+  "drawer_menu.link.shop_all": [
+    {
+      "type": 0,
+      "value": "Handla allt"
+    }
+  ],
+  "drawer_menu.link.sign_in": [
+    {
+      "type": 0,
+      "value": "Logga in"
+    }
+  ],
+  "drawer_menu.link.site_map": [
+    {
+      "type": 0,
+      "value": "Webbplatskarta"
+    }
+  ],
+  "drawer_menu.link.store_locator": [
+    {
+      "type": 0,
+      "value": "Butikslokaliserare"
+    }
+  ],
+  "drawer_menu.link.terms_and_conditions": [
+    {
+      "type": 0,
+      "value": "Villkor"
+    }
+  ],
+  "empty_cart.description.empty_cart": [
+    {
+      "type": 0,
+      "value": "Din kundvagn är tom."
+    }
+  ],
+  "empty_cart.link.continue_shopping": [
+    {
+      "type": 0,
+      "value": "Fortsätt handla"
+    }
+  ],
+  "empty_cart.link.sign_in": [
+    {
+      "type": 0,
+      "value": "Logga in"
+    }
+  ],
+  "empty_cart.message.continue_shopping": [
+    {
+      "type": 0,
+      "value": "Fortsätt handla för att lägga till artiklar i din kundvagn."
+    }
+  ],
+  "empty_cart.message.sign_in_or_continue_shopping": [
+    {
+      "type": 0,
+      "value": "Logga in för att hämta dina sparade artiklar eller fortsätt handla."
+    }
+  ],
+  "empty_search_results.info.cant_find_anything_for_category": [
+    {
+      "type": 0,
+      "value": "Vi kunde inte hitta något för "
+    },
+    {
+      "type": 1,
+      "value": "category"
+    },
+    {
+      "type": 0,
+      "value": ". Försök att söka efter en produkt eller "
+    },
+    {
+      "type": 1,
+      "value": "link"
+    },
+    {
+      "type": 0,
+      "value": "."
+    }
+  ],
+  "empty_search_results.info.cant_find_anything_for_query": [
+    {
+      "type": 0,
+      "value": "Vi kunde inte hitta något för ”"
+    },
+    {
+      "type": 1,
+      "value": "searchQuery"
+    },
+    {
+      "type": 0,
+      "value": "”."
+    }
+  ],
+  "empty_search_results.info.double_check_spelling": [
+    {
+      "type": 0,
+      "value": "Dubbelkolla stavningen och försök igen eller "
+    },
+    {
+      "type": 1,
+      "value": "link"
+    },
+    {
+      "type": 0,
+      "value": "."
+    }
+  ],
+  "empty_search_results.link.contact_us": [
+    {
+      "type": 0,
+      "value": "Kontakta oss"
+    }
+  ],
+  "empty_search_results.recommended_products.title.most_viewed": [
+    {
+      "type": 0,
+      "value": "Mest visade"
+    }
+  ],
+  "empty_search_results.recommended_products.title.top_sellers": [
+    {
+      "type": 0,
+      "value": "Toppsäljare"
+    }
+  ],
+  "field.password.assistive_msg.hide_password": [
+    {
+      "type": 0,
+      "value": "Dölj lösenord"
+    }
+  ],
+  "field.password.assistive_msg.show_password": [
+    {
+      "type": 0,
+      "value": "Visa lösenord"
+    }
+  ],
+  "footer.column.account": [
+    {
+      "type": 0,
+      "value": "Konto"
+    }
+  ],
+  "footer.column.customer_support": [
+    {
+      "type": 0,
+      "value": "Kundsupport"
+    }
+  ],
+  "footer.column.our_company": [
+    {
+      "type": 0,
+      "value": "Vårt företag"
+    }
+  ],
+  "footer.link.about_us": [
+    {
+      "type": 0,
+      "value": "Om oss"
+    }
+  ],
+  "footer.link.contact_us": [
+    {
+      "type": 0,
+      "value": "Kontakta oss"
+    }
+  ],
+  "footer.link.order_status": [
+    {
+      "type": 0,
+      "value": "Beställningsstatus"
+    }
+  ],
+  "footer.link.privacy_policy": [
+    {
+      "type": 0,
+      "value": "Sekretesspolicy"
+    }
+  ],
+  "footer.link.shipping": [
+    {
+      "type": 0,
+      "value": "Frakt"
+    }
+  ],
+  "footer.link.signin_create_account": [
+    {
+      "type": 0,
+      "value": "Logga in eller skapa konto"
+    }
+  ],
+  "footer.link.site_map": [
+    {
+      "type": 0,
+      "value": "Webbplatskarta"
+    }
+  ],
+  "footer.link.store_locator": [
+    {
+      "type": 0,
+      "value": "Butikslokaliserare"
+    }
+  ],
+  "footer.link.terms_conditions": [
+    {
+      "type": 0,
+      "value": "Villkor"
+    }
+  ],
+  "footer.locale_selector.assistive_msg": [
+    {
+      "type": 0,
+      "value": "Välj språk"
+    }
+  ],
+  "footer.message.copyright": [
+    {
+      "type": 0,
+      "value": "Salesforce eller dess närstående bolag. Alla rättigheter förbehållna. Detta är endast en demobutik. Gjorda beställningar kommer INTE att behandlas."
+    }
+  ],
+  "footer.subscribe.button.sign_up": [
+    {
+      "type": 0,
+      "value": "Registrera dig"
+    }
+  ],
+  "footer.subscribe.description.sign_up": [
+    {
+      "type": 0,
+      "value": "Registrera dig för att hålla koll på de hetaste erbjudandena"
+    }
+  ],
+  "footer.subscribe.email.assistive_msg": [
+    {
+      "type": 0,
+      "value": "E-postadress för nyhetsbrev"
+    }
+  ],
+  "footer.subscribe.heading.first_to_know": [
+    {
+      "type": 0,
+      "value": "Håll dig uppdaterad"
+    }
+  ],
+  "form_action_buttons.button.cancel": [
+    {
+      "type": 0,
+      "value": "Avbryt"
+    }
+  ],
+  "form_action_buttons.button.save": [
+    {
+      "type": 0,
+      "value": "Spara"
+    }
+  ],
+  "global.account.link.account_details": [
+    {
+      "type": 0,
+      "value": "Kontouppgifter"
+    }
+  ],
+  "global.account.link.addresses": [
+    {
+      "type": 0,
+      "value": "Adresser"
+    }
+  ],
+  "global.account.link.order_history": [
+    {
+      "type": 0,
+      "value": "Beställningshistorik"
+    }
+  ],
+  "global.account.link.wishlist": [
+    {
+      "type": 0,
+      "value": "Önskelista"
+    }
+  ],
+  "global.error.create_account": [
+    {
+      "type": 0,
+      "value": "Denna funktion är inte tillgänglig för närvarande. Du måste skapa ett konto för att få tillgång till den här funktionen."
+    }
+  ],
+  "global.error.feature_unavailable": [
+    {
+      "type": 0,
+      "value": "Denna funktion är inte tillgänglig för närvarande."
+    }
+  ],
+  "global.error.invalid_token": [
+    {
+      "type": 0,
+      "value": "Ogiltig token. Försök igen."
+    }
+  ],
+  "global.error.something_went_wrong": [
+    {
+      "type": 0,
+      "value": "Något gick fel. Försök igen!"
+    }
+  ],
+  "global.info.added_to_wishlist": [
+    {
+      "type": 1,
+      "value": "quantity"
+    },
+    {
+      "type": 0,
+      "value": " "
+    },
+    {
+      "offset": 0,
+      "options": {
+        "one": {
+          "value": [
+            {
+              "type": 0,
+              "value": "produkt"
+            }
+          ]
+        },
+        "other": {
+          "value": [
+            {
+              "type": 0,
+              "value": "produkter"
+            }
+          ]
+        }
+      },
+      "pluralType": "cardinal",
+      "type": 6,
+      "value": "quantity"
+    },
+    {
+      "type": 0,
+      "value": " läggs till i önskelistan"
+    }
+  ],
+  "global.info.already_in_wishlist": [
+    {
+      "type": 0,
+      "value": "Produkten finns redan i önskelistan"
+    }
+  ],
+  "global.info.removed_from_wishlist": [
+    {
+      "type": 0,
+      "value": "Produkten har tagits bort från önskelistan"
+    }
+  ],
+  "global.link.added_to_wishlist.view_wishlist": [
+    {
+      "type": 0,
+      "value": "Visa"
+    }
+  ],
+  "header.button.assistive_msg.logo": [
+    {
+      "type": 0,
+      "value": "Logotyp"
+    }
+  ],
+  "header.button.assistive_msg.menu": [
+    {
+      "type": 0,
+      "value": "Meny"
+    }
+  ],
+  "header.button.assistive_msg.menu.open_dialog": [
+    {
+      "type": 0,
+      "value": "Öppnar en dialogruta"
+    }
+  ],
+  "header.button.assistive_msg.my_account": [
+    {
+      "type": 0,
+      "value": "Mitt konto"
+    }
+  ],
+  "header.button.assistive_msg.my_account_menu": [
+    {
+      "type": 0,
+      "value": "Öppna kontomeny"
+    }
+  ],
+  "header.button.assistive_msg.my_cart_with_num_items": [
+    {
+      "type": 0,
+      "value": "Min kundvagn, antal artiklar: "
+    },
+    {
+      "type": 1,
+      "value": "numItems"
+    }
+  ],
+  "header.button.assistive_msg.store_locator": [
+    {
+      "type": 0,
+      "value": "Butikslokaliserare"
+    }
+  ],
+  "header.button.assistive_msg.wishlist": [
+    {
+      "type": 0,
+      "value": "Önskelista"
+    }
+  ],
+  "header.field.placeholder.search_for_products": [
+    {
+      "type": 0,
+      "value": "Sök efter produkter ..."
+    }
+  ],
+  "header.popover.action.log_out": [
+    {
+      "type": 0,
+      "value": "Logga ut"
+    }
+  ],
+  "header.popover.title.my_account": [
+    {
+      "type": 0,
+      "value": "Mitt konto"
+    }
+  ],
+  "home.description.features": [
+    {
+      "type": 0,
+      "value": "Färdiga funktioner så att du bara behöver fokusera på att lägga till förbättringar."
+    }
+  ],
+  "home.description.here_to_help": [
+    {
+      "type": 0,
+      "value": "Kontakta vår supportpersonal."
+    }
+  ],
+  "home.description.here_to_help_line_2": [
+    {
+      "type": 0,
+      "value": "De hjälper dig att komma till rätt plats."
+    }
+  ],
+  "home.description.shop_products": [
+    {
+      "type": 0,
+      "value": "Detta avsnitt innehåller innehåll från katalogen. "
+    },
+    {
+      "type": 1,
+      "value": "docLink"
+    },
+    {
+      "type": 0,
+      "value": " om hur du byter ut den."
+    }
+  ],
+  "home.features.description.cart_checkout": [
+    {
+      "type": 0,
+      "value": "Bästa praxis för e-handel för en köpares upplevelse när det gäller kundvagn och betalning."
+    }
+  ],
+  "home.features.description.components": [
+    {
+      "type": 0,
+      "value": "Byggt med Chakra UI, ett enkelt, modulärt och lättillgängligt React-komponentbibliotek."
+    }
+  ],
+  "home.features.description.einstein_recommendations": [
+    {
+      "type": 0,
+      "value": "Leverera nästa topprodukt eller topperbjudande till varje kund med hjälp av produktrekommendationer."
+    }
+  ],
+  "home.features.description.my_account": [
+    {
+      "type": 0,
+      "value": "Kunder kan hantera kontoinformation som profil, adresser, betalningar och beställningar."
+    }
+  ],
+  "home.features.description.shopper_login": [
+    {
+      "type": 0,
+      "value": "Gör det möjligt för kunderna att enkelt logga in och få en mer personlig köpupplevelse."
+    }
+  ],
+  "home.features.description.wishlist": [
+    {
+      "type": 0,
+      "value": "Registrerade kunder kan lägga till produkter på sin önskelista och köpa dem senare."
+    }
+  ],
+  "home.features.heading.cart_checkout": [
+    {
+      "type": 0,
+      "value": "Kundvagn och betalning"
+    }
+  ],
+  "home.features.heading.components": [
+    {
+      "type": 0,
+      "value": "Komponenter och designkit"
+    }
+  ],
+  "home.features.heading.einstein_recommendations": [
+    {
+      "type": 0,
+      "value": "Einstein-rekommendationer"
+    }
+  ],
+  "home.features.heading.my_account": [
+    {
+      "type": 0,
+      "value": "Mitt konto"
+    }
+  ],
+  "home.features.heading.shopper_login": [
+    {
+      "type": 0,
+      "value": "Inloggning för kunder och tjänst för API-åtkomst"
+    }
+  ],
+  "home.features.heading.wishlist": [
+    {
+      "type": 0,
+      "value": "Önskelista"
+    }
+  ],
+  "home.heading.features": [
+    {
+      "type": 0,
+      "value": "Funktioner"
+    }
+  ],
+  "home.heading.here_to_help": [
+    {
+      "type": 0,
+      "value": "Vi finns här för att hjälpa dig"
+    }
+  ],
+  "home.heading.shop_products": [
+    {
+      "type": 0,
+      "value": "Handla produkter"
+    }
+  ],
+  "home.hero_features.link.design_kit": [
+    {
+      "type": 0,
+      "value": "Skapa med Figma PWA Design Kit"
+    }
+  ],
+  "home.hero_features.link.on_github": [
+    {
+      "type": 0,
+      "value": "Ladda ner via Github"
+    }
+  ],
+  "home.hero_features.link.on_managed_runtime": [
+    {
+      "type": 0,
+      "value": "Distribuera via Managed Runtime"
+    }
+  ],
+  "home.link.contact_us": [
+    {
+      "type": 0,
+      "value": "Kontakta oss"
+    }
+  ],
+  "home.link.get_started": [
+    {
+      "type": 0,
+      "value": "Kom igång"
+    }
+  ],
+  "home.link.read_docs": [
+    {
+      "type": 0,
+      "value": "Läs dokumenten"
+    }
+  ],
+  "home.title.react_starter_store": [
+    {
+      "type": 0,
+      "value": "React PWA startbutik för detaljhandel"
+    }
+  ],
+  "icons.assistive_msg.lock": [
+    {
+      "type": 0,
+      "value": "Säker"
+    }
+  ],
+  "item_attributes.label.promotions": [
+    {
+      "type": 0,
+      "value": "Kampanjer"
+    }
+  ],
+  "item_attributes.label.quantity": [
+    {
+      "type": 0,
+      "value": "Kvantitet: "
+    },
+    {
+      "type": 1,
+      "value": "quantity"
+    }
+  ],
+  "item_attributes.label.selected_options": [
+    {
+      "type": 0,
+      "value": "Valda alternativ"
+    }
+  ],
+  "item_image.label.sale": [
+    {
+      "type": 0,
+      "value": "Försäljning"
+    }
+  ],
+  "item_image.label.unavailable": [
+    {
+      "type": 0,
+      "value": "Ej tillgänglig"
+    }
+  ],
+  "item_variant.assistive_msg.quantity": [
+    {
+      "type": 0,
+      "value": "Kvantitet "
+    },
+    {
+      "type": 1,
+      "value": "quantity"
+    }
+  ],
+  "item_variant.quantity.label": [
+    {
+      "type": 0,
+      "value": "Kvantitetsväljare för "
+    },
+    {
+      "type": 1,
+      "value": "productName"
+    },
+    {
+      "type": 0,
+      "value": ". Vald kvantitet är "
+    },
+    {
+      "type": 1,
+      "value": "quantity"
+    }
+  ],
+  "lCPCxk": [
+    {
+      "type": 0,
+      "value": "Välj alla dina alternativ ovan"
+    }
+  ],
+  "list_menu.nav.assistive_msg": [
+    {
+      "type": 0,
+      "value": "Huvudnavigering"
+    }
+  ],
+  "locale_text.message.ar-SA": [
+    {
+      "type": 0,
+      "value": "Arabiska (Saudiarabien)"
+    }
+  ],
+  "locale_text.message.bn-BD": [
+    {
+      "type": 0,
+      "value": "Bangla (Bangladesh)"
+    }
+  ],
+  "locale_text.message.bn-IN": [
+    {
+      "type": 0,
+      "value": "Bangla (Indien)"
+    }
+  ],
+  "locale_text.message.cs-CZ": [
+    {
+      "type": 0,
+      "value": "Tjeckiska (Tjeckien)"
+    }
+  ],
+  "locale_text.message.da-DK": [
+    {
+      "type": 0,
+      "value": "Danska (Danmark)"
+    }
+  ],
+  "locale_text.message.de-AT": [
+    {
+      "type": 0,
+      "value": "Tyska (Österrike)"
+    }
+  ],
+  "locale_text.message.de-CH": [
+    {
+      "type": 0,
+      "value": "Tyska (Schweiz)"
+    }
+  ],
+  "locale_text.message.de-DE": [
+    {
+      "type": 0,
+      "value": "Tyska (Tyskland)"
+    }
+  ],
+  "locale_text.message.el-GR": [
+    {
+      "type": 0,
+      "value": "Grekiska (Grekland)"
+    }
+  ],
+  "locale_text.message.en-AU": [
+    {
+      "type": 0,
+      "value": "Engelska (Australien)"
+    }
+  ],
+  "locale_text.message.en-CA": [
+    {
+      "type": 0,
+      "value": "Engelska (Kanada)"
+    }
+  ],
+  "locale_text.message.en-GB": [
+    {
+      "type": 0,
+      "value": "Engelska (Storbritannien)"
+    }
+  ],
+  "locale_text.message.en-IE": [
+    {
+      "type": 0,
+      "value": "Engelska (Irland)"
+    }
+  ],
+  "locale_text.message.en-IN": [
+    {
+      "type": 0,
+      "value": "Engelska (Indien)"
+    }
+  ],
+  "locale_text.message.en-NZ": [
+    {
+      "type": 0,
+      "value": "Engelska (Nya Zeeland)"
+    }
+  ],
+  "locale_text.message.en-US": [
+    {
+      "type": 0,
+      "value": "Engelska (USA)"
+    }
+  ],
+  "locale_text.message.en-ZA": [
+    {
+      "type": 0,
+      "value": "Engelska (Sydafrika)"
+    }
+  ],
+  "locale_text.message.es-AR": [
+    {
+      "type": 0,
+      "value": "Spanska (Argentina)"
+    }
+  ],
+  "locale_text.message.es-CL": [
+    {
+      "type": 0,
+      "value": "Spanska (Chile)"
+    }
+  ],
+  "locale_text.message.es-CO": [
+    {
+      "type": 0,
+      "value": "Spanska (Colombia)"
+    }
+  ],
+  "locale_text.message.es-ES": [
+    {
+      "type": 0,
+      "value": "Spanska (Spanien)"
+    }
+  ],
+  "locale_text.message.es-MX": [
+    {
+      "type": 0,
+      "value": "Spanska (Mexiko)"
+    }
+  ],
+  "locale_text.message.es-US": [
+    {
+      "type": 0,
+      "value": "Spanska (USA)"
+    }
+  ],
+  "locale_text.message.fi-FI": [
+    {
+      "type": 0,
+      "value": "Finska (Finland)"
+    }
+  ],
+  "locale_text.message.fr-BE": [
+    {
+      "type": 0,
+      "value": "Franska (Belgien)"
+    }
+  ],
+  "locale_text.message.fr-CA": [
+    {
+      "type": 0,
+      "value": "Franska (Kanada)"
+    }
+  ],
+  "locale_text.message.fr-CH": [
+    {
+      "type": 0,
+      "value": "Franska (Schweiz)"
+    }
+  ],
+  "locale_text.message.fr-FR": [
+    {
+      "type": 0,
+      "value": "Franska (Frankrike)"
+    }
+  ],
+  "locale_text.message.he-IL": [
+    {
+      "type": 0,
+      "value": "Hebreiska (Israel)"
+    }
+  ],
+  "locale_text.message.hi-IN": [
+    {
+      "type": 0,
+      "value": "Hindi (Indien)"
+    }
+  ],
+  "locale_text.message.hu-HU": [
+    {
+      "type": 0,
+      "value": "Ungerska (Ungern)"
+    }
+  ],
+  "locale_text.message.id-ID": [
+    {
+      "type": 0,
+      "value": "Indonesiska (Indonesien)"
+    }
+  ],
+  "locale_text.message.it-CH": [
+    {
+      "type": 0,
+      "value": "Italienska (Schweiz)"
+    }
+  ],
+  "locale_text.message.it-IT": [
+    {
+      "type": 0,
+      "value": "Italienska (Italien)"
+    }
+  ],
+  "locale_text.message.ja-JP": [
+    {
+      "type": 0,
+      "value": "Japanska (Japan)"
+    }
+  ],
+  "locale_text.message.ko-KR": [
+    {
+      "type": 0,
+      "value": "Koreanska (Republiken Korea)"
+    }
+  ],
+  "locale_text.message.nl-BE": [
+    {
+      "type": 0,
+      "value": "Nederländska (Belgien)"
+    }
+  ],
+  "locale_text.message.nl-NL": [
+    {
+      "type": 0,
+      "value": "Nederländska (Nederländerna)"
+    }
+  ],
+  "locale_text.message.no-NO": [
+    {
+      "type": 0,
+      "value": "Norska (Norge)"
+    }
+  ],
+  "locale_text.message.pl-PL": [
+    {
+      "type": 0,
+      "value": "Polska (Polen)"
+    }
+  ],
+  "locale_text.message.pt-BR": [
+    {
+      "type": 0,
+      "value": "Portugisiska (Brasilien)"
+    }
+  ],
+  "locale_text.message.pt-PT": [
+    {
+      "type": 0,
+      "value": "Portugisiska (Portugal)"
+    }
+  ],
+  "locale_text.message.ro-RO": [
+    {
+      "type": 0,
+      "value": "Rumänska (Rumänien)"
+    }
+  ],
+  "locale_text.message.ru-RU": [
+    {
+      "type": 0,
+      "value": "Ryska (Ryssland)"
+    }
+  ],
+  "locale_text.message.sk-SK": [
+    {
+      "type": 0,
+      "value": "Slovakiska (Slovakien)"
+    }
+  ],
+  "locale_text.message.sv-SE": [
+    {
+      "type": 0,
+      "value": "Svenska (Sverige)"
+    }
+  ],
+  "locale_text.message.ta-IN": [
+    {
+      "type": 0,
+      "value": "Tamil (Indien)"
+    }
+  ],
+  "locale_text.message.ta-LK": [
+    {
+      "type": 0,
+      "value": "Tamil (Sri Lanka)"
+    }
+  ],
+  "locale_text.message.th-TH": [
+    {
+      "type": 0,
+      "value": "Thailändska (Thailand)"
+    }
+  ],
+  "locale_text.message.tr-TR": [
+    {
+      "type": 0,
+      "value": "Turkiska (Turkiet)"
+    }
+  ],
+  "locale_text.message.zh-CN": [
+    {
+      "type": 0,
+      "value": "Kinesiska (Kina)"
+    }
+  ],
+  "locale_text.message.zh-HK": [
+    {
+      "type": 0,
+      "value": "Kinesiska (Hongkong)"
+    }
+  ],
+  "locale_text.message.zh-TW": [
+    {
+      "type": 0,
+      "value": "Kinesiska (Taiwan)"
+    }
+  ],
+  "login_form.action.create_account": [
+    {
+      "type": 0,
+      "value": "Skapa konto"
+    }
+  ],
+  "login_form.button.apple": [
+    {
+      "type": 0,
+      "value": "Apple"
+    }
+  ],
+  "login_form.button.back": [
+    {
+      "type": 0,
+      "value": "Tillbaka till inloggningsalternativ"
+    }
+  ],
+  "login_form.button.continue_securely": [
+    {
+      "type": 0,
+      "value": "Fortsätt tryggt och säkert"
+    }
+  ],
+  "login_form.button.google": [
+    {
+      "type": 0,
+      "value": "Google"
+    }
+  ],
+  "login_form.button.password": [
+    {
+      "type": 0,
+      "value": "Lösenord"
+    }
+  ],
+  "login_form.button.sign_in": [
+    {
+      "type": 0,
+      "value": "Logga in"
+    }
+  ],
+  "login_form.link.forgot_password": [
+    {
+      "type": 0,
+      "value": "Har du glömt lösenordet?"
+    }
+  ],
+  "login_form.message.dont_have_account": [
+    {
+      "type": 0,
+      "value": "Har du inget konto?"
+    }
+  ],
+  "login_form.message.or_login_with": [
+    {
+      "type": 0,
+      "value": "Eller logga in med"
+    }
+  ],
+  "login_form.message.welcome_back": [
+    {
+      "type": 0,
+      "value": "Välkommen tillbaka"
+    }
+  ],
+  "login_page.error.incorrect_username_or_password": [
+    {
+      "type": 0,
+      "value": "Felaktigt användarnamn eller lösenord, försök igen."
+    }
+  ],
+  "offline_banner.description.browsing_offline_mode": [
+    {
+      "type": 0,
+      "value": "Du surfar för närvarande i offlineläge"
+    }
+  ],
+  "order_summary.action.remove_promo": [
+    {
+      "type": 0,
+      "value": "Ta bort"
+    }
+  ],
+  "order_summary.cart_items.action.num_of_items_in_cart": [
+    {
+      "offset": 0,
+      "options": {
+        "=0": {
+          "value": [
+            {
+              "type": 0,
+              "value": "0 artiklar"
+            }
+          ]
+        },
+        "one": {
+          "value": [
+            {
+              "type": 7
+            },
+            {
+              "type": 0,
+              "value": " artikel"
+            }
+          ]
+        },
+        "other": {
+          "value": [
+            {
+              "type": 7
+            },
+            {
+              "type": 0,
+              "value": " artiklar"
+            }
+          ]
+        }
+      },
+      "pluralType": "cardinal",
+      "type": 6,
+      "value": "itemCount"
+    },
+    {
+      "type": 0,
+      "value": " i kundvagnen"
+    }
+  ],
+  "order_summary.cart_items.link.edit_cart": [
+    {
+      "type": 0,
+      "value": "Redigera kundvagn"
+    }
+  ],
+  "order_summary.heading.order_summary": [
+    {
+      "type": 0,
+      "value": "Beställningssammanfattning"
+    }
+  ],
+  "order_summary.label.estimated_total": [
+    {
+      "type": 0,
+      "value": "Beräknad totalsumma"
+    }
+  ],
+  "order_summary.label.free": [
+    {
+      "type": 0,
+      "value": "Gratis"
+    }
+  ],
+  "order_summary.label.order_total": [
+    {
+      "type": 0,
+      "value": "Beställning totalt"
+    }
+  ],
+  "order_summary.label.promo_applied": [
+    {
+      "type": 0,
+      "value": "kampanjerbjudande tillämpat"
+    }
+  ],
+  "order_summary.label.promotions_applied": [
+    {
+      "type": 0,
+      "value": "Kampanjerbjudanden tillämpade"
+    }
+  ],
+  "order_summary.label.shipping": [
+    {
+      "type": 0,
+      "value": "Frakt"
+    }
+  ],
+  "order_summary.label.subtotal": [
+    {
+      "type": 0,
+      "value": "Delsumma"
+    }
+  ],
+  "order_summary.label.tax": [
+    {
+      "type": 0,
+      "value": "Skatt"
+    }
+  ],
+  "page_not_found.action.go_back": [
+    {
+      "type": 0,
+      "value": "Tillbaka till föregående sida"
+    }
+  ],
+  "page_not_found.link.homepage": [
+    {
+      "type": 0,
+      "value": "Gå till startsidan"
+    }
+  ],
+  "page_not_found.message.suggestion_to_try": [
+    {
+      "type": 0,
+      "value": "Försök att skriva in adressen igen, återvänd till föregående sida eller gå till startsidan."
+    }
+  ],
+  "page_not_found.title.page_cant_be_found": [
+    {
+      "type": 0,
+      "value": "Sidan du letar efter går inte att hitta."
+    }
+  ],
+  "pagination.field.num_of_pages": [
+    {
+      "type": 0,
+      "value": "av "
+    },
+    {
+      "type": 1,
+      "value": "numOfPages"
+    }
+  ],
+  "pagination.field.page_number_select": [
+    {
+      "type": 0,
+      "value": "Välj sidnummer"
+    }
+  ],
+  "pagination.link.next": [
+    {
+      "type": 0,
+      "value": "Nästa"
+    }
+  ],
+  "pagination.link.next.assistive_msg": [
+    {
+      "type": 0,
+      "value": "Nästa sida"
+    }
+  ],
+  "pagination.link.prev": [
+    {
+      "type": 0,
+      "value": "Föreg."
+    }
+  ],
+  "pagination.link.prev.assistive_msg": [
+    {
+      "type": 0,
+      "value": "Föregående sida"
+    }
+  ],
+  "password_card.info.password_updated": [
+    {
+      "type": 0,
+      "value": "Lösenord uppdaterat"
+    }
+  ],
+  "password_card.label.password": [
+    {
+      "type": 0,
+      "value": "Lösenord"
+    }
+  ],
+  "password_card.title.password": [
+    {
+      "type": 0,
+      "value": "Lösenord"
+    }
+  ],
+  "password_requirements.error.eight_letter_minimum": [
+    {
+      "type": 0,
+      "value": "Minst 8 tecken"
+    }
+  ],
+  "password_requirements.error.one_lowercase_letter": [
+    {
+      "type": 0,
+      "value": "1 liten bokstav"
+    }
+  ],
+  "password_requirements.error.one_number": [
+    {
+      "type": 0,
+      "value": "1 siffra"
+    }
+  ],
+  "password_requirements.error.one_special_character": [
+    {
+      "type": 0,
+      "value": "1 specialtecken (till exempel: , S ! % #)"
+    }
+  ],
+  "password_requirements.error.one_uppercase_letter": [
+    {
+      "type": 0,
+      "value": "1 stor bokstav"
+    }
+  ],
+  "password_reset_success.toast": [
+    {
+      "type": 0,
+      "value": "Lösenordsåterställningen lyckades"
+    }
+  ],
+  "payment_selection.heading.credit_card": [
+    {
+      "type": 0,
+      "value": "Kreditkort"
+    }
+  ],
+  "payment_selection.radio_group.assistive_msg": [
+    {
+      "type": 0,
+      "value": "Betalning"
+    }
+  ],
+  "payment_selection.tooltip.secure_payment": [
+    {
+      "type": 0,
+      "value": "Detta är en säker SSL-krypterad betalning."
+    }
+  ],
+  "price_per_item.label.each": [
+    {
+      "type": 0,
+      "value": " st."
+    }
+  ],
+  "product_detail.accordion.button.product_detail": [
+    {
+      "type": 0,
+      "value": "Produktinformation"
+    }
+  ],
+  "product_detail.accordion.button.questions": [
+    {
+      "type": 0,
+      "value": "Frågor"
+    }
+  ],
+  "product_detail.accordion.button.reviews": [
+    {
+      "type": 0,
+      "value": "Omdömen"
+    }
+  ],
+  "product_detail.accordion.button.size_fit": [
+    {
+      "type": 0,
+      "value": "Storlek och passform"
+    }
+  ],
+  "product_detail.accordion.message.coming_soon": [
+    {
+      "type": 0,
+      "value": "Kommer snart"
+    }
+  ],
+  "product_detail.recommended_products.title.complete_set": [
+    {
+      "type": 0,
+      "value": "Få ett komplett set"
+    }
+  ],
+  "product_detail.recommended_products.title.might_also_like": [
+    {
+      "type": 0,
+      "value": "Du kanske också gillar"
+    }
+  ],
+  "product_detail.recommended_products.title.recently_viewed": [
+    {
+      "type": 0,
+      "value": "Senast visade"
+    }
+  ],
+  "product_item.label.quantity": [
+    {
+      "type": 0,
+      "value": "Kvantitet:"
+    }
+  ],
+  "product_list.button.filter": [
+    {
+      "type": 0,
+      "value": "Filter"
+    }
+  ],
+  "product_list.button.sort_by": [
+    {
+      "type": 0,
+      "value": "Sortera efter: "
+    },
+    {
+      "type": 1,
+      "value": "sortOption"
+    }
+  ],
+  "product_list.drawer.title.sort_by": [
+    {
+      "type": 0,
+      "value": "Sortera efter"
+    }
+  ],
+  "product_list.modal.button.clear_filters": [
+    {
+      "type": 0,
+      "value": "Rensa filter"
+    }
+  ],
+  "product_list.modal.button.view_items": [
+    {
+      "type": 0,
+      "value": "Visa "
+    },
+    {
+      "type": 1,
+      "value": "prroductCount"
+    },
+    {
+      "type": 0,
+      "value": " artiklar"
+    }
+  ],
+  "product_list.modal.title.filter": [
+    {
+      "type": 0,
+      "value": "Filter"
+    }
+  ],
+  "product_list.refinements.button.assistive_msg.add_filter": [
+    {
+      "type": 0,
+      "value": "Lägg till filter: "
+    },
+    {
+      "type": 1,
+      "value": "label"
+    }
+  ],
+  "product_list.refinements.button.assistive_msg.add_filter_with_hit_count": [
+    {
+      "type": 0,
+      "value": "Lägg till filter: "
+    },
+    {
+      "type": 1,
+      "value": "label"
+    },
+    {
+      "type": 0,
+      "value": " ("
+    },
+    {
+      "type": 1,
+      "value": "hitCount"
+    },
+    {
+      "type": 0,
+      "value": ")"
+    }
+  ],
+  "product_list.refinements.button.assistive_msg.remove_filter": [
+    {
+      "type": 0,
+      "value": "Ta bort filter: "
+    },
+    {
+      "type": 1,
+      "value": "label"
+    }
+  ],
+  "product_list.refinements.button.assistive_msg.remove_filter_with_hit_count": [
+    {
+      "type": 0,
+      "value": "Ta bort filter: "
+    },
+    {
+      "type": 1,
+      "value": "label"
+    },
+    {
+      "type": 0,
+      "value": " ("
+    },
+    {
+      "type": 1,
+      "value": "hitCount"
+    },
+    {
+      "type": 0,
+      "value": ")"
+    }
+  ],
+  "product_list.select.sort_by": [
+    {
+      "type": 0,
+      "value": "Sortera efter: "
+    },
+    {
+      "type": 1,
+      "value": "sortOption"
+    }
+  ],
+  "product_list.sort_by.label.assistive_msg": [
+    {
+      "type": 0,
+      "value": "Sortera produkter efter"
+    }
+  ],
+  "product_scroller.assistive_msg.scroll_left": [
+    {
+      "type": 0,
+      "value": "Bläddra produkter till vänster"
+    }
+  ],
+  "product_scroller.assistive_msg.scroll_right": [
+    {
+      "type": 0,
+      "value": "Bläddra produkter till höger"
+    }
+  ],
+  "product_tile.assistive_msg.add_to_wishlist": [
+    {
+      "type": 0,
+      "value": "Lägg till "
+    },
+    {
+      "type": 1,
+      "value": "product"
+    },
+    {
+      "type": 0,
+      "value": " på önskelistan"
+    }
+  ],
+  "product_tile.assistive_msg.remove_from_wishlist": [
+    {
+      "type": 0,
+      "value": "Ta bort "
+    },
+    {
+      "type": 1,
+      "value": "product"
+    },
+    {
+      "type": 0,
+      "value": " från önskelistan"
+    }
+  ],
+  "product_tile.badge.label.new": [
+    {
+      "type": 0,
+      "value": "Ny"
+    }
+  ],
+  "product_tile.badge.label.sale": [
+    {
+      "type": 0,
+      "value": "Försäljning"
+    }
+  ],
+  "product_view.button.add_bundle_to_cart": [
+    {
+      "type": 0,
+      "value": "Lägg till paket i kundvagnen"
+    }
+  ],
+  "product_view.button.add_bundle_to_wishlist": [
+    {
+      "type": 0,
+      "value": "Lägg till paket i önskelistan"
+    }
+  ],
+  "product_view.button.add_set_to_cart": [
+    {
+      "type": 0,
+      "value": "Lägg till set i kundvagnen"
+    }
+  ],
+  "product_view.button.add_set_to_wishlist": [
+    {
+      "type": 0,
+      "value": "Lägg till set i önskelistan"
+    }
+  ],
+  "product_view.button.add_to_cart": [
+    {
+      "type": 0,
+      "value": "Lägg till i kundvagnen"
+    }
+  ],
+  "product_view.button.add_to_wishlist": [
+    {
+      "type": 0,
+      "value": "Lägg till i önskelistan"
+    }
+  ],
+  "product_view.button.update": [
+    {
+      "type": 0,
+      "value": "Uppdatera"
+    }
+  ],
+  "product_view.label.assistive_msg.quantity_decrement": [
+    {
+      "type": 0,
+      "value": "Minska kvantitet för "
+    },
+    {
+      "type": 1,
+      "value": "productName"
+    }
+  ],
+  "product_view.label.assistive_msg.quantity_increment": [
+    {
+      "type": 0,
+      "value": "Öka kvantitet för "
+    },
+    {
+      "type": 1,
+      "value": "productName"
+    }
+  ],
+  "product_view.label.quantity": [
+    {
+      "type": 0,
+      "value": "Kvantitet"
+    }
+  ],
+  "product_view.label.quantity_decrement": [
+    {
+      "type": 0,
+      "value": "–"
+    }
+  ],
+  "product_view.label.quantity_increment": [
+    {
+      "type": 0,
+      "value": "+"
+    }
+  ],
+  "product_view.label.variant_type": [
+    {
+      "type": 1,
+      "value": "variantType"
+    }
+  ],
+  "product_view.link.full_details": [
+    {
+      "type": 0,
+      "value": "Se fullständig information"
+    }
+  ],
+  "profile_card.info.profile_updated": [
+    {
+      "type": 0,
+      "value": "Profilen har uppdaterats"
+    }
+  ],
+  "profile_card.label.email": [
+    {
+      "type": 0,
+      "value": "E-post"
+    }
+  ],
+  "profile_card.label.full_name": [
+    {
+      "type": 0,
+      "value": "Fullständigt namn"
+    }
+  ],
+  "profile_card.label.phone": [
+    {
+      "type": 0,
+      "value": "Telefonnummer"
+    }
+  ],
+  "profile_card.message.not_provided": [
+    {
+      "type": 0,
+      "value": "Uppgift saknas"
+    }
+  ],
+  "profile_card.title.my_profile": [
+    {
+      "type": 0,
+      "value": "Min profil"
+    }
+  ],
+  "profile_fields.label.profile_form": [
+    {
+      "type": 0,
+      "value": "Profilformulär"
+    }
+  ],
+  "promo_code_fields.button.apply": [
+    {
+      "type": 0,
+      "value": "Tillämpa"
+    }
+  ],
+  "promo_popover.assistive_msg.info": [
+    {
+      "type": 0,
+      "value": "Info"
+    }
+  ],
+  "promo_popover.heading.promo_applied": [
+    {
+      "type": 0,
+      "value": "Kampanjerbjudanden tillämpade"
+    }
+  ],
+  "promocode.accordion.button.have_promocode": [
+    {
+      "type": 0,
+      "value": "Har du en kampanjkod?"
+    }
+  ],
+  "recent_searches.action.clear_searches": [
+    {
+      "type": 0,
+      "value": "Ta bort senaste sökningar"
+    }
+  ],
+  "recent_searches.heading.recent_searches": [
+    {
+      "type": 0,
+      "value": "Senaste sökningar"
+    }
+  ],
+  "register_form.action.sign_in": [
+    {
+      "type": 0,
+      "value": "Logga in"
+    }
+  ],
+  "register_form.button.create_account": [
+    {
+      "type": 0,
+      "value": "Skapa konto"
+    }
+  ],
+  "register_form.heading.lets_get_started": [
+    {
+      "type": 0,
+      "value": "Låt oss komma igång!"
+    }
+  ],
+  "register_form.message.agree_to_policy_terms": [
+    {
+      "type": 0,
+      "value": "Genom att skapa ett konto godkänner du "
+    },
+    {
+      "children": [
+        {
+          "type": 0,
+          "value": "Sekretesspolicyn"
+        }
+      ],
+      "type": 8,
+      "value": "policy"
+    },
+    {
+      "type": 0,
+      "value": " och "
+    },
+    {
+      "children": [
+        {
+          "type": 0,
+          "value": "Villkoren"
+        }
+      ],
+      "type": 8,
+      "value": "terms"
+    },
+    {
+      "type": 0,
+      "value": " för Salesforce"
+    }
+  ],
+  "register_form.message.already_have_account": [
+    {
+      "type": 0,
+      "value": "Har du redan ett konto?"
+    }
+  ],
+  "register_form.message.create_an_account": [
+    {
+      "type": 0,
+      "value": "Skapa ett konto och få tillgång till de allra bästa produkterna, inspiration och vår community."
+    }
+  ],
+  "reset_password_form.action.sign_in": [
+    {
+      "type": 0,
+      "value": "Logga in"
+    }
+  ],
+  "reset_password_form.button.reset_password": [
+    {
+      "type": 0,
+      "value": "Återställ lösenord"
+    }
+  ],
+  "reset_password_form.message.enter_your_email": [
+    {
+      "type": 0,
+      "value": "Ange din e-postadress för att få instruktioner om hur du återställer ditt lösenord"
+    }
+  ],
+  "reset_password_form.message.return_to_sign_in": [
+    {
+      "type": 0,
+      "value": "Eller återvänd till"
+    }
+  ],
+  "reset_password_form.title.reset_password": [
+    {
+      "type": 0,
+      "value": "Återställ lösenord"
+    }
+  ],
+  "search.action.cancel": [
+    {
+      "type": 0,
+      "value": "Avbryt"
+    }
+  ],
+  "selected_refinements.action.assistive_msg.clear_all": [
+    {
+      "type": 0,
+      "value": "Rensa alla filter"
+    }
+  ],
+  "selected_refinements.action.clear_all": [
+    {
+      "type": 0,
+      "value": "Rensa alla"
+    }
+  ],
+  "shipping_address.button.continue_to_shipping": [
+    {
+      "type": 0,
+      "value": "Fortsätt till fraktmetod"
+    }
+  ],
+  "shipping_address.label.edit_button": [
+    {
+      "type": 0,
+      "value": "Redigera "
+    },
+    {
+      "type": 1,
+      "value": "address"
+    }
+  ],
+  "shipping_address.label.remove_button": [
+    {
+      "type": 0,
+      "value": "Ta bort "
+    },
+    {
+      "type": 1,
+      "value": "address"
+    }
+  ],
+  "shipping_address.label.shipping_address_form": [
+    {
+      "type": 0,
+      "value": "Formulär för fraktadress"
+    }
+  ],
+  "shipping_address.title.shipping_address": [
+    {
+      "type": 0,
+      "value": "Fraktadress"
+    }
+  ],
+  "shipping_address_edit_form.button.save_and_continue": [
+    {
+      "type": 0,
+      "value": "Spara och fortsätt till fraktmetod"
+    }
+  ],
+  "shipping_address_form.heading.edit_address": [
+    {
+      "type": 0,
+      "value": "Redigera adress"
+    }
+  ],
+  "shipping_address_form.heading.new_address": [
+    {
+      "type": 0,
+      "value": "Lägg till ny adress"
+    }
+  ],
+  "shipping_address_selection.button.add_address": [
+    {
+      "type": 0,
+      "value": "Lägg till ny adress"
+    }
+  ],
+  "shipping_address_selection.button.submit": [
+    {
+      "type": 0,
+      "value": "Skicka"
+    }
+  ],
+  "shipping_address_selection.title.add_address": [
+    {
+      "type": 0,
+      "value": "Lägg till ny adress"
+    }
+  ],
+  "shipping_address_selection.title.edit_shipping": [
+    {
+      "type": 0,
+      "value": "Redigera fraktadress"
+    }
+  ],
+  "shipping_options.action.send_as_a_gift": [
+    {
+      "type": 0,
+      "value": "Vill du skicka som present?"
+    }
+  ],
+  "shipping_options.button.continue_to_payment": [
+    {
+      "type": 0,
+      "value": "Fortsätt till betalning"
+    }
+  ],
+  "shipping_options.title.shipping_gift_options": [
+    {
+      "type": 0,
+      "value": "Frakt och presentalternativ"
+    }
+  ],
+  "signout_confirmation_dialog.button.cancel": [
+    {
+      "type": 0,
+      "value": "Avbryt"
+    }
+  ],
+  "signout_confirmation_dialog.button.sign_out": [
+    {
+      "type": 0,
+      "value": "Logga ut"
+    }
+  ],
+  "signout_confirmation_dialog.heading.sign_out": [
+    {
+      "type": 0,
+      "value": "Logga ut"
+    }
+  ],
+  "signout_confirmation_dialog.message.sure_to_sign_out": [
+    {
+      "type": 0,
+      "value": "Är du säker på att du vill logga ut? Du måste logga in igen för att fortsätta med din nuvarande beställning."
+    }
+  ],
+  "social_login_redirect.message.authenticating": [
+    {
+      "type": 0,
+      "value": "Autentiserar ..."
+    }
+  ],
+  "social_login_redirect.message.redirect_link": [
+    {
+      "type": 0,
+      "value": "Om du inte omdirigeras automatiskt klickar du på "
+    },
+    {
+      "children": [
+        {
+          "type": 0,
+          "value": "den här länken"
+        }
+      ],
+      "type": 8,
+      "value": "link"
+    },
+    {
+      "type": 0,
+      "value": " för att fortsätta."
+    }
+  ],
+  "store_locator.action.find": [
+    {
+      "type": 0,
+      "value": "Hitta"
+    }
+  ],
+  "store_locator.action.select_a_country": [
+    {
+      "type": 0,
+      "value": "Välj ett land"
+    }
+  ],
+  "store_locator.action.use_my_location": [
+    {
+      "type": 0,
+      "value": "Använd min plats"
+    }
+  ],
+  "store_locator.action.viewMore": [
+    {
+      "type": 0,
+      "value": "Visa mer"
+    }
+  ],
+  "store_locator.description.away": [
+    {
+      "type": 0,
+      "value": "bort"
+    }
+  ],
+  "store_locator.description.loading_locations": [
+    {
+      "type": 0,
+      "value": "Laddar platser ..."
+    }
+  ],
+  "store_locator.description.no_locations": [
+    {
+      "type": 0,
+      "value": "Tyvärr finns det inga platser i detta område"
+    }
+  ],
+  "store_locator.description.or": [
+    {
+      "type": 0,
+      "value": "Eller"
+    }
+  ],
+  "store_locator.description.phone": [
+    {
+      "type": 0,
+      "value": "Telefon:"
+    }
+  ],
+  "store_locator.description.viewing_near_postal_code": [
+    {
+      "type": 0,
+      "value": "Visar butiker inom "
+    },
+    {
+      "type": 1,
+      "value": "distance"
+    },
+    {
+      "type": 0,
+      "value": " "
+    },
+    {
+      "type": 1,
+      "value": "distanceUnit"
+    },
+    {
+      "type": 0,
+      "value": " från "
+    },
+    {
+      "type": 1,
+      "value": "postalCode"
+    },
+    {
+      "type": 0,
+      "value": " i"
+    }
+  ],
+  "store_locator.description.viewing_near_your_location": [
+    {
+      "type": 0,
+      "value": "Visar butiker nära din plats"
+    }
+  ],
+  "store_locator.dropdown.germany": [
+    {
+      "type": 0,
+      "value": "Tyskland"
+    }
+  ],
+  "store_locator.dropdown.united_states": [
+    {
+      "type": 0,
+      "value": "USA"
+    }
+  ],
+  "store_locator.error.agree_to_share_your_location": [
+    {
+      "type": 0,
+      "value": "Samtyck till att dela din plats"
+    }
+  ],
+  "store_locator.error.please_enter_a_postal_code": [
+    {
+      "type": 0,
+      "value": "Ange ett postnummer."
+    }
+  ],
+  "store_locator.error.please_select_a_country": [
+    {
+      "type": 0,
+      "value": "Välj ett land."
+    }
+  ],
+  "store_locator.field.placeholder.enter_postal_code": [
+    {
+      "type": 0,
+      "value": "Ange postnummer"
+    }
+  ],
+  "store_locator.pagination.load_more": [
+    {
+      "type": 0,
+      "value": "Ladda mer"
+    }
+  ],
+  "store_locator.title": [
+    {
+      "type": 0,
+      "value": "Hitta en butik"
+    }
+  ],
+  "swatch_group.selected.label": [
+    {
+      "type": 1,
+      "value": "label"
+    },
+    {
+      "type": 0,
+      "value": ":"
+    }
+  ],
+  "toggle_card.action.edit": [
+    {
+      "type": 0,
+      "value": "Redigera"
+    }
+  ],
+  "toggle_card.action.editContactInfo": [
+    {
+      "type": 0,
+      "value": "Redigera kontaktuppgifter"
+    }
+  ],
+  "toggle_card.action.editPaymentInfo": [
+    {
+      "type": 0,
+      "value": "Redigera betalningsinformation"
+    }
+  ],
+  "toggle_card.action.editShippingAddress": [
+    {
+      "type": 0,
+      "value": "Redigera fraktadress"
+    }
+  ],
+  "toggle_card.action.editShippingOptions": [
+    {
+      "type": 0,
+      "value": "Redigera fraktalternativ"
+    }
+  ],
+  "update_password_fields.button.forgot_password": [
+    {
+      "type": 0,
+      "value": "Glömt lösenord?"
+    }
+  ],
+  "use_address_fields.error.please_enter_first_name": [
+    {
+      "type": 0,
+      "value": "Ange ditt förnamn."
+    }
+  ],
+  "use_address_fields.error.please_enter_last_name": [
+    {
+      "type": 0,
+      "value": "Ange ditt efternamn."
+    }
+  ],
+  "use_address_fields.error.please_enter_phone_number": [
+    {
+      "type": 0,
+      "value": "Ange ditt telefonnummer."
+    }
+  ],
+  "use_address_fields.error.please_enter_your_postal_or_zip": [
+    {
+      "type": 0,
+      "value": "Ange ditt postnummer."
+    }
+  ],
+  "use_address_fields.error.please_select_your_address": [
+    {
+      "type": 0,
+      "value": "Ange din adress."
+    }
+  ],
+  "use_address_fields.error.please_select_your_city": [
+    {
+      "type": 0,
+      "value": "Ange din ort."
+    }
+  ],
+  "use_address_fields.error.please_select_your_country": [
+    {
+      "type": 0,
+      "value": "Välj ditt land."
+    }
+  ],
+  "use_address_fields.error.please_select_your_state_or_province": [
+    {
+      "type": 0,
+      "value": "Välj din delstat."
+    }
+  ],
+  "use_address_fields.error.required": [
+    {
+      "type": 0,
+      "value": "Krävs"
+    }
+  ],
+  "use_address_fields.error.state_code_invalid": [
+    {
+      "type": 0,
+      "value": "Ange delstat/provins förkortad till två bokstäver."
+    }
+  ],
+  "use_address_fields.label.address": [
+    {
+      "type": 0,
+      "value": "Adress"
+    }
+  ],
+  "use_address_fields.label.address_form": [
+    {
+      "type": 0,
+      "value": "Adressformulär"
+    }
+  ],
+  "use_address_fields.label.city": [
+    {
+      "type": 0,
+      "value": "Ort"
+    }
+  ],
+  "use_address_fields.label.country": [
+    {
+      "type": 0,
+      "value": "Land"
+    }
+  ],
+  "use_address_fields.label.first_name": [
+    {
+      "type": 0,
+      "value": "Förnamn"
+    }
+  ],
+  "use_address_fields.label.last_name": [
+    {
+      "type": 0,
+      "value": "Efternamn"
+    }
+  ],
+  "use_address_fields.label.phone": [
+    {
+      "type": 0,
+      "value": "Telefon"
+    }
+  ],
+  "use_address_fields.label.postal_code": [
+    {
+      "type": 0,
+      "value": "Postnummer"
+    }
+  ],
+  "use_address_fields.label.preferred": [
+    {
+      "type": 0,
+      "value": "Ställ in som standard"
+    }
+  ],
+  "use_address_fields.label.province": [
+    {
+      "type": 0,
+      "value": "Provins"
+    }
+  ],
+  "use_address_fields.label.state": [
+    {
+      "type": 0,
+      "value": "Delstat"
+    }
+  ],
+  "use_address_fields.label.zipCode": [
+    {
+      "type": 0,
+      "value": "Postnummer"
+    }
+  ],
+  "use_credit_card_fields.error.required": [
+    {
+      "type": 0,
+      "value": "Krävs"
+    }
+  ],
+  "use_credit_card_fields.error.required_card_number": [
+    {
+      "type": 0,
+      "value": "Ange ditt kortnummer."
+    }
+  ],
+  "use_credit_card_fields.error.required_expiry": [
+    {
+      "type": 0,
+      "value": "Ange ditt utgångsdatum."
+    }
+  ],
+  "use_credit_card_fields.error.required_name": [
+    {
+      "type": 0,
+      "value": "Ange ditt namn så som det står på ditt kort."
+    }
+  ],
+  "use_credit_card_fields.error.required_security_code": [
+    {
+      "type": 0,
+      "value": "Ange din säkerhetskod."
+    }
+  ],
+  "use_credit_card_fields.error.valid_card_number": [
+    {
+      "type": 0,
+      "value": "Ange ett giltigt kortnummer."
+    }
+  ],
+  "use_credit_card_fields.error.valid_date": [
+    {
+      "type": 0,
+      "value": "Ange ett giltigt datum."
+    }
+  ],
+  "use_credit_card_fields.error.valid_name": [
+    {
+      "type": 0,
+      "value": "Ange ett giltigt namn."
+    }
+  ],
+  "use_credit_card_fields.error.valid_security_code": [
+    {
+      "type": 0,
+      "value": "Ange en giltig säkerhetskod."
+    }
+  ],
+  "use_credit_card_fields.label.card_number": [
+    {
+      "type": 0,
+      "value": "Kortnummer"
+    }
+  ],
+  "use_credit_card_fields.label.card_type": [
+    {
+      "type": 0,
+      "value": "Typ av kort"
+    }
+  ],
+  "use_credit_card_fields.label.expiry": [
+    {
+      "type": 0,
+      "value": "Utgångsdatum"
+    }
+  ],
+  "use_credit_card_fields.label.name": [
+    {
+      "type": 0,
+      "value": "Namn på kortet"
+    }
+  ],
+  "use_credit_card_fields.label.security_code": [
+    {
+      "type": 0,
+      "value": "Säkerhetskod"
+    }
+  ],
+  "use_login_fields.error.required_email": [
+    {
+      "type": 0,
+      "value": "Ange din e-postadress."
+    }
+  ],
+  "use_login_fields.error.required_password": [
+    {
+      "type": 0,
+      "value": "Ange ditt lösenord."
+    }
+  ],
+  "use_login_fields.label.email": [
+    {
+      "type": 0,
+      "value": "E-post"
+    }
+  ],
+  "use_login_fields.label.password": [
+    {
+      "type": 0,
+      "value": "Lösenord"
+    }
+  ],
+  "use_product.message.inventory_remaining": [
+    {
+      "type": 0,
+      "value": "Det finns bara "
+    },
+    {
+      "type": 1,
+      "value": "stockLevel"
+    },
+    {
+      "type": 0,
+      "value": " kvar!"
+    }
+  ],
+  "use_product.message.inventory_remaining_for_product": [
+    {
+      "type": 0,
+      "value": "Det finns bara "
+    },
+    {
+      "type": 1,
+      "value": "stockLevel"
+    },
+    {
+      "type": 0,
+      "value": " kvar av "
+    },
+    {
+      "type": 1,
+      "value": "productName"
+    },
+    {
+      "type": 0,
+      "value": "!"
+    }
+  ],
+  "use_product.message.out_of_stock": [
+    {
+      "type": 0,
+      "value": "Finns inte i lager"
+    }
+  ],
+  "use_product.message.out_of_stock_for_product": [
+    {
+      "type": 1,
+      "value": "productName"
+    },
+    {
+      "type": 0,
+      "value": " finns inte i lager"
+    }
+  ],
+  "use_profile_fields.error.required_email": [
+    {
+      "type": 0,
+      "value": "Ange en giltig e-postadress."
+    }
+  ],
+  "use_profile_fields.error.required_first_name": [
+    {
+      "type": 0,
+      "value": "Ange ditt förnamn."
+    }
+  ],
+  "use_profile_fields.error.required_last_name": [
+    {
+      "type": 0,
+      "value": "Ange ditt efternamn."
+    }
+  ],
+  "use_profile_fields.error.required_phone": [
+    {
+      "type": 0,
+      "value": "Ange ditt telefonnummer."
+    }
+  ],
+  "use_profile_fields.label.email": [
+    {
+      "type": 0,
+      "value": "E-post"
+    }
+  ],
+  "use_profile_fields.label.first_name": [
+    {
+      "type": 0,
+      "value": "Förnamn"
+    }
+  ],
+  "use_profile_fields.label.last_name": [
+    {
+      "type": 0,
+      "value": "Efternamn"
+    }
+  ],
+  "use_profile_fields.label.phone": [
+    {
+      "type": 0,
+      "value": "Telefonnummer"
+    }
+  ],
+  "use_promo_code_fields.error.required_promo_code": [
+    {
+      "type": 0,
+      "value": "Ange en giltig kampanjkod."
+    }
+  ],
+  "use_promo_code_fields.label.promo_code": [
+    {
+      "type": 0,
+      "value": "Kampanjkod"
+    }
+  ],
+  "use_promocode.error.check_the_code": [
+    {
+      "type": 0,
+      "value": "Kontrollera koden och försök igen. Den kanske redan har tillämpats eller så har kampanjen avslutats."
+    }
+  ],
+  "use_promocode.info.promo_applied": [
+    {
+      "type": 0,
+      "value": "kampanjerbjudande tillämpat"
+    }
+  ],
+  "use_promocode.info.promo_removed": [
+    {
+      "type": 0,
+      "value": "Kampanjerbjudande har tagits bort"
+    }
+  ],
+  "use_registration_fields.error.contain_number": [
+    {
+      "type": 0,
+      "value": "Lösenordet måste innehålla minst en siffra."
+    }
+  ],
+  "use_registration_fields.error.lowercase_letter": [
+    {
+      "type": 0,
+      "value": "Lösenordet måste innehålla minst en liten bokstav."
+    }
+  ],
+  "use_registration_fields.error.minimum_characters": [
+    {
+      "type": 0,
+      "value": "Lösenordet måste innehålla minst 8 tecken."
+    }
+  ],
+  "use_registration_fields.error.required_email": [
+    {
+      "type": 0,
+      "value": "Ange en giltig e-postadress."
+    }
+  ],
+  "use_registration_fields.error.required_first_name": [
+    {
+      "type": 0,
+      "value": "Ange ditt förnamn."
+    }
+  ],
+  "use_registration_fields.error.required_last_name": [
+    {
+      "type": 0,
+      "value": "Ange ditt efternamn."
+    }
+  ],
+  "use_registration_fields.error.required_password": [
+    {
+      "type": 0,
+      "value": "Skapa ett lösenord."
+    }
+  ],
+  "use_registration_fields.error.special_character": [
+    {
+      "type": 0,
+      "value": "Lösenordet måste innehålla minst ett specialtecken."
+    }
+  ],
+  "use_registration_fields.error.uppercase_letter": [
+    {
+      "type": 0,
+      "value": "Lösenordet måste innehålla minst en stor bokstav."
+    }
+  ],
+  "use_registration_fields.label.email": [
+    {
+      "type": 0,
+      "value": "E-post"
+    }
+  ],
+  "use_registration_fields.label.first_name": [
+    {
+      "type": 0,
+      "value": "Förnamn"
+    }
+  ],
+  "use_registration_fields.label.last_name": [
+    {
+      "type": 0,
+      "value": "Efternamn"
+    }
+  ],
+  "use_registration_fields.label.password": [
+    {
+      "type": 0,
+      "value": "Lösenord"
+    }
+  ],
+  "use_registration_fields.label.sign_up_to_emails": [
+    {
+      "type": 0,
+      "value": "Registrera mig för e-post från Salesforce (du kan avsluta prenumerationen när som helst)"
+    }
+  ],
+  "use_reset_password_fields.error.required_email": [
+    {
+      "type": 0,
+      "value": "Ange en giltig e-postadress."
+    }
+  ],
+  "use_reset_password_fields.label.email": [
+    {
+      "type": 0,
+      "value": "E-post"
+    }
+  ],
+  "use_update_password_fields.error.contain_number": [
+    {
+      "type": 0,
+      "value": "Lösenordet måste innehålla minst en siffra."
+    }
+  ],
+  "use_update_password_fields.error.lowercase_letter": [
+    {
+      "type": 0,
+      "value": "Lösenordet måste innehålla minst en liten bokstav."
+    }
+  ],
+  "use_update_password_fields.error.minimum_characters": [
+    {
+      "type": 0,
+      "value": "Lösenordet måste innehålla minst 8 tecken."
+    }
+  ],
+  "use_update_password_fields.error.password_mismatch": [
+    {
+      "type": 0,
+      "value": "Lösenorden stämmer inte överens."
+    }
+  ],
+  "use_update_password_fields.error.required_confirm_password": [
+    {
+      "type": 0,
+      "value": "Bekräfta ditt lösenord."
+    }
+  ],
+  "use_update_password_fields.error.required_new_password": [
+    {
+      "type": 0,
+      "value": "Ange ett nytt lösenord."
+    }
+  ],
+  "use_update_password_fields.error.required_password": [
+    {
+      "type": 0,
+      "value": "Ange ditt lösenord."
+    }
+  ],
+  "use_update_password_fields.error.special_character": [
+    {
+      "type": 0,
+      "value": "Lösenordet måste innehålla minst ett specialtecken."
+    }
+  ],
+  "use_update_password_fields.error.uppercase_letter": [
+    {
+      "type": 0,
+      "value": "Lösenordet måste innehålla minst en stor bokstav."
+    }
+  ],
+  "use_update_password_fields.label.confirm_new_password": [
+    {
+      "type": 0,
+      "value": "Bekräfta nytt lösenord"
+    }
+  ],
+  "use_update_password_fields.label.current_password": [
+    {
+      "type": 0,
+      "value": "Nuvarande lösenord"
+    }
+  ],
+  "use_update_password_fields.label.new_password": [
+    {
+      "type": 0,
+      "value": "Nytt lösenord"
+    }
+  ],
+  "wishlist_primary_action.button.addSetToCart.label": [
+    {
+      "type": 0,
+      "value": "Lägg till "
+    },
+    {
+      "type": 1,
+      "value": "productName"
+    },
+    {
+      "type": 0,
+      "value": "-set i varukorgen"
+    }
+  ],
+  "wishlist_primary_action.button.addToCart.label": [
+    {
+      "type": 0,
+      "value": "Lägg till "
+    },
+    {
+      "type": 1,
+      "value": "productName"
+    },
+    {
+      "type": 0,
+      "value": " i varukorgen"
+    }
+  ],
+  "wishlist_primary_action.button.add_set_to_cart": [
+    {
+      "type": 0,
+      "value": "Lägg till set i kundvagnen"
+    }
+  ],
+  "wishlist_primary_action.button.add_to_cart": [
+    {
+      "type": 0,
+      "value": "Lägg till i kundvagnen"
+    }
+  ],
+  "wishlist_primary_action.button.viewFullDetails.label": [
+    {
+      "type": 0,
+      "value": "Visa fullständig information för "
+    },
+    {
+      "type": 1,
+      "value": "productName"
+    }
+  ],
+  "wishlist_primary_action.button.view_full_details": [
+    {
+      "type": 0,
+      "value": "Visa fullständig information"
+    }
+  ],
+  "wishlist_primary_action.button.view_options": [
+    {
+      "type": 0,
+      "value": "Visa alternativ"
+    }
+  ],
+  "wishlist_primary_action.button.view_options.label": [
+    {
+      "type": 0,
+      "value": "Visa alternativ för "
+    },
+    {
+      "type": 1,
+      "value": "productName"
+    }
+  ],
+  "wishlist_primary_action.info.added_to_cart": [
+    {
+      "type": 1,
+      "value": "quantity"
+    },
+    {
+      "type": 0,
+      "value": " "
+    },
+    {
+      "offset": 0,
+      "options": {
+        "one": {
+          "value": [
+            {
+              "type": 0,
+              "value": "artikel"
+            }
+          ]
+        },
+        "other": {
+          "value": [
+            {
+              "type": 0,
+              "value": "artiklar"
+            }
+          ]
+        }
+      },
+      "pluralType": "cardinal",
+      "type": 6,
+      "value": "quantity"
+    },
+    {
+      "type": 0,
+      "value": " har lagts till i kundvagnen"
+    }
+  ],
+  "wishlist_secondary_button_group.action.remove": [
+    {
+      "type": 0,
+      "value": "Ta bort"
+    }
+  ],
+  "wishlist_secondary_button_group.info.item.remove.label": [
+    {
+      "type": 0,
+      "value": "Ta bort "
+    },
+    {
+      "type": 1,
+      "value": "productName"
+    }
+  ],
+  "wishlist_secondary_button_group.info.item_removed": [
+    {
+      "type": 0,
+      "value": "Produkten har tagits bort från önskelistan"
+    }
+  ],
+  "with_registration.info.please_sign_in": [
+    {
+      "type": 0,
+      "value": "Logga in för att fortsätta!"
+    }
+  ]
+}

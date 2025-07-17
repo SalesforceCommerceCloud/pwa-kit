@@ -12,7 +12,7 @@ import {
     mockProductSearch,
     mockedEmptyCustomerProductList,
     mockCategories
-} from '../../mocks/mock-data'
+} from '../../../mocks/mock-data'
 import {act, screen, waitFor} from '@testing-library/react'
 import {Route, Switch} from 'react-router-dom'
 import {createPathWithDefaults, renderWithProviders} from '../../utils/test-utils'
@@ -91,7 +91,8 @@ MockedComponent.propTypes = {
 const MockedEmptyPage = () => {
     return <EmptySearchResults searchQuery={'test'} category={undefined} />
 }
-
+// TODO: fix all
+// Found an unhandled GET request to https://www.domain.com/mobify/proxy/api/product/shopper-products/v1/organizations/f_ecom_zzrf_001/products?ids=11736753M%2C22951021M%2C25592770M%2C25752986M&expand=availability%2Clinks%2Cpromotions%2Coptions%2Cimages%2Cprices%2Cvariations&locale=en-GB&allImages=true&perPricebook=true&siteId=site-1
 beforeEach(() => {
     global.server.use(
         rest.get('*/product-search', (req, res, ctx) => {

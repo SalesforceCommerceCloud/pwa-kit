@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, {createContext, useContext, useMemo} from 'react'
+import React, {useMemo} from 'react'
 import PropTypes from 'prop-types'
 import {ChakraProvider} from '@chakra-ui/react'
 
@@ -14,18 +14,17 @@ import 'focus-visible/dist/focus-visible'
 
 import theme from '../../../src/theme'
 // import {MultiSiteProvider, AppConfigProvider} from '../../../src/contexts'
-import {MultiSiteProvider} from '../../../src/contexts'
-import {useAppOrigin} from '../../../src/hooks/use-app-origin'
-import {resolveSiteFromUrl, resolveLocaleFromUrl} from '../../../src/utils/site-utils'
+import {MultiSiteProvider} from '../../contexts'
+import {useAppOrigin} from '../../hooks/use-app-origin'
+import {resolveSiteFromUrl, resolveLocaleFromUrl} from '../../utils/site-utils'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
-import {createUrlTemplate} from '../../../src/utils/url'
+import {createUrlTemplate} from '../../utils/url'
 import createLogger from '@salesforce/pwa-kit-runtime/utils/logger-factory'
 
 import {CommerceApiProvider} from '@salesforce/commerce-sdk-react'
 import {withReactQuery} from '@salesforce/pwa-kit-react-sdk/ssr/universal/components/with-react-query'
 import {useCorrelationId} from '@salesforce/pwa-kit-react-sdk/ssr/universal/hooks'
 import {ReactQueryDevtools} from '@tanstack/react-query-devtools'
-import {DEFAULT_DNT_STATE} from '../../../config/constants'
 
 /**
  * Use the AppConfig component to inject extra arguments into the getProps

@@ -7,7 +7,7 @@
 
 import React from 'react'
 import {act, screen, fireEvent, waitFor, within} from '@testing-library/react'
-import {mockCustomerBaskets, mockedCustomerProductLists} from '../../mocks/mock-data'
+import {mockCustomerBaskets, mockedCustomerProductLists} from '../../../mocks/mock-data'
 import {Route, Switch} from 'react-router-dom'
 import {rest} from 'msw'
 import ProductDetail from '.'
@@ -18,13 +18,13 @@ import {
     einsteinRecommendation,
     masterProduct,
     productsForEinstein
-} from '../../pages/product-detail/index.mock'
-import mockedProductSet from '../../mocks/product-set-winter-lookM'
+} from './index.mock'
+import mockedProductSet from '../../../mocks/product-set-winter-lookM'
 import {
     mockProductBundle,
     basketWithProductBundle,
     bundleProductItemsForPDP
-} from '../../mocks/product-bundle'
+} from '../../../mocks/product-bundle'
 
 const mockAddToWishlist = jest.fn()
 jest.mock('@salesforce/commerce-sdk-react', () => {

@@ -11,8 +11,8 @@ import {renderWithProviders, createPathWithDefaults} from '../../utils/test-util
 import Login from '.'
 import {BrowserRouter as Router, Route} from 'react-router-dom'
 import Account from '../../pages/account'
-import mockConfig from '../../mock-config'
-import {mockedRegisteredCustomer} from '../../mocks/mock-data'
+import mockConfig from '../../../config/mocks/mock-config'
+import {mockedRegisteredCustomer} from '../../../mocks/mock-data'
 import {AuthHelpers} from '@salesforce/commerce-sdk-react'
 
 const mockMergedBasket = {

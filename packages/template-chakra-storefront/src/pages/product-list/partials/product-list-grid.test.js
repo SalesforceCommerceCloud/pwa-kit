@@ -5,10 +5,9 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
-import {screen, fireEvent} from '@testing-library/react'
+import {screen, act} from '@testing-library/react'
 import {renderWithProviders} from '../../../utils/test-utils'
 import ProductListGrid from './product-list-grid'
-import userEvent from '@testing-library/user-event'
 
 jest.mock('../../../utils/utils', () => {
     const original = jest.requireActual('../../../utils/utils')
@@ -96,20 +95,23 @@ describe('ProductListGrid', () => {
         expect(screen.getByText('Product 2')).toBeInTheDocument()
     })
 
-    test('handles product click', () => {
-        renderWithProviders(<ProductListGrid {...mockProps} />)
+    test('handles product click', async () => {
+        const {user} = renderWithProviders(<ProductListGrid {...mockProps} />)
         const productTiles = screen.getAllByTestId(/sf-product-tile-/)
-        fireEvent.click(productTiles[0])
+        await act(async () => {
+            await user.click(productTiles[0])
+        })
         expect(mockProps.onClickProduct).toHaveBeenCalledWith(mockProps.productSearchResult.hits[0])
     })
 
     test('handles favourite toggle', async () => {
-        const user = userEvent.setup()
         mockProps.isItemInWishlist.mockReturnValue(false)
 
-        renderWithProviders(<ProductListGrid {...mockProps} />)
+        const {user} = renderWithProviders(<ProductListGrid {...mockProps} />)
         const favouriteButtons = screen.getAllByTestId('tile-wishlist-btn')
-        await user.click(favouriteButtons[0])
+        await act(async () => {
+            await user.click(favouriteButtons[0])
+        })
         expect(mockProps.onFavouriteToggle).toHaveBeenCalledWith(
             mockProps.productSearchResult.hits[0],
             true

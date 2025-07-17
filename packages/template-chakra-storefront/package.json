@@ -14,6 +14,10 @@
   "scripts": {
     "analyze-build": "cross-env MOBIFY_ANALYZE=true npm run build",
     "build": "pwa-kit-dev build",
+    "build-translations": "npm run extract-default-translations && npm run compile-translations && npm run compile-translations:pseudo",
+    "compile-translations": "node ./scripts/translations/compile-folder.js translations",
+    "compile-translations:pseudo": "node ./scripts/translations/compile-pseudo.js translations/en-US.json",
+    "extract-default-translations": "node ./scripts/translations/extract-default-messages.js en-US en-GB",
     "format": "pwa-kit-dev format \"**/*.{js,jsx,ts,tsx}\"",
     "lint": "npm run lint:js && npm run typecheck",
     "lint:fix": "npm run lint:js -- --fix",
@@ -30,6 +34,7 @@
     "@chakra-ui/react": "3.22.0",
     "@emotion/react": "^11.14.0",
     "@loadable/component": "^5.15.3",
+    "@formatjs/cli": "^6.0.4",
     "@peculiar/webcrypto": "^1.4.2",
     "@salesforce/cc-datacloud-typescript": "^1.0.10",
     "@salesforce/commerce-sdk-react": "4.0.0-extensibility-preview.5",

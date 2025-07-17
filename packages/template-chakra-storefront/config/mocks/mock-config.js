@@ -51,16 +51,14 @@ module.exports = {
     login: {
         passwordless: {
             enabled: false,
-            callbackURI: 'https://webhook.site/27761b71-50c1-4097-a600-21a3b89a546c',
-            landingPath: '/passwordless-login-landing'
+            callbackURI: 'https://webhook.site/27761b71-50c1-4097-a600-21a3b89a546c'
         },
         social: {
             enabled: false,
-            idps: ['google', 'apple'],
-            redirectURI: '/social-callback'
+            idps: ['google', 'apple']
         },
         resetPassword: {
-            callbackURI: 'https://webhook.site/27761b71-50c1-4097-a600-21a3b89a546c',
+            callbackURI: process.env.RESET_PASSWORD_CALLBACK_URI || '/reset-password-callback',
             landingPath: '/reset-password-landing'
         }
     },
@@ -80,7 +78,7 @@ module.exports = {
                 {value: 'US', label: 'United States'}
             ]
         },
-        CheckoutConfirmation: {
+        checkoutConfirmation: {
             path: '/checkout/confirmation/:orderNo'
         },
         home: {
@@ -91,16 +89,16 @@ module.exports = {
         login: {
             path: '/login'
         },
-        Registration: {
+        registration: {
             path: '/registration'
         },
-        ResetPassword: {
+        resetPassword: {
             path: '/reset-password'
         },
-        LoginRedirect: {
+        loginRedirect: {
             path: '/callback'
         },
-        ProductDetail: {
+        productDetail: {
             path: '/product/:productId'
         },
         productList: {

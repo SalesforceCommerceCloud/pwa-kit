@@ -12,7 +12,7 @@ import {rest} from 'msw'
 import {renderWithProviders, createPathWithDefaults} from '../../utils/test-utils'
 import Confirmation from './confirmation'
 import {mockOrder, mockProducts} from './confirmation.mock'
-import mockConfig from '../../../mock-config'
+import mockConfig from '../../../config/mocks/mock-config'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 
 jest.mock('@salesforce/pwa-kit-runtime/utils/ssr-config', () => {

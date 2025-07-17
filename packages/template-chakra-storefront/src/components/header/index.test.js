@@ -6,11 +6,11 @@
  */
 import React from 'react'
 import PropTypes from 'prop-types'
-import {fireEvent, screen, waitFor, act} from '@testing-library/react'
+import {createMemoryHistory} from 'history'
+import {screen, waitFor, act} from '@testing-library/react'
 import Header from '../../components/header/index'
 import {renderWithProviders, createPathWithDefaults} from '../../utils/test-utils'
 import {rest} from 'msw'
-import {createMemoryHistory} from 'history'
 import {mockCustomerBaskets} from '../../../mocks/mock-data'
 
 jest.mock('@chakra-ui/react', () => {
@@ -85,7 +85,7 @@ test('renders Header with event handlers', async () => {
     const onLogoClick = jest.fn()
     const onMyAccountClick = jest.fn()
     const onMyCartClick = jest.fn()
-    renderWithProviders(
+    const {user} = renderWithProviders(
         <Header
             onMenuClick={onMenuClick}
             onLogoClick={onLogoClick}
@@ -105,22 +105,22 @@ test('renders Header with event handlers', async () => {
     const account = screen.getByLabelText(/My Account/i)
     const cart = screen.getByLabelText(/My cart, number of items: 2/)
     await act(async () => {
-        fireEvent.click(menu)
+        await user.click(menu)
     })
     expect(onMenuClick).toHaveBeenCalledTimes(1)
 
     await act(async () => {
-        fireEvent.click(logo)
+        await user.click(logo)
     })
     expect(onLogoClick).toHaveBeenCalledTimes(1)
 
     await act(async () => {
-        fireEvent.click(cart)
+        await user.click(cart)
     })
     expect(onMyCartClick).toHaveBeenCalledTimes(1)
 
     await act(async () => {
-        fireEvent.click(account)
+        await user.click(account)
     })
     expect(onMyAccountClick).toHaveBeenCalledTimes(1)
 })
@@ -170,12 +170,11 @@ test('route to account page when an authenticated users click on account icon', 
     const {user} = renderWithProviders(<MockedComponent history={history} />)
 
     await waitFor(() => {
-        // Look for account button
-        const accountTrigger = screen.getByLabelText(/My account/)
+        // Look for account icon
+        const accountTrigger = screen.getByLabelText('Open account menu')
         expect(accountTrigger).toBeInTheDocument()
     })
-
-    const accountButton = screen.getByLabelText(/My account/)
+    const accountButton = screen.getByLabelText(/My account/i)
 
     await act(async () => {
         await user.click(accountButton)

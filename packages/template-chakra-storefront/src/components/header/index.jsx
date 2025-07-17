@@ -22,10 +22,6 @@ import {
     useSlotRecipe
 } from '@chakra-ui/react'
 import {AuthHelpers, useAuthHelper, useCustomerType} from '@salesforce/commerce-sdk-react'
-import {
-    useApplicationExtension,
-    useApplicationExtensionsStore
-} from '@salesforce/pwa-kit-extension-sdk/react'
 
 import {useCurrentBasket} from '../../hooks'
 
@@ -116,6 +112,10 @@ const Header = ({
         isEnabled: false
     }
     const isStoreLocatorEnabled = !!storeLocatorExtension && storeLocatorExtension.isEnabled
+    const openModal = () => {
+        // TODO: unwire this from upgradeability zustand store slice
+        console.log('openModal')
+    }
 
     const [showLoading, setShowLoading] = useState(false)
 

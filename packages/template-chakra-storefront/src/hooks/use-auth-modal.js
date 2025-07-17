@@ -89,7 +89,6 @@ export const AuthModal = ({
     const callbackURL = isAbsoluteURL(passwordlessConfigCallback)
         ? passwordlessConfigCallback
         : `${appOrigin}${passwordlessConfigCallback}`
-
     const {data: baskets} = useCustomerBaskets(
         {parameters: {customerId}},
         {

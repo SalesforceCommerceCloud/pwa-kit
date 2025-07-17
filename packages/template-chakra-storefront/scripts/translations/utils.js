@@ -7,7 +7,7 @@
  */
 
 /* eslint @typescript-eslint/no-var-requires: "off" */
-const OUTPUT_FOLDER_PATH = 'app/static/translations/compiled'
+const OUTPUT_FOLDER_PATH = 'src/static/translations/compiled'
 
 module.exports = {
     OUTPUT_FOLDER_PATH

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, salesforce.com, inc.
+ * Copyright (c) 2025, salesforce.com, inc.
  * All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
@@ -10,7 +10,6 @@ import {Helmet} from 'react-helmet'
 import {Box, Button, Flex, Heading, IconButton, Stack, Text} from '@chakra-ui/react'
 
 import {BrandLogo, FileIcon} from '../icons'
-import {withChakraUI} from '../with-chakra-ui'
 
 // <Error> is rendered when:
 //
@@ -142,4 +141,4 @@ Error.propTypes = {
     message: PropTypes.string
 }
 
-export default withChakraUI(Error)
+export default Error

@@ -5,9 +5,8 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, {useEffect} from 'react'
+import React from 'react'
 import {useIntl, FormattedMessage} from 'react-intl'
-import {useLocation} from 'react-router-dom'
 
 // Components
 import {
@@ -34,8 +33,6 @@ import {getStaticAssetUrl} from '@salesforce/pwa-kit-react-sdk/ssr/universal/uti
 import {heroFeatures, features} from './data'
 
 //Hooks
-import useEinstein from '../../hooks/use-einstein'
-import useDataCloud from '../../hooks/use-datacloud'
 
 // Constants
 import {useServerContext} from '@salesforce/pwa-kit-react-sdk/ssr/universal/hooks'
@@ -50,9 +47,6 @@ import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
  */
 const Home = () => {
     const intl = useIntl()
-    const einstein = useEinstein()
-    const dataCloud = useDataCloud()
-    const {pathname} = useLocation()
     const {
         pages: {
             home: {productLimit: HOME_PRODUCT_LIMIT, mainCategory: HOME_MAIN_CATEGORY}
@@ -78,12 +72,6 @@ const Home = () => {
             refine: [`cgid=${HOME_MAIN_CATEGORY}`, 'htype=master']
         }
     })
-
-    /**************** Einstein ****************/
-    useEffect(() => {
-        einstein.sendViewPage(pathname)
-        dataCloud.sendViewPage(pathname)
-    }, [])
 
     return (
         <Box data-testid="home-page" layerStyle="page">
