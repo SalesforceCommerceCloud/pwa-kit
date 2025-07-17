@@ -143,7 +143,6 @@ describe('useMultiship', () => {
             expect(result.current).toHaveProperty('moveItemsToPickupShipment')
             expect(result.current).toHaveProperty('findOrCreateDeliveryShipment')
             expect(result.current).toHaveProperty('findOrCreatePickupShipment')
-            expect(result.current).toHaveProperty('isCurrentShippingMethodPickup')
         })
 
         test('should handle null basket', () => {
@@ -447,7 +446,7 @@ describe('useMultiship', () => {
                 basketWithEmptyDefault,
                 'me',
                 [],
-                false, // hasAnyPickupSelected = false for delivery
+                false,
                 mockStoreInfo
             )
             expect(mockCreateShipmentForBasket).not.toHaveBeenCalled()
@@ -525,7 +524,7 @@ describe('useMultiship', () => {
                 basketWithEmptyDefault,
                 'me',
                 [],
-                true, // hasAnyPickupSelected = true for pickup
+                true, 
                 mockStoreInfo
             )
         })
