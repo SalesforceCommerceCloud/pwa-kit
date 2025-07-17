@@ -63,8 +63,8 @@ The `mcp.json` file opens. Add this definition to your `mcp.json` file and repla
 {
   "mcpServers": {
 
-    "pwa-kit-mcp-server": {
-      "command": "node {{parent-dir-to-mcp}}/pwa-kit-mcp-server/dist/server/server.js",
+    "pwa-kit-mcp": {
+      "command": "node {{parent-dir-to-mcp}}/pwa-kit-mcp/dist/server/server.js",
       "transport": "stdio",
       "args": [],
       "env": {
@@ -97,10 +97,10 @@ The `claude_desktop_config.json` file opens.
 ```json
 {
   "mcpServers": {
-    "pwa-kit-mcp-server": {
+    "pwa-kit-mcp": {
       "command": "{{path-to-node}}/node",
       "transport": "stdio",
-      "args": ["{{parent-dir-to-mcp}}/pwa-kit-mcp-server/dist/server/server.js"],
+      "args": ["{{parent-dir-to-mcp}}/pwa-kit-mcp/dist/server/server.js"],
       "env": {
         "PWA_STOREFRONT_APP_PATH": "{{path-to-app-directory}}"
       }

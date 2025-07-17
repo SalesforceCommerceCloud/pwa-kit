@@ -1,5 +1,5 @@
 {
-  "name": "@salesforce/pwa-kit-mcp-server",
+  "name": "@salesforce/pwa-kit-mcp",
   "version": "0.1.0-preview.0",
   "private": true,
   "description": "MCP server that helps you build Salesforce Commerce Cloud PWA Kit Composable Storefront",
@@ -37,7 +37,7 @@
   ],
   "author": "Spark Team",
   "bin": {
-    "pwa-kit-mcp-server": "dist/server/server.js"
+    "pwa-kit-mcp": "dist/server/server.js"
   },
   "license": "ISC",
   "dependencies": {
