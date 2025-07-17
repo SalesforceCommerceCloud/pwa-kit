@@ -26,7 +26,7 @@ import RecommendedProducts from '../components/recommended-products'
 import {LockIcon} from '../components/icons'
 import {findImageGroupBy} from '../utils/image-groups-utils'
 import {getPriceData, getDisplayVariationValues} from '../utils/product-utils'
-import {EINSTEIN_RECOMMENDERS} from '../constants'
+import {EINSTEIN_RECOMMENDERS} from '../../config/constants'
 import DisplayPrice from '../components/display-price'
 import SafePortal from '../components/safe-portal'
 

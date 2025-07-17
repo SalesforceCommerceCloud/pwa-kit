@@ -13,11 +13,11 @@ import {Alert, Box, Container, Stack, Text, Spinner} from '@chakra-ui/react'
 import useNavigation from '../../hooks/use-navigation'
 import {useAuthHelper, AuthHelpers, useShopperBasketsMutation} from '@salesforce/commerce-sdk-react'
 import {useSearchParams} from '../../hooks'
-import {useCurrentCustomer} from '../../hooks/use-current-customer'
+import {useCurrentCustomer} from '../../hooks'
 import {useAppOrigin} from '../../hooks/use-app-origin'
-import {useExtensionConfig} from '../../hooks/use-extension-config'
+import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {getSessionJSONItem, clearSessionJSONItem, buildRedirectURI} from '../../utils/utils'
-import {API_ERROR_MESSAGE} from '../../constants'
+import {API_ERROR_MESSAGE} from '../../../config/constants'
 import {AlertIcon} from '../../components/icons'
 
 const SocialLoginRedirect = () => {
@@ -28,7 +28,7 @@ const SocialLoginRedirect = () => {
     const {data: customer} = useCurrentCustomer()
     // Build redirectURI from config values
     const appOrigin = useAppOrigin()
-    const {login} = useExtensionConfig()
+    const {login} = getConfig()
     const redirectPath = login?.social?.redirectURI || ''
     const redirectURI = buildRedirectURI(appOrigin, redirectPath)
 

@@ -39,7 +39,7 @@ import {productUrlBuilder, rebuildPathWithParams} from '../../utils/url'
 import {getPriceData} from '../../utils/product-utils'
 import {useCurrency} from '../../hooks'
 import {filterImageGroups, getDecoratedVariationAttributes} from '../../utils/product-utils'
-import {PRODUCT_BADGE_DETAILS} from '../../constants'
+import {PRODUCT_BADGE_DETAILS} from '../../../config/constants'
 
 // Constants for product tile page
 export const PRODUCT_TILE_IMAGE_VIEW_TYPE = 'large'

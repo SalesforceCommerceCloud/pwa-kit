@@ -9,7 +9,7 @@ import PropTypes from 'prop-types'
 import {Alert, Box, Button, Container, Dialog, Stack, Text} from '@chakra-ui/react'
 import {useForm} from 'react-hook-form'
 import {FormattedMessage, useIntl} from 'react-intl'
-import {useCheckout} from '../../../pages/checkout/util/checkout-context'
+import {useCheckout} from '../util/checkout-context'
 import useLoginFields from '../../../components/forms/useLoginFields'
 import {ToggleCard, ToggleCardEdit, ToggleCardSummary} from '../../../components/toggle-card'
 import Field from '../../../components/field'
@@ -18,12 +18,11 @@ import {AlertIcon} from '../../../components/icons'
 import LoginState from '../../../pages/checkout/partials/login-state'
 import {AuthModal, EMAIL_VIEW, PASSWORD_VIEW, useAuthModal} from '../../../hooks/use-auth-modal'
 import useNavigation from '../../../hooks/use-navigation'
-import {useCurrentCustomer} from '../../../hooks/use-current-customer'
-import {useCurrentBasket} from '../../../hooks/use-current-basket'
+import {useCurrentCustomer, useCurrentBasket} from '../../../hooks'
 import {isAbsoluteURL} from '../../../page-designer/utils'
 import {useAppOrigin} from '../../../hooks/use-app-origin'
 import {AuthHelpers, useAuthHelper, useShopperBasketsMutation} from '@salesforce/commerce-sdk-react'
-import {useExtensionConfig} from '../../../hooks/use-extension-config'
+import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 
 import {
     API_ERROR_MESSAGE,
@@ -31,7 +30,7 @@ import {
     CREATE_ACCOUNT_FIRST_ERROR_MESSAGE,
     PASSWORDLESS_ERROR_MESSAGES,
     USER_NOT_FOUND_ERROR
-} from '../../../constants'
+} from '../../../../config/constants'
 
 const ContactInfo = ({isSocialEnabled = false, isPasswordlessEnabled = false, idps = []}) => {
     const {formatMessage} = useIntl()
@@ -39,7 +38,7 @@ const ContactInfo = ({isSocialEnabled = false, isPasswordlessEnabled = false, id
     const {data: customer} = useCurrentCustomer()
     const {data: basket} = useCurrentBasket()
     const appOrigin = useAppOrigin()
-    const config = useExtensionConfig()
+    const config = getConfig()
     const login = useAuthHelper(AuthHelpers.LoginRegisteredUserB2C)
     const logout = useAuthHelper(AuthHelpers.Logout)
     const authorizePasswordlessLogin = useAuthHelper(AuthHelpers.AuthorizePasswordless)

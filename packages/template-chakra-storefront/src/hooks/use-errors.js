@@ -6,7 +6,7 @@
  */
 import {useIntl} from 'react-intl'
 import useToast from './use-toast'
-import {API_ERROR_MESSAGE} from '../constants'
+import {API_ERROR_MESSAGE} from '../../config/constants'
 
 /**
  * Custom hook for error handling

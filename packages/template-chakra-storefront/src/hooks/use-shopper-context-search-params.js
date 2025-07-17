@@ -9,7 +9,7 @@ import {useMemo} from 'react'
 import {useLocation} from 'react-router-dom'
 
 // Constants
-import {SHOPPER_CONTEXT_SEARCH_PARAMS, SHOPPER_CONTEXT_FIELD_TYPES} from '../constants'
+import {SHOPPER_CONTEXT_SEARCH_PARAMS, SHOPPER_CONTEXT_FIELD_TYPES} from '../../config/constants'
 
 /**
  * This hook will return a shopper context object when search params related

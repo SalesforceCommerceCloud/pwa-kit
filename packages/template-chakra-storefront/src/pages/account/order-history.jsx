@@ -22,14 +22,15 @@ import {
     Image,
     Skeleton
 } from '@chakra-ui/react'
+import PropTypes from 'prop-types'
 import {useCustomerOrders, useProducts} from '@salesforce/commerce-sdk-react'
 import useNavigation from '../../hooks/use-navigation'
-import {useExtensionConfig, useCurrentCustomer, usePageUrls, useSearchParams} from '../../hooks'
+import {useCurrentCustomer, usePageUrls, useSearchParams} from '../../hooks'
 import PageActionPlaceHolder from '../../components/page-action-placeholder'
 import Link from '../../components/link'
 import {ChevronRightIcon, ReceiptIcon} from '../../components/icons'
 import Pagination from '../../components/pagination'
-import PropTypes from 'prop-types'
+import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 
 const OrderProductImages = ({productItems}) => {
     const ids = productItems.map((item) => item.productId).join(',') ?? ''
@@ -80,8 +81,8 @@ const AccountOrderHistory = () => {
     const {formatMessage, formatDate} = useIntl()
     const navigate = useNavigation()
     const {
-        pages: {Account: accountConfig}
-    } = useExtensionConfig()
+        pages: {account: accountConfig}
+    } = getConfig()
 
     const {data: customer} = useCurrentCustomer()
     const {customerId} = customer

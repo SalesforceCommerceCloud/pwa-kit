@@ -7,6 +7,7 @@
 
 import React from 'react'
 import {Box, Grid, Stack} from '@chakra-ui/react'
+import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 
 // Project Components
 import PageMetadata from './page-metadata'
@@ -21,7 +22,6 @@ import ProductListPagination from './partials/product-list-pagination'
 import PageAnalytics from './page-analytics'
 
 // Hooks
-import {useExtensionConfig} from '../../hooks'
 import {useProductListWishlist} from './hooks/use-product-list-wishlist'
 import {useProductListData} from './hooks/use-product-list-data'
 import {useProductListControls} from './hooks/use-product-list-controls'
@@ -33,8 +33,8 @@ import {useProductListControls} from './hooks/use-product-list-controls'
  */
 const ProductList = () => {
     const {
-        pages: {ProductList: productListConfig}
-    } = useExtensionConfig()
+        pages: {productList: productListConfig}
+    } = getConfig()
     const {toggleItem, isItemInWishlist} = useProductListWishlist()
 
     const {

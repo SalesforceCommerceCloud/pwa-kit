@@ -111,13 +111,11 @@ const Header = ({
     const {isRegistered} = useCustomerType()
     const logout = useAuthHelper(AuthHelpers.Logout)
     const navigate = useNavigation()
-    const storeLocatorExtension = useApplicationExtension(
-        '@salesforce/extension-chakra-store-locator'
-    )
+    // TODO: unwire this from upgradeability, it was calling `useApplicationExtension`
+    const storeLocatorExtension = {
+        isEnabled: false
+    }
     const isStoreLocatorEnabled = !!storeLocatorExtension && storeLocatorExtension.isEnabled
-    const openModal = useApplicationExtensionsStore((state) => {
-        return state.state['@salesforce/extension-chakra-store-locator']?.openModal || noop
-    })
 
     const [showLoading, setShowLoading] = useState(false)
 

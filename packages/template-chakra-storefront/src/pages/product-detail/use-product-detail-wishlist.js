@@ -17,7 +17,7 @@ import {
     TOAST_ACTION_VIEW_WISHLIST,
     TOAST_MESSAGE_ADDED_TO_WISHLIST,
     TOAST_MESSAGE_ALREADY_IN_WISHLIST
-} from '../../constants'
+} from '../../../config/constants'
 
 // TODO: we are in the process of de-duplicating the wishlist related logic
 // across multiple pages. We first need to extract these logic into individual files

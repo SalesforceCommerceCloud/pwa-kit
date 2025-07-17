@@ -18,7 +18,7 @@ jest.mock('./use-toast', () => ({
 }))
 
 // Mock the constants
-jest.mock('../constants', () => ({
+jest.mock('../../config/constants', () => ({
     API_ERROR_MESSAGE: {
         id: 'api.error.message',
         defaultMessage: 'Something went wrong. Please try again.'

@@ -16,7 +16,7 @@ import {
     TOAST_ACTION_VIEW_WISHLIST,
     TOAST_MESSAGE_ADDED_TO_WISHLIST,
     TOAST_MESSAGE_ALREADY_IN_WISHLIST
-} from '../../constants'
+} from '../../../config/constants'
 
 /**
  * Custom hook to handle wishlist operations from cart

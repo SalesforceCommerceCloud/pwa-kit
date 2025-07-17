@@ -46,9 +46,9 @@ const ProductDetail = loadable(() => import('../src/pages/product-detail'), {fal
 const ProductList = loadable(() => import('../src/pages/product-list'), {
     fallback
 })
-const StoreLocator = loadable(() => import('../src/pages/store-locator'), {
-    fallback
-})
+// const StoreLocator = loadable(() => import('../src/pages/store-locator'), {
+//     fallback
+// })
 const Wishlist = loadable(() => import('../src/pages/account/wishlist'), {
     fallback
 })
@@ -129,10 +129,10 @@ export const routes = [
         path: '/account/wishlist',
         component: Wishlist
     },
-    {
-        path: '/store-locator',
-        component: StoreLocator
-    },
+    // {
+    //     path: '/store-locator',
+    //     component: StoreLocator
+    // },
     {
         path: '*',
         component: PageNotFound

@@ -83,7 +83,7 @@ const AppConfig = ({children, locals = {}}) => {
             logger={memoizedLogger}
         >
             <MultiSiteProvider site={locals.site} locale={locals.locale} buildUrl={locals.buildUrl}>
-                <ChakraProvider theme={theme}>{children}</ChakraProvider>
+                <ChakraProvider value={theme}>{children}</ChakraProvider>
             </MultiSiteProvider>
             <ReactQueryDevtools />
         </CommerceApiProvider>

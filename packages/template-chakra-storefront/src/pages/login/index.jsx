@@ -35,9 +35,9 @@ import {
     FEATURE_UNAVAILABLE_ERROR_MESSAGE,
     PASSWORDLESS_ERROR_MESSAGES,
     USER_NOT_FOUND_ERROR
-} from '../../constants'
+} from '../../../config/constants'
 import {usePrevious} from '../../hooks/use-previous'
-import {useExtensionConfig} from '../../hooks'
+import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {isServer} from '../../utils/utils'
 
 const LOGIN_ERROR_MESSAGE = defineMessage({
@@ -57,7 +57,7 @@ const Login = ({initialView = LOGIN_VIEW}) => {
     const {path} = useRouteMatch()
     const einstein = useEinstein()
     const dataCloud = useDataCloud()
-    const {login: loginConfig} = useExtensionConfig()
+    const {login: loginConfig} = getConfig()
     const {isRegistered, customerType} = useCustomerType()
     const login = useAuthHelper(AuthHelpers.LoginRegisteredUserB2C)
     const loginPasswordless = useAuthHelper(AuthHelpers.LoginPasswordlessUser)

@@ -9,7 +9,7 @@ import PropTypes from 'prop-types'
 import {FormattedMessage} from 'react-intl'
 import {Stack} from '@chakra-ui/react'
 import RecommendedProducts from '../../../components/recommended-products'
-import {EINSTEIN_RECOMMENDERS} from '../../../constants'
+import {EINSTEIN_RECOMMENDERS} from '../../../../config/constants'
 
 /**
  * Cart recommendations component that displays product recommendations

@@ -85,7 +85,7 @@ jest.mock('../use-current-customer', () => ({
 }))
 
 // Mock the constants
-jest.mock('../../constants', () => ({
+jest.mock('../../../config/constants', () => ({
     TOAST_ACTION_VIEW_WISHLIST: {
         id: 'toast.action.view_wishlist',
         defaultMessage: 'View Wishlist'

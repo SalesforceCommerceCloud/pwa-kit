@@ -17,7 +17,11 @@ import PasswordRequirements from '../../components/forms/password-requirements'
 import useUpdatePasswordFields from '../../components/forms/useUpdatePasswordFields'
 import {usePasswordReset} from '../../hooks/use-password-reset'
 import useNavigation from '../../hooks/use-navigation'
-import {API_ERROR_MESSAGE, INVALID_TOKEN_ERROR, INVALID_TOKEN_ERROR_MESSAGE} from '../../constants'
+import {
+    API_ERROR_MESSAGE,
+    INVALID_TOKEN_ERROR,
+    INVALID_TOKEN_ERROR_MESSAGE
+} from '../../../config/constants'
 
 const ResetPasswordLanding = () => {
     const form = useForm()

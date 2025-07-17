@@ -11,7 +11,7 @@ import {initDataCloudSdk} from '@salesforce/cc-datacloud-typescript'
 import {useUsid, useCustomerType, useDNT} from '@salesforce/commerce-sdk-react'
 import useMultiSite from '../hooks/use-multi-site'
 import {useCurrentCustomer} from '../hooks/use-current-customer'
-import {useExtensionConfig} from '../hooks/use-extension-config'
+import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 
 export class DataCloudApi {
     constructor({siteId, appSourceId, tenantId, dnt}) {
@@ -437,7 +437,7 @@ const useDataCloud = () => {
     }
 
     // Grab Data Cloud configuration values and initialize the sdk
-    const {dataCloudAPI: config} = useExtensionConfig()
+    const {dataCloudAPI: config} = getConfig()
 
     const {appSourceId, tenantId} = config
 

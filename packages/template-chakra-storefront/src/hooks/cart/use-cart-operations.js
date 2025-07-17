@@ -9,7 +9,7 @@ import {useIntl} from 'react-intl'
 import debounce from 'lodash/debounce'
 import {useShopperBasketsMutation} from '@salesforce/commerce-sdk-react'
 import useToast from '../use-toast'
-import {TOAST_MESSAGE_REMOVED_ITEM_FROM_CART} from '../../constants'
+import {TOAST_MESSAGE_REMOVED_ITEM_FROM_CART} from '../../../config/constants'
 import {getUpdateBundleChildArray} from '../../utils/product-utils'
 
 const DEBOUNCE_WAIT = 750

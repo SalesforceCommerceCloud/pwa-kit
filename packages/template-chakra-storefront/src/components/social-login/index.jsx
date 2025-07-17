@@ -12,13 +12,13 @@ import {Button} from '@chakra-ui/react'
 import logger from '../../utils/logger-instance'
 import {useAuthHelper, AuthHelpers} from '@salesforce/commerce-sdk-react'
 import {useAppOrigin} from '../../hooks/use-app-origin'
-import {useExtensionConfig} from '../../hooks/use-extension-config'
+import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {setSessionJSONItem, buildRedirectURI} from '../../utils/utils'
 
 // Icons
-import {AppleIcon, GoogleIcon} from '../../components/icons'
+import {AppleIcon, GoogleIcon} from '../icons'
 
-import {API_ERROR_MESSAGE, FEATURE_UNAVAILABLE_ERROR_MESSAGE} from '../../constants'
+import {API_ERROR_MESSAGE, FEATURE_UNAVAILABLE_ERROR_MESSAGE} from '../../../config/constants'
 
 const IDP_CONFIG = {
     apple: {
@@ -48,7 +48,7 @@ const SocialLogin = ({form, idps = []}) => {
 
     // Build redirectURI from config values
     const appOrigin = useAppOrigin()
-    const {login: loginConfig} = useExtensionConfig()
+    const {login: loginConfig} = getConfig()
     const redirectPath = loginConfig?.social?.redirectURI || ''
     const redirectURI = buildRedirectURI(appOrigin, redirectPath)
 

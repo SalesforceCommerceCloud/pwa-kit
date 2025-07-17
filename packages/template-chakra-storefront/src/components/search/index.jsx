@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React, {useEffect, useMemo, useRef, useState} from 'react'
-import {useSearchSuggestions} from '@salesforce/commerce-sdk-react'
+import {FormattedMessage, useIntl} from 'react-intl'
 import {
     CloseButton,
     Input,
@@ -18,15 +18,16 @@ import {
     Spinner,
     useSlotRecipe
 } from '@chakra-ui/react'
-import SearchSuggestions from '../../components/search/partials/search-suggestions'
-import {SearchIcon} from '../../components/icons'
+import debounce from 'lodash/debounce'
+import {useSearchSuggestions} from '@salesforce/commerce-sdk-react'
+import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
+
+import {SearchIcon} from '../icons'
 import {capitalize, boldString, getSessionJSONItem, setSessionJSONItem} from '../../utils/utils'
 import useNavigation from '../../hooks/use-navigation'
+import SearchSuggestions from '../../components/search/partials/search-suggestions'
 import {HideOnDesktop, HideOnMobile} from '../responsive'
-import {FormattedMessage, useIntl} from 'react-intl'
-import debounce from 'lodash/debounce'
 import {productUrlBuilder, searchUrlBuilder, categoryUrlBuilder} from '../../utils/url'
-import {useExtensionConfig} from '../../hooks'
 
 const formatSuggestions = (searchSuggestions, input) => {
     return {
@@ -75,7 +76,7 @@ const Search = (props) => {
     const [searchQuery, setSearchQuery] = useState('')
     const navigate = useNavigation()
     const intl = useIntl()
-    const {search: searchConfig} = useExtensionConfig()
+    const {search: searchConfig} = getConfig()
     const searchSuggestion = useSearchSuggestions(
         {
             parameters: {

@@ -18,9 +18,9 @@ import useEinstein from '../../hooks/use-einstein'
 import useDataCloud from '../../hooks/use-datacloud'
 import {useLocation, useRouteMatch} from 'react-router-dom'
 import {usePasswordReset} from '../../hooks/use-password-reset'
-import {useExtensionConfig} from '../../hooks'
+import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 
-import {API_ERROR_MESSAGE, FEATURE_UNAVAILABLE_ERROR_MESSAGE} from '../../constants'
+import {API_ERROR_MESSAGE, FEATURE_UNAVAILABLE_ERROR_MESSAGE} from '../../../config/constants'
 
 const ResetPassword = () => {
     const {formatMessage} = useIntl()
@@ -31,7 +31,7 @@ const ResetPassword = () => {
     const {pathname} = useLocation()
     const {path} = useRouteMatch()
     const {getPasswordResetToken} = usePasswordReset()
-    const {login: loginConfig} = useExtensionConfig()
+    const {login: loginConfig} = getConfig()
 
     const submitForm = async ({email}) => {
         try {

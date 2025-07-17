@@ -5,14 +5,13 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import {useServerContext} from '@salesforce/pwa-kit-react-sdk/ssr/universal/hooks'
-import {useExtensionConfig} from '../../hooks'
+import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 /*
  * This component is used to set the cache headers for the page.
  */
 export default function PageCache() {
     const {res} = useServerContext()
-    const {maxCacheAge: MAX_CACHE_AGE, staleWhileRevalidate: STALE_WHILE_REVALIDATE} =
-        useExtensionConfig()
+    const {maxCacheAge: MAX_CACHE_AGE, staleWhileRevalidate: STALE_WHILE_REVALIDATE} = getConfig()
     if (res) {
         res.set(
             'Cache-Control',

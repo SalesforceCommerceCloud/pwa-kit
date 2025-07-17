@@ -10,7 +10,7 @@ import {FormattedMessage, useIntl} from 'react-intl'
 import {useItemVariant} from '../../../../components/item-variant'
 import ProductViewModal from '../../../../components/product-view-modal'
 import useToast from '../../../../hooks/use-toast'
-import {API_ERROR_MESSAGE} from '../../../../constants'
+import {API_ERROR_MESSAGE} from '../../../../../config/constants'
 import Link from '../../../../components/link'
 import {useShopperBasketsMutationHelper} from '@salesforce/commerce-sdk-react'
 

@@ -19,6 +19,7 @@ import {
     useCustomerBaskets,
     useShopperBasketsMutation
 } from '@salesforce/commerce-sdk-react'
+import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import LoginForm from '../components/login'
 import ResetPasswordForm from '../components/reset-password'
 import RegisterForm from '../components/register'
@@ -30,7 +31,7 @@ import {
     FEATURE_UNAVAILABLE_ERROR_MESSAGE,
     PASSWORDLESS_ERROR_MESSAGES,
     USER_NOT_FOUND_ERROR
-} from '../constants'
+} from '../../config/constants'
 import useNavigation from './use-navigation'
 import useToast from './use-toast'
 import {usePrevious} from './use-previous'
@@ -38,7 +39,6 @@ import {usePasswordReset} from './use-password-reset'
 import {isServer} from '../utils/utils'
 import {isAbsoluteURL} from '../page-designer/utils'
 import {useAppOrigin} from './use-app-origin'
-import {useExtensionConfig} from './use-extension-config'
 import SafePortal from '../components/safe-portal'
 
 export const LOGIN_VIEW = 'login'
@@ -81,7 +81,7 @@ export const AuthModal = ({
     const login = useAuthHelper(AuthHelpers.LoginRegisteredUserB2C)
     const register = useAuthHelper(AuthHelpers.Register)
     const appOrigin = useAppOrigin()
-    const config = useExtensionConfig()
+    const config = getConfig()
 
     const {getPasswordResetToken} = usePasswordReset()
     const authorizePasswordlessLogin = useAuthHelper(AuthHelpers.AuthorizePasswordless)
@@ -366,7 +366,7 @@ AuthModal.propTypes = {
  */
 export const useAuthModal = (initialView = LOGIN_VIEW) => {
     const {open, onOpen, onClose} = useDisclosure()
-    const {login} = useExtensionConfig()
+    const {login} = getConfig()
     const {passwordless = {}, social = {}} = login
 
     return {
