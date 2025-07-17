@@ -130,8 +130,21 @@ function processFile(filePath, plugins) {
         }
     }
 
+    const pluginPositions = []
+    const globalPluginRegex = new RegExp(Object.keys(plugins).join('|'), 'g')
+    let match
+    while ((match = globalPluginRegex.exec(source)) !== null) {
+        pluginPositions.push({
+            start: match.index,
+            end: match.index + match[0].length,
+            name: match[0]  // Optional: store which plugin was found
+        })
+    }
     const nodeContainsPluginReferences = (node) => {
-        return pluginRegex.test(source.slice(node.start, node.end))
+        // Check if any plugin reference falls within the node's range
+        return pluginPositions.some(pos => 
+            pos.start >= node.start && pos.start < node.end
+        )
     }
 
     // Traverse AST and remove nodes guarded by plugin flags
