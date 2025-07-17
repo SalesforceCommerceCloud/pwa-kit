@@ -66,11 +66,15 @@ describe('trim-extensions', () => {
             '/src/components/featureComponent.jsx',
             '/src/components/featureAComponent/index.jsx',
             '/src/components/featureBComponent/index.jsx',
-            '/src/pages/featureBPage/index.jsx',
+            '/src/pages/featureBPage/index.jsx'
         ])
         fs.statSync.mockReturnValue({isDirectory: () => false})
         fs.existsSync.mockImplementation((filePath) => {
-            if (filePath.includes('featureAComponent') || filePath.includes('featureBComponent') || filePath.includes('featureBPage')) {
+            if (
+                filePath.includes('featureAComponent') ||
+                filePath.includes('featureBComponent') ||
+                filePath.includes('featureBPage')
+            ) {
                 if (
                     filePath.endsWith('.jsx') ||
                     filePath.endsWith('.tsx') ||

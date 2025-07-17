@@ -32,5 +32,8 @@ module.exports = {
                 ]
             }
         ]
+    },
+    globals: {
+        SFDC_EXT_STORE_LOCATOR_ENABLED: 'readonly'
     }
 }

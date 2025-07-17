@@ -40,7 +40,9 @@ import CheckoutFooter from '../../../src/pages/checkout/partials/checkout-footer
 import {DrawerMenu} from '../../../src/components/drawer-menu'
 import {ListMenu, ListMenuContent} from '../../../src/components/list-menu'
 import {HideOnDesktop, HideOnMobile} from '../../../src/components/responsive'
-const StoreLocatorModal = SFDC_EXT_STORE_LOCATOR_ENABLED && loadable(() => import('../../../src/components/store-locator'))
+const StoreLocatorModal =
+    SFDC_EXT_STORE_LOCATOR_ENABLED &&
+    loadable(() => import('../../../src/components/store-locator'))
 // Hooks
 import {AuthModal, useAuthModal} from '../../../src/hooks/use-auth-modal'
 import {DntNotification, useDntNotification} from '../../../src/hooks/use-dnt-notification'
@@ -131,11 +133,13 @@ const App = (props) => {
     const styles = useStyleConfig('App')
 
     const {isOpen, onOpen, onClose} = useDisclosure()
+    /* eslint-disable react-hooks/rules-of-hooks */
+
     const {
         isOpen: isOpenStoreLocator,
         onOpen: onOpenStoreLocator,
         onClose: onCloseStoreLocator
-    } = SFDC_EXT_STORE_LOCATOR_ENABLED && useDisclosure() 
+    } = SFDC_EXT_STORE_LOCATOR_ENABLED && useDisclosure()
 
     const targetLocale = getTargetLocale({
         getUserPreferredLocales: () => {
@@ -276,7 +280,7 @@ const App = (props) => {
         onLogoClick: onLogoClick,
         onMyCartClick: onCartClick,
         onMyAccountClick: onAccountClick,
-        onWishlistClick: onWishlistClick,
+        onWishlistClick: onWishlistClick
     }
 
     SFDC_EXT_STORE_LOCATOR_ENABLED && (headerProps.onStoreLocatorClick = onOpenStoreLocator)

@@ -7,7 +7,7 @@
 
 import {defineMessage} from 'react-intl'
 import {noop} from '../src/utils/utils'
-import { ScaleFade } from '@chakra-ui/react'
+import {ScaleFade} from '@chakra-ui/react'
 
 // Default details of badge labels and the corresponding product custom properties that enable badges.
 export const PRODUCT_BADGE_DETAILS = [

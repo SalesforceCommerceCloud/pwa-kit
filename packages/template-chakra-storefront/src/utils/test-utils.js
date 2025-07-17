@@ -20,11 +20,7 @@ import {withReactQuery} from '@salesforce/pwa-kit-react-sdk/ssr/universal/compon
 import fallbackMessages from '../static/translations/compiled/en-GB.json'
 import mockConfig from '../../mock-config'
 // Contexts
-import {
-    CurrencyProvider,
-    MultiSiteProvider,
-    StoreLocatorProvider
-} from '../contexts'
+import {CurrencyProvider, MultiSiteProvider, StoreLocatorProvider} from '../contexts'
 
 import {createUrlTemplate} from './url'
 import {getSiteByReference} from './site-utils'
@@ -155,7 +151,7 @@ export const TestProviders = ({
                         fetchedToken={bypassAuth ? (isGuest ? guestToken : registerUserToken) : ''}
                     >
                         <CurrencyProvider currency={DEFAULT_CURRENCY}>
-                             <StoreLocatorProvider config={storeLocatorConfig}>
+                            <StoreLocatorProvider config={storeLocatorConfig}>
                                 <Router>
                                     <ChakraProvider theme={theme}>
                                         <AddToCartModalProvider>{children}</AddToCartModalProvider>

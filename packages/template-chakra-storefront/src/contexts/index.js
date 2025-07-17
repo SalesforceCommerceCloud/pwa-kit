@@ -91,7 +91,4 @@ CurrencyProvider.propTypes = {
     currency: PropTypes.string
 }
 
-export {
-    StoreLocatorContext,
-    StoreLocatorProvider
-} from './store-locator-provider'
+export {StoreLocatorContext, StoreLocatorProvider} from './store-locator-provider'

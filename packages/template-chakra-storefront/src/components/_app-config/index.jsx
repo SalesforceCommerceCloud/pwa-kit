@@ -76,15 +76,18 @@ const AppConfig = ({children, locals = {}}) => {
     const passwordlessLoginCallbackURI = useMemo(() => passwordlessCallback, [passwordlessCallback])
     const defaultDnt = useMemo(() => locals.appConfig.dnt, [locals.appConfig.dnt])
 
-    const storeLocatorConfig = useMemo(() => ({
-        radius: STORE_LOCATOR_RADIUS,
-        radiusUnit: STORE_LOCATOR_RADIUS_UNIT,
-        defaultCountry: STORE_LOCATOR_DEFAULT_COUNTRY,
-        defaultCountryCode: STORE_LOCATOR_DEFAULT_COUNTRY_CODE,
-        defaultPostalCode: STORE_LOCATOR_DEFAULT_POSTAL_CODE,
-        defaultPageSize: STORE_LOCATOR_DEFAULT_PAGE_SIZE,
-        supportedCountries: STORE_LOCATOR_SUPPORTED_COUNTRIES
-    }), [])
+    const storeLocatorConfig = useMemo(
+        () => ({
+            radius: STORE_LOCATOR_RADIUS,
+            radiusUnit: STORE_LOCATOR_RADIUS_UNIT,
+            defaultCountry: STORE_LOCATOR_DEFAULT_COUNTRY,
+            defaultCountryCode: STORE_LOCATOR_DEFAULT_COUNTRY_CODE,
+            defaultPostalCode: STORE_LOCATOR_DEFAULT_POSTAL_CODE,
+            defaultPageSize: STORE_LOCATOR_DEFAULT_PAGE_SIZE,
+            supportedCountries: STORE_LOCATOR_SUPPORTED_COUNTRIES
+        }),
+        []
+    )
 
     return (
         <CommerceApiProvider

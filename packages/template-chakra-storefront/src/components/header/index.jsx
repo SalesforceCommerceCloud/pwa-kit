@@ -361,7 +361,8 @@ Header.propTypes = {
     searchInputRef: PropTypes.oneOfType([
         PropTypes.func,
         PropTypes.shape({current: PropTypes.elementType})
-    ])
+    ]),
+    onStoreLocatorClick: PropTypes.func
 }
 
 export default Header

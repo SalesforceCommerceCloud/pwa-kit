@@ -11,9 +11,7 @@ import React from 'react'
 import {Box, Container} from '@chakra-ui/react'
 import {StoreLocator} from '../../components/store-locator'
 
-
 const StoreLocatorPage = () => {
-
     return (
         <Box data-testid="store-locator-page" bg="gray.50" py={[8, 16]}>
             <Container

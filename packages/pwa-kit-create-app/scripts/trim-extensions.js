@@ -54,7 +54,12 @@ function trimExtensions(directory, generatedPlugins) {
             if (!filePath.includes('node_modules')) {
                 if (stats.isDirectory()) {
                     processDirectory(filePath)
-                } else if (file.endsWith('.jsx') || file.endsWith('.tsx') || file.endsWith('.js') || file.endsWith('.ts')) {
+                } else if (
+                    file.endsWith('.jsx') ||
+                    file.endsWith('.tsx') ||
+                    file.endsWith('.js') ||
+                    file.endsWith('.ts')
+                ) {
                     processFile(filePath, plugins)
                 }
             }
@@ -71,9 +76,17 @@ function processFile(filePath, plugins) {
     const source = fs.readFileSync(filePath, 'utf-8')
 
     // Search file content for plugin references
-    const pluginRegex = new RegExp(Object.keys(plugins).join('|'))
-    const hasPluginReferences = pluginRegex.test(source)
-    if (!hasPluginReferences) {
+    const pluginPositions = []
+    const pluginRegex = new RegExp(Object.keys(plugins).join('|'), 'g')
+    let match
+    while ((match = pluginRegex.exec(source)) !== null) {
+        pluginPositions.push({
+            start: match.index,
+            end: match.index + match[0].length,
+            name: match[0] // store which plugin was found
+        })
+    }
+    if (pluginPositions.length === 0) {
         // No plugins found in file, return early
         return false
     }
@@ -126,7 +139,8 @@ function processFile(filePath, plugins) {
     }
 
     const nodeContainsPluginReferences = (node) => {
-        return pluginRegex.test(source.slice(node.start, node.end))
+        // Check if any plugin reference falls within the node's range
+        return pluginPositions.some((pos) => pos.start >= node.start && pos.start < node.end)
     }
 
     // Traverse AST and remove nodes guarded by plugin flags
@@ -210,7 +224,10 @@ function processFile(filePath, plugins) {
                             }
                         }
                     })
-                } else if (path.node.argument && path.node.argument.type === 'ConditionalExpression') {
+                } else if (
+                    path.node.argument &&
+                    path.node.argument.type === 'ConditionalExpression'
+                ) {
                     // Handle top-level ternary in return statement
                     const testValue = evaluateLogicalExpression(path.node.argument.test)
                     if (testValue === true) {
@@ -335,7 +352,9 @@ function removeUnusedComponents(directory) {
                                 absoluteImportPath = path.resolve(path.dirname(absoluteImportPath))
                             }
                             // If this import matches any exported file and it's not from one of the component candidates, remove it from the set
-                            const isCandidate = Array.from(removeComponentCandidates).find((candidate) => candidate.includes(path.dirname(filePath)))
+                            const isCandidate = Array.from(removeComponentCandidates).find(
+                                (candidate) => candidate === path.resolve(path.dirname(filePath))
+                            )
                             if (exportedFiles.has(absoluteImportPath) && !isCandidate) {
                                 exportedFiles.delete(absoluteImportPath)
                             }
@@ -369,9 +388,7 @@ function removeUnusedComponents(directory) {
         })
 
     // Output results
-    const filesToRemove = unusedFiles.filter((filePath) =>
-        removeComponentCandidates.has(filePath)
-    )
+    const filesToRemove = unusedFiles.filter((filePath) => removeComponentCandidates.has(filePath))
     if (filesToRemove.length > 0) {
         console.log('\nDeleting unused components:')
         filesToRemove.forEach((file) => {
@@ -409,7 +426,7 @@ function removeUnusedComponents(directory) {
 //         console.error('Please provide a directory path');
 //         process.exit(1);
 //     }
-//     trimExtensions(directory, {SFDC_EXT_STORE_LOCATOR_ENABLED: true});
+//     trimExtensions(directory, {});
 // }
 
 module.exports = trimExtensions
