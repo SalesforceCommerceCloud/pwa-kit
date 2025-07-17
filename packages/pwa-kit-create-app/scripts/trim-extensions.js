@@ -83,7 +83,7 @@ function processFile(filePath, plugins) {
         pluginPositions.push({
             start: match.index,
             end: match.index + match[0].length,
-            name: match[0]  // store which plugin was found
+            name: match[0] // store which plugin was found
         })
     }
     if (pluginPositions.length === 0) {
@@ -140,9 +140,7 @@ function processFile(filePath, plugins) {
 
     const nodeContainsPluginReferences = (node) => {
         // Check if any plugin reference falls within the node's range
-        return pluginPositions.some(pos => 
-            pos.start >= node.start && pos.start < node.end
-        )
+        return pluginPositions.some((pos) => pos.start >= node.start && pos.start < node.end)
     }
 
     // Traverse AST and remove nodes guarded by plugin flags
@@ -355,7 +353,7 @@ function removeUnusedComponents(directory) {
                             }
                             // If this import matches any exported file and it's not from one of the component candidates, remove it from the set
                             const isCandidate = Array.from(removeComponentCandidates).find(
-                                (candidate) => candidate === path.dirname(filePath)
+                                (candidate) => candidate === path.resolve(path.dirname(filePath))
                             )
                             if (exportedFiles.has(absoluteImportPath) && !isCandidate) {
                                 exportedFiles.delete(absoluteImportPath)
