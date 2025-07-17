@@ -9,7 +9,7 @@ import {screen, waitFor} from '@testing-library/react'
 import {rest} from 'msw'
 import {createPathWithDefaults, renderWithProviders} from '../../utils/test-utils'
 import StoreLocator from '.'
-import mockConfig from '../../mock-config'
+import mockConfig from '../../../config/mocks/mock-config'
 
 const mockStores = {
     limit: 4,

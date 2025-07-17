@@ -5,10 +5,10 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
-import {AddToCartModal, AddToCartModalContext} from '../hooks/use-add-to-cart-modal'
+import {AddToCartModal, AddToCartModalContext} from './use-add-to-cart-modal'
 import {renderWithProviders} from '../utils/test-utils'
 import {screen} from '@testing-library/react'
-import {mockProductBundle, mockBundleItemsAdded} from '../mocks/product-bundle'
+import {mockProductBundle, mockBundleItemsAdded} from '../../mocks/product-bundle'
 import {getDisplayVariationValues} from '../utils/product-utils'
 
 // Mock the hooks

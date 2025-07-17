@@ -6,7 +6,7 @@
  */
 import React from 'react'
 import useNavigation from './use-navigation'
-import mockConfig from '../mock-config'
+import mockConfig from '../../config/mocks/mock-config'
 import {renderWithProviders} from '../utils/test-utils'
 import {act} from '@testing-library/react'
 

@@ -11,7 +11,7 @@ import withRegistration from '../../components/with-registration/index'
 import {renderWithProviders} from '../../utils/test-utils'
 import userEvent from '@testing-library/user-event'
 import {rest} from 'msw'
-import {mockedGuestCustomer} from '../../mocks/mock-data'
+import {mockedGuestCustomer} from '../../../mocks/mock-data'
 
 const ButtonWithRegistration = withRegistration(Button)
 

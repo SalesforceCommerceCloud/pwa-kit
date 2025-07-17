@@ -10,10 +10,10 @@ import {screen, waitFor, within, act} from '@testing-library/react'
 import SearchInput from '../../components/search/index'
 import Suggestions from '../../components/search/partials/suggestions'
 import {clearSessionJSONItem, getSessionJSONItem, setSessionJSONItem, noop} from '../../utils/utils'
-import mockSearchResults from '../../mocks/searchResults'
-import mockConfig from '../../mock-config'
+import mockSearchResults from '../../../mocks/searchResults'
+import mockConfig from '../../../config/mocks/mock-config'
 import {rest} from 'msw'
-import {mockCustomerBaskets} from '../../mocks/mock-data'
+import {mockCustomerBaskets} from '../../../mocks/mock-data'
 
 // Constants for Search Component
 const RECENT_SEARCH_LIMIT = mockConfig.search.recentSearchLimit

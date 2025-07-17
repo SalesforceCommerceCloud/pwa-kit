@@ -14,7 +14,7 @@ import {
     mockProductSearchItem,
     mockProductSetHit,
     mockStandardProductHit
-} from '../../mocks/product-search-hit-data'
+} from '../../../mocks/product-search-hit-data'
 import {useBreakpointValue} from '@chakra-ui/react'
 
 jest.mock('@chakra-ui/react', () => {

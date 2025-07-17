@@ -10,7 +10,7 @@
 require('cross-fetch/polyfill')
 require('raf/polyfill') // fix requestAnimationFrame issue with polyfill
 require('@testing-library/jest-dom/extend-expect')
-const mockConfig = require('./mock-config')
+const mockConfig = require('./config/mocks/mock-config')
 
 const mockAppConfig = {
     app: {

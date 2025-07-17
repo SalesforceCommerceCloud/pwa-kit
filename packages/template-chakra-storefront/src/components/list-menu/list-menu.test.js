@@ -6,9 +6,9 @@
  */
 import React from 'react'
 import {act, screen} from '@testing-library/react'
-import {ListMenu} from '../../components/list-menu'
+import {ListMenu} from './list-menu'
 import {renderWithProviders} from '../../utils/test-utils'
-import {mockCategories} from '../../mocks/mock-data'
+import {mockCategories} from '../../../mocks/mock-data'
 import userEvent from '@testing-library/user-event'
 
 describe('ListMenu', () => {

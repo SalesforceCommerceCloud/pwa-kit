@@ -9,7 +9,7 @@ import PropTypes from 'prop-types'
 import {act, screen, waitFor, within} from '@testing-library/react'
 import {renderWithProviders} from '../../utils/test-utils'
 import ResetPasswordForm from '.'
-import mockConfig from '../../mock-config'
+import mockConfig from '../../../config/mocks/mock-config'
 import {useForm} from 'react-hook-form'
 
 const MockedComponent = ({mockSubmitForm, mockClickSignIn}) => {

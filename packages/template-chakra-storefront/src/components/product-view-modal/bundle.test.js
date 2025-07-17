@@ -15,7 +15,7 @@ import {
     mockBundledProductItemsVariant,
     mockProductBundleWithVariants,
     mockProductBundle
-} from '../../mocks/product-bundle'
+} from '../../../mocks/product-bundle'
 import {rest} from 'msw'
 
 const MockComponent = ({updateCart}) => {

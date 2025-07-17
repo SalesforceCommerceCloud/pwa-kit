@@ -11,7 +11,7 @@ import {renderWithProviders, createPathWithDefaults, guestToken} from '../utils/
 import {AuthModal, useAuthModal} from '../hooks/use-auth-modal'
 import {BrowserRouter as Router, Route} from 'react-router-dom'
 import Account from '../pages/account'
-import {mockedRegisteredCustomer} from '../mocks/mock-data'
+import {mockedRegisteredCustomer} from '../../mocks/mock-data'
 import * as ReactHookForm from 'react-hook-form'
 import {AuthHelpers} from '@salesforce/commerce-sdk-react'
 import {prependHandlersToServer} from '../../jest-setup'

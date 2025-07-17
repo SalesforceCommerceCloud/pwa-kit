@@ -13,13 +13,13 @@ import {act, screen, waitFor} from '@testing-library/react'
 import {renderWithProviders} from '../utils/test-utils'
 import useActiveData from './use-active-data'
 import {mockCategory, mockProduct, mockSearchResults} from './einstein-mock-data'
-import mockConfig from '../../mock-config'
+import mockConfig from '../../config/mocks/mock-config'
 const DEFAULT_SEARCH_PARAMS = mockConfig.search.defaultSearchParams
 jest.mock('@salesforce/pwa-kit-runtime/utils/ssr-config', () => {
     const original = jest.requireActual('@salesforce/pwa-kit-runtime/utils/ssr-config')
     return {
         ...original,
-        getConfig: jest.fn(() => require('../../mock-config'))
+        getConfig: jest.fn(() => require('../../config/mocks/mock-config'))
     }
 })
 

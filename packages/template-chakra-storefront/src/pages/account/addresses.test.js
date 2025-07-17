@@ -12,10 +12,10 @@ import AccountAddresses from '../../pages/account/addresses'
 import {
     mockedRegisteredCustomerWithNoAddress,
     mockedRegisteredCustomer
-} from '../../mocks/mock-data'
+} from '../../../mocks/mock-data'
 
 import {Route, Switch} from 'react-router-dom'
-import mockConfig from '../../mock-config'
+import mockConfig from '../../../config/mocks/mock-config'
 
 let mockCustomer = {}
 

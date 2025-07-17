@@ -15,10 +15,10 @@ import {
     mockedRegisteredCustomer,
     mockOrderProducts,
     mockPasswordUpdateFalure
-} from '../../mocks/mock-data'
+} from '../../../mocks/mock-data'
 import Account from '../../pages/account/index'
 import Login from '../../pages/login'
-import mockConfig from '../../mock-config'
+import mockConfig from '../../../config/mocks/mock-config'
 import {useCustomerType} from '@salesforce/commerce-sdk-react'
 
 jest.setTimeout(60000)

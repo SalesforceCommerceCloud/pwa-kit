@@ -12,8 +12,8 @@ import {BrowserRouter as Router, Route} from 'react-router-dom'
 import Account from '../../pages/account'
 import Registration from '../../pages/registration'
 import ResetPassword from '../../pages/reset-password'
-import mockConfig from '../../mock-config'
-import {mockedRegisteredCustomer} from '../../mocks/mock-data'
+import mockConfig from '../../../config/mocks/mock-config'
+import {mockedRegisteredCustomer} from '../../../mocks/mock-data'
 import {prependHandlersToServer} from '../../../jest-setup'
 
 jest.mock('../../hooks/use-datacloud', () => ({

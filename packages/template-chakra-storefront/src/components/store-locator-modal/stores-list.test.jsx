@@ -11,11 +11,11 @@ import {renderWithProviders} from '../../utils/test-utils'
 import {waitFor, screen, fireEvent} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import {Accordion} from '@chakra-ui/react'
-import mockConfig from '../../../mock-config'
+import mockConfig from '../../../config/mocks/mock-config'
 
 // Mock getConfig to return our mockConfig
 jest.mock('@salesforce/pwa-kit-runtime/utils/ssr-config', () => {
-    const actualConfig = jest.requireActual('../../../mock-config')
+    const actualConfig = jest.requireActual('../../../config/mocks/mock-config')
     return {
         getConfig: jest.fn().mockReturnValue(actualConfig)
     }

@@ -23,7 +23,7 @@ import {
     mockCategorySearchParams,
     mockRecommendationIds,
     mockLoginViewPageEventDNT
-} from '../mocks/datacloud-mock-data'
+} from '../../mocks/datacloud-mock-data'
 import {
     mockProduct,
     mockCategory,

@@ -11,7 +11,7 @@ import ProductViewModal from '../../components/product-view-modal/index'
 import {renderWithProviders} from '../../utils/test-utils'
 import {act, fireEvent, screen} from '@testing-library/react'
 import {useDisclosure} from '@chakra-ui/react'
-import mockProductDetail from '../../mocks/variant-750518699578M'
+import mockProductDetail from '../../../mocks/variant-750518699578M'
 import {prependHandlersToServer} from '../../../jest-setup'
 
 const MockComponent = ({updateCart}) => {

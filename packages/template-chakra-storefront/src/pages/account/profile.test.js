@@ -9,11 +9,14 @@ import {act, screen, waitFor, within} from '@testing-library/react'
 import {createPathWithDefaults, renderWithProviders} from '../../utils/test-utils'
 import {rest} from 'msw'
 import AccountDetail from '../../pages/account/profile'
-import {mockedRegisteredCustomerWithNoNumber, mockedRegisteredCustomer} from '../../mocks/mock-data'
+import {
+    mockedRegisteredCustomerWithNoNumber,
+    mockedRegisteredCustomer
+} from '../../../mocks/mock-data'
 import Toaster, {toaster} from '../../components/toaster'
 
 import {Route, Switch} from 'react-router-dom'
-import mockConfig from '../../mock-config'
+import mockConfig from '../../../config/mocks/mock-config'
 import * as sdk from '@salesforce/commerce-sdk-react'
 
 const MockedComponent = () => {

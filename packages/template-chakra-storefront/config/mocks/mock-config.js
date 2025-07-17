@@ -70,7 +70,7 @@ module.exports = {
             path: '/account',
             orderSearchParam: {limit: 10, offset: 0, sort: 'best-matches', refine: []}
         },
-        Cart: {
+        cart: {
             path: '/cart'
         },
         checkout: {
@@ -88,7 +88,7 @@ module.exports = {
             productLimit: 10,
             mainCategory: 'newarrivals'
         },
-        Login: {
+        login: {
             path: '/login'
         },
         Registration: {

@@ -11,12 +11,12 @@ import {rest} from 'msw'
 import {renderWithProviders, createPathWithDefaults} from '../../utils/test-utils'
 import {mockCustomerBaskets, mockOrderHistory, mockOrderProducts} from '../../../mocks/mock-data'
 import Orders from './orders'
-import mockConfig from '../../../mock-config'
+import mockConfig from '../../../config/mocks/mock-config'
 jest.mock('@salesforce/pwa-kit-runtime/utils/ssr-config', () => {
     const original = jest.requireActual('@salesforce/pwa-kit-runtime/utils/ssr-config')
     return {
         ...original,
-        getConfig: jest.fn(() => require('../../../mock-config'))
+        getConfig: jest.fn(() => require('../../../config/mocks/mock-config'))
     }
 })
 const MockedComponent = () => {
