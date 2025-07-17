@@ -42,11 +42,11 @@ import http from 'http'
 import https from 'https'
 import {proxyConfigs, updatePackageMobify} from '../../utils/ssr-shared'
 import {
-    proxyBasePath,
-    bundleBasePath,
-    healthCheckPath,
-    slasPrivateProxyPath
-} from '../../utils/ssr-namespace-paths'
+    getProxyPath,
+    getBundlePath,
+    getHealthCheckPath,
+    getSlasPrivateProxyPath
+} from '../../utils/ssr-paths'
 import {applyProxyRequestHeaders} from '../../utils/ssr-server/configure-proxy'
 import awsServerlessExpress from 'aws-serverless-express'
 import expressLogging from 'morgan'
@@ -223,7 +223,7 @@ export const RemoteServerFactory = {
      * @private
      */
     _isBundleOrProxyPath(url) {
-        return url.startsWith(proxyBasePath) || url.startsWith(bundleBasePath)
+        return url.startsWith(getProxyPath()) || url.startsWith(getBundlePath())
     },
 
     /**
@@ -667,7 +667,7 @@ export const RemoteServerFactory = {
      */
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     _setupProxying(app, options) {
-        app.all(`${proxyBasePath}/*`, (_, res) => {
+        app.all(`${getProxyPath()}/*`, (_, res) => {
             return res.status(501).json({
                 message:
                     'Environment proxies are not set: https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/proxying-requests.html'
@@ -679,7 +679,7 @@ export const RemoteServerFactory = {
      * @private
      */
     _handleMissingSlasPrivateEnvVar(app) {
-        app.use(slasPrivateProxyPath, (_, res) => {
+        app.use(getSlasPrivateProxyPath(), (_, res) => {
             return res.status(501).json({
                 message:
                     'Environment variable PWA_KIT_SLAS_CLIENT_SECRET not set: Please set this environment variable to proceed.'
@@ -695,28 +695,28 @@ export const RemoteServerFactory = {
             return
         }
 
-        localDevLog(`Proxying ${slasPrivateProxyPath} to ${options.slasTarget}`)
+        localDevLog(`Proxying ${getSlasPrivateProxyPath()} to ${options.slasTarget}`)
 
         const clientId = options.mobify?.app?.commerceAPI?.parameters?.clientId
         const clientSecret = process.env.PWA_KIT_SLAS_CLIENT_SECRET
         if (!clientSecret) {
-            this._handleMissingSlasPrivateEnvVar(app, slasPrivateProxyPath)
+            this._handleMissingSlasPrivateEnvVar(app, getSlasPrivateProxyPath())
             return
         }
 
         const encodedSlasCredentials = Buffer.from(`${clientId}:${clientSecret}`).toString('base64')
 
         app.use(
-            slasPrivateProxyPath,
+            getSlasPrivateProxyPath(),
             createProxyMiddleware({
                 target: options.slasTarget,
                 changeOrigin: true,
-                pathRewrite: {[slasPrivateProxyPath]: ''},
+                pathRewrite: {[getSlasPrivateProxyPath()]: ''},
                 onProxyReq: (proxyRequest, incomingRequest, res) => {
                     applyProxyRequestHeaders({
                         proxyRequest,
                         incomingRequest,
-                        proxyPath: slasPrivateProxyPath,
+                        proxyPath: getSlasPrivateProxyPath(),
                         targetHost: options.slasHostName,
                         targetProtocol: 'https'
                     })
@@ -750,7 +750,7 @@ export const RemoteServerFactory = {
      * @private
      */
     _setupHealthcheck(app) {
-        app.get(`${healthCheckPath}`, (_, res) =>
+        app.get(`${getHealthCheckPath()}`, (_, res) =>
             res.set('cache-control', NO_CACHE).sendStatus(200).end()
         )
     },

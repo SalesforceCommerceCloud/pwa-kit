@@ -28,6 +28,7 @@ import {
     resolveLocaleFromUrl
 } from '@salesforce/retail-react-app/app/utils/site-utils'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
+import {getEnvBasePath, getProxyPath} from '@salesforce/pwa-kit-runtime/utils/ssr-paths'
 import {createUrlTemplate} from '@salesforce/retail-react-app/app/utils/url'
 import createLogger from '@salesforce/pwa-kit-runtime/utils/logger-factory'
 
@@ -76,6 +77,9 @@ const AppConfig = ({children, locals = {}}) => {
         supportedCountries: STORE_LOCATOR_SUPPORTED_COUNTRIES
     }
 
+    const redirectURI = `${appOrigin}/callback`
+    const proxy = `${appOrigin}${getEnvBasePath()}${commerceApiConfig.proxyPath}`
+
     return (
         <CommerceApiProvider
             shortCode={commerceApiConfig.parameters.shortCode}
@@ -84,9 +88,9 @@ const AppConfig = ({children, locals = {}}) => {
             siteId={locals.site?.id}
             locale={locals.locale?.id}
             currency={locals.locale?.preferredCurrency}
-            redirectURI={`${appOrigin}/callback`}
+            redirectURI={redirectURI}
             passwordlessLoginCallbackURI={passwordlessCallback}
-            proxy={`${appOrigin}${commerceApiConfig.proxyPath}`}
+            proxy={proxy}
             headers={headers}
             defaultDnt={DEFAULT_DNT_STATE}
             // Uncomment 'enablePWAKitPrivateClient' to use SLAS private client login flows.

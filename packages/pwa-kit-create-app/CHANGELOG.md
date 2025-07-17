@@ -1,3 +1,5 @@
+- Add support for environment level base paths [#1970](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1970)
+
 ## v3.11.0-dev.0 (May 23, 2025)
 - Fix the demo instance details in `program.json`[#2800](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2800)
 - Fix exiting before `program.json` content can be flushed [#2699](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2699)
