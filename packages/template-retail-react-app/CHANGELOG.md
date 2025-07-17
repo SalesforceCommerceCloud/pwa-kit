@@ -13,7 +13,7 @@
 - Support saving default shipping address on user registration from order confirmation [#2706](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2706)
 - Minor updates to support BOPIS E2E tests [#2716](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2716)
 - Provide support for partial hydration [#2696](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2696)
-- Show Automatic Bonus Products on Cart Page [#2704](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2704)
+- Show Automatic Bonus Products on Cart Page [#2704](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2704) [#2760](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2760) [#2815](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2815) 
 - Support Standard Products [2697](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2697)
 - Fix passwordless race conditions in form submission [#2758](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2758)
 - Use `<picture>` element for responsive images [#2724](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2724)
