@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, salesforce.com, inc.
+ * Copyright (c) 2025, salesforce.com, inc.
  * All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
@@ -10,11 +10,12 @@
 import {renderHook} from '@testing-library/react'
 import {useAppAnalytics} from './use-app-analytics'
 
-// Mock analytics dependencies
-jest.mock('../../../utils/analytics', () => ({
-    setAnalyticsConfig: jest.fn(),
-    trackPageView: jest.fn()
-}))
+// Mock dependencies
+jest.mock('../../../hooks/use-active-data', () =>
+    jest.fn(() => ({
+        trackPage: jest.fn()
+    }))
+)
 
 jest.mock('react-router-dom', () => ({
     useLocation: jest.fn(() => ({
@@ -29,51 +30,117 @@ describe('useAppAnalytics', () => {
     const mockLocaleId = 'en-US'
     const mockCurrency = 'USD'
 
+    const mockUseActiveData = require('../../../hooks/use-active-data')
+    const {useLocation} = require('react-router-dom')
+
     beforeEach(() => {
         jest.clearAllMocks()
     })
 
-    it('sets up analytics configuration on mount', () => {
-        const {setAnalyticsConfig} = require('../../../utils/analytics')
+    it('returns tracking utilities', () => {
+        const {result} = renderHook(() => useAppAnalytics(mockSiteId, mockLocaleId, mockCurrency))
+
+        expect(result.current).toEqual(
+            expect.objectContaining({
+                trackPage: expect.any(Function),
+                activeData: expect.objectContaining({
+                    trackPage: expect.any(Function)
+                })
+            })
+        )
+    })
+
+    it('calls trackPage on mount', () => {
+        const mockTrackPage = jest.fn()
+        mockUseActiveData.mockReturnValue({
+            trackPage: mockTrackPage
+        })
 
         renderHook(() => useAppAnalytics(mockSiteId, mockLocaleId, mockCurrency))
 
-        expect(setAnalyticsConfig).toHaveBeenCalledWith({
-            siteId: mockSiteId,
-            localeId: mockLocaleId,
-            currency: mockCurrency
-        })
+        expect(mockTrackPage).toHaveBeenCalledWith(mockSiteId, mockLocaleId, mockCurrency)
     })
 
-    it('tracks page view on location change', () => {
-        const {trackPageView} = require('../../../utils/analytics')
-        const {useLocation} = require('react-router-dom')
+    it('calls trackPage when location changes', () => {
+        const mockTrackPage = jest.fn()
+        mockUseActiveData.mockReturnValue({
+            trackPage: mockTrackPage
+        })
 
         const {rerender} = renderHook(() => useAppAnalytics(mockSiteId, mockLocaleId, mockCurrency))
+
+        // Clear initial call
+        mockTrackPage.mockClear()
 
         // Change location
         useLocation.mockReturnValue({
             pathname: '/products',
-            search: '?category=mens',
-            hash: '#top'
+            search: '?q=test',
+            hash: ''
         })
 
         rerender()
 
-        expect(trackPageView).toHaveBeenCalledWith('/products?category=mens#top')
+        expect(mockTrackPage).toHaveBeenCalledWith(mockSiteId, mockLocaleId, mockCurrency)
     })
 
-    it('handles missing analytics dependencies gracefully', () => {
-        // Mock missing analytics functions
-        jest.doMock('../../../utils/analytics', () => ({}))
+    it('handles missing activeData gracefully', () => {
+        mockUseActiveData.mockReturnValue({})
 
         expect(() => {
             renderHook(() => useAppAnalytics(mockSiteId, mockLocaleId, mockCurrency))
         }).not.toThrow()
     })
 
-    it('updates config when parameters change', () => {
-        const {setAnalyticsConfig} = require('../../../utils/analytics')
+    it('handles undefined parameters', () => {
+        const mockTrackPage = jest.fn()
+        mockUseActiveData.mockReturnValue({
+            trackPage: mockTrackPage
+        })
+
+        renderHook(() => useAppAnalytics(undefined, undefined, undefined))
+
+        expect(mockTrackPage).toHaveBeenCalledWith(undefined, undefined, undefined)
+    })
+
+    it('tracks page with correct parameters when called manually', () => {
+        const mockTrackPage = jest.fn()
+        mockUseActiveData.mockReturnValue({
+            trackPage: mockTrackPage
+        })
+
+        const {result} = renderHook(() => useAppAnalytics(mockSiteId, mockLocaleId, mockCurrency))
+
+        // Clear initial call
+        mockTrackPage.mockClear()
+
+        // Call trackPage manually
+        result.current.trackPage()
+
+        expect(mockTrackPage).toHaveBeenCalledWith(mockSiteId, mockLocaleId, mockCurrency)
+    })
+
+    it('provides access to activeData object', () => {
+        const mockActiveData = {
+            trackPage: jest.fn(),
+            otherMethod: jest.fn()
+        }
+        mockUseActiveData.mockReturnValue(mockActiveData)
+
+        const {result} = renderHook(() => useAppAnalytics(mockSiteId, mockLocaleId, mockCurrency))
+
+        expect(result.current.activeData).toBe(mockActiveData)
+    })
+
+    it('handles location changes with different parameters', () => {
+        const mockTrackPage = jest.fn()
+        mockUseActiveData.mockReturnValue({
+            trackPage: mockTrackPage
+        })
+
+        const newSiteId = 'NewSite'
+        const newLocaleId = 'es-ES'
+        const newCurrency = 'EUR'
 
         const {rerender} = renderHook(
             ({siteId, localeId, currency}) => useAppAnalytics(siteId, localeId, currency),
@@ -86,56 +153,22 @@ describe('useAppAnalytics', () => {
             }
         )
 
-        // Change parameters
+        // Clear initial call
+        mockTrackPage.mockClear()
+
+        // Change parameters and location
+        useLocation.mockReturnValue({
+            pathname: '/checkout',
+            search: '',
+            hash: ''
+        })
+
         rerender({
-            siteId: 'NewSite',
-            localeId: 'fr-FR',
-            currency: 'EUR'
+            siteId: newSiteId,
+            localeId: newLocaleId,
+            currency: newCurrency
         })
 
-        expect(setAnalyticsConfig).toHaveBeenCalledWith({
-            siteId: 'NewSite',
-            localeId: 'fr-FR',
-            currency: 'EUR'
-        })
-    })
-
-    it('handles undefined parameters', () => {
-        const {setAnalyticsConfig} = require('../../../utils/analytics')
-
-        renderHook(() => useAppAnalytics(undefined, undefined, undefined))
-
-        expect(setAnalyticsConfig).toHaveBeenCalledWith({
-            siteId: undefined,
-            localeId: undefined,
-            currency: undefined
-        })
-    })
-
-    it('tracks multiple page views', () => {
-        const {trackPageView} = require('../../../utils/analytics')
-        const {useLocation} = require('react-router-dom')
-
-        const {rerender} = renderHook(() => useAppAnalytics(mockSiteId, mockLocaleId, mockCurrency))
-
-        // First location change
-        useLocation.mockReturnValue({
-            pathname: '/products',
-            search: '',
-            hash: ''
-        })
-        rerender()
-
-        // Second location change
-        useLocation.mockReturnValue({
-            pathname: '/cart',
-            search: '',
-            hash: ''
-        })
-        rerender()
-
-        expect(trackPageView).toHaveBeenCalledTimes(2)
-        expect(trackPageView).toHaveBeenNthCalledWith(1, '/products')
-        expect(trackPageView).toHaveBeenNthCalledWith(2, '/cart')
+        expect(mockTrackPage).toHaveBeenCalledWith(newSiteId, newLocaleId, newCurrency)
     })
 })

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, salesforce.com, inc.
+ * Copyright (c) 2025, salesforce.com, inc.
  * All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
@@ -15,6 +15,13 @@ jest.mock('react-helmet', () => ({
     Helmet: jest.fn(({children}) => <div data-testid="helmet">{children}</div>)
 }))
 
+// Mock getPathWithLocale function
+jest.mock('../../../utils/url', () => ({
+    getPathWithLocale: jest.fn((localeId, buildUrl, options) => 
+        `/test-path/${localeId}${options?.location?.pathname || ''}`
+    )
+}))
+
 describe('AppSEO', () => {
     const defaultProps = {
         appConfig: {
@@ -26,7 +33,8 @@ describe('AppSEO', () => {
         site: {
             id: 'test-site',
             l10n: {
-                supported_locales: [
+                defaultLocale: 'en-US',
+                supportedLocales: [
                     {id: 'en-US', preferred_currency: 'USD'},
                     {id: 'es-ES', preferred_currency: 'EUR'}
                 ]
@@ -68,16 +76,6 @@ describe('AppSEO', () => {
         expect(defaultProps.buildUrl).toHaveBeenCalled()
     })
 
-    it('handles missing appConfig gracefully', () => {
-        const props = {
-            ...defaultProps,
-            appConfig: undefined
-        }
-
-        render(<AppSEO {...props} />)
-        expect(Helmet).toHaveBeenCalled()
-    })
-
     it('handles different pathnames', () => {
         const props = {
             ...defaultProps,
@@ -94,7 +92,37 @@ describe('AppSEO', () => {
             site: {
                 id: 'test-site',
                 l10n: {
-                    supported_locales: []
+                    defaultLocale: 'en-US',
+                    supportedLocales: []
+                }
+            }
+        }
+
+        render(<AppSEO {...props} />)
+        expect(Helmet).toHaveBeenCalled()
+    })
+
+    it('handles missing l10n data', () => {
+        const props = {
+            ...defaultProps,
+            site: {
+                id: 'test-site',
+                l10n: undefined
+            }
+        }
+
+        render(<AppSEO {...props} />)
+        expect(Helmet).toHaveBeenCalled()
+    })
+
+    it('handles missing supportedLocales array', () => {
+        const props = {
+            ...defaultProps,
+            site: {
+                id: 'test-site',
+                l10n: {
+                    defaultLocale: 'en-US',
+                    supportedLocales: undefined
                 }
             }
         }

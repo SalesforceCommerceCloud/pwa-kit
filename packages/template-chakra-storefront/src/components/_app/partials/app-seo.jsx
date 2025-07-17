@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, salesforce.com, inc.
+ * Copyright (c) 2025, salesforce.com, inc.
  * All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
@@ -36,7 +36,7 @@ const AppSEO = ({appConfig, appOrigin, themeColor, site, locale, buildUrl, locat
                 For more details on hrefLang, see
                 https://developers.google.com/search/docs/advanced/crawling/localized-versions
              */}
-            {site.l10n?.supportedLocales.map((locale) => (
+            {site.l10n?.supportedLocales?.map((locale) => (
                 <link
                     rel="alternate"
                     hrefLang={locale.id.toLowerCase()}
@@ -50,16 +50,18 @@ const AppSEO = ({appConfig, appOrigin, themeColor, site, locale, buildUrl, locat
                 />
             ))}
             {/* A general locale as fallback. For example: "en" if default locale is "en-GB" */}
-            <link
-                rel="alternate"
-                hrefLang={site.l10n.defaultLocale.slice(0, 2)}
-                href={`${appOrigin}${getPathWithLocale(locale.id, buildUrl, {
-                    location: {
-                        ...location,
-                        search: ''
-                    }
-                })}`}
-            />
+            {site.l10n?.defaultLocale && (
+                <link
+                    rel="alternate"
+                    hrefLang={site.l10n.defaultLocale.slice(0, 2)}
+                    href={`${appOrigin}${getPathWithLocale(locale.id, buildUrl, {
+                        location: {
+                            ...location,
+                            search: ''
+                        }
+                    })}`}
+                />
+            )}
             {/* A wider fallback for user locales that the app does not support */}
             <link rel="alternate" hrefLang="x-default" href={`${appOrigin}/`} />
         </Seo>
