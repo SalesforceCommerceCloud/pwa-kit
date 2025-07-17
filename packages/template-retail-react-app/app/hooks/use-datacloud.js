@@ -124,15 +124,92 @@ export class DataCloudApi {
      * @returns {object} - The party identification event object with required fields for the schema.
      */
     _constructPartyIdentification(args) {
+        const partyIdentifier = args.isGuest ? args.guestId : args.customerId
+        const partyIdType = args.isGuest ? 'CC_USID' : 'CC_REGISTERED_CUSTOMER_ID'
+
         return {
-            party: args.isGuest ? args.guestId : args.customerId,
-            userId: args.isGuest ? args.guestId : args.customerId,
-            IDName: args.isGuest ? 'CC_USID' : 'CC_REGISTERED_CUSTOMER_ID',
-            IDType: args.isGuest ? 'CC_USID' : 'CC_REGISTERED_CUSTOMER_ID',
-            partyIdentificationId: args.isGuest ? args.guestId : args.customerId,
+            party: partyIdentifier,
+            userId: partyIdentifier,
+            IDName: partyIdType,
+            IDType: partyIdType,
+            partyIdentificationId: partyIdentifier,
             internalOrganizationId: this.siteId,
             creationEventId: crypto.randomUUID()
         }
+    }
+
+    /**
+     * Creates standard events (identity, party identification, contact point email) 
+     * that are common across all send methods
+     */
+    _createStandardEvents(args, additionalIdentityProps = {}) {
+        const baseEvent = this._constructBaseEvent(args)
+        const userDetails = this._constructUserDetails(args)
+
+        const identityProfile = this.dnt
+            ? {}
+            : this._concatenateEvents(
+                baseEvent,
+                this._generateEventDetails('identity', 'Profile'),
+                userDetails,
+                additionalIdentityProps
+            )
+
+        const partyIdentification = this.dnt
+            ? {}
+            : this._concatenateEvents(
+                baseEvent,
+                this._generateEventDetails('partyIdentification', 'Profile'),
+                this._constructPartyIdentification(args)
+            )
+
+        const contactPointEmail = args.email ? this._concatenateEvents(
+            baseEvent,
+            this._generateEventDetails('contactPointEmail', 'Profile', args.email)
+        ) : null
+
+        return { baseEvent, identityProfile, partyIdentification, contactPointEmail }
+    }
+
+    _handleApiError(err) {
+        if (err?.response?.status === 400) {
+            logger.warn(
+                '[DataCloudApi] 400 Bad Request: Check your Data Cloud configuration (appSourceId, tenantId) and event payload.',
+                {
+                    namespace: 'use-datacloud._handleApiError',
+                    additionalProperties: { error: err?.response }
+                }
+            )
+        } else {
+            logger.error('[DataCloudApi] Error sending Data Cloud event', {
+                namespace: 'use-datacloud._handleApiError',
+                additionalProperties: { error: err?.response }
+            })
+        }
+    }
+
+    /**
+     * Constructs the interaction object and sends it to Data Cloud
+     */
+    _sendInteraction(standardEvents, specificEvents) {
+        const { identityProfile, partyIdentification, contactPointEmail } = standardEvents
+
+        const interaction = {
+            events: [
+                ...(!this.dnt ? [identityProfile, partyIdentification] : []),
+                ...(contactPointEmail ? [contactPointEmail] : []),
+                ...specificEvents
+            ]
+        }
+
+        return this.sdk.webEventsAppSourceIdPost(interaction).catch((err) => this._handleApiError(err))
+    }
+
+    /**
+     * Maps search results to DataCloud product format
+     */
+    _mapSearchResultsToProducts(searchResults) {
+        return searchResults?.hits?.map((product) => this._constructDatacloudProduct(product)) || []
     }
 
     /**
@@ -144,43 +221,23 @@ export class DataCloudApi {
      * @param {object} args - Additional metadata for the event
      */
     async sendViewPage(path, args) {
-        const baseEvent = this._constructBaseEvent(args)
-        const userDetails = this._constructUserDetails(args)
+        // 1. Create standard events (identity, party, email)
+        const standardEvents = this._createStandardEvents(args, { sourceUrl: path })
 
-        // If DNT, we do not send the identity Profile event
-        const identityProfile = this.dnt
-            ? {}
-            : this._concatenateEvents(
-                  baseEvent,
-                  this._generateEventDetails('identity', 'Profile'),
-                  userDetails,
-                  {
-                      sourceUrl: path
-                  }
-              )
+        // 2. Create method-specific events using standardEvents.baseEvent
+        const specificEvents = [
+            this._concatenateEvents(
+                standardEvents.baseEvent,
+                this._generateEventDetails('userEngagement', 'Engagement'),
+                {
+                    interactionName: 'page-view',
+                    sourceUrl: path
+                }
+            )
+        ]
 
-        const partyIdentification = this.dnt
-            ? {}
-            : this._concatenateEvents(
-                  baseEvent,
-                  this._generateEventDetails('partyIdentification', 'Profile'),
-                  this._constructPartyIdentification(args)
-              )
-
-        const userEngagement = this._concatenateEvents(
-            baseEvent,
-            this._generateEventDetails('userEngagement', 'Engagement'),
-            {
-                interactionName: 'page-view',
-                sourceUrl: path
-            }
-        )
-
-        const interaction = {
-            events: [...(!this.dnt ? [identityProfile, partyIdentification] : []), userEngagement]
-        }
-
-        this.sdk.webEventsAppSourceIdPost(interaction).catch((err) => this._handleApiError(err))
+        // 3. Send the interaction
+        return this._sendInteraction(standardEvents, specificEvents)
     }
 
     /**
@@ -193,54 +250,25 @@ export class DataCloudApi {
      * @param {object} args - Additional metadata for the event
      */
     async sendViewProduct(product, args) {
-        const baseEvent = this._constructBaseEvent(args)
-        const baseProduct = this._constructDatacloudProduct(product)
-        const userDetails = this._constructUserDetails(args)
+        // 1. Create standard events (identity, party, email)
+        const standardEvents = this._createStandardEvents(args)
 
-        const identityProfile = this.dnt
-            ? {}
-            : this._concatenateEvents(
-                  baseEvent,
-                  this._generateEventDetails('identity', 'Profile'),
-                  userDetails
-              )
-
-        const partyIdentification = this.dnt
-            ? {}
-            : this._concatenateEvents(
-                  baseEvent,
-                  this._generateEventDetails('partyIdentification', 'Profile'),
-                  this._constructPartyIdentification(args)
-              )
-
-        let contactPointEmail = null
-        if (args.email) {
-            contactPointEmail = this._concatenateEvents(
-                baseEvent,
-                this._generateEventDetails('contactPointEmail', 'Profile', args.email)
+        // 2. Create method-specific events using standardEvents.baseEvent
+        const specificEvents = [
+            this._concatenateEvents(
+                standardEvents.baseEvent,
+                this._generateEventDetails('catalog', 'Engagement'),
+                this._constructDatacloudProduct(product),
+                {
+                    type: 'Product',
+                    webStoreId: 'pwa',
+                    interactionName: 'catalog-object-view-start'
+                }
             )
-        }
+        ]
 
-        const catalog = this._concatenateEvents(
-            baseEvent,
-            this._generateEventDetails('catalog', 'Engagement'),
-            baseProduct,
-            {
-                type: 'Product',
-                webStoreId: 'pwa',
-                interactionName: 'catalog-object-view-start'
-            }
-        )
-
-        const interaction = {
-            events: [
-                ...(!this.dnt ? [identityProfile, partyIdentification] : []),
-                ...(contactPointEmail ? [contactPointEmail] : []),
-                catalog
-            ]
-        }
-
-        this.sdk.webEventsAppSourceIdPost(interaction).catch((err) => this._handleApiError(err))
+        // 3. Send the interaction
+        return this._sendInteraction(standardEvents, specificEvents)
     }
 
     /**
@@ -257,16 +285,13 @@ export class DataCloudApi {
      * @param {object} args - Additional metadata for the event
      */
     async sendViewCategory(searchParams, category, searchResults, args) {
-        const baseEvent = this._constructBaseEvent(args)
-        const userDetails = this._constructUserDetails(args)
+        // 1. Create standard events (identity, party, email)
+        const standardEvents = this._createStandardEvents(args)
 
-        const products = searchResults?.hits?.map((product) =>
-            this._constructDatacloudProduct(product)
-        )
-
-        const catalogObjects = products.map((product) => {
+        // 2. Create method-specific events using standardEvents.baseEvent
+        const specificEvents = this._mapSearchResultsToProducts(searchResults).map((product) => {
             return this._concatenateEvents(
-                baseEvent,
+                standardEvents.baseEvent,
                 this._generateEventDetails('catalog', 'Engagement'),
                 this._constructBaseSearchResult(searchParams),
                 {
@@ -279,39 +304,8 @@ export class DataCloudApi {
             )
         })
 
-        const identityProfile = this.dnt
-            ? null
-            : this._concatenateEvents(
-                  baseEvent,
-                  this._generateEventDetails('identity', 'Profile'),
-                  userDetails
-              )
-
-        const partyIdentification = this.dnt
-            ? {}
-            : this._concatenateEvents(
-                  baseEvent,
-                  this._generateEventDetails('partyIdentification', 'Profile'),
-                  this._constructPartyIdentification(args)
-              )
-
-        let contactPointEmail = null
-        if (args.email) {
-            contactPointEmail = this._concatenateEvents(
-                baseEvent,
-                this._generateEventDetails('contactPointEmail', 'Profile', args.email)
-            )
-        }
-
-        const interaction = {
-            events: [
-                ...(!this.dnt ? [identityProfile, partyIdentification] : []),
-                ...(contactPointEmail ? [contactPointEmail] : []),
-                ...catalogObjects
-            ]
-        }
-
-        this.sdk.webEventsAppSourceIdPost(interaction).catch((err) => this._handleApiError(err))
+        // 3. Send the interaction
+        return this._sendInteraction(standardEvents, specificEvents)
     }
 
     /**
@@ -328,16 +322,13 @@ export class DataCloudApi {
      * @param {object} args - Additional metadata for the event
      */
     async sendViewSearchResults(searchParams, searchResults, args) {
-        const baseEvent = this._constructBaseEvent(args)
-        const userDetails = this._constructUserDetails(args)
+        // 1. Create standard events (identity, party, email)
+        const standardEvents = this._createStandardEvents(args)
 
-        const products = searchResults?.hits?.map((product) =>
-            this._constructDatacloudProduct(product)
-        )
-
-        const catalogObjects = products.map((product) => {
+        // 2. Create method-specific events using standardEvents.baseEvent
+        const specificEvents = this._mapSearchResultsToProducts(searchResults).map((product) => {
             return this._concatenateEvents(
-                baseEvent,
+                standardEvents.baseEvent,
                 this._generateEventDetails('catalog', 'Engagement'),
                 this._constructBaseSearchResult(searchParams),
                 {
@@ -350,39 +341,8 @@ export class DataCloudApi {
             )
         })
 
-        const identityProfile = this.dnt
-            ? {}
-            : this._concatenateEvents(
-                  baseEvent,
-                  this._generateEventDetails('identity', 'Profile'),
-                  userDetails
-              )
-
-        const partyIdentification = this.dnt
-            ? {}
-            : this._concatenateEvents(
-                  baseEvent,
-                  this._generateEventDetails('partyIdentification', 'Profile'),
-                  this._constructPartyIdentification(args)
-              )
-
-        let contactPointEmail = null
-        if (args.email) {
-            contactPointEmail = this._concatenateEvents(
-                baseEvent,
-                this._generateEventDetails('contactPointEmail', 'Profile', args.email)
-            )
-        }
-
-        const interaction = {
-            events: [
-                ...(!this.dnt ? [identityProfile, partyIdentification] : []),
-                ...(contactPointEmail ? [contactPointEmail] : []),
-                ...catalogObjects
-            ]
-        }
-
-        this.sdk.webEventsAppSourceIdPost(interaction).catch((err) => this._handleApiError(err))
+        // 3. Send the interaction
+        return this._sendInteraction(standardEvents, specificEvents)
     }
 
     /**
@@ -397,12 +357,13 @@ export class DataCloudApi {
      * @param {object} args - Additional metadata for the event
      */
     async sendViewRecommendations(recommenderDetails, products, args) {
-        const baseEvent = this._constructBaseEvent(args)
-        const userDetails = this._constructUserDetails(args)
+        // 1. Create standard events (identity, party, email)
+        const standardEvents = this._createStandardEvents(args)
 
-        const catalogObjects = products.map((product) => {
+        // 2. Create method-specific events using standardEvents.baseEvent
+        const specificEvents = products.map((product) => {
             return this._concatenateEvents(
-                baseEvent,
+                standardEvents.baseEvent,
                 this._generateEventDetails('catalog', 'Engagement'),
                 {
                     id: product.id,
@@ -415,56 +376,8 @@ export class DataCloudApi {
             )
         })
 
-        const identityProfile = this.dnt
-            ? {}
-            : this._concatenateEvents(
-                  baseEvent,
-                  this._generateEventDetails('identity', 'Profile'),
-                  userDetails
-              )
-
-        const partyIdentification = this.dnt
-            ? {}
-            : this._concatenateEvents(
-                  baseEvent,
-                  this._generateEventDetails('partyIdentification', 'Profile'),
-                  this._constructPartyIdentification(args)
-              )
-
-        let contactPointEmail = null
-        if (args.email) {
-            contactPointEmail = this._concatenateEvents(
-                baseEvent,
-                this._generateEventDetails('contactPointEmail', 'Profile', args.email)
-            )
-        }
-
-        const interaction = {
-            events: [
-                ...(identityProfile ? [identityProfile, partyIdentification] : []),
-                ...(contactPointEmail ? [contactPointEmail] : []),
-                ...catalogObjects
-            ]
-        }
-
-        this.sdk.webEventsAppSourceIdPost(interaction).catch((err) => this._handleApiError(err))
-    }
-
-    _handleApiError(err) {
-        if (err?.response?.status === 400) {
-            logger.warn(
-                '[DataCloudApi] 400 Bad Request: Check your Data Cloud configuration (appSourceId, tenantId) and event payload.',
-                {
-                    namespace: 'use-datacloud._handleApiError',
-                    additionalProperties: {error: err?.response}
-                }
-            )
-        } else {
-            logger.error('[DataCloudApi] Error sending Data Cloud event', {
-                namespace: 'use-datacloud._handleApiError',
-                additionalProperties: {error: err?.response}
-            })
-        }
+        // 3. Send the interaction
+        return this._sendInteraction(standardEvents, specificEvents)
     }
 }
 
