@@ -225,10 +225,8 @@ export class DataCloudApi {
      * @param {object} args - Additional metadata for the event
      */
     async sendViewPage(path, args) {
-        // 1. Create standard events (identity, party, email)
         const standardEvents = this._createStandardEvents(args, {sourceUrl: path})
 
-        // 2. Create method-specific events using standardEvents.baseEvent
         const specificEvents = [
             this._concatenateEvents(
                 standardEvents.baseEvent,
@@ -240,7 +238,6 @@ export class DataCloudApi {
             )
         ]
 
-        // 3. Send the interaction
         return this._sendInteraction(standardEvents, specificEvents)
     }
 
@@ -254,10 +251,8 @@ export class DataCloudApi {
      * @param {object} args - Additional metadata for the event
      */
     async sendViewProduct(product, args) {
-        // 1. Create standard events (identity, party, email)
         const standardEvents = this._createStandardEvents(args)
 
-        // 2. Create method-specific events using standardEvents.baseEvent
         const specificEvents = [
             this._concatenateEvents(
                 standardEvents.baseEvent,
@@ -271,7 +266,6 @@ export class DataCloudApi {
             )
         ]
 
-        // 3. Send the interaction
         return this._sendInteraction(standardEvents, specificEvents)
     }
 
@@ -289,10 +283,8 @@ export class DataCloudApi {
      * @param {object} args - Additional metadata for the event
      */
     async sendViewCategory(searchParams, category, searchResults, args) {
-        // 1. Create standard events (identity, party, email)
         const standardEvents = this._createStandardEvents(args)
 
-        // 2. Create method-specific events using standardEvents.baseEvent
         const specificEvents = this._mapSearchResultsToProducts(searchResults).map((product) => {
             return this._concatenateEvents(
                 standardEvents.baseEvent,
@@ -308,7 +300,6 @@ export class DataCloudApi {
             )
         })
 
-        // 3. Send the interaction
         return this._sendInteraction(standardEvents, specificEvents)
     }
 
@@ -326,10 +317,8 @@ export class DataCloudApi {
      * @param {object} args - Additional metadata for the event
      */
     async sendViewSearchResults(searchParams, searchResults, args) {
-        // 1. Create standard events (identity, party, email)
         const standardEvents = this._createStandardEvents(args)
 
-        // 2. Create method-specific events using standardEvents.baseEvent
         const specificEvents = this._mapSearchResultsToProducts(searchResults).map((product) => {
             return this._concatenateEvents(
                 standardEvents.baseEvent,
@@ -345,7 +334,6 @@ export class DataCloudApi {
             )
         })
 
-        // 3. Send the interaction
         return this._sendInteraction(standardEvents, specificEvents)
     }
 
@@ -361,10 +349,8 @@ export class DataCloudApi {
      * @param {object} args - Additional metadata for the event
      */
     async sendViewRecommendations(recommenderDetails, products, args) {
-        // 1. Create standard events (identity, party, email)
         const standardEvents = this._createStandardEvents(args)
 
-        // 2. Create method-specific events using standardEvents.baseEvent
         const specificEvents = products.map((product) => {
             return this._concatenateEvents(
                 standardEvents.baseEvent,
@@ -380,7 +366,6 @@ export class DataCloudApi {
             )
         })
 
-        // 3. Send the interaction
         return this._sendInteraction(standardEvents, specificEvents)
     }
 }
