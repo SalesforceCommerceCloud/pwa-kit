@@ -33,6 +33,22 @@ import Pagination from '@salesforce/retail-react-app/app/components/pagination'
 import PropTypes from 'prop-types'
 import {DEFAULT_ORDERS_SEARCH_PARAMS} from '@salesforce/retail-react-app/app/constants'
 
+// Helper function to get color scheme based on order status
+export const getOrderStatusColorScheme = (status) => {
+    if (!status) return {bg: 'gray', color: 'white'}
+
+    const normalizedStatus = status.toLowerCase().trim()
+
+    switch (normalizedStatus) {
+        case 'cancelled':
+            return {bg: '#ff5722', color: 'white'}
+        case 'created':
+            return {bg: '#cdefc4', color: '#194e31'}
+        default:
+            return {bg: 'gray', color: 'white'}
+    }
+}
+
 const OrderProductImages = ({productItems}) => {
     const ids = productItems.map((item) => item.productId).join(',') ?? ''
     const {data: {data: products} = {}, isLoading} = useProducts({
@@ -180,7 +196,13 @@ const AccountOrderHistory = () => {
                                                 values={{orderNumber: order.orderNo}}
                                             />
                                         </Text>
-                                        <Badge colorScheme="green">{order.status}</Badge>
+                                        <Badge
+                                            bg={getOrderStatusColorScheme(order.status).bg}
+                                            color={getOrderStatusColorScheme(order.status).color}
+                                            variant="solid"
+                                        >
+                                            {order.status}
+                                        </Badge>
                                     </Stack>
                                 </Box>
                                 <Grid templateColumns={{base: 'repeat(auto-fit, 88px)'}} gap={4}>
