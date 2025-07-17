@@ -46,7 +46,7 @@ const main = async (opts) => {
         }
 
         if (templateVersion) {
-            generateAppCommand = `${generateAppCommand} --templateVersion ${templateVersion}`
+            generateAppCommand = `${generateAppCommand} --templateVersion ${templateVersion} --initGit`
         }
         console.log('Running command:', generateAppCommand)
         return await runGeneratorWithResponses(generateAppCommand, cliResponses)
