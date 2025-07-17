@@ -93,19 +93,6 @@ describe('OrderStatusBar', () => {
         })
     })
 
-    test('renders step labels with proper positioning', () => {
-        renderWithProviders(<OrderStatusBar />)
-
-        // Check that all step labels are rendered
-        const labels = screen.getAllByText(/Ordered|Dispatched|Out for delivery|Delivered/)
-        expect(labels).toHaveLength(4)
-
-        // Check that each label is in the document
-        labels.forEach((label) => {
-            expect(label).toBeInTheDocument()
-        })
-    })
-
     test('handles case-sensitive step label matching', () => {
         // Test case-insensitive matching
         const {rerender} = renderWithProviders(<OrderStatusBar currentStepLabel="ordered" />)

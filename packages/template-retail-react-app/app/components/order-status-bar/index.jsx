@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
-import {Box, useTheme, Text} from '@chakra-ui/react'
+import {Box, useTheme, Text, VisuallyHidden} from '@chakra-ui/react'
 import PropTypes from 'prop-types'
 import {useIntl} from 'react-intl'
 
@@ -121,6 +121,10 @@ const OrderStatusBar = ({currentStepLabel}) => {
         const labels = []
         for (let i = 0; i < n; i++) {
             const x = getStepOffset(i)
+            const stepStatus =
+                i < currentStep ? 'completed' : i === currentStep ? 'current' : 'pending'
+            const stepLabel = getLocalizedMessage(steps[i])
+
             labels.push(
                 <Box
                     key={i}
@@ -132,8 +136,21 @@ const OrderStatusBar = ({currentStepLabel}) => {
                     display="flex"
                     alignItems="center"
                     justifyContent="center"
-                    pointerEvents="none"
                     px={[1, 2]} // Add horizontal padding for text
+                    as="button"
+                    tabIndex={0}
+                    role="tab"
+                    aria-selected={i === currentStep}
+                    aria-label={`${stepLabel} - ${stepStatus}`}
+                    aria-describedby={`step-description-${i}`}
+                    _focus={{
+                        outline: '2px solid',
+                        outlineColor: 'blue.500',
+                        outlineOffset: '2px'
+                    }}
+                    _hover={{
+                        cursor: 'pointer'
+                    }}
                 >
                     <Text
                         color={getLabelColor(i)}
@@ -144,9 +161,15 @@ const OrderStatusBar = ({currentStepLabel}) => {
                         wordBreak="break-word"
                         hyphens="auto"
                         maxW="100%"
+                        pointerEvents="none"
                     >
-                        {getLocalizedMessage(steps[i])}
+                        {stepLabel}
                     </Text>
+                    <VisuallyHidden id={`step-description-${i}`}>
+                        {stepStatus === 'completed' && 'This step has been completed'}
+                        {stepStatus === 'current' && 'This is the current step'}
+                        {stepStatus === 'pending' && 'This step is pending'}
+                    </VisuallyHidden>
                 </Box>
             )
         }
@@ -154,17 +177,31 @@ const OrderStatusBar = ({currentStepLabel}) => {
     }
 
     return (
-        <Box position="relative" width="100%" maxWidth="1080px" height="50px">
+        <Box
+            position="relative"
+            width="100%"
+            maxWidth="1080px"
+            height="50px"
+            role="tablist"
+            aria-label="Order Status Steps"
+            aria-describedby="order-status-description"
+        >
             <svg
                 width="100%"
                 height="auto"
                 viewBox={`0 0 ${svgWidth} ${svgHeight}`}
                 style={{display: 'block'}}
                 preserveAspectRatio="none"
+                aria-hidden="true"
             >
                 {renderStepShapes()}
             </svg>
             {renderStepLabels()}
+            <VisuallyHidden id="order-status-description">
+                Order status progress bar with {steps.length} steps. Currently on step{' '}
+                {currentStep + 1}: {getLocalizedMessage(steps[currentStep])}. Use Tab to navigate
+                between steps.
+            </VisuallyHidden>
         </Box>
     )
 }
