@@ -131,6 +131,7 @@ const ShippingMultiAddress = ({
                         })?.images?.[0]
                         const imageUrl = image?.disBaseLink || image?.link || ''
                         const addressKey = item.productId + '-' + idx
+                        const mobileAddressKey = addressKey + '-mobile'
                         const selectedAddressId =
                             selectedAddresses[addressKey] || addresses[0]?.addressId
                         const selectedAddress =
@@ -152,48 +153,54 @@ const ShippingMultiAddress = ({
                                     direction={{base: 'column', md: 'row'}}
                                     align="flex-start"
                                     w="100%"
-                                    gap={4}
+                                    gap={{base: 4, md: 6}}
                                 >
                                     {/* Left: Image and info */}
                                     <Flex direction="row" align="flex-start" flex={1} minW={0}>
-                                        <VStack align="center" minW="90px" mr={0} spacing={2}>
+                                        <HStack align="flex-start" spacing={3} w="100%">
                                             <Image
                                                 src={imageUrl}
                                                 alt={item.productName}
-                                                w="90px"
-                                                h="120px"
+                                                w={{base: '60px', md: '90px'}}
+                                                h={{base: '80px', md: '120px'}}
                                                 objectFit="cover"
                                                 borderRadius="md"
                                                 bg="gray.100"
+                                                flexShrink={0}
                                             />
-                                        </VStack>
-                                        <ItemVariantProvider variant={variant}>
-                                            <VStack justify="center" minW={0} ml={4} flex={1}>
-                                                <Text
-                                                    fontWeight="medium"
-                                                    fontSize="md"
-                                                    mb={1}
-                                                    color="gray.900"
+                                            <ItemVariantProvider variant={variant}>
+                                                <VStack
+                                                    justify="flex-start"
+                                                    minW={0}
+                                                    flex={1}
+                                                    pt={0}
+                                                    align="flex-start"
                                                 >
-                                                    {item.productName}
-                                                </Text>
-                                                <MultiShippingItemAttributes
-                                                    variant={variant}
-                                                    includeQuantity
-                                                />
-                                            </VStack>
-                                        </ItemVariantProvider>
+                                                    <Text
+                                                        fontWeight="medium"
+                                                        fontSize={{base: 'sm', md: 'md'}}
+                                                        mb={1}
+                                                        color="gray.900"
+                                                        textAlign="left"
+                                                    >
+                                                        {item.productName}
+                                                    </Text>
+                                                    <MultiShippingItemAttributes
+                                                        variant={variant}
+                                                        includeQuantity
+                                                    />
+                                                </VStack>
+                                            </ItemVariantProvider>
+                                        </HStack>
                                     </Flex>
 
-                                    {/* Right: Address dropdown and price */}
+                                    {/* Right: Address dropdown and price - only on desktop */}
                                     <VStack
                                         align="flex-start"
-                                        minW={{base: '100%', md: '340px'}}
-                                        ml={{base: 0, md: 8}}
-                                        flexShrink={0}
-                                        h="100%"
                                         w={{base: '100%', md: '340px'}}
-                                        overflow="visible"
+                                        flexShrink={0}
+                                        display={{base: 'none', md: 'flex'}}
+                                        pt={0}
                                     >
                                         <Text fontWeight="medium" fontSize="sm" mb={2}>
                                             {formatMessage(deliveryAddressLabel)}
@@ -216,14 +223,14 @@ const ShippingMultiAddress = ({
                                                     borderRadius="md"
                                                     p={2}
                                                     fontSize="md"
-                                                    bg="gray.50"
+                                                    bg="white"
                                                     cursor="pointer"
                                                     w="100%"
                                                     display="flex"
                                                     alignItems="center"
                                                     justifyContent="space-between"
                                                     fontWeight="normal"
-                                                    _hover={{bg: 'gray.100'}}
+                                                    _hover={{bg: 'gray.50'}}
                                                     onClick={() =>
                                                         setOpenDropdown(
                                                             openDropdown === addressKey
@@ -242,50 +249,51 @@ const ShippingMultiAddress = ({
                                                     }}
                                                 >
                                                     <HStack
+                                                        align="center"
+                                                        spacing={2}
                                                         flex={1}
                                                         minW={0}
                                                         maxW="100%"
-                                                        spacing={1}
+                                                        overflow="hidden"
                                                     >
-                                                        <Text fontWeight="bold" whiteSpace="nowrap">
+                                                        <Text
+                                                            fontWeight="bold"
+                                                            fontSize={{base: 'sm', md: 'md'}}
+                                                            whiteSpace="nowrap"
+                                                            flexShrink={0}
+                                                        >
                                                             {selectedAddress?.firstName}{' '}
                                                             {selectedAddress?.lastName}
                                                         </Text>
-                                                        <Text>-</Text>
-                                                        <Text
-                                                            fontWeight="normal"
-                                                            overflow="hidden"
-                                                            textOverflow="ellipsis"
-                                                            whiteSpace="nowrap"
-                                                            flex={1}
-                                                        >
-                                                            {selectedAddress.address1}
-                                                        </Text>
-                                                        <Text
-                                                            fontWeight="normal"
-                                                            overflow="hidden"
-                                                            textOverflow="ellipsis"
-                                                            whiteSpace="nowrap"
-                                                            flex={1}
-                                                            fontSize="sm"
-                                                            color="gray.600"
-                                                        >
-                                                            {formatMessage(
-                                                                {
-                                                                    id: 'shipping_multi_address.format.address_line_2',
-                                                                    defaultMessage:
-                                                                        '{city}, {stateCode} {postalCode}'
-                                                                },
-                                                                {
-                                                                    city: selectedAddress.city,
-                                                                    stateCode:
-                                                                        selectedAddress.stateCode ||
-                                                                        '',
-                                                                    postalCode:
-                                                                        selectedAddress.postalCode
-                                                                }
-                                                            )}
-                                                        </Text>
+                                                        <Text flexShrink={0}>-</Text>
+                                                        <Box flex={1} minW={0}>
+                                                            <Text
+                                                                fontWeight="normal"
+                                                                fontSize={{base: 'xs', md: 'sm'}}
+                                                                color="gray.600"
+                                                                overflow="hidden"
+                                                                textOverflow="ellipsis"
+                                                                whiteSpace="nowrap"
+                                                                w="100%"
+                                                            >
+                                                                {selectedAddress.address1},{' '}
+                                                                {formatMessage(
+                                                                    {
+                                                                        id: 'shipping_multi_address.format.address_line_2',
+                                                                        defaultMessage:
+                                                                            '{city}, {stateCode} {postalCode}'
+                                                                    },
+                                                                    {
+                                                                        city: selectedAddress.city,
+                                                                        stateCode:
+                                                                            selectedAddress.stateCode ||
+                                                                            '',
+                                                                        postalCode:
+                                                                            selectedAddress.postalCode
+                                                                    }
+                                                                )}
+                                                            </Text>
+                                                        </Box>
                                                     </HStack>
                                                     <Text ml={2} fontSize="lg" color="gray.500">
                                                         ▼
@@ -357,23 +365,28 @@ const ShippingMultiAddress = ({
                                                                     <VStack
                                                                         align="flex-start"
                                                                         spacing={1}
+                                                                        w="100%"
                                                                     >
-                                                                        <Text fontWeight="bold">
+                                                                        <Text
+                                                                            fontWeight="bold"
+                                                                            fontSize={{
+                                                                                base: 'sm',
+                                                                                md: 'md'
+                                                                            }}
+                                                                        >
                                                                             {addr.firstName}{' '}
                                                                             {addr.lastName}
                                                                         </Text>
                                                                         <Text
                                                                             fontWeight="normal"
                                                                             color="gray.600"
-                                                                            fontSize="sm"
+                                                                            fontSize={{
+                                                                                base: 'xs',
+                                                                                md: 'sm'
+                                                                            }}
+                                                                            wordBreak="break-word"
                                                                         >
-                                                                            {addr.address1}
-                                                                        </Text>
-                                                                        <Text
-                                                                            fontWeight="normal"
-                                                                            color="gray.600"
-                                                                            fontSize="sm"
-                                                                        >
+                                                                            {addr.address1},{' '}
                                                                             {formatMessage(
                                                                                 {
                                                                                     id: 'shipping_multi_address.format.address_line_2',
@@ -455,6 +468,316 @@ const ShippingMultiAddress = ({
                                         </Box>
                                     </VStack>
                                 </Flex>
+
+                                {/* Mobile: Address dropdown and price - only on mobile */}
+                                <VStack
+                                    align="flex-start"
+                                    w="100%"
+                                    spacing={3}
+                                    display={{base: 'flex', md: 'none'}}
+                                    mt={4}
+                                    pt={0}
+                                    minW={0}
+                                    maxW="100%"
+                                    overflowX="hidden"
+                                    minH={openDropdown === mobileAddressKey ? '300px' : 'auto'}
+                                >
+                                    <Text fontWeight="medium" fontSize="sm" mb={2}>
+                                        {formatMessage(deliveryAddressLabel)}
+                                    </Text>
+
+                                    {/* Address Dropdown */}
+                                    <Box
+                                        ref={(el) => (dropdownRefs.current[mobileAddressKey] = el)}
+                                        position="relative"
+                                        w="100%"
+                                        mb={6}
+                                        overflow="visible"
+                                        minW={0}
+                                        maxW="100%"
+                                    >
+                                        <Box
+                                            position="relative"
+                                            w="100%"
+                                            minW={0}
+                                            maxW="100%"
+                                            overflow="visible"
+                                        >
+                                            <Box
+                                                role="button"
+                                                tabIndex={0}
+                                                border="1px solid"
+                                                borderColor="gray.300"
+                                                borderRadius="md"
+                                                p={2}
+                                                fontSize="md"
+                                                bg="white"
+                                                cursor="pointer"
+                                                w="100%"
+                                                display="flex"
+                                                alignItems="center"
+                                                justifyContent="space-between"
+                                                fontWeight="normal"
+                                                _hover={{bg: 'gray.50'}}
+                                                onClick={() =>
+                                                    setOpenDropdown(
+                                                        openDropdown === mobileAddressKey
+                                                            ? null
+                                                            : mobileAddressKey
+                                                    )
+                                                }
+                                                onKeyDown={(e) => {
+                                                    if (e.key === 'Enter' || e.key === ' ') {
+                                                        setOpenDropdown(
+                                                            openDropdown === mobileAddressKey
+                                                                ? null
+                                                                : mobileAddressKey
+                                                        )
+                                                    }
+                                                }}
+                                                overflow="hidden"
+                                                minW={0}
+                                                maxW="100%"
+                                            >
+                                                <HStack
+                                                    align="center"
+                                                    spacing={2}
+                                                    flex={1}
+                                                    minW={0}
+                                                    maxW="100%"
+                                                    overflow="hidden"
+                                                >
+                                                    <Text
+                                                        fontWeight="bold"
+                                                        fontSize={{base: 'sm', md: 'md'}}
+                                                        whiteSpace="nowrap"
+                                                        flexShrink={0}
+                                                    >
+                                                        {selectedAddress?.firstName}{' '}
+                                                        {selectedAddress?.lastName}
+                                                    </Text>
+                                                    <Text flexShrink={0}>-</Text>
+                                                    <Box
+                                                        flex={1}
+                                                        minW={0}
+                                                        maxW={{
+                                                            base: '100px',
+                                                            sm: '120px',
+                                                            md: '150px'
+                                                        }}
+                                                    >
+                                                        <Text
+                                                            fontWeight="normal"
+                                                            fontSize={{base: 'xs', md: 'sm'}}
+                                                            color="gray.600"
+                                                            overflow="hidden"
+                                                            textOverflow="ellipsis"
+                                                            whiteSpace="nowrap"
+                                                            w="100%"
+                                                        >
+                                                            {selectedAddress.address1},{' '}
+                                                            {formatMessage(
+                                                                {
+                                                                    id: 'shipping_multi_address.format.address_line_2',
+                                                                    defaultMessage:
+                                                                        '{city}, {stateCode} {postalCode}'
+                                                                },
+                                                                {
+                                                                    city: selectedAddress.city,
+                                                                    stateCode:
+                                                                        selectedAddress.stateCode ||
+                                                                        '',
+                                                                    postalCode:
+                                                                        selectedAddress.postalCode
+                                                                }
+                                                            )}
+                                                        </Text>
+                                                    </Box>
+                                                </HStack>
+                                                <Text
+                                                    ml={2}
+                                                    fontSize="lg"
+                                                    color="gray.500"
+                                                    flexShrink={0}
+                                                >
+                                                    ▼
+                                                </Text>
+                                            </Box>
+
+                                            {/* Custom Dropdown */}
+                                            {openDropdown === mobileAddressKey && (
+                                                <Box
+                                                    position="absolute"
+                                                    top="100%"
+                                                    left={0}
+                                                    right={0}
+                                                    zIndex={1000}
+                                                    mt={0}
+                                                    bg="white"
+                                                    border="1px solid"
+                                                    borderColor="gray.200"
+                                                    borderRadius="md"
+                                                    boxShadow="lg"
+                                                    overflow="hidden"
+                                                    maxH="200px"
+                                                    w="100%"
+                                                >
+                                                    <List
+                                                        spacing={0}
+                                                        overflowY="auto"
+                                                        maxH="200px"
+                                                        w="100%"
+                                                    >
+                                                        {addresses.map((addr, index) => (
+                                                            <ListItem
+                                                                key={addr.addressId}
+                                                                p={3}
+                                                                cursor="pointer"
+                                                                fontSize="md"
+                                                                bg={
+                                                                    addr.addressId ===
+                                                                    selectedAddressId
+                                                                        ? 'blue.50'
+                                                                        : 'white'
+                                                                }
+                                                                borderBottom={
+                                                                    index < addresses.length - 1
+                                                                        ? '1px solid'
+                                                                        : 'none'
+                                                                }
+                                                                borderColor="gray.100"
+                                                                _hover={{bg: 'gray.50'}}
+                                                                onClick={() => {
+                                                                    setSelectedAddresses(
+                                                                        (prev) => ({
+                                                                            ...prev,
+                                                                            [addressKey]:
+                                                                                addr.addressId
+                                                                        })
+                                                                    )
+                                                                    setOpenDropdown(null)
+                                                                }}
+                                                                onKeyDown={(e) => {
+                                                                    if (
+                                                                        e.key === 'Enter' ||
+                                                                        e.key === ' '
+                                                                    ) {
+                                                                        setSelectedAddresses(
+                                                                            (prev) => ({
+                                                                                ...prev,
+                                                                                [addressKey]:
+                                                                                    addr.addressId
+                                                                            })
+                                                                        )
+                                                                        setOpenDropdown(null)
+                                                                    }
+                                                                }}
+                                                            >
+                                                                <VStack
+                                                                    align="flex-start"
+                                                                    spacing={1}
+                                                                    w="100%"
+                                                                >
+                                                                    <Text
+                                                                        fontWeight="bold"
+                                                                        fontSize={{
+                                                                            base: 'sm',
+                                                                            md: 'md'
+                                                                        }}
+                                                                    >
+                                                                        {addr.firstName}{' '}
+                                                                        {addr.lastName}
+                                                                    </Text>
+                                                                    <Text
+                                                                        fontWeight="normal"
+                                                                        color="gray.600"
+                                                                        fontSize={{
+                                                                            base: 'xs',
+                                                                            md: 'sm'
+                                                                        }}
+                                                                        wordBreak="break-word"
+                                                                    >
+                                                                        {addr.address1},{' '}
+                                                                        {formatMessage(
+                                                                            {
+                                                                                id: 'shipping_multi_address.format.address_line_2',
+                                                                                defaultMessage:
+                                                                                    '{city}, {stateCode} {postalCode}'
+                                                                            },
+                                                                            {
+                                                                                city: addr.city,
+                                                                                stateCode:
+                                                                                    addr.stateCode ||
+                                                                                    '',
+                                                                                postalCode:
+                                                                                    addr.postalCode
+                                                                            }
+                                                                        )}
+                                                                    </Text>
+                                                                </VStack>
+                                                            </ListItem>
+                                                        ))}
+                                                        {/* Add New Address option */}
+                                                        <ListItem
+                                                            p={3}
+                                                            cursor="pointer"
+                                                            fontSize="md"
+                                                            color="blue.600"
+                                                            borderTop="1px solid"
+                                                            borderColor="gray.200"
+                                                            _hover={{bg: 'blue.50'}}
+                                                            onClick={() => {
+                                                                setOpenDropdown(null)
+                                                                onAddNewAddress()
+                                                            }}
+                                                            onKeyDown={(e) => {
+                                                                if (
+                                                                    e.key === 'Enter' ||
+                                                                    e.key === ' '
+                                                                ) {
+                                                                    setOpenDropdown(null)
+                                                                    onAddNewAddress()
+                                                                }
+                                                            }}
+                                                        >
+                                                            <HStack spacing={2}>
+                                                                <Text
+                                                                    fontWeight="bold"
+                                                                    fontSize="lg"
+                                                                >
+                                                                    +
+                                                                </Text>
+                                                                <Text>
+                                                                    {formatMessage(
+                                                                        addNewAddressLabel
+                                                                    )}
+                                                                </Text>
+                                                            </HStack>
+                                                        </ListItem>
+                                                    </List>
+                                                </Box>
+                                            )}
+                                        </Box>
+                                    </Box>
+
+                                    {/* Price */}
+                                    <Box
+                                        fontWeight="semibold"
+                                        fontSize="md"
+                                        color="gray.900"
+                                        alignSelf="flex-end"
+                                        mt="auto"
+                                    >
+                                        {typeof variant.priceAfterItemDiscount === 'number' && (
+                                            <Text>
+                                                {new Intl.NumberFormat(undefined, {
+                                                    style: 'currency',
+                                                    currency: basket?.currency || 'USD'
+                                                }).format(variant.priceAfterItemDiscount)}
+                                            </Text>
+                                        )}
+                                    </Box>
+                                </VStack>
                             </Box>
                         )
                     })}
