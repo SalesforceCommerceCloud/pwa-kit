@@ -166,5 +166,5 @@ const colors = {
         900: '#520066'
     }
 }
-
 export default colors
+

@@ -13,7 +13,8 @@ import {
     Container,
     Heading,
     SimpleGrid,
-    Stack
+    Stack,
+    useMultiStyleConfig
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 import {useForm, Controller} from 'react-hook-form'
 import {shallowEquals} from '@salesforce/retail-react-app/app/utils/utils'
@@ -43,23 +44,16 @@ const ShippingAddressEditForm = ({
     isBillingAddress = false
 }) => {
     const {formatMessage} = useIntl()
+    const styles = useMultiStyleConfig('ShippingAddressSelection')
 
     return (
         <Box
-            {...(hasSavedAddresses &&
-                !isBillingAddress && {
-                    gridColumn: [1, 1, 'span 2'],
-                    paddingX: [4, 4, 6],
-                    paddingY: 6,
-                    rounded: 'base',
-                    border: '1px solid',
-                    borderColor: 'blue.600'
-                })}
+            {...(hasSavedAddresses && !isBillingAddress ? styles.editFormExpanded : styles.editForm)}
             data-testid="sf-shipping-address-edit-form"
         >
             <Stack spacing={6}>
                 {hasSavedAddresses && !isBillingAddress && (
-                    <Heading as="h3" size="sm">
+                    <Heading {...styles.editFormTitle}>
                         {title}
                     </Heading>
                 )}
@@ -78,11 +72,10 @@ const ShippingAddressEditForm = ({
                         />
                     ) : (
                         !hideSubmitButton && (
-                            <Box>
+                            <Box {...styles.submitButtonContainer}>
                                 <Container variant="form">
                                     <Button
-                                        type="submit"
-                                        width="full"
+                                        {...styles.submitButton}
                                         disabled={form.formState.isSubmitting}
                                     >
                                         {formatMessage(submitButtonLabel)}

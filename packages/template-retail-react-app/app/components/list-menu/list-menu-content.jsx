@@ -24,6 +24,7 @@ import LinksList from '@salesforce/retail-react-app/app/components/links-list'
 
 // Others
 import {categoryUrlBuilder} from '@salesforce/retail-react-app/app/utils/url'
+import listMenuStyles from '@salesforce/retail-react-app/app/theme/foundations/list-menu-styles'
 
 const ListMenuContent = ({maxColumns, item, itemsKey, onClose, initialFocusRef}) => {
     const theme = useTheme()
@@ -49,7 +50,7 @@ const ListMenuContent = ({maxColumns, item, itemsKey, onClose, initialFocusRef})
                         href: categoryUrlBuilder(item, locale),
                         text: name,
                         styles: {
-                            fontSize: 'md',
+                            ...listMenuStyles.dropdown.text,
                             marginBottom: 2
                         }
                     }
@@ -61,7 +62,7 @@ const ListMenuContent = ({maxColumns, item, itemsKey, onClose, initialFocusRef})
                                   href: categoryUrlBuilder(item, locale),
                                   text: name,
                                   styles: {
-                                      fontSize: 'md',
+                                      ...listMenuStyles.dropdown.text,
                                       paddingTop: 3,
                                       paddingBottom: 3
                                   }
@@ -74,7 +75,7 @@ const ListMenuContent = ({maxColumns, item, itemsKey, onClose, initialFocusRef})
                             key={id}
                             heading={heading}
                             links={links}
-                            color={'gray.900'}
+                            color={listMenuStyles.dropdown.text.color}
                             onLinkClick={onClose}
                             {...(index === 0 ? {headingLinkRef: initialFocusRef} : {})}
                         />

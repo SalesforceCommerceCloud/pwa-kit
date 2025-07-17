@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
+import listMenuStyles from '@salesforce/retail-react-app/app/theme/foundations/list-menu-styles'
+
 export default {
     baseStyle: {
         container: {
@@ -52,31 +54,30 @@ export default {
             paddingBottom: 2,
             paddingLeft: 1,
             marginLeft: 3,
-            fontSize: 'md',
-            fontWeight: 700,
-            color: 'gray.900',
+            ...listMenuStyles.primary.default,
             _hover: {
-                textDecoration: 'none'
+                textDecoration: 'none',
+                ...listMenuStyles.primary.hover
             }
         },
         listMenuTriggerLinkActive: {
             textDecoration: 'none',
+            ...listMenuStyles.primary.active,
             _before: {
                 position: 'absolute',
-                backgroundColor: 'black',
+                ...listMenuStyles.active.underline,
                 content: 'attr(name)',
-                height: '2px',
                 color: 'transparent',
                 bottom: '0px'
             }
         },
         listMenuTriggerlessLinkActive: {
             textDecoration: 'none',
+            ...listMenuStyles.primary.active,
             _before: {
                 position: 'absolute',
-                backgroundColor: 'black',
+                ...listMenuStyles.active.underline,
                 content: 'attr(name)',
-                height: '2px',
                 width: '-webkit-fill-available',
                 color: 'transparent',
                 bottom: '0px'
