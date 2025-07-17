@@ -42,6 +42,9 @@ import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 
 //we will be importing the submission call from payment sheet here
 import {usePaymentSheetSubmission} from '@salesforce/retail-react-app/app/pages/checkout/partials/salesforce-payments/payment-sheet'
+//reads the configuration data here when checkout is loaded
+import {usePaymentConfigManager} from '@salesforce/retail-react-app/app/hooks/salesforce-payments/use-payment-config-manager'
+
 
 const Checkout = () => {
     const {formatMessage} = useIntl()
@@ -54,7 +57,14 @@ const Checkout = () => {
     const {passwordless = {}, social = {}} = getConfig().app.login || {}
     
     // check feature toggle
-    const salesforcePaymentsEnabled = getConfig().app.checkout.SalesforcePaymentsEnabled
+    //const salesforcePaymentsEnabled = getConfig().app.checkout.SalesforcePaymentsEnabled
+       
+    // ✅ Replace hardcoded flag with API-driven state
+    const paymentState = usePaymentConfigManager()
+    const {isSFPEnabled, isReady, paymentConfigLoading} = paymentState
+
+       
+    
     // ✅ Import payment processing from payment-sheet
     const {submitPaymentSheetOrder, isProcessing} = usePaymentSheetSubmission()
 
@@ -72,7 +82,7 @@ const Checkout = () => {
         setIsLoading(true)
         try {
             // ✅ Anitha: Process payment first if SFP is enabled
-            if (salesforcePaymentsEnabled) {
+            if (isSFPEnabled) {
                 console.log('🚀 Processing SFP payment before order creation...')
                 await submitPaymentSheetOrder()
                 console.log('✅ Payment processed, now creating order...')
@@ -123,8 +133,34 @@ const Checkout = () => {
                             <ShippingAddress />
                             <ShippingOptions />
                             {/* Conditional Payment Component */}
-                            {salesforcePaymentsEnabled ? <SFPaymentsSheet /> : <Payment />}
+                            {/*{salesforcePaymentsEnabled ? <SFPaymentsSheet /> : <Payment />}*/}
 
+{/* ✅ Simple placeholder without Text component */}
+{isReady ? (
+    isSFPEnabled ? (
+        <SFPaymentsSheet paymentState={paymentState} />
+    ) : (
+        <Payment />
+    )
+) : (
+    <Box
+    borderWidth="1px"
+    borderRadius="lg" 
+    borderColor="gray.200"
+    bg="white"
+    minH="78px"
+    mb={6}
+    p={6}  // ✅ Add padding like other sections
+>
+    <div style={{
+        color: '#666', 
+        fontSize: '18px', 
+        fontWeight: '600'
+    }}>
+        Payments
+    </div>
+</Box>
+)}
                             {step === 4 && (
                                 <Box pt={3} display={{base: 'none', lg: 'block'}}>
                                     <Container variant="form">
