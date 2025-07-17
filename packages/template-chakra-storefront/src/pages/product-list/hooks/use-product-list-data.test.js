@@ -161,13 +161,19 @@ describe('useProductListData', () => {
         })
 
         test('throws HTTPNotFound for 404 category error', () => {
+            const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
+            
             useCategory.mockReturnValue({error: {response: {status: 404}}})
             expect(() => renderHook(() => useProductListData())).toThrow(HTTPNotFound)
+            
+            consoleSpy.mockRestore()
         })
 
         test('throws HTTPError for other category errors', () => {
+            const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
             useCategory.mockReturnValue({error: {response: {status: 500}}})
             expect(() => renderHook(() => useProductListData())).toThrow(HTTPError)
+            consoleSpy.mockRestore()
         })
     })
 

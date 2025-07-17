@@ -12,7 +12,7 @@ import {
     mockProductSearch,
     mockedEmptyCustomerProductList,
     mockCategories
-} from '../../mocks/mock-data'
+} from '../../../mocks/mock-data'
 import {act, screen, waitFor} from '@testing-library/react'
 import {Route, Switch} from 'react-router-dom'
 import {createPathWithDefaults, renderWithProviders} from '../../utils/test-utils'

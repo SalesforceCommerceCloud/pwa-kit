@@ -9,7 +9,7 @@ import {act, screen, waitFor, within} from '@testing-library/react'
 import ContactInfo from './contact-info'
 import {renderWithProviders} from '../../../utils/test-utils'
 import {rest} from 'msw'
-import {scapiBasketWithItem} from '../../../mocks/mock-data'
+import {scapiBasketWithItem} from '../../../../mocks/mock-data'
 import {AuthHelpers} from '@salesforce/commerce-sdk-react'
 
 const invalidEmail = 'invalidEmail'

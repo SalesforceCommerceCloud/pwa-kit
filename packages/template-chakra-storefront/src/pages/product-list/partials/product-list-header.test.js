@@ -5,8 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
-import {screen, waitFor} from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
+import {act, screen, waitFor} from '@testing-library/react'
 import ProductListHeader from './product-list-header'
 import {useHistory} from 'react-router-dom'
 import {renderWithProviders} from '../../../utils/test-utils'
@@ -103,8 +102,7 @@ describe('ProductListHeader', () => {
     })
 
     test('mobile filter button opens and closes filter modal', async () => {
-        const user = userEvent.setup()
-        renderWithProviders(<ProductListHeader {...defaultProps} />)
+        const {user} = renderWithProviders(<ProductListHeader {...defaultProps} />)
 
         const filterButton = screen.getByText(/Filter/i)
         expect(filterButton).toBeInTheDocument()
@@ -112,8 +110,9 @@ describe('ProductListHeader', () => {
         // Modal content is not visible initially
         expect(screen.queryByText(/View 100 Items/i)).not.toBeInTheDocument()
 
-        await user.click(filterButton)
-
+        await act(async () => {
+            await user.click(filterButton)
+        })
         // Modal content is now visible
         expect(screen.getByText(/View 100 Items/i)).toBeInTheDocument()
         expect(screen.getByText(/Clear Filters/i)).toBeInTheDocument()
@@ -121,7 +120,9 @@ describe('ProductListHeader', () => {
 
         // Click to close modal
         const viewItemsButton = screen.getByText(/View 100 Items/i)
-        await user.click(viewItemsButton)
+        await act(async () => {
+            await user.click(viewItemsButton)
+        })
 
         // Modal content is gone
         await waitFor(() => {
@@ -130,22 +131,26 @@ describe('ProductListHeader', () => {
     })
 
     test('reset filter button in modal calls resetFilters', async () => {
-        const user = userEvent.setup()
         const resetFilters = jest.fn()
-        renderWithProviders(<ProductListHeader {...defaultProps} resetFilters={resetFilters} />)
+        const {user} = renderWithProviders(
+            <ProductListHeader {...defaultProps} resetFilters={resetFilters} />
+        )
 
         const filterButton = screen.getByText(/Filter/i)
-        await user.click(filterButton)
+        await act(async () => {
+            await user.click(filterButton)
+        })
 
         const clearButton = screen.getByText(/Clear Filters/i)
-        await user.click(clearButton)
+        await act(async () => {
+            await user.click(clearButton)
+        })
 
         expect(resetFilters).toHaveBeenCalled()
     })
 
     test('mobile sort button opens sort drawer and allows sorting', async () => {
-        const user = userEvent.setup()
-        renderWithProviders(<ProductListHeader {...defaultProps} />)
+        const {user} = renderWithProviders(<ProductListHeader {...defaultProps} />)
 
         const sortButton = screen.getByText(/Sort By: Best Matches/i)
         expect(sortButton).toBeInTheDocument()
@@ -153,8 +158,9 @@ describe('ProductListHeader', () => {
         // Drawer not visible initially
         expect(screen.queryByText('Price High to Low')).not.toBeInTheDocument()
 
-        await user.click(sortButton)
-
+        await act(async () => {
+            await user.click(sortButton)
+        })
         // Drawer is now visible with sort options
         expect(screen.getByText('Best Matches')).toBeInTheDocument()
         expect(screen.getByText('Price High to Low')).toBeInTheDocument()
@@ -162,18 +168,23 @@ describe('ProductListHeader', () => {
 
         // Click a sort option
         const highToLow = screen.getByText('Price High to Low')
-        await user.click(highToLow)
+        await act(async () => {
+            await user.click(highToLow)
+        })
 
         // History is updated with new sort URL
         expect(history.push).toHaveBeenCalledWith('/sort/price-high-to-low')
     })
 
     test('displays loading spinner when filters are loading in modal', async () => {
-        const user = userEvent.setup()
-        renderWithProviders(<ProductListHeader {...defaultProps} filtersLoading={true} />)
+        const {user} = renderWithProviders(
+            <ProductListHeader {...defaultProps} filtersLoading={true} />
+        )
 
         const filterButton = screen.getByText(/Filter/i)
-        await user.click(filterButton)
+        await act(async () => {
+            await user.click(filterButton)
+        })
 
         expect(await screen.findByTestId('loading')).toBeInTheDocument()
     })

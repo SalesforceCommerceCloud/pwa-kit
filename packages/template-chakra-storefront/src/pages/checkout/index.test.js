@@ -15,8 +15,8 @@ import {
     mockShippingMethods,
     mockedRegisteredCustomer,
     mockedCustomerProductLists
-} from '../../mocks/mock-data'
-import mockConfig from '../../mock-config'
+} from '../../../mocks/mock-data'
+import mockConfig from '../../../config/mocks/mock-config'
 
 // This is a flaky test file!
 jest.retryTimes(5)

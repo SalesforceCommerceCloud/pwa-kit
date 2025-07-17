@@ -15,14 +15,14 @@ import {
     mockEmptyBasket,
     mockCartVariant,
     mockedCustomerProductLists
-} from '../../mocks/mock-data'
-import mockVariant from '../../mocks/variant-750518699578M'
+} from '../../../mocks/mock-data'
+import mockVariant from '../../../mocks/variant-750518699578M'
 import {rest} from 'msw'
 import {
     mockProductBundle,
     mockGetBundleChildrenProducts,
     basketWithProductBundle
-} from '../../mocks/product-bundle'
+} from '../../../mocks/product-bundle'
 import {prependHandlersToServer} from '../../../jest-setup'
 import {baskets as mockBaskets, products as mockProducts} from '../../pages/cart/cart.mock'
 
