@@ -5,7 +5,6 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-// Third-Party Imports
 import React, {useState, useEffect, useMemo, createContext, useContext} from 'react'
 import PropTypes from 'prop-types'
 import {useHistory, useLocation} from 'react-router-dom'
@@ -65,9 +64,11 @@ import {AddToCartModalProvider} from '../../hooks/use-add-to-cart-modal'
 import {useCurrentCustomer, useCurrentBasket} from '../../hooks'
 import {useAppOrigin} from '../../hooks/use-app-origin'
 import {useUpdateShopperContext} from '../../hooks/use-update-shopper-context'
-import useActiveData from '../../hooks/use-active-data'
 import useMultiSite from '../../hooks/use-multi-site'
 import {DntNotification, useDntNotification} from '../../hooks/use-dnt-notification'
+import useActiveData from '../../../src/hooks/use-active-data'
+import useEinstein from '../../../src/hooks/use-einstein'
+import useDataCloud from '../../../src/hooks/use-datacloud'
 import logger from '../../../src/utils/logger-instance'
 
 // HOCs
@@ -129,6 +130,8 @@ const App = (props) => {
     const {getTokenWhenReady} = useAccessToken()
     const appOrigin = useAppOrigin()
     const activeData = useActiveData()
+    const einstein = useEinstein()
+    const dataCloud = useDataCloud()
     const history = useHistory()
     const location = useLocation()
     const authModal = useAuthModal()
@@ -282,6 +285,8 @@ const App = (props) => {
 
     const trackPage = () => {
         activeData.trackPage(site.id, locale.id, currency)
+        einstein.sendViewPage(location.pathname)
+        dataCloud.sendViewPage(location.pathname)
     }
 
     useEffect(() => {
