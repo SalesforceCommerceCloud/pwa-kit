@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, {Fragment, useCallback, useEffect, useState} from 'react'
+import React, {Fragment, useCallback, useEffect, useState, useRef} from 'react'
 import PropTypes from 'prop-types'
 import {Helmet} from 'react-helmet'
 import {FormattedMessage, useIntl} from 'react-intl'
@@ -326,6 +326,7 @@ const ProductDetail = () => {
     }
 
     const [pickupInStoreMap, setPickupInStoreMap] = useState({})
+    const prevProductIdRef = useRef()
 
     const handlePickupInStoreChange = (productId, checked) => {
         setPickupInStoreMap((prev) => ({
@@ -333,6 +334,41 @@ const ProductDetail = () => {
             [productId]: checked
         }))
     }
+
+    // Transfer pickup state when variant changes
+    useEffect(() => {
+        if (!product?.id || !selectedInventoryId) return
+
+        const currentProductId = product.id
+        const prevProductId = prevProductIdRef.current
+
+        // Update ref for next time
+        prevProductIdRef.current = currentProductId
+
+        // Check if product ID changed (variant selection)
+        if (prevProductId && prevProductId !== currentProductId) {
+            // Use callback to get current pickup state
+            setPickupInStoreMap((prev) => {
+                const prevHadPickup = prev[prevProductId]
+
+                if (prevHadPickup) {
+                    // Check if current variant has store inventory
+                    const hasStoreInventory = product.inventories?.some(
+                        (inv) => inv.id === selectedInventoryId && inv.orderable
+                    )
+
+                    // Transfer pickup state if inventory available, otherwise clear
+                    return {
+                        ...prev,
+                        [prevProductId]: false, // Clear previous selection
+                        [currentProductId]: hasStoreInventory // Set new selection based on inventory
+                    }
+                }
+
+                return prev // No changes needed
+            })
+        }
+    }, [product?.id, selectedInventoryId])
 
     const handleAddToCart = async (productSelectionValues = []) => {
         try {
