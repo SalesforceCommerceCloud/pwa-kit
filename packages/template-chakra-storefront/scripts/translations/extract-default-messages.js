@@ -14,8 +14,6 @@
 const {exec} = require('child_process')
 const fs = require('fs')
 const path = require('path')
-const packagePath = path.join(process.cwd(), 'package.json')
-const pkgJSON = JSON.parse(fs.readFileSync(packagePath))
 
 const getAllFilesByExtensions = (dirPath, arrayOfFiles = [], extensions = []) => {
     const files = fs.readdirSync(dirPath, {withFileTypes: true})

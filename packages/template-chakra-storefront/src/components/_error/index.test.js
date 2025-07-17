@@ -7,10 +7,10 @@
 import React from 'react'
 import Error from './index'
 // !!! ----- WARNING ----- WARNING ----- WARNING ----- !!!
-// Tests use render instead of renderWithProviders because
+// Tests use render or renderWithChakraProvider instead of renderWithProviders because
 // error component is rendered outside provider tree
 // !!! ----------------------------------------------- !!!
-import {screen, render} from '@testing-library/react'
+import {screen} from '@testing-library/react'
 import {renderWithChakraProvider} from '../../utils/test-utils'
 const originalLocation = window.location
 

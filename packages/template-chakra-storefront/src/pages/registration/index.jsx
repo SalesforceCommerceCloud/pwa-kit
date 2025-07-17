@@ -47,8 +47,6 @@ const Registration = () => {
         }
     }, [isRegistered])
 
-
-
     return (
         <Box data-testid="registration-page" bg="gray.50" py={[8, 16]}>
             <Seo title="Registration" description="Customer sign up" />

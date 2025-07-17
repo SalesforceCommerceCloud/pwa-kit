@@ -8,7 +8,7 @@ import React from 'react'
 import {renderWithProviders} from '../../utils/test-utils'
 import HomePage from '../../pages/home'
 import {rest} from 'msw'
-import {mockProductSearch} from '../../mocks/mock-data'
+import {mockProductSearch} from '../../../mocks/mock-data'
 jest.mock('../../hooks/use-datacloud', () => ({
     __esModule: true,
     default: jest.fn(() => ({

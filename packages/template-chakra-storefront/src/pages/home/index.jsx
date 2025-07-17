@@ -73,8 +73,6 @@ const Home = () => {
         }
     })
 
-
-
     return (
         <Box data-testid="home-page" layerStyle="page">
             <Seo

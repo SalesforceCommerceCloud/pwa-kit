@@ -31,7 +31,7 @@ import AccountAddresses from '../../pages/account/addresses'
 import AccountOrders from '../../pages/account/orders'
 import AccountWishlist from '../../pages/account/wishlist/index'
 
-import {messages, navLinks} from '../../pages/account/constant'
+import {messages, navLinks} from './constant'
 import useNavigation from '../../hooks/use-navigation'
 import LoadingSpinner from '../../components/loading-spinner'
 import useMultiSite from '../../hooks/use-multi-site'

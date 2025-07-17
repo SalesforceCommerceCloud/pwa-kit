@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, {useState, useEffect, useMemo, createContext, useContext} from 'react'
+import React, {useState, useEffect} from 'react'
 import PropTypes from 'prop-types'
 import {useHistory, useLocation} from 'react-router-dom'
 import {Helmet} from 'react-helmet'
@@ -72,11 +72,11 @@ import useDataCloud from '../../../src/hooks/use-datacloud'
 import logger from '../../../src/utils/logger-instance'
 
 // HOCs
-import {withCommerceSdkReact} from '../../../src/components/with-commerce-sdk-react'
+import {withCommerceSdkReact} from '../with-commerce-sdk-react'
 
 //other
-import {watchOnlineStatus, flatten, isServer} from '../../../src/utils/utils'
-import {getTargetLocale, fetchTranslations} from '../../../src/utils/locale'
+import {watchOnlineStatus, flatten, isServer} from '../../utils/utils'
+import {getTargetLocale, fetchTranslations} from '../../utils/locale'
 
 const PlaceholderComponent = () => (
     <Center p="2">
@@ -151,11 +151,11 @@ const App = (props) => {
         onClose: onDrawerMenuClose
     } = useDisclosure()
 
-    const {
-        isOpen: isOpenStoreLocator,
-        onOpen: onOpenStoreLocator,
-        onClose: onCloseStoreLocator
-    } = useDisclosure()
+    // const {
+    //     isOpen: isOpenStoreLocator,
+    //     onOpen: onOpenStoreLocator,
+    //     onClose: onCloseStoreLocator
+    // } = useDisclosure()
 
     const targetLocale = getTargetLocale({
         getUserPreferredLocales: () => {
@@ -260,7 +260,7 @@ const App = (props) => {
         history.push(path)
 
         // Close the drawer.
-        onClose()
+        onDrawerMenuClose()
     }
 
     const onCartClick = () => {
@@ -268,7 +268,7 @@ const App = (props) => {
         history.push(path)
 
         // Close the drawer.
-        onClose()
+        onDrawerMenuClose()
     }
 
     const onAccountClick = () => {
@@ -391,7 +391,6 @@ const App = (props) => {
                                             onMyCartClick={onCartClick}
                                             onMyAccountClick={onAccountClick}
                                             onWishlistClick={onWishlistClick}
-                                            onStoreLocatorClick={onOpenStoreLocator}
                                         >
                                             <HideOnDesktop>
                                                 <DrawerMenu

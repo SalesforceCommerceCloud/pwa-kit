@@ -38,9 +38,6 @@ const ProductList = loadable(() => import('./product-list'), {
 const SocialLoginRedirect = loadable(() => import('./social-login-redirect'), {
     fallback
 })
-const Wishlist = loadable(() => import('./account/wishlist'), {
-    fallback
-})
 
 // NOTE: Apply "displayName" for easy filtering. This is a widely use pattern to allow filtering without
 // triggering the loadable logic. Please note that we want to keep these in aligned with name in the
@@ -53,6 +50,7 @@ Home.displayName = 'Home'
 Login.displayName = 'Login'
 Registration.displayName = 'Registration'
 ResetPassword.displayName = 'ResetPassword'
+SocialLoginRedirect.displayName = 'SocialLoginRedirect'
 LoginRedirect.displayName = 'LoginRedirect'
 ProductDetail.displayName = 'ProductDetail'
 ProductList.displayName = 'ProductList'

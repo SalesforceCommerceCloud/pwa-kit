@@ -183,9 +183,6 @@
   "carousel.button.scroll_right.assistive_msg": {
     "defaultMessage": "Scroll carousel right"
   },
-  "cart.info.removed_from_cart": {
-    "defaultMessage": "Item removed from cart"
-  },
   "cart.product_edit_modal.modal_label": {
     "defaultMessage": "Edit modal for {productName}"
   },
@@ -370,32 +367,20 @@
   "confirmation_modal.remove_cart_item.action.no": {
     "defaultMessage": "No, keep item"
   },
-  "confirmation_modal.remove_cart_item.action.remove": {
-    "defaultMessage": "Remove"
-  },
   "confirmation_modal.remove_cart_item.action.yes": {
     "defaultMessage": "Yes, remove item"
   },
   "confirmation_modal.remove_cart_item.assistive_msg.no": {
     "defaultMessage": "No, keep item"
   },
-  "confirmation_modal.remove_cart_item.assistive_msg.remove": {
-    "defaultMessage": "Remove unavailable products"
-  },
   "confirmation_modal.remove_cart_item.assistive_msg.yes": {
     "defaultMessage": "Yes, remove item"
-  },
-  "confirmation_modal.remove_cart_item.message.need_to_remove_due_to_unavailability": {
-    "defaultMessage": "Some items are no longer available online and will be removed from your cart."
   },
   "confirmation_modal.remove_cart_item.message.sure_to_remove": {
     "defaultMessage": "Are you sure you want to remove this item from your cart?"
   },
   "confirmation_modal.remove_cart_item.title.confirm_remove": {
     "defaultMessage": "Confirm Remove Item"
-  },
-  "confirmation_modal.remove_cart_item.title.items_unavailable": {
-    "defaultMessage": "Items Unavailable"
   },
   "confirmation_modal.remove_wishlist_item.action.no": {
     "defaultMessage": "No, keep item"
@@ -647,30 +632,6 @@
   },
   "global.account.link.wishlist": {
     "defaultMessage": "Wishlist"
-  },
-  "global.error.create_account": {
-    "defaultMessage": "This feature is not currently available. You must create an account to access this feature."
-  },
-  "global.error.feature_unavailable": {
-    "defaultMessage": "This feature is not currently available."
-  },
-  "global.error.invalid_token": {
-    "defaultMessage": "Invalid token, please try again."
-  },
-  "global.error.something_went_wrong": {
-    "defaultMessage": "Something went wrong. Try again!"
-  },
-  "global.info.added_to_wishlist": {
-    "defaultMessage": "{quantity} {quantity, plural, one {item} other {items}} added to wishlist"
-  },
-  "global.info.already_in_wishlist": {
-    "defaultMessage": "Item is already in wishlist"
-  },
-  "global.info.removed_from_wishlist": {
-    "defaultMessage": "Item removed from wishlist"
-  },
-  "global.link.added_to_wishlist.view_wishlist": {
-    "defaultMessage": "View"
   },
   "header.button.assistive_msg.clear_search": {
     "defaultMessage": "Clear Search"
@@ -1204,12 +1165,6 @@
   "product_tile.assistive_msg.remove_from_wishlist": {
     "defaultMessage": "Remove {product} from wishlist"
   },
-  "product_tile.badge.label.new": {
-    "defaultMessage": "New"
-  },
-  "product_tile.badge.label.sale": {
-    "defaultMessage": "Sale"
-  },
   "product_view.button.add_bundle_to_cart": {
     "defaultMessage": "Add Bundle to Cart"
   },
@@ -1429,12 +1384,6 @@
   },
   "store_locator.description.viewing_near_your_location": {
     "defaultMessage": "Viewing stores near your location"
-  },
-  "store_locator.dropdown.germany": {
-    "defaultMessage": "Germany"
-  },
-  "store_locator.dropdown.united_states": {
-    "defaultMessage": "United States"
   },
   "store_locator.error.agree_to_share_your_location": {
     "defaultMessage": "Please agree to share your location"

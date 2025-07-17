@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
-import {act, fireEvent, screen, waitFor} from '@testing-library/react'
+import {act, screen, waitFor} from '@testing-library/react'
 import {useAuthHelper, AuthHelpers} from '@salesforce/commerce-sdk-react'
 import {renderWithProviders} from '../utils/test-utils'
 import {usePasswordReset} from './use-password-reset'
