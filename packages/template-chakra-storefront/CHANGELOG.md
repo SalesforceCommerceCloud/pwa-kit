@@ -1,6 +1,7 @@
 ## 0.1.0-extensibility-preview.5
 - Migrate directory structure from `app/*` to `src/*` [#2693](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2693)
-- Create a safe version of `<Portal>` that won't break the SSR rendering [#2785](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2785)
+- Upgrade to Chakra UI v3 [2839](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2839)
+  - Create a safe version of `<Portal>` that won't break the SSR rendering [#2785](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2785)
 
 ## 0.1.0-extensibility-preview.4
 - Fix hreflang alternate links [#2269](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2269)
