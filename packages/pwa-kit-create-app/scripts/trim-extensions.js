@@ -76,9 +76,17 @@ function processFile(filePath, plugins) {
     const source = fs.readFileSync(filePath, 'utf-8')
 
     // Search file content for plugin references
-    const pluginRegex = new RegExp(Object.keys(plugins).join('|'))
-    const hasPluginReferences = pluginRegex.test(source)
-    if (!hasPluginReferences) {
+    const pluginPositions = []
+    const pluginRegex = new RegExp(Object.keys(plugins).join('|'), 'g')
+    let match
+    while ((match = pluginRegex.exec(source)) !== null) {
+        pluginPositions.push({
+            start: match.index,
+            end: match.index + match[0].length,
+            name: match[0]  // store which plugin was found
+        })
+    }
+    if (pluginPositions.length === 0) {
         // No plugins found in file, return early
         return false
     }
@@ -130,16 +138,6 @@ function processFile(filePath, plugins) {
         }
     }
 
-    const pluginPositions = []
-    const globalPluginRegex = new RegExp(Object.keys(plugins).join('|'), 'g')
-    let match
-    while ((match = globalPluginRegex.exec(source)) !== null) {
-        pluginPositions.push({
-            start: match.index,
-            end: match.index + match[0].length,
-            name: match[0]  // Optional: store which plugin was found
-        })
-    }
     const nodeContainsPluginReferences = (node) => {
         // Check if any plugin reference falls within the node's range
         return pluginPositions.some(pos => 
@@ -254,6 +252,7 @@ function processFile(filePath, plugins) {
                 compact: false
             }).code
             // Replace the original file with the trimmed version
+            fs.copyFileSync(filePath, `${filePath}.bak`)
             fs.writeFileSync(filePath, output)
             // prettify the file
             execSync(`npx prettier --write ${filePath}`)
