@@ -16,22 +16,23 @@ describe('ListMenu', () => {
         const user = userEvent.setup()
         renderWithProviders(<ListMenu root={mockCategories.root} itemsKey="categories" />)
 
-        const categoryTrigger = screen.getByText(/Mens/i)
-        await act(async () => {
-            await user.hover(categoryTrigger)
-        })
+        const categoryTrigger = screen.getByText('Mens')
         expect(categoryTrigger).toBeInTheDocument()
         expect(screen.getByRole('navigation', {name: 'Main navigation'})).toBeInTheDocument()
+
+        // Click on the chevron icon to open the dropdown
+        const chevronIcon = screen.getByLabelText('chevron-down')
+        await act(async () => {
+            await user.click(chevronIcon)
+        })
+
         const suit = screen.getByText(/suits/i)
         expect(suit).toBeInTheDocument()
     })
+
     test('ListMenu renders Spinner without root categories', () => {
-        renderWithProviders(<ListMenu />, {
-            wrapperProps: {initialCategories: {}}
-        })
-
+        renderWithProviders(<ListMenu root={null} />)
         const spinner = document.querySelector('.chakra-spinner')
-
         expect(spinner).toBeInTheDocument()
     })
 })
