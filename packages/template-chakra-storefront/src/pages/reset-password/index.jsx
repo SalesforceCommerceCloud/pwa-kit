@@ -40,8 +40,6 @@ const ResetPassword = () => {
         }
     }
 
-
-
     return (
         <Box data-testid="reset-password-page" bg="gray.50" py={[8, 16]}>
             <Seo title="Reset password" description="Reset customer password" />
