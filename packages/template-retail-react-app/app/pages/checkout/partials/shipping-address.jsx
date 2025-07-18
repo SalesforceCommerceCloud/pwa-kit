@@ -142,7 +142,7 @@ export default function ShippingAddress() {
     if (isMultiShipping) {
         editLabel = formatMessage({
             defaultMessage: 'Ship Items to One Address',
-            id: 'shipping_address.link.ship_items_to_one_address'
+            id: 'shipping_address.action.ship_items_to_one_address'
         })
         onEdit = () => setIsMultiShipping(false)
     } else if (isEditingShippingAddress && canUseMultiShipping) {
