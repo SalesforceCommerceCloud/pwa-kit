@@ -39,18 +39,20 @@ const ListMenuPopover = ({contentComponent, item, name, itemsKey, maxColumns}) =
                         />
                     </Box>
                 </Popover.Trigger>
-                <Popover.Positioner>
-                    <Popover.Content data-testid="popover-menu" css={styles.popoverContent}>
-                        <Popover.Body css={styles.popoverBody}>
-                            <ContentComponent
-                                item={item}
-                                itemsKey={itemsKey}
-                                onClose={onClose}
-                                maxColumns={maxColumns}
-                            />
-                        </Popover.Body>
-                    </Popover.Content>
-                </Popover.Positioner>
+                {open && (
+                    <Popover.Positioner>
+                        <Popover.Content data-testid="popover-menu" css={styles.popoverContent}>
+                            <Popover.Body css={styles.popoverBody}>
+                                <ContentComponent
+                                    item={item}
+                                    itemsKey={itemsKey}
+                                    onClose={onClose}
+                                    maxColumns={maxColumns}
+                                />
+                            </Popover.Body>
+                        </Popover.Content>
+                    </Popover.Positioner>
+                )}
             </Popover.Root>
         </Box>
     )
