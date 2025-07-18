@@ -32,7 +32,6 @@ describe.skip('QuantityPicker', () => {
         const button = screen.getByText(MINUS)
         await act(async () => {
             await user.click(button)
-
         })
         expect(input.value).toBe('4')
     })
@@ -50,7 +49,7 @@ describe.skip('QuantityPicker', () => {
         expect(input.value).toBe('7')
     })
     test('hitting space on minus decrements value', async () => {
-        const {user} =  renderWithProviders(<MockComponent />)
+        const {user} = renderWithProviders(<MockComponent />)
         const input = screen.getByRole('spinbutton')
         const button = screen.getByText(MINUS)
         await act(async () => {
@@ -80,32 +79,5 @@ describe.skip('QuantityPicker', () => {
         })
         const button = screen.getByText(MINUS)
         expect(button).toHaveFocus()
-    })
-
-    test('clicking plus increments value', async () => {
-        const {user} =  renderWithProviders(<MockComponent />)
-        const input = screen.getByRole('spinbutton')
-        const button = screen.getByTestId('quantity-increment')
-
-        await act(async () => {
-            await user.click(button)
-        })
-
-        await waitFor(() => {
-            expect(input.value).toBe('6')
-        })
-    })
-    test('clicking minus decrements value', async () => {
-        const {user} = renderWithProviders(<MockComponent />)
-        const input = screen.getByRole('spinbutton')
-        const button = screen.getByTestId('quantity-decrement')
-
-        await act(async () => {
-            await user.click(button)
-        })
-
-        await waitFor(() => {
-            expect(input.value).toBe('4')
-        })
     })
 })
