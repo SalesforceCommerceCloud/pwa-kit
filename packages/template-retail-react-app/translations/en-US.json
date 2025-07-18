@@ -1406,6 +1406,12 @@
   "selected_refinements.filter.in_stock": {
     "defaultMessage": "In Stock"
   },
+  "shipping_address.action.deliver_to_multiple_addresses": {
+    "defaultMessage": "Deliver to Multiple Addresses"
+  },
+  "shipping_address.action.ship_items_to_one_address": {
+    "defaultMessage": "Ship Items to One Address"
+  },
   "shipping_address.button.add_new_address": {
     "defaultMessage": "Add New Address"
   },
@@ -1426,12 +1432,6 @@
   },
   "shipping_address.label.shipping_address_form": {
     "defaultMessage": "Shipping Address Form"
-  },
-  "shipping_address.link.deliver_to_multiple_addresses": {
-    "defaultMessage": "Deliver to Multiple Addresses"
-  },
-  "shipping_address.link.ship_items_to_one_address": {
-    "defaultMessage": "Ship Items to One Address"
   },
   "shipping_address.message.no_items_in_basket": {
     "defaultMessage": "No items in basket."

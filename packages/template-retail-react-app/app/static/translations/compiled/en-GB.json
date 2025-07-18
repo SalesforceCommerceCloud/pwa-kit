@@ -3329,6 +3329,18 @@
       "value": "In Stock"
     }
   ],
+  "shipping_address.action.deliver_to_multiple_addresses": [
+    {
+      "type": 0,
+      "value": "Deliver to Multiple Addresses"
+    }
+  ],
+  "shipping_address.action.ship_items_to_one_address": [
+    {
+      "type": 0,
+      "value": "Ship Items to One Address"
+    }
+  ],
   "shipping_address.button.add_new_address": [
     {
       "type": 0,
@@ -3377,18 +3389,6 @@
     {
       "type": 0,
       "value": "Shipping Address Form"
-    }
-  ],
-  "shipping_address.link.deliver_to_multiple_addresses": [
-    {
-      "type": 0,
-      "value": "Deliver to Multiple Addresses"
-    }
-  ],
-  "shipping_address.link.ship_items_to_one_address": [
-    {
-      "type": 0,
-      "value": "Ship Items to One Address"
     }
   ],
   "shipping_address.message.no_items_in_basket": [

@@ -7041,6 +7041,34 @@
       "value": "]"
     }
   ],
+  "shipping_address.action.deliver_to_multiple_addresses": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ḓḗḗŀīṽḗḗř ŧǿǿ Ḿŭŭŀŧīƥŀḗḗ Ȧḓḓřḗḗşşḗḗş"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "shipping_address.action.ship_items_to_one_address": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Şħīƥ Īŧḗḗḿş ŧǿǿ Ǿƞḗḗ Ȧḓḓřḗḗşş"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
   "shipping_address.button.add_new_address": [
     {
       "type": 0,
@@ -7141,34 +7169,6 @@
     {
       "type": 0,
       "value": "Şħīƥƥīƞɠ Ȧḓḓřḗḗşş Ƒǿǿřḿ"
-    },
-    {
-      "type": 0,
-      "value": "]"
-    }
-  ],
-  "shipping_address.link.deliver_to_multiple_addresses": [
-    {
-      "type": 0,
-      "value": "["
-    },
-    {
-      "type": 0,
-      "value": "Ḓḗḗŀīṽḗḗř ŧǿǿ Ḿŭŭŀŧīƥŀḗḗ Ȧḓḓřḗḗşşḗḗş"
-    },
-    {
-      "type": 0,
-      "value": "]"
-    }
-  ],
-  "shipping_address.link.ship_items_to_one_address": [
-    {
-      "type": 0,
-      "value": "["
-    },
-    {
-      "type": 0,
-      "value": "Şħīƥ Īŧḗḗḿş ŧǿǿ Ǿƞḗḗ Ȧḓḓřḗḗşş"
     },
     {
       "type": 0,
