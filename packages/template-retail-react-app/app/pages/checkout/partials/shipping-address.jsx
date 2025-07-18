@@ -140,9 +140,7 @@ export default function ShippingAddress() {
     const hasMultipleItems = basket?.productItems?.length > 1
     const isEditingShippingAddress = step === STEPS.SHIPPING_ADDRESS
     const isRegisteredUser = customer?.isRegistered
-    const hasExistingAddresses = customer?.addresses && customer.addresses.length > 0
-    const canUseMultiShipping =
-        hasMultipleItems && isRegisteredUser && hasExistingAddresses && MULTISHIP_IS_ENABLED
+    const canUseMultiShipping = hasMultipleItems && isRegisteredUser && MULTISHIP_IS_ENABLED
 
     // Update editLabel and onEdit logic
     let editLabel

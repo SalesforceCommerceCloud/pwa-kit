@@ -4,14 +4,13 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {useState, useRef, useEffect} from 'react'
+import React, {useState} from 'react'
 import {useProducts} from '@salesforce/commerce-sdk-react'
 import {findImageGroupBy} from '@salesforce/retail-react-app/app/utils/image-groups-utils'
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
 import ItemVariantProvider from '@salesforce/retail-react-app/app/components/item-variant'
 import {
     Text,
-    Stack,
     Button,
     Container,
     Box,
@@ -19,9 +18,10 @@ import {
     VStack,
     HStack,
     Image,
+    VisuallyHidden,
+    Select,
     List,
-    ListItem,
-    VisuallyHidden
+    ListItem
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 import {useIntl} from 'react-intl'
 import PropTypes from 'prop-types'
@@ -61,21 +61,6 @@ const IMAGE_ALT = {
     defaultMessage: 'Product image for {productName}'
 }
 
-const DROPDOWN_LABEL = {
-    id: 'shipping_multi_address.dropdown.label',
-    defaultMessage: 'Delivery address options'
-}
-
-const ADDRESS_DESCRIPTION = {
-    id: 'shipping_multi_address.address.description',
-    defaultMessage: 'Address for {firstName} {lastName}'
-}
-
-const ADD_NEW_ADDRESS_DESCRIPTION = {
-    id: 'shipping_multi_address.add_new.description',
-    defaultMessage: 'Add a new delivery address'
-}
-
 const PRICE_LABEL = {
     id: 'shipping_multi_address.price.label',
     defaultMessage: 'Product price'
@@ -96,34 +81,38 @@ const ADDRESS_LINE_2_FORMAT = {
     defaultMessage: '{city}, {stateCode} {postalCode}'
 }
 
+const QUANTITY_LABEL = {
+    id: 'shipping_multi_address.quantity.label',
+    defaultMessage: 'Quantity'
+}
+
 const MultiShippingItemAttributes = ({variant, includeQuantity = true}) => {
+    const {formatMessage} = useIntl()
     // Get display values for attributes
     const variationAttributes = variant?.variationAttributes || []
     const variationValues = variant?.variationValues || {}
     return (
-        <Stack spacing={1.5} flex={1} role="list" aria-label="Product attributes">
+        <List spacing={1.5} flex={1} aria-label="Product attributes">
             {variationAttributes &&
                 variationAttributes.length > 0 &&
                 variationAttributes.map((attr) => {
                     const value = attr.values?.find((v) => v.value === variationValues[attr.id])
                     return (
-                        <Text
-                            lineHeight={1}
-                            color="gray.700"
-                            fontSize="sm"
-                            key={attr.id}
-                            role="listitem"
-                        >
-                            {attr.name || attr.id}: {value?.name || value?.value || ''}
-                        </Text>
+                        <ListItem key={attr.id}>
+                            <Text lineHeight={1} color="gray.700" fontSize="sm">
+                                {attr.name || attr.id}: {value?.name || value?.value || ''}
+                            </Text>
+                        </ListItem>
                     )
                 })}
             {includeQuantity && (
-                <Text lineHeight={1} color="gray.700" fontSize="sm" role="listitem">
-                    Quantity: {variant.quantity}
-                </Text>
+                <ListItem>
+                    <Text lineHeight={1} color="gray.700" fontSize="sm">
+                        {formatMessage(QUANTITY_LABEL)}: {variant.quantity}
+                    </Text>
+                </ListItem>
             )}
-        </Stack>
+        </List>
     )
 }
 
@@ -158,56 +147,6 @@ const ShippingMultiAddress = ({
     const {data: customer} = useCurrentCustomer()
     const addresses = customer?.addresses || []
     const [selectedAddresses, setSelectedAddresses] = useState({})
-    const [openDropdown, setOpenDropdown] = useState(null)
-    const dropdownRefs = useRef({})
-    const [focusedIndex, setFocusedIndex] = useState(-1)
-
-    useEffect(() => {
-        function handleClickOutside(event) {
-            if (openDropdown !== null) {
-                const ref = dropdownRefs.current[openDropdown]
-                if (ref && !ref.contains(event.target)) {
-                    setOpenDropdown(null)
-                    setFocusedIndex(-1)
-                }
-            }
-        }
-        document.addEventListener('mousedown', handleClickOutside)
-        return () => document.removeEventListener('mousedown', handleClickOutside)
-    }, [openDropdown])
-
-    // Reset focused index when dropdown closes
-    useEffect(() => {
-        if (openDropdown === null) {
-            setFocusedIndex(-1)
-        }
-    }, [openDropdown])
-
-    // Focus the element at the current focused index
-    useEffect(() => {
-        if (focusedIndex >= 0 && openDropdown) {
-            const dropdownKey = openDropdown.endsWith('-mobile') ? openDropdown : openDropdown
-            const isMobile = dropdownKey.endsWith('-mobile')
-            const baseKey = isMobile ? dropdownKey.replace('-mobile', '') : dropdownKey
-
-            // Find the element to focus
-            let elementToFocus = null
-            if (focusedIndex < addresses.length) {
-                // Focus an address item
-                const addressId = addresses[focusedIndex]?.addressId
-                if (addressId) {
-                    elementToFocus = document.querySelector(`[data-address-id="${addressId}"]`)
-                }
-            } else {
-                // Focus the "Add New Address" item
-                elementToFocus = document.querySelector(`[data-add-new-address="${baseKey}"]`)
-            }
-
-            if (elementToFocus) {
-                elementToFocus.focus()
-            }
-        }
-    }, [focusedIndex, openDropdown, addresses])
 
     // Early return after hooks
     if (!basket?.productItems?.length) {
@@ -262,59 +201,6 @@ const ShippingMultiAddress = ({
         console.log('Add New Address clicked!')
     }
 
-    // Keyboard navigation handler
-    const handleDropdownKeyDown = (e, addressKey, isMobile = false) => {
-        const dropdownKey = isMobile ? addressKey + '-mobile' : addressKey
-        const isOpen = openDropdown === dropdownKey
-        const totalOptions = addresses.length + 1 // +1 for "Add New Address"
-
-        if (!isOpen) {
-            if (e.key === 'Enter' || e.key === ' ' || e.key === 'ArrowDown') {
-                e.preventDefault()
-                setOpenDropdown(dropdownKey)
-                setFocusedIndex(0)
-            }
-        } else {
-            switch (e.key) {
-                case 'Escape':
-                    e.preventDefault()
-                    setOpenDropdown(null)
-                    setFocusedIndex(-1)
-                    break
-                case 'ArrowDown':
-                    e.preventDefault()
-                    setFocusedIndex((prev) => (prev + 1) % totalOptions)
-                    break
-                case 'ArrowUp':
-                    e.preventDefault()
-                    setFocusedIndex((prev) => (prev - 1 + totalOptions) % totalOptions)
-                    break
-                case 'Enter':
-                case ' ':
-                    e.preventDefault()
-                    if (focusedIndex === addresses.length) {
-                        // "Add New Address" option
-                        setOpenDropdown(null)
-                        setFocusedIndex(-1)
-                        onAddNewAddress()
-                    } else if (focusedIndex >= 0 && focusedIndex < addresses.length) {
-                        // Address option
-                        setSelectedAddresses((prev) => ({
-                            ...prev,
-                            [addressKey]: addresses[focusedIndex].addressId
-                        }))
-                        setOpenDropdown(null)
-                        setFocusedIndex(-1)
-                    }
-                    break
-                case 'Tab':
-                    setOpenDropdown(null)
-                    setFocusedIndex(-1)
-                    break
-            }
-        }
-    }
-
     return (
         <Box as="main" role="main" aria-label={formatMessage(MAIN_LABEL)}>
             <VStack spacing={0}>
@@ -340,12 +226,8 @@ const ShippingMultiAddress = ({
                             })?.images?.[0]
                             const imageUrl = image?.disBaseLink || image?.link || ''
                             const addressKey = item.productId + '-' + idx
-                            const mobileAddressKey = addressKey + '-mobile'
                             const selectedAddressId =
                                 selectedAddresses[addressKey] || addresses[0]?.addressId
-                            const selectedAddress =
-                                addresses.find((a) => a.addressId === selectedAddressId) ||
-                                addresses[0]
 
                             return (
                                 <Box
@@ -434,370 +316,60 @@ const ShippingMultiAddress = ({
                                             </Text>
 
                                             {/* Address Dropdown */}
-                                            <Box
-                                                ref={(el) =>
-                                                    (dropdownRefs.current[addressKey] = el)
-                                                }
-                                                position="relative"
-                                                w="100%"
-                                                mb={6}
-                                                overflow="visible"
-                                            >
-                                                <Box position="relative">
-                                                    <Box
-                                                        role="combobox"
-                                                        aria-expanded={openDropdown === addressKey}
-                                                        aria-haspopup="listbox"
-                                                        aria-labelledby={`delivery-address-label-${addressKey}`}
-                                                        tabIndex={0}
-                                                        border="1px solid"
-                                                        borderColor="gray.300"
-                                                        borderRadius="md"
-                                                        p={2}
-                                                        fontSize="md"
-                                                        bg="white"
-                                                        cursor="pointer"
-                                                        w="100%"
-                                                        display="flex"
-                                                        alignItems="center"
-                                                        justifyContent="space-between"
-                                                        fontWeight="normal"
-                                                        _hover={{bg: 'gray.50'}}
-                                                        _focus={{
-                                                            outline: '2px solid',
-                                                            outlineColor: 'blue.500',
-                                                            outlineOffset: '2px'
+                                            <Box w="100%" mb={6}>
+                                                <Select
+                                                    value={selectedAddressId || ''}
+                                                    onChange={(e) => {
+                                                        const value = e.target.value
+                                                        if (value === 'add-new') {
+                                                            onAddNewAddress()
+                                                            // Reset to first address after calling onAddNewAddress
+                                                            setSelectedAddresses((prev) => ({
+                                                                ...prev,
+                                                                [addressKey]:
+                                                                    addresses[0]?.addressId || ''
+                                                            }))
+                                                        } else {
+                                                            setSelectedAddresses((prev) => ({
+                                                                ...prev,
+                                                                [addressKey]: value
+                                                            }))
+                                                        }
+                                                    }}
+                                                    aria-labelledby={`delivery-address-label-${addressKey}`}
+                                                    size="md"
+                                                    borderColor="gray.300"
+                                                    _hover={{borderColor: 'gray.400'}}
+                                                    _focus={{
+                                                        borderColor: 'blue.500',
+                                                        boxShadow:
+                                                            '0 0 0 1px var(--chakra-colors-blue-500)'
+                                                    }}
+                                                >
+                                                    {addresses.map((addr) => (
+                                                        <option
+                                                            key={addr.addressId}
+                                                            value={addr.addressId}
+                                                        >
+                                                            {addr.firstName} {addr.lastName} -{' '}
+                                                            {addr.address1},{' '}
+                                                            {formatMessage(ADDRESS_LINE_2_FORMAT, {
+                                                                city: addr.city,
+                                                                stateCode: addr.stateCode || '',
+                                                                postalCode: addr.postalCode
+                                                            })}
+                                                        </option>
+                                                    ))}
+                                                    <option
+                                                        value="add-new"
+                                                        style={{
+                                                            color: '#3182ce',
+                                                            fontWeight: 'bold'
                                                         }}
-                                                        onClick={() =>
-                                                            setOpenDropdown(
-                                                                openDropdown === addressKey
-                                                                    ? null
-                                                                    : addressKey
-                                                            )
-                                                        }
-                                                        onKeyDown={(e) =>
-                                                            handleDropdownKeyDown(e, addressKey)
-                                                        }
                                                     >
-                                                        <HStack
-                                                            align="center"
-                                                            spacing={2}
-                                                            flex={1}
-                                                            minW={0}
-                                                            maxW="100%"
-                                                            overflow="hidden"
-                                                        >
-                                                            <Text
-                                                                fontWeight="bold"
-                                                                fontSize={{base: 'sm', md: 'md'}}
-                                                                whiteSpace="nowrap"
-                                                                flexShrink={0}
-                                                            >
-                                                                {selectedAddress?.firstName}{' '}
-                                                                {selectedAddress?.lastName}
-                                                            </Text>
-                                                            <Text flexShrink={0}>-</Text>
-                                                            <Box flex={1} minW={0}>
-                                                                <Text
-                                                                    fontWeight="normal"
-                                                                    fontSize={{
-                                                                        base: 'xs',
-                                                                        md: 'sm'
-                                                                    }}
-                                                                    color="gray.600"
-                                                                    overflow="hidden"
-                                                                    textOverflow="ellipsis"
-                                                                    whiteSpace="nowrap"
-                                                                    w="100%"
-                                                                >
-                                                                    {selectedAddress.address1},{' '}
-                                                                    {formatMessage(
-                                                                        {
-                                                                            id: 'shipping_multi_address.format.address_line_2',
-                                                                            defaultMessage:
-                                                                                '{city}, {stateCode} {postalCode}'
-                                                                        },
-                                                                        {
-                                                                            city: selectedAddress.city,
-                                                                            stateCode:
-                                                                                selectedAddress.stateCode ||
-                                                                                '',
-                                                                            postalCode:
-                                                                                selectedAddress.postalCode
-                                                                        }
-                                                                    )}
-                                                                </Text>
-                                                            </Box>
-                                                        </HStack>
-                                                        <Text
-                                                            ml={2}
-                                                            fontSize="lg"
-                                                            color="gray.500"
-                                                            aria-hidden="true"
-                                                        >
-                                                            ▼
-                                                        </Text>
-                                                    </Box>
-
-                                                    {/* Custom Dropdown */}
-                                                    {openDropdown === addressKey && (
-                                                        <Box
-                                                            role="listbox"
-                                                            aria-label={formatMessage(
-                                                                DROPDOWN_LABEL
-                                                            )}
-                                                            position="absolute"
-                                                            top="100%"
-                                                            left={0}
-                                                            right={0}
-                                                            zIndex={1000}
-                                                            mt={0}
-                                                            bg="white"
-                                                            border="1px solid"
-                                                            borderColor="gray.200"
-                                                            borderRadius="md"
-                                                            boxShadow="lg"
-                                                            overflow="hidden"
-                                                            onKeyDown={(e) => {
-                                                                // Handle arrow key navigation at the container level
-                                                                if (
-                                                                    e.key === 'ArrowDown' ||
-                                                                    e.key === 'ArrowUp'
-                                                                ) {
-                                                                    e.preventDefault()
-                                                                    const totalOptions =
-                                                                        addresses.length + 1
-                                                                    if (e.key === 'ArrowDown') {
-                                                                        setFocusedIndex(
-                                                                            (prev) =>
-                                                                                (prev + 1) %
-                                                                                totalOptions
-                                                                        )
-                                                                    } else {
-                                                                        setFocusedIndex(
-                                                                            (prev) =>
-                                                                                (prev -
-                                                                                    1 +
-                                                                                    totalOptions) %
-                                                                                totalOptions
-                                                                        )
-                                                                    }
-                                                                }
-                                                            }}
-                                                        >
-                                                            <List spacing={0}>
-                                                                {addresses.map((addr, index) => (
-                                                                    <ListItem
-                                                                        key={addr.addressId}
-                                                                        data-address-id={
-                                                                            addr.addressId
-                                                                        }
-                                                                        role="option"
-                                                                        aria-selected={
-                                                                            addr.addressId ===
-                                                                            selectedAddressId
-                                                                        }
-                                                                        aria-describedby={`address-${addr.addressId}-description`}
-                                                                        tabIndex={
-                                                                            focusedIndex === index
-                                                                                ? 0
-                                                                                : -1
-                                                                        }
-                                                                        p={3}
-                                                                        cursor="pointer"
-                                                                        fontSize="md"
-                                                                        bg={
-                                                                            addr.addressId ===
-                                                                            selectedAddressId
-                                                                                ? 'blue.50'
-                                                                                : 'white'
-                                                                        }
-                                                                        borderBottom={
-                                                                            index <
-                                                                            addresses.length - 1
-                                                                                ? '1px solid'
-                                                                                : 'none'
-                                                                        }
-                                                                        borderColor="gray.100"
-                                                                        _hover={{bg: 'gray.50'}}
-                                                                        _focus={{
-                                                                            outline: '2px solid',
-                                                                            outlineColor:
-                                                                                'blue.500',
-                                                                            outlineOffset: '2px',
-                                                                            bg: 'gray.50'
-                                                                        }}
-                                                                        onClick={() => {
-                                                                            setSelectedAddresses(
-                                                                                (prev) => ({
-                                                                                    ...prev,
-                                                                                    [addressKey]:
-                                                                                        addr.addressId
-                                                                                })
-                                                                            )
-                                                                            setOpenDropdown(null)
-                                                                            setFocusedIndex(-1)
-                                                                        }}
-                                                                        onKeyDown={(e) => {
-                                                                            if (
-                                                                                e.key === 'Enter' ||
-                                                                                e.key === ' '
-                                                                            ) {
-                                                                                e.preventDefault()
-                                                                                setSelectedAddresses(
-                                                                                    (prev) => ({
-                                                                                        ...prev,
-                                                                                        [addressKey]:
-                                                                                            addr.addressId
-                                                                                    })
-                                                                                )
-                                                                                setOpenDropdown(
-                                                                                    null
-                                                                                )
-                                                                                setFocusedIndex(-1)
-                                                                            }
-                                                                            // Let arrow keys bubble up to the main handler
-                                                                        }}
-                                                                    >
-                                                                        <VStack
-                                                                            align="flex-start"
-                                                                            spacing={1}
-                                                                            w="100%"
-                                                                        >
-                                                                            <VisuallyHidden
-                                                                                id={`address-${addr.addressId}-description`}
-                                                                            >
-                                                                                {formatMessage(
-                                                                                    ADDRESS_DESCRIPTION,
-                                                                                    {
-                                                                                        firstName:
-                                                                                            addr.firstName,
-                                                                                        lastName:
-                                                                                            addr.lastName
-                                                                                    }
-                                                                                )}
-                                                                            </VisuallyHidden>
-                                                                            <VisuallyHidden
-                                                                                id={`address-${addr.addressId}-description`}
-                                                                            >
-                                                                                {formatMessage(
-                                                                                    ADDRESS_DESCRIPTION,
-                                                                                    {
-                                                                                        firstName:
-                                                                                            addr.firstName,
-                                                                                        lastName:
-                                                                                            addr.lastName
-                                                                                    }
-                                                                                )}
-                                                                            </VisuallyHidden>
-                                                                            <Text
-                                                                                fontWeight="bold"
-                                                                                fontSize={{
-                                                                                    base: 'sm',
-                                                                                    md: 'md'
-                                                                                }}
-                                                                            >
-                                                                                {addr.firstName}{' '}
-                                                                                {addr.lastName}
-                                                                            </Text>
-                                                                            <Text
-                                                                                fontWeight="normal"
-                                                                                color="gray.600"
-                                                                                fontSize={{
-                                                                                    base: 'xs',
-                                                                                    md: 'sm'
-                                                                                }}
-                                                                                wordBreak="break-word"
-                                                                            >
-                                                                                {addr.address1},{' '}
-                                                                                {formatMessage(
-                                                                                    ADDRESS_LINE_2_FORMAT,
-                                                                                    {
-                                                                                        city: addr.city,
-                                                                                        stateCode:
-                                                                                            addr.stateCode ||
-                                                                                            '',
-                                                                                        postalCode:
-                                                                                            addr.postalCode
-                                                                                    }
-                                                                                )}
-                                                                            </Text>
-                                                                        </VStack>
-                                                                    </ListItem>
-                                                                ))}
-                                                                {/* Add New Address option */}
-                                                                <ListItem
-                                                                    data-add-new-address={
-                                                                        addressKey
-                                                                    }
-                                                                    role="option"
-                                                                    aria-describedby="add-new-address-description"
-                                                                    tabIndex={
-                                                                        focusedIndex ===
-                                                                        addresses.length
-                                                                            ? 0
-                                                                            : -1
-                                                                    }
-                                                                    p={3}
-                                                                    cursor="pointer"
-                                                                    fontSize="md"
-                                                                    color="blue.600"
-                                                                    borderTop="1px solid"
-                                                                    borderColor="gray.200"
-                                                                    _hover={{bg: 'blue.50'}}
-                                                                    _focus={{
-                                                                        outline: '2px solid',
-                                                                        outlineColor: 'blue.500',
-                                                                        outlineOffset: '2px',
-                                                                        bg: 'blue.50'
-                                                                    }}
-                                                                    onClick={() => {
-                                                                        setOpenDropdown(null)
-                                                                        setFocusedIndex(-1)
-                                                                        onAddNewAddress()
-                                                                    }}
-                                                                    onKeyDown={(e) => {
-                                                                        if (
-                                                                            e.key === 'Enter' ||
-                                                                            e.key === ' '
-                                                                        ) {
-                                                                            e.preventDefault()
-                                                                            setOpenDropdown(null)
-                                                                            setFocusedIndex(-1)
-                                                                            onAddNewAddress()
-                                                                        }
-                                                                        // Let arrow keys bubble up to the main handler
-                                                                    }}
-                                                                >
-                                                                    <VisuallyHidden id="add-new-address-description">
-                                                                        {formatMessage(
-                                                                            ADD_NEW_ADDRESS_DESCRIPTION
-                                                                        )}
-                                                                    </VisuallyHidden>
-                                                                    <VisuallyHidden id="add-new-address-description-mobile">
-                                                                        {formatMessage(
-                                                                            ADD_NEW_ADDRESS_DESCRIPTION
-                                                                        )}
-                                                                    </VisuallyHidden>
-                                                                    <HStack spacing={2}>
-                                                                        <Text
-                                                                            fontWeight="bold"
-                                                                            fontSize="lg"
-                                                                            aria-hidden="true"
-                                                                        >
-                                                                            +
-                                                                        </Text>
-                                                                        <Text>
-                                                                            {formatMessage(
-                                                                                addNewAddressLabel
-                                                                            )}
-                                                                        </Text>
-                                                                    </HStack>
-                                                                </ListItem>
-                                                            </List>
-                                                        </Box>
-                                                    )}
-                                                </Box>
+                                                        + {formatMessage(addNewAddressLabel)}
+                                                    </option>
+                                                </Select>
                                             </Box>
 
                                             {/* Price */}
@@ -833,12 +405,12 @@ const ShippingMultiAddress = ({
                                         minW={0}
                                         maxW="100%"
                                         overflowX="hidden"
-                                        minH={openDropdown === mobileAddressKey ? '300px' : 'auto'}
+                                        minH="auto"
                                         role="group"
-                                        aria-labelledby={`delivery-address-label-${mobileAddressKey}`}
+                                        aria-labelledby={`delivery-address-label-${addressKey}`}
                                     >
                                         <Text
-                                            id={`delivery-address-label-${mobileAddressKey}`}
+                                            id={`delivery-address-label-${addressKey}`}
                                             fontWeight="medium"
                                             fontSize="sm"
                                             mb={2}
@@ -847,346 +419,51 @@ const ShippingMultiAddress = ({
                                         </Text>
 
                                         {/* Address Dropdown */}
-                                        <Box
-                                            ref={(el) =>
-                                                (dropdownRefs.current[mobileAddressKey] = el)
-                                            }
-                                            position="relative"
-                                            w="100%"
-                                            mb={6}
-                                            overflow="visible"
-                                            minW={0}
-                                            maxW="100%"
-                                        >
-                                            <Box
-                                                position="relative"
-                                                w="100%"
-                                                minW={0}
-                                                maxW="100%"
-                                                overflow="visible"
+                                        <Box w="100%" mb={6}>
+                                            <Select
+                                                value={selectedAddressId || ''}
+                                                onChange={(e) => {
+                                                    const value = e.target.value
+                                                    if (value === 'add-new') {
+                                                        onAddNewAddress()
+                                                    } else {
+                                                        setSelectedAddresses((prev) => ({
+                                                            ...prev,
+                                                            [addressKey]: value
+                                                        }))
+                                                    }
+                                                }}
+                                                aria-labelledby={`delivery-address-label-${addressKey}`}
+                                                size="md"
+                                                borderColor="gray.300"
+                                                _hover={{borderColor: 'gray.400'}}
+                                                _focus={{
+                                                    borderColor: 'blue.500',
+                                                    boxShadow:
+                                                        '0 0 0 1px var(--chakra-colors-blue-500)'
+                                                }}
                                             >
-                                                <Box
-                                                    role="combobox"
-                                                    aria-expanded={
-                                                        openDropdown === mobileAddressKey
-                                                    }
-                                                    aria-haspopup="listbox"
-                                                    aria-labelledby={`delivery-address-label-${mobileAddressKey}`}
-                                                    tabIndex={0}
-                                                    border="1px solid"
-                                                    borderColor="gray.300"
-                                                    borderRadius="md"
-                                                    p={2}
-                                                    fontSize="md"
-                                                    bg="white"
-                                                    cursor="pointer"
-                                                    w="100%"
-                                                    display="flex"
-                                                    alignItems="center"
-                                                    justifyContent="space-between"
-                                                    fontWeight="normal"
-                                                    _hover={{bg: 'gray.50'}}
-                                                    _focus={{
-                                                        outline: '2px solid',
-                                                        outlineColor: 'blue.500',
-                                                        outlineOffset: '2px'
-                                                    }}
-                                                    onClick={() =>
-                                                        setOpenDropdown(
-                                                            openDropdown === mobileAddressKey
-                                                                ? null
-                                                                : mobileAddressKey
-                                                        )
-                                                    }
-                                                    onKeyDown={(e) =>
-                                                        handleDropdownKeyDown(e, addressKey, true)
-                                                    }
-                                                    overflow="hidden"
-                                                    minW={0}
-                                                    maxW="100%"
+                                                {addresses.map((addr) => (
+                                                    <option
+                                                        key={addr.addressId}
+                                                        value={addr.addressId}
+                                                    >
+                                                        {addr.firstName} {addr.lastName} -{' '}
+                                                        {addr.address1},{' '}
+                                                        {formatMessage(ADDRESS_LINE_2_FORMAT, {
+                                                            city: addr.city,
+                                                            stateCode: addr.stateCode || '',
+                                                            postalCode: addr.postalCode
+                                                        })}
+                                                    </option>
+                                                ))}
+                                                <option
+                                                    value="add-new"
+                                                    style={{color: '#3182ce', fontWeight: 'bold'}}
                                                 >
-                                                    <HStack
-                                                        align="center"
-                                                        spacing={2}
-                                                        flex={1}
-                                                        minW={0}
-                                                        maxW="100%"
-                                                        overflow="hidden"
-                                                    >
-                                                        <Text
-                                                            fontWeight="bold"
-                                                            fontSize={{base: 'sm', md: 'md'}}
-                                                            whiteSpace="nowrap"
-                                                            flexShrink={0}
-                                                        >
-                                                            {selectedAddress?.firstName}{' '}
-                                                            {selectedAddress?.lastName}
-                                                        </Text>
-                                                        <Text flexShrink={0}>-</Text>
-                                                        <Box
-                                                            flex={1}
-                                                            minW={0}
-                                                            maxW={{
-                                                                base: '100px',
-                                                                sm: '120px',
-                                                                md: '150px'
-                                                            }}
-                                                        >
-                                                            <Text
-                                                                fontWeight="normal"
-                                                                fontSize={{base: 'xs', md: 'sm'}}
-                                                                color="gray.600"
-                                                                overflow="hidden"
-                                                                textOverflow="ellipsis"
-                                                                whiteSpace="nowrap"
-                                                                w="100%"
-                                                            >
-                                                                {selectedAddress.address1},{' '}
-                                                                {formatMessage(
-                                                                    ADDRESS_LINE_2_FORMAT,
-                                                                    {
-                                                                        city: selectedAddress.city,
-                                                                        stateCode:
-                                                                            selectedAddress.stateCode ||
-                                                                            '',
-                                                                        postalCode:
-                                                                            selectedAddress.postalCode
-                                                                    }
-                                                                )}
-                                                            </Text>
-                                                        </Box>
-                                                    </HStack>
-                                                    <Text
-                                                        ml={2}
-                                                        fontSize="lg"
-                                                        color="gray.500"
-                                                        flexShrink={0}
-                                                        aria-hidden="true"
-                                                    >
-                                                        ▼
-                                                    </Text>
-                                                </Box>
-
-                                                {/* Custom Dropdown */}
-                                                {openDropdown === mobileAddressKey && (
-                                                    <Box
-                                                        role="listbox"
-                                                        aria-label={formatMessage(DROPDOWN_LABEL)}
-                                                        position="absolute"
-                                                        top="100%"
-                                                        left={0}
-                                                        right={0}
-                                                        zIndex={1000}
-                                                        mt={0}
-                                                        bg="white"
-                                                        border="1px solid"
-                                                        borderColor="gray.200"
-                                                        borderRadius="md"
-                                                        boxShadow="lg"
-                                                        overflow="hidden"
-                                                        maxH="200px"
-                                                        w="100%"
-                                                        onKeyDown={(e) => {
-                                                            // Handle arrow key navigation at the container level
-                                                            if (
-                                                                e.key === 'ArrowDown' ||
-                                                                e.key === 'ArrowUp'
-                                                            ) {
-                                                                e.preventDefault()
-                                                                const totalOptions =
-                                                                    addresses.length + 1
-                                                                if (e.key === 'ArrowDown') {
-                                                                    setFocusedIndex(
-                                                                        (prev) =>
-                                                                            (prev + 1) %
-                                                                            totalOptions
-                                                                    )
-                                                                } else {
-                                                                    setFocusedIndex(
-                                                                        (prev) =>
-                                                                            (prev -
-                                                                                1 +
-                                                                                totalOptions) %
-                                                                            totalOptions
-                                                                    )
-                                                                }
-                                                            }
-                                                        }}
-                                                    >
-                                                        <List
-                                                            spacing={0}
-                                                            overflowY="auto"
-                                                            maxH="200px"
-                                                            w="100%"
-                                                        >
-                                                            {addresses.map((addr, index) => (
-                                                                <ListItem
-                                                                    key={addr.addressId}
-                                                                    data-address-id={addr.addressId}
-                                                                    role="option"
-                                                                    aria-selected={
-                                                                        addr.addressId ===
-                                                                        selectedAddressId
-                                                                    }
-                                                                    aria-describedby={`address-${addr.addressId}-description`}
-                                                                    tabIndex={
-                                                                        focusedIndex === index
-                                                                            ? 0
-                                                                            : -1
-                                                                    }
-                                                                    p={3}
-                                                                    cursor="pointer"
-                                                                    fontSize="md"
-                                                                    bg={
-                                                                        addr.addressId ===
-                                                                        selectedAddressId
-                                                                            ? 'blue.50'
-                                                                            : 'white'
-                                                                    }
-                                                                    borderBottom={
-                                                                        index < addresses.length - 1
-                                                                            ? '1px solid'
-                                                                            : 'none'
-                                                                    }
-                                                                    borderColor="gray.100"
-                                                                    _hover={{bg: 'gray.50'}}
-                                                                    _focus={{
-                                                                        outline: '2px solid',
-                                                                        outlineColor: 'blue.500',
-                                                                        outlineOffset: '2px',
-                                                                        bg: 'gray.50'
-                                                                    }}
-                                                                    onClick={() => {
-                                                                        setSelectedAddresses(
-                                                                            (prev) => ({
-                                                                                ...prev,
-                                                                                [addressKey]:
-                                                                                    addr.addressId
-                                                                            })
-                                                                        )
-                                                                        setOpenDropdown(null)
-                                                                        setFocusedIndex(-1)
-                                                                    }}
-                                                                    onKeyDown={(e) => {
-                                                                        if (
-                                                                            e.key === 'Enter' ||
-                                                                            e.key === ' '
-                                                                        ) {
-                                                                            e.preventDefault()
-                                                                            setSelectedAddresses(
-                                                                                (prev) => ({
-                                                                                    ...prev,
-                                                                                    [addressKey]:
-                                                                                        addr.addressId
-                                                                                })
-                                                                            )
-                                                                            setOpenDropdown(null)
-                                                                            setFocusedIndex(-1)
-                                                                        }
-                                                                        // Let arrow keys bubble up to the main handler
-                                                                    }}
-                                                                >
-                                                                    <VStack
-                                                                        align="flex-start"
-                                                                        spacing={1}
-                                                                        w="100%"
-                                                                    >
-                                                                        <Text
-                                                                            fontWeight="bold"
-                                                                            fontSize={{
-                                                                                base: 'sm',
-                                                                                md: 'md'
-                                                                            }}
-                                                                        >
-                                                                            {addr.firstName}{' '}
-                                                                            {addr.lastName}
-                                                                        </Text>
-                                                                        <Text
-                                                                            fontWeight="normal"
-                                                                            color="gray.600"
-                                                                            fontSize={{
-                                                                                base: 'xs',
-                                                                                md: 'sm'
-                                                                            }}
-                                                                            wordBreak="break-word"
-                                                                        >
-                                                                            {addr.address1},{' '}
-                                                                            {formatMessage(
-                                                                                ADDRESS_LINE_2_FORMAT,
-                                                                                {
-                                                                                    city: addr.city,
-                                                                                    stateCode:
-                                                                                        addr.stateCode ||
-                                                                                        '',
-                                                                                    postalCode:
-                                                                                        addr.postalCode
-                                                                                }
-                                                                            )}
-                                                                        </Text>
-                                                                    </VStack>
-                                                                </ListItem>
-                                                            ))}
-                                                            {/* Add New Address option */}
-                                                            <ListItem
-                                                                data-add-new-address={addressKey}
-                                                                role="option"
-                                                                aria-describedby="add-new-address-description-mobile"
-                                                                tabIndex={
-                                                                    focusedIndex ===
-                                                                    addresses.length
-                                                                        ? 0
-                                                                        : -1
-                                                                }
-                                                                p={3}
-                                                                cursor="pointer"
-                                                                fontSize="md"
-                                                                color="blue.600"
-                                                                borderTop="1px solid"
-                                                                borderColor="gray.200"
-                                                                _hover={{bg: 'blue.50'}}
-                                                                _focus={{
-                                                                    outline: '2px solid',
-                                                                    outlineColor: 'blue.500',
-                                                                    outlineOffset: '2px',
-                                                                    bg: 'blue.50'
-                                                                }}
-                                                                onClick={() => {
-                                                                    setOpenDropdown(null)
-                                                                    setFocusedIndex(-1)
-                                                                    onAddNewAddress()
-                                                                }}
-                                                                onKeyDown={(e) => {
-                                                                    if (
-                                                                        e.key === 'Enter' ||
-                                                                        e.key === ' '
-                                                                    ) {
-                                                                        e.preventDefault()
-                                                                        setOpenDropdown(null)
-                                                                        setFocusedIndex(-1)
-                                                                        onAddNewAddress()
-                                                                    }
-                                                                    // Let arrow keys bubble up to the main handler
-                                                                }}
-                                                            >
-                                                                <HStack spacing={2}>
-                                                                    <Text
-                                                                        fontWeight="bold"
-                                                                        fontSize="lg"
-                                                                        aria-hidden="true"
-                                                                    >
-                                                                        +
-                                                                    </Text>
-                                                                    <Text>
-                                                                        {formatMessage(
-                                                                            addNewAddressLabel
-                                                                        )}
-                                                                    </Text>
-                                                                </HStack>
-                                                            </ListItem>
-                                                        </List>
-                                                    </Box>
-                                                )}
-                                            </Box>
+                                                    + {formatMessage(addNewAddressLabel)}
+                                                </option>
+                                            </Select>
                                         </Box>
 
                                         {/* Price */}
