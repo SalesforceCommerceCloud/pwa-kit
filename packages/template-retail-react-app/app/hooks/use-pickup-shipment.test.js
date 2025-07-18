@@ -611,7 +611,7 @@ describe('usePickupShipment', () => {
         })
     })
 
-    describe('updateShippingMethodIfNeeded', () => {
+    describe('configureDefaultShipmentIfNeeded', () => {
         let mockMutateAsync
         let mockRefetchShippingMethods
 
@@ -659,11 +659,13 @@ describe('usePickupShipment', () => {
                 ]
             }
             const productItems = [{productId: 'product-1', inventoryId: 'inv-1', quantity: 1}]
+            const targetShipmentId = 'me'
             const hasAnyPickupSelected = true
             const selectedStore = {id: 'store-1', inventoryId: 'inv-1'}
 
-            await result.current.updateShippingMethodIfNeeded(
+            await result.current.configureDefaultShipmentIfNeeded(
                 basketResponse,
+                targetShipmentId,
                 productItems,
                 hasAnyPickupSelected,
                 selectedStore
@@ -713,11 +715,13 @@ describe('usePickupShipment', () => {
                 ]
             }
             const productItems = [{productId: 'product-1', quantity: 1}]
+            const targetShipmentId = 'me'
             const hasAnyPickupSelected = false
             const selectedStore = {id: 'store-1', inventoryId: 'inv-1'}
 
-            await result.current.updateShippingMethodIfNeeded(
+            await result.current.configureDefaultShipmentIfNeeded(
                 basketResponse,
+                targetShipmentId,
                 productItems,
                 hasAnyPickupSelected,
                 selectedStore
@@ -746,9 +750,43 @@ describe('usePickupShipment', () => {
                 body: {
                     shippingMethod: {
                         id: 'standard-shipping'
-                    }
+                    },
+                    c_fromStoreId: null
                 }
             })
+        })
+
+        test('does not configure shipping when targetShipmentId is not default shipment', async () => {
+            const {result} = renderHook(() => usePickupShipment())
+
+            const basketResponse = {
+                basketId: 'basket-123',
+                shipments: [
+                    {
+                        shipmentId: 'custom-shipment-456',
+                        shippingMethod: {
+                            id: 'standard-shipping',
+                            c_storePickupEnabled: false
+                        }
+                    }
+                ]
+            }
+            const productItems = [{productId: 'product-1', inventoryId: 'inv-1', quantity: 1}]
+            const targetShipmentId = 'custom-shipment-456'
+            const hasAnyPickupSelected = true
+            const selectedStore = {id: 'store-1', inventoryId: 'inv-1'}
+
+            await result.current.configureDefaultShipmentIfNeeded(
+                basketResponse,
+                targetShipmentId,
+                productItems,
+                hasAnyPickupSelected,
+                selectedStore
+            )
+
+            // Should not make any API calls since it returns early
+            expect(mockMutateAsync).not.toHaveBeenCalled()
+            expect(mockRefetchShippingMethods).not.toHaveBeenCalled()
         })
 
         test('does not configure shipping when pickup selection matches current method', async () => {
@@ -766,11 +804,13 @@ describe('usePickupShipment', () => {
                 ]
             }
             const productItems = [{productId: 'product-1', quantity: 1}]
+            const targetShipmentId = 'me'
             const hasAnyPickupSelected = true // Pickup selected and current method is pickup
             const selectedStore = {id: 'store-1', inventoryId: 'inv-1'}
 
-            await result.current.updateShippingMethodIfNeeded(
+            await result.current.configureDefaultShipmentIfNeeded(
                 basketResponse,
+                targetShipmentId,
                 productItems,
                 hasAnyPickupSelected,
                 selectedStore
@@ -795,11 +835,13 @@ describe('usePickupShipment', () => {
                 ]
             }
             const productItems = [{productId: 'product-1', quantity: 1}]
+            const targetShipmentId = 'me'
             const hasAnyPickupSelected = false // No pickup selected and current method is not pickup
             const selectedStore = {id: 'store-1', inventoryId: 'inv-1'}
 
-            await result.current.updateShippingMethodIfNeeded(
+            await result.current.configureDefaultShipmentIfNeeded(
                 basketResponse,
+                targetShipmentId,
                 productItems,
                 hasAnyPickupSelected,
                 selectedStore
@@ -836,11 +878,13 @@ describe('usePickupShipment', () => {
                 ]
             }
             const productItems = [{productId: 'product-1', inventoryId: 'inv-1', quantity: 1}]
+            const targetShipmentId = 'me'
             const hasAnyPickupSelected = true
             const selectedStore = {id: 'store-1', inventoryId: 'inv-1'}
 
-            await result.current.updateShippingMethodIfNeeded(
+            await result.current.configureDefaultShipmentIfNeeded(
                 basketResponse,
+                targetShipmentId,
                 productItems,
                 hasAnyPickupSelected,
                 selectedStore
@@ -900,11 +944,13 @@ describe('usePickupShipment', () => {
                 ]
             }
             const productItems = [{productId: 'product-1', quantity: 1}]
+            const targetShipmentId = 'me'
             const hasAnyPickupSelected = false
             const selectedStore = {id: 'store-1', inventoryId: 'inv-1'}
 
-            await result.current.updateShippingMethodIfNeeded(
+            await result.current.configureDefaultShipmentIfNeeded(
                 basketResponse,
+                targetShipmentId,
                 productItems,
                 hasAnyPickupSelected,
                 selectedStore
@@ -919,7 +965,8 @@ describe('usePickupShipment', () => {
                 body: {
                     shippingMethod: {
                         id: null
-                    }
+                    },
+                    c_fromStoreId: null
                 }
             })
         })

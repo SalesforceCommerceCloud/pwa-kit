@@ -36,7 +36,11 @@ import useActiveData from '@salesforce/retail-react-app/app/hooks/use-active-dat
 import {useServerContext} from '@salesforce/pwa-kit-react-sdk/ssr/universal/hooks'
 import usePickupShipment from '@salesforce/retail-react-app/app/hooks/use-pickup-shipment'
 import {useSelectedStore} from '@salesforce/retail-react-app/app/hooks/use-selected-store'
-import {STORE_LOCATOR_IS_ENABLED} from '@salesforce/retail-react-app/app/constants'
+import {useMultiship} from '@salesforce/retail-react-app/app/hooks/use-multiship'
+import {
+    STORE_LOCATOR_IS_ENABLED,
+    MULTISHIP_IS_ENABLED
+} from '@salesforce/retail-react-app/app/constants'
 // Project Components
 import RecommendedProducts from '@salesforce/retail-react-app/app/components/recommended-products'
 import ProductView from '@salesforce/retail-react-app/app/components/product-view'
@@ -97,10 +101,18 @@ const ProductDetail = () => {
 
     const {
         addInventoryIdsToPickupItems,
-        updateShippingMethodIfNeeded,
+        configureDefaultShipmentIfNeeded,
         isCurrentShippingMethodPickup,
         hasPickupItems
     } = usePickupShipment(basket)
+
+    /*************************** Multiship ********************/
+    const {
+        moveItemsToDeliveryShipment,
+        moveItemsToPickupShipment,
+        findOrCreateDeliveryShipment,
+        findOrCreatePickupShipment
+    } = useMultiship(basket)
 
     /*************************** Product Detail and Category ********************/
     const {productId} = useParams()
@@ -380,7 +392,7 @@ const ProductDetail = () => {
                 basket?.shipments?.[0]?.shippingMethod
             )
             // Only perform the check if the basket exists and has at least one item
-            if (basket && basket.productItems?.length > 0) {
+            if (!MULTISHIP_IS_ENABLED && basket && basket.productItems?.length > 0) {
                 if (hasAnyPickupSelected && !currentShippingMethodIsPickup) {
                     throw new Error(
                         formatMessage({
@@ -401,11 +413,36 @@ const ProductDetail = () => {
                 }
             }
 
+            // Set target to default shipment
+            let targetShipmentId = 'me'
+
+            if (basket) {
+                // Ensure a suitable shipment exists
+                if (hasAnyPickupSelected) {
+                    targetShipmentId = await findOrCreatePickupShipment(productItems, selectedStore)
+                } else {
+                    targetShipmentId = await findOrCreateDeliveryShipment(
+                        productItems,
+                        selectedStore
+                    )
+                }
+
+                if (!targetShipmentId) {
+                    throw new Error('Failed to find or create shipment')
+                }
+
+                productItems = productItems.map((item) => ({
+                    ...item,
+                    shipmentId: targetShipmentId
+                }))
+            }
+
             const basketResponse = await addItemToNewOrExistingBasket(productItems)
 
-            // Configure shipping method based on pickup selection
-            await updateShippingMethodIfNeeded(
+            // Configure shipping method for default shipment based on pickup selection
+            await configureDefaultShipmentIfNeeded(
                 basketResponse,
+                targetShipmentId,
                 productItems,
                 hasAnyPickupSelected,
                 selectedStore
@@ -585,7 +622,7 @@ const ProductDetail = () => {
             }
 
             // Configure shipping method based on pickup selection
-            await updateShippingMethodIfNeeded(
+            await configureDefaultShipmentIfNeeded(
                 res,
                 productItems,
                 hasAnyPickupSelected,

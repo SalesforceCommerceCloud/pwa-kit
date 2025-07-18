@@ -83,7 +83,8 @@ jest.mock('@salesforce/retail-react-app/app/constants', () => {
     const originalModule = jest.requireActual('@salesforce/retail-react-app/app/constants')
     return {
         ...originalModule,
-        DEFAULT_DNT_STATE: false
+        DEFAULT_DNT_STATE: false,
+        MULTISHIP_IS_ENABLED: false
     }
 })
 
@@ -988,7 +989,8 @@ describe('standard product', () => {
                 {
                     productId: mockStandardProductOrderable.id,
                     price: mockStandardProductOrderable.price,
-                    quantity: 1
+                    quantity: 1,
+                    shipmentId: 'me'
                 }
             ])
         })
@@ -1018,7 +1020,8 @@ describe('standard product', () => {
                 {
                     productId: mockStandardProductOrderable.id,
                     price: mockStandardProductOrderable.price,
-                    quantity: 3
+                    quantity: 3,
+                    shipmentId: 'me'
                 }
             ])
         })
