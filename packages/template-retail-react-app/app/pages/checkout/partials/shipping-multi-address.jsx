@@ -183,6 +183,32 @@ const ShippingMultiAddress = ({
         }
     }, [openDropdown])
 
+    // Focus the element at the current focused index
+    useEffect(() => {
+        if (focusedIndex >= 0 && openDropdown) {
+            const dropdownKey = openDropdown.endsWith('-mobile') ? openDropdown : openDropdown
+            const isMobile = dropdownKey.endsWith('-mobile')
+            const baseKey = isMobile ? dropdownKey.replace('-mobile', '') : dropdownKey
+
+            // Find the element to focus
+            let elementToFocus = null
+            if (focusedIndex < addresses.length) {
+                // Focus an address item
+                const addressId = addresses[focusedIndex]?.addressId
+                if (addressId) {
+                    elementToFocus = document.querySelector(`[data-address-id="${addressId}"]`)
+                }
+            } else {
+                // Focus the "Add New Address" item
+                elementToFocus = document.querySelector(`[data-add-new-address="${baseKey}"]`)
+            }
+
+            if (elementToFocus) {
+                elementToFocus.focus()
+            }
+        }
+    }, [focusedIndex, openDropdown, addresses])
+
     // Early return after hooks
     if (!basket?.productItems?.length) {
         return (
@@ -231,10 +257,9 @@ const ShippingMultiAddress = ({
         )
     }
 
-    // Handler for Add New Address (placeholder)
     const onAddNewAddress = () => {
         // TODO: Implement add new address logic/modal
-        alert('Add New Address clicked!')
+        console.log('Add New Address clicked!')
     }
 
     // Keyboard navigation handler
@@ -533,11 +558,40 @@ const ShippingMultiAddress = ({
                                                             borderRadius="md"
                                                             boxShadow="lg"
                                                             overflow="hidden"
+                                                            onKeyDown={(e) => {
+                                                                // Handle arrow key navigation at the container level
+                                                                if (
+                                                                    e.key === 'ArrowDown' ||
+                                                                    e.key === 'ArrowUp'
+                                                                ) {
+                                                                    e.preventDefault()
+                                                                    const totalOptions =
+                                                                        addresses.length + 1
+                                                                    if (e.key === 'ArrowDown') {
+                                                                        setFocusedIndex(
+                                                                            (prev) =>
+                                                                                (prev + 1) %
+                                                                                totalOptions
+                                                                        )
+                                                                    } else {
+                                                                        setFocusedIndex(
+                                                                            (prev) =>
+                                                                                (prev -
+                                                                                    1 +
+                                                                                    totalOptions) %
+                                                                                totalOptions
+                                                                        )
+                                                                    }
+                                                                }
+                                                            }}
                                                         >
                                                             <List spacing={0}>
                                                                 {addresses.map((addr, index) => (
                                                                     <ListItem
                                                                         key={addr.addressId}
+                                                                        data-address-id={
+                                                                            addr.addressId
+                                                                        }
                                                                         role="option"
                                                                         aria-selected={
                                                                             addr.addressId ===
@@ -589,6 +643,7 @@ const ShippingMultiAddress = ({
                                                                                 e.key === 'Enter' ||
                                                                                 e.key === ' '
                                                                             ) {
+                                                                                e.preventDefault()
                                                                                 setSelectedAddresses(
                                                                                     (prev) => ({
                                                                                         ...prev,
@@ -601,6 +656,7 @@ const ShippingMultiAddress = ({
                                                                                 )
                                                                                 setFocusedIndex(-1)
                                                                             }
+                                                                            // Let arrow keys bubble up to the main handler
                                                                         }}
                                                                     >
                                                                         <VStack
@@ -671,6 +727,9 @@ const ShippingMultiAddress = ({
                                                                 ))}
                                                                 {/* Add New Address option */}
                                                                 <ListItem
+                                                                    data-add-new-address={
+                                                                        addressKey
+                                                                    }
                                                                     role="option"
                                                                     aria-describedby="add-new-address-description"
                                                                     tabIndex={
@@ -702,10 +761,12 @@ const ShippingMultiAddress = ({
                                                                             e.key === 'Enter' ||
                                                                             e.key === ' '
                                                                         ) {
+                                                                            e.preventDefault()
                                                                             setOpenDropdown(null)
                                                                             setFocusedIndex(-1)
                                                                             onAddNewAddress()
                                                                         }
+                                                                        // Let arrow keys bubble up to the main handler
                                                                     }}
                                                                 >
                                                                     <VisuallyHidden id="add-new-address-description">
@@ -925,6 +986,32 @@ const ShippingMultiAddress = ({
                                                         overflow="hidden"
                                                         maxH="200px"
                                                         w="100%"
+                                                        onKeyDown={(e) => {
+                                                            // Handle arrow key navigation at the container level
+                                                            if (
+                                                                e.key === 'ArrowDown' ||
+                                                                e.key === 'ArrowUp'
+                                                            ) {
+                                                                e.preventDefault()
+                                                                const totalOptions =
+                                                                    addresses.length + 1
+                                                                if (e.key === 'ArrowDown') {
+                                                                    setFocusedIndex(
+                                                                        (prev) =>
+                                                                            (prev + 1) %
+                                                                            totalOptions
+                                                                    )
+                                                                } else {
+                                                                    setFocusedIndex(
+                                                                        (prev) =>
+                                                                            (prev -
+                                                                                1 +
+                                                                                totalOptions) %
+                                                                            totalOptions
+                                                                    )
+                                                                }
+                                                            }
+                                                        }}
                                                     >
                                                         <List
                                                             spacing={0}
@@ -935,6 +1022,7 @@ const ShippingMultiAddress = ({
                                                             {addresses.map((addr, index) => (
                                                                 <ListItem
                                                                     key={addr.addressId}
+                                                                    data-address-id={addr.addressId}
                                                                     role="option"
                                                                     aria-selected={
                                                                         addr.addressId ===
@@ -984,6 +1072,7 @@ const ShippingMultiAddress = ({
                                                                             e.key === 'Enter' ||
                                                                             e.key === ' '
                                                                         ) {
+                                                                            e.preventDefault()
                                                                             setSelectedAddresses(
                                                                                 (prev) => ({
                                                                                     ...prev,
@@ -994,6 +1083,7 @@ const ShippingMultiAddress = ({
                                                                             setOpenDropdown(null)
                                                                             setFocusedIndex(-1)
                                                                         }
+                                                                        // Let arrow keys bubble up to the main handler
                                                                     }}
                                                                 >
                                                                     <VStack
@@ -1038,6 +1128,7 @@ const ShippingMultiAddress = ({
                                                             ))}
                                                             {/* Add New Address option */}
                                                             <ListItem
+                                                                data-add-new-address={addressKey}
                                                                 role="option"
                                                                 aria-describedby="add-new-address-description-mobile"
                                                                 tabIndex={
@@ -1069,10 +1160,12 @@ const ShippingMultiAddress = ({
                                                                         e.key === 'Enter' ||
                                                                         e.key === ' '
                                                                     ) {
+                                                                        e.preventDefault()
                                                                         setOpenDropdown(null)
                                                                         setFocusedIndex(-1)
                                                                         onAddNewAddress()
                                                                     }
+                                                                    // Let arrow keys bubble up to the main handler
                                                                 }}
                                                             >
                                                                 <HStack spacing={2}>

@@ -401,4 +401,159 @@ describe('ShippingMultiAddress', () => {
             expect(screen.getAllByText('123 Test St, Test City, CA 12345')).toHaveLength(4)
         })
     })
+
+    describe('Keyboard Navigation', () => {
+        it('should handle arrow key navigation in dropdown', () => {
+            renderWithIntl(<ShippingMultiAddress {...defaultProps} />)
+
+            // Find and click the first dropdown trigger to open it
+            const dropdownTriggers = screen.getAllByRole('combobox')
+            const firstDropdown = dropdownTriggers[0]
+            fireEvent.click(firstDropdown)
+
+            // Verify dropdown is open by checking for address options
+            // Use getAllByText since there are multiple instances (desktop + mobile)
+            const johnDoeElements = screen.getAllByText('John Doe')
+            const janeSmithElements = screen.getAllByText('Jane Smith')
+            const addNewAddressElements = screen.getAllByText('Add New Address')
+
+            expect(johnDoeElements.length).toBeGreaterThan(0)
+            expect(janeSmithElements.length).toBeGreaterThan(0)
+            expect(addNewAddressElements.length).toBeGreaterThan(0)
+
+            // Get the dropdown container - look for the first listbox
+            const dropdownContainers = screen.getAllByRole('listbox')
+            const dropdownContainer = dropdownContainers[0]
+            expect(dropdownContainer).toBeInTheDocument()
+
+            // Test ArrowDown navigation
+            fireEvent.keyDown(dropdownContainer, {key: 'ArrowDown'})
+
+            // The first address item should now be focused
+            const firstAddressItem = dropdownContainer.querySelector('[data-address-id="addr-1"]')
+            expect(firstAddressItem).toHaveAttribute('tabIndex', '0')
+
+            // Test ArrowDown to move to second item
+            fireEvent.keyDown(dropdownContainer, {key: 'ArrowDown'})
+
+            // The second address item should now be focused
+            const secondAddressItem = dropdownContainer.querySelector('[data-address-id="addr-2"]')
+            expect(secondAddressItem).toHaveAttribute('tabIndex', '0')
+
+            // Test ArrowDown to move to "Add New Address"
+            fireEvent.keyDown(dropdownContainer, {key: 'ArrowDown'})
+
+            // The "Add New Address" item should now be focused
+            const addNewAddressItem = dropdownContainer.querySelector(
+                '[data-add-new-address="product-1-0"]'
+            )
+            expect(addNewAddressItem).toHaveAttribute('tabIndex', '0')
+
+            // Test ArrowDown to wrap around to first item
+            fireEvent.keyDown(dropdownContainer, {key: 'ArrowDown'})
+
+            // Should wrap back to first item
+            expect(firstAddressItem).toHaveAttribute('tabIndex', '0')
+
+            // Test ArrowUp navigation
+            fireEvent.keyDown(dropdownContainer, {key: 'ArrowUp'})
+
+            // Should move back to "Add New Address"
+            expect(addNewAddressItem).toHaveAttribute('tabIndex', '0')
+
+            // Test ArrowUp to move to second item
+            fireEvent.keyDown(dropdownContainer, {key: 'ArrowUp'})
+
+            // Should move to second item
+            expect(secondAddressItem).toHaveAttribute('tabIndex', '0')
+
+            // Test ArrowUp to move to first item
+            fireEvent.keyDown(dropdownContainer, {key: 'ArrowUp'})
+
+            // Should move to first item
+            expect(firstAddressItem).toHaveAttribute('tabIndex', '0')
+
+            // Test ArrowUp to wrap around to "Add New Address"
+            fireEvent.keyDown(dropdownContainer, {key: 'ArrowUp'})
+
+            // Should wrap to "Add New Address"
+            expect(addNewAddressItem).toHaveAttribute('tabIndex', '0')
+        })
+
+        it('should handle Enter key to select address', () => {
+            renderWithIntl(<ShippingMultiAddress {...defaultProps} />)
+
+            // Find and click the first dropdown trigger to open it
+            const dropdownTriggers = screen.getAllByRole('combobox')
+            const firstDropdown = dropdownTriggers[0]
+            fireEvent.click(firstDropdown)
+
+            // Get the dropdown container
+            const dropdownContainers = screen.getAllByRole('listbox')
+            const dropdownContainer = dropdownContainers[0]
+
+            // Navigate to second address
+            fireEvent.keyDown(dropdownContainer, {key: 'ArrowDown'})
+            fireEvent.keyDown(dropdownContainer, {key: 'ArrowDown'})
+
+            // Select the second address with Enter
+            const secondAddressItem = dropdownContainer.querySelector('[data-address-id="addr-2"]')
+            fireEvent.keyDown(secondAddressItem, {key: 'Enter'})
+
+            // Dropdown should close - check that the listbox is no longer visible
+            const listboxes = screen.queryAllByRole('listbox')
+            const visibleListboxes = listboxes.filter((lb) => lb.style.display !== 'none')
+            expect(visibleListboxes).toHaveLength(0)
+        })
+
+        it('should handle Space key to select address', () => {
+            renderWithIntl(<ShippingMultiAddress {...defaultProps} />)
+
+            // Find and click the first dropdown trigger to open it
+            const dropdownTriggers = screen.getAllByRole('combobox')
+            const firstDropdown = dropdownTriggers[0]
+            fireEvent.click(firstDropdown)
+
+            // Get the dropdown container
+            const dropdownContainers = screen.getAllByRole('listbox')
+            const dropdownContainer = dropdownContainers[0]
+
+            // Navigate to "Add New Address"
+            fireEvent.keyDown(dropdownContainer, {key: 'ArrowDown'})
+            fireEvent.keyDown(dropdownContainer, {key: 'ArrowDown'})
+            fireEvent.keyDown(dropdownContainer, {key: 'ArrowDown'})
+
+            // Select "Add New Address" with Space
+            const addNewAddressItem = dropdownContainer.querySelector(
+                '[data-add-new-address="product-1-0"]'
+            )
+            fireEvent.keyDown(addNewAddressItem, {key: ' '})
+
+            // Dropdown should close - check that the listbox is no longer visible
+            const listboxes = screen.queryAllByRole('listbox')
+            const visibleListboxes = listboxes.filter((lb) => lb.style.display !== 'none')
+            expect(visibleListboxes).toHaveLength(0)
+        })
+
+        it('should handle Escape key to close dropdown', () => {
+            renderWithIntl(<ShippingMultiAddress {...defaultProps} />)
+
+            // Find and click the first dropdown trigger to open it
+            const dropdownTriggers = screen.getAllByRole('combobox')
+            const firstDropdown = dropdownTriggers[0]
+            fireEvent.click(firstDropdown)
+
+            // Verify dropdown is open
+            const johnDoeElements = screen.getAllByText('John Doe')
+            expect(johnDoeElements.length).toBeGreaterThan(0)
+
+            // Press Escape to close dropdown
+            fireEvent.keyDown(firstDropdown, {key: 'Escape'})
+
+            // Dropdown should close - check that the listbox is no longer visible
+            const listboxes = screen.queryAllByRole('listbox')
+            const visibleListboxes = listboxes.filter((lb) => lb.style.display !== 'none')
+            expect(visibleListboxes).toHaveLength(0)
+        })
+    })
 })
