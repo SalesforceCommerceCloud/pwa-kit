@@ -30,10 +30,8 @@ const ListMenuPopover = ({contentComponent, item, name, itemsKey, maxColumns}) =
             open={open}
             onOpenChange={handleOpenChange}
         >
-            <Popover.Trigger asChild>
-                <Box>
-                    <ListMenuTrigger item={item} name={name} isOpen={open} />
-                </Box>
+            <Popover.Trigger>
+                <ListMenuTrigger item={item} name={name} isOpen={open} />
             </Popover.Trigger>
             <Popover.Positioner>
                 <Popover.Content data-testid="popover-menu" css={styles.popoverContent}>
