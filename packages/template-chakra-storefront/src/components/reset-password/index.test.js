@@ -6,10 +6,10 @@
  */
 import React from 'react'
 import PropTypes from 'prop-types'
-import {screen, waitFor, within} from '@testing-library/react'
+import {act, screen, waitFor, within} from '@testing-library/react'
 import {renderWithProviders} from '../../utils/test-utils'
 import ResetPasswordForm from '.'
-import mockConfig from '../../../mock-config'
+import mockConfig from '../../../config/mocks/mock-config'
 import {useForm} from 'react-hook-form'
 
 const MockedComponent = ({mockSubmitForm, mockClickSignIn}) => {
@@ -64,11 +64,13 @@ test('Allows customer to generate password token and see success message', async
         }
     )
 
-    // enter credentials and submit
-    await user.type(await screen.findByLabelText('Email'), 'foo@test.com')
-    await user.click(
-        within(await screen.findByTestId('sf-auth-modal-form')).getByText(/reset password/i)
-    )
+    await act(async () => {
+        // enter credentials and submit
+        await user.type(await screen.findByLabelText('Email'), 'foo@test.com')
+        await user.click(
+            within(await screen.findByTestId('sf-auth-modal-form')).getByText(/reset password/i)
+        )
+    })
     await waitFor(() => {
         expect(mockSubmitForm).toHaveBeenCalled()
     })
@@ -78,8 +80,9 @@ test('Allows customer to generate password token and see success message', async
         expect(screen.getByText(/foo@test.com/i)).toBeInTheDocument()
     })
 
-    await user.click(screen.getByText('Back to Sign In'))
-
+    await act(async () => {
+        await user.click(screen.getByText('Back to Sign In'))
+    })
     expect(mockClickSignIn).toHaveBeenCalledTimes(1)
 })
 

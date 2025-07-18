@@ -12,7 +12,7 @@ import {Box, Container} from '@chakra-ui/react'
 import {useForm} from 'react-hook-form'
 import Seo from '../../components/seo'
 import ResetPasswordForm from '../../components/reset-password'
-import ResetPasswordLanding from './reset-password-landing'
+import ResetPasswordLanding from '../../pages/reset-password/reset-password-landing'
 import useNavigation from '../../hooks/use-navigation'
 import {useRouteMatch} from 'react-router-dom'
 import {usePasswordReset} from '../../hooks/use-password-reset'
@@ -39,8 +39,6 @@ const ResetPassword = () => {
             form.setError('global', {type: 'manual', message})
         }
     }
-
-
 
     return (
         <Box data-testid="reset-password-page" bg="gray.50" py={[8, 16]}>

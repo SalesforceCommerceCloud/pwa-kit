@@ -6,16 +6,7 @@
  */
 import React from 'react'
 import {noop} from '../../utils/utils'
-import {
-    Button,
-    AlertDialog,
-    AlertDialogBody,
-    AlertDialogFooter,
-    AlertDialogHeader,
-    AlertDialogContent,
-    AlertDialogOverlay,
-    Text
-} from '@chakra-ui/react'
+import {Button, Dialog, Text} from '@chakra-ui/react'
 
 import PropTypes from 'prop-types'
 import {CONFIRMATION_DIALOG_DEFAULT_CONFIG} from '../../pages/account/constant'
@@ -45,40 +36,45 @@ const ConfirmationModal = ({
     }
 
     return (
-        <AlertDialog
-            isOpen={props.isOpen}
-            isCentered
-            onClose={handleAlternateActionClick}
+        <Dialog.Root
+            open={props.open}
+            placement="center"
+            onOpenChange={({open}) => !open && handleAlternateActionClick()}
+            role="alertdialog"
             {...props}
         >
-            <AlertDialogOverlay />
-            <AlertDialogContent>
-                <AlertDialogHeader>{formatMessage(dialogTitle)}</AlertDialogHeader>
-                <AlertDialogBody>
-                    <Text>{formatMessage(confirmationMessage)}</Text>
-                </AlertDialogBody>
+            <Dialog.Backdrop />
+            <Dialog.Positioner>
+                <Dialog.Content>
+                    <Dialog.Header>
+                        <Dialog.Title>{formatMessage(dialogTitle)}</Dialog.Title>
+                    </Dialog.Header>
+                    <Dialog.Body>
+                        <Text>{formatMessage(confirmationMessage)}</Text>
+                    </Dialog.Body>
 
-                <AlertDialogFooter>
-                    {!hideAlternateAction ? (
+                    <Dialog.Footer>
+                        {!hideAlternateAction ? (
+                            <Button
+                                variant="ghost"
+                                mr={3}
+                                aria-label={formatMessage(alternateActionAriaLabel)}
+                                onClick={handleAlternateActionClick}
+                            >
+                                {formatMessage(alternateActionLabel)}
+                            </Button>
+                        ) : null}
                         <Button
-                            variant="ghost"
-                            mr={3}
-                            aria-label={formatMessage(alternateActionAriaLabel)}
-                            onClick={handleAlternateActionClick}
+                            variant="solid"
+                            onClick={handleConfirmClick}
+                            aria-label={formatMessage(primaryActionAriaLabel)}
                         >
-                            {formatMessage(alternateActionLabel)}
+                            {formatMessage(primaryActionLabel)}
                         </Button>
-                    ) : null}
-                    <Button
-                        variant="solid"
-                        onClick={handleConfirmClick}
-                        aria-label={formatMessage(primaryActionAriaLabel)}
-                    >
-                        {formatMessage(primaryActionLabel)}
-                    </Button>
-                </AlertDialogFooter>
-            </AlertDialogContent>
-        </AlertDialog>
+                    </Dialog.Footer>
+                </Dialog.Content>
+            </Dialog.Positioner>
+        </Dialog.Root>
     )
 }
 
@@ -86,7 +82,7 @@ ConfirmationModal.propTypes = {
     /**
      * Prop to check if modal is open
      */
-    isOpen: PropTypes.bool.isRequired,
+    open: PropTypes.bool.isRequired,
     /**
      * Callback invoked to open the modal
      */

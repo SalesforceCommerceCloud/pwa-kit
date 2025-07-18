@@ -50,9 +50,9 @@ const ResetPasswordLanding = () => {
     }
 
     return (
-        <Stack justify="center" align="center" spacing={6}>
+        <Stack justify="center" align="center" gap={6}>
             <BrandLogo width="60px" height="auto" />
-            <Stack spacing={2}>
+            <Stack gap={2}>
                 <Text align="center" fontSize="xl" fontWeight="semibold">
                     <FormattedMessage
                         defaultMessage="Reset Password"
@@ -62,7 +62,7 @@ const ResetPasswordLanding = () => {
             </Stack>
             <Container variant="form">
                 <form onSubmit={form.handleSubmit(submit)}>
-                    <Stack spacing={6} paddingLeft={4} paddingRight={4}>
+                    <Stack gap={6} paddingLeft={4} paddingRight={4}>
                         {form.formState.errors?.global && (
                             <Alert data-testid="password-update-error" status="error">
                                 <AlertIcon color="red.500" boxSize={4} />
@@ -71,9 +71,8 @@ const ResetPasswordLanding = () => {
                                 </Text>
                             </Alert>
                         )}
-                        <Stack spacing={3} pb={2}>
+                        <Stack gap={3} pb={2}>
                             <Field {...fields.password} />
-                            <Field {...fields.confirmPassword} />
                             <PasswordRequirements value={password} />
                         </Stack>
                         <Button type="submit" isLoading={form.formState.isSubmitting}>

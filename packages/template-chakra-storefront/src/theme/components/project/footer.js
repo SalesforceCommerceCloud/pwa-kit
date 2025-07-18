@@ -4,8 +4,10 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-export default {
-    parts: [
+import {defineSlotRecipe} from '@chakra-ui/react'
+
+export default defineSlotRecipe({
+    slots: [
         'container',
         'content',
         'subscribe',
@@ -13,13 +15,16 @@ export default {
         'subscribeButtonContainer',
         'subscribeHeading',
         'subscribeMessage',
-        'localeSelector',
-        'bottomHalf',
+        'localeSelectorWrapper',
+        'localeSelectorRoot',
+        'localeSelectorField',
+        'localeDropdownOption',
+        'legalSection',
         'horizontalRule',
         'copyright',
         'socialIcons'
     ],
-    baseStyle: {
+    base: {
         container: {
             width: 'full',
             background: 'gray.900'
@@ -52,20 +57,26 @@ export default {
             fontSize: 'sm',
             marginBottom: 4
         },
-        localeSelector: {
+        localeSelectorWrapper: {
             display: 'inline-block',
             marginTop: 8
         },
-        localeDropdown: {
+        localeSelectorRoot: {},
+        localeSelectorField: {
+            fontSize: 'md',
+            borderColor: 'transparent',
             background: 'gray.800',
             _hover: {
                 background: 'whiteAlpha.500'
             }
         },
+        indicator: {
+            color: 'white'
+        },
         localeDropdownOption: {
             color: 'black'
         },
-        bottomHalf: {
+        legalSection: {
             maxWidth: {base: '34.5rem', lg: '100%'}
         },
         horizontalRule: {
@@ -76,9 +87,6 @@ export default {
             fontSize: 'sm',
             marginBottom: 6,
             color: 'gray.50'
-        },
-        socialIcons: {
-            marginTop: 4
         }
     }
-}
+})

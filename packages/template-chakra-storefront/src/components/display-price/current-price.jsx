@@ -9,7 +9,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import {Text, VisuallyHidden} from '@chakra-ui/react'
 import {useIntl} from 'react-intl'
-import msg from './messages'
+import msg from '../../components/display-price/messages'
 
 /**
  * Component that displays current price of a product with a11y
@@ -33,7 +33,7 @@ const CurrentPrice = ({labelForA11y, price, as, isRange = false, currency, ...ex
                 <Text
                     as={as}
                     {...extraProps}
-                    aria-live={'polite'}
+                    aria-live="polite"
                     aria-label={intl.formatMessage(msg.ariaLabelCurrentPriceWithRange, {
                         currentPrice: currentPriceText
                     })}

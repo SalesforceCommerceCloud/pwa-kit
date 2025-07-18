@@ -28,7 +28,7 @@ const PasswordRequirement = ({isValid, children}) => {
     return (
         <Flex align="center">
             <CheckCircleIcon {...iconStyles} />
-            <Text fontSize="sm" lineHeight={4}>
+            <Text fontSize="sm" lineHeight="1rem">
                 {children}
             </Text>
         </Flex>
@@ -51,7 +51,7 @@ const PasswordRequirements = ({value}) => {
     const pwValidations = validatePassword(value)
 
     return (
-        <Stack spacing={2}>
+        <Stack gap={2}>
             <PasswordRequirement isValid={pwValidations.hasMinChars}>
                 <FormattedMessage
                     id="password_requirements.error.eight_letter_minimum"

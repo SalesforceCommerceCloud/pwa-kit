@@ -10,7 +10,7 @@ import {Box, Stack, Heading, Flex, Skeleton} from '@chakra-ui/react'
 import {useProducts, useShopperCustomersMutation} from '@salesforce/commerce-sdk-react'
 
 import useNavigation from '../../../hooks/use-navigation'
-import {useToast} from '../../../hooks/use-toast'
+import useToast from '../../../hooks/use-toast'
 import {useWishList} from '../../../hooks/use-wish-list'
 
 import PageActionPlaceHolder from '../../../components/page-action-placeholder'
@@ -39,7 +39,7 @@ const AccountWishlist = () => {
     const [selectedItem, setSelectedItem] = useState(undefined)
     const [isWishlistItemLoading, setWishlistItemLoading] = useState(false)
 
-    const {data: wishListData, isLoading: isWishListLoading} = useWishList()
+    const {data: wishListData, isPending: isWishListLoading} = useWishList()
     const productIds = wishListData?.customerProductListItems?.map((item) => item.productId)
 
     const {data: productsData, isLoading: isProductsLoading} = useProducts(
@@ -127,7 +127,7 @@ const AccountWishlist = () => {
         } catch (err) {
             toast({
                 title: formatMessage(API_ERROR_MESSAGE),
-                status: 'error'
+                type: 'error'
             })
         }
 
@@ -140,7 +140,7 @@ const AccountWishlist = () => {
     const isPageLoading = hasWishlistItems ? isProductsLoading : isWishListLoading
 
     return (
-        <Stack spacing={4} data-testid="account-wishlist-page">
+        <Stack gap="4" data-testid="account-wishlist-page">
             <Heading as="h1" fontSize="2xl" tabIndex="0" ref={headingRef}>
                 <FormattedMessage defaultMessage="Wishlist" id="account_wishlist.title.wishlist" />
             </Heading>
@@ -150,16 +150,15 @@ const AccountWishlist = () => {
                     {new Array(numberOfSkeletonItems).fill(0).map((i, idx) => (
                         <Box
                             key={idx}
-                            p={[4, 6]}
-                            my={4}
+                            p={['4', '6']}
+                            my="4"
                             border="1px solid"
                             borderColor="gray.100"
                             borderRadius="base"
                         >
-                            <Flex width="full" align="flex-start">
-                                <Skeleton boxSize={['88px', 36]} mr={4} />
-
-                                <Stack spacing={2}>
+                            <Flex w="full" align="flex-start">
+                                <Skeleton boxSize={['88px', '36']} mr="4" />
+                                <Stack gap="2">
                                     <Skeleton h="20px" w="112px" />
                                     <Skeleton h="20px" w="84px" />
                                     <Skeleton h="20px" w="140px" />

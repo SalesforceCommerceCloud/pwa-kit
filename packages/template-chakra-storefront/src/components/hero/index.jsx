@@ -20,17 +20,19 @@ const Hero = ({title, img, actions, ...props}) => {
             {...props}
         >
             <Stack
-                align={'center'}
-                spacing={{base: 8, md: 10}}
+                align="center"
+                gap={{base: 8, md: 10}}
                 paddingTop={{base: 12, md: 10}}
                 paddingBottom={{base: 6, md: 10}}
                 direction={{base: 'column', lg: 'row'}}
             >
-                <Stack flex={1} spacing={{base: 5, md: 8}}>
+                <Stack flex={1} gap={{base: 5, md: 8}}>
                     <Heading
                         as="h1"
                         fontSize={{base: '4xl', md: '5xl', lg: '6xl'}}
+                        fontWeight={{base: 'medium', md: 'bold'}}
                         maxWidth={{base: '75%', md: '50%', lg: 'md'}}
+                        lineHeight={{base: 'shorter'}}
                     >
                         {title}
                     </Heading>
@@ -39,18 +41,18 @@ const Hero = ({title, img, actions, ...props}) => {
                 </Stack>
                 <Flex
                     flex={1}
-                    justify={'center'}
-                    align={'center'}
-                    position={'relative'}
-                    width={'full'}
+                    justify="center"
+                    align="center"
+                    position="relative"
+                    width="full"
                     paddingTop={{base: 4, lg: 0}}
                 >
-                    <Box position={'relative'} width={{base: 'full', md: '80%', lg: 'full'}}>
+                    <Box position="relative" width={{base: 'full', md: '80%', lg: 'full'}}>
                         <Image
-                            fit={'cover'}
-                            align={'center'}
-                            width={'100%'}
-                            height={'100%'}
+                            objectFit="cover"
+                            objectPosition="center"
+                            width="100%"
+                            height="100%"
                             src={src}
                             alt={alt}
                         />

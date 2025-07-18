@@ -5,6 +5,16 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 export default {
-    top: '0px -1px 3px rgba(0, 0, 0, 0.1), 0px -1px 2px rgba(0, 0, 0, 0.06)',
-    outline: '0 0 0 3px var(--chakra-colors-blue-500)'
+    outline: {
+        value: {
+            _light: '0 0 0 3px {colors.blue.500}',
+            _dark: '0 0 0 3px {colors.blue.500}'
+        }
+    },
+    top: {
+        value: {
+            _light: '0px -1px 3px rgba(0, 0, 0, 0.1), 0px -1px 2px rgba(0, 0, 0, 0.06)',
+            _dark: '0px -1px 3px rgba(0, 0, 0, 0.1), 0px -1px 2px rgba(0, 0, 0, 0.06)'
+        }
+    }
 }

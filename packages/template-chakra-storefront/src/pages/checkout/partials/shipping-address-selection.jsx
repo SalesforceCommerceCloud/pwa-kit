@@ -50,14 +50,14 @@ const ShippingAddressEditForm = ({
                 })}
             data-testid="sf-shipping-address-edit-form"
         >
-            <Stack spacing={6}>
+            <Stack gap={6}>
                 {hasSavedAddresses && !isBillingAddress && (
                     <Heading as="h3" size="sm">
                         {title}
                     </Heading>
                 )}
 
-                <Stack spacing={6}>
+                <Stack gap={6}>
                     <AddressFields
                         form={form}
                         formTitleAriaLabel={formTitleAriaLabel}
@@ -154,7 +154,21 @@ const ShippingAddressSelection = ({
 
     useEffect(() => {
         if (isBillingAddress) {
-            form.reset({...selectedAddress})
+            // For billing address, use default values if no selectedAddress
+            const defaultValues = selectedAddress
+                ? {...selectedAddress}
+                : {
+                      firstName: '',
+                      lastName: '',
+                      phone: '',
+                      countryCode: 'US',
+                      address1: '',
+                      city: '',
+                      stateCode: '',
+                      postalCode: '',
+                      addressId: ''
+                  }
+            form.reset(defaultValues)
             return
         }
         // Automatically select the customer's default/preferred shipping address
@@ -208,7 +222,6 @@ const ShippingAddressSelection = ({
         }
 
         const address = customer.addresses.find((addr) => addr.addressId === addressId)
-
         form.reset({...address})
     }
 
@@ -270,20 +283,22 @@ const ShippingAddressSelection = ({
     }
     return (
         <form onSubmit={form.handleSubmit(submitForm)}>
-            <Stack spacing={4}>
+            <Stack gap={4}>
                 {hasSavedAddresses && !isBillingAddress && (
                     <Controller
                         name="addressId"
                         defaultValue=""
                         control={form.control}
                         rules={{required: !isEditingAddress}}
-                        render={({field: {value}}) => (
-                            <RadioCardGroup value={value} onChange={handleAddressIdSelection}>
-                                <SimpleGrid
-                                    columns={[1, 1, 2]}
-                                    spacing={4}
-                                    gridAutoFlow="row dense"
-                                >
+                        render={({field: {value, onChange}}) => (
+                            <RadioCardGroup
+                                value={value}
+                                onValueChange={(selected) => {
+                                    onChange(selected.value)
+                                    handleAddressIdSelection(selected.value)
+                                }}
+                            >
+                                <SimpleGrid columns={[1, 1, 2]} gap={4} gridAutoFlow="row dense">
                                     {customer.addresses?.map((address, index) => {
                                         const editLabel = formatMessage(
                                             {
@@ -302,7 +317,10 @@ const ShippingAddressSelection = ({
                                         )
                                         return (
                                             <React.Fragment key={address.addressId}>
-                                                <RadioCard value={address.addressId}>
+                                                <RadioCard
+                                                    value={address.addressId}
+                                                    isSelected={address.addressId === value}
+                                                >
                                                     <ActionCard
                                                         padding={0}
                                                         border="none"
@@ -361,10 +379,10 @@ const ShippingAddressSelection = ({
                                         color="blue.600"
                                         height={['44px', '44px', '167px']}
                                         rounded="base"
-                                        fontWeight="medium"
-                                        leftIcon={<PlusIcon boxSize={'15px'} />}
+                                        fontWeight="semibold"
                                         onClick={toggleAddressEdit}
                                     >
+                                        <PlusIcon boxSize={'15px'} />
                                         <FormattedMessage
                                             defaultMessage="Add New Address"
                                             id="shipping_address_selection.button.add_address"

@@ -16,7 +16,7 @@ import {useCurrentCustomer} from '../../hooks/use-current-customer'
 import useIntersectionObserver from '../../hooks/use-intersection-observer'
 import {useWishList} from '../../hooks/use-wish-list'
 
-import {useToast} from '../../hooks/use-toast'
+import useToast from '../../hooks/use-toast'
 import useNavigation from '../../hooks/use-navigation'
 import {
     API_ERROR_MESSAGE,
@@ -138,13 +138,8 @@ const RecommendedProducts = ({zone, recommender, products, title, shouldFetch, .
 
             toast({
                 title: formatMessage(TOAST_MESSAGE_ADDED_TO_WISHLIST, {quantity: 1}),
-                status: 'success',
+                type: 'success',
                 action: (
-                    // it would be better if we could use <Button as={Link}>
-                    // but unfortunately the Link component is not compatible
-                    // with Chakra Toast, since the ToastManager is rendered via portal
-                    // and the toast doesn't have access to intl provider, which is a
-                    // requirement of the Link component.
                     <Button variant="link" onClick={() => navigate('/account/wishlist')}>
                         {formatMessage(TOAST_ACTION_VIEW_WISHLIST)}
                     </Button>
@@ -153,7 +148,7 @@ const RecommendedProducts = ({zone, recommender, products, title, shouldFetch, .
         } catch {
             toast({
                 title: formatMessage(API_ERROR_MESSAGE),
-                status: 'error'
+                type: 'error'
             })
         }
     }
@@ -175,13 +170,12 @@ const RecommendedProducts = ({zone, recommender, products, title, shouldFetch, .
             })
             toast({
                 title: formatMessage(TOAST_MESSAGE_REMOVED_FROM_WISHLIST),
-                status: 'success',
-                id: product.productId
+                type: 'success'
             })
         } catch {
             toast({
                 title: formatMessage(API_ERROR_MESSAGE),
-                status: 'error'
+                type: 'error'
             })
         }
     }

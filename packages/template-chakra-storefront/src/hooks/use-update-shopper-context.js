@@ -16,10 +16,10 @@ import {isServer, isHydrated} from '../utils/utils'
 import {useQueryClient} from '@tanstack/react-query'
 
 // Hooks
-import useMultiSite from './use-multi-site'
+import useMultiSite from '../hooks/use-multi-site'
 
 // Constants
-import {useShopperContextSearchParams} from './use-shopper-context-search-params'
+import {useShopperContextSearchParams} from '../hooks/use-shopper-context-search-params'
 
 /*
  * This hook will set the shopper context when search params pertinant

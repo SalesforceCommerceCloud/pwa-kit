@@ -7,7 +7,7 @@
 import React from 'react'
 import {renderWithProviders} from '../../utils/test-utils'
 import Link from './index'
-import mockConfig from '../../../mock-config'
+import mockConfig from '../../../config/mocks/mock-config'
 const originalLocation = window.location
 
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'

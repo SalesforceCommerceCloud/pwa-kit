@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
-import {fireEvent} from '@testing-library/react'
+import {act, fireEvent} from '@testing-library/react'
 import {renderWithProviders} from '../../utils/test-utils'
 import Hero from './index'
 
@@ -22,11 +22,15 @@ test('Hero renders without errors', () => {
     expect(getByText(/title/i)).toBeInTheDocument()
 })
 
-test('Hero renders actions and event handlers', () => {
+test('Hero renders actions and event handlers', async () => {
     const onClick = jest.fn()
     const data = {
         title: 'title',
-        actions: <button data-testid="button" onClick={onClick}></button>,
+        actions: (
+            <button data-testid="button" onClick={onClick}>
+                button
+            </button>
+        ),
         img: {
             src: 'src',
             alt: 'alt'
@@ -35,6 +39,8 @@ test('Hero renders actions and event handlers', () => {
     const {getByTestId} = renderWithProviders(<Hero {...data} />)
     const button = getByTestId('button')
     expect(button).toBeInTheDocument()
-    fireEvent.click(button)
+    await act(async () => {
+        fireEvent.click(button)
+    })
     expect(onClick).toHaveBeenCalledTimes(1)
 })

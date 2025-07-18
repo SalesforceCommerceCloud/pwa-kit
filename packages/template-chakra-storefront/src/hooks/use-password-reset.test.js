@@ -5,11 +5,10 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
-import {fireEvent, screen, waitFor} from '@testing-library/react'
+import {act, screen, waitFor} from '@testing-library/react'
 import {useAuthHelper, AuthHelpers} from '@salesforce/commerce-sdk-react'
 import {renderWithProviders} from '../utils/test-utils'
 import {usePasswordReset} from './use-password-reset'
-import mockConfig from '../../mock-config'
 
 const mockEmail = 'test@email.com'
 const mockToken = '123456'
@@ -62,24 +61,28 @@ afterEach(() => {
 
 describe('usePasswordReset', () => {
     test('getPasswordResetToken sends expected api request', async () => {
-        renderWithProviders(<MockComponent />)
+        const {user} = renderWithProviders(<MockComponent />)
 
         const trigger = screen.getByTestId('get-password-reset-token')
-        await fireEvent.click(trigger)
+        await act(async () => {
+            await user.click(trigger)
+        })
         await waitFor(() => {
             expect(getPasswordResetToken.mutateAsync).toHaveBeenCalled()
             expect(getPasswordResetToken.mutateAsync).toHaveBeenCalledWith({
                 user_id: mockEmail,
-                callback_uri: mockConfig.login.resetPassword.callbackURI
+                callback_uri: 'https://www.domain.com/reset-password-callback'
             })
         })
     })
 
     test('resetPassword sends expected api request', async () => {
-        renderWithProviders(<MockComponent />)
+        const {user} = renderWithProviders(<MockComponent />)
 
         const trigger = screen.getByTestId('reset-password')
-        await fireEvent.click(trigger)
+        await act(async () => {
+            await user.click(trigger)
+        })
         await waitFor(() => {
             expect(resetPassword.mutateAsync).toHaveBeenCalled()
             expect(resetPassword.mutateAsync).toHaveBeenCalledWith(

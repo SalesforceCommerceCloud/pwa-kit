@@ -18,7 +18,7 @@ import {CommerceApiProvider} from '@salesforce/commerce-sdk-react'
 import {PageContext, Region} from '@salesforce/commerce-sdk-react/components'
 import {withReactQuery} from '@salesforce/pwa-kit-react-sdk/ssr/universal/components/with-react-query'
 import fallbackMessages from '../static/translations/compiled/en-GB.json'
-import mockConfig from '../../mock-config'
+import mockConfig from '../../config/mocks/mock-config'
 // Contexts
 import {CurrencyProvider, MultiSiteProvider} from '../contexts'
 
@@ -86,7 +86,8 @@ export const renderWithReactIntl = (node, locale = DEFAULT_LOCALE) => {
 }
 
 export const renderWithRouter = (node) => renderWithReactIntl(<Router>{node}</Router>)
-
+export const renderWithChakraProvider = (node) =>
+    render(<ChakraProvider value={theme}>{node}</ChakraProvider>)
 /**
  * This is the Providers used to wrap components
  * for testing purposes.
@@ -133,7 +134,7 @@ export const TestProviders = ({
                     >
                         <CurrencyProvider currency={DEFAULT_CURRENCY}>
                             <Router>
-                                <ChakraProvider theme={theme}>
+                                <ChakraProvider value={theme}>
                                     <AddToCartModalProvider>{children}</AddToCartModalProvider>
                                 </ChakraProvider>
                             </Router>

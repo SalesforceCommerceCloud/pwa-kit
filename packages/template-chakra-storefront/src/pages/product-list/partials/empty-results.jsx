@@ -81,7 +81,7 @@ const EmptySearchResults = ({searchQuery, category}) => {
                             }
                         )}
                     </Text>
-                    <Stack spacing={16} marginTop={32}>
+                    <Stack gap={16} marginTop={32}>
                         <RecommendedProducts
                             title={
                                 <FormattedMessage
