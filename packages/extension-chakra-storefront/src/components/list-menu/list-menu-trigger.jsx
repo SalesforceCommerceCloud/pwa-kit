@@ -9,28 +9,22 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import {Link as RouteLink} from 'react-router-dom'
 
-import {Box, useSlotRecipe} from '@chakra-ui/react'
+import {Box, Button, useSlotRecipe} from '@chakra-ui/react'
 
 import Link from '../../components/link'
 import {ChevronDownIcon} from '../../components/icons'
 
 import {categoryUrlBuilder} from '../../utils/url'
 
-const ListMenuTrigger = ({item, name, isOpen, onOpen, onClose}) => {
+const ListMenuTrigger = ({item, name, isOpen}) => {
     const recipe = useSlotRecipe({key: 'listMenu'})
     const styles = recipe()
-
-    const keyMap = {
-        Escape: () => onClose(),
-        Enter: () => onOpen()
-    }
 
     return (
         <Box css={styles.listMenuTriggerContainer}>
             <Link
                 as={RouteLink}
                 to={categoryUrlBuilder(item)}
-                onMouseOver={onOpen}
                 css={styles.listMenuTriggerLink}
                 {...{name: name + ' __'}}
                 {...(isOpen ? {css: styles.listMenuTriggerLinkActive} : {})}
@@ -38,17 +32,9 @@ const ListMenuTrigger = ({item, name, isOpen, onOpen, onClose}) => {
                 {name}
             </Link>
 
-            <Link
-                as={RouteLink}
-                to={'#'}
-                onMouseOver={onOpen}
-                onKeyDown={(e) => {
-                    keyMap[e.key]?.(e)
-                }}
-                css={styles.listMenuTriggerLinkIcon}
-            >
+            <Button unstyled css={styles.listMenuTriggerLinkIcon}>
                 <ChevronDownIcon />
-            </Link>
+            </Button>
         </Box>
     )
 }
@@ -56,9 +42,7 @@ const ListMenuTrigger = ({item, name, isOpen, onOpen, onClose}) => {
 ListMenuTrigger.propTypes = {
     item: PropTypes.object,
     name: PropTypes.string,
-    isOpen: PropTypes.bool,
-    onOpen: PropTypes.func,
-    onClose: PropTypes.func
+    isOpen: PropTypes.bool
 }
 
 export {ListMenuTrigger}

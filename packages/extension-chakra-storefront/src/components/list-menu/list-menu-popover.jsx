@@ -14,45 +14,35 @@ import {ListMenuTrigger} from '../../components/list-menu/list-menu-trigger'
 
 const ListMenuPopover = ({contentComponent, item, name, itemsKey, maxColumns}) => {
     const [open, setOpen] = useState(false)
-    const onOpen = () => setOpen(true)
-    const onClose = () => setOpen(false)
+    const handleOpenChange = (details) => {
+        setOpen(details.open)
+    }
+
     const ContentComponent = contentComponent || ListMenuContent
     const recipe = useSlotRecipe({key: 'listMenu'})
     const styles = recipe()
 
     return (
-        <Box onMouseLeave={onClose}>
-            <Popover.Root
-                open={open}
-                positioning={{placement: 'bottom-start'}}
-                lazyMount
-                unstyled
-            >
-                <Popover.Trigger asChild>
-                    <Box onMouseEnter={onOpen}>
-                        <ListMenuTrigger
-                            item={item}
-                            name={name}
-                            isOpen={open}
-                            onOpen={onOpen}
-                            onClose={onClose}
-                        />
-                    </Box>
-                </Popover.Trigger>
-                <Popover.Positioner>
-                    <Popover.Content data-testid="popover-menu" css={styles.popoverContent}>
-                        <Popover.Body css={styles.popoverBody}>
-                            <ContentComponent
-                                item={item}
-                                itemsKey={itemsKey}
-                                onClose={onClose}
-                                maxColumns={maxColumns}
-                            />
-                        </Popover.Body>
-                    </Popover.Content>
-                </Popover.Positioner>
-            </Popover.Root>
-        </Box>
+        <Popover.Root
+            positioning={{placement: 'bottom-start'}}
+            lazyMount
+            unstyled
+            open={open}
+            onOpenChange={handleOpenChange}
+        >
+            <Popover.Trigger asChild>
+                <Box>
+                    <ListMenuTrigger item={item} name={name} isOpen={open} />
+                </Box>
+            </Popover.Trigger>
+            <Popover.Positioner>
+                <Popover.Content data-testid="popover-menu" css={styles.popoverContent}>
+                    <Popover.Body css={styles.popoverBody}>
+                        <ContentComponent item={item} itemsKey={itemsKey} maxColumns={maxColumns} />
+                    </Popover.Body>
+                </Popover.Content>
+            </Popover.Positioner>
+        </Popover.Root>
     )
 }
 
