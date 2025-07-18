@@ -219,25 +219,32 @@ const ShippingMultiAddress = ({
                                         {/* Left: Image and info */}
                                         <Flex direction="row" align="flex-start" flex={1} minW={0}>
                                             <HStack align="flex-start" spacing={3} w="100%">
-                                                <Image
-                                                    src={imageUrl}
-                                                    alt={formatMessage(
-                                                        {
-                                                            id: 'shipping_multi_address.image.alt',
-                                                            defaultMessage:
-                                                                'Product image for {productName}'
-                                                        },
-                                                        {
-                                                            productName: item.productName
-                                                        }
-                                                    )}
-                                                    w={{base: '60px', md: '90px'}}
-                                                    h={{base: '80px', md: '120px'}}
-                                                    objectFit="cover"
+                                                <Box
+                                                    flexShrink={0}
                                                     borderRadius="md"
                                                     bg="gray.100"
-                                                    flexShrink={0}
-                                                />
+                                                    overflow="hidden"
+                                                    position="relative"
+                                                    w={{base: '60px', md: '80px'}}
+                                                    aspectRatio="1"
+                                                >
+                                                    <Image
+                                                        src={imageUrl}
+                                                        alt={formatMessage(
+                                                            {
+                                                                id: 'shipping_multi_address.image.alt',
+                                                                defaultMessage:
+                                                                    'Product image for {productName}'
+                                                            },
+                                                            {
+                                                                productName: item.productName
+                                                            }
+                                                        )}
+                                                        objectFit="cover"
+                                                        w="100%"
+                                                        h="100%"
+                                                    />
+                                                </Box>
                                                 <ItemVariantProvider variant={variant}>
                                                     <VStack
                                                         justify="flex-start"
