@@ -9,7 +9,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import {Link as RouteLink} from 'react-router-dom'
 
-import {Box, Button, useSlotRecipe} from '@chakra-ui/react'
+import {Box, useSlotRecipe} from '@chakra-ui/react'
 
 import Link from '../../components/link'
 import {ChevronDownIcon} from '../../components/icons'
@@ -32,9 +32,10 @@ const ListMenuTrigger = ({item, name, isOpen}) => {
                 {name}
             </Link>
 
-            <Button unstyled css={styles.listMenuTriggerLinkIcon}>
+            {/* NOTE: To avoid nested buttons (since ListMenuTrigger will be wrapped with Popover.Trigger), this cannot be a Button */}
+            <Box css={styles.listMenuTriggerLinkIcon} role="button" tabIndex="0">
                 <ChevronDownIcon />
-            </Button>
+            </Box>
         </Box>
     )
 }
