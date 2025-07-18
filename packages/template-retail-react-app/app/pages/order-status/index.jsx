@@ -1,15 +1,24 @@
 /*
- * Copyright (c) 2024, salesforce.com, inc.
+ * Copyright (c) 2025, salesforce.com, inc.
  * All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
 import React from 'react'
-import {Box, Heading, Grid, Container, Button, Text, Stack} from '@chakra-ui/react'
+import {
+    Box,
+    Heading,
+    Grid,
+    Container,
+    Button,
+    Text,
+    Stack
+} from '@salesforce/retail-react-app/app/components/shared/ui'
 import {BrandLogo} from '@salesforce/retail-react-app/app/components/icons'
 import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
+import OrderLookup from '@salesforce/retail-react-app/app/components/order-lookup/index'
 
 const OrderStatusPage = () => {
     const navigate = useNavigation()
@@ -20,17 +29,21 @@ const OrderStatusPage = () => {
         navigate('/login')
     }
 
+    const handleOrderLookup = () => {
+        // TODO: API integration for order lookup
+    }
+
     // Check if user is not registered and customer data has loaded
     const shouldShowSignInForm = customerType !== null && !isRegistered
 
     return (
-        <Box data-testid="order-status-page" minH="100vh" bg="gray.50">
-            <Container py={{base: 8, md: 16}} pt={{base: 12, md: 24}}>
+        <Box data-testid="order-status-page" bg="gray.50">
+            <Container py={{base: 8, md: 8}} pt={{base: 12, md: 24}}>
                 <Heading as="h1" size="lg" textAlign="left">
                     Order Status
                 </Heading>
             </Container>
-            <Container maxW="1000px" px={4} mt={8}>
+            <Container maxW="container.lg" px={4} mt={8} pb={{base: 8, md: 16}}>
                 <Grid
                     templateColumns={{base: '1fr', md: '1fr 1fr'}}
                     gap={8}
@@ -44,7 +57,7 @@ const OrderStatusPage = () => {
                             borderRadius="md"
                             boxShadow="md"
                             p={{base: 6, md: 8}}
-                            maxW="450px"
+                            maxW="md"
                             width="100%"
                             mx="auto"
                         >
@@ -66,6 +79,7 @@ const OrderStatusPage = () => {
                     )}
 
                     {/* Order Lookup Card */}
+                    <OrderLookup onSubmit={handleOrderLookup} />
                 </Grid>
             </Container>
         </Box>
