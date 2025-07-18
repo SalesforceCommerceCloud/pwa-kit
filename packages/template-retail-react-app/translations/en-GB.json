@@ -1460,6 +1460,42 @@
   "shipping_address_selection.title.edit_shipping": {
     "defaultMessage": "Edit Shipping Address"
   },
+  "shipping_multi_address.actions.region": {
+    "defaultMessage": "Checkout actions"
+  },
+  "shipping_multi_address.error.label": {
+    "defaultMessage": "Error loading products"
+  },
+  "shipping_multi_address.error.message": {
+    "defaultMessage": "Error loading products. Please try again."
+  },
+  "shipping_multi_address.format.address_line_2": {
+    "defaultMessage": "{city}, {stateCode} {postalCode}"
+  },
+  "shipping_multi_address.image.alt": {
+    "defaultMessage": "Product image for {productName}"
+  },
+  "shipping_multi_address.loading.label": {
+    "defaultMessage": "Loading products"
+  },
+  "shipping_multi_address.loading.message": {
+    "defaultMessage": "Loading products..."
+  },
+  "shipping_multi_address.main.label": {
+    "defaultMessage": "Multi-shipping address selection"
+  },
+  "shipping_multi_address.price.label": {
+    "defaultMessage": "Product price"
+  },
+  "shipping_multi_address.products.region": {
+    "defaultMessage": "Products and delivery addresses"
+  },
+  "shipping_multi_address.quantity.label": {
+    "defaultMessage": "Quantity"
+  },
+  "shipping_multi_address.submit.description": {
+    "defaultMessage": "Continue to next step with selected delivery addresses"
+  },
   "shipping_options.action.send_as_a_gift": {
     "defaultMessage": "Do you want to send this as a gift?"
   },

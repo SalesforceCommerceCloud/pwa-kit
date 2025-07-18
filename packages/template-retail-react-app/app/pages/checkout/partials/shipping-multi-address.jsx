@@ -26,66 +26,6 @@ import {
 import {useIntl} from 'react-intl'
 import PropTypes from 'prop-types'
 
-const LOADING_LABEL = {
-    id: 'shipping_multi_address.loading.label',
-    defaultMessage: 'Loading products'
-}
-
-const LOADING_MESSAGE = {
-    id: 'shipping_multi_address.loading.message',
-    defaultMessage: 'Loading products...'
-}
-
-const ERROR_LABEL = {
-    id: 'shipping_multi_address.error.label',
-    defaultMessage: 'Error loading products'
-}
-
-const ERROR_MESSAGE = {
-    id: 'shipping_multi_address.error.message',
-    defaultMessage: 'Error loading products. Please try again.'
-}
-
-const MAIN_LABEL = {
-    id: 'shipping_multi_address.main.label',
-    defaultMessage: 'Multi-shipping address selection'
-}
-
-const PRODUCTS_REGION_LABEL = {
-    id: 'shipping_multi_address.products.region',
-    defaultMessage: 'Products and delivery addresses'
-}
-
-const IMAGE_ALT = {
-    id: 'shipping_multi_address.image.alt',
-    defaultMessage: 'Product image for {productName}'
-}
-
-const PRICE_LABEL = {
-    id: 'shipping_multi_address.price.label',
-    defaultMessage: 'Product price'
-}
-
-const ACTIONS_REGION_LABEL = {
-    id: 'shipping_multi_address.actions.region',
-    defaultMessage: 'Checkout actions'
-}
-
-const SUBMIT_DESCRIPTION = {
-    id: 'shipping_multi_address.submit.description',
-    defaultMessage: 'Continue to next step with selected delivery addresses'
-}
-
-const ADDRESS_LINE_2_FORMAT = {
-    id: 'shipping_multi_address.format.address_line_2',
-    defaultMessage: '{city}, {stateCode} {postalCode}'
-}
-
-const QUANTITY_LABEL = {
-    id: 'shipping_multi_address.quantity.label',
-    defaultMessage: 'Quantity'
-}
-
 const MultiShippingItemAttributes = ({variant, includeQuantity = true}) => {
     const {formatMessage} = useIntl()
     // Get display values for attributes
@@ -108,7 +48,11 @@ const MultiShippingItemAttributes = ({variant, includeQuantity = true}) => {
             {includeQuantity && (
                 <ListItem>
                     <Text lineHeight={1} color="gray.700" fontSize="sm">
-                        {formatMessage(QUANTITY_LABEL)}: {variant.quantity}
+                        {formatMessage({
+                            id: 'shipping_multi_address.quantity.label',
+                            defaultMessage: 'Quantity'
+                        })}
+                        : {variant.quantity}
                     </Text>
                 </ListItem>
             )}
@@ -173,9 +117,15 @@ const ShippingMultiAddress = ({
                 color="gray.500"
                 role="status"
                 aria-live="polite"
-                aria-label={formatMessage(LOADING_LABEL)}
+                aria-label={formatMessage({
+                    id: 'shipping_multi_address.loading.label',
+                    defaultMessage: 'Loading products'
+                })}
             >
-                {formatMessage(LOADING_MESSAGE)}
+                {formatMessage({
+                    id: 'shipping_multi_address.loading.message',
+                    defaultMessage: 'Loading products...'
+                })}
             </Box>
         )
     }
@@ -189,9 +139,15 @@ const ShippingMultiAddress = ({
                 color="red.500"
                 role="alert"
                 aria-live="assertive"
-                aria-label={formatMessage(ERROR_LABEL)}
+                aria-label={formatMessage({
+                    id: 'shipping_multi_address.error.label',
+                    defaultMessage: 'Error loading products'
+                })}
             >
-                {formatMessage(ERROR_MESSAGE)}
+                {formatMessage({
+                    id: 'shipping_multi_address.error.message',
+                    defaultMessage: 'Error loading products. Please try again.'
+                })}
             </Box>
         )
     }
@@ -202,7 +158,14 @@ const ShippingMultiAddress = ({
     }
 
     return (
-        <Box as="main" role="main" aria-label={formatMessage(MAIN_LABEL)}>
+        <Box
+            as="main"
+            role="main"
+            aria-label={formatMessage({
+                id: 'shipping_multi_address.main.label',
+                defaultMessage: 'Multi-shipping address selection'
+            })}
+        >
             <VStack spacing={0}>
                 <Box
                     border="1px solid"
@@ -212,7 +175,10 @@ const ShippingMultiAddress = ({
                     p={2}
                     w="100%"
                     role="region"
-                    aria-label={formatMessage(PRODUCTS_REGION_LABEL)}
+                    aria-label={formatMessage({
+                        id: 'shipping_multi_address.products.region',
+                        defaultMessage: 'Products and delivery addresses'
+                    })}
                 >
                     <VStack spacing={2}>
                         {basket.productItems.map((item, idx) => {
@@ -255,9 +221,16 @@ const ShippingMultiAddress = ({
                                             <HStack align="flex-start" spacing={3} w="100%">
                                                 <Image
                                                     src={imageUrl}
-                                                    alt={formatMessage(IMAGE_ALT, {
-                                                        productName: item.productName
-                                                    })}
+                                                    alt={formatMessage(
+                                                        {
+                                                            id: 'shipping_multi_address.image.alt',
+                                                            defaultMessage:
+                                                                'Product image for {productName}'
+                                                        },
+                                                        {
+                                                            productName: item.productName
+                                                        }
+                                                    )}
                                                     w={{base: '60px', md: '90px'}}
                                                     h={{base: '80px', md: '120px'}}
                                                     objectFit="cover"
@@ -353,11 +326,18 @@ const ShippingMultiAddress = ({
                                                         >
                                                             {addr.firstName} {addr.lastName} -{' '}
                                                             {addr.address1},{' '}
-                                                            {formatMessage(ADDRESS_LINE_2_FORMAT, {
-                                                                city: addr.city,
-                                                                stateCode: addr.stateCode || '',
-                                                                postalCode: addr.postalCode
-                                                            })}
+                                                            {formatMessage(
+                                                                {
+                                                                    id: 'shipping_multi_address.format.address_line_2',
+                                                                    defaultMessage:
+                                                                        '{city}, {stateCode} {postalCode}'
+                                                                },
+                                                                {
+                                                                    city: addr.city,
+                                                                    stateCode: addr.stateCode || '',
+                                                                    postalCode: addr.postalCode
+                                                                }
+                                                            )}
                                                         </option>
                                                     ))}
                                                     <option
@@ -379,7 +359,10 @@ const ShippingMultiAddress = ({
                                                 color="gray.900"
                                                 alignSelf="flex-end"
                                                 mt="auto"
-                                                aria-label={formatMessage(PRICE_LABEL)}
+                                                aria-label={formatMessage({
+                                                    id: 'shipping_multi_address.price.label',
+                                                    defaultMessage: 'Product price'
+                                                })}
                                             >
                                                 {typeof variant.priceAfterItemDiscount ===
                                                     'number' && (
@@ -450,11 +433,18 @@ const ShippingMultiAddress = ({
                                                     >
                                                         {addr.firstName} {addr.lastName} -{' '}
                                                         {addr.address1},{' '}
-                                                        {formatMessage(ADDRESS_LINE_2_FORMAT, {
-                                                            city: addr.city,
-                                                            stateCode: addr.stateCode || '',
-                                                            postalCode: addr.postalCode
-                                                        })}
+                                                        {formatMessage(
+                                                            {
+                                                                id: 'shipping_multi_address.format.address_line_2',
+                                                                defaultMessage:
+                                                                    '{city}, {stateCode} {postalCode}'
+                                                            },
+                                                            {
+                                                                city: addr.city,
+                                                                stateCode: addr.stateCode || '',
+                                                                postalCode: addr.postalCode
+                                                            }
+                                                        )}
                                                     </option>
                                                 ))}
                                                 <option
@@ -473,7 +463,10 @@ const ShippingMultiAddress = ({
                                             color="gray.900"
                                             alignSelf="flex-end"
                                             mt="auto"
-                                            aria-label={formatMessage(PRICE_LABEL)}
+                                            aria-label={formatMessage({
+                                                id: 'shipping_multi_address.price.label',
+                                                defaultMessage: 'Product price'
+                                            })}
                                         >
                                             {typeof variant.priceAfterItemDiscount === 'number' && (
                                                 <Text>
@@ -490,7 +483,15 @@ const ShippingMultiAddress = ({
                         })}
                     </VStack>
                 </Box>
-                <Box pt={2} w="100%" role="region" aria-label={formatMessage(ACTIONS_REGION_LABEL)}>
+                <Box
+                    pt={2}
+                    w="100%"
+                    role="region"
+                    aria-label={formatMessage({
+                        id: 'shipping_multi_address.actions.region',
+                        defaultMessage: 'Checkout actions'
+                    })}
+                >
                     <Container variant="form">
                         <Button
                             type="button"
@@ -501,7 +502,11 @@ const ShippingMultiAddress = ({
                             {formatMessage(submitButtonLabel)}
                         </Button>
                         <VisuallyHidden id="submit-button-description">
-                            {formatMessage(SUBMIT_DESCRIPTION)}
+                            {formatMessage({
+                                id: 'shipping_multi_address.submit.description',
+                                defaultMessage:
+                                    'Continue to next step with selected delivery addresses'
+                            })}
                         </VisuallyHidden>
                     </Container>
                 </Box>

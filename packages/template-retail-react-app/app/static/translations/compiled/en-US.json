@@ -3445,6 +3445,98 @@
       "value": "Edit Shipping Address"
     }
   ],
+  "shipping_multi_address.actions.region": [
+    {
+      "type": 0,
+      "value": "Checkout actions"
+    }
+  ],
+  "shipping_multi_address.error.label": [
+    {
+      "type": 0,
+      "value": "Error loading products"
+    }
+  ],
+  "shipping_multi_address.error.message": [
+    {
+      "type": 0,
+      "value": "Error loading products. Please try again."
+    }
+  ],
+  "shipping_multi_address.format.address_line_2": [
+    {
+      "type": 1,
+      "value": "city"
+    },
+    {
+      "type": 0,
+      "value": ", "
+    },
+    {
+      "type": 1,
+      "value": "stateCode"
+    },
+    {
+      "type": 0,
+      "value": " "
+    },
+    {
+      "type": 1,
+      "value": "postalCode"
+    }
+  ],
+  "shipping_multi_address.image.alt": [
+    {
+      "type": 0,
+      "value": "Product image for "
+    },
+    {
+      "type": 1,
+      "value": "productName"
+    }
+  ],
+  "shipping_multi_address.loading.label": [
+    {
+      "type": 0,
+      "value": "Loading products"
+    }
+  ],
+  "shipping_multi_address.loading.message": [
+    {
+      "type": 0,
+      "value": "Loading products..."
+    }
+  ],
+  "shipping_multi_address.main.label": [
+    {
+      "type": 0,
+      "value": "Multi-shipping address selection"
+    }
+  ],
+  "shipping_multi_address.price.label": [
+    {
+      "type": 0,
+      "value": "Product price"
+    }
+  ],
+  "shipping_multi_address.products.region": [
+    {
+      "type": 0,
+      "value": "Products and delivery addresses"
+    }
+  ],
+  "shipping_multi_address.quantity.label": [
+    {
+      "type": 0,
+      "value": "Quantity"
+    }
+  ],
+  "shipping_multi_address.submit.description": [
+    {
+      "type": 0,
+      "value": "Continue to next step with selected delivery addresses"
+    }
+  ],
   "shipping_options.action.send_as_a_gift": [
     {
       "type": 0,
