@@ -451,7 +451,8 @@ describe('usePickupShipment', () => {
                     shippingMethod: {
                         id: '005' // Default pickup shipping method ID
                     },
-                    c_fromStoreId: 'store-id-456'
+                    c_fromStoreId: 'store-id-456',
+                    shippingAddress: {}
                 }
             })
         })
@@ -476,7 +477,8 @@ describe('usePickupShipment', () => {
                     shippingMethod: {
                         id: 'custom-pickup-method'
                     },
-                    c_fromStoreId: 'store-id-456'
+                    c_fromStoreId: 'store-id-456',
+                    shippingAddress: {}
                 }
             })
         })
@@ -671,22 +673,11 @@ describe('usePickupShipment', () => {
                 selectedStore
             )
 
-            // Should clear shipping address first
-            expect(mockMutateAsync).toHaveBeenNthCalledWith(1, {
-                parameters: {
-                    basketId: 'basket-123',
-                    shipmentId: 'me'
-                },
-                body: {
-                    shippingAddress: {}
-                }
-            })
-
             // Should fetch shipping methods
             expect(mockRefetchShippingMethods).toHaveBeenCalled()
 
-            // Should configure pickup shipment (second call)
-            expect(mockMutateAsync).toHaveBeenNthCalledWith(2, {
+            // Should configure pickup shipment (single call with shipping address cleared)
+            expect(mockMutateAsync).toHaveBeenCalledWith({
                 parameters: {
                     basketId: 'basket-123',
                     shipmentId: 'me'
@@ -695,7 +686,8 @@ describe('usePickupShipment', () => {
                     shippingMethod: {
                         id: 'pickup-method-123'
                     },
-                    c_fromStoreId: 'store-1'
+                    c_fromStoreId: 'store-1',
+                    shippingAddress: {}
                 }
             })
         })
@@ -727,22 +719,11 @@ describe('usePickupShipment', () => {
                 selectedStore
             )
 
-            // Should clear shipping address first
-            expect(mockMutateAsync).toHaveBeenNthCalledWith(1, {
-                parameters: {
-                    basketId: 'basket-123',
-                    shipmentId: 'me'
-                },
-                body: {
-                    shippingAddress: {}
-                }
-            })
-
             // Should fetch shipping methods
             expect(mockRefetchShippingMethods).toHaveBeenCalled()
 
-            // Should configure regular shipping method (second call)
-            expect(mockMutateAsync).toHaveBeenNthCalledWith(2, {
+            // Should configure regular shipping method (single call with shipping address cleared)
+            expect(mockMutateAsync).toHaveBeenCalledWith({
                 parameters: {
                     basketId: 'basket-123',
                     shipmentId: 'me'
@@ -751,7 +732,8 @@ describe('usePickupShipment', () => {
                     shippingMethod: {
                         id: 'standard-shipping'
                     },
-                    c_fromStoreId: null
+                    c_fromStoreId: null,
+                    shippingAddress: {}
                 }
             })
         })
@@ -890,20 +872,10 @@ describe('usePickupShipment', () => {
                 selectedStore
             )
 
-            // Should still clear shipping address and fetch methods
-            expect(mockMutateAsync).toHaveBeenNthCalledWith(1, {
-                parameters: {
-                    basketId: 'basket-123',
-                    shipmentId: 'me'
-                },
-                body: {
-                    shippingAddress: {}
-                }
-            })
+            // Should fetch methods and configure pickup with null shipping method ID (which will use default)
             expect(mockRefetchShippingMethods).toHaveBeenCalled()
 
-            // Should configure pickup with null shipping method ID (which will use default)
-            expect(mockMutateAsync).toHaveBeenNthCalledWith(2, {
+            expect(mockMutateAsync).toHaveBeenCalledWith({
                 parameters: {
                     basketId: 'basket-123',
                     shipmentId: 'me'
@@ -912,7 +884,8 @@ describe('usePickupShipment', () => {
                     shippingMethod: {
                         id: null
                     },
-                    c_fromStoreId: 'store-1'
+                    c_fromStoreId: 'store-1',
+                    shippingAddress: {}
                 }
             })
         })
@@ -957,7 +930,7 @@ describe('usePickupShipment', () => {
             )
 
             // Should configure regular shipping with null shipping method ID
-            expect(mockMutateAsync).toHaveBeenNthCalledWith(2, {
+            expect(mockMutateAsync).toHaveBeenCalledWith({
                 parameters: {
                     basketId: 'basket-123',
                     shipmentId: 'me'
@@ -966,9 +939,201 @@ describe('usePickupShipment', () => {
                     shippingMethod: {
                         id: null
                     },
-                    c_fromStoreId: null
+                    c_fromStoreId: null,
+                    shippingAddress: {}
                 }
             })
+        })
+    })
+
+    describe('updateRegularShippingMethod', () => {
+        let mockMutateAsync
+
+        beforeEach(() => {
+            mockMutateAsync = jest.fn().mockResolvedValue({})
+            jest.clearAllMocks()
+
+            // Get the mocked module and update the mock to include mutateAsync
+            const commerceSdkMock = jest.requireMock('@salesforce/commerce-sdk-react')
+            commerceSdkMock.useShopperBasketsMutation.mockReturnValue({
+                mutateAsync: mockMutateAsync,
+                isLoading: false
+            })
+        })
+
+        test('configures regular shipping method successfully', async () => {
+            const {result} = renderHook(() => usePickupShipment())
+
+            const basketId = 'basket-123'
+            const shippingMethodId = 'standard-shipping'
+
+            await result.current.updateRegularShippingMethod(basketId, shippingMethodId)
+
+            expect(mockMutateAsync).toHaveBeenCalledWith({
+                parameters: {
+                    basketId: 'basket-123',
+                    shipmentId: 'me'
+                },
+                body: {
+                    shippingMethod: {
+                        id: 'standard-shipping'
+                    },
+                    c_fromStoreId: null,
+                    shippingAddress: {}
+                }
+            })
+        })
+
+        test('logs warning when mutation fails and throwOnError is false', async () => {
+            const mutationError = new Error('Regular shipping mutation failed')
+            mockMutateAsync.mockRejectedValue(mutationError)
+
+            const consoleSpy = jest.spyOn(console, 'warn').mockImplementation(() => {})
+
+            const {result} = renderHook(() => usePickupShipment())
+
+            const basketId = 'basket-123'
+            const shippingMethodId = 'standard-shipping'
+
+            await result.current.updateRegularShippingMethod(basketId, shippingMethodId)
+
+            expect(consoleSpy).toHaveBeenCalledWith(
+                'Failed to configure regular shipping method:',
+                mutationError
+            )
+
+            consoleSpy.mockRestore()
+        })
+
+        test('throws error when mutation fails and throwOnError is true', async () => {
+            const mutationError = new Error('Regular shipping mutation failed')
+            mockMutateAsync.mockRejectedValue(mutationError)
+
+            const {result} = renderHook(() => usePickupShipment())
+
+            const basketId = 'basket-123'
+            const shippingMethodId = 'standard-shipping'
+            const throwOnError = true
+
+            await expect(
+                result.current.updateRegularShippingMethod(basketId, shippingMethodId, throwOnError)
+            ).rejects.toThrow('Regular shipping mutation failed')
+        })
+    })
+
+    describe('getDefaultShippingMethodId', () => {
+        test('returns default shipping method ID when found', () => {
+            const {result} = renderHook(() => usePickupShipment())
+
+            const shippingMethods = {
+                defaultShippingMethodId: 'standard-shipping'
+            }
+
+            const defaultMethodId = result.current.getDefaultShippingMethodId(shippingMethods)
+
+            expect(defaultMethodId).toBe('standard-shipping')
+        })
+
+        test('returns null when defaultShippingMethodId is missing', () => {
+            const {result} = renderHook(() => usePickupShipment())
+
+            const shippingMethods = {}
+
+            const defaultMethodId = result.current.getDefaultShippingMethodId(shippingMethods)
+
+            expect(defaultMethodId).toBeNull()
+        })
+
+        test('returns null when shippingMethods is null', () => {
+            const {result} = renderHook(() => usePickupShipment())
+
+            const defaultMethodId = result.current.getDefaultShippingMethodId(null)
+
+            expect(defaultMethodId).toBeNull()
+        })
+    })
+
+    describe('isCurrentShippingMethodPickup', () => {
+        test('returns true when shipping method has c_storePickupEnabled = true', () => {
+            const {result} = renderHook(() => usePickupShipment())
+
+            const shippingMethod = {
+                id: 'pickup-method',
+                c_storePickupEnabled: true
+            }
+
+            const isPickup = result.current.isCurrentShippingMethodPickup(shippingMethod)
+
+            expect(isPickup).toBe(true)
+        })
+
+        test('returns false when shipping method has c_storePickupEnabled = false', () => {
+            const {result} = renderHook(() => usePickupShipment())
+
+            const shippingMethod = {
+                id: 'standard-shipping',
+                c_storePickupEnabled: false
+            }
+
+            const isPickup = result.current.isCurrentShippingMethodPickup(shippingMethod)
+
+            expect(isPickup).toBe(false)
+        })
+
+        test('returns false when shipping method has no c_storePickupEnabled property', () => {
+            const {result} = renderHook(() => usePickupShipment())
+
+            const shippingMethod = {
+                id: 'standard-shipping'
+            }
+
+            const isPickup = result.current.isCurrentShippingMethodPickup(shippingMethod)
+
+            expect(isPickup).toBe(false)
+        })
+
+        test('returns false when shipping method is null', () => {
+            const {result} = renderHook(() => usePickupShipment())
+
+            const isPickup = result.current.isCurrentShippingMethodPickup(null)
+
+            expect(isPickup).toBe(false)
+        })
+    })
+
+    describe('hook initialization with basket parameter', () => {
+        test('initializes hook with basket parameter', () => {
+            const basket = {
+                basketId: 'test-basket-123'
+            }
+
+            const {result} = renderHook(() => usePickupShipment(basket))
+
+            // Verify that all expected functions are returned
+            expect(result.current.updatePickupShipment).toBeDefined()
+            expect(result.current.updateRegularShippingMethod).toBeDefined()
+            expect(result.current.configureDefaultShipmentIfNeeded).toBeDefined()
+            expect(result.current.hasPickupItems).toBeDefined()
+            expect(result.current.addInventoryIdsToPickupItems).toBeDefined()
+            expect(result.current.getPickupShippingMethodId).toBeDefined()
+            expect(result.current.getDefaultShippingMethodId).toBeDefined()
+            expect(result.current.isCurrentShippingMethodPickup).toBeDefined()
+            expect(result.current.updateShipmentForBasketMutation).toBeDefined()
+        })
+
+        test('initializes hook without basket parameter', () => {
+            const {result} = renderHook(() => usePickupShipment())
+
+            // Verify that all expected functions are returned
+            expect(result.current.updatePickupShipment).toBeDefined()
+            expect(result.current.updateRegularShippingMethod).toBeDefined()
+            expect(result.current.configureDefaultShipmentIfNeeded).toBeDefined()
+            expect(result.current.hasPickupItems).toBeDefined()
+            expect(result.current.addInventoryIdsToPickupItems).toBeDefined()
+            expect(result.current.getPickupShippingMethodId).toBeDefined()
+            expect(result.current.getDefaultShippingMethodId).toBeDefined()
+            expect(result.current.isCurrentShippingMethodPickup).toBeDefined()
+            expect(result.current.updateShipmentForBasketMutation).toBeDefined()
         })
     })
 })

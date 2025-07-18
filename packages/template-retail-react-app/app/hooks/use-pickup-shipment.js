@@ -104,7 +104,9 @@ export const usePickupShipment = (basket) => {
                     shippingMethod: {
                         id: pickupShippingMethodId
                     },
-                    c_fromStoreId: storeInfo.id
+                    c_fromStoreId: storeInfo.id,
+                    // Clear shipping address if any. This will be set correctly during checkout
+                    shippingAddress: {}
                 }
             })
         } catch (error) {
@@ -139,7 +141,9 @@ export const usePickupShipment = (basket) => {
                     shippingMethod: {
                         id: shippingMethodId
                     },
-                    c_fromStoreId: null
+                    c_fromStoreId: null,
+                    // Clear shipping address if any. This will be set correctly during checkout
+                    shippingAddress: {}
                 }
             })
         } catch (error) {
@@ -230,17 +234,6 @@ export const usePickupShipment = (basket) => {
             (hasAnyPickupSelected && !isCurrentlyPickup) ||
             (!hasAnyPickupSelected && isCurrentlyPickup)
         ) {
-            // Clear shipping address when there's a mismatch by updating shipment without shippingAddress
-            await updateShipmentForBasketMutation.mutateAsync({
-                parameters: {
-                    basketId: basketResponse.basketId,
-                    shipmentId: 'me'
-                },
-                body: {
-                    shippingAddress: {}
-                }
-            })
-
             // Fetch shipping methods to get available options
             const {data: fetchedShippingMethods} = await refetchShippingMethods()
 
