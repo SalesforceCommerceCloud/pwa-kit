@@ -11,11 +11,16 @@ This file contains test cases to verify that the `unit-tests-template-retail-rea
 ## Test Cases
 
 ### Test 1: DrawerMenu Component Test Generation
+**Workflow:** Generate → Analyze → Cleanup (NO test execution)
+
 **Steps:**
-- Create new test file `drawer-menu-underTest.test.js` (colocated with existing drawer-menu component at `packages/template-retail-react-app/app/components/drawer-menu/`)
-- Use Claude 3.5 for generation
-- Apply rules: `@/testing` (located at `.cursor/rules/testing/unit-tests-generic.mdc` and `.cursor/rules/testing/unit-tests-template-retail-react-app.mdc`)
-- Prompt: "Write unit test for drawer-menu component"
+1. **Generate:** Create new test file `drawer-menu-underTest.test.js` (colocated with existing drawer-menu component at `packages/template-retail-react-app/app/components/drawer-menu/`)
+2. **Apply Rules:** Use `@/testing` (located at `.cursor/rules/testing/unit-tests-generic.mdc` and `.cursor/rules/testing/unit-tests-template-retail-react-app.mdc`)
+3. **Prompt:** "Write unit test for drawer-menu component"
+4. **Analyze:** Perform static code analysis against verification patterns (see below)
+5. **Cleanup:** Delete the generated test file after validation
+
+**Important:** DO NOT run the test after creation - skip test execution entirely
 
 **Verify that the newly generated test file follows these patterns:**
 1. Test Setup
@@ -44,7 +49,7 @@ This file contains test cases to verify that the `unit-tests-template-retail-rea
 - Not using async/await for user interactions
 
 **Expected Output:**
-Provide a clear, structured report with:
+Provide a clear, structured report based on **static code analysis only** (no test execution):
 - ✅ **PASS** or ❌ **FAIL** for each verification point
 - Specific line numbers and code snippets for any failures
 - Summary: `X/Y patterns followed correctly`
