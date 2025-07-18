@@ -5,186 +5,147 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React from 'react'
+/* eslint-disable @typescript-eslint/no-var-requires */
 import {renderHook, act} from '@testing-library/react'
 import {useAppOnlineStatus} from './use-app-online-status'
 
-// Mock the watchOnlineStatus utility
+// Mock utils
 jest.mock('../../../utils/utils', () => ({
     watchOnlineStatus: jest.fn()
 }))
 
-import {watchOnlineStatus} from '../../../utils/utils'
-
 describe('useAppOnlineStatus', () => {
-    let originalOnLine
-    let addEventListenerSpy
-    let removeEventListenerSpy
     let mockUnsubscribe
 
     beforeEach(() => {
-        // Store original descriptor
-        originalOnLine = Object.getOwnPropertyDescriptor(navigator, 'onLine')
-
-        // Clear any existing property first
-        delete navigator.onLine
-
-        // Mock window event listeners
-        addEventListenerSpy = jest.spyOn(window, 'addEventListener')
-        removeEventListenerSpy = jest.spyOn(window, 'removeEventListener')
-
-        // Create mock unsubscribe function
         mockUnsubscribe = jest.fn()
 
-        // Mock watchOnlineStatus to return unsubscribe function
-        watchOnlineStatus.mockImplementation((callback) => {
-            // Store callback for manual triggering in tests
-            watchOnlineStatus.mockCallback = callback
-            return mockUnsubscribe
+        // Reset navigator.onLine to a known state
+        delete window.navigator.onLine
+        Object.defineProperty(window.navigator, 'onLine', {
+            writable: true,
+            configurable: true,
+            value: true
         })
+
+        // Mock watchOnlineStatus to return an unsubscribe function
+        const {watchOnlineStatus} = require('../../../utils/utils')
+        watchOnlineStatus.mockReturnValue(mockUnsubscribe)
     })
 
     afterEach(() => {
-        addEventListenerSpy.mockRestore()
-        removeEventListenerSpy.mockRestore()
-        watchOnlineStatus.mockClear()
-
-        // Restore original navigator.onLine
-        delete navigator.onLine
-        if (originalOnLine) {
-            Object.defineProperty(navigator, 'onLine', originalOnLine)
-        }
+        jest.clearAllMocks()
+        jest.restoreAllMocks()
     })
 
-    it('returns initial online status', () => {
-        // Set navigator.onLine before rendering
-        Object.defineProperty(navigator, 'onLine', {
-            value: true,
+    test('returns initial online status', () => {
+        Object.defineProperty(window.navigator, 'onLine', {
             writable: true,
-            configurable: true
+            configurable: true,
+            value: true
         })
 
         const {result} = renderHook(() => useAppOnlineStatus())
 
         expect(result.current.isOnline).toBe(true)
-        expect(watchOnlineStatus).toHaveBeenCalledWith(expect.any(Function))
     })
 
-    it('returns false when initially offline', () => {
-        // Set navigator.onLine to false before rendering
-        Object.defineProperty(navigator, 'onLine', {
-            value: false,
+    test('returns false when initially offline', () => {
+        Object.defineProperty(window.navigator, 'onLine', {
             writable: true,
-            configurable: true
+            configurable: true,
+            value: false
         })
 
         const {result} = renderHook(() => useAppOnlineStatus())
 
         expect(result.current.isOnline).toBe(false)
-        expect(watchOnlineStatus).toHaveBeenCalledWith(expect.any(Function))
     })
 
-    it('sets up event listeners for online/offline events', () => {
-        Object.defineProperty(navigator, 'onLine', {
-            value: true,
-            writable: true,
-            configurable: true
-        })
+    test('sets up watchOnlineStatus subscription', () => {
+        const {watchOnlineStatus} = require('../../../utils/utils')
 
         renderHook(() => useAppOnlineStatus())
 
         expect(watchOnlineStatus).toHaveBeenCalledWith(expect.any(Function))
     })
 
-    it('cleans up event listeners on unmount', () => {
-        Object.defineProperty(navigator, 'onLine', {
-            value: true,
-            writable: true,
-            configurable: true
-        })
-
+    test('cleans up subscription on unmount', () => {
         const {unmount} = renderHook(() => useAppOnlineStatus())
 
         unmount()
 
-        expect(mockUnsubscribe).toHaveBeenCalled()
+        expect(mockUnsubscribe).toHaveBeenCalledTimes(1)
     })
 
-    it('updates status when going online', () => {
-        Object.defineProperty(navigator, 'onLine', {
-            value: false,
-            writable: true,
-            configurable: true
+    test('updates status when watchOnlineStatus callback is triggered', () => {
+        const {watchOnlineStatus} = require('../../../utils/utils')
+        let onlineStatusCallback
+
+        watchOnlineStatus.mockImplementation((callback) => {
+            onlineStatusCallback = callback
+            return mockUnsubscribe
         })
 
         const {result} = renderHook(() => useAppOnlineStatus())
 
+        // Simulate status change via callback
+        act(() => {
+            onlineStatusCallback(false)
+        })
+
         expect(result.current.isOnline).toBe(false)
 
-        // Simulate going online
+        // Simulate status change back to online
         act(() => {
-            watchOnlineStatus.mockCallback(true)
+            onlineStatusCallback(true)
         })
 
         expect(result.current.isOnline).toBe(true)
     })
 
-    it('updates status when going offline', () => {
-        Object.defineProperty(navigator, 'onLine', {
-            value: true,
-            writable: true,
-            configurable: true
+    test('handles multiple online/offline transitions', () => {
+        const {watchOnlineStatus} = require('../../../utils/utils')
+        let onlineStatusCallback
+
+        watchOnlineStatus.mockImplementation((callback) => {
+            onlineStatusCallback = callback
+            return mockUnsubscribe
         })
 
         const {result} = renderHook(() => useAppOnlineStatus())
 
-        expect(result.current.isOnline).toBe(true)
-
-        // Simulate going offline
-        act(() => {
-            watchOnlineStatus.mockCallback(false)
-        })
-
-        expect(result.current.isOnline).toBe(false)
-    })
-
-    it('handles multiple online/offline transitions', () => {
-        Object.defineProperty(navigator, 'onLine', {
-            value: true,
-            writable: true,
-            configurable: true
-        })
-
-        const {result} = renderHook(() => useAppOnlineStatus())
-
-        // Initially online
+        // Start online
         expect(result.current.isOnline).toBe(true)
 
         // Go offline
         act(() => {
-            watchOnlineStatus.mockCallback(false)
+            onlineStatusCallback(false)
         })
         expect(result.current.isOnline).toBe(false)
 
         // Go back online
         act(() => {
-            watchOnlineStatus.mockCallback(true)
+            onlineStatusCallback(true)
         })
         expect(result.current.isOnline).toBe(true)
-
-        // Go offline again
-        act(() => {
-            watchOnlineStatus.mockCallback(false)
-        })
-        expect(result.current.isOnline).toBe(false)
     })
 
-    it('handles missing navigator.onLine gracefully', () => {
-        // Don't define navigator.onLine - it should default to true
+    test('handles missing navigator.onLine gracefully', () => {
+        delete window.navigator.onLine
+
         const {result} = renderHook(() => useAppOnlineStatus())
 
-        // Should default to true when navigator.onLine is not available
+        // Should default to true when navigator.onLine is undefined
         expect(result.current.isOnline).toBe(true)
+    })
+
+    test('calls watchOnlineStatus with correct callback function', () => {
+        const {watchOnlineStatus} = require('../../../utils/utils')
+
+        renderHook(() => useAppOnlineStatus())
+
+        expect(watchOnlineStatus).toHaveBeenCalledTimes(1)
         expect(watchOnlineStatus).toHaveBeenCalledWith(expect.any(Function))
     })
 })

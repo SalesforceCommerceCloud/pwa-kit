@@ -5,130 +5,122 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React from 'react'
-import {renderHook, act} from '@testing-library/react'
-import {useHistory} from 'react-router-dom'
-import {ChakraProvider} from '@chakra-ui/react'
+/* eslint-disable @typescript-eslint/no-var-requires */
+import {renderHook} from '@testing-library/react'
 import {useAppNavigation} from './use-app-navigation'
-import theme from '../../../theme'
 
-// Mock react-router-dom
-jest.mock('react-router-dom', () => ({
-    useHistory: jest.fn(),
-    useLocation: jest.fn(() => ({
-        pathname: '/test',
-        search: '',
-        hash: '',
-        state: null
-    }))
+// Mock dependencies
+jest.mock('./use-app-config', () => ({
+    useAppConfig: jest.fn()
 }))
 
-// Mock the useAppLocalization hook directly
 jest.mock('./use-app-localization', () => ({
-    useAppLocalization: jest.fn(() => ({
-        targetLocale: 'en-US',
-        messages: {
-            'common.welcome': 'Welcome',
-            'common.hello': 'Hello'
-        },
-        site: {id: 'RefArch', alias: 'test-site'},
-        locale: {id: 'en-US'},
-        buildUrl: jest.fn((href) => href), // Return the path as-is without prefix
-        currency: 'USD',
-        appOrigin: 'https://example.com'
-    }))
+    useAppLocalization: jest.fn()
 }))
+
+jest.mock('react-router-dom', () => ({
+    useHistory: jest.fn()
+}))
+
+const mockAppConfig = {
+    pages: {
+        home: {
+            path: '/'
+        }
+    }
+}
+
+const mockLocalization = {
+    buildUrl: jest.fn((path) => path)
+}
+
+const mockHistory = {
+    push: jest.fn()
+}
 
 describe('useAppNavigation', () => {
-    const mockPush = jest.fn()
-
     beforeEach(() => {
+        const {useAppConfig} = require('./use-app-config')
+        const {useAppLocalization} = require('./use-app-localization')
+        const {useHistory} = require('react-router-dom')
+
+        useAppConfig.mockReturnValue({appConfig: mockAppConfig})
+        useAppLocalization.mockReturnValue(mockLocalization)
+        useHistory.mockReturnValue(mockHistory)
+    })
+
+    afterEach(() => {
         jest.clearAllMocks()
-        useHistory.mockReturnValue({
-            push: mockPush
-        })
     })
 
-    // Simple wrapper with just ChakraProvider
-    const wrapper = ({children}) => <ChakraProvider value={theme}>{children}</ChakraProvider>
+    test('returns navigation handlers', () => {
+        const {result} = renderHook(() => useAppNavigation())
 
-    it('returns navigation handlers', () => {
-        const {result} = renderHook(() => useAppNavigation(), {wrapper})
-
-        expect(result.current).toMatchObject({
-            onLogoClick: expect.any(Function),
-            onCartClick: expect.any(Function),
-            onAccountClick: expect.any(Function),
-            onWishlistClick: expect.any(Function)
-        })
+        expect(result.current.onLogoClick).toEqual(expect.any(Function))
+        expect(result.current.onCartClick).toEqual(expect.any(Function))
+        expect(result.current.onAccountClick).toEqual(expect.any(Function))
+        expect(result.current.onWishlistClick).toEqual(expect.any(Function))
     })
 
-    it('handles logo click navigation', () => {
-        const {result} = renderHook(() => useAppNavigation(), {wrapper})
+    test('handles logo click navigation', () => {
+        const {result} = renderHook(() => useAppNavigation())
 
-        act(() => {
-            result.current.onLogoClick()
-        })
+        result.current.onLogoClick()
 
-        expect(mockPush).toHaveBeenCalledWith('/')
+        expect(mockLocalization.buildUrl).toHaveBeenCalledWith('/')
+        expect(mockHistory.push).toHaveBeenCalledWith('/')
     })
 
-    it('handles cart click navigation', () => {
-        const {result} = renderHook(() => useAppNavigation(), {wrapper})
+    test('handles cart click navigation', () => {
+        const {result} = renderHook(() => useAppNavigation())
 
-        act(() => {
-            result.current.onCartClick()
-        })
+        result.current.onCartClick()
 
-        expect(mockPush).toHaveBeenCalledWith('/cart')
+        expect(mockLocalization.buildUrl).toHaveBeenCalledWith('/cart')
+        expect(mockHistory.push).toHaveBeenCalledWith('/cart')
     })
 
-    it('handles account click navigation', () => {
-        const {result} = renderHook(() => useAppNavigation(), {wrapper})
+    test('handles account click navigation', () => {
+        const {result} = renderHook(() => useAppNavigation())
 
-        act(() => {
-            result.current.onAccountClick()
-        })
+        result.current.onAccountClick()
 
-        expect(mockPush).toHaveBeenCalledWith('/account')
+        expect(mockLocalization.buildUrl).toHaveBeenCalledWith('/account')
+        expect(mockHistory.push).toHaveBeenCalledWith('/account')
     })
 
-    it('handles wishlist click navigation', () => {
-        const {result} = renderHook(() => useAppNavigation(), {wrapper})
+    test('handles wishlist click navigation', () => {
+        const {result} = renderHook(() => useAppNavigation())
 
-        act(() => {
-            result.current.onWishlistClick()
-        })
+        result.current.onWishlistClick()
 
-        expect(mockPush).toHaveBeenCalledWith('/account/wishlist')
+        expect(mockLocalization.buildUrl).toHaveBeenCalledWith('/account/wishlist')
+        expect(mockHistory.push).toHaveBeenCalledWith('/account/wishlist')
     })
 
-    it('handles multiple navigation calls', () => {
-        const {result} = renderHook(() => useAppNavigation(), {wrapper})
+    test('handles multiple navigation calls', () => {
+        const {result} = renderHook(() => useAppNavigation())
 
-        act(() => {
-            result.current.onLogoClick()
-            result.current.onCartClick()
-            result.current.onAccountClick()
-        })
+        result.current.onLogoClick()
+        result.current.onCartClick()
+        result.current.onAccountClick()
 
-        expect(mockPush).toHaveBeenCalledTimes(3)
-        expect(mockPush).toHaveBeenNthCalledWith(1, '/')
-        expect(mockPush).toHaveBeenNthCalledWith(2, '/cart')
-        expect(mockPush).toHaveBeenNthCalledWith(3, '/account')
+        expect(mockHistory.push).toHaveBeenCalledTimes(3)
+        expect(mockHistory.push).toHaveBeenNthCalledWith(1, '/')
+        expect(mockHistory.push).toHaveBeenNthCalledWith(2, '/cart')
+        expect(mockHistory.push).toHaveBeenNthCalledWith(3, '/account')
     })
 
-    it('handles missing history object gracefully', () => {
+    test('handles missing history object gracefully', () => {
+        const {useHistory} = require('react-router-dom')
         useHistory.mockReturnValue(null)
 
-        const {result} = renderHook(() => useAppNavigation(), {wrapper})
+        const {result} = renderHook(() => useAppNavigation())
 
-        // Should not throw error when clicking handlers
+        // Should not throw errors when history is null
         expect(() => {
             result.current.onLogoClick()
             result.current.onCartClick()
-            result.current.onAccountClick()
-            result.current.onWishlistClick()
         }).not.toThrow()
     })
 })

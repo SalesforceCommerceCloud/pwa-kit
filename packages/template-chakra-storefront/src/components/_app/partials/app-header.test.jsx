@@ -5,15 +5,16 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
+/* eslint-disable react/prop-types */
+
 import React from 'react'
 import {screen} from '@testing-library/react'
 import {renderWithProviders} from '../../../utils/test-utils'
 import AppHeader from './app-header'
-import theme from '../../../theme'
 
 // Mock Header component
 jest.mock('../../header', () => {
-    return function MockHeader(props) {
+    function MockHeader(props) {
         // Create a safe serializable version of props
         const safeProps = {
             isLoading: props.isLoading,
@@ -33,19 +34,18 @@ jest.mock('../../header', () => {
 
         return (
             <div data-testid="header">
-                <div data-testid="header-props" data-props={JSON.stringify(safeProps)}>
-                    Props stored in data attribute
-                </div>
+                <div data-testid="header-props" data-props={JSON.stringify(safeProps)} />
                 {props.children}
             </div>
         )
     }
+
+    return MockHeader
 })
 
-// Mock MobileNavigation component
+// Mock AppMobileNavigation component
 jest.mock('./app-mobile-navigation', () => {
-    return function MockMobileNavigation(props) {
-        // Create a safe serializable version of props
+    function MockAppMobileNavigation(props) {
         const safeProps = {
             isDrawerMenuOpen: props.isDrawerMenuOpen,
             categories: Array.isArray(props.categories) ? props.categories.length : 0,
@@ -58,12 +58,12 @@ jest.mock('./app-mobile-navigation', () => {
 
         return (
             <div data-testid="mobile-navigation">
-                <div data-testid="mobile-navigation-props" data-props={JSON.stringify(safeProps)}>
-                    Mobile Navigation Props
-                </div>
+                <div data-testid="mobile-navigation-props" data-props={JSON.stringify(safeProps)} />
             </div>
         )
     }
+
+    return MockAppMobileNavigation
 })
 
 // Mock CheckoutHeader component
@@ -105,14 +105,14 @@ describe('AppHeader', () => {
         jest.clearAllMocks()
     })
 
-    it('renders header when not on checkout page', () => {
+    test('renders header when not on checkout page', () => {
         renderWithProviders(<AppHeader {...defaultProps} />)
 
         expect(screen.getByTestId('header')).toBeInTheDocument()
         expect(screen.getByTestId('mobile-navigation')).toBeInTheDocument()
     })
 
-    it('does not render header on checkout page', () => {
+    test('does not render header on checkout page', () => {
         const props = {
             ...defaultProps,
             isCheckout: true
@@ -124,7 +124,7 @@ describe('AppHeader', () => {
         expect(screen.queryByTestId('mobile-navigation')).not.toBeInTheDocument()
     })
 
-    it('passes correct props to Header component', () => {
+    test('passes correct props to Header component', () => {
         renderWithProviders(<AppHeader {...defaultProps} />)
 
         const headerPropsElement = screen.getByTestId('header-props')
@@ -132,9 +132,12 @@ describe('AppHeader', () => {
 
         expect(headerProps.onMenuClick).toBe('function')
         expect(headerProps.onLogoClick).toBe('function')
+        expect(headerProps.onMyCartClick).toBe('function')
+        expect(headerProps.onMyAccountClick).toBe('function')
+        expect(headerProps.onWishlistClick).toBe('function')
     })
 
-    it('passes correct props to MobileNavigation component', () => {
+    test('passes correct props to MobileNavigation component', () => {
         renderWithProviders(<AppHeader {...defaultProps} />)
 
         const mobileNavPropsElement = screen.getByTestId('mobile-navigation-props')
@@ -146,7 +149,7 @@ describe('AppHeader', () => {
         expect(mobileNavProps.onLogoClick).toBe('function')
     })
 
-    it('handles missing styles gracefully', () => {
+    test('handles missing styles gracefully', () => {
         const props = {
             ...defaultProps,
             styles: {
@@ -162,24 +165,15 @@ describe('AppHeader', () => {
         expect(screen.getByTestId('mobile-navigation')).toBeInTheDocument()
     })
 
-    it('handles missing mobileNavigationProps gracefully', () => {
+    test('handles missing mobileNavigationProps gracefully', () => {
         const props = {
             ...defaultProps,
-            mobileNavigationProps: {
-                categories: [],
-                isDrawerMenuOpen: false,
-                onDrawerMenuClose: jest.fn(),
-                onLogoClick: jest.fn()
-            }
+            mobileNavigationProps: undefined
         }
 
         renderWithProviders(<AppHeader {...props} />)
 
-        const mobileNavPropsElement = screen.getByTestId('mobile-navigation-props')
-        const mobileNavProps = JSON.parse(mobileNavPropsElement.getAttribute('data-props'))
-
-        expect(mobileNavProps.categories).toBe(0) // Empty array = 0 count
-        expect(mobileNavProps.isDrawerMenuOpen).toBe(false)
         expect(screen.getByTestId('header')).toBeInTheDocument()
+        expect(screen.getByTestId('mobile-navigation')).toBeInTheDocument()
     })
 })

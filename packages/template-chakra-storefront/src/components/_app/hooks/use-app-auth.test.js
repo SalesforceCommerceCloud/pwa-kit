@@ -67,17 +67,16 @@ describe('useAppAuth', () => {
 
     test('returns correct structure when auth modal is open', () => {
         const {useAuthModal} = require('../../../hooks/use-auth-modal')
-        const openAuthModal = {
-            ...mockAuthModal,
+        useAuthModal.mockReturnValue({
             isOpen: true,
-            initialView: 'register'
-        }
-
-        useAuthModal.mockReturnValue(openAuthModal)
+            onOpen: jest.fn(),
+            onClose: jest.fn()
+        })
 
         const {result} = renderHook(() => useAppAuth())
 
         expect(result.current.authModal.isOpen).toBe(true)
-        expect(result.current.authModal.initialView).toBe('register')
+        expect(result.current.authModal.onOpen).toEqual(expect.any(Function))
+        expect(result.current.authModal.onClose).toEqual(expect.any(Function))
     })
 })

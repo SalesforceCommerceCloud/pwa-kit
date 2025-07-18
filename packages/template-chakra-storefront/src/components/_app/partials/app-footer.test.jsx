@@ -25,34 +25,45 @@ jest.mock('../../../pages/checkout/partials/checkout-footer', () => {
 })
 
 describe('AppFooter', () => {
-    it('renders footer when not on checkout page', () => {
-        renderWithProviders(<AppFooter isCheckout={false} />)
+    const defaultProps = {
+        isCheckout: false
+    }
+
+    beforeEach(() => {
+        jest.clearAllMocks()
+    })
+
+    test('renders footer when not on checkout page', () => {
+        renderWithProviders(<AppFooter {...defaultProps} />)
 
         expect(screen.getByTestId('footer')).toBeInTheDocument()
         expect(screen.queryByTestId('checkout-footer')).not.toBeInTheDocument()
     })
 
-    it('does not render footer on checkout page', () => {
-        renderWithProviders(<AppFooter isCheckout={true} />)
+    test('does not render footer on checkout page', () => {
+        const props = {...defaultProps, isCheckout: true}
+        renderWithProviders(<AppFooter {...props} />)
 
-        expect(screen.queryByTestId('footer')).not.toBeInTheDocument()
         expect(screen.getByTestId('checkout-footer')).toBeInTheDocument()
+        expect(screen.queryByTestId('footer')).not.toBeInTheDocument()
     })
 
-    it('renders footer by default when isCheckout prop is not provided', () => {
+    test('renders footer by default when isCheckout prop is not provided', () => {
         renderWithProviders(<AppFooter />)
 
         expect(screen.getByTestId('footer')).toBeInTheDocument()
     })
 
-    it('handles undefined isCheckout prop gracefully', () => {
-        renderWithProviders(<AppFooter isCheckout={undefined} />)
+    test('handles undefined isCheckout prop gracefully', () => {
+        const props = {...defaultProps, isCheckout: undefined}
+        renderWithProviders(<AppFooter {...props} />)
 
         expect(screen.getByTestId('footer')).toBeInTheDocument()
     })
 
-    it('handles null isCheckout prop gracefully', () => {
-        renderWithProviders(<AppFooter isCheckout={null} />)
+    test('handles null isCheckout prop gracefully', () => {
+        const props = {...defaultProps, isCheckout: null}
+        renderWithProviders(<AppFooter {...props} />)
 
         expect(screen.getByTestId('footer')).toBeInTheDocument()
     })

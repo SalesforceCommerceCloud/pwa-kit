@@ -21,7 +21,7 @@ export const useAppModals = () => {
     const dntNotification = useDntNotification()
 
     const {
-        open: isDrawerMenuOpen,
+        isOpen: isDrawerMenuOpen,
         onOpen: onDrawerMenuOpen,
         onClose: onDrawerMenuClose
     } = useDisclosure()

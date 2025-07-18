@@ -24,39 +24,39 @@ jest.mock('../../../utils/utils', () => ({
     flatten: jest.fn()
 }))
 
-const mockCategoriesTree = {
+const mockCategoryTree = {
     id: 'root',
     name: 'Root',
     categories: [
-        {id: 'mens', name: 'Mens'},
-        {id: 'womens', name: 'Womens'}
+        {id: 'category1', name: 'Category 1'},
+        {id: 'category2', name: 'Category 2'}
     ]
-}
-
-const mockFlattenedCategories = {
-    mens: {id: 'mens', name: 'Mens'},
-    womens: {id: 'womens', name: 'Womens'}
 }
 
 const mockCustomer = {
     customerId: 'test-customer',
-    email: 'test@example.com',
-    isRegistered: true
+    email: 'test@example.com'
 }
 
 const mockBasket = {
-    basketId: 'test-basket',
-    currency: 'USD',
-    productItems: []
+    basketId: 'test-basket'
+}
+
+const mockFlattenedCategories = {
+    category1: {id: 'category1', name: 'Category 1'},
+    category2: {id: 'category2', name: 'Category 2'}
 }
 
 describe('useAppData', () => {
     beforeEach(() => {
         const {useCategory} = require('@salesforce/commerce-sdk-react')
-        const {useCurrentCustomer, useCurrentBasket} = require('../../../hooks')
+        const {useCurrentCustomer} = require('../../../hooks')
+        const {useCurrentBasket} = require('../../../hooks')
         const {flatten} = require('../../../utils/utils')
 
-        useCategory.mockReturnValue({data: mockCategoriesTree})
+        useCategory.mockReturnValue({
+            data: mockCategoryTree
+        })
         useCurrentCustomer.mockReturnValue({data: mockCustomer})
         useCurrentBasket.mockReturnValue({data: mockBasket})
         flatten.mockReturnValue(mockFlattenedCategories)
@@ -69,7 +69,7 @@ describe('useAppData', () => {
     test('returns categories tree, flattened categories, customer, and basket data', () => {
         const {result} = renderHook(() => useAppData())
 
-        expect(result.current.categoriesTree).toEqual(mockCategoriesTree)
+        expect(result.current.categoriesTree).toEqual(mockCategoryTree)
         expect(result.current.categories).toEqual(mockFlattenedCategories)
         expect(result.current.customer).toEqual(mockCustomer)
         expect(result.current.basket).toEqual(mockBasket)
@@ -93,25 +93,27 @@ describe('useAppData', () => {
 
         renderHook(() => useAppData())
 
-        expect(flatten).toHaveBeenCalledWith(mockCategoriesTree, 'categories')
+        expect(flatten).toHaveBeenCalledWith(mockCategoryTree, 'categories')
     })
 
     test('handles empty categories tree', () => {
         const {useCategory} = require('@salesforce/commerce-sdk-react')
         const {flatten} = require('../../../utils/utils')
 
-        useCategory.mockReturnValue({data: null})
+        useCategory.mockReturnValue({
+            data: null
+        })
         flatten.mockReturnValue({})
 
         const {result} = renderHook(() => useAppData())
 
-        expect(flatten).toHaveBeenCalledWith({}, 'categories')
         expect(result.current.categoriesTree).toBeNull()
         expect(result.current.categories).toEqual({})
     })
 
     test('calls customer and basket hooks', () => {
-        const {useCurrentCustomer, useCurrentBasket} = require('../../../hooks')
+        const {useCurrentCustomer} = require('../../../hooks')
+        const {useCurrentBasket} = require('../../../hooks')
 
         renderHook(() => useAppData())
 

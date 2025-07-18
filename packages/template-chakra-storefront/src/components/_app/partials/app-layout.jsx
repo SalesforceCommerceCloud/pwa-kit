@@ -22,7 +22,7 @@ const AppLayout = ({children, isOnline, headerComponent, footerComponent, modals
     return (
         <>
             <ScrollToTop />
-            <Box id="app" display="flex" flexDirection="column" flex={1}>
+            <Box id="app" display="flex" flexDirection="column" flex={1} data-testid="app-layout">
                 <SkipNavLink zIndex="skipLink">Skip to Content</SkipNavLink>
 
                 {/* Header */}

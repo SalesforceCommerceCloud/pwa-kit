@@ -7,7 +7,7 @@
 
 import React from 'react'
 import {render, screen} from '@testing-library/react'
-import {renderWithProviders} from '../../../utils/test-utils'
+import {StorefrontPreview} from '@salesforce/commerce-sdk-react/components'
 import AppProviders from './app-providers'
 
 // Mock components
@@ -46,7 +46,7 @@ describe('AppProviders', () => {
         jest.clearAllMocks()
     })
 
-    it('renders children correctly', () => {
+    test('renders children correctly', () => {
         render(
             <AppProviders {...defaultProps}>
                 <MockChild />
@@ -56,9 +56,7 @@ describe('AppProviders', () => {
         expect(screen.getByText('Test Child')).toBeInTheDocument()
     })
 
-    it('sets up StorefrontPreview with correct props', () => {
-        const {StorefrontPreview} = require('@salesforce/commerce-sdk-react/components')
-
+    test('sets up StorefrontPreview with correct props', () => {
         render(
             <AppProviders {...defaultProps}>
                 <MockChild />
@@ -73,7 +71,7 @@ describe('AppProviders', () => {
         )
     })
 
-    it('sets up IntlProvider with correct locale and messages', () => {
+    test('sets up IntlProvider with correct locale and messages', () => {
         render(
             <AppProviders {...defaultProps}>
                 <MockChild />
@@ -84,7 +82,7 @@ describe('AppProviders', () => {
         expect(screen.getByText('Test Child')).toBeInTheDocument()
     })
 
-    it('provides ChakraProvider for styling', () => {
+    test('provides ChakraProvider for styling', () => {
         render(
             <AppProviders {...defaultProps}>
                 <MockChild />
@@ -94,7 +92,7 @@ describe('AppProviders', () => {
         expect(screen.getByTestId('storefront-preview')).toBeInTheDocument()
     })
 
-    it('handles missing messages gracefully', () => {
+    test('handles missing messages gracefully', () => {
         const props = {
             ...defaultProps,
             messages: undefined
@@ -109,7 +107,7 @@ describe('AppProviders', () => {
         expect(screen.getByText('Test Child')).toBeInTheDocument()
     })
 
-    it('handles different currencies', () => {
+    test('handles different currencies', () => {
         const props = {
             ...defaultProps,
             currency: 'EUR'
@@ -121,6 +119,6 @@ describe('AppProviders', () => {
             </AppProviders>
         )
 
-        expect(screen.getByText('Test Child')).toBeInTheDocument()
+        expect(screen.getByTestId('currency-provider')).toBeInTheDocument()
     })
 })
