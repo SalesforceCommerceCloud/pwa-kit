@@ -181,7 +181,7 @@ const ShippingMultiAddress = ({
                     })}
                 >
                     <VStack spacing={2}>
-                        {basket.productItems.map((item, idx) => {
+                        {basket.productItems.map((item) => {
                             // Merge product details into item
                             const productDetail = productsMap[item.productId] || {}
                             const variant = {...item, ...productDetail}
@@ -191,7 +191,7 @@ const ShippingMultiAddress = ({
                                 selectedVariationAttributes: variant.variationValues
                             })?.images?.[0]
                             const imageUrl = image?.disBaseLink || image?.link || ''
-                            const addressKey = item.productId + '-' + idx
+                            const addressKey = item.itemId
                             const selectedAddressId =
                                 selectedAddresses[addressKey] || addresses[0]?.addressId
 
