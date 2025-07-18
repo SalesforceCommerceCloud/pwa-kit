@@ -7,7 +7,10 @@
 import React, {useState} from 'react'
 import {useProducts} from '@salesforce/commerce-sdk-react'
 import {findImageGroupBy} from '@salesforce/retail-react-app/app/utils/image-groups-utils'
+import {getPriceData} from '@salesforce/retail-react-app/app/utils/product-utils'
+import DisplayPrice from '@salesforce/retail-react-app/app/components/display-price'
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
+import {useCurrency} from '@salesforce/retail-react-app/app/hooks'
 import ItemVariantProvider from '@salesforce/retail-react-app/app/components/item-variant'
 import {
     Text,
@@ -74,20 +77,26 @@ const ShippingMultiAddress = ({
     deliveryAddressLabel
 }) => {
     const {formatMessage} = useIntl()
+    const {currency} = useCurrency()
     const productIds = basket?.productItems?.map((item) => item.productId).join(',')
     const {
-        data: products,
+        data: productsMap,
         isLoading: productsLoading,
         error: productsError
     } = useProducts(
         {parameters: {ids: productIds, allImages: true}},
-        {enabled: Boolean(productIds)}
+        {
+            enabled: Boolean(productIds),
+            select: (data) => {
+                return (
+                    data?.data?.reduce((acc, p) => {
+                        acc[p.id] = p
+                        return acc
+                    }, {}) || {}
+                )
+            }
+        }
     )
-    const productsMap =
-        products?.data?.reduce((acc, p) => {
-            acc[p.id] = p
-            return acc
-        }, {}) || {}
     const {data: customer} = useCurrentCustomer()
     const addresses = customer?.addresses || []
     const [selectedAddresses, setSelectedAddresses] = useState({})
@@ -183,7 +192,7 @@ const ShippingMultiAddress = ({
                     <VStack spacing={2}>
                         {basket.productItems.map((item) => {
                             // Merge product details into item
-                            const productDetail = productsMap[item.productId] || {}
+                            const productDetail = productsMap?.[item.productId] || {}
                             const variant = {...item, ...productDetail}
                             // Use findImageGroupBy to get the image
                             const image = findImageGroupBy(productDetail.imageGroups, {
@@ -371,14 +380,12 @@ const ShippingMultiAddress = ({
                                                     defaultMessage: 'Product price'
                                                 })}
                                             >
-                                                {typeof variant.priceAfterItemDiscount ===
-                                                    'number' && (
-                                                    <Text>
-                                                        {new Intl.NumberFormat(undefined, {
-                                                            style: 'currency',
-                                                            currency: basket?.currency || 'USD'
-                                                        }).format(variant.priceAfterItemDiscount)}
-                                                    </Text>
+                                                {variant.priceAfterItemDiscount && (
+                                                    <DisplayPrice
+                                                        priceData={getPriceData(variant)}
+                                                        currency={currency}
+                                                        labelForA11y={variant.productName}
+                                                    />
                                                 )}
                                             </Box>
                                         </VStack>
@@ -475,13 +482,12 @@ const ShippingMultiAddress = ({
                                                 defaultMessage: 'Product price'
                                             })}
                                         >
-                                            {typeof variant.priceAfterItemDiscount === 'number' && (
-                                                <Text>
-                                                    {new Intl.NumberFormat(undefined, {
-                                                        style: 'currency',
-                                                        currency: basket?.currency || 'USD'
-                                                    }).format(variant.priceAfterItemDiscount)}
-                                                </Text>
+                                            {variant.priceAfterItemDiscount && (
+                                                <DisplayPrice
+                                                    priceData={getPriceData(variant)}
+                                                    currency={currency}
+                                                    labelForA11y={variant.productName}
+                                                />
                                             )}
                                         </Box>
                                     </VStack>
