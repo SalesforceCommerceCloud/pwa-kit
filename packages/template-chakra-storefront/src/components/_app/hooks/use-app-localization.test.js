@@ -7,29 +7,79 @@
 
 /* eslint-disable @typescript-eslint/no-var-requires */
 
+import React from 'react'
 import {renderHook} from '@testing-library/react'
+import {ChakraProvider} from '@chakra-ui/react'
+import {BrowserRouter} from 'react-router-dom'
+import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
 import {useAppLocalization} from './use-app-localization'
+import theme from '../../../theme'
+
+// Create a test QueryClient
+const createTestQueryClient = () =>
+    new QueryClient({
+        defaultOptions: {
+            queries: {
+                retry: false
+            }
+        }
+    })
+
+// Create wrapper for all providers
+const wrapper = ({children}) => {
+    const queryClient = createTestQueryClient()
+    return (
+        <BrowserRouter>
+            <QueryClientProvider client={queryClient}>
+                <ChakraProvider value={theme}>{children}</ChakraProvider>
+            </QueryClientProvider>
+        </BrowserRouter>
+    )
+}
 
 // Mock dependencies
+const mockBuildUrlWithAppOrigin = jest.fn(
+    (origin, href, site, locale) => `${origin}/${locale}${href}`
+)
+
+jest.mock('../../../utils/utils', () => ({
+    buildUrlWithAppOrigin: mockBuildUrlWithAppOrigin
+}))
+
+jest.mock('../../../hooks/use-app-origin', () => ({
+    useAppOrigin: jest.fn(() => 'https://example.com')
+}))
+
+jest.mock('../../../hooks/use-multi-site', () => ({
+    __esModule: true,
+    default: jest.fn(() => ({
+        site: {
+            id: 'RefArch',
+            alias: 'test-site',
+            l10n: {
+                defaultCurrency: 'USD'
+            }
+        },
+        locale: {
+            id: 'en-US',
+            preferredCurrency: 'USD'
+        },
+        buildUrl: jest.fn((href) => `/test${href}`)
+    }))
+}))
+
+// Mock React Query to return mock messages data
 jest.mock('../../../utils/locale', () => ({
     getTargetLocale: jest.fn(() => 'en-US')
 }))
 
-jest.mock('../../../utils/utils', () => ({
-    buildUrlWithAppOrigin: jest.fn((origin, href, site, locale) => `${origin}/${locale}${href}`)
-}))
-
-jest.mock('../../../hooks/use-site', () => ({
-    useSite: jest.fn(() => ({
-        id: 'RefArch',
-        alias: 'test-site'
-    }))
-}))
-
-jest.mock('../../../hooks/use-locale', () => ({
-    useLocale: jest.fn(() => ({
-        id: 'en-US',
-        alias: 'en_US'
+jest.mock('@tanstack/react-query', () => ({
+    ...jest.requireActual('@tanstack/react-query'),
+    useQuery: jest.fn(() => ({
+        data: {
+            'common.welcome': 'Welcome',
+            'common.hello': 'Hello'
+        }
     }))
 }))
 
@@ -51,10 +101,11 @@ Object.defineProperty(window, 'location', {
 describe('useAppLocalization', () => {
     beforeEach(() => {
         jest.clearAllMocks()
+        mockBuildUrlWithAppOrigin.mockClear()
     })
 
     it('returns localization data correctly', () => {
-        const {result} = renderHook(() => useAppLocalization())
+        const {result} = renderHook(() => useAppLocalization(), {wrapper})
 
         expect(result.current).toMatchObject({
             targetLocale: 'en-US',
@@ -72,18 +123,30 @@ describe('useAppLocalization', () => {
     })
 
     it('builds URLs correctly', () => {
-        const {buildUrlWithAppOrigin} = require('../../../utils/utils')
-        const {result} = renderHook(() => useAppLocalization())
+        const useMultiSite = require('../../../hooks/use-multi-site').default
+        const mockBuildUrl = jest.fn()
+        useMultiSite.mockReturnValueOnce({
+            site: {
+                id: 'RefArch',
+                alias: 'test-site',
+                l10n: {
+                    defaultCurrency: 'USD'
+                }
+            },
+            locale: {
+                id: 'en-US',
+                preferredCurrency: 'USD'
+            },
+            buildUrl: mockBuildUrl
+        })
+
+        const {result} = renderHook(() => useAppLocalization(), {wrapper})
 
         const testHref = '/test-page'
         result.current.buildUrl(testHref)
 
-        expect(buildUrlWithAppOrigin).toHaveBeenCalledWith(
-            'https://example.com',
-            testHref,
-            expect.any(Object),
-            expect.any(Object)
-        )
+        // Should call the buildUrl function from useMultiSite
+        expect(mockBuildUrl).toHaveBeenCalledWith(testHref)
     })
 
     it('handles missing window origin', () => {
@@ -91,7 +154,7 @@ describe('useAppLocalization', () => {
         const originalOrigin = window.location.origin
         delete window.location.origin
 
-        const {result} = renderHook(() => useAppLocalization())
+        const {result} = renderHook(() => useAppLocalization(), {wrapper})
 
         expect(result.current.appOrigin).toBeDefined()
 
@@ -103,21 +166,29 @@ describe('useAppLocalization', () => {
         const {getTargetLocale} = require('../../../utils/locale')
         getTargetLocale.mockReturnValue('fr-FR')
 
-        const {result} = renderHook(() => useAppLocalization())
+        const {result} = renderHook(() => useAppLocalization(), {wrapper})
 
         expect(result.current.targetLocale).toBe('fr-FR')
     })
 
     it('handles different currencies', () => {
-        const {
-            useShopperCustomersQuery
-        } = require('@salesforce/commerce-sdk-react')
-        useShopperCustomersQuery.mockReturnValue({
-            locale: 'en-US',
-            currency: 'EUR'
+        const useMultiSite = require('../../../hooks/use-multi-site').default
+        useMultiSite.mockReturnValueOnce({
+            site: {
+                id: 'RefArch',
+                alias: 'test-site',
+                l10n: {
+                    defaultCurrency: 'EUR'
+                }
+            },
+            locale: {
+                id: 'en-US',
+                preferredCurrency: 'EUR'
+            },
+            buildUrl: jest.fn((href) => `/test${href}`)
         })
 
-        const {result} = renderHook(() => useAppLocalization())
+        const {result} = renderHook(() => useAppLocalization(), {wrapper})
 
         expect(result.current.currency).toBe('EUR')
     })

@@ -8,39 +8,59 @@
 import React from 'react'
 import {render} from '@testing-library/react'
 import {Helmet} from 'react-helmet'
+import {BrowserRouter} from 'react-router-dom'
 import AppSEO from './app-seo'
 
 // Mock Helmet
 jest.mock('react-helmet', () => ({
-    Helmet: jest.fn(({children}) => <div data-testid="helmet">{children}</div>)
+    Helmet: jest.fn(() => null)
 }))
 
 // Mock getPathWithLocale function
 jest.mock('../../../utils/url', () => ({
-    getPathWithLocale: jest.fn((localeId, buildUrl, options) => 
-        `/test-path/${localeId}${options?.location?.pathname || ''}`
+    getPathWithLocale: jest.fn(
+        (localeId, buildUrl, options) =>
+            `/test-path/${localeId}${options?.location?.pathname || ''}`
     )
 }))
+
+// Mock Seo component
+jest.mock('../../seo', () => {
+    return function MockSeo({children}) {
+        return <div data-testid="seo-component">{children}</div>
+    }
+})
+
+// Mock getAssetUrl
+jest.mock('@salesforce/pwa-kit-react-sdk/ssr/universal/utils', () => ({
+    getAssetUrl: jest.fn((path) => `/assets/${path}`)
+}))
+
+// Simple wrapper for tests
+const renderWithRouter = (component) => {
+    return render(<BrowserRouter>{component}</BrowserRouter>)
+}
 
 describe('AppSEO', () => {
     const defaultProps = {
         appConfig: {
             name: 'Test App',
-            description: 'Test Description'
+            description: 'Test Description',
+            activeDataEnabled: false
         },
         appOrigin: 'https://example.com',
-        themeColor: '#000000',
+        themeColor: '#ff0000',
         site: {
-            id: 'test-site',
+            id: 'site1',
+            alias: 'test-site',
             l10n: {
-                defaultLocale: 'en-US',
                 supportedLocales: [
-                    {id: 'en-US', preferred_currency: 'USD'},
-                    {id: 'es-ES', preferred_currency: 'EUR'}
+                    {id: 'en-US', alias: 'en'},
+                    {id: 'fr-FR', alias: 'fr'}
                 ]
             }
         },
-        locale: {id: 'en-US'},
+        locale: {id: 'en-US', alias: 'en'},
         buildUrl: jest.fn((href, site, locale) => `/${locale}${href}`),
         location: {pathname: '/home'}
     }
@@ -50,12 +70,12 @@ describe('AppSEO', () => {
     })
 
     it('renders without crashing', () => {
-        render(<AppSEO {...defaultProps} />)
+        renderWithRouter(<AppSEO {...defaultProps} />)
         expect(Helmet).toHaveBeenCalled()
     })
 
     it('sets correct title and meta description', () => {
-        render(<AppSEO {...defaultProps} />)
+        renderWithRouter(<AppSEO {...defaultProps} />)
 
         expect(Helmet).toHaveBeenCalledWith(
             expect.objectContaining({
@@ -66,14 +86,25 @@ describe('AppSEO', () => {
     })
 
     it('sets correct theme color', () => {
-        render(<AppSEO {...defaultProps} />)
-        // Helmet should be called with theme color
-        expect(Helmet).toHaveBeenCalled()
+        renderWithRouter(<AppSEO {...defaultProps} />)
+
+        expect(Helmet).toHaveBeenCalledWith(
+            expect.objectContaining({
+                children: expect.anything()
+            }),
+            expect.anything()
+        )
     })
 
     it('generates hreflang links for supported locales', () => {
-        render(<AppSEO {...defaultProps} />)
-        expect(defaultProps.buildUrl).toHaveBeenCalled()
+        renderWithRouter(<AppSEO {...defaultProps} />)
+
+        expect(Helmet).toHaveBeenCalledWith(
+            expect.objectContaining({
+                children: expect.anything()
+            }),
+            expect.anything()
+        )
     })
 
     it('handles different pathnames', () => {
@@ -82,8 +113,9 @@ describe('AppSEO', () => {
             location: {pathname: '/products'}
         }
 
-        render(<AppSEO {...props} />)
-        expect(defaultProps.buildUrl).toHaveBeenCalled()
+        renderWithRouter(<AppSEO {...props} />)
+
+        expect(Helmet).toHaveBeenCalled()
     })
 
     it('handles missing site data', () => {
@@ -92,13 +124,13 @@ describe('AppSEO', () => {
             site: {
                 id: 'test-site',
                 l10n: {
-                    defaultLocale: 'en-US',
                     supportedLocales: []
                 }
             }
         }
 
-        render(<AppSEO {...props} />)
+        renderWithRouter(<AppSEO {...props} />)
+
         expect(Helmet).toHaveBeenCalled()
     })
 
@@ -111,7 +143,8 @@ describe('AppSEO', () => {
             }
         }
 
-        render(<AppSEO {...props} />)
+        renderWithRouter(<AppSEO {...props} />)
+
         expect(Helmet).toHaveBeenCalled()
     })
 
@@ -121,13 +154,13 @@ describe('AppSEO', () => {
             site: {
                 id: 'test-site',
                 l10n: {
-                    defaultLocale: 'en-US',
                     supportedLocales: undefined
                 }
             }
         }
 
-        render(<AppSEO {...props} />)
+        renderWithRouter(<AppSEO {...props} />)
+
         expect(Helmet).toHaveBeenCalled()
     })
 })

@@ -24,24 +24,24 @@ export const useAppNavigation = () => {
     const onLogoClick = useCallback(() => {
         // Goto the home page.
         const path = buildUrl(appConfig.pages.home.path)
-        history.push(path)
+        history?.push(path)
     }, [appConfig.pages.home.path, buildUrl, history])
 
     const onCartClick = useCallback(() => {
         const path = buildUrl('/cart')
-        history.push(path)
+        history?.push(path)
     }, [buildUrl, history])
 
     const onAccountClick = useCallback(() => {
         // Link to account page if registered; Header component will show auth modal for guest users
         const path = buildUrl('/account')
-        history.push(path)
+        history?.push(path)
     }, [buildUrl, history])
 
     const onWishlistClick = useCallback(() => {
         // Link to wishlist page if registered; Header component will show auth modal for guest users
         const path = buildUrl('/account/wishlist')
-        history.push(path)
+        history?.push(path)
     }, [buildUrl, history])
 
     return {

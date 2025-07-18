@@ -5,134 +5,186 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
+import React from 'react'
 import {renderHook, act} from '@testing-library/react'
 import {useAppOnlineStatus} from './use-app-online-status'
 
-// Mock navigator.onLine
-Object.defineProperty(navigator, 'onLine', {
-    writable: true,
-    value: true
-})
+// Mock the watchOnlineStatus utility
+jest.mock('../../../utils/utils', () => ({
+    watchOnlineStatus: jest.fn()
+}))
+
+import {watchOnlineStatus} from '../../../utils/utils'
 
 describe('useAppOnlineStatus', () => {
+    let originalOnLine
     let addEventListenerSpy
     let removeEventListenerSpy
+    let mockUnsubscribe
 
     beforeEach(() => {
-        jest.clearAllMocks()
+        // Store original descriptor
+        originalOnLine = Object.getOwnPropertyDescriptor(navigator, 'onLine')
+
+        // Clear any existing property first
+        delete navigator.onLine
 
         // Mock window event listeners
         addEventListenerSpy = jest.spyOn(window, 'addEventListener')
         removeEventListenerSpy = jest.spyOn(window, 'removeEventListener')
 
-        // Reset navigator.onLine to true
-        navigator.onLine = true
+        // Create mock unsubscribe function
+        mockUnsubscribe = jest.fn()
+
+        // Mock watchOnlineStatus to return unsubscribe function
+        watchOnlineStatus.mockImplementation((callback) => {
+            // Store callback for manual triggering in tests
+            watchOnlineStatus.mockCallback = callback
+            return mockUnsubscribe
+        })
     })
 
     afterEach(() => {
         addEventListenerSpy.mockRestore()
         removeEventListenerSpy.mockRestore()
+        watchOnlineStatus.mockClear()
+
+        // Restore original navigator.onLine
+        delete navigator.onLine
+        if (originalOnLine) {
+            Object.defineProperty(navigator, 'onLine', originalOnLine)
+        }
     })
 
     it('returns initial online status', () => {
+        // Set navigator.onLine before rendering
+        Object.defineProperty(navigator, 'onLine', {
+            value: true,
+            writable: true,
+            configurable: true
+        })
+
         const {result} = renderHook(() => useAppOnlineStatus())
 
         expect(result.current.isOnline).toBe(true)
+        expect(watchOnlineStatus).toHaveBeenCalledWith(expect.any(Function))
     })
 
     it('returns false when initially offline', () => {
-        navigator.onLine = false
+        // Set navigator.onLine to false before rendering
+        Object.defineProperty(navigator, 'onLine', {
+            value: false,
+            writable: true,
+            configurable: true
+        })
 
         const {result} = renderHook(() => useAppOnlineStatus())
 
         expect(result.current.isOnline).toBe(false)
+        expect(watchOnlineStatus).toHaveBeenCalledWith(expect.any(Function))
     })
 
     it('sets up event listeners for online/offline events', () => {
+        Object.defineProperty(navigator, 'onLine', {
+            value: true,
+            writable: true,
+            configurable: true
+        })
+
         renderHook(() => useAppOnlineStatus())
 
-        expect(addEventListenerSpy).toHaveBeenCalledWith('online', expect.any(Function))
-        expect(addEventListenerSpy).toHaveBeenCalledWith('offline', expect.any(Function))
+        expect(watchOnlineStatus).toHaveBeenCalledWith(expect.any(Function))
     })
 
     it('cleans up event listeners on unmount', () => {
+        Object.defineProperty(navigator, 'onLine', {
+            value: true,
+            writable: true,
+            configurable: true
+        })
+
         const {unmount} = renderHook(() => useAppOnlineStatus())
 
         unmount()
 
-        expect(removeEventListenerSpy).toHaveBeenCalledWith('online', expect.any(Function))
-        expect(removeEventListenerSpy).toHaveBeenCalledWith('offline', expect.any(Function))
+        expect(mockUnsubscribe).toHaveBeenCalled()
     })
 
     it('updates status when going online', () => {
-        navigator.onLine = false
+        Object.defineProperty(navigator, 'onLine', {
+            value: false,
+            writable: true,
+            configurable: true
+        })
+
         const {result} = renderHook(() => useAppOnlineStatus())
 
         expect(result.current.isOnline).toBe(false)
 
         // Simulate going online
         act(() => {
-            navigator.onLine = true
-            window.dispatchEvent(new Event('online'))
+            watchOnlineStatus.mockCallback(true)
         })
 
         expect(result.current.isOnline).toBe(true)
     })
 
     it('updates status when going offline', () => {
-        navigator.onLine = true
+        Object.defineProperty(navigator, 'onLine', {
+            value: true,
+            writable: true,
+            configurable: true
+        })
+
         const {result} = renderHook(() => useAppOnlineStatus())
 
         expect(result.current.isOnline).toBe(true)
 
         // Simulate going offline
         act(() => {
-            navigator.onLine = false
-            window.dispatchEvent(new Event('offline'))
+            watchOnlineStatus.mockCallback(false)
         })
 
         expect(result.current.isOnline).toBe(false)
     })
 
     it('handles multiple online/offline transitions', () => {
+        Object.defineProperty(navigator, 'onLine', {
+            value: true,
+            writable: true,
+            configurable: true
+        })
+
         const {result} = renderHook(() => useAppOnlineStatus())
 
-        // Start online
+        // Initially online
         expect(result.current.isOnline).toBe(true)
 
         // Go offline
         act(() => {
-            navigator.onLine = false
-            window.dispatchEvent(new Event('offline'))
+            watchOnlineStatus.mockCallback(false)
         })
         expect(result.current.isOnline).toBe(false)
 
-        // Go online again
+        // Go back online
         act(() => {
-            navigator.onLine = true
-            window.dispatchEvent(new Event('online'))
+            watchOnlineStatus.mockCallback(true)
         })
         expect(result.current.isOnline).toBe(true)
 
         // Go offline again
         act(() => {
-            navigator.onLine = false
-            window.dispatchEvent(new Event('offline'))
+            watchOnlineStatus.mockCallback(false)
         })
         expect(result.current.isOnline).toBe(false)
     })
 
     it('handles missing navigator.onLine gracefully', () => {
-        // Temporarily remove navigator.onLine
-        const originalOnLine = navigator.onLine
-        delete navigator.onLine
-
+        // Don't define navigator.onLine - it should default to true
         const {result} = renderHook(() => useAppOnlineStatus())
 
         // Should default to true when navigator.onLine is not available
         expect(result.current.isOnline).toBe(true)
-
-        // Restore original value
-        navigator.onLine = originalOnLine
+        expect(watchOnlineStatus).toHaveBeenCalledWith(expect.any(Function))
     })
 })

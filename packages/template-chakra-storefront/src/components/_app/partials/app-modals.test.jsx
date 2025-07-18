@@ -5,89 +5,67 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-/* eslint-disable @typescript-eslint/no-var-requires */
-
 import React from 'react'
-import {render, screen} from '@testing-library/react'
-import {createPortal} from 'react-dom'
-import {ChakraProvider} from '@chakra-ui/react'
-import {BrowserRouter} from 'react-router-dom'
+import {screen} from '@testing-library/react'
+import {renderWithProviders} from '../../../utils/test-utils'
 import AppModals from './app-modals'
 
-// Mock React Portal
-jest.mock('react-dom', () => ({
-    ...jest.requireActual('react-dom'),
-    createPortal: jest.fn((child) => child)
+// Mock AuthModal component
+jest.mock('../../../hooks/use-auth-modal', () => ({
+    AuthModal: function MockAuthModal(props) {
+        // Only render if props are provided and not empty
+        if (!props || Object.keys(props).length === 0) {
+            return null
+        }
+        return <div data-testid="auth-modal">Auth Modal: {JSON.stringify(props)}</div>
+    }
 }))
 
-// Mock AuthModal component
-jest.mock('../../auth-modal', () => {
-    const MockAuthModal = (props) => {
-        return props.authModal ? (
-            <div data-testid="auth-modal">
-                <div data-testid="auth-modal-props">{JSON.stringify(props.authModal)}</div>
-            </div>
-        ) : null
-    }
-    MockAuthModal.propTypes = {
-        authModal: require('prop-types').object
-    }
-    return MockAuthModal
-})
-
 // Mock DNTNotification component
-jest.mock('../../dnt-notification', () => {
-    const MockDNTNotification = (props) => {
-        return props.dntNotification ? (
-            <div data-testid="dnt-notification">
-                <div data-testid="dnt-props">{JSON.stringify(props.dntNotification)}</div>
-            </div>
-        ) : null
+jest.mock('../../../hooks/use-dnt-notification', () => ({
+    DntNotification: function MockDNTNotification(props) {
+        // Only render if props are provided and not empty
+        if (!props || Object.keys(props).length === 0) {
+            return null
+        }
+        return <div data-testid="dnt-notification">DNT Notification: {JSON.stringify(props)}</div>
     }
-    MockDNTNotification.propTypes = {
-        dntNotification: require('prop-types').object
-    }
-    return MockDNTNotification
-})
+}))
 
 describe('AppModals', () => {
-    const renderWithProviders = (component) => {
-        return render(
-            <ChakraProvider>
-                <BrowserRouter>{component}</BrowserRouter>
-            </ChakraProvider>
-        )
+    const mockAuthModal = {
+        isOpen: true,
+        onClose: jest.fn(),
+        type: 'login'
+    }
+
+    const mockDNTNotification = {
+        isOpen: true,
+        onClose: jest.fn()
     }
 
     beforeEach(() => {
         jest.clearAllMocks()
-        // Mock document.body for portal
-        document.body.innerHTML = ''
     })
 
     it('renders auth modal when authModal prop is provided', () => {
-        const authModal = {isOpen: true, onClose: jest.fn()}
-
-        renderWithProviders(<AppModals authModal={authModal} />)
+        renderWithProviders(<AppModals authModal={mockAuthModal} />)
 
         expect(screen.getByTestId('auth-modal')).toBeInTheDocument()
-        expect(createPortal).toHaveBeenCalled()
+        expect(screen.queryByTestId('dnt-notification')).not.toBeInTheDocument()
     })
 
     it('renders DNT notification when dntNotification prop is provided', () => {
-        const dntNotification = {isOpen: true, onClose: jest.fn()}
-
-        renderWithProviders(<AppModals dntNotification={dntNotification} />)
+        renderWithProviders(<AppModals dntNotification={mockDNTNotification} />)
 
         expect(screen.getByTestId('dnt-notification')).toBeInTheDocument()
-        expect(createPortal).toHaveBeenCalled()
+        expect(screen.queryByTestId('auth-modal')).not.toBeInTheDocument()
     })
 
     it('renders both modals when both props are provided', () => {
-        const authModal = {isOpen: true, onClose: jest.fn()}
-        const dntNotification = {isOpen: true, onClose: jest.fn()}
-
-        renderWithProviders(<AppModals authModal={authModal} dntNotification={dntNotification} />)
+        renderWithProviders(
+            <AppModals authModal={mockAuthModal} dntNotification={mockDNTNotification} />
+        )
 
         expect(screen.getByTestId('auth-modal')).toBeInTheDocument()
         expect(screen.getByTestId('dnt-notification')).toBeInTheDocument()
@@ -113,24 +91,19 @@ describe('AppModals', () => {
     })
 
     it('passes correct props to AuthModal', () => {
-        const authModal = {isOpen: true, onClose: jest.fn(), type: 'login'}
+        renderWithProviders(<AppModals authModal={mockAuthModal} />)
 
-        renderWithProviders(<AppModals authModal={authModal} />)
-
-        const propsElement = screen.getByTestId('auth-modal-props')
-        const props = JSON.parse(propsElement.textContent)
-
-        expect(props).toMatchObject(authModal)
+        const authModalElement = screen.getByTestId('auth-modal')
+        expect(authModalElement).toBeInTheDocument()
+        expect(authModalElement.textContent).toContain('"isOpen":true')
+        expect(authModalElement.textContent).toContain('"type":"login"')
     })
 
     it('passes correct props to DNTNotification', () => {
-        const dntNotification = {isOpen: true, onClose: jest.fn(), message: 'DNT message'}
+        renderWithProviders(<AppModals dntNotification={mockDNTNotification} />)
 
-        renderWithProviders(<AppModals dntNotification={dntNotification} />)
-
-        const propsElement = screen.getByTestId('dnt-props')
-        const props = JSON.parse(propsElement.textContent)
-
-        expect(props).toMatchObject(dntNotification)
+        const dntElement = screen.getByTestId('dnt-notification')
+        expect(dntElement).toBeInTheDocument()
+        expect(dntElement.textContent).toContain('"isOpen":true')
     })
 })

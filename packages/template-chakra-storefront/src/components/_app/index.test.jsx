@@ -8,9 +8,10 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 
 import React from 'react'
-import {render, screen} from '@testing-library/react'
-import {BrowserRouter} from 'react-router-dom'
+import {screen} from '@testing-library/react'
+import {renderWithProviders} from '../../utils/test-utils'
 import App from './index'
+import theme from '../../theme'
 
 // Mock all custom hooks
 jest.mock('./hooks', () => ({
@@ -87,11 +88,7 @@ jest.mock('./partials', () => ({
 
 describe('App', () => {
     const renderApp = (children = <div data-testid="app-children">Test Children</div>) => {
-        return render(
-            <BrowserRouter>
-                <App>{children}</App>
-            </BrowserRouter>
-        )
+        return renderWithProviders(<App>{children}</App>)
     }
 
     beforeEach(() => {
@@ -178,11 +175,7 @@ describe('App', () => {
     })
 
     it('handles missing children gracefully', () => {
-        render(
-            <BrowserRouter>
-                <App />
-            </BrowserRouter>
-        )
+        renderWithProviders(<App />)
 
         expect(screen.getByTestId('app-layout')).toBeInTheDocument()
     })

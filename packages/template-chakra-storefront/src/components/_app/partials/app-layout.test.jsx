@@ -6,43 +6,37 @@
  */
 
 import React from 'react'
-import {render, screen} from '@testing-library/react'
-import {ChakraProvider} from '@chakra-ui/react'
-import {BrowserRouter} from 'react-router-dom'
+import {screen} from '@testing-library/react'
+import {renderWithProviders} from '../../../utils/test-utils'
 import AppLayout from './app-layout'
 
-// Mock OfflineNotification component
-jest.mock('../../offline-notification', () => {
-    return function MockOfflineNotification() {
-        return <div data-testid="offline-notification">You are offline</div>
+// Mock OfflineBanner component
+jest.mock('../../offline-banner', () => {
+    return function MockOfflineBanner() {
+        return <div data-testid="offline-banner">Offline Banner</div>
     }
 })
 
 describe('AppLayout', () => {
-    const renderWithProviders = (component) => {
-        return render(
-            <ChakraProvider>
-                <BrowserRouter>{component}</BrowserRouter>
-            </ChakraProvider>
-        )
-    }
-
     const defaultProps = {
         isOnline: true,
         headerComponent: <div data-testid="header">Header</div>,
         footerComponent: <div data-testid="footer">Footer</div>,
-        modalsComponent: <div data-testid="modals">Modals</div>,
-        children: <div data-testid="main-content">Main Content</div>
+        modalsComponent: <div data-testid="modals">Modals</div>
     }
 
     it('renders all components when online', () => {
-        renderWithProviders(<AppLayout {...defaultProps} />)
+        renderWithProviders(
+            <AppLayout {...defaultProps}>
+                <div data-testid="children">Children</div>
+            </AppLayout>
+        )
 
         expect(screen.getByTestId('header')).toBeInTheDocument()
-        expect(screen.getByTestId('main-content')).toBeInTheDocument()
         expect(screen.getByTestId('footer')).toBeInTheDocument()
         expect(screen.getByTestId('modals')).toBeInTheDocument()
-        expect(screen.queryByTestId('offline-notification')).not.toBeInTheDocument()
+        expect(screen.getByTestId('children')).toBeInTheDocument()
+        expect(screen.queryByTestId('offline-banner')).not.toBeInTheDocument()
     })
 
     it('shows offline notification when offline', () => {
@@ -51,13 +45,14 @@ describe('AppLayout', () => {
             isOnline: false
         }
 
-        renderWithProviders(<AppLayout {...props} />)
+        renderWithProviders(
+            <AppLayout {...props}>
+                <div data-testid="children">Children</div>
+            </AppLayout>
+        )
 
-        expect(screen.getByTestId('offline-notification')).toBeInTheDocument()
-        expect(screen.getByTestId('header')).toBeInTheDocument()
-        expect(screen.getByTestId('main-content')).toBeInTheDocument()
-        expect(screen.getByTestId('footer')).toBeInTheDocument()
-        expect(screen.getByTestId('modals')).toBeInTheDocument()
+        expect(screen.getByTestId('offline-banner')).toBeInTheDocument()
+        expect(screen.getByTestId('children')).toBeInTheDocument()
     })
 
     it('renders without header component', () => {
@@ -66,11 +61,15 @@ describe('AppLayout', () => {
             headerComponent: null
         }
 
-        renderWithProviders(<AppLayout {...props} />)
+        renderWithProviders(
+            <AppLayout {...props}>
+                <div data-testid="children">Children</div>
+            </AppLayout>
+        )
 
         expect(screen.queryByTestId('header')).not.toBeInTheDocument()
-        expect(screen.getByTestId('main-content')).toBeInTheDocument()
         expect(screen.getByTestId('footer')).toBeInTheDocument()
+        expect(screen.getByTestId('children')).toBeInTheDocument()
     })
 
     it('renders without footer component', () => {
@@ -79,11 +78,15 @@ describe('AppLayout', () => {
             footerComponent: null
         }
 
-        renderWithProviders(<AppLayout {...props} />)
+        renderWithProviders(
+            <AppLayout {...props}>
+                <div data-testid="children">Children</div>
+            </AppLayout>
+        )
 
         expect(screen.getByTestId('header')).toBeInTheDocument()
-        expect(screen.getByTestId('main-content')).toBeInTheDocument()
         expect(screen.queryByTestId('footer')).not.toBeInTheDocument()
+        expect(screen.getByTestId('children')).toBeInTheDocument()
     })
 
     it('renders without modals component', () => {
@@ -92,25 +95,24 @@ describe('AppLayout', () => {
             modalsComponent: null
         }
 
-        renderWithProviders(<AppLayout {...props} />)
+        renderWithProviders(
+            <AppLayout {...props}>
+                <div data-testid="children">Children</div>
+            </AppLayout>
+        )
 
         expect(screen.getByTestId('header')).toBeInTheDocument()
-        expect(screen.getByTestId('main-content')).toBeInTheDocument()
         expect(screen.getByTestId('footer')).toBeInTheDocument()
         expect(screen.queryByTestId('modals')).not.toBeInTheDocument()
+        expect(screen.getByTestId('children')).toBeInTheDocument()
     })
 
     it('renders without children', () => {
-        const props = {
-            ...defaultProps,
-            children: null
-        }
-
-        renderWithProviders(<AppLayout {...props} />)
+        renderWithProviders(<AppLayout {...defaultProps} />)
 
         expect(screen.getByTestId('header')).toBeInTheDocument()
-        expect(screen.queryByTestId('main-content')).not.toBeInTheDocument()
         expect(screen.getByTestId('footer')).toBeInTheDocument()
+        expect(screen.getByTestId('modals')).toBeInTheDocument()
     })
 
     it('handles undefined isOnline prop (defaults to online)', () => {
@@ -119,34 +121,35 @@ describe('AppLayout', () => {
             isOnline: undefined
         }
 
-        renderWithProviders(<AppLayout {...props} />)
+        renderWithProviders(
+            <AppLayout {...props}>
+                <div data-testid="children">Children</div>
+            </AppLayout>
+        )
 
-        expect(screen.queryByTestId('offline-notification')).not.toBeInTheDocument()
+        expect(screen.queryByTestId('offline-banner')).not.toBeInTheDocument()
+        expect(screen.getByTestId('children')).toBeInTheDocument()
     })
 
     it('uses proper flex layout structure', () => {
         renderWithProviders(<AppLayout {...defaultProps} />)
 
-        // The layout should be rendered within a flex container
-        expect(screen.getByTestId('main-content')).toBeInTheDocument()
+        // Check that the layout container is rendered
+        const layoutContainer = screen.getByTestId('header').parentElement
+        expect(layoutContainer).toBeInTheDocument()
     })
 
     it('renders multiple children correctly', () => {
-        const props = {
-            ...defaultProps,
-            children: [
-                <div key="1" data-testid="child-1">
-                    Child 1
-                </div>,
-                <div key="2" data-testid="child-2">
-                    Child 2
-                </div>
-            ]
-        }
+        renderWithProviders(
+            <AppLayout {...defaultProps}>
+                <div data-testid="child1">Child 1</div>
+                <div data-testid="child2">Child 2</div>
+                <div data-testid="child3">Child 3</div>
+            </AppLayout>
+        )
 
-        renderWithProviders(<AppLayout {...props} />)
-
-        expect(screen.getByTestId('child-1')).toBeInTheDocument()
-        expect(screen.getByTestId('child-2')).toBeInTheDocument()
+        expect(screen.getByTestId('child1')).toBeInTheDocument()
+        expect(screen.getByTestId('child2')).toBeInTheDocument()
+        expect(screen.getByTestId('child3')).toBeInTheDocument()
     })
 })

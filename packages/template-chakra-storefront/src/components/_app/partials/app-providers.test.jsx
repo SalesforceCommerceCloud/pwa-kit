@@ -7,15 +7,31 @@
 
 import React from 'react'
 import {render, screen} from '@testing-library/react'
-import {CommerceProvider} from '@salesforce/commerce-sdk-react'
+import {renderWithProviders} from '../../../utils/test-utils'
 import AppProviders from './app-providers'
 
 // Mock components
 const MockChild = () => <div>Test Child</div>
 
 // Mock external dependencies
-jest.mock('@salesforce/commerce-sdk-react', () => ({
-    CommerceProvider: jest.fn(({children}) => <div data-testid="commerce-provider">{children}</div>)
+jest.mock('@salesforce/commerce-sdk-react/components', () => ({
+    StorefrontPreview: jest.fn(({children}) => (
+        <div data-testid="storefront-preview">{children}</div>
+    ))
+}))
+
+// Mock the useAppConfig hook
+jest.mock('../hooks/use-app-config', () => ({
+    useAppConfig: jest.fn(() => ({
+        appConfig: {
+            defaultAppLocale: 'en-US'
+        }
+    }))
+}))
+
+// Mock CurrencyProvider
+jest.mock('../../../contexts', () => ({
+    CurrencyProvider: jest.fn(({children}) => <div data-testid="currency-provider">{children}</div>)
 }))
 
 describe('AppProviders', () => {
@@ -40,16 +56,18 @@ describe('AppProviders', () => {
         expect(screen.getByText('Test Child')).toBeInTheDocument()
     })
 
-    it('sets up CommerceProvider with correct props', () => {
+    it('sets up StorefrontPreview with correct props', () => {
+        const {StorefrontPreview} = require('@salesforce/commerce-sdk-react/components')
+
         render(
             <AppProviders {...defaultProps}>
                 <MockChild />
             </AppProviders>
         )
 
-        expect(CommerceProvider).toHaveBeenCalledWith(
+        expect(StorefrontPreview).toHaveBeenCalledWith(
             expect.objectContaining({
-                getTokenWhenReady: defaultProps.getTokenWhenReady
+                getToken: defaultProps.getTokenWhenReady
             }),
             expect.anything()
         )
@@ -73,7 +91,7 @@ describe('AppProviders', () => {
             </AppProviders>
         )
 
-        expect(screen.getByTestId('commerce-provider')).toBeInTheDocument()
+        expect(screen.getByTestId('storefront-preview')).toBeInTheDocument()
     })
 
     it('handles missing messages gracefully', () => {
@@ -106,4 +124,3 @@ describe('AppProviders', () => {
         expect(screen.getByText('Test Child')).toBeInTheDocument()
     })
 })
- 

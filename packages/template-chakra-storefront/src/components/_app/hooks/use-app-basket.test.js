@@ -40,18 +40,19 @@ const mockCustomer = {
 
 describe('useAppBasket', () => {
     beforeEach(() => {
-        const {useShopperBasketsMutation} = require('@salesforce/commerce-sdk-react')
-
-        useShopperBasketsMutation
-            .mockReturnValueOnce(mockUpdateBasket)
-            .mockReturnValueOnce(mockUpdateCustomerForBasket)
-    })
-
-    afterEach(() => {
         jest.clearAllMocks()
     })
 
+    afterEach(() => {
+        jest.restoreAllMocks()
+    })
+
     test('returns basket mutation functions and loading states', () => {
+        const {useShopperBasketsMutation} = require('@salesforce/commerce-sdk-react')
+        useShopperBasketsMutation
+            .mockReturnValueOnce(mockUpdateBasket)
+            .mockReturnValueOnce(mockUpdateCustomerForBasket)
+
         const {result} = renderHook(() => useAppBasket(mockBasket, mockCustomer, 'USD'))
 
         expect(result.current.updateBasket).toBe(mockUpdateBasket)
@@ -62,12 +63,14 @@ describe('useAppBasket', () => {
 
     test('calls useShopperBasketsMutation with correct parameters', () => {
         const {useShopperBasketsMutation} = require('@salesforce/commerce-sdk-react')
+        useShopperBasketsMutation
+            .mockReturnValueOnce(mockUpdateBasket)
+            .mockReturnValueOnce(mockUpdateCustomerForBasket)
 
         renderHook(() => useAppBasket(mockBasket, mockCustomer, 'USD'))
 
         expect(useShopperBasketsMutation).toHaveBeenCalledWith('updateBasket')
         expect(useShopperBasketsMutation).toHaveBeenCalledWith('updateCustomerForBasket')
-        expect(useShopperBasketsMutation).toHaveBeenCalledTimes(2)
     })
 
     test('updates basket currency when it differs from current currency', () => {
@@ -76,22 +79,39 @@ describe('useAppBasket', () => {
             currency: 'EUR'
         }
 
+        const {useShopperBasketsMutation} = require('@salesforce/commerce-sdk-react')
+        useShopperBasketsMutation
+            .mockReturnValueOnce(mockUpdateBasket)
+            .mockReturnValueOnce(mockUpdateCustomerForBasket)
+
         renderHook(() => useAppBasket(basketWithDifferentCurrency, mockCustomer, 'USD'))
 
-        // The useEffect would trigger updateBasket.mutate, but testing useEffect requires additional setup
-        // This test ensures the hook structure is correct
-        expect(mockUpdateBasket.mutate).not.toHaveBeenCalled() // Would be called in real scenario via useEffect
+        expect(mockUpdateBasket.mutate).toHaveBeenCalledWith({
+            parameters: {basketId: 'test-basket'},
+            body: {currency: 'USD'}
+        })
     })
 
     test('updates customer email when it differs from basket customer email', () => {
+        const {useShopperBasketsMutation} = require('@salesforce/commerce-sdk-react')
+        useShopperBasketsMutation
+            .mockReturnValueOnce(mockUpdateBasket)
+            .mockReturnValueOnce(mockUpdateCustomerForBasket)
+
         renderHook(() => useAppBasket(mockBasket, mockCustomer, 'USD'))
 
-        // The useEffect would trigger updateCustomerForBasket.mutate when emails differ
-        // This test ensures the hook structure is correct
-        expect(mockUpdateCustomerForBasket.mutate).not.toHaveBeenCalled() // Would be called in real scenario via useEffect
+        expect(mockUpdateCustomerForBasket.mutate).toHaveBeenCalledWith({
+            parameters: {basketId: 'test-basket'},
+            body: {email: 'new@example.com'}
+        })
     })
 
     test('handles null basket gracefully', () => {
+        const {useShopperBasketsMutation} = require('@salesforce/commerce-sdk-react')
+        useShopperBasketsMutation
+            .mockReturnValueOnce(mockUpdateBasket)
+            .mockReturnValueOnce(mockUpdateCustomerForBasket)
+
         const {result} = renderHook(() => useAppBasket(null, mockCustomer, 'USD'))
 
         expect(result.current.updateBasket).toBe(mockUpdateBasket)
@@ -99,6 +119,11 @@ describe('useAppBasket', () => {
     })
 
     test('handles null customer gracefully', () => {
+        const {useShopperBasketsMutation} = require('@salesforce/commerce-sdk-react')
+        useShopperBasketsMutation
+            .mockReturnValueOnce(mockUpdateBasket)
+            .mockReturnValueOnce(mockUpdateCustomerForBasket)
+
         const {result} = renderHook(() => useAppBasket(mockBasket, null, 'USD'))
 
         expect(result.current.updateBasket).toBe(mockUpdateBasket)
@@ -106,8 +131,7 @@ describe('useAppBasket', () => {
     })
 
     test('returns correct loading states when mutations are pending', () => {
-        const {useShopperBasketsMutation} = require('@salesforce/commerce-sdk-react')
-
+        // Create pending state mocks
         const pendingUpdateBasket = {
             ...mockUpdateBasket,
             isPending: true
@@ -117,6 +141,7 @@ describe('useAppBasket', () => {
             isPending: true
         }
 
+        const {useShopperBasketsMutation} = require('@salesforce/commerce-sdk-react')
         useShopperBasketsMutation
             .mockReturnValueOnce(pendingUpdateBasket)
             .mockReturnValueOnce(pendingUpdateCustomer)

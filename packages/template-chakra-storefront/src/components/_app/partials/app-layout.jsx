@@ -29,7 +29,7 @@ const AppLayout = ({children, isOnline, headerComponent, footerComponent, modals
                 {headerComponent}
 
                 {/* Offline Banner */}
-                {!isOnline && <OfflineBanner />}
+                {isOnline === false && <OfflineBanner />}
 
                 <AddToCartModalProvider>
                     <SkipNavContent
