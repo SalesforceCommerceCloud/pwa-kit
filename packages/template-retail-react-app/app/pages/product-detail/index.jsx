@@ -688,85 +688,73 @@ const ProductDetail = () => {
                             // Render the child products
                             comboProduct.childProducts.map(
                                 ({product: childProduct, quantity: childQuantity}) => (
-                                    <Island hydrateOn={'visible'} key={childProduct.id}>
-                                        <Box data-testid="child-product">
-                                            <ProductView
-                                                // Do not use an arrow function as we are manipulating the functions scope.
-                                                ref={function (ref) {
-                                                    // Assign the "set" scope of the ref, this is how we access the internal
-                                                    // validation.
-                                                    childProductRefs.current[childProduct.id] = {
-                                                        ref,
-                                                        validateOrderability:
-                                                            this.validateOrderability
-                                                    }
-                                                }}
-                                                product={childProduct}
-                                                isProductPartOfSet={isProductASet}
-                                                isProductPartOfBundle={isProductABundle}
-                                                childOfBundleQuantity={childQuantity}
-                                                selectedBundleParentQuantity={
-                                                    selectedBundleQuantity
+                                    <Box key={childProduct.id} data-testid="child-product">
+                                        <ProductView
+                                            // Do not use an arrow function as we are manipulating the functions scope.
+                                            ref={function (ref) {
+                                                // Assign the "set" scope of the ref, this is how we access the internal
+                                                // validation.
+                                                childProductRefs.current[childProduct.id] = {
+                                                    ref,
+                                                    validateOrderability: this.validateOrderability
                                                 }
-                                                addToCart={
-                                                    isProductASet
-                                                        ? (productSelectionValues) =>
-                                                              handleAddToCart(
-                                                                  productSelectionValues
-                                                              )
-                                                        : null
-                                                }
-                                                addToWishlist={
-                                                    isProductASet ? handleAddToWishlist : null
-                                                }
-                                                onVariantSelected={(product, variant, quantity) => {
-                                                    if (quantity) {
-                                                        setChildProductSelection(
-                                                            (previousState) => ({
-                                                                ...previousState,
-                                                                [product.id]: {
-                                                                    product,
-                                                                    variant,
-                                                                    quantity: isProductABundle
-                                                                        ? childQuantity
-                                                                        : quantity
-                                                                }
-                                                            })
-                                                        )
-                                                    } else {
-                                                        const selections = {
-                                                            ...childProductSelection
+                                            }}
+                                            product={childProduct}
+                                            isProductPartOfSet={isProductASet}
+                                            isProductPartOfBundle={isProductABundle}
+                                            childOfBundleQuantity={childQuantity}
+                                            selectedBundleParentQuantity={selectedBundleQuantity}
+                                            addToCart={
+                                                isProductASet
+                                                    ? (productSelectionValues) =>
+                                                          handleAddToCart(productSelectionValues)
+                                                    : null
+                                            }
+                                            addToWishlist={
+                                                isProductASet ? handleAddToWishlist : null
+                                            }
+                                            onVariantSelected={(product, variant, quantity) => {
+                                                if (quantity) {
+                                                    setChildProductSelection((previousState) => ({
+                                                        ...previousState,
+                                                        [product.id]: {
+                                                            product,
+                                                            variant,
+                                                            quantity: isProductABundle
+                                                                ? childQuantity
+                                                                : quantity
                                                         }
-                                                        delete selections[product.id]
-                                                        setChildProductSelection(selections)
+                                                    }))
+                                                } else {
+                                                    const selections = {
+                                                        ...childProductSelection
                                                     }
-                                                }}
-                                                isProductLoading={isProductLoading}
-                                                isBasketLoading={isBasketLoading}
-                                                isWishlistLoading={isWishlistLoading}
-                                                setChildProductOrderability={
-                                                    setChildProductOrderability
+                                                    delete selections[product.id]
+                                                    setChildProductSelection(selections)
                                                 }
-                                                pickupInStore={!!pickupInStoreMap[childProduct?.id]}
-                                                setPickupInStore={(checked) =>
-                                                    childProduct &&
-                                                    handlePickupInStoreChange(
-                                                        childProduct.id,
-                                                        checked
-                                                    )
-                                                }
-                                                onOpenStoreLocator={onOpenStoreLocator}
-                                                showDeliveryOptions={
-                                                    STORE_LOCATOR_IS_ENABLED && !isProductABundle
-                                                }
-                                            />
-                                            <InformationAccordion product={childProduct} />
+                                            }}
+                                            isProductLoading={isProductLoading}
+                                            isBasketLoading={isBasketLoading}
+                                            isWishlistLoading={isWishlistLoading}
+                                            setChildProductOrderability={
+                                                setChildProductOrderability
+                                            }
+                                            pickupInStore={!!pickupInStoreMap[childProduct?.id]}
+                                            setPickupInStore={(checked) =>
+                                                childProduct &&
+                                                handlePickupInStoreChange(childProduct.id, checked)
+                                            }
+                                            onOpenStoreLocator={onOpenStoreLocator}
+                                            showDeliveryOptions={
+                                                STORE_LOCATOR_IS_ENABLED && !isProductABundle
+                                            }
+                                        />
+                                        <InformationAccordion product={childProduct} />
 
-                                            <Box display={['none', 'none', 'none', 'block']}>
-                                                <hr />
-                                            </Box>
+                                        <Box display={['none', 'none', 'none', 'block']}>
+                                            <hr />
                                         </Box>
-                                    </Island>
+                                    </Box>
                                 )
                             )
                         }
