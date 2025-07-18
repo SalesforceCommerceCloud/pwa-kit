@@ -1418,6 +1418,9 @@
   "search.suggestions.products": {
     "defaultMessage": "Products"
   },
+  "search_suggestions.category.in_parent": {
+    "defaultMessage": "in"
+  },
   "selected_refinements.action.assistive_msg.clear_all": {
     "defaultMessage": "Clear all filters"
   },

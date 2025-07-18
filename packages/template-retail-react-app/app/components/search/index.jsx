@@ -34,7 +34,7 @@ import {
     RECENT_SEARCH_KEY,
     RECENT_SEARCH_LIMIT,
     RECENT_SEARCH_MIN_LENGTH,
-    SEARCH_SUGGESTIONS_INCLUDE_CUSTOM_PRODUCT_PROPERTIES
+    PRODUCT_BADGE_CUSTOM_FIELD_NAME
 } from '@salesforce/retail-react-app/app/constants'
 import {
     productUrlBuilder,
@@ -42,7 +42,7 @@ import {
     categoryUrlBuilder
 } from '@salesforce/retail-react-app/app/utils/url'
 
-const formatSuggestions = (searchSuggestions, input) => {
+const formatSuggestions = (searchSuggestions) => {
     return {
         categorySuggestions: searchSuggestions?.categorySuggestions?.categories?.map(
             (suggestion) => {
@@ -104,8 +104,7 @@ const Search = (props) => {
             parameters: {
                 q: searchQuery,
                 expand: 'images,prices,custom_product_properties',
-                includedCustomProductProperties:
-                    SEARCH_SUGGESTIONS_INCLUDE_CUSTOM_PRODUCT_PROPERTIES
+                includedCustomProductProperties: PRODUCT_BADGE_CUSTOM_FIELD_NAME
             }
         },
         {
@@ -115,7 +114,7 @@ const Search = (props) => {
     const searchInputRef = useRef()
     const recentSearches = getSessionJSONItem(RECENT_SEARCH_KEY)
     const searchSuggestions = useMemo(
-        () => formatSuggestions(searchSuggestion.data, searchInputRef?.current?.value),
+        () => formatSuggestions(searchSuggestion.data),
         [searchSuggestion]
     )
 
