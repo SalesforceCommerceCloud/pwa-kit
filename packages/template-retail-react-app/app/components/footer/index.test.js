@@ -28,7 +28,7 @@ describe('Footer', () => {
 
     test('renders mobile version by default', () => {
         renderWithProviders(<Footer />)
-        // This link is hidden initially, but would be shown for desktop
+        // This link is hidden for mobile view but will be shown for desktop
         expect(screen.getByRole('link', {name: 'About Us', hidden: true})).toBeInTheDocument()
     })
 
@@ -53,7 +53,7 @@ describe('Footer', () => {
 
         renderWithProviders(<Footer />)
 
-        // Verify desktop elements are hidden
+        // Hidden in Mobile screens. Verify that the link is not present.
         expect(screen.queryByRole('link', {name: /order status/i})).not.toBeInTheDocument()
         expect(screen.getAllByText(/privacy policy/i)[0]).toBeInTheDocument()
     })
