@@ -506,9 +506,23 @@ class Auth {
                 return ''
             }
             const {isGuest, customerId, usid} = this.parseSlasJWT(sfraAuthToken)
+
+             /**
+             * If a token exists, handleTokenResponse will be called to set the data in storage.
+             * The refresh_token_expires_in wil already be set based on whether overridesValue, responseValue or defaultValue is set.
+             * We can use this value to set the usid expiration but if the value is missing from storage we need to re-evaluate the correct value.
+             * So we call getRefreshTokenCookieTTLValue again.
+             */
+             const refreshTokenTTLValue = this.getRefreshTokenCookieTTLValue(
+                parseInt(this.get('refresh_token_expires_in')),
+                isGuest
+            )
+            const expiresDate = this.convertSecondsToDate(refreshTokenTTLValue)
             this.set('access_token', sfraAuthToken)
             this.set('customer_id', customerId)
-            this.set('usid', usid)
+            this.set('usid', usid, {
+                expires: expiresDate
+            })
             this.set('customer_type', isGuest ? 'guest' : 'registered')
 
             accessToken = sfraAuthToken
@@ -567,13 +581,21 @@ class Auth {
     }
 
     /**
-     * Retrieves our refresh token cookie ttl value
+     * Retrieves our refresh token cookie ttl value from the following sources in order:
+     * 1. Override value (if set)
+     * 2. SLAS response value (if set)
+     * 3. Default value (if no override or SLAS response value is set)
      */
     private getRefreshTokenCookieTTLValue(
-        overrideValue: number | undefined,
-        responseValue: number | undefined,
-        defaultValue: number
+        refreshTokenExpiresInSLASValue: number | undefined,
+        isGuest: boolean
     ): number {
+        const overrideValue = isGuest
+            ? this.refreshTokenGuestCookieTTL
+            : this.refreshTokenRegisteredCookieTTL
+        const defaultValue = isGuest
+            ? DEFAULT_SLAS_REFRESH_TOKEN_GUEST_TTL
+            : DEFAULT_SLAS_REFRESH_TOKEN_REGISTERED_TTL
         // Check if overrideValue is valid
         // if not, log warning and fall back to responseValue or defaultValue
         const isOverrideValid =
@@ -583,7 +605,7 @@ class Auth {
         }
 
         // Return the first valid value: overrideValue (if valid), responseValue, or defaultValue
-        return isOverrideValid ? overrideValue : responseValue || defaultValue
+        return isOverrideValid ? overrideValue : refreshTokenExpiresInSLASValue || defaultValue
     }
 
     /**
@@ -600,21 +622,12 @@ class Auth {
         this.set('id_token', res.id_token)
         this.set('idp_access_token', res.idp_access_token)
         this.set('token_type', res.token_type)
-        this.set('usid', res.usid)
         this.set('customer_type', isGuest ? 'guest' : 'registered')
 
         const refreshTokenKey = isGuest ? 'refresh_token_guest' : 'refresh_token_registered'
-        const overrideValue = isGuest
-            ? this.refreshTokenGuestCookieTTL
-            : this.refreshTokenRegisteredCookieTTL
-        const responseValue = res.refresh_token_expires_in as number | undefined
-        const defaultValue = isGuest
-            ? DEFAULT_SLAS_REFRESH_TOKEN_GUEST_TTL
-            : DEFAULT_SLAS_REFRESH_TOKEN_REGISTERED_TTL
         const refreshTokenTTLValue = this.getRefreshTokenCookieTTLValue(
-            overrideValue,
-            responseValue,
-            defaultValue
+            res.refresh_token_expires_in,
+            isGuest
         )
         if (res.access_token) {
             const {uido} = this.parseSlasJWT(res.access_token)
@@ -623,6 +636,10 @@ class Auth {
         const expiresDate = this.convertSecondsToDate(refreshTokenTTLValue)
         this.set('refresh_token_expires_in', refreshTokenTTLValue.toString())
         this.set(refreshTokenKey, res.refresh_token, {
+            expires: expiresDate
+        })
+
+        this.set('usid', res.usid, {
             expires: expiresDate
         })
     }
@@ -768,9 +785,23 @@ class Auth {
     async ready() {
         if (this.fetchedToken && this.fetchedToken !== '') {
             const {isGuest, customerId, usid} = this.parseSlasJWT(this.fetchedToken)
+
+            /**
+             * If a token exists, handleTokenResponse will be called to set the data in storage.
+             * The refresh_token_expires_in wil already be set based on whether overridesValue, responseValue or defaultValue is set.
+             * We can use this value to set the usid expiration but if the value is missing from storage we need to re-evaluate the correct value.
+             * So we call getRefreshTokenCookieTTLValue again.
+             */
+            const refreshTokenTTLValue = this.getRefreshTokenCookieTTLValue(
+                parseInt(this.get('refresh_token_expires_in')),
+                isGuest
+            )
+            const expiresDate = this.convertSecondsToDate(refreshTokenTTLValue)
             this.set('access_token', this.fetchedToken)
             this.set('customer_id', customerId)
-            this.set('usid', usid)
+            this.set('usid', usid, {
+                expires: expiresDate
+            })
             this.set('customer_type', isGuest ? 'guest' : 'registered')
             return this.data
         }
