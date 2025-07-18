@@ -52,7 +52,7 @@ const App = (props) => {
         onDrawerMenuOpen,
         onDrawerMenuClose,
         dntNotification
-        // Store locator variables will be used when feature is enabled:
+        // TODO: Store locator variables will be used when feature is enabled:
         // isOpenStoreLocator,
         // onOpenStoreLocator,
         // onCloseStoreLocator
@@ -81,7 +81,8 @@ const App = (props) => {
         onMyCartClick: onCartClick,
         onMyAccountClick: onAccountClick,
         onWishlistClick,
-        // onStoreLocatorClick: onOpenStoreLocator, // Will be enabled when store locator feature is ready
+        // TODO: Will be enabled when store locator feature is ready
+        // onStoreLocatorClick: onOpenStoreLocator,
         mobileNavigationProps
     }
 
@@ -98,7 +99,7 @@ const App = (props) => {
     const modalProps = {
         authModal,
         dntNotification
-        // Store locator modal will be added when enabled:
+        // TODO: Store locator modal will be added when enabled:
         // isOpenStoreLocator,
         // onCloseStoreLocator
     }
