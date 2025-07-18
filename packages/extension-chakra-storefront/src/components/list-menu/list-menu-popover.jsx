@@ -25,7 +25,7 @@ const ListMenuPopover = ({contentComponent, item, name, itemsKey, maxColumns}) =
             <Popover.Root
                 open={open}
                 positioning={{placement: 'bottom-start'}}
-                lazyMounted
+                lazyMount
                 unstyled
             >
                 <Popover.Trigger asChild>
@@ -39,20 +39,18 @@ const ListMenuPopover = ({contentComponent, item, name, itemsKey, maxColumns}) =
                         />
                     </Box>
                 </Popover.Trigger>
-                {open && (
-                    <Popover.Positioner>
-                        <Popover.Content data-testid="popover-menu" css={styles.popoverContent}>
-                            <Popover.Body css={styles.popoverBody}>
-                                <ContentComponent
-                                    item={item}
-                                    itemsKey={itemsKey}
-                                    onClose={onClose}
-                                    maxColumns={maxColumns}
-                                />
-                            </Popover.Body>
-                        </Popover.Content>
-                    </Popover.Positioner>
-                )}
+                <Popover.Positioner>
+                    <Popover.Content data-testid="popover-menu" css={styles.popoverContent}>
+                        <Popover.Body css={styles.popoverBody}>
+                            <ContentComponent
+                                item={item}
+                                itemsKey={itemsKey}
+                                onClose={onClose}
+                                maxColumns={maxColumns}
+                            />
+                        </Popover.Body>
+                    </Popover.Content>
+                </Popover.Positioner>
             </Popover.Root>
         </Box>
     )
